@@ -26,3 +26,14 @@
 *.exe
 *.out
 *.app
+
+# Custom
+CMakeLists.txt.user*
+Makefile
+.travis.yml
+CMake/common/
+BBPTestData/
+Lunchbox/
+vmmlib/
+Debug/
+Release/

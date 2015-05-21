@@ -1,0 +1,3 @@
+# -*- mode: cmake -*-
+git_subproject(Lunchbox https://github.com/Eyescale/Lunchbox.git e67f363)
+git_subproject(vmmlib https://github.com/Eyescale/vmmlib.git eb372a2)
