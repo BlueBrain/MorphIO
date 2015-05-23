@@ -184,11 +184,11 @@ bool SpikeReportFile::fillReportMap( Spikes& spikes, const size_t maxLines )
         // OpenMP doesn't allow escaping a parallel section with an exception.
         // These variables are used to annotate the first parse error.
         std::string errorString;
-        size_t errorIndex = linesRead;
+        int64_t errorIndex = int64_t(linesRead);
 
         // Parsing strings
         #pragma omp parallel for
-        for( size_t i = 0; i < linesRead; ++i )
+        for( int64_t i = 0; i < int64_t(linesRead); ++i )
         {
             const std::string& line = lines[i];
             if( !_spikeParseFunction( line.c_str( ), spikeArray[first + i] ))

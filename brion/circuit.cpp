@@ -189,7 +189,7 @@ public:
             {
                 const tokenizer tokens( data[j], sep );
                 tokenizer::const_iterator t = tokens.begin();
-                std::advance( t, type );
+                std::advance( t, int32_t(type));
                 buffer[j] = *t;
             }
             return buffer;

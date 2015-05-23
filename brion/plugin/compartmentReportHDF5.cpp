@@ -55,10 +55,10 @@ namespace
 
 // Computes compartment counts for a section within a cell inside an ordered
 // offset based compartment mapping (see CompartmentReportMapping).
-size_t calcCompartmentCounts( SectionOffsets::const_iterator cell,
-                              uint64_ts::const_iterator section,
-                              const SectionOffsets& mapping,
-                              const size_t totalCompartments )
+uint16_t calcCompartmentCounts( SectionOffsets::const_iterator cell,
+                                uint64_ts::const_iterator section,
+                                const SectionOffsets& mapping,
+                                const size_t totalCompartments )
 {
     const uint64_t firstIndex = *section;
     if( firstIndex == LB_UNDEFINED_UINT64 ) // Detecting empty sections
@@ -96,7 +96,7 @@ size_t calcCompartmentCounts( SectionOffsets::const_iterator cell,
 
     LBASSERT( lastIndex - firstIndex > 0 &&
                 lastIndex - firstIndex <= std::numeric_limits<size_t>::max( ));
-    return lastIndex - firstIndex;
+    return uint16_t(lastIndex - firstIndex);
 }
 
 const std::string mappingDatasetName( "mapping" );
@@ -440,7 +440,7 @@ bool CompartmentReportHDF5::writeCompartments( const uint32_t gid,
         LBASSERTINFO( compCount > 0, gid );
         H5::DataSet dataset = _createDataset( gid, compCount );
 
-        const int sections = counts.size();
+        const size_t sections = counts.size();
         LBASSERT( sections > 0 );
         dataset.openAttribute( 1 ).write( H5::PredType::NATIVE_INT, &sections );
 

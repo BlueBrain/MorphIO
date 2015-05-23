@@ -143,7 +143,7 @@ public:
             SilenceHDF5 silence;
             dataset.dataset = _file.openDataSet( name );
         }
-        catch( const H5::Exception& exc )
+        catch( const H5::Exception& )
         {
             LBVERB << "Could not find synapse dataset for " << name << ": "
                    << std::endl;
