@@ -203,7 +203,7 @@ bool CompartmentReportMap::_flushHeader()
                   "Invalid report time " << _header.startTime << ".." <<
                   _header.endTime << "/" << _header.timestep );
 
-    _header.nGIDs = _gids.size();
+    _header.nGIDs = uint32_t(_gids.size( ));
 
     _store.setQueueDepth( 0 );
     const std::string& scope = _getScope( _uri );

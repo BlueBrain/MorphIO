@@ -8,6 +8,11 @@ source_group(\\ FILES CMakeLists.txt)
 
 include(files.cmake)
 
+if(MSVC)
+  add_definitions(/wd4251 # missing dll-interface for H5::Exception
+    )
+endif()
+
 set(BRION_LINK_LIBRARIES ${Boost_LIBRARIES} ${HDF5_LIBRARIES}
                          ${LUNCHBOX_LIBRARIES})
 

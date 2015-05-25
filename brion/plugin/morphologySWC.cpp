@@ -312,7 +312,7 @@ void MorphologySWC::_buildSampleTree( RawSWCInfo& info )
                 info.numSections += 2;
             }
             // Linking the parent to this sample
-            parent.nextID = currentSample;
+            parent.nextID = int(currentSample);
         }
         else
         {
@@ -386,7 +386,7 @@ void MorphologySWC::_buildStructure( RawSWCInfo& info )
     sectionQueue.pop_front();
     while( sample )
     {
-        _sections->push_back( Vector2i( _points->size( ),
+        _sections->push_back( Vector2i( int(_points->size( )),
                                         sample->parentSection ));
         _types->push_back( sample->type );
 

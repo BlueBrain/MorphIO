@@ -225,7 +225,7 @@ public:
 
     virtual void writeVertices( const Vector3fs& vertices )
     {
-        _vertices = vertices.size();
+        _vertices = uint32_t(vertices.size( ));
 
         // initialize all seek positions depending on vertices
         _vSectionSeek = _vertexSeek + _vertices * 3 * sizeof(float);
@@ -265,7 +265,7 @@ public:
             LBTHROW( std::runtime_error( "No vertices written before "
                                          "triangles" ));
         LBASSERT( triangles.size() % 3 == 0 );
-        _triangles = triangles.size() / 3;
+        _triangles = uint32_t(triangles.size() / 3);
 
         // initialize seek position of triangle strip depending on triangles
         _tristripSeek = _triangleSeek + _triangles * 3 * sizeof(uint32_t);
@@ -295,7 +295,7 @@ public:
             LBTHROW( std::runtime_error( "No vertices written before "
                                          "tristrip" ));
 
-        _tristrip = tristrip.size();
+        _tristrip = uint32_t(tristrip.size( ));
         _file.seekp( 2 * sizeof(uint32_t) );
         _file.write( (const char*)&_tristrip, sizeof(_tristrip));
         _file.seekp( _tristripSeek );
