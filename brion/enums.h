@@ -101,7 +101,25 @@ enum MorphologyVersion
     MORPHOLOGY_VERSION_H5_1 = 1,
     MORPHOLOGY_VERSION_H5_2 = 2,
     MORPHOLOGY_VERSION_SWC_1 = 101,
+    MORPHOLOGY_VERSION_UNDEFINED
 };
+
+/** Output stream formatter for MorphologyVersion */
+inline std::ostream& operator << ( std::ostream& os, const MorphologyVersion v )
+{
+    switch( v )
+    {
+    case MORPHOLOGY_VERSION_H5_1:
+        return os << "h5v1";
+    case MORPHOLOGY_VERSION_H5_2:
+        return os << "h5v2";
+    case MORPHOLOGY_VERSION_SWC_1:
+        return os << "swcv1";
+    default:
+    case MORPHOLOGY_VERSION_UNDEFINED:
+        return os << "UNDEFINED";
+    }
+}
 
 /** The supported attributes of a neuron. */
 enum NeuronAttributes
