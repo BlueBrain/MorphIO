@@ -75,8 +75,7 @@ const std::string _a_apical( "apical" );
 const std::string _a_creator( "creator" );
 const std::string _a_version( "version" );
 
-template< typename T >
-inline std::string string_cast( const T& t )
+template< typename T > inline std::string toString( const T& t )
 {
     return boost::lexical_cast< std::string >( t );
 }
@@ -145,6 +144,9 @@ MorphologyHDF5::MorphologyHDF5( const MorphologyInitData& initData )
         case MORPHOLOGY_VERSION_H5_1:
             _writeV1Header();
             break;
+        case MORPHOLOGY_VERSION_UNDEFINED:
+            _version = MORPHOLOGY_VERSION_H5_2;
+            // no break;
         case MORPHOLOGY_VERSION_H5_2:
             _writeV2Header();
             break;
@@ -178,8 +180,7 @@ bool MorphologyHDF5::handles( const MorphologyInitData& initData )
     return path.substr( pos ) == ".h5";
 }
 
-Vector4fsPtr MorphologyHDF5::readPoints(
-    const MorphologyRepairStage stage ) const
+Vector4fsPtr MorphologyHDF5::readPoints( MorphologyRepairStage stage ) const
 {
     lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
 
@@ -190,16 +191,17 @@ Vector4fsPtr MorphologyHDF5::readPoints(
             dataset = _file.openDataSet( "/" + _d_points );
         else
         {
+            if( stage == MORPHOLOGY_UNDEFINED )
+                stage = _stage;
             dataset = _file.openDataSet(
-                "/" + _g_root + "/" + string_cast(
-                    stage == MORPHOLOGY_UNDEFINED ? _stage : stage ) +
-                "/" + _d_points );
+                "/" + _g_root + "/" + toString( stage ) + "/" + _d_points );
         }
     }
     catch( ... )
     {
         LBERROR << "Could not open points dataset for morphology file "
-                << _file.getFileName() << std::endl;
+                << _file.getFileName() << " repair stage "
+                << toString( stage ) << std::endl;
         return Vector4fsPtr( new Vector4fs );
     }
 
@@ -260,12 +262,13 @@ Vector2isPtr MorphologyHDF5::readSections( MorphologyRepairStage stage ) const
     try
     {
         dataset = _file.openDataSet( "/" + _g_root  + "/" + _g_structure +
-                                     "/" + string_cast( stage ));
+                                     "/" + toString( stage ));
     }
     catch( ... )
     {
         LBERROR << "Could not open sections dataset for morphology file "
-                << _file.getFileName() << std::endl;
+                << _file.getFileName() << " repair stage "
+                << toString( stage ) << std::endl;
         return Vector2isPtr( new Vector2is );
     }
 
@@ -383,7 +386,7 @@ void MorphologyHDF5::writePoints( const Vector4fs& points,
     else
     {
         H5::Group root = _file.openGroup( _g_root );
-        H5::Group group = root.createGroup( string_cast( stage ));
+        H5::Group group = root.createGroup( toString( stage ));
         dataset = group.createDataSet( _d_points, pointsDT, pointsDS );
     }
 
@@ -425,7 +428,7 @@ void MorphologyHDF5::writeSections( const Vector2is& sections,
     H5::DataSpace structureDS( 2, dim );
 
     H5::Group root = _file.openGroup( _g_root + "/" + _g_structure );
-    H5::DataSet dataset = root.createDataSet( string_cast( stage ),
+    H5::DataSet dataset = root.createDataSet( toString( stage ),
                                               structureDT, structureDS );
     dataset.write( sections.data(), H5::PredType::NATIVE_INT );
 }
@@ -523,7 +526,7 @@ void MorphologyHDF5::_selectRepairStage()
         {
             detail::SilenceHDF5 silence;
             _file.openDataSet( "/" + _g_root + "/" +
-                               string_cast( stages[i] ) + "/" + _d_points );
+                               toString( stages[i] ) + "/" + _d_points );
             _stage = stages[i];
             break;
         }

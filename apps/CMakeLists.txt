@@ -9,3 +9,9 @@ set(SPIKECONVERTER_SOURCES spikeConverter.cpp)
 set(SPIKECONVERTER_LINK_LIBRARIES Brion)
 
 common_application(spikeConverter)
+
+set(MORPHOLOGYCONVERTER_HEADERS)
+set(MORPHOLOGYCONVERTER_SOURCES morphologyConverter.cpp)
+set(MORPHOLOGYCONVERTER_LINK_LIBRARIES Brion ${Boost_PROGRAM_OPTIONS_LIBRARY})
+
+common_application(morphologyConverter)

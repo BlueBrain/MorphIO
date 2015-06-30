@@ -28,12 +28,12 @@
 *.app
 
 # Custom
+.travis.yml
+/BBPTestData/
+/Lunchbox/
+/Servus/
+/vmmlib/
+CMake/common/
 CMakeLists.txt.user*
 Makefile
-.travis.yml
-CMake/common/
-BBPTestData/
-Lunchbox/
-vmmlib/
-Debug/
-Release/
+build/

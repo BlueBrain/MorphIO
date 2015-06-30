@@ -212,9 +212,9 @@ BOOST_AUTO_TEST_CASE( test_h5_write_v2 )
     brion::SectionTypesPtr types = source.readSectionTypes();
     brion::Vector2isPtr apicals = source.readApicals();
 
-    {
-        brion::Morphology a( "testv2.h5",
-                             brion::MORPHOLOGY_VERSION_H5_2, true );
+    {   // undefined should auto-select h5 v2
+        brion::Morphology a( "testv2.h5", brion::MORPHOLOGY_VERSION_UNDEFINED,
+                             true );
         a.writePoints( *points, brion::MORPHOLOGY_REPAIRED );
         a.writeSections( *sections, brion::MORPHOLOGY_REPAIRED );
         a.writeSectionTypes( *types );
@@ -229,6 +229,7 @@ BOOST_AUTO_TEST_CASE( test_h5_write_v2 )
     brion::SectionTypesPtr types2 = source2.readSectionTypes();
     brion::Vector2isPtr apicals2 = source2.readApicals();
 
+    BOOST_CHECK_EQUAL( source2.getVersion(), brion::MORPHOLOGY_VERSION_H5_2 );
     BOOST_CHECK( *points == *points2 );
     BOOST_CHECK( *sections == *sections2 );
     BOOST_CHECK( *types == *types2 );

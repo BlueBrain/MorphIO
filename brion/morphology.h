@@ -89,7 +89,8 @@ public:
     /** Open the given morphology file for write access.
      *
      * @param target filepath of the output morphology file
-     * @param version the output file format version
+     * @param version the output file format version, automatically chosen if
+     *                undefined.
      * @param overwrite true to allow overwrite of existing file
      * @throw std::runtime_error if file could not be created
      * @version 1.0

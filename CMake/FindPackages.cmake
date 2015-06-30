@@ -52,7 +52,7 @@ macro(COMMON_PACKAGE Name)
   endif()
 endmacro()
 
-common_package(Boost 1.41.0  REQUIRED COMPONENTS date_time filesystem regex system unit_test_framework)
+common_package(Boost 1.41.0  REQUIRED COMPONENTS date_time filesystem regex system unit_test_framework program_options)
 common_package(HDF5 1.8  REQUIRED COMPONENTS C CXX)
 common_package(Lunchbox 1.10  REQUIRED )
 common_package(vmmlib 1.8  REQUIRED )
