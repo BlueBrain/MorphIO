@@ -50,7 +50,7 @@ const int AXON = brion::SECTION_AXON;
 const int DENDRITE = brion::SECTION_DENDRITE;
 const int APICAL_DENDRITE = brion::SECTION_APICAL_DENDRITE;
 
-BOOST_AUTO_TEST_CASE( test_invalid_open )
+BOOST_AUTO_TEST_CASE( invalid_open )
 {
     BOOST_CHECK_THROW( brion::Morphology( "/bla" ), std::runtime_error );
     BOOST_CHECK_THROW( brion::Morphology( "bla" ), std::runtime_error );
@@ -60,14 +60,14 @@ BOOST_AUTO_TEST_CASE( test_invalid_open )
     BOOST_CHECK_THROW( brion::Morphology( path.string( )), std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_h5_invalid_open )
+BOOST_AUTO_TEST_CASE( h5_invalid_open )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/simulations/may17_2011/Control/voltage.h5";
     BOOST_CHECK_THROW( brion::Morphology( path.string( )), std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_h5_illegal_write )
+BOOST_AUTO_TEST_CASE( h5_illegal_write )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE( test_h5_illegal_write )
     BOOST_CHECK_THROW( morphology.flush(), std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_h5_overwrite )
+BOOST_AUTO_TEST_CASE( h5_overwrite )
 {
     const std::string file( "overwritetest.h5" );
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE( test_h5_overwrite )
     boost::filesystem::remove( file );
 }
 
-BOOST_AUTO_TEST_CASE( test_h5_read_v1 )
+BOOST_AUTO_TEST_CASE( h5_read_v1 )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE( test_h5_read_v1 )
     BOOST_CHECK_EQUAL( (*types)[5],  2 );
 }
 
-BOOST_AUTO_TEST_CASE( test_h5_write_v1 )
+BOOST_AUTO_TEST_CASE( h5_write_v1 )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE( test_h5_write_v1 )
     BOOST_CHECK( *types == *types2 );
 }
 
-BOOST_AUTO_TEST_CASE( test_h5_read_v2 )
+BOOST_AUTO_TEST_CASE( h5_read_v2 )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/morphologies/14.07.10_repaired/v2/C010398B-P2.h5";
@@ -199,7 +199,7 @@ BOOST_AUTO_TEST_CASE( test_h5_read_v2 )
     BOOST_CHECK_EQUAL( (*apicals)[0].y(), 76 );
 }
 
-BOOST_AUTO_TEST_CASE( test_h5_write_v2 )
+BOOST_AUTO_TEST_CASE( h5_write_v2 )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/morphologies/14.07.10_repaired/v2/C010398B-P2.h5";
@@ -236,7 +236,7 @@ BOOST_AUTO_TEST_CASE( test_h5_write_v2 )
     BOOST_CHECK( *apicals == *apicals2 );
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_invalid_open )
+BOOST_AUTO_TEST_CASE( swc_invalid_open )
 {
     BOOST_CHECK_THROW( brion::Morphology( "not_found.swc"),
                        std::runtime_error );
@@ -298,7 +298,7 @@ void verifyArray( const std::vector< T >& array, const size_t length, ... )
                                    ref.begin(), ref.end( ));
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_soma )
+BOOST_AUTO_TEST_CASE( swc_soma )
 {
     boost::filesystem::path path( BRION_TESTDATA );
     const brion::MorphologyRepairStage stage = brion::MORPHOLOGY_REPAIRED;
@@ -310,7 +310,7 @@ BOOST_AUTO_TEST_CASE( test_swc_soma )
     verifyArray( *source.readSectionTypes(), 1, SOMA );
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_soma_ring )
+BOOST_AUTO_TEST_CASE( swc_soma_ring )
 {
     boost::filesystem::path path( BRION_TESTDATA );
     const brion::MorphologyRepairStage stage = brion::MORPHOLOGY_REPAIRED;
@@ -324,7 +324,7 @@ BOOST_AUTO_TEST_CASE( test_swc_soma_ring )
     verifyArray( *source.readSectionTypes(), 1, SOMA );
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_no_soma )
+BOOST_AUTO_TEST_CASE( swc_no_soma )
 {
     boost::filesystem::path path( BRION_TESTDATA );
     path /= "swc/no_soma.swc";
@@ -332,7 +332,7 @@ BOOST_AUTO_TEST_CASE( test_swc_no_soma )
     BOOST_CHECK_THROW( brion::Morphology( path.string( )), std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_two_somas )
+BOOST_AUTO_TEST_CASE( swc_two_somas )
 {
     boost::filesystem::path path( BRION_TESTDATA );
     path /= "swc/two_somas.swc";
@@ -340,7 +340,7 @@ BOOST_AUTO_TEST_CASE( test_swc_two_somas )
     BOOST_CHECK_THROW( brion::Morphology( path.string( )), std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_single_section )
+BOOST_AUTO_TEST_CASE( swc_single_section )
 {
     boost::filesystem::path path( BRION_TESTDATA );
     const brion::MorphologyRepairStage stage = brion::MORPHOLOGY_REPAIRED;
@@ -355,7 +355,7 @@ BOOST_AUTO_TEST_CASE( test_swc_single_section )
     verifyArray( *source.readSectionTypes(), 2, SOMA, AXON );
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_single_section_unordered )
+BOOST_AUTO_TEST_CASE( swc_single_section_unordered )
 {
     boost::filesystem::path path( BRION_TESTDATA );
     const brion::MorphologyRepairStage stage = brion::MORPHOLOGY_REPAIRED;
@@ -370,7 +370,7 @@ BOOST_AUTO_TEST_CASE( test_swc_single_section_unordered )
     verifyArray( *source.readSectionTypes(), 2, SOMA, AXON );
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_single_section_missing_segment )
+BOOST_AUTO_TEST_CASE( swc_single_section_missing_segment )
 {
     boost::filesystem::path path( BRION_TESTDATA );
     path /= "swc/single_section_missing_segment.swc";
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE( test_swc_single_section_missing_segment )
     BOOST_CHECK_THROW( brion::Morphology( path.string( )), std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_section_type_changes )
+BOOST_AUTO_TEST_CASE( swc_section_type_changes )
 {
     boost::filesystem::path path( BRION_TESTDATA );
     const brion::MorphologyRepairStage stage = brion::MORPHOLOGY_REPAIRED;
@@ -395,7 +395,7 @@ BOOST_AUTO_TEST_CASE( test_swc_section_type_changes )
                  SOMA, AXON, DENDRITE, APICAL_DENDRITE );
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_first_order_sections )
+BOOST_AUTO_TEST_CASE( swc_first_order_sections )
 {
     boost::filesystem::path path( BRION_TESTDATA );
     const brion::MorphologyRepairStage stage = brion::MORPHOLOGY_REPAIRED;
@@ -414,7 +414,7 @@ BOOST_AUTO_TEST_CASE( test_swc_first_order_sections )
 
 }
 
-BOOST_AUTO_TEST_CASE( test_swc_bifurcation )
+BOOST_AUTO_TEST_CASE( swc_bifurcation )
 {
     boost::filesystem::path path( BRION_TESTDATA );
     const brion::MorphologyRepairStage stage = brion::MORPHOLOGY_REPAIRED;
@@ -431,3 +431,14 @@ BOOST_AUTO_TEST_CASE( test_swc_bifurcation )
     verifyArray( *source.readSectionTypes(), 4,
                  SOMA, DENDRITE, APICAL_DENDRITE, APICAL_DENDRITE );
 }
+
+BOOST_AUTO_TEST_CASE( swc_neuron )
+{
+    boost::filesystem::path path( BRION_TESTDATA );
+    path /= "swc/Neuron.swc";
+
+    brion::Morphology neuron( path.string( ));
+    BOOST_CHECK_EQUAL( neuron.readPoints( brion::MORPHOLOGY_REPAIRED )->size(),
+                       927 );
+}
+

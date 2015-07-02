@@ -219,8 +219,11 @@ void MorphologySWC::_readSamples( RawSWCInfo& info )
     while( !std::getline( file, line ).fail( ))
     {
         ++lineNumber;
-        if( line[0] == '#' )
+        // Fix #4: Subsequent non-empty lines each represent a single neuron
+        // sample point with seven data items.
+        if( line[0] == '#' || line.empty( ))
             continue;
+
         char* data;
         const unsigned int id = strtol(line.data(), &data, 10 );
         if( *data != ' ' )
