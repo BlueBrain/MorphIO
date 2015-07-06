@@ -19,6 +19,8 @@ int main( int argc, char* argv[] )
         ( "version,v", "Show program name/version banner and exit" )
         ( "input,i", po::value< std::string >(), "Input morphology" )
         ( "output,o", po::value< std::string >(), "Output morphology" )
+        ( "format,f", po::value< std::string >()->default_value( "h5v2" ),
+          "Format for output (h5v1, h5v2)" )
         ( "stage", po::value< std::string >()->default_value( "all" ),
           "Morphology repair stage to convert (raw, unraveled, repaired, all)" )
     ;
@@ -75,11 +77,19 @@ int main( int argc, char* argv[] )
         return EXIT_FAILURE;
     }
 
+    brion::MorphologyVersion out_version = brion::MORPHOLOGY_VERSION_UNDEFINED;
+    if ( vm["format"].as< std::string >() == "h5v1" ) {
+        out_version = brion::MORPHOLOGY_VERSION_H5_1;
+    }
+
     lunchbox::Clock clock;
     const brion::Morphology in( input );
 
+    brion::Morphology out( output, out_version, true );
+
     if( in.getVersion() == brion::MORPHOLOGY_VERSION_SWC_1 ||
-        in.getVersion() == brion::MORPHOLOGY_VERSION_H5_1 )
+        in.getVersion() == brion::MORPHOLOGY_VERSION_H5_1 ||
+        out.getVersion() == brion::MORPHOLOGY_VERSION_H5_1)
     {
         stages.resize( 1 ); // do not have stages and ignore the arg
     }
@@ -88,7 +98,6 @@ int main( int argc, char* argv[] )
     float writeTime = 0.f;
     size_t emptyStages = 0;
 
-    brion::Morphology out( output, brion::MORPHOLOGY_VERSION_UNDEFINED, true );
     BOOST_FOREACH( const brion::MorphologyRepairStage stage, stages )
     {
         writeTime += clock.resetTimef();
@@ -115,7 +124,10 @@ int main( int argc, char* argv[] )
     readTime += clock.resetTimef();
 
     out.writeSectionTypes( *types );
-    out.writeApicals( *apicals );
+    if ( out.getVersion() != brion::MORPHOLOGY_VERSION_H5_1 ) {
+        out.writeApicals( *apicals );
+    }
+
     writeTime += clock.resetTimef();
     LBDEBUG << types->size() << " section types, " << apicals->size()
             << " apicals in " << input << std::endl;
