@@ -77,22 +77,19 @@ int main( int argc, char* argv[] )
         return EXIT_FAILURE;
     }
 
-    brion::MorphologyVersion out_version = brion::MORPHOLOGY_VERSION_UNDEFINED;
-    if ( vm["format"].as< std::string >() == "h5v1" ) {
-        out_version = brion::MORPHOLOGY_VERSION_H5_1;
-    }
+    brion::MorphologyVersion outVersion = brion::MORPHOLOGY_VERSION_UNDEFINED;
+    if ( vm["format"].as< std::string >() == "h5v1" )
+        outVersion = brion::MORPHOLOGY_VERSION_H5_1;
 
     lunchbox::Clock clock;
     const brion::Morphology in( input );
 
-    brion::Morphology out( output, out_version, true );
+    brion::Morphology out( output, outVersion, true );
 
     if( in.getVersion() == brion::MORPHOLOGY_VERSION_SWC_1 ||
         in.getVersion() == brion::MORPHOLOGY_VERSION_H5_1 ||
         out.getVersion() == brion::MORPHOLOGY_VERSION_H5_1)
-    {
         stages.resize( 1 ); // do not have stages and ignore the arg
-    }
 
     float readTime = clock.resetTimef();
     float writeTime = 0.f;
@@ -124,9 +121,8 @@ int main( int argc, char* argv[] )
     readTime += clock.resetTimef();
 
     out.writeSectionTypes( *types );
-    if ( out.getVersion() != brion::MORPHOLOGY_VERSION_H5_1 ) {
+    if ( out.getVersion() != brion::MORPHOLOGY_VERSION_H5_1 )
         out.writeApicals( *apicals );
-    }
 
     writeTime += clock.resetTimef();
     LBDEBUG << types->size() << " section types, " << apicals->size()
