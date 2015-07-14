@@ -84,16 +84,19 @@ int main( int argc, char* argv[] )
     lunchbox::Clock clock;
     const brion::Morphology in( input );
 
+    float readTime = clock.resetTimef();
+    float writeTime = 0.f;
+    size_t emptyStages = 0;
+
     brion::Morphology out( output, outVersion, true );
 
     if( in.getVersion() == brion::MORPHOLOGY_VERSION_SWC_1 ||
         in.getVersion() == brion::MORPHOLOGY_VERSION_H5_1 ||
         out.getVersion() == brion::MORPHOLOGY_VERSION_H5_1)
-        stages.resize( 1 ); // do not have stages and ignore the arg
+    {
+        stages.resize( 1 ); // does not have stages and ignores the arg
+    }
 
-    float readTime = clock.resetTimef();
-    float writeTime = 0.f;
-    size_t emptyStages = 0;
 
     BOOST_FOREACH( const brion::MorphologyRepairStage stage, stages )
     {
