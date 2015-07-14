@@ -40,6 +40,7 @@
 #  include <vmmlib/vmmlib.hpp>
 #pragma warning(pop)
 
+/** @namespace brion Blue Brain File IO classes */
 namespace brion
 {
 
