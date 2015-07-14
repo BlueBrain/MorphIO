@@ -5,7 +5,6 @@
 #
 
 set(BRION_PUBLIC_HEADERS
-  ${COMMON_INCLUDES}
   blueConfig.h
   circuit.h
   compartmentReport.h
@@ -44,7 +43,6 @@ set(BRION_HEADERS
   )
 
 set(BRION_SOURCES
-  ${COMMON_SOURCES}
   plugin/compartmentReportCommon.cpp
   plugin/compartmentReportBinary.cpp
   plugin/compartmentReportHDF5.cpp
