@@ -33,7 +33,10 @@ namespace detail { class Synapse; }
  * Following RAII, this class is ready to use after the creation and will ensure
  * release of resources upon destruction. Threadsafety is guaranteed for all
  * provided methods.
+ *
+ * Example: @include tests/synapse.cpp
  */
+
 class Synapse : public boost::noncopyable
 {
 public:
@@ -53,7 +56,7 @@ public:
     /** Read requested synapse attributes for a given neuron.
      *
      * @param gid GID of neuron, empty return value for not found GID
-     * @param attributes desired attributes to load into return value
+     * @param attributes bitwise combination of SynapseAttributes to load
      * @return data matrix containing values for attributes consecutively for
      *         each connected neuron
      * @version 1.0

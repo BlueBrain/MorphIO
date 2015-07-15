@@ -100,7 +100,7 @@ public:
                 const hsize_t readCounts[2] = { dataset.dims[0], 1 };
                 const hsize_t readOffsets[2] = { 0, i };
                 dataset.dataspace.selectHyperslab( H5S_SELECT_OR, readCounts,
-                                           readOffsets );
+                                                   readOffsets );
             }
         }
 
@@ -110,7 +110,6 @@ public:
 
         dataset.dataset.read( values.data(), H5::PredType::NATIVE_FLOAT,
                               targetspace, dataset.dataspace );
-
         return values;
     }
 
