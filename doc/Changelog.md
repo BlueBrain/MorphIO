@@ -1,6 +1,10 @@
 Changelog {#Changelog}
 =========
 
+## git master {master)
+
+* Extended brion::Synapse to also support non-merged synapse files
+
 ## Release 1.5.0 (2015-07-07) {changelog_1_5_0}
 
 * Add RESTING_VOLTAGE constant.
