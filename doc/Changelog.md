@@ -3,7 +3,10 @@ Changelog {#Changelog}
 
 ## git master {master)
 
-* Extended brion::Synapse to also support non-merged synapse files
+* [#12](https://github.com/BlueBrain/Brion/pull/12):
+  Add brion::Target::parse() to resolve a given target name
+* [#12](https://github.com/BlueBrain/Brion/pull/12):
+  Extended brion::Synapse to also support non-merged synapse files
 
 ## Release 1.5.0 (2015-07-07) {changelog_1_5_0}
 

@@ -21,7 +21,6 @@
 #define BRION_TARGET
 
 #include <brion/types.h>
-#include <boost/noncopyable.hpp>
 
 namespace brion
 {
@@ -33,11 +32,17 @@ namespace detail { class Target; }
  * Following RAII, this class is ready to use after the creation and will ensure
  * release of resources upon destruction.
  */
-class Target : public boost::noncopyable
+class Target
 {
 public:
+    /** Copy-construct a target file. @version 1.6 */
+    Target( const Target& from );
+
     /** Close target file. @version 1.0 */
     ~Target();
+
+    /** Assign a different target. @version 1.6 */
+    Target& operator = ( const Target& rhs );
 
     /** @name Read API */
     //@{
@@ -64,12 +69,25 @@ public:
      * @version 1.0
      */
     const Strings& get( const std::string& name ) const;
+
+    /**
+     * Parse a given target into a GID set.
+     *
+     * All given targets are searched for the given name. If found, the named
+     * target is recursively resolved to a GID set.
+     *
+     * @param targets the targets to parse
+     * @param name the target name to parse
+     * @return the set of cell identifiers parsed
+     * @version 1.6
+     */
+    static GIDSet parse( const Targets& targets, const std::string& name );
     //@}
 
 private:
     friend std::ostream& operator << ( std::ostream&, const Target& );
 
-    detail::Target* const _impl;
+    detail::Target* _impl;
 };
 
 /** Stream out content of target file. */
