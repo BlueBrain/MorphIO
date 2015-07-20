@@ -1,5 +1,7 @@
+
 /* Copyright (c) 2013-2015, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
+ *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -53,7 +55,7 @@ lunchbox::SpinLock testLock;
         BOOST_CHECK_GT( ( L ), ( R ) );           \
     }
 
-BOOST_AUTO_TEST_CASE( test_invalid_open )
+BOOST_AUTO_TEST_CASE( invalid_open )
 {
     BOOST_CHECK_THROW( brion::Synapse( "/bla" ), std::runtime_error );
     BOOST_CHECK_THROW( brion::Synapse( "bla" ), std::runtime_error );
@@ -67,25 +69,24 @@ BOOST_AUTO_TEST_CASE( test_invalid_open )
     BOOST_CHECK_THROW( brion::Synapse( path.string( )), std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_invalid_read )
+BOOST_AUTO_TEST_CASE( invalid_read )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn.h5";
 
-    brion::Synapse synapseFile( path.string( ));
+    const brion::Synapse synapseFile( path.string( ));
     const brion::SynapseMatrix& data = synapseFile.read( 0,
                                                 brion::SYNAPSE_ALL_ATTRIBUTES );
     BOOST_CHECK_EQUAL( data.shape()[0], 0 );
     BOOST_CHECK_EQUAL( data.shape()[1], 0 );
 }
 
-BOOST_AUTO_TEST_CASE( test_read )
+BOOST_AUTO_TEST_CASE( read_attributes )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn.h5";
 
-    brion::Synapse synapseFile( path.string( ));
-
+    const brion::Synapse synapseFile( path.string( ));
     const brion::SynapseMatrix& empty =
                             synapseFile.read( 1, brion::SYNAPSE_NO_ATTRIBUTES );
     BOOST_CHECK_EQUAL( empty.shape()[0], 0 );
@@ -93,7 +94,6 @@ BOOST_AUTO_TEST_CASE( test_read )
 
     const brion::SynapseMatrix& data = synapseFile.read( 1,
                                                 brion::SYNAPSE_ALL_ATTRIBUTES );
-    std::cout << data << std::endl;
     BOOST_CHECK_EQUAL( data.shape()[0], 77 );   // 77 synapses for GID 1
     BOOST_CHECK_EQUAL( data.shape()[1], 19 );   // 19 (==all) synapse attributes
     BOOST_CHECK_EQUAL( data[0][0], 10 );
@@ -107,7 +107,6 @@ BOOST_AUTO_TEST_CASE( test_read )
 
     const brion::SynapseMatrix& data2 = synapseFile.read( 4,
                                                          brion::SYNAPSE_DELAY );
-    std::cout << data2 << std::endl;
     BOOST_CHECK_EQUAL( data2.shape()[0], 41 );   // 41 synapses for GID 4
     BOOST_CHECK_EQUAL( data2.shape()[1], 1 );    // 1  synapse attributes
     BOOST_CHECK_CLOSE( data2[0][0], 1.46838176f, .0003f );
@@ -115,12 +114,12 @@ BOOST_AUTO_TEST_CASE( test_read )
     BOOST_CHECK_CLOSE( data2[9][0], 2.21976233f, .0003f );
 }
 
-BOOST_AUTO_TEST_CASE( test_parallel_read )
+BOOST_AUTO_TEST_CASE( parallel_read )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn.h5";
 
-    brion::Synapse synapseFile( path.string( ));
+    const brion::Synapse synapseFile( path.string( ));
 
     brion::uint32_ts connectedNeurons( 100 );
     brion::GIDSet gids;
@@ -142,13 +141,12 @@ BOOST_AUTO_TEST_CASE( test_parallel_read )
     }
 }
 
-BOOST_AUTO_TEST_CASE( test_read_positions )
+BOOST_AUTO_TEST_CASE( read_positions )
 {
     boost::filesystem::path path( BBP_TESTDATA );
-    path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn_positions.h5";
+    path /="circuitBuilding_1000neurons/Functionalizer_output/nrn_positions.h5";
 
-    brion::Synapse synapseFile( path.string( ));
-
+    const brion::Synapse synapseFile( path.string( ));
     const brion::SynapseMatrix& empty =
                    synapseFile.read( 1, brion::SYNAPSE_POSITION_NO_ATTRIBUTES );
     BOOST_CHECK_EQUAL( empty.shape()[0], 0 );
@@ -156,7 +154,6 @@ BOOST_AUTO_TEST_CASE( test_read_positions )
 
     const brion::SynapseMatrix& data = synapseFile.read( 1,
                                                       brion::SYNAPSE_POSITION );
-    std::cout << data << std::endl;
     BOOST_CHECK_EQUAL( data.shape()[0], 77 );   // 77 synapses for GID 1
     BOOST_CHECK_EQUAL( data.shape()[1], 13 );   // 19 (==all) synapse attributes
     BOOST_CHECK_EQUAL( data[0][0], 10 );
@@ -170,7 +167,6 @@ BOOST_AUTO_TEST_CASE( test_read_positions )
 
     const brion::SynapseMatrix& data2 = synapseFile.read( 4,
                                         brion::SYNAPSE_POSTSYNAPTIC_SURFACE_Y );
-    std::cout << data2 << std::endl;
     BOOST_CHECK_EQUAL( data2.shape()[0], 41 );   // 41 synapses for GID 4
     BOOST_CHECK_EQUAL( data2.shape()[1], 1 );    // 1  synapse attribute
     BOOST_CHECK_CLOSE( data2[0][0], 2029.24304f, .0003f );
@@ -178,12 +174,12 @@ BOOST_AUTO_TEST_CASE( test_read_positions )
     BOOST_CHECK_CLOSE( data2[9][0], 2001.01599f, .0003f );
 }
 
-BOOST_AUTO_TEST_CASE( test_getNumSynapses )
+BOOST_AUTO_TEST_CASE( getNumSynapses )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn.h5";
 
-    brion::Synapse synapseFile( path.string( ));
+    const brion::Synapse synapseFile( path.string( ));
     brion::GIDSet gids;
 
     size_t numSynapses = synapseFile.getNumSynapses( gids );
@@ -203,11 +199,11 @@ BOOST_AUTO_TEST_CASE( test_getNumSynapses )
     BOOST_CHECK_EQUAL( numSynapses, 1172 );
 }
 
-BOOST_AUTO_TEST_CASE( test_perf )
+BOOST_AUTO_TEST_CASE( perf )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn.h5";
-    brion::Synapse synapseFile( path.string( ));
+    const brion::Synapse synapseFile( path.string( ));
 
     brion::GIDSet gids;
     for( uint32_t i = 1; i <= 1000; ++ i)
@@ -246,4 +242,34 @@ BOOST_AUTO_TEST_CASE( test_perf )
     LBERROR << "Reading almost all attributes for " << numSynapses
             << " synapses for " << gids.size() << " cells took: "
             << duration.total_milliseconds() << " ms." << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE( read_unmerged )
+{
+    boost::filesystem::path path( BBP_TESTDATA );
+    path /= "local/unmergedSynapses/nrn.h5";
+
+    const brion::Synapse synapseFile( path.string( ));
+    const brion::SynapseMatrix& data = synapseFile.read( 1,
+                                                brion::SYNAPSE_ALL_ATTRIBUTES );
+    BOOST_CHECK_EQUAL( data.shape()[0], 376 );   // synapses for GID 1
+    BOOST_CHECK_EQUAL( data.shape()[1], 19 );   // 19 (==all) synapse attributes
+    BOOST_CHECK_EQUAL( data[0][0], 6 );
+    BOOST_CHECK_EQUAL( data[1][0], 6 );
+    BOOST_CHECK_EQUAL( data[2][0], 11 );
+    BOOST_CHECK_EQUAL( data[3][0], 11 );
+    BOOST_CHECK_EQUAL( data[4][0], 12 );
+    BOOST_CHECK_EQUAL( data[5][0], 12 );
+    BOOST_CHECK_EQUAL( data[6][0], 20 );
+
+    brion::GIDSet gids;
+    gids.insert( 1 );
+    size_t numSynapses = synapseFile.getNumSynapses( gids );
+    BOOST_CHECK_EQUAL( numSynapses, 376 );
+
+    for( uint32_t i = 2; i <= 10; ++i )
+        gids.insert( i );
+
+    numSynapses = synapseFile.getNumSynapses( gids );
+    BOOST_CHECK_EQUAL( numSynapses, 2903 );
 }

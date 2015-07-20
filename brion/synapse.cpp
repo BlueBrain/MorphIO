@@ -22,8 +22,10 @@
 #include "detail/silenceHDF5.h"
 
 #include <bitset>
+#include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/regex.hpp>
 #include <H5Cpp.h>
 #include <lunchbox/log.h>
 #include <lunchbox/scopedMutex.h>
@@ -39,11 +41,14 @@ struct Dataset
     H5::DataSpace dataspace;
     hsize_t dims[2];
 };
+namespace fs = boost::filesystem;
+using boost::lexical_cast;
 
-class Synapse : public boost::noncopyable
+/** Access a single synapse file (nrn*.h5 or nrn*.h5.<int> */
+class SynapseFile : public boost::noncopyable
 {
 public:
-    explicit Synapse( const std::string& source )
+    explicit SynapseFile( const std::string& source )
     {
         lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
 
@@ -72,7 +77,7 @@ public:
         }
     }
 
-    ~Synapse()
+    ~SynapseFile()
     {
         lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
 
@@ -166,9 +171,166 @@ public:
         return true;
     }
 
+    SynapseMatrix read( const uint32_t gid, const uint32_t attributes ) const
+    {
+        switch( _numAttributes )
+        {
+        case SYNAPSE_ALL:
+            return read< SYNAPSE_ALL >( gid, attributes );
+        case SYNAPSE_POSITION_ALL:
+            return read< SYNAPSE_POSITION_ALL >( gid, attributes );
+        default:
+            LBERROR << "Synapse file " << _file.getFileName()
+                    << " has unknown number of attributes: " << _numAttributes
+                    << std::endl;
+            return SynapseMatrix();
+        }
+    }
+
+private:
     H5::H5File _file;
     size_t _numAttributes;
 };
+
+/** Implement the logic to read a merged .h5 or individual .h5.<int> files */
+class Synapse : public boost::noncopyable
+{
+public:
+    explicit Synapse( const std::string& source )
+        : _file( 0 )
+        , _gid( 0 )
+    {
+        try
+        {
+            _file = new SynapseFile( source );
+        }
+        catch( const std::runtime_error& )
+        {
+            // try to open in individual files
+            const fs::path dir = fs::path( source ).parent_path();
+            const fs::path filename =  fs::path( source ).filename();
+            const boost::regex filter( filename.string() + "\\.[0-9]+$" );
+
+            fs::directory_iterator end;
+            for( fs::directory_iterator i( dir ); i != end; ++i )
+            {
+                const fs::path candidate = i->path().filename();
+                boost::smatch match;
+
+                if( !boost::filesystem::is_regular_file( i->status( )) ||
+                    !boost::regex_match( candidate.string(), match, filter ))
+                {
+                    continue;
+                }
+
+                _unmappedFiles.push_back( i->path().string( ));
+            }
+
+            if( _unmappedFiles.empty( ))
+            {
+                LBTHROW( std::runtime_error( "Could not find synapse files " +
+                                             dir.string() + "/" +
+                                             filename.string() + ".[0-9]+" ));
+            }
+        }
+    }
+
+    ~Synapse()
+    {
+        delete _file;
+    }
+
+    SynapseMatrix read( const uint32_t gid, const uint32_t attributes ) const
+    {
+        if( _findFile( gid ))
+            return _file->read( gid, attributes );
+        return SynapseMatrix();
+    }
+
+    size_t getNumSynapses( const GIDSet& gids ) const
+    {
+        size_t numSynapses = 0;
+        BOOST_FOREACH( const uint32_t gid, gids )
+        {
+            if( !_findFile( gid ))
+                continue;
+
+            GIDSet set;
+            set.insert( gid );
+            numSynapses += _file->getNumSynapses( set );
+        }
+        return numSynapses;
+    }
+
+private:
+    typedef std::map< uint32_t, std::string > GidFileMap;
+
+    mutable SynapseFile* _file;
+    mutable uint32_t _gid; // current or 0 for all
+    mutable Strings _unmappedFiles;
+    mutable GidFileMap _fileMap;
+
+    bool _findFile( const uint32_t gid ) const
+    {
+        if( _file && ( _gid == gid || _gid == 0 ))
+            return true;
+
+        const std::string& filename = _findFilename( gid );
+        if( filename.empty( ))
+            return false;
+
+        delete _file;
+        _file = new SynapseFile( filename );
+        _gid = gid;
+        return true;
+    }
+
+    std::string _findFilename( const uint32_t gid ) const
+    {
+        while( _fileMap[ gid ].empty( ))
+        {
+            if( _unmappedFiles.empty( ))
+                return std::string();
+
+            const std::string candidate = _unmappedFiles.back();
+            _unmappedFiles.pop_back();
+
+            lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
+            H5::H5File file;
+            try
+            {
+                SilenceHDF5 silence;
+                file.openFile( candidate, H5F_ACC_RDONLY );
+            }
+            catch( const H5::Exception& exc )
+            {
+                LBINFO <<  "Could not open synapse file " << candidate << ": "
+                       << exc.getDetailMsg() << std::endl;
+                continue;
+            }
+
+            const size_t size = file.getNumObjs();
+            for( size_t i = 0; i < size; ++i )
+            {
+                const std::string& name = file.getObjnameByIdx( i );
+                const boost::regex filter( "^a[0-9]+$" );
+                boost::smatch match;
+
+                if( boost::regex_match( name, match, filter ))
+                {
+                    std::string string = match.str();
+                    string.erase( 0, 1 ); // remove the 'a'
+                    const uint32_t cGID = lexical_cast<uint32_t>( string );
+                    _fileMap[ cGID ] = candidate;
+                }
+            }
+            file.close();
+        }
+
+        return _fileMap[ gid ];
+    }
+};
+
 }
 
 Synapse::Synapse( const std::string& source )
@@ -184,18 +346,7 @@ Synapse::~Synapse()
 SynapseMatrix Synapse::read( const uint32_t gid,
                              const uint32_t attributes ) const
 {
-    switch( _impl->_numAttributes )
-    {
-    case SYNAPSE_ALL:
-        return _impl->read< SYNAPSE_ALL >( gid, attributes );
-    case SYNAPSE_POSITION_ALL:
-        return _impl->read< SYNAPSE_POSITION_ALL >( gid, attributes );
-    default:
-        LBERROR << "Synapse file " << _impl->_file.getFileName()
-                << " has unknown number of attributes: "
-                << _impl->_numAttributes << std::endl;
-        return SynapseMatrix();
-    }
+    return _impl->read( gid, attributes );
 }
 
 size_t Synapse::getNumSynapses( const GIDSet& gids ) const

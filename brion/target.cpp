@@ -38,6 +38,8 @@ inline brion::TargetType lexical_cast( const std::string& s )
 }
 }
 
+using boost::lexical_cast;
+
 namespace brion
 {
 namespace detail
@@ -68,7 +70,7 @@ public:
             const std::string& name = *i++;
             std::string content = *i++;
 
-            const TargetType type = boost::lexical_cast< TargetType >( typeStr);
+            const TargetType type = lexical_cast< TargetType >( typeStr );
             _targetNames[type].push_back( name );
             boost::trim( content );
             if( content.empty( ))
@@ -107,6 +109,10 @@ private:
 };
 }
 
+Target::Target( const Target& from )
+    : _impl( new detail::Target( *from._impl ))
+{}
+
 Target::Target( const std::string& source )
     : _impl( new detail::Target( source ))
 {
@@ -117,6 +123,17 @@ Target::~Target()
     delete _impl;
 }
 
+Target& Target::operator = ( const Target& rhs )
+{
+    if( this == &rhs )
+        return *this;
+
+    delete _impl;
+    _impl = new detail::Target( *rhs._impl );
+    return *this;
+}
+
+
 const Strings& Target::getTargetNames( const TargetType type ) const
 {
     return _impl->getTargetNames( type );
@@ -125,6 +142,36 @@ const Strings& Target::getTargetNames( const TargetType type ) const
 const Strings& Target::get( const std::string& name ) const
 {
     return _impl->get( name );
+}
+
+namespace
+{
+void _parse( const Targets& targets, const std::string& name, GIDSet& gids )
+{
+    BOOST_FOREACH( const Target& target, targets )
+    {
+        const brion::Strings& values = target.get( name );
+        BOOST_FOREACH( const std::string& value, values )
+        {
+            try
+            {
+                gids.insert( lexical_cast< uint32_t >( value.substr( 1 )));
+            }
+            catch( ... )
+            {
+                if( value != name )
+                    _parse( targets, value, gids );
+            }
+        }
+    }
+}
+}
+
+GIDSet Target::parse( const Targets& targets, const std::string& name )
+{
+    brion::GIDSet gids;
+    _parse( targets, name, gids );
+    return gids;
 }
 
 std::ostream& operator << ( std::ostream& os, const Target& target )

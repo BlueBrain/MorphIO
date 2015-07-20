@@ -1,5 +1,6 @@
 /* Copyright (c) 2013-2015, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
+ *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -36,7 +37,7 @@
 #include <boost/test/unit_test.hpp>
 
 
-BOOST_AUTO_TEST_CASE( test_invalid_open )
+BOOST_AUTO_TEST_CASE( invalid_open )
 {
     BOOST_CHECK_THROW( brion::Target( "blub" ), std::runtime_error );
 
@@ -45,7 +46,7 @@ BOOST_AUTO_TEST_CASE( test_invalid_open )
     BOOST_CHECK_THROW( brion::Target( path.string( )), std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_read )
+BOOST_AUTO_TEST_CASE( get )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/circuits/18.10.10_600cell/ncsFunctionalCompare/start.target";
@@ -67,4 +68,14 @@ BOOST_AUTO_TEST_CASE( test_read )
     BOOST_CHECK_EQUAL( layer4Target[0], "a269" );
     BOOST_CHECK_EQUAL( layer4Target[10], "a279" );
     BOOST_CHECK_EQUAL( layer4Target[42], "a311" );
+}
+
+BOOST_AUTO_TEST_CASE( parse )
+{
+    boost::filesystem::path path( BBP_TESTDATA );
+    path /= "local/circuits/18.10.10_600cell/ncsFunctionalCompare/start.target";
+    const brion::Target target( path.string( ));
+    const brion::GIDSet& column = brion::Target::parse(
+        brion::Targets( 1, target ), "Column" );
+    BOOST_CHECK_EQUAL( column.size(), 600 );
 }

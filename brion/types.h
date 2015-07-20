@@ -76,7 +76,7 @@ typedef std::vector< Vector4f > Vector4fs;
 typedef std::vector< Vector3d > Vector3ds;
 typedef std::vector< Vector4d > Vector4ds;
 typedef std::vector< SectionType > SectionTypes;
-
+typedef std::vector< Target > Targets;
 typedef boost::shared_ptr< int32_ts > int32_tsPtr;
 typedef boost::shared_ptr< uint16_ts > uint16_tsPtr;
 typedef boost::shared_ptr< uint32_ts > uint32_tsPtr;
