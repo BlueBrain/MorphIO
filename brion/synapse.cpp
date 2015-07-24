@@ -230,7 +230,7 @@ public:
             {
                 LBTHROW( std::runtime_error( "Could not find synapse files " +
                                              dir.string() + "/" +
-                                             filename.string() + ".[0-9]+" ));
+                                             filename.string( )));
             }
         }
     }
