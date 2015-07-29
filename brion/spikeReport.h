@@ -175,12 +175,18 @@ public:
     /**
      * Return the time of the latest spike that has been received.
      *
-     * @return undefined in STATIC reports. In STREAM reports it reports the
-     *         latest timestamp that has been received or UNDEFINED_TIMESTAMP
-     *         if no spikes have been received.
-     *         The function waitUntil() is guaranteed to not block if takes as
-     *         input a valid timestamp smaller than the value returned by
-     *         getLatestSpikeTime().
+     * @return undefined in STATIC reports. Let t be the timestamp of the
+     *         latest spike received, in STREAM reports it returns:
+     *         - UNDEFINED_TIMESTAMP is no spike has been received
+     *         - t if at least one spike has been received and the end
+     *           of the stream has not been reahed.
+     *         - An unspecified value x, such as x > t, if at least one
+     *           spike has been received and the end of the stream has been
+     *           reached.
+     *
+     *         In any case, the function waitUntil() is guaranteed to not
+     *         block if it takes as input a valid timestamp smaller than
+     *         the value returned by getLatestSpikeTime().
      * @throw std::runtime_error if invoked on non STREAM writers.
      * @version 1.4
      */
