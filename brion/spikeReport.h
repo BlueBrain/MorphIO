@@ -86,7 +86,7 @@ public:
      *        registered spike report plugin.
      * @version 1.4
      */
-    SpikeReport( const URI &uri, const int mode );
+    explicit SpikeReport( const URI &uri, const int mode );
 
     /** Destructor. @version 1.3 */
     ~SpikeReport();
@@ -228,4 +228,3 @@ private:
 
 }
 #endif
-

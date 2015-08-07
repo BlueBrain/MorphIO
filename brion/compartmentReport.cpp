@@ -38,7 +38,7 @@ public:
                                      CompartmentReportInitData >
                                                     CompartmentPluginFactory;
 
-    CompartmentReport( const CompartmentReportInitData& initData )
+    explicit CompartmentReport( const CompartmentReportInitData& initData )
         : plugin( CompartmentPluginFactory::getInstance().create( initData ))
     {
     }

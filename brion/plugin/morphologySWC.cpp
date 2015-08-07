@@ -48,7 +48,7 @@ struct Sample
         , parentSection( -1 )
     {}
 
-    Sample( const char* line )
+    explicit Sample( const char* line )
         : nextID( -1 )
         , siblingID( -1 )
         , parentSection( -1 )

@@ -39,10 +39,9 @@ public:
     typedef lunchbox::PluginFactory< SpikeReportPlugin, SpikeReportInitData >
                 SpikePluginFactory;
 
-    SpikeReport( const SpikeReportInitData& initData )
+    explicit SpikeReport( const SpikeReportInitData& initData )
         : plugin( SpikePluginFactory::getInstance().create( initData ))
-    {
-    }
+    {}
 
     boost::scoped_ptr< SpikeReportPlugin > plugin;
 };

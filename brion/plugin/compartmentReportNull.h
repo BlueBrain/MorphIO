@@ -34,7 +34,7 @@ namespace plugin
 class CompartmentReportNull : public CompartmentReportCommon
 {
 public:
-    CompartmentReportNull( const CompartmentReportInitData& ) {}
+    explicit CompartmentReportNull( const CompartmentReportInitData& ) {}
     virtual ~CompartmentReportNull() {}
 
     static bool handles( const CompartmentReportInitData& initData )

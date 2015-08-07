@@ -66,7 +66,7 @@ public:
     brion::Spikes spikes;
     const std::string tmpFileName;
 
-    TemporaryData( const std::string& reportType )
+    explicit TemporaryData( const std::string& reportType )
         : tmpFileName( "/tmp/" + lunchbox::make_UUID().getString() + "." +
                        reportType )
     {

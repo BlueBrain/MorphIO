@@ -35,9 +35,8 @@ class SpikeReportNEST : public SpikeReportPlugin
 {
 public:
     /** Create a new NEST report. */
-    SpikeReportNEST( const SpikeReportInitData& initData );
-
-    ~SpikeReportNEST();
+    explicit SpikeReportNEST( const SpikeReportInitData& initData );
+    virtual ~SpikeReportNEST();
 
     /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );
