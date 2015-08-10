@@ -41,7 +41,7 @@ class SpikeReportBinary : public SpikeReportPlugin
 {
 public:
     /** Create a new Binary report. */
-    SpikeReportBinary( const SpikeReportInitData& initData );
+    explicit SpikeReportBinary( const SpikeReportInitData& initData );
 
     /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );

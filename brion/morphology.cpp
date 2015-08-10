@@ -37,7 +37,7 @@ public:
     typedef lunchbox::PluginFactory< MorphologyPlugin, MorphologyInitData >
         MorphologyPluginFactory;
 
-    Morphology( const MorphologyInitData& initData )
+    explicit Morphology( const MorphologyInitData& initData )
         : plugin( MorphologyPluginFactory::getInstance().create( initData ))
     {
         (void)initData;

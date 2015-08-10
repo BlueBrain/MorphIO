@@ -34,7 +34,7 @@ class SpikeReportBluron : public SpikeReportPlugin
 {
 public:
     /** Create a new Bluron report. */
-    SpikeReportBluron( const SpikeReportInitData& initData );
+    explicit SpikeReportBluron( const SpikeReportInitData& initData );
 
     /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );

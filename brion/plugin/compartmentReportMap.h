@@ -32,8 +32,7 @@ namespace plugin
 class CompartmentReportMap : public CompartmentReportCommon
 {
 public:
-    CompartmentReportMap( const CompartmentReportInitData& initData );
-
+    explicit CompartmentReportMap( const CompartmentReportInitData& initData );
     virtual ~CompartmentReportMap();
 
     static bool handles( const CompartmentReportInitData& initData );

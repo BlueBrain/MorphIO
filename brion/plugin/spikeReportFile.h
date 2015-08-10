@@ -58,18 +58,16 @@ namespace plugin
 class SpikeReportFile : public boost::noncopyable
 {
 public:
-
     /**
      * Open a new report file.
      * @param filename The path to the report file.
      * @param rt The Type of report.
      * @throws std::runtime_error if the file could not be opened.
      */
-    SpikeReportFile( const std::string& filename,
-                     const SpikeReportType rt,
-                     const int accessMode );
-
-    ~SpikeReportFile();
+    explicit SpikeReportFile( const std::string& filename,
+                              const SpikeReportType rt,
+                              const int accessMode );
+    virtual ~SpikeReportFile();
 
     /**
      * Read the file, appending results to the given Spikes.

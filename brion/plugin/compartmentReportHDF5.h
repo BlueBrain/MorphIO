@@ -34,9 +34,8 @@ namespace plugin
 class CompartmentReportHDF5 : public CompartmentReportCommon
 {
 public:
-    CompartmentReportHDF5( const CompartmentReportInitData& initData );
-
-    ~CompartmentReportHDF5();
+    explicit CompartmentReportHDF5( const CompartmentReportInitData& initData );
+    virtual ~CompartmentReportHDF5();
 
     static bool handles( const CompartmentReportInitData& initData );
 

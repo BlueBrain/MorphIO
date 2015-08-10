@@ -32,7 +32,6 @@ namespace plugin
 class CompartmentReportCommon : public CompartmentReportPlugin
 {
 public:
-
     CompartmentReportCommon();
     ~CompartmentReportCommon() {}
 

@@ -58,9 +58,8 @@ struct HeaderInfo
 class CompartmentReportBinary : public CompartmentReportCommon
 {
 public:
-    CompartmentReportBinary( const CompartmentReportInitData& initData );
-
-    ~CompartmentReportBinary();
+    explicit CompartmentReportBinary( const CompartmentReportInitData& data );
+    virtual ~CompartmentReportBinary();
 
     static bool handles( const CompartmentReportInitData& initData );
 

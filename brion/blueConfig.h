@@ -50,7 +50,7 @@ public:
      *                           CircuitConfig file
      * @version 1.0
      */
-    BlueConfig( const std::string& source );
+    explicit BlueConfig( const std::string& source );
 
     /** Get names of given section type.
      *

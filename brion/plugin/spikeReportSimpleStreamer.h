@@ -39,9 +39,8 @@ namespace plugin
 class SpikeReportSimpleStreamer : public SpikeReportPlugin
 {
 public:
-    SpikeReportSimpleStreamer( const SpikeReportInitData& initData );
-
-    ~SpikeReportSimpleStreamer();
+    explicit SpikeReportSimpleStreamer( const SpikeReportInitData& initData );
+    virtual ~SpikeReportSimpleStreamer();
 
     /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );

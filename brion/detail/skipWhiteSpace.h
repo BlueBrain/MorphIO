@@ -29,7 +29,7 @@ namespace detail
 
 struct SkipWhiteSpace
 {
-    SkipWhiteSpace( size_t& line_count )
+    explicit SkipWhiteSpace( size_t& line_count )
         : _line_count( &line_count )
     {}
 
@@ -56,4 +56,3 @@ inline std::istream& operator >> ( std::istream& in, const SkipWhiteSpace& ws )
 }
 }
 #endif
-
