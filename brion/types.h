@@ -121,6 +121,7 @@ typedef std::pair< float, uint32_t > Spike;
 
 const float UNDEFINED_TIMESTAMP = std::numeric_limits< float >::max();
 const float RESTING_VOLTAGE = -67.; //!< Resting voltage in mV
+const float MINIMUM_VOLTAGE = -80.; //!< Lowest voltage after hyperpolarisation
 
 using lunchbox::Strings;
 using lunchbox::URI;
