@@ -13,8 +13,9 @@ if(MSVC)
     )
 endif()
 
-set(BRION_LINK_LIBRARIES ${Boost_LIBRARIES} ${HDF5_LIBRARIES}
-                         ${LUNCHBOX_LIBRARIES})
+set(BRION_LINK_LIBRARIES PUBLIC Lunchbox vmmlib
+                         PRIVATE ${Boost_LIBRARIES} ${HDF5_LIBRARIES}
+)
 
 common_library(Brion)
 
