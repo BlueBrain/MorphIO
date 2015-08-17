@@ -27,7 +27,7 @@ common_package(BBPTestData)
 common_package(Boost REQUIRED COMPONENTS date_time filesystem program_options
                                          regex system unit_test_framework)
 common_package(HDF5 REQUIRED COMPONENTS C CXX)
-common_package(Lunchbox  REQUIRED)
+common_package(Lunchbox REQUIRED)
 common_package(OpenMP)
 common_package(vmmlib REQUIRED)
 common_package_post()
