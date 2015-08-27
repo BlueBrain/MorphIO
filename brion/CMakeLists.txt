@@ -15,6 +15,7 @@ endif()
 
 set(BRION_LINK_LIBRARIES PUBLIC Lunchbox vmmlib
                          PRIVATE ${Boost_LIBRARIES} ${HDF5_LIBRARIES}
+                                 ${CMAKE_THREADS_LIB_INIT}
 )
 
 common_library(Brion)
