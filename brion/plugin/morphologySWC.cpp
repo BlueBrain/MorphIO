@@ -36,12 +36,25 @@ namespace
 {
 
 // It's not clear if -1 is the only way of identifying a root section.
-const int UNDEFINED_PARENT_SWC = -1;
+const int SWC_UNDEFINED_PARENT = -1;
+
+enum SWCSectionType
+{
+    SWC_SECTION_UNDEFINED = 0,
+    SWC_SECTION_SOMA = 1,
+    SWC_SECTION_AXON = 2,
+    SWC_SECTION_DENDRITE = 3,
+    SWC_SECTION_APICAL_DENDRITE = 4,
+    SWC_SECTION_FORK_POINT = 5,
+    SWC_SECTION_END_POINT = 6,
+    SWC_SECTION_CUSTOM = 7
+};
 
 struct Sample
 {
     Sample()
         : valid( false )
+        , type( SWC_SECTION_UNDEFINED )
         , parent( -1 )
         , nextID( -1 )
         , siblingID( -1 )
@@ -59,21 +72,14 @@ struct Sample
                         &radius, &parent ) == 6;
         point.w() = radius * 2; // The point array stores diameters.
 
-        switch( type )
-        {
-        case SECTION_SOMA:
-        case SECTION_AXON:
-        case SECTION_DENDRITE:
-        case SECTION_APICAL_DENDRITE:
-            break;
-        default:
-            valid = false; // Unknown section type
-        }
+        if (type >= SWC_SECTION_CUSTOM)
+            valid = false; // Unknown section type, custom samples are also
+                           // Regarded as unknown.
     }
 
     bool valid;
     Vector4f point; // x, y, z and diameter
-    SectionType type;
+    SWCSectionType type;
     int parent;
     int nextID;
     int siblingID;
@@ -88,6 +94,36 @@ template< typename T >
 inline std::string string_cast( const T& t )
 {
     return boost::lexical_cast< std::string >( t );
+}
+
+void _correctSampleType( Sample& sample, const Samples& samples )
+{
+    SWCSectionType type = sample.type;
+    // Fork and end point sample types don't make much sense for Brion.
+    // The sample type will be corrected to be that of the parent section.
+    // If the parent is the soma or doesn't exist, the final type will be
+    // undefined. If the parent is also a fork point, the traversal will
+    // continue.
+    int parentID = sample.parent;
+    while( type == SWC_SECTION_FORK_POINT || type == SWC_SECTION_END_POINT )
+    {
+        if( parentID == SWC_UNDEFINED_PARENT )
+        {
+            sample.type = SWC_SECTION_UNDEFINED;
+            return;
+        }
+
+        type = samples[parentID].type;
+        parentID = samples[parentID].parent;
+
+        if( type == SWC_SECTION_SOMA || type == SWC_SECTION_UNDEFINED )
+        {
+            sample.type = SWC_SECTION_UNDEFINED;
+            return;
+        }
+    }
+
+    sample.type = type;
 }
 
 }
@@ -114,7 +150,6 @@ struct MorphologySWC::RawSWCInfo
 
     size_t numSections;
 };
-
 
 MorphologySWC::MorphologySWC( const MorphologyInitData& initData )
     : _points( new Vector4fs )
@@ -289,9 +324,11 @@ void MorphologySWC::_buildSampleTree( RawSWCInfo& info )
         Sample& sample = samples[currentSample];
         visited[currentSample] = true;
 
+        _correctSampleType( sample, samples );
+
         // Moving to the parent if not visited yet, otherwise searching
         // for the next end point.
-        const bool root = sample.parent == UNDEFINED_PARENT_SWC;
+        const bool root = sample.parent == SWC_UNDEFINED_PARENT;
 
         if( !root )
         {
@@ -320,12 +357,12 @@ void MorphologySWC::_buildSampleTree( RawSWCInfo& info )
         else
         {
             ++info.numSections;
-            if( sample.type == SECTION_SOMA )
+            if( sample.type == SWC_SECTION_SOMA )
             {
                 // Only one soma section is permitted. If a previous
                 // one is detected, then throw.
                 if( info.roots.size() &&
-                    samples[info.roots[0]].type == SECTION_SOMA )
+                    samples[info.roots[0]].type == SWC_SECTION_SOMA )
                 {
                     LBTHROW( std::runtime_error(
                         "Reading swc morphology file: " + info.filename +
@@ -336,10 +373,18 @@ void MorphologySWC::_buildSampleTree( RawSWCInfo& info )
             }
             else
             {
-                info.roots.push_back(currentSample);
+                info.roots.push_back( currentSample );
                 // Non soma root sections get their parent section
                 // assigned to the soma at this point.
                 sample.parentSection = 0;
+                // If the sample type is fork or end point, we convert it
+                // into undefined because we don't really know which is the
+                // type of the section.
+                if( sample.type == SWC_SECTION_FORK_POINT ||
+                    sample.type == SWC_SECTION_END_POINT )
+                {
+                    sample.type = SWC_SECTION_UNDEFINED;
+                }
             }
         }
 
@@ -391,13 +436,13 @@ void MorphologySWC::_buildStructure( RawSWCInfo& info )
     {
         _sections->push_back( Vector2i( int(_points->size( )),
                                         sample->parentSection ));
-        _types->push_back( sample->type );
+        _types->push_back( SectionType( sample->type ));
 
         // Pushing first point of the section using the parent sample
         // if necessary
         const Sample* parent =
             sample->parent == -1 ? 0 : &samples[sample->parent];
-        if( parent && parent->type != SECTION_SOMA )
+        if( parent && parent->type != SWC_SECTION_SOMA )
             _points->push_back( parent->point );
 
         // Iterate while we stay on the same section and push points
@@ -407,7 +452,7 @@ void MorphologySWC::_buildStructure( RawSWCInfo& info )
                // There are degenerated cases where this is absolutely
                // needed (e.g. a morphology with only one first order
                // section a point soma).
-               sample->type == _types->back( ))
+               sample->type == SWCSectionType( _types->back( )))
         {
             _points->push_back( sample->point );
             sample = sample->nextID == -1 ? 0 : &samples[sample->nextID];
@@ -420,7 +465,7 @@ void MorphologySWC::_buildStructure( RawSWCInfo& info )
             // the sibling (if any) to the sectionQeueue and continuing
             // traversing the current section
             assert( sample->siblingID != -1 ||
-                    sample->type != _types->back( ));
+                    sample->type != SWCSectionType( _types->back( )));
 
             // Assigning the parent section to the current sample, this
             // will be stored in the section array at the beginning of

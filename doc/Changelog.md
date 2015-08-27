@@ -3,6 +3,11 @@ Changelog {#Changelog}
 
 ## git master {master)
 
+* [#9](https://github.com/BlueBrain/Brion/issues/9):
+  Extend SWC parser to support fork and end points and undefined section points.
+  The Brion::SectionType enum has not been extended to include end and fork
+  points, these types are translated into the most reasonable one based on the
+  point ancestors.
 * [#12](https://github.com/BlueBrain/Brion/pull/12):
   Add brion::Target::parse() to resolve a given target name
 * [#12](https://github.com/BlueBrain/Brion/pull/12):

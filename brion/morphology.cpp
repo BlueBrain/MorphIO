@@ -40,7 +40,6 @@ public:
     explicit Morphology( const MorphologyInitData& initData )
         : plugin( MorphologyPluginFactory::getInstance().create( initData ))
     {
-        (void)initData;
     }
 
     boost::scoped_ptr< MorphologyPlugin > plugin;

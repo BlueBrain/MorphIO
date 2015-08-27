@@ -45,6 +45,7 @@ typedef brion::Vector2i V2i; // For brevity
 #pragma clang diagnostic ignored "-Wnon-pod-varargs"
 
 // Ellipsis promotes enums to ints, so we need to use int.
+const int UNDEFINED = brion::SECTION_UNDEFINED;
 const int SOMA = brion::SECTION_SOMA;
 const int AXON = brion::SECTION_AXON;
 const int DENDRITE = brion::SECTION_DENDRITE;
@@ -430,6 +431,38 @@ BOOST_AUTO_TEST_CASE( swc_bifurcation )
                  V2i( 0, -1 ), V2i( 1, 0 ), V2i( 3, 1 ), V2i( 6, 1 ));
     verifyArray( *source.readSectionTypes(), 4,
                  SOMA, DENDRITE, APICAL_DENDRITE, APICAL_DENDRITE );
+}
+
+BOOST_AUTO_TEST_CASE( swc_end_points )
+{
+    boost::filesystem::path path( BRION_TESTDATA );
+    const brion::MorphologyRepairStage stage = brion::MORPHOLOGY_REPAIRED;
+    path /= "swc/end_points.swc";
+
+    const brion::Morphology source( path.string( ));
+
+    verifyArray( *source.readSections( stage ), 6,
+                 V2i( 0, -1 ), V2i( 1, 0 ), V2i( 2, 1 ), V2i( 4, 1 ),
+                 V2i( 7, 0 ), V2i( 8, 0 ));
+
+    verifyArray( *source.readSectionTypes(), 6,
+                 SOMA, AXON, AXON, AXON, UNDEFINED, UNDEFINED );
+}
+
+BOOST_AUTO_TEST_CASE( swc_fork_points )
+{
+    boost::filesystem::path path( BRION_TESTDATA );
+    const brion::MorphologyRepairStage stage = brion::MORPHOLOGY_REPAIRED;
+    path /= "swc/fork_points.swc";
+
+    const brion::Morphology source( path.string( ));
+
+    verifyArray( *source.readSections( stage ), 6,
+                 V2i( 0, -1 ), V2i( 1, 0 ), V2i( 2, 1 ), V2i( 4, 1 ),
+                 V2i( 7, 0 ), V2i( 8, 0 ));
+
+    verifyArray( *source.readSectionTypes(), 6,
+                 SOMA, AXON, AXON, AXON, UNDEFINED, UNDEFINED );
 }
 
 BOOST_AUTO_TEST_CASE( swc_neuron )

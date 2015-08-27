@@ -61,7 +61,8 @@ public:
      *  of the parent section.
      *
      * @param stage the repair stage to take the section information from
-     * @return index and parent index of all sections of the morphology
+     * @return First point and parent indices of all the sections of the
+     *         morphology.
      * @version 1.0
      */
     Vector2isPtr readSections( const MorphologyRepairStage stage ) const;
