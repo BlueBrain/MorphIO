@@ -10,7 +10,6 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
   ${CMAKE_SOURCE_DIR}/CMake/common)
 
 include(GitExternal)
-include(SubProject)
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "6")
@@ -32,7 +31,7 @@ common_package(OpenMP)
 common_package(vmmlib REQUIRED)
 common_package_post()
 
-list(APPEND BRION_DEPENDENT_LIBRARIES Lunchbox vmmlib)
+list(APPEND BRION_DEPENDENT_LIBRARIES Boost Lunchbox vmmlib)
 
 add_subdirectory(brion)
 add_subdirectory(apps)
