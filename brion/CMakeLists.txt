@@ -13,6 +13,7 @@ if(MSVC)
     )
 endif()
 
+set(BRION_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
 set(BRION_LINK_LIBRARIES PUBLIC Lunchbox vmmlib
                          PRIVATE ${Boost_LIBRARIES} ${HDF5_LIBRARIES}
                                  ${CMAKE_THREADS_LIB_INIT}
