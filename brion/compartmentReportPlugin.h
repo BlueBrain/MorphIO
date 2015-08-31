@@ -20,6 +20,7 @@
 #ifndef BRION_COMPARTMENTREPORT_PLUGIN
 #define BRION_COMPARTMENTREPORT_PLUGIN
 
+#include <brion/api.h>
 #include <brion/types.h>
 #include <brion/pluginInitData.h>
 
@@ -93,7 +94,7 @@ public:
     typedef CompartmentReportInitData InitDataT;
 
     /** @internal */
-    virtual ~CompartmentReportPlugin(){}
+    virtual ~CompartmentReportPlugin() {}
 
     /** @name Abstract interface */
     //@{
@@ -119,7 +120,7 @@ public:
     virtual const SectionOffsets& getOffsets() const = 0;
 
     /** @copydoc brion::CompartmentReport::getNumCompartments */
-    virtual size_t getNumCompartments( const size_t index ) const = 0;
+    virtual size_t getNumCompartments( size_t index ) const = 0;
 
     /** @copydoc brion::CompartmentReport::getCompartmentCounts */
     virtual const CompartmentCounts& getCompartmentCounts() const = 0;
@@ -128,13 +129,13 @@ public:
     virtual size_t getFrameSize() const = 0;
 
     /** @copydoc brion::CompartmentReport::loadFrame */
-    virtual floatsPtr loadFrame( const float timestamp ) const = 0;
+    virtual floatsPtr loadFrame( float timestamp ) const = 0;
 
     /** @copydoc brion::CompartmentReport::updateMapping */
     virtual void updateMapping( const GIDSet& gids ) = 0;
 
     /** @copydoc brion::CompartmentReport::setBufferSize */
-    virtual void setBufferSize( const size_t size )
+    virtual void setBufferSize( size_t size )
     {
         // To keep doxygen happy
         (void)size;
@@ -147,17 +148,18 @@ public:
     virtual size_t getBufferSize() const { return 0; }
 
     /** @copydoc brion::CompartmentReport::writeHeader */
-    virtual void writeHeader( const float startTime, const float endTime,
-                              const float timestep, const std::string& dunit,
-                              const std::string& tunit ) = 0;
+    virtual void writeHeader( float startTime, float endTime,
+                                        float timestep,
+                                        const std::string& dunit,
+                                        const std::string& tunit ) = 0;
 
     /** @copydoc brion::CompartmentReport::writeCompartments */
-    virtual bool writeCompartments( const uint32_t gid,
-                                    const uint16_ts& counts ) = 0;
+    virtual bool writeCompartments( uint32_t gid,
+                                              const uint16_ts& counts ) = 0;
 
     /** @copydoc brion::CompartmentReport::writeFrame */
-    virtual bool writeFrame( const uint32_t gid, const floats& voltages,
-                             const float timestamp ) = 0;
+    virtual bool writeFrame( uint32_t gid, const floats& voltages,
+                                       float timestamp ) = 0;
 
     /** @copydoc brion::CompartmentReport::flush */
     virtual bool flush() = 0;

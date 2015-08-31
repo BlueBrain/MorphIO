@@ -20,6 +20,7 @@
 #ifndef BRION_BLUECONFIG
 #define BRION_BLUECONFIG
 
+#include <brion/api.h>
 #include <brion/types.h>
 
 #include <boost/lexical_cast.hpp>
@@ -39,7 +40,7 @@ class BlueConfig : public boost::noncopyable
 {
 public:
     /** Close BlueConfig or CircuitConfig file. @version 1.0 */
-    ~BlueConfig();
+    BRION_API ~BlueConfig();
 
     /** @name Read API */
     //@{
@@ -50,7 +51,7 @@ public:
      *                           CircuitConfig file
      * @version 1.0
      */
-    explicit BlueConfig( const std::string& source );
+    BRION_API explicit BlueConfig( const std::string& source );
 
     /** Get names of given section type.
      *
@@ -58,6 +59,7 @@ public:
      * @return names of sections matching the query type
      * @version 1.0
      */
+    BRION_API
     const Strings& getSectionNames( const BlueConfigSection section ) const;
 
     /** Get value as string for key in given section.
@@ -68,9 +70,9 @@ public:
      * @return value as string of the given section & key, empty if not found
      * @version 1.0
      */
-    const std::string& get( const BlueConfigSection section,
-                            const std::string& sectionName,
-                            const std::string& key ) const;
+    BRION_API const std::string& get( const BlueConfigSection section,
+                                      const std::string& sectionName,
+                                      const std::string& key ) const;
 
     /** Get value as type T for key in given section.
      *

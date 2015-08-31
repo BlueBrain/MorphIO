@@ -20,6 +20,7 @@
 #ifndef BRION_TARGET
 #define BRION_TARGET
 
+#include <brion/api.h>
 #include <brion/types.h>
 
 namespace brion
@@ -36,13 +37,13 @@ class Target
 {
 public:
     /** Copy-construct a target file. @version 1.6 */
-    Target( const Target& from );
+    BRION_API Target( const Target& from );
 
     /** Close target file. @version 1.0 */
-    ~Target();
+    BRION_API ~Target();
 
     /** Assign a different target. @version 1.6 */
-    Target& operator = ( const Target& rhs );
+    BRION_API Target& operator = ( const Target& rhs );
 
     /** @name Read API */
     //@{
@@ -52,7 +53,7 @@ public:
      * @throw std::runtime_error if file is not a valid target file
      * @version 1.0
      */
-    explicit Target( const std::string& source );
+    BRION_API explicit Target( const std::string& source );
 
     /** Get list of targets for the desired type.
      *
@@ -60,7 +61,7 @@ public:
      * @return list of target names
      * @version 1.0
      */
-    const Strings& getTargetNames( const TargetType type ) const;
+    BRION_API const Strings& getTargetNames( const TargetType type ) const;
 
     /** Get targets and/or GIDSet grouped by the given target
      *
@@ -68,7 +69,7 @@ public:
      * @return list of values in the target. Can be targets and/or GIDSet
      * @version 1.0
      */
-    const Strings& get( const std::string& name ) const;
+    BRION_API const Strings& get( const std::string& name ) const;
 
     /**
      * Parse a given target into a GID set.
@@ -81,7 +82,7 @@ public:
      * @return the set of cell identifiers parsed
      * @version 1.6
      */
-    static GIDSet parse( const Targets& targets, const std::string& name );
+    BRION_API static GIDSet parse( const Targets& targets, const std::string& name );
     //@}
 
 private:

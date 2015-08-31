@@ -20,6 +20,7 @@
 #ifndef SPIKEREPORTPLUGIN_H
 #define SPIKEREPORTPLUGIN_H
 
+#include <brion/api.h>
 #include <brion/types.h>
 #include <brion/spikeReport.h>
 #include <brion/pluginInitData.h>

@@ -20,6 +20,7 @@
 #ifndef BRION_COMPARTMENTREPORT
 #define BRION_COMPARTMENTREPORT
 
+#include <brion/api.h>
 #include <brion/types.h>
 #include <boost/noncopyable.hpp>
 
@@ -39,7 +40,7 @@ class CompartmentReport : public boost::noncopyable
 {
 public:
     /** Close compartment report. @version 1.0 */
-    ~CompartmentReport();
+    BRION_API ~CompartmentReport();
 
     /** Open given URI to a compartment report for reading and/or writing.
      *
@@ -52,8 +53,8 @@ public:
      *                           valid
      * @version 1.4
      */
-    CompartmentReport( const URI& uri, const int mode,
-                       const GIDSet& gids = GIDSet( ));
+    BRION_API CompartmentReport( const URI& uri, const int mode,
+                                 const GIDSet& gids = GIDSet( ));
 
     /** @name Read API */
     //@{
@@ -67,8 +68,8 @@ public:
      * @version 1.0
      * @deprecated
      */
-    CompartmentReport( const std::string& source,
-                       const GIDSet& gids = GIDSet( ));
+    BRION_API CompartmentReport( const std::string& source,
+                                 const GIDSet& gids = GIDSet( ));
 
     /** Update compartment mapping wrt the given GIDs.
      *
@@ -77,10 +78,10 @@ public:
      * @param gids the neurons of interest
      * @version 1.0
      */
-    void updateMapping( const GIDSet& gids );
+    BRION_API void updateMapping( const GIDSet& gids );
 
     /** @return the current considered GIDs. @version 1.0 */
-    const GIDSet& getGIDs() const;
+    BRION_API const GIDSet& getGIDs() const;
 
     /** Get the current mapping of each section of each neuron in each
      *  simulation frame buffer.
@@ -92,7 +93,7 @@ public:
      * @return the offset for each section for each neuron
      * @version 1.0
      */
-    const SectionOffsets& getOffsets() const;
+    BRION_API const SectionOffsets& getOffsets() const;
 
     /** Get the number of compartments for each section of each neuron provided
      *  by the GID set via updateMapping().
@@ -103,7 +104,7 @@ public:
      * @return the compartment counts for each section for each neuron
      * @version 1.0
      */
-    const CompartmentCounts& getCompartmentCounts() const;
+    BRION_API const CompartmentCounts& getCompartmentCounts() const;
 
     /** Get the number of compartments for the given neuron.
      *
@@ -114,25 +115,25 @@ public:
      * @return number of compartments for the given neuron
      * @version 1.0
      */
-    size_t getNumCompartments( const size_t index ) const;
+    BRION_API size_t getNumCompartments( const size_t index ) const;
 
     /** @return the current start time of the report. @version 1.0 */
-    float getStartTime() const;
+    float BRION_API getStartTime() const;
 
     /** @return the current end time of the report. @version 1.0 */
-    float getEndTime() const;
+    BRION_API float getEndTime() const;
 
     /** @return the sampling time interval of the report. @version 1.0 */
-    float getTimestep() const;
+    BRION_API float getTimestep() const;
 
     /** @return the data unit of the report. @version 1.0 */
-    const std::string& getDataUnit() const;
+    BRION_API const std::string& getDataUnit() const;
 
     /** @return the time unit of the report. @version 1.0 */
-    const std::string& getTimeUnit() const;
+    BRION_API const std::string& getTimeUnit() const;
 
     /** @return the size of a loaded report frame. @version 1.0 */
-    size_t getFrameSize() const;
+    BRION_API size_t getFrameSize() const;
 
     /** Load report values at the given time stamp.
      *
@@ -140,7 +141,7 @@ public:
      * @return the report values if found at timestamp, 0 otherwise
      * @version 1.0
      */
-    floatsPtr loadFrame( const float timestamp ) const;
+    BRION_API floatsPtr loadFrame( const float timestamp ) const;
 
     /** Set the size of the stream buffer for loaded frames.
      *
@@ -152,13 +153,13 @@ public:
      * @param size the new size of the frame buffer.
      * @version 1.0
      */
-    void setBufferSize( const size_t size );
+    BRION_API void setBufferSize( const size_t size );
 
     /** @return the number of the simulation frame buffers. @version 1.0 */
-    size_t getBufferSize() const;
+    BRION_API size_t getBufferSize() const;
 
     /** Clears all buffered frames to free memory. @version 1.0 */
-    void clearBuffer();
+    BRION_API void clearBuffer();
     //@}
 
 
@@ -174,9 +175,9 @@ public:
      * @version 1.0
      * @deprecated
      */
-    CompartmentReport( const std::string& source,
-                       const CompartmentReportFormat format,
-                       const bool overwrite = false );
+    BRION_API CompartmentReport( const std::string& source,
+                                 const CompartmentReportFormat format,
+                                 const bool overwrite = false );
 
     /** Write the header information of this report.
      *
@@ -188,9 +189,9 @@ public:
      * @throw std::invalid_argument if any passed argument is invalid
      * @version 1.0
      */
-    void writeHeader( const float startTime, const float endTime,
-                      const float timestep, const std::string& dunit,
-                      const std::string& tunit );
+    BRION_API void writeHeader( const float startTime, const float endTime,
+                                const float timestep, const std::string& dunit,
+                                const std::string& tunit );
 
     /** Write the compartment counts for each section for one cell.
      *
@@ -201,7 +202,8 @@ public:
      * @return false if saving was not successful, true otherwise
      * @version 1.0
      */
-    bool writeCompartments( const uint32_t gid, const uint16_ts& counts );
+    BRION_API bool writeCompartments( const uint32_t gid,
+                                      const uint16_ts& counts );
 
     /** Write the voltages for one cell at a point in time.
      *
@@ -214,11 +216,11 @@ public:
      * @return false if saving was not successful, true otherwise
      * @version 1.0
      */
-    bool writeFrame( const uint32_t gid, const floats& voltages,
-                     const float timestamp );
+    BRION_API bool writeFrame( const uint32_t gid, const floats& voltages,
+                               const float timestamp );
 
     /** Flush data to output. @return true on success. @version 1.0 */
-    bool flush();
+    BRION_API bool flush();
     //@}
 
 private:

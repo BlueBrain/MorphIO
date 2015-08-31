@@ -22,6 +22,7 @@
 #ifndef BRION_SPIKEREPORT_H
 #define BRION_SPIKEREPORT_H
 
+#include <brion/api.h>
 #include <brion/types.h>
 
 #include <boost/noncopyable.hpp>
@@ -86,15 +87,15 @@ public:
      *        registered spike report plugin.
      * @version 1.4
      */
-    explicit SpikeReport( const URI &uri, const int mode );
+    BRION_API explicit SpikeReport( const URI &uri, const int mode );
 
     /** Destructor. @version 1.3 */
-    ~SpikeReport();
+    BRION_API ~SpikeReport();
 
     /**
      * @version 1.4
      */
-    ReadMode getReadMode() const;
+    BRION_API ReadMode getReadMode() const;
 
     /**
      * Get the time of the first spike.
@@ -102,7 +103,7 @@ public:
      *         are no spikes.
      * @version 1.3
      */
-    float getStartTime() const;
+    BRION_API float getStartTime() const;
 
     /**
      * Get the time of the last spike.
@@ -110,7 +111,7 @@ public:
      *         are no spikes.
      * @version 1.3
      */
-    float getEndTime() const;
+    BRION_API float getEndTime() const;
 
     /**
      * Get the spike times and cell GIDs.
@@ -119,7 +120,7 @@ public:
      * moved from the receive cache.
      *
      * @version 1.3 */
-    const Spikes& getSpikes() const;
+    BRION_API const Spikes& getSpikes() const;
 
     /**
      * Writes the spike times and cell GIDs.
@@ -127,7 +128,7 @@ public:
      * @param spikes Spikes to write.
      * @throw std::runtime_error if invoked on spike readers.
      * @version 1.4 */
-    void writeSpikes( const Spikes& spikes );
+    BRION_API void writeSpikes( const Spikes& spikes );
 
     /**
      * Lock the caller until the first spike past the given time stamp arrives
@@ -150,8 +151,8 @@ public:
      * @throw std::runtime_error if invoked on STATIC readers.
      * @version 1.4
      */
-    bool waitUntil( const float timeStamp,
-                    const uint32_t timeout = LB_TIMEOUT_INDEFINITE );
+    BRION_API bool waitUntil( const float timeStamp,
+                              const uint32_t timeout = LB_TIMEOUT_INDEFINITE );
 
 
     /**
@@ -170,7 +171,7 @@ public:
      * @throw std::runtime_error if invoked on non STREAM writers.
      * @version 1.4
      */
-    float getNextSpikeTime();
+    BRION_API float getNextSpikeTime();
 
     /**
      * Return the time of the latest spike that has been received.
@@ -190,7 +191,7 @@ public:
      * @throw std::runtime_error if invoked on non STREAM writers.
      * @version 1.4
      */
-    float getLatestSpikeTime();
+    BRION_API float getLatestSpikeTime();
 
     /**
      * Remove all spikes contained in the given time interval
@@ -205,7 +206,7 @@ public:
      *        reader.
      * @version 1.4
      */
-    void clear( const float startTime, const float endTime );
+    BRION_API void clear( const float startTime, const float endTime );
 
     /**
      * Closes the report.
@@ -220,7 +221,7 @@ public:
      *
      * @version 1.4
      */
-    void close();
+    BRION_API void close();
 
 private:
     detail::SpikeReport* _impl;

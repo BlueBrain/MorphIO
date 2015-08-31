@@ -20,6 +20,7 @@
 #ifndef BRION_SYNAPSE
 #define BRION_SYNAPSE
 
+#include <brion/api.h>
 #include <brion/types.h>
 #include <boost/noncopyable.hpp>
 
@@ -41,7 +42,7 @@ class Synapse : public boost::noncopyable
 {
 public:
     /** Close synapse file. @version 1.0 */
-    ~Synapse();
+    BRION_API ~Synapse();
 
     /** @name Read API */
     //@{
@@ -51,7 +52,7 @@ public:
      * @throw std::runtime_error if file is not a valid synapse file
      * @version 1.0
      */
-    explicit Synapse( const std::string& source );
+    BRION_API explicit Synapse( const std::string& source );
 
     /** Read requested synapse attributes for a given neuron.
      *
@@ -61,7 +62,8 @@ public:
      *         each connected neuron
      * @version 1.0
      */
-    SynapseMatrix read( const uint32_t gid, const uint32_t attributes ) const;
+    BRION_API SynapseMatrix read( const uint32_t gid,
+                                  const uint32_t attributes ) const;
 
     /** Get the number of synapses for a set of neurons.
      *
@@ -69,7 +71,7 @@ public:
      * @return number of synapses for the set of neurons.
      * @version 1.0
      */
-    size_t getNumSynapses( const GIDSet& gids ) const;
+    BRION_API size_t getNumSynapses( const GIDSet& gids ) const;
     //@}
 
 private:
