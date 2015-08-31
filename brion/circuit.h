@@ -19,6 +19,7 @@
 #ifndef BRION_CIRCUIT
 #define BRION_CIRCUIT
 
+#include <brion/api.h>
 #include <brion/types.h>
 #include <boost/noncopyable.hpp>
 
@@ -36,7 +37,7 @@ class Circuit : public boost::noncopyable
 {
 public:
     /** Close circuit file. @version 1.0 */
-    ~Circuit();
+    BRION_API ~Circuit();
 
     /** @name Read API */
     //@{
@@ -46,7 +47,7 @@ public:
      * @throw std::runtime_error if file is not a valid circuit file
      * @version 1.0
      */
-    explicit Circuit( const std::string& source );
+    BRION_API explicit Circuit( const std::string& source );
 
     /** Retrieve neuron attributes for set of neurons.
      *
@@ -59,10 +60,11 @@ public:
      * @throw std::runtime_error if any GID is out of range.
      * @version 1.0
      */
-    NeuronMatrix get( const GIDSet& gids, const uint32_t attributes ) const;
+    BRION_API NeuronMatrix get( const GIDSet& gids,
+                                const uint32_t attributes ) const;
 
     /** @return number of neurons stored in the circuit file. @version 1.0 */
-    size_t getNumNeurons() const;
+    BRION_API size_t getNumNeurons() const;
 
     /** Get type information for the neurons in the circuit.
      *
@@ -70,7 +72,7 @@ public:
      * @return list of type information
      * @version 1.0
      */
-    Strings getTypes( const NeuronClass type ) const;
+    BRION_API Strings getTypes( const NeuronClass type ) const;
     //@}
 
 private:

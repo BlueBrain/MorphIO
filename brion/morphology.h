@@ -20,6 +20,7 @@
 #ifndef BRION_MORPHOLOGY
 #define BRION_MORPHOLOGY
 
+#include <brion/api.h>
 #include <brion/types.h>
 #include <boost/noncopyable.hpp>
 
@@ -37,7 +38,7 @@ class Morphology : public boost::noncopyable
 {
 public:
     /** Close morphology file. @version 1.0 */
-    ~Morphology();
+    BRION_API ~Morphology();
 
     /** @name Read API */
     //@{
@@ -47,7 +48,7 @@ public:
      * @throw std::runtime_error if file is not a valid morphology file
      * @version 1.0
      */
-    explicit Morphology( const std::string& source );
+    BRION_API explicit Morphology( const std::string& source );
 
     /** Read points of morphology, representing x,y,z coordinates + diameter.
      *
@@ -55,7 +56,7 @@ public:
      * @return x,y,z coords + diameter of all points of the morphology
      * @version 1.0
      */
-    Vector4fsPtr readPoints( const MorphologyRepairStage stage ) const;
+    BRION_API Vector4fsPtr readPoints( MorphologyRepairStage stage ) const;
 
     /** Read sections of morphology, representing section start index and index
      *  of the parent section.
@@ -65,21 +66,21 @@ public:
      *         morphology.
      * @version 1.0
      */
-    Vector2isPtr readSections( const MorphologyRepairStage stage ) const;
+    BRION_API Vector2isPtr readSections( MorphologyRepairStage stage ) const;
 
     /** Read section types of morphology.
      *
      * @return type of all sections of the morphology
      * @version 1.0
      */
-    SectionTypesPtr readSectionTypes() const;
+    BRION_API SectionTypesPtr readSectionTypes() const;
 
     /** Read apical points of morphology, representing section and point index.
      *
      * @return section and point index of all apical points in the morphology
      * @version 1.0
      */
-    Vector2isPtr readApicals() const;
+    BRION_API Vector2isPtr readApicals() const;
 
     /** @internal */
     MorphologyVersion getVersion() const;
@@ -96,9 +97,8 @@ public:
      * @throw std::runtime_error if file could not be created
      * @version 1.0
      */
-    Morphology( const std::string& target,
-                const MorphologyVersion version,
-                const bool overwrite = false );
+    BRION_API Morphology( const std::string& target,
+                          MorphologyVersion version, bool overwrite = false );
 
     /** Write points of morphology, representing x,y,z coordinates + diameter.
      *
@@ -107,8 +107,8 @@ public:
      * @throw std::runtime_error if object not created with write ctor
      * @version 1.0
      */
-    void writePoints( const Vector4fs& points,
-                      const MorphologyRepairStage stage );
+    BRION_API void writePoints( const Vector4fs& points,
+                                MorphologyRepairStage stage );
 
     /** Write sections of morphology, representing section start index and index
      *  of parent the section.
@@ -118,8 +118,8 @@ public:
      * @throw std::runtime_error if object not created with write ctor
      * @version 1.0
      */
-    void writeSections( const Vector2is& sections,
-                        const MorphologyRepairStage stage );
+    BRION_API void writeSections( const Vector2is& sections,
+                                  MorphologyRepairStage stage );
 
     /** Write section types of morphology.
      *
@@ -127,7 +127,7 @@ public:
      * @throw std::runtime_error if object not created with write ctor
      * @version 1.0
      */
-    void writeSectionTypes( const SectionTypes& types );
+    BRION_API void writeSectionTypes( const SectionTypes& types );
 
     /** Write apical points of morphology, representing section and point index.
      *
@@ -136,10 +136,10 @@ public:
      * @throw std::runtime_error if called for version 1 files
      * @version 1.0
      */
-    void writeApicals( const Vector2is& apicals );
+    BRION_API void writeApicals( const Vector2is& apicals );
 
     /** Flush data to output. @version 1.0 */
-    void flush();
+    BRION_API void flush();
     //@}
 
 private:

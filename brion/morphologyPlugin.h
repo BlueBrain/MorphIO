@@ -20,6 +20,7 @@
 #ifndef BRION_MORPHOLOGYPLUGIN_H
 #define BRION_MORPHOLOGYPLUGIN_H
 
+#include <brion/api.h>
 #include <brion/types.h>
 #include <brion/morphology.h> // Needed by doxygen
 #include <brion/pluginInitData.h>
@@ -109,11 +110,11 @@ public:
     //@{
     /** @copydoc brion::Morphology::writePoints */
     virtual void writePoints( const Vector4fs& points,
-                              const MorphologyRepairStage stage ) = 0;
+                              MorphologyRepairStage stage ) = 0;
 
     /** @copydoc brion::Morphology::writeSections */
     virtual void writeSections( const Vector2is& sections,
-                                const MorphologyRepairStage stage ) = 0;
+                                MorphologyRepairStage stage ) = 0;
 
     /** @copydoc brion::Morphology::writeSectionTypes */
     virtual void writeSectionTypes( const SectionTypes& types ) = 0;
