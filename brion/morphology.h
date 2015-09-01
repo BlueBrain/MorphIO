@@ -83,7 +83,7 @@ public:
     BRION_API Vector2isPtr readApicals() const;
 
     /** @internal */
-    MorphologyVersion getVersion() const;
+    BRION_API MorphologyVersion getVersion() const;
     //@}
 
     /** @name Write API */
