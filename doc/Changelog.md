@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [39](https://github.com/BlueBrain/Brion/pull/39):
+  Add compartment report converter tool
 * [38](https://github.com/BlueBrain/Brion/pull/38):
   Fix crash while reading more than `ulimit -Sn` (1024 default) morphologies
 * [31](https://github.com/BlueBrain/Brion/pull/31):
