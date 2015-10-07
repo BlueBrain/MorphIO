@@ -23,8 +23,6 @@
 #include <lunchbox/debug.h>
 #include <lunchbox/pluginRegisterer.h>
 
-#define ASYNC_IO
-
 namespace lunchbox
 {
 template<> inline void byteswap(
@@ -43,15 +41,16 @@ namespace brion
 {
 namespace
 {
-static const std::string countsKey( "cellCount" );
-static const std::string dunitKey( "dunit" );
-static const std::string frameKey( "frame" );
-static const std::string gidsKey( "gids" );
-static const std::string headerKey( "header" );
-static const std::string tunitKey( "tunit" );
+const std::string countsKey( "cellCount" );
+const std::string dunitKey( "dunit" );
+const std::string frameKey( "frame" );
+const std::string gidsKey( "gids" );
+const std::string headerKey( "header" );
+const std::string tunitKey( "tunit" );
 
-static const uint32_t _version = 3; // Increase with each change in a k/v pair
-static const uint32_t _magic = 0xdb;
+const uint32_t _version = 3; // Increase with each change in a k/v pair
+const uint32_t _magic = 0xdb;
+const size_t _queueDepth = 32768; // async queue depth, heuristic from benchmark
 
 std::string _getScope( const lunchbox::URI& uri )
 {
@@ -78,9 +77,7 @@ CompartmentReportMap::CompartmentReportMap(
     , _store( initData.getURI( ))
     , _readable( false )
 {
-#ifdef ASYNC_IO
-    _store.setQueueDepth( 4096 ); // async write queue depth, heuristic from benchmarks
-#endif
+    _store.setQueueDepth( _queueDepth );
     if( _uri.findQuery( "name" ) == _uri.queryEnd( ))
         _uri.addQuery( "name", "default" );
     if( _uri.findQuery( "target" ) == _uri.queryEnd( ))
@@ -205,7 +202,6 @@ bool CompartmentReportMap::_flushHeader()
 
     _header.nGIDs = uint32_t(_gids.size( ));
 
-    _store.setQueueDepth( 0 );
     const std::string& scope = _getScope( _uri );
     if( !_store.insert( scope + headerKey, _header ) ||
         !_store.insert( scope + gidsKey, _gids ) ||
@@ -216,8 +212,6 @@ bool CompartmentReportMap::_flushHeader()
     }
 
     LBVERB << "Wrote meta information of " << _uri << std::endl;
-    _store.setQueueDepth( 10000 );
-    _store.flush();
     return _loadHeader();
 }
 
