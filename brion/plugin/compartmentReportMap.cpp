@@ -189,7 +189,10 @@ bool CompartmentReportMap::writeFrame( const uint32_t gid,
 
 bool CompartmentReportMap::flush()
 {
-    return _flushHeader();
+    if( !_flushHeader( ))
+        return false;
+    _store.flush();
+    return true;
 }
 
 bool CompartmentReportMap::_flushHeader()
