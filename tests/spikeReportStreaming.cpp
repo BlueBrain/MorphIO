@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE( test_stream_no_read )
     boost::filesystem::path path( BBP_TESTDATA );
     path /= NEST_SPIKE_REPORT_FILE;
     brion::SpikeReport report( brion::URI( "spikes://" + path.string( )),
-                               brion::MODE_READ);
+                               brion::MODE_READ );
 
     BOOST_CHECK_EQUAL( report.getStartTime(), UNDEFINED_TIMESTAMP );
     BOOST_CHECK_EQUAL( report.getEndTime(), UNDEFINED_TIMESTAMP );
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE( test_stream_read_all )
     boost::filesystem::path path( BBP_TESTDATA );
     path /= NEST_SPIKE_REPORT_FILE;
     brion::SpikeReport report( brion::URI( "spikes://" + path.string( )),
-                               brion::MODE_READ);
+                               brion::MODE_READ );
 
     report.waitUntil( UNDEFINED_TIMESTAMP );
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE( test_stream_read_timeout )
     boost::filesystem::path path( BBP_TESTDATA );
     path /= NEST_SPIKE_REPORT_FILE;
     brion::SpikeReport report( brion::URI( "spikes://" + path.string( )),
-                               brion::MODE_READ);
+                               brion::MODE_READ );
 
     BOOST_CHECK( !report.waitUntil( 1000, 1 ));
 }

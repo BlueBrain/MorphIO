@@ -22,15 +22,20 @@
 
 #include "spikeReportPlugin.h"
 #include "pluginInitData.h"
+#include <brion/version.h>
 
 #include <lunchbox/plugin.h>
 #include <lunchbox/pluginFactory.h>
 #include <lunchbox/uint128_t.h>
 #include <boost/scoped_ptr.hpp>
 
+namespace
+{
+const std::string spikePluginDSONamePattern( "Brion.*SpikeReport" );
+}
+
 namespace brion
 {
-
 namespace detail
 {
 class SpikeReport
@@ -39,9 +44,22 @@ public:
     typedef lunchbox::PluginFactory< SpikeReportPlugin, SpikeReportInitData >
                 SpikePluginFactory;
 
+    class DSOPluginsLoader
+    {
+    public:
+        DSOPluginsLoader()
+        {
+            auto& factory = SpikePluginFactory::getInstance();
+            factory.load( BRION_VERSION_ABI, lunchbox::getLibraryPaths(),
+                          spikePluginDSONamePattern );
+        }
+    };
+
     explicit SpikeReport( const SpikeReportInitData& initData )
-        : plugin( SpikePluginFactory::getInstance().create( initData ))
-    {}
+    {
+        static DSOPluginsLoader loader;
+        plugin.reset( SpikePluginFactory::getInstance().create( initData ));
+    }
 
     boost::scoped_ptr< SpikeReportPlugin > plugin;
 };

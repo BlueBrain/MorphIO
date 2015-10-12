@@ -81,6 +81,8 @@ public:
      *        - NEST ('gdf' extension). NEST file based reports. In read mode,
      *          shell wildcards are accepted at the file path leaf to load
      *          multiple report files.
+     *        Support for additional types can be added through plugins; see
+     *        SpikeReportPlugin for the details.
      *
      * @param mode the brion::AccessMode bitmask
      * @throw std::runtime_error if the input URI is not handled by any

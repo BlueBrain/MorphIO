@@ -63,10 +63,10 @@ public:
     /** @copydoc brion::SpikeReport::waitUntil */
     bool waitUntil( const float timeStamp, const uint32_t timeout ) final;
 
-    /** @copydoc brion::SpikeReport::waitUntil */
+    /** @copydoc brion::SpikeReport::getNextSpikeTime */
     float getNextSpikeTime() final;
 
-    /** @copydoc brion::SpikeReport::waitUntil */
+    /** @copydoc brion::SpikeReport::getLatestSpikeTime */
     float getLatestSpikeTime() final;
 
     /** @copydoc brion::SpikeReport::clear */

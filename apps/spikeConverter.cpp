@@ -1,5 +1,6 @@
 /* Copyright (c) 2015, EPFL/Blue Brain Project
  *                     Stefan Eilemann <stefan.eilemann@epfl.ch>
+ *                     Raphael Dumusc <raphael.dumusc@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -19,6 +20,19 @@
 
 #include <brion/brion.h>
 #include <lunchbox/clock.h>
+#include <lunchbox/sleep.h>
+
+#define STREAM_READ_TIMEOUT_MS  500
+#define STREAM_SEND_DELAY_MS   1000
+#define STREAM_SEND_FREQ_MS     500
+#define STREAM_FRAME_LENGTH_MS   10
+
+void printSentFrame( const unsigned int index, const size_t count )
+{
+    LBINFO << "Sent frame " << index << ": " << index * STREAM_FRAME_LENGTH_MS
+           << "-" << (index+1) * STREAM_FRAME_LENGTH_MS << " [ms], "
+           << count << " spikes" << std::endl;
+}
 
 int main( int argc, char* argv[] )
 {
@@ -29,11 +43,53 @@ int main( int argc, char* argv[] )
     }
 
     lunchbox::Clock clock;
-    const brion::SpikeReport in( brion::URI( argv[1] ), brion::MODE_READ );
+    brion::SpikeReport in( brion::URI( argv[1] ), brion::MODE_READ );
     const float readTime = clock.resetTimef();
 
     brion::SpikeReport out( brion::URI( argv[2] ), brion::MODE_WRITE );
-    out.writeSpikes( in.getSpikes( ));
+
+    if( in.getReadMode() == brion::SpikeReport::STREAM )
+    {
+        // Stream-to-File conversion
+        while( in.getNextSpikeTime() != brion::UNDEFINED_TIMESTAMP )
+        {
+            in.waitUntil( brion::UNDEFINED_TIMESTAMP, STREAM_READ_TIMEOUT_MS );
+            out.writeSpikes( in.getSpikes( ));
+            in.clear( in.getStartTime( ), in.getEndTime( ));
+        }
+    }
+    else if( out.getReadMode() == brion::SpikeReport::STREAM )
+    {
+        // File-to-Stream conversion
+
+        // leave time for a Zeq connection to establish
+        lunchbox::sleep( STREAM_SEND_DELAY_MS );
+
+        brion::Spikes outSpikes;
+        unsigned int frameIndex = 0;
+
+        const brion::Spikes& inSpikes = in.getSpikes();
+        for( brion::Spikes::const_iterator spikeIt = inSpikes.begin();
+             spikeIt != inSpikes.end(); ++spikeIt )
+        {
+            if( spikeIt->first >= (frameIndex+1) * STREAM_FRAME_LENGTH_MS )
+            {
+                out.writeSpikes( outSpikes );
+                printSentFrame( frameIndex++, outSpikes.size( ));
+                outSpikes.clear();
+                lunchbox::sleep( STREAM_SEND_FREQ_MS );
+            }
+            outSpikes.insert( *spikeIt );
+        }
+        out.writeSpikes( outSpikes );
+        printSentFrame( frameIndex, outSpikes.size( ));
+    }
+    else
+    {
+        // File-to-File conversion
+        out.writeSpikes( in.getSpikes( ));
+    }
+
     out.close();
     const float writeTime = clock.resetTimef();
 

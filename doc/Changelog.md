@@ -12,6 +12,10 @@ Changelog {#Changelog}
   Add brion::Target::parse() to resolve a given target name
 * [#12](https://github.com/BlueBrain/Brion/pull/12):
   Extended brion::Synapse to also support non-merged synapse files
+* [#22](https://github.com/BlueBrain/Brion/pull/22):
+  SpikeReport DSO plugins in the LD_LIBRARY_PATH are loaded automatically.
+* [#22](https://github.com/BlueBrain/Brion/pull/22):
+  spikeConverter can process spikes to and from stream-type SpikeReport plugins.
 
 ## Release 1.5.0 (2015-07-07) {changelog_1_5_0}
 
