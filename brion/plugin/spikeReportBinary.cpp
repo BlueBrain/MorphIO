@@ -36,7 +36,8 @@ static const uint32_t version = 1;
 }
 
 SpikeReportBinary::SpikeReportBinary( const SpikeReportInitData& initData )
-    : _filename( initData.getURI().getPath( ))
+    : _uri( initData.getURI( ))
+    , _filename( _uri.getPath( ))
 {
     if( initData.getAccessMode() & MODE_READ )
     {
@@ -80,6 +81,11 @@ bool SpikeReportBinary::handles( const SpikeReportInitData& initData )
     const boost::filesystem::path ext =
         boost::filesystem::path( uri.getPath() ).extension();
     return ext == BINARY_REPORT_FILE_EXT;
+}
+
+const URI& SpikeReportBinary::getURI() const
+{
+    return _uri;
 }
 
 float SpikeReportBinary::getStartTime() const

@@ -45,6 +45,9 @@ public:
     /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );
 
+    /** @copydoc brion::SpikeReport::getURI */
+    const URI& getURI() const final;
+
     /** @copydoc brion::SpikeReport::getStartTime */
     float getStartTime() const final;
 
@@ -76,7 +79,8 @@ public:
     void close() final;
 
 private:
-    std::string _filename;
+    const URI _uri;
+    const std::string _filename;
 
     // This is the data set that is exposed to the user. This data set is
     // updated with cached incoming spikes by waitUntil.

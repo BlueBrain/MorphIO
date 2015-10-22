@@ -89,10 +89,20 @@ public:
      *        registered spike report plugin.
      * @version 1.4
      */
-    BRION_API explicit SpikeReport( const URI &uri, const int mode );
+    BRION_API explicit SpikeReport( const URI& uri, const int mode );
 
     /** Destructor. @version 1.3 */
     BRION_API ~SpikeReport();
+
+    /**
+     * Get the URI used to instantiate the report. It could be different from
+     * the input URI, depending on the plugin implementation.
+     *
+     * @return The URI used in the instance. It could be the same as the input
+     * URI or a different one, depending on the implementation
+     * @version 1.6
+     */
+    BRION_API const URI& getURI() const;
 
     /**
      * @version 1.4
@@ -155,7 +165,6 @@ public:
      */
     BRION_API bool waitUntil( const float timeStamp,
                               const uint32_t timeout = LB_TIMEOUT_INDEFINITE );
-
 
     /**
      * Return the time of the next spike available in the internal cache.

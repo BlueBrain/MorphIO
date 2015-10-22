@@ -34,7 +34,8 @@ const size_t DEFAULT_LINES_PER_BATCH = 5000;
 
 SpikeReportSimpleStreamer::SpikeReportSimpleStreamer(
                                         const SpikeReportInitData& initData )
-    : _filename( initData.getURI().getPath( ) )
+    : _uri( initData.getURI( ))
+    , _filename( _uri.getPath( ))
     , _lastTimeStamp( -1 ) // This means that nothing has been received yet
     , _lastEndTime( 0 )
 {
@@ -64,6 +65,11 @@ bool SpikeReportSimpleStreamer::handles( const SpikeReportInitData& initData )
     const boost::filesystem::path ext =
             boost::filesystem::path( uri.getPath() ).extension();
     return ext == NEST_REPORT_FILE_EXT;
+}
+
+const URI& SpikeReportSimpleStreamer::getURI() const
+{
+    return _uri;
 }
 
 float SpikeReportSimpleStreamer::getStartTime() const

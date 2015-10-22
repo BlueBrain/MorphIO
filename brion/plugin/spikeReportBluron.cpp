@@ -38,7 +38,8 @@ namespace
 }
 
 SpikeReportBluron::SpikeReportBluron( const SpikeReportInitData& initData )
-    : _spikeReportFile( initData.getURI().getPath(), BLURON_SPIKE_REPORT,
+    : _uri( initData.getURI( ))
+    , _spikeReportFile( _uri.getPath(), BLURON_SPIKE_REPORT,
                         initData.getAccessMode( ))
 {
     if( initData.getAccessMode() == MODE_READ )
@@ -55,6 +56,11 @@ bool SpikeReportBluron::handles( const SpikeReportInitData& initData )
     const boost::filesystem::path ext =
             boost::filesystem::path( uri.getPath() ).extension();
     return ext == BLURON_REPORT_FILE_EXT;
+}
+
+const URI& SpikeReportBluron::getURI() const
+{
+    return _uri;
 }
 
 float SpikeReportBluron::getStartTime() const

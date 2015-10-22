@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 ## git master {master)
 
+* [#24](https://github.com/BlueBrain/Brion/pull/24):
+  Add getURI() method in SpikeReport.
 * [#9](https://github.com/BlueBrain/Brion/issues/9):
   Extend SWC parser to support fork and end points and undefined section points.
   The Brion::SectionType enum has not been extended to include end and fork
