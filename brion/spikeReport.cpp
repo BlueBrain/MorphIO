@@ -76,6 +76,11 @@ SpikeReport::~SpikeReport()
     delete _impl;
 }
 
+const URI& SpikeReport::getURI() const
+{
+    return _impl->plugin->getURI();
+}
+
 SpikeReport::ReadMode SpikeReport::getReadMode() const
 {
     return _impl->plugin->getReadMode();
@@ -123,7 +128,7 @@ void SpikeReport::clear( const float startTime, const float endTime )
 
 void SpikeReport::close()
 {
-    _impl->plugin->close( );
+    _impl->plugin->close();
 }
 
 }

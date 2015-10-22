@@ -46,6 +46,9 @@ public:
     /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );
 
+    /** @copydoc brion::SpikeReport::getURI */
+    const URI& getURI() const final;
+
     /** @copydoc brion::SpikeReport::getStartTime */
     float getStartTime() const final;
 
@@ -66,6 +69,7 @@ public:
         { return SpikeReport::STATIC; }
 
 private:
+    const URI _uri;
     const std::string _filename;
     Spikes _spikes;
 };

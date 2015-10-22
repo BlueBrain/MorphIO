@@ -74,17 +74,17 @@ lunchbox::Strings expandShellWildcard( const std::string& filename )
 }
 
 SpikeReportNEST::SpikeReportNEST( const SpikeReportInitData& initData )
+    : _uri( initData.getURI( ))
 {
-    const lunchbox::URI& uri = initData.getURI();
     const int accessMode = initData.getAccessMode();
 
     if( accessMode == MODE_READ )
-        _reportFiles = expandShellWildcard( uri.getPath( ));
+        _reportFiles = expandShellWildcard( _uri.getPath( ));
 
     if( accessMode & MODE_WRITE  )
-        _reportFiles.push_back( uri.getPath( ) );
+        _reportFiles.push_back( _uri.getPath( ));
 
-    _spikeReportFiles.resize( _reportFiles.size() );
+    _spikeReportFiles.resize( _reportFiles.size( ));
 
     bool emptyReport = true;
     size_t reportIndex = 0;
@@ -108,6 +108,11 @@ SpikeReportNEST::~SpikeReportNEST()
 {
     BOOST_FOREACH( SpikeReportFile* writer, _spikeReportFiles )
        delete writer;
+}
+
+const URI& SpikeReportNEST::getURI() const
+{
+    return _uri;
 }
 
 bool SpikeReportNEST::handles( const SpikeReportInitData& initData )

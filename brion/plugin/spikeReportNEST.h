@@ -38,6 +38,9 @@ public:
     explicit SpikeReportNEST( const SpikeReportInitData& initData );
     virtual ~SpikeReportNEST();
 
+    /** @copydoc brion::SpikeReport::getURI */
+    const URI& getURI() const final;
+
     /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );
 
@@ -63,6 +66,7 @@ public:
     }
 
 private:
+    const URI _uri;
     Spikes _spikes;
     Strings _reportFiles;
     typedef std::vector< SpikeReportFile* > SpikeReportFiles;

@@ -112,6 +112,9 @@ public:
                      "Operation not supported in spike report plugin" ));
     }
 
+    /** @copydoc brion::SpikeReport::getURI */
+    virtual const URI& getURI() const = 0;
+
     /** @copydoc brion::SpikeReport::getReadMode */
     virtual SpikeReport::ReadMode getReadMode() const = 0;
 
