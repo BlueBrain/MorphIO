@@ -37,11 +37,10 @@ static const uint32_t version = 1;
 
 SpikeReportBinary::SpikeReportBinary( const SpikeReportInitData& initData )
     : _uri( initData.getURI( ))
-    , _filename( _uri.getPath( ))
 {
     if( initData.getAccessMode() & MODE_READ )
     {
-        lunchbox::MemoryMap file( _filename );
+        lunchbox::MemoryMap file( _uri.getPath( ));
         const size_t size = file.getSize();
 
         if( (size % sizeof( uint32_t )) != 0 )
@@ -110,7 +109,7 @@ void SpikeReportBinary::writeSpikes( const Spikes& spikes )
     const size_t nElems = spikes.size();
     const size_t size = sizeof( magic ) + sizeof( version ) +
                         nElems * sizeof( float ) + nElems * sizeof( uint32_t );
-    lunchbox::MemoryMap file( _filename, size );
+    lunchbox::MemoryMap file( _uri.getPath(), size );
 
     uint32_t* iData = file.getAddress< uint32_t >();
     float* fData = file.getAddress< float >();

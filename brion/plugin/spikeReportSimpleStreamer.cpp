@@ -35,7 +35,6 @@ const size_t DEFAULT_LINES_PER_BATCH = 5000;
 SpikeReportSimpleStreamer::SpikeReportSimpleStreamer(
                                         const SpikeReportInitData& initData )
     : _uri( initData.getURI( ))
-    , _filename( _uri.getPath( ))
     , _lastTimeStamp( -1 ) // This means that nothing has been received yet
     , _lastEndTime( 0 )
 {
@@ -189,7 +188,7 @@ void SpikeReportSimpleStreamer::close()
 
 void SpikeReportSimpleStreamer::_readLoop()
 {
-    SpikeReportFile reader( _filename, NEST_SPIKE_REPORT, MODE_READ );
+    SpikeReportFile reader( _uri.getPath(), NEST_SPIKE_REPORT, MODE_READ );
 
     bool eof = false;
     while( !eof )

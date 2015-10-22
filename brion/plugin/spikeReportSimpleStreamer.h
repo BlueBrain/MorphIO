@@ -45,42 +45,31 @@ public:
     /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );
 
-    /** @copydoc brion::SpikeReport::getURI */
     const URI& getURI() const final;
 
-    /** @copydoc brion::SpikeReport::getStartTime */
     float getStartTime() const final;
 
-    /** @copydoc brion::SpikeReport::getEndTime */
     float getEndTime() const final;
 
-    /** @copydoc brion::SpikeReport::getSpikes */
     const Spikes& getSpikes() const final;
 
-    /** @copydoc brion::SpikeReport::getReadMode */
     SpikeReport::ReadMode getReadMode() const final
     {
         return SpikeReport::STREAM;
     }
 
-    /** @copydoc brion::SpikeReport::waitUntil */
     bool waitUntil( const float timeStamp, const uint32_t timeout ) final;
 
-    /** @copydoc brion::SpikeReport::getNextSpikeTime */
     float getNextSpikeTime() final;
 
-    /** @copydoc brion::SpikeReport::getLatestSpikeTime */
     float getLatestSpikeTime() final;
 
-    /** @copydoc brion::SpikeReport::clear */
     void clear( const float starTime, const float endTime ) final;
 
-    /** @copydoc brion::SpikeReport::close */
     void close() final;
 
 private:
     const URI _uri;
-    const std::string _filename;
 
     // This is the data set that is exposed to the user. This data set is
     // updated with cached incoming spikes by waitUntil.

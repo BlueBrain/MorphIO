@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE( test_bluron_invalid_report_information )
     path /= BLURON_SPIKE_REPORT_FILE;
 
     BOOST_CHECK_THROW( const brion::SpikeReport report(
-                           brion::URI( path.string( ) + ";" + path.string( )),
+                           brion::URI( path.string() + ";" + path.string( )),
                            brion::MODE_READ ),
                        std::runtime_error );
 }
@@ -294,4 +294,14 @@ BOOST_AUTO_TEST_CASE( test_overwrite_flag_with_existing_report )
 
     BOOST_CHECK_NO_THROW( brion::SpikeReport( brion::URI( data.tmpFileName ),
                                               brion::MODE_OVERWRITE ));
+}
+
+BOOST_AUTO_TEST_CASE( test_spikes_uri )
+{
+    TemporaryData data( "dat" );
+
+    const brion::URI uri( data.tmpFileName );
+    brion::SpikeReport report( uri, brion::MODE_WRITE );
+
+    BOOST_CHECK_EQUAL( uri, report.getURI( ));
 }
