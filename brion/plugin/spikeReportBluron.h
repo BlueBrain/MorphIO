@@ -39,25 +39,18 @@ public:
     /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );
 
-    /** @copydoc brion::SpikeReport::getURI */
     const URI& getURI() const final;
 
-    /** @copydoc brion::SpikeReport::getStartTime */
     float getStartTime() const final;
 
-    /** @copydoc brion::SpikeReport::getEndTime */
     float getEndTime() const final;
 
-    /** @copydoc brion::SpikeReport::getSpikes */
     const Spikes& getSpikes() const final;
 
-    /** @copydoc brion::SpikeReport::writeSpikes */
     void writeSpikes( const Spikes& spikes );
 
-    /** @copydoc brion::SpikeReport::close */
     void close();
 
-    /** @copydoc brion::SpikeReport::getReadMode */
     SpikeReport::ReadMode getReadMode() const final
     {
         return SpikeReport::STATIC;
