@@ -152,3 +152,41 @@ BOOST_AUTO_TEST_CASE( test_verify_loaded_data )
     BOOST_CHECK_EQUAL( config.get<float>( brion::CONFIGSECTION_REPORT,
                                           "voltage", "EndTime" ), 99.f );
 }
+
+BOOST_AUTO_TEST_CASE( semantic_api )
+{
+    const std::string prefix( BBP_TESTDATA );
+    const brion::BlueConfig config( bbp::test::getBlueconfig( ));
+    BOOST_CHECK_EQUAL( config.getCircuitSource(),
+                     prefix + "/local/circuits/18.10.10_600cell/circuit.mvd2" );
+
+    BOOST_CHECK_EQUAL( config.getReportSource( "unknown"), brion::URI( ));
+    const std::string root = config.get( brion::CONFIGSECTION_RUN, "Demo",
+                                         "OutputRoot" );
+    const brion::URI allCompartments =
+        config.getReportSource( "allCompartments" );
+    BOOST_CHECK_EQUAL( allCompartments.getScheme(), "file" );
+    BOOST_CHECK_EQUAL( allCompartments.getPath(),
+                       root + "/allCompartments.bbp" );
+}
+
+BOOST_AUTO_TEST_CASE( parse_target )
+{
+    const brion::BlueConfig config( bbp::test::getBlueconfig( ));
+    const brion::GIDSet defaultTarget = config.parseTarget( "" );
+    BOOST_CHECK( defaultTarget.size( ));
+    const brion::GIDSet columnTarget = config.parseTarget( "Column" );
+    BOOST_CHECK( columnTarget.size( ));
+    // Can't use BOOST_CHECK_EQUAL because GIDSet lacks operator<<
+    BOOST_CHECK( defaultTarget == columnTarget );
+
+    const brion::GIDSet fromUserTarget = config.parseTarget( "AllL5CSPC" );
+    BOOST_CHECK( fromUserTarget.size( ));
+    const brion::GIDSet fromStartTarget = config.parseTarget( "L5CSPC" );
+    BOOST_CHECK( fromStartTarget.size( ));
+    BOOST_CHECK( fromStartTarget == fromUserTarget );
+
+    // Shouldn't this throw instead?
+    const brion::GIDSet empty = config.parseTarget( "unexistent" );
+    BOOST_CHECK( empty.empty( ));
+}

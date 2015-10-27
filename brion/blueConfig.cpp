@@ -19,12 +19,15 @@
 
 #include "blueConfig.h"
 
+#include <brion/target.h>
+#include <lunchbox/log.h>
+#include <lunchbox/stdExt.h>
+#include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-#include <lunchbox/log.h>
-#include <lunchbox/stdExt.h>
 
+namespace fs = boost::filesystem;
 namespace boost
 {
 template<>
@@ -115,7 +118,7 @@ public:
                 continue;
             }
 
-            _names[type].push_back( name );
+            names[type].push_back( name );
 
             Strings lines;
             boost::split( lines, content, boost::is_any_of( "\n" ),
@@ -137,18 +140,34 @@ public:
 
                 std::string value = line.substr( pos+1 );
                 boost::trim( value );
-                _table[type][name].insert( std::make_pair( line.substr( 0, pos),
+                table[type][name].insert( std::make_pair( line.substr( 0, pos),
                                                            value ));
             }
         }
 
-        if( _table[CONFIGSECTION_RUN].empty( ))
+        if( table[CONFIGSECTION_RUN].empty( ))
             LBTHROW( std::runtime_error( source +
                                          " not a valid BlueConfig file" ));
     }
 
-    Strings _names[CONFIGSECTION_ALL];
-    ValueTable _table[CONFIGSECTION_ALL];
+    std::string getRun()
+    {
+        const brion::Strings& runs = names[ brion::CONFIGSECTION_RUN ];
+        return runs.empty() ? std::string() : runs.front();
+    }
+
+    std::string getOutputRoot()
+    {
+        return table[ brion::CONFIGSECTION_RUN ][ getRun() ][ "OutputRoot" ];
+    }
+
+    std::string getCircuitTarget()
+    {
+        return table[ brion::CONFIGSECTION_RUN ][ getRun() ][ "CircuitTarget" ];
+    }
+
+    Strings names[CONFIGSECTION_ALL];
+    ValueTable table[CONFIGSECTION_ALL];
 };
 }
 
@@ -162,17 +181,57 @@ BlueConfig::~BlueConfig()
     delete _impl;
 }
 
-const Strings&
-BlueConfig::getSectionNames( const BlueConfigSection section ) const
+const Strings& BlueConfig::getSectionNames( const BlueConfigSection section )
+    const
 {
-    return _impl->_names[section];
+    return _impl->names[section];
 }
 
 const std::string& BlueConfig::get( const BlueConfigSection section,
                                     const std::string& sectionName,
                                     const std::string& key ) const
 {
-    return _impl->_table[section][sectionName][key];
+    return _impl->table[section][sectionName][key];
+}
+
+std::string BlueConfig::getCircuitSource()
+{
+    return get( CONFIGSECTION_RUN, _impl->getRun(), "CircuitPath" ) +
+           "/circuit.mvd2";
+}
+
+brion::URI BlueConfig::getReportSource( const std::string& report )
+{
+    std::string format = get( CONFIGSECTION_REPORT, report, "Format" );
+    boost::algorithm::to_lower( format );
+
+    if( format == "binary" || format == "bin" )
+        return URI( std::string( "file://" ) + _impl->getOutputRoot() + "/" +
+                    report + ".bbp" );
+
+    if( format == "hdf5" || format.empty() || fs::is_directory( format ))
+        return URI( std::string( "file://" ) + _impl->getOutputRoot() + "/" +
+                    report + ".h5" );
+
+    if( format == "stream" || format == "leveldb" || format == "skv" )
+        return URI( _impl->getOutputRoot( ));
+
+    LBWARN << "Unknown report format " << format << std::endl;
+    return URI();
+}
+
+brion::GIDSet BlueConfig::parseTarget( std::string target )
+{
+    if( target.empty( ))
+        target = _impl->getCircuitTarget();
+
+    const std::string& run = _impl->getRun();
+    brion::Targets targets;
+    targets.push_back( brion::Target(
+        get( brion::CONFIGSECTION_RUN, run, "nrnPath" ) + "/start.target" ));
+    targets.push_back( brion::Target(
+        get( brion::CONFIGSECTION_RUN, run, "TargetFile" )));
+    return brion::Target::parse( targets, target );
 }
 
 std::ostream& operator << ( std::ostream& os, const BlueConfig& config )
@@ -180,7 +239,7 @@ std::ostream& operator << ( std::ostream& os, const BlueConfig& config )
     for( size_t i = 0; i < CONFIGSECTION_ALL; ++i )
     {
         BOOST_FOREACH( const ValueTable::value_type& entry,
-                       config._impl->_table[i] )
+                       config._impl->table[i] )
         {
             os << boost::lexical_cast< std::string >( BlueConfigSection( i ))
                << " " << entry.first << std::endl;

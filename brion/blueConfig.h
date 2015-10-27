@@ -92,6 +92,19 @@ public:
     }
     //@}
 
+    /** @name Semantic read API */
+    //@{
+    /** @return the full path to the circuit.mvd2 file. @sa Circuit */
+    BRION_API std::string getCircuitSource();
+
+    /** @return the URI to the named report. @sa CompartmentReport */
+    BRION_API brion::URI getReportSource( const std::string& report );
+
+    /** @return the set of GIDs for the given target, or the circuit target if
+     *          the given target is empty. */
+    BRION_API brion::GIDSet parseTarget( std::string target );
+    //@}
+
 private:
     friend std::ostream& operator << ( std::ostream&, const BlueConfig& );
 
