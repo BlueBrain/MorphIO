@@ -95,14 +95,24 @@ public:
     /** @name Semantic read API */
     //@{
     /** @return the full path to the circuit.mvd2 file. @sa Circuit */
-    BRION_API std::string getCircuitSource();
+    BRION_API std::string getCircuitSource() const;
 
     /** @return the URI to the named report. @sa CompartmentReport */
-    BRION_API brion::URI getReportSource( const std::string& report );
+    BRION_API brion::URI getReportSource( const std::string& report ) const;
+
+    /** @return the URI to the default spike data source. @sa SpikeReport */
+    BRION_API brion::URI getSpikeSource() const;
+
+    /** @return the name of the circuit target
+        @version 1.7 */
+    std::string getCircuitTarget() const;
 
     /** @return the set of GIDs for the given target, or the circuit target if
      *          the given target is empty. */
-    BRION_API brion::GIDSet parseTarget( std::string target );
+    BRION_API brion::GIDSet parseTarget( std::string target ) const;
+
+    /** @return the simulation timestep or NaN if undefined. */
+    BRION_API float getTimestep() const;
     //@}
 
 private:

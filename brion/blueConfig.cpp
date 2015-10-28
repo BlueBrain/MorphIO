@@ -68,6 +68,11 @@ inline std::string lexical_cast( const brion::BlueConfigSection& b )
 }
 }
 
+namespace
+{
+    const char* const SPIKE_FILE = "/out.dat";
+}
+
 namespace brion
 {
 
@@ -76,6 +81,7 @@ typedef stde::hash_map< std::string, KVStore > ValueTable;
 
 namespace detail
 {
+
 class BlueConfig
 {
 public:
@@ -156,15 +162,50 @@ public:
         return runs.empty() ? std::string() : runs.front();
     }
 
-    std::string getOutputRoot()
+    const std::string& get( const BlueConfigSection section,
+                            const std::string& sectionName,
+                            const std::string& key  ) const
     {
-        return table[ brion::CONFIGSECTION_RUN ][ getRun() ][ "OutputRoot" ];
+        // This function doesn't create entries in the tables in case they
+        // doesn't exist.
+        static std::string empty;
+        const ValueTable::const_iterator tableIt =
+            table[section].find( sectionName );
+        if( tableIt == table[section].end( ))
+            return empty;
+        const KVStore& store = tableIt->second;
+        const KVStore::const_iterator kv = store.find( key );
+        if( kv == store.end( ))
+            return empty;
+        return kv->second;
     }
 
-    std::string getCircuitTarget()
+    const std::string& getCircuitTarget()
     {
-        return table[ brion::CONFIGSECTION_RUN ][ getRun() ][ "CircuitTarget" ];
+        return get( brion::CONFIGSECTION_RUN, getRun(), "CircuitTarget" );
     }
+
+    const std::string& getOutputRoot()
+    {
+        return get( brion::CONFIGSECTION_RUN, getRun(), "OutputRoot" );
+    }
+
+
+    template <typename T >
+    bool get( const BlueConfigSection section, const std::string& sectionName,
+              const std::string& key, T& value ) const
+    {
+        try
+        {
+            value = boost::lexical_cast< T >( get( section, sectionName, key ));
+        }
+        catch( const boost::bad_lexical_cast& )
+        {
+            return false;
+        }
+        return true;
+    }
+
 
     Strings names[CONFIGSECTION_ALL];
     ValueTable table[CONFIGSECTION_ALL];
@@ -191,18 +232,24 @@ const std::string& BlueConfig::get( const BlueConfigSection section,
                                     const std::string& sectionName,
                                     const std::string& key ) const
 {
-    return _impl->table[section][sectionName][key];
+    return _impl->get( section, sectionName, key );
 }
 
-std::string BlueConfig::getCircuitSource()
+std::string BlueConfig::getCircuitSource() const
 {
     return get( CONFIGSECTION_RUN, _impl->getRun(), "CircuitPath" ) +
            "/circuit.mvd2";
 }
 
-brion::URI BlueConfig::getReportSource( const std::string& report )
+URI BlueConfig::getReportSource( const std::string& report ) const
 {
     std::string format = get( CONFIGSECTION_REPORT, report, "Format" );
+    if( format.empty( ))
+    {
+        LBWARN << "Invalid or missing report  " << report << std::endl;
+        return URI();
+    }
+
     boost::algorithm::to_lower( format );
 
     if( format == "binary" || format == "bin" )
@@ -220,7 +267,20 @@ brion::URI BlueConfig::getReportSource( const std::string& report )
     return URI();
 }
 
-brion::GIDSet BlueConfig::parseTarget( std::string target )
+URI BlueConfig::getSpikeSource() const
+{
+    std::string path = get( CONFIGSECTION_RUN, _impl->getRun(), "SpikesPath" );
+    if( path.empty( ))
+        path = _impl->getOutputRoot() + SPIKE_FILE;
+    return URI( std::string( "file://" ) + path );
+}
+
+std::string BlueConfig::getCircuitTarget() const
+{
+    return _impl->getCircuitTarget();
+}
+
+GIDSet BlueConfig::parseTarget( std::string target ) const
 {
     if( target.empty( ))
         target = _impl->getCircuitTarget();
@@ -232,6 +292,14 @@ brion::GIDSet BlueConfig::parseTarget( std::string target )
     targets.push_back( brion::Target(
         get( brion::CONFIGSECTION_RUN, run, "TargetFile" )));
     return brion::Target::parse( targets, target );
+}
+
+float BlueConfig::getTimestep() const
+{
+    const std::string& run = _impl->getRun();
+    float timestep = std::numeric_limits<float>::quiet_NaN();
+    _impl->get< float >( brion::CONFIGSECTION_RUN, run, "Dt", timestep );
+    return timestep;
 }
 
 std::ostream& operator << ( std::ostream& os, const BlueConfig& config )

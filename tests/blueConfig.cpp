@@ -157,17 +157,25 @@ BOOST_AUTO_TEST_CASE( semantic_api )
 {
     const std::string prefix( BBP_TESTDATA );
     const brion::BlueConfig config( bbp::test::getBlueconfig( ));
+    const std::string root = config.get( brion::CONFIGSECTION_RUN, "Demo",
+                                         "OutputRoot" );
+
     BOOST_CHECK_EQUAL( config.getCircuitSource(),
                      prefix + "/local/circuits/18.10.10_600cell/circuit.mvd2" );
 
     BOOST_CHECK_EQUAL( config.getReportSource( "unknown"), brion::URI( ));
-    const std::string root = config.get( brion::CONFIGSECTION_RUN, "Demo",
-                                         "OutputRoot" );
     const brion::URI allCompartments =
         config.getReportSource( "allCompartments" );
     BOOST_CHECK_EQUAL( allCompartments.getScheme(), "file" );
     BOOST_CHECK_EQUAL( allCompartments.getPath(),
                        root + "/allCompartments.bbp" );
+
+    const brion::URI spikes = config.getSpikeSource();
+    BOOST_CHECK_EQUAL( spikes.getScheme(), "file" );
+    BOOST_CHECK_EQUAL( spikes.getPath(), root + "/out.dat" );
+
+    BOOST_CHECK_EQUAL( config.getCircuitTarget(), "Column" );
+    BOOST_CHECK_EQUAL( config.getTimestep( ), 0.025f );
 }
 
 BOOST_AUTO_TEST_CASE( parse_target )
