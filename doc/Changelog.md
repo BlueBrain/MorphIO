@@ -1,10 +1,14 @@
 Changelog {#Changelog}
 =========
 
-# git master {#master)
+# git master
 
 * [31](https://github.com/BlueBrain/Brion/pull/31):
   Fix crash while reading more than `ulimit -Sn` (1024 default) NEST gdf files
+* [30](https://github.com/BlueBrain/Brion/pull/30):
+  Added a new library, Brain, to provide higher level functions. The library
+  provides the Circuit and Morphology classes to deal with morphologies at
+  circuit level.
 * [29](https://github.com/BlueBrain/Brion/pull/29):
   New member functions in brion::BlueConfig to provide a semantic API.
 * [28](https://github.com/BlueBrain/Brion/pull/28):

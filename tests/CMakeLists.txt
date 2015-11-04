@@ -15,7 +15,7 @@ endif()
 configure_file(paths.h.in ${PROJECT_BINARY_DIR}/tests/paths.h)
 include_directories(${PROJECT_BINARY_DIR}/tests)
 
-set(TEST_LIBRARIES ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Brion BBPTestData)
+set(TEST_LIBRARIES ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Brain Brion BBPTestData)
 if(LUNCHBOX_USE_SKV)
   common_package(skv REQUIRED)
   include_directories(${SKV_INCLUDE_DIRS})

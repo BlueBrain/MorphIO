@@ -4,7 +4,7 @@
 
 ![](doc/BBPLOGO350.jpg)
 
-Welcome to Brion, a C++ library for read and write access to Blue Brain data
+Welcome to Brion, a C++ project for read and write access to Blue Brain data
 structures, including BlueConfig/CircuitConfig, Circuit, CompartmentReport,
 Mesh, Morphology, Synapse and Target files.
 
@@ -18,7 +18,15 @@ To keep track of the changes between releases check the [changelog](@ref Changel
 
 # Features {#Features}
 
-Brion provides the following major features:
+Brion provides two libraries Brion and Brain. The former is a collection of file
+readers and writers intended for low level access to the data model. The latter
+is a set of higher level classes that wrap low level data objects with a more
+user friendly API.
+
+# IO library
+
+This is the core library provided by Brion. It includes classes for reading
+and writing files which store the Blue Brain data model.
 
 * Fast and low-overhead read access to:
   * Blue configs (brion::BlueConfig)
@@ -26,7 +34,8 @@ Brion provides the following major features:
   * H5 Synapses data (brion::SynapseSummary, brion::Synapse)
   * Target (brion::Target)
   * BBP binary meshes (brion::Mesh)
-  * BBP H5 morphologies and SWC morphologies (brion::Morphology)
+  * BBP H5 morphologies and SWC morphologies (brion::Morphology and
+    brion::morphologies)
   * Compartment reports (brion::CompartmentReport)
   * Spike reports (brion::SpikeReport)
 * Fast and low-overhead write access to:
@@ -37,6 +46,14 @@ Brion provides the following major features:
   [vmmlib](http://vmml.github.io/vmmlib),
   [Lunchbox](http://eyescale.github.io/Lunchbox-1.8/index.html),
   [Boost](http://www.boost.org/doc/libs).
+
+## High level library
+
+The higher level library is called Brain and it provides:
+
+* A circuit class to facilitate loading information about cells and
+  morphologies in local and global circuit coordinates.
+* A morphology class with higher level functions to deal with morphologies.
 
 # Building {#Building}
 

@@ -27,8 +27,6 @@
 namespace brion
 {
 
-namespace detail { class Morphology; }
-
 /** Read & write access to a Morphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
@@ -143,9 +141,9 @@ public:
     //@}
 
 private:
-    detail::Morphology* const _impl;
+    class Impl;
+    Impl* const _impl;
 };
 
 }
-
 #endif

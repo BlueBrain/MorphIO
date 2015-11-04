@@ -36,11 +36,13 @@ common_package_post()
 list(APPEND BRION_DEPENDENT_LIBRARIES Boost Lunchbox vmmlib)
 
 add_subdirectory(brion)
+add_subdirectory(brain)
 add_subdirectory(apps)
 add_subdirectory(tests)
 
 include(CPackConfig)
 
 set(DOXYGEN_MAINPAGE_MD README.md)
-set(DOXYGEN_EXTRA_INPUT ${PROJECT_SOURCE_DIR}/README.md)
+set(DOXYGEN_EXPAND_AS_DEFINED "BRAIN_API BRION_API")
+set(DOXYGEN_EXTRA_INPUT "${PROJECT_SOURCE_DIR}/README.md ${CMAKE_INSTALL_PREFIX}/include/brain")
 include(DoxygenRule)

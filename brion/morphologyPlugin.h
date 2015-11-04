@@ -38,11 +38,11 @@ namespace brion
 class MorphologyInitData : public PluginInitData
 {
 public:
-    explicit MorphologyInitData( const lunchbox::URI& uri )
+    explicit MorphologyInitData( const URI& uri )
         : PluginInitData( uri, MODE_READ )
     {}
 
-    MorphologyInitData( const lunchbox::URI& uri,
+    MorphologyInitData( const URI& uri,
                         const MorphologyVersion version,
                         const unsigned int accessMode )
         : PluginInitData( uri, accessMode )

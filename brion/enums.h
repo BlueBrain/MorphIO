@@ -70,7 +70,7 @@ enum MeshStructure
     MESH_PSD,           //!< post-synaptic densities
     MESH_AZ,            //!< active zones
     MESH_ENDO,          //!< endoplasmic reticulum
-    MESH_ALL
+    MESH_ALL            //!< @internal must be last
 };
 
 /** The supported formats for mesh files. */
@@ -159,7 +159,7 @@ enum TargetType
 {
     TARGET_CELL = 0,
     TARGET_COMPARTMENT,
-    TARGET_ALL
+    TARGET_ALL //!< @internal must be last
 };
 
 /** Classification of neuron substructures. */
@@ -170,6 +170,7 @@ enum SectionType
     SECTION_AXON,
     SECTION_DENDRITE,           //!< general or basal dendrite (near to soma)
     SECTION_APICAL_DENDRITE,    //!< apical dendrite (far from soma)
+    SECTION_ALL //!< @internal must be last
 };
 
 /** The supported attributes of a synapse. */

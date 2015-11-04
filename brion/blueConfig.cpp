@@ -233,6 +233,18 @@ const std::string& BlueConfig::get( const BlueConfigSection section,
     return _impl->get( section, sectionName, key );
 }
 
+brion::Targets BlueConfig::getTargets() const
+{
+    const std::string& run = _impl->getRun();
+    brion::Targets targets;
+    targets.push_back( brion::Target(
+        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_NRN_PATH_KEY  ) +
+        CIRCUIT_TARGET_FILE  ));
+    targets.push_back( brion::Target(
+        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_TARGET_FILE_KEY )));
+    return targets;
+}
+
 URI BlueConfig::getCircuitSource() const
 {
     URI uri;
@@ -312,19 +324,10 @@ std::string BlueConfig::getCircuitTarget() const
     return _impl->getCircuitTarget();
 }
 
-GIDSet BlueConfig::parseTarget( std::string target ) const
+GIDSet BlueConfig::parseTarget( const std::string& target ) const
 {
-    if( target.empty( ))
-        target = _impl->getCircuitTarget();
-
-    const std::string& run = _impl->getRun();
-    brion::Targets targets;
-    targets.push_back( brion::Target(
-        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_NRN_PATH_KEY  ) +
-        CIRCUIT_TARGET_FILE  ));
-    targets.push_back( brion::Target(
-        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_TARGET_FILE_KEY )));
-    return brion::Target::parse( targets, target );
+    return brion::Target::parse(
+        getTargets(), target.empty() ? _impl->getCircuitTarget() : target );
 }
 
 float BlueConfig::getTimestep() const
