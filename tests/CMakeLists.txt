@@ -6,8 +6,8 @@
 # Change this number when adding tests to force a CMake run: 1
 
 if(NOT BBPTESTDATA_FOUND)
-  if(RELEASE_VERSION)
-    message(FATAL_ERROR "Release version requires unit tests")
+  if(ENABLE_COVERAGE)
+    message(FATAL_ERROR "Coverage report generation requires test data")
   endif()
   return()
 endif()

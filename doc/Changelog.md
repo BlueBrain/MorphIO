@@ -1,25 +1,27 @@
 Changelog {#Changelog}
 =========
 
-## git master {master)
+<!-- Uncomment at first change # git master {#master) -->
 
-* [#24](https://github.com/BlueBrain/Brion/pull/24):
+# Release 1.6.0 (9-Nov-2015)
+
+* [24](https://github.com/BlueBrain/Brion/pull/24):
   Add getURI() method in SpikeReport.
-* [#9](https://github.com/BlueBrain/Brion/issues/9):
+* [22](https://github.com/BlueBrain/Brion/pull/22):
+  spikeConverter can process spikes to and from stream-type SpikeReport plugins.
+* [22](https://github.com/BlueBrain/Brion/pull/22):
+  SpikeReport DSO plugins in the LD_LIBRARY_PATH are loaded automatically.
+* [12](https://github.com/BlueBrain/Brion/pull/12):
+  Extended brion::Synapse to also support non-merged synapse files
+* [12](https://github.com/BlueBrain/Brion/pull/12):
+  Add brion::Target::parse() to resolve a given target name
+* [9](https://github.com/BlueBrain/Brion/issues/9):
   Extend SWC parser to support fork and end points and undefined section points.
   The Brion::SectionType enum has not been extended to include end and fork
   points, these types are translated into the most reasonable one based on the
   point ancestors.
-* [#12](https://github.com/BlueBrain/Brion/pull/12):
-  Add brion::Target::parse() to resolve a given target name
-* [#12](https://github.com/BlueBrain/Brion/pull/12):
-  Extended brion::Synapse to also support non-merged synapse files
-* [#22](https://github.com/BlueBrain/Brion/pull/22):
-  SpikeReport DSO plugins in the LD_LIBRARY_PATH are loaded automatically.
-* [#22](https://github.com/BlueBrain/Brion/pull/22):
-  spikeConverter can process spikes to and from stream-type SpikeReport plugins.
 
-## Release 1.5.0 (2015-07-07) {changelog_1_5_0}
+# Release 1.5.0 (7-Jul-2015)
 
 * Add RESTING_VOLTAGE constant.
 * Add support for binary spike reports.
@@ -41,7 +43,7 @@ Changelog {#Changelog}
 * Replace use of iostreams by lunchbox::MemoryMap.
 * Several bugfixes and cleanups.
 
-## Release 1.4.0 (2014-10-08) {changelog_1_4_0}
+# Release 1.4.0 (8-Oct-2014)
 
 * Old report readers have been adapted to be static plugins using
   lunchbox::IOPluginFactory.
@@ -54,11 +56,3 @@ Changelog {#Changelog}
   Lunchbox::PersistentMap.
 * Spike loading has been optimized (in a 12-core GPU the expected
   speed-up is above 4x for large files).
-
-## Known Bugs {Bugs}
-
-The following bugs were known at release time. Please file a
-[Bug Report](https://github.com/BlueBrain/Brion/issues) if you find
-any other issue with this release.
-
-* No known bugs.
