@@ -97,6 +97,9 @@ public:
     /** @return the full path to the circuit.mvd2 file. @sa Circuit */
     BRION_API std::string getCircuitSource() const;
 
+    /** @return the path to the location of synapse nrn files. */
+    BRION_API std::string getSynapseSource() const;
+
     /** @return the URI to the named report. @sa CompartmentReport */
     BRION_API brion::URI getReportSource( const std::string& report ) const;
 

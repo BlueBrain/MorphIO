@@ -241,6 +241,11 @@ std::string BlueConfig::getCircuitSource() const
            "/circuit.mvd2";
 }
 
+std::string BlueConfig::getSynapseSource() const
+{
+    return get( CONFIGSECTION_RUN, _impl->getRun(), "nrnPath" );
+}
+
 URI BlueConfig::getReportSource( const std::string& report ) const
 {
     std::string format = get( CONFIGSECTION_REPORT, report, "Format" );
