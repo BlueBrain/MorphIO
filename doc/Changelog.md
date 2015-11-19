@@ -1,7 +1,10 @@
 Changelog {#Changelog}
 =========
 
-<!-- Uncomment at first change # git master {#master) -->
+# git master {#master)
+
+* [28](https://github.com/BlueBrain/Brion/pull/28):
+  SpikeReport continues parsing files that have broken lines
 
 # Release 1.6.0 (9-Nov-2015)
 
