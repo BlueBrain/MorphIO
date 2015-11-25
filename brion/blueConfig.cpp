@@ -19,12 +19,16 @@
 
 #include "blueConfig.h"
 
+#include <brion/constants.h>
+#include <brion/target.h>
+#include <lunchbox/log.h>
+#include <lunchbox/stdExt.h>
+#include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-#include <lunchbox/log.h>
-#include <lunchbox/stdExt.h>
 
+namespace fs = boost::filesystem;
 namespace boost
 {
 template<>
@@ -73,6 +77,7 @@ typedef stde::hash_map< std::string, KVStore > ValueTable;
 
 namespace detail
 {
+
 class BlueConfig
 {
 public:
@@ -115,7 +120,7 @@ public:
                 continue;
             }
 
-            _names[type].push_back( name );
+            names[type].push_back( name );
 
             Strings lines;
             boost::split( lines, content, boost::is_any_of( "\n" ),
@@ -137,18 +142,71 @@ public:
 
                 std::string value = line.substr( pos+1 );
                 boost::trim( value );
-                _table[type][name].insert( std::make_pair( line.substr( 0, pos),
+                table[type][name].insert( std::make_pair( line.substr( 0, pos),
                                                            value ));
             }
         }
 
-        if( _table[CONFIGSECTION_RUN].empty( ))
+        if( table[CONFIGSECTION_RUN].empty( ))
             LBTHROW( std::runtime_error( source +
                                          " not a valid BlueConfig file" ));
     }
 
-    Strings _names[CONFIGSECTION_ALL];
-    ValueTable _table[CONFIGSECTION_ALL];
+    std::string getRun()
+    {
+        const brion::Strings& runs = names[ brion::CONFIGSECTION_RUN ];
+        return runs.empty() ? std::string() : runs.front();
+    }
+
+    const std::string& get( const BlueConfigSection section,
+                            const std::string& sectionName,
+                            const std::string& key  ) const
+    {
+        // This function doesn't create entries in the tables in case they
+        // don't exist.
+        static std::string empty;
+        const ValueTable::const_iterator tableIt =
+            table[section].find( sectionName );
+        if( tableIt == table[section].end( ))
+            return empty;
+        const KVStore& store = tableIt->second;
+        const KVStore::const_iterator kv = store.find( key );
+        if( kv == store.end( ))
+            return empty;
+        return kv->second;
+    }
+
+    const std::string& getCircuitTarget()
+    {
+        return get( brion::CONFIGSECTION_RUN, getRun(),
+                    BLUECONFIG_CIRCUIT_TARGET_KEY );
+    }
+
+    const std::string& getOutputRoot()
+    {
+        return get( brion::CONFIGSECTION_RUN, getRun(),
+                    BLUECONFIG_OUTPUT_PATH_KEY );
+    }
+
+
+    template <typename T >
+    bool get( const BlueConfigSection section, const std::string& sectionName,
+              const std::string& key, T& value ) const
+    {
+        try
+        {
+            value = boost::lexical_cast< T >( get( section, sectionName, key ));
+        }
+        catch( const boost::bad_lexical_cast& )
+        {
+            return false;
+        }
+        return true;
+    }
+
+
+    Strings names[CONFIGSECTION_ALL];
+    ValueTable table[CONFIGSECTION_ALL];
 };
 }
 
@@ -162,17 +220,120 @@ BlueConfig::~BlueConfig()
     delete _impl;
 }
 
-const Strings&
-BlueConfig::getSectionNames( const BlueConfigSection section ) const
+const Strings& BlueConfig::getSectionNames( const BlueConfigSection section )
+    const
 {
-    return _impl->_names[section];
+    return _impl->names[section];
 }
 
 const std::string& BlueConfig::get( const BlueConfigSection section,
                                     const std::string& sectionName,
                                     const std::string& key ) const
 {
-    return _impl->_table[section][sectionName][key];
+    return _impl->get( section, sectionName, key );
+}
+
+URI BlueConfig::getCircuitSource() const
+{
+    URI uri;
+    uri.setScheme("file");
+    uri.setPath( get( CONFIGSECTION_RUN, _impl->getRun(),
+                      BLUECONFIG_CIRCUIT_PATH_KEY ) + CIRCUIT_FILE );
+    return uri;
+}
+
+
+URI BlueConfig::getSynapseSource() const
+{
+    URI uri;
+    uri.setScheme("file");
+    uri.setPath( get( CONFIGSECTION_RUN, _impl->getRun(),
+                      BLUECONFIG_NRN_PATH_KEY ));
+    return uri;
+}
+
+URI BlueConfig::getMorphologySource() const
+{
+    URI uri;
+    uri.setScheme("file");
+    std::string bare = get( CONFIGSECTION_RUN, _impl->getRun(),
+                            BLUECONFIG_MORPHOLOGY_PATH_KEY );
+    const fs::path barePath( bare );
+    const fs::path guessedPath = barePath / MORPHOLOGY_HDF5_FILES_SUBDIRECTORY;
+    if( fs::exists( guessedPath ) && fs::is_directory( guessedPath ))
+        uri.setPath( guessedPath.string( ));
+    else
+        uri.setPath( bare );
+
+    return uri;
+}
+
+URI BlueConfig::getReportSource( const std::string& report ) const
+{
+    std::string format = get( CONFIGSECTION_REPORT, report,
+                              BLUECONFIG_REPORT_FORMAT_KEY );
+    if( format.empty( ))
+    {
+        LBWARN << "Invalid or missing report  " << report << std::endl;
+        return URI();
+    }
+
+    boost::algorithm::to_lower( format );
+
+    if( format == "binary" || format == "bin" )
+        return URI( std::string( "file://" ) + _impl->getOutputRoot() + "/" +
+                    report + ".bbp" );
+
+    if( format == "hdf5" || format.empty() || fs::is_directory( format ))
+        return URI( std::string( "file://" ) + _impl->getOutputRoot() + "/" +
+                    report + ".h5" );
+
+    if( format == "stream" || format == "leveldb" || format == "skv" )
+        return URI( _impl->getOutputRoot( ));
+
+    LBWARN << "Unknown report format " << format << std::endl;
+    return URI();
+}
+
+URI BlueConfig::getSpikeSource() const
+{
+    std::string path = get( CONFIGSECTION_RUN, _impl->getRun(),
+                            BLUECONFIG_SPIKES_PATH_KEY );
+    if( path.empty( ))
+        path = _impl->getOutputRoot() + SPIKE_FILE;
+    URI uri;
+    uri.setScheme( "file" );
+    uri.setPath( path );
+    return uri;
+}
+
+std::string BlueConfig::getCircuitTarget() const
+{
+    return _impl->getCircuitTarget();
+}
+
+GIDSet BlueConfig::parseTarget( std::string target ) const
+{
+    if( target.empty( ))
+        target = _impl->getCircuitTarget();
+
+    const std::string& run = _impl->getRun();
+    brion::Targets targets;
+    targets.push_back( brion::Target(
+        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_NRN_PATH_KEY  ) +
+        CIRCUIT_TARGET_FILE  ));
+    targets.push_back( brion::Target(
+        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_TARGET_FILE_KEY )));
+    return brion::Target::parse( targets, target );
+}
+
+float BlueConfig::getTimestep() const
+{
+    const std::string& run = _impl->getRun();
+    float timestep = std::numeric_limits<float>::quiet_NaN();
+    _impl->get< float >( brion::CONFIGSECTION_RUN, run, BLUECONFIG_DT_KEY,
+                         timestep );
+    return timestep;
 }
 
 std::ostream& operator << ( std::ostream& os, const BlueConfig& config )
@@ -180,7 +341,7 @@ std::ostream& operator << ( std::ostream& os, const BlueConfig& config )
     for( size_t i = 0; i < CONFIGSECTION_ALL; ++i )
     {
         BOOST_FOREACH( const ValueTable::value_type& entry,
-                       config._impl->_table[i] )
+                       config._impl->table[i] )
         {
             os << boost::lexical_cast< std::string >( BlueConfigSection( i ))
                << " " << entry.first << std::endl;

@@ -92,6 +92,51 @@ public:
     }
     //@}
 
+    /** @name Semantic read API */
+    //@{
+    /** @return the URI to the circuit information. @sa Circuit
+     * @version 1.7
+     */
+    BRION_API URI getCircuitSource() const;
+
+    /** @return the URI to the location of synapse nrn files.
+     * @version 1.7
+     */
+    BRION_API URI getSynapseSource() const;
+
+    /** @return the full path to the morphology database. A suffix may be
+     *          prepended to the to the bare path from the BlueConfig.
+     * @version 1.7
+     */
+    BRION_API URI getMorphologySource() const;
+
+    /** @return the URI to the named report. @sa CompartmentReport
+     * @version 1.7
+     */
+    BRION_API URI getReportSource( const std::string& report ) const;
+
+    /** @return the URI to the default spike data source. @sa SpikeReport
+     * @version 1.7
+     */
+    BRION_API URI getSpikeSource() const;
+
+    /** @return the name of the circuit target
+     * @version 1.7
+     */
+    std::string getCircuitTarget() const;
+
+    /** @return the set of GIDs for the given target, or the circuit target if
+     *          the given target is empty.
+     * @version 1.7
+     */
+    BRION_API brion::GIDSet parseTarget( std::string target ) const;
+
+    /** @return the simulation timestep in ms or NaN if undefined.
+     * @version 1.7
+     */
+    BRION_API float getTimestep() const;
+    //@}
+
 private:
     friend std::ostream& operator << ( std::ostream&, const BlueConfig& );
 

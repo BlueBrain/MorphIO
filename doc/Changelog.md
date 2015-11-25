@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master {#master)
 
+* [29](https://github.com/BlueBrain/Brion/pull/29):
+  New member functions in brion::BlueConfig to provide a semantic API.
 * [28](https://github.com/BlueBrain/Brion/pull/28):
   SpikeReport continues parsing files that have broken lines
 
