@@ -26,12 +26,10 @@
 namespace brion
 {
 
-namespace detail { class Circuit; }
-
 /** Read access to a Circuit file.
  *
- * Following RAII, this class is ready to use after the creation and will ensure
- * release of resources upon destruction.
+ * This class loads the circuit data at creation and will ensure release of
+ * resources upon destruction.
  */
 class Circuit : public boost::noncopyable
 {
@@ -48,6 +46,14 @@ public:
      * @version 1.0
      */
     BRION_API explicit Circuit( const std::string& source );
+
+    /** Open given filepath to a circuit file for reading.
+     *
+     * @param source filepath to circuit file
+     * @throw std::runtime_error if file is not a valid circuit file
+     * @version 1.7
+     */
+    BRION_API explicit Circuit( const URI& source );
 
     /** Retrieve neuron attributes for set of neurons.
      *
@@ -76,7 +82,8 @@ public:
     //@}
 
 private:
-    detail::Circuit* const _impl;
+    class Impl;
+    Impl* const _impl;
 };
 
 }

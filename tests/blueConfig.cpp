@@ -161,9 +161,11 @@ BOOST_AUTO_TEST_CASE( semantic_api )
                                          "OutputRoot" );
 
     BOOST_CHECK_EQUAL( config.getCircuitSource(),
-                     prefix + "/local/circuits/18.10.10_600cell/circuit.mvd2" );
+        brion::URI( prefix + "/local/circuits/18.10.10_600cell/circuit.mvd2" ));
     BOOST_CHECK_EQUAL( config.getSynapseSource(),
-             prefix + "/local/circuits/18.10.10_600cell/ncsFunctionalCompare" );
+        brion::URI( prefix + "/local/circuits/18.10.10_600cell/ncsFunctionalCompare" ));
+    BOOST_CHECK_EQUAL( config.getMorphologySource(),
+        brion::URI( prefix + "/local/morphologies/01.07.08/h5" ));
 
     BOOST_CHECK_EQUAL( config.getReportSource( "unknown"), brion::URI( ));
     const brion::URI allCompartments =

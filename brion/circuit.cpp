@@ -28,8 +28,6 @@
 
 namespace brion
 {
-namespace detail
-{
 
 enum Section
 {
@@ -44,10 +42,10 @@ enum Section
     SECTION_UNKNOWN
 };
 
-class Circuit
+class Circuit::Impl
 {
 public:
-    explicit Circuit( const std::string& source )
+    explicit Impl( const std::string& source )
     {
         namespace fs = boost::filesystem;
         fs::path path = source;
@@ -86,10 +84,6 @@ public:
             else
                 _table[current].push_back( content );
         }
-    }
-
-    ~Circuit()
-    {
     }
 
     NeuronMatrix get( const GIDSet& gids, const uint32_t attributes ) const
@@ -207,10 +201,14 @@ private:
     typedef stde::hash_map< uint32_t, Strings > CircuitTable;
     CircuitTable _table;
 };
-}
 
 Circuit::Circuit( const std::string& source )
-    : _impl( new detail::Circuit( source ))
+    : _impl( new Impl( source ))
+{
+}
+
+Circuit::Circuit( const URI& source )
+    : _impl( new Impl( source.getPath( )))
 {
 }
 

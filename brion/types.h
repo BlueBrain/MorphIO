@@ -58,11 +58,11 @@ class Synapse;
 class SynapseSummary;
 class Target;
 
-typedef vmml::vector< 2, int32_t > Vector2i; //!< A two-component int32 vector
-typedef vmml::vector< 3, float > Vector3f;   //!< A three-component float vector
-typedef vmml::vector< 4, float > Vector4f;   //!< A four-component float vector
-typedef vmml::vector< 3, double > Vector3d; //!< A three-component double vector
-typedef vmml::vector< 4, double > Vector4d; //!< A four-component double vector
+using vmml::Vector2i;
+using vmml::Vector3f;
+using vmml::Vector4f;
+using vmml::Vector3d;
+using vmml::Vector4d;
 
 typedef std::vector< size_t > size_ts;
 typedef std::vector< int32_t > int32_ts;
@@ -124,7 +124,8 @@ const float RESTING_VOLTAGE = -67.; //!< Resting voltage in mV
 const float MINIMUM_VOLTAGE = -80.; //!< Lowest voltage after hyperpolarisation
 
 using lunchbox::Strings;
-using lunchbox::URI;
+
+using servus::URI;
 }
 
 // if you have a type T in namespace N, the operator << for T needs to be in

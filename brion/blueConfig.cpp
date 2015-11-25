@@ -19,6 +19,7 @@
 
 #include "blueConfig.h"
 
+#include <brion/constants.h>
 #include <brion/target.h>
 #include <lunchbox/log.h>
 #include <lunchbox/stdExt.h>
@@ -66,11 +67,6 @@ inline std::string lexical_cast( const brion::BlueConfigSection& b )
     }
     throw boost::bad_lexical_cast();
 }
-}
-
-namespace
-{
-    const char* const SPIKE_FILE = "/out.dat";
 }
 
 namespace brion
@@ -167,7 +163,7 @@ public:
                             const std::string& key  ) const
     {
         // This function doesn't create entries in the tables in case they
-        // doesn't exist.
+        // don't exist.
         static std::string empty;
         const ValueTable::const_iterator tableIt =
             table[section].find( sectionName );
@@ -182,12 +178,14 @@ public:
 
     const std::string& getCircuitTarget()
     {
-        return get( brion::CONFIGSECTION_RUN, getRun(), "CircuitTarget" );
+        return get( brion::CONFIGSECTION_RUN, getRun(),
+                    BLUECONFIG_CIRCUIT_TARGET_KEY );
     }
 
     const std::string& getOutputRoot()
     {
-        return get( brion::CONFIGSECTION_RUN, getRun(), "OutputRoot" );
+        return get( brion::CONFIGSECTION_RUN, getRun(),
+                    BLUECONFIG_OUTPUT_PATH_KEY );
     }
 
 
@@ -235,20 +233,45 @@ const std::string& BlueConfig::get( const BlueConfigSection section,
     return _impl->get( section, sectionName, key );
 }
 
-std::string BlueConfig::getCircuitSource() const
+URI BlueConfig::getCircuitSource() const
 {
-    return get( CONFIGSECTION_RUN, _impl->getRun(), "CircuitPath" ) +
-           "/circuit.mvd2";
+    URI uri;
+    uri.setScheme("file");
+    uri.setPath( get( CONFIGSECTION_RUN, _impl->getRun(),
+                      BLUECONFIG_CIRCUIT_PATH_KEY ) + CIRCUIT_FILE );
+    return uri;
 }
 
-std::string BlueConfig::getSynapseSource() const
+
+URI BlueConfig::getSynapseSource() const
 {
-    return get( CONFIGSECTION_RUN, _impl->getRun(), "nrnPath" );
+    URI uri;
+    uri.setScheme("file");
+    uri.setPath( get( CONFIGSECTION_RUN, _impl->getRun(),
+                      BLUECONFIG_NRN_PATH_KEY ));
+    return uri;
+}
+
+URI BlueConfig::getMorphologySource() const
+{
+    URI uri;
+    uri.setScheme("file");
+    std::string bare = get( CONFIGSECTION_RUN, _impl->getRun(),
+                            BLUECONFIG_MORPHOLOGY_PATH_KEY );
+    const fs::path barePath( bare );
+    const fs::path guessedPath = barePath / MORPHOLOGY_HDF5_FILES_SUBDIRECTORY;
+    if( fs::exists( guessedPath ) && fs::is_directory( guessedPath ))
+        uri.setPath( guessedPath.string( ));
+    else
+        uri.setPath( bare );
+
+    return uri;
 }
 
 URI BlueConfig::getReportSource( const std::string& report ) const
 {
-    std::string format = get( CONFIGSECTION_REPORT, report, "Format" );
+    std::string format = get( CONFIGSECTION_REPORT, report,
+                              BLUECONFIG_REPORT_FORMAT_KEY );
     if( format.empty( ))
     {
         LBWARN << "Invalid or missing report  " << report << std::endl;
@@ -274,10 +297,14 @@ URI BlueConfig::getReportSource( const std::string& report ) const
 
 URI BlueConfig::getSpikeSource() const
 {
-    std::string path = get( CONFIGSECTION_RUN, _impl->getRun(), "SpikesPath" );
+    std::string path = get( CONFIGSECTION_RUN, _impl->getRun(),
+                            BLUECONFIG_SPIKES_PATH_KEY );
     if( path.empty( ))
         path = _impl->getOutputRoot() + SPIKE_FILE;
-    return URI( std::string( "file://" ) + path );
+    URI uri;
+    uri.setScheme( "file" );
+    uri.setPath( path );
+    return uri;
 }
 
 std::string BlueConfig::getCircuitTarget() const
@@ -293,9 +320,10 @@ GIDSet BlueConfig::parseTarget( std::string target ) const
     const std::string& run = _impl->getRun();
     brion::Targets targets;
     targets.push_back( brion::Target(
-        get( brion::CONFIGSECTION_RUN, run, "nrnPath" ) + "/start.target" ));
+        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_NRN_PATH_KEY  ) +
+        CIRCUIT_TARGET_FILE  ));
     targets.push_back( brion::Target(
-        get( brion::CONFIGSECTION_RUN, run, "TargetFile" )));
+        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_TARGET_FILE_KEY )));
     return brion::Target::parse( targets, target );
 }
 
@@ -303,7 +331,8 @@ float BlueConfig::getTimestep() const
 {
     const std::string& run = _impl->getRun();
     float timestep = std::numeric_limits<float>::quiet_NaN();
-    _impl->get< float >( brion::CONFIGSECTION_RUN, run, "Dt", timestep );
+    _impl->get< float >( brion::CONFIGSECTION_RUN, run, BLUECONFIG_DT_KEY,
+                         timestep );
     return timestep;
 }
 
