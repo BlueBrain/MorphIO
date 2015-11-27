@@ -80,9 +80,8 @@ void writeNESTLine( std::fstream& file,
 SpikeReportFile::SpikeReportFile( const std::string& filename,
                                   const SpikeReportType rt,
                                   const int accessMode )
-    : _filename( filename ),
-      _reportType( rt ),
-      _file( 0 )
+    : _filename( filename )
+    , _reportType( rt )
 {
     if( filename.empty( ))
     {
@@ -130,13 +129,11 @@ SpikeReportFile::SpikeReportFile( const std::string& filename,
         }
     }
 
-    _file = new std::fstream( _filename.c_str(), fileMode );
+    _file.reset( new std::fstream( _filename.c_str(), fileMode ));
 }
 
 SpikeReportFile::~SpikeReportFile()
 {
-    if( _file )
-        delete _file;
 }
 
 bool SpikeReportFile::fillReportMap( Spikes& spikes, const size_t maxLines )
@@ -232,7 +229,7 @@ bool SpikeReportFile::fillReportMap( Spikes& spikes, const size_t maxLines )
     return _file->eof();
 }
 
-void SpikeReportFile::writeReportMap( const Spikes &spikes )
+void SpikeReportFile::writeReportMap( const Spikes& spikes )
 {
     if( !_spikeWriteFunction )
         LBTHROW( std::runtime_error( "File is not opened for writing " +
@@ -244,7 +241,8 @@ void SpikeReportFile::writeReportMap( const Spikes &spikes )
 
 void SpikeReportFile::close()
 {
-    _file->close();
+    if( _file )
+        _file->close();
 }
 
 }

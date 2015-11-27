@@ -47,9 +47,9 @@ boost::regex convertToRegex( const std::string& stringWithShellLikeWildcard )
     return boost::regex( "^" + wildcard + "$" );
 }
 
-lunchbox::Strings expandShellWildcard( const std::string& filename )
+Strings expandShellWildcard( const std::string& filename )
 {
-    lunchbox::Strings expandedFilenames;
+    Strings expandedFilenames;
 
     namespace fs = boost::filesystem;
 
@@ -75,39 +75,29 @@ lunchbox::Strings expandShellWildcard( const std::string& filename )
 
 SpikeReportNEST::SpikeReportNEST( const SpikeReportInitData& initData )
     : _uri( initData.getURI( ))
+    , _spikeReportFile( _uri.getPath(), NEST_SPIKE_REPORT,
+                        initData.getAccessMode( ))
 {
     const int accessMode = initData.getAccessMode();
 
     if( accessMode == MODE_READ )
-        _reportFiles = expandShellWildcard( _uri.getPath( ));
-
-    if( accessMode & MODE_WRITE  )
-        _reportFiles.push_back( _uri.getPath( ));
-
-    _spikeReportFiles.resize( _reportFiles.size( ));
-
-    bool emptyReport = true;
-    size_t reportIndex = 0;
-    BOOST_FOREACH( const std::string& reportFile, _reportFiles )
     {
-        _spikeReportFiles[ reportIndex ] =
-                    new SpikeReportFile( reportFile,
-                                         NEST_SPIKE_REPORT,
-                                         accessMode );
-        if( accessMode == MODE_READ )
-            _spikeReportFiles[ reportIndex ]->fillReportMap( _spikes );
-        emptyReport = false;
-        ++reportIndex;
-    }
+        const Strings& reportFiles = expandShellWildcard( _uri.getPath( ));
+        if( reportFiles.empty( ))
+            LBTHROW( std::runtime_error( "No file(s) to read found in " +
+                                         _uri.getPath( )));
 
-    if( emptyReport )
-        LBTHROW( std::runtime_error( "Empty source" ));
+        BOOST_FOREACH( const std::string& reportFile, reportFiles )
+        {
+            SpikeReportFile reader( reportFile, NEST_SPIKE_REPORT, MODE_READ );
+            reader.fillReportMap( _spikes );
+        }
+        return;
+    }
 }
 
 SpikeReportNEST::~SpikeReportNEST()
 {
-    BOOST_FOREACH( SpikeReportFile* writer, _spikeReportFiles )
-       delete writer;
 }
 
 const URI& SpikeReportNEST::getURI() const
@@ -117,7 +107,7 @@ const URI& SpikeReportNEST::getURI() const
 
 bool SpikeReportNEST::handles( const SpikeReportInitData& initData )
 {
-    const lunchbox::URI& uri = initData.getURI();
+    const URI& uri = initData.getURI();
 
     if( !uri.getScheme().empty() && uri.getScheme() != "file" )
         return false;
@@ -129,7 +119,7 @@ bool SpikeReportNEST::handles( const SpikeReportInitData& initData )
 
 float SpikeReportNEST::getStartTime() const
 {
-    if ( _spikes.empty( ))
+    if( _spikes.empty( ))
         return std::numeric_limits< float >::max();
 
     return _spikes.begin()->first;
@@ -137,7 +127,7 @@ float SpikeReportNEST::getStartTime() const
 
 float SpikeReportNEST::getEndTime() const
 {
-    if ( _spikes.empty( ))
+    if( _spikes.empty( ))
         return std::numeric_limits< float >::max();
 
     return _spikes.rbegin()->first;
@@ -148,18 +138,14 @@ const Spikes& SpikeReportNEST::getSpikes() const
     return _spikes;
 }
 
-void SpikeReportNEST::writeSpikes( const Spikes &spikes )
+void SpikeReportNEST::writeSpikes( const Spikes& spikes )
 {
-    BOOST_FOREACH( SpikeReportFile* writer,
-                   _spikeReportFiles )
-        writer->writeReportMap( spikes );
+    _spikeReportFile.writeReportMap( spikes );
 }
 
 void SpikeReportNEST::close()
 {
-    BOOST_FOREACH( SpikeReportFile* writer,
-                   _spikeReportFiles )
-       writer->close();
+    _spikeReportFile.close();
 }
 
 }
