@@ -53,7 +53,6 @@ class Mesh;
 class Morphology;
 class SpikeReport;
 class SpikeReportPlugin;
-
 class Synapse;
 class SynapseSummary;
 class Target;

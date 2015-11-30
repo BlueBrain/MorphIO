@@ -43,6 +43,16 @@ set(BRION_HEADERS
   )
 
 set(BRION_SOURCES
+  blueConfig.cpp
+  circuit.cpp
+  compartmentReport.cpp
+  mesh.cpp
+  morphology.cpp
+  spikeReport.cpp
+  synapseSummary.cpp
+  synapse.cpp
+  target.cpp
+  detail/lockHDF5.cpp
   plugin/compartmentReportCommon.cpp
   plugin/compartmentReportBinary.cpp
   plugin/compartmentReportHDF5.cpp
@@ -55,14 +65,4 @@ set(BRION_SOURCES
   plugin/spikeReportFile.cpp
   plugin/spikeReportNEST.cpp
   plugin/spikeReportSimpleStreamer.cpp
-  blueConfig.cpp
-  circuit.cpp
-  compartmentReport.cpp
-  mesh.cpp
-  morphology.cpp
-  spikeReport.cpp
-  synapseSummary.cpp
-  synapse.cpp
-  target.cpp
-  detail/lockHDF5.cpp
   )

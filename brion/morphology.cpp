@@ -29,35 +29,31 @@
 namespace brion
 {
 
-namespace detail
-{
-class Morphology
+class Morphology::Impl
 {
 public:
     typedef lunchbox::PluginFactory< MorphologyPlugin, MorphologyInitData >
         MorphologyPluginFactory;
 
-    explicit Morphology( const MorphologyInitData& initData )
+    explicit Impl( const MorphologyInitData& initData )
         : plugin( MorphologyPluginFactory::getInstance().create( initData ))
     {
     }
 
     boost::scoped_ptr< MorphologyPlugin > plugin;
 };
-}
 
 Morphology::Morphology( const std::string& source )
-    : _impl( new detail::Morphology(
-                 MorphologyInitData( lunchbox::URI( source ))))
+    : _impl( new Impl( MorphologyInitData( lunchbox::URI( source ))))
 {
 }
 
 Morphology::Morphology( const std::string& target,
                         const MorphologyVersion version,
                         const bool overwrite )
-    : _impl( new detail::Morphology(
-                 MorphologyInitData( lunchbox::URI( target ), version,
-                                     overwrite ? MODE_OVERWRITE : MODE_WRITE )))
+    : _impl( new Impl( MorphologyInitData( lunchbox::URI( target ), version,
+                                           overwrite ? MODE_OVERWRITE :
+                                                       MODE_WRITE )))
 {
 }
 

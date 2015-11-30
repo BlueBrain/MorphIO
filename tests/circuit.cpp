@@ -29,6 +29,7 @@
  */
 
 #include <brion/brion.h>
+#include <brain/brain.h>
 #include <BBP/TestDatasets.h>
 
 #define BOOST_TEST_MODULE Circuit
@@ -147,4 +148,138 @@ BOOST_AUTO_TEST_CASE(test_types)
     BOOST_CHECK_EQUAL( etypes[5], "bNA" );
     BOOST_CHECK_EQUAL( etypes[6], "bAD" );
     BOOST_CHECK_EQUAL( etypes[7], "cST" );
+}
+
+BOOST_AUTO_TEST_CASE( brain_circuit_constructor )
+{
+    brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+    brain::Circuit circuit2( brion::BlueConfig( bbp::test::getBlueconfig( )));
+    BOOST_CHECK_THROW( brain::Circuit( brion::URI( "pluto" )),
+                       std::runtime_error );
+}
+
+BOOST_AUTO_TEST_CASE( brain_circuit_target )
+{
+    const brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+    const brion::BlueConfig config( bbp::test::getBlueconfig( ));
+
+    brion::GIDSet first = circuit.getGIDs();
+    brion::GIDSet second = config.parseTarget( "" );
+    BOOST_CHECK_EQUAL_COLLECTIONS( first.begin(), first.end(),
+                                   second.begin(), second.end( ));
+
+    first = circuit.getGIDs( "Column" );
+    second = config.parseTarget( "Column" );
+    BOOST_CHECK_EQUAL_COLLECTIONS( first.begin(), first.end(),
+                                   second.begin(), second.end( ));
+
+    first = circuit.getGIDs( "AllL5CSPC" );
+    second = config.parseTarget( "AllL5CSPC" );
+    BOOST_CHECK_EQUAL_COLLECTIONS( first.begin(), first.end(),
+                                   second.begin(), second.end( ));
+}
+
+BOOST_AUTO_TEST_CASE( brain_circuit_positions )
+{
+    const brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+
+    brion::GIDSet gids;
+    gids.insert(1);
+    gids.insert(2);
+    // This call also tests brain::Circuit::getMorphologyURIs
+    const brain::Vector3fs positions = circuit.getPositions( gids );
+    BOOST_CHECK_EQUAL( positions.size(), gids.size( ));
+
+    typedef brain::Vector3f V3;
+    BOOST_CHECK_SMALL(
+        ( positions[0] - V3( 54.410675, 1427.669280, 124.882234 )).length(),
+        0.000001f );
+    BOOST_CHECK_SMALL(
+        ( positions[1] - V3( 28.758332, 1393.556264, 98.258210 )).length(),
+        0.000001f );
+}
+
+namespace
+{
+void _checkMorphology( const brain::Morphology& morphology,
+                       const std::string& other )
+{
+    const brion::Morphology reference(
+        BBP_TESTDATA + ( "/local/morphologies/01.07.08/h5/" + other ));
+    BOOST_CHECK( morphology.getPoints() ==
+                 *reference.readPoints( brion::MORPHOLOGY_UNDEFINED ));
+}
+void _checkMorphology( const brain::Morphology& morphology,
+                       const std::string& other,
+                       const brain::Matrix4f& transform )
+{
+    const brain::Morphology reference(
+        brion::URI(
+            BBP_TESTDATA + ( "/local/morphologies/01.07.08/h5/" + other)),
+        transform );
+    const brain::Vector4fs& p = morphology.getPoints();
+    const brain::Vector4fs& q = reference.getPoints();
+    BOOST_REQUIRE( p.size() == q.size( ));
+    for( size_t i = 0; i != p.size(); ++i )
+        BOOST_CHECK_SMALL(( p[i] - q[i] ).length( ), 0.0001f);
+}
+}
+
+BOOST_AUTO_TEST_CASE( load_bad_morphologies )
+{
+    const brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+
+    brion::GIDSet gids;
+    gids.insert( 10000000 );
+    BOOST_CHECK_THROW(
+        circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_LOCAL ),
+        std::runtime_error );
+}
+
+BOOST_AUTO_TEST_CASE( load_local_morphologies )
+{
+    const brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+
+    brion::GIDSet gids;
+    for( uint32_t gid = 1; gid < 500; gid += 75)
+        gids.insert(gid);
+    // This call also tests brain::Circuit::getMorphologyURIs
+    const brain::Morphologies morphologies =
+        circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_LOCAL );
+    BOOST_CHECK_EQUAL( morphologies.size(), gids.size( ));
+
+    // Checking the first morphology
+    _checkMorphology( *morphologies[0], "R-C010306G.h5" );
+
+    // Checking shared morphologies
+    gids.clear();
+    gids.insert(2);
+    gids.insert(4);
+    gids.insert(6);
+    const brain::Morphologies repeated =
+        circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_LOCAL );
+
+    BOOST_CHECK_EQUAL( repeated.size(), gids.size( ));
+    BOOST_CHECK_EQUAL( repeated[0].get(), repeated[2].get( ));
+    BOOST_CHECK( repeated[0].get() != repeated[1].get( ));
+}
+
+BOOST_AUTO_TEST_CASE( load_global_morphologies )
+{
+    const brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+
+    brion::GIDSet gids;
+    for( uint32_t gid = 1; gid < 500; gid += 75)
+        gids.insert(gid);
+    const brain::Morphologies morphologies =
+        circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_GLOBAL );
+    BOOST_CHECK_EQUAL( morphologies.size(), gids.size( ));
+
+    // Checking the first morphology
+    brain::Matrix4f matrix( brain::Matrix4f::IDENTITY );
+    matrix.rotate_y( -75.992327 * M_PI/180.0f );
+    matrix.set_translation(
+        brain::Vector3f( 54.410675, 1427.669280, 124.882234 ));
+
+    _checkMorphology( *morphologies[0], "R-C010306G.h5", matrix );
 }

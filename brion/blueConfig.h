@@ -74,6 +74,12 @@ public:
                                       const std::string& sectionName,
                                       const std::string& key ) const;
 
+    /**
+     * @return the user and circuit file target parsers.
+     * @version 1.7
+     */
+    BRION_API Targets getTargets() const;
+
     /** Get value as type T for key in given section.
      *
      * @param section type of section to get the value from
@@ -92,20 +98,24 @@ public:
     }
     //@}
 
+
     /** @name Semantic read API */
     //@{
-    /** @return the URI to the circuit information. @sa Circuit
+    /**
+     * @return the URI to the circuit information. @sa Circuit
      * @version 1.7
      */
     BRION_API URI getCircuitSource() const;
 
-    /** @return the URI to the location of synapse nrn files.
+    /*
+     * @return the URI to the location of synapse nrn files.
      * @version 1.7
      */
     BRION_API URI getSynapseSource() const;
 
-    /** @return the full path to the morphology database. A suffix may be
-     *          prepended to the to the bare path from the BlueConfig.
+    /**
+     * @return the full path to the morphology database. A suffix may be
+     *         prepended to the to the bare path from the BlueConfig.
      * @version 1.7
      */
     BRION_API URI getMorphologySource() const;
@@ -115,21 +125,24 @@ public:
      */
     BRION_API URI getReportSource( const std::string& report ) const;
 
-    /** @return the URI to the default spike data source. @sa SpikeReport
+    /**
+     * @return the URI to the default spike data source. @sa SpikeReport
      * @version 1.7
      */
     BRION_API URI getSpikeSource() const;
 
-    /** @return the name of the circuit target
+    /**
+     * @return the name of the circuit target
      * @version 1.7
      */
     std::string getCircuitTarget() const;
 
-    /** @return the set of GIDs for the given target, or the circuit target if
-     *          the given target is empty.
+    /**
+     * @return the set of GIDs for the given target, or the circuit target if
+     *         the given target is empty.
      * @version 1.7
      */
-    BRION_API brion::GIDSet parseTarget( std::string target ) const;
+    BRION_API GIDSet parseTarget( const std::string& target ) const;
 
     /** @return the simulation timestep in ms or NaN if undefined.
      * @version 1.7
