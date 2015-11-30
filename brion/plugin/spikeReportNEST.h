@@ -61,9 +61,7 @@ public:
 private:
     const URI _uri;
     Spikes _spikes;
-    Strings _reportFiles;
-    typedef std::vector< SpikeReportFile* > SpikeReportFiles;
-    SpikeReportFiles _spikeReportFiles;
+    SpikeReportFile _spikeReportFile;
 };
 
 }

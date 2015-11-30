@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master {#master)
 
+* [31](https://github.com/BlueBrain/Brion/pull/31):
+  Fix crash while reading more than `ulimit -Sn` (1024 default) NEST gdf files
 * [29](https://github.com/BlueBrain/Brion/pull/29):
   New member functions in brion::BlueConfig to provide a semantic API.
 * [28](https://github.com/BlueBrain/Brion/pull/28):

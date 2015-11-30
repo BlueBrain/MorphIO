@@ -23,6 +23,8 @@
 #include <brion/types.h>
 #include "spikeReportTypes.h"
 
+#include <boost/scoped_ptr.hpp>
+
 namespace brion
 {
 namespace plugin
@@ -110,7 +112,7 @@ private:
 
     std::string _filename;
     SpikeReportType _reportType;
-    std::fstream *_file;
+    boost::scoped_ptr< std::fstream > _file;
     SpikeParseFunc _spikeParseFunction;
     SpikeWriteFunc _spikeWriteFunction;
 };
