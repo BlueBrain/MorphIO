@@ -39,7 +39,6 @@ namespace brion
 class PluginInitData
 {
 public:
-
     /**
      * Create a PluginInitData object given a URI and access mode.
      *
@@ -48,24 +47,23 @@ public:
      * @param accessMode the brion::AccessMode bitmask
      * @version 1.4
      */
-    explicit PluginInitData( const lunchbox::URI& uri,
+    explicit PluginInitData( const URI& uri,
                              const int accessMode = MODE_READ )
         : _uri( uri ), _accessMode( accessMode )
     {}
 
     /** @return the URI. @version 1.4 */
-    const lunchbox::URI& getURI( ) const { return _uri; }
+    const URI& getURI() const { return _uri; }
 
     /**
      *
      * @return Returns the access mode.
      * @version 1.4
      */
-    int getAccessMode( ) const { return _accessMode; }
+    int getAccessMode() const { return _accessMode; }
 
 protected:
-
-    const lunchbox::URI _uri;
+    const URI _uri;
     const int _accessMode;
 };
 

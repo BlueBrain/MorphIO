@@ -44,7 +44,7 @@ public:
      * @param gids the neurons of interest in READ_MODE
      * @version 1.4
      */
-    explicit CompartmentReportInitData( const lunchbox::URI& uri,
+    explicit CompartmentReportInitData( const URI& uri,
                                         const int accessMode =  MODE_READ,
                                         const GIDSet& gids = GIDSet( ))
         : PluginInitData( uri, accessMode )

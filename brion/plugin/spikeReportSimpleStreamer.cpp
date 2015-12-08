@@ -56,7 +56,7 @@ SpikeReportSimpleStreamer::~SpikeReportSimpleStreamer()
 
 bool SpikeReportSimpleStreamer::handles( const SpikeReportInitData& initData )
 {
-    const lunchbox::URI& uri = initData.getURI();
+    const URI& uri = initData.getURI();
 
     if( uri.getScheme() != "spikes" )
         return false;

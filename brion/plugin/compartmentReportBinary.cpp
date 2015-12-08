@@ -175,7 +175,7 @@ bool CompartmentReportBinary::handles(
     if( initData.getAccessMode() != MODE_READ )
         return false;
 
-    const lunchbox::URI& uri = initData.getURI();
+    const URI& uri = initData.getURI();
     if( !uri.getScheme().empty() && uri.getScheme() != "file" )
         return false;
 
