@@ -5,16 +5,19 @@ Changelog {#Changelog}
 
 * [39](https://github.com/BlueBrain/Brion/pull/39):
   Add compartment report converter tool
+* [30](https://github.com/BlueBrain/Brion/pull/30), [35](https://github.com/BlueBrain/Brion/pull/35):
+  Added a new library, Brain, to provide higher level functions and classes.
+  The library provides:
+  - A Circuit class to get basic information from cells and targets and load
+    morphologies at circuit level.
+  - A brain::cell namspace with a Morphology class plus other related classes
+    to access morphological data about neurons.
 * [38](https://github.com/BlueBrain/Brion/pull/38):
   Fix crash while reading more than `ulimit -Sn` (1024 default) morphologies
 * [37](https://github.com/BlueBrain/Brion/pull/37):
   Added support for synapse nrn_extra.h5 files.
 * [31](https://github.com/BlueBrain/Brion/pull/31):
   Fix crash while reading more than `ulimit -Sn` (1024 default) NEST gdf files
-* [30](https://github.com/BlueBrain/Brion/pull/30):
-  Added a new library, Brain, to provide higher level functions. The library
-  provides the Circuit and Morphology classes to deal with morphologies at
-  circuit level.
 * [29](https://github.com/BlueBrain/Brion/pull/29):
   New member functions in brion::BlueConfig to provide a semantic API.
 * [28](https://github.com/BlueBrain/Brion/pull/28):

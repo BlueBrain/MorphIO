@@ -18,7 +18,7 @@
  */
 
 #include "circuit.h"
-#include "morphology.h"
+#include "cell/morphology.h"
 
 #include <brion/blueConfig.h>
 #include <brion/circuit.h>
@@ -102,11 +102,11 @@ URIs Circuit::getMorphologyURIs( const GIDSet& gids ) const
     return uris;
 }
 
-Morphologies Circuit::loadMorphologies( const GIDSet& gids,
+cell::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
                                         const Coordinates coords ) const
 {
     const URIs& uris = getMorphologyURIs( gids );
-    Morphologies result;
+    cell::Morphologies result;
     result.reserve( uris.size( ));
 
     if( coords == COORDINATES_GLOBAL )
@@ -116,22 +116,22 @@ Morphologies Circuit::loadMorphologies( const GIDSet& gids,
         {
             const URI& uri = uris[i];
             const brion::Morphology raw( uri.getPath( ));
-            result.push_back( MorphologyPtr( new Morphology( raw,
-                                                             transforms[i] )));
+            result.push_back( cell::MorphologyPtr(
+                                  new cell::Morphology( raw, transforms[i] )));
         }
         return result;
     }
 
-    std::map< std::string, MorphologyPtr > loaded;
+    std::map< std::string, cell::MorphologyPtr > loaded;
     for( size_t i = 0; i < uris.size(); ++i )
     {
         const URI& uri = uris[i];
 
-        MorphologyPtr& morphology = loaded[uri.getPath()];
+        cell::MorphologyPtr& morphology = loaded[uri.getPath()];
         if( !morphology )
         {
             const brion::Morphology raw( uri.getPath( ));
-            morphology.reset( new Morphology( raw ));
+            morphology.reset( new cell::Morphology( raw ));
         }
 
         result.push_back( morphology );

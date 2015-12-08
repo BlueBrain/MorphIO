@@ -8,16 +8,20 @@ source_group(\\ FILES CMakeLists.txt)
 
 set(BRAIN_PUBLIC_HEADERS
   circuit.h
-  morphology.h
   types.h
+  cell/morphology.h
+  cell/section.h
   )
 
 set(BRAIN_HEADERS
+  cell/morphologyImpl.h
   )
 
 set(BRAIN_SOURCES
   circuit.cpp
-  morphology.cpp
+  cell/morphology.cpp
+  cell/morphologyImpl.cpp
+  cell/section.cpp
   )
 
 set(BRAIN_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})

@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2013-2015, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -18,15 +17,19 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_MORPHOLOGY
-#define BRAIN_MORPHOLOGY
+#ifndef BRAIN_CELL_MORPHOLOGY
+#define BRAIN_CELL_MORPHOLOGY
 
 #include <brain/api.h>
 #include <brain/types.h>
 
+//#include <brain/cell/section.h>
+
 #include <boost/noncopyable.hpp>
 
 namespace brain
+{
+namespace cell
 {
 
 /**
@@ -46,6 +49,9 @@ namespace brain
 class Morphology : public boost::noncopyable
 {
 public:
+    /** @internal */
+    class Impl;
+
     /**
      * Create a morphology from a URI, load all the data and transform
      * the points.
@@ -91,31 +97,25 @@ public:
     /** @copydoc brion::Morphology::getApicals */
     BRAIN_API const Vector2is& getApicals() const;
 
-    /**
-     * Return the list of ids for the given section types.
-     */
+    /** Return the list of ids for the given section types. */
     BRAIN_API uint32_ts getSectionIDs( const SectionTypes& types ) const;
 
+    /** Return the sections which have the given section type. */
+    BRAIN_API Sections getSections( SectionType type ) const;
+
+    /** Return the sections which have any of the given section types. */
+    BRAIN_API Sections getSections( const SectionTypes& types ) const;
+
     /**
-     * Return a list of points sampling a sections at discrete locations or all
-     * the available points of no sample locations are given.
-     *
-     * @param sectionID Section to sample. If the section is the soma this
-     *        function will return the soma position for all sampling positions.
-     *        The soma position is assumed to be (0, 0, 0) unless the morphology
-     *        has been transformed.
-     * @param points Normalized positions of the sample points along the
-     *        section. Values will be clampled to [0, 1] before sampling.
-     * @return The vector with all the points of the section if points is empty.
-     *         The section sampled at the given points otherwise.
+     * Return the Section with the given id.
+     * @throw runtime_error if the id is out of range
      */
-    BRAIN_API Vector4fs getSectionSamples(
-        size_t sectionID, const floats& points = brion::floats( )) const;
+    BRAIN_API Section getSection( const uint32_t& id ) const;
 
 private:
-    class Impl;
     Impl* const _impl;
 };
 
+}
 }
 #endif
