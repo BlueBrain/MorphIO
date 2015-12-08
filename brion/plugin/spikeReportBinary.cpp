@@ -73,7 +73,7 @@ SpikeReportBinary::SpikeReportBinary( const SpikeReportInitData& initData )
 
 bool SpikeReportBinary::handles( const SpikeReportInitData& initData )
 {
-    const lunchbox::URI& uri = initData.getURI();
+    const URI& uri = initData.getURI();
     if( !uri.getScheme().empty() && uri.getScheme() != "file" )
         return false;
 

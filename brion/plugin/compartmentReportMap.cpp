@@ -52,7 +52,7 @@ const uint32_t _version = 3; // Increase with each change in a k/v pair
 const uint32_t _magic = 0xdb;
 const size_t _queueDepth = 32768; // async queue depth, heuristic from benchmark
 
-std::string _getScope( const lunchbox::URI& uri )
+std::string _getScope( const URI& uri )
 {
     return uri.findQuery( "name" )->second + "_" +
         uri.findQuery( "target" )->second + "_";

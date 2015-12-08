@@ -22,8 +22,6 @@
 #ifndef BRION_ENUMS
 #define BRION_ENUMS
 
-#include <lunchbox/uri.h>
-
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>

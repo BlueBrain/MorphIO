@@ -26,6 +26,7 @@
 #include <boost/multi_array.hpp>
 #include <boost/shared_ptr.hpp>
 #include <lunchbox/types.h>
+#include <servus/uri.h>
 #include <set>
 #include <map>
 

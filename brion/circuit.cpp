@@ -22,8 +22,8 @@
 
 #include <bitset>
 #include <boost/filesystem.hpp>
-#include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
+#include <boost/tokenizer.hpp>
 #include <lunchbox/stdExt.h>
 
 namespace brion

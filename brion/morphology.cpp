@@ -44,14 +44,14 @@ public:
 };
 
 Morphology::Morphology( const std::string& source )
-    : _impl( new Impl( MorphologyInitData( lunchbox::URI( source ))))
+    : _impl( new Impl( MorphologyInitData( URI( source ))))
 {
 }
 
 Morphology::Morphology( const std::string& target,
                         const MorphologyVersion version,
                         const bool overwrite )
-    : _impl( new Impl( MorphologyInitData( lunchbox::URI( target ), version,
+    : _impl( new Impl( MorphologyInitData( URI( target ), version,
                                            overwrite ? MODE_OVERWRITE :
                                                        MODE_WRITE )))
 {

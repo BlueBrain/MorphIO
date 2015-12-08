@@ -205,7 +205,7 @@ CompartmentReportHDF5::~CompartmentReportHDF5()
 
 bool CompartmentReportHDF5::handles( const CompartmentReportInitData& initData )
 {
-    const lunchbox::URI& uri = initData.getURI();
+    const URI& uri = initData.getURI();
     if( !uri.getScheme().empty() && uri.getScheme() != "file" )
         return false;
 

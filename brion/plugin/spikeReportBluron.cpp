@@ -48,7 +48,7 @@ SpikeReportBluron::SpikeReportBluron( const SpikeReportInitData& initData )
 
 bool SpikeReportBluron::handles( const SpikeReportInitData& initData )
 {
-    const lunchbox::URI& uri = initData.getURI();
+    const URI& uri = initData.getURI();
 
     if( !uri.getScheme().empty() && uri.getScheme() != "file" )
         return false;

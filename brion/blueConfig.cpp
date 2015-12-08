@@ -19,14 +19,15 @@
 
 #include "blueConfig.h"
 
-#include <brion/constants.h>
-#include <brion/target.h>
-#include <lunchbox/log.h>
-#include <lunchbox/stdExt.h>
+#include "constants.h"
+#include "target.h"
+
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
+#include <lunchbox/log.h>
+#include <lunchbox/stdExt.h>
 
 namespace fs = boost::filesystem;
 namespace boost

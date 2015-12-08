@@ -23,6 +23,7 @@ set(BRION_PUBLIC_HEADERS
   )
 
 set(BRION_HEADERS
+  constants.h
   plugin/compartmentReportCommon.h
   plugin/compartmentReportBinary.h
   plugin/compartmentReportHDF5.h

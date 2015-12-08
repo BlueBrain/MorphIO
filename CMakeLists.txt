@@ -30,10 +30,11 @@ common_package(Boost REQUIRED COMPONENTS date_time filesystem program_options
 common_package(HDF5 REQUIRED COMPONENTS C CXX)
 common_package(Lunchbox REQUIRED)
 common_package(OpenMP)
+common_package(Servus REQUIRED)
 common_package(vmmlib REQUIRED)
 common_package_post()
 
-list(APPEND BRION_DEPENDENT_LIBRARIES Boost Lunchbox vmmlib)
+list(APPEND BRION_DEPENDENT_LIBRARIES Boost Lunchbox Servus vmmlib)
 
 add_subdirectory(brion)
 add_subdirectory(brain)

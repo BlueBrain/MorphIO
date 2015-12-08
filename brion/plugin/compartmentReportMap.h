@@ -76,7 +76,7 @@ public:
     };
 
 private:
-    lunchbox::URI _uri;
+    URI _uri;
     lunchbox::PersistentMap _store;
 
     Header _header;
