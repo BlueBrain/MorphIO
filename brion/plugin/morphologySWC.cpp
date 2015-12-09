@@ -240,7 +240,7 @@ void MorphologySWC::flush()
 
 void MorphologySWC::_readSamples( RawSWCInfo& info )
 {
-    std::ifstream file( info.filename );
+    std::ifstream file( info.filename.c_str( ));
     if( file.fail( ))
         LBTHROW( std::runtime_error(
                      "Error opening morphology file: " + info.filename ));
