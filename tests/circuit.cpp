@@ -152,15 +152,15 @@ BOOST_AUTO_TEST_CASE(test_types)
 
 BOOST_AUTO_TEST_CASE( brain_circuit_constructor )
 {
-    brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
-    brain::Circuit circuit2( brion::BlueConfig( bbp::test::getBlueconfig( )));
+    brain::Circuit circuit( (brion::URI( bbp::test::getBlueconfig( ))));
+    brain::Circuit circuit2( (brion::BlueConfig( bbp::test::getBlueconfig( ))));
     BOOST_CHECK_THROW( brain::Circuit( brion::URI( "pluto" )),
                        std::runtime_error );
 }
 
 BOOST_AUTO_TEST_CASE( brain_circuit_target )
 {
-    const brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+    const brain::Circuit circuit( (brion::URI( bbp::test::getBlueconfig( ))));
     const brion::BlueConfig config( bbp::test::getBlueconfig( ));
 
     brion::GIDSet first = circuit.getGIDs();
@@ -181,7 +181,7 @@ BOOST_AUTO_TEST_CASE( brain_circuit_target )
 
 BOOST_AUTO_TEST_CASE( brain_circuit_positions )
 {
-    const brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+    const brain::Circuit circuit( (brion::URI( bbp::test::getBlueconfig( ))));
 
     brion::GIDSet gids;
     gids.insert(1);
@@ -227,7 +227,7 @@ void _checkMorphology( const brain::Morphology& morphology,
 
 BOOST_AUTO_TEST_CASE( load_bad_morphologies )
 {
-    const brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+    const brain::Circuit circuit( (brion::URI( bbp::test::getBlueconfig( ))));
 
     brion::GIDSet gids;
     gids.insert( 10000000 );
@@ -238,7 +238,7 @@ BOOST_AUTO_TEST_CASE( load_bad_morphologies )
 
 BOOST_AUTO_TEST_CASE( load_local_morphologies )
 {
-    const brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+    const brain::Circuit circuit( (brion::URI( bbp::test::getBlueconfig( ))));
 
     brion::GIDSet gids;
     for( uint32_t gid = 1; gid < 500; gid += 75)
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE( load_local_morphologies )
 
 BOOST_AUTO_TEST_CASE( load_global_morphologies )
 {
-    const brain::Circuit circuit( brion::URI( bbp::test::getBlueconfig( )));
+    const brain::Circuit circuit( (brion::URI( bbp::test::getBlueconfig( ))));
 
     brion::GIDSet gids;
     for( uint32_t gid = 1; gid < 500; gid += 75)
