@@ -49,7 +49,7 @@ public:
     public:
         DSOPluginsLoader()
         {
-            auto& factory = SpikePluginFactory::getInstance();
+            SpikePluginFactory& factory = SpikePluginFactory::getInstance();
             factory.load( BRION_VERSION_ABI, lunchbox::getLibraryPaths(),
                           spikePluginDSONamePattern );
         }
