@@ -51,7 +51,7 @@ public:
 
     /**
      * Opens a circuit for read access.
-     * @param config The object representing the BlueConfig.
+     * @param blueConfig The object representing the BlueConfig.
      */
     BRAIN_API explicit Circuit( const brion::BlueConfig& blueConfig );
 

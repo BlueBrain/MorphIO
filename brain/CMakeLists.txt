@@ -6,7 +6,19 @@
 
 source_group(\\ FILES CMakeLists.txt)
 
-include(files.cmake)
+set(BRAIN_PUBLIC_HEADERS
+  circuit.h
+  morphology.h
+  types.h
+  )
+
+set(BRAIN_HEADERS
+  )
+
+set(BRAIN_SOURCES
+  circuit.cpp
+  morphology.cpp
+  )
 
 set(BRAIN_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
 set(BRAIN_LINK_LIBRARIES PUBLIC Brion vmmlib)
