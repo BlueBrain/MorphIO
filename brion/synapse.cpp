@@ -65,7 +65,7 @@ public:
 
         Dataset dataset;
         const std::string& datasetName = _file.getObjnameByIdx( 0 );
-        if( !_loadDataset( datasetName, dataset ))
+        if( !_openDataset( datasetName, dataset ))
             LBTHROW( std::runtime_error( "Cannot open dataset in synapse file "
                                          + source ));
 
@@ -94,7 +94,7 @@ public:
         lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
 
         Dataset dataset;
-        if( !_loadDataset( gid, dataset ))
+        if( !_openDataset( gid, dataset ))
             return SynapseMatrix();
 
         dataset.dataspace.selectNone();
@@ -126,21 +126,21 @@ public:
         BOOST_FOREACH( const uint32_t gid, gids )
         {
             Dataset dataset;
-            if( !_loadDataset( gid, dataset ))
+            if( !_openDataset( gid, dataset ))
                 continue;
             numSynapses += dataset.dims[0];
         }
         return numSynapses;
     }
 
-    bool _loadDataset( const uint32_t gid, Dataset& dataset ) const
+    bool _openDataset( const uint32_t gid, Dataset& dataset ) const
     {
         std::stringstream name;
         name << "a" << gid;
-        return _loadDataset( name.str(), dataset );
+        return _openDataset( name.str(), dataset );
     }
 
-    bool _loadDataset( const std::string& name, Dataset& dataset ) const
+    bool _openDataset( const std::string& name, Dataset& dataset ) const
     {
         try
         {
