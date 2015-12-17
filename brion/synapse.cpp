@@ -71,7 +71,8 @@ public:
 
         _numAttributes = dataset.dims[1];
         if( _numAttributes != SYNAPSE_ALL &&
-            _numAttributes != SYNAPSE_POSITION_ALL )
+            _numAttributes != SYNAPSE_POSITION_ALL &&
+            _numAttributes != 1 /* nrn_extra */)
         {
             LBTHROW( std::runtime_error( source + " not a valid synapse file"));
         }
@@ -179,6 +180,9 @@ public:
             return read< SYNAPSE_ALL >( gid, attributes );
         case SYNAPSE_POSITION_ALL:
             return read< SYNAPSE_POSITION_ALL >( gid, attributes );
+        case 1:
+            // nrn_extra
+            return read< 1 >( gid, 1 );
         default:
             LBERROR << "Synapse file " << _file.getFileName()
                     << " has unknown number of attributes: " << _numAttributes
