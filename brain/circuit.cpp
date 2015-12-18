@@ -103,37 +103,38 @@ URIs Circuit::getMorphologyURIs( const GIDSet& gids ) const
 }
 
 Morphologies Circuit::loadMorphologies( const GIDSet& gids,
-                                        Coordinates coords ) const
+                                        const Coordinates coords ) const
 {
-    // Creating all the brion::Morphologies objects first to detect a missing
-    // morphology before loading anything.
     const URIs& uris = getMorphologyURIs( gids );
-    std::vector< boost::shared_ptr< brion::Morphology > > raw;
-    raw.reserve( uris.size( ));
-    BOOST_FOREACH( const URI& uri, uris )
-        raw.push_back( boost::shared_ptr< brion::Morphology >(
-                           new brion::Morphology( uri.getPath( ))));
-
     Morphologies result;
-    result.reserve( gids.size( ));
+    result.reserve( uris.size( ));
 
     if( coords == COORDINATES_GLOBAL )
     {
         const Matrix4fs& transforms = getTransforms( gids );
-        for( size_t i = 0; i != uris.size(); ++i )
-            result.push_back(
-                MorphologyPtr( new Morphology( *raw[i], transforms[i] )));
-    }
-    else
-    {
-        std::map< std::string, MorphologyPtr > loaded;
-        for( size_t i = 0; i != uris.size(); ++i )
+        for( size_t i = 0; i < uris.size(); ++i )
         {
-            MorphologyPtr& morphology = loaded[uris[i].getPath()];
-            if( !morphology )
-                morphology.reset( new Morphology( *raw[i] ));
-            result.push_back( morphology );
+            const URI& uri = uris[i];
+            const brion::Morphology raw( uri.getPath( ));
+            result.push_back( MorphologyPtr( new Morphology( raw,
+                                                             transforms[i] )));
         }
+        return result;
+    }
+
+    std::map< std::string, MorphologyPtr > loaded;
+    for( size_t i = 0; i < uris.size(); ++i )
+    {
+        const URI& uri = uris[i];
+
+        MorphologyPtr& morphology = loaded[uri.getPath()];
+        if( !morphology )
+        {
+            const brion::Morphology raw( uri.getPath( ));
+            morphology.reset( new Morphology( raw ));
+        }
+
+        result.push_back( morphology );
     }
     return result;
 }
