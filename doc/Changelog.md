@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [38](https://github.com/BlueBrain/Brion/pull/38):
+  Fix crash while reading more than `ulimit -Sn` (1024 default) morphologies
 * [31](https://github.com/BlueBrain/Brion/pull/31):
   Fix crash while reading more than `ulimit -Sn` (1024 default) NEST gdf files
 * [30](https://github.com/BlueBrain/Brion/pull/30):
