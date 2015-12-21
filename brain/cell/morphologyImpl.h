@@ -41,13 +41,17 @@ public:
     const brion::Vector2isPtr sections;
     const brion::SectionTypesPtr types;
     const brion::Vector2isPtr apicals;
-    Vector3f somaPosition;
+
+    Matrix4f transformation;
+
+    uint32_t somaSection;
 
     Impl( const brion::Morphology& morphology );
 
     SectionRange getSectionRange( const uint32_t sectionID ) const;
 
-    uint32_ts getSectionIDs( const SectionTypes& requestedTypes ) const;
+    uint32_ts getSectionIDs( const SectionTypes& requestedTypes,
+                             bool excludeSoma ) const;
 
     float getSectionLength( const uint32_t sectionID ) const;
 
@@ -62,7 +66,7 @@ public:
 
     const uint32_ts& getChildren( const uint32_t sectionID ) const;
 
-    void transform( const Matrix4f& transformation );
+    void transform( const Matrix4f& matrix );
 
 private:
 

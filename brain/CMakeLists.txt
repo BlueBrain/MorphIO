@@ -11,6 +11,7 @@ set(BRAIN_PUBLIC_HEADERS
   types.h
   cell/morphology.h
   cell/section.h
+  cell/soma.h
   )
 
 set(BRAIN_HEADERS
@@ -22,6 +23,7 @@ set(BRAIN_SOURCES
   cell/morphology.cpp
   cell/morphologyImpl.cpp
   cell/section.cpp
+  cell/soma.cpp
   )
 
 set(BRAIN_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})

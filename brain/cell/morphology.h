@@ -58,6 +58,7 @@ public:
      * @param source URI of the morphology data source.
      * @param transform the transformation matrix to apply to the points.
      *        Radii will not be affected by this transformation.
+     * @throw runtime_error if an inconsistency is detected in the input file.
      */
     BRAIN_API Morphology( const URI& source, const Matrix4f& transform );
 
@@ -67,6 +68,7 @@ public:
      * @param morphology the brion::Morphology to load from.
      * @param transform the transformation matrix to apply to the points.
      *        Radii will not be affected by this transformation.
+     * @throw runtime_error if an inconsistency is detected in the input file.
      */
     BRAIN_API Morphology( const brion::Morphology& morphology,
                           const Matrix4f& transform );
@@ -74,12 +76,14 @@ public:
     /**
      * Create a morphology from a URI and load all the data.
      * @param source URI of the morphology data source.
+     * @throw runtime_error if an inconsistency is detected in the input file.
      */
     BRAIN_API Morphology( const URI& source );
 
     /**
      * Create a morphology from a brion::Morphology and load all the data.
      * @param morphology the brion::Morphology to load from.
+     * @throw runtime_error if an inconsistency is detected in the input file.
      */
     BRAIN_API Morphology( const brion::Morphology& morphology );
 
@@ -100,17 +104,28 @@ public:
     /** Return the list of ids for the given section types. */
     BRAIN_API uint32_ts getSectionIDs( const SectionTypes& types ) const;
 
-    /** Return the sections which have the given section type. */
+    /**
+     * Return the sections which have the given section type.
+     * If type is SECTION_SOMA an empty list is returned.
+     */
     BRAIN_API Sections getSections( SectionType type ) const;
 
-    /** Return the sections which have any of the given section types. */
+    /**
+     * Return the sections which have any of the given section types.
+     * No sections are returned for the type SECTION_SOMA.
+     */
     BRAIN_API Sections getSections( const SectionTypes& types ) const;
 
     /**
      * Return the Section with the given id.
-     * @throw runtime_error if the id is out of range
+     * @throw runtime_error if the id is out of range or the given id refers to
+     * a soma section.
      */
     BRAIN_API Section getSection( const uint32_t& id ) const;
+
+    BRAIN_API Soma getSoma() const;
+
+    const Matrix4f& getTransformation() const;
 
 private:
     Impl* const _impl;

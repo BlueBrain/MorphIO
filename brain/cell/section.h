@@ -53,6 +53,7 @@ class Section
 {
 public:
     friend class Morphology;
+    friend class Soma;
 
     Section( const Section& section );
 

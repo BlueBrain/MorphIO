@@ -587,6 +587,7 @@ BOOST_AUTO_TEST_CASE( get_section_ids )
     brion::SectionTypes types;
     types.push_back( brion::SECTION_SOMA );
     checkEqualArrays( morphology.getSectionIDs( types ), 1, 0 );
+
     types.push_back( brion::SECTION_DENDRITE );
     checkEqualArrays( morphology.getSectionIDs( types ),
                       7, 0, 4, 5, 6, 7, 8, 9 );
@@ -603,7 +604,10 @@ BOOST_AUTO_TEST_CASE( get_section_ids )
 BOOST_AUTO_TEST_CASE( get_sections )
 {
     brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
-    for( size_t i = 0; i < 13; ++i )
+
+    BOOST_CHECK_THROW( morphology.getSection( 0 ), std::runtime_error );
+
+    for( size_t i = 1; i < 13; ++i )
         BOOST_CHECK_EQUAL( morphology.getSection( i ).getID(), i );
 
     brain::cell::Section section = morphology.getSection( 1 );
@@ -611,9 +615,6 @@ BOOST_AUTO_TEST_CASE( get_sections )
     section = morphology.getSection( 2 );
     BOOST_CHECK( section == morphology.getSection( 2 ));
 
-
-    BOOST_CHECK_EQUAL( morphology.getSection( 0 ).getType(),
-                       brion::SECTION_SOMA );
     for( size_t i = 1; i < 4; ++i )
         BOOST_CHECK_EQUAL( morphology.getSection( i ).getType(),
                            brion::SECTION_AXON );
@@ -699,6 +700,26 @@ BOOST_AUTO_TEST_CASE( get_section_distances_to_soma )
     }
 }
 
+BOOST_AUTO_TEST_CASE( get_soma_geomery )
+{
+    brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
+
+    const brain::cell::Soma soma = morphology.getSoma();
+    checkEqualArrays( soma.getProfilePoints(), 4,
+                      V4f( .1, 0, 0, .1 ), V4f( 0, .1, 0, .1 ),
+                      V4f( -.1, 0, 0, .1 ), V4f( 0, -.1, 0, .1 ));
+
+    BOOST_CHECK_CLOSE( soma.getMeanRadius(), 0.1, 1e-5 );
+    BOOST_CHECK_EQUAL( soma.getCentroid(), V3f::ZERO );
+
+    brain::Matrix4f matrix( brain::Matrix4f::IDENTITY );
+    matrix.set_translation( V3f( 2, 0, 0 ));
+    brain::cell::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
+
+    BOOST_CHECK_EQUAL( transformed.getSoma().getCentroid(), V3f( 2, 0, 0 ));
+
+}
+
 BOOST_AUTO_TEST_CASE( get_section_samples_by_positions )
 {
     brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
@@ -728,38 +749,20 @@ BOOST_AUTO_TEST_CASE( morphology_hierarchy )
 {
     brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
 
-    BOOST_CHECK( !morphology.getSection( 0 ).hasParent( ));
-    BOOST_CHECK( morphology.getSection( 1 ).hasParent( ));
-    BOOST_CHECK( morphology.getSection( 4 ).hasParent( ));
-    BOOST_CHECK_EQUAL( morphology.getSection( 1 ).getParent().getID(), 0 );
-    BOOST_CHECK_EQUAL( morphology.getSection( 4 ).getParent().getID(), 0 );
+    BOOST_CHECK( !morphology.getSection( 1 ).hasParent( ));
+    BOOST_CHECK( !morphology.getSection( 4 ).hasParent( ));
     BOOST_CHECK_EQUAL( morphology.getSection( 2 ).getParent().getID(), 1 );
     BOOST_CHECK_EQUAL( morphology.getSection( 3 ).getParent().getID(), 1 );
     BOOST_CHECK_EQUAL( morphology.getSection( 5 ).getParent().getID(), 4 );
     BOOST_CHECK_EQUAL( morphology.getSection( 6 ).getParent().getID(), 4 );
-    BOOST_CHECK_THROW( morphology.getSection( 0 ).getParent(),
-                       std::runtime_error );
 
+    checkEqualArrays( getSectionIDs( morphology.getSoma().getChildren( )),
+                      4, 1, 4, 7, 10 );
     checkEqualArrays( getSectionIDs( morphology.getSection( 1 ).getChildren( )),
                       2, 2, 3 );
     checkEqualArrays( getSectionIDs( morphology.getSection( 4 ).getChildren( )),
                       2, 5, 6 );
     BOOST_CHECK( morphology.getSection( 5 ).getChildren().empty( ));
-}
-
-BOOST_AUTO_TEST_CASE( soma_position )
-{
-    brain::cell::Morphology local( TEST_MORPHOLOGY_URI );
-    brion::floats points;
-    points.push_back( 0.232 ); // arbitrary
-    BOOST_CHECK_EQUAL(
-        local.getSection( 0 ).getSamples( points )[0], V3f::ZERO );
-
-    brain::Matrix4f matrix( brain::Matrix4f::IDENTITY );
-    matrix.set_translation( V3f( 2, 0, 0 ));
-    brain::cell::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
-    BOOST_CHECK_EQUAL( transformed.getSection( 0 ).getSamples( points )[0],
-                       V3f( 2, 0, 0 ));
 }
 
 BOOST_AUTO_TEST_CASE( transform_with_matrix )

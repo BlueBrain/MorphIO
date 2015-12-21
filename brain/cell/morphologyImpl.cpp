@@ -38,10 +38,17 @@ Morphology::Impl::Impl( const brion::Morphology& morphology )
     , sections( morphology.readSections( MORPHOLOGY_UNDEFINED ))
     , types( morphology.readSectionTypes( ))
     , apicals( morphology.readApicals( ))
-    , somaPosition( Vector3f::ZERO ) // the soma is assumed to be
-      // centered at the 0, 0, 0
+    , transformation( Matrix4f::IDENTITY )
 {
     _extractChildrenLists();
+
+    const uint32_ts ids =
+        getSectionIDs( SectionTypes( 1, SECTION_SOMA ), false );
+
+    if( ids.size() != 1 )
+        LBTHROW( std::runtime_error(
+                    "Bad input morphology. None or more than one soma found" ));
+    somaSection = ids[0];
 }
 
 SectionRange Morphology::Impl::getSectionRange( const uint32_t sectionID ) const
@@ -53,11 +60,14 @@ SectionRange Morphology::Impl::getSectionRange( const uint32_t sectionID ) const
 }
 
 uint32_ts Morphology::Impl::getSectionIDs(
-    const SectionTypes& requestedTypes ) const
+    const SectionTypes& requestedTypes, bool excludeSoma ) const
 {
     std::bitset< SECTION_APICAL_DENDRITE > bits;
     BOOST_FOREACH( const SectionType type, requestedTypes )
-        bits[size_t( type )] = true;
+    {
+        if( type != SECTION_SOMA || !excludeSoma )
+            bits[size_t( type )] = true;
+    }
 
     uint32_ts result;
     for( size_t i = 0; i != types->size(); ++i )
@@ -101,7 +111,8 @@ Vector4fs Morphology::Impl::getSectionSamples( const uint32_t sectionID,
 
     // If the section is the soma return directly the soma position.
     if(( *types )[sectionID] == SECTION_SOMA )
-        return Vector4fs( samplePoints.size( ), Vector4f( somaPosition, 1 ));
+        // This code shouldn't be reached.
+        LBTHROW( std::runtime_error( "Invalid method called on soma section" ));
 
     // Dealing with the degenerate case of single point sections.
     if( range.first + 1 == range.second )
@@ -177,16 +188,15 @@ const uint32_ts& Morphology::Impl::getChildren( const uint32_t sectionID ) const
     return _sectionChildren[sectionID];
 }
 
-void Morphology::Impl::transform( const Matrix4f& transformation )
+void Morphology::Impl::transform( const Matrix4f& matrix )
 {
     #pragma omp parallel for
     for( size_t i = 0; i < points->size(); ++i)
     {
         Vector4f& p = ( *points )[i];
-        const Vector3f pp = transformation * p.get_sub_vector< 3 >();
+        const Vector3f pp = matrix * p.get_sub_vector< 3 >();
         p.get_sub_vector< 3 >() = pp;
     }
-    somaPosition = transformation * somaPosition;
 }
 
 void Morphology::Impl::_extractChildrenLists()

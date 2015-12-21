@@ -54,6 +54,7 @@ namespace cell
     typedef std::vector< MorphologyPtr > Morphologies;
     class Section;
     typedef std::vector< Section > Sections;
+    class Soma;
 }
 
 

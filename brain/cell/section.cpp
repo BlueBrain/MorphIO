@@ -108,12 +108,13 @@ floats Section::getSampleDistancesToSoma() const
 
 bool Section::hasParent() const
 {
-    return ( *_morphology->sections )[_id][1] != -1;
+    int32_t parent = ( *_morphology->sections )[_id][1];
+    return parent != -1 && uint32_t(parent) != _morphology->somaSection;
 }
 Section Section::getParent() const
 {
     int32_t parent = ( *_morphology->sections )[_id][1];
-    if( parent == -1 )
+    if( parent == -1 || uint32_t(parent) == _morphology->somaSection )
         LBTHROW( std::runtime_error( "Cannot access parent section" ));
     return Section( parent, _morphology );
 }

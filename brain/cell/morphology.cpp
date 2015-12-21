@@ -19,6 +19,7 @@
 
 #include "morphology.h"
 #include "section.h"
+#include "soma.h"
 
 #include "morphologyImpl.h"
 
@@ -38,6 +39,7 @@ Morphology::Morphology( const URI& source, const Matrix4f& transform )
 {
     _impl->ref();
     _impl->transform( transform );
+    _impl->transformation = transform;
 }
 
 Morphology::Morphology( const brion::Morphology& morphology,
@@ -46,6 +48,7 @@ Morphology::Morphology( const brion::Morphology& morphology,
 {
     _impl->ref();
     _impl->transform( transform );
+    _impl->transformation = transform;
 }
 
 Morphology::Morphology( const URI& source )
@@ -87,30 +90,34 @@ const Vector2is& Morphology::getApicals() const
 
 uint32_ts Morphology::getSectionIDs( const SectionTypes& types ) const
 {
-    return _impl->getSectionIDs( types );
+    return _impl->getSectionIDs( types, false );
 }
 
 Sections Morphology::getSections( const SectionType type ) const
 {
     const SectionTypes types( 1, type );
-    const uint32_ts ids = _impl->getSectionIDs( types );
+    const uint32_ts ids = _impl->getSectionIDs( types, true );
     Sections result;
-    BOOST_FOREACH( uint32_t id, ids )
+    BOOST_FOREACH( const uint32_t id, ids )
         result.push_back( Section( id, _impl ));
     return result;
 }
 
 Sections Morphology::getSections( const SectionTypes& types ) const
 {
-    uint32_ts ids = _impl->getSectionIDs( types );
+    const uint32_ts ids = _impl->getSectionIDs( types, true );
     Sections result;
-    BOOST_FOREACH( uint32_t id, ids )
+    BOOST_FOREACH( const uint32_t id, ids )
         result.push_back( Section( id, _impl ));
     return result;
 }
 
 Section Morphology::getSection( const uint32_t& id ) const
 {
+    if(( *_impl->types )[id] == SECTION_SOMA )
+        LBTHROW(
+            std::runtime_error( "The soma cannot be accessed as a Section" ));
+
     if( _impl->sections->size() <= id )
     {
         std::stringstream msg;
@@ -119,6 +126,16 @@ Section Morphology::getSection( const uint32_t& id ) const
     }
 
     return Section( id, _impl );
+}
+
+Soma Morphology::getSoma() const
+{
+    return Soma( _impl );
+}
+
+const Matrix4f& Morphology::getTransformation() const
+{
+    return _impl->transformation;
 }
 
 }
