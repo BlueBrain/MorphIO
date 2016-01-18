@@ -9,21 +9,21 @@ source_group(\\ FILES CMakeLists.txt)
 set(BRAIN_PUBLIC_HEADERS
   circuit.h
   types.h
-  cell/morphology.h
-  cell/section.h
-  cell/soma.h
+  neuron/morphology.h
+  neuron/section.h
+  neuron/soma.h
   )
 
 set(BRAIN_HEADERS
-  cell/morphologyImpl.h
+  neuron/morphologyImpl.h
   )
 
 set(BRAIN_SOURCES
   circuit.cpp
-  cell/morphology.cpp
-  cell/morphologyImpl.cpp
-  cell/section.cpp
-  cell/soma.cpp
+  neuron/morphology.cpp
+  neuron/morphologyImpl.cpp
+  neuron/section.cpp
+  neuron/soma.cpp
   )
 
 set(BRAIN_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})

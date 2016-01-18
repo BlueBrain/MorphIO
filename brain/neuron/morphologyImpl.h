@@ -18,8 +18,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_CELL_MORPHOLOGYIMPL
-#define BRAIN_CELL_MORPHOLOGYIMPL
+#ifndef BRAIN_NEURON_MORPHOLOGYIMPL
+#define BRAIN_NEURON_MORPHOLOGYIMPL
 
 #include "morphology.h"
 
@@ -28,11 +28,10 @@
 
 namespace brain
 {
+namespace neuron
+{
 
 typedef std::pair< size_t, size_t > SectionRange;
-
-namespace cell
-{
 
 class Morphology::Impl : public lunchbox::Referenced
 {

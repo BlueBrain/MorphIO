@@ -47,7 +47,7 @@ using brion::GIDSet;
 using brion::URI;
 typedef std::vector< URI > URIs;
 
-namespace cell
+namespace neuron
 {
     class Morphology;
     typedef boost::shared_ptr< Morphology > MorphologyPtr;

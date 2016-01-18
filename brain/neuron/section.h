@@ -17,17 +17,17 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_CELL_SECTION
-#define BRAIN_CELL_SECTION
+#ifndef BRAIN_NEURON_SECTION
+#define BRAIN_NEURON_SECTION
 
 #include <brain/api.h>
 #include <brain/types.h>
 
-#include <brain/cell/morphology.h>
+#include <brain/neuron/morphology.h>
 
 namespace brain
 {
-namespace cell
+namespace neuron
 {
 
 /**
@@ -55,18 +55,20 @@ public:
     friend class Morphology;
     friend class Soma;
 
-    Section( const Section& section );
+    BRAIN_API Section( const Section& section );
 
-    ~Section();
+    BRAIN_API ~Section();
 
-    Section& operator=( const Section& section );
+    BRAIN_API Section& operator=( const Section& section );
 
-    bool operator==( const Section& section ) const;
+    BRAIN_API bool operator==( const Section& section ) const;
+    BRAIN_API bool operator!=( const Section& section ) const;
 
     /** Return the ID of this section. */
-    uint32_t getID() const;
+    BRAIN_API uint32_t getID() const;
 
-    SectionType getType() const;
+    /** Return the morphological type of this section (dedrite, axon, ...). */
+    BRAIN_API SectionType getType() const;
 
     /**
      * Return the total length of this section in microns.
@@ -132,7 +134,7 @@ public:
     BRAIN_API Sections getChildren() const;
 
 protected:
-    Section( uint32_t id, Morphology::Impl* morphology );
+    BRAIN_API Section( uint32_t id, Morphology::Impl* morphology );
 
 private:
     uint32_t _id;

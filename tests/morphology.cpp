@@ -364,10 +364,10 @@ void checkCloseArraysUptoN( const std::vector< T >& array,
     va_end( args );
 }
 
-brion::uint32_ts getSectionIDs( const brain::cell::Sections& sections )
+brion::uint32_ts getSectionIDs( const brain::neuron::Sections& sections )
 {
     brion::uint32_ts result;
-    BOOST_FOREACH( const brain::cell::Section& section, sections )
+    BOOST_FOREACH( const brain::neuron::Section& section, sections )
         result.push_back( section.getID( ));
     return result;
 }
@@ -555,7 +555,7 @@ BOOST_AUTO_TEST_CASE( swc_neuron )
 
 namespace
 {
-void checkEqualMorphologies( const brain::cell::Morphology& first,
+void checkEqualMorphologies( const brain::neuron::Morphology& first,
                              const brion::Morphology& second )
 {
     BOOST_CHECK( *second.readPoints( brion::MORPHOLOGY_UNDEFINED ) ==
@@ -572,17 +572,19 @@ BOOST_AUTO_TEST_CASE( v2_morphology_constructors )
     boost::shared_ptr< brion::Morphology > raw(
         new brion::Morphology( TEST_MORPHOLOGY_FILENAME ));
 
-    checkEqualMorphologies(
-        brain::cell::Morphology( TEST_MORPHOLOGY_URI ), *raw );
-    checkEqualMorphologies( brain::cell::Morphology( *raw ), *raw );
+    brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
+    BOOST_CHECK_EQUAL( morphology.getTransformation(),
+                       brain::Matrix4f::IDENTITY );
+    checkEqualMorphologies( morphology, *raw );
+    checkEqualMorphologies( brain::neuron::Morphology( *raw ), *raw );
 
-    BOOST_CHECK_THROW( brain::cell::Morphology( brion::URI( "/mars" )),
+    BOOST_CHECK_THROW( brain::neuron::Morphology( brion::URI( "/mars" )),
                        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE( get_section_ids )
 {
-    brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
+    brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
 
     brion::SectionTypes types;
     types.push_back( brion::SECTION_SOMA );
@@ -603,16 +605,17 @@ BOOST_AUTO_TEST_CASE( get_section_ids )
 
 BOOST_AUTO_TEST_CASE( get_sections )
 {
-    brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
+    brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
 
     BOOST_CHECK_THROW( morphology.getSection( 0 ), std::runtime_error );
 
     for( size_t i = 1; i < 13; ++i )
         BOOST_CHECK_EQUAL( morphology.getSection( i ).getID(), i );
 
-    brain::cell::Section section = morphology.getSection( 1 );
+    brain::neuron::Section section = morphology.getSection( 1 );
     BOOST_CHECK( section == morphology.getSection( 1 ));
     section = morphology.getSection( 2 );
+    BOOST_CHECK( section != morphology.getSection( 1 ));
     BOOST_CHECK( section == morphology.getSection( 2 ));
 
     for( size_t i = 1; i < 4; ++i )
@@ -628,7 +631,7 @@ BOOST_AUTO_TEST_CASE( get_sections )
 
 BOOST_AUTO_TEST_CASE( get_section_samples )
 {
-    brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
+    brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
 
     brion::Vector4fs points;
     for( size_t i = 0; i != 11; ++i)
@@ -669,7 +672,7 @@ BOOST_AUTO_TEST_CASE( get_section_samples )
 
 BOOST_AUTO_TEST_CASE( get_section_distances_to_soma )
 {
-    brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
+    brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
 
     uint32_t sections[] = {1, 4, 7, 10};
 
@@ -702,9 +705,9 @@ BOOST_AUTO_TEST_CASE( get_section_distances_to_soma )
 
 BOOST_AUTO_TEST_CASE( get_soma_geomery )
 {
-    brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
+    brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
 
-    const brain::cell::Soma soma = morphology.getSoma();
+    const brain::neuron::Soma soma = morphology.getSoma();
     checkEqualArrays( soma.getProfilePoints(), 4,
                       V4f( .1, 0, 0, .1 ), V4f( 0, .1, 0, .1 ),
                       V4f( -.1, 0, 0, .1 ), V4f( 0, -.1, 0, .1 ));
@@ -714,15 +717,14 @@ BOOST_AUTO_TEST_CASE( get_soma_geomery )
 
     brain::Matrix4f matrix( brain::Matrix4f::IDENTITY );
     matrix.set_translation( V3f( 2, 0, 0 ));
-    brain::cell::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
-
+    brain::neuron::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
     BOOST_CHECK_EQUAL( transformed.getSoma().getCentroid(), V3f( 2, 0, 0 ));
 
 }
 
 BOOST_AUTO_TEST_CASE( get_section_samples_by_positions )
 {
-    brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
+    brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
 
     brion::floats points;
     for( float p = 0.0; p <= 1.0; p += 0.2 )
@@ -747,7 +749,7 @@ BOOST_AUTO_TEST_CASE( get_section_samples_by_positions )
 
 BOOST_AUTO_TEST_CASE( morphology_hierarchy )
 {
-    brain::cell::Morphology morphology( TEST_MORPHOLOGY_URI );
+    brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
 
     BOOST_CHECK( !morphology.getSection( 1 ).hasParent( ));
     BOOST_CHECK( !morphology.getSection( 4 ).hasParent( ));
@@ -769,7 +771,7 @@ BOOST_AUTO_TEST_CASE( transform_with_matrix )
 {
     brain::Matrix4f matrix( brain::Matrix4f::IDENTITY );
     matrix.rotate_z( M_PI * 0.5 );
-    brain::cell::Morphology rotated( TEST_MORPHOLOGY_URI, matrix );
+    brain::neuron::Morphology rotated( TEST_MORPHOLOGY_URI, matrix );
     checkCloseArraysUptoN( rotated.getPoints(), 4,
       V4f( .0, .1, .0, .1 ), V4f( -.1, .0, .0, .1 ),
       V4f( .0, -.1, .0, .1 ), V4f( .1, .0, .0, .1 ));
@@ -777,7 +779,8 @@ BOOST_AUTO_TEST_CASE( transform_with_matrix )
     matrix = brain::Matrix4f::IDENTITY;
     matrix.rotate_z( M_PI * 0.5 );
     matrix.set_translation( V3f( 2, 0, 0 ));
-    brain::cell::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
+    brain::neuron::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
+    BOOST_CHECK_EQUAL( transformed.getTransformation(), matrix );
     checkCloseArraysUptoN( transformed.getPoints(), 4,
       V4f( 2., .1, .0, .1 ), V4f( 1.9, .0, .0, .1 ),
       V4f( 2., -.1, .0, .1 ), V4f( 2.1, .0, .0, .1 ));

@@ -27,7 +27,7 @@
 
 namespace brain
 {
-namespace cell
+namespace neuron
 {
 
 Section::Section( const uint32_t id, Morphology::Impl* morphology )
@@ -71,6 +71,10 @@ bool Section::operator==( const Section& other ) const
     return other._id == _id && other._morphology == _morphology;
 }
 
+bool Section::operator!=( const Section& other ) const
+{
+    return !( *this == other );
+}
 uint32_t Section::getID() const
 {
     return _id;
@@ -108,12 +112,12 @@ floats Section::getSampleDistancesToSoma() const
 
 bool Section::hasParent() const
 {
-    int32_t parent = ( *_morphology->sections )[_id][1];
+    const int32_t parent = ( *_morphology->sections )[_id][1];
     return parent != -1 && uint32_t(parent) != _morphology->somaSection;
 }
 Section Section::getParent() const
 {
-    int32_t parent = ( *_morphology->sections )[_id][1];
+    const int32_t parent = ( *_morphology->sections )[_id][1];
     if( parent == -1 || uint32_t(parent) == _morphology->somaSection )
         LBTHROW( std::runtime_error( "Cannot access parent section" ));
     return Section( parent, _morphology );
@@ -123,6 +127,7 @@ Sections Section::getChildren() const
 {
     const uint32_ts& children = _morphology->getChildren( _id );
     Sections result;
+    result.reserve( children.size( ));
     BOOST_FOREACH( uint32_t id, children )
         result.push_back( Section( id, _morphology ));
     return result;

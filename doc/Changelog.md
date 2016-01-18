@@ -5,7 +5,8 @@ Changelog {#Changelog}
 
 * [39](https://github.com/BlueBrain/Brion/pull/39):
   Add compartment report converter tool
-* [30](https://github.com/BlueBrain/Brion/pull/30), [35](https://github.com/BlueBrain/Brion/pull/35):
+* [30](https://github.com/BlueBrain/Brion/pull/30),
+  [35](https://github.com/BlueBrain/Brion/pull/35):
   Added a new library, Brain, to provide higher level functions and classes.
   The library provides:
   - A Circuit class to get basic information from cells and targets and load

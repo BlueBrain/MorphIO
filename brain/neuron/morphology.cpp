@@ -31,7 +31,7 @@
 
 namespace brain
 {
-namespace cell
+namespace neuron
 {
 
 Morphology::Morphology( const URI& source, const Matrix4f& transform )

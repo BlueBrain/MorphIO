@@ -25,7 +25,7 @@
 
 namespace brain
 {
-namespace cell
+namespace neuron
 {
 
 namespace

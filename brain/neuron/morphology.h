@@ -17,19 +17,17 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_CELL_MORPHOLOGY
-#define BRAIN_CELL_MORPHOLOGY
+#ifndef BRAIN_NEURON_MORPHOLOGY
+#define BRAIN_NEURON_MORPHOLOGY
 
 #include <brain/api.h>
 #include <brain/types.h>
-
-//#include <brain/cell/section.h>
 
 #include <boost/noncopyable.hpp>
 
 namespace brain
 {
-namespace cell
+namespace neuron
 {
 
 /**
@@ -123,9 +121,12 @@ public:
      */
     BRAIN_API Section getSection( const uint32_t& id ) const;
 
+    /** Return the object with the information about the neuron soma */
     BRAIN_API Soma getSoma() const;
 
-    const Matrix4f& getTransformation() const;
+    /** Return the transformation that was passed to the constructor or the
+        identity matrix is no transformation was given. */
+    BRAIN_API const Matrix4f& getTransformation() const;
 
 private:
     Impl* const _impl;

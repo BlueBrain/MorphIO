@@ -19,6 +19,7 @@
  */
 
 #include "morphologyImpl.h"
+#include "section.h"
 
 #include <brion/morphology.h>
 
@@ -30,7 +31,7 @@
 
 namespace brain
 {
-namespace cell
+namespace neuron
 {
 
 Morphology::Impl::Impl( const brion::Morphology& morphology )
@@ -60,7 +61,7 @@ SectionRange Morphology::Impl::getSectionRange( const uint32_t sectionID ) const
 }
 
 uint32_ts Morphology::Impl::getSectionIDs(
-    const SectionTypes& requestedTypes, bool excludeSoma ) const
+    const SectionTypes& requestedTypes, const bool excludeSoma ) const
 {
     std::bitset< SECTION_APICAL_DENDRITE > bits;
     BOOST_FOREACH( const SectionType type, requestedTypes )

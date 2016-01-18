@@ -18,23 +18,24 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_CELL_SOMA
-#define BRAIN_CELL_SOMA
+#ifndef BRAIN_NEURON_SOMA
+#define BRAIN_NEURON_SOMA
 
 #include <brain/api.h>
 #include <brain/types.h>
 
-#include <brain/cell/morphology.h>
+#include <brain/neuron/morphology.h>
 
 namespace brain
 {
-namespace cell
+namespace neuron
 {
 
 /**
- * A class to represent a cell soma.
+ * A class to represent a neuron soma.
  *
- * This class provides functions to query information about the soma of a cell.
+ * This class provides functions to query information about the soma of a
+ * neuron.
  *
  * Typically the soma is described as the poly-line of the projection
  * of the soma onto a plane, where the plane normal points in the vertical
@@ -58,24 +59,24 @@ public:
 
     ~Soma();
 
-    Soma( const Soma& soma );
+    BRAIN_API Soma( const Soma& soma );
 
-    Soma& operator=( const Soma& soma );
+    BRAIN_API Soma& operator=( const Soma& soma );
 
     /** Return the points of the soma profile. */
-    Vector4fs getProfilePoints() const;
+    BRAIN_API Vector4fs getProfilePoints() const;
 
     /** Return the mean distance between the profile points and the centroid. */
-    float getMeanRadius() const;
+    BRAIN_API float getMeanRadius() const;
 
     /** Return the average of the profile points. */
-    Vector3f getCentroid() const;
+    BRAIN_API Vector3f getCentroid() const;
 
     /** Return the first order sections starting from the soma. */
-    Sections getChildren() const;
+    BRAIN_API Sections getChildren() const;
 
 protected:
-    Soma( Morphology::Impl* morhology );
+    BRAIN_API Soma( Morphology::Impl* morhology );
 
 private:
     Morphology::Impl* _morphology;
