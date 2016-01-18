@@ -1,5 +1,5 @@
-# Copyright (c) 2015, EPFL/Blue Brain Project
-#                     Stefan.Eilemann@epfl.ch
+# Copyright (c) 2015-2016, EPFL/Blue Brain Project
+#                          Stefan.Eilemann@epfl.ch
 #
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
 #
@@ -15,3 +15,12 @@ set(MORPHOLOGYCONVERTER_SOURCES morphologyConverter.cpp)
 set(MORPHOLOGYCONVERTER_LINK_LIBRARIES Brion ${Boost_PROGRAM_OPTIONS_LIBRARY})
 
 common_application(morphologyConverter)
+
+set(COMPARTMENTCONVERTER_HEADERS)
+set(COMPARTMENTCONVERTER_SOURCES compartmentConverter.cpp)
+set(COMPARTMENTCONVERTER_LINK_LIBRARIES Brion ${Boost_PROGRAM_OPTIONS_LIBRARY})
+if(TARGET BBPTestData)
+  list(APPEND COMPARTMENTCONVERTER_LINK_LIBRARIES BBPTestData)
+endif()
+
+common_application(compartmentConverter)
