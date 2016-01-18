@@ -31,6 +31,22 @@ namespace detail { class Synapse; }
 
 /** Read access to a Synapse file.
  *
+ * There are three types of synapse files that can be read by this class:
+ * - nrn[_efferent].h5: These files store the synaptic model parameters,
+ *   connectivity information and morphological location of synapses. They
+ *   are organized as sets of tables with one table per neuron and one row
+ *   per affernt (or efferent) synapse.
+ * - nrn_positions_[_efferent].h5: These files store precomputed spatial
+ *   locations of synapses on the dendrite/axon longitudinal axes and on the
+ *   cell membranes.
+ * - nrn_extra.h5: This file stores the index of each synapse in the
+ *   list of afferent synapses of a post-synaptic neuron before any pruning
+ *   or filtering is carried out. This indices together with post-synaptic
+ *   neuron GIDs can be used as synapse GIDs.
+ *
+ * There exists a forth file type, nrn_summary.h5, with the aggregated
+ * connectivity per cell. SynapseSummary is the clase used to parse it.
+ *
  * Following RAII, this class is ready to use after the creation and will ensure
  * release of resources upon destruction. Threadsafety is guaranteed for all
  * provided methods.
