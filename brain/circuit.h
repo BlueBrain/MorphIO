@@ -75,8 +75,8 @@ public:
      *         will shared the same Morphology object in the list. If global
      *         coordinates are requested, all Morphology objects are unique.
      */
-    BRAIN_API Morphologies loadMorphologies( const GIDSet& gids,
-                                             Coordinates coords ) const;
+    BRAIN_API neuron::Morphologies loadMorphologies( const GIDSet& gids,
+                                                     Coordinates coords ) const;
 
     /** @return The positions of the given cells. */
     BRAIN_API Vector3fs getPositions( const GIDSet& gids ) const;

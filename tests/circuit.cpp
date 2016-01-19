@@ -201,7 +201,7 @@ BOOST_AUTO_TEST_CASE( brain_circuit_positions )
 
 namespace
 {
-void _checkMorphology( const brain::Morphology& morphology,
+void _checkMorphology( const brain::neuron::Morphology& morphology,
                        const std::string& other )
 {
     const brion::Morphology reference(
@@ -209,11 +209,11 @@ void _checkMorphology( const brain::Morphology& morphology,
     BOOST_CHECK( morphology.getPoints() ==
                  *reference.readPoints( brion::MORPHOLOGY_UNDEFINED ));
 }
-void _checkMorphology( const brain::Morphology& morphology,
+void _checkMorphology( const brain::neuron::Morphology& morphology,
                        const std::string& other,
                        const brain::Matrix4f& transform )
 {
-    const brain::Morphology reference(
+    const brain::neuron::Morphology reference(
         brion::URI(
             BBP_TESTDATA + ( "/local/morphologies/01.07.08/h5/" + other)),
         transform );
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE( load_local_morphologies )
     for( uint32_t gid = 1; gid < 500; gid += 75)
         gids.insert(gid);
     // This call also tests brain::Circuit::getMorphologyURIs
-    const brain::Morphologies morphologies =
+    const brain::neuron::Morphologies morphologies =
         circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_LOCAL );
     BOOST_CHECK_EQUAL( morphologies.size(), gids.size( ));
 
@@ -256,7 +256,7 @@ BOOST_AUTO_TEST_CASE( load_local_morphologies )
     gids.insert(2);
     gids.insert(4);
     gids.insert(6);
-    const brain::Morphologies repeated =
+    const brain::neuron::Morphologies repeated =
         circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_LOCAL );
 
     BOOST_CHECK_EQUAL( repeated.size(), gids.size( ));
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE( load_global_morphologies )
     brion::GIDSet gids;
     for( uint32_t gid = 1; gid < 500; gid += 75)
         gids.insert(gid);
-    const brain::Morphologies morphologies =
+    const brain::neuron::Morphologies morphologies =
         circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_GLOBAL );
     BOOST_CHECK_EQUAL( morphologies.size(), gids.size( ));
 

@@ -26,10 +26,9 @@
 namespace brain
 {
 
+using namespace brion::enums;
+
 class Circuit;
-class Morphology;
-typedef boost::shared_ptr< Morphology > MorphologyPtr;
-typedef std::vector< MorphologyPtr > Morphologies;
 
 using vmml::Vector2i;
 using vmml::Vector3f;
@@ -43,12 +42,21 @@ typedef std::vector< Matrix4f > Matrix4fs;
 using brion::uint32_ts;
 using brion::floats;
 
-using brion::MorphologyRepairStage;
-using brion::SectionType;
 using brion::SectionTypes;
 using brion::GIDSet;
 using brion::URI;
 typedef std::vector< URI > URIs;
+
+namespace neuron
+{
+    class Morphology;
+    typedef boost::shared_ptr< Morphology > MorphologyPtr;
+    typedef std::vector< MorphologyPtr > Morphologies;
+    class Section;
+    typedef std::vector< Section > Sections;
+    class Soma;
+}
+
 
 }
 #endif

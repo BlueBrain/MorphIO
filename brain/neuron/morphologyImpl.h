@@ -1,0 +1,88 @@
+
+/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+ *                          Juan Hernando <jhernando@fi.upm.es>
+ *
+ * This file is part of Brion <https://github.com/BlueBrain/Brion>
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#ifndef BRAIN_NEURON_MORPHOLOGYIMPL
+#define BRAIN_NEURON_MORPHOLOGYIMPL
+
+#include "morphology.h"
+
+#include <lunchbox/lfVector.h>
+#include <lunchbox/referenced.h>
+
+namespace brain
+{
+namespace neuron
+{
+
+typedef std::pair< size_t, size_t > SectionRange;
+
+class Morphology::Impl : public lunchbox::Referenced
+{
+public:
+    const brion::Vector4fsPtr points;
+    const brion::Vector2isPtr sections;
+    const brion::SectionTypesPtr types;
+    const brion::Vector2isPtr apicals;
+
+    Matrix4f transformation;
+
+    uint32_t somaSection;
+
+    Impl( const brion::Morphology& morphology );
+
+    SectionRange getSectionRange( const uint32_t sectionID ) const;
+
+    uint32_ts getSectionIDs( const SectionTypes& requestedTypes,
+                             bool excludeSoma ) const;
+
+    float getSectionLength( const uint32_t sectionID ) const;
+
+    Vector4fs getSectionSamples( const uint32_t sectionID ) const;
+
+    Vector4fs getSectionSamples( const uint32_t sectionID,
+                                 const floats& samplePoints ) const;
+
+    float getDistanceToSoma( const uint32_t sectionID ) const;
+
+    floats getSampleDistancesToSoma( const uint32_t sectionID ) const;
+
+    const uint32_ts& getChildren( const uint32_t sectionID ) const;
+
+    void transform( const Matrix4f& matrix );
+
+private:
+
+    // Distances caches. These caches need to be thread-safe to follow the
+    // recommendations for C++11 about mutable and const correctness.
+    // (http://herbsutter.com/2013/05/24/gotw-6a-const-correctness-part-1-3/)
+    typedef lunchbox::LFVector< float > LFFloats;
+    mutable LFFloats _distancesToSoma;
+    mutable LFFloats _sectionLengths;
+
+    std::vector< uint32_ts > _sectionChildren;
+
+    void _extractChildrenLists();
+    float _computeSectionLength( const uint32_t sectionID ) const;
+    floats _computeAccumulatedLengths( const SectionRange& range ) const;
+};
+
+}
+}
+#endif

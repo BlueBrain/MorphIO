@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2013-2015, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -18,8 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_MORPHOLOGY
-#define BRAIN_MORPHOLOGY
+#ifndef BRAIN_NEURON_MORPHOLOGY
+#define BRAIN_NEURON_MORPHOLOGY
 
 #include <brain/api.h>
 #include <brain/types.h>
@@ -27,6 +26,8 @@
 #include <boost/noncopyable.hpp>
 
 namespace brain
+{
+namespace neuron
 {
 
 /**
@@ -46,12 +47,16 @@ namespace brain
 class Morphology : public boost::noncopyable
 {
 public:
+    /** @internal */
+    class Impl;
+
     /**
      * Create a morphology from a URI, load all the data and transform
      * the points.
      * @param source URI of the morphology data source.
      * @param transform the transformation matrix to apply to the points.
      *        Radii will not be affected by this transformation.
+     * @throw runtime_error if an inconsistency is detected in the input file.
      */
     BRAIN_API Morphology( const URI& source, const Matrix4f& transform );
 
@@ -61,6 +66,7 @@ public:
      * @param morphology the brion::Morphology to load from.
      * @param transform the transformation matrix to apply to the points.
      *        Radii will not be affected by this transformation.
+     * @throw runtime_error if an inconsistency is detected in the input file.
      */
     BRAIN_API Morphology( const brion::Morphology& morphology,
                           const Matrix4f& transform );
@@ -68,12 +74,14 @@ public:
     /**
      * Create a morphology from a URI and load all the data.
      * @param source URI of the morphology data source.
+     * @throw runtime_error if an inconsistency is detected in the input file.
      */
     BRAIN_API Morphology( const URI& source );
 
     /**
      * Create a morphology from a brion::Morphology and load all the data.
      * @param morphology the brion::Morphology to load from.
+     * @throw runtime_error if an inconsistency is detected in the input file.
      */
     BRAIN_API Morphology( const brion::Morphology& morphology );
 
@@ -91,31 +99,39 @@ public:
     /** @copydoc brion::Morphology::getApicals */
     BRAIN_API const Vector2is& getApicals() const;
 
-    /**
-     * Return the list of ids for the given section types.
-     */
+    /** Return the list of ids for the given section types. */
     BRAIN_API uint32_ts getSectionIDs( const SectionTypes& types ) const;
 
     /**
-     * Return a list of points sampling a sections at discrete locations or all
-     * the available points of no sample locations are given.
-     *
-     * @param sectionID Section to sample. If the section is the soma this
-     *        function will return the soma position for all sampling positions.
-     *        The soma position is assumed to be (0, 0, 0) unless the morphology
-     *        has been transformed.
-     * @param points Normalized positions of the sample points along the
-     *        section. Values will be clampled to [0, 1] before sampling.
-     * @return The vector with all the points of the section if points is empty.
-     *         The section sampled at the given points otherwise.
+     * Return the sections which have the given section type.
+     * If type is SECTION_SOMA an empty list is returned.
      */
-    BRAIN_API Vector4fs getSectionSamples(
-        size_t sectionID, const floats& points = brion::floats( )) const;
+    BRAIN_API Sections getSections( SectionType type ) const;
+
+    /**
+     * Return the sections which have any of the given section types.
+     * No sections are returned for the type SECTION_SOMA.
+     */
+    BRAIN_API Sections getSections( const SectionTypes& types ) const;
+
+    /**
+     * Return the Section with the given id.
+     * @throw runtime_error if the id is out of range or the given id refers to
+     * a soma section.
+     */
+    BRAIN_API Section getSection( const uint32_t& id ) const;
+
+    /** Return the object with the information about the neuron soma */
+    BRAIN_API Soma getSoma() const;
+
+    /** Return the transformation that was passed to the constructor or the
+        identity matrix is no transformation was given. */
+    BRAIN_API const Matrix4f& getTransformation() const;
 
 private:
-    class Impl;
     Impl* const _impl;
 };
 
+}
 }
 #endif
