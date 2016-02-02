@@ -195,8 +195,8 @@ void Morphology::Impl::transform( const Matrix4f& matrix )
     for( size_t i = 0; i < points->size(); ++i)
     {
         Vector4f& p = ( *points )[i];
-        const Vector3f pp = matrix * p.get_sub_vector< 3 >();
-        p.get_sub_vector< 3 >() = pp;
+        const Vector3f& pp = matrix * p.get_sub_vector< 3 >();
+        p.set_sub_vector< 3 >( pp );
     }
 }
 
@@ -227,7 +227,7 @@ float Morphology::Impl::_computeSectionLength( const uint32_t sectionID ) const
     {
         const Vector4f& start = ( *points )[i];
         const Vector4f& end = ( *points )[i + 1];
-        const Vector3f diff = ( end - start ).get_sub_vector< 3 >();
+        const Vector3f& diff = ( end - start ).get_sub_vector< 3 >();
         length += diff.length( );
     }
     return length;
@@ -243,7 +243,7 @@ floats Morphology::Impl::_computeAccumulatedLengths(
     {
         const Vector4f& start = ( *points )[i];
         const Vector4f& end = ( *points )[i + 1];
-        const Vector3f diff = ( end - start ).get_sub_vector< 3 >();
+        const Vector3f& diff = ( end - start ).get_sub_vector< 3 >();
         result.push_back( result.back() + diff.length( ));
     }
     return result;

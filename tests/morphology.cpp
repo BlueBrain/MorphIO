@@ -320,7 +320,9 @@ void _checkCloseArrays( const std::vector< T >& array,
     for( size_t i = 0; i != length; ++i )
     {
         const T& v = ( T )va_arg( args, typename VaArgsType< T >::type );
-        BOOST_CHECK_SMALL(( array[i] - v ).length( ), 0.00001f);
+        std::ostringstream os;
+        os << array[i] << " != " << v << " at " << i;
+        BOOST_CHECK_MESSAGE( array[i].equals( v ), os.str( ));
     }
 }
 
@@ -718,7 +720,8 @@ BOOST_AUTO_TEST_CASE( get_soma_geomery )
     brain::Matrix4f matrix( brain::Matrix4f::IDENTITY );
     matrix.set_translation( V3f( 2, 0, 0 ));
     brain::neuron::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
-    BOOST_CHECK_EQUAL( transformed.getSoma().getCentroid(), V3f( 2, 0, 0 ));
+    BOOST_CHECK_MESSAGE( transformed.getSoma().getCentroid().equals(V3f( 2,0,0 )),
+                         transformed.getSoma().getCentroid( ));
 
 }
 
@@ -785,4 +788,3 @@ BOOST_AUTO_TEST_CASE( transform_with_matrix )
       V4f( 2., .1, .0, .1 ), V4f( 1.9, .0, .0, .1 ),
       V4f( 2., -.1, .0, .1 ), V4f( 2.1, .0, .0, .1 ));
 }
-
