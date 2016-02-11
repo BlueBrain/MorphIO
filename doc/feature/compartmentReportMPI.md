@@ -8,13 +8,15 @@ key-value store from CoreNeuron.
 ## Requirements
 
 * Efficient parallel write from an MPI application, for now only for the
-  map-based reports
+  map-based reports (no duplicate writes, decoupled MPI processes, i.e.,
+  no barrier needed)
 * Parallelization across the data domain for full neurons, i.e., no
   parallel writing of a frame for a single GID
 
 ## API
 
-New parameter 'gids' to CompartmentReport::writeHeader (see Implementation).
+New parameter 'gids' to CompartmentReport::writeHeader (see
+Implementation section).
 
 ## Examples
 
