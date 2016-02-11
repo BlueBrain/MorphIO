@@ -161,7 +161,7 @@ CompartmentReportBinary::CompartmentReportBinary(
     if( !_parseMapping( ))
         LBTHROW( std::runtime_error( "Parsing mapping failed" ));
 
-    _cacheNeuronCompartmentCounts( initData.getGids() );
+    _cacheNeuronCompartmentCounts( initData.getGids( ));
 
 }
 

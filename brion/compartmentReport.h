@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -73,7 +73,10 @@ public:
 
     /** Update compartment mapping wrt the given GIDs.
      *
-     * An empty gids set loads all data from the report.
+     * Allows to change the GIDs in an open report without throwing away the
+     * already opened data, i.e., avoiding the overhead of always creating a new
+     * compartment report object when the desired GID set changes. An empty gids
+     * set loads all data from the report.
      *
      * @param gids the neurons of interest
      * @version 1.0
