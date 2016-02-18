@@ -6,6 +6,9 @@
 
 source_group(\\ FILES CMakeLists.txt)
 
+## force inclue directory for cmake 2 compat
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../MVDTool/include ${CMAKE_CURRENT_SOURCE_DIR}/../MVDTool/deps/highfive/include)
+
 set(BRAIN_PUBLIC_HEADERS
   circuit.h
   types.h
@@ -27,7 +30,8 @@ set(BRAIN_SOURCES
   )
 
 set(BRAIN_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
-set(BRAIN_LINK_LIBRARIES PUBLIC Brion vmmlib)
+set(BRAIN_LINK_LIBRARIES PUBLIC Brion vmmlib
+                         PRIVATE ${HDF5_LIBRARIES})
 set(BRAIN_INCLUDE_NAME brain)
 set(BRAIN_NAMESPACE brain)
 

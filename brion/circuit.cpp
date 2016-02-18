@@ -45,6 +45,7 @@ enum Section
 class Circuit::Impl
 {
 public:
+
     explicit Impl( const std::string& source )
     {
         namespace fs = boost::filesystem;
@@ -85,6 +86,7 @@ public:
                 _table[current].push_back( content );
         }
     }
+
 
     NeuronMatrix get( const GIDSet& gids, const uint32_t attributes ) const
     {
@@ -200,6 +202,7 @@ private:
 
     typedef stde::hash_map< uint32_t, Strings > CircuitTable;
     CircuitTable _table;
+
 };
 
 Circuit::Circuit( const std::string& source )

@@ -64,6 +64,8 @@ using vmml::Vector4f;
 using vmml::Vector3d;
 using vmml::Vector4d;
 
+typedef vmml::quaternionf Quaternionf;
+
 typedef std::vector< size_t > size_ts;
 typedef std::vector< int32_t > int32_ts;
 typedef std::vector< uint16_t > uint16_ts;
@@ -75,6 +77,7 @@ typedef std::vector< Vector3f > Vector3fs;
 typedef std::vector< Vector4f > Vector4fs;
 typedef std::vector< Vector3d > Vector3ds;
 typedef std::vector< Vector4d > Vector4ds;
+typedef std::vector< Quaternionf > Quaternionfs;
 typedef std::vector< SectionType > SectionTypes;
 typedef std::vector< Target > Targets;
 typedef boost::shared_ptr< int32_ts > int32_tsPtr;

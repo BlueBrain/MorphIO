@@ -150,6 +150,9 @@ BOOST_AUTO_TEST_CASE(test_types)
     BOOST_CHECK_EQUAL( etypes[7], "cST" );
 }
 
+
+
+
 BOOST_AUTO_TEST_CASE( brain_circuit_constructor )
 {
     brain::Circuit circuit( (brion::URI( bbp::test::getBlueconfig( ))));
@@ -157,6 +160,8 @@ BOOST_AUTO_TEST_CASE( brain_circuit_constructor )
     BOOST_CHECK_THROW( brain::Circuit( brion::URI( "pluto" )),
                        std::runtime_error );
 }
+
+
 
 BOOST_AUTO_TEST_CASE( brain_circuit_target )
 {
@@ -178,6 +183,7 @@ BOOST_AUTO_TEST_CASE( brain_circuit_target )
     BOOST_CHECK_EQUAL_COLLECTIONS( first.begin(), first.end(),
                                    second.begin(), second.end( ));
 }
+
 
 BOOST_AUTO_TEST_CASE( brain_circuit_positions )
 {
@@ -219,6 +225,11 @@ void _checkMorphology( const brain::neuron::Morphology& morphology,
         transform );
     const brain::Vector4fs& p = morphology.getPoints();
     const brain::Vector4fs& q = reference.getPoints();
+
+    BOOST_CHECK( reference.getTransformation().equals(transform, 0.001));
+
+
+
     BOOST_REQUIRE( p.size() == q.size( ));
     for( size_t i = 0; i != p.size(); ++i )
         BOOST_CHECK_SMALL(( p[i] - q[i] ).length( ), 0.0001f);
@@ -283,3 +294,69 @@ BOOST_AUTO_TEST_CASE( load_global_morphologies )
 
     _checkMorphology( *morphologies[0], "R-C010306G.h5", matrix );
 }
+
+void _check_transform(const brain::Matrix4f & trans, const brain::Quaternionf & quat,
+                      const brain::Vector3f & pos)
+{
+   brain::Matrix4f mat;
+   quat.get_rotation_matrix(mat);
+   mat.set_translation(pos);
+   mat[3][3] =1;
+   BOOST_CHECK( mat.equals( trans, 0.001f));
+
+//  std::cout << trans << "\n" << mat << std::endl;
+
+}
+
+BOOST_AUTO_TEST_CASE(brain_circuit_all_mvd3)
+{
+    brion::BlueConfig config(BBP_TEST_BLUECONFIG);
+    config.setCircuitType(brion::CircuitMVD3);
+
+    brain::Circuit circuit(config);
+
+    brain::Vector3fs positions = circuit.getPositions(brion::GIDSet());
+    brain::Matrix4fs transforms = circuit.getTransforms(brion::GIDSet());
+    BOOST_CHECK_EQUAL( positions.size(), 1000 );
+    BOOST_CHECK_EQUAL( transforms.size(), 1000 );
+
+    BOOST_CHECK_SMALL(
+        ( positions[20] - brion::Vector3f( 30.1277100000, 1794.1259110000, 19.8605870000  )).length(),
+        0.000001f );
+    BOOST_CHECK_SMALL(
+        ( positions[100] - brion::Vector3f( 48.7579240000, 1824.4589930000, 15.3025840000 )).length(),
+        0.000001f );
+
+    _check_transform(transforms[20], brain::Quaternionf (0, 0.923706, 0, 0.383102), brion::Vector3f( 30.1277100000, 1794.1259110000, 19.8605870000  ));
+    _check_transform(transforms[100], brain::Quaternionf (0, -0.992667, 0, 0.120884), brion::Vector3f( 48.7579240000, 1824.4589930000, 15.3025840000 ));
+}
+
+BOOST_AUTO_TEST_CASE(brain_circuit_partial_mvd3)
+{
+    brion::BlueConfig config(BBP_TEST_BLUECONFIG);
+    config.setCircuitType(brion::CircuitMVD3);
+
+    brain::Circuit circuit(config);
+
+    brion::GIDSet set;
+    set.insert(6);
+    set.insert(21);
+    set.insert(101);
+    set.insert(501);
+
+    brain::Vector3fs positions = circuit.getPositions(set);
+    brain::Matrix4fs transforms = circuit.getTransforms(set);
+    BOOST_CHECK_EQUAL( positions.size(), 4 );
+    BOOST_CHECK_EQUAL( transforms.size(), 4 );
+
+    BOOST_CHECK_SMALL(
+        ( positions[1] - brion::Vector3f( 30.1277100000, 1794.1259110000, 19.8605870000  )).length(),
+        0.000001f );
+    BOOST_CHECK_SMALL(
+        ( positions[2] - brion::Vector3f( 48.7579240000, 1824.4589930000, 15.3025840000 )).length(),
+        0.000001f );
+
+    _check_transform(transforms[1], brain::Quaternionf (0, 0.923706, 0, 0.383102), brion::Vector3f( 30.1277100000, 1794.1259110000, 19.8605870000  ));
+    _check_transform(transforms[2], brain::Quaternionf (0, -0.992667, 0, 0.120884), brion::Vector3f( 48.7579240000, 1824.4589930000, 15.3025840000 ));
+}
+

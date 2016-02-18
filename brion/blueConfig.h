@@ -102,10 +102,12 @@ public:
     /** @name Semantic read API */
     //@{
     /**
-     * @return the URI to the circuit information. @sa Circuit
+     * @return the URI to the circuit information. @sa Circuit.
+     *
      * @version 1.7
      */
     BRION_API URI getCircuitSource() const;
+
 
     /*
      * @return the URI to the location of synapse nrn files.
@@ -148,7 +150,15 @@ public:
      * @version 1.7
      */
     BRION_API float getTimestep() const;
+
+    /** @brief define the circuit type to use ( e.g MVD2/MVD3 ).
+     *          default is MVD2
+     */
+    BRION_API void setCircuitType(CircuitType circuit_type);
+
     //@}
+
+
 
 private:
     friend std::ostream& operator << ( std::ostream&, const BlueConfig& );

@@ -34,6 +34,7 @@ using vmml::Vector2i;
 using vmml::Vector3f;
 using vmml::Vector4f;
 using vmml::Matrix4f;
+using brion::Quaternionf;
 
 using brion::Vector2is;
 using brion::Vector3fs;
@@ -41,6 +42,7 @@ using brion::Vector4fs;
 typedef std::vector< Matrix4f > Matrix4fs;
 using brion::uint32_ts;
 using brion::floats;
+using brion::Quaternionfs;
 
 using brion::SectionTypes;
 using brion::GIDSet;

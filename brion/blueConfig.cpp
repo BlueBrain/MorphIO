@@ -82,7 +82,10 @@ namespace detail
 class BlueConfig
 {
 public:
-    explicit BlueConfig( const std::string& source )
+    explicit BlueConfig( const std::string& source) :
+        names(),
+        table(),
+        mvd_type(CircuitMVD2)
     {
         std::ifstream file( source.c_str( ));
         if( !file.is_open( ))
@@ -208,6 +211,8 @@ public:
 
     Strings names[CONFIGSECTION_ALL];
     ValueTable table[CONFIGSECTION_ALL];
+    CircuitType mvd_type;
+
 };
 }
 
@@ -249,12 +254,14 @@ brion::Targets BlueConfig::getTargets() const
 URI BlueConfig::getCircuitSource() const
 {
     URI uri;
+    const std::string circuit_filename =
+            ((_impl->mvd_type == CircuitMVD2)?(CIRCUIT_FILE):(CIRCUIT_FILE_MVD3));
+
     uri.setScheme("file");
     uri.setPath( get( CONFIGSECTION_RUN, _impl->getRun(),
-                      BLUECONFIG_CIRCUIT_PATH_KEY ) + CIRCUIT_FILE );
+                      BLUECONFIG_CIRCUIT_PATH_KEY ) + circuit_filename );
     return uri;
 }
-
 
 URI BlueConfig::getSynapseSource() const
 {
@@ -338,6 +345,10 @@ float BlueConfig::getTimestep() const
     _impl->get< float >( brion::CONFIGSECTION_RUN, run, BLUECONFIG_DT_KEY,
                          timestep );
     return timestep;
+}
+
+void BlueConfig::setCircuitType(CircuitType circuit_type){
+    _impl->mvd_type = circuit_type;
 }
 
 std::ostream& operator << ( std::ostream& os, const BlueConfig& config )
