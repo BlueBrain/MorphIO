@@ -286,7 +286,7 @@ BOOST_AUTO_TEST_CASE( load_global_morphologies )
 
 BOOST_AUTO_TEST_CASE(brain_circuit_all_mvd3)
 {
-    brion::BlueConfig config(BBP_TEST_BLUECONFIG);
+    brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
     brain::Circuit circuit(config);
     BOOST_CHECK_EQUAL( circuit.getGIDs().size(), 1000 );
 
@@ -316,7 +316,7 @@ BOOST_AUTO_TEST_CASE(brain_circuit_all_mvd3)
 
 BOOST_AUTO_TEST_CASE(brain_circuit_partial_mvd3)
 {
-    brion::BlueConfig config(BBP_TEST_BLUECONFIG);
+    brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
     brain::Circuit circuit(config);
 
     brion::GIDSet set;
