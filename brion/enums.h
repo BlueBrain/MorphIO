@@ -44,13 +44,6 @@ enum BlueConfigSection
     CONFIGSECTION_ALL //!< @internal must be last
 };
 
-/** The supported MVD circuit file format */
-enum CircuitType{
-    CircuitMVD2=20,
-    CircuitMVD3=30
-};
-
-
 /**
  * The supported formats for compartment reports.
  * @deprecated since version 1.4, kept until removed from BBPSDK and replaced by

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -30,23 +30,24 @@ using namespace brion::enums;
 
 class Circuit;
 
+using vmml::Matrix4f;
+using vmml::Quaternionf;
 using vmml::Vector2i;
 using vmml::Vector3f;
 using vmml::Vector4f;
-using vmml::Matrix4f;
-using brion::Quaternionf;
 
+using brion::GIDSet;
+using brion::SectionTypes;
+using brion::Strings;
+using brion::URI;
 using brion::Vector2is;
 using brion::Vector3fs;
 using brion::Vector4fs;
-typedef std::vector< Matrix4f > Matrix4fs;
-using brion::uint32_ts;
 using brion::floats;
-using brion::Quaternionfs;
+using brion::uint32_ts;
 
-using brion::SectionTypes;
-using brion::GIDSet;
-using brion::URI;
+typedef std::vector< Matrix4f > Matrix4fs;
+typedef std::vector< Quaternionf > Quaternionfs;
 typedef std::vector< URI > URIs;
 
 namespace neuron
@@ -62,4 +63,3 @@ namespace neuron
 
 }
 #endif
-

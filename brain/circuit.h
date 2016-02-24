@@ -59,10 +59,10 @@ public:
 
     /**
      * @return The set of GIDs for the given target name. If empty it will
-     *         return the circuit target specified on the
-     *         BlueConfig/CircuitConfig file.
-     *         If the target cannot be found or an empty string was given and
-     *         there is no circuit target, the return value is an empty set.
+     *         return the circuit target specified on the BlueConfig or
+     *         CircuitConfig file. If the target cannot be found or an empty
+     *         string was given and there is no circuit target, the return value
+     *         is an empty set.
      */
     BRAIN_API GIDSet getGIDs( const std::string& target = "" ) const;
 
@@ -83,11 +83,11 @@ public:
     /** @return The local to world transformations of the given cells. */
     BRAIN_API Matrix4fs getTransforms( const GIDSet& gids ) const;
 
+    class Impl; //!< @internal
+
 private:
-    class Impl;
     Impl* _impl;
 };
-
 
 }
 #endif
