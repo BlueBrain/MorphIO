@@ -1,5 +1,6 @@
 /* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
+ *                          Adrien.Devresse@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *

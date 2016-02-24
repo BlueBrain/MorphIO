@@ -102,7 +102,7 @@ public:
     /** @name Semantic read API */
     //@{
     /**
-     * @return the URI to the circuit information. 
+     * @return the URI to the circuit information.
      * @sa Circuit
      * @version 1.7
      */
@@ -150,8 +150,6 @@ public:
      */
     BRION_API float getTimestep() const;
     //@}
-
-
 
 private:
     friend std::ostream& operator << ( std::ostream&, const BlueConfig& );

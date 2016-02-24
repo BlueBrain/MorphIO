@@ -284,7 +284,9 @@ BOOST_AUTO_TEST_CASE( load_global_morphologies )
     _checkMorphology( *morphologies[0], "R-C010306G.h5", matrix );
 }
 
-BOOST_AUTO_TEST_CASE(brain_circuit_all_mvd3)
+#ifdef BRAIN_USE_MVD3
+
+BOOST_AUTO_TEST_CASE(all_mvd3)
 {
     brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
     brain::Circuit circuit(config);
@@ -314,19 +316,19 @@ BOOST_AUTO_TEST_CASE(brain_circuit_all_mvd3)
                      0.00001f ));
 }
 
-BOOST_AUTO_TEST_CASE(brain_circuit_partial_mvd3)
+BOOST_AUTO_TEST_CASE(partial_mvd3)
 {
     brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
     brain::Circuit circuit(config);
 
-    brion::GIDSet set;
-    set.insert(6);
-    set.insert(21);
-    set.insert(101);
-    set.insert(501);
+    brion::GIDSet gids;
+    gids.insert(6);
+    gids.insert(21);
+    gids.insert(101);
+    gids.insert(501);
 
-    const brain::Vector3fs& positions = circuit.getPositions( set );
-    const brain::Matrix4fs& transforms = circuit.getTransforms( set );
+    const brain::Vector3fs& positions = circuit.getPositions( gids );
+    const brain::Matrix4fs& transforms = circuit.getTransforms( gids );
     BOOST_CHECK_EQUAL( positions.size(), 4 );
     BOOST_CHECK_EQUAL( transforms.size(), 4 );
 
@@ -348,3 +350,22 @@ BOOST_AUTO_TEST_CASE(brain_circuit_partial_mvd3)
                          brain::Vector3f( 48.757924, 1824.458993, 15.302584 )),
                      0.00001f ));
 }
+
+BOOST_AUTO_TEST_CASE(morphology_names_mvd3)
+{
+    brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
+    brain::Circuit circuit(config);
+
+    brion::GIDSet gids;
+    gids.insert(21);
+    gids.insert(501);
+
+    const brain::URIs& names = circuit.getMorphologyURIs( gids );
+    BOOST_REQUIRE_EQUAL( names.size(), 2 );
+    BOOST_CHECK( boost::algorithm::ends_with( std::to_string( names[0] ),
+                             "dend-C280998A-P3_axon-sm110131a1-3_INT_idA.h5" ));
+    BOOST_CHECK( boost::algorithm::ends_with( std::to_string( names[1] ),
+                                         "dend-ch160801B_axon-Fluo55_low.h5" ));
+}
+
+#endif

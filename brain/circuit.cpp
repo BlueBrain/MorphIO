@@ -1,5 +1,8 @@
 /* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
+ *                          Adrien.Devresse@epfl.ch
+ *                          Daniel.Nachbaur@epfl.ch
+ *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -27,23 +30,21 @@
 
 #include <lunchbox/log.h>
 
-#include <mvd/mvd3.hpp>
-#include <mvd/mvd_generic.hpp>
+#ifdef BRAIN_USE_MVD3
+#  include <mvd/mvd3.hpp>
+#  include <mvd/mvd_generic.hpp>
+#endif
 
 #include <boost/foreach.hpp>
-#include <boost/scoped_ptr.hpp>
-#include <boost/math/constants/constants.hpp>
-
-#include <cassert>
-#include <algorithm>
-#include <functional>
 
 using boost::lexical_cast;
 
 namespace brain
 {
+
 namespace
 {
+#ifdef BRAIN_USE_MVD3
 bool isSequence( const GIDSet& gids )
 {
     return ( *gids.rbegin() - *gids.begin() + 1 ) == gids.size();
@@ -76,15 +77,18 @@ void assign( const ::MVD3::Range& range, const GIDSet& gids,
     }
 }
 
-Vector3f toVector3f( const ::MVD3::Positions::const_subarray< 1 >::type& subarray )
+Vector3f toVector3f(
+    const ::MVD3::Positions::const_subarray< 1 >::type& subarray )
 {
     return Vector3f( subarray[0], subarray[1], subarray[2] );
 }
 
-Quaternionf toQuaternion( const ::MVD3::Rotations::const_subarray< 1 >::type& subarray )
+Quaternionf toQuaternion(
+    const ::MVD3::Rotations::const_subarray< 1 >::type& subarray )
 {
     return Quaternionf( subarray[0], subarray[1], subarray[2], subarray[3] );
 }
+#endif
 
 std::string toString( const std::string& in ) { return in; }
 }
@@ -161,7 +165,7 @@ public:
 
     Quaternionfs getRotations( const GIDSet& gids ) const final
     {
-        const float deg_rad2 = float( M_PI ) / 360.f;
+        const float deg2rad = float( M_PI ) / 180.f;
         const brion::NeuronMatrix& data =
             _circuit.get( gids, brion::NEURON_ROTATION );
         Quaternionfs rotations( gids.size( ));
@@ -172,9 +176,8 @@ public:
             try
             {
                 // transform rotation Y angle in degree into rotation quaternion
-                const float angle2 = lexical_cast<float>( data[i][0] )*deg_rad2;
-                rotations[i] = Quaternionf( 0.f, std::sin( angle2 ),
-                                            0.f, std::cos( angle2 ));
+                const float angle = lexical_cast<float>( data[i][0] ) * deg2rad;
+                rotations[i] = Quaternionf( angle, Vector3f( 0, 1, 0 ));
             }
             catch( const boost::bad_lexical_cast& )
             {
@@ -203,6 +206,7 @@ private:
     brion::Circuit _circuit;
 };
 
+#ifdef BRAIN_USE_MVD3
 class MVD3 : public Circuit::Impl
 {
 public:
@@ -241,13 +245,18 @@ public:
 private:
     ::MVD3::MVD3File _circuit;
 };
+#endif
 
 Circuit::Impl* newImpl( const brion::BlueConfig& config )
 {
     const std::string circuit = config.getCircuitSource().getPath();
     if( boost::algorithm::ends_with( circuit, ".mvd2" ))
         return new MVD2( config );
+#ifdef BRAIN_USE_MVD3
     return new MVD3( config );
+#else
+    throw std::runtime_error( "MVD3 support requires CMake 3" );
+#endif
 }
 
 Circuit::Circuit( const URI& source )
