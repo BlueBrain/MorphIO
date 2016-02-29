@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -25,7 +25,8 @@
 #include <lunchbox/debug.h>
 #include <lunchbox/log.h>
 #include <lunchbox/memoryMap.h>
-
+#include <vmmlib/vector.hpp>
+#include <fstream>
 
 namespace brion
 {

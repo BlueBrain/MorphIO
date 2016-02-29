@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -20,14 +20,14 @@
 #include "spikeReportFile.h"
 #include "../detail/skipWhiteSpace.h"
 
-#include <boost/lexical_cast.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/regex.hpp>
 #include <lunchbox/log.h>
 #include <lunchbox/stdExt.h>
-
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/regex.hpp>
 #include <boost/version.hpp>
+#include <fstream>
 
 namespace brion
 {
