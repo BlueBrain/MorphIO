@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -25,6 +25,7 @@
 #include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
 #include <lunchbox/stdExt.h>
+#include <fstream>
 
 namespace brion
 {

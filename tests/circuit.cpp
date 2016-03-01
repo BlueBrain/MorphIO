@@ -70,7 +70,6 @@ BOOST_AUTO_TEST_CASE(test_all_attributes)
 
     const brion::NeuronMatrix& data = circuit.get( brion::GIDSet(),
                                                  brion::NEURON_ALL_ATTRIBUTES );
-    std::cout << data << std::endl;
 
     BOOST_CHECK_EQUAL( data.shape()[0], 10 );   // 10 neurons
     BOOST_CHECK_EQUAL( data.shape()[1], brion::NEURON_ALL );
@@ -95,7 +94,6 @@ BOOST_AUTO_TEST_CASE(test_some_attributes)
     gids.insert( 6 );
     const brion::NeuronMatrix& data = circuit.get( gids,
                           brion::NEURON_ETYPE | brion::NEURON_MORPHOLOGY_NAME );
-    std::cout << data << std::endl;
 
     BOOST_CHECK_EQUAL( data.shape()[0], 2 );   // 2 neurons
     BOOST_CHECK_EQUAL( data.shape()[1], 2 );   // 2 attributes
@@ -219,6 +217,8 @@ void _checkMorphology( const brain::neuron::Morphology& morphology,
         transform );
     const brain::Vector4fs& p = morphology.getPoints();
     const brain::Vector4fs& q = reference.getPoints();
+    BOOST_CHECK( reference.getTransformation().equals( transform ));
+
     BOOST_REQUIRE( p.size() == q.size( ));
     for( size_t i = 0; i != p.size(); ++i )
         BOOST_CHECK_SMALL(( p[i] - q[i] ).length( ), 0.0001f);
@@ -283,3 +283,89 @@ BOOST_AUTO_TEST_CASE( load_global_morphologies )
 
     _checkMorphology( *morphologies[0], "R-C010306G.h5", matrix );
 }
+
+#ifdef BRAIN_USE_MVD3
+
+BOOST_AUTO_TEST_CASE(all_mvd3)
+{
+    brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
+    brain::Circuit circuit(config);
+    BOOST_CHECK_EQUAL( circuit.getGIDs().size(), 1000 );
+
+    brain::Vector3fs positions = circuit.getPositions( circuit.getGIDs( ));
+    brain::Matrix4fs transforms = circuit.getTransforms( circuit.getGIDs( ));
+    BOOST_CHECK_EQUAL( positions.size(), 1000 );
+    BOOST_CHECK_EQUAL( transforms.size(), 1000 );
+
+    BOOST_CHECK_SMALL(
+        ( positions[20] - brion::Vector3f( 30.1277100000, 1794.1259110000, 19.8605870000  )).length(),
+        0.000001f );
+    BOOST_CHECK_SMALL(
+        ( positions[100] - brion::Vector3f( 48.7579240000, 1824.4589930000, 15.3025840000 )).length(),
+        0.000001f );
+
+    BOOST_CHECK( transforms[20].equals(
+                     brain::Matrix4f(
+                         brain::Quaternionf( 0.383102, 0,  0.923706, 0 ),
+                         brain::Vector3f( 30.12771, 1794.125911, 19.860587 )),
+                     0.00001f ));
+    BOOST_CHECK( transforms[100].equals(
+                     brain::Matrix4f(
+                         brain::Quaternionf ( 0.120884, 0, -0.992667, 0 ),
+                         brain::Vector3f( 48.757924, 1824.458993, 15.302584 )),
+                     0.00001f ));
+}
+
+BOOST_AUTO_TEST_CASE(partial_mvd3)
+{
+    brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
+    brain::Circuit circuit(config);
+
+    brion::GIDSet gids;
+    gids.insert(6);
+    gids.insert(21);
+    gids.insert(101);
+    gids.insert(501);
+
+    const brain::Vector3fs& positions = circuit.getPositions( gids );
+    const brain::Matrix4fs& transforms = circuit.getTransforms( gids );
+    BOOST_CHECK_EQUAL( positions.size(), 4 );
+    BOOST_CHECK_EQUAL( transforms.size(), 4 );
+
+    BOOST_CHECK_SMALL(
+        ( positions[1] - brion::Vector3f( 30.1277100000, 1794.1259110000, 19.8605870000  )).length(),
+        0.000001f );
+    BOOST_CHECK_SMALL(
+        ( positions[2] - brion::Vector3f( 48.7579240000, 1824.4589930000, 15.3025840000 )).length(),
+        0.000001f );
+
+    BOOST_CHECK( transforms[1].equals(
+                     brain::Matrix4f(
+                         brain::Quaternionf( 0.383102, 0, 0.923706, 0 ),
+                         brain::Vector3f( 30.12771, 1794.125911, 19.860587 )),
+                     0.00001f ));
+    BOOST_CHECK( transforms[2].equals(
+                     brain::Matrix4f(
+                         brain::Quaternionf( 0.120884, 0, -0.992667, 0 ),
+                         brain::Vector3f( 48.757924, 1824.458993, 15.302584 )),
+                     0.00001f ));
+}
+
+BOOST_AUTO_TEST_CASE(morphology_names_mvd3)
+{
+    brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
+    brain::Circuit circuit(config);
+
+    brion::GIDSet gids;
+    gids.insert(21);
+    gids.insert(501);
+
+    const brain::URIs& names = circuit.getMorphologyURIs( gids );
+    BOOST_REQUIRE_EQUAL( names.size(), 2 );
+    BOOST_CHECK( boost::algorithm::ends_with( std::to_string( names[0] ),
+                             "dend-C280998A-P3_axon-sm110131a1-3_INT_idA.h5" ));
+    BOOST_CHECK( boost::algorithm::ends_with( std::to_string( names[1] ),
+                                         "dend-ch160801B_axon-Fluo55_low.h5" ));
+}
+
+#endif

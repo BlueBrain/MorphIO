@@ -30,15 +30,9 @@
 #include <set>
 #include <map>
 
-#define VMMLIB_CUSTOM_CONFIG
-#ifndef NDEBUG
-#  define VMMLIB_SAFE_ACCESSORS
-#endif
-#undef VMMLIB_ALIGN
-#define VMMLIB_ALIGN( var ) var
 #pragma warning(push)
 #pragma warning(disable : 4996)
-#  include <vmmlib/vmmlib.hpp>
+#  include <vmmlib/types.hpp>
 #pragma warning(pop)
 
 /** @namespace brion Blue Brain File IO classes */

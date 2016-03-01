@@ -102,7 +102,8 @@ public:
     /** @name Semantic read API */
     //@{
     /**
-     * @return the URI to the circuit information. @sa Circuit
+     * @return the URI to the circuit information.
+     * @sa Circuit
      * @version 1.7
      */
     BRION_API URI getCircuitSource() const;

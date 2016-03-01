@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -28,6 +28,7 @@
 #include <boost/regex.hpp>
 #include <lunchbox/log.h>
 #include <lunchbox/stdExt.h>
+#include <fstream>
 
 namespace fs = boost::filesystem;
 namespace boost
@@ -248,13 +249,17 @@ brion::Targets BlueConfig::getTargets() const
 
 URI BlueConfig::getCircuitSource() const
 {
+    const std::string& path = get( CONFIGSECTION_RUN, _impl->getRun(),
+                                   BLUECONFIG_CIRCUIT_PATH_KEY );
+    const std::string filename = path +
+        ( fs::exists( fs::path( path ) / CIRCUIT_FILE_MVD3 ) ?
+              CIRCUIT_FILE_MVD3 : CIRCUIT_FILE_MVD2 );
+
     URI uri;
-    uri.setScheme("file");
-    uri.setPath( get( CONFIGSECTION_RUN, _impl->getRun(),
-                      BLUECONFIG_CIRCUIT_PATH_KEY ) + CIRCUIT_FILE );
+    uri.setScheme( "file" );
+    uri.setPath( filename );
     return uri;
 }
-
 
 URI BlueConfig::getSynapseSource() const
 {

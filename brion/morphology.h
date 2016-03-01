@@ -22,6 +22,7 @@
 
 #include <brion/api.h>
 #include <brion/types.h>
+#include <vmmlib/vector.hpp> // return value
 #include <boost/noncopyable.hpp>
 
 namespace brion

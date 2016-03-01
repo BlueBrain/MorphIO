@@ -1,5 +1,6 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
+ *                          Adrien.Devresse@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -23,6 +24,7 @@
 #include <brain/api.h>
 #include <brain/types.h>
 
+#include <vmmlib/matrix.hpp> // return value
 #include <boost/noncopyable.hpp>
 
 namespace brain
@@ -59,10 +61,10 @@ public:
 
     /**
      * @return The set of GIDs for the given target name. If empty it will
-     *         return the circuit target specified on the
-     *         BlueConfig/CircuitConfig file.
-     *         If the target cannot be found or an empty string was given and
-     *         there is no circuit target, the return value is an empty set.
+     *         return the circuit target specified on the BlueConfig or
+     *         CircuitConfig file. If the target cannot be found or an empty
+     *         string was given and there is no circuit target, the return value
+     *         is an empty set.
      */
     BRAIN_API GIDSet getGIDs( const std::string& target = "" ) const;
 
@@ -83,8 +85,9 @@ public:
     /** @return The local to world transformations of the given cells. */
     BRAIN_API Matrix4fs getTransforms( const GIDSet& gids ) const;
 
+    class Impl; //!< @internal
+
 private:
-    class Impl;
     Impl* _impl;
 };
 
