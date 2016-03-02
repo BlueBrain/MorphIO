@@ -98,15 +98,23 @@ class Circuit::Impl
 public:
     Impl( const brion::BlueConfig& config )
         : _morphologySource( config.getMorphologySource( ))
-        , _circuitTarget( config.getCircuitTarget( ))
         , _targetParsers( config.getTargets( ))
     {}
     virtual ~Impl() {}
 
+    virtual size_t getNumNeurons() const = 0;
+
+    GIDSet getGIDs() const
+    {
+        brain::GIDSet gids;
+        for( size_t i = 0; i < getNumNeurons(); ++i )
+            gids.insert( i + 1 );
+        return gids;
+    }
+
     GIDSet getGIDs( const std::string& target ) const
     {
-        return brion::Target::parse(
-            _targetParsers, target.empty() ? _circuitTarget : target );
+        return brion::Target::parse( _targetParsers, target );
     }
 
     virtual Vector3fs getPositions( const GIDSet& gids ) const = 0;
@@ -123,7 +131,6 @@ public:
 
 private:
     const brion::URI _morphologySource;
-    const std::string _circuitTarget;
     const brion::Targets _targetParsers;
 };
 
@@ -134,6 +141,11 @@ public:
         : Impl( config )
         , _circuit( config.getCircuitSource().getPath( ))
     {}
+
+    size_t getNumNeurons() const final
+    {
+        return _circuit.getNumNeurons();
+    }
 
     Vector3fs getPositions( const GIDSet& gids ) const final
     {
@@ -215,6 +227,11 @@ public:
         , _circuit( config.getCircuitSource().getPath( ))
     {}
 
+    size_t getNumNeurons() const final
+    {
+        return _circuit.getNbNeuron();
+    }
+
     Vector3fs getPositions( const GIDSet& gids ) const final
     {
         Vector3fs results( gids.size( ));
@@ -272,6 +289,11 @@ Circuit::Circuit( const brion::BlueConfig& config )
 Circuit::~Circuit()
 {
     delete _impl;
+}
+
+GIDSet Circuit::getGIDs() const
+{
+    return _impl->getGIDs();
 }
 
 GIDSet Circuit::getGIDs( const std::string& target ) const
@@ -349,10 +371,14 @@ Matrix4fs Circuit::getTransforms( const GIDSet& gids ) const
 
 }
 
+size_t Circuit::getNumNeurons() const
+{
+    return _impl->getNumNeurons();
+}
+
 Quaternionfs Circuit::getRotations( const GIDSet& gids ) const
 {
     return _impl->getRotations( gids );
 }
-
 
 }

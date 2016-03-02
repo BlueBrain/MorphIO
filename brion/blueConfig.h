@@ -139,8 +139,8 @@ public:
     BRION_API std::string getCircuitTarget() const;
 
     /**
-     * @return the set of GIDs for the given target, or the circuit target if
-     *         the given target is empty.
+     * @return the set of GIDs for the given target
+     * @throw  std::runtime_error if target is invalid
      * @version 1.7
      */
     BRION_API GIDSet parseTarget( const std::string& target ) const;

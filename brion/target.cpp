@@ -98,8 +98,7 @@ public:
         ValueTable::const_iterator i = _targetValues.find( name );
         if( i != _targetValues.end( ))
             return i->second;
-        static Strings empty;
-        return empty;
+        LBTHROW( std::runtime_error( name + " not a valid target" ));
     }
 
 private:
@@ -151,20 +150,26 @@ void _parse( const Targets& targets, const std::string& name, GIDSet& gids )
 {
     BOOST_FOREACH( const Target& target, targets )
     {
-        const brion::Strings& values = target.get( name );
-        BOOST_FOREACH( const std::string& value, values )
+        try
         {
-            try
+            const brion::Strings& values = target.get( name );
+            BOOST_FOREACH( const std::string& value, values )
             {
-                gids.insert( lexical_cast< uint32_t >( value.substr( 1 )));
+                try
+                {
+                    gids.insert( lexical_cast< uint32_t >( value.substr( 1 )));
+                }
+                catch( ... )
+                {
+                    if( value != name )
+                        _parse( targets, value, gids );
+                }
             }
-            catch( ... )
-            {
-                if( value != name )
-                    _parse( targets, value, gids );
-            }
+            return;
         }
+        catch( ... ) {}
     }
+    LBTHROW( std::runtime_error( name + " not a valid target" ));
 }
 }
 
