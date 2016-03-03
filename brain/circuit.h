@@ -83,6 +83,7 @@ public:
 
     /** @return The positions of the given cells. */
     BRAIN_API Vector3fs getPositions( const GIDSet& gids ) const;
+
     /** @return The local to world transformations of the given cells. */
     BRAIN_API Matrix4fs getTransforms( const GIDSet& gids ) const;
     /** @return The local to world rotation of the given cells. */
@@ -90,7 +91,7 @@ public:
     /** @return The number of neurons in the circuit. */
     BRAIN_API size_t getNumNeurons() const;
 
-    class Impl; //!< @internal
+    class Impl; //!< @internal, public for inheritance MVD2/3 impls
 
 private:
     Impl* _impl;
