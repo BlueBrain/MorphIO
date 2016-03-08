@@ -129,7 +129,7 @@ int main( const int argc, char** argv )
 #ifdef BRION_USE_BBPTESTDATA
     if( input.empty( ))
         input = std::string( BBP_TESTDATA ) +
-                "/local/simulations/may17_2011/Control/allCompartments.bbp";
+                "/circuitBuilding_1000neurons/Neurodamus_output/voltages.bbp";
 #endif
     if( input.empty( ))
     {
