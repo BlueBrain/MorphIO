@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [46](https://github.com/BlueBrain/Brion/pull/46):
+  Fixed a bug in enum to string conversions affecting morphologyConverter.
 * [39](https://github.com/BlueBrain/Brion/pull/39):
   Add compartment report converter tool
 * [30](https://github.com/BlueBrain/Brion/pull/30),

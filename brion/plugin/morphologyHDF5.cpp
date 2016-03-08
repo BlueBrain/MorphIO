@@ -31,25 +31,6 @@
 
 #include <H5Cpp.h>
 
-#include <boost/lexical_cast.hpp>
-
-namespace boost
-{
-template<>
-inline std::string lexical_cast( const brion::MorphologyRepairStage& s )
-{
-    switch( s )
-    {
-    case brion::MORPHOLOGY_RAW: return "raw";
-    case brion::MORPHOLOGY_UNRAVELED: return "unraveled";
-    case brion::MORPHOLOGY_REPAIRED: return "repaired";
-    case brion::MORPHOLOGY_UNDEFINED:
-    default:
-        throw boost::bad_lexical_cast();
-    }
-}
-}
-
 namespace brion
 {
 namespace plugin
@@ -75,11 +56,18 @@ const std::string _a_apical( "apical" );
 const std::string _a_creator( "creator" );
 const std::string _a_version( "version" );
 
-template< typename T > inline std::string toString( const T& t )
+std::string toString( const brion::enums::MorphologyRepairStage& s )
 {
-    return boost::lexical_cast< std::string >( t );
+    switch( s )
+    {
+    case brion::MORPHOLOGY_RAW: return "raw";
+    case brion::MORPHOLOGY_UNRAVELED: return "unraveled";
+    case brion::MORPHOLOGY_REPAIRED: return "repaired";
+    case brion::MORPHOLOGY_UNDEFINED:
+    default:
+        throw boost::bad_lexical_cast();
+    }
 }
-
 
 lunchbox::PluginRegisterer< MorphologyHDF5 > registerer;
 
