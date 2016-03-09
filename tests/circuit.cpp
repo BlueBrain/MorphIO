@@ -279,10 +279,10 @@ BOOST_AUTO_TEST_CASE( load_global_morphologies )
     BOOST_CHECK_EQUAL( morphologies.size(), gids.size( ));
 
     // Checking the first morphology
-    brain::Matrix4f matrix( brain::Matrix4f::IDENTITY );
+    brain::Matrix4f matrix;
     matrix.rotate_y( -75.992327 * M_PI/180.0f );
-    matrix.set_translation(
-        brain::Vector3f( 54.410675, 1427.669280, 124.882234 ));
+    matrix.setTranslation( brain::Vector3f( 54.410675, 1427.669280,
+                                            124.882234 ));
 
     _checkMorphology( *morphologies[0], "R-C010306G.h5", matrix );
 }
