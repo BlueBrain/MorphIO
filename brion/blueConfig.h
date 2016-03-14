@@ -74,12 +74,6 @@ public:
                                       const std::string& sectionName,
                                       const std::string& key ) const;
 
-    /**
-     * @return the user and circuit file target parsers.
-     * @version 1.7
-     */
-    BRION_API Targets getTargets() const;
-
     /** Get value as type T for key in given section.
      *
      * @param section type of section to get the value from
@@ -96,6 +90,12 @@ public:
         const std::string& val = get( section, sectionName, key );
         return val.empty() ? T() : boost::lexical_cast< T >( val );
     }
+
+    /**
+     * @return the user and circuit file target parsers.
+     * @version 1.7
+     */
+    BRION_API Targets getTargets() const;
     //@}
 
 
@@ -136,7 +136,7 @@ public:
      * @return the name of the circuit target
      * @version 1.7
      */
-    std::string getCircuitTarget() const;
+    BRION_API std::string getCircuitTarget() const;
 
     /**
      * @return the set of GIDs for the given target, or the circuit target if
