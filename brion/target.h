@@ -82,7 +82,8 @@ public:
      * @return the set of cell identifiers parsed
      * @version 1.6
      */
-    BRION_API static GIDSet parse( const Targets& targets, const std::string& name );
+    BRION_API static GIDSet parse( const Targets& targets,
+                                   const std::string& name );
     //@}
 
 private:

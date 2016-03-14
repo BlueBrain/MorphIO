@@ -121,7 +121,7 @@ public:
     BRION_API size_t getNumCompartments( const size_t index ) const;
 
     /** @return the current start time of the report. @version 1.0 */
-    float BRION_API getStartTime() const;
+    BRION_API float getStartTime() const;
 
     /** @return the current end time of the report. @version 1.0 */
     BRION_API float getEndTime() const;
