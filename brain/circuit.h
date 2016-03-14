@@ -84,6 +84,8 @@ public:
     BRAIN_API Vector3fs getPositions( const GIDSet& gids ) const;
     /** @return The local to world transformations of the given cells. */
     BRAIN_API Matrix4fs getTransforms( const GIDSet& gids ) const;
+    /** @return The local to world rotation of the given cells. */
+    BRAIN_API Quaternionfs getRotations( const GIDSet& gids ) const;
 
     class Impl; //!< @internal
 

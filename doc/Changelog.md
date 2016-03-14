@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [49](https://github.com/BlueBrain/Brion/pull/49):
+  Added the method brain::Circuit::getRotations
 * [46](https://github.com/BlueBrain/Brion/pull/46):
   Fixed a bug in enum to string conversions affecting morphologyConverter.
 * [39](https://github.com/BlueBrain/Brion/pull/39):

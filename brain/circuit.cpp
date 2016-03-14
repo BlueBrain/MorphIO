@@ -349,5 +349,10 @@ Matrix4fs Circuit::getTransforms( const GIDSet& gids ) const
 
 }
 
+Quaternionfs Circuit::getRotations( const GIDSet& gids ) const
+{
+    return _impl->getRotations( gids );
+}
+
 
 }
