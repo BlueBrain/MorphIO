@@ -306,12 +306,13 @@ BOOST_AUTO_TEST_CASE(all_mvd3)
 
     BOOST_CHECK( transforms[20].equals(
                      brain::Matrix4f(
-                         brain::Quaternionf( 0.383102, 0,  0.923706, 0 ),
+                         brain::Quaternionf( 0, 0.923706, 0, 0.383102 ),
                          brain::Vector3f( 30.12771, 1794.125911, 19.860587 )),
                      0.00001f ));
+
     BOOST_CHECK( transforms[100].equals(
                      brain::Matrix4f(
-                         brain::Quaternionf ( 0.120884, 0, -0.992667, 0 ),
+                         brain::Quaternionf ( 0, -0.992667, 0, 0.120884 ),
                          brain::Vector3f( 48.757924, 1824.458993, 15.302584 )),
                      0.00001f ));
 }
@@ -341,12 +342,12 @@ BOOST_AUTO_TEST_CASE(partial_mvd3)
 
     BOOST_CHECK( transforms[1].equals(
                      brain::Matrix4f(
-                         brain::Quaternionf( 0.383102, 0, 0.923706, 0 ),
+                         brain::Quaternionf( 0, 0.923706, 0, 0.383102 ),
                          brain::Vector3f( 30.12771, 1794.125911, 19.860587 )),
                      0.00001f ));
     BOOST_CHECK( transforms[2].equals(
                      brain::Matrix4f(
-                         brain::Quaternionf( 0.120884, 0, -0.992667, 0 ),
+                         brain::Quaternionf( 0, -0.992667, 0, 0.120884 ),
                          brain::Vector3f( 48.757924, 1824.458993, 15.302584 )),
                      0.00001f ));
 }
