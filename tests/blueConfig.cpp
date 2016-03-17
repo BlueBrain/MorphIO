@@ -185,12 +185,9 @@ BOOST_AUTO_TEST_CASE( semantic_api )
 BOOST_AUTO_TEST_CASE( parse_target )
 {
     const brion::BlueConfig config( bbp::test::getBlueconfig( ));
-    const brion::GIDSet defaultTarget = config.parseTarget( "" );
-    BOOST_CHECK( defaultTarget.size( ));
+    BOOST_CHECK_THROW( config.parseTarget( "" ), std::runtime_error );
     const brion::GIDSet columnTarget = config.parseTarget( "Column" );
     BOOST_CHECK( columnTarget.size( ));
-    // Can't use BOOST_CHECK_EQUAL because GIDSet lacks operator<<
-    BOOST_CHECK( defaultTarget == columnTarget );
 
     const brion::GIDSet fromUserTarget = config.parseTarget( "AllL5CSPC" );
     BOOST_CHECK( fromUserTarget.size( ));
@@ -198,7 +195,5 @@ BOOST_AUTO_TEST_CASE( parse_target )
     BOOST_CHECK( fromStartTarget.size( ));
     BOOST_CHECK( fromStartTarget == fromUserTarget );
 
-    // Shouldn't this throw instead?
-    const brion::GIDSet empty = config.parseTarget( "unexistent" );
-    BOOST_CHECK( empty.empty( ));
+    BOOST_CHECK_THROW( config.parseTarget( "unexistent" ), std::runtime_error );
 }

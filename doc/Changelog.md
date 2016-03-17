@@ -7,6 +7,12 @@ Changelog {#Changelog}
   Added the method brain::Circuit::getRotations
 * [46](https://github.com/BlueBrain/Brion/pull/46):
   Fixed a bug in enum to string conversions affecting morphologyConverter.
+* [45](https://github.com/BlueBrain/Brion/pull/45):
+  Made targets optional.
+  - brain::Circuit::getGIDs() returns all GIDs handled by the circuit.
+  - brain::Circuit::getGIDs( target ) returns GIDS for a specified target.
+  - brain::Circuit::getNumNeurons() returns the total number of neurons in the
+    circuit.
 * [39](https://github.com/BlueBrain/Brion/pull/39):
   Add compartment report converter tool
 * [30](https://github.com/BlueBrain/Brion/pull/30),

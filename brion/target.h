@@ -67,6 +67,7 @@ public:
      *
      * @param name target name to get the values from
      * @return list of values in the target. Can be targets and/or GIDSet
+     * @throw std::runtime_error if name is an invalid target
      * @version 1.0
      */
     BRION_API const Strings& get( const std::string& name ) const;
@@ -80,6 +81,7 @@ public:
      * @param targets the targets to parse
      * @param name the target name to parse
      * @return the set of cell identifiers parsed
+     * @throw std::runtime_error if name is an invalid target
      * @version 1.6
      */
     BRION_API static GIDSet parse( const Targets& targets,

@@ -61,12 +61,13 @@ public:
 
     /**
      * @return The set of GIDs for the given target name. If empty it will
-     *         return the circuit target specified on the BlueConfig or
-     *         CircuitConfig file. If the target cannot be found or an empty
-     *         string was given and there is no circuit target, the return value
-     *         is an empty set.
+     *         return all the GIDs held by the circuit. If the target cannot be
+     *         found, a runtime exception is raised.
      */
-    BRAIN_API GIDSet getGIDs( const std::string& target = "" ) const;
+    BRAIN_API GIDSet getGIDs( const std::string& target ) const;
+
+    /** @return All GIDs held by the circuit */
+    BRAIN_API GIDSet getGIDs() const;
 
     /** @return The set of URIs to access the morphologies of the given cells */
     BRAIN_API URIs getMorphologyURIs( const GIDSet& gids ) const;
@@ -86,6 +87,8 @@ public:
     BRAIN_API Matrix4fs getTransforms( const GIDSet& gids ) const;
     /** @return The local to world rotation of the given cells. */
     BRAIN_API Quaternionfs getRotations( const GIDSet& gids ) const;
+    /** @return The number of neurons in the circuit. */
+    BRAIN_API size_t getNumNeurons() const;
 
     class Impl; //!< @internal
 

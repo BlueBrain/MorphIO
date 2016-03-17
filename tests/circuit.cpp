@@ -162,7 +162,7 @@ BOOST_AUTO_TEST_CASE( brain_circuit_target )
     const brion::BlueConfig config( bbp::test::getBlueconfig( ));
 
     brion::GIDSet first = circuit.getGIDs();
-    brion::GIDSet second = config.parseTarget( "" );
+    brion::GIDSet second = config.parseTarget( "Column" );
     BOOST_CHECK_EQUAL_COLLECTIONS( first.begin(), first.end(),
                                    second.begin(), second.end( ));
 
@@ -171,10 +171,13 @@ BOOST_AUTO_TEST_CASE( brain_circuit_target )
     BOOST_CHECK_EQUAL_COLLECTIONS( first.begin(), first.end(),
                                    second.begin(), second.end( ));
 
-    first = circuit.getGIDs( "AllL5CSPC" );
-    second = config.parseTarget( "AllL5CSPC" );
+    first = circuit.getGIDs( "Layer1" );
+    second = config.parseTarget( "Layer1" );
     BOOST_CHECK_EQUAL_COLLECTIONS( first.begin(), first.end(),
                                    second.begin(), second.end( ));
+
+    BOOST_CHECK_THROW( circuit.getGIDs( "!ThisIsAnInvalidTarget!" ),
+                       std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE( brain_circuit_positions )
@@ -290,12 +293,13 @@ BOOST_AUTO_TEST_CASE(all_mvd3)
 {
     brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
     brain::Circuit circuit(config);
-    BOOST_CHECK_EQUAL( circuit.getGIDs().size(), 1000 );
+    const size_t numNeurons = circuit.getNumNeurons( );
+    BOOST_CHECK_EQUAL( circuit.getGIDs().size(), numNeurons );
 
     brain::Vector3fs positions = circuit.getPositions( circuit.getGIDs( ));
     brain::Matrix4fs transforms = circuit.getTransforms( circuit.getGIDs( ));
-    BOOST_CHECK_EQUAL( positions.size(), 1000 );
-    BOOST_CHECK_EQUAL( transforms.size(), 1000 );
+    BOOST_CHECK_EQUAL( positions.size(), numNeurons );
+    BOOST_CHECK_EQUAL( transforms.size(), numNeurons );
 
     BOOST_CHECK_SMALL(
         ( positions[20] - brion::Vector3f( 30.1277100000, 1794.1259110000, 19.8605870000  )).length(),
@@ -306,10 +310,9 @@ BOOST_AUTO_TEST_CASE(all_mvd3)
 
     BOOST_CHECK( transforms[20].equals(
                      brain::Matrix4f(
-                         brain::Quaternionf( 0, 0.923706, 0, 0.383102 ),
+                         brain::Quaternionf( 0,  0.923706, 0, 0.383102 ),
                          brain::Vector3f( 30.12771, 1794.125911, 19.860587 )),
                      0.00001f ));
-
     BOOST_CHECK( transforms[100].equals(
                      brain::Matrix4f(
                          brain::Quaternionf ( 0, -0.992667, 0, 0.120884 ),
