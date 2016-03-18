@@ -74,8 +74,6 @@ public:
             const TargetType type = lexical_cast< TargetType >( typeStr );
             _targetNames[type].push_back( name );
             boost::trim( content );
-            if( content.empty( ))
-                continue;
             boost::split( _targetValues[name], content, boost::is_any_of("\n "),
                           boost::token_compress_on );
         }
@@ -146,13 +144,17 @@ const Strings& Target::get( const std::string& name ) const
 
 namespace
 {
-void _parse( const Targets& targets, const std::string& name, GIDSet& gids )
+void _parse( const Targets& targets,
+             const std::string& name,
+             GIDSet& gids,
+             bool& found )
 {
     BOOST_FOREACH( const Target& target, targets )
     {
         try
         {
             const brion::Strings& values = target.get( name );
+            found = true;
             BOOST_FOREACH( const std::string& value, values )
             {
                 try
@@ -162,21 +164,22 @@ void _parse( const Targets& targets, const std::string& name, GIDSet& gids )
                 catch( ... )
                 {
                     if( value != name )
-                        _parse( targets, value, gids );
+                        _parse( targets, value, gids, found );
                 }
             }
-            return;
         }
         catch( ... ) {}
     }
-    LBTHROW( std::runtime_error( name + " not a valid target" ));
 }
 }
 
 GIDSet Target::parse( const Targets& targets, const std::string& name )
 {
     brion::GIDSet gids;
-    _parse( targets, name, gids );
+    bool found = false;
+    _parse( targets, name, gids, found );
+    if( !found )
+        LBTHROW( std::runtime_error( name + " not a valid target" ));
     return gids;
 }
 
