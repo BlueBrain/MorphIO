@@ -1,4 +1,4 @@
-\Redesign of the SpikeReport and Spikes container
+Redesign of the SpikeReport and Spikes container
 ============
 
 The current design of the SpikeReport has several flaws that need to be
@@ -30,14 +30,14 @@ based on it.
   the same channel needed for communicating the desired target could be used
   for the handshaking required to ensure that the first spikes are not missed.
 
-* As few details as possible should that are specific to streams should be
-  exposed. This means that it should be easy to write client code that works
-  the same for both file based and stream based reports without special
-  conditions for stream based reports.
+* As few details as possible that are specific to streams should be exposed.
+  This means that it should be easy to write client code that works the same
+  for both file based and stream based reports without special conditions for
+  stream based reports.
 
 * For stream reports the user will be able to:
- * Retrieve all the data until the end of stream in a simple loop without doing
-   any active wait (blocking calls are allowed).
+ * Retrieve all the data until the end of the stream in a simple loop without
+   doing any active wait (blocking calls are allowed).
  * Know if the end of stream has been reached.
  * Get all the data received so far without locking.
  * Get information about the latest timestamp reached by the source in the
@@ -56,10 +56,11 @@ IO) seems to be the best abstraction at the lower level. Providing random
 access and out-of-core support is complicated at the lower level because
 internal buffering is needed and this can only be implementated efficiently if
 some assumptions about how client code will use the API are made. The most
-important characteristic of the current proposal is that read operations  only
-moves forward, so each operation starts where the previous one left over.
+important characteristic of the current proposal is that all operations can only
+move forward, so each operation starts where the previous one left over.
 This way there is no need to make any distinction between the file and stream
-based cases. Random access can still be supported adding a seek function.
+based cases. Random access is partially supported by a function that does
+forward skip.
 
 The current proposal defers important design decisions to the higher level API,
 but the its benefit is that it provides a relatively simply API for the most
@@ -73,13 +74,12 @@ Thread-safey is only guaranteed for const access.
 
     struct Spike
     {
-        Spike( float timestamp_, uint32_t gid_ );
-        float timestamp;
+        Spike( float time_, uint32_t gid_ );
+        float time;
         uint32_t gid;
     };
 
     typedef std::vector< Spike > Spikes;
-    typedef boost::shared_ptr< Spikes > SpikesPtr;
 
 ### SpikeReport
 
@@ -101,9 +101,9 @@ Thread-safey is only guaranteed for const access.
         /**
          * Release all resources.
          * Any threads waiting on futures will return immediately and calling
-         * get will throw a runtime_exception.
+         * get will throw std::runtime_error.
          */
-        ~SPikeReport();
+        ~SpikeReport();
 
         const URI& getURI();
 
@@ -115,85 +115,113 @@ Thread-safey is only guaranteed for const access.
          * @return the end time of the latest complete read/write operation or
          *         UNDEFINED_TIMESTAMP if no operation has been issued.
          *
-         * Operations are deemed as complete when the returned future is ready.
+         * Read operations are deemed as complete when the returned future is
+         * ready.
          *
          * The time inverval to which getCurrentTime refers is open on the
-         * right. That means that no read of write operation may return or take
-         * a timestamp < getCurrentTime().
+         * right. That means that upon completion of a read or write operation
+         * no spike read or written may have a timestamp >= getCurrentTime().
          */
         float getCurrentTime() const;
 
         /**
-         * Read spikes until getCurrentTime becomes > min, the end of the source
-         * is reached or closed.
+         * Read spikes until getCurrentTime becomes > min, the end of the report
+         * is reached or the report closed.
+         *
+         * This function fetches all the available data from the source.
+         * If no error occurs and the end is not reached, the min value passed
+         * is also guaranteed to be inside the time window of the data returned.
          *
          * Preconditions:
-         * - r.getState() is 0 or ENDED.
+         * - r.getState() is OK or ENDED.
          * - The report was open in read mode.
-         * - There is no previous read operation with a pending future.
+         * - There is no previous read or forward operation with a pending
+         *   future.
          * - min >= getCurrentTime() or UNDEFINED_TIMESTAMP.
-         * Throw std::logic_error if one of the preconditions is not fulfilled.
          *
          * Postconditions:
          * Let:
          *  - r be the SpikeReport
          *  - f be the returned future by r.read(min)
-         *  - and s = r.getCurrentTime() before read is called or -inf if
-         *    undefined:
+         *  - and s = r.getCurrentTime() before read is called (s = -inf if
+         *    undefined):
          * After f.wait() returns the following are all true:
          *  - r.getCurrentTime() >= s
-         *  - If r.getState() == 0, then r.getCurrentTime() > min
+         *  - If r.getState() == OK, then r.getCurrentTime() > min
          *  - For each spike timestamp t_s in f.get(),
          *    s <= t_s < r.getCurrentTime() (Note this could collapse to an
-         *    empty interval is r.getState() != 0)
+         *    empty interval if r.getState() != OK)
          *
          * After successful f.wait_for or f.wait_until, the result is the same
          * as above. If they time out, no observable state changes.
          *
-         * If the state is FAILED when read is called the result is undefined.
+         * If the state is FAILED or some other operation is still pending
+         * when read is called the result is undefined.
          *
          * @param min The minimum end time until which spikes will be read. If
-         *        UNDEFINED_TIMESTAMP, it will be considered as infinite.
+         *        UNDEFINED_TIMESTAMP, it will be considered as -infinite. This
+         *        means that as much data as possible will be fetched without
+         *        a minumum.
+         * @throw std::logic_error if one of the preconditions is not fulfilled.
          */
         boost::future< Spikes > read( float min );
 
         /**
-         * Read all available spikes.
+         * Read spikes until getCurrentTime() == max, the end of the report is
+         * reached or the report closed.
          *
-         * This is a convenience function that behaves like:
-         * read( -inf ) is getCurrentTime() is undefined and
-         * read( getCurrentTime( )) otherwise.
+         * This function is very similar to the normal read, but instead of
+         * specifying a lower bound of getCurrentTime at return, it specifies
+         * a requested strict value. The preconditions and postconditions
+         * are the same except for those involving the parameter min which
+         * become:
+         *
+         * Precondition: max > getCurrentTime()
+         * Postcondition: If r.getState() == OK, then r.getCurrentTime() == max
+         *
+         * @throw std::runtime_error if the precondition does not hold.
+         * @sa forward()
          */
-        boost::future< Spikes > read();
+        boost::future< Spikes > readUntil( float max );
 
-        enum StateFlags { ENDED = 1, FAILED = 2 };
-        /** @return The state of the report after the last completed
-          *  operation. */
-        StateFlags getState() const;
+        /**
+         * Forward to a given absolute timestamp.
+         *
+         * In read mode this means skipping data forward until the timestamp
+         * is made current. In write mode for streams, consumers are notified
+         * about the progress.
+         *
+         * Preconditions:
+         * - toTimestamp >= getCurrentTime()
+         *
+         * Postconditions:
+         * Let:
+         *  - r be the SpikeReport
+         *  - f be the returned future by r.forward(toTimestamp)
+         * Then:
+         *  - After f.wait() returns r.getCurrentTime() == toTimestamp.
+         *  - The postconditions of read operations imply that this function
+         *    throws away the data previous to toTimestamp (or avoids reading
+         *    it at all if possible).
+         *
+         * @throw std::runtime_error if a precondition does not hold.
+         */
+        boost::future< void > forward( float toTimestamp );
+
+        enum State { OK = 0, ENDED = 1, FAILED = 2 };
+        /** @return The state after the last completed operation. */
+        State getState() const;
 
        /**
-         * Write the given spikes to the output and advance latestTime.
-         * If spikes is empty and latestTime is UNDEFINED_TIMESTAMP, this is a
-         * no operation (needed to handle gracefully the copy of empty sources).
+         * Write the given spikes to the output.
          *
-         * @param spikes
-         * @param lastestTime a timestamp greater than any timestamp present in
-         *        spikes.
+         * Upon return getCurrenTime() is the greatest of all the spike times
+         * plus an epsilon.
+         *
+         * @param spikes A sorted collection of spikes. For every spike, its
+         *        timestamp t must be >= getCurrentTime().
          */
-        boost::future< void > write( const SpikesPtr& spikes,
-                                     float latestTime );
-
-        /*
-         * Closes the report.
-         *
-         * In read mode this call forces the state to be changed to ENDED.
-         * Any call waiting in any future will be unblocked as if there was
-         * no more data to be read.
-         *
-         * In write mode with stream reports this signals the end of the
-         * report to the consumers.
-         */
-        void close();
+        void write( const Spikes& spikes );
     }
 
 
@@ -201,34 +229,50 @@ Thread-safey is only guaranteed for const access.
 
 ### Copying a spike report from one URL to another without any timeout.
 
-    SpikeReport source( "url1", brion::MODE_READ )
-    SpikeReport destination( "url2", brion::MODE_WRITE )
+    SpikeReport input( "url1", brion::MODE_READ )
+    SpikeReport output( "url2", brion::MODE_WRITE )
 
-    while( source.getStateFlags() == 0 )
-    {
-        const auto spikes = source.read().get();
-        destination.write( spikes, source.getCurrentTime( )).wait();
-    }
-    if (source.getStateFlags() & SpikeReport::FAILED)
+    while( input.getState() == OK )
+        output.write( input.read().get() ))
+
+    if (input .getState() == SpikeReport::FAILED)
        ... // Report error.
+    // To be strictly correct, the last operation should be output.forward to
+    // advance until the current timestamp.
 
 ### Copying a spike report from one URL to another with a read timeout.
 
-    SpikeReport source( "url1", brion::MODE_READ )
-    SpikeReport destination( "url2", brion::MODE_WRITE )
+    SpikeReport intput( "url1", brion::MODE_READ )
+    SpikeReport output( "url2", brion::MODE_WRITE )
 
-    while( source.getStateFlags() == 0 )
+    while( input.getState() == OK )
     {
-        auto future = source.read();
+        auto future = input.read();
         const auto status =
             future.wait_for( boost::chrono::milliseconds( 250 ));
         if( status == boost::future_state::ready )
-            destination.write( future.get(), source.getCurrentTime( ));
+            output.write( future.get( ));
         else
             ... // Handle timeout
+
+        output.write( spikes );
+        if (output.getState() == SpikeReport::FAILED)
+           ... // Report error.
     }
-    if (source.getStateFlags() & SpikeReport::FAILED)
+    if (input.getState() == SpikeReport::FAILED)
        ... // Report error.
+
+### Writing data at regular time intervals
+
+    const float time delta = ...;
+    for( size_t i = 0; ...; ++i )
+    {
+        const start = i * delta;
+        const end = (i + 1) * delta;
+        const Spikes = produceSpikes( start, end );
+        output.write( spikes );
+        output.forward( end ).get();
+    }
 
 
 ## Implementation
@@ -244,9 +288,10 @@ _Resolved: Yes_
 
 Not at this level. A higher level class can could provide a custom container
 if that's necessary for performance reasons. At this class, the interface is
-designed in a way that the implementation does not need to cache anything.
-This means that the container can be handed over to the consumer and rely on
-RVO and move semantics to avoid unnecessary copies.
+designed in a way that the implementation does not need to cache anything under
+normal conditions (no operation times out). This means that the container
+can be handed over to the consumer and rely on RVO and move semantics to
+avoid unnecessary copies.
 
 ### 2: Why Spikes::getCurrentTime() returns a time greater than the largest spike time (in the general case)?
 
@@ -256,21 +301,7 @@ To ensure consistency with the specification of the time interval from
 SpikeReport::read, which is open on the right. The time of the last spike is
 still easy to recover because it is the last element in the container.
 
-### 3: Why there is no SpikeReport::seek, despite it is needed to implement out-of-core random access?
-
-_Resolved: Yes_
-
-Because is not really needed at the moment. For low level clients, the only use
-case that we have for the moment is mainly forwarding of file to stream and
-viceversa and direct streaming of spikes from a running simulation. In neither
-case seek is needed. For client using a higher level interface this is annternal
-optimization that can be easily added later. The first implementation can read
-the whole file at construction time to provide random access (but obviously not
-out-of-core). For stream based reports, seek is not supported anyway, so the
-only way to provided random access is to buffer all the data as it's received,
-which is not out-of-core by definition.
-
-### 4: The return value of read should be boost::future< Spikes& > or boost::future< Spikes >?
+### 3: The return value of read should be boost::future< Spikes& > or boost::future< Spikes >?
 
 _Resolved: No_
 
@@ -280,7 +311,7 @@ that get() returns a meaningful value only the first time is called when
 returning by value (because the implementation uses std::move, but I'm not
 fully sure about this).
 
-### 5: Are the getStartTime() and getEndTime() methods needed?
+### 4: Are the getStartTime() and getEndTime() methods needed?
 
 _Resolved: No_
 
