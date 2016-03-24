@@ -3,10 +3,10 @@ Changelog {#Changelog}
 
 # Release 1.7.0 (24-Mar-2016)
 
+* [56](https://github.com/BlueBrain/Brion/pull/56):
+  Improved target parser
 * [55](https://github.com/BlueBrain/Brion/pull/55):
   Add basic provenance metadata for written HDF5 compartment reports
-* [51](https://github.com/BlueBrain/Brion/pull/51):
-  Empty target does not rise an exeption anymore
 * [49](https://github.com/BlueBrain/Brion/pull/49):
   Added the method brain::Circuit::getRotations
 * [46](https://github.com/BlueBrain/Brion/pull/46):
@@ -17,6 +17,8 @@ Changelog {#Changelog}
   - brain::Circuit::getGIDs( target ) returns GIDS for a specified target.
   - brain::Circuit::getNumNeurons() returns the total number of neurons in the
     circuit.
+* [43](https://github.com/BlueBrain/Brion/pull/43):
+  Add MVD3 support to brain::circuit 
 * [39](https://github.com/BlueBrain/Brion/pull/39):
   Add compartment report converter tool
 * [30](https://github.com/BlueBrain/Brion/pull/30),
