@@ -11,7 +11,7 @@ Mesh, Morphology, Synapse and Target files.
 Brion can be retrieved by cloning the
 [source code](https://github.com/BlueBrain/Brion.git).
 The [latest API documentation]
-(http://bluebrain.github.io/Brion-1.6/index.html) can be found on
+(http://bluebrain.github.io/Brion-1.7/index.html) can be found on
 [bluebrain.github.io](http://bluebrain.github.io).
 
 To keep track of the changes between releases check the [changelog](@ref Changelog).

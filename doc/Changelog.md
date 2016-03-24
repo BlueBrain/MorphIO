@@ -1,8 +1,10 @@
 Changelog {#Changelog}
 =========
 
-# git master
+# Release 1.7.0 (24-Mar-2016)
 
+* [51](https://github.com/BlueBrain/Brion/pull/51):
+  Empty target does not rise an exeption anymore
 * [49](https://github.com/BlueBrain/Brion/pull/49):
   Added the method brain::Circuit::getRotations
 * [46](https://github.com/BlueBrain/Brion/pull/46):
