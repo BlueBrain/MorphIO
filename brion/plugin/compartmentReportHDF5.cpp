@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -20,6 +20,8 @@
 #include "compartmentReportHDF5.h"
 #include "../detail/lockHDF5.h"
 #include "../detail/silenceHDF5.h"
+#include "../detail/utilsHDF5.h"
+#include <brion/version.h>
 
 #include <boost/filesystem.hpp>
 #include <boost/scoped_array.hpp>
@@ -425,6 +427,8 @@ void CompartmentReportHDF5::writeHeader( const float startTime,
     _timestep = timestep;
     _dunit = dunit;
     _tunit = tunit;
+
+    _createMetaData();
 }
 
 bool CompartmentReportHDF5::writeCompartments( const uint32_t gid,
@@ -595,15 +599,32 @@ H5::DataSet& CompartmentReportHDF5::_getDataset( const uint32_t gid )
     return it->second;
 }
 
+void CompartmentReportHDF5::_createMetaData()
+{
+    H5::Group root = _file.openGroup( "/" );
+
+    detail::addStringAttribute( root, "creator", "Brion" );
+    detail::addStringAttribute( root, "software_version",
+                                brion::Version::getRevString( ));
+
+    const time_t now = ::time(0);
+#ifdef _WIN32
+    char* gmtString = ::ctime( &now );
+#else
+    char gmtString[32];
+    ::ctime_r( &now, gmtString );
+#endif
+    std::string creationTimeName = gmtString;
+    creationTimeName.pop_back(); // ctime_r ends with \n
+    detail::addStringAttribute( root, "creation_time", creationTimeName );
+}
+
 void CompartmentReportHDF5::_createMappingAttributes( H5::DataSet& dataset )
 {
 //    const std::string type =
 //                         boost::lexical_cast< std::string >( _spec.type( ));
     const std::string type = "1";   // COMPARTMENT_REPORT
-    H5::StrType stringType( H5::PredType::C_S1, type.length( ));
-
-    H5::Attribute typeAttr = dataset.createAttribute( mappingAttributes[0],
-                                                   stringType, H5S_SCALAR );
+    detail::addStringAttribute( dataset, mappingAttributes[0], type );
     dataset.createAttribute( mappingAttributes[1], H5::PredType::NATIVE_INT,
                              H5S_SCALAR );
     dataset.createAttribute( mappingAttributes[2], H5::PredType::NATIVE_INT,
@@ -614,8 +635,6 @@ void CompartmentReportHDF5::_createMappingAttributes( H5::DataSet& dataset )
                              H5S_SCALAR );
     dataset.createAttribute( mappingAttributes[5], H5::PredType::NATIVE_INT,
                              H5S_SCALAR );
-
-    typeAttr.write( stringType, type );
 }
 
 void CompartmentReportHDF5::_createDataAttributes( H5::DataSet& dataset )
@@ -624,8 +643,6 @@ void CompartmentReportHDF5::_createDataAttributes( H5::DataSet& dataset )
     const double startTime = getStartTime();
     const double endTime = getEndTime();
     const double timestep = getTimestep();
-    H5::StrType string2Type( H5::PredType::C_S1, _tunit.length( ));
-    H5::StrType stringType( H5::PredType::C_S1, _dunit.length( ));
 
     H5::Attribute rankAttr = dataset.createAttribute( dataAttributes[0],
                                      H5::PredType::NATIVE_INT, H5S_SCALAR );
@@ -635,17 +652,13 @@ void CompartmentReportHDF5::_createDataAttributes( H5::DataSet& dataset )
                                   H5::PredType::NATIVE_DOUBLE, H5S_SCALAR );
     H5::Attribute dtAttr = dataset.createAttribute( dataAttributes[3],
                                   H5::PredType::NATIVE_DOUBLE, H5S_SCALAR );
-    H5::Attribute dunitAttr = dataset.createAttribute( dataAttributes[4],
-                                                   stringType, H5S_SCALAR );
-    H5::Attribute tunitAttr = dataset.createAttribute( dataAttributes[5],
-                                                  string2Type, H5S_SCALAR );
 
     rankAttr.write( H5::PredType::NATIVE_INT, &rank );
     tstartAttr.write( H5::PredType::NATIVE_DOUBLE, &startTime );
     tstopAttr.write( H5::PredType::NATIVE_DOUBLE, &endTime );
     dtAttr.write( H5::PredType::NATIVE_DOUBLE, &timestep );
-    dunitAttr.write( stringType, _dunit );
-    tunitAttr.write( string2Type, _tunit );
+    detail::addStringAttribute( dataset, dataAttributes[4], _dunit );
+    detail::addStringAttribute( dataset, dataAttributes[5], _tunit );
 }
 
 }

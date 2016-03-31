@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # Release 1.7.0 (24-Mar-2016)
 
+* [55](https://github.com/BlueBrain/Brion/pull/55):
+  Add basic provenance metadata for written HDF5 compartment reports
 * [51](https://github.com/BlueBrain/Brion/pull/51):
   Empty target does not rise an exeption anymore
 * [49](https://github.com/BlueBrain/Brion/pull/49):

@@ -22,6 +22,7 @@
 
 #include "../detail/lockHDF5.h"
 #include "../detail/silenceHDF5.h"
+#include "../detail/utilsHDF5.h"
 
 #include <brion/version.h>
 
@@ -583,13 +584,10 @@ void MorphologyHDF5::_writeV2Header()
     char gmtString[32];
     ::ctime_r( &now, gmtString );
 #endif
-    const std::string creator = "Brion " + Version::getString() +
-                                " brion::Morphology " + gmtString;
-    H5::DataSpace creatorDS( H5S_SCALAR );
-    H5::StrType stringDT( H5::PredType::C_S1, creator.length( ));
-    H5::Attribute creatorAttr = root.createAttribute( _a_creator, stringDT,
-                                                      creatorDS );
-    creatorAttr.write( stringDT, creator );
+    std::string creator = "Brion " + Version::getString() +
+                          " brion::Morphology " + gmtString;
+    creator.pop_back(); // ctime_r ends with \n
+    detail::addStringAttribute( root, _a_creator, creator );
 
     H5::DataSpace versionDS( H5S_SCALAR );
     H5::Attribute versionAttr = root.createAttribute( _a_version,

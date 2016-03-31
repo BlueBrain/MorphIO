@@ -43,6 +43,7 @@ set(BRION_HEADERS
   detail/meshHDF5.h
   detail/lockHDF5.h
   detail/silenceHDF5.h
+  detail/utilsHDF5.h
   )
 
 set(BRION_SOURCES

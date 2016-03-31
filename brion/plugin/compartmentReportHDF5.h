@@ -71,6 +71,7 @@ private:
 
     H5::DataSet _createDataset( const uint32_t gid, const size_t compCount );
     H5::DataSet& _getDataset( const uint32_t gid );
+    void _createMetaData();
     void _createMappingAttributes( H5::DataSet& dataset );
     void _createDataAttributes( H5::DataSet& dataset );
 
