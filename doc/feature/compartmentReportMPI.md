@@ -45,7 +45,7 @@ header before any other data is written.
 
 ### 1: Shall we write the list of GIDs from rank 0?
 
-Resolved: Yes
+_Resolved: Yes_
 
 Pro: Does not change the current storage.
 Con: Might be more cumbersome for application to use, as gids have to be
