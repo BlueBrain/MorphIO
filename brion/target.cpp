@@ -74,8 +74,14 @@ public:
             const TargetType type = lexical_cast< TargetType >( typeStr );
             _targetNames[type].push_back( name );
             boost::trim( content );
-            boost::split( _targetValues[name], content, boost::is_any_of("\n "),
-                          boost::token_compress_on );
+            if( content.empty( ))
+                _targetValues[name] = Strings();
+            else
+            {
+                boost::split( _targetValues[name], content,
+                              boost::is_any_of("\n "),
+                              boost::token_compress_on );
+            }
         }
 
         if( _targetNames.empty( ))
@@ -91,12 +97,15 @@ public:
         return empty;
     }
 
+    bool contains( const std::string& name ) const
+        { return _targetValues.find( name ) != _targetValues.end(); }
+
     const Strings& get( const std::string& name ) const
     {
         ValueTable::const_iterator i = _targetValues.find( name );
         if( i != _targetValues.end( ))
             return i->second;
-        LBTHROW( std::runtime_error( name + " not a valid target" ));
+        throw( std::runtime_error( name + " not a valid target" ));
     }
 
 private:
@@ -137,49 +146,55 @@ const Strings& Target::getTargetNames( const TargetType type ) const
     return _impl->getTargetNames( type );
 }
 
+bool Target::contains( const std::string& name ) const
+{
+    return _impl->contains( name );
+}
+
 const Strings& Target::get( const std::string& name ) const
 {
     return _impl->get( name );
 }
 
-namespace
+GIDSet Target::parse( const Targets& targets, const std::string& root )
 {
-void _parse( const Targets& targets,
-             const std::string& name,
-             GIDSet& gids,
-             bool& found )
-{
-    BOOST_FOREACH( const Target& target, targets )
-    {
-        try
-        {
-            const brion::Strings& values = target.get( name );
-            found = true;
-            BOOST_FOREACH( const std::string& value, values )
-            {
-                try
-                {
-                    gids.insert( lexical_cast< uint32_t >( value.substr( 1 )));
-                }
-                catch( ... )
-                {
-                    if( value != name )
-                        _parse( targets, value, gids, found );
-                }
-            }
-        }
-        catch( ... ) {}
-    }
-}
-}
+    if( root.empty( ))
+        LBTHROW( std::runtime_error( "Empty target name" ));
 
-GIDSet Target::parse( const Targets& targets, const std::string& name )
-{
-    brion::GIDSet gids;
-    bool found = false;
-    _parse( targets, name, gids, found );
-    if( !found )
-        LBTHROW( std::runtime_error( name + " not a valid target" ));
+    GIDSet gids;
+    Strings names( 1, root );
+    while( !names.empty( ))
+    {
+        const std::string name = names.back();
+        names.pop_back();
+
+        if( name[0] == 'a' ) // maybe a GID
+        {
+            try
+            {
+                gids.insert( lexical_cast< uint32_t >( name.substr( 1 )));
+                continue;
+            }
+            catch( const boost::bad_lexical_cast& ) {} // not a GID
+        }
+
+        bool found = false;
+        BOOST_FOREACH( const Target& target, targets )
+        {
+            if( !target.contains( name ))
+                continue;
+
+            const brion::Strings& values = target.get( name );
+            std::copy( values.begin(), values.end(),
+                       std::back_inserter( names ));
+            found = true;
+            break;
+        }
+        if( !found )
+            LBTHROW( std::runtime_error( "Parse " + root + " failed: " + name +
+                                         " is not a valid target " ));
+    }
+
     return gids;
 }
 
@@ -200,3 +215,4 @@ std::ostream& operator << ( std::ostream& os, const Target& target )
 }
 
 }
+
