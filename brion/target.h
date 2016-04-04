@@ -63,6 +63,9 @@ public:
      */
     BRION_API const Strings& getTargetNames( const TargetType type ) const;
 
+    /** @return true if the target exists. @version 1.7 */
+    BRION_API bool contains( const std::string& name ) const;
+
     /** Get targets and/or GIDSet grouped by the given target
      *
      * @param name target name to get the values from
@@ -77,11 +80,13 @@ public:
      *
      * All given targets are searched for the given name. If found, the named
      * target is recursively resolved to a GID set.
+     * Empty targets are valid, i.e., do not throw when an empty target is 
+     * found.
      *
      * @param targets the targets to parse
      * @param name the target name to parse
      * @return the set of cell identifiers parsed
-     * @throw std::runtime_error if name is an invalid target
+     * @throw std::runtime_error if a non-existent (sub)target is found.
      * @version 1.6
      */
     BRION_API static GIDSet parse( const Targets& targets,
