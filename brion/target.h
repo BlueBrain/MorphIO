@@ -80,13 +80,13 @@ public:
      *
      * All given targets are searched for the given name. If found, the named
      * target is recursively resolved to a GID set.
-     * Empty targets are valid, i.e., do not throw when an empty target is 
+     * Empty targets are valid, i.e., does not throw when an empty target is 
      * found.
      *
      * @param targets the targets to parse
      * @param name the target name to parse
      * @return the set of cell identifiers parsed
-     * @throw std::runtime_error if a non-existent (sub)target is found.
+     * @throw std::runtime_error if a non-existent (sub)target is given.
      * @version 1.6
      */
     BRION_API static GIDSet parse( const Targets& targets,

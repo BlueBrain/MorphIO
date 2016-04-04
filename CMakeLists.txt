@@ -14,7 +14,7 @@ include(GitExternal)
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "7")
 set(VERSION_PATCH "0")
-set(VERSION_ABI 5)
+set(VERSION_ABI 6)
 
 set(BRION_DESCRIPTION "The Blue Brain C++ I/O library")
 set(BRION_MAINTAINER
