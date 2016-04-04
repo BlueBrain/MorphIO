@@ -56,11 +56,11 @@ IO) seems to be the best abstraction at the lower level. Providing random
 access and out-of-core support is complicated at the lower level because
 internal buffering is needed and this can only be implementated efficiently if
 some assumptions about how client code will use the API are made. The most
-important characteristic of the current proposal is that all operations can only
-move forward, so each operation starts where the previous one left over.
-This way there is no need to make any distinction between the file and stream
-based cases. Random access is partially supported by a function that does
-forward skip.
+important characteristic of the current proposal is that read and write
+operations can only move forward, so each operation starts where the previous
+one left over. This way there is no need to make any distinction between the
+file and stream based cases. Random access is partially supported by a
+seek function that for stream based reports will only support forward skip.
 
 The current proposal defers important design decisions to the higher level API,
 but the its benefit is that it provides a relatively simply API for the most
@@ -135,7 +135,7 @@ Thread-safey is only guaranteed for const access.
          * Preconditions:
          * - r.getState() is OK or ENDED.
          * - The report was open in read mode.
-         * - There is no previous read or forward operation with a pending
+         * - There is no previous read or seek operation with a pending
          *   future.
          * - min >= getCurrentTime() or UNDEFINED_TIMESTAMP.
          *
@@ -180,33 +180,38 @@ Thread-safey is only guaranteed for const access.
          * Postcondition: If r.getState() == OK, then r.getCurrentTime() == max
          *
          * @throw std::runtime_error if the precondition does not hold.
-         * @sa forward()
+         * @sa seek()
          */
         boost::future< Spikes > readUntil( float max );
 
         /**
-         * Forward to a given absolute timestamp.
+         * Seek to a given absolute timestamp.
          *
-         * In read mode this means skipping data forward until the timestamp
+         * If toTimestamp >= getCurrentTime() and the report was opening
+         * for reading, data will be skipped forward until the timestamp
          * is made current. In write mode for streams, consumers are notified
          * about the progress.
          *
+         * The case toTimestamp < getCurrentTime() is only supported by file
+         * based reports.
+         *
          * Preconditions:
-         * - toTimestamp >= getCurrentTime()
+         * - There is no standing read or readUntil operation.
          *
          * Postconditions:
          * Let:
          *  - r be the SpikeReport
-         *  - f be the returned future by r.forward(toTimestamp)
+         *  - f be the returned future by r.seek(toTimestamp)
          * Then:
          *  - After f.wait() returns r.getCurrentTime() == toTimestamp.
-         *  - The postconditions of read operations imply that this function
-         *    throws away the data previous to toTimestamp (or avoids reading
-         *    it at all if possible).
+         *  - The postconditions of read operations imply that in forward skips
+         *    this function throws away the data previous to toTimestamp (or
+         *    avoids reading it at all if possible).
          *
-         * @throw std::runtime_error if a precondition does not hold.
+         * @throw std::runtime_error if a precondition does not hold or the
+         *        operation is not supported by the implementation.
          */
-        boost::future< void > forward( float toTimestamp );
+        boost::future< void > seek( float toTimestamp );
 
         enum State { OK = 0, ENDED = 1, FAILED = 2 };
         /** @return The state after the last completed operation. */
@@ -237,7 +242,7 @@ Thread-safey is only guaranteed for const access.
 
     if (input .getState() == SpikeReport::FAILED)
        ... // Report error.
-    // To be strictly correct, the last operation should be output.forward to
+    // To be strictly correct, the last operation should be output.seek to
     // advance until the current timestamp.
 
 ### Copying a spike report from one URL to another with a read timeout.
@@ -271,7 +276,7 @@ Thread-safey is only guaranteed for const access.
         const end = (i + 1) * delta;
         const Spikes = produceSpikes( start, end );
         output.write( spikes );
-        output.forward( end ).get();
+        output.seek( end ).get();
     }
 
 
