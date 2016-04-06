@@ -35,7 +35,7 @@ Vector3f _computeCentroid( const Vector4fs& points )
 {
     Vector3f centroid( Vector3f::ZERO );
     BOOST_FOREACH( const Vector4f& point, points )
-        centroid += point.get_sub_vector< 3 >();
+        centroid += point.get_sub_vector< 3, 0 >();
     centroid /= float( points.size( ));
     return centroid;
 }
@@ -81,7 +81,7 @@ float Soma::getMeanRadius() const
     const Vector3f centroid = _computeCentroid( points );
     float radius = 0;
     BOOST_FOREACH( const Vector4f point, points )
-        radius += ( point.get_sub_vector< 3 >() - centroid ).length();
+        radius += ( point.get_sub_vector< 3, 0 >() - centroid ).length();
     return radius /= float( points.size( ));
 }
 

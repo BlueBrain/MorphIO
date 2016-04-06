@@ -615,7 +615,8 @@ void CompartmentReportHDF5::_createMetaData()
     ::ctime_r( &now, gmtString );
 #endif
     std::string creationTimeName = gmtString;
-    creationTimeName.pop_back(); // ctime_r ends with \n
+    // ctime_r ends with \n
+    creationTimeName = creationTimeName.substr( 0, creationTimeName.size() -1 );
     detail::addStringAttribute( root, "creation_time", creationTimeName );
 }
 
