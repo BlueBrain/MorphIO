@@ -586,7 +586,7 @@ void MorphologyHDF5::_writeV2Header()
 #endif
     std::string creator = "Brion " + Version::getString() +
                           " brion::Morphology " + gmtString;
-    creator.pop_back(); // ctime_r ends with \n
+    creator = creator.substr( 0, creator.size() -1 ); // ctime_r ends with \n
     detail::addStringAttribute( root, _a_creator, creator );
 
     H5::DataSpace versionDS( H5S_SCALAR );
