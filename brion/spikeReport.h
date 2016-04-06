@@ -89,7 +89,7 @@ public:
      *        registered spike report plugin.
      * @version 1.4
      */
-    BRION_API explicit SpikeReport( const URI& uri, const int mode );
+    BRION_API SpikeReport( const URI& uri, const int mode );
 
     /** Destructor. @version 1.3 */
     BRION_API ~SpikeReport();

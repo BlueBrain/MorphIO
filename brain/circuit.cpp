@@ -96,7 +96,7 @@ std::string toString( const std::string& in ) { return in; }
 class Circuit::Impl
 {
 public:
-    Impl( const brion::BlueConfig& config )
+    explicit Impl( const brion::BlueConfig& config )
         : _morphologySource( config.getMorphologySource( ))
         , _targetParsers( config.getTargets( ))
     {}

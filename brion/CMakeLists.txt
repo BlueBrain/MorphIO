@@ -4,8 +4,6 @@
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
 #
 
-source_group(\\ FILES CMakeLists.txt)
-
 set(BRION_PUBLIC_HEADERS
   blueConfig.h
   circuit.h
