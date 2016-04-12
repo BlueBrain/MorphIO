@@ -1,5 +1,5 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
- *                          Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2016, EPFL/Blue Brain Project
+ *                     Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -17,37 +17,26 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_TYPES
-#define BRAIN_TYPES
+#ifndef BRAIN_NEURON_TYPES
+#define BRAIN_NEURON_TYPES
 
-#include <brion/types.h>
+#include <vector>
+#include <boost/shared_ptr.hpp>
 
-/** @namespace brain Algorithmic interface to Blue Brain data model */
 namespace brain
 {
+/** High-level interface to neuron morphologies. */
+namespace neuron
+{
+class Morphology;
+class Section;
+class Soma;
 
-using namespace brion::enums;
+typedef boost::shared_ptr< Morphology > MorphologyPtr;
 
-class Circuit;
+typedef std::vector< MorphologyPtr > Morphologies;
+typedef std::vector< Section > Sections;
+}
 
-using vmml::Matrix4f;
-using vmml::Quaternionf;
-using vmml::Vector2i;
-using vmml::Vector3f;
-using vmml::Vector4f;
-
-using brion::GIDSet;
-using brion::SectionTypes;
-using brion::Strings;
-using brion::URI;
-using brion::Vector2is;
-using brion::Vector3fs;
-using brion::Vector4fs;
-using brion::floats;
-using brion::uint32_ts;
-
-typedef std::vector< Matrix4f > Matrix4fs;
-typedef std::vector< Quaternionf > Quaternionfs;
-typedef std::vector< URI > URIs;
 }
 #endif

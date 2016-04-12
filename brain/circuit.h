@@ -23,6 +23,7 @@
 
 #include <brain/api.h>
 #include <brain/types.h>
+#include <brain/neuron/types.h>
 
 #include <vmmlib/matrix.hpp> // return value
 #include <boost/noncopyable.hpp>

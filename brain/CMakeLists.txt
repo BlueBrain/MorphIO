@@ -12,6 +12,7 @@ set(BRAIN_PUBLIC_HEADERS
   neuron/morphology.h
   neuron/section.h
   neuron/soma.h
+  neuron/types.h
   )
 
 set(BRAIN_HEADERS
