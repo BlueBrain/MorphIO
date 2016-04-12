@@ -25,7 +25,7 @@
 
 #include <lunchbox/lfVector.h>
 #include <lunchbox/referenced.h>
-#include <vmmlib/matrix.hpp>
+#include <vmmlib/matrix.hpp> // member
 
 namespace brain
 {

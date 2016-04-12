@@ -51,6 +51,7 @@ const std::string tunitKey( "tunit" );
 const uint32_t _version = 3; // Increase with each change in a k/v pair
 const uint32_t _magic = 0xdb;
 const size_t _queueDepth = 32768; // async queue depth, heuristic from benchmark
+#define ASYNC_IO
 
 std::string _getScope( const URI& uri )
 {
@@ -329,11 +330,25 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
     floatsPtr buffer( new floats( getFrameSize( )));
     floats::iterator iter = buffer->begin();
     const size_t index = _getFrameNumber( time );
+    std::map< uint32_t, size_t > sizeMap;
+
+    BOOST_FOREACH( const uint32_t gid, _gids )
+    {
+        const CellCompartments::const_iterator i = _cellCounts.find( gid );
+        if( i == _cellCounts.end( ))
+        {
+            LBWARN << "Missing mapping for gid " << gid << std::endl;
+            return floatsPtr();
+        }
+        const size_t size = std::accumulate( i->second.begin(),
+                                             i->second.end(), 0 ) *
+                            sizeof( float );
+        sizeMap[ gid ] = size;
 
 #ifdef ASYNC_IO
-    BOOST_FOREACH( const uint32_t gid, _gids )
-        _store.fetch( scope + toString( gid ) + "_" + toString( index ));
+        _store.fetch( scope + toString( gid ) + "_" + toString( index ), size );
 #endif
+    }
 
     BOOST_FOREACH( const uint32_t gid, _gids )
     {
@@ -346,6 +361,9 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
             LBWARN << "Missing data for gid " << toString( gid ) << std::endl;
             return floatsPtr();
         }
+        LBASSERTINFO( sizeMap[ gid ] == cellData.size(),
+                      sizeMap[ gid ] << " != " << cellData.size( ));
+
         ::memcpy( &(*iter), cellData.data(), cellData.size( ));
         iter += cellData.size() / sizeof( float );
         if( iter > buffer->end( ))

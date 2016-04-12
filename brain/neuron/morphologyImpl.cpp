@@ -39,7 +39,6 @@ Morphology::Impl::Impl( const brion::Morphology& morphology )
     , sections( morphology.readSections( MORPHOLOGY_UNDEFINED ))
     , types( morphology.readSectionTypes( ))
     , apicals( morphology.readApicals( ))
-    , transformation( Matrix4f::IDENTITY )
 {
     _extractChildrenLists();
 

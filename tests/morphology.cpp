@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -576,7 +576,7 @@ BOOST_AUTO_TEST_CASE( v2_morphology_constructors )
 
     brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
     BOOST_CHECK_EQUAL( morphology.getTransformation(),
-                       brain::Matrix4f::IDENTITY );
+                       brain::Matrix4f( ));
     checkEqualMorphologies( morphology, *raw );
     checkEqualMorphologies( brain::neuron::Morphology( *raw ), *raw );
 
@@ -717,8 +717,8 @@ BOOST_AUTO_TEST_CASE( get_soma_geomery )
     BOOST_CHECK_CLOSE( soma.getMeanRadius(), 0.1, 1e-5 );
     BOOST_CHECK_EQUAL( soma.getCentroid(), V3f::ZERO );
 
-    brain::Matrix4f matrix( brain::Matrix4f::IDENTITY );
-    matrix.set_translation( V3f( 2, 0, 0 ));
+    brain::Matrix4f matrix;
+    matrix.setTranslation( V3f( 2, 0, 0 ));
     brain::neuron::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
     BOOST_CHECK_MESSAGE( transformed.getSoma().getCentroid().equals(V3f( 2,0,0 )),
                          transformed.getSoma().getCentroid( ));
@@ -772,16 +772,16 @@ BOOST_AUTO_TEST_CASE( morphology_hierarchy )
 
 BOOST_AUTO_TEST_CASE( transform_with_matrix )
 {
-    brain::Matrix4f matrix( brain::Matrix4f::IDENTITY );
+    brain::Matrix4f matrix;
     matrix.rotate_z( M_PI * 0.5 );
     brain::neuron::Morphology rotated( TEST_MORPHOLOGY_URI, matrix );
     checkCloseArraysUptoN( rotated.getPoints(), 4,
       V4f( .0, .1, .0, .1 ), V4f( -.1, .0, .0, .1 ),
       V4f( .0, -.1, .0, .1 ), V4f( .1, .0, .0, .1 ));
 
-    matrix = brain::Matrix4f::IDENTITY;
+    matrix = brain::Matrix4f();
     matrix.rotate_z( M_PI * 0.5 );
-    matrix.set_translation( V3f( 2, 0, 0 ));
+    matrix.setTranslation( V3f( 2, 0, 0 ));
     brain::neuron::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
     BOOST_CHECK_EQUAL( transformed.getTransformation(), matrix );
     checkCloseArraysUptoN( transformed.getPoints(), 4,
