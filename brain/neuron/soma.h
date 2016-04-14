@@ -76,7 +76,7 @@ public:
     BRAIN_API Sections getChildren() const;
 
 protected:
-    BRAIN_API Soma( Morphology::Impl* morhology );
+    BRAIN_API explicit Soma( Morphology::Impl* morhology );
 
 private:
     Morphology::Impl* _morphology;

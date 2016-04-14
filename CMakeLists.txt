@@ -4,35 +4,35 @@
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
 #
 
-cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
-project(Brion)
+cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+project(Brion VERSION 1.7.0)
+set(Brion_VERSION_ABI 6)
+
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
   ${CMAKE_SOURCE_DIR}/CMake/common)
 
 include(GitExternal)
 
-set(VERSION_MAJOR "1")
-set(VERSION_MINOR "7")
-set(VERSION_PATCH "0")
-set(VERSION_ABI 6)
-
 set(BRION_DESCRIPTION "The Blue Brain C++ I/O library")
 set(BRION_MAINTAINER
   "Blue Brain Project <bbp-open-source@googlegroups.com>")
 set(BRION_LICENSE LGPL)
+set(BRION_DEB_DEPENDS libhdf5-serial-dev libboost-date-time-dev
+  libboost-filesystem-dev libboost-regex-dev libboost-system-dev
+  libboost-test-dev)
 
 set(COMMON_PROJECT_DOMAIN ch.epfl.bluebrain)
 include(Common)
 
-common_package(BBPTestData)
-common_package(Boost REQUIRED COMPONENTS date_time filesystem program_options
-                                         regex system unit_test_framework)
-common_package(HDF5 REQUIRED COMPONENTS C CXX)
-common_package(Lunchbox REQUIRED)
-common_package(OpenMP)
-common_package(Servus REQUIRED)
-common_package(vmmlib REQUIRED)
-common_package_post()
+common_find_package(BBPTestData)
+common_find_package(Boost REQUIRED COMPONENTS
+  date_time filesystem program_options regex system unit_test_framework)
+common_find_package(HDF5 REQUIRED COMPONENTS C CXX)
+common_find_package(Lunchbox REQUIRED)
+common_find_package(OpenMP)
+common_find_package(Servus REQUIRED)
+common_find_package(vmmlib REQUIRED)
+common_find_package_post()
 
 list(APPEND BRION_DEPENDENT_LIBRARIES Boost Lunchbox Servus vmmlib)
 

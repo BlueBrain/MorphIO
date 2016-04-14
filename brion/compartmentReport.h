@@ -68,8 +68,8 @@ public:
      * @version 1.0
      * @deprecated
      */
-    BRION_API CompartmentReport( const std::string& source,
-                                 const GIDSet& gids = GIDSet( ));
+    BRION_API explicit CompartmentReport( const std::string& source,
+                                          const GIDSet& gids = GIDSet( ));
 
     /** Update compartment mapping wrt the given GIDs.
      *

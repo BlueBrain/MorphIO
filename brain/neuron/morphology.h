@@ -77,14 +77,14 @@ public:
      * @param source URI of the morphology data source.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
-    BRAIN_API Morphology( const URI& source );
+    BRAIN_API explicit Morphology( const URI& source );
 
     /**
      * Create a morphology from a brion::Morphology and load all the data.
      * @param morphology the brion::Morphology to load from.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
-    BRAIN_API Morphology( const brion::Morphology& morphology );
+    BRAIN_API explicit Morphology( const brion::Morphology& morphology );
 
     BRAIN_API ~Morphology();
 

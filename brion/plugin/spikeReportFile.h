@@ -66,9 +66,8 @@ public:
      * @param rt The Type of report.
      * @throws std::runtime_error if the file could not be opened.
      */
-    explicit SpikeReportFile( const std::string& filename,
-                              const SpikeReportType rt,
-                              const int accessMode );
+    SpikeReportFile( const std::string& filename, const SpikeReportType rt,
+                     const int accessMode );
     virtual ~SpikeReportFile();
 
     /**

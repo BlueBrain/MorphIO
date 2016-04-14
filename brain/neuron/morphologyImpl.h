@@ -46,7 +46,7 @@ public:
 
     uint32_t somaSection;
 
-    Impl( const brion::Morphology& morphology );
+    explicit Impl( const brion::Morphology& morphology );
 
     SectionRange getSectionRange( const uint32_t sectionID ) const;
 

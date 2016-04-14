@@ -6,8 +6,13 @@
 # Change this number when adding tests to force a CMake run: 1
 
 if(NOT BBPTESTDATA_FOUND)
-  if(ENABLE_COVERAGE)
+  if(COMMON_ENABLE_COVERAGE)
     message(FATAL_ERROR "Coverage report generation requires test data")
+  endif()
+  if(NOT TARGET ${PROJECT_NAME}-tests)
+    add_custom_target(${PROJECT_NAME}-tests)
+    set_target_properties(${PROJECT_NAME}-tests PROPERTIES
+      EXCLUDE_FROM_DEFAULT_BUILD ON FOLDER ${PROJECT_NAME}/tests)
   endif()
   return()
 endif()
@@ -17,7 +22,7 @@ include_directories(${PROJECT_BINARY_DIR}/tests)
 
 set(TEST_LIBRARIES ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Brain Brion BBPTestData)
 if(LUNCHBOX_USE_SKV)
-  common_package(skv REQUIRED)
+  common_find_package(skv REQUIRED)
   include_directories(${SKV_INCLUDE_DIRS})
   list(APPEND TEST_LIBRARIES fxlogger)
 endif()
