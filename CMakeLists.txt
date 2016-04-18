@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2015, EPFL/Blue Brain Project
+# Copyright (c) 2013-2016, EPFL/Blue Brain Project
 #                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
 #
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -31,6 +31,8 @@ common_find_package(HDF5 REQUIRED COMPONENTS C CXX)
 common_find_package(Lunchbox REQUIRED)
 common_find_package(OpenMP)
 common_find_package(Servus REQUIRED)
+common_find_package(PythonInterp)
+common_find_package(PythonLibs)
 common_find_package(vmmlib REQUIRED)
 common_find_package_post()
 
