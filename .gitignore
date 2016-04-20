@@ -28,7 +28,6 @@
 *.app
 
 # Custom
-.travis.yml
 /BBPTestData/
 /Lunchbox/
 /Servus/
