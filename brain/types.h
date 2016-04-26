@@ -29,6 +29,9 @@ namespace brain
 using namespace brion::enums;
 
 class Circuit;
+class Spikes;
+class SpikeReportReader;
+class SpikeReportWriter;
 
 using vmml::Matrix4f;
 using vmml::Quaternionf;
@@ -49,5 +52,8 @@ using brion::uint32_ts;
 typedef std::vector< Matrix4f > Matrix4fs;
 typedef std::vector< Quaternionf > Quaternionfs;
 typedef std::vector< URI > URIs;
+
+typedef boost::shared_ptr< SpikeReportReader > SpikeReportReaderPtr;
+typedef boost::shared_ptr< SpikeReportWriter > SpikeReportWriterPtr;
 }
 #endif
