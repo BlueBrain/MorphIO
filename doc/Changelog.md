@@ -1,6 +1,11 @@
 Changelog {#Changelog}
 =========
 
+# git master
+
+* [63](https://github.com/BlueBrain/Brion/pull/63):
+  Moved old BBPSDK/Monsteer spike report to Brain (pending refactoring)
+
 # Release 1.7.0 (24-Mar-2016)
 
 * [56](https://github.com/BlueBrain/Brion/pull/56):
