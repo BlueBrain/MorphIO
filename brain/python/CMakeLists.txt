@@ -27,8 +27,12 @@ target_link_libraries(brain_python
 set_target_properties(brain_python PROPERTIES
   OUTPUT_NAME "_brain" PREFIX ""
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/brain)
+configure_file(brain/__init__.py
+               ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/brain/__init__.py)
 
-set_property(GLOBAL APPEND PROPERTY BRAIN_ALL_DEP_TARGETS brain_python)
+set_property(GLOBAL APPEND PROPERTY BRION_ALL_DEP_TARGETS brain_python)
 
 install(TARGETS brain_python
   LIBRARY DESTINATION ${PYTHON_LIBRARY_SUFFIX}/brain)
+install(FILES ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/brain/__init__.py
+        DESTINATION ${PYTHON_LIBRARY_SUFFIX}/brain)
