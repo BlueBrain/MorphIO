@@ -98,7 +98,7 @@ class Circuit::Impl
 public:
     explicit Impl( const brion::BlueConfig& config )
         : _morphologySource( config.getMorphologySource( ))
-        , _targetParsers( config.getTargets( ))
+        , _targetSources( config.getTargetSources( ))
     {}
     virtual ~Impl() {}
 
@@ -107,13 +107,19 @@ public:
     GIDSet getGIDs() const
     {
         brain::GIDSet gids;
+        brain::GIDSet::const_iterator hint = gids.begin();
         for( size_t i = 0; i < getNumNeurons(); ++i )
-            gids.insert( i + 1 );
+            hint = gids.insert( hint, i + 1 );
         return gids;
     }
 
     GIDSet getGIDs( const std::string& target ) const
     {
+        if( _targetParsers.empty( ))
+        {
+            BOOST_FOREACH( const URI& uri, _targetSources )
+                _targetParsers.push_back( brion::Target( uri.getPath( )));
+        }
         return brion::Target::parse( _targetParsers, target );
     }
 
@@ -131,7 +137,8 @@ public:
 
 private:
     const brion::URI _morphologySource;
-    const brion::Targets _targetParsers;
+    const brion::URIs _targetSources;
+    mutable brion::Targets _targetParsers;
 };
 
 class MVD2 : public Circuit::Impl

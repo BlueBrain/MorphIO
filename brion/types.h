@@ -120,6 +120,8 @@ const float MINIMUM_VOLTAGE = -80.; //!< Lowest voltage after hyperpolarisation
 using lunchbox::Strings;
 
 using servus::URI;
+
+typedef std::vector< URI > URIs;
 }
 
 // if you have a type T in namespace N, the operator << for T needs to be in

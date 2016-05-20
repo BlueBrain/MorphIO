@@ -43,6 +43,7 @@ using brion::GIDSet;
 using brion::SectionTypes;
 using brion::Strings;
 using brion::URI;
+using brion::URIs;
 using brion::Vector2is;
 using brion::Vector3fs;
 using brion::Vector4fs;
@@ -51,7 +52,6 @@ using brion::uint32_ts;
 
 typedef std::vector< Matrix4f > Matrix4fs;
 typedef std::vector< Quaternionf > Quaternionfs;
-typedef std::vector< URI > URIs;
 
 typedef boost::shared_ptr< SpikeReportReader > SpikeReportReaderPtr;
 typedef boost::shared_ptr< SpikeReportWriter > SpikeReportWriterPtr;
