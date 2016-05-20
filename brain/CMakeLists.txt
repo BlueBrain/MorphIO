@@ -42,7 +42,7 @@ if(TARGET MVDTool)
 endif()
 common_library(Brain)
 if(TARGET MVDTool)
-  add_definitions(-DBRAIN_USE_MVD3)
+  target_compile_definitions(Brain PUBLIC BRAIN_USE_MVD3)
 endif()
 
 add_subdirectory(python)
