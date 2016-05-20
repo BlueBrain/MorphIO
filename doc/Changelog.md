@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [69](https://github.com/BlueBrain/Brion/pull/69):
+  Speedup brain::Circuit::getIDs(), add brion::BlueConfig::getTargetSources()
 * [63](https://github.com/BlueBrain/Brion/pull/63):
   Moved old BBPSDK/Monsteer spike report to Brain (pending refactoring)
 

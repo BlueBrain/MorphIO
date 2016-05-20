@@ -132,6 +132,12 @@ public:
      */
     BRION_API URI getSpikeSource() const;
 
+    /*
+     * @return the URIs to the locations of the target files.
+     * @version 1.8
+     */
+    BRION_API URIs getTargetSources() const;
+
     /**
      * @return the name of the circuit target
      * @version 1.7

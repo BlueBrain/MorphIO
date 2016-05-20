@@ -237,20 +237,10 @@ const std::string& BlueConfig::get( const BlueConfigSection section,
 
 brion::Targets BlueConfig::getTargets() const
 {
-    const std::string& run = _impl->getRun();
-    brion::Targets targets;
-
-    const std::string& nrnPath =
-        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_NRN_PATH_KEY );
-    if( !nrnPath.empty( ))
-        targets.push_back( brion::Target(
-            nrnPath + "/" + CIRCUIT_TARGET_FILE ));
-
-    const std::string& targetPath =
-        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_TARGET_FILE_KEY );
-    if( !targetPath.empty( ))
-        targets.push_back( brion::Target( targetPath ));
-
+    Targets targets;
+    const URIs& uris = getTargetSources();
+    BOOST_FOREACH( const URI& uri, uris )
+        targets.push_back( Target( uri.getPath( )));
     return targets;
 }
 
@@ -332,10 +322,39 @@ URI BlueConfig::getSpikeSource() const
     return uri;
 }
 
+brion::URIs BlueConfig::getTargetSources() const
+{
+    const std::string& run = _impl->getRun();
+
+    URIs uris;
+    const std::string& nrnPath =
+        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_NRN_PATH_KEY );
+    if( !nrnPath.empty( ))
+    {
+        URI uri;
+        uri.setScheme( "file" );
+        uri.setPath( nrnPath + "/" + CIRCUIT_TARGET_FILE );
+        uris.push_back( uri );
+    }
+
+    const std::string& targetPath =
+        get( brion::CONFIGSECTION_RUN, run, BLUECONFIG_TARGET_FILE_KEY );
+    if( !targetPath.empty( ))
+    {
+        URI uri;
+        uri.setScheme( "file" );
+        uri.setPath( targetPath );
+        uris.push_back( uri );
+    }
+
+    return uris;
+}
+
 std::string BlueConfig::getCircuitTarget() const
 {
     return _impl->getCircuitTarget();
 }
+
 
 GIDSet BlueConfig::parseTarget( const std::string& target ) const
 {
