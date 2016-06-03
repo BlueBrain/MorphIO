@@ -456,10 +456,9 @@ bool CompartmentReportHDF5::writeCompartments( const uint32_t gid,
         boost::scoped_array< float > mapping( new float[compCount] );
         size_t i = 0;
         for( size_t j = 0; j < counts.size(); ++j )
-        {
             for( size_t k = 0; k < counts[j]; ++k )
                 mapping[i++] = j;
-        }
+
         dataset.write( mapping.get(), H5::PredType::NATIVE_FLOAT );
         return true;
     }
