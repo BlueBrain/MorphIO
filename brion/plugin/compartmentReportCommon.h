@@ -35,7 +35,7 @@ public:
     CompartmentReportCommon();
     ~CompartmentReportCommon() {}
 
-    size_t getNumCompartments( const size_t index ) const final;
+    size_t getNumCompartments( size_t index ) const final;
 
 protected:
 

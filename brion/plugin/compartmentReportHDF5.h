@@ -54,15 +54,15 @@ public:
     const CompartmentCounts& getCompartmentCounts() const final;
     size_t getFrameSize() const final;
 
-    floatsPtr loadFrame( const float timestamp ) const final;
+    floatsPtr loadFrame( float timestamp ) const final;
     void updateMapping( const GIDSet& gids ) final;
 
-    void writeHeader( const float startTime, const float endTime,
-                      const float timestep, const std::string& dunit,
+    void writeHeader( float startTime, float endTime,
+                      float timestep, const std::string& dunit,
                       const std::string& tunit ) final;
-    bool writeCompartments( const uint32_t gid, const uint16_ts& counts ) final;
-    bool writeFrame( const uint32_t gid, const floats& voltages,
-                     const float timestamp ) final;
+    bool writeCompartments( uint32_t gid, const uint16_ts& counts ) final;
+    bool writeFrame( uint32_t gid, const floats& voltages,
+                     float timestamp ) final;
     bool flush() final;
 
 private:

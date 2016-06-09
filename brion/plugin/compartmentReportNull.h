@@ -52,13 +52,13 @@ public:
     const CompartmentCounts& getCompartmentCounts() const final
         { return _emptyCounts; }
 
-    floatsPtr loadFrame( const float ) const final { return floatsPtr(); }
+    floatsPtr loadFrame( float ) const final { return floatsPtr(); }
     void updateMapping( const GIDSet& ) final {}
-    void writeHeader( const float, const float, const float, const std::string&,
+    void writeHeader( float, float, float, const std::string&,
                       const std::string& ) final {}
-    bool writeCompartments( const uint32_t, const uint16_ts& ) final
+    bool writeCompartments( uint32_t, const uint16_ts& ) final
         { return true; }
-    bool writeFrame( const uint32_t, const floats&, const float ) final
+    bool writeFrame( uint32_t, const floats&, float ) final
         { return true; }
     bool flush() final { return true; }
 
