@@ -52,10 +52,10 @@ public:
     MorphologyVersion getVersion() const final;
 
     void writePoints( const Vector4fs& points,
-                      const MorphologyRepairStage stage ) final;
+                      MorphologyRepairStage stage ) final;
 
     void writeSections( const Vector2is& sections,
-                        const MorphologyRepairStage stage ) final;
+                        MorphologyRepairStage stage ) final;
 
     void writeSectionTypes( const SectionTypes& types ) final;
 

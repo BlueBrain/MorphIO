@@ -118,7 +118,7 @@ public:
      * @return number of compartments for the given neuron
      * @version 1.0
      */
-    BRION_API size_t getNumCompartments( const size_t index ) const;
+    BRION_API size_t getNumCompartments( size_t index ) const;
 
     /** @return the current start time of the report. @version 1.0 */
     BRION_API float getStartTime() const;
@@ -144,7 +144,7 @@ public:
      * @return the report values if found at timestamp, 0 otherwise
      * @version 1.0
      */
-    BRION_API floatsPtr loadFrame( const float timestamp ) const;
+    BRION_API floatsPtr loadFrame( float timestamp ) const;
 
     /** Set the size of the stream buffer for loaded frames.
      *
@@ -192,8 +192,8 @@ public:
      * @throw std::invalid_argument if any passed argument is invalid
      * @version 1.0
      */
-    BRION_API void writeHeader( const float startTime, const float endTime,
-                                const float timestep, const std::string& dunit,
+    BRION_API void writeHeader( float startTime, float endTime,
+                                float timestep, const std::string& dunit,
                                 const std::string& tunit );
 
     /** Write the compartment counts for each section for one cell.
@@ -205,7 +205,7 @@ public:
      * @return false if saving was not successful, true otherwise
      * @version 1.0
      */
-    BRION_API bool writeCompartments( const uint32_t gid,
+    BRION_API bool writeCompartments( uint32_t gid,
                                       const uint16_ts& counts );
 
     /** Write the voltages for one cell at a point in time.
@@ -219,8 +219,8 @@ public:
      * @return false if saving was not successful, true otherwise
      * @version 1.0
      */
-    BRION_API bool writeFrame( const uint32_t gid, const floats& voltages,
-                               const float timestamp );
+    BRION_API bool writeFrame( uint32_t gid, const floats& voltages,
+                               float timestamp );
 
     /** Flush data to output. @return true on success. @version 1.0 */
     BRION_API bool flush();

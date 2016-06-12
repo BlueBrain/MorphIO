@@ -27,7 +27,7 @@ include(Common)
 common_find_package(BBPTestData)
 common_find_package(Boost REQUIRED COMPONENTS
   date_time filesystem program_options regex system unit_test_framework)
-common_find_package(HDF5 REQUIRED COMPONENTS C CXX)
+common_find_package(HDF5 SYSTEM REQUIRED COMPONENTS C CXX)
 common_find_package(Lunchbox REQUIRED)
 common_find_package(OpenMP)
 common_find_package(Servus REQUIRED)
