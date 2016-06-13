@@ -1,4 +1,6 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+ *                          bbp-open-source@googlegroups.com
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -27,13 +29,21 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <H5Cpp.h>
+#include <lunchbox/atomic.h>
 #include <lunchbox/log.h>
+#include <lunchbox/persistentMap.h>
 #include <lunchbox/scopedMutex.h>
+
 
 namespace brion
 {
 namespace detail
 {
+namespace
+{
+static lunchbox::a_ssize_t _cacheHits;
+static lunchbox::a_ssize_t _cacheMiss;
+}
 
 struct Dataset
 {
@@ -49,6 +59,8 @@ class SynapseFile : public boost::noncopyable
 {
 public:
     explicit SynapseFile( const std::string& source )
+        : _cache( lunchbox::PersistentMap::createCache( ))
+        , _cacheKey( fs::canonical( fs::path( source )).generic_string( ))
     {
         lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
 
@@ -92,8 +104,32 @@ public:
         if( !bits.any( ))
             return SynapseMatrix();
 
-        lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
+        std::string cacheKey;
+        if( _cache )
+        {
+            cacheKey = _cacheKey + "/" + lexical_cast< std::string >( gid ) +
+                       "/" + lexical_cast< std::string >( attributes );
+            const std::string& cached = (*_cache)[ cacheKey ];
+            if( !cached.empty( ))
+            {
+                if( (++_cacheHits % 5000) == 0 )
+                    LBDEBUG << int( float( _cacheHits ) /
+                                    float( _cacheHits+_cacheMiss )*100.f + .5f )
+                            << "% cache hit rate" << std::endl;
 
+                const size_t dim0 = cached.size() / bits.count() /
+                                    sizeof( float );
+                SynapseMatrix values( boost::extents[ dim0 ][ bits.count( )]);
+                ::memcpy( values.data(), cached.data(), cached.size( ));
+                return values;
+            }
+            if( (++_cacheMiss % 5000) == 0 )
+                LBDEBUG << int( float( _cacheHits ) /
+                                float( _cacheHits + _cacheMiss ) * 100.f + .5f )
+                        << "% cache hit rate" << std::endl;
+        }
+
+        lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
         Dataset dataset;
         if( !_openDataset( gid, dataset ))
             return SynapseMatrix();
@@ -116,6 +152,9 @@ public:
 
         dataset.dataset.read( values.data(), H5::PredType::NATIVE_FLOAT,
                               targetspace, dataset.dataspace );
+        if( _cache )
+            _cache->insert( cacheKey, values.data(),
+                            dataset.dims[0] * bits.count() * sizeof( float ));
         return values;
     }
 
@@ -192,6 +231,8 @@ public:
     }
 
 private:
+    lunchbox::PersistentMapPtr _cache;
+    std::string _cacheKey;
     H5::H5File _file;
     size_t _numAttributes;
 };

@@ -206,7 +206,7 @@ BOOST_AUTO_TEST_CASE( perf )
     const brion::Synapse synapseFile( path.string( ));
 
     brion::GIDSet gids;
-    for( uint32_t i = 1; i <= 1000; ++ i)
+    for( uint32_t i = 1; i <= 1000; ++i )
         gids.insert( i );
 
     namespace bp = boost::posix_time;
