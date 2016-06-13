@@ -164,10 +164,10 @@ enum TargetType
 enum SectionType
 {
     SECTION_UNDEFINED = 0,
-    SECTION_SOMA,               //!< neuron cell body
-    SECTION_AXON,
-    SECTION_DENDRITE,           //!< general or basal dendrite (near to soma)
-    SECTION_APICAL_DENDRITE,    //!< apical dendrite (far from soma)
+    SECTION_SOMA = 1,            //!< neuron cell body
+    SECTION_AXON = 2,
+    SECTION_DENDRITE = 3,        //!< general or basal dendrite (near to soma)
+    SECTION_APICAL_DENDRITE = 4, //!< apical dendrite (far from soma)
     SECTION_ALL //!< @internal must be last
 };
 
