@@ -3,12 +3,21 @@ Changelog {#Changelog}
 
 # git master
 
+* [74](https://github.com/BlueBrain/Brion/pull/74):
+  Remove deprecated enums and functions:
+  - `CompartmentReport( const std::string&, const GIDSet& )` and
+    `CompartmentReport( const std::string&,
+    const brion::CompartmentReportFormat, const bool )` constructors; use
+    brion::CompartmentReport::CompartmentReport( const brion::URI&, int, const brion::GIDSet& )
+    instead
+  - `enum CompartmentReportFormat`; use brion::BlueConfig::getReportSource()
+    instead
 * [71](https://github.com/BlueBrain/Brion/pull/71):
   Transparent caching of Synapse loading. See
   [Lunchbox#263](https://github.com/Eyescale/Lunchbox/pull/263) for
   configuration.
 * [69](https://github.com/BlueBrain/Brion/pull/69):
-  Speedup brain::Circuit::getIDs(), add brion::BlueConfig::getTargetSources()
+  Speedup brain::Circuit::getGIDs(), add brion::BlueConfig::getTargetSources()
 * [63](https://github.com/BlueBrain/Brion/pull/63):
   Moved old BBPSDK/Monsteer spike report to Brain (pending refactoring)
 

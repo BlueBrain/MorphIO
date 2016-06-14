@@ -24,6 +24,8 @@
 #include <brion/types.h>
 #include <brion/pluginInitData.h>
 
+#include <boost/noncopyable.hpp>
+
 namespace brion
 {
 

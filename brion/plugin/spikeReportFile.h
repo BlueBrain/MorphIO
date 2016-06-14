@@ -23,6 +23,7 @@
 #include <brion/types.h>
 #include "spikeReportTypes.h"
 
+#include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace brion

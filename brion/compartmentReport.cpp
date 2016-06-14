@@ -56,26 +56,6 @@ CompartmentReport::CompartmentReport( const URI& uri, const int mode,
 {
 }
 
-CompartmentReport::CompartmentReport( const std::string& source,
-                                      const GIDSet& gids )
-    : _impl( new detail::CompartmentReport( CompartmentReportInitData(
-                                                URI( source ),
-                                                MODE_READ,
-                                                gids )))
-{
-}
-
-CompartmentReport::CompartmentReport( const std::string& source,
-                                      const CompartmentReportFormat,
-                                      const bool overwrite )
-    : _impl( new detail::CompartmentReport( CompartmentReportInitData(
-                                                URI( source ),
-                                                overwrite ? MODE_OVERWRITE :
-                                                            MODE_WRITE,
-                                                GIDSet( ))))
-{
-}
-
 CompartmentReport::~CompartmentReport()
 {
     delete _impl;

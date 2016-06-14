@@ -22,9 +22,7 @@
 #ifndef BRION_ENUMS
 #define BRION_ENUMS
 
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/lexical_cast.hpp>
+#include <ostream>
 
 namespace brion
 {
@@ -42,22 +40,6 @@ enum BlueConfigSection
     CONFIGSECTION_REPORT,
     CONFIGSECTION_UNKNOWN,
     CONFIGSECTION_ALL //!< @internal must be last
-};
-
-/**
- * The supported formats for compartment reports.
- * @deprecated since version 1.4, kept until removed from BBPSDK and replaced by
- * a string.
- */
-enum CompartmentReportFormat
-{
-    REPORTFORMAT_BINARY,
-    REPORTFORMAT_HDF5,
-    REPORTFORMAT_STREAM,
-    REPORTFORMAT_LEVELDB, //!< @version 1.4
-    REPORTFORMAT_SKV,  //!< @version 1.4
-    REPORTFORMAT_NULL,  //!< @version 1.4
-    REPORTFORMAT_INVALID
 };
 
 /** The supported structural mesh types. */
@@ -271,55 +253,5 @@ enum AccessMode
 
 }
 }
-
-namespace boost
-{
-
-// CompartmentReportFormat <-> std::string converters (used for type
-// field in BlueConfig)
-
-/** @internal */
-template<> inline
-std::string lexical_cast( const brion::enums::CompartmentReportFormat& f )
-{
-    switch( f )
-    {
-    case brion::enums::REPORTFORMAT_BINARY: return "bin";
-    case brion::enums::REPORTFORMAT_HDF5: return "hdf5";
-    case brion::enums::REPORTFORMAT_STREAM: return "stream";
-    case brion::enums::REPORTFORMAT_LEVELDB: return "leveldb";
-    case brion::enums::REPORTFORMAT_SKV: return "skv";
-    case brion::enums::REPORTFORMAT_NULL: return "null";
-    case brion::enums::REPORTFORMAT_INVALID: return "invalid";
-    default: return lexical_cast< std::string >( int( f ));
-    }
-}
-
-/** @internal */
-template<> inline
-brion::enums::CompartmentReportFormat lexical_cast( const std::string& string )
-{
-    std::string type = string;
-    algorithm::to_lower( type );
-
-    if( type == "binary" || type == "bin" )
-        return brion::enums::REPORTFORMAT_BINARY;
-    if( type.empty() || boost::filesystem::is_directory( type ) ||
-        type == "hdf5" )
-    {
-        return brion::enums::REPORTFORMAT_HDF5;
-    }
-    if( type == "stream" )
-        return brion::enums::REPORTFORMAT_STREAM;
-    if( type == "leveldb" )
-        return brion::enums::REPORTFORMAT_LEVELDB;
-    if( type == "skv" )
-        return brion::enums::REPORTFORMAT_SKV;
-    if( type == "null" )
-        return brion::enums::REPORTFORMAT_NULL;
-    return brion::enums::REPORTFORMAT_INVALID;
-}
-}
-
 
 #endif

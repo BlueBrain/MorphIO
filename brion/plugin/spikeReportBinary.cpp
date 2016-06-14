@@ -22,6 +22,8 @@
 #include <lunchbox/memoryMap.h>
 #include <lunchbox/pluginRegisterer.h>
 
+#include <boost/filesystem/path.hpp>
+
 #define BINARY_REPORT_FILE_EXT ".spikes"
 
 namespace brion

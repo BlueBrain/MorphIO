@@ -19,6 +19,7 @@
 
 #include "compartmentReportBinary.h"
 
+#include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
 #include <lunchbox/debug.h>
 #include <lunchbox/log.h>

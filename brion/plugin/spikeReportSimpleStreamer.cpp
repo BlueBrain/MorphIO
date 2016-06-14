@@ -21,6 +21,8 @@
 #include "spikeReportFile.h"
 #include "../pluginInitData.h"
 
+#include <boost/filesystem/path.hpp>
+
 namespace brion
 {
 namespace plugin
