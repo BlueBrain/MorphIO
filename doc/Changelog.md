@@ -3,6 +3,10 @@ Changelog {#Changelog}
 
 # git master
 
+* [71](https://github.com/BlueBrain/Brion/pull/71):
+  Transparent caching of Synapse loading. See
+  [Lunchbox#263](https://github.com/Eyescale/Lunchbox/pull/263) for
+  configuration.
 * [69](https://github.com/BlueBrain/Brion/pull/69):
   Speedup brain::Circuit::getIDs(), add brion::BlueConfig::getTargetSources()
 * [63](https://github.com/BlueBrain/Brion/pull/63):
@@ -25,7 +29,7 @@ Changelog {#Changelog}
   - brain::Circuit::getNumNeurons() returns the total number of neurons in the
     circuit.
 * [43](https://github.com/BlueBrain/Brion/pull/43):
-  Add MVD3 support to brain::circuit 
+  Add MVD3 support to brain::circuit
 * [39](https://github.com/BlueBrain/Brion/pull/39):
   Add compartment report converter tool
 * [30](https://github.com/BlueBrain/Brion/pull/30),
