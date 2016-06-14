@@ -53,24 +53,11 @@ public:
      *                           valid
      * @version 1.4
      */
-    BRION_API CompartmentReport( const URI& uri, const int mode,
+    BRION_API CompartmentReport( const URI& uri, int mode,
                                  const GIDSet& gids = GIDSet( ));
 
     /** @name Read API */
     //@{
-    /** Open given source to a compartment report for reading.
-     *
-     * An empty GIDSet loads all data from the report.
-     *
-     * @param source filepath to compartment report
-     * @param gids the neurons of interest
-     * @throw std::runtime_error if source is not a valid compartment report
-     * @version 1.0
-     * @deprecated
-     */
-    BRION_API explicit CompartmentReport( const std::string& source,
-                                          const GIDSet& gids = GIDSet( ));
-
     /** Update compartment mapping wrt the given GIDs.
      *
      * Allows to change the GIDs in an open report without throwing away the
@@ -168,20 +155,6 @@ public:
 
     /** @name Write API */
     //@{
-    /** Open given source to a compartment report for writing.
-     *
-     * @param source filepath to compartment report
-     * @param format output format of the report
-     * @param overwrite true to allow overwrite of existing file
-     * @throw std::runtime_error if source is not a valid compartment report or
-     *        if location cannot be overwritten
-     * @version 1.0
-     * @deprecated
-     */
-    BRION_API CompartmentReport( const std::string& source,
-                                 const CompartmentReportFormat format,
-                                 const bool overwrite = false );
-
     /** Write the header information of this report.
      *
      * @param startTime the start time of the report

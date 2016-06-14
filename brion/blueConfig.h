@@ -108,7 +108,7 @@ public:
      */
     BRION_API URI getCircuitSource() const;
 
-    /*
+    /**
      * @return the URI to the location of synapse nrn files.
      * @version 1.7
      */
@@ -132,7 +132,7 @@ public:
      */
     BRION_API URI getSpikeSource() const;
 
-    /*
+    /**
      * @return the URIs to the locations of the target files.
      * @version 1.8
      */

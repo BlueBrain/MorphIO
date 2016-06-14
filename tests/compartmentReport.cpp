@@ -33,6 +33,7 @@
 
 #define BOOST_TEST_MODULE CompartmentReport
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
@@ -69,7 +70,6 @@ BOOST_AUTO_TEST_CASE( test_open_binary )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/simulations/may17_2011/Control/voltage.bbp";
-    BOOST_CHECK_NO_THROW( brion::CompartmentReport( path.string( )));
     BOOST_CHECK_NO_THROW( brion::CompartmentReport( brion::URI( path.string( )),
                                                     brion::MODE_READ ));
 }
@@ -78,7 +78,6 @@ BOOST_AUTO_TEST_CASE( test_open_hdf5 )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/simulations/may17_2011/Control/voltage.h5";
-    BOOST_CHECK_NO_THROW( brion::CompartmentReport( path.string( )));
     BOOST_CHECK_NO_THROW( brion::CompartmentReport( brion::URI( path.string( )),
                                                     brion::MODE_READ ));
 }
