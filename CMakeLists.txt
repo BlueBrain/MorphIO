@@ -30,9 +30,9 @@ common_find_package(Boost REQUIRED COMPONENTS
 common_find_package(HDF5 SYSTEM REQUIRED COMPONENTS C CXX)
 common_find_package(Lunchbox REQUIRED)
 common_find_package(OpenMP)
-common_find_package(Servus REQUIRED)
 common_find_package(PythonInterp)
 common_find_package(PythonLibs)
+common_find_package(Servus REQUIRED)
 common_find_package(vmmlib REQUIRED)
 common_find_package_post()
 
