@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -57,9 +57,19 @@ Morphology::Morphology( const std::string& target,
 {
 }
 
+Morphology::Morphology( const std::string& file, const CellFamily family )
+    : _impl( new Impl( MorphologyInitData( URI( file ), family )))
+{
+}
+
 Morphology::~Morphology()
 {
     delete _impl;
+}
+
+CellFamily Morphology::getCellFamily() const
+{
+    return _impl->plugin->getCellFamily();
 }
 
 Vector4fsPtr Morphology::readPoints( const MorphologyRepairStage stage ) const
@@ -81,6 +91,11 @@ SectionTypesPtr Morphology::readSectionTypes() const
 Vector2isPtr Morphology::readApicals() const
 {
     return _impl->plugin->readApicals();
+}
+
+floatsPtr Morphology::readPerimeters() const
+{
+    return _impl->plugin->readPerimeters();
 }
 
 MorphologyVersion Morphology::getVersion() const
@@ -108,6 +123,11 @@ void Morphology::writeSectionTypes( const SectionTypes& types )
 void Morphology::writeApicals( const Vector2is& apicals )
 {
     _impl->plugin->writeApicals( apicals );
+}
+
+void Morphology::writePerimeters( const floats& perimeters )
+{
+    _impl->plugin->writePerimeters( perimeters );
 }
 
 void Morphology::flush()

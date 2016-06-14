@@ -1,5 +1,6 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
+ *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -40,6 +41,8 @@ class MorphologyInitData : public PluginInitData
 public:
     explicit MorphologyInitData( const URI& uri )
         : PluginInitData( uri, MODE_READ )
+        , _version( MORPHOLOGY_VERSION_H5_1_1 )
+        , _family( FAMILY_NEURON )
     {}
 
     MorphologyInitData( const URI& uri,
@@ -47,6 +50,14 @@ public:
                         const unsigned int accessMode )
         : PluginInitData( uri, accessMode )
         , _version( version )
+        , _family( FAMILY_NEURON )
+    {}
+
+    MorphologyInitData( const URI& uri,
+                        const CellFamily family )
+        : PluginInitData( uri, MODE_WRITE )
+        , _version( MORPHOLOGY_VERSION_H5_1_1 )
+        , _family( family )
     {}
 
     MorphologyVersion getVersion() const
@@ -54,8 +65,14 @@ public:
         return _version;
     }
 
+    CellFamily getFamily() const
+    {
+        return _family;
+    }
+
 protected:
-    MorphologyVersion _version;
+    const MorphologyVersion _version;
+    const CellFamily _family;
 };
 
 /** Base interface for morphology readers plugins.
@@ -91,6 +108,9 @@ public:
 
     /** @name Read API */
     //@{
+    /** @copydoc brion::Morphology::getCellFamily */
+    virtual CellFamily getCellFamily() const = 0;
+
     /** @copydoc brion::Morphology::readPoints */
     virtual Vector4fsPtr readPoints( MorphologyRepairStage stage ) const = 0;
 
@@ -102,6 +122,9 @@ public:
 
     /** @copydoc brion::Morphology::readApicals */
     virtual Vector2isPtr readApicals() const = 0;
+
+    /** @copydoc brion::Morphology::readPerimeters */
+    virtual floatsPtr readPerimeters() const = 0;
 
     virtual MorphologyVersion getVersion() const = 0;
     //@}
@@ -121,6 +144,9 @@ public:
 
     /** @copydoc brion::Morphology::writeApicals */
     virtual void writeApicals( const Vector2is& apicals ) = 0;
+
+    /** @copydoc brion::Morphology::writePerimeters */
+    virtual void writePerimeters( const floats& perimeters ) = 0;
 
     /** @copydoc brion::Morphology::flush */
     virtual void flush() = 0;
