@@ -603,19 +603,20 @@ void MorphologyHDF5::_checkVersion( const std::string& source )
     if( _readV11Metadata( ))
         return;
 
+    if( _readV2Metadata( ))
+        return;
+
     try
     {
         _resolveV1();
         _version = MORPHOLOGY_VERSION_H5_1;
         return;
     }
-    catch( ... ) {}
-
-    if( _readV2Metadata( ))
-        _version = MORPHOLOGY_VERSION_H5_2;
-    else
+    catch( ... )
+    {
         LBTHROW( std::runtime_error( "Unknown morphology file format for "
                                      "file " + source ));
+    }
 }
 
 void MorphologyHDF5::_selectRepairStage()
@@ -740,7 +741,7 @@ bool MorphologyHDF5::_readV11Metadata()
     }
 }
 
-bool MorphologyHDF5:: _readV2Metadata() const
+bool MorphologyHDF5:: _readV2Metadata()
 {
     try
     {
@@ -748,10 +749,9 @@ bool MorphologyHDF5:: _readV2Metadata() const
         const H5::Group& root = _file.openGroup( _g_root );
         const H5::Attribute& attr = root.openAttribute( _a_version );
 
-        int32_t version;
-        attr.read( H5::PredType::NATIVE_INT, &version );
+        attr.read( H5::PredType::NATIVE_INT, &_version );
 
-        if( version == MORPHOLOGY_VERSION_H5_2 )
+        if( _version == MORPHOLOGY_VERSION_H5_2 )
             return true;
     }
     catch( const H5::Exception& ) {}
@@ -760,6 +760,7 @@ bool MorphologyHDF5:: _readV2Metadata() const
     {
         detail::SilenceHDF5 silence;
         _file.openGroup( _g_root );
+        _version = MORPHOLOGY_VERSION_H5_2;
         return true;
     }
     catch( const H5::Exception& )

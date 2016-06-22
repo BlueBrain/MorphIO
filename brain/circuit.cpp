@@ -30,14 +30,21 @@
 #include <brion/detail/silenceHDF5.h>
 
 #include <lunchbox/log.h>
+#include <lunchbox/persistentMap.h>
 
 #ifdef BRAIN_USE_MVD3
 #  include <mvd/mvd3.hpp>
 #  include <mvd/mvd_generic.hpp>
 #endif
 
-#include <boost/foreach.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/unordered_map.hpp>
 
+#ifdef BRION_USE_CXX11
+#  include <future>
+#endif
+
+namespace fs = boost::filesystem;
 using boost::lexical_cast;
 
 namespace brain
@@ -99,18 +106,27 @@ size_t toSize_t( const std::string& in )
 size_t toSize_t( const std::string& in ) { return std::stoul( in ); }
 #endif
 size_t nop( const size_t& in ) { return in; }
+
+typedef boost::unordered_map< std::string, neuron::MorphologyPtr > Loaded;
 }
 
 class Circuit::Impl
 {
 public:
     explicit Impl( const brion::BlueConfig& config )
-        : _morphologySource( config.getMorphologySource( ))
+        : _circuitSource( config.getCircuitSource( ))
+        , _morphologySource( config.getMorphologySource( ))
         , _targetSources( config.getTargetSources( ))
+        , _cache( lunchbox::PersistentMap::createCache( ))
     {}
     virtual ~Impl() {}
 
     virtual size_t getNumNeurons() const = 0;
+
+    const brion::URI& getCircuitSource() const
+    {
+        return _circuitSource;
+    }
 
     GIDSet getGIDs() const
     {
@@ -147,10 +163,60 @@ public:
         return uri;
     }
 
+    void saveToCache( const std::string& hash,
+                      neuron::MorphologyPtr morphology )
+    {
+        if( _cache )
+        {
+            servus::Serializable::Data data = morphology->toBinary();
+            _cache->insert( hash, data.ptr.get(), data.size );
+        }
+    }
+
+    Loaded loadFromCache( const std::set< std::string >& hashes LB_UNUSED )
+        const
+    {
+        Loaded loaded;
+#ifdef BRION_USE_CXX11
+        if( _cache )
+        {
+            LBDEBUG << "Using cache for morphology loading" << std::endl;
+            typedef std::future< std::pair< std::string,
+                                            neuron::MorphologyPtr > > Future;
+            std::vector< Future > futures;
+
+            Strings keys( hashes.begin(), hashes.end( ));
+            futures.reserve( keys.size( ));
+
+            _cache->takeValues( keys, [&futures] ( const std::string& key,
+                                                 char* data, const size_t size )
+            {
+                futures.push_back( std::async( std::launch::async,
+                                               [key, data, size]
+                {
+                    neuron::MorphologyPtr morphology(
+                                new neuron::Morphology( data, size ));
+                    std::free( data );
+                    return std::make_pair( key, morphology );
+                }));
+            });
+
+            for( auto& future : futures )
+                loaded.insert( future.get( ));
+
+            LBINFO << "Loaded " << loaded.size() << " out of " << hashes.size()
+                   << " morphologies from cache" << std::endl;
+        }
+#endif
+        return loaded;
+    }
+
 private:
+    const brion::URI _circuitSource;
     const brion::URI _morphologySource;
     const brion::URIs _targetSources;
     mutable brion::Targets _targetParsers;
+    lunchbox::PersistentMapPtr _cache;
 };
 
 class MVD2 : public Circuit::Impl
@@ -442,36 +508,64 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
                                                 const Coordinates coords ) const
 {
     const URIs& uris = getMorphologyURIs( gids );
+
+    // < GID, hash >
+    Strings gidHashes;
+    gidHashes.reserve( uris.size( ));
+    std::set< std::string > hashes;
+    GIDSet::const_iterator gid = gids.begin();
+    for( size_t i = 0; i < uris.size(); ++i, ++gid )
+    {
+        std::string hash( fs::canonical( uris[i].getPath( )).generic_string( ));
+
+        if( coords == COORDINATES_GLOBAL )
+        {
+            // store circuit + GID for transformed morphology
+            hash += fs::canonical(
+                        _impl->getCircuitSource().getPath( )).generic_string() +
+                        boost::lexical_cast< std::string >( *gid );
+            hash = servus::make_uint128( hash ).getString();
+        }
+        else
+            hash = servus::make_uint128( hash ).getString();
+
+        gidHashes.push_back( hash );
+        hashes.insert( hash );
+    }
+
+    Loaded loaded = _impl->loadFromCache( hashes );
+
+    // resolve missing morphologies and put them in GID-order into result
     neuron::Morphologies result;
     result.reserve( uris.size( ));
 
-    if( coords == COORDINATES_GLOBAL )
-    {
-        const Matrix4fs& transforms = getTransforms( gids );
-        for( size_t i = 0; i < uris.size(); ++i )
-        {
-            const URI& uri = uris[i];
-            const brion::Morphology raw( uri.getPath( ));
-            result.push_back( neuron::MorphologyPtr(
-                                 new neuron::Morphology( raw, transforms[i] )));
-        }
-        return result;
-    }
-
-    std::map< std::string, neuron::MorphologyPtr > loaded;
+    const Matrix4fs transforms =
+             coords == COORDINATES_GLOBAL ? getTransforms( gids ) : Matrix4fs();
     for( size_t i = 0; i < uris.size(); ++i )
     {
         const URI& uri = uris[i];
 
-        neuron::MorphologyPtr& morphology = loaded[uri.getPath()];
-        if( !morphology )
+        const std::string& hash = gidHashes[i];
+        Loaded::const_iterator it = loaded.find( hash );
+        if( it == loaded.end( ))
         {
+            neuron::MorphologyPtr morphology;
             const brion::Morphology raw( uri.getPath( ));
-            morphology.reset( new neuron::Morphology( raw ));
-        }
+            if( coords == COORDINATES_GLOBAL )
+                morphology.reset( new neuron::Morphology( raw, transforms[i] ));
+            else
+                morphology.reset( new neuron::Morphology( raw ));
 
-        result.push_back( morphology );
+            loaded.insert( std::make_pair( hash, morphology ));
+
+            _impl->saveToCache( hash, morphology );
+
+            result.push_back( morphology );
+        }
+        else
+            result.push_back( it->second );
     }
+
     return result;
 }
 
