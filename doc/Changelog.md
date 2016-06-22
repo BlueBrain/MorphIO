@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [77](https://github.com/BlueBrain/Brion/pull/77):
+  Add brain::Circuit::getMorphologyTypes() and brain::Circuit::getElectrophysiologyTypes()
 * [75](https://github.com/BlueBrain/Brion/pull/75):
   Implement morphology version 1.1 specification
 * [74](https://github.com/BlueBrain/Brion/pull/74):

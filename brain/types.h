@@ -49,6 +49,7 @@ using brion::Vector3fs;
 using brion::Vector4fs;
 using brion::floats;
 using brion::uint32_ts;
+using brion::size_ts;
 
 typedef std::vector< Matrix4f > Matrix4fs;
 typedef std::vector< Quaternionf > Quaternionfs;

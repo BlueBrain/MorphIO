@@ -85,6 +85,24 @@ public:
     /** @return The positions of the given cells. */
     BRAIN_API Vector3fs getPositions( const GIDSet& gids ) const;
 
+    /** @return The morphology type indices of the given cells. */
+    BRAIN_API size_ts getMorphologyTypes( const GIDSet& gids ) const;
+
+    /**
+     * @return The morphology type names of the circuit, indexed by
+     *         getMorphologyTypes().
+     */
+    BRAIN_API Strings getMorphologyNames() const;
+
+    /** @return The electrophysiology type indices of the given cells. */
+    BRAIN_API size_ts getElectrophysiologyTypes( const GIDSet& gids ) const;
+
+    /**
+     * @return The electrophysiology type names of the circuit, indexed by
+     *         getElectrophysiologyTypes().
+     */
+    BRAIN_API Strings getElectrophysiologyNames() const;
+
     /** @return The local to world transformations of the given cells. */
     BRAIN_API Matrix4fs getTransforms( const GIDSet& gids ) const;
     /** @return The local to world rotation of the given cells. */

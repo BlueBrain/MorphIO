@@ -372,4 +372,40 @@ BOOST_AUTO_TEST_CASE(morphology_names_mvd3)
                                          "dend-ch160801B_axon-Fluo55_low.h5" ));
 }
 
+BOOST_AUTO_TEST_CASE(compare_mvd2_mvd3)
+{
+    brion::BlueConfig config2( BBP_TEST_BLUECONFIG );
+    brain::Circuit circuit2( config2 );
+
+    brion::BlueConfig config3( BBP_TEST_BLUECONFIG3 );
+    brain::Circuit circuit3( config3 );
+
+    brion::GIDSet gids;
+    gids.insert( 21 );
+    gids.insert( 501 );
+
+    const brain::size_ts& mtypes2 = circuit2.getMorphologyTypes( gids );
+    const brain::size_ts& etypes2 = circuit2.getElectrophysiologyTypes( gids );
+    const brain::Strings& allMTypes2 = circuit2.getMorphologyNames();
+    const brain::Strings& allETypes2 = circuit2.getElectrophysiologyNames();
+    const brain::URIs& names2 = circuit2.getMorphologyURIs( gids );
+
+    const brain::size_ts& mtypes3 = circuit3.getMorphologyTypes( gids );
+    const brain::size_ts& etypes3 = circuit3.getElectrophysiologyTypes( gids );
+    const brain::Strings& allMTypes3 = circuit3.getMorphologyNames();
+    const brain::Strings& allETypes3 = circuit3.getElectrophysiologyNames();
+    const brain::URIs& names3 = circuit3.getMorphologyURIs( gids );
+
+    BOOST_CHECK_EQUAL_COLLECTIONS( mtypes2.begin(), mtypes2.end(),
+                                   mtypes3.begin(), mtypes3.end( ));
+    BOOST_CHECK_EQUAL_COLLECTIONS( etypes2.begin(), etypes2.end(),
+                                   etypes3.begin(), etypes3.end( ));
+    BOOST_CHECK_EQUAL_COLLECTIONS( allMTypes2.begin(), allMTypes2.end(),
+                                   allMTypes3.begin(), allMTypes3.end( ));
+    BOOST_CHECK_EQUAL_COLLECTIONS( allETypes2.begin(), allETypes2.end(),
+                                   allETypes3.begin(), allETypes3.end( ));
+    BOOST_CHECK_EQUAL_COLLECTIONS( names2.begin(), names2.end(),
+                                   names3.begin(), names3.end( ));
+}
+
 #endif

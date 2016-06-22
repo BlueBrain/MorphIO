@@ -91,6 +91,13 @@ Quaternionf toQuaternion(
 #endif
 
 std::string toString( const std::string& in ) { return in; }
+#ifdef BRION_USE_CXX03
+size_t toSize_t( const std::string& in )
+    { return boost::lexical_cast< size_t >( in ); }
+#else
+size_t toSize_t( const std::string& in ) { return std::stoul( in ); }
+#endif
+size_t nop( const size_t& in ) { return in; }
 }
 
 class Circuit::Impl
@@ -124,6 +131,10 @@ public:
     }
 
     virtual Vector3fs getPositions( const GIDSet& gids ) const = 0;
+    virtual size_ts getMTypes( const GIDSet& gids ) const = 0;
+    virtual Strings getMorphologyNames() const = 0;
+    virtual size_ts getETypes( const GIDSet& gids ) const = 0;
+    virtual Strings getElectrophysiologyNames() const = 0;
     virtual Quaternionfs getRotations( const GIDSet& gids ) const = 0;
     virtual Strings getMorphologyNames( const GIDSet& gids ) const = 0;
 
@@ -182,6 +193,40 @@ public:
         return positions;
     }
 
+    size_ts getMTypes( const GIDSet& gids ) const final
+    {
+        const brion::NeuronMatrix& matrix =  _circuit.get( gids,
+                                                           brion::NEURON_MTYPE );
+        size_ts result( matrix.shape()[ 0 ]);
+
+        brion::NeuronMatrix::const_array_view<1>::type view =
+            matrix[ boost::indices[brion::NeuronMatrix::index_range( )][ 0 ]];
+        std::transform( view.begin(), view.end(), result.begin(), toSize_t );
+        return result;
+    }
+
+    Strings getMorphologyNames() const final
+    {
+        return _circuit.getTypes( brion::NEURONCLASS_MTYPE );
+    }
+
+    size_ts getETypes( const GIDSet& gids ) const final
+    {
+        const brion::NeuronMatrix& matrix =  _circuit.get( gids,
+                                                           brion::NEURON_ETYPE );
+        size_ts result( matrix.shape()[ 0 ]);
+
+        brion::NeuronMatrix::const_array_view<1>::type view =
+            matrix[ boost::indices[brion::NeuronMatrix::index_range( )][ 0 ]];
+        std::transform( view.begin(), view.end(), result.begin(), toSize_t );
+        return result;
+    }
+
+    Strings getElectrophysiologyNames() const final
+    {
+        return _circuit.getTypes( brion::NEURONCLASS_ETYPE );
+    }
+
     Quaternionfs getRotations( const GIDSet& gids ) const final
     {
         const float deg2rad = float( M_PI ) / 180.f;
@@ -211,14 +256,14 @@ public:
 
     Strings getMorphologyNames( const GIDSet& gids ) const final
     {
-        brion::NeuronMatrix matrix =
-            _circuit.get( gids, brion::NEURON_MORPHOLOGY_NAME );
-        Strings res( matrix.shape()[ 0 ]);
+        const brion::NeuronMatrix& matrix =
+                _circuit.get( gids, brion::NEURON_MORPHOLOGY_NAME );
+        Strings result( matrix.shape()[ 0 ]);
 
-        brion::NeuronMatrix::array_view<1>::type view =
+        brion::NeuronMatrix::const_array_view<1>::type view =
             matrix[ boost::indices[brion::NeuronMatrix::index_range( )][ 0 ]];
-        std::transform( view.begin(), view.end(), res.begin(), toString );
-        return res;
+        std::transform( view.begin(), view.end(), result.begin(), toString );
+        return result;
     }
 
 private:
@@ -246,6 +291,34 @@ public:
         const ::MVD3::Positions& positions = _circuit.getPositions( range );
         assign( range, gids, positions, results, toVector3f );
         return results;
+    }
+
+    size_ts getMTypes( const GIDSet& gids ) const final
+    {
+        size_ts results( gids.size( ));
+        const ::MVD3::Range& range = getRange( gids );
+        const size_ts& mtypes = _circuit.getIndexMtypes( range );
+        assign( range, gids, mtypes, results, nop );
+        return results;
+    }
+
+    Strings getMorphologyNames() const final
+    {
+        return _circuit.listAllMtypes();
+    }
+
+    size_ts getETypes( const GIDSet& gids ) const final
+    {
+        size_ts results( gids.size( ));
+        const ::MVD3::Range& range = getRange( gids );
+        const size_ts& etypes = _circuit.getIndexEtypes( range );
+        assign( range, gids, etypes, results, nop );
+        return results;
+    }
+
+    Strings getElectrophysiologyNames() const final
+    {
+        return _circuit.listAllEtypes();
     }
 
     Quaternionfs getRotations( const GIDSet& gids ) const final
@@ -359,6 +432,26 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
 Vector3fs Circuit::getPositions( const GIDSet& gids ) const
 {
     return _impl->getPositions( gids );
+}
+
+size_ts Circuit::getMorphologyTypes( const GIDSet& gids ) const
+{
+    return _impl->getMTypes( gids );
+}
+
+Strings Circuit::getMorphologyNames() const
+{
+    return _impl->getMorphologyNames();
+}
+
+size_ts Circuit::getElectrophysiologyTypes( const GIDSet& gids ) const
+{
+    return _impl->getETypes( gids );
+}
+
+Strings Circuit::getElectrophysiologyNames() const
+{
+    return _impl->getElectrophysiologyNames();
 }
 
 Matrix4fs Circuit::getTransforms( const GIDSet& gids ) const
