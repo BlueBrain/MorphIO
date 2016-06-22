@@ -64,7 +64,7 @@ None
     {
         ...
         /**
-         * Open the given morphology file to write a version 1.1 morphology.
+         * Open the given morphology file for write access.
          *
          * @param file filename of the output morphology file
          * @param family the cell family that this morphology represents.
@@ -76,8 +76,8 @@ None
 
         /**
          * @return perimeters of the cross sections for each point of the
-         *         morphology in micrometers. Can be empty for version 1.1
-         *         morphology of FAMILY_NEURON.
+         *         morphology in micrometers.
+         * @throw std::runtime_error if empty for FAMILY_GLIA
          */
         floatsPtr readPerimeters() const;
 
@@ -85,17 +85,23 @@ None
          * Write perimeters of morphology.
          *
          * @param perimeters perimeters of the cross sections for each point of
-         *                   the morphology in micrometers.
+         *                   the morphology in micrometers
+         * @throw std::runtime_error if object not created with write ctor
+         * @throw std::runtime_error if not supported by implementation
          */
         void writePerimeters( const floats& perimeters );
 
 ## File format
 
-* new root 'cell_family' with datatype H5::NATIVE_INT
 * new root dataset 'perimeters' with dimension 1 and datatype H5::NATIVE_FLOAT
-* new root attributes 'creator', 'software_version', 'creation_time' with
-  datatype H5::C_S1 (string)
-* new root attribute 'version' with datatype H5::STD_U32LE and dimensionality 2
+* new root group 'metadata'
+* new enum 'cell_family_enum' with datatype H5::NATIVE_INT and values
+  NEURON=0 and GLIA=1 inside 'metadata'
+* new attribute 'cell_family' with datatype 'cell_family_enum' inside 'metadata'
+* new attributes 'creator', 'software_version', 'creation_time' with datatype
+  H5::C_S1 (string) inside 'metadata'
+* new attribute 'version' with datatype H5::STD_U32LE and dimensionality 2
+  inside 'metadata'
 
 ## Examples
 

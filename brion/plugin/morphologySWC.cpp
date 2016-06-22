@@ -1,5 +1,6 @@
 /* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
+ *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -185,6 +186,11 @@ bool MorphologySWC::handles( const MorphologyInitData& initData )
     return path.substr( pos ) == ".swc";
 }
 
+CellFamily MorphologySWC::getCellFamily() const
+{
+    return FAMILY_NEURON;
+}
+
 Vector4fsPtr MorphologySWC::readPoints( MorphologyRepairStage ) const
 {
     return _points;
@@ -203,7 +209,12 @@ SectionTypesPtr MorphologySWC::readSectionTypes() const
 Vector2isPtr MorphologySWC::readApicals() const
 {
     // Can these points be inferred? Should it be done at all?
-    return Vector2isPtr(new Vector2is());
+    return Vector2isPtr( new Vector2is( ));
+}
+
+floatsPtr MorphologySWC::readPerimeters() const
+{
+    return floatsPtr( new floats( ));
 }
 
 MorphologyVersion MorphologySWC::getVersion() const
@@ -229,6 +240,11 @@ void MorphologySWC::writeSectionTypes( const SectionTypes& )
 }
 
 void MorphologySWC::writeApicals( const Vector2is& )
+{
+    LBUNIMPLEMENTED
+}
+
+void MorphologySWC::writePerimeters( const floats& )
 {
     LBUNIMPLEMENTED
 }

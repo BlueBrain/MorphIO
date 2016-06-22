@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -41,6 +41,8 @@ public:
     /** Check if this plugin can handle the given uri. */
     static bool handles( const MorphologyInitData& initData );
 
+    CellFamily getCellFamily() const final;
+
     Vector4fsPtr readPoints( MorphologyRepairStage stage ) const final;
 
     Vector2isPtr readSections( MorphologyRepairStage stage ) const final;
@@ -48,6 +50,8 @@ public:
     SectionTypesPtr readSectionTypes() const final;
 
     Vector2isPtr readApicals() const final;
+
+    floatsPtr readPerimeters() const final;
 
     MorphologyVersion getVersion() const final;
 
@@ -61,25 +65,36 @@ public:
 
     void writeApicals( const Vector2is& apicals ) final;
 
+    void writePerimeters( const floats& perimeters ) final;
+
     void flush() final;
 
 private:
     H5::H5File _file;
+
+    H5::DataSet _points;
+    hsize_t _pointsDims[2];
+
+    H5::DataSet _sections;
+    hsize_t _sectionsDims[2];
+
     MorphologyVersion _version;
     MorphologyRepairStage _stage;
+    CellFamily _family;
     bool _write;
 
     void _checkVersion( const std::string& source );
-
     void _selectRepairStage();
 
-    bool _isV1() const;
+    void _resolveV1();
 
-    bool _isV2() const;
+    void _writeV11Metadata( const MorphologyInitData& initData );
+    bool _readV11Metadata();
 
-    void _writeV1Header();
+    bool _readV2Metadata() const;
+    void _writeV2Metadata();
 
-    void _writeV2Header();
+    H5::DataSet _getStructureDataSet( size_t nSections );
 };
 
 }

@@ -1,5 +1,6 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
+ *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -35,6 +36,8 @@ public:
     /** Check if this plugin can handle the given uri. */
     static bool handles( const MorphologyInitData& initData );
 
+    CellFamily getCellFamily() const final;
+
     Vector4fsPtr readPoints( MorphologyRepairStage stage ) const final;
 
     Vector2isPtr readSections( MorphologyRepairStage stage ) const final;
@@ -42,6 +45,8 @@ public:
     SectionTypesPtr readSectionTypes() const final;
 
     Vector2isPtr readApicals() const final;
+
+    floatsPtr readPerimeters() const final;
 
     MorphologyVersion getVersion() const final;
 
@@ -54,6 +59,8 @@ public:
     void writeSectionTypes( const SectionTypes& types ) final;
 
     void writeApicals( const Vector2is& apicals ) final;
+
+    void writePerimeters( const floats& perimeters ) final;
 
     void flush() final;
 

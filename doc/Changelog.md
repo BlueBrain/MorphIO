@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [75](https://github.com/BlueBrain/Brion/pull/75):
+  Implement morphology version 1.1 specification
 * [74](https://github.com/BlueBrain/Brion/pull/74):
   Remove deprecated enums and functions:
   - `CompartmentReport( const std::string&, const GIDSet& )` and

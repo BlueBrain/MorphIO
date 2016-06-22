@@ -64,6 +64,15 @@ const int DENDRITE = brion::SECTION_DENDRITE;
 const int APICAL_DENDRITE = brion::SECTION_APICAL_DENDRITE;
 }
 
+template< typename T >
+void checkCloseArrays( const std::vector< T >& array1,
+                       const std::vector< T >& array2 )
+{
+    BOOST_CHECK_EQUAL( array1.size(), array2.size() );
+    for( size_t i = 0; i != std::min( array1.size(), array2.size( )); ++i )
+        BOOST_CHECK_CLOSE( array1[i], array2[i], 2e-5f);
+}
+
 BOOST_AUTO_TEST_CASE( invalid_open )
 {
     BOOST_CHECK_THROW( brion::Morphology( "/bla" ), std::runtime_error );
@@ -127,6 +136,7 @@ BOOST_AUTO_TEST_CASE( h5_read_v1 )
     path /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
 
     const brion::Morphology morphology( path.string( ));
+    BOOST_CHECK_EQUAL( morphology.getCellFamily(), brion::FAMILY_NEURON );
 
     const brion::Vector4fsPtr points =
                                  morphology.readPoints( brion::MORPHOLOGY_RAW );
@@ -148,6 +158,8 @@ BOOST_AUTO_TEST_CASE( h5_read_v1 )
     BOOST_CHECK_EQUAL( types->size(), 138 );
     BOOST_CHECK_EQUAL( (*types)[0],  1 );
     BOOST_CHECK_EQUAL( (*types)[5],  2 );
+
+    BOOST_CHECK( morphology.readPerimeters()->empty( ));
 }
 
 BOOST_AUTO_TEST_CASE( h5_write_v1 )
@@ -167,6 +179,10 @@ BOOST_AUTO_TEST_CASE( h5_write_v1 )
         a.writePoints( *points, brion::MORPHOLOGY_UNDEFINED );
         a.writeSections( *sections, brion::MORPHOLOGY_UNDEFINED );
         a.writeSectionTypes( *types );
+        BOOST_CHECK_THROW( a.writeApicals( brion::Vector2is( )),
+                           std::runtime_error );
+        BOOST_CHECK_THROW( a.writePerimeters( brion::floats( )),
+                           std::runtime_error );
     }
 
     const brion::Morphology source2( "testv1.h5" );
@@ -180,12 +196,101 @@ BOOST_AUTO_TEST_CASE( h5_write_v1 )
     BOOST_CHECK( *types == *types2 );
 }
 
+BOOST_AUTO_TEST_CASE( h5_write_v11_glia )
+{
+    const std::string file( "glia.h5" );
+    boost::filesystem::remove( file );
+
+    boost::filesystem::path path( BBP_TESTDATA );
+    path /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
+
+    const brion::Morphology morphology( path.string( ));
+    brion::floats perimeters;
+    brion::Vector4fsPtr points = morphology.readPoints();
+    perimeters.reserve( points->size( ));
+    for( size_t i = 0; i < points->size(); ++i )
+        perimeters.push_back( (*points)[i].w() * 4.f );
+
+    brion::Morphology glia( file, brion::FAMILY_GLIA );
+    glia.writePoints( *points );
+    glia.writeSections( *morphology.readSections( ));
+    glia.writeSectionTypes( *morphology.readSectionTypes( ));
+    glia.writePerimeters( perimeters );
+    BOOST_CHECK_THROW( glia.writeApicals( brion::Vector2is( )),
+                       std::runtime_error );
+
+    const brion::Morphology gliaRead( file );
+    BOOST_CHECK_EQUAL( gliaRead.getCellFamily(), brion::FAMILY_GLIA );
+    checkCloseArrays( *gliaRead.readPerimeters(), perimeters );
+
+    boost::filesystem::remove( file );
+}
+
+BOOST_AUTO_TEST_CASE( h5_write_invalid_glia )
+{
+    const std::string file( "glia.h5" );
+    boost::filesystem::remove( file );
+    brion::Morphology glia( file, brion::FAMILY_GLIA );
+    brion::floats perimeters;
+    BOOST_CHECK_THROW( glia.writePerimeters( perimeters ), std::runtime_error );
+    boost::filesystem::remove( file );
+}
+
+BOOST_AUTO_TEST_CASE( h5_write_v11_neuron )
+{
+    const std::string file( "neuron.h5" );
+    boost::filesystem::remove( file );
+
+    boost::filesystem::path path( BBP_TESTDATA );
+    path /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
+
+    const brion::Morphology morphology( path.string( ));
+
+    brion::Morphology neuron( file, brion::FAMILY_NEURON );
+    neuron.writePoints( *morphology.readPoints( ));
+    neuron.writeSections( *morphology.readSections( ));
+    neuron.writeSectionTypes( *morphology.readSectionTypes( ));
+    BOOST_CHECK_THROW( neuron.writeApicals( brion::Vector2is( )),
+                       std::runtime_error );
+
+    const brion::Morphology neuronRead( file );
+    BOOST_CHECK_EQUAL( neuronRead.getCellFamily(), brion::FAMILY_NEURON );
+    BOOST_CHECK( neuronRead.readPerimeters()->empty( ));
+
+    boost::filesystem::remove( file );
+}
+
+BOOST_AUTO_TEST_CASE( h5_write_invalid_neuron )
+{
+    const std::string file( "neuron.h5" );
+    boost::filesystem::remove( file );
+
+    {
+        brion::Morphology neuron( file, brion::FAMILY_NEURON );
+        neuron.writePoints( brion::Vector4fs( 5 ));
+        BOOST_CHECK_THROW( neuron.writePoints( brion::Vector4fs( 1 )), std::runtime_error );
+        BOOST_CHECK_THROW( neuron.writePerimeters( brion::floats( 4 )), std::runtime_error );
+        neuron.writePerimeters( brion::floats( 5 ));
+        boost::filesystem::remove( file );
+    }
+
+    {
+        brion::Morphology neuron( file, brion::FAMILY_NEURON );
+        neuron.writePerimeters( brion::floats( 5 ));
+        BOOST_CHECK_THROW( neuron.writePerimeters( brion::floats( 4 )), std::runtime_error );
+        BOOST_CHECK_THROW( neuron.writePoints( brion::Vector4fs( 3 )), std::runtime_error );
+        neuron.writePoints( brion::Vector4fs( 5 ));
+        boost::filesystem::remove( file );
+    }
+}
+
 BOOST_AUTO_TEST_CASE( h5_read_v2 )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= "local/morphologies/14.07.10_repaired/v2/C010398B-P2.h5";
 
     const brion::Morphology morphology( path.string( ));
+    BOOST_CHECK_EQUAL( morphology.getCellFamily(), brion::FAMILY_NEURON );
 
     brion::Vector4fsPtr points =
                             morphology.readPoints( brion::MORPHOLOGY_REPAIRED );
@@ -212,6 +317,8 @@ BOOST_AUTO_TEST_CASE( h5_read_v2 )
     BOOST_CHECK_EQUAL( apicals->size(), 1 );
     BOOST_CHECK_EQUAL( (*apicals)[0].x(), 67 );
     BOOST_CHECK_EQUAL( (*apicals)[0].y(), 76 );
+
+    BOOST_CHECK( morphology.readPerimeters()->empty( ));
 }
 
 BOOST_AUTO_TEST_CASE( h5_write_v2 )
@@ -234,6 +341,8 @@ BOOST_AUTO_TEST_CASE( h5_write_v2 )
         a.writeSections( *sections, brion::MORPHOLOGY_REPAIRED );
         a.writeSectionTypes( *types );
         a.writeApicals( *apicals );
+        BOOST_CHECK_THROW( a.writePerimeters( brion::floats( )),
+                           std::runtime_error );
     }
 
     const brion::Morphology source2( "testv2.h5" );
@@ -335,15 +444,6 @@ void checkCloseArrays( const std::vector< T >& array,
     va_start( args, length );
     _checkCloseArrays( array, length, args );
     va_end( args );
-}
-
-template< typename T >
-void checkCloseArrays( const std::vector< T >& array1,
-                       const std::vector< T >& array2 )
-{
-    BOOST_CHECK_EQUAL( array1.size(), array2.size() );
-    for( size_t i = 0; i != std::min( array1.size(), array2.size( )); ++i )
-        BOOST_CHECK_CLOSE( array1[i], array2[i], 2e-5f);
 }
 
 template< typename T, long unsigned int M >
@@ -553,6 +653,8 @@ BOOST_AUTO_TEST_CASE( swc_neuron )
     brion::Morphology neuron( path.string( ));
     BOOST_CHECK_EQUAL( neuron.readPoints( brion::MORPHOLOGY_REPAIRED )->size(),
                        927 );
+    BOOST_CHECK_EQUAL( neuron.getCellFamily(), brion::FAMILY_NEURON );
+    BOOST_CHECK( neuron.readPerimeters()->empty( ));
 }
 
 namespace

@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -73,11 +73,8 @@ uint32_ts Morphology::Impl::getSectionIDs(
     for( size_t i = 0; i != types->size(); ++i )
     {
         const SectionType type = ( *types )[i];
-        if( type == SECTION_ALL )
-            LBWARN << "Unknown section type " << int(type) << std::endl;
-        else
-            if( bits[size_t( type )] )
-                result.push_back( i );
+        if( bits[size_t( type )] )
+            result.push_back( i );
     }
     return result;
 }

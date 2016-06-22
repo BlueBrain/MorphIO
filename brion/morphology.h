@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -49,13 +49,17 @@ public:
      */
     BRION_API explicit Morphology( const std::string& source );
 
+    /** @return the cell family of that morphology. @version 1.8 */
+    BRION_API CellFamily getCellFamily() const;
+
     /** Read points of morphology, representing x,y,z coordinates + diameter.
      *
      * @param stage the repair stage to take the points from
      * @return x,y,z coords + diameter of all points of the morphology
      * @version 1.0
      */
-    BRION_API Vector4fsPtr readPoints( MorphologyRepairStage stage ) const;
+    BRION_API Vector4fsPtr
+    readPoints( MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED ) const;
 
     /** Read sections of morphology, representing section start index and index
      *  of the parent section.
@@ -65,7 +69,8 @@ public:
      *         morphology.
      * @version 1.0
      */
-    BRION_API Vector2isPtr readSections( MorphologyRepairStage stage ) const;
+    BRION_API Vector2isPtr
+    readSections( MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED ) const;
 
     /** Read section types of morphology.
      *
@@ -81,6 +86,14 @@ public:
      */
     BRION_API Vector2isPtr readApicals() const;
 
+    /**
+     * @return perimeters of the cross sections for each point of the morphology
+     *         in micrometers.
+     * @throw std::runtime_error if empty for FAMILY_GLIA
+     * @version 1.8
+     */
+    BRION_API floatsPtr readPerimeters() const;
+
     /** @internal */
     BRION_API MorphologyVersion getVersion() const;
     //@}
@@ -95,35 +108,49 @@ public:
      * @param overwrite true to allow overwrite of existing file
      * @throw std::runtime_error if file could not be created
      * @version 1.0
+     * @deprecated
      */
     BRION_API Morphology( const std::string& target,
                           MorphologyVersion version, bool overwrite = false );
+
+    /**
+     * Open the given morphology file for write access.
+     *
+     * @param file filename of the output morphology file
+     * @param family the cell family that this morphology represents
+     * @throw std::runtime_error if file could not be created
+     * @version 1.8
+     */
+    BRION_API Morphology( const std::string& file, CellFamily family );
 
     /** Write points of morphology, representing x,y,z coordinates + diameter.
      *
      * @param points x,y,z coords + diameter of all points of the morphology
      * @param stage the repair stage to save those points to
-     * @throw std::runtime_error if object not created with write ctor
+     * @throw std::runtime_error if object not writable
+     * @throw std::runtime_error points already written
+     * @throw std::runtime_error number of points does not match number of
+     *                           perimeters
      * @version 1.0
      */
     BRION_API void writePoints( const Vector4fs& points,
-                                MorphologyRepairStage stage );
+                           MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED );
 
     /** Write sections of morphology, representing section start index and index
      *  of parent the section.
      *
      * @param sections index and parent index of all sections of the morphology
      * @param stage the repair stage to save those sections to
-     * @throw std::runtime_error if object not created with write ctor
+     * @throw std::runtime_error if object not writable
      * @version 1.0
      */
     BRION_API void writeSections( const Vector2is& sections,
-                                  MorphologyRepairStage stage );
+                           MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED );
 
     /** Write section types of morphology.
      *
      * @param types type of each section of the morphology
-     * @throw std::runtime_error if object not created with write ctor
+     * @throw std::runtime_error if object not writable
      * @version 1.0
      */
     BRION_API void writeSectionTypes( const SectionTypes& types );
@@ -132,10 +159,25 @@ public:
      *
      * @param apicals section and point index of all apical points
      * @throw std::runtime_error if object not created with write ctor
-     * @throw std::runtime_error if called for version 1 files
+     * @throw std::runtime_error if not supported by implementation
      * @version 1.0
+     * @deprecated
      */
     BRION_API void writeApicals( const Vector2is& apicals );
+
+    /**
+     * Write perimeters of morphology.
+     *
+     * @param perimeters perimeters of the cross sections for each point of
+     *                   the morphology in micrometers
+     * @throw std::runtime_error if object not writable
+     * @throw std::runtime_error perimeters already written
+     * @throw std::runtime_error number of points does not match number of
+     *                           perimeters
+     * @throw std::runtime_error if not supported by implementation
+     * @version 1.8
+     */
+    BRION_API void writePerimeters( const floats& perimeters );
 
     /** Flush data to output. @version 1.0 */
     BRION_API void flush();
