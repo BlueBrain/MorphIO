@@ -170,6 +170,12 @@ MorphologyHDF5::~MorphologyHDF5()
 {
     lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
 
+    if( _points.getId( ))
+        _points.close();
+
+    if( _sections.getId( ))
+        _sections.close();
+
     if( _file.getId( ))
         _file.close();
 }
