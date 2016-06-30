@@ -1,7 +1,7 @@
 Changelog {#Changelog}
 =========
 
-# git master
+# Release 1.8.0 (30-Jun-2016)
 
 * [77](https://github.com/BlueBrain/Brion/pull/77):
   Add brain::Circuit::getMorphologyTypes() and brain::Circuit::getElectrophysiologyTypes()
