@@ -34,6 +34,8 @@
 
 #define BOOST_TEST_MODULE Circuit
 #include <boost/filesystem/path.hpp>
+#include <boost/foreach.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/test/unit_test.hpp>
 #include <lunchbox/bitOperation.h>
 
@@ -228,15 +230,31 @@ void _checkMorphology( const brain::neuron::Morphology& morphology,
 }
 }
 
-BOOST_AUTO_TEST_CASE( load_bad_morphologies )
+BOOST_AUTO_TEST_CASE( test_gid_out_of_range )
 {
-    const brain::Circuit circuit( (brion::URI( bbp::test::getBlueconfig( ))));
+    typedef boost::shared_ptr< const brain::Circuit > CircuitPtr;
+    std::vector< CircuitPtr > circuits;
+    circuits.push_back( CircuitPtr( new brain::Circuit(
+                                        brion::URI( BBP_TEST_BLUECONFIG ))));
+#ifdef BRAIN_USE_MVD3
+    circuits.push_back( CircuitPtr( new brain::Circuit(
+                                        brion::URI( BBP_TEST_BLUECONFIG3 ))));
+#endif
 
     brion::GIDSet gids;
     gids.insert( 10000000 );
-    BOOST_CHECK_THROW(
-        circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_LOCAL ),
-        std::runtime_error );
+    BOOST_FOREACH( const CircuitPtr& circuit, circuits )
+    {
+        BOOST_CHECK_THROW( circuit->getPositions( gids ), std::runtime_error );
+        BOOST_CHECK_THROW( circuit->getMorphologyTypes( gids ),
+                           std::runtime_error );
+        BOOST_CHECK_THROW( circuit->getElectrophysiologyTypes( gids ),
+                           std::runtime_error );
+        BOOST_CHECK_THROW( circuit->getRotations( gids ), std::runtime_error );
+        BOOST_CHECK_THROW(
+            circuit->loadMorphologies( gids, brain::Circuit::COORDINATES_LOCAL),
+            std::runtime_error );
+    }
 }
 
 BOOST_AUTO_TEST_CASE( load_local_morphologies )

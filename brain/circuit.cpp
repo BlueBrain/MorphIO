@@ -27,6 +27,7 @@
 #include <brion/circuit.h>
 #include <brion/morphology.h>
 #include <brion/target.h>
+#include <brion/detail/silenceHDF5.h>
 
 #include <lunchbox/log.h>
 
@@ -288,18 +289,36 @@ public:
     {
         Vector3fs results( gids.size( ));
         const ::MVD3::Range& range = getRange( gids );
-        const ::MVD3::Positions& positions = _circuit.getPositions( range );
-        assign( range, gids, positions, results, toVector3f );
-        return results;
+        try
+        {
+            brion::detail::SilenceHDF5 silence;
+            const ::MVD3::Positions& positions = _circuit.getPositions( range );
+            assign( range, gids, positions, results, toVector3f );
+            return results;
+        }
+        catch( const HighFive::Exception& e )
+        {
+            LBTHROW( std::runtime_error( "Exception in getPositions(): " +
+                                         std::string( e.what( ))));
+        }
     }
 
     size_ts getMTypes( const GIDSet& gids ) const final
     {
         size_ts results( gids.size( ));
         const ::MVD3::Range& range = getRange( gids );
-        const size_ts& mtypes = _circuit.getIndexMtypes( range );
-        assign( range, gids, mtypes, results, nop );
-        return results;
+        try
+        {
+            brion::detail::SilenceHDF5 silence;
+            const size_ts& mtypes = _circuit.getIndexMtypes( range );
+            assign( range, gids, mtypes, results, nop );
+            return results;
+        }
+        catch( const HighFive::Exception& e )
+        {
+            LBTHROW( std::runtime_error( "Exception in getMTypes(): " +
+                                         std::string( e.what( ))));
+        }
     }
 
     Strings getMorphologyNames() const final
@@ -311,9 +330,18 @@ public:
     {
         size_ts results( gids.size( ));
         const ::MVD3::Range& range = getRange( gids );
-        const size_ts& etypes = _circuit.getIndexEtypes( range );
-        assign( range, gids, etypes, results, nop );
-        return results;
+        try
+        {
+            brion::detail::SilenceHDF5 silence;
+            const size_ts& etypes = _circuit.getIndexEtypes( range );
+            assign( range, gids, etypes, results, nop );
+            return results;
+        }
+        catch( const HighFive::Exception& e )
+        {
+            LBTHROW( std::runtime_error( "Exception in getETypes(): " +
+                                         std::string( e.what( ))));
+        }
     }
 
     Strings getElectrophysiologyNames() const final
@@ -325,18 +353,36 @@ public:
     {
         Quaternionfs results( gids.size( ));
         const ::MVD3::Range& range = getRange( gids );
-        const ::MVD3::Rotations& rotations = _circuit.getRotations( range );
-        assign( range, gids, rotations, results, toQuaternion );
-        return results;
+        try
+        {
+            brion::detail::SilenceHDF5 silence;
+            const ::MVD3::Rotations& rotations = _circuit.getRotations( range );
+            assign( range, gids, rotations, results, toQuaternion );
+            return results;
+        }
+        catch( const HighFive::Exception& e )
+        {
+            LBTHROW( std::runtime_error( "Exception in getRotations(): " +
+                                         std::string( e.what( ))));
+        }
     }
 
     Strings getMorphologyNames( const GIDSet& gids ) const final
     {
         Strings results( gids.size( ));
         const ::MVD3::Range& range = getRange( gids );
-        const Strings& morphos = _circuit.getMorphologies( range );
-        assign( range, gids, morphos, results, toString );
-        return results;
+        try
+        {
+            brion::detail::SilenceHDF5 silence;
+            const Strings& morphos = _circuit.getMorphologies( range );
+            assign( range, gids, morphos, results, toString );
+            return results;
+        }
+        catch( const HighFive::Exception& e )
+        {
+            LBTHROW( std::runtime_error( "Exception in getMorphologyNames(): " +
+                                         std::string( e.what( ))));
+        }
     }
 
 private:
