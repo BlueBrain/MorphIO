@@ -1,6 +1,11 @@
 Changelog {#Changelog}
 =========
 
+# Release 1.9.0 (git master)
+
+* [81](https://github.com/BlueBrain/Brion/pull/81):
+  Fix GID out-of-bounds handling for MVD3 in brain::Circuit
+
 # Release 1.8.0 (30-Jun-2016)
 
 * [77](https://github.com/BlueBrain/Brion/pull/77):
