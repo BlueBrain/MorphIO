@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # Release 1.9.0 (git master)
 
+* [82](https://github.com/BlueBrain/Brion/pull/82):
+  Improve performance when reading synapse attributes from non-merged files
 * [81](https://github.com/BlueBrain/Brion/pull/81):
   Fix GID out-of-bounds handling for MVD3 in brain::Circuit
 * [79](https://github.com/BlueBrain/Brion/pull/79):
