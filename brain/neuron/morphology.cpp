@@ -34,6 +34,17 @@ namespace brain
 namespace neuron
 {
 
+servus::Serializable::Data Morphology::toBinary() const
+{
+    return _impl->toBinary();
+}
+
+Morphology::Morphology( const void* data, const size_t size )
+    : _impl( new Impl( data, size ))
+{
+    _impl->ref();
+}
+
 Morphology::Morphology( const URI& source, const Matrix4f& transform )
     : _impl( new Impl( brion::Morphology( source.getPath( ))))
 {

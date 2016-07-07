@@ -34,17 +34,19 @@ namespace neuron
 
 typedef std::pair< size_t, size_t > SectionRange;
 
-class Morphology::Impl : public lunchbox::Referenced
+class Morphology::Impl : public lunchbox::Referenced, public servus::Serializable
 {
 public:
-    const brion::Vector4fsPtr points;
-    const brion::Vector2isPtr sections;
-    const brion::SectionTypesPtr types;
-    const brion::Vector2isPtr apicals;
+    brion::Vector4fsPtr points;
+    brion::Vector2isPtr sections;
+    brion::SectionTypesPtr types;
+    brion::Vector2isPtr apicals;
 
     Matrix4f transformation;
 
     uint32_t somaSection;
+
+    Impl( const void* data, const size_t size );
 
     explicit Impl( const brion::Morphology& morphology );
 
@@ -69,6 +71,9 @@ public:
     void transform( const Matrix4f& matrix );
 
 private:
+    std::string getTypeName() const final { return "brain::neuron::Morphology::Impl"; }
+    bool _fromBinary( const void* data, const size_t size ) final;
+    servus::Serializable::Data _toBinary() const final;
 
     // Distances caches. These caches need to be thread-safe to follow the
     // recommendations for C++11 about mutable and const correctness.

@@ -5,6 +5,9 @@ Changelog {#Changelog}
 
 * [81](https://github.com/BlueBrain/Brion/pull/81):
   Fix GID out-of-bounds handling for MVD3 in brain::Circuit
+* [79](https://github.com/BlueBrain/Brion/pull/79):
+  Use PersistentMap for cache in brain::Circuit::loadMorphologies(); add thread
+  safety w/ synapses cache
 
 # Release 1.8.0 (30-Jun-2016)
 

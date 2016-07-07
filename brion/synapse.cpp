@@ -107,6 +107,7 @@ public:
         std::string cacheKey;
         if( _cache )
         {
+            lunchbox::ScopedWrite mutex( _cacheLock );
             cacheKey = _cacheKey + "/" + lexical_cast< std::string >( gid ) +
                        "/" + lexical_cast< std::string >( attributes );
             const std::string& cached = (*_cache)[ cacheKey ];
@@ -152,9 +153,13 @@ public:
 
         dataset.dataset.read( values.data(), H5::PredType::NATIVE_FLOAT,
                               targetspace, dataset.dataspace );
+
         if( _cache )
+        {
+            lunchbox::ScopedWrite cacheMutex( _cacheLock );
             _cache->insert( cacheKey, values.data(),
                             dataset.dims[0] * bits.count() * sizeof( float ));
+        }
         return values;
     }
 
@@ -232,6 +237,7 @@ public:
 
 private:
     lunchbox::PersistentMapPtr _cache;
+    mutable lunchbox::Lock _cacheLock;
     std::string _cacheKey;
     H5::H5File _file;
     size_t _numAttributes;

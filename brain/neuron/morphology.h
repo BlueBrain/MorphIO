@@ -25,6 +25,7 @@
 #include <brain/neuron/types.h>
 
 #include <boost/noncopyable.hpp>
+#include <servus/serializable.h>
 
 namespace brain
 {
@@ -130,6 +131,10 @@ public:
     BRAIN_API const Matrix4f& getTransformation() const;
 
 private:
+    friend class brain::Circuit;
+    Morphology( const void* data, const size_t size );
+    servus::Serializable::Data toBinary() const;
+
     Impl* const _impl;
 };
 

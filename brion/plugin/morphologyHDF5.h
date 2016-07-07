@@ -91,7 +91,7 @@ private:
     void _writeV11Metadata( const MorphologyInitData& initData );
     bool _readV11Metadata();
 
-    bool _readV2Metadata() const;
+    bool _readV2Metadata();
     void _writeV2Metadata();
 
     H5::DataSet _getStructureDataSet( size_t nSections );
