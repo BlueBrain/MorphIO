@@ -24,15 +24,21 @@
 #include "detail/silenceHDF5.h"
 
 #include <bitset>
+
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
+#include <boost/unordered_map.hpp>
+
 #include <H5Cpp.h>
+
 #include <lunchbox/atomic.h>
 #include <lunchbox/log.h>
 #include <lunchbox/persistentMap.h>
 #include <lunchbox/scopedMutex.h>
+
+#include <fstream>
 
 
 namespace brion
@@ -157,8 +163,12 @@ public:
         if( _cache )
         {
             lunchbox::ScopedWrite cacheMutex( _cacheLock );
-            _cache->insert( cacheKey, values.data(),
-                            dataset.dims[0] * bits.count() * sizeof( float ));
+            const size_t size = dataset.dims[0] * bits.count() * sizeof( float );
+            if( !_cache->insert( cacheKey, values.data(), size ))
+                LBWARN << "Failed to insert synapse information for GID " << gid
+                       << " into cache; item size is " << float(size) / LB_1MB
+                       << " MB" << std::endl;
+
         }
         return values;
     }
@@ -257,32 +267,12 @@ public:
         }
         catch( const std::runtime_error& )
         {
-            // try to open in individual files
-            const fs::path dir = fs::path( source ).parent_path();
-            const fs::path filename =  fs::path( source ).filename();
-            const boost::regex filter( filename.string() + "\\.[0-9]+$" );
+            const fs::path sourcePath( source );
+            const fs::path dir = sourcePath.parent_path();
+            const std::string filename = sourcePath.filename().generic_string();
 
-            fs::directory_iterator end;
-            for( fs::directory_iterator i( dir ); i != end; ++i )
-            {
-                const fs::path candidate = i->path().filename();
-                boost::smatch match;
-
-                if( !boost::filesystem::is_regular_file( i->status( )) ||
-                    !boost::regex_match( candidate.string(), match, filter ))
-                {
-                    continue;
-                }
-
-                _unmappedFiles.push_back( i->path().string( ));
-            }
-
-            if( _unmappedFiles.empty( ))
-            {
-                LBTHROW( std::runtime_error( "Could not find synapse files " +
-                                             dir.string() + "/" +
-                                             filename.string( )));
-            }
+            _createIndex( dir, filename );
+            _fillFilemap( dir, filename );
         }
     }
 
@@ -314,12 +304,76 @@ public:
     }
 
 private:
-    typedef std::map< uint32_t, std::string > GidFileMap;
+    typedef boost::unordered_map< uint32_t, std::string > GidFileMap;
+    typedef boost::unordered_map< std::string, H5::H5File > UnmappedFiles;
 
     mutable SynapseFile* _file;
     mutable uint32_t _gid; // current or 0 for all
-    mutable Strings _unmappedFiles;
+    mutable UnmappedFiles _unmappedFiles;
     mutable GidFileMap _fileMap;
+
+    void _createIndex( const fs::path& dir, const std::string& filename )
+    {
+        // extract the GID->file mapping from the merge_nrn.sh script
+        const fs::path merge_nrn = dir / "merge_nrn.sh";
+        const std::ifstream mergeFile( merge_nrn.generic_string().c_str( ));
+        if( !mergeFile.is_open( ))
+        {
+            LBWARN << "No merge file found in " << dir
+                   << " to build lookup index; loading data will be slow"
+                   << std::endl;
+            return;
+        }
+
+        std::stringstream buffer;
+        buffer << mergeFile.rdbuf();
+
+        const boost::regex commentregx( "#.*?\\n" );
+        const std::string content = boost::regex_replace( buffer.str(),
+                                                          commentregx , "\n" );
+
+        const boost::regex regx( "\\$CMD -i \\$H5.(?<number>[0-9]+) -o "
+                                 "\\$H5 -s /a(?<gid>[0-9]+)" );
+        const int subs[] = {1, 2};
+        boost::sregex_token_iterator i( content.begin(), content.end(), regx,
+                                        subs );
+
+        const std::string basename =
+                            (dir / fs::path( filename )).generic_string() + ".";
+        for( boost::sregex_token_iterator end; i != end; )
+        {
+            const std::string& fileNumber = *i++;
+            const uint32_t fileGID = boost::lexical_cast< uint32_t >(*i++);
+            _fileMap[ fileGID ] = basename + fileNumber;
+        }
+    }
+
+    void _fillFilemap( const fs::path& dir, const std::string& filename )
+    {
+        // try to open in individual files
+        const boost::regex filter( filename + "\\.[0-9]+$" );
+        fs::directory_iterator end;
+        for( fs::directory_iterator i( dir ); i != end; ++i )
+        {
+            const fs::path candidate = i->path().filename();
+            boost::smatch match;
+
+            if( !boost::filesystem::is_regular_file( i->status( )) ||
+                !boost::regex_match( candidate.string(), match, filter ))
+            {
+                continue;
+            }
+
+            _unmappedFiles.insert( std::make_pair( i->path().string(),
+                                                   H5::H5File( )));
+        }
+
+        if( _unmappedFiles.empty( ))
+        {
+            LBTHROW( std::runtime_error( "Could not find synapse files " +
+                                         dir.string() + "/" + filename ));
+        }
+    }
 
     bool _findFile( const uint32_t gid ) const
     {
@@ -338,47 +392,37 @@ private:
 
     std::string _findFilename( const uint32_t gid ) const
     {
-        while( _fileMap[ gid ].empty( ))
+        if( !_fileMap[ gid ].empty( ))
+            return _fileMap[ gid ];
+
+        // at this point we can only search in each file for the GID which
+        // usually results in waiting for I/O and non-parallizable search thanks
+        // to HDF5
+
+        lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
+        SilenceHDF5 silence;
+
+        BOOST_FOREACH( UnmappedFiles::value_type& entry, _unmappedFiles )
         {
-            if( _unmappedFiles.empty( ))
-                return std::string();
+            const std::string& candidate = entry.first;
+            H5::H5File& file = entry.second;
+            // keeping the files open 'saves' some time
+            if( file.getId() <= 0 )
+                file.openFile( candidate, H5F_ACC_RDONLY );
 
-            const std::string candidate = _unmappedFiles.back();
-            _unmappedFiles.pop_back();
-
-            lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
-            H5::H5File file;
             try
             {
-                SilenceHDF5 silence;
-                file.openFile( candidate, H5F_ACC_RDONLY );
-            }
-            catch( const H5::Exception& exc )
-            {
-                LBINFO <<  "Could not open synapse file " << candidate << ": "
-                       << exc.getDetailMsg() << std::endl;
-                continue;
-            }
+                std::stringstream name;
+                name << "a" << gid;
 
-            const size_t size = file.getNumObjs();
-            for( size_t i = 0; i < size; ++i )
-            {
-                const std::string& name = file.getObjnameByIdx( i );
-                const boost::regex filter( "^a[0-9]+$" );
-                boost::smatch match;
-
-                if( boost::regex_match( name, match, filter ))
-                {
-                    std::string string = match.str();
-                    string.erase( 0, 1 ); // remove the 'a'
-                    const uint32_t cGID = lexical_cast<uint32_t>( string );
-                    _fileMap[ cGID ] = candidate;
-                }
+                // this trial-and-error is the 'fastest' path found
+                file.openDataSet( name.str( ));
+                _fileMap[ gid ] = candidate;
+                return candidate;
             }
-            file.close();
+            catch( const H5::Exception& ) {}
         }
-
-        return _fileMap[ gid ];
+        return std::string();
     }
 };
 

@@ -71,7 +71,8 @@ public:
     void transform( const Matrix4f& matrix );
 
 private:
-    std::string getTypeName() const final { return "brain::neuron::Morphology::Impl"; }
+    std::string getTypeName() const final
+        { return "brain::neuron::Morphology::Impl"; }
     bool _fromBinary( const void* data, const size_t size ) final;
     servus::Serializable::Data _toBinary() const final;
 

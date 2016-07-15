@@ -101,7 +101,7 @@ public:
         const int subs[] = {1, 2, 3};
         boost::sregex_token_iterator i( fileString.begin(), fileString.end(),
                                         regx, subs );
-        for( boost::sregex_token_iterator j; i != j; )
+        for( boost::sregex_token_iterator end; i != end; )
         {
             const std::string& typeStr = *i++;
             const std::string& name = *i++;
