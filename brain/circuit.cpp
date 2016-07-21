@@ -42,6 +42,9 @@
 
 #ifdef BRION_USE_CXX11
 #  include <future>
+#  include <random>
+#else
+#  include <algorithm>
 #endif
 
 namespace fs = boost::filesystem;
@@ -118,7 +121,21 @@ public:
         , _morphologySource( config.getMorphologySource( ))
         , _targetSources( config.getTargetSources( ))
         , _cache( lunchbox::PersistentMap::createCache( ))
-    {}
+#ifdef BRION_USE_CXX11
+        , _randomEngine( _randomDevice( ))
+#endif
+    {
+        const char* seedEnv = getenv( "BRAIN_CIRCUIT_SEED" );
+        if( seedEnv )
+        {
+#ifdef BRION_USE_CXX11
+            _randomEngine.seed( std::stoul( seedEnv ));
+#else
+            srand( atol( seedEnv ));
+#endif
+        }
+    }
+
     virtual ~Impl() {}
 
     virtual size_t getNumNeurons() const = 0;
@@ -132,7 +149,7 @@ public:
     {
         brain::GIDSet gids;
         brain::GIDSet::const_iterator hint = gids.begin();
-        for( size_t i = 0; i < getNumNeurons(); ++i )
+        for( uint32_t i = 0; i < getNumNeurons(); ++i )
             hint = gids.insert( hint, i + 1 );
         return gids;
     }
@@ -145,6 +162,24 @@ public:
                 _targetParsers.push_back( brion::Target( uri.getPath( )));
         }
         return brion::Target::parse( _targetParsers, target );
+    }
+
+    GIDSet getRandomGIDs( const float fraction,
+                          const std::string& target ) const
+    {
+        if( fraction < 0.f || fraction > 1.f )
+            LBTHROW( std::runtime_error( "Fraction for getRandomGIDs() must be "
+                                         "in the range [0,1]" ));
+
+        const GIDSet& gids = target.empty() ? getGIDs() : getGIDs( target );
+        uint32_ts randomGids( gids.begin(), gids.end( ));
+#ifdef BRION_USE_CXX1
+        std::shuffle( randomGids.begin(), randomGids.end(), _randomEngine );
+#else
+        std::random_shuffle( randomGids.begin(), randomGids.end( ));
+#endif
+        randomGids.resize( size_t( std::ceil( randomGids.size() * fraction )));
+        return GIDSet( randomGids.begin(), randomGids.end( ));
     }
 
     virtual Vector3fs getPositions( const GIDSet& gids ) const = 0;
@@ -217,6 +252,11 @@ private:
     const brion::URIs _targetSources;
     mutable brion::Targets _targetParsers;
     lunchbox::PersistentMapPtr _cache;
+
+#ifdef BRION_USE_CXX11
+    std::random_device _randomDevice;
+    std::mt19937_64 _randomEngine;
+#endif
 };
 
 class MVD2 : public Circuit::Impl
@@ -491,6 +531,17 @@ GIDSet Circuit::getGIDs() const
 GIDSet Circuit::getGIDs( const std::string& target ) const
 {
     return _impl->getGIDs( target );
+}
+
+GIDSet Circuit::getRandomGIDs( const float fraction ) const
+{
+    return _impl->getRandomGIDs( fraction, "" );
+}
+
+GIDSet Circuit::getRandomGIDs( const float fraction,
+                               const std::string& target ) const
+{
+    return _impl->getRandomGIDs( fraction, target );
 }
 
 URIs Circuit::getMorphologyURIs( const GIDSet& gids ) const
