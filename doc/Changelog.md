@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # Release 1.9.0 (git master)
 
+* [83](https://github.com/BlueBrain/Brion/pull/83):
+  Add brain::Circuit::getRandomGIDs()
 * [82](https://github.com/BlueBrain/Brion/pull/82):
   Improve performance when reading synapse attributes from non-merged files
 * [81](https://github.com/BlueBrain/Brion/pull/81):

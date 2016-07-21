@@ -61,14 +61,29 @@ public:
     BRAIN_API  ~Circuit();
 
     /**
-     * @return The set of GIDs for the given target name. If empty it will
-     *         return all the GIDs held by the circuit. If the target cannot be
-     *         found, a runtime exception is raised.
+     * @return The set of GIDs for the given target name.
+     * @throw std::runtime_error if the target cannot be found.
      */
     BRAIN_API GIDSet getGIDs( const std::string& target ) const;
 
     /** @return All GIDs held by the circuit */
     BRAIN_API GIDSet getGIDs() const;
+
+    /**
+     * @return A random fraction of GIDs from the given target name.
+     * @env BRAIN_CIRCUIT_SEED set the seed for deterministic randomness
+     * @throw std::runtime_error if the fraction is not in the range [0,1].
+     * @throw std::runtime_error if the target cannot be found.
+     */
+    BRAIN_API GIDSet getRandomGIDs( float fraction,
+                                    const std::string& target ) const;
+
+    /**
+     * @return A random fraction of GIDs from the circuit.
+     * @env BRAIN_CIRCUIT_SEED set the seed for deterministic randomness
+     * @throw std::runtime_error if the fraction is not in the range [0,1].
+     */
+    BRAIN_API GIDSet getRandomGIDs( float fraction ) const;
 
     /** @return The set of URIs to access the morphologies of the given cells */
     BRAIN_API URIs getMorphologyURIs( const GIDSet& gids ) const;

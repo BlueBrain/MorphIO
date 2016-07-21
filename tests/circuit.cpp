@@ -426,4 +426,33 @@ BOOST_AUTO_TEST_CASE(compare_mvd2_mvd3)
                                    names3.begin(), names3.end( ));
 }
 
-#endif
+BOOST_AUTO_TEST_CASE( brain_circuit_random_gids )
+{
+    const brain::Circuit circuit( brion::URI( BBP_TEST_BLUECONFIG3 ));
+    const brain::GIDSet& gids = circuit.getRandomGIDs( 0.1f );
+    BOOST_CHECK_EQUAL( gids.size(), 100 );
+
+    const brain::GIDSet& gids2 = circuit.getRandomGIDs( 0.1f );
+    BOOST_CHECK_EQUAL( gids2.size(), 100 );
+
+    bool notEqual = true;
+    brain::GIDSet::const_iterator it1 = gids.begin();
+    brain::GIDSet::const_iterator it2 = gids2.begin();
+    for( ; it1 != gids.end(); ++it1, ++it2 )
+    {
+        if( *it1 != *it2 )
+        {
+            notEqual = true;
+            break;
+        }
+    }
+    BOOST_CHECK( notEqual );
+
+    const brain::GIDSet& gids3 = circuit.getRandomGIDs( 0.5f, "Layer1" );
+    BOOST_CHECK_EQUAL( gids3.size(), 10 );
+
+    BOOST_CHECK_THROW( circuit.getRandomGIDs( -5.f ), std::runtime_error );
+    BOOST_CHECK_THROW( circuit.getRandomGIDs( 1.1f ), std::runtime_error );
+}
+
+#endif // BRAIN_USE_MVD3
