@@ -35,7 +35,7 @@ namespace detail { class Synapse; }
  * - nrn[_efferent].h5: These files store the synaptic model parameters,
  *   connectivity information and morphological location of synapses. They
  *   are organized as sets of tables with one table per neuron and one row
- *   per affernt (or efferent) synapse.
+ *   per afferent (or efferent) synapse.
  * - nrn_positions_[_efferent].h5: These files store precomputed spatial
  *   locations of synapses on the dendrite/axon longitudinal axes and on the
  *   cell membranes.
@@ -53,7 +53,6 @@ namespace detail { class Synapse; }
  *
  * Example: @include tests/synapse.cpp
  */
-
 class Synapse : public boost::noncopyable
 {
 public:
