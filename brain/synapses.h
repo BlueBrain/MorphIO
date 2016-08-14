@@ -205,16 +205,25 @@ public:
     BRAIN_API const float* decays() const;
 
     /** @return the absolute synaptic efficacies in millivolts. */
-    BRAIN_API const int* efficacys() const;
+    BRAIN_API const int* efficacies() const;
     //@}
+
+protected:
+    // The Impl pointer needs to be used in the Python wrapping as a custodian.
+    // Instead of moving the Impl declaration outside the implementation, this
+    // base class is used to give access to a virtual destructor, which is all
+    // the wrapping needs.
+    struct BaseImpl
+    {
+        virtual ~BaseImpl() {};
+    };
+    struct Impl;
+    std::shared_ptr< const BaseImpl > _impl;
 
 private:
     friend struct detail::SynapsesStream;
     Synapses( const Circuit& circuit, const GIDSet& gids,
               const GIDSet& filterGIDs, bool afferent, SynapsePrefetch prefetch );
-
-    struct Impl;
-    std::shared_ptr< const Impl > _impl;
 };
 
 }

@@ -35,12 +35,6 @@ typedef brion::Vector2i V2i;
 
 namespace
 {
-const std::string TEST_MORPHOLOGY_FILENAME =
-    std::string( BRION_TESTDATA ) + "/h5/test_neuron.h5";
-const brion::URI TEST_MORPHOLOGY_URI =
-    brion::URI( "file://" + TEST_MORPHOLOGY_FILENAME );
-
-
 // Ellipsis promotes enums to ints, so we need to use int.
 #pragma clang diagnostic ignored "-Wnon-pod-varargs"
 const int UNDEFINED = brion::SECTION_UNDEFINED;

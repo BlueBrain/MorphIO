@@ -16,17 +16,4 @@
 # along with this library; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import sys as _sys
-
-if _sys.version_info[0] != ${USE_PYTHON_VERSION}:
-    raise ImportError("Invalid Python version")
-
-from ._brain import *
-
-from . import neuron
-
-# Import the test helper module if present
-try:
-    from ._brain import _test as test
-except ImportError as e:
-    pass
+from .._brain._neuron import *

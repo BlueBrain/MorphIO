@@ -1,5 +1,5 @@
-
-/* Copyright (c) 2006-2016, Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+ *                          Juan Hernando <juan.hernando@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -17,9 +17,15 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_BINDING_SPIKES_H
-#define BRAIN_BINDING_SPIKES_H
+#ifndef BRAIN_PYTHON_SUBMODULES
+#define BRAIN_PYTHON_SUBMODULES
 
-void export_Spikes();
+#include <boost/python.hpp>
 
+namespace brain
+{
+
+boost::python::scope exportSubmodule( const std::string& name );
+
+}
 #endif

@@ -17,7 +17,7 @@ out = h5py.File('test_neuron.h5', 'w')
 
 def createTBranchPoints():
     # Creates a branch with a T shape
-    # The first section is a non-homogeneous distance sampling of 10 points
+    # The first section is a non-homogeneous distance sampling of 11 points
     # on a straight line from (0, 0, 0) to (0, 5, 5).
     first = [[0, i*i / 20.0, i*i / 20.0, 0.5 + i*i/1000.0] for i in range(11)]
     # The second section is an homogeneous sampling from (0, 5, 5) to (-2, 5, 5)
@@ -35,7 +35,7 @@ points = numpy.array([[.1, .0, .0, .1], [.0, .1, .0, .1],
                       [-.1, .0, .0, .1], [.0, -.1, .0, .1]])
 structure = numpy.array([[0, 1, -1]])
 
-# Axon section
+# Axon section to the bottom
 structure = numpy.append(
     structure, createTBranchStructure(points.shape[0], structure.shape[0], AXON),
     axis=0)

@@ -1,6 +1,4 @@
-
-/* Copyright (c) 2006-2016, Ahmet Bilgili <ahmet.bilgili@epfl.ch>
- *                          Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2016, Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -18,9 +16,31 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_BINDING_SPIKEREPORTWRITER_H
-#define BRAIN_BINDING_SPIKEREPORTWRITER_H
+#ifndef BRION_USE_BBPTESTDATA
+namespace brain { void export_test() {} }
+#else
 
-void export_SpikeReportWriter();
+#include <boost/python.hpp>
 
+#include "submodules.h"
+
+#include <BBP/TestDatasets.h>
+
+namespace brain
+{
+
+void export_test()
+{
+    boost::python::list configs;
+    for( const auto& config : bbp::test::getBlueconfigs( ))
+        configs.append( config );
+
+    boost::python::scope test = brain::exportSubmodule("test");
+
+    test.attr("blue_config") = bbp::test::getBlueconfig();
+    test.attr("blue_configs") = configs;
+    test.attr("circuit_config") = bbp::test::getCircuitconfig();
+}
+
+}
 #endif

@@ -58,7 +58,7 @@ template<typename T> void _allocate( T& data, const size_t size )
 }
 }
 
-struct Synapses::Impl
+struct Synapses::Impl : public Synapses::BaseImpl
 {
     Impl( const Circuit& circuit, const GIDSet& gids, const GIDSet& filterGIDs,
           const bool afferent, const SynapsePrefetch prefetch )
@@ -402,8 +402,9 @@ Synapses& Synapses::operator=( Synapses&& rhs )
 
 size_t Synapses::size() const
 {
-    lunchbox::ScopedRead mutex( _impl->_lock );
-    return _impl->_size;
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    lunchbox::ScopedRead mutex( impl._lock );
+    return impl._size;
 }
 
 bool Synapses::empty() const
@@ -428,170 +429,198 @@ Synapse Synapses::operator[]( const size_t index_ ) const
 
 const size_t* Synapses::indices() const
 {
-    lunchbox::ScopedRead mutex( _impl->_lock );
-    if( !_impl->_index )
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    lunchbox::ScopedRead mutex( impl._lock );
+    if( !impl._index )
         LBTHROW( std::runtime_error( "No synapse index file available" ));
-    return _impl->_index.get();
+    return impl._index.get();
 }
 
 const uint32_t* Synapses::preGIDs() const
 {
-    return _impl->_preGID.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    return impl._preGID.get();
 }
 
 const uint32_t* Synapses::preSectionIDs() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_preSectionID.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._preSectionID.get();
 }
 
 const uint32_t* Synapses::preSegmentIDs() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_preSegmentID.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._preSegmentID.get();
 }
 
 const float* Synapses::preDistances() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_preDistance.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._preDistance.get();
 }
 
 const float* Synapses::preSurfaceXPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_preSurfacePositionX.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._preSurfacePositionX.get();
 }
 
 const float* Synapses::preSurfaceYPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_preSurfacePositionY.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._preSurfacePositionY.get();
 }
 
 const float* Synapses::preSurfaceZPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_preSurfacePositionZ.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._preSurfacePositionZ.get();
 }
 
 const float* Synapses::preCenterXPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_preCenterPositionX.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._preCenterPositionX.get();
 }
 
 const float* Synapses::preCenterYPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_preCenterPositionY.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._preCenterPositionY.get();
 }
 
 const float* Synapses::preCenterZPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_preCenterPositionZ.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._preCenterPositionZ.get();
 }
 
 const uint32_t* Synapses::postGIDs() const
 {
-    return _impl->_postGID.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    return impl._postGID.get();
 }
 
 const uint32_t* Synapses::postSectionIDs() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_postSectionID.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._postSectionID.get();
 }
 
 const uint32_t* Synapses::postSegmentIDs() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_postSegmentID.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._postSegmentID.get();
 }
 
 const float* Synapses::postDistances() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_postDistance.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._postDistance.get();
 }
 
 const float* Synapses::postSurfaceXPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_postSurfacePositionX.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._postSurfacePositionX.get();
 }
 
 const float* Synapses::postSurfaceYPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_postSurfacePositionY.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._postSurfacePositionY.get();
 }
 
 const float* Synapses::postSurfaceZPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_postSurfacePositionZ.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._postSurfacePositionZ.get();
 }
 
 const float* Synapses::postCenterXPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_postCenterPositionX.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._postCenterPositionX.get();
 }
 
 const float* Synapses::postCenterYPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_postCenterPositionY.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._postCenterPositionY.get();
 }
 
 const float* Synapses::postCenterZPositions() const
 {
-    _impl->_ensurePositions();
-    return _impl->_postCenterPositionZ.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensurePositions();
+    return impl._postCenterPositionZ.get();
 }
 
 const float* Synapses::delays() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_delay.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._delay.get();
 }
 
 const float* Synapses::conductances() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_conductance.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._conductance.get();
 }
 
 const float* Synapses::utilizations() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_utilization.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._utilization.get();
 }
 
 const float* Synapses::depressions() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_depression.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._depression.get();
 }
 
 const float* Synapses::facilitations() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_facilitation.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._facilitation.get();
 }
 
 const float* Synapses::decays() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_decay.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._decay.get();
 }
 
-const int* Synapses::efficacys() const
+const int* Synapses::efficacies() const
 {
-    _impl->_ensureAttributes();
-    return _impl->_efficacy.get();
+    const Impl& impl = static_cast< const Impl& >( *_impl );
+    impl._ensureAttributes();
+    return impl._efficacy.get();
 }
 
 }
