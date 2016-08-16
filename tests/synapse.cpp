@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE( parallel_read )
     {
         const brion::SynapseMatrix& data = synapseFile.read( i,
                                               brion::SYNAPSE_CONNECTED_NEURON );
-        connectedNeurons[i] = data[0][0];
+        connectedNeurons[i-1] = data[0][0];
         gids.insert( i );
     }
 
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE( parallel_read )
     {
         const brion::SynapseMatrix& data = synapseFile.read( i,
                                                 brion::SYNAPSE_ALL_ATTRIBUTES );
-        TS_BOOST_CHECK_EQUAL( connectedNeurons[i], data[0][0] );
+        TS_BOOST_CHECK_EQUAL( connectedNeurons[i-1], data[0][0] );
         TS_BOOST_CHECK_GT( synapseFile.getNumSynapses( gids ), 0 );
     }
 }

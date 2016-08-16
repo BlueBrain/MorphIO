@@ -161,7 +161,7 @@ Thread-safey is only guaranteed for const access.
          * @param min The minimum end time until which spikes will be read. If
          *        UNDEFINED_TIMESTAMP, it will be considered as -infinite. This
          *        means that as much data as possible will be fetched without
-         *        a minumum.
+         *        a minimum.
          * @throw std::logic_error if one of the preconditions is not fulfilled.
          */
         boost::future< Spikes > read( float min );

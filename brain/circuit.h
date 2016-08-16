@@ -58,7 +58,7 @@ public:
      */
     BRAIN_API explicit Circuit( const brion::BlueConfig& blueConfig );
 
-    BRAIN_API  ~Circuit();
+    BRAIN_API ~Circuit();
 
     /**
      * @return The set of GIDs for the given target name.
@@ -90,7 +90,7 @@ public:
 
     /**
      * @return The list of morpholgies for the GID set. If local coordinates
-     *         are requested, morpholgies that are repeated in the circuit
+     *         are requested, morphologies that are repeated in the circuit
      *         will shared the same Morphology object in the list. If global
      *         coordinates are requested, all Morphology objects are unique.
      */

@@ -89,16 +89,16 @@ public:
 
     BRAIN_API ~Morphology();
 
-    /** @copydoc brion::Morphology::getPoints */
+    /** @sa brion::Morphology::readPoints */
     BRAIN_API const Vector4fs& getPoints() const;
 
-    /** @copydoc brion::Morphology::getSections */
+    /** @sa brion::Morphology::readSections */
     BRAIN_API const Vector2is& getSections() const;
 
-    /** @copydoc brion::Morphology::getSectionTypes */
+    /** @sa brion::Morphology::readSectionTypes */
     BRAIN_API const SectionTypes& getSectionTypes() const;
 
-    /** @copydoc brion::Morphology::getApicals */
+    /** @sa brion::Morphology::readApicals */
     BRAIN_API const Vector2is& getApicals() const;
 
     /** Return the list of ids for the given section types. */
