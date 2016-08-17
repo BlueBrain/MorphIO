@@ -26,7 +26,7 @@
 #include <brain/neuron/types.h>
 
 #include <vmmlib/matrix.hpp> // return value
-#include <boost/noncopyable.hpp>
+#include <memory>
 
 namespace brain
 {
@@ -36,7 +36,7 @@ namespace brain
  * This class provides convenience functions to access information about the
  * cells inside the circuit and their morphologies.
  */
-class Circuit : public boost::noncopyable
+class Circuit
 {
 public:
     /** Coordinate system to use for circuit morphologies */
@@ -120,15 +120,53 @@ public:
 
     /** @return The local to world transformations of the given cells. */
     BRAIN_API Matrix4fs getTransforms( const GIDSet& gids ) const;
+
     /** @return The local to world rotation of the given cells. */
     BRAIN_API Quaternionfs getRotations( const GIDSet& gids ) const;
+
     /** @return The number of neurons in the circuit. */
     BRAIN_API size_t getNumNeurons() const;
+
+    /**
+     * Access all afferent synapses of the given GIDs.
+     *
+     * @param gids the gids to load afferent synapses for
+     * @param prefetch which synapse data to load on SynapsesStream.read()
+     * @return synapse data stream
+     */
+    BRAIN_API SynapsesStream getAfferentSynapses( const GIDSet& gids,
+                         SynapsePrefetch prefetch = SYNAPSEPREFETCH_ALL ) const;
+
+    /**
+     * Access all efferent synapses of the given GIDs.
+     *
+     * @param gids the gids to load efferent synapses for
+     * @param prefetch which synapse data to load on SynapsesStream.read()
+     * @return synapse data stream
+     */
+    BRAIN_API SynapsesStream getEfferentSynapses( const GIDSet& gids,
+                         SynapsePrefetch prefetch = SYNAPSEPREFETCH_ALL ) const;
+
+    /**
+     * Access all synapses along the projection from the pre- to the postGIDs.
+     *
+     * @param preGIDs the gids to load the efferent synapses for
+     * @param postGIDs the gids to load the afferent synapses for
+     * @param prefetch which synapse data to load on SynapsesStream.read()
+     * @return synapse data stream
+     */
+    BRAIN_API SynapsesStream getProjectedSynapses( const GIDSet& preGIDs,
+                                                   const GIDSet& postGIDs,
+                         SynapsePrefetch prefetch = SYNAPSEPREFETCH_ALL ) const;
 
     class Impl; //!< @internal, public for inheritance MVD2/3 impls
 
 private:
-    Impl* _impl;
+    Circuit( const Circuit& ) = delete;
+    Circuit& operator=( const Circuit& ) = delete;
+
+    friend class Synapses;
+    std::unique_ptr< const Impl > _impl;
 };
 
 }

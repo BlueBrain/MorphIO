@@ -20,18 +20,23 @@
 #ifndef BRAIN_TYPES
 #define BRAIN_TYPES
 
+#include <brain/enums.h>
 #include <brion/types.h>
 
 /** @namespace brain Algorithmic interface to Blue Brain data model */
 namespace brain
 {
 
-using namespace brion::enums;
+using namespace brain::enums;
 
 class Circuit;
 class Spikes;
 class SpikeReportReader;
 class SpikeReportWriter;
+class Synapse;
+class Synapses;
+class SynapsesIterator;
+class SynapsesStream;
 
 using vmml::Matrix4f;
 using vmml::Quaternionf;
@@ -56,5 +61,18 @@ typedef std::vector< Quaternionf > Quaternionfs;
 
 typedef boost::shared_ptr< SpikeReportReader > SpikeReportReaderPtr;
 typedef boost::shared_ptr< SpikeReportWriter > SpikeReportWriterPtr;
+
+/**
+ * The GID of a synapse is the a tuple of two numbers:
+ * - The GID of the post-synaptic cell.
+ * - The index of the synapse in the array of afferent contacts
+ *   of the post-synaptic cell before pruning/filtering.
+ * GIDs are invariant regardless of how the structural touches are
+ * converted into functional synapses during circuit building.
+ */
+typedef std::pair< uint32_t, size_t > SynapseGID;
+
+namespace detail { struct SynapsesStream; }
+
 }
 #endif

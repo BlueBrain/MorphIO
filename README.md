@@ -11,7 +11,7 @@ Mesh, Morphology, Synapse and Target files.
 Brion can be retrieved by cloning the
 [source code](https://github.com/BlueBrain/Brion.git).
 The [latest API documentation]
-(http://bluebrain.github.io/Brion-1.7/index.html) can be found on
+(http://bluebrain.github.io/Brion-1.9/index.html) can be found on
 [bluebrain.github.io](http://bluebrain.github.io).
 
 To keep track of the changes between releases check the [changelog](@ref Changelog).
@@ -20,8 +20,8 @@ To keep track of the changes between releases check the [changelog](@ref Changel
 
 Brion provides two libraries Brion and Brain. The former is a collection of file
 readers and writers intended for low level access to the data model. The latter
-is a set of higher level classes that wrap low level data objects with a more
-user friendly API.
+is a set of higher level classes that wrap low level data objects with a
+use-case oriented API.
 
 ## IO library
 
@@ -45,15 +45,17 @@ and writing files which store the Blue Brain data model.
 * Basic [data types](@ref brion/types.h) to work with the loaded data using
   [Boost](http://www.boost.org/doc/libs),
   [Lunchbox](http://eyescale.github.io/Lunchbox-1.14/index.html),
-  [vmmlib](http://eyescale.github.io/vmmlib-1.11/index.html).
+  [vmmlib](http://eyescale.github.io/vmmlib-1.12/index.html).
 
 ## High level library
 
 The higher level library is called Brain and it provides:
 
-* brain::Circuit to facilitate loading information about cells and
-  morphologies in local and global circuit coordinates.
-* brain::neuron::Morphology with higher level functions to deal with morphologies.
+* brain::Circuit to facilitate loading information about cells, morphologies (in
+  local and global circuit coordinates) and synapses.
+* brain::neuron::Morphology with higher level functions to deal with
+  morphologies.
+* brain::Synapses and brain::Synapse for array and object access to synapses.
 
 # Building {#Building}
 
@@ -62,7 +64,7 @@ system, including all Unix variants. Brion uses CMake to create a
 platform-specific build environment. The following platforms and build
 environments are tested:
 
-* Linux: Ubuntu 14.04 and RHEL 6 (Makefile, i386, x64)
+* Linux: Ubuntu 14.04 & 16.04 and RHEL 6 (Makefile, i386, x64)
 
 Building from source is as simple as:
 

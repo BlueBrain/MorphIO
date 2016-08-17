@@ -162,7 +162,7 @@ SynapseSummary::~SynapseSummary()
     delete _impl;
 }
 
-SynapseSummaryMatrix SynapseSummary::read( const uint32_t gid )
+SynapseSummaryMatrix SynapseSummary::read( const uint32_t gid ) const
 {
     return _impl->read( gid );
 }

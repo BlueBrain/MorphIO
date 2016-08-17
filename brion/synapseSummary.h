@@ -58,7 +58,7 @@ public:
      *         synapses for each connected neuron
      * @version 1.0
      */
-    BRION_API SynapseSummaryMatrix read( const uint32_t gid );
+    BRION_API SynapseSummaryMatrix read( const uint32_t gid ) const;
     //@}
 
 private:

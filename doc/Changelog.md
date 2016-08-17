@@ -3,6 +3,10 @@ Changelog {#Changelog}
 
 # Release 1.9.0 (git master)
 
+* [85](https://github.com/BlueBrain/Brion/pull/85):
+  Implement brain synapses specification
+* [84](https://github.com/BlueBrain/Brion/pull/84):
+  Brain synapses specification
 * [83](https://github.com/BlueBrain/Brion/pull/83):
   Add brain::Circuit::getRandomGIDs()
 * [82](https://github.com/BlueBrain/Brion/pull/82):
