@@ -303,11 +303,7 @@ URI BlueConfig::getReportSource( const std::string& report ) const
         return URI( std::string( "file://" ) + _impl->getOutputRoot() + "/" +
                     report + ".h5" );
 
-    if( format == "stream" || format == "leveldb" || format == "skv" )
-        return URI( _impl->getOutputRoot( ));
-
-    LBWARN << "Unknown report format " << format << std::endl;
-    return URI();
+    return URI( _impl->getOutputRoot( ));
 }
 
 URI BlueConfig::getSpikeSource() const
