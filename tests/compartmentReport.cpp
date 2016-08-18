@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -38,9 +38,6 @@
 #include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
 #include <lunchbox/log.h>
-#ifdef LUNCHBOX_USE_SKV
-#  include <FxLogger/FxLogger.hpp>
-#endif
 
 using boost::lexical_cast;
 
@@ -342,10 +339,6 @@ BOOST_AUTO_TEST_CASE( test_convert_and_compare )
     const boost::filesystem::path& temp = createUniquePath();
     std::vector< brion::URI > uris;
 
-#ifdef LUNCHBOX_USE_SKV
-    FxLogger_Init( "compartmentReport" );
-    uris.push_back( brion::URI( "skv://" ));
-#endif
     uris.push_back( brion::URI( temp.string() + ".h5" ));
     uris.push_back( brion::URI( "leveldb://" ));
 
