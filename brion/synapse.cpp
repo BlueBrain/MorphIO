@@ -315,7 +315,9 @@ private:
     void _createIndex( const fs::path& dir, const std::string& filename )
     {
         // extract the GID->file mapping from the merge_nrn.sh script
-        const fs::path merge_nrn = dir / "merge_nrn.sh";
+        const bool afferent = filename.find( "efferent" ) == std::string::npos;
+        const fs::path merge_nrn = dir / (afferent ? "merge_nrn.sh"
+                                                   : "merge_nrn_efferent.sh");
         const std::ifstream mergeFile( merge_nrn.generic_string().c_str( ));
         if( !mergeFile.is_open( ))
         {

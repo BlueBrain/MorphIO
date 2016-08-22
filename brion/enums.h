@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-/** @file enums.h Enumerations used in Brion. */
+/** @file brion/enums.h Enumerations used in Brion. */
 
 #ifndef BRION_ENUMS
 #define BRION_ENUMS
@@ -26,7 +26,6 @@
 
 namespace brion
 {
-/** @namespace enums Enumeration definitions */
 namespace enums
 {
 

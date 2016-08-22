@@ -39,7 +39,9 @@ common_find_package_post()
 list(APPEND BRION_DEPENDENT_LIBRARIES Boost Lunchbox Servus vmmlib)
 
 add_subdirectory(brion)
-add_subdirectory(brain)
+if(NOT COMMON_USE_CXX03)
+  add_subdirectory(brain)
+endif()
 add_subdirectory(apps)
 add_subdirectory(tests)
 
