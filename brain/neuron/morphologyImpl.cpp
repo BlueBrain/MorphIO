@@ -177,7 +177,7 @@ Vector4fs Morphology::Impl::getSectionSamples( const uint32_t sectionID ) const
 }
 
 Vector4fs Morphology::Impl::getSectionSamples( const uint32_t sectionID,
-                                         const floats& samplePoints ) const
+                                               const floats& samplePoints ) const
 {
     const SectionRange range = getSectionRange( sectionID );
 
@@ -206,10 +206,20 @@ Vector4fs Morphology::Impl::getSectionSamples( const uint32_t sectionID,
                 index < accumLengths.size() - 1; ++index )
             ;
 
+        // If the first point of the section is repeated and we are interpolating
+        // at 0 length - accumLengths[0] and accumLengths[1] - accumLengths[0]
+        // will be both 0. To avoid the 0/0 operation we check for
+        // length == accumLengths[index].
+        const size_t start = range.first + index;
+        if( length == accumLengths[index] )
+        {
+            result.push_back(( *points )[start] );
+            continue;
+        }
+
         // Interpolating the cross section at point.
         const float alpha = ( length - accumLengths[index] ) /
-                          ( accumLengths[index + 1] - accumLengths[index] );
-        const size_t start = range.first + index;
+                            ( accumLengths[index + 1] - accumLengths[index] );
         const Vector4f sample = ( *points )[start + 1] * alpha +
                                 ( *points )[start] * (1 - alpha );
         result.push_back( sample );
