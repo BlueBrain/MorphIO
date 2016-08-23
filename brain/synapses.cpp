@@ -63,20 +63,20 @@ struct Synapses::Impl
     Impl( const Circuit& circuit, const GIDSet& gids, const GIDSet& filterGIDs,
           const bool afferent, const SynapsePrefetch prefetch )
         : _circuit( circuit )
-        , _gids( prefetch != SYNAPSEPREFETCH_ALL ? gids : GIDSet( ))
-        , _filterGIDs( prefetch != SYNAPSEPREFETCH_ALL ? filterGIDs : GIDSet( ))
+        , _gids( prefetch != SynapsePrefetch::all ? gids : GIDSet( ))
+        , _filterGIDs( prefetch != SynapsePrefetch::all ? filterGIDs : GIDSet( ))
         , _afferent( afferent )
         , _size( 0 )
     {
-        if( prefetch == SYNAPSEPREFETCH_NONE )
+        if( prefetch == SynapsePrefetch::none )
         {
             _loadConnectivity( gids, filterGIDs );
             return;
         }
 
-        if( prefetch & SYNAPSEPREFETCH_ATTRIBUTES )
+        if( int( prefetch ) & int( SynapsePrefetch::attributes ))
             _loadAttributes( gids, filterGIDs );
-        if( prefetch & SYNAPSEPREFETCH_POSITIONS )
+        if( int( prefetch ) & int( SynapsePrefetch::positions ))
             _loadPositions( gids, filterGIDs );
     }
 

@@ -67,7 +67,7 @@ public:
     /** Return the ID of this section. */
     BRAIN_API uint32_t getID() const;
 
-    /** Return the morphological type of this section (dedrite, axon, ...). */
+    /** Return the morphological type of this section (dendrite, axon, ...). */
     BRAIN_API SectionType getType() const;
 
     /**

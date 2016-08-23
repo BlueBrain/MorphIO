@@ -41,11 +41,11 @@ BOOST_AUTO_TEST_CASE( projection )
     const brain::Synapses& syn1 =
        circuit.getProjectedSynapses( circuit.getGIDs( "Layer1" ),
                                      circuit.getGIDs( "Layer2" ),
-                                     brain::SYNAPSEPREFETCH_NONE );
+                                     brain::SynapsePrefetch::none );
     const brain::Synapses& syn2 =
        circuit.getProjectedSynapses( circuit.getGIDs( "Layer2" ),
                                      circuit.getGIDs( "Layer1" ),
-                                     brain::SYNAPSEPREFETCH_NONE );
+                                     brain::SynapsePrefetch::none );
     BOOST_CHECK_NE( syn1.size(), syn2.size( ));
     BOOST_CHECK_EQUAL( syn1.size(), 895 );
     BOOST_CHECK_EQUAL( syn2.size(), 353 );
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE( projection_stream )
     brain::SynapsesStream stream =
        circuit.getProjectedSynapses( circuit.getGIDs( "Layer2" ),
                                      circuit.getGIDs( "Layer5" ),
-                                     brain::SYNAPSEPREFETCH_POSITIONS );
+                                     brain::SynapsePrefetch::positions );
     const size_t remaining = 130;
     BOOST_CHECK_EQUAL( stream.getRemaining(), remaining );
     std::future< brain::Synapses > future = stream.read();
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE( lazy_loading_afferent )
             circuit.getAfferentSynapses( circuit.getGIDs( "Layer1" ));
     const brain::Synapses& synapsesLazy =
             circuit.getAfferentSynapses( circuit.getGIDs( "Layer1" ),
-                                         brain::SYNAPSEPREFETCH_NONE );
+                                         brain::SynapsePrefetch::none );
     BOOST_CHECK_EQUAL( synapses.size(), synapsesLazy.size() );
     BOOST_CHECK_EQUAL( synapses[0].getPresynapticGID(),
                        synapsesLazy[0].getPresynapticGID( ));
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE( lazy_loading_efferent )
             circuit.getEfferentSynapses( circuit.getGIDs( "Layer1" ));
     const brain::Synapses& synapsesLazy =
             circuit.getEfferentSynapses( circuit.getGIDs( "Layer1" ),
-                                         brain::SYNAPSEPREFETCH_NONE );
+                                         brain::SynapsePrefetch::none );
     BOOST_CHECK_EQUAL( synapses.size(), synapsesLazy.size() );
     BOOST_CHECK_EQUAL( synapses[0].getPresynapticGID(),
                        synapsesLazy[0].getPresynapticGID( ));
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE( lazy_loading_pathway )
     const brain::Synapses& synapsesLazy =
             circuit.getProjectedSynapses( circuit.getGIDs( "Layer2" ),
                                           circuit.getGIDs( "Layer4" ),
-                                          brain::SYNAPSEPREFETCH_NONE );
+                                          brain::SynapsePrefetch::none );
     BOOST_CHECK_EQUAL( synapses.size(), synapsesLazy.size() );
     BOOST_CHECK_EQUAL( synapses[0].getPresynapticGID(),
                        synapsesLazy[0].getPresynapticGID( ));
@@ -196,7 +196,7 @@ BOOST_AUTO_TEST_CASE( copy )
     const brain::Circuit circuit( brion::URI( BBP_TEST_BLUECONFIG3 ));
     const brain::Synapses& synapses =
             circuit.getAfferentSynapses( circuit.getGIDs( "Layer1" ),
-                                         brain::SYNAPSEPREFETCH_NONE );
+                                         brain::SynapsePrefetch::none );
 
     const brain::Synapses synapsesCopy = synapses;
 
@@ -218,7 +218,7 @@ BOOST_AUTO_TEST_CASE( full_copy )
     const brain::Circuit circuit( brion::URI( BBP_TEST_BLUECONFIG3 ));
     const brain::Synapses& synapses =
             circuit.getAfferentSynapses( circuit.getGIDs( "Layer1" ),
-                                         brain::SYNAPSEPREFETCH_ALL );
+                                         brain::SynapsePrefetch::all );
 
     const brain::Synapses synapsesCopy = synapses;
 
@@ -234,7 +234,7 @@ BOOST_AUTO_TEST_CASE( check_all_synapse_attributes )
     const brain::Circuit circuit( brion::URI( BBP_TEST_BLUECONFIG3 ));
     const brain::Synapses& synapses =
             circuit.getAfferentSynapses( brion::GIDSet{1},
-                                         brain::SYNAPSEPREFETCH_ALL );
+                                         brain::SynapsePrefetch::all );
     BOOST_CHECK_EQUAL( synapses.size(), 77 );
 
     const brain::Synapse& synapse = synapses[0];

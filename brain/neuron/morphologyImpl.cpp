@@ -36,7 +36,7 @@ namespace neuron
 namespace
 {
 template< typename T >
-void _serializeArray( uint8_t*& dst,
+void _serializeArray( unsigned char*& dst,
                       const boost::shared_ptr< std::vector< T > >& src )
 {
     const size_t arraySize = src->size();
@@ -48,7 +48,7 @@ void _serializeArray( uint8_t*& dst,
 
 template< typename T >
 void _deserializeArray( boost::shared_ptr< std::vector< T > >& dst,
-                        const uint8_t*& src )
+                        const unsigned char*& src )
 {
     const size_t arraySize = *reinterpret_cast< const size_t* >( src );
     src += sizeof(size_t);
@@ -66,16 +66,14 @@ Morphology::Impl::Impl( const void* data, const size_t size )
 }
 
 Morphology::Impl::Impl( const brion::Morphology& morphology )
-    : points( morphology.readPoints( MORPHOLOGY_UNDEFINED ))
-    , sections( morphology.readSections( MORPHOLOGY_UNDEFINED ))
+    : points( morphology.readPoints( brion::enums::MORPHOLOGY_UNDEFINED ))
+    , sections( morphology.readSections( brion::enums::MORPHOLOGY_UNDEFINED ))
     , types( morphology.readSectionTypes( ))
     , apicals( morphology.readApicals( ))
 {
     _extractChildrenLists();
 
-    const uint32_ts ids =
-        getSectionIDs( SectionTypes( 1, SECTION_SOMA ), false );
-
+    const uint32_ts ids = getSectionIDs({ SectionType::soma }, false );
     if( ids.size() != 1 )
         LBTHROW( std::runtime_error(
                     "Bad input morphology. None or more than one soma found" ));
@@ -84,18 +82,17 @@ Morphology::Impl::Impl( const brion::Morphology& morphology )
 
 bool Morphology::Impl::_fromBinary( const void* data, const size_t size )
 {
-    const uint8_t* ptr = reinterpret_cast< const uint8_t* >( data );
+    const unsigned char* ptr = reinterpret_cast< const unsigned char* >( data );
 
     _deserializeArray( points, ptr );
     _deserializeArray( sections, ptr );
     _deserializeArray( types, ptr );
-    if( size_t(ptr - reinterpret_cast< const uint8_t* >( data )) < size )
+    if( size_t(ptr - reinterpret_cast< const unsigned char* >( data )) < size )
         _deserializeArray( apicals, ptr );
 
     _extractChildrenLists();
 
-    const uint32_ts ids =
-        getSectionIDs( SectionTypes( 1, SECTION_SOMA ), false );
+    const uint32_ts ids = getSectionIDs({ SectionType::soma }, false );
 
     if( ids.size() != 1 )
         LBTHROW( std::runtime_error(
@@ -114,7 +111,7 @@ servus::Serializable::Data Morphology::Impl::_toBinary() const
     if( !apicals->empty( ))
         data.size += sizeof(size_t) + sizeof(brion::Vector2i) * apicals->size();
 
-    uint8_t* ptr = new uint8_t[data.size];
+    unsigned char* ptr = new unsigned char[data.size];
     data.ptr.reset( ptr );
 
     _serializeArray( ptr, points );
@@ -137,17 +134,17 @@ SectionRange Morphology::Impl::getSectionRange( const uint32_t sectionID ) const
 uint32_ts Morphology::Impl::getSectionIDs(
     const SectionTypes& requestedTypes, const bool excludeSoma ) const
 {
-    std::bitset< SECTION_APICAL_DENDRITE > bits;
+    std::bitset< size_t( SectionType::apicalDendrite )> bits;
     BOOST_FOREACH( const SectionType type, requestedTypes )
     {
-        if( type != SECTION_SOMA || !excludeSoma )
+        if( type != SectionType::soma || !excludeSoma )
             bits[size_t( type )] = true;
     }
 
     uint32_ts result;
     for( size_t i = 0; i != types->size(); ++i )
     {
-        const SectionType type = ( *types )[i];
+        const SectionType type = static_cast< SectionType >(( *types )[i] );
         if( bits[size_t( type )] )
             result.push_back( i );
     }
@@ -161,7 +158,7 @@ float Morphology::Impl::getSectionLength( const uint32_t sectionID ) const
 
     float& length = _sectionLengths[sectionID];
 
-    if( length == 0 && ( *types )[sectionID] != SECTION_SOMA )
+    if( length == 0 && ( *types )[sectionID] != brion::enums::SECTION_SOMA )
         length = _computeSectionLength( sectionID );
     return length;
 }
@@ -182,7 +179,7 @@ Vector4fs Morphology::Impl::getSectionSamples( const uint32_t sectionID,
     const SectionRange range = getSectionRange( sectionID );
 
     // If the section is the soma return directly the soma position.
-    if(( *types )[sectionID] == SECTION_SOMA )
+    if(( *types )[sectionID] == brion::enums::SECTION_SOMA )
         // This code shouldn't be reached.
         LBTHROW( std::runtime_error( "Invalid method called on soma section" ));
 
@@ -240,7 +237,7 @@ float Morphology::Impl::getDistanceToSoma( const uint32_t sectionID ) const
         // been computed yet. Soma and first order sections are cheap
         // to detect and compute.
         const int32_t parent = ( *sections )[sectionID][1];
-        if( parent == -1 || ( *types )[parent] == SECTION_SOMA )
+        if( parent == -1 || ( *types )[parent] == brion::enums::SECTION_SOMA )
             return 0;
         // For the other cases it doesn't matter to have concurrent updates
         // because they will yield the same result (and it's probably
