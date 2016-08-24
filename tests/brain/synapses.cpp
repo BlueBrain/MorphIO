@@ -76,9 +76,9 @@ BOOST_AUTO_TEST_CASE( projection_stream )
         ++i;
         BOOST_CHECK_EQUAL( stream.getRemaining(), remaining - i );
 
-        const float* __restrict__ posx = synapses.preSurfacePositionX();
-        const float* __restrict__ posy = synapses.preSurfacePositionY();
-        const float* __restrict__ posz = synapses.preSurfacePositionZ();
+        const float* __restrict__ posx = synapses.preSurfaceXPositions();
+        const float* __restrict__ posy = synapses.preSurfaceYPositions();
+        const float* __restrict__ posz = synapses.preSurfaceZPositions();
 
         for( size_t j = 0; j < synapses.size(); ++j )
             bbox.merge( vmml::Vector3f( posx[j], posy[j], posz[j] ));
