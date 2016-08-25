@@ -115,7 +115,17 @@ void _shuffle( T& container )
     std::mt19937_64 randomEngine( randomDevice( ));
     const char* seedEnv = getenv( "BRAIN_CIRCUIT_SEED" );
     if( seedEnv )
-        randomEngine.seed( std::stoul( seedEnv ));
+    {
+        try
+        {
+            randomEngine.seed( std::stoul( seedEnv ));
+        }
+        catch( const std::exception& exc )
+        {
+            LBWARN << "Could not set BRAIN_CIRCUIT_SEED to " << seedEnv << ": "
+                   << exc.what() << std::endl;
+        }
+    }
     std::shuffle( container.begin(), container.end(), randomEngine );
 }
 
@@ -156,8 +166,18 @@ public:
     {
         if( _targetParsers.empty( ))
         {
-            BOOST_FOREACH( const URI& uri, _targetSources )
-                _targetParsers.push_back( brion::Target( uri.getPath( )));
+            for( const URI& uri : _targetSources )
+            {
+                try
+                {
+                    _targetParsers.push_back( brion::Target( uri.getPath( )));
+                }
+                catch( const std::runtime_error& exc )
+                {
+                    LBWARN << "Failed to load targets from " << uri.getPath()
+                           << ": " << exc.what() << std::endl;
+                }
+            }
         }
         return brion::Target::parse( _targetParsers, target );
     }

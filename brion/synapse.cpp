@@ -267,6 +267,8 @@ public:
         }
         catch( const std::runtime_error& )
         {
+            LBINFO << "No merged synapse file found at " << source << std::endl;
+
             const fs::path sourcePath( source );
             const fs::path dir = sourcePath.parent_path();
             const std::string filename = sourcePath.filename().generic_string();
