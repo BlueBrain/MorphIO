@@ -108,8 +108,19 @@ std::string toString( const std::string& in ) { return in; }
 size_t toSize_t( const std::string& in ) { return std::stoul( in ); }
 size_t nop( const size_t& in ) { return in; }
 
-typedef boost::unordered_map< std::string, neuron::MorphologyPtr > Loaded;
+template<typename T>
+void _shuffle( T& container )
+{
+    std::random_device randomDevice;
+    std::mt19937_64 randomEngine( randomDevice( ));
+    const char* seedEnv = getenv( "BRAIN_CIRCUIT_SEED" );
+    if( seedEnv )
+        randomEngine.seed( std::stoul( seedEnv ));
+    std::shuffle( container.begin(), container.end(), randomEngine );
 }
+
+typedef boost::unordered_map< std::string, neuron::MorphologyPtr > Loaded;
+} // anonymous namespace
 
 class Circuit::Impl
 {
@@ -120,11 +131,7 @@ public:
         , _synapseSource( config.getSynapseSource( ))
         , _targetSources( config.getTargetSources( ))
         , _cache( lunchbox::PersistentMap::createCache( ))
-        , _randomEngine( _randomDevice( ))
     {
-        const char* seedEnv = getenv( "BRAIN_CIRCUIT_SEED" );
-        if( seedEnv )
-            _randomEngine.seed( std::stoul( seedEnv ));
     }
 
     virtual ~Impl() {}
@@ -164,11 +171,7 @@ public:
 
         const GIDSet& gids = target.empty() ? getGIDs() : getGIDs( target );
         uint32_ts randomGids( gids.begin(), gids.end( ));
-#ifdef BRION_USE_CXX1
-        std::shuffle( randomGids.begin(), randomGids.end(), _randomEngine );
-#else
-        std::random_shuffle( randomGids.begin(), randomGids.end( ));
-#endif
+        _shuffle( randomGids );
         randomGids.resize( size_t( std::ceil( randomGids.size() * fraction )));
         return GIDSet( randomGids.begin(), randomGids.end( ));
     }
@@ -291,9 +294,6 @@ public:
     mutable std::unique_ptr< brion::Synapse > _synapseAttributes[2];
     mutable std::unique_ptr< brion::Synapse > _synapseExtra;
     mutable std::unique_ptr< brion::Synapse > _synapsePositions[2];
-
-    std::random_device _randomDevice;
-    std::mt19937_64 _randomEngine;
 };
 
 class MVD2 : public Circuit::Impl
