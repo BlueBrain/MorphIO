@@ -82,7 +82,7 @@ uint32_t Section::getID() const
 
 SectionType Section::getType() const
 {
-    return ( *_morphology->types )[_id];
+    return static_cast< SectionType >(( *_morphology->types )[_id] );
 }
 
 float Section::getLength() const

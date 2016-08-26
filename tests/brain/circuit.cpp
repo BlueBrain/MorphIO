@@ -251,9 +251,9 @@ BOOST_AUTO_TEST_CASE( test_gid_out_of_range )
         BOOST_CHECK_THROW( circuit->getElectrophysiologyTypes( gids ),
                            std::runtime_error );
         BOOST_CHECK_THROW( circuit->getRotations( gids ), std::runtime_error );
-        BOOST_CHECK_THROW(
-            circuit->loadMorphologies( gids, brain::Circuit::COORDINATES_LOCAL),
-            std::runtime_error );
+        BOOST_CHECK_THROW( circuit->loadMorphologies(
+                               gids, brain::Circuit::Coordinates::local),
+                           std::runtime_error );
     }
 }
 
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE( load_local_morphologies )
         gids.insert(gid);
     // This call also tests brain::Circuit::getMorphologyURIs
     const brain::neuron::Morphologies morphologies =
-        circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_LOCAL );
+        circuit.loadMorphologies( gids, brain::Circuit::Coordinates::local );
     BOOST_CHECK_EQUAL( morphologies.size(), gids.size( ));
 
     // Checking the first morphology
@@ -278,7 +278,7 @@ BOOST_AUTO_TEST_CASE( load_local_morphologies )
     gids.insert(4);
     gids.insert(6);
     const brain::neuron::Morphologies repeated =
-        circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_LOCAL );
+        circuit.loadMorphologies( gids, brain::Circuit::Coordinates::local );
 
     BOOST_CHECK_EQUAL( repeated.size(), gids.size( ));
     BOOST_CHECK_EQUAL( repeated[0].get(), repeated[2].get( ));
@@ -293,7 +293,7 @@ BOOST_AUTO_TEST_CASE( load_global_morphologies )
     for( uint32_t gid = 1; gid < 500; gid += 75)
         gids.insert(gid);
     const brain::neuron::Morphologies morphologies =
-        circuit.loadMorphologies( gids, brain::Circuit::COORDINATES_GLOBAL );
+        circuit.loadMorphologies( gids, brain::Circuit::Coordinates::global );
     BOOST_CHECK_EQUAL( morphologies.size(), gids.size( ));
 
     // Checking the first morphology

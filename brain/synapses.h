@@ -80,132 +80,132 @@ public:
      * @throw std::runtime_error if index information not found in the synapse
      *                           source of the circuit.
      */
-    BRAIN_API const size_t* index() const;
+    BRAIN_API const size_t* indices() const;
 
     /** @name Presynaptic topological and geometrical attributes */
     //@{
     /** @return the GIDs of the presynaptic neurons. */
-    BRAIN_API const uint32_t* preGID() const;
+    BRAIN_API const uint32_t* preGIDs() const;
 
     /** @return the section IDs on the presynaptic neurons. */
-    BRAIN_API const uint32_t* preSectionID() const;
+    BRAIN_API const uint32_t* preSectionIDs() const;
 
     /** @return the segment IDs on the presynaptic neurons. */
-    BRAIN_API const uint32_t* preSegmentID() const;
+    BRAIN_API const uint32_t* preSegmentIDs() const;
 
     /** @return the distances in micrometer to the presynaptic neurons. */
-    BRAIN_API const float* preDistance() const;
+    BRAIN_API const float* preDistances() const;
 
     /**
      * @return the presynaptic touch position x-coordinates on the surfaces of
      *         the segments.
      */
-    BRAIN_API const float* preSurfacePositionX() const;
+    BRAIN_API const float* preSurfaceXPositions() const;
 
     /**
      * @return the presynaptic touch position y-coordinates on the surfaces of
      *         the segments.
      */
-    BRAIN_API const float* preSurfacePositionY() const;
+    BRAIN_API const float* preSurfaceYPositions() const;
 
     /**
      * @return the presynaptic touch position z-coordinates on the surfaces of
      *         the segments.
      */
-    BRAIN_API const float* preSurfacePositionZ() const;
+    BRAIN_API const float* preSurfaceZPositions() const;
 
     /**
      * @return the presynaptic touch position x-coordinates in the center of the
      * segments.
      */
-    BRAIN_API const float* preCenterPositionX() const;
+    BRAIN_API const float* preCenterXPositions() const;
 
     /**
      * @return the presynaptic touch position y-coordinates in the center of the
      * segments.
      */
-    BRAIN_API const float* preCenterPositionY() const;
+    BRAIN_API const float* preCenterYPositions() const;
 
     /**
      * @return the presynaptic touch position z-coordinates in the center of the
      * segments.
      */
-    BRAIN_API const float* preCenterPositionZ() const;
+    BRAIN_API const float* preCenterZPositions() const;
     //@}
 
     /** @name Presynaptic topological and geometrical attributes */
     //@{
     /** @return the GIDs of the postsynaptic neurons. */
-    BRAIN_API const uint32_t* postGID() const;
+    BRAIN_API const uint32_t* postGIDs() const;
 
     /** @return the section IDs on the postsynaptic neurons. */
-    BRAIN_API const uint32_t* postSectionID() const;
+    BRAIN_API const uint32_t* postSectionIDs() const;
 
     /** @return the segment IDs on the postsynaptic neurons. */
-    BRAIN_API const uint32_t* postSegmentID() const;
+    BRAIN_API const uint32_t* postSegmentIDs() const;
 
     /** @return the distances in micrometer to the postsynaptic neurons. */
-    BRAIN_API const float* postDistance() const;
+    BRAIN_API const float* postDistances() const;
 
     /**
      * @return the postsynaptic touch position x-coordinates on the surfaces of
      *         the segments.
      */
-    BRAIN_API const float* postSurfacePositionX() const;
+    BRAIN_API const float* postSurfaceXPositions() const;
 
     /**
      * @return the postsynaptic touch position x-coordinates on the surfaces of
      *         the segments.
      */
-    BRAIN_API const float* postSurfacePositionY() const;
+    BRAIN_API const float* postSurfaceYPositions() const;
 
     /**
      * @return the postsynaptic touch position x-coordinates on the surfaces of
      *         the segments.
      */
-    BRAIN_API const float* postSurfacePositionZ() const;
+    BRAIN_API const float* postSurfaceZPositions() const;
 
     /**
      * @return the postsynaptic touch position x-coordinates in the center of
      *         the segments.
      */
-    BRAIN_API const float* postCenterPositionX() const;
+    BRAIN_API const float* postCenterXPositions() const;
 
     /**
      * @return the postsynaptic touch position y-coordinates in the center of
      *         the segments.
      */
-    BRAIN_API const float* postCenterPositionY() const;
+    BRAIN_API const float* postCenterYPositions() const;
 
     /**
      * @return the postsynaptic touch position z-coordinates in the center of
      *         the segments.
      */
-    BRAIN_API const float* postCenterPositionZ() const;
+    BRAIN_API const float* postCenterZPositions() const;
     //@}
 
     /** @name Synaptic model attributes */
     //@{
     /** @return the axonal delays in milliseconds. */
-    BRAIN_API const float* delay() const;
+    BRAIN_API const float* delays() const;
 
     /** @return the conductances in nanosiemens. */
-    BRAIN_API const float* conductance() const;
+    BRAIN_API const float* conductances() const;
 
     /** @return the neuro-transmitter release probabilities. */
-    BRAIN_API const float* utilization() const;
+    BRAIN_API const float* utilizations() const;
 
     /** @return the depression time constants in milliseconds. */
-    BRAIN_API const float* depression() const;
+    BRAIN_API const float* depressions() const;
 
     /** @return the facilitation time constants in milliseconds. */
-    BRAIN_API const float* facilitation() const;
+    BRAIN_API const float* facilitations() const;
 
     /** @return the decay time constants in milliseconds. */
-    BRAIN_API const float* decay() const;
+    BRAIN_API const float* decays() const;
 
     /** @return the absolute synaptic efficacies in millivolts. */
-    BRAIN_API const int* efficacy() const;
+    BRAIN_API const int* efficacys() const;
     //@}
 
 private:

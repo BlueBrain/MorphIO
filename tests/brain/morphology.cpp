@@ -144,7 +144,9 @@ void checkEqualMorphologies( const brain::neuron::Morphology& first,
                  first.getPoints( ));
     BOOST_CHECK( *second.readSections( brion::MORPHOLOGY_UNDEFINED ) ==
                  first.getSections( ));
-    BOOST_CHECK( *second.readSectionTypes() == first.getSectionTypes( ));
+    BOOST_CHECK( *second.readSectionTypes() ==
+                 reinterpret_cast< const brion::SectionTypes& >(
+                     first.getSectionTypes( )));
     BOOST_CHECK( *second.readApicals() == first.getApicals( ));
 }
 } // namespace
@@ -167,26 +169,27 @@ BOOST_AUTO_TEST_CASE( v2_morphology_constructors )
 BOOST_AUTO_TEST_CASE( get_section_ids )
 {
     brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
+    using brain::neuron::SectionType;
 
-    brion::SectionTypes types;
-    types.push_back( brion::SECTION_SOMA );
+    brain::neuron::SectionTypes types{ SectionType::soma };
     checkEqualArrays( morphology.getSectionIDs( types ), 1, 0 );
 
-    types.push_back( brion::SECTION_DENDRITE );
+    types.push_back( SectionType::dendrite );
     checkEqualArrays( morphology.getSectionIDs( types ),
                       7, 0, 4, 5, 6, 7, 8, 9 );
-    types.push_back( brion::SECTION_APICAL_DENDRITE );
+    types.push_back( SectionType::apicalDendrite );
     checkEqualArrays( morphology.getSectionIDs( types ),
                       10, 0, 4, 5, 6, 7, 8, 9, 10, 11, 12 );
     types.clear();
-    types.push_back( brion::SECTION_AXON );
-    types.push_back( brion::SECTION_DENDRITE );
+    types.push_back( SectionType::axon );
+    types.push_back( SectionType::dendrite );
     checkEqualArrays( morphology.getSectionIDs( types ),
                       9, 1, 2, 3, 4, 5, 6, 7, 8, 9 );
 }
 
 BOOST_AUTO_TEST_CASE( get_sections )
 {
+    using brain::neuron::SectionType;
     brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
 
     BOOST_CHECK_THROW( morphology.getSection( 0 ), std::runtime_error );
@@ -201,14 +204,14 @@ BOOST_AUTO_TEST_CASE( get_sections )
     BOOST_CHECK( section == morphology.getSection( 2 ));
 
     for( size_t i = 1; i < 4; ++i )
-        BOOST_CHECK_EQUAL( morphology.getSection( i ).getType(),
-                           brion::SECTION_AXON );
+        BOOST_CHECK( morphology.getSection( i ).getType() ==
+                     SectionType::axon );
     for( size_t i = 4; i < 10; ++i )
-        BOOST_CHECK_EQUAL( morphology.getSection( i ).getType(),
-                           brion::SECTION_DENDRITE );
+        BOOST_CHECK( morphology.getSection( i ).getType() ==
+                     SectionType::dendrite );
     for( size_t i = 10; i < 13; ++i )
-        BOOST_CHECK_EQUAL( morphology.getSection( i ).getType(),
-                           brion::SECTION_APICAL_DENDRITE );
+        BOOST_CHECK( morphology.getSection( i ).getType() ==
+                     SectionType::apicalDendrite );
 }
 
 BOOST_AUTO_TEST_CASE( get_section_samples )

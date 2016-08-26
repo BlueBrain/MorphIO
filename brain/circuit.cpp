@@ -100,7 +100,7 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
     {
         std::string hash( fs::canonical( uris[i].getPath( )).generic_string( ));
 
-        if( coords == COORDINATES_GLOBAL )
+        if( coords == Coordinates::global )
         {
             // store circuit + GID for transformed morphology
             hash += fs::canonical(
@@ -122,7 +122,7 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
     result.reserve( uris.size( ));
 
     const Matrix4fs transforms =
-             coords == COORDINATES_GLOBAL ? getTransforms( gids ) : Matrix4fs();
+             coords == Coordinates::global ? getTransforms( gids ) : Matrix4fs();
     for( size_t i = 0; i < uris.size(); ++i )
     {
         const URI& uri = uris[i];
@@ -133,7 +133,7 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
         {
             neuron::MorphologyPtr morphology;
             const brion::Morphology raw( uri.getPath( ));
-            if( coords == COORDINATES_GLOBAL )
+            if( coords == Coordinates::global )
                 morphology.reset( new neuron::Morphology( raw, transforms[i] ));
             else
                 morphology.reset( new neuron::Morphology( raw ));

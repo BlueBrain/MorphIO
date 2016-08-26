@@ -20,14 +20,25 @@
 #ifndef BRAIN_TYPES
 #define BRAIN_TYPES
 
-#include <brain/enums.h>
 #include <brion/types.h>
 
 /** @namespace brain Algorithmic interface to Blue Brain data model */
 namespace brain
 {
 
-using namespace brain::enums;
+/**
+ * Loading of data during SynapsesStream::read(), otherwise load happens
+ * on-demand.
+ */
+enum class SynapsePrefetch
+{
+    none = 0,                    //!< only loads pre- and post GIDs
+    attributes = 1 << 0,         //!< topological information (section,
+                                 //!  segment, distance) and model
+                                 //!  attributes
+    positions = 1 << 1,          //!< pre/post surface/center positions
+    all = attributes | positions //!< all synapse data
+};
 
 class Circuit;
 class Spikes;
@@ -45,7 +56,6 @@ using vmml::Vector3f;
 using vmml::Vector4f;
 
 using brion::GIDSet;
-using brion::SectionTypes;
 using brion::Strings;
 using brion::URI;
 using brion::URIs;
