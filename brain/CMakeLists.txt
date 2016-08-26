@@ -6,7 +6,6 @@
 
 set(BRAIN_PUBLIC_HEADERS
   circuit.h
-  enums.h
   neuron/morphology.h
   neuron/section.h
   neuron/soma.h

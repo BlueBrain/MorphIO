@@ -91,7 +91,7 @@ const Vector2is& Morphology::getSections() const
 
 const SectionTypes& Morphology::getSectionTypes() const
 {
-    return *_impl->types;
+    return reinterpret_cast< std::vector<SectionType>& >( *_impl->types );
 }
 
 const Vector2is& Morphology::getApicals() const
@@ -125,7 +125,7 @@ Sections Morphology::getSections( const SectionTypes& types ) const
 
 Section Morphology::getSection( const uint32_t& id ) const
 {
-    if(( *_impl->types )[id] == SECTION_SOMA )
+    if(( *_impl->types )[id] == brion::enums::SECTION_SOMA )
         LBTHROW(
             std::runtime_error( "The soma cannot be accessed as a Section" ));
 

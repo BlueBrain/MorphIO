@@ -3,6 +3,10 @@ Changelog {#Changelog}
 
 # Release 1.9.0 (git master)
 
+* [88](https://github.com/BlueBrain/Brion/pull/88):
+  - Brain namespace enums made strongly typed.
+  - Fix for brain::Section::getSamples for sections where the first point
+    appears repeated.
 * [85](https://github.com/BlueBrain/Brion/pull/85):
   Implement brain synapses specification
 * [84](https://github.com/BlueBrain/Brion/pull/84):

@@ -22,6 +22,7 @@
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <brion/enums.h>
 
 namespace brain
 {
@@ -32,10 +33,20 @@ class Morphology;
 class Section;
 class Soma;
 
+enum class SectionType
+{
+    soma = brion::enums::SECTION_SOMA,
+    axon = brion::enums::SECTION_AXON,
+    dendrite = brion::enums::SECTION_DENDRITE,
+    apicalDendrite = brion::enums::SECTION_APICAL_DENDRITE,
+    undefined = brion::enums::SECTION_UNDEFINED
+};
+
 typedef boost::shared_ptr< Morphology > MorphologyPtr;
 
 typedef std::vector< MorphologyPtr > Morphologies;
 typedef std::vector< Section > Sections;
+typedef std::vector< SectionType > SectionTypes;
 }
 
 }

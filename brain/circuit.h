@@ -40,10 +40,10 @@ class Circuit
 {
 public:
     /** Coordinate system to use for circuit morphologies */
-    enum Coordinates
+    enum class Coordinates
     {
-        COORDINATES_GLOBAL,
-        COORDINATES_LOCAL
+        global,
+        local
     };
 
     /**
@@ -134,8 +134,9 @@ public:
      * @param prefetch which synapse data to load on SynapsesStream.read()
      * @return synapse data stream
      */
-    BRAIN_API SynapsesStream getAfferentSynapses( const GIDSet& gids,
-                         SynapsePrefetch prefetch = SYNAPSEPREFETCH_ALL ) const;
+    BRAIN_API SynapsesStream getAfferentSynapses(
+        const GIDSet& gids,
+        SynapsePrefetch prefetch = SynapsePrefetch::all ) const;
 
     /**
      * Access all efferent synapses of the given GIDs.
@@ -144,8 +145,9 @@ public:
      * @param prefetch which synapse data to load on SynapsesStream.read()
      * @return synapse data stream
      */
-    BRAIN_API SynapsesStream getEfferentSynapses( const GIDSet& gids,
-                         SynapsePrefetch prefetch = SYNAPSEPREFETCH_ALL ) const;
+    BRAIN_API SynapsesStream getEfferentSynapses(
+        const GIDSet& gids,
+        SynapsePrefetch prefetch = SynapsePrefetch::all ) const;
 
     /**
      * Access all synapses along the projection from the pre- to the postGIDs.
@@ -155,9 +157,9 @@ public:
      * @param prefetch which synapse data to load on SynapsesStream.read()
      * @return synapse data stream
      */
-    BRAIN_API SynapsesStream getProjectedSynapses( const GIDSet& preGIDs,
-                                                   const GIDSet& postGIDs,
-                         SynapsePrefetch prefetch = SYNAPSEPREFETCH_ALL ) const;
+    BRAIN_API SynapsesStream getProjectedSynapses(
+        const GIDSet& preGIDs, const GIDSet& postGIDs,
+        SynapsePrefetch prefetch = SynapsePrefetch::all ) const;
 
     class Impl; //!< @internal, public for inheritance MVD2/3 impls
 
