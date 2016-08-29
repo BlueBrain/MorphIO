@@ -192,7 +192,7 @@ GIDSet Target::parse( const Targets& targets, const std::string& root )
         }
         if( !found )
             LBTHROW( std::runtime_error( "Parse " + root + " failed: " + name +
-                                         " is not a valid target " ));
+                                         " is not a valid or known target" ));
     }
 
     return gids;
