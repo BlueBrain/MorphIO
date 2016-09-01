@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2015, EPFL/Blue Brain Project
+# Copyright (c) 2013-2016, EPFL/Blue Brain Project
 #                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
 #
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -22,3 +22,5 @@ else()
   file(GLOB EXCLUDE_FROM_TESTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} brain/*.cpp)
 endif()
 include(CommonCTest)
+
+add_subdirectory(brain/python)

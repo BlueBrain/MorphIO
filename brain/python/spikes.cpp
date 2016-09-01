@@ -20,8 +20,10 @@
 
 #include <brain/spikes.h>
 
-using namespace boost::python;
-using namespace brain;
+namespace bp = boost::python;
+
+namespace brain
+{
 
 namespace
 {
@@ -29,7 +31,7 @@ struct Conversion
 {
     static PyObject* convert(const std::pair< float, unsigned int >& pair)
     {
-        tuple t = make_tuple(pair.first, pair.second);
+        bp::tuple t = bp::make_tuple(pair.first, pair.second);
         Py_INCREF(t.ptr());
         return t.ptr();
     }
@@ -39,11 +41,13 @@ struct Conversion
 void export_Spikes()
 {
 
-to_python_converter< brion::Spike, Conversion >();
+bp::to_python_converter< brion::Spike, Conversion >();
 
-class_< Spikes >( "Spikes", no_init )
-    .def( "__iter__", range( &Spikes::begin, &Spikes::end ))
+bp::class_< Spikes >( "Spikes", bp::no_init )
+    .def( "__iter__", bp::range( &Spikes::begin, &Spikes::end ))
     .def( "__len__", &Spikes::size )
 ;
+
+}
 
 }

@@ -1,6 +1,5 @@
-
-/* Copyright (c) 2006-2015, Ahmet Bilgili <ahmet.bilgili@epfl.ch>
- *                          Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+ *                          Juan Hernando <juan.hernando@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -18,9 +17,30 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_BINDING_SPIKEREPORTREADER_H
-#define BRAIN_BINDING_SPIKEREPORTREADER_H
+#include "../submodules.h"
 
-void export_SpikeReportReader();
+#include <brain/neuron/types.h>
 
-#endif
+namespace brain
+{
+namespace neuron
+{
+
+void export_Morphology();
+
+void export_module()
+{
+    boost::python::scope neuron = exportSubmodule("neuron");
+
+    boost::python::enum_< neuron::SectionType >( "SectionType" )
+        .value( "soma", neuron::SectionType::soma )
+        .value( "axon", neuron::SectionType::axon )
+        .value( "dendrite", neuron::SectionType::dendrite )
+        .value( "apical_dendrite", neuron::SectionType::apicalDendrite )
+        .value( "undefined", neuron::SectionType::undefined );
+
+    export_Morphology();
+}
+
+}
+}

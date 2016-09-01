@@ -1,0 +1,55 @@
+/* Copyright (c) 2013-2016, Juan Hernando <juan.hernando@epfl.ch>
+ *
+ * This file is part of Brion <https://github.com/BlueBrain/Brion>
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+#ifndef BRAIN_PYTHON_ARRAYHELPERS_H
+#define BRAIN_PYTHON_ARRAYHELPERS_H
+
+#include <brain/types.h>
+
+#include <boost/python.hpp>
+#include <boost/shared_ptr.hpp>
+#include <vector>
+
+namespace brain
+{
+
+void importArray();
+
+template< typename T >
+boost::python::object toNumpy( std::vector< T >&& vector );
+
+/** The custodian object must be copy constructible. In general it's expected
+    to be a std::shared_ptr or boost::shared_ptr. */
+template< typename T, typename U >
+boost::python::object toNumpy( const std::vector< T >& vector,
+                               const U& custodian );
+
+/** The custodian object must be copy constructible. In general it's expected
+    to be a std::shared_ptr or boost::shared_ptr. */
+template< typename T, typename U >
+boost::python::object toNumpy( const T* array, size_t size,
+                               const U& custodian );
+
+boost::python::object toNumpy( const Matrix4f& matrix );
+
+Matrix4f fromNumpy( const boost::python::object& object );
+
+}
+
+#include "arrayHelpers.inc"
+#endif

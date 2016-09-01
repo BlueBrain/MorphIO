@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2006-2016, Ahmet Bilgili <ahmet.bilgili@epfl.ch>
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -24,27 +23,29 @@
 #include <brain/spikeReportWriter.h>
 #include <brain/spikes.h>
 
-using namespace boost::python;
-using namespace brain;
+namespace bp = boost::python;
+
+namespace brain
+{
 
 namespace
 {
-
-SpikeReportWriterPtr initURI( const std::string& uri )
+SpikeReportWriterPtr _initURI( const std::string& uri )
 {
     return SpikeReportWriterPtr( new SpikeReportWriter( brion::URI( uri )));
 }
-
 }
 
 void export_SpikeReportWriter()
 {
 
-class_< SpikeReportWriter, boost::noncopyable >(
-    "SpikeReportWriter", no_init )
-    .def( "__init__", make_constructor( initURI ))
+bp::class_< SpikeReportWriter, boost::noncopyable >(
+    "SpikeReportWriter", bp::no_init )
+    .def( "__init__", bp::make_constructor( _initURI ))
     .def( "close", &SpikeReportWriter::close )
     .def( "writeSpikes", &SpikeReportWriter::writeSpikes )
 ;
+
+}
 
 }

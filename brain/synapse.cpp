@@ -142,7 +142,7 @@ float Synapse::getDecay() const
 
 int Synapse::getEfficacy() const
 {
-    return _synapses.efficacys()[_index];
+    return _synapses.efficacies()[_index];
 }
 
 }

@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # Release 1.9.0 (git master)
 
+* [89](https://github.com/BlueBrain/Brion/pull/89):
+  Python wrapping of brain classes.
 * [88](https://github.com/BlueBrain/Brion/pull/88):
   - Brain namespace enums made strongly typed.
   - Fix for brain::Section::getSamples for sections where the first point

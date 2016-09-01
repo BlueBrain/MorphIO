@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2006-2016, Ahmet Bilgili <ahmet.bilgili@epfl.ch>
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -24,13 +23,66 @@
 
 #include <boost/python.hpp>
 
-#include "spikeReportReader.h"
-#include "spikeReportWriter.h"
-#include "spikes.h"
+#include "arrayHelpers.h"
+
+#include <vmmlib/vector.hpp>
+
+namespace brain
+{
+
+void export_Circuit();
+void export_Spikes();
+void export_SpikeReportReader();
+void export_SpikeReportWriter();
+void export_Synapses();
+void export_test();
+
+namespace neuron
+{
+    void export_module();
+}
+
+}
+
+struct Vector3fToTuple
+{
+    static PyObject* convert( const brain::Vector3f& v )
+    {
+        boost::python::object tuple =
+            boost::python::make_tuple( v.x(), v.y(), v.z( ));
+        return boost::python::incref(tuple.ptr());
+    }
+};
+
+struct URItoString
+{
+    static PyObject* convert( const servus::URI& uri )
+    {
+        boost::python::object result( std::to_string( uri ));
+        return boost::python::incref(result.ptr());
+    }
+};
 
 BOOST_PYTHON_MODULE(_brain)
 {
-    export_SpikeReportReader();
-    export_SpikeReportWriter();
-    export_Spikes();
+    boost::python::to_python_converter< servus::URI, URItoString >();
+    boost::python::to_python_converter< brain::Vector3f, Vector3fToTuple >();
+
+    brain::importArray();
+
+    boost::python::enum_< brain::SynapsePrefetch >( "SynapsePrefetch" )
+        .value( "none", brain::SynapsePrefetch::none )
+        .value( "attributes", brain::SynapsePrefetch::attributes )
+        .value( "positions", brain::SynapsePrefetch::positions )
+        .value( "all", brain::SynapsePrefetch::all );
+
+    brain::neuron::export_module();
+
+    brain::export_test();
+
+    brain::export_Circuit();
+    brain::export_Spikes();
+    brain::export_SpikeReportReader();
+    brain::export_SpikeReportWriter();
+    brain::export_Synapses();
 }

@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2006-2016, Ahmet Bilgili <ahmet.bilgili@epfl.ch>
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -24,25 +23,25 @@
 #include <brain/spikeReportReader.h>
 #include <brain/spikes.h>
 
-using namespace brain;
-using namespace boost::python;
+namespace bp = boost::python;
+
+namespace brain
+{
 
 namespace
 {
-
-SpikeReportReaderPtr initURI( const std::string& uri )
+SpikeReportReaderPtr _initURI( const std::string& uri )
 {
     return SpikeReportReaderPtr( new SpikeReportReader( brion::URI( uri )));
 }
-
 }
 
 void export_SpikeReportReader()
 {
 
-class_< SpikeReportReader, boost::noncopyable >(
-    "SpikeReportReader", no_init )
-    .def( "__init__", make_constructor( initURI ))
+bp::class_< SpikeReportReader, boost::noncopyable >(
+    "SpikeReportReader", bp::no_init )
+    .def( "__init__", bp::make_constructor( _initURI ))
     .def( "close", &SpikeReportReader::close )
     .def( "getStartTime", &SpikeReportReader::getStartTime )
     .def( "getEndTime", &SpikeReportReader::getEndTime )
@@ -53,5 +52,7 @@ class_< SpikeReportReader, boost::noncopyable >(
           &SpikeReportReader::getSpikes )
     .def( "hasEnded", &SpikeReportReader::hasEnded )
     .def( "isStream", &SpikeReportReader::isStream );
+
+}
 
 }
