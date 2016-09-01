@@ -116,7 +116,7 @@ class TestMorphologyFunctions(unittest.TestCase):
         for p in soma.profile_points():
             assert(len(p) == 4)
         assert(numpy.isclose(soma.mean_radius(), 0.1))
-        assert(soma.centroid() == [0, 0, 0])
+        assert(soma.centroid() == (0, 0, 0))
 
 class TestMorphologyMemoryManagement(unittest.TestCase):
 

@@ -85,24 +85,6 @@ GET_SYNAPSES_ARRAY_PROPERTY( float, facilitations )
 GET_SYNAPSES_ARRAY_PROPERTY( float, decays )
 GET_SYNAPSES_ARRAY_PROPERTY( int, efficacies )
 
-bp::list _toList( const brain::Vector3f& v )
-{
-    bp::list out;
-    out.append( v.x( ));
-    out.append( v.y( ));
-    out.append( v.z( ));
-    return out;
-}
-
-#define GET_SYNAPSE_VEC3_PROPERTY( name ) \
-    bp::list Synapse_##name( const SynapseWrapper& synapse )    \
-        { return _toList( synapse.name( )); }
-
-GET_SYNAPSE_VEC3_PROPERTY( getPresynapticSurfacePosition )
-GET_SYNAPSE_VEC3_PROPERTY( getPresynapticCenterPosition )
-GET_SYNAPSE_VEC3_PROPERTY( getPostsynapticSurfacePosition )
-GET_SYNAPSE_VEC3_PROPERTY( getPostsynapticCenterPosition )
-
 }
 
 void export_Synapses()
@@ -113,14 +95,14 @@ bp::class_< SynapseWrapper >( "Synapse", bp::no_init )
     .def( "pre_section", &Synapse::getPresynapticSectionID )
     .def( "pre_segment", &Synapse::getPresynapticSegmentID )
     .def( "pre_distance", &Synapse::getPresynapticDistance )
-    .def( "pre_center_position", Synapse_getPresynapticCenterPosition )
-    .def( "pre_surface_position", Synapse_getPresynapticSurfacePosition )
+    .def( "pre_center_position", &Synapse::getPresynapticCenterPosition )
+    .def( "pre_surface_position", &Synapse::getPresynapticSurfacePosition )
     .def( "post_gid", &Synapse::getPostsynapticGID )
     .def( "post_section", &Synapse::getPostsynapticSectionID )
     .def( "post_segment", &Synapse::getPostsynapticSegmentID )
     .def( "post_distance", &Synapse::getPostsynapticDistance )
-    .def( "post_center_position", Synapse_getPostsynapticCenterPosition )
-    .def( "post_surface_position", Synapse_getPostsynapticSurfacePosition )
+    .def( "post_center_position", &Synapse::getPostsynapticCenterPosition )
+    .def( "post_surface_position", &Synapse::getPostsynapticSurfacePosition )
     .def( "delay", &Synapse::getDelay )
     .def( "conductance", &Synapse::getConductance )
     .def( "utilization", &Synapse::getUtilization )

@@ -60,16 +60,6 @@ bp::object Soma_getProfilePoints( const SomaWrapper& soma )
     return toNumpy( soma.getProfilePoints( ));
 }
 
-bp::list Soma_getCentroid( const SomaWrapper& soma )
-{
-    bp::list result;
-    const Vector3f& centroid = soma.getCentroid();
-    result.append( centroid[0] );
-    result.append( centroid[1] );
-    result.append( centroid[2] );
-    return result;
-}
-
 #define GET_SECTION_ARRAY( Array ) \
     bp::object Section_get##Array( const SectionWrapper& section )  \
     {                                                               \
@@ -194,7 +184,7 @@ bp::class_< SomaWrapper >(
     "Soma", bp::no_init )
     .def( "profile_points", Soma_getProfilePoints )
     .def( "mean_radius", &Soma::getMeanRadius )
-    .def( "centroid", Soma_getCentroid )
+    .def( "centroid", &Soma::getCentroid )
     ;
 
 bp::class_< SectionWrapper >(

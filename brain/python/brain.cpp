@@ -25,6 +25,8 @@
 
 #include "arrayHelpers.h"
 
+#include <vmmlib/vector.hpp>
+
 namespace brain
 {
 
@@ -42,6 +44,16 @@ namespace neuron
 
 }
 
+struct Vector3fToTuple
+{
+    static PyObject* convert( const brain::Vector3f& v )
+    {
+        boost::python::object tuple =
+            boost::python::make_tuple( v.x(), v.y(), v.z( ));
+        return boost::python::incref(tuple.ptr());
+    }
+};
+
 struct URItoString
 {
     static PyObject* convert( const servus::URI& uri )
@@ -54,6 +66,7 @@ struct URItoString
 BOOST_PYTHON_MODULE(_brain)
 {
     boost::python::to_python_converter< servus::URI, URItoString >();
+    boost::python::to_python_converter< brain::Vector3f, Vector3fToTuple >();
 
     brain::importArray();
 
