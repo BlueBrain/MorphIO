@@ -117,8 +117,8 @@ public:
                 boost::lexical_cast< BlueConfigSection >( typeStr );
             if( type == brion::CONFIGSECTION_UNKNOWN )
             {
-                LBWARN << "Found unknown section '" << typeStr
-                       << "' in BlueConfig file " << source << std::endl;
+                LBDEBUG << "Found unknown section '" << typeStr
+                        << "' in BlueConfig file " << source << std::endl;
                 continue;
             }
 

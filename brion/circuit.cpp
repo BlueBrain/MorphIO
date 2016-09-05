@@ -72,6 +72,9 @@ public:
                                          SECTION_CIRCUITSEEDS ));
 
         _file.open( source.c_str( ));
+        if( !_file.is_open( ))
+            LBTHROW( std::runtime_error( "Could not open MVD2 file " + source));
+
         _file >> std::ws;
         Section current = SECTION_UNKNOWN;
         while( !_file.eof( ))
