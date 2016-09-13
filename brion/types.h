@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -25,6 +25,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/multi_array.hpp>
 #include <boost/shared_ptr.hpp>
+#include <lunchbox/compiler.h>
 #include <lunchbox/types.h>
 #include <servus/uri.h>
 #include <set>
@@ -113,9 +114,10 @@ typedef std::pair< float, uint32_t > Spike;
 
 /** A value for undefined timestamps */
 
-const float UNDEFINED_TIMESTAMP = std::numeric_limits< float >::max();
-const float RESTING_VOLTAGE = -67.; //!< Resting voltage in mV
-const float MINIMUM_VOLTAGE = -80.; //!< Lowest voltage after hyperpolarisation
+const float UNDEFINED_TIMESTAMP LB_UNUSED = std::numeric_limits< float >::max();
+const float RESTING_VOLTAGE LB_UNUSED = -67.; //!< Resting voltage in mV
+/** Lowest voltage after hyperpolarisation */
+const float MINIMUM_VOLTAGE LB_UNUSED = -80.;
 
 using lunchbox::Strings;
 

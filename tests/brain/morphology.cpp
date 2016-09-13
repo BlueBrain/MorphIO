@@ -55,42 +55,11 @@ void checkCloseArrays( const std::vector< T >& array1,
 }
 
 template< typename T >
-void checkEqualArrays( const std::vector< T >& array, const size_t length, ... )
+void checkEqualArrays( const std::vector< T >& array1,
+                       const std::vector< T >& array2 )
 {
-    // Create the reference array
-    std::vector< T > ref;
-    va_list args;
-    va_start( args, length );
-    for( size_t i = 0; i != length; ++i )
-        ref.push_back( (T)va_arg( args, typename VaArgsType< T >::type ));
-    va_end( args );
-
-    BOOST_CHECK_EQUAL_COLLECTIONS( array.begin(), array.end(),
-                                   ref.begin(), ref.end( ));
-}
-
-template< typename T >
-void _checkCloseArrays( const std::vector< T >& array,
-                        const size_t length, va_list args )
-{
-    for( size_t i = 0; i != length; ++i )
-    {
-        const T& v = ( T )va_arg( args, typename VaArgsType< T >::type );
-        std::ostringstream os;
-        os << array[i] << " != " << v << " at " << i;
-        BOOST_CHECK_MESSAGE( array[i].equals( v ), os.str( ));
-    }
-}
-
-template< typename T >
-void checkCloseArrays( const std::vector< T >& array,
-                       const size_t length, ... )
-{
-    BOOST_CHECK_EQUAL( array.size(), length );
-    va_list args;
-    va_start( args, length );
-    _checkCloseArrays( array, length, args );
-    va_end( args );
+    BOOST_CHECK_EQUAL_COLLECTIONS( array1.begin(), array1.end(),
+                                   array2.begin(), array2.end( ));
 }
 
 template< typename T, long unsigned int M >
@@ -103,14 +72,12 @@ void checkCloseArrays( const std::vector< vmml::vector< M, T > >& array1,
 }
 
 template< typename T >
-void checkCloseArraysUptoN( const std::vector< T >& array,
-                            const size_t length, ... )
+void checkCloseArraysUpToGiven( const std::vector< T >& array,
+                                const std::vector< T >& given )
 {
-    BOOST_CHECK( array.size() >= length );
-    va_list args;
-    va_start( args, length );
-    _checkCloseArrays( array, length, args );
-    va_end( args );
+    BOOST_CHECK_GE( array.size(), given.size() );
+    checkCloseArrays( std::vector< T >( array.begin(),
+                                        array.begin() + given.size( )), given );
 }
 
 brion::uint32_ts getSectionIDs( const brain::neuron::Sections& sections )
@@ -161,19 +128,19 @@ BOOST_AUTO_TEST_CASE( get_section_ids )
     using brain::neuron::SectionType;
 
     brain::neuron::SectionTypes types{ SectionType::soma };
-    checkEqualArrays( morphology.getSectionIDs( types ), 1, 0 );
+    checkEqualArrays( morphology.getSectionIDs( types ), { 0 } );
 
     types.push_back( SectionType::dendrite );
     checkEqualArrays( morphology.getSectionIDs( types ),
-                      7, 0, 4, 5, 6, 7, 8, 9 );
+                      { 0, 4, 5, 6, 7, 8, 9 });
     types.push_back( SectionType::apicalDendrite );
     checkEqualArrays( morphology.getSectionIDs( types ),
-                      10, 0, 4, 5, 6, 7, 8, 9, 10, 11, 12 );
+                      { 0, 4, 5, 6, 7, 8, 9, 10, 11, 12 });
     types.clear();
     types.push_back( SectionType::axon );
     types.push_back( SectionType::dendrite );
     checkEqualArrays( morphology.getSectionIDs( types ),
-                      9, 1, 2, 3, 4, 5, 6, 7, 8, 9 );
+                      { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
 }
 
 BOOST_AUTO_TEST_CASE( get_sections )
@@ -282,9 +249,9 @@ BOOST_AUTO_TEST_CASE( get_soma_geometry )
     brain::neuron::Morphology morphology( TEST_MORPHOLOGY_URI );
 
     const brain::neuron::Soma soma = morphology.getSoma();
-    checkEqualArrays( soma.getProfilePoints(), 4,
-                      V4f( .1, 0, 0, .1 ), V4f( 0, .1, 0, .1 ),
-                      V4f( -.1, 0, 0, .1 ), V4f( 0, -.1, 0, .1 ));
+    checkEqualArrays( soma.getProfilePoints(),
+                      { V4f( .1, 0, 0, .1 ), V4f( 0, .1, 0, .1 ),
+                        V4f( -.1, 0, 0, .1 ), V4f( 0, -.1, 0, .1 )});
 
     BOOST_CHECK_CLOSE( soma.getMeanRadius(), 0.1, 1e-5 );
     BOOST_CHECK_EQUAL( soma.getCentroid(), V3f::ZERO );
@@ -292,7 +259,8 @@ BOOST_AUTO_TEST_CASE( get_soma_geometry )
     brain::Matrix4f matrix;
     matrix.setTranslation( V3f( 2, 0, 0 ));
     brain::neuron::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
-    BOOST_CHECK_MESSAGE( transformed.getSoma().getCentroid().equals(V3f( 2,0,0 )),
+    BOOST_CHECK_MESSAGE( transformed.getSoma().getCentroid().equals(
+                             V3f( 2,0,0 )),
                          transformed.getSoma().getCentroid( ));
 
 }
@@ -305,21 +273,25 @@ BOOST_AUTO_TEST_CASE( get_section_samples_by_positions )
     for( float p = 0.0; p <= 1.0; p += 0.2 )
         points.push_back( p );
 
-    checkCloseArrays( morphology.getSection( 1 ).getSamples( points ), 6,
-        V4f( 0, 0, 0, .5 ), V4f( 0, -1, 1, .52 ), V4f( 0, -2, 2, .54 ),
-        V4f( 0, -3, 3, .56 ), V4f( 0, -4, 4, .58 ), V4f(  0, -5, 5, .6 ));
+    checkCloseArrays( morphology.getSection( 1 ).getSamples( points ),
+                      { V4f( 0, 0, 0, .5 ), V4f( 0, -1, 1, .52 ),
+                        V4f( 0, -2, 2, .54 ), V4f( 0, -3, 3, .56 ),
+                        V4f( 0, -4, 4, .58 ), V4f(  0, -5, 5, .6 )});
 
-    checkCloseArrays( morphology.getSection( 4 ).getSamples( points ), 6,
-        V4f( 0, 0, 0, .5 ), V4f( 1, 0, 1, .52 ), V4f( 2, 0, 2, .54 ),
-        V4f( 3, 0, 3, .56 ), V4f( 4, 0, 4, .58 ), V4f(  5, 0, 5, .6 ));
+    checkCloseArrays( morphology.getSection( 4 ).getSamples( points ),
+                      { V4f( 0, 0, 0, .5 ), V4f( 1, 0, 1, .52 ),
+                        V4f( 2, 0, 2, .54 ), V4f( 3, 0, 3, .56 ),
+                        V4f( 4, 0, 4, .58 ), V4f(  5, 0, 5, .6 )});
 
-    checkCloseArrays( morphology.getSection( 7 ).getSamples( points ), 6,
-        V4f( 0, 0, 0, .5 ), V4f( -1, 0, 1, .52 ), V4f( -2, 0, 2, .54 ),
-        V4f( -3, 0, 3, .56 ), V4f( -4, 0, 4, .58 ), V4f( -5, 0, 5, .6 ));
+    checkCloseArrays( morphology.getSection( 7 ).getSamples( points ),
+                      { V4f( 0, 0, 0, .5 ), V4f( -1, 0, 1, .52 ),
+                        V4f( -2, 0, 2, .54 ), V4f( -3, 0, 3, .56 ),
+                        V4f( -4, 0, 4, .58 ), V4f( -5, 0, 5, .6 )});
 
-    checkCloseArrays( morphology.getSection( 10 ).getSamples( points ), 6,
-        V4f( 0, 0, 0, .5 ), V4f( 0, 1, 1, .52 ), V4f( 0, 2, 2, .54 ),
-        V4f( 0, 3, 3, .56 ), V4f( 0, 4, 4, .58 ), V4f(  0, 5, 5, .6 ));
+    checkCloseArrays( morphology.getSection( 10 ).getSamples( points ),
+                      { V4f( 0, 0, 0, .5 ), V4f( 0, 1, 1, .52 ),
+                        V4f( 0, 2, 2, .54 ), V4f( 0, 3, 3, .56 ),
+                        V4f( 0, 4, 4, .58 ), V4f(  0, 5, 5, .6 )});
 }
 
 BOOST_AUTO_TEST_CASE( morphology_hierarchy )
@@ -334,11 +306,11 @@ BOOST_AUTO_TEST_CASE( morphology_hierarchy )
     BOOST_CHECK_EQUAL( morphology.getSection( 6 ).getParent().getID(), 4 );
 
     checkEqualArrays( getSectionIDs( morphology.getSoma().getChildren( )),
-                      4, 1, 4, 7, 10 );
+                      { 1, 4, 7, 10 });
     checkEqualArrays( getSectionIDs( morphology.getSection( 1 ).getChildren( )),
-                      2, 2, 3 );
+                      { 2, 3 });
     checkEqualArrays( getSectionIDs( morphology.getSection( 4 ).getChildren( )),
-                      2, 5, 6 );
+                      { 5, 6 });
     BOOST_CHECK( morphology.getSection( 5 ).getChildren().empty( ));
 }
 
@@ -347,16 +319,16 @@ BOOST_AUTO_TEST_CASE( transform_with_matrix )
     brain::Matrix4f matrix;
     matrix.rotate_z( M_PI * 0.5 );
     brain::neuron::Morphology rotated( TEST_MORPHOLOGY_URI, matrix );
-    checkCloseArraysUptoN( rotated.getPoints(), 4,
-      V4f( .0, .1, .0, .1 ), V4f( -.1, .0, .0, .1 ),
-      V4f( .0, -.1, .0, .1 ), V4f( .1, .0, .0, .1 ));
+    checkCloseArraysUpToGiven( rotated.getPoints(),
+                               { V4f( .0, .1, .0, .1 ), V4f( -.1, .0, .0, .1 ),
+                                 V4f( .0, -.1, .0, .1 ),V4f( .1, .0, .0, .1 )});
 
     matrix = brain::Matrix4f();
     matrix.rotate_z( M_PI * 0.5 );
     matrix.setTranslation( V3f( 2, 0, 0 ));
     brain::neuron::Morphology transformed( TEST_MORPHOLOGY_URI, matrix );
     BOOST_CHECK_EQUAL( transformed.getTransformation(), matrix );
-    checkCloseArraysUptoN( transformed.getPoints(), 4,
-      V4f( 2., .1, .0, .1 ), V4f( 1.9, .0, .0, .1 ),
-      V4f( 2., -.1, .0, .1 ), V4f( 2.1, .0, .0, .1 ));
+    checkCloseArraysUpToGiven( transformed.getPoints(),
+                              { V4f( 2., .1, .0, .1 ), V4f( 1.9, .0, .0, .1 ),
+                                V4f( 2., -.1, .0, .1 ),V4f( 2.1, .0, .0, .1 )});
 }

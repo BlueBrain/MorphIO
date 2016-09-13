@@ -34,10 +34,9 @@ namespace plugin
 /** A reader for spike report files.
  *
  * A spike report is a text file format in which each line contains a pair of
- * spike time and cell GID values separated by one or more \<tab\> or whitespace.
- * Spike times are floating point values in miliseconds units.
- * Cell GIDs are unsigned integer values which uniquely identify a cell within
- * the current experiment.
+ * spike time and cell GID values separated by one or more whitespace. Spike
+ * times are floating point values in miliseconds units. Cell GIDs are unsigned
+ * integer values which uniquely identify a cell within the current experiment.
  * Lines beginning with a '/' or '#' are treated as comments and ignored by the
  * parser. An example file could look like those below:
  *
@@ -85,7 +84,7 @@ public:
      */
     bool fillReportMap( Spikes& spikes,
                         const size_t maxLines =
-                        std::numeric_limits< size_t >::max( ));
+                            std::numeric_limits< size_t >::max( ));
 
     /**
      * Write to the file.
@@ -94,9 +93,7 @@ public:
      */
     void writeReportMap( const Spikes& spikes );
 
-    /**
-     * Close file.
-     */
+    /** Close file. */
     void close();
 
     /** A spike value. */
