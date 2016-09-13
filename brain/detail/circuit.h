@@ -27,10 +27,14 @@
 #include <brion/synapse.h>
 #include <brion/synapseSummary.h>
 #include <brion/target.h>
+#include <brion/detail/lockHDF5.h>
 #include <brion/detail/silenceHDF5.h>
 
+#include <lunchbox/lock.h>
+#include <lunchbox/lockable.h>
 #include <lunchbox/log.h>
 #include <lunchbox/persistentMap.h>
+#include <lunchbox/scopedMutex.h>
 
 #ifdef BRAIN_USE_MVD3
 #  include <mvd/mvd3.hpp>
@@ -214,29 +218,35 @@ public:
 
     const brion::SynapseSummary& getSynapseSummary() const
     {
-        if( !_synapseSummary )
-            _synapseSummary.reset( new brion::SynapseSummary(
+        lunchbox::ScopedWrite mutex( _synapseSummary );
+
+        if( !(*_synapseSummary ))
+            _synapseSummary->reset( new brion::SynapseSummary(
                                _synapseSource.getPath() + summaryFilename ));
-        return *_synapseSummary;
+        return **_synapseSummary;
     }
 
     const brion::Synapse& getSynapseAttributes( const bool afferent ) const
     {
         const size_t i = afferent ? 0 : 1;
-        if( !_synapseAttributes[i] )
-            _synapseAttributes[i].reset(
+        lunchbox::ScopedWrite mutex( _synapseAttributes[i] );
+
+        if( !(*_synapseAttributes[i] ))
+            _synapseAttributes[i]->reset(
                 new brion::Synapse( _synapseSource.getPath() + (afferent ?
                                           afferentFilename : efferentFilename )));
-        return *_synapseAttributes[i];
+        return **_synapseAttributes[i];
     }
 
     const brion::Synapse* getSynapseExtra() const
     {
-        if( !_synapseExtra )
+        lunchbox::ScopedWrite mutex( _synapseExtra );
+
+        if( !(*_synapseExtra ))
         {
             try
             {
-                _synapseExtra.reset( new brion::Synapse(
+                _synapseExtra->reset( new brion::Synapse(
                                  _synapseSource.getPath() + extraFilename ));
             }
             catch( ... )
@@ -244,17 +254,19 @@ public:
                 return nullptr;
             }
         }
-        return _synapseExtra.get();
+        return _synapseExtra->get();
     }
 
     const brion::Synapse& getSynapsePositions( const bool afferent ) const
     {
         const size_t i = afferent ? 0 : 1;
-        if( !_synapsePositions[i] )
-            _synapsePositions[i].reset(
+        lunchbox::ScopedWrite mutex( _synapsePositions[i] );
+
+        if( !(*_synapsePositions[i] ))
+            _synapsePositions[i]->reset(
                 new brion::Synapse( _synapseSource.getPath() + (afferent ?
                       afferentPositionsFilename : efferentPositionsFilename )));
-        return *_synapsePositions[i];
+        return **_synapsePositions[i];
     }
 
     void saveToCache( const std::string& hash,
@@ -310,10 +322,13 @@ public:
     mutable brion::Targets _targetParsers;
     mutable lunchbox::PersistentMapPtr _cache;
 
-    mutable std::unique_ptr< brion::SynapseSummary > _synapseSummary;
-    mutable std::unique_ptr< brion::Synapse > _synapseAttributes[2];
-    mutable std::unique_ptr< brion::Synapse > _synapseExtra;
-    mutable std::unique_ptr< brion::Synapse > _synapsePositions[2];
+    template< typename T >
+    using LockPtr = lunchbox::Lockable< std::unique_ptr< T >>;
+
+    mutable LockPtr< brion::SynapseSummary > _synapseSummary;
+    mutable LockPtr< brion::Synapse > _synapseAttributes[2];
+    mutable LockPtr< brion::Synapse > _synapseExtra;
+    mutable LockPtr< brion::Synapse > _synapsePositions[2];
 };
 
 class MVD2 : public Circuit::Impl
@@ -454,6 +469,7 @@ struct MVD3 : public Circuit::Impl
         try
         {
             brion::detail::SilenceHDF5 silence;
+            lunchbox::ScopedWrite mutex( brion::detail::_hdf5Lock );
             const ::MVD3::Positions& positions = _circuit.getPositions( range );
             assign( range, gids, positions, results, toVector3f );
             return results;
@@ -472,6 +488,7 @@ struct MVD3 : public Circuit::Impl
         try
         {
             brion::detail::SilenceHDF5 silence;
+            lunchbox::ScopedWrite mutex( brion::detail::_hdf5Lock );
             const size_ts& mtypes = _circuit.getIndexMtypes( range );
             assign( range, gids, mtypes, results, nop );
             return results;
@@ -495,6 +512,7 @@ struct MVD3 : public Circuit::Impl
         try
         {
             brion::detail::SilenceHDF5 silence;
+            lunchbox::ScopedWrite mutex( brion::detail::_hdf5Lock );
             const size_ts& etypes = _circuit.getIndexEtypes( range );
             assign( range, gids, etypes, results, nop );
             return results;
@@ -518,6 +536,7 @@ struct MVD3 : public Circuit::Impl
         try
         {
             brion::detail::SilenceHDF5 silence;
+            lunchbox::ScopedWrite mutex( brion::detail::_hdf5Lock );
             const ::MVD3::Rotations& rotations = _circuit.getRotations( range );
             assign( range, gids, rotations, results, toQuaternion );
             return results;
@@ -536,6 +555,7 @@ struct MVD3 : public Circuit::Impl
         try
         {
             brion::detail::SilenceHDF5 silence;
+            lunchbox::ScopedWrite mutex( brion::detail::_hdf5Lock );
             const Strings& morphos = _circuit.getMorphologies( range );
             assign( range, gids, morphos, results, toString );
             return results;
