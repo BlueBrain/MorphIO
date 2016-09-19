@@ -3,6 +3,10 @@ Changelog {#Changelog}
 
 # Release 1.9.0 (git master)
 
+* [94](https://github.com/BlueBrain/Brion/pull/94):
+  Fixed SWC morphology parser for morphologies with soma contour. The parser was
+  creating invalid soma sections when the first order sections where connected
+  to arbitrary soma sample points.
 * [89](https://github.com/BlueBrain/Brion/pull/89):
   Python wrapping of brain classes.
 * [88](https://github.com/BlueBrain/Brion/pull/88):
