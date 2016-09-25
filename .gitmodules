@@ -1,0 +1,6 @@
+[submodule "deps/hadoken"]
+	path = deps/hadoken
+	url = git@github.com:adevress/hadoken.git
+[submodule "deps/highfive"]
+	path = deps/highfive
+	url = git@github.com:BlueBrain/highfive.git

@@ -1,19 +1,19 @@
 
-MVD-tool
+morpho-tool
 
 ** Info
 
-A simple C++ parser and tool for the MVD3 neuroscience file format
+Utility tool developped by the Blue Brain Project for biological neuron morphologies
 
-- provide a tool to convert MVD2 to MVD3
-- provide a tool to export MVD to CSV
-- provide a simple header base parser for MVD2
-- provide a parser based on the HighFive library for MVD3
+Compatible with the h5v1 morphology format
+
+
+
 
 
 ** compilation
 
-# fetch HighFive as submodule ( if not already done )
+# fetch HighFive and hadoken as submodule ( if not already done )
 git submodule update --recursive --init
 
 # configure, compile
