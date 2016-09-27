@@ -1,0 +1,157 @@
+#ifndef MORPHO_TREE_HPP
+#define MORPHO_TREE_HPP
+
+
+#include <vector>
+#include <memory>
+
+#include <boost/noncopyable.hpp>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+
+namespace morpho{
+
+
+enum branch_type{
+    soma_type =0x00,
+    dentrite_type = 0x01,
+    axon_type = 0x02
+
+};
+
+
+class branch;
+class morpho_tree;
+
+
+///
+/// \brief generic container for a branch of a morphology
+///
+class branch : private boost::noncopyable{
+public:
+    typedef boost::numeric::ublas::matrix<double> mat_points;
+    typedef boost::numeric::ublas::vector<double> vec_double;
+
+
+
+    inline branch(branch_type type_b) : _type(type_b), _id(0), _parent_id(0) {}
+
+    inline virtual ~branch(){}
+
+
+
+    inline void set_points(mat_points && points, vec_double && distances){
+        _points = std::move(points);
+        _distances = std::move(distances);
+    }
+
+    inline const mat_points & get_points() const{
+        return _points;
+    }
+
+    inline branch_type get_type() const{
+        return _type;
+    }
+
+    inline std::size_t get_parent_id() const{
+        return _parent_id;
+    }
+
+    inline const std::vector<std::size_t> & get_childrens() const{
+        return _childrens;
+    }
+
+    inline std::size_t get_parent() const{
+        return _parent_id;
+    }
+
+private:
+    branch_type _type;
+
+    std::size_t _id, _parent_id;
+
+    mat_points _points;
+
+    vec_double _distances;
+
+    std::vector<std::size_t > _childrens;
+
+    friend class morpho_tree;
+};
+
+
+///
+/// \brief container for an entire morphology tree
+///
+class morpho_tree : private boost::noncopyable{
+
+public:
+    inline morpho_tree() {}
+    inline virtual ~morpho_tree(){}
+
+
+    ///
+    /// \brief set the root element of the tree
+    /// \param root_elem
+    ///
+    inline std::size_t set_root(std::unique_ptr<branch> && root_elem){
+        root_elem->_id = 0;
+        root_elem->_parent_id = 0;
+        _branches.emplace_back(std::move(root_elem));
+        return 0;
+    }
+
+
+    ///
+    /// \brief insert a new child branch intro the tree, as children of parent_id branch
+    /// \param parent_id
+    /// \param children
+    /// \return  id of the branch
+    ///
+    inline std::size_t add_child(std::size_t parent_id, std::unique_ptr<branch> && children){
+        if(parent_id >= _branches.size()){
+            std::runtime_error("Invalid parent id ");
+        }
+
+        const std::size_t my_id = _branches.size();;
+
+        children->_id = my_id;
+        children->_parent_id = parent_id;
+
+        _branches.emplace_back(std::move(children));
+        _branches[parent_id]->_childrens.push_back(my_id);
+        return my_id;
+    }
+
+
+    ///
+    /// \brief get branch for a given id
+    /// \param id_branch
+    /// \return
+    ///
+    inline branch & get_branch(std::size_t id_branch){
+        if(id_branch >= _branches.size()){
+            std::runtime_error("Invalid branch id ");
+        }
+        return *(_branches[id_branch]);
+    }
+
+
+    ///
+    /// \brief get number of branch
+    /// \return
+    ///
+    inline std::size_t get_tree_size() const{
+        return _branches.size();
+    }
+
+
+private:
+    std::vector<std::unique_ptr<branch> > _branches;
+
+};
+
+} //morpho
+
+#endif // MORPHO_TREE_HPP
+

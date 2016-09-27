@@ -1,38 +1,27 @@
 
-if(UNIT_TESTS)
-
-find_package(Boost 1.41 QUIET REQUIRED COMPONENTS filesystem system unit_test_framework)
+if(MORPHOTOOL_UNIT_TESTS)
 
 
-SET(MVD2_TEST_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../circuit.mvd2)
-SET(MVD3_TEST_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../circuit.mvd3)
+find_package(Boost 1.41.0 REQUIRED system unit_test_framework)
 
+include_directories(${CMAKE_SOURCE_DIR})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS} )
 
-add_definitions(-DMVD2_FILENAME="${MVD2_TEST_FILE}")
-add_definitions(-DMVD3_FILENAME="${MVD3_TEST_FILE}")
-if(CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_COMPILER_IS_CLANG)
-  add_definitions(-Wno-unused-local-typedefs)
+link_directories( ${Boost_LIBRARY_DIRS} )
+
+if(NOT Boost_USE_STATIC_LIBS)
+        add_definitions(-DBOOST_TEST_DYN_LINK=TRUE)
 endif()
 
-include_directories(${HDF5_INCLUDE_DIRS})
 
 
-## mvd2
+file(GLOB  tests_morpho_src "*morpho*.cpp")
+add_executable(tests_morpho_bin ${tests_morpho_src})
 
-file(GLOB  tests_mvd2_src "*mvd2.cpp")
-add_executable(test_mvd2 ${tests_mvd2_src})
+target_link_libraries(tests_morpho_bin ${Boost_UNIT_TEST_FRAMEWORK_LIBRARIES})
 
-target_link_libraries(test_mvd2 ${Boost_UNIT_TEST_FRAMEWORK_LIBRARIES})
-
-add_test(NAME test_parser_mvd2 COMMAND test_mvd2)
+add_test(NAME test_morpho COMMAND tests_morpho_bin)
 
 
-# mvd3
-file(GLOB  tests_mvd3_src "*mvd3.cpp")
-add_executable(test_mvd3 ${tests_mvd3_src})
-
-target_link_libraries(test_mvd3 ${Boost_UNIT_TEST_FRAMEWORK_LIBRARIES} ${HDF5_LIBRARIES})
-
-add_test(NAME test_parser_mvd3 COMMAND test_mvd3)
 
 endif()

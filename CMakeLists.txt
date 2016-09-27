@@ -45,3 +45,10 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/morpho DESTINATION ${INCLUDE_INS
 install(TARGETS morpho-tool RUNTIME DESTINATION ${BIN_INSTALL_DIR})
 
 #add_subdirectory(tests/unit)
+
+add_subdirectory(deps/hadoken)
+add_subdirectory(deps/highfive)
+
+
+add_subdirectory(tests/unit)
+
