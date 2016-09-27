@@ -11,12 +11,11 @@
 #
 with import <BBPpkgs> { };
 
+{
 
-stdenv.mkDerivation rec {
+brion = brion.overrideDerivation (oldAttr: rec {
       name = "Brion-DEV";
       src = ./.;
-      buildInputs = [stdenv pkgconfig boost zlib cmake cmake-external hdf5-cpp servus lunchbox vmmlib mvdtool bbptestdata ];
-
     
       doCheck= true;
       
@@ -24,6 +23,8 @@ stdenv.mkDerivation rec {
 			export LD_LIBRARY_PATH=$PWD/lib:$LD_LIBRARY_PATH;
 			ctest -E perf -V;
 		  '';
+
+	 });
    
 
 }

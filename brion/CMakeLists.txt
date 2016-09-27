@@ -76,7 +76,11 @@ endif()
 
 set(BRION_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
 set(BRION_LINK_LIBRARIES PUBLIC Lunchbox Servus vmmlib
-                         PRIVATE ${Boost_LIBRARIES} ${HDF5_LIBRARIES}
+                         PRIVATE  ${Boost_SYSTEM_LIBRARIES} 
+                                 ${Boost_FILESYSTEM_LIBRARIES} 
+                                 ${Boost_DATE_TIME_LIBRARIES} 
+                                 ${Boost_REGEX_LIBRARIES} 
+                                 ${HDF5_LIBRARIES}
                                  ${CMAKE_THREADS_LIB_INIT}
 )
 

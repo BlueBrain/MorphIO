@@ -21,13 +21,10 @@ set(BRAIN_PYTHON_SOURCE_FILES
   spikes.cpp
   synapses.cpp
   submodules.cpp
+  test.cpp
   neuron/module.cpp
   neuron/morphology.cpp
 )
-if(TARGET BBPTestData)
-  list(APPEND BRAIN_PYTHON_SOURCE_FILES test.cpp)
-endif()
-
 include_directories(${PYTHON_INCLUDE_DIRS}
                     ${PYTHON_NUMPY_INCLUDE_DIR})
 
