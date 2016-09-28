@@ -19,7 +19,6 @@
 
 #include <brion/brion.h>
 #include <lunchbox/clock.h>
-#include <lunchbox/omp.h>
 #ifdef BRION_USE_BBPTESTDATA
 #  include <BBP/TestDatasets.h>
 #endif
@@ -27,6 +26,9 @@
 #include <boost/foreach.hpp>
 #include <boost/program_options.hpp>
 #include <boost/progress.hpp>
+#ifdef BRION_USE_OPENMP
+#  include <omp.h>
+#endif
 
 namespace po = boost::program_options;
 using boost::lexical_cast;
@@ -83,7 +85,7 @@ int main( const int argc, char** argv )
           "Convert at most the given number of frames" )
         ( "compare,c", "Compare written report with input" )
         ( "dump,d", "Dump input report information (no output conversion)" )
-#ifdef LUNCHBOX_USE_OPENMP
+#ifdef BRION_USE_OPENMP
         ( "threads,t", po::value< unsigned >()->default_value( 1 ),
           "Number of threads to use" )
 #endif
@@ -115,8 +117,11 @@ int main( const int argc, char** argv )
         return EXIT_SUCCESS;
     }
 
-#ifdef LUNCHBOX_USE_OPENMP
-    lunchbox::OMP::setNThreads( vm[ "threads" ].as< unsigned >( ));
+#ifdef BRION_USE_OPENMP
+    omp_set_num_threads( vm[ "threads" ].as< unsigned >( ));
+    const unsigned nThreads = omp_get_num_threads();
+#else
+    const unsigned nThreads = 1;
 #endif
 
     std::string input;
@@ -180,7 +185,7 @@ int main( const int argc, char** argv )
     float writeTime = clock.getTimef();
 
     const size_t nFrames = (end - start) / step;
-    boost::progress_display progress( nFrames / lunchbox::OMP::getNThreads( ));
+    boost::progress_display progress( nFrames / nThreads );
 
 #pragma omp parallel for private(clock)
     for( size_t i = 0; i < nFrames; ++i )
@@ -208,7 +213,9 @@ int main( const int argc, char** argv )
             ++index;
         }
         writeTime += clock.getTimef();
-        if( lunchbox::OMP::getThreadNum() == 0 )
+#ifdef BRION_USE_OPENMP
+        if( omp_get_thread_num() == 0 )
+#endif
             ++progress;
     }
 
@@ -218,8 +225,7 @@ int main( const int argc, char** argv )
 
     std::cout << "Converted " << inURI << " to " << outURI
               << " (in " << size_t( loadTime ) << " out " << size_t( writeTime )
-              << " ms) using " << lunchbox::OMP::getNThreads() << " threads"
-              << std::endl;
+              << " ms) using " << nThreads << " threads" << std::endl;
 
     if( vm.count( "compare" ))
     {
