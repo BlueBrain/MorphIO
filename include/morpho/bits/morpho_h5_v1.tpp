@@ -36,13 +36,13 @@ inline void split_xyz_and_distance(const morpho_reader::mat_points & raw_points,
 inline branch_type branch_type_from_h5v1(const int type_id){
     switch(type_id){
         case 1:
-            return soma_type;
+            return branch_type::soma;
         case 2:
-            return axon_type;
+            return branch_type::axon;
         case 3:
-            return dentrite_basal_type;
+            return branch_type::dentrite_basal;
         case 4:
-            return dentrite_apical_type;
+            return branch_type::dentrite_apical;
          default:
             throw std::runtime_error("invalid cell type in morphology");
     }
@@ -151,7 +151,7 @@ morpho_tree morpho_reader::create_morpho_tree() const{
 
     {
         // create soma
-        std::unique_ptr<branch> soma(new branch(soma_type));
+        std::unique_ptr<branch> soma(new branch(branch_type::soma));
 
         mat_points raw_soma_points  =  get_soma_points_raw();
         branch::mat_points soma_points;

@@ -4,24 +4,27 @@
 
 #include <vector>
 #include <memory>
+#include <bitset>
 
 #include <boost/noncopyable.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
+
 namespace morpho{
-
-
-enum branch_type{
-    soma_type =0x00,
-    axon_type = 0x01,
-    dentrite_basal_type = 0x02,
-    dentrite_apical_type = 0x03
-};
 
 
 class branch;
 class morpho_tree;
+
+
+/// branch type
+enum class branch_type{
+    soma =0x00,
+    axon = 0x01,
+    dentrite_basal = 0x02,
+    dentrite_apical = 0x03
+};
 
 
 ///
@@ -93,8 +96,10 @@ private:
 /// \brief container for an entire morphology tree
 ///
 class morpho_tree : private boost::noncopyable{
-
 public:
+    /// flags
+    static constexpr int point_soma = 0x01;
+
     inline morpho_tree() {}
     inline virtual ~morpho_tree(){}
 
@@ -158,9 +163,18 @@ public:
         return _branches.size();
     }
 
+    inline void add_flag(const std::bitset<64> & flag){
+        _flags |= flag;
+    }
+
+    inline std::bitset<64> get_flags() const{
+        return _flags;
+    }
+
 
 private:
     std::vector<std::unique_ptr<branch> > _branches;
+    std::bitset<64> _flags;
 
 };
 

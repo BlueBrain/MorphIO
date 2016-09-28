@@ -132,12 +132,8 @@ void gmsh_exporter::serialize_branch_lines(morpho_tree & tree,
 
     // we skip the first point, duplicate from last segment
 
-    if(branch_id == 0){
-        fmt::scat(geo_stream,
-                  "Line(", counter, ") = {", vec_range[0].first, ",", vec_range[0].first+1, " } ;\n"
-                  );
-       counter +=1;
-       point_counter = vec_range[0].second;
+    if(branch.get_type() == branch_type::soma && branch.get_points().size1() <= 1){
+        fmt::scat(geo_stream, "// soma point mode, skip Line for soma\n");
     }else{
         point_counter = vec_range[branch_id].first;
         for(std::size_t i =0; i < points.size1()-1; ++i){

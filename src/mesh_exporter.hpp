@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <bitset>
 
 #include <morpho/morpho_h5_v1.hpp>
 #include <morpho/morpho_tree.hpp>
@@ -11,9 +12,17 @@
 
 namespace morpho{
 
+
+
 class gmsh_exporter
 {
 public:
+
+    enum exporter_flags {
+        none = 0x00,
+        point_soma = 0x01
+    };
+
     gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename);
 
 
@@ -26,6 +35,7 @@ public:
 private:
     std::ofstream geo_stream;
     morpho::h5_v1::morpho_reader reader;
+
 
     void serialize_header();
 
