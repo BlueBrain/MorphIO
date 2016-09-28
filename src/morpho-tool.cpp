@@ -32,6 +32,7 @@
 #include <morpho/morpho_h5_v1.hpp>
 
 #include "mesh_exporter.hpp"
+#include "x3d_exporter.hpp"
 
 using namespace std;
 using namespace morpho;
@@ -50,13 +51,15 @@ po::parsed_options parse_args(int argc, char** argv,
     po::options_description general("Commands:\n"
                                     "\t\t\n"
                                     "  export gmsh [morphology-file] [geo-file]:\texport morphology file to .geo file format\n"
+                                    "  export x3d [morphology-file] [x3d-file]:\texport morphology file to .x3d file format\n"
                                     "\n\n"
                                     "Options");
     general.add_options()
         ("help", "produce a help message")
         ("version", "output the version number")
         ("point-cloud", "gmsh: export to a point cloud")
-        ("wireframe", "gmsh: export to a wired morphology (default)")        
+        ("wireframe", "gmsh: export to a wired morphology (default)")
+        ("sphere", "x3d: export cloud of sphere (default)")
         ("command", po::value<std::string>(), "command to execute")
         ("subargs", po::value<std::vector<std::string> >(), "Arguments for command");
         ;
@@ -95,6 +98,16 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
     fmt::scat(std::cout, "\nconvert ", filename_morpho, " to gmsh file format.... ", filename_geo, "\n\n");    
 }
 
+void export_morpho_to_x3d(const std::string & filename_morpho, const std::string & filename_x3d,
+                          po::variables_map & options){
+    x3d_exporter exporter(filename_morpho, filename_x3d);
+
+    exporter.export_to_sphere();
+
+    fmt::scat(std::cout, "\nconvert ", filename_morpho, " to x3d file format.... ", filename_x3d, "\n\n");
+}
+
+
 
 
 int main(int argc, char** argv){
@@ -111,11 +124,19 @@ int main(int argc, char** argv){
         if(options.count("command") && options.count("subargs") ){
             std::string command = options["command"].as<std::string>();
             std::vector<std::string> subargs = po::collect_unrecognized(parsed_options.options, po::include_positional);
-            if(command == "export" 
-                && subargs.size() == 4 
-                && subargs[1] == "gmsh"){
-                export_morpho_to_mesh(subargs[2], subargs[3], options);
-                return 0;
+            if(command == "export" ){
+
+                if(subargs.size() == 4
+                    && subargs[1] == "gmsh"){
+                    export_morpho_to_mesh(subargs[2], subargs[3], options);
+                    return 0;
+                }
+
+                if(subargs.size() == 4
+                    && subargs[1] == "x3d"){
+                    export_morpho_to_x3d(subargs[2], subargs[3], options);
+                    return 0;
+                }
             };
         }
 
