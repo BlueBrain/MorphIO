@@ -31,6 +31,43 @@ void gmsh_exporter::export_to_point_cloud(){
 }
 
 
+void gmsh_exporter::export_to_wireframe(){
+    serialize_header();
+
+    morpho_tree tree = reader.create_morpho_tree();
+
+    std::size_t n_branch = tree.get_tree_size();
+
+    std::vector<std::pair<std::size_t, std::size_t>> range_vec;
+
+    // export points for the soma first
+    geo_stream << "// export morphology points \n";
+
+    {
+        size_t counter =0;
+        range_vec.resize(n_branch);
+        for(auto i = std::size_t(0); i < n_branch; ++i){
+            range_vec[i]=
+                        serialize_branch_points(tree.get_branch(i), counter);
+        }
+    }
+
+    fmt::scat(geo_stream, "\n\n");
+
+    {
+        std::size_t point_counter=0, line_counter=0;
+
+        serialize_branch_lines(tree,
+                               0,
+                               range_vec,
+                               line_counter,
+                               point_counter);
+
+    }
+
+}
+
+
 
 void gmsh_exporter::serialize_header(){
     geo_stream << gmsh_header << "\n";
@@ -46,6 +83,77 @@ void gmsh_exporter::serialize_header(){
               "lcar3 = .055;\n");
 
 }
+
+
+std::pair<std::size_t, std::size_t> gmsh_exporter::serialize_branch_points(const branch &b, std::size_t & counter){
+    auto& points = b.get_points();
+    auto& distance = b.get_distances();
+
+    assert(distance.size() == points.size1());
+
+    fmt::scat(geo_stream,
+              "// serialize points for branch ", b.get_id(), "\n");
+
+    const size_t init_counter = counter;
+
+
+    // we skip the first point, duplicate from last segment
+    for(std::size_t i =0; i < points.size1(); ++i){
+
+        fmt::scat(geo_stream,
+                  "Point(", counter, ") = {", points(i,0), ",", points(i,1), ",", points(i,2), ",", distance(i), "} ;\n");
+        counter++;
+
+    }
+
+    fmt::scat(geo_stream,
+              "\n\n");
+    // return last point id
+    return std::make_pair(init_counter, counter);
+
+}
+
+void gmsh_exporter::serialize_branch_lines(morpho_tree & tree,
+                                            size_t branch_id,
+                                            const std::vector<std::pair<std::size_t, std::size_t> > & vec_range,
+                                            size_t &counter, std::size_t & point_counter) {
+
+    if(branch_id >= tree.get_tree_size()){
+        return;
+    }
+
+    fmt::scat(geo_stream,
+              "// serialize lines for branch ", branch_id, "\n");
+
+    const auto & branch = tree.get_branch(branch_id);
+    const auto & parent_branch = tree.get_branch(branch.get_parent_id());
+
+    auto & points = branch.get_points();
+
+    // we skip the first point, duplicate from last segment
+
+    if(branch_id == 0){
+        fmt::scat(geo_stream,
+                  "Line(", counter, ") = {", vec_range[0].first, ",", vec_range[0].first+1, " } ;\n"
+                  );
+       counter +=1;
+       point_counter = vec_range[0].second;
+    }else{
+        point_counter = vec_range[branch_id].first;
+        for(std::size_t i =0; i < points.size1()-1; ++i){
+
+            fmt::scat(geo_stream,
+                  "Line(", counter, ") = {", point_counter, ",", point_counter+1, " } ;\n"
+                      );
+            counter += 1;
+            point_counter +=1;
+
+        }
+    }
+
+    serialize_branch_lines(tree, branch_id+1, vec_range, counter, point_counter);
+}
+
 
 void gmsh_exporter::serialize_points_raw(){
     geo_stream << "// export morphology points \n";

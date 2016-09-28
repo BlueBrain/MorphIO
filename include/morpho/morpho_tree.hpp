@@ -14,9 +14,9 @@ namespace morpho{
 
 enum branch_type{
     soma_type =0x00,
-    dentrite_type = 0x01,
-    axon_type = 0x02
-
+    axon_type = 0x01,
+    dentrite_basal_type = 0x02,
+    dentrite_apical_type = 0x03
 };
 
 
@@ -49,6 +49,11 @@ public:
         return _points;
     }
 
+    inline const vec_double & get_distances() const{
+        return _distances;
+    }
+
+
     inline branch_type get_type() const{
         return _type;
     }
@@ -63,6 +68,10 @@ public:
 
     inline std::size_t get_parent() const{
         return _parent_id;
+    }
+
+    inline std::size_t get_id() const{
+        return _id;
     }
 
 private:
@@ -88,6 +97,10 @@ class morpho_tree : private boost::noncopyable{
 public:
     inline morpho_tree() {}
     inline virtual ~morpho_tree(){}
+
+    morpho_tree(morpho_tree && other){
+        _branches = std::move(other._branches);
+    }
 
 
     ///

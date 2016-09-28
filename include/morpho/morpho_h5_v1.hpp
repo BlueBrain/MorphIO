@@ -10,6 +10,8 @@
 
 #include <highfive/H5File.hpp>
 
+#include "morpho_tree.hpp"
+
 
 namespace morpho{
 
@@ -54,6 +56,8 @@ public:
     inline mat_points get_soma_points_raw() const;
 
 
+    inline mat_index get_struct_raw() const;
+
     ///
     /// \brief points range of a given branch by id
     /// \return range( offset, count )
@@ -68,6 +72,9 @@ public:
     inline const std::string & get_filename() const{
         return filename;
     }
+
+
+    inline morpho_tree create_morpho_tree() const;
 
 
 private:

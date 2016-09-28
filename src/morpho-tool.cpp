@@ -43,7 +43,8 @@ std::string version(){
 void export_morpho_to_mesh(const std::string & filename_morpho, const std::string & filename_geo){
     gmsh_exporter exporter(filename_morpho, filename_geo);
 
-    exporter.export_to_point_cloud();
+//    exporter.export_to_point_cloud();
+    exporter.export_to_wireframe();
 }
 
 

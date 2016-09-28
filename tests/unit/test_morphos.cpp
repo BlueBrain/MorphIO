@@ -30,10 +30,10 @@ BOOST_AUTO_TEST_CASE( test_morpho_tree )
 
     BOOST_CHECK_EQUAL(tree.get_branch(0).get_childrens().size(), 0);
 
-    id = tree.add_child(0, std::unique_ptr<branch>(new branch(dentrite_type)));
+    id = tree.add_child(0, std::unique_ptr<branch>(new branch(dentrite_basal_type)));
     BOOST_CHECK_EQUAL(id, 1);
     BOOST_CHECK_EQUAL(tree.get_tree_size(), 2);
-    BOOST_CHECK_EQUAL(tree.get_branch(1).get_type(), morpho::dentrite_type);
+    BOOST_CHECK_EQUAL(tree.get_branch(1).get_type(), morpho::dentrite_basal_type);
 
     BOOST_CHECK_EQUAL(tree.get_branch(0).get_childrens().size(), 1);
     BOOST_CHECK_EQUAL(tree.get_branch(0).get_childrens()[0], id);
