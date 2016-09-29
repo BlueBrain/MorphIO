@@ -5,10 +5,11 @@
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
 #
 
-if( NOT Boost_PYTHON${USE_BOOST_PYTHON_VERSION}_LIBRARY OR
-    NOT PYTHONLIBS_FOUND OR NOT PYTHON_EXECUTABLE )
+if(NOT Boost_PYTHON${USE_BOOST_PYTHON_VERSION}_LIBRARY OR
+   NOT PYTHONLIBS_FOUND OR NOT PYTHON_EXECUTABLE OR
+   NOT NUMPY_FOUND)
 
-  message(STATUS "No Boost.Python or Python found. Disabling python bindings")
+  message(STATUS "Not configured brain.py: Boost.Python, Python or Numpy not found")
   return()
 endif()
 
