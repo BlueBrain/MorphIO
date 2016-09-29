@@ -59,6 +59,7 @@ po::parsed_options parse_args(int argc, char** argv,
         ("version", "output the version number")
         ("point-cloud", "gmsh: export to a point cloud")
         ("wireframe", "gmsh: export to a wired morphology (default)")
+        ("single-soma", "gmsh: represent soma as a single element, point or sphere")
         ("sphere", "x3d: export cloud of sphere (default)")
         ("command", po::value<std::string>(), "command to execute")
         ("subargs", po::value<std::vector<std::string> >(), "Arguments for command");
@@ -87,7 +88,13 @@ po::parsed_options parse_args(int argc, char** argv,
 
 void export_morpho_to_mesh(const std::string & filename_morpho, const std::string & filename_geo,
                           po::variables_map & options){
-    gmsh_exporter exporter(filename_morpho, filename_geo);
+
+    gmsh_exporter::exporter_flags flags;
+    if(options.count("single-soma")){
+        flags.set(gmsh_exporter::exporter_single_soma);
+    }
+
+    gmsh_exporter exporter(filename_morpho, filename_geo, flags);
 
     if(options.count("point-cloud")){
         exporter.export_to_point_cloud();

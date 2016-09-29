@@ -18,12 +18,11 @@ class gmsh_exporter
 {
 public:
 
-    enum exporter_flags {
-        none = 0x00,
-        point_soma = 0x01
-    };
+    typedef std::bitset<64> exporter_flags;
+    static constexpr int exporter_single_soma = 0x01;
 
-    gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename);
+
+    gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
 
 
     void export_to_point_cloud();
@@ -35,6 +34,7 @@ public:
 private:
     std::ofstream geo_stream;
     morpho::h5_v1::morpho_reader reader;
+    exporter_flags flags;
 
 
     void serialize_header();
