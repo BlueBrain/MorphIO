@@ -11,17 +11,15 @@ namespace fs = boost::filesystem;
 namespace morpho{
 
 
+
 void points_distance_to_sphere(const branch::point & point, double distance,
+                               const std::string & sphere_unit_name,
                                std::ostream & output){
 
     fmt::scat(output,
-    "<Transform translation='", point[0], " ", point[1], " ", point[2], "'>" "\n"
-    "  <Shape>"  "\n"
-    "    <Sphere radius='", distance/2, "' />"  "\n"
-    "    <Appearance>"  "\n"
-    "      <Material DEF='MaterialLightBlue' diffuseColor='0.1 0.5 1'/>"  "\n"
-    "    </Appearance>"  "\n"
-    "  </Shape>"  "\n"
+    "<Transform translation='", point[0], " ", point[1], " ", point[2],
+            "' scale='", distance/2," ", distance/2 ," ",distance/2 ,"' >" "\n"
+    "  <Shape USE=\"",sphere_unit_name,"\" />"  "\n"
     "</Transform>"  "\n"
 
     );
@@ -41,9 +39,24 @@ void x3d_exporter::export_to_sphere(){
     });
 }
 
+static std::string get_sphere(const std::string reference_name){
+    return fmt::scat("<Shape DEF=\"",reference_name, "\">" "\n"
+               "  <Sphere radius='1.0' /> " "\n"
+               "  <Appearance>" "\n"
+               "    <Material DEF='MaterialLightBlue' diffuseColor='0.1 0.5 1'/>" "\n"
+               "  </Appearance>" "\n"
+               "</Shape>        " "\n");
+}
+
 
 void x3d_exporter::export_all_points(){
     fmt::scat(x3d_stream, "    <Group>" "\n");
+
+    const std::string sphere_unit_name = "baseSphere";
+
+    // export base sphere
+    fmt::scat(x3d_stream, get_sphere(sphere_unit_name));
+
 
     morpho_tree tree = reader.create_morpho_tree(morpho::h5_v1::morpho_reader::generate_single_soma);
 
@@ -55,7 +68,9 @@ void x3d_exporter::export_all_points(){
 
         assert(points.size1() == distance.size());
         for(std::size_t i = 0; i < points.size1(); ++i){
-            points_distance_to_sphere({ points(i,0), points(i,1), points(i,2) }, distance[i], x3d_stream);
+            points_distance_to_sphere({ points(i,0), points(i,1), points(i,2) }, distance[i],
+                                      sphere_unit_name,
+                                      x3d_stream);
         }
     }
 
