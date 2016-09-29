@@ -35,6 +35,8 @@ public:
     typedef boost::numeric::ublas::matrix<double> mat_points;
     typedef boost::numeric::ublas::vector<double> vec_double;
 
+    typedef boost::array<double, 3> point;
+
 
 
     inline branch(branch_type type_b) : _type(type_b), _id(0), _parent_id(0) {}

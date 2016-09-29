@@ -21,7 +21,7 @@ set(Boost_NO_BOOST_CMAKE TRUE)
 SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
 ## find dependencies
-find_package(Boost 1.41 QUIET REQUIRED COMPONENTS system program_options)
+find_package(Boost 1.41 QUIET REQUIRED COMPONENTS system filesystem program_options)
 find_package(HDF5 QUIET REQUIRED)
 
 
@@ -41,7 +41,8 @@ add_definitions( -DH5_USE_BOOST -DMORPHO_VERSION_MAJOR=\"${VERSION_MAJOR}\" -DMO
 
 aux_source_directory(src SRC_LIST)
 add_executable(morpho-tool ${SRC_LIST} ${MORPHO_HEADERS_BITS} ${MORPHO_HEADERS})
-target_link_libraries(morpho-tool ${HDF5_C_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARIES})
+target_link_libraries(morpho-tool ${HDF5_C_LIBRARIES} ${Boost_FILESYSTEM_LIBRARIES}
+                            ${Boost_SYSTEM_LIBRARIES} ${Boost_PROGRAM_OPTIONS_LIBRARIES})
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/morpho DESTINATION ${INCLUDE_INSTALL_DIR})
 install(TARGETS morpho-tool RUNTIME DESTINATION ${BIN_INSTALL_DIR})

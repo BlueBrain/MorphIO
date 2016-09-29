@@ -4,6 +4,7 @@
 
 #include "../morpho_h5_v1.hpp"
 
+#include <tuple>
 
 #include <boost/numeric/ublas/blas.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -13,6 +14,9 @@
 #include <highfive/H5DataSet.hpp>
 
 #include <hadoken/format/format.hpp>
+
+#include <hadoken/geometry/geometry.hpp>
+#include <hadoken/ublas/ublas.hpp>
 
 namespace morpho{
 
@@ -30,6 +34,39 @@ inline void split_xyz_and_distance(const morpho_reader::mat_points & raw_points,
         points(i,2) = raw_points(i,2);
         distance(i) = raw_points(i,3);
     }
+}
+
+inline void soma_gravity_center(const morpho_reader::mat_points & raw_points,
+                                                             morpho_reader::mat_points & center,
+                                                             double & distance){
+    distance =0;
+    center.resize(1, 3);
+
+    hadoken::ublas::zero(center);
+
+    for(std::size_t i = 0; i < raw_points.size1(); ++i){
+        for(std::size_t j = 0; j < 3; ++j){
+            center(0, j) += raw_points(i,j);
+        }
+    }
+
+
+    // compute gravity center
+    hadoken::ublas::for_each(center, [&](double & val){
+        val /= raw_points.size1();
+    });
+
+
+    // compute average distance from gravity center
+    for(std::size_t i = 0; i < raw_points.size1(); ++i){
+        const branch::point p = {{  raw_points(i,0),
+                              raw_points(i,1),
+                              raw_points(i,2) }};
+
+        distance += hadoken::geometry::distance3D(p.data(), &(center(0,0)));
+    }
+
+    distance /= raw_points.size1();
 }
 
 inline branch_type branch_type_from_h5v1(const int type_id){
@@ -142,7 +179,7 @@ morpho_reader::mat_index morpho_reader::get_struct_raw() const {
 
 
 
-morpho_tree morpho_reader::create_morpho_tree() const{
+morpho_tree morpho_reader::create_morpho_tree(generate_flags flags ) const{
 
 
     morpho_tree res;
@@ -153,12 +190,23 @@ morpho_tree morpho_reader::create_morpho_tree() const{
         std::unique_ptr<branch> soma(new branch(branch_type::soma));
 
         mat_points raw_soma_points  =  get_soma_points_raw();
-        branch::mat_points soma_points;
-        branch::vec_double soma_distance;
 
-        split_xyz_and_distance(raw_soma_points, soma_points, soma_distance);
+        if(flags & generate_single_soma){
+                branch::mat_points points(1,3);
+                branch::vec_double distance;
+                distance.resize(1);
 
-        soma->set_points(std::move(soma_points), std::move(soma_distance));
+                soma_gravity_center(raw_soma_points, points, distance(0));
+
+                soma->set_points(std::move(points), std::move(distance));
+        }else {
+            branch::mat_points soma_points;
+            branch::vec_double soma_distance;
+
+            split_xyz_and_distance(raw_soma_points, soma_points, soma_distance);
+
+            soma->set_points(std::move(soma_points), std::move(soma_distance));
+        }
         res.set_root(std::move(soma));
     }
 
