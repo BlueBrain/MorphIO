@@ -19,14 +19,14 @@ set(BRION_MAINTAINER
 set(BRION_LICENSE LGPL)
 set(BRION_DEB_DEPENDS libhdf5-serial-dev libboost-date-time-dev
   libboost-filesystem-dev libboost-regex-dev libboost-system-dev
-  libboost-test-dev)
+  libboost-test-dev libboost-thread-dev)
 
 set(COMMON_PROJECT_DOMAIN ch.epfl.bluebrain)
 include(Common)
 
 common_find_package(BBPTestData)
-common_find_package(Boost REQUIRED COMPONENTS date_time filesystem
-                    program_options regex system thread unit_test_framework)
+common_find_package(Boost REQUIRED COMPONENTS
+  date_time filesystem program_options regex system thread unit_test_framework)
 common_find_package(Boost COMPONENTS python${USE_BOOST_PYTHON_VERSION})
 common_find_package(HDF5 SYSTEM REQUIRED COMPONENTS C CXX)
 common_find_package(Lunchbox REQUIRED)
