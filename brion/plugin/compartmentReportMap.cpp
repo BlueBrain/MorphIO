@@ -258,7 +258,7 @@ bool CompartmentReportMap::_loadHeader()
         _store.fetch( scope + tunitKey );
         if( loadGIDs )
             _store.fetch( scope + gidsKey, _header.nGIDs * sizeof( uint32_t ));
-        BOOST_FOREACH( const uint32_t gid, _gids )
+        for( const uint32_t gid : _gids )
             _store.fetch( scope + countsKey + toString( gid ));
 #endif
 
@@ -270,14 +270,12 @@ bool CompartmentReportMap::_loadHeader()
         _readable = true;
 #ifdef ASYNC_IO
         if( loadGIDs )
-        {
-            BOOST_FOREACH( const uint32_t gid, _gids )
+            for( const uint32_t gid : _gids )
                 _store.fetch( scope + countsKey + toString( gid ));
-        }
 #endif
 
         uint64_t offset = 0;
-        BOOST_FOREACH( const uint32_t gid, _gids )
+        for( const uint32_t gid : _gids )
         {
             _cellCounts[ gid ] = _store.getVector< uint16_t >( scope +
                                                                countsKey +
@@ -332,7 +330,7 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
     const size_t index = _getFrameNumber( time );
     std::map< uint32_t, size_t > sizeMap;
 
-    BOOST_FOREACH( const uint32_t gid, _gids )
+    for( const uint32_t gid : _gids )
     {
         const CellCompartments::const_iterator i = _cellCounts.find( gid );
         if( i == _cellCounts.end( ))
@@ -350,7 +348,7 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
 #endif
     }
 
-    BOOST_FOREACH( const uint32_t gid, _gids )
+    for( const uint32_t gid : _gids )
     {
         LBASSERTINFO( iter < buffer->end(), buffer->size() << " gid " << gid );
         const std::string& cellData = _store[ scope + toString( gid ) + "_" +
