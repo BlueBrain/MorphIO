@@ -106,11 +106,12 @@ Quaternionf toQuaternion(
 {
     return Quaternionf( subarray[0], subarray[1], subarray[2], subarray[3] );
 }
+
+size_t nop( const size_t& in ) { return in; }
 #endif
 
 std::string toString( const std::string& in ) { return in; }
 size_t toSize_t( const std::string& in ) { return std::stoul( in ); }
-size_t nop( const size_t& in ) { return in; }
 
 template<typename T>
 void _shuffle( T& container )
