@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, EPFL/Blue Brain Project
+/* Copyright (c) 2015-2016, EPFL/Blue Brain Project
  *                     Stefan Eilemann <stefan.eilemann@epfl.ch>
  *                     Raphael Dumusc <raphael.dumusc@epfl.ch>
  *
@@ -20,6 +20,7 @@
 
 #include <brion/brion.h>
 #include <lunchbox/clock.h>
+#include <lunchbox/log.h>
 #include <lunchbox/sleep.h>
 
 #define STREAM_READ_TIMEOUT_MS  500

@@ -75,10 +75,12 @@ protected:
     const CellFamily _family;
 };
 
-/** Base interface for morphology readers plugins.
+/**
+ * Base interface for morphology readers plugins.
+ *
  * The following example creates a new plugin and registers it:
  * @code
- * class MyMorpholgy : MorphologyPlugin
+ * class MyMorphology : MorphologyPlugin
  * {
  *     MyMorphology( const MorphologyInitData& initData );
  *     static bool handles( const MorphologyInitData& initData );
