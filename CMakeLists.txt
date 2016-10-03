@@ -30,6 +30,7 @@ common_find_package(Boost REQUIRED COMPONENTS date_time filesystem
 common_find_package(Boost COMPONENTS python${USE_BOOST_PYTHON_VERSION})
 common_find_package(HDF5 SYSTEM REQUIRED COMPONENTS C CXX)
 common_find_package(Lunchbox REQUIRED)
+common_find_package(MVDTool)
 common_find_package(NumPy 1.7)
 common_find_package(OpenMP)
 common_find_package(PythonInterp)
