@@ -46,7 +46,7 @@ set_target_properties(brain_python PROPERTIES
 configure_file(brain/__init__.py
                ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/brain/__init__.py)
 
-set_property(GLOBAL APPEND PROPERTY BRION_ALL_DEP_TARGETS brain_python)
+add_dependencies(Brion-all brain_python)
 
 macro(COPY_AND_INSTALL_PACKAGE_DIRECTORY DIRECTORY)
     file(COPY brain/${DIRECTORY}
