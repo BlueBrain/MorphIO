@@ -89,7 +89,7 @@ inline branch_type branch_type_from_h5v1(const int type_id){
 
 namespace fmt = hadoken::format;
 
-morpho_reader::morpho_reader(const std::__cxx11::string & myfilename)  :
+morpho_reader::morpho_reader(const std::string & myfilename)  :
     h5_file(myfilename),
     filename(myfilename),
     structures(h5_file.getDataSet("/structure")),

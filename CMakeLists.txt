@@ -1,5 +1,5 @@
 project(morpho-tool)
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2)
 
 enable_testing()
 
@@ -16,7 +16,9 @@ include(ReleaseDebugAutoFlags)
 
 
 option(MORPHOTOOL_UNIT_TESTS "Enable or disable unit tests" ON)
+
 set(Boost_NO_BOOST_CMAKE TRUE)
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
 
 ## find dependencies
 find_package(Boost 1.41 QUIET REQUIRED COMPONENTS system filesystem program_options)
