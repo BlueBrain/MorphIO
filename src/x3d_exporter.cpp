@@ -28,7 +28,8 @@ void points_distance_to_sphere(const branch::point & point, double distance,
 
 x3d_exporter::x3d_exporter(const std::string & morphology_filename, const std::string & x3d_filename) :
     reader(morphology_filename),
-    x3d_stream(x3d_filename)
+    x3d_stream(x3d_filename),
+    dest_filename(x3d_filename)
 {
 
 }
@@ -96,7 +97,36 @@ void x3d_exporter::envelop_header_and_footer(const std::function<void ()> & fcon
               );
 
 
+    html_viewer();
 
+}
+
+void x3d_exporter::html_viewer(){
+    fs::path html_filename = fs::path(dest_filename).parent_path();
+    html_filename /= fs::path(dest_filename).stem();
+
+    std::ofstream ohtml( fmt::scat(html_filename.native(), "_page.html"));
+
+    fmt::scat(ohtml,
+              "<html>" "\n"
+              "<head>" "\n"
+              "    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"/>" "\n"
+              "    <title>Rendering test page for ", dest_filename, " </title>" "\n"
+              "    <script type='text/javascript' src='http://www.x3dom.org/download/x3dom.js'> </script>" "\n"
+              "    <link rel='stylesheet' type='text/css' href='http://www.x3dom.org/download/x3dom.css'/>" "\n"
+              "</head>" "\n"
+              "<body>" "\n"
+              "<h1>Rendering test page for ", dest_filename, "</h1>" "\n"
+              "<script>" "\n"
+              "</script>" "\n"
+              "<x3d width='1200px' height='800px'>" "\n"
+              "    <scene>" "\n"
+              "            <Inline nameSpaceName=\"Morpho\" mapDEFToID=\"true\"" "\n"
+              "                     url=\"", dest_filename, "\" />" "\n"
+              "    </scene>" "\n"
+              "</x3d>" "\n"
+              "</body>" "\n"
+              "</html>");
 }
 
 } // morpho

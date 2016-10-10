@@ -105,6 +105,9 @@ std::pair<std::size_t, std::size_t> gmsh_exporter::serialize_branch_points(const
 
         fmt::scat(geo_stream,
                   "Point(", counter, ") = {", points(i,0), ",", points(i,1), ",", points(i,2), ",", distance(i), "} ;\n");
+
+        fmt::scat(geo_stream,
+                  "Physical Point(", counter, ") = {", counter, "} ;\n");
         counter++;
 
     }
@@ -148,14 +151,18 @@ void gmsh_exporter::serialize_branch_lines(morpho_tree & tree,
                   "// link to parent soma \n"
                   "Line(", counter, ") = {", vec_range[parent_branch.get_id()].first, ",", point_counter, " } ;\n"
                       );
+            fmt::scat(geo_stream,
+                      "Physical Line(", counter, ") = {", counter, "} ;\n");
             counter += 1;
         }
 
         for(std::size_t i =0; i < points.size1()-1; ++i){
 
             fmt::scat(geo_stream,
-                  "Line(", counter, ") = {", point_counter, ",", point_counter+1, " } ;\n"
+                  "Line(", counter, ") = { ", point_counter, ",", point_counter+1, " } ;\n"
                       );
+            fmt::scat(geo_stream,
+                      "Physical Line(", counter, ") = { ", counter, " } ;\n");
             counter += 1;
             point_counter +=1;
 

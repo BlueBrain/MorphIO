@@ -21,9 +21,12 @@ public:
 private:
     morpho::h5_v1::morpho_reader reader;
     std::ofstream x3d_stream;
+    std::string dest_filename;
 
 
     void envelop_header_and_footer(const std::function<void (void)> & fcontent);
+
+    void html_viewer();
 
     void export_all_points();
 };
