@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # Release 1.9.0 (git master)
 
+* [102](https://github.com/BlueBrain/Brion/pull/102):
+  Use PersistentMap for caching synapse positions loaded from brain::Circuit
 * [94](https://github.com/BlueBrain/Brion/pull/94):
   Fixed SWC morphology parser for morphologies with soma contour. The parser was
   creating invalid soma sections when the first order sections where connected

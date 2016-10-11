@@ -16,6 +16,6 @@ variables:
   * each morphology is hashed by its canonical filepath if COORDINATES_LOCAL
   * each morphology is hashed by its canonical filepath plus canonical circuit
     filepath and GID if COORDINATES_GLOBAL
-* Synapse attributes from brion::Synapse::read()
-  * each set of synapse attributes is hashed together with the synapse canonical
-    filepath and GID
+* Synapse position from brain::Circuit::get<type>Synapses()
+  * all synapse positions per neuron are hashed by its canonical filepath of the
+    nrn file plus if afferent/efferent plus the GID of the neuron.

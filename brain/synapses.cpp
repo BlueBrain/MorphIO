@@ -184,17 +184,71 @@ struct Synapses::Impl : public Synapses::BaseImpl
         if( _preSurfacePositionX )
             return;
 
-        const bool haveSize = _size > 0;
-        const brion::Synapse& synapsePositions =
-                _circuit._impl->getSynapsePositions( _afferent );
-        _allocatePositions( haveSize ? _size
-                                     : synapsePositions.getNumSynapses( gids ));
-
-        size_t i = 0;
+        Strings hashes;
+        hashes.reserve( gids.size( ));
+        const auto& path = _circuit._impl->_synapseSource.getPath();
+        const std::string baseHash( fs::canonical( path ).generic_string( ));
         for( const auto gid : gids )
         {
-            const auto& pos = synapsePositions.read( gid,
-                                                     brion::SYNAPSE_POSITION );
+            std::string gidHash = baseHash;
+            gidHash += _afferent ? "_afferent" : "_efferent";
+            gidHash += std::to_string( gid );
+            gidHash = servus::make_uint128( gidHash ).getString();
+            hashes.push_back( gidHash );
+        }
+
+        CachedSynapses loaded =
+                        _circuit._impl->loadSynapsePositionsFromCache( hashes );
+
+        const bool haveSize = _size > 0;
+
+        // delay the opening of the synapse file as much as possible, even
+        // though the code looks ugly... As the circuit impl keeps the file
+        // opened, we can safely just get a loose pointer here.
+        const brion::Synapse* synapsePositions = nullptr;
+
+        if( !haveSize )
+        {
+            auto hash = hashes.begin();
+            for( const auto gid : gids )
+            {
+                auto it = loaded.find( *hash );
+                ++hash;
+                if( it != loaded.end() )
+                    _size += it->second.shape()[0];
+                else
+                {
+                    if( !synapsePositions )
+                        synapsePositions =
+                              &_circuit._impl->getSynapsePositions( _afferent );
+                    _size += synapsePositions->getNumSynapses( GIDSet{ gid } );
+                }
+            }
+        }
+
+        _allocatePositions( _size );
+
+        size_t i = 0;
+        auto hash = hashes.begin();
+        for( const auto gid : gids )
+        {
+            auto it = loaded.find( *hash );
+            const bool cached = it != loaded.end();
+
+            const auto readFromFile = [&]
+            {
+                if( !synapsePositions )
+                    synapsePositions =
+                            &_circuit._impl->getSynapsePositions( _afferent );
+                return synapsePositions->read( gid, brion::SYNAPSE_POSITION );
+            };
+
+            const brion::SynapseMatrix pos = cached ? it->second
+                                                    : readFromFile();
+
+            if( !cached )
+                _circuit._impl->saveSynapsePositionsToCache( gid, *hash, pos );
+            ++hash;
 
             for( size_t j = 0; j < pos.shape()[0]; ++j )
             {

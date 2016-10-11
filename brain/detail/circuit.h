@@ -42,10 +42,10 @@
 #endif
 
 #include <boost/filesystem.hpp>
-#include <boost/unordered_map.hpp>
 
 #include <future>
 #include <random>
+#include <unordered_map>
 
 namespace fs = boost::filesystem;
 using boost::lexical_cast;
@@ -134,7 +134,10 @@ void _shuffle( T& container )
     std::shuffle( container.begin(), container.end(), randomEngine );
 }
 
-typedef boost::unordered_map< std::string, neuron::MorphologyPtr > Loaded;
+typedef std::unordered_map< std::string,
+                            neuron::MorphologyPtr > CachedMorphologies;
+typedef std::unordered_map< std::string,
+                            brion::SynapseMatrix > CachedSynapses;
 } // anonymous namespace
 
 class Circuit::Impl
@@ -270,49 +273,111 @@ public:
         return **_synapsePositions[i];
     }
 
-    void saveToCache( const std::string& hash,
-                      neuron::MorphologyPtr morphology ) const
+    void saveMorphologiesToCache( const std::string& uri,
+                                  const std::string& hash,
+                                  neuron::MorphologyPtr morphology ) const
     {
-        if( _cache )
+        if( !_cache )
+            return;
+
+        servus::Serializable::Data data = morphology->toBinary();
+        if( !_cache->insert( hash, data.ptr.get(), data.size ))
         {
-            servus::Serializable::Data data = morphology->toBinary();
-            _cache->insert( hash, data.ptr.get(), data.size );
+            LBWARN << "Failed to insert morphology " << uri
+                   << " into cache; item size is " << float(data.size) / LB_1MB
+                   << " MB" << std::endl;
         }
     }
 
-    Loaded loadFromCache( const std::set< std::string >& hashes LB_UNUSED )
-        const
+    CachedMorphologies
+    loadMorphologiesFromCache( const std::set< std::string >& hashes ) const
     {
-        Loaded loaded;
-        if( _cache )
+        CachedMorphologies loaded;
+        if( !_cache )
+            return loaded;
+
+        LBDEBUG << "Using cache for morphology loading" << std::endl;
+        typedef std::future< std::pair< std::string,
+                                        neuron::MorphologyPtr >> Future;
+        std::vector< Future > futures;
+
+        Strings keys( hashes.begin(), hashes.end( ));
+        futures.reserve( keys.size( ));
+
+        _cache->takeValues( keys, [&futures] ( const std::string& key,
+                                               char* data, const size_t size )
         {
-            LBDEBUG << "Using cache for morphology loading" << std::endl;
-            typedef std::future< std::pair< std::string,
-                                            neuron::MorphologyPtr > > Future;
-            std::vector< Future > futures;
-
-            Strings keys( hashes.begin(), hashes.end( ));
-            futures.reserve( keys.size( ));
-
-            _cache->takeValues( keys, [&futures] ( const std::string& key,
-                                                 char* data, const size_t size )
+            futures.push_back( std::async( [key, data, size]
             {
-                futures.push_back( std::async( std::launch::async,
-                                               [key, data, size]
-                {
-                    neuron::MorphologyPtr morphology(
-                                new neuron::Morphology( data, size ));
-                    std::free( data );
-                    return std::make_pair( key, morphology );
-                }));
-            });
+                neuron::MorphologyPtr morphology(
+                            new neuron::Morphology( data, size ));
+                std::free( data );
+                return std::make_pair( key, morphology );
+            }));
+        });
 
-            for( auto& future : futures )
-                loaded.insert( future.get( ));
+        for( auto& future : futures )
+            loaded.insert( future.get( ));
 
-            LBINFO << "Loaded " << loaded.size() << " out of " << hashes.size()
-                   << " morphologies from cache" << std::endl;
+        LBINFO << "Loaded " << loaded.size() << " out of " << hashes.size()
+               << " morphologies from cache" << std::endl;
+        return loaded;
+    }
+
+    void saveSynapsePositionsToCache( const uint32_t gid,
+                                      const std::string& hash,
+                                      const brion::SynapseMatrix& value ) const
+    {
+        if( !_cache )
+            return;
+
+        const size_t size = value.num_elements() * sizeof( float );
+        if( !_cache->insert( hash, value.data(), size ))
+        {
+            LBWARN << "Failed to insert synapse positions for GID " << gid
+                   << " into cache; item size is " << float(size) / LB_1MB
+                   << " MB" << std::endl;
         }
+    }
+
+    CachedSynapses loadSynapsePositionsFromCache( const Strings& keys ) const
+    {
+        CachedSynapses loaded;
+        if( !_cache )
+            return loaded;
+
+        LBDEBUG << "Using cache for synapses position loading" << std::endl;
+        typedef std::future< std::pair< std::string,
+                                        brion::SynapseMatrix >> Future;
+
+        std::vector< Future > futures;
+        futures.reserve( keys.size( ));
+
+        _cache->takeValues( keys, [&futures] ( const std::string& key,
+                                               char* data, const size_t size )
+        {
+            futures.push_back( std::async( [key, data, size]
+            {
+                // there is no constructor in multi_array which just accepts the
+                // size in bytes (although there's a getter for it used in
+                // saveSynapsePositionsToCache()), so we reconstruct the row and
+                // column count here.
+                const size_t numColumns = brion::SYNAPSE_POSITION_ALL;
+                const size_t numRows = size / sizeof(float) / numColumns;
+                brion::SynapseMatrix values( boost::extents[numRows]
+                                                           [numColumns]);
+                ::memmove( values.data(), data, size );
+                std::free( data );
+                return std::make_pair( key, values );
+            }));
+        });
+
+        for( auto& future : futures )
+            loaded.insert( future.get( ));
+
+        LBDEBUG << "Loaded synapse positions for " << loaded.size()
+                << " out of " << keys.size() << " neurons from cache"
+                << std::endl;
         return loaded;
     }
 

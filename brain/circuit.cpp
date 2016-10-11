@@ -115,7 +115,7 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
         hashes.insert( hash );
     }
 
-    Loaded loaded = _impl->loadFromCache( hashes );
+    CachedMorphologies cached = _impl->loadMorphologiesFromCache( hashes );
 
     // resolve missing morphologies and put them in GID-order into result
     neuron::Morphologies result;
@@ -128,8 +128,8 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
         const URI& uri = uris[i];
 
         const std::string& hash = gidHashes[i];
-        Loaded::const_iterator it = loaded.find( hash );
-        if( it == loaded.end( ))
+        CachedMorphologies::const_iterator it = cached.find( hash );
+        if( it == cached.end( ))
         {
             neuron::MorphologyPtr morphology;
             const brion::Morphology raw( uri.getPath( ));
@@ -138,9 +138,9 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
             else
                 morphology.reset( new neuron::Morphology( raw ));
 
-            loaded.insert( std::make_pair( hash, morphology ));
+            cached.insert( std::make_pair( hash, morphology ));
 
-            _impl->saveToCache( hash, morphology );
+            _impl->saveMorphologiesToCache( uri.getPath(), hash, morphology );
 
             result.push_back( morphology );
         }
