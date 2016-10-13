@@ -169,12 +169,12 @@ circuitWrapper
     .def( "rotations", Circuit_getRotations )
     .def( "num_neurons", &Circuit::getNumNeurons )
     .def( "afferent_synapses", Circuit_getAfferentSynapses,
-          ( bp::arg( "gids"), bp::arg( "prefetch" ) = SynapsePrefetch::all ))
+          ( bp::arg( "gids"), bp::arg( "prefetch" ) = SynapsePrefetch::none ))
     .def( "efferent_synapses", Circuit_getEfferentSynapses,
-          ( bp::arg( "gids"), bp::arg( "prefetch" ) = SynapsePrefetch::all ))
+          ( bp::arg( "gids"), bp::arg( "prefetch" ) = SynapsePrefetch::none ))
     .def( "projected_synapses", Circuit_getProjectedSynapses,
           ( bp::arg( "preGids"), bp::arg( "postGIDs" ),
-            bp::arg( "prefetch" ) = SynapsePrefetch::all ))
+            bp::arg( "prefetch" ) = SynapsePrefetch::none ))
     ;
 }
 

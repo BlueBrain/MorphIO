@@ -136,7 +136,7 @@ public:
      */
     BRAIN_API SynapsesStream getAfferentSynapses(
         const GIDSet& gids,
-        SynapsePrefetch prefetch = SynapsePrefetch::all ) const;
+        SynapsePrefetch prefetch = SynapsePrefetch::none ) const;
 
     /**
      * Access all efferent synapses of the given GIDs.
@@ -147,7 +147,7 @@ public:
      */
     BRAIN_API SynapsesStream getEfferentSynapses(
         const GIDSet& gids,
-        SynapsePrefetch prefetch = SynapsePrefetch::all ) const;
+        SynapsePrefetch prefetch = SynapsePrefetch::none ) const;
 
     /**
      * Access all synapses along the projection from the pre- to the postGIDs.
@@ -159,7 +159,7 @@ public:
      */
     BRAIN_API SynapsesStream getProjectedSynapses(
         const GIDSet& preGIDs, const GIDSet& postGIDs,
-        SynapsePrefetch prefetch = SynapsePrefetch::all ) const;
+        SynapsePrefetch prefetch = SynapsePrefetch::none ) const;
 
     class Impl; //!< @internal, public for inheritance MVD2/3 impls
 

@@ -30,7 +30,7 @@ class TestCircuitFunctions(unittest.TestCase):
         synapses = self.circuit.afferent_synapses(gids)
         assert(len(synapses) == 312)
         synapses = self.circuit.afferent_synapses(gids,
-                                                  brain.SynapsePrefetch.none)
+                                                  brain.SynapsePrefetch.all)
         assert(len(synapses) == 312)
 
     def test_efferent(self):
@@ -38,7 +38,7 @@ class TestCircuitFunctions(unittest.TestCase):
         synapses = self.circuit.efferent_synapses(gids)
         assert(len(synapses) == 331)
         synapses = self.circuit.efferent_synapses(gids,
-                                                  brain.SynapsePrefetch.none)
+                                                  brain.SynapsePrefetch.all)
         assert(len(synapses) == 331)
 
     def test_projection(self):
@@ -47,7 +47,7 @@ class TestCircuitFunctions(unittest.TestCase):
         synapses = self.circuit.projected_synapses(pre, post)
         print(len(synapses) == 1888)
         synapses = self.circuit.projected_synapses(pre, post,
-                                                   brain.SynapsePrefetch.none)
+                                                   brain.SynapsePrefetch.all)
         assert(len(synapses) == 1888)
 
 class TestSynapsesAccessors(unittest.TestCase):
@@ -127,7 +127,7 @@ class TestMemoryManagement(unittest.TestCase):
 
     def test_synapses(self):
         circuit = brain.Circuit(brain.test.circuit_config)
-        synapses = circuit.afferent_synapses([320], brain.SynapsePrefetch.none)
+        synapses = circuit.afferent_synapses([320])
         del circuit
         delays = synapses.delays()
         for delay in delays:
@@ -135,7 +135,7 @@ class TestMemoryManagement(unittest.TestCase):
 
     def test_synapse(self):
         circuit = brain.Circuit(brain.test.circuit_config)
-        synapses = circuit.afferent_synapses([320], brain.SynapsePrefetch.none)
+        synapses = circuit.afferent_synapses([320])
         del circuit
         synapses = [s for s in synapses]
         for synapse in synapses:
