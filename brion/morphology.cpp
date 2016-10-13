@@ -32,8 +32,7 @@ namespace brion
 class Morphology::Impl
 {
 public:
-    typedef lunchbox::PluginFactory< MorphologyPlugin, MorphologyInitData >
-        MorphologyPluginFactory;
+    typedef lunchbox::PluginFactory< MorphologyPlugin > MorphologyPluginFactory;
 
     explicit Impl( const MorphologyInitData& initData )
         : plugin( MorphologyPluginFactory::getInstance().create( initData ))

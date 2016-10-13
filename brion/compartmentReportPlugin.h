@@ -36,7 +36,6 @@ namespace brion
 class CompartmentReportInitData : public PluginInitData
 {
 public:
-
     /** Create a CompartmentReportInitData object given a URI, access mode
      *  and GIDs.
      *
@@ -47,7 +46,7 @@ public:
      * @version 1.4
      */
     explicit CompartmentReportInitData( const URI& uri,
-                                        const int accessMode =  MODE_READ,
+                                        const int accessMode = MODE_READ,
                                         const GIDSet& gids = GIDSet( ))
         : PluginInitData( uri, accessMode )
         , _gids( gids )
@@ -58,10 +57,9 @@ public:
      * @return Returns the gids.
      * @version 1.4
      */
-    const GIDSet& getGids( ) const { return _gids; }
+    const GIDSet& getGids() const { return _gids; }
 
 private:
-
     const GIDSet _gids;
 };
 
@@ -90,7 +88,7 @@ class CompartmentReportPlugin : public boost::noncopyable
 {
 public:
     /** @internal Needed by the PluginRegisterer. */
-    typedef CompartmentReportPlugin PluginT;
+    typedef CompartmentReportPlugin InterfaceT;
 
     /** @internal Needed by the PluginRegisterer. */
     typedef CompartmentReportInitData InitDataT;

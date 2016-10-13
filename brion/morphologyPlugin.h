@@ -98,7 +98,7 @@ class MorphologyPlugin : public boost::noncopyable
 {
 public:
     /** @internal Needed by the PluginRegisterer. */
-    typedef MorphologyPlugin PluginT;
+    typedef MorphologyPlugin InterfaceT;
 
     /** @internal Needed by the PluginRegisterer. */
     typedef MorphologyInitData InitDataT;

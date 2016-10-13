@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2014-2016, EPFL/Blue Brain Project
  *                          Juan Hernando Vieites <jhernando@fi.upm.es>
  *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
  *
@@ -41,17 +41,16 @@ namespace detail
 class SpikeReport
 {
 public:
-    typedef lunchbox::PluginFactory< SpikeReportPlugin, SpikeReportInitData >
-                SpikePluginFactory;
+    typedef lunchbox::PluginFactory< SpikeReportPlugin > SpikePluginFactory;
 
     class DSOPluginsLoader
     {
     public:
         DSOPluginsLoader()
         {
-            SpikePluginFactory& factory = SpikePluginFactory::getInstance();
-            factory.load( BRION_VERSION_ABI, lunchbox::getLibraryPaths(),
-                          spikePluginDSONamePattern );
+            SpikePluginFactory::getInstance().load( BRION_VERSION_ABI,
+                                                    lunchbox::getLibraryPaths(),
+                                                    spikePluginDSONamePattern );
         }
     };
 

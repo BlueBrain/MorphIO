@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -34,14 +34,12 @@ namespace detail
 class CompartmentReport
 {
 public:
-    typedef lunchbox::PluginFactory< CompartmentReportPlugin,
-                                     CompartmentReportInitData >
-                                                    CompartmentPluginFactory;
+    typedef lunchbox::PluginFactory< CompartmentReportPlugin >
+        CompartmentPluginFactory;
 
     explicit CompartmentReport( const CompartmentReportInitData& initData )
         : plugin( CompartmentPluginFactory::getInstance().create( initData ))
-    {
-    }
+    {}
 
     const boost::scoped_ptr< CompartmentReportPlugin > plugin;
 
@@ -50,11 +48,9 @@ public:
 
 CompartmentReport::CompartmentReport( const URI& uri, const int mode,
                                       const GIDSet& gids )
-    : _impl( new detail::CompartmentReport( CompartmentReportInitData( uri,
-                                                                       mode,
-                                                                       gids )))
-{
-}
+    : _impl( new detail::CompartmentReport(
+                 CompartmentReportInitData( uri, mode, gids )))
+{}
 
 CompartmentReport::~CompartmentReport()
 {
