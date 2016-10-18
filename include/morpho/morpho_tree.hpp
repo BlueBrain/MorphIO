@@ -35,7 +35,7 @@ public:
     typedef boost::numeric::ublas::matrix<double> mat_points;
     typedef boost::numeric::ublas::vector<double> vec_double;
 
-    typedef boost::array<double, 3> point;
+    typedef std::array<double, 3> point;
 
 
 
@@ -91,6 +91,20 @@ private:
     std::vector<std::size_t > _childrens;
 
     friend class morpho_tree;
+};
+
+
+///
+/// \brief soma branch type
+///
+class soma : public branch{
+public:
+    inline soma() : branch(branch_type::soma) {}
+    inline virtual ~soma(){}
+
+
+private:
+
 };
 
 

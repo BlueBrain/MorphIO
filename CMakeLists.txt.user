@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.1.82, 2016-09-29T00:42:46. -->
+<!-- Written by QtCreator 4.1.82, 2016-10-18T01:16:36. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -64,12 +64,9 @@
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{cf3a3a95-ea88-4cfe-b782-8e4faeba1052}</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
-   <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
+   <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">1</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
-    <valuelist type="QVariantList" key="CMake.Configuration">
-     <value type="QString">CMAKE_CXX_COMPILER:FILEPATH=/usr/bin/c++</value>
-     <value type="QString">CMAKE_C_COMPILER:FILEPATH=/usr/bin/cc</value>
-    </valuelist>
+    <valuelist type="QVariantList" key="CMake.Configuration"/>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/didi/workspace/EPFL/morpho-tools-build</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
