@@ -24,12 +24,8 @@ before_install:
   - brew outdated cmake || brew upgrade cmake
   - brew install cppcheck doxygen ninja
   - brew install homebrew/science/hdf5
-  - brew tap homebrew/versions
-  - brew install homebrew/versions/boost159
-  - brew switch boost159 1.59.0
 script:
   - mkdir $BUILD_TYPE
   - cd $BUILD_TYPE
   - cmake -GNinja -DCMAKE_INSTALL_PREFIX=$PWD/install -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
   - ninja all && ninja $PROJECT_NAME-tests && ninja install
-
