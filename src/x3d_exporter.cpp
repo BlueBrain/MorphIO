@@ -6,6 +6,7 @@
 #include <morpho/morpho_tree.hpp>
 
 namespace fmt = hadoken::format;
+namespace geo = hadoken::geometry::cartesian;
 namespace fs = boost::filesystem;
 
 namespace morpho{
@@ -17,7 +18,7 @@ void points_distance_to_sphere(const branch::point & point, double distance,
                                std::ostream & output){
 
     fmt::scat(output,
-    "<Transform translation='", point[0], " ", point[1], " ", point[2],
+    "<Transform translation='", geo::get_x(point), " ", geo::get_y(point), " ", geo::get_z(point),
             "' scale='", distance/2," ", distance/2 ," ",distance/2 ,"' >" "\n"
     "  <Shape USE=\"",sphere_unit_name,"\" />"  "\n"
     "</Transform>"  "\n"
@@ -59,9 +60,15 @@ void x3d_exporter::export_all_points(){
     fmt::scat(x3d_stream, get_sphere(sphere_unit_name));
 
 
-    morpho_tree tree = reader.create_morpho_tree(morpho::h5_v1::morpho_reader::generate_single_soma);
+    morpho_tree tree = reader.create_morpho_tree();
 
-    for(std::size_t b_id =0; b_id < tree.get_tree_size(); ++b_id){
+    // export soma
+    auto & soma = static_cast<branch_soma&>(tree.get_branch(0));
+    auto sphere = soma.get_sphere();
+    points_distance_to_sphere(sphere.get_center(), sphere.get_radius(), sphere_unit_name, x3d_stream);
+
+    // export points
+    for(std::size_t b_id =1; b_id < tree.get_tree_size(); ++b_id){
 
         auto & branch = tree.get_branch(b_id);
         auto & points = branch.get_points();

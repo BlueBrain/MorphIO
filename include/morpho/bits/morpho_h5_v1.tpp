@@ -36,38 +36,6 @@ inline void split_xyz_and_distance(const morpho_reader::mat_points & raw_points,
     }
 }
 
-inline void soma_gravity_center(const morpho_reader::mat_points & raw_points,
-                                                             morpho_reader::mat_points & center,
-                                                             double & distance){
-    distance =0;
-    center.resize(1, 3);
-
-    hadoken::ublas::zero(center);
-
-    for(std::size_t i = 0; i < raw_points.size1(); ++i){
-        for(std::size_t j = 0; j < 3; ++j){
-            center(0, j) += raw_points(i,j);
-        }
-    }
-
-
-    // compute gravity center
-    hadoken::ublas::for_each(center, [&](double & val){
-        val /= raw_points.size1();
-    });
-
-
-    // compute average distance from gravity center
-    for(std::size_t i = 0; i < raw_points.size1(); ++i){
-        const branch::point p = {{  raw_points(i,0),
-                              raw_points(i,1),
-                              raw_points(i,2) }};
-
-        distance += hadoken::geometry::distance3D(p.data(), &(center(0,0)));
-    }
-
-    distance /= raw_points.size1();
-}
 
 inline branch_type branch_type_from_h5v1(const int type_id){
     switch(type_id){
@@ -177,36 +145,43 @@ morpho_reader::mat_index morpho_reader::get_struct_raw() const {
     return res;
 }
 
+/// check if branch has duplicted points with parent
+static inline bool check_duplicated_point(branch::mat_range_points & prev_range, branch::mat_range_points & range){
+    namespace geo = hadoken::geometry::cartesian;
+    std::size_t prev_range_last_elem = prev_range.size1()-1;
+    const geo::point3d point_prev(prev_range(prev_range_last_elem, 0), prev_range(prev_range_last_elem, 1), prev_range(prev_range_last_elem, 2));
+    const geo::point3d point_new(range(0, 0), range(0, 1), range(0, 2));
+
+    if( geo::distance(
+                point_prev,
+                point_new) <= 0.001){
+        std::cout << "duplicated point" << std::endl;
+        return true;
+    }
+    std::cout << "not duplicated" << std::endl;
+    return false;
+ }
 
 
-morpho_tree morpho_reader::create_morpho_tree(generate_flags flags ) const{
+morpho_tree morpho_reader::create_morpho_tree() const{
 
+    namespace ublas = boost::numeric::ublas;
 
     morpho_tree res;
 
 
     {
         // create soma
-        std::unique_ptr<branch> soma(new branch(branch_type::soma));
+        std::unique_ptr<branch> soma(new branch_soma());
 
         mat_points raw_soma_points  =  get_soma_points_raw();
 
-        if(flags & generate_single_soma){
-                branch::mat_points points(1,3);
-                branch::vec_double distance;
-                distance.resize(1);
+        branch::mat_points soma_points;
+        branch::vec_double soma_distance;
 
-                soma_gravity_center(raw_soma_points, points, distance(0));
+        split_xyz_and_distance(raw_soma_points, soma_points, soma_distance);
 
-                soma->set_points(std::move(points), std::move(distance));
-        }else {
-            branch::mat_points soma_points;
-            branch::vec_double soma_distance;
-
-            split_xyz_and_distance(raw_soma_points, soma_points, soma_distance);
-
-            soma->set_points(std::move(soma_points), std::move(soma_distance));
-        }
+        soma->set_points(std::move(soma_points), std::move(soma_distance));
         res.set_root(std::move(soma));
     }
 
@@ -224,19 +199,17 @@ morpho_tree morpho_reader::create_morpho_tree(generate_flags flags ) const{
 
             auto raw_mat_range = get_branch_range_raw(i);
 
-            branch_points.resize(raw_mat_range.second, 3);
-            branch_distance.resize(raw_mat_range.second);
+            const std::size_t n_row = raw_mat_range.second;
+            const std::size_t n_col = 3;
+            branch_points.resize(n_row, n_col);
+            branch_distance.resize(n_row);
 
             // first line -> end segment previous branch
             const int prev_id = struct_raw(i, 2);
 
-            // add all the points from this branch
-            for(std::size_t p = 0; p < raw_mat_range.second; ++p){
-                for(std::size_t c =0; c < 3; ++c){
-                    branch_points(p, c) = points_raw(raw_mat_range.first +p, c);
-                }
-                branch_distance(p) = points_raw(raw_mat_range.first +p, 3);
-            }
+            branch::mat_range_points range_points_raw(points_raw, branch::range(raw_mat_range.first, raw_mat_range.first+ n_row), branch::range(0, n_col));
+            branch_points = range_points_raw;
+            branch_distance = ublas::subrange( ublas::column(points_raw, 3), raw_mat_range.first, raw_mat_range.first+ n_row);
 
             std::unique_ptr<branch> b(new branch(branch_type_from_h5v1(struct_raw(i, 1))));
             b->set_points(std::move(branch_points), std::move(branch_distance));
@@ -247,9 +220,10 @@ morpho_tree morpho_reader::create_morpho_tree(generate_flags flags ) const{
     }
 
 
-
     return res;
 }
+
+
 
 
 

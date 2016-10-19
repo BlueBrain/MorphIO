@@ -22,10 +22,6 @@ using namespace boost::numeric;
 
 class morpho_reader{
 public:
-    enum generate_flags{
-        generate_default = 0x00,
-        generate_single_soma = 0x01
-    };
 
     typedef ublas::matrix<double> mat_points;
     typedef ublas::matrix<int> mat_index;
@@ -79,7 +75,7 @@ public:
     }
 
 
-    inline morpho_tree create_morpho_tree(generate_flags flags = generate_default) const;
+    inline morpho_tree create_morpho_tree() const;
 
 
 private:

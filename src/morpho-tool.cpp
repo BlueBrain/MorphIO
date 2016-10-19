@@ -89,9 +89,9 @@ po::parsed_options parse_args(int argc, char** argv,
 void export_morpho_to_mesh(const std::string & filename_morpho, const std::string & filename_geo,
                           po::variables_map & options){
 
-    gmsh_exporter::exporter_flags flags;
+    gmsh_exporter::exporter_flags flags = 0;
     if(options.count("single-soma")){
-        flags.set(gmsh_exporter::exporter_single_soma);
+        flags |= gmsh_exporter::exporter_single_soma;
     }
 
     gmsh_exporter exporter(filename_morpho, filename_geo, flags);

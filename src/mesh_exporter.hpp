@@ -127,7 +127,7 @@ class gmsh_exporter
 {
 public:
 
-    typedef std::bitset<64> exporter_flags;
+    typedef int exporter_flags;
     static constexpr int exporter_single_soma = 0x01;
 
 

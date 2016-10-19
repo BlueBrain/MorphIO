@@ -10,6 +10,9 @@
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
+#include <hadoken/geometry/geometry.hpp>
+#include <hadoken/format/format.hpp>
+
 
 namespace morpho{
 
@@ -32,14 +35,20 @@ enum class branch_type{
 ///
 class branch : private boost::noncopyable{
 public:
+
     typedef boost::numeric::ublas::matrix<double> mat_points;
+    typedef boost::numeric::ublas::matrix_range<mat_points> mat_range_points;
+
     typedef boost::numeric::ublas::vector<double> vec_double;
+    typedef boost::numeric::ublas::vector_range<vec_double> vec_double_range;
 
-    typedef std::array<double, 3> point;
+    using range =  boost::numeric::ublas::range;
+    using point = hadoken::geometry::cartesian::point3d;
+    using linestring = hadoken::geometry::cartesian::linestring3d;
 
 
 
-    inline branch(branch_type type_b) : _type(type_b), _id(0), _parent_id(0) {}
+    inline branch(branch_type type_b) : _type(type_b), _parent(nullptr), _id(0) {}
 
     inline virtual ~branch(){}
 
@@ -58,13 +67,25 @@ public:
         return _distances;
     }
 
+    inline std::size_t get_size() const{
+        assert(_distances.size() == _points.size1());
+        return _distances.size();
+    }
+
+    inline point get_point(const std::size_t id) const{
+        namespace fmt = hadoken::format;
+        if(id >= get_size()){
+            std::out_of_range(fmt::scat("id ", id, " out of range "));
+        }
+        return point(_points(id, 0),
+                      _points(id, 1),
+                      _points(id, 2));
+    }
+
+    inline linestring get_linestring() const;
 
     inline branch_type get_type() const{
         return _type;
-    }
-
-    inline std::size_t get_parent_id() const{
-        return _parent_id;
     }
 
     inline const std::vector<std::size_t> & get_childrens() const{
@@ -72,7 +93,10 @@ public:
     }
 
     inline std::size_t get_parent() const{
-        return _parent_id;
+        if(_parent == nullptr)
+            return 0;
+        return _parent->get_id();
+
     }
 
     inline std::size_t get_id() const{
@@ -82,7 +106,9 @@ public:
 private:
     branch_type _type;
 
-    std::size_t _id, _parent_id;
+    branch* _parent;
+
+    std::size_t _id;
 
     mat_points _points;
 
@@ -97,10 +123,15 @@ private:
 ///
 /// \brief soma branch type
 ///
-class soma : public branch{
+class branch_soma : public branch{
 public:
-    inline soma() : branch(branch_type::soma) {}
-    inline virtual ~soma(){}
+    using sphere = hadoken::geometry::cartesian::sphere3d;
+
+    inline branch_soma() : branch(branch_type::soma) {}
+    inline virtual ~branch_soma(){}
+
+
+   inline  sphere get_sphere() const;
 
 
 private:
@@ -114,9 +145,11 @@ private:
 class morpho_tree : private boost::noncopyable{
 public:
     /// flags
-    static constexpr int point_soma = 0x01;
+    static constexpr int point_soma_flag = 0x01;
+    static constexpr int no_dup_point_flag = 0x02;
 
-    inline morpho_tree() {}
+
+    inline morpho_tree() : _branches(), _flags(0) {}
     inline virtual ~morpho_tree(){}
 
     morpho_tree(morpho_tree && other){
@@ -130,7 +163,7 @@ public:
     ///
     inline std::size_t set_root(std::unique_ptr<branch> && root_elem){
         root_elem->_id = 0;
-        root_elem->_parent_id = 0;
+        root_elem->_parent = nullptr;
         _branches.emplace_back(std::move(root_elem));
         return 0;
     }
@@ -147,10 +180,10 @@ public:
             std::runtime_error("Invalid parent id ");
         }
 
-        const std::size_t my_id = _branches.size();;
+        const std::size_t my_id = _branches.size();
 
         children->_id = my_id;
-        children->_parent_id = parent_id;
+        children->_parent = &get_branch(parent_id);
 
         _branches.emplace_back(std::move(children));
         _branches[parent_id]->_childrens.push_back(my_id);
@@ -179,22 +212,24 @@ public:
         return _branches.size();
     }
 
-    inline void add_flag(const std::bitset<64> & flag){
+    inline void add_flag(int flag){
         _flags |= flag;
     }
 
-    inline std::bitset<64> get_flags() const{
+    inline int get_flags() const{
         return _flags;
     }
 
 
 private:
     std::vector<std::unique_ptr<branch> > _branches;
-    std::bitset<64> _flags;
+    int _flags;
 
 };
 
 } //morpho
+
+#include "bits/morpho_tree_bits.hpp"
 
 #endif // MORPHO_TREE_HPP
 

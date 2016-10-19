@@ -81,10 +81,10 @@ void gmsh_abstract_file::export_points_to_stream(ostream &out){
 
     for(auto p = all_points.begin(); p != all_points.end(); ++p){
         fmt::scat(out,
-                  "Point(", p->id, ") = {", geo::get_x(p->coords), ",", geo::get_y(p->coords), ",", geo::get_z(p->coords), ",", p->diameter, "} ;\n");
+                  "Point(", p->id,") = {", geo::get_x(p->coords),", ", geo::get_y(p->coords), ", ", geo::get_z(p->coords), ", ", p->diameter,"};\n");
         if(p->isPhysical){
             fmt::scat(out,
-                      "Physical Point(", p->id, ") = { ", p->id, "} ;\n");
+                      "Physical Point(", p->id,") = {", p->id,"};\n");
         }
     }
 
@@ -100,10 +100,10 @@ void gmsh_abstract_file::export_segments_to_stream(ostream &out){
 
     for(auto p = all_segments.begin(); p != all_segments.end(); ++p){
         fmt::scat(out,
-                  "Line(", p->id, ") = {", find_point(p->point1), ", ", find_point(p->point2), "} ;\n");
+                  "Line(", p->id,") = {" , find_point(p->point1),", ", find_point(p->point2),"};\n");
         if(p->isPhysical){
             fmt::scat(out,
-                      "Physical Line(", p->id, ") = {", p->id, "} ;\n");
+                      "Physical Line(", p->id,") = {", p->id,"};\n");
         }
     }
 
@@ -130,14 +130,7 @@ void gmsh_exporter::export_to_point_cloud(){
 void gmsh_exporter::export_to_wireframe(){
     serialize_header();
 
-
-    int tree_flags = morpho::h5_v1::morpho_reader::generate_default;
-    if(flags[exporter_single_soma]){
-        tree_flags |= morpho::h5_v1::morpho_reader::generate_single_soma;
-    }
-
-
-    morpho_tree tree = reader.create_morpho_tree(static_cast<morpho::h5_v1::morpho_reader::generate_flags>(tree_flags));
+    morpho_tree tree = reader.create_morpho_tree();
 
     gmsh_abstract_file vfile;
     construct_gmsh_vfile_lines(tree, tree.get_branch(0), vfile);
@@ -174,13 +167,12 @@ void gmsh_exporter::construct_gmsh_vfile_raw(gmsh_abstract_file & vfile){
 
 void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree & tree, branch & current_branch, gmsh_abstract_file & vfile){
 
-    const auto & points = current_branch.get_points();
-    const auto & diameter = current_branch.get_distances();
-    if(points.size1() > 1){
-        for(std::size_t i =0; i < points.size1()-1; ++i){
-            gmsh_point p1(geo::point3d(points(i,0), points(i,1), points(i,2)), diameter[i]);
+    const auto linestring = current_branch.get_linestring();
+    if(linestring.size() > 1 && !(current_branch.get_type() == branch_type::soma && (flags & exporter_single_soma))){
+        for(std::size_t i =0; i < (linestring.size()-1); ++i){
+            gmsh_point p1(linestring[i], 1.0);
             p1.setPhysical(true);
-            gmsh_point p2(geo::point3d(points(i+1,0), points(i+1,1), points(i+1,2)), diameter[i+1]);
+            gmsh_point p2(linestring[i+1], 1.0);
             p2.setPhysical(true);
 
             gmsh_segment segment(p1, p2);
