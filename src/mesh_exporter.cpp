@@ -408,7 +408,7 @@ void gmsh_exporter::construct_gmsh_3d_object(morpho_tree & tree, branch & curren
     const auto & childrens = current_branch.get_childrens();
     for( auto & c : childrens){
         branch & child_branch = tree.get_branch(c);
-        construct_gmsh_vfile_lines(tree, child_branch, vfile);
+        construct_gmsh_3d_object(tree, child_branch, vfile);
     }
 }
 
