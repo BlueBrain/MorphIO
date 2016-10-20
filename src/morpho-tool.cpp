@@ -59,6 +59,7 @@ po::parsed_options parse_args(int argc, char** argv,
         ("version", "output the version number")
         ("point-cloud", "gmsh: export to a point cloud")
         ("wireframe", "gmsh: export to a wired morphology (default)")
+        ("3d-object", "gmsh: export to a 3D object model")
         ("single-soma", "gmsh: represent soma as a single element, point or sphere")
         ("sphere", "x3d: export cloud of sphere (default)")
         ("command", po::value<std::string>(), "command to execute")
@@ -99,6 +100,8 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
     if(options.count("point-cloud")){
         exporter.export_to_point_cloud();
  
+    }else if(options.count("3d-object")){
+        exporter.export_to_3d_object();
     }else{
         exporter.export_to_wireframe();
     }

@@ -7,6 +7,7 @@
 #include <bitset>
 #include <functional>
 #include <unordered_set>
+#include <cstddef>
 
 #include <hadoken/geometry/geometry.hpp>
 #include <hadoken/math/math_floating_point.hpp>
@@ -23,7 +24,13 @@ namespace geo = hadoken::geometry::cartesian;
 /// \brief gmsh representation of a point
 ///
 struct gmsh_point{
-    inline gmsh_point(const geo::point3d & my_coords, double d = 0) :
+    inline gmsh_point() :
+        coords(),
+        diameter(),
+        id(0),
+        isPhysical(false){}
+
+    inline gmsh_point(const geo::point3d & my_coords, double d = 0.1) :
         coords(my_coords),
         diameter(d),
         id(0),
@@ -38,6 +45,7 @@ struct gmsh_point{
     }
 
 
+    /// operator == for Equal requirement
     inline bool operator==(const gmsh_point & other) const noexcept{
         return ( hadoken::math::almost_equal(geo::get_x(coords), geo::get_x(other.coords))
                && hadoken::math::almost_equal(geo::get_y(coords), geo::get_y(other.coords))
@@ -51,7 +59,7 @@ struct gmsh_point{
 };
 
 
-///
+/// \brief representation of a segment in 3D
 struct gmsh_segment{
     inline gmsh_segment(const gmsh_point & p1, const gmsh_point & p2) :
         point1(p1), point2(p2),
@@ -62,7 +70,7 @@ struct gmsh_segment{
         isPhysical = phys;
     }
 
-    /// operator < for Comparable requirements
+    /// operator == for Equal requirement
     inline bool operator==(const gmsh_segment & other) const noexcept{
         return (point1 == other.point1) && (point2 == other.point2);
     }
@@ -72,6 +80,83 @@ struct gmsh_segment{
     std::size_t id;
     bool isPhysical;
 };
+
+/// representation of a circle-arc in 3D
+struct gmsh_circle{
+    inline gmsh_circle(const gmsh_point & my_center, const gmsh_point & p1, const gmsh_point & p2) :
+        center(my_center),
+        point1(p1), point2(p2),
+        id(0),
+        isPhysical(false){}
+
+    /// operator == for Equal requirement
+    inline bool operator==(const gmsh_circle & other) const noexcept{
+        return (center == other.center) && (point1 == other.point1) && (point2 == other.point2);
+    }
+
+    inline void setPhysical(bool phys){
+        isPhysical = phys;
+    }
+
+    gmsh_point center, point1, point2;
+    std::size_t id;
+    bool isPhysical;
+};
+
+
+/// representation of a closed loop in 3D
+struct gmsh_line_loop{
+    inline gmsh_line_loop(const std::vector<std::int64_t> & id_list) :
+        ids(id_list),
+        id(0),
+        isPhysical(false), isRuled(false){}
+
+    /// operator == for Equal requirement
+    inline bool operator==(const gmsh_line_loop & other) const noexcept{
+        if(ids.size() != other.ids.size()){
+            return false;
+        }
+        return std::equal(ids.begin(), ids.end(), other.ids.begin());
+    }
+
+    inline void setPhysical(bool phys){
+        isPhysical = phys;
+    }
+
+    inline void setRuled(bool r){
+        isRuled = r;
+    }
+
+    std::vector<std::int64_t> ids;
+    std::size_t id;
+    bool isPhysical, isRuled;
+};
+
+
+/// representation of a volume in 3D
+struct gmsh_volume{
+    inline gmsh_volume(const std::vector<std::size_t> & id_list) :
+            ids(id_list),
+            id(0),
+            isPhysical(false){}
+
+        /// operator == for Equal requirement
+        inline bool operator==(const gmsh_volume & other) const noexcept{
+            if(ids.size() != other.ids.size()){
+                return false;
+            }
+            return std::equal(ids.begin(), ids.end(), other.ids.begin());
+        }
+
+        inline void setPhysical(bool phys){
+            isPhysical = phys;
+        }
+
+        std::vector<std::size_t> ids;
+        std::size_t id;
+        bool isPhysical;
+};
+
 
 ///
 /// \brief in memory abstract gmsh file representation
@@ -87,11 +172,28 @@ public:
     /// add a segment and return its id
     std::size_t add_segment(const gmsh_segment & s);
 
+    /// add a new gmsh circle
+    std::size_t add_circle(const gmsh_circle & c);
+
+    /// add a new line loop
+    std::size_t add_line_loop(const gmsh_line_loop & l);
+
+    /// volume in 3D
+    std::size_t add_volume(const gmsh_volume & l);
+
     /// get all points
     std::vector<gmsh_point> get_all_points() const;
 
     /// get all segments
     std::vector<gmsh_segment> get_all_segments() const;
+
+    /// get all circles
+    std::vector<gmsh_circle> get_all_circles() const;
+
+    /// get all line loop
+    std::vector<gmsh_line_loop> get_all_line_loops() const;
+
+   std::vector<gmsh_volume> get_all_volumes() const;
 
     /// export all points to stream in gmsh format
     void export_points_to_stream(std::ostream & out);
@@ -99,7 +201,19 @@ public:
     /// export all segments to stream in gmsh format
     void export_segments_to_stream(std::ostream & out);
 
+    /// export all segments to the stream in gmsh format
+    void export_circle_to_stream(std::ostream & out);
+
+    /// export all segments to the stream in gmsh format
+    void export_line_loop_to_stream(std::ostream & out);
+
+    /// export all segments to the stream in gmsh format
+    void export_volume_to_stream(std::ostream & out);
+
 private:
+
+    std::size_t create_id_line_element();
+
     struct hash_gmsh_point{
         std::size_t operator()(const gmsh_point & p) const noexcept{
             std::hash<double> hd;
@@ -107,16 +221,35 @@ private:
         }
     };
 
-    struct hash_gmsh_segment{
-        std::size_t operator()(const gmsh_segment & s) const noexcept{
+    template<typename GeometryType>
+    struct hash_geometry_point{
+        std::size_t operator()(const GeometryType & s) const noexcept{
             std::hash<double> hd;
             return hd(geo::get_x(s.point1.coords));
         }
     };
 
+    template<typename GeometryType>
+    struct hash_geometry_ids{
+        std::size_t operator()(const GeometryType & s) const noexcept{
+            std::hash<std::size_t> hd;
+            std::size_t res = 0x1f1f1f;
+            for(auto & id : s.ids){
+                res ^= hd(id);
+            }
+            return res;
+        }
+    };
+
     std::unordered_set<gmsh_point, hash_gmsh_point> _points;
 
-    std::unordered_set<gmsh_segment, hash_gmsh_segment> _segments;
+    std::unordered_set<gmsh_segment, hash_geometry_point<gmsh_segment> > _segments;
+
+    std::unordered_set<gmsh_circle, hash_geometry_point<gmsh_circle> > _circles;
+
+    std::unordered_set<gmsh_line_loop, hash_geometry_ids<gmsh_line_loop> > _line_loop;
+
+    std::unordered_set<gmsh_volume, hash_geometry_ids<gmsh_volume> > _volumes;
 };
 
 
@@ -138,6 +271,7 @@ public:
 
     void export_to_wireframe();
 
+    void export_to_3d_object();
 
 
 private:
@@ -154,6 +288,8 @@ private:
    void construct_gmsh_vfile_raw(gmsh_abstract_file & vfile);
 
    void construct_gmsh_vfile_lines(morpho_tree & tree, branch & current_branch, gmsh_abstract_file & vfile);
+
+   void construct_gmsh_3d_object(morpho_tree & tree, branch & current_branch, gmsh_abstract_file & vfile);
 
 };
 
