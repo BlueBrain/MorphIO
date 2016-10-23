@@ -43,7 +43,7 @@ inline void soma_gravity_center(const branch::mat_points & raw_points,
 branch::linestring branch::get_linestring() const{
     namespace geo = hadoken::geometry::cartesian;
     linestring res;
-    res.reserve(get_size());
+    res.reserve(get_size()+1);
 
     // if not first point, add the parent last point
     if(_parent != nullptr){
@@ -64,6 +64,50 @@ branch::linestring branch::get_linestring() const{
 
 
 }
+
+
+branch::circle_pipe branch::get_circle_pipe() const{
+    namespace geo = hadoken::geometry::cartesian;
+    circle_pipe res;
+    res.reserve(get_size());
+
+    if(get_size() < 1)
+        return res;
+
+    // if not first point, add the parent last point
+    if(_parent != nullptr){
+        // if our parent is the soma, add a circle based on the soma sphere, oriented
+        if(_parent->get_type() == branch_type::soma){
+            auto & soma = static_cast<branch_soma&>(*_parent);
+            auto sphere = soma.get_sphere();
+            auto center = sphere.get_center();
+            auto radius = sphere.get_radius();
+            auto axis = center - get_point(0);
+            res.emplace_back(geo::circle3d(center, radius, axis));
+
+        }else{
+            branch::circle_pipe parent_circle_pipe = _parent->get_circle_pipe();
+            if(parent_circle_pipe.size() < 1){
+                throw std::runtime_error("Invalid parent circle pipe, requires at least parent to have circle pipe > 1 circle element");
+            }
+            res.push_back(parent_circle_pipe.back());
+        }
+    }else{
+        throw std::runtime_error("Unable to compute circle pipe without parent informations");
+    }
+
+    for(std::size_t i =0; i < get_size(); ++i){
+        const auto  & prev_center = res.back().get_center();
+        auto center = get_point(i);
+        auto axis = prev_center - center;
+        auto radius = _distances[i];
+        res.emplace_back(geo::circle3d(center, radius, axis));
+    }
+    return res;
+
+
+}
+
 
 branch_soma::sphere branch_soma::get_sphere() const{
     namespace fmt = hadoken::format;

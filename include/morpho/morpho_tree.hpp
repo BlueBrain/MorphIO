@@ -46,6 +46,8 @@ public:
     using point = hadoken::geometry::cartesian::point3d;
     using linestring = hadoken::geometry::cartesian::linestring3d;
 
+    using circle_pipe = std::vector<hadoken::geometry::cartesian::circle3d>;
+
 
 
     inline branch(branch_type type_b) : _type(type_b), _parent(nullptr), _id(0) {}
@@ -59,19 +61,40 @@ public:
         _distances = std::move(distances);
     }
 
+    ///
+    /// \brief  get all the points associated to the branch
+    ///
+    ///  the result does not contain the starting connected point coming from the previous branch
+    ///
+    /// \return matrix of all the points associated to the branch, one point per row
+    ///
     inline const mat_points & get_points() const{
         return _points;
     }
 
+    ///
+    /// \brief get_distances
+    /// \return
+    ///
     inline const vec_double & get_distances() const{
         return _distances;
     }
 
+    ///
+    /// \brief get_size
+    /// \return number of point composing the branch
+    ///
     inline std::size_t get_size() const{
         assert(_distances.size() == _points.size1());
         return _distances.size();
     }
 
+    ///
+    /// \param id
+    /// \return return point in the branch for a given id
+    ///
+    ///  the id msut be inferior to the branch size
+    ///
     inline point get_point(const std::size_t id) const{
         namespace fmt = hadoken::format;
         if(id >= get_size()){
@@ -82,7 +105,17 @@ public:
                       _points(id, 2));
     }
 
+    ///
+    /// \brief get_linestring
+    /// \return
+    ///
     inline linestring get_linestring() const;
+
+    ///
+    /// \brief get_circle_pipe
+    /// \return
+    ///
+    inline circle_pipe get_circle_pipe() const;
 
     inline branch_type get_type() const{
         return _type;

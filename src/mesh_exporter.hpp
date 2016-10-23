@@ -30,7 +30,7 @@ struct gmsh_point{
         id(0),
         isPhysical(false){}
 
-    inline gmsh_point(const geo::point3d & my_coords, double d = 0.1) :
+    inline gmsh_point(const geo::point3d & my_coords, double d = 1.0) :
         coords(my_coords),
         diameter(d),
         id(0),
