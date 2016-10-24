@@ -88,7 +88,7 @@ branch::circle_pipe branch::get_circle_pipe() const{
         }else{
             branch::circle_pipe parent_circle_pipe = _parent->get_circle_pipe();
             if(parent_circle_pipe.size() < 1){
-                throw std::runtime_error("Invalid parent circle pipe, requires at least parent to have circle pipe > 1 circle element");
+                throw std::runtime_error("Invalid parent circle pipe, requires at least parent to have circle pipe >= 1 circle element");
             }
             res.push_back(parent_circle_pipe.back());
         }
@@ -101,6 +101,14 @@ branch::circle_pipe branch::get_circle_pipe() const{
         auto center = get_point(i);
         auto axis = prev_center - center;
         auto radius = _distances[i];
+
+        if(prev_center.close_to(center)){
+            namespace fmt = hadoken::format;
+            fmt::scat(std::cerr, "WARNING: skip point, Duplicated point in morphology detected ", prev_center, " and ",
+                                            center, " in branch ", get_id(), ",  on point id ", i, "\n");
+            continue;
+        }
+
         res.emplace_back(geo::circle3d(center, radius, axis));
     }
     return res;

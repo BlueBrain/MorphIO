@@ -252,11 +252,14 @@ void gmsh_exporter::export_to_point_cloud(){
 void gmsh_exporter::export_to_wireframe(){
     serialize_header();
 
+    fmt::scat(std::cout, "load morphology tree ", reader.get_filename(), "\n");
     morpho_tree tree = reader.create_morpho_tree();
 
     gmsh_abstract_file vfile;
+    fmt::scat(std::cout, "convert morphology tree to gmsh set of wireframe geometries", "\n");
     construct_gmsh_vfile_lines(tree, tree.get_branch(0), vfile);
 
+    fmt::scat(std::cout, "export gmsh objects to output file", "\n");
     vfile.export_points_to_stream(geo_stream);
     vfile.export_segments_to_stream(geo_stream);
 }
@@ -265,11 +268,15 @@ void gmsh_exporter::export_to_wireframe(){
 void gmsh_exporter::export_to_3d_object(){
     serialize_header();
 
+    fmt::scat(std::cout, "load morphology tree ", reader.get_filename(), "\n");
     morpho_tree tree = reader.create_morpho_tree();
 
+
     gmsh_abstract_file vfile;
+    fmt::scat(std::cout, "convert morphology tree to gmsh set of 3D geometries", "\n");
     construct_gmsh_3d_object(tree, tree.get_branch(0), vfile);
 
+    fmt::scat(std::cout, "export gmsh objects to output file", "\n");
     vfile.export_points_to_stream(geo_stream);
     vfile.export_segments_to_stream(geo_stream);
     vfile.export_circle_to_stream(geo_stream);
@@ -378,31 +385,63 @@ void create_gmsh_sphere(gmsh_abstract_file & vfile, const geo::sphere3d & sphere
 void check_points_on_circle(double radius, gmsh_point & center, std::array<gmsh_point, 4> & points){
 
     for(auto & p: points){
-        bool is_on_circle = hadoken::math::almost_equal(radius, geo::distance(center.coords, p.coords));
+        auto new_radius = geo::distance(center.coords, p.coords);
+        bool is_on_circle = hadoken::math::close_to_abs(radius, new_radius, 0.0001);
         if(is_on_circle == false){
             throw std::out_of_range(fmt::scat("Invalid circle generation point ", p.coords, " is not on circle of center ", center.coords,
-                                              " and radius ", radius));
+                                              " radius ", radius, " != ", new_radius));
         }
     }
 }
 
+//
+// look for a suitable axis vector for cross product
+// if dot_product == 1, the vector are colinear and the cross product will be null
+// consequently, looking for the minimum value of the dot product
+geo::vector3d get_unit_vec(const geo::vector3d & p1){
+    const std::array<geo::vector3d, 2> unit_vec = { geo::vector3d({ 1.0, 0, 0}), geo::vector3d({ 0, 1.0, 0 }) };
+
+    double prev_dot = std::numeric_limits<double>::max();
+    geo::vector3d res;
+    for(auto && u :  unit_vec){
+        double dot_res = geo::dot_product(p1, u);
+        if(dot_res < prev_dot){
+            prev_dot = dot_res;
+            res = u;
+        }
+    }
+
+    return res;
+}
+
 void create_gmsh_circle(gmsh_abstract_file & vfile, const geo::circle3d & p1, gmsh_point & center, std::array<gmsh_point, 4> & points,
                         std::array<std::size_t, 4> & arc_ids){
-    const std::array<geo::vector3d, 4> unit_vec = { geo::vector3d({ 1.0, 0, 0}), geo::vector3d({ 0, 1.0, 0 }),
-                                                    geo::vector3d({ -1.0, 0, 0}), geo::vector3d({ 0, -1.0, 0 }) };
+
 
     auto center_coords = p1.get_center();
     center = gmsh_point(center_coords);
     vfile.add_point(center);
 
-    auto axis = geo::normalize(p1.get_axis());
     auto radius = p1.get_radius();
+    auto axis = geo::normalize(p1.get_axis());
+    auto unit_vec = get_unit_vec(axis);
 
-    for(std::size_t i= 0; i < points.size(); ++i){
-            auto normal_vec = geo::cross_product(unit_vec[i], axis);
-            normal_vec = geo::normalize(normal_vec);
-            normal_vec *= radius;
-            points[i] = gmsh_point( center_coords + normal_vec);
+    auto normal_vec = geo::cross_product(unit_vec, axis);
+    normal_vec = geo::normalize(normal_vec);
+
+    auto orig_vec = geo::cross_product(normal_vec, axis);
+    orig_vec = geo::normalize(orig_vec);
+
+    // create the 4 orthogonal points on the circle
+    std::array<geo::point3d, 4> norm_vectors;
+    norm_vectors[0] = normal_vec * radius;
+    norm_vectors[1] = orig_vec * radius;
+    norm_vectors[2] = normal_vec * radius * -1;
+    norm_vectors[3] = orig_vec * radius * -1;
+
+
+    for(std::size_t i= 0; i < norm_vectors.size(); ++i){
+            points[i] = gmsh_point( center_coords + norm_vectors[i]);
             points[i].setPhysical(true);
             vfile.add_point(points[i]);
     };
@@ -417,27 +456,92 @@ void create_gmsh_circle(gmsh_abstract_file & vfile, const geo::circle3d & p1, gm
     }
 }
 
+std::size_t create_gmsh_disk(gmsh_abstract_file & vfile, std::array<std::size_t, 4> & arc_ids){
+    std::vector<std::int64_t> ids;
+    ids.reserve(4);
+    std::copy(arc_ids.begin(), arc_ids.end(), std::back_inserter(ids));
+    gmsh_line_loop disk(ids);
+    disk.setPhysical(true);
+    disk.setRuled(true);
+    return vfile.add_line_loop(disk);
+}
+
+std::vector<std::size_t> create_gmsh_pipe_surfaces(gmsh_abstract_file & vfile,
+                                                   std::array<gmsh_point, 4> & disk1_points,
+                                                   std::array<std::size_t, 4> & arc1_ids,
+                                                   std::array<gmsh_point, 4> & disk2_points,
+                                                   std::array<std::size_t, 4> & arc2_ids){
+    std::vector<std::size_t> res;
+    std::vector<std::int64_t> ids;
+    ids.reserve(4);
+    res.reserve(4);
+
+    assert(disk1_points.size() == disk2_points.size());
+    assert(arc1_ids.size() == arc2_ids.size());
+    assert(disk1_points.size() == arc2_ids.size());
+
+    for(std::size_t i =0; i < disk1_points.size(); ++i){
+        std::size_t id = i;
+        std::size_t next_id = (i < (disk1_points.size() -1)) ? i+1 : 0;
+        ids.clear();
+
+        std::size_t line_id1, line_id2;
+        {
+            gmsh_segment seg1(disk1_points[id], disk2_points[id]);
+            seg1.setPhysical(true);
+            line_id1 = vfile.add_segment(seg1);
+        }
+
+        {
+            gmsh_segment seg2(disk1_points[next_id], disk2_points[next_id]);
+            seg2.setPhysical(true);
+            line_id2 = vfile.add_segment(seg2);
+        }
+
+
+        ids.emplace_back(arc1_ids[i]);
+        ids.emplace_back(line_id2);
+        ids.emplace_back(- arc2_ids[i]);
+        ids.emplace_back( - line_id1 );
+
+        gmsh_line_loop pipe_surface(ids);
+        pipe_surface.setPhysical(true);
+        pipe_surface.setRuled(true);
+        res.emplace_back(vfile.add_line_loop(pipe_surface));
+    }
+    return res;
+}
+
 
 void create_gmsh_truncated_pipe(gmsh_abstract_file & vfile, const geo::circle3d & p1, const geo::circle3d & p2){
+    std::vector<std::size_t> volume_ids;
+
     // create 6 points of the sphere
+    std::array<gmsh_point, 4> circle1_points, circle2_points;
+    std::array<std::size_t, 4> arc1_ids, arc2_ids;
 
    // first circle
     {
        gmsh_point center;
-       std::array<gmsh_point, 4> circle_points;
-       std::array<std::size_t, 4> arc_ids;
-       create_gmsh_circle(vfile, p1, center, circle_points, arc_ids);
+       create_gmsh_circle(vfile, p1, center, circle1_points, arc1_ids);
     }
 
    // second circle
    {
         gmsh_point center;
-        std::array<gmsh_point, 4> circle_points;
-        std::array<std::size_t, 4> arc_ids;
-        create_gmsh_circle(vfile, p2, center, circle_points, arc_ids);
-
+        create_gmsh_circle(vfile, p2, center, circle2_points, arc2_ids);
     }
+    // create connecting line loops
 
+    volume_ids.emplace_back(create_gmsh_disk(vfile, arc1_ids));
+    volume_ids.emplace_back(create_gmsh_disk(vfile, arc2_ids));
+    auto pipe_surfaces_ids = create_gmsh_pipe_surfaces(vfile, circle1_points, arc1_ids, circle2_points, arc2_ids);
+    volume_ids.insert(volume_ids.end(), pipe_surfaces_ids.begin(), pipe_surfaces_ids.end());
+
+    // create final volume
+    gmsh_volume truncated_pipe(volume_ids);
+    truncated_pipe.setPhysical(true);
+    vfile.add_volume(truncated_pipe);
 }
 
 
@@ -477,11 +581,10 @@ void gmsh_exporter::construct_gmsh_3d_object(morpho_tree & tree, branch & curren
     for( auto & c : childrens){
         branch & child_branch = tree.get_branch(c);
         auto pipe = child_branch.get_circle_pipe();
-        int i = 0;
-         // for(std::size_t i =0 ; i < pipe.size()-1; ++i){
+        for(std::size_t i =0 ; i < pipe.size()-1; ++i){
             create_gmsh_truncated_pipe(vfile, pipe[i], pipe[i+1]);
-        //}
-        //construct_gmsh_3d_object(tree, child_branch, vfile);
+        }
+        construct_gmsh_3d_object(tree, child_branch, vfile);
     }
 }
 
