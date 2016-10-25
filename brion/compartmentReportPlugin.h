@@ -168,12 +168,11 @@ public:
 
 }
 
-namespace boost
+namespace std
 {
-template<> inline
-std::string lexical_cast( const brion::CompartmentReportInitData& data )
+inline string to_string( const brion::CompartmentReportInitData& data )
 {
-    return lexical_cast< std::string >( data.getURI( ));
+    return to_string( data.getURI( ));
 }
 }
 

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
  *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -21,7 +21,6 @@
 #include "spikeReportNEST.h"
 #include "../pluginInitData.h"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <lunchbox/pluginRegisterer.h>
@@ -87,7 +86,7 @@ SpikeReportNEST::SpikeReportNEST( const SpikeReportInitData& initData )
             LBTHROW( std::runtime_error( "No file(s) to read found in " +
                                          _uri.getPath( )));
 
-        BOOST_FOREACH( const std::string& reportFile, reportFiles )
+        for( const std::string& reportFile : reportFiles )
         {
             SpikeReportFile reader( reportFile, NEST_SPIKE_REPORT, MODE_READ );
             reader.fillReportMap( _spikes );

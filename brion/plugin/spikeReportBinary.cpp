@@ -119,7 +119,7 @@ void SpikeReportBinary::writeSpikes( const Spikes& spikes )
 
     iData[ index++ ] = magic;
     iData[ index++ ] = version;
-    BOOST_FOREACH( const Spike& spike, spikes )
+    for( const Spike& spike : spikes )
     {
         fData[ index++ ] = spike.first;
         iData[ index++ ] = spike.second;
