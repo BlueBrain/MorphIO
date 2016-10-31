@@ -441,8 +441,6 @@ void gmsh_exporter::export_to_3d_object(){
 
 
 void gmsh_exporter::serialize_header(){
-    geo_stream << gmsh_header << "\n";
-
 
     fmt::scat(geo_stream,
               gmsh_header,
@@ -710,28 +708,10 @@ void gmsh_exporter::construct_gmsh_3d_object(morpho_tree & tree, branch & curren
     }else{
 
         auto & distance = current_branch.get_distances();
+        std::size_t last_elem = distance.size()-1;
 
-        for(std::size_t i =0; i < distance.size(); ++i){
-                    create_gmsh_sphere(vfile, geo::sphere3d(current_branch.get_point(i), distance(i)));
-        }
-
+        create_gmsh_sphere(vfile, geo::sphere3d(current_branch.get_point(last_elem), distance(last_elem)));
     }
-
-
-  /*  const auto linestring = current_branch.get_linestring();
-    if(linestring.size() > 1 && !(current_branch.get_type() == branch_type::soma && (flags & exporter_single_soma))){
-        for(std::size_t i =0; i < (linestring.size()-1); ++i){
-            gmsh_point p1(linestring[i], 1.0);
-            p1.setPhysical(true);
-            gmsh_point p2(linestring[i+1], 1.0);
-            p2.setPhysical(true);
-
-            gmsh_segment segment(p1, p2);
-            segment.setPhysical(true);
-            vfile.add_segment(segment);
-        }
-    }
-   */
 
     const auto & childrens = current_branch.get_childrens();
     for( auto & c : childrens){
