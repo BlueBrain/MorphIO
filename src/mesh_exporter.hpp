@@ -197,18 +197,23 @@ public:
 
     /// export all points to stream in gmsh format
     void export_points_to_stream(std::ostream & out);
+    void export_points_to_stream_dmg(std::ostream & out);
 
     /// export all segments to stream in gmsh format
     void export_segments_to_stream(std::ostream & out);
+    void export_segments_to_stream_dmg(std::ostream & out);
 
     /// export all segments to the stream in gmsh format
     void export_circle_to_stream(std::ostream & out);
+    void export_circle_to_stream_dmg(std::ostream & out);
 
     /// export all segments to the stream in gmsh format
     void export_line_loop_to_stream(std::ostream & out);
+    void export_line_loop_to_stream_dmg(std::ostream & out);
 
     /// export all segments to the stream in gmsh format
     void export_volume_to_stream(std::ostream & out);
+    void export_volume_to_stream_dmg(std::ostream & out);
 
 private:
 
@@ -264,7 +269,7 @@ public:
     static constexpr int exporter_single_soma = 0x01;
 
 
-    gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
+    gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags flags = exporter_flags(), bool to_write_dmg = false);
 
 
     void export_to_point_cloud();
@@ -275,7 +280,8 @@ public:
 
 
 private:
-    std::ofstream geo_stream;
+    bool write_dmg;
+    std::ofstream geo_stream, dmg_stream;
     morpho::h5_v1::morpho_reader reader;
     exporter_flags flags;
 

@@ -95,7 +95,7 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
         flags |= gmsh_exporter::exporter_single_soma;
     }
 
-    gmsh_exporter exporter(filename_morpho, filename_geo, flags);
+    gmsh_exporter exporter(filename_morpho, filename_geo, flags, true);
 
     if(options.count("point-cloud")){
         exporter.export_to_point_cloud();
