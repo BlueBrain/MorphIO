@@ -373,6 +373,22 @@ void gmsh_exporter::export_to_wireframe(){
     vfile.export_segments_to_stream(geo_stream);
 
     if (write_dmg) {
+        fmt::scat(std::cout, "export gmsh geometry objects to dmg file format", "\n");
+
+        std::size_t ndim[2] = {0, 0};
+        auto all_points = vfile.get_all_points();
+        for(auto p = all_points.begin(); p != all_points.end(); ++p)
+           if(p->isPhysical)
+               ndim[0]++;
+
+        auto all_segments = vfile.get_all_segments();
+        for(auto p = all_segments.begin(); p != all_segments.end(); ++p)
+           if(p->isPhysical)
+               ndim[1]++;
+
+        /// Write the header of dmg information
+        fmt::scat(dmg_stream, "0 0 ", ndim[1], " ", ndim[0], "\n0 0 0\n0 0 0\n");
+
         vfile.export_points_to_stream_dmg(dmg_stream);
         vfile.export_segments_to_stream_dmg(dmg_stream);
     }
@@ -398,6 +414,7 @@ void gmsh_exporter::export_to_3d_object(){
     vfile.export_volume_to_stream(geo_stream);
 
     if (write_dmg) {
+        fmt::scat(std::cout, "export gmsh geometry objects to dmg file format", "\n");
         std::size_t ndim[4] = {0, 0, 0, 0};
         auto all_points = vfile.get_all_points();
         for(auto p = all_points.begin(); p != all_points.end(); ++p)

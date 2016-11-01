@@ -60,6 +60,7 @@ po::parsed_options parse_args(int argc, char** argv,
         ("point-cloud", "gmsh: export to a point cloud")
         ("wireframe", "gmsh: export to a wired morphology (default)")
         ("3d-object", "gmsh: export to a 3D object model")
+        ("with-dmg", "gmsh: export to a dmg file format as well")
         ("single-soma", "gmsh: represent soma as a single element, point or sphere")
         ("sphere", "x3d: export cloud of sphere (default)")
         ("command", po::value<std::string>(), "command to execute")
@@ -95,7 +96,11 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
         flags |= gmsh_exporter::exporter_single_soma;
     }
 
-    gmsh_exporter exporter(filename_morpho, filename_geo, flags, true);
+    bool with_dmg = false;
+    if(options.count("with-dmg"))
+        with_dmg = true;
+
+    gmsh_exporter exporter(filename_morpho, filename_geo, flags, with_dmg);
 
     if(options.count("point-cloud")){
         exporter.export_to_point_cloud();
