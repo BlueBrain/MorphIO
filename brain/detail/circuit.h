@@ -30,10 +30,10 @@
 #include <brion/detail/lockHDF5.h>
 #include <brion/detail/silenceHDF5.h>
 
+#include <keyv/Map.h>
 #include <lunchbox/lock.h>
 #include <lunchbox/lockable.h>
 #include <lunchbox/log.h>
-#include <lunchbox/persistentMap.h>
 #include <lunchbox/scopedMutex.h>
 
 #ifdef BRAIN_USE_MVD3
@@ -148,7 +148,7 @@ public:
         , _morphologySource( config.getMorphologySource( ))
         , _synapseSource( config.getSynapseSource( ))
         , _targetSources( config.getTargetSources( ))
-        , _cache( lunchbox::PersistentMap::createCache( ))
+        , _cache( keyv::Map::createCache( ))
     {
     }
 
@@ -386,7 +386,7 @@ public:
     const brion::URI _synapseSource;
     const brion::URIs _targetSources;
     mutable brion::Targets _targetParsers;
-    mutable lunchbox::PersistentMapPtr _cache;
+    mutable keyv::MapPtr _cache;
 
     template< typename T >
     using LockPtr = lunchbox::Lockable< std::unique_ptr< T >>;

@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2014-2016, EPFL/Blue Brain Project
  *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -21,14 +21,14 @@
 #define BRION_PLUGIN_COMPARTMENTREPORTMAP
 
 #include "compartmentReportCommon.h"
-#include <lunchbox/persistentMap.h>
 #include <lunchbox/stdExt.h>
+#include <keyv/Map.h>
 
 namespace brion
 {
 namespace plugin
 {
-/** A read/write report using a lunchbox::PersistentMap as backend */
+/** A read/write report using a keyv::Map as backend */
 class CompartmentReportMap : public CompartmentReportCommon
 {
 public:
@@ -77,7 +77,7 @@ public:
 
 private:
     URI _uri;
-    lunchbox::PersistentMap _store;
+    keyv::Map _store;
 
     Header _header;
 

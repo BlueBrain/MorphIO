@@ -1,8 +1,10 @@
 Changelog {#Changelog}
 =========
 
-# Release 1.9.0 (git master)
+# git master
 
+* [110](https://github.com/BlueBrain/Brion/pull/110):
+  Break PersistentMap out into keyv::Map
 * [107](https://github.com/BlueBrain/Brion/pull/107):
   Added Sphinx generated documentation of the brain python module.
 * [102](https://github.com/BlueBrain/Brion/pull/102):

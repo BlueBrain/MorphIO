@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2014-2016, EPFL/Blue Brain Project
  *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -108,8 +108,8 @@ CompartmentReportMap::~CompartmentReportMap()
 
 bool CompartmentReportMap::handles(const CompartmentReportInitData& initData )
 {
-    return lunchbox::PersistentMap::handles( initData.getURI() )
-            && !initData.getURI().getScheme().empty();
+    return keyv::Map::handles( initData.getURI( )) &&
+           !initData.getURI().getScheme().empty();
 }
 
 void CompartmentReportMap::_clear()

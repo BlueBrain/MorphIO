@@ -75,20 +75,12 @@ if(MSVC)
 endif()
 
 set(BRION_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
-set(BRION_LINK_LIBRARIES PUBLIC Lunchbox Servus vmmlib
-                         PRIVATE ${Boost_SYSTEM_LIBRARIES}
-                                 ${Boost_FILESYSTEM_LIBRARIES}
-                                 ${Boost_DATE_TIME_LIBRARIES}
-                                 ${Boost_REGEX_LIBRARIES}
-                                 ${Boost_THREAD_LIBRARIES}
-                                 ${HDF5_LIBRARIES}
-                                 ${CMAKE_THREADS_LIB_INIT}
+set(BRION_LINK_LIBRARIES
+  PUBLIC Lunchbox Servus vmmlib
+  PRIVATE Keyv
+  ${Boost_SYSTEM_LIBRARIES} ${Boost_FILESYSTEM_LIBRARIES}
+  ${Boost_DATE_TIME_LIBRARIES} ${Boost_REGEX_LIBRARIES} ${Boost_THREAD_LIBRARIES}
+  ${HDF5_LIBRARIES} ${CMAKE_THREADS_LIB_INIT}
 )
 
 common_library(Brion)
-
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "ppc")
-  # WAR gcc 4.4 bug on BlueGene
-  set_property(SOURCE mesh.cpp APPEND_STRING PROPERTY
-    COMPILE_FLAGS "-Wno-uninitialized")
-endif()
