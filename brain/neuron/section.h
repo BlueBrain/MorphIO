@@ -122,8 +122,11 @@ public:
     BRAIN_API bool hasParent() const;
 
     /**
-     * Return the parent section of this section.
+     * Return the parent section of this section \if pybind or None if doesn't
+     * have any.\else.
+     *
      * @throw runtime_error is the section doesn't have a parent.
+     * \endif
      */
     BRAIN_API Section getParent() const;
 

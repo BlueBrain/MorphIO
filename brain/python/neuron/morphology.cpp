@@ -22,6 +22,7 @@
 
 #include "../arrayHelpers.h"
 #include "../helpers.h"
+#include "docstrings.h"
 
 #include <brain/neuron/morphology.h>
 #include <brain/neuron/section.h>
@@ -180,40 +181,73 @@ bp::object Morphology_getTransformation( const MorphologyPtr& morphology )
 void export_Morphology()
 {
 
+const auto selfarg = bp::arg( "self" );
+
+// Do not modify whitespace on DOXY_FN lines
+
 bp::class_< SomaWrapper >(
-    "Soma", bp::no_init )
-    .def( "profile_points", Soma_getProfilePoints )
-    .def( "mean_radius", &Soma::getMeanRadius )
-    .def( "centroid", &Soma::getCentroid )
+    "Soma", DOXY_CLASS( brain::neuron::Soma ), bp::no_init )
+    .def( "profile_points", Soma_getProfilePoints, ( selfarg ),
+          DOXY_FN( brain::neuron::Soma::getProfilePoints ))
+    .def( "mean_radius", &Soma::getMeanRadius, ( selfarg ),
+          DOXY_FN( brain::neuron::Soma::getMeanRadius ))
+    .def( "centroid", &Soma::getCentroid, ( selfarg ),
+          DOXY_FN( brain::neuron::Soma::getCentroid ))
     ;
 
 bp::class_< SectionWrapper >(
-    "Section", bp::no_init )
+    "Section", DOXY_CLASS( brain::neuron::Section ), bp::no_init )
     .def( bp::self == bp::self )
-    .def( "id", &Section::getID )
-    .def( "type", &Section::getType )
-    .def( "length", &Section::getLength )
-    .def( "samples", Section_getSamples )
-    .def( "samples", Section_getSamplesFromPositions )
-    .def( "distance_to_soma", &Section::getDistanceToSoma )
-    .def( "sample_distances_to_soma", Section_getSampleDistancesToSoma )
-    .def( "parent", Section_getParent )
-    .def( "children", Section_getChildren )
+    .def( "id", &Section::getID, ( selfarg ),
+          DOXY_FN( brain::neuron::Section::getID ))
+    .def( "type", &Section::getType, ( selfarg ),
+          DOXY_FN( brain::neuron::Section::getType ))
+    .def( "length", &Section::getLength, ( selfarg ),
+          DOXY_FN( brain::neuron::Section::getLength ))
+    .def( "samples", Section_getSamples, ( selfarg ),
+          DOXY_FN( brain::neuron::Section::getSamples() const))
+    .def( "samples", Section_getSamplesFromPositions,
+          ( selfarg, bp::arg( "positions" )),
+          DOXY_FN( brain::neuron::Section::getSamples(const floats&) const))
+    .def( "distance_to_soma", &Section::getDistanceToSoma, ( selfarg ),
+          DOXY_FN( brain::neuron::Section::getDistanceToSoma ))
+    .def( "sample_distances_to_soma", Section_getSampleDistancesToSoma,
+          ( selfarg ),
+          DOXY_FN( brain::neuron::Section::getSampleDistancesToSoma ))
+    .def( "parent", Section_getParent, ( selfarg ),
+          DOXY_FN( brain::neuron::Section::getParent ))
+    .def( "children", Section_getChildren, ( selfarg ),
+          DOXY_FN( brain::neuron::Section::getChildren ))
     ;
 
 bp::class_< Morphology, boost::noncopyable, MorphologyPtr >(
-    "Morphology", bp::no_init )
-    .def( "__init__", bp::make_constructor( Morphology_initFromURI ))
-    .def( "__init__", bp::make_constructor( Morphology_initFromURIAndTransform ))
-    .def( "points", Morphology_getPoints )
-    .def( "sections", Morphology_getSections )
-    .def( "section_types", Morphology_getSectionTypes)
-    .def( "apicals", Morphology_getApicals )
-    .def( "section_ids", Morphology_getSectionIDs )
-    .def( "sections", Morphology_getSectionsByType )
-    .def( "section", Morphology_getSection )
-    .def( "soma", Morphology_getSoma )
-    .def( "transformation", Morphology_getTransformation )
+    "Morphology", DOXY_CLASS( brain::neuron::Morphology ), bp::no_init )
+    .def( "__init__", bp::make_constructor( Morphology_initFromURI ),
+          DOXY_FN( brain::neuron::Morphology::Morphology(const URI&)))
+    .def( "__init__", bp::make_constructor( Morphology_initFromURIAndTransform ),
+          DOXY_FN( brain::neuron::Morphology::Morphology(const URI&, const Matrix4f&)))
+    // The following docstrings are given explictly because the return types
+    // are special and the original documentation uses @sa, which points nowhere.
+    .def( "points", Morphology_getPoints, ( selfarg ),
+          "Return a 4xN numpy array with the x,y,z and radius of all the points of this morphology.")
+    .def( "sections", Morphology_getSections, ( selfarg ),
+          "Return a 2xN numpy array with the parent ID and first point offset of each section." )
+    .def( "section_types", Morphology_getSectionTypes, ( selfarg ),
+          "Return a numpy array with the section types." )
+    .def( "apicals", Morphology_getApicals, ( selfarg ),
+          "Return a 2xN numpy array with the section id and point index of apical points." )
+    .def( "section_ids", Morphology_getSectionIDs,
+          ( selfarg, bp::arg( "types" )),
+          DOXY_FN( brain::neuron::Morphology::getSectionIDs ))
+    .def( "sections", Morphology_getSectionsByType,
+          ( selfarg, bp::arg( "type" )),
+          DOXY_FN( brain::neuron::Morphology::getSections(const SectionTypes&) const))
+    .def( "section", Morphology_getSection, ( selfarg, bp::arg( "id" )),
+          DOXY_FN( brain::neuron::Morphology::getSections(SectionType) const))
+    .def( "soma", Morphology_getSoma, ( selfarg ),
+          DOXY_FN( brain::neuron::Morphology::getSoma ))
+    .def( "transformation", Morphology_getTransformation, ( selfarg ),
+          DOXY_FN( brain::neuron::Morphology::getTransformation ))
     ;
 
 }

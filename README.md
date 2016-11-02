@@ -13,6 +13,8 @@ Brion can be retrieved by cloning the
 The [latest API documentation]
 (http://bluebrain.github.io/Brion-1.9/index.html) can be found on
 [bluebrain.github.io](http://bluebrain.github.io).
+Additional documentation exists for the [Python wrapping of Brain]
+(python/index.html).
 
 To keep track of the changes between releases check the [changelog](@ref Changelog).
 

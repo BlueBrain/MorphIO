@@ -1,4 +1,4 @@
-Synapse support in Brain
+Synapse support in Brain {#brainSynapses}
 ============
 
 The low-level data access for synapses provided by Brion needs a complementary

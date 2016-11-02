@@ -63,7 +63,9 @@ public:
 
     BRAIN_API Soma& operator=( const Soma& soma );
 
-    /** Return the points of the soma profile. */
+    /** Return the x,y,z and radius of the points of the soma
+      * profile \if pybind as a 4xN numpy array\endif.
+      */
     BRAIN_API Vector4fs getProfilePoints() const;
 
     /** Return the mean distance between the profile points and the centroid. */

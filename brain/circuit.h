@@ -48,6 +48,7 @@ public:
 
     /**
      * Opens a circuit for read access.
+     *
      * @param source the URI to the CircuitConfig or BlueConfig file.
      */
     BRAIN_API explicit Circuit( const URI& source );
@@ -66,7 +67,7 @@ public:
      */
     BRAIN_API GIDSet getGIDs( const std::string& target ) const;
 
-    /** @return All GIDs held by the circuit */
+    /** @return The set of all GIDs held by the circuit */
     BRAIN_API GIDSet getGIDs() const;
 
     /**
@@ -118,10 +119,14 @@ public:
      */
     BRAIN_API Strings getElectrophysiologyNames() const;
 
-    /** @return The local to world transformations of the given cells. */
+    /** @return \if pybind A Nx4 numpy array with the \else The \endif
+     *          local to world transformations of the given cells.
+     */
     BRAIN_API Matrix4fs getTransforms( const GIDSet& gids ) const;
 
-    /** @return The local to world rotation of the given cells. */
+    /** @return \if pybind A Nx4 numpy array with the \else The \endif
+     *           local to world rotation of the given cells.
+     */
     BRAIN_API Quaternionfs getRotations( const GIDSet& gids ) const;
 
     /** @return The number of neurons in the circuit. */
@@ -131,8 +136,12 @@ public:
      * Access all afferent synapses of the given GIDs.
      *
      * @param gids the gids to load afferent synapses for
+     * \if pybind
+     * @param prefetch which synapse data to preload
+     * \else
      * @param prefetch which synapse data to load on SynapsesStream.read()
      * @return synapse data stream
+     * \endif
      */
     BRAIN_API SynapsesStream getAfferentSynapses(
         const GIDSet& gids,
@@ -142,8 +151,12 @@ public:
      * Access all efferent synapses of the given GIDs.
      *
      * @param gids the gids to load efferent synapses for
+     * \if pybind
+     * @param prefetch which synapse data to preload
+     * \else
      * @param prefetch which synapse data to load on SynapsesStream.read()
      * @return synapse data stream
+     * \endif
      */
     BRAIN_API SynapsesStream getEfferentSynapses(
         const GIDSet& gids,
@@ -154,8 +167,12 @@ public:
      *
      * @param preGIDs the gids to load the efferent synapses for
      * @param postGIDs the gids to load the afferent synapses for
+     * \if pybind
+     * @param prefetch which synapse data to preload
+     * \else
      * @param prefetch which synapse data to load on SynapsesStream.read()
      * @return synapse data stream
+     * \endif
      */
     BRAIN_API SynapsesStream getProjectedSynapses(
         const GIDSet& preGIDs, const GIDSet& postGIDs,

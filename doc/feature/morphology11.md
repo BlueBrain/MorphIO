@@ -1,4 +1,4 @@
-Implementing Morphology version 1.1, support for glia cells
+Implementing Morphology version 1.1, support for glia cells {#morphology11}
 ============
 
 The current morphology version 1 specification and implementation is tailored

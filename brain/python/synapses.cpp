@@ -21,9 +21,10 @@
 
 #include "types.h"
 #include "arrayHelpers.h"
+#include "docstrings.h"
 
 #include <brain/synapses.h>
-#include <brain/synapses.h>
+
 
 #include <vmmlib/vector.hpp>
 
@@ -90,63 +91,115 @@ GET_SYNAPSES_ARRAY_PROPERTY( int, efficacies )
 void export_Synapses()
 {
 
-bp::class_< SynapseWrapper >( "Synapse", bp::no_init )
-    .def( "pre_gid", &Synapse::getPresynapticGID )
-    .def( "pre_section", &Synapse::getPresynapticSectionID )
-    .def( "pre_segment", &Synapse::getPresynapticSegmentID )
-    .def( "pre_distance", &Synapse::getPresynapticDistance )
-    .def( "pre_center_position", &Synapse::getPresynapticCenterPosition )
-    .def( "pre_surface_position", &Synapse::getPresynapticSurfacePosition )
-    .def( "post_gid", &Synapse::getPostsynapticGID )
-    .def( "post_section", &Synapse::getPostsynapticSectionID )
-    .def( "post_segment", &Synapse::getPostsynapticSegmentID )
-    .def( "post_distance", &Synapse::getPostsynapticDistance )
-    .def( "post_center_position", &Synapse::getPostsynapticCenterPosition )
-    .def( "post_surface_position", &Synapse::getPostsynapticSurfacePosition )
-    .def( "delay", &Synapse::getDelay )
-    .def( "conductance", &Synapse::getConductance )
-    .def( "utilization", &Synapse::getUtilization )
-    .def( "depression", &Synapse::getDepression )
-    .def( "facilitation", &Synapse::getFacilitation )
-    .def( "decay", &Synapse::getDecay )
-    .def( "efficacy", &Synapse::getEfficacy )
+const auto selfarg = bp::arg( "self" );
+
+bp::class_< SynapseWrapper >( "Synapse",
+                              DOXY_CLASS( brain::Synapse ), bp::no_init )
+    .def( "pre_gid", &Synapse::getPresynapticGID, ( selfarg ),
+          DOXY_FN( brain::Synapse::getPresynapticGID ))
+    .def( "pre_section", &Synapse::getPresynapticSectionID, ( selfarg ),
+          DOXY_FN( brain::Synapse::getPresynapticSectionID ))
+    .def( "pre_segment", &Synapse::getPresynapticSegmentID, ( selfarg ),
+          DOXY_FN( brain::Synapse::getPresynapticSegmentID ))
+    .def( "pre_distance", &Synapse::getPresynapticDistance, ( selfarg ),
+          DOXY_FN( brain::Synapse::getPresynapticDistance ))
+    .def( "pre_center_position", &Synapse::getPresynapticCenterPosition,
+          ( selfarg ), DOXY_FN( brain::Synapse::getPresynapticCenterPosition ))
+    .def( "pre_surface_position", &Synapse::getPresynapticSurfacePosition,
+          ( selfarg ), DOXY_FN( brain::Synapse::getPresynapticSurfacePosition ))
+    .def( "post_gid", &Synapse::getPostsynapticGID, ( selfarg ),
+          DOXY_FN( brain::Synapse::getPostsynapticGID ))
+    .def( "post_section", &Synapse::getPostsynapticSectionID, ( selfarg ),
+          DOXY_FN( brain::Synapse::getPostsynapticSectionID ))
+    .def( "post_segment", &Synapse::getPostsynapticSegmentID, ( selfarg ),
+          DOXY_FN( brain::Synapse::getPostsynapticSegmentID ))
+    .def( "post_distance", &Synapse::getPostsynapticDistance, ( selfarg ),
+          DOXY_FN( brain::Synapse::getPostsynapticDistance ))
+    .def( "post_center_position", &Synapse::getPostsynapticCenterPosition,
+          ( selfarg ), DOXY_FN( brain::Synapse::getPostsynapticCenterPosition ))
+    .def( "post_surface_position", &Synapse::getPostsynapticSurfacePosition,
+          ( selfarg ), DOXY_FN( brain::Synapse::getPostsynapticSurfacePosition ))
+    .def( "delay", &Synapse::getDelay, ( selfarg ),
+          DOXY_FN( brain::Synapse::getDelay ))
+    .def( "conductance", &Synapse::getConductance, ( selfarg ),
+          DOXY_FN( brain::Synapse::getConductance ))
+    .def( "utilization", &Synapse::getUtilization, ( selfarg ),
+          DOXY_FN( brain::Synapse::getUtilization ))
+    .def( "depression", &Synapse::getDepression, ( selfarg ),
+          DOXY_FN( brain::Synapse::getDepression ))
+    .def( "facilitation", &Synapse::getFacilitation, ( selfarg ),
+          DOXY_FN( brain::Synapse::getFacilitation ))
+    .def( "decay", &Synapse::getDecay, ( selfarg ),
+          DOXY_FN( brain::Synapse::getDecay ))
+    .def( "efficacy", &Synapse::getEfficacy, ( selfarg ),
+          DOXY_FN( brain::Synapse::getEfficacy ))
     ;
 
-bp::class_< SynapsesWrapper >( "Synapses", bp::no_init )
+bp::class_< SynapsesWrapper >( "Synapses", DOXY_CLASS( brain::Synapses ),
+                               bp::no_init )
     .def( "__nonzero__", nonzero )
     .def( "__len__", &Synapses::size )
     .def( "__getitem__", Synapses_get )
     // There is no need to wrap the iterator, Python provides one out of the
     // box thanks to __len__ and __getitem__
-    .def( "empty", &Synapses::empty )
-    .def( "indices", Synapses_indices )
-    .def( "pre_gids", Synapses_preGIDs )
-    .def( "pre_section_ids", Synapses_preSectionIDs )
-    .def( "pre_segment_ids", Synapses_preSegmentIDs )
-    .def( "pre_distances", Synapses_preDistances )
-    .def( "pre_surface_x_positions", Synapses_preSurfaceXPositions )
-    .def( "pre_surface_y_positions", Synapses_preSurfaceYPositions )
-    .def( "pre_surface_z_positions", Synapses_preSurfaceZPositions )
-    .def( "pre_center_x_positions", Synapses_preCenterXPositions )
-    .def( "pre_center_y_positions", Synapses_preCenterYPositions )
-    .def( "pre_center_z_positions", Synapses_preCenterZPositions )
-    .def( "post_gids", Synapses_postGIDs )
-    .def( "post_section_ids", Synapses_postSectionIDs )
-    .def( "post_segment_ids", Synapses_postSegmentIDs )
-    .def( "post_distances", Synapses_postDistances )
-    .def( "post_surface_x_positions", Synapses_postSurfaceXPositions )
-    .def( "post_surface_y_positions", Synapses_postSurfaceYPositions )
-    .def( "post_surface_z_positions", Synapses_postSurfaceZPositions )
-    .def( "post_center_x_positions", Synapses_postCenterXPositions )
-    .def( "post_center_y_positions", Synapses_postCenterYPositions )
-    .def( "post_center_z_positions", Synapses_postCenterZPositions )
-    .def( "delays", Synapses_delays )
-    .def( "conductances", Synapses_conductances )
-    .def( "utilizations", Synapses_utilizations )
-    .def( "depressions", Synapses_depressions )
-    .def( "facilitations", Synapses_facilitations )
-    .def( "decays", Synapses_decays )
-    .def( "efficacies", Synapses_efficacies )
+    .def( "empty", &Synapses::empty, ( selfarg ),
+          DOXY_FN( brain::Synapses::empty ))
+    .def( "indices", Synapses_indices, ( selfarg ),
+          DOXY_FN( brain::Synapses::indices ))
+    .def( "pre_gids", Synapses_preGIDs, ( selfarg ),
+          DOXY_FN( brain::Synapses::preGIDs ))
+    .def( "pre_section_ids", Synapses_preSectionIDs, ( selfarg ),
+          DOXY_FN( brain::Synapses::preSectionIDs ))
+    .def( "pre_segment_ids", Synapses_preSegmentIDs, ( selfarg ),
+          DOXY_FN( brain::Synapses::preSegmentIDs ))
+    .def( "pre_distances", Synapses_preDistances, ( selfarg ),
+          DOXY_FN( brain::Synapses::preDistances ))
+    .def( "pre_surface_x_positions", Synapses_preSurfaceXPositions,
+          ( selfarg ), DOXY_FN( brain::Synapses::preSurfaceXPositions ))
+    .def( "pre_surface_y_positions", Synapses_preSurfaceYPositions,
+          ( selfarg ), DOXY_FN( brain::Synapses::preSurfaceYPositions ))
+    .def( "pre_surface_z_positions", Synapses_preSurfaceZPositions,
+          ( selfarg ), DOXY_FN( brain::Synapses::preSurfaceZPositions ))
+    .def( "pre_center_x_positions", Synapses_preCenterXPositions, ( selfarg ),
+          DOXY_FN( brain::Synapses::preCenterXPositions ))
+    .def( "pre_center_y_positions", Synapses_preCenterYPositions, ( selfarg ),
+          DOXY_FN( brain::Synapses::preCenterYPositions ))
+    .def( "pre_center_z_positions", Synapses_preCenterZPositions, ( selfarg ),
+          DOXY_FN( brain::Synapses::preCenterZPositions ))
+    .def( "post_gids", Synapses_postGIDs, ( selfarg ),
+          DOXY_FN( brain::Synapses::postGIDs ))
+    .def( "post_section_ids", Synapses_postSectionIDs, ( selfarg ),
+          DOXY_FN( brain::Synapses::postSectionIDs ))
+    .def( "post_segment_ids", Synapses_postSegmentIDs, ( selfarg ),
+          DOXY_FN( brain::Synapses::postSegmentIDs ))
+    .def( "post_distances", Synapses_postDistances, ( selfarg ),
+          DOXY_FN( brain::Synapses::postDistances ))
+    .def( "post_surface_x_positions", Synapses_postSurfaceXPositions,
+          ( selfarg ), DOXY_FN( brain::Synapses::postSurfaceXPositions ))
+    .def( "post_surface_y_positions", Synapses_postSurfaceYPositions,
+          ( selfarg ), DOXY_FN( brain::Synapses::postSurfaceYPositions ))
+    .def( "post_surface_z_positions", Synapses_postSurfaceZPositions,
+          ( selfarg ), DOXY_FN( brain::Synapses::postSurfaceZPositions ))
+    .def( "post_center_x_positions", Synapses_postCenterXPositions, ( selfarg ),
+          DOXY_FN( brain::Synapses::postCenterXPositions ))
+    .def( "post_center_y_positions", Synapses_postCenterYPositions, ( selfarg ),
+          DOXY_FN( brain::Synapses::postCenterYPositions ))
+    .def( "post_center_z_positions", Synapses_postCenterZPositions, ( selfarg ),
+          DOXY_FN( brain::Synapses::postCenterZPositions ))
+    .def( "delays", Synapses_delays, ( selfarg ),
+          DOXY_FN( brain::Synapses::delays ))
+    .def( "conductances", Synapses_conductances, ( selfarg ),
+          DOXY_FN( brain::Synapses::conductances ))
+    .def( "utilizations", Synapses_utilizations, ( selfarg ),
+          DOXY_FN( brain::Synapses::utilizations ))
+    .def( "depressions", Synapses_depressions, ( selfarg ),
+          DOXY_FN( brain::Synapses::depressions ))
+    .def( "facilitations", Synapses_facilitations, ( selfarg ),
+          DOXY_FN( brain::Synapses::facilitations ))
+    .def( "decays", Synapses_decays, ( selfarg ),
+          DOXY_FN( brain::Synapses::decays ))
+    .def( "efficacies", Synapses_efficacies, ( selfarg ),
+          DOXY_FN( brain::Synapses::efficacies ))
     ;
 
 }

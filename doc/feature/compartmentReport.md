@@ -1,4 +1,4 @@
-Additions to compartmentReport to support ZeroEQ streams
+Additions to compartmentReport to support ZeroEQ streams {#compartmentReport}
 ============
 
 ## Motivation

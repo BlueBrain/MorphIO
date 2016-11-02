@@ -1,4 +1,4 @@
-Compartment report writing from MPI applications
+Compartment report writing from MPI applications {#compartmentReportMPI}
 ============
 
 This feature is a modification of the CompartmentReport to allow MPI

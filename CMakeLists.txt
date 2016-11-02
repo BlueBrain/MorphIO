@@ -9,7 +9,7 @@ project(Brion VERSION 1.9.0)
 set(Brion_VERSION_ABI 7)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
-  ${CMAKE_SOURCE_DIR}/CMake/common)
+  ${CMAKE_SOURCE_DIR}/CMake/common ${CMAKE_SOURCE_DIR}/Pydoxine/CMake)
 
 include(GitExternal)
 
@@ -36,6 +36,7 @@ common_find_package(OpenMP)
 common_find_package(PythonInterp)
 common_find_package(PythonLibs)
 common_find_package(Servus REQUIRED)
+common_find_package(Sphinx 1.3)
 common_find_package(vmmlib REQUIRED)
 common_find_package_post()
 
@@ -55,3 +56,5 @@ set(DOXYGEN_EXPAND_AS_DEFINED "BRAIN_API BRION_API")
 set(DOXYGEN_EXTRA_INPUT "${PROJECT_SOURCE_DIR}/README.md ${CMAKE_INSTALL_PREFIX}/include/brain")
 set(DOXYGEN_PREDEFINED_MACROS "BRAIN_API:=")
 include(DoxygenRule)
+
+add_subdirectory(doc/python)

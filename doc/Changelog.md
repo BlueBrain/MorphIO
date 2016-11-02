@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # Release 1.9.0 (git master)
 
+* [107](https://github.com/BlueBrain/Brion/pull/107):
+  Added Sphinx generated documentation of the brain python module.
 * [102](https://github.com/BlueBrain/Brion/pull/102):
   Use PersistentMap for caching synapse positions loaded from brain::Circuit
 * [94](https://github.com/BlueBrain/Brion/pull/94):

@@ -34,6 +34,9 @@ namespace brain
  * per-array access on the various synapses attributes. Data which was not
  * prefetched will be loaded on-demand.
  *
+ * This container can be iterated as well as random accessed using the
+ * operator [].
+ *
  * This class is thread-safe, moveable and copyable.
  */
 class Synapses

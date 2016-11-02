@@ -55,6 +55,7 @@ public:
     /**
      * Create a morphology from a URI, load all the data and transform
      * the points.
+     *
      * @param source URI of the morphology data source.
      * @param transform the transformation matrix to apply to the points.
      *        Radii will not be affected by this transformation.
@@ -65,6 +66,7 @@ public:
     /**
      * Create a morphology from a brion::Morphology, load all the data
      * and transform the points.
+     *
      * @param morphology the brion::Morphology to load from.
      * @param transform the transformation matrix to apply to the points.
      *        Radii will not be affected by this transformation.
@@ -75,6 +77,7 @@ public:
 
     /**
      * Create a morphology from a URI and load all the data.
+     *
      * @param source URI of the morphology data source.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
@@ -82,6 +85,7 @@ public:
 
     /**
      * Create a morphology from a brion::Morphology and load all the data.
+     *
      * @param morphology the brion::Morphology to load from.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
@@ -120,6 +124,7 @@ public:
 
     /**
      * Return the Section with the given id.
+     *
      * @throw runtime_error if the id is out of range or the given id refers to
      * a soma section.
      */
@@ -128,8 +133,10 @@ public:
     /** Return the object with the information about the neuron soma */
     BRAIN_API Soma getSoma() const;
 
-    /** Return the transformation that was passed to the constructor or the
-        identity matrix is no transformation was given. */
+    /** Return \if pybind a 4x4 numpry arry with \endif
+     *  the transformation that was passed to the constructor or the
+     *  identity matrix is no transformation was given.
+     */
     BRAIN_API const Matrix4f& getTransformation() const;
 
 private:
