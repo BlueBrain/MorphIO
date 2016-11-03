@@ -41,6 +41,29 @@ BOOST_AUTO_TEST_CASE( test_gmsh_point )
 }
 
 
+BOOST_AUTO_TEST_CASE( test_gmsh_point_duplication_filter )
+{
+    using namespace morpho;
+    namespace geo = hadoken::geometry::cartesian;
+
+    gmsh_abstract_file mfile;
+
+    geo::point3d p1(0.5, 0.2, 0.6);
+
+    geo::point3d p1_close_copy = p1 + geo::point3d(std::numeric_limits<double>::epsilon(),
+                                             std::numeric_limits<double>::epsilon(),
+                                             std::numeric_limits<double>::epsilon());
+    geo::point3d p1_far_copy = p1 + geo::point3d(100, 100 , 100);
+
+    BOOST_CHECK( p1.close_to(p1_close_copy) );
+    BOOST_CHECK( p1.close_to(p1_far_copy) == false);
+
+
+    BOOST_CHECK_EQUAL(mfile.add_point(p1), 0);
+    BOOST_CHECK_EQUAL(mfile.add_point(p1_far_copy), 1);
+    BOOST_CHECK_EQUAL(mfile.add_point(p1_close_copy), 0);
+}
+
 
 
 BOOST_AUTO_TEST_CASE( test_gmsh_lines )

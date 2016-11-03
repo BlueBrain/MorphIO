@@ -4,6 +4,7 @@
 #include <vector>
 #include <cmath>
 
+
 #include <hadoken/format/format.hpp>
 
 #include <morpho/morpho_h5_v1.hpp>
@@ -337,20 +338,25 @@ std::size_t gmsh_abstract_file::create_id_line_element(){
     return _segments.size() + _circles.size() + _line_loop.size();
 }
 
-gmsh_exporter::gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags my_flags, bool to_write_dmg) :
+gmsh_exporter::gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags my_flags) :
     geo_stream(mesh_filename),
     dmg_stream(),
     reader(morphology_filename),
-    flags(my_flags),
-    write_dmg(to_write_dmg)
+    flags(my_flags)
 {
-    if (write_dmg) {
-        std::string str("dmg_file.dmg");
-        dmg_stream.open(str);
+    if (is_dmg_enabled()) {
+        std::string dmg_filename(mesh_filename);
+        dmg_filename.erase(dmg_filename.find_last_of('.'), std::string::npos);
+        dmg_filename.append(".dmg");
+        dmg_stream.open(dmg_filename);
     }
 
 }
 
+
+bool gmsh_exporter::is_dmg_enabled() const{
+    return flags & exporter_write_dmg;
+}
 
 void gmsh_exporter::export_to_point_cloud(){
     serialize_header();
@@ -372,7 +378,7 @@ void gmsh_exporter::export_to_wireframe(){
     vfile.export_points_to_stream(geo_stream);
     vfile.export_segments_to_stream(geo_stream);
 
-    if (write_dmg) {
+    if (is_dmg_enabled()) {
         fmt::scat(std::cout, "export gmsh geometry objects to dmg file format", "\n");
 
         std::size_t ndim[2] = {0, 0};
@@ -413,7 +419,7 @@ void gmsh_exporter::export_to_3d_object(){
     vfile.export_line_loop_to_stream(geo_stream);
     vfile.export_volume_to_stream(geo_stream);
 
-    if (write_dmg) {
+    if (is_dmg_enabled()) {
         fmt::scat(std::cout, "export gmsh geometry objects to dmg file format", "\n");
         std::size_t ndim[4] = {0, 0, 0, 0};
         auto all_points = vfile.get_all_points();
@@ -748,7 +754,7 @@ void gmsh_exporter::serialize_points_raw(){
     construct_gmsh_vfile_raw(vfile);
     vfile.export_points_to_stream(geo_stream);
 
-    if (write_dmg)
+    if (is_dmg_enabled())
         vfile.export_points_to_stream_dmg(dmg_stream);
 }
 
