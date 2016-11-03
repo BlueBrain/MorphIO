@@ -222,7 +222,10 @@ private:
     struct hash_gmsh_point{
         std::size_t operator()(const gmsh_point & p) const noexcept{
             std::hash<double> hd;
-            return hd(geo::get_x(p.get_point()));
+            const double xpos = geo::get_x(p.get_point());
+            // round up the value to the desired precision ( 4 digit prec )
+            const double xpos_round = std::ceil(xpos*10000);
+            return hd(xpos_round);
         }
     };
 
@@ -267,9 +270,10 @@ public:
 
     typedef int exporter_flags;
     static constexpr int exporter_single_soma = 0x01;
+    static constexpr int exporter_write_dmg = 0x02;
 
 
-    gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags flags = exporter_flags(), bool to_write_dmg = false);
+    gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
 
 
     void export_to_point_cloud();
@@ -280,11 +284,11 @@ public:
 
 
 private:
-    bool write_dmg;
     std::ofstream geo_stream, dmg_stream;
     morpho::h5_v1::morpho_reader reader;
     exporter_flags flags;
 
+    bool is_dmg_enabled() const;
 
     void serialize_header();
 

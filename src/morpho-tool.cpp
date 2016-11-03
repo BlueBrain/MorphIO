@@ -96,11 +96,11 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
         flags |= gmsh_exporter::exporter_single_soma;
     }
 
-    bool with_dmg = false;
-    if(options.count("with-dmg"))
-        with_dmg = true;
+    if(options.count("with-dmg")){
+        flags |= gmsh_exporter::exporter_write_dmg;
+    }
 
-    gmsh_exporter exporter(filename_morpho, filename_geo, flags, with_dmg);
+    gmsh_exporter exporter(filename_morpho, filename_geo, flags);
 
     if(options.count("point-cloud")){
         exporter.export_to_point_cloud();
