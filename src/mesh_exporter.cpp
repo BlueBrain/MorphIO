@@ -39,9 +39,6 @@ const std::string gmsh_header =
 "****************************************************************/\n\n";
 
 
-std::set<size_t> ph_circles;
-
-
 std::size_t gmsh_abstract_file::add_point(const gmsh_point &point){
     gmsh_point new_point(point);
     new_point.id = _points.size();
@@ -213,7 +210,6 @@ void gmsh_abstract_file::export_circle_to_stream(ostream &out){
         if(p->isPhysical){
             fmt::scat(out,
                       "Physical Line(", p->id,") = {", p->id,"};\n");
-ph_circles.insert(p->id);
         }
     }
 
@@ -266,29 +262,10 @@ void gmsh_abstract_file::export_line_loop_to_stream(ostream &out){
 void gmsh_abstract_file::export_line_loop_to_stream_dmg(ostream &out){
 
     auto all_loop = get_all_line_loops();
-//auto all_circles = get_all_circles();
-//size_t nloop = 0;
-//size_t ncirc = all_circles.size();
-//size_t nphcirc = ph_circles.size();
-//printf("Number of physical circles at start: %d\n", nphcirc);
     for(auto p = all_loop.begin(); p != all_loop.end(); ++p){
         if(!p->isPhysical)
             continue;
-/*
-        /// Check if underlying circles are physical
-        bool ph_circle = true;
-        for(auto & id : p->ids) {
-            size_t cnumber = id;
-            if (ph_circles.count(std::abs(id)) == 0) {
-                ph_circle = false;
-                break;
-            }
-        }
-        if(!ph_circle)
-            continue;
 
-++nloop;
-*/
         fmt::scat(out, p->id, " 1\n", " ", p->ids.size(), "\n");
         for(auto & id : p->ids) {
             fmt::scat(out, "  ", std::abs(id));
@@ -298,7 +275,6 @@ void gmsh_abstract_file::export_line_loop_to_stream_dmg(ostream &out){
                 fmt::scat(out, " 0\n");
         }
     }
-//printf("Number of line loops is %d\n", nloop);
 }
 
 
@@ -454,10 +430,7 @@ void gmsh_exporter::export_to_3d_object(){
         for(auto p = all_circles.begin(); p != all_circles.end(); ++p) {
             if(p->isPhysical)
                 ndim[1]++;
-//            if(p->isPhysical)
-//                ph_circles.insert(p->id);
         }
-//printf("Number of physical circles: %d\n", (int)ph_circles.size());
 
         auto all_line_loops = vfile.get_all_line_loops();
         for(auto p = all_line_loops.begin(); p != all_line_loops.end(); ++p)
