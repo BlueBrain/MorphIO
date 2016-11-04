@@ -37,6 +37,15 @@ inline void soma_gravity_center(const branch::mat_points & raw_points,
 }
 
 
+// return the tangeante of a 3 points linestring in point 2
+inline branch::vector get_tangente_axis(const branch::point & p1, const branch::point & p2, const branch::point & p3){
+    namespace geo = hadoken::geometry::cartesian;
+    branch::vector v1 = p2 - p1, v2 = p3 - p2;
+
+    return v1 + v2;
+}
+
+
 }
 
 
@@ -64,6 +73,8 @@ branch::linestring branch::get_linestring() const{
 
 
 }
+
+
 
 
 branch::circle_pipe branch::get_circle_pipe() const{
@@ -99,7 +110,15 @@ branch::circle_pipe branch::get_circle_pipe() const{
     for(std::size_t i =0; i < get_size(); ++i){
         const auto  & prev_center = res.back().get_center();
         auto center = get_point(i);
-        auto axis = prev_center - center;
+        branch::vector axis;
+
+        // compute the axis based on the tangente if we are not the last point
+        if(i < get_size() -1){
+            axis = get_tangente_axis(prev_center, center, get_point(i+1));
+        }else{
+            axis = prev_center - center;
+        }
+
         auto radius = _distances[i];
 
         if(prev_center.close_to(center)){
