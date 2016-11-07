@@ -22,18 +22,8 @@ set(BRAIN_PYTHON_SOURCES
   neuron/morphology.cpp
 )
 
-set(__docstrings_sources)
-set(__docstrings_headers)
-# Input files to docstrings need absolute paths.
-foreach(__header ${BRAIN_PUBLIC_HEADERS})
-  list(APPEND __docstrings_headers ${PROJECT_SOURCE_DIR}/brain/${__header})
-endforeach()
-foreach(__source ${BRAIN_PYTHON_SOURCES})
-  list(APPEND __docstrings_sources ${CMAKE_CURRENT_SOURCE_DIR}/${__source})
-endforeach()
-
-set(DOCSTRINGS_INCLUDE_PATH ${PROJECT_BINARY_DIR}/include)
-docstrings(__docstrings_sources __docstrings_headers)
+docstrings(BRAIN_PYTHON_SOURCES BRAIN_PUBLIC_HEADERS
+  ${PROJECT_BINARY_DIR}/include)
 
 list(APPEND BRAIN_PYTHON_SOURCES
   arrayHelpers.cpp
@@ -54,6 +44,7 @@ add_library(brain_python MODULE ${BRAIN_PYTHON_SOURCES})
 common_compile_options(brain_python)
 if(TARGET ${PROJECT_NAME}-docstrings)
   add_dependencies(brain_python Brain ${PROJECT_NAME}-docstrings)
+  target_compile_definitions(brain_python PRIVATE BRAIN_HAS_DOCSTRINGS)
 endif()
 
 target_link_libraries(brain_python

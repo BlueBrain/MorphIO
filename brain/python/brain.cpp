@@ -67,7 +67,7 @@ struct URItoString
 
 BOOST_PYTHON_MODULE(_brain)
 {
-#if defined BRION_USE_SPHINX && defined BRION_USE_DOGYXGEN
+#ifdef BRAIN_HAS_DOCSTRINGS
     /* Only change the default Boost.Python options for documentation if we
        are going to get docstrings from doxygen. */
     boost::python::docstring_options doc_options(true, true, false);
