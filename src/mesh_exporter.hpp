@@ -215,7 +215,17 @@ public:
     void export_volume_to_stream(std::ostream & out);
     void export_volume_to_stream_dmg(std::ostream & out);
 
+    /// Add a bounding box geometry based on neuron points
+    void add_bounding_box();
+
+///Duplicate neuron points and segments, MUST be deleted!
+void add_dup_neuron_points();
+void add_dup_neuron_segments();
+
 private:
+
+    /// To support neuron duplication, must be deleted
+    std::size_t npoint;
 
     std::size_t create_id_line_element();
 
@@ -271,6 +281,7 @@ public:
     typedef int exporter_flags;
     static constexpr int exporter_single_soma = 0x01;
     static constexpr int exporter_write_dmg = 0x02;
+    static constexpr int exporter_bounding_box = 0x04;
 
 
     gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
@@ -289,6 +300,7 @@ private:
     exporter_flags flags;
 
     bool is_dmg_enabled() const;
+    bool is_bbox_enabled() const;
 
     void serialize_header();
 

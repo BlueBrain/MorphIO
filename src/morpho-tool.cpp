@@ -61,6 +61,7 @@ po::parsed_options parse_args(int argc, char** argv,
         ("wireframe", "gmsh: export to a wired morphology (default)")
         ("3d-object", "gmsh: export to a 3D object model")
         ("with-dmg", "gmsh: export to a dmg file format as well")
+        ("with-bounding-box", "gmsh: add a bounding box to the geometry based on neurons info")
         ("single-soma", "gmsh: represent soma as a single element, point or sphere")
         ("sphere", "x3d: export cloud of sphere (default)")
         ("command", po::value<std::string>(), "command to execute")
@@ -98,6 +99,10 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
 
     if(options.count("with-dmg")){
         flags |= gmsh_exporter::exporter_write_dmg;
+    }
+
+    if(options.count("with-bounding-box")){
+        flags |= gmsh_exporter::exporter_bounding_box;
     }
 
     gmsh_exporter exporter(filename_morpho, filename_geo, flags);
