@@ -319,8 +319,9 @@ public:
         for( auto& future : futures )
             loaded.insert( future.get( ));
 
-        LBINFO << "Loaded " << loaded.size() << " out of " << hashes.size()
-               << " morphologies from cache" << std::endl;
+        LBINFO << "Loaded " << loaded.size() << " morphologies from cache, "
+               << "loading " << hashes.size() - loaded.size()
+               << " remaining from file" << std::endl;
         return loaded;
     }
 
