@@ -293,6 +293,7 @@ public:
 
     gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
 
+    gmsh_exporter(const std::vector<morpho_tree> & trees, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
 
     void export_to_point_cloud();
 
@@ -305,6 +306,7 @@ private:
     std::ofstream geo_stream, dmg_stream;
     morpho::h5_v1::morpho_reader reader;
     exporter_flags flags;
+    std::vector<morpho_tree> morphotrees;
 
     bool is_dmg_enabled() const;
 
