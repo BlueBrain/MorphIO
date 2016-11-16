@@ -236,14 +236,8 @@ public:
     /// Add a bounding box geometry based on neuron points
     void add_bounding_box();
 
-///Duplicate neuron points and segments, MUST be deleted!
-void add_dup_neuron_points();
-void add_dup_neuron_segments();
 
 private:
-
-    /// To support neuron duplication, must be deleted
-    std::size_t npoint;
 
     std::size_t create_id_line_element();
 

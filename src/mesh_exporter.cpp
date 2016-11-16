@@ -168,45 +168,38 @@ void gmsh_abstract_file::add_bounding_box(){
        maxp[i] += offset;
     }
 
-    double cubeSize = fabs(maxp[0]-minp[0]);
-    for (int i = 1; i < 3; ++i){
-        double size = fabs(maxp[i]-minp[i]);
-        if (size > cubeSize)
-            cubeSize = size;
-    }
-    
-
-    /// Create 8 points of a bounding box
+    double csize = 100.;
     std::vector<gmsh_point> pnts;
-    gmsh_point pnt0(geo::point3d(minp[0], minp[1], minp[2]));
+    gmsh_point pnt0(geo::point3d(minp[0], minp[1], minp[2]), csize);
     pnt0.setPhysical(true);
     add_point(pnt0);
     pnts.push_back(pnt0);
-    gmsh_point pnt1(geo::point3d(minp[0]+cubeSize, minp[1], minp[2]));
+    gmsh_point pnt1(geo::point3d(maxp[0], minp[1], minp[2]), csize);
     pnt1.setPhysical(true);
     add_point(pnt1);
     pnts.push_back(pnt1);
-    gmsh_point pnt2(geo::point3d(maxp[0], maxp[1], maxp[2]-cubeSize));
+    gmsh_point pnt2(geo::point3d(maxp[0], maxp[1], minp[2]), csize);
     pnt2.setPhysical(true);
     add_point(pnt2);
     pnts.push_back(pnt2);
-    gmsh_point pnt3(geo::point3d(minp[0], minp[1]+cubeSize, minp[2]));
+    gmsh_point pnt3(geo::point3d(minp[0], maxp[1], minp[2]), csize);
     pnt3.setPhysical(true);
     add_point(pnt3);
+
     pnts.push_back(pnt3);
-    gmsh_point pnt4(geo::point3d(minp[0], minp[1], minp[2]+cubeSize));
+    gmsh_point pnt4(geo::point3d(minp[0], minp[1], maxp[2]), csize);
     pnt4.setPhysical(true);
     add_point(pnt4);
     pnts.push_back(pnt4);
-    gmsh_point pnt5(geo::point3d(maxp[0], maxp[1]-cubeSize, maxp[2]));
+    gmsh_point pnt5(geo::point3d(maxp[0], minp[1], maxp[2]), csize);
     pnt5.setPhysical(true);
     add_point(pnt5);
     pnts.push_back(pnt5);
-    gmsh_point pnt6(geo::point3d(maxp[0], maxp[1], maxp[2]));
+    gmsh_point pnt6(geo::point3d(maxp[0], maxp[1], maxp[2]), csize);
     pnt6.setPhysical(true);
     add_point(pnt6);
     pnts.push_back(pnt6);
-    gmsh_point pnt7(geo::point3d(maxp[0]-cubeSize, maxp[1], maxp[2]));
+    gmsh_point pnt7(geo::point3d(minp[0], maxp[1], maxp[2]), csize);
     pnt7.setPhysical(true);
     add_point(pnt7);
     pnts.push_back(pnt7);
@@ -268,10 +261,13 @@ void gmsh_abstract_file::export_points_to_stream(ostream &out){
     out << "\n";
     out << "// export morphology points \n";
 
+    /// Setting the scaling factor
+    fmt::scat(out, "h=1;\n");
     auto all_points = get_all_points();
     for(auto p = all_points.begin(); p != all_points.end(); ++p){
         fmt::scat(out,
-                  "Point(", p->id,") = {", clean_coordinate(geo::get_x(p->coords)),", ", clean_coordinate(geo::get_y(p->coords)), ", ", clean_coordinate(geo::get_z(p->coords)), "};\n");
+//                  "Point(", p->id,") = {", clean_coordinate(geo::get_x(p->coords)),", ", clean_coordinate(geo::get_y(p->coords)), ", ", clean_coordinate(geo::get_z(p->coords)), "};\n");
+                  "Point(", p->id,") = {", clean_coordinate(geo::get_x(p->coords)),", ", clean_coordinate(geo::get_y(p->coords)), ", ", clean_coordinate(geo::get_z(p->coords)), ", ", p->diameter, "*h};\n");
         if(p->isPhysical){
             fmt::scat(out,
                       "Physical Point(", p->id,") = {", p->id,"};\n");
@@ -486,34 +482,6 @@ void gmsh_exporter::export_to_point_cloud(){
 }
 
 
-/// Adding duplicated neuron points based on alredy existent points
-void gmsh_abstract_file::add_dup_neuron_points() {
-    auto all_points = get_all_points();
-    npoint = all_points.size();
-    for(size_t i = 0; i < npoint; ++i) {
-        gmsh_point epnt = all_points[i];
-        gmsh_point pnt(geo::point3d(geo::get_x(epnt.coords)+393, geo::get_y(epnt.coords), geo::get_z(epnt.coords)), epnt.diameter);
-        pnt.setPhysical(epnt.isPhysical);
-        add_point(pnt);
-    }
-}
-
-
-/// Adding duplicated neuron segments based on alredy existent segments
-void gmsh_abstract_file::add_dup_neuron_segments() {
-    auto all_segments = get_all_segments();
-    auto all_points = get_all_points();
-
-    std::size_t nseg = all_segments.size();
-    for(size_t i = 0; i < nseg; ++i){
-        gmsh_segment eseg = all_segments[i];
-        gmsh_segment seg(all_points[find_point(eseg.point1)+npoint], all_points[find_point(eseg.point2)+npoint]);
-        seg.setPhysical(eseg.isPhysical);
-        add_segment(seg);
-    }
-}
-
-
 void gmsh_exporter::export_to_wireframe(){
     serialize_header();
 
@@ -523,10 +491,6 @@ void gmsh_exporter::export_to_wireframe(){
     gmsh_abstract_file vfile;
     fmt::scat(std::cout, "convert morphology tree to gmsh set of wireframe geometries", "\n");
     construct_gmsh_vfile_lines(tree, tree.get_branch(0), vfile);
-
-    /// Duplicating neuron(s)
-    vfile.add_dup_neuron_points();
-    vfile.add_dup_neuron_segments();
 
     if (is_bbox_enabled()) {
        fmt::scat(std::cout, "Adding bounding box", "\n");
@@ -540,6 +504,16 @@ void gmsh_exporter::export_to_wireframe(){
     if (is_bbox_enabled()) {
         vfile.export_line_loop_to_stream(geo_stream);
         vfile.export_volume_to_stream(geo_stream);
+
+        /// Insert lines in the cube for geo file
+        auto all_segments = vfile.get_all_segments();
+        size_t seg_id_beg = all_segments[0].id;
+        size_t seg_id_end = all_segments[all_segments.size()-13].id;
+
+        auto all_volumes = vfile.get_all_volumes();
+        size_t vol_id_end = all_volumes[all_volumes.size()-1].id;
+
+        fmt::scat(geo_stream, "For s In {", seg_id_beg, ":", seg_id_end, "}\n  Line{s} In Volume{", vol_id_end, "};\nEndFor");
     }
 
     if (is_dmg_enabled()) {
@@ -663,9 +637,13 @@ void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree & tree, branch & curr
     const auto linestring = current_branch.get_linestring();
     if(linestring.size() > 1 && !(current_branch.get_type() == branch_type::soma && (flags & exporter_single_soma))){
         for(std::size_t i =0; i < (linestring.size()-1); ++i){
-            gmsh_point p1(linestring[i], 1.0);
+            auto dist = geo::distance(linestring[i], linestring[i+1]);
+            gmsh_point p1(linestring[i], dist);
             p1.setPhysical(true);
-            gmsh_point p2(linestring[i+1], 1.0);
+
+            if (i < linestring.size()-1)
+                dist = geo::distance(linestring[i+1], linestring[i+2]);
+            gmsh_point p2(linestring[i+1], dist);
             p2.setPhysical(true);
 
             gmsh_segment segment(p1, p2);
