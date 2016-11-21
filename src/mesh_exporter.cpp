@@ -467,6 +467,21 @@ gmsh_exporter::gmsh_exporter(const std::string & morphology_filename, const std:
 
 }
 
+gmsh_exporter::gmsh_exporter(std::vector<morpho_tree> && trees, const std::string & mesh_filename, exporter_flags my_flags) :
+    geo_stream(mesh_filename),
+    dmg_stream(),
+    reader("default.h5"),
+    flags(my_flags),
+    morphotrees(std::move(trees))
+{
+    if (is_dmg_enabled()) {
+        std::string dmg_filename(mesh_filename);
+        dmg_filename.erase(dmg_filename.find_last_of('.'), std::string::npos);
+        dmg_filename.append(".dmg");
+        dmg_stream.open(dmg_filename);
+    }
+
+}
 
 bool gmsh_exporter::is_dmg_enabled() const{
     return flags & exporter_write_dmg;
@@ -485,12 +500,17 @@ void gmsh_exporter::export_to_point_cloud(){
 void gmsh_exporter::export_to_wireframe(){
     serialize_header();
 
-    fmt::scat(std::cout, "load morphology tree ", reader.get_filename(), "\n");
-    morpho_tree tree = reader.create_morpho_tree();
+    if (morphotrees.size()<1){
+      fmt::scat(std::cout, "load morphology tree ", reader.get_filename(), "\n");
+      morpho_tree tree = reader.create_morpho_tree();
+      morphotrees.push_back(std::move(tree));
+    }
 
     gmsh_abstract_file vfile;
     fmt::scat(std::cout, "convert morphology tree to gmsh set of wireframe geometries", "\n");
-    construct_gmsh_vfile_lines(tree, tree.get_branch(0), vfile);
+    for(unsigned int i=0;i<morphotrees.size();i++){
+      construct_gmsh_vfile_lines(morphotrees[i], morphotrees[i].get_branch(0), vfile);
+    }
 
     if (is_bbox_enabled()) {
        fmt::scat(std::cout, "Adding bounding box", "\n");
@@ -600,7 +620,7 @@ void gmsh_exporter::export_to_3d_object(){
 
         /// Write the header of dmg information
         fmt::scat(dmg_stream, ndim[3], " ", ndim[2], " ", ndim[1], " ", ndim[0], "\n0 0 0\n0 0 0\n");
-        
+
         vfile.export_points_to_stream_dmg(dmg_stream);
         vfile.export_segments_to_stream_dmg(dmg_stream);
         vfile.export_circle_to_stream_dmg(dmg_stream);
