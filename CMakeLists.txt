@@ -19,7 +19,8 @@ set(BRION_MAINTAINER
 set(BRION_LICENSE LGPL)
 set(BRION_DEB_DEPENDS libhdf5-serial-dev libboost-date-time-dev
   libboost-filesystem-dev libboost-regex-dev libboost-system-dev
-  libboost-test-dev libboost-thread-dev python3-sphinx python3-lxml)
+  libboost-test-dev libboost-thread-dev
+  python3-sphinx python3-lxml python3-dev python3-numpy)
 set(BRION_PORT_DEPENDS sphinx py-lxml)
 
 set(COMMON_PROJECT_DOMAIN ch.epfl.bluebrain)
