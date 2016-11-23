@@ -66,7 +66,7 @@ system, including all Unix variants. Brion uses CMake to create a
 platform-specific build environment. The following platforms and build
 environments are tested:
 
-* Linux: Ubuntu 14.04 & 16.04 and RHEL 6 (Makefile, i386, x64)
+* Linux: Ubuntu 16.04 and RHEL 6 (Makefile, x64)
 
 Building from source is as simple as:
 
