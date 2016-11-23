@@ -298,7 +298,7 @@ public:
 
     gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
 
-    gmsh_exporter(const std::vector<morpho_tree> & trees, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
+    gmsh_exporter(std::vector<morpho_tree> && trees, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
 
     void export_to_point_cloud();
 
