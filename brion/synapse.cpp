@@ -313,14 +313,14 @@ private:
             const fs::path candidate = i->path().filename();
             boost::smatch match;
 
-            if( !boost::filesystem::is_regular_file( i->status( )) ||
-                !boost::regex_match( candidate.string(), match, filter ))
+            // Testing first if the regex matches. We don't want to throw on
+            // is_regular_file for directory entries that are not valid anyway.
+            if( boost::regex_match( candidate.string(), match, filter ) &&
+                boost::filesystem::is_regular_file( i->status( )))
             {
-                continue;
+                _unmappedFiles.insert( std::make_pair( i->path().string(),
+                                                       H5::H5File( )));
             }
-
-            _unmappedFiles.insert( std::make_pair( i->path().string(),
-                                                   H5::H5File( )));
         }
 
         if( _unmappedFiles.empty( ))
