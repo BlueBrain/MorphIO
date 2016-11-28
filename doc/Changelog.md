@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [113](https://github.com/BlueBrain/Brion/pull/113):
+  Support for old circuits containing only synapse center positions.
 * [110](https://github.com/BlueBrain/Brion/pull/110):
   Break PersistentMap out into keyv::Map
 * [107](https://github.com/BlueBrain/Brion/pull/107):

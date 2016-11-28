@@ -101,19 +101,19 @@ public:
 
     /**
      * @return the presynaptic touch position x-coordinates on the surfaces of
-     *         the segments.
+     *         the segments. May be null in old circuits.
      */
     BRAIN_API const float* preSurfaceXPositions() const;
 
     /**
      * @return the presynaptic touch position y-coordinates on the surfaces of
-     *         the segments.
+     *         the segments. May be null in old circuits.
      */
     BRAIN_API const float* preSurfaceYPositions() const;
 
     /**
      * @return the presynaptic touch position z-coordinates on the surfaces of
-     *         the segments.
+     *         the segments. May be null in old circuits.
      */
     BRAIN_API const float* preSurfaceZPositions() const;
 
@@ -152,19 +152,19 @@ public:
 
     /**
      * @return the postsynaptic touch position x-coordinates on the surfaces of
-     *         the segments.
+     *         the segments. May be null in old circuits.
      */
     BRAIN_API const float* postSurfaceXPositions() const;
 
     /**
      * @return the postsynaptic touch position x-coordinates on the surfaces of
-     *         the segments.
+     *         the segments. May be null in old circuits.
      */
     BRAIN_API const float* postSurfaceYPositions() const;
 
     /**
      * @return the postsynaptic touch position x-coordinates on the surfaces of
-     *         the segments.
+     *         the segments. May be null in old circuits.
      */
     BRAIN_API const float* postSurfaceZPositions() const;
 

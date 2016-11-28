@@ -181,7 +181,7 @@ struct Synapses::Impl : public Synapses::BaseImpl
 
     void _loadPositions( const GIDSet& gids, const GIDSet& filterGIDs ) const
     {
-        if( _preSurfacePositionX )
+        if( _preCenterPositionX )
             return;
 
         Strings hashes;
@@ -197,7 +197,7 @@ struct Synapses::Impl : public Synapses::BaseImpl
             hashes.push_back( gidHash );
         }
 
-        CachedSynapses loaded =
+        const CachedSynapses loaded =
                         _circuit._impl->loadSynapsePositionsFromCache( hashes );
 
         const bool haveSize = _size > 0;
@@ -205,23 +205,23 @@ struct Synapses::Impl : public Synapses::BaseImpl
         // delay the opening of the synapse file as much as possible, even
         // though the code looks ugly... As the circuit impl keeps the file
         // opened, we can safely just get a loose pointer here.
-        const brion::Synapse* synapsePositions = nullptr;
+        const brion::Synapse* positions = nullptr;
 
         if( !haveSize )
         {
             auto hash = hashes.begin();
             for( const auto gid : gids )
             {
-                auto it = loaded.find( *hash );
+                const auto it = loaded.find( *hash );
                 ++hash;
                 if( it != loaded.end() )
                     _size += it->second.shape()[0];
                 else
                 {
-                    if( !synapsePositions )
-                        synapsePositions =
+                    if( !positions )
+                        positions =
                               &_circuit._impl->getSynapsePositions( _afferent );
-                    _size += synapsePositions->getNumSynapses( GIDSet{ gid } );
+                    _size += positions->getNumSynapses( GIDSet{ gid } );
                 }
             }
         }
@@ -230,6 +230,7 @@ struct Synapses::Impl : public Synapses::BaseImpl
 
         size_t i = 0;
         auto hash = hashes.begin();
+        bool haveSurfacePositions = false;
         for( const auto gid : gids )
         {
             auto it = loaded.find( *hash );
@@ -237,10 +238,14 @@ struct Synapses::Impl : public Synapses::BaseImpl
 
             const auto readFromFile = [&]
             {
-                if( !synapsePositions )
-                    synapsePositions =
-                            &_circuit._impl->getSynapsePositions( _afferent );
-                return synapsePositions->read( gid, brion::SYNAPSE_POSITION );
+                if( !positions )
+                    positions =
+                        &_circuit._impl->getSynapsePositions( _afferent );
+                if( positions->getNumAttributes() ==
+                    brion::SYNAPSE_POSITION_ALL )
+                    return positions->read( gid, brion::SYNAPSE_POSITION );
+                else
+                    return positions->read( gid, brion::SYNAPSE_OLD_POSITION );
             };
 
             const brion::SynapseMatrix pos = cached ? it->second
@@ -250,7 +255,7 @@ struct Synapses::Impl : public Synapses::BaseImpl
                 _circuit._impl->saveSynapsePositionsToCache( gid, *hash, pos );
             ++hash;
 
-            for( size_t j = 0; j < pos.shape()[0]; ++j )
+            for( size_t j = 0; j < pos.size(); ++j )
             {
                 const uint32_t preGid = pos[j][0];
                 FILTER( preGid );
@@ -261,20 +266,43 @@ struct Synapses::Impl : public Synapses::BaseImpl
                     _postGID.get()[i] = gid;
                 }
 
-                _preSurfacePositionX.get()[i] = pos[j][1];
-                _preSurfacePositionY.get()[i] = pos[j][2];
-                _preSurfacePositionZ.get()[i] = pos[j][3];
-                _postSurfacePositionX.get()[i] = pos[j][4];
-                _postSurfacePositionY.get()[i] = pos[j][5];
-                _postSurfacePositionZ.get()[i] = pos[j][6];
-                _preCenterPositionX.get()[i] = pos[j][7];
-                _preCenterPositionY.get()[i] = pos[j][8];
-                _preCenterPositionZ.get()[i] = pos[j][9];
-                _postCenterPositionX.get()[i] = pos[j][10];
-                _postCenterPositionY.get()[i] = pos[j][11];
-                _postCenterPositionZ.get()[i] = pos[j][12];
+                if( pos.shape()[1] == brion::SYNAPSE_POSITION_ALL )
+                {
+                    haveSurfacePositions = true;
+                    _preSurfacePositionX.get()[i] = pos[j][1];
+                    _preSurfacePositionY.get()[i] = pos[j][2];
+                    _preSurfacePositionZ.get()[i] = pos[j][3];
+                    _postSurfacePositionX.get()[i] = pos[j][4];
+                    _postSurfacePositionY.get()[i] = pos[j][5];
+                    _postSurfacePositionZ.get()[i] = pos[j][6];
+                    _preCenterPositionX.get()[i] = pos[j][7];
+                    _preCenterPositionY.get()[i] = pos[j][8];
+                    _preCenterPositionZ.get()[i] = pos[j][9];
+                    _postCenterPositionX.get()[i] = pos[j][10];
+                    _postCenterPositionY.get()[i] = pos[j][11];
+                    _postCenterPositionZ.get()[i] = pos[j][12];
+                }
+                else
+                {
+                    _preCenterPositionX.get()[i] = pos[j][1];
+                    _preCenterPositionY.get()[i] = pos[j][2];
+                    _preCenterPositionZ.get()[i] = pos[j][3];
+                    _postCenterPositionX.get()[i] = pos[j][4];
+                    _postCenterPositionY.get()[i] = pos[j][5];
+                    _postCenterPositionZ.get()[i] = pos[j][6];
+                }
                 ++i;
             }
+        }
+
+        if( !haveSurfacePositions)
+        {
+            _preSurfacePositionX.reset();
+            _preSurfacePositionY.reset();
+            _preSurfacePositionZ.reset();
+            _postSurfacePositionX.reset();
+            _postSurfacePositionY.reset();
+            _postSurfacePositionZ.reset();
         }
 
         if( !haveSize )
@@ -356,7 +384,7 @@ struct Synapses::Impl : public Synapses::BaseImpl
     bool _hasPositions() const
     {
         lunchbox::ScopedRead mutex( _lock );
-        return _preSurfacePositionX.get() != nullptr;
+        return _preCenterPositionX.get() != nullptr;
     }
 
     const Circuit& _circuit;

@@ -44,11 +44,47 @@ namespace brion
 namespace detail
 {
 
+namespace
+{
 struct Dataset
 {
     H5::DataSet dataset;
     H5::DataSpace dataspace;
     hsize_t dims[2];
+};
+
+bool _openDataset( const H5::H5File& file, const std::string& name,
+                   Dataset& dataset )
+{
+    try
+    {
+        SilenceHDF5 silence;
+        dataset.dataset = file.openDataSet( name );
+    }
+    catch( const H5::Exception& )
+    {
+        LBVERB << "Could not find synapse dataset for " << name << ": "
+               << std::endl;
+        return false;
+    }
+
+    dataset.dataspace = dataset.dataset.getSpace();
+    if( dataset.dataspace.getSimpleExtentNdims() != 2 )
+    {
+        LBERROR << "Synapse dataset is not 2 dimensional" << std::endl;
+        return false;
+    }
+
+    if( dataset.dataspace.getSimpleExtentDims( dataset.dims ) < 0 )
+    {
+        LBERROR << "Synapse dataset dimensions could not be retrieved"
+                << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
 };
 namespace fs = boost::filesystem;
 using boost::lexical_cast;
@@ -74,13 +110,14 @@ public:
 
         Dataset dataset;
         const std::string& datasetName = _file.getObjnameByIdx( 0 );
-        if( !_openDataset( datasetName, dataset ))
+        if( !detail::_openDataset( _file, datasetName, dataset ))
             LBTHROW( std::runtime_error( "Cannot open dataset in synapse file "
                                          + source ));
 
         _numAttributes = dataset.dims[1];
         if( _numAttributes != SYNAPSE_ALL &&
             _numAttributes != SYNAPSE_POSITION_ALL &&
+            _numAttributes != SYNAPSE_OLD_POSITION_ALL &&
             _numAttributes != 1 /* nrn_extra */)
         {
             LBTHROW( std::runtime_error( source + " not a valid synapse file"));
@@ -127,6 +164,11 @@ public:
         return values;
     }
 
+    size_t getNumAttributes() const
+    {
+        return _numAttributes;
+    }
+
     size_t getNumSynapses( const GIDSet& gids ) const
     {
         lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
@@ -146,38 +188,7 @@ public:
     {
         std::stringstream name;
         name << "a" << gid;
-        return _openDataset( name.str(), dataset );
-    }
-
-    bool _openDataset( const std::string& name, Dataset& dataset ) const
-    {
-        try
-        {
-            SilenceHDF5 silence;
-            dataset.dataset = _file.openDataSet( name );
-        }
-        catch( const H5::Exception& )
-        {
-            LBVERB << "Could not find synapse dataset for " << name << ": "
-                   << std::endl;
-            return false;
-        }
-
-        dataset.dataspace = dataset.dataset.getSpace();
-        if( dataset.dataspace.getSimpleExtentNdims() != 2 )
-        {
-            LBERROR << "Synapse dataset is not 2 dimensional" << std::endl;
-            return false;
-        }
-
-        if( dataset.dataspace.getSimpleExtentDims( dataset.dims ) < 0 )
-        {
-            LBERROR << "Synapse dataset dimensions could not be retrieved"
-                    << std::endl;
-            return false;
-        }
-
-        return true;
+        return detail::_openDataset( _file, name.str(), dataset );
     }
 
     SynapseMatrix read( const uint32_t gid, const uint32_t attributes ) const
@@ -188,6 +199,8 @@ public:
             return read< SYNAPSE_ALL >( gid, attributes );
         case SYNAPSE_POSITION_ALL:
             return read< SYNAPSE_POSITION_ALL >( gid, attributes );
+        case SYNAPSE_OLD_POSITION_ALL:
+            return read< SYNAPSE_OLD_POSITION_ALL >( gid, attributes );
         case 1:
             // nrn_extra
             return read< 1 >( gid, 1 );
@@ -225,7 +238,7 @@ public:
             const std::string filename = sourcePath.filename().generic_string();
 
             _createIndex( dir, filename );
-            _fillFilemap( dir, filename );
+            _findCandidateFiles( dir, filename );
         }
     }
 
@@ -256,13 +269,39 @@ public:
         return numSynapses;
     }
 
+    size_t getNumAttributes() const
+    {
+        if( _file )
+            return _file->getNumAttributes();
+
+        assert( !_fileNames.empty( ));
+
+        const std::string& filename = _fileNames.front();
+        H5::H5File file;
+        try
+        {
+            SilenceHDF5 silence;
+            file.openFile( filename, H5F_ACC_RDONLY );
+        }
+        catch( const H5::Exception& exc )
+        {
+            LBTHROW( std::runtime_error(
+                "Could not open synapse file " + filename + ": " +
+                exc.getDetailMsg( )));
+        }
+        Dataset dataset;
+        if( !_openDataset( file, file.getObjnameByIdx( 0 ), dataset ))
+            LBTHROW( std::runtime_error( "Cannot open dataset in synapse file "
+                                         + filename ));
+        return dataset.dims[1];
+    }
+
 private:
     typedef boost::unordered_map< uint32_t, std::string > GidFileMap;
-    typedef boost::unordered_map< std::string, H5::H5File > UnmappedFiles;
 
     mutable SynapseFile* _file;
     mutable uint32_t _gid; // current or 0 for all
-    mutable UnmappedFiles _unmappedFiles;
+    Strings _fileNames;
     mutable GidFileMap _fileMap;
 
     void _createIndex( const fs::path& dir, const std::string& filename )
@@ -274,8 +313,8 @@ private:
         const std::ifstream mergeFile( merge_nrn.generic_string().c_str( ));
         if( !mergeFile.is_open( ))
         {
-            LBWARN << "No merge file found in " << dir
-                   << " to build lookup index; loading data will be slow"
+            LBWARN << "No merged file found in " << dir
+                   << " to build lookup index; loading data will be very slow"
                    << std::endl;
             return;
         }
@@ -303,7 +342,7 @@ private:
         }
     }
 
-    void _fillFilemap( const fs::path& dir, const std::string& filename )
+    void _findCandidateFiles( const fs::path& dir, const std::string& filename )
     {
         // try to open in individual files
         const boost::regex filter( filename + "\\.[0-9]+$" );
@@ -318,12 +357,11 @@ private:
             if( boost::regex_match( candidate.string(), match, filter ) &&
                 boost::filesystem::is_regular_file( i->status( )))
             {
-                _unmappedFiles.insert( std::make_pair( i->path().string(),
-                                                       H5::H5File( )));
+                _fileNames.push_back( i->path().string());
             }
         }
 
-        if( _unmappedFiles.empty( ))
+        if( _fileNames.empty( ))
         {
             LBTHROW( std::runtime_error( "Could not find synapse files " +
                                          dir.string() + "/" + filename ));
@@ -357,20 +395,17 @@ private:
         lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
         SilenceHDF5 silence;
 
-        BOOST_FOREACH( UnmappedFiles::value_type& entry, _unmappedFiles )
+        // this trial-and-error is the 'fastest' path found
+        BOOST_FOREACH( const std::string& candidate, _fileNames )
         {
-            const std::string& candidate = entry.first;
-            H5::H5File& file = entry.second;
-            // keeping the files open 'saves' some time
-            if( file.getId() <= 0 )
-                file.openFile( candidate, H5F_ACC_RDONLY );
-
             try
             {
+                H5::H5File file;
+                file.openFile( candidate, H5F_ACC_RDONLY );
+
                 std::stringstream name;
                 name << "a" << gid;
 
-                // this trial-and-error is the 'fastest' path found
                 file.openDataSet( name.str( ));
                 _fileMap[ gid ] = candidate;
                 return candidate;
@@ -402,6 +437,11 @@ SynapseMatrix Synapse::read( const uint32_t gid,
 size_t Synapse::getNumSynapses( const GIDSet& gids ) const
 {
     return _impl->getNumSynapses( gids );
+}
+
+size_t Synapse::getNumAttributes() const
+{
+    return _impl->getNumAttributes();
 }
 
 }

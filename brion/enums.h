@@ -244,6 +244,29 @@ enum SynapsePositions
                        SYNAPSE_POSTSYNAPTIC_POSITION
 };
 
+enum SynapseOldPositions
+{
+    SYNAPSE_OLD_PRESYNAPTIC_CENTER_X = 1 << 1,
+    SYNAPSE_OLD_PRESYNAPTIC_CENTER_Y = 1 << 2,
+    SYNAPSE_OLD_PRESYNAPTIC_CENTER_Z = 1 << 3,
+    SYNAPSE_OLD_POSTSYNAPTIC_CENTER_X = 1 << 4,
+    SYNAPSE_OLD_POSTSYNAPTIC_CENTER_Y = 1 << 5,
+    SYNAPSE_OLD_POSTSYNAPTIC_CENTER_Z = 1 << 6,
+    SYNAPSE_OLD_POSITION_ALL = 7,
+
+    SYNAPSE_OLD_PRESYNAPTIC_POSITION = SYNAPSE_OLD_PRESYNAPTIC_CENTER_X |
+                                       SYNAPSE_OLD_PRESYNAPTIC_CENTER_Y |
+                                       SYNAPSE_OLD_PRESYNAPTIC_CENTER_Z,
+
+    SYNAPSE_OLD_POSTSYNAPTIC_POSITION = SYNAPSE_OLD_POSTSYNAPTIC_CENTER_X |
+                                        SYNAPSE_OLD_POSTSYNAPTIC_CENTER_Y |
+                                        SYNAPSE_OLD_POSTSYNAPTIC_CENTER_Z,
+
+    SYNAPSE_OLD_POSITION = SYNAPSE_CONNECTED_NEURON |
+                           SYNAPSE_OLD_PRESYNAPTIC_POSITION |
+                           SYNAPSE_OLD_POSTSYNAPTIC_POSITION
+};
+
 /**
  * Specify the access mode of data.
  * @version 1.4

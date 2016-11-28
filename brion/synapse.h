@@ -87,6 +87,11 @@ public:
      * @version 1.0
      */
     BRION_API size_t getNumSynapses( const GIDSet& gids ) const;
+
+    /** Return the number of columns of the synapse file.
+     * @version 1.9
+     */
+    BRION_API size_t getNumAttributes() const;
     //@}
 
 private:

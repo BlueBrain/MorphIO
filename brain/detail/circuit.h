@@ -149,6 +149,7 @@ public:
         , _synapseSource( config.getSynapseSource( ))
         , _targetSources( config.getTargetSources( ))
         , _cache( keyv::Map::createCache( ))
+        , _synapsePositionColumns( 0 )
     {
     }
 
@@ -266,11 +267,17 @@ public:
         const size_t i = afferent ? 0 : 1;
         lunchbox::ScopedWrite mutex( _synapsePositions[i] );
 
-        if( !(*_synapsePositions[i] ))
-            _synapsePositions[i]->reset(
+        auto& positions = *_synapsePositions[i];
+        if( !positions )
+            positions.reset(
                 new brion::Synapse( _synapseSource.getPath() + (afferent ?
                       afferentPositionsFilename : efferentPositionsFilename )));
-        return **_synapsePositions[i];
+
+        if( _synapsePositionColumns == 0 )
+            _synapsePositionColumns = positions->getNumAttributes();
+        assert(_synapsePositionColumns == positions->getNumAttributes());
+
+        return *positions;
     }
 
     void saveMorphologiesToCache( const std::string& uri,
@@ -354,19 +361,21 @@ public:
         std::vector< Future > futures;
         futures.reserve( keys.size( ));
 
-        _cache->takeValues( keys, [&futures] ( const std::string& key,
-                                               char* data, const size_t size )
+        _findSynapsePositionsColumns();
+
+        _cache->takeValues( keys, [this, &futures]( const std::string& key,
+                                                  char* data, const size_t size )
         {
-            futures.push_back( std::async( [key, data, size]
+            futures.push_back( std::async( [this, key, data, size]
             {
                 // there is no constructor in multi_array which just accepts the
                 // size in bytes (although there's a getter for it used in
                 // saveSynapsePositionsToCache()), so we reconstruct the row and
                 // column count here.
-                const size_t numColumns = brion::SYNAPSE_POSITION_ALL;
+                const size_t numColumns = _synapsePositionColumns;
                 const size_t numRows = size / sizeof(float) / numColumns;
-                brion::SynapseMatrix values( boost::extents[numRows]
-                                                           [numColumns]);
+                brion::SynapseMatrix values(
+                    boost::extents[numRows][numColumns]);
                 ::memmove( values.data(), data, size );
                 std::free( data );
                 return std::make_pair( key, values );
@@ -380,6 +389,17 @@ public:
                 << " out of " << keys.size() << " neurons from cache"
                 << std::endl;
         return loaded;
+    }
+
+    void _findSynapsePositionsColumns() const
+    {
+        lunchbox::ScopedWrite mutex( _synapsePositions[0] );
+        if( !(*_synapsePositions[0] ))
+            _synapsePositions[0]->reset(
+                new brion::Synapse( _synapseSource.getPath() +
+                                    afferentPositionsFilename ));
+        _synapsePositionColumns = (*_synapsePositions[0])->getNumAttributes();
+
     }
 
     const brion::URI _circuitSource;
@@ -396,6 +416,7 @@ public:
     mutable LockPtr< brion::Synapse > _synapseAttributes[2];
     mutable LockPtr< brion::Synapse > _synapseExtra;
     mutable LockPtr< brion::Synapse > _synapsePositions[2];
+    mutable size_t _synapsePositionColumns;
 };
 
 class MVD2 : public Circuit::Impl

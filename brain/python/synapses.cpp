@@ -54,8 +54,9 @@ SynapseWrapper Synapses_get( const SynapsesWrapper& synapses, long int index )
 }
 
 #define GET_SYNAPSES_ARRAY_PROPERTY( type, name ) \
-bp::object Synapses_##name( const SynapsesWrapper& synapses )       \
-    { return toNumpy( synapses.name(), synapses.size(), synapses._impl ); }
+bp::object Synapses_##name( const SynapsesWrapper& synapses ) \
+    { if( !synapses.name() ) return bp::object();             \
+      return toNumpy( synapses.name(), synapses.size(), synapses._impl ); }
 
 GET_SYNAPSES_ARRAY_PROPERTY( size_t, indices )
 GET_SYNAPSES_ARRAY_PROPERTY( uin32_t, preGIDs )

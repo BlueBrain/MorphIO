@@ -64,6 +64,9 @@ float Synapse::getPresynapticDistance() const
 
 Vector3f Synapse::getPresynapticSurfacePosition() const
 {
+    if (!_synapses.preSurfaceXPositions())
+        throw std::runtime_error( "Surface synapse positions not available" );
+
     return Vector3f( _synapses.preSurfaceXPositions()[_index],
                      _synapses.preSurfaceYPositions()[_index],
                      _synapses.preSurfaceZPositions()[_index] );
@@ -98,6 +101,9 @@ float Synapse::getPostsynapticDistance() const
 
 Vector3f Synapse::getPostsynapticSurfacePosition() const
 {
+    if (!_synapses.postSurfaceXPositions())
+        throw std::runtime_error( "Surface synapse positions not available" );
+
     return Vector3f( _synapses.postSurfaceXPositions()[_index],
                      _synapses.postSurfaceYPositions()[_index],
                      _synapses.postSurfaceZPositions()[_index] );
