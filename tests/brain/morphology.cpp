@@ -254,7 +254,7 @@ BOOST_AUTO_TEST_CASE( get_soma_geometry )
                         V4f( -.1, 0, 0, .1 ), V4f( 0, -.1, 0, .1 )});
 
     BOOST_CHECK_CLOSE( soma.getMeanRadius(), 0.1, 1e-5 );
-    BOOST_CHECK_EQUAL( soma.getCentroid(), V3f::ZERO );
+    BOOST_CHECK_EQUAL( soma.getCentroid(), V3f( ));
 
     brain::Matrix4f matrix;
     matrix.setTranslation( V3f( 2, 0, 0 ));
