@@ -4,7 +4,7 @@
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
 #
 
-if(NOT SPHINX_FOUND)
+if(NOT SPHINX_FOUND OR NOT TARGET brain_python)
   return()
 endif()
 
