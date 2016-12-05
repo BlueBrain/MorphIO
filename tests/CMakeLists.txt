@@ -15,12 +15,7 @@ endif()
 configure_file(paths.h.in ${PROJECT_BINARY_DIR}/tests/paths.h)
 include_directories(${PROJECT_BINARY_DIR}/tests)
 
-set(TEST_LIBRARIES ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Brion BBPTestData)
-if(NOT COMMON_USE_CXX03)
-  list(APPEND TEST_LIBRARIES Brain)
-else()
-  file(GLOB EXCLUDE_FROM_TESTS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} brain/*.cpp)
-endif()
+set(TEST_LIBRARIES ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} Brion Brain BBPTestData)
 include(CommonCTest)
 
 add_subdirectory(brain/python)
