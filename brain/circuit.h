@@ -62,12 +62,15 @@ public:
     BRAIN_API ~Circuit();
 
     /**
-     * @return The set of GIDs for the given target name.
+     * @return The \if pybind array \else set \endif of GIDs for the given
+     *         target name.
      * @throw std::runtime_error if the target cannot be found.
      */
     BRAIN_API GIDSet getGIDs( const std::string& target ) const;
 
-    /** @return The set of all GIDs held by the circuit */
+    /** @return The \if pybind array \else set \endif of all GIDs held by the
+     *          circuit.
+     */
     BRAIN_API GIDSet getGIDs() const;
 
     /**
@@ -98,34 +101,41 @@ public:
     BRAIN_API neuron::Morphologies loadMorphologies( const GIDSet& gids,
                                                      Coordinates coords ) const;
 
-    /** @return The positions of the given cells. */
+    /** @return The positions of the given cells in the iteration order of the
+     *          input gids.
+     */
     BRAIN_API Vector3fs getPositions( const GIDSet& gids ) const;
 
-    /** @return The morphology type indices of the given cells. */
+    /** @return The morphology type indices of the given cells in the iteration
+     *          order of the input gids.
+     */
     BRAIN_API size_ts getMorphologyTypes( const GIDSet& gids ) const;
 
     /**
      * @return The morphology type names of the circuit, indexed by
      *         getMorphologyTypes().
      */
-    BRAIN_API Strings getMorphologyNames() const;
+    BRAIN_API Strings getMorphologyTypeNames() const;
 
-    /** @return The electrophysiology type indices of the given cells. */
+    /** @return The electrophysiology type indices of the given cells in the
+     *          iteration order of the input gids.
+     */
     BRAIN_API size_ts getElectrophysiologyTypes( const GIDSet& gids ) const;
 
     /**
      * @return The electrophysiology type names of the circuit, indexed by
      *         getElectrophysiologyTypes().
      */
-    BRAIN_API Strings getElectrophysiologyNames() const;
+    BRAIN_API Strings getElectrophysiologyTypeNames() const;
 
     /** @return \if pybind A Nx4 numpy array with the \else The \endif
-     *          local to world transformations of the given cells.
+     *          local to world transformations of the given cells in the
+     *          iteration
      */
     BRAIN_API Matrix4fs getTransforms( const GIDSet& gids ) const;
 
     /** @return \if pybind A Nx4 numpy array with the \else The \endif
-     *           local to world rotation of the given cells.
+     *          local to world rotation of the given cells.
      */
     BRAIN_API Quaternionfs getRotations( const GIDSet& gids ) const;
 

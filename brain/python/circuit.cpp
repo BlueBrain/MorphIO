@@ -36,6 +36,45 @@ namespace brain
 namespace
 {
 
+/* Reorders a collection with a random access iterator in place provided a pair
+   of iterators with the desired order. The order collection is overwritten.
+   http://stackoverflow.com/questions/838384
+*/
+template< typename T >
+void _reorderDestructive( std::vector< T >& values, uint32_ts& order )
+{
+    size_t remaining = order.size();
+    for( uint32_t in_pos = 0; remaining > 0; ++in_pos )
+    {
+        uint32_t out_pos = order[in_pos];
+        if( out_pos == std::numeric_limits< uint32_t >::max( ))
+            continue;
+        --remaining;
+        T tmp = values[in_pos];
+        for( uint32_t i; out_pos != in_pos; out_pos = i, --remaining )
+        {
+            assert( out_pos != std::numeric_limits< uint32_t >::max( ));
+            std::swap( tmp, values[out_pos] );
+            std::swap( order[out_pos],
+                       i = std::numeric_limits< uint32_t >::max( ));
+        }
+        values[in_pos] = tmp;
+    }
+}
+
+template< typename MemberFunction >
+bp::object _getProperty( const Circuit& circuit, const MemberFunction& property,
+                         bp::object cellSet )
+{
+    uint32_ts mapping;
+    GIDSet gids;
+    gidsFromPython( cellSet, gids, mapping );
+    auto values = (circuit.*property)( gids );
+    if( !mapping.empty( ))
+        _reorderDestructive( values, mapping );
+    return toNumpy( std::move( values ));
+}
+
 CircuitPtr Circuit_initFromURI( const std::string& uri )
 {
     return CircuitPtr( new Circuit( URI( uri )));
@@ -43,37 +82,45 @@ CircuitPtr Circuit_initFromURI( const std::string& uri )
 
 bp::object Circuit_getAllGIDs( const Circuit& circuit )
 {
-    return toPythonSet( circuit.getGIDs( ));
+    return toNumpy( toVector( circuit.getGIDs( )));
 }
 
 bp::object Circuit_getGIDs( const Circuit& circuit, const std::string& target )
 {
-    return toPythonSet( circuit.getGIDs( target ));
+    return toNumpy( toVector( circuit.getGIDs( target )));
 }
 
 bp::object Circuit_getRandomTargetGIDs(
     const Circuit& circuit, const float fraction, const std::string& target )
 {
-    return toPythonSet( circuit.getRandomGIDs( fraction, target ));
+    return toNumpy( toVector( circuit.getRandomGIDs( fraction, target )));
 }
 
 bp::object Circuit_getRandomGIDs( const Circuit& circuit, const float fraction )
 {
-    return toPythonSet( circuit.getRandomGIDs( fraction ));
+    return toNumpy( toVector( circuit.getRandomGIDs( fraction )));
 }
 
 #define GET_CIRCUIT_PROPERTY_FOR_GIDS(property) \
     bp::object Circuit_get##property( const Circuit& circuit, bp::object gids ) \
 {                                                                               \
-    return toNumpy( circuit.get##property( gidsFromPython( gids )));            \
+    return _getProperty( circuit, &Circuit::get##property, gids );              \
 }
 
-GET_CIRCUIT_PROPERTY_FOR_GIDS(MorphologyTypes)
-GET_CIRCUIT_PROPERTY_FOR_GIDS(ElectrophysiologyTypes)
+GET_CIRCUIT_PROPERTY_FOR_GIDS( MorphologyTypes )
+GET_CIRCUIT_PROPERTY_FOR_GIDS( ElectrophysiologyTypes )
 
-bp::object Circuit_getMorphologyURIs( const Circuit& circuit, bp::object gids )
+bp::object Circuit_getMorphologyURIs( const Circuit& circuit, bp::object object )
 {
-    return toPythonList( circuit.getMorphologyURIs( gidsFromPython( gids )));
+    // Not trying to use a more general version of _getProperty because of its
+    // complexity.
+    uint32_ts mapping;
+    GIDSet gids;
+    gidsFromPython( object, gids, mapping );
+    auto uris = circuit.getMorphologyURIs( gids );
+    if( !mapping.empty( ))
+        _reorderDestructive( uris, mapping );
+    return toPythonList( uris );
 }
 
 #define GET_CIRCUIT_PROPERTY_VALUES(property) \
@@ -81,25 +128,32 @@ bp::object Circuit_getMorphologyURIs( const Circuit& circuit, bp::object gids )
 {                                                           \
     return toPythonList( circuit.get##property( ));         \
 }
-GET_CIRCUIT_PROPERTY_VALUES(MorphologyNames)
-GET_CIRCUIT_PROPERTY_VALUES(ElectrophysiologyNames)
+GET_CIRCUIT_PROPERTY_VALUES(MorphologyTypeNames)
+GET_CIRCUIT_PROPERTY_VALUES(ElectrophysiologyTypeNames)
 
-bp::list Circuit_loadMorphologies( const Circuit& circuit,
-                                   bp::object gids, Circuit::Coordinates coords )
+bp::list Circuit_loadMorphologies( const Circuit& circuit, bp::object object,
+                                   Circuit::Coordinates coords )
 {
-    return toPythonList(
-        circuit.loadMorphologies( gidsFromPython( gids ), coords ));
+    // Not trying to use a more general version of _getProperty because of its
+    // complexity.
+    uint32_ts mapping;
+    GIDSet gids;
+    gidsFromPython( object, gids, mapping );
+    auto morphologies = circuit.loadMorphologies( gids , coords );
+    if( !mapping.empty( ))
+        _reorderDestructive( morphologies, mapping );
+    return toPythonList( morphologies );
 }
 
 bp::object Circuit_getPositions( const Circuit& circuit, bp::object gids )
 {
-    return toNumpy( circuit.getPositions( gidsFromPython( gids )));
+    return _getProperty( circuit, &Circuit::getPositions, gids );
 }
 
 bp::object Circuit_getTransforms( const Circuit& circuit, bp::object gids )
 {
     bp::object matrices =
-        toNumpy( circuit.getTransforms( gidsFromPython( gids )));
+        _getProperty( circuit, &Circuit::getTransforms, gids );
     // We want the result to be indexed using regular mathematical notation
     // even if the actual storage is column-major.
     return matrices.attr( "transpose" )( 0, 2, 1 );
@@ -107,7 +161,7 @@ bp::object Circuit_getTransforms( const Circuit& circuit, bp::object gids )
 
 bp::object Circuit_getRotations( const Circuit& circuit, bp::object gids )
 {
-    return toNumpy( circuit.getRotations( gidsFromPython( gids )));
+    return _getProperty( circuit, &Circuit::getRotations, gids );
 }
 
 SynapsesWrapper Circuit_getAfferentSynapses(
@@ -181,14 +235,14 @@ circuitWrapper
     .def( "morphology_types", Circuit_getMorphologyTypes,
           ( selfarg, bp::arg( "gids" )),
           DOXY_FN( brain::Circuit::getMorphologyTypes ))
-    .def( "morphology_names", Circuit_getMorphologyNames, ( selfarg ),
-          DOXY_FN( brain::Circuit::getMorphologyNames ))
+    .def( "morphology_type_names", Circuit_getMorphologyTypeNames, ( selfarg ),
+          DOXY_FN( brain::Circuit::getMorphologyTypeNames ))
     .def( "electrophysiology_types", Circuit_getElectrophysiologyTypes,
           ( selfarg, bp::arg( "gids" )),
           DOXY_FN( brain::Circuit::getElectrophysiologyTypes ))
-    .def( "electrophysiology_names", Circuit_getElectrophysiologyNames,
+    .def( "electrophysiology_type_names", Circuit_getElectrophysiologyTypeNames,
           ( selfarg),
-          DOXY_FN( brain::Circuit::getElectrophysiologyNames ))
+          DOXY_FN( brain::Circuit::getElectrophysiologyTypeNames ))
     .def( "transforms", Circuit_getTransforms,
           ( selfarg, bp::arg( "gids" )),
           DOXY_FN( brain::Circuit::getTransforms ))

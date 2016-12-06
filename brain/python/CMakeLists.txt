@@ -27,6 +27,7 @@ docstrings(BRAIN_PYTHON_SOURCES BRAIN_PUBLIC_HEADERS
 
 list(APPEND BRAIN_PYTHON_SOURCES
   arrayHelpers.cpp
+  helpers.cpp
   spikeReportWriter.cpp
   spikeReportReader.cpp
   spikes.cpp

@@ -30,24 +30,37 @@ namespace brain
 
 void importArray();
 
+/** @return True if the python object is a numpy.ndarray, false otherwise. */
+bool isArray( const boost::python::object& object );
+
 template< typename T >
 boost::python::object toNumpy( std::vector< T >&& vector );
 
 /** The custodian object must be copy constructible. In general it's expected
-    to be a std::shared_ptr or boost::shared_ptr. */
+ *   to be a std::shared_ptr or boost::shared_ptr.
+ */
 template< typename T, typename U >
 boost::python::object toNumpy( const std::vector< T >& vector,
                                const U& custodian );
 
 /** The custodian object must be copy constructible. In general it's expected
-    to be a std::shared_ptr or boost::shared_ptr. */
+ *  to be a std::shared_ptr or boost::shared_ptr.
+ */
 template< typename T, typename U >
 boost::python::object toNumpy( const T* array, size_t size,
                                const U& custodian );
 
 boost::python::object toNumpy( const Matrix4f& matrix );
 
-Matrix4f fromNumpy( const boost::python::object& object );
+/** Copy the GIDs from a numpy array into a uint32_t vector.
+ *  @param object The python object representing the numpy array.
+ *  @param result The destination array.
+ *  @return true if the GIDs are in ascending order
+ */
+bool gidsFromNumpy( const boost::python::object& object, uint32_ts& result );
+
+template <typename T>
+T fromNumpy( const boost::python::object& object );
 
 }
 

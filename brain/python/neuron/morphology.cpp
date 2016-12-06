@@ -103,7 +103,8 @@ MorphologyPtr Morphology_initFromURI( const std::string& uri )
 MorphologyPtr Morphology_initFromURIAndTransform( const std::string& uri,
                                                   bp::object transform )
 {
-    return MorphologyPtr( new Morphology( URI( uri ), fromNumpy( transform )));
+    return MorphologyPtr( new Morphology( URI( uri ),
+                                          fromNumpy< Matrix4f >( transform )));
 }
 
 #define GET_MORPHOLOGY_ARRAY( Array ) \

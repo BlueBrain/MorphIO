@@ -393,14 +393,14 @@ BOOST_AUTO_TEST_CASE(compare_mvd2_mvd3)
 
     const brain::size_ts& mtypes2 = circuit2.getMorphologyTypes( gids );
     const brain::size_ts& etypes2 = circuit2.getElectrophysiologyTypes( gids );
-    const brain::Strings& allMTypes2 = circuit2.getMorphologyNames();
-    const brain::Strings& allETypes2 = circuit2.getElectrophysiologyNames();
+    const brain::Strings& allMTypes2 = circuit2.getMorphologyTypeNames();
+    const brain::Strings& allETypes2 = circuit2.getElectrophysiologyTypeNames();
     const brain::URIs& names2 = circuit2.getMorphologyURIs( gids );
 
     const brain::size_ts& mtypes3 = circuit3.getMorphologyTypes( gids );
     const brain::size_ts& etypes3 = circuit3.getElectrophysiologyTypes( gids );
-    const brain::Strings& allMTypes3 = circuit3.getMorphologyNames();
-    const brain::Strings& allETypes3 = circuit3.getElectrophysiologyNames();
+    const brain::Strings& allMTypes3 = circuit3.getMorphologyTypeNames();
+    const brain::Strings& allETypes3 = circuit3.getElectrophysiologyTypeNames();
     const brain::URIs& names3 = circuit3.getMorphologyURIs( gids );
 
     BOOST_CHECK_EQUAL_COLLECTIONS( mtypes2.begin(), mtypes2.end(),

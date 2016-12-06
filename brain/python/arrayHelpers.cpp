@@ -176,6 +176,11 @@ void importArray()
     bp::class_< AbstractCustodian, AbstractCustodianPtr >( "_Custodian" );
 }
 
+bool isArray( const bp::object& o )
+{
+    return PyArray_Check( o.ptr( ));
+}
+
 bp::object toNumpy( const brain::Matrix4f& matrix )
 {
     npy_intp dims[2] = { 4, 4 };
@@ -195,6 +200,35 @@ bp::object toNumpy( const brain::Matrix4f& matrix )
 
 namespace
 {
+
+template< typename T >
+bool _copyGIDs( PyArrayObject* array, uint32_ts& result )
+{
+    const size_t size = PyArray_DIMS(array)[0];
+    bool sorted = true;
+
+    result.clear();
+    result.reserve( size );
+
+    T last = 0;
+    for( size_t i = 0; i != size; ++i )
+    {
+        const T gid = *static_cast< T* >(PyArray_GETPTR1( array, i ));
+        if( gid < 0 || ssize_t( gid ) >
+                       ssize_t( std::numeric_limits< uint32_t >::max( )))
+        {
+            PyErr_SetString( PyExc_ValueError, "Invalid input GID" );
+            boost::python::throw_error_already_set();
+        }
+        if( last >= gid )
+            sorted = false;
+        else
+            last = gid;
+        result.push_back( gid );
+    }
+    return sorted;
+}
+
 template< typename T >
 void _copyArrayToMatrix( PyArrayObject* array, Matrix4f& matrix )
 {
@@ -205,9 +239,37 @@ void _copyArrayToMatrix( PyArrayObject* array, Matrix4f& matrix )
 
 }
 
+bool gidsFromNumpy( const boost::python::object& object, uint32_ts& result )
+{
+    PyArrayObject* array = reinterpret_cast< PyArrayObject* >( object.ptr( ));
+    if( PyArray_NDIM( array ) != 1 )
+    {
+        PyErr_SetString( PyExc_ValueError,
+                         "Cannot convert argument to GID set" );
+        boost::python::throw_error_already_set();
+    }
+
+    switch( PyArray_TYPE( array ))
+    {
+    case NPY_LONG: return _copyGIDs< long >( array, result );
+    case NPY_INT: return _copyGIDs< int >( array, result );
+    case NPY_UINT: return _copyGIDs< unsigned int >( array, result );
+    default:;
+    }
+    std::stringstream msg;
+    PyArray_Descr* desc = PyArray_DESCR( array );
+    msg << "Cannot convert numpy array of type " << desc->kind
+        << desc->elsize << " to GID set" << std::endl;
+    PyErr_SetString( PyExc_ValueError, msg.str().c_str( ));
+    boost::python::throw_error_already_set();
+    return false; // Unreachable
+}
+
+
+template <>
 Matrix4f fromNumpy( const bp::object& o )
 {
-    if( !PyArray_Check( o.ptr( )))
+    if( !isArray( o ))
     {
         PyErr_SetString( PyExc_ValueError, "Cannot convert object to Matrix4f" );
         bp::throw_error_already_set();

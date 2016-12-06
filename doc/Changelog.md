@@ -3,6 +3,12 @@ Changelog {#Changelog}
 
 # git master
 
+* [117](https://github.com/BlueBrain/Brion/pull/117):
+  Changes and fixes in Brain Python module:
+  - Functions that take gids now preserve the iteration order of the input in
+    the output arrays/lists.
+  - Replaced Python sets with numpy arrays in functions returning GID sets.
+  - Circuit::getXYZNames functions renamed to Circuit::getXYZTypeNames.
 * [113](https://github.com/BlueBrain/Brion/pull/113):
   Support for old circuits containing only synapse center positions.
 * [110](https://github.com/BlueBrain/Brion/pull/110):

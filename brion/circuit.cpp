@@ -22,7 +22,6 @@
 
 #include <bitset>
 #include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
 #include <boost/tokenizer.hpp>
 #include <lunchbox/log.h>
 #include <lunchbox/stdExt.h>
@@ -101,9 +100,9 @@ public:
 
         std::vector<int32_t> indices;
         indices.reserve( gids.size( ));
-        BOOST_FOREACH( const uint32_t gid, gids )
+        for( const uint32_t gid : gids )
         {
-            if ( gid > neurons.size( ))
+            if( gid > neurons.size( ) || gid == 0 )
             {
                 std::stringstream msg;
                 msg << "Cell GID out of range: " << gid;
