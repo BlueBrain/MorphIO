@@ -119,6 +119,11 @@ class TestCircuit(unittest.TestCase):
                           lambda: self.circuit.positions([1, 3, 1]))
 
     def test_bad_gids(self):
+        self.assertRaises(RuntimeError,
+                          lambda: self.circuit.positions(numpy.array([0])))
+        self.assertRaises(RuntimeError,
+                          lambda: self.circuit.morphology_uris(
+                              numpy.array([10000])))
         self.assertRaises(RuntimeError, lambda: self.circuit.positions([0]))
         self.assertRaises(RuntimeError,
                           lambda: self.circuit.load_morphologies(

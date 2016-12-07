@@ -24,6 +24,7 @@ before_install:
   - brew outdated cmake || brew upgrade cmake
   - brew install cppcheck doxygen ninja
   - brew install homebrew/science/hdf5
+  - brew install boost-python
 script:
   - mkdir $BUILD_TYPE
   - cd $BUILD_TYPE

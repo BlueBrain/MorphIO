@@ -1,7 +1,7 @@
 Changelog {#Changelog}
 =========
 
-# git master
+# Release 1.9.0 (09-Dec-2016)
 
 * [117](https://github.com/BlueBrain/Brion/pull/117):
   Changes and fixes in Brain Python module:

@@ -1,8 +1,8 @@
-Feature specifications {#FeatureSpecs}
-======================
+RFCs {#rfcs}
+============
 
-* @subpage compartmentReport
-* @subpage compartmentReportMPI
+* @subpage compartment_report
+* @subpage compartment_report_mpi
 * @subpage morphology11
-* @subpage spikeReport
-* @subpage brainSynapses
+* @subpage spike_reports
+* @subpage brain_synapses
