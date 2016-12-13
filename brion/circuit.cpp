@@ -24,8 +24,8 @@
 #include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
 #include <lunchbox/log.h>
-#include <lunchbox/stdExt.h>
 #include <fstream>
+#include <unordered_map>
 
 namespace brion
 {
@@ -55,7 +55,7 @@ public:
             LBTHROW( std::runtime_error( "Expecting mvd file format for "
                                          " circuit file " + source ));
 
-        typedef stde::hash_map< std::string, Section > LookUp;
+        typedef std::unordered_map< std::string, Section > LookUp;
         LookUp sections;
         sections.insert( std::make_pair( "Neurons Loaded", SECTION_NEURONS ));
         sections.insert( std::make_pair( "MicroBox Data", SECTION_MICROBOX ));
@@ -202,7 +202,7 @@ public:
 private:
     std::ifstream _file;
 
-    typedef stde::hash_map< uint32_t, Strings > CircuitTable;
+    typedef std::unordered_map< uint32_t, Strings > CircuitTable;
     CircuitTable _table;
 };
 
