@@ -266,8 +266,8 @@ void gmsh_abstract_file::export_points_to_stream(ostream &out){
     auto all_points = get_all_points();
     for(auto p = all_points.begin(); p != all_points.end(); ++p){
         fmt::scat(out,
-//                  "Point(", p->id,") = {", clean_coordinate(geo::get_x(p->coords)),", ", clean_coordinate(geo::get_y(p->coords)), ", ", clean_coordinate(geo::get_z(p->coords)), "};\n");
-                  "Point(", p->id,") = {", clean_coordinate(geo::get_x(p->coords)),", ", clean_coordinate(geo::get_y(p->coords)), ", ", clean_coordinate(geo::get_z(p->coords)), ", ", p->diameter, "*h};\n");
+                  "Point(", p->id,") = {", clean_coordinate(geo::get_x(p->coords)),", ", clean_coordinate(geo::get_y(p->coords)), ", ", clean_coordinate(geo::get_z(p->coords)), "};\n");
+//                  "Point(", p->id,") = {", clean_coordinate(geo::get_x(p->coords)),", ", clean_coordinate(geo::get_y(p->coords)), ", ", clean_coordinate(geo::get_z(p->coords)), ", ", p->diameter, "*h};\n");
         if(p->isPhysical){
             fmt::scat(out,
                       "Physical Point(", p->id,") = {", p->id,"};\n");
@@ -661,7 +661,7 @@ void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree & tree, branch & curr
             gmsh_point p1(linestring[i], dist);
             p1.setPhysical(true);
 
-            if (i < linestring.size()-1)
+            if (i < linestring.size()-2)
                 dist = geo::distance(linestring[i+1], linestring[i+2]);
             gmsh_point p2(linestring[i+1], dist);
             p2.setPhysical(true);
