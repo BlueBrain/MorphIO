@@ -1,6 +1,12 @@
 Changelog {#Changelog}
 =========
 
+# git master
+
+* [119](https://github.com/BlueBrain/Brion/pull/119):
+  Optimized brain::Circuit::loadMorphologies for slow stat'ing
+  filesystems (GPFS)
+
 # Release 1.9.0 (09-Dec-2016)
 
 * [117](https://github.com/BlueBrain/Brion/pull/117):

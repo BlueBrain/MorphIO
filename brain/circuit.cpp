@@ -90,6 +90,9 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
                                                 const Coordinates coords ) const
 {
     const URIs& uris = getMorphologyURIs( gids );
+    const auto circuitPath =
+        // cache outside of loop, canonical does stat() which is slow on GPFS
+        fs::canonical( _impl->getCircuitSource().getPath( )).generic_string();
 
     // < GID, hash >
     Strings gidHashes;
@@ -98,19 +101,15 @@ neuron::Morphologies Circuit::loadMorphologies( const GIDSet& gids,
     GIDSet::const_iterator gid = gids.begin();
     for( size_t i = 0; i < uris.size(); ++i, ++gid )
     {
-        std::string hash( fs::canonical( uris[i].getPath( )).generic_string( ));
+        auto hash = uris[i].getPath();
+        if( hash[0] != '/' ) // opt: don't stat abs file path (see above)
+            hash = fs::canonical( hash ).generic_string();
 
         if( coords == Coordinates::global )
-        {
             // store circuit + GID for transformed morphology
-            hash += fs::canonical(
-                        _impl->getCircuitSource().getPath( )).generic_string() +
-                        boost::lexical_cast< std::string >( *gid );
-            hash = servus::make_uint128( hash ).getString();
-        }
-        else
-            hash = servus::make_uint128( hash ).getString();
+            hash += circuitPath + boost::lexical_cast< std::string >( *gid );
 
+        hash = servus::make_uint128( hash ).getString();
         gidHashes.push_back( hash );
         hashes.insert( hash );
     }

@@ -5,8 +5,8 @@
 #
 
 cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
-project(Brion VERSION 1.9.0)
-set(Brion_VERSION_ABI 7)
+project(Brion VERSION 1.10.0)
+set(Brion_VERSION_ABI 8)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
   ${CMAKE_SOURCE_DIR}/CMake/common ${CMAKE_SOURCE_DIR}/Pydoxine/CMake)
