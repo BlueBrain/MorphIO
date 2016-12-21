@@ -23,7 +23,6 @@
 #  include <BBP/TestDatasets.h>
 #endif
 
-#include <boost/foreach.hpp>
 #include <boost/program_options.hpp>
 #include <boost/progress.hpp>
 #ifdef BRION_USE_OPENMP
@@ -97,7 +96,7 @@ int main( const int argc, char** argv )
         po::store( po::parse_command_line( argc, argv, options ), vm );
         po::notify( vm );
     }
-    catch( const boost::program_options::error& e )
+    catch( const po::error& e )
     {
         std::cerr << "Command line parse error: " << e.what() << std::endl
                   << options << std::endl;
@@ -177,7 +176,7 @@ int main( const int argc, char** argv )
 
     {
         size_t index = 0;
-        BOOST_FOREACH( const uint32_t gid, gids )
+        for( const uint32_t gid : gids )
             to.writeCompartments( gid, counts[ index++ ] );
     }
 
@@ -194,13 +193,18 @@ int main( const int argc, char** argv )
         clock.reset();
         brion::floatsPtr data = in.loadFrame( t );
         loadTime += clock.getTimef();
+        if( !data )
+        {
+            LBERROR << "Can't load frame at " << t << " ms" << std::endl;
+            ::exit( EXIT_FAILURE );
+        }
 
         const brion::floats& voltages = *data.get();
         const brion::SectionOffsets& offsets = in.getOffsets();
 
         size_t index = 0;
         clock.reset();
-        BOOST_FOREACH( const uint32_t gid, gids )
+        for( const uint32_t gid : gids )
         {
             brion::floats cellVoltages;
             cellVoltages.reserve( in.getNumCompartments( index ));

@@ -51,17 +51,11 @@ const std::string tunitKey( "tunit" );
 const uint32_t _version = 3; // Increase with each change in a k/v pair
 const uint32_t _magic = 0xdb;
 const size_t _queueDepth = 32768; // async queue depth, heuristic from benchmark
-#define ASYNC_IO
 
 std::string _getScope( const URI& uri )
 {
     return uri.findQuery( "name" )->second + "_" +
         uri.findQuery( "target" )->second + "_";
-}
-
-template< class T > std::string toString( const T& value )
-{
-    return boost::lexical_cast< std::string >( value );
 }
 }
 
@@ -163,7 +157,7 @@ bool CompartmentReportMap::writeCompartments( const uint32_t gid,
 {
     LBASSERTINFO( !counts.empty(), gid );
     _gids.insert( gid );
-    return _store.insert( _getScope( _uri ) + countsKey + toString( gid ),
+    return _store.insert( _getScope( _uri ) + countsKey + std::to_string( gid ),
                           counts );
 }
 
@@ -177,14 +171,14 @@ bool CompartmentReportMap::writeFrame( const uint32_t gid,
     const std::string& scope = _getScope( _uri );
 #ifndef NDEBUG
     const uint16_ts& counts = _store.getVector< uint16_t >( scope + countsKey +
-                                                            toString( gid ));
+                                                            std::to_string( gid ));
     const size_t size = std::accumulate( counts.begin(), counts.end(), 0 );
     LBASSERTINFO( size == voltages.size(), "gid " << gid << " should have " <<
                   size << " voltages not " << voltages.size( ));
 #endif
 
     const size_t index = _getFrameNumber( time );
-    const std::string& key = scope + toString( gid ) + "_" + toString( index );
+    const std::string& key = scope + std::to_string( gid ) + "_" + std::to_string( index );
     return _store.insert( key, voltages );
 }
 
@@ -253,14 +247,12 @@ bool CompartmentReportMap::_loadHeader()
                       _header.endTime << "/" << _header.timestep );
 
         const bool loadGIDs = _gids.empty();
-#ifdef ASYNC_IO
         _store.fetch( scope + dunitKey );
         _store.fetch( scope + tunitKey );
         if( loadGIDs )
             _store.fetch( scope + gidsKey, _header.nGIDs * sizeof( uint32_t ));
         for( const uint32_t gid : _gids )
-            _store.fetch( scope + countsKey + toString( gid ));
-#endif
+            _store.fetch( scope + countsKey + std::to_string( gid ));
 
         _dunit = _store[ scope + dunitKey ];
         _tunit = _store[ scope + tunitKey ];
@@ -268,27 +260,53 @@ bool CompartmentReportMap::_loadHeader()
             _gids = _store.getSet< uint32_t >( scope + gidsKey );
 
         _readable = true;
-#ifdef ASYNC_IO
-        if( loadGIDs )
-            for( const uint32_t gid : _gids )
-                _store.fetch( scope + countsKey + toString( gid ));
-#endif
+        if( !loadGIDs )
+            return true;
+
+        Strings keys;
+        keys.reserve( _gids.size( ));
+        std::unordered_map< std::string, uint32_t > gidMap;
+        for( const uint32_t gid : _gids )
+        {
+            keys.push_back( scope + countsKey + std::to_string( gid ));
+            gidMap[ keys.back() ] = gid;
+        }
+
+        size_t taken = 0;
+        const auto takeValue = [&] ( const std::string& key,
+                                     char* data, const size_t size )
+        {
+            const uint32_t gid = gidMap[ key ];
+            _cellCounts[ gid ] = std::vector< uint16_t >(
+                reinterpret_cast< const uint16_t* >( data ),
+                reinterpret_cast< const uint16_t* >( data + size ));
+
+            std::free( data );
+            ++taken;
+        };
+
+        _store.takeValues( keys, takeValue );
+        if( taken != _gids.size( ))
+        {
+            LBWARN << "Missing " << _gids.size() - taken << " of "
+                   << _gids.size() << " gids in report header" << std::endl;
+            _cellCounts.clear();
+            return false;
+        }
 
         uint64_t offset = 0;
         for( const uint32_t gid : _gids )
         {
-            _cellCounts[ gid ] = _store.getVector< uint16_t >( scope +
-                                                               countsKey +
-                                                               toString( gid ));
-            _counts.push_back( _cellCounts[ gid ] );
+            const auto& cellCounts = _cellCounts[ gid ];
+            _counts.push_back( cellCounts );
 
-            const size_t nSections = _cellCounts[ gid ].size();
+            const size_t nSections = cellCounts.size();
             _offsets.push_back( uint64_ts( nSections,
                                         std::numeric_limits<uint64_t>::max( )));
 
             for( size_t i = 0; i < nSections; ++i )
             {
-                const uint16_t numCompartments = _cellCounts[ gid ][ i ];
+                const uint16_t numCompartments = cellCounts[ i ];
                 if( numCompartments == 0 )
                     continue;
 
@@ -296,9 +314,10 @@ bool CompartmentReportMap::_loadHeader()
                 offset += numCompartments;
             }
 
-            _totalCompartments += std::accumulate( _cellCounts[ gid ].begin(),
-                                                   _cellCounts[ gid ].end(), 0);
+            _totalCompartments += std::accumulate( cellCounts.begin(),
+                                                   cellCounts.end(), 0 );
         }
+        return true;
     }
     catch( const std::runtime_error& e )
     {
@@ -325,13 +344,22 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
         return floatsPtr();
 
     const std::string& scope = _getScope( _uri );
+    const std::string& index = std::string( "_" ) +
+                               std::to_string( _getFrameNumber( time ));
+
     floatsPtr buffer( new floats( getFrameSize( )));
-    floats::iterator iter = buffer->begin();
-    const size_t index = _getFrameNumber( time );
-    std::map< uint32_t, size_t > sizeMap;
+    float* const ptr = buffer->data();
+
+    std::unordered_map< std::string, size_t > offsetMap;
+    size_t offset = 0;
+
+    Strings keys;
+    keys.reserve( _gids.size( ));
 
     for( const uint32_t gid : _gids )
     {
+        keys.push_back( scope + std::to_string( gid ) + index );
+        offsetMap[ keys.back() ] = offset;
         const CellCompartments::const_iterator i = _cellCounts.find( gid );
         if( i == _cellCounts.end( ))
         {
@@ -339,38 +367,25 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
             return floatsPtr();
         }
         const size_t size = std::accumulate( i->second.begin(),
-                                             i->second.end(), 0 ) *
-                            sizeof( float );
-        sizeMap[ gid ] = size;
-
-#ifdef ASYNC_IO
-        _store.fetch( scope + toString( gid ) + "_" + toString( index ), size );
-#endif
+                                             i->second.end(), 0 );
+        offset += size;
     }
 
-    for( const uint32_t gid : _gids )
+    size_t taken = 0;
+    const auto takeValue = [ ptr, &offsetMap, &taken ]
+        ( const std::string& key, char* data, const size_t size )
     {
-        LBASSERTINFO( iter < buffer->end(), buffer->size() << " gid " << gid );
-        const std::string& cellData = _store[ scope + toString( gid ) + "_" +
-                                              toString( index ) ];
-        LBASSERT( !cellData.empty( ));
-        if( cellData.empty( ))
-        {
-            LBWARN << "Missing data for gid " << toString( gid ) << std::endl;
-            return floatsPtr();
-        }
-        LBASSERTINFO( sizeMap[ gid ] == cellData.size(),
-                      sizeMap[ gid ] << " != " << cellData.size( ));
+        ::memcpy( ptr + offsetMap[ key ], data, size );
+        std::free( data );
+        ++taken;
+    };
 
-        ::memcpy( &(*iter), cellData.data(), cellData.size( ));
-        iter += cellData.size() / sizeof( float );
-        if( iter > buffer->end( ))
-            return floatsPtr();
-    }
-    if( iter == buffer->end( ))
+    _store.takeValues( keys, takeValue );
+    if( taken == _gids.size( ))
         return buffer;
 
-    LBASSERT( iter == buffer->end( ));
+    LBWARN << "Missing " << _gids.size() - taken << " of " << _gids.size()
+           << " gids in report frame at " << time << " ms" << std::endl;
     return floatsPtr();
 }
 
