@@ -19,6 +19,7 @@
 
 #include "compartmentReportMap.h"
 
+#include <lunchbox/atomic.h>
 #include <lunchbox/bitOperation.h>
 #include <lunchbox/debug.h>
 #include <lunchbox/pluginRegisterer.h>
@@ -51,6 +52,11 @@ const std::string tunitKey( "tunit" );
 const uint32_t _version = 3; // Increase with each change in a k/v pair
 const uint32_t _magic = 0xdb;
 const size_t _queueDepth = 32768; // async queue depth, heuristic from benchmark
+#ifdef BRION_USE_OPENMP
+const size_t _nThreads = omp_get_num_procs();
+#else
+const size_t _nThreads = 1;
+#endif
 
 std::string _getScope( const URI& uri )
 {
@@ -69,10 +75,18 @@ namespace
 CompartmentReportMap::CompartmentReportMap(
                                 const CompartmentReportInitData& initData )
     : _uri( initData.getURI( ))
-    , _store( initData.getURI( ))
     , _readable( false )
 {
-    _store.setQueueDepth( _queueDepth );
+    // have at least one store
+    _stores.emplace_back( keyv::Map( _uri ));
+    _stores.back().setQueueDepth( _queueDepth );
+    if( _uri.getScheme() == "memcached" ) // parallelize loading with memcached
+        while( _stores.size() < _nThreads )
+        {
+            _stores.emplace_back( keyv::Map( _uri ));
+            _stores.back().setQueueDepth( _queueDepth );
+        }
+
     if( _uri.findQuery( "name" ) == _uri.queryEnd( ))
         _uri.addQuery( "name", "default" );
     if( _uri.findQuery( "target" ) == _uri.queryEnd( ))
@@ -109,7 +123,8 @@ bool CompartmentReportMap::handles(const CompartmentReportInitData& initData )
 void CompartmentReportMap::_clear()
 {
     _readable = false;
-    _store.setByteswap( false );
+    for( auto& store : _stores )
+        store.setByteswap( false );
     _header = Header();
     _gids.clear();
     _offsets.clear();
@@ -157,8 +172,8 @@ bool CompartmentReportMap::writeCompartments( const uint32_t gid,
 {
     LBASSERTINFO( !counts.empty(), gid );
     _gids.insert( gid );
-    return _store.insert( _getScope( _uri ) + countsKey + std::to_string( gid ),
-                          counts );
+    return _stores.front().insert(
+        _getScope( _uri ) + countsKey + std::to_string( gid ), counts );
 }
 
 bool CompartmentReportMap::writeFrame( const uint32_t gid,
@@ -170,8 +185,9 @@ bool CompartmentReportMap::writeFrame( const uint32_t gid,
 
     const std::string& scope = _getScope( _uri );
 #ifndef NDEBUG
-    const uint16_ts& counts = _store.getVector< uint16_t >( scope + countsKey +
-                                                            std::to_string( gid ));
+    const uint16_ts& counts =
+        _stores.front().getVector< uint16_t >( scope + countsKey +
+                                               std::to_string( gid ));
     const size_t size = std::accumulate( counts.begin(), counts.end(), 0 );
     LBASSERTINFO( size == voltages.size(), "gid " << gid << " should have " <<
                   size << " voltages not " << voltages.size( ));
@@ -179,14 +195,15 @@ bool CompartmentReportMap::writeFrame( const uint32_t gid,
 
     const size_t index = _getFrameNumber( time );
     const std::string& key = scope + std::to_string( gid ) + "_" + std::to_string( index );
-    return _store.insert( key, voltages );
+    return _stores.front().insert( key, voltages );
 }
 
 bool CompartmentReportMap::flush()
 {
     if( !_flushHeader( ))
         return false;
-    _store.flush();
+    for( auto& store : _stores )
+        store.flush();
     return true;
 }
 
@@ -201,10 +218,11 @@ bool CompartmentReportMap::_flushHeader()
     _header.nGIDs = uint32_t(_gids.size( ));
 
     const std::string& scope = _getScope( _uri );
-    if( !_store.insert( scope + headerKey, _header ) ||
-        !_store.insert( scope + gidsKey, _gids ) ||
-        !_store.insert( scope + dunitKey, _dunit ) ||
-        !_store.insert( scope + tunitKey, _tunit ))
+    auto& store = _stores.front();
+    if( !store.insert( scope + headerKey, _header ) ||
+        !store.insert( scope + gidsKey, _gids ) ||
+        !store.insert( scope + dunitKey, _dunit ) ||
+        !store.insert( scope + tunitKey, _tunit ))
     {
         return false;
     }
@@ -220,12 +238,14 @@ bool CompartmentReportMap::_loadHeader()
 
     try
     {
-        _header = _store.get< Header >( scope + headerKey );
+        auto& store = _stores.front();
+        _header = store.get< Header >( scope + headerKey );
         const bool byteswap = ( _header.magic != _magic );
         if( byteswap )
         {
             lunchbox::byteswap( _header );
-            _store.setByteswap( true );
+            for( auto& store_ : _stores )
+                store_.setByteswap( true );
         }
 
         LBASSERT( _header.magic == _magic );
@@ -247,17 +267,17 @@ bool CompartmentReportMap::_loadHeader()
                       _header.endTime << "/" << _header.timestep );
 
         const bool loadGIDs = _gids.empty();
-        _store.fetch( scope + dunitKey );
-        _store.fetch( scope + tunitKey );
+        store.fetch( scope + dunitKey );
+        store.fetch( scope + tunitKey );
         if( loadGIDs )
-            _store.fetch( scope + gidsKey, _header.nGIDs * sizeof( uint32_t ));
+            store.fetch( scope + gidsKey, _header.nGIDs * sizeof( uint32_t ));
         for( const uint32_t gid : _gids )
-            _store.fetch( scope + countsKey + std::to_string( gid ));
+            store.fetch( scope + countsKey + std::to_string( gid ));
 
-        _dunit = _store[ scope + dunitKey ];
-        _tunit = _store[ scope + tunitKey ];
+        _dunit = store[ scope + dunitKey ];
+        _tunit = store[ scope + tunitKey ];
         if( loadGIDs )
-            _gids = _store.getSet< uint32_t >( scope + gidsKey );
+            _gids = store.getSet< uint32_t >( scope + gidsKey );
 
         _readable = true;
         if( !loadGIDs )
@@ -269,7 +289,7 @@ bool CompartmentReportMap::_loadHeader()
         for( const uint32_t gid : _gids )
         {
             keys.push_back( scope + countsKey + std::to_string( gid ));
-            gidMap[ keys.back() ] = gid;
+            gidMap.emplace( keys.back(), gid );
         }
 
         size_t taken = 0;
@@ -285,7 +305,7 @@ bool CompartmentReportMap::_loadHeader()
             ++taken;
         };
 
-        _store.takeValues( keys, takeValue );
+        store.takeValues( keys, takeValue );
         if( taken != _gids.size( ))
         {
             LBWARN << "Missing " << _gids.size() - taken << " of "
@@ -359,7 +379,7 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
     for( const uint32_t gid : _gids )
     {
         keys.push_back( scope + std::to_string( gid ) + index );
-        offsetMap[ keys.back() ] = offset;
+        offsetMap.emplace( keys.back(), offset );
         const CellCompartments::const_iterator i = _cellCounts.find( gid );
         if( i == _cellCounts.end( ))
         {
@@ -371,16 +391,37 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
         offset += size;
     }
 
+#ifdef BRION_USE_OPENMP
+    lunchbox::a_ssize_t taken;
+    omp_set_num_threads( _stores.size( ));
+#else
     size_t taken = 0;
-    const auto takeValue = [ ptr, &offsetMap, &taken ]
-        ( const std::string& key, char* data, const size_t size )
+#endif
+#pragma omp parallel
     {
-        ::memcpy( ptr + offsetMap[ key ], data, size );
-        std::free( data );
-        ++taken;
-    };
+#ifdef BRION_USE_OPENMP
+        auto& store = _stores[ omp_get_thread_num( )];
+        const size_t start = float( omp_get_thread_num( )) *
+                          float( keys.size( )) / float( omp_get_num_threads( ));
+        const size_t end = float( omp_get_thread_num() + 1 ) *
+                          float( keys.size( )) / float( omp_get_num_threads( ));
+        const Strings subKeys( keys.begin() + start, keys.begin() + end );
+#else
+        auto& store = _stores.front();
+        const Strings& subKeys = keys;
+#endif
 
-    _store.takeValues( keys, takeValue );
+        const auto takeValue = [ ptr, &offsetMap, &taken ]
+            ( const std::string& key, char* data, const size_t size )
+        {
+            ::memcpy( ptr + offsetMap[ key ], data, size );
+            std::free( data );
+            ++taken;
+        };
+
+        store.takeValues( subKeys, takeValue );
+    }
+
     if( taken == _gids.size( ))
         return buffer;
 

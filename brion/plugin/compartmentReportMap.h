@@ -77,7 +77,7 @@ public:
 
 private:
     URI _uri;
-    keyv::Map _store;
+    std::vector< keyv::Map > _stores;
 
     Header _header;
 
