@@ -120,6 +120,19 @@ floatsPtr CompartmentReport::loadFrame( const float timestamp ) const
     return _impl->plugin->loadFrame( timestamp );
 }
 
+size_t CompartmentReport::getNeuronSize( const uint32_t gid ) const
+{
+    const auto& gids = getGIDs();
+    const size_t index = std::distance( gids.begin(), gids.find( gid ));
+    const size_t nTimesteps = (getEndTime() - getStartTime( )) / getTimestep();
+    return getNumCompartments( index ) * nTimesteps;
+}
+
+floatsPtr CompartmentReport::loadNeuron( const uint32_t gid ) const
+{
+    return _impl->plugin->loadNeuron( gid );
+}
+
 void CompartmentReport::setBufferSize( const size_t size )
 {
     _impl->plugin->setBufferSize( size );

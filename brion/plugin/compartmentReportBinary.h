@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -79,6 +79,7 @@ public:
     size_t getFrameSize() const final;
 
     floatsPtr loadFrame( float timestamp ) const final;
+    floatsPtr loadNeuron( const uint32_t gid ) const final;
     void updateMapping( const GIDSet& gids ) final;
 
     void writeHeader( float startTime, float endTime,
@@ -112,7 +113,7 @@ private:
 
     SectionOffsets _conversionOffsets;
 
-    size_t _comps;  // subtarget
+    size_t _subNumCompartments;  // subtarget
 
     GIDSet _originalGIDs;
     bool _subtarget;

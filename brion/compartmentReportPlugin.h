@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -130,6 +130,10 @@ public:
 
     /** @copydoc brion::CompartmentReport::loadFrame */
     virtual floatsPtr loadFrame( float timestamp ) const = 0;
+
+    /** @copydoc brion::CompartmentReport::loadNeuron */
+    virtual floatsPtr loadNeuron( uint32_t ) const
+        { throw std::runtime_error( "loadNeuron() not implemented" ); }
 
     /** @copydoc brion::CompartmentReport::updateMapping */
     virtual void updateMapping( const GIDSet& gids ) = 0;

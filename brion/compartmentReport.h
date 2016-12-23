@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -122,16 +122,27 @@ public:
     /** @return the time unit of the report. @version 1.0 */
     BRION_API const std::string& getTimeUnit() const;
 
-    /** @return the size of a loaded report frame. @version 1.0 */
+    /** @return the number of values of a loaded report frame. @version 1.0 */
     BRION_API size_t getFrameSize() const;
 
     /** Load report values at the given time stamp.
      *
      * @param timestamp the time stamp of interest
-     * @return the report values if found at timestamp, 0 otherwise
+     * @return the report values if found at timestamp, nullptr otherwise
      * @version 1.0
      */
     BRION_API floatsPtr loadFrame( float timestamp ) const;
+
+    /** @return the number of values of the given neuron report. @version 1.0 */
+    BRION_API size_t getNeuronSize( uint32_t gid ) const;
+
+    /** Load report values for the given neuron.
+     *
+     * @param gid the cell identifier
+     * @return the report values if cell is found, nullptr otherwise
+     * @version 1.0
+     */
+    BRION_API floatsPtr loadNeuron( uint32_t gid ) const;
 
     /** Set the size of the stream buffer for loaded frames.
      *

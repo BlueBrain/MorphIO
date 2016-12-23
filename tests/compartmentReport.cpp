@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -220,6 +220,26 @@ void test_compare( const brion::URI& uri1, const brion::URI& uri2 )
             BOOST_CHECK_EQUAL( (*frame1)[j], (*frame2)[j] );
         }
     }
+
+    try
+    {
+        // cross-check second GID's voltage report
+        const uint32_t gid = *( ++report1.getGIDs().begin( ));
+        brion::floatsPtr frame1 = report1.loadNeuron( gid );
+        brion::floatsPtr frame2 = report2.loadNeuron( gid );
+        const size_t size = report1.getNeuronSize( gid );
+
+        BOOST_CHECK( frame1 );
+        BOOST_CHECK( frame2 );
+        BOOST_CHECK( size > 0  );
+        BOOST_CHECK_EQUAL( size, report2.getNeuronSize( gid ));
+
+        for( size_t i = 0; i < size; ++i )
+        {
+            BOOST_CHECK_EQUAL( (*frame1)[i], (*frame2)[i] );
+        }
+    }
+    catch( const std::runtime_error& ) {} // loadNeuron(gid) is optional, ignore
 
     brion::GIDSet gids;
     gids.insert( 394 );

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -147,7 +147,7 @@ CompartmentReportBinary::CompartmentReportBinary(
     , _timestep( 0 )
     , _file()
     , _header()
-    , _comps( 0 )
+    , _subNumCompartments( 0 )
     , _subtarget( false )
 {
     if( initData.getAccessMode() != MODE_READ )
@@ -202,7 +202,7 @@ const CompartmentCounts& CompartmentReportBinary::getCompartmentCounts() const
 
 size_t CompartmentReportBinary::getFrameSize() const
 {
-    return _subtarget ? _comps : _header.numCompartments;
+    return _subtarget ? _subNumCompartments : _header.numCompartments;
 }
 
 floatsPtr CompartmentReportBinary::loadFrame( const float timestamp ) const
@@ -212,7 +212,6 @@ floatsPtr CompartmentReportBinary::loadFrame( const float timestamp ) const
         return floatsPtr();
 
     const size_t frameNumber = _getFrameNumber( timestamp );
-
     const size_t frameOffset = _header.dataBlockOffset +
                           _header.numCompartments * sizeof(float) * frameNumber;
 
@@ -231,10 +230,10 @@ floatsPtr CompartmentReportBinary::loadFrame( const float timestamp ) const
         return buffer;
     }
 
-    if( _comps == 0 )
+    if( _subNumCompartments == 0 )
         return floatsPtr();
 
-    floatsPtr buffer( new floats( _comps ));
+    floatsPtr buffer( new floats( _subNumCompartments ));
     const float* const source = (const float*)(ptr + frameOffset);
     const SectionOffsets& offsets = getOffsets();
     const CompartmentCounts& compCounts = getCompartmentCounts();
@@ -255,9 +254,55 @@ floatsPtr CompartmentReportBinary::loadFrame( const float timestamp ) const
     if( _header.byteswap )
     {
 #pragma omp parallel for
-        for( ssize_t i = 0; i < ssize_t( _comps ); ++i )
+        for( ssize_t i = 0; i < ssize_t( _subNumCompartments ); ++i )
             lunchbox::byteswap( (*buffer)[i] );
     }
+    return buffer;
+}
+
+floatsPtr CompartmentReportBinary::loadNeuron( const uint32_t gid ) const
+{
+    const uint8_t* const bytePtr = _file.getAddress< const uint8_t >();
+    if( !bytePtr || _offsets[_subtarget].empty( ))
+        return floatsPtr();
+
+    const size_t index = std::distance( _gids.begin(), _gids.find( gid ));
+    if( index >= _gids.size( ))
+        return floatsPtr();
+
+    const float* const ptr = (const float*)(bytePtr + _header.dataBlockOffset);
+
+    const size_t frameSize = _header.numCompartments;
+    const size_t nFrames = (_endTime - _startTime) / _timestep;
+    const size_t nCompartments = getNumCompartments( index );
+    const size_t nValues = nFrames * nCompartments;
+    floatsPtr buffer( new floats( nValues ));
+
+    const SectionOffsets& offsets = _offsets[0];
+    const CompartmentCounts& compCounts = getCompartmentCounts();
+    for( size_t i = 0; i < nFrames; ++i )
+    {
+        const size_t srcOffset = i * frameSize;
+        size_t dstOffset = i * nCompartments;
+        for( size_t j = 0; j < offsets[index].size(); ++j )
+        {
+            const uint16_t numCompartments = compCounts[index][j];
+            const uint64_t sourceOffset = offsets[index][j];
+
+            ::memcpy( buffer->data() + dstOffset,
+                      ptr + srcOffset + sourceOffset,
+                      numCompartments * sizeof( float ));
+            dstOffset += numCompartments;
+        }
+    }
+
+    if( _header.byteswap )
+    {
+#pragma omp parallel for
+        for( ssize_t i = 0; i < ssize_t( nValues ); ++i )
+            lunchbox::byteswap( (*buffer)[i] );
+    }
+
     return buffer;
 }
 
@@ -292,7 +337,7 @@ void CompartmentReportBinary::updateMapping( const GIDSet& gids )
 
     // then build conversion mapping from original to subtarget
     size_t cellIndex = 0;
-    _comps = 0;
+    _subNumCompartments = 0;
     for( GIDSetCIter i = _gids.begin(); i != _gids.end(); ++i )
     {
         const size_t index = gidIndex[*i];
@@ -309,7 +354,7 @@ void CompartmentReportBinary::updateMapping( const GIDSet& gids )
             const uint16_t compCount = _counts[0][index][sid];
             sectionOffsets[sid] = _offsets[0][index][sid];
             sectionCounts[sid] = compCount;
-            _comps += compCount;
+            _subNumCompartments += compCount;
         }
         ++cellIndex;
     }

@@ -51,6 +51,8 @@ public:
         { return _counts; }
 
     floatsPtr loadFrame( float timestamp ) const final;
+    floatsPtr loadNeuron( uint32_t gid ) const final;
+
     void updateMapping( const GIDSet& gids ) final;
 
     void writeHeader( float startTime, float endTime,

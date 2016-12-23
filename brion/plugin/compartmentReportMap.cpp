@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2014-2017, EPFL/Blue Brain Project
  *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -432,6 +432,71 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
 
     LBWARN << "Missing " << _gids.size() - taken << " of " << _gids.size()
            << " gids in report frame at " << time << " ms" << std::endl;
+    return floatsPtr();
+}
+
+floatsPtr CompartmentReportMap::loadNeuron( const uint32_t gid ) const
+{
+    if( !_readable )
+        return floatsPtr();
+
+    const size_t index = std::distance( _gids.begin(), _gids.find( gid ));
+    if( index >= _gids.size( ))
+        return floatsPtr();
+
+    const std::string& scope = _uri + std::to_string( gid ) + "_";
+    const size_t nFrames = (_header.endTime - _header.startTime) /
+                           _header.timestep;
+    const size_t nCompartments = getNumCompartments( index );
+
+    floatsPtr buffer( new floats( nFrames * nCompartments ));
+    float* const ptr = buffer->data();
+
+    std::unordered_map< std::string, size_t > offsetMap;
+    Strings keys;
+    keys.reserve( nFrames );
+
+    for( size_t i = 0; i < nFrames; ++i )
+    {
+        keys.push_back( scope + std::to_string( i ));
+        offsetMap.emplace( keys.back(), i * nCompartments );
+    }
+
+#ifdef BRION_USE_OPENMP
+    lunchbox::a_ssize_t taken;
+    omp_set_num_threads( _stores.size( ));
+#else
+    size_t taken = 0;
+#endif
+#pragma omp parallel
+    {
+#ifdef BRION_USE_OPENMP
+        auto& store = _stores[ omp_get_thread_num( )];
+        const size_t start = float( omp_get_thread_num( )) *
+                          float( keys.size( )) / float( omp_get_num_threads( ));
+        const size_t end = float( omp_get_thread_num() + 1 ) *
+                          float( keys.size( )) / float( omp_get_num_threads( ));
+        const Strings subKeys( keys.begin() + start, keys.begin() + end );
+#else
+        const Strings& subKeys = keys;
+#endif
+
+        const auto takeValue = [ ptr, &offsetMap, &taken ]
+            ( const std::string& key, char* data, const size_t size )
+        {
+            ::memcpy( ptr + offsetMap[ key ], data, size );
+            std::free( data );
+            ++taken;
+        };
+
+        store.takeValues( subKeys, takeValue );
+    }
+
+    if( size_t( taken ) == nFrames )
+        return buffer;
+
+    LBWARN << "Missing " << nFrames - taken << " of " << nFrames
+           << " time steps of gid " << gid << std::endl;
     return floatsPtr();
 }
 

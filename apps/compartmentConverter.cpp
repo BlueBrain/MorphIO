@@ -131,21 +131,22 @@ int main( const int argc, char** argv )
     brion::CompartmentReport in( inURI, brion::MODE_READ );
     float loadTime = clock.getTimef();
 
+    const float start = in.getStartTime();
+    const float step = in.getTimestep();
+    float end = in.getEndTime();
+
     if( vm.count( "dump" ))
     {
         std::cout << "Compartment report " << inURI << ":" << std::endl
-                  << "  Time: " << in.getStartTime() << ".."
-                  << in.getEndTime() << " / " << in.getTimestep()
-                  << " " << in.getTimeUnit() << std::endl
+                  << "  " << (end - start) / step << " frames: "
+                  << start << ".." << end << " / " << step << " "
+                  << in.getTimeUnit() << std::endl
                   << "  " << in.getGIDs().size() << " neurons" << std::endl
                   << "  " << in.getFrameSize() << " compartments"
                   << std::endl;
         return EXIT_SUCCESS;
     }
 
-    const float start = in.getStartTime();
-    const float step = in.getTimestep();
-    float end = in.getEndTime();
     const float maxEnd = start + maxFrames * step;
     end = std::min( end, maxEnd );
     const brion::CompartmentCounts& counts = in.getCompartmentCounts();
