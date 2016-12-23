@@ -25,9 +25,6 @@
 
 #include <boost/program_options.hpp>
 #include <boost/progress.hpp>
-#ifdef BRION_USE_OPENMP
-#  include <omp.h>
-#endif
 
 namespace po = boost::program_options;
 using boost::lexical_cast;
@@ -83,12 +80,7 @@ int main( const int argc, char** argv )
         ( "maxFrames,m", po::value< size_t >(),
           "Convert at most the given number of frames" )
         ( "compare,c", "Compare written report with input" )
-        ( "dump,d", "Dump input report information (no output conversion)" )
-#ifdef BRION_USE_OPENMP
-        ( "threads,t", po::value< unsigned >()->default_value( 1 ),
-          "Number of threads to use" )
-#endif
-        ;
+        ( "dump,d", "Dump input report information (no output conversion)" );
     po::variables_map vm;
 
     try
@@ -115,13 +107,6 @@ int main( const int argc, char** argv )
                   << brion::Version::getString() << std::endl;
         return EXIT_SUCCESS;
     }
-
-#ifdef BRION_USE_OPENMP
-    omp_set_num_threads( vm[ "threads" ].as< unsigned >( ));
-    const unsigned nThreads = omp_get_num_threads();
-#else
-    const unsigned nThreads = 1;
-#endif
 
     std::string input;
     if( vm.count( "input" ))
@@ -184,9 +169,8 @@ int main( const int argc, char** argv )
     float writeTime = clock.getTimef();
 
     const size_t nFrames = (end - start) / step;
-    boost::progress_display progress( nFrames / nThreads );
+    boost::progress_display progress( nFrames );
 
-#pragma omp parallel for private(clock)
     for( size_t i = 0; i < nFrames; ++i )
     {
         const float t = start + i * step;
@@ -210,17 +194,17 @@ int main( const int argc, char** argv )
             cellVoltages.reserve( in.getNumCompartments( index ));
 
             for( size_t j = 0; j < offsets[index].size(); ++j )
+            {
+                const auto offset = offsets[index][j];
                 for( size_t k = 0; k < counts[index][j]; ++k )
-                    cellVoltages.push_back( voltages[ offsets[index][j]+k] );
+                    cellVoltages.emplace_back( voltages[ offset + k ] );
+            }
 
             to.writeFrame( gid, cellVoltages, t );
             ++index;
         }
         writeTime += clock.getTimef();
-#ifdef BRION_USE_OPENMP
-        if( omp_get_thread_num() == 0 )
-#endif
-            ++progress;
+        ++progress;
     }
 
     clock.reset();
@@ -229,7 +213,7 @@ int main( const int argc, char** argv )
 
     std::cout << "Converted " << inURI << " to " << outURI
               << " (in " << size_t( loadTime ) << " out " << size_t( writeTime )
-              << " ms) using " << nThreads << " threads" << std::endl;
+              << " ms)" << std::endl;
 
     if( vm.count( "compare" ))
     {
