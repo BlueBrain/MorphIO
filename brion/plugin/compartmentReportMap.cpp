@@ -478,6 +478,7 @@ floatsPtr CompartmentReportMap::loadNeuron( const uint32_t gid ) const
                           float( keys.size( )) / float( omp_get_num_threads( ));
         const Strings subKeys( keys.begin() + start, keys.begin() + end );
 #else
+        auto& store = _stores.front();
         const Strings& subKeys = keys;
 #endif
 

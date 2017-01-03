@@ -79,6 +79,8 @@ int main( const int argc, char** argv )
         ( "output,o", po::value< std::string >(), "Output report URI" )
         ( "maxFrames,m", po::value< size_t >(),
           "Convert at most the given number of frames" )
+        ( "gids,g", po::value< std::vector< uint32_t >>()->multitoken(),
+          "List of whitespace-separated sub-GIDs to convert" )
         ( "compare,c", "Compare written report with input" )
         ( "dump,d", "Dump input report information (no output conversion)" );
     po::variables_map vm;
@@ -145,6 +147,14 @@ int main( const int argc, char** argv )
                   << "  " << in.getFrameSize() << " compartments"
                   << std::endl;
         return EXIT_SUCCESS;
+    }
+
+    if( vm.count( "gids" ))
+    {
+        brion::GIDSet gids;
+        for( const auto gid : vm["gids"].as< std::vector< uint32_t >>( ))
+            gids.emplace( gid );
+        in.updateMapping( gids );
     }
 
     const float maxEnd = start + maxFrames * step;
