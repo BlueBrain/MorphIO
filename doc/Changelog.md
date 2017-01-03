@@ -4,7 +4,8 @@ Changelog {#Changelog}
 # git master
 
 * [121](https://github.com/BlueBrain/Brion/pull/121):
-  Performance optimizations for map and binary compartment reports
+  Performance optimizations for map and binary compartment reports, fix
+  sub target loading of map compartment reports
 * [119](https://github.com/BlueBrain/Brion/pull/119):
   Optimized brain::Circuit::loadMorphologies for slow stat'ing
   filesystems (GPFS)

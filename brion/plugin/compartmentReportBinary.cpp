@@ -216,9 +216,41 @@ floatsPtr CompartmentReportBinary::loadFrame( const float timestamp ) const
     const size_t frameOffset = _header.dataBlockOffset +
                           _header.numCompartments * sizeof(float) * frameNumber;
 
-    floatsPtr buffer( new floats( _header.numCompartments ));
-    memcpy( buffer->data(), ptr + frameOffset,
-            _header.numCompartments * sizeof(float) );
+    if( !_subtarget )
+    {
+        floatsPtr buffer( new floats( _header.numCompartments ));
+        memcpy( buffer->data(), ptr + frameOffset,
+                _header.numCompartments * sizeof(float) );
+
+        if( _header.byteswap )
+        {
+#pragma omp parallel for
+            for( int32_t i = 0; i < _header.numCompartments; ++i )
+                lunchbox::byteswap( (*buffer)[i] );
+        }
+        return buffer;
+    }
+
+    if( _comps == 0 )
+        return floatsPtr();
+
+    floatsPtr buffer( new floats( _comps ));
+    const float* const source = (const float*)(ptr + frameOffset);
+    const SectionOffsets& offsets = getOffsets();
+    const CompartmentCounts& compCounts = getCompartmentCounts();
+
+    for( size_t i = 0; i < _gids.size(); ++i )
+    {
+        for( size_t j = 0; j < offsets[i].size(); ++j )
+        {
+            const uint16_t numCompartments = compCounts[i][j];
+            const uint64_t sourceOffset = _conversionOffsets[i][j];
+            const uint64_t targetOffset = offsets[i][j];
+
+            for( uint16_t k = 0; k < numCompartments; ++k )
+                (*buffer)[k + targetOffset] = source[k + sourceOffset];
+        }
+    }
 
     if( _header.byteswap )
     {
@@ -226,33 +258,7 @@ floatsPtr CompartmentReportBinary::loadFrame( const float timestamp ) const
         for( ssize_t i = 0; i < ssize_t( _comps ); ++i )
             lunchbox::byteswap( (*buffer)[i] );
     }
-
-    if( !_subtarget )
-        return buffer;
-
-    if( _comps == 0 )
-        return floatsPtr();
-
-    floatsPtr subBuffer( new floats( _comps ));
-    size_t cellIndex = 0;
-    for( GIDSetCIter i = _gids.begin(); i != _gids.end(); ++i )
-    {
-        const SectionOffsets& offsets = getOffsets();
-        const CompartmentCounts& compCounts = getCompartmentCounts();
-
-        for( size_t j = 0; j < offsets[cellIndex].size(); ++j )
-        {
-            const uint16_t numCompartments = compCounts[cellIndex][j];
-            const uint64_t sourceOffset = _conversionOffsets[cellIndex][j];
-            const uint64_t targetOffset = offsets[cellIndex][j];
-
-            for( uint16_t k = 0; k < numCompartments; ++k )
-                (*subBuffer)[k + targetOffset] = (*buffer)[k + sourceOffset];
-        }
-        ++cellIndex;
-    }
-
-    return subBuffer;
+    return buffer;
 }
 
 void CompartmentReportBinary::updateMapping( const GIDSet& gids )
