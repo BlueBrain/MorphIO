@@ -222,9 +222,10 @@ bool CompartmentReportMap::_flushHeader()
 
 bool CompartmentReportMap::_loadHeader()
 {
-    const auto gids = _gids; // keep requested gids
+    GIDSet gids;
+    gids.swap( _gids ); // keep requested gids
     _clear();
-    _gids = gids; // restore after clear
+    _gids.swap( gids ); // restore after clear
 
     try
     {
@@ -354,7 +355,7 @@ void CompartmentReportMap::updateMapping( const GIDSet& gids )
     const auto all = _stores.front().getSet< uint32_t >( _uri + gidsKey );
     const auto& subset = gids.empty() ? all : gids;
 
-    _gids = all.empty() ? subset : _computeIntersection( all, subset );
+    _gids = _computeIntersection( all, subset );
 
     if( _gids.empty( ))
         LBTHROW( std::runtime_error( "CompartmentReportMap::updateMapping:"
@@ -368,11 +369,8 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
     if( !_readable )
         return floatsPtr();
 
-    const std::string& index = std::string( "_" ) +
-                               std::to_string( _getFrameNumber( time ));
-
-    floatsPtr buffer( new floats( getFrameSize( )));
-    float* const ptr = buffer->data();
+    const std::string index = std::string( "_" ) +
+                              std::to_string( _getFrameNumber( time ));
 
     std::unordered_map< std::string, size_t > offsetMap;
     size_t offset = 0;
@@ -394,6 +392,9 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
                                              i->second.end(), 0 );
         offset += size;
     }
+
+    floatsPtr buffer( new floats( getFrameSize( )));
+    float* const ptr = buffer->data();
 
 #ifdef BRION_USE_OPENMP
     lunchbox::a_ssize_t taken;

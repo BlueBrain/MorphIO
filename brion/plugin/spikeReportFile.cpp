@@ -22,7 +22,6 @@
 
 #include <lunchbox/log.h>
 #include <lunchbox/stdExt.h>
-#include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
