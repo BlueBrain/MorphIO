@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *                          Adrien.Devresse@epfl.ch
  *                          Daniel.Nachbaur@epfl.ch
@@ -24,6 +24,7 @@
 #include "detail/circuit.h"
 
 #include "synapsesStream.h"
+#include <boost/algorithm/string.hpp>
 
 namespace brain
 {

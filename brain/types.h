@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -69,8 +69,8 @@ using brion::size_ts;
 typedef std::vector< Matrix4f > Matrix4fs;
 typedef std::vector< Quaternionf > Quaternionfs;
 
-typedef boost::shared_ptr< SpikeReportReader > SpikeReportReaderPtr;
-typedef boost::shared_ptr< SpikeReportWriter > SpikeReportWriterPtr;
+typedef std::shared_ptr< SpikeReportReader > SpikeReportReaderPtr;
+typedef std::shared_ptr< SpikeReportWriter > SpikeReportWriterPtr;
 
 /**
  * The GID of a synapse is the a tuple of two numbers:

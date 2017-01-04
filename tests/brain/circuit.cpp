@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -22,6 +22,7 @@
 #include <BBP/TestDatasets.h>
 
 #define BOOST_TEST_MODULE Circuit
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
 #include <boost/shared_ptr.hpp>

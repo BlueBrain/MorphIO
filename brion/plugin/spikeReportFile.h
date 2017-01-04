@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -24,6 +24,7 @@
 #include "spikeReportTypes.h"
 
 #include <boost/noncopyable.hpp>
+#include <boost/function.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace brion

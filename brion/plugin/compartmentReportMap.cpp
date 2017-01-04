@@ -422,7 +422,7 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
         store.takeValues( subKeys, takeValue );
     }
 
-    if( taken == _gids.size( ))
+    if( size_t( taken ) == _gids.size( ))
         return buffer;
 
     LBWARN << "Missing " << _gids.size() - taken << " of " << _gids.size()

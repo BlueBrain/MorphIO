@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -22,9 +22,7 @@
 
 #include <brion/enums.h>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/multi_array.hpp>
-#include <boost/shared_ptr.hpp>
 #include <lunchbox/compiler.h>
 #include <lunchbox/types.h>
 #include <servus/uri.h>
@@ -72,16 +70,16 @@ typedef std::vector< Vector3d > Vector3ds;
 typedef std::vector< Vector4d > Vector4ds;
 typedef std::vector< SectionType > SectionTypes;
 typedef std::vector< Target > Targets;
-typedef boost::shared_ptr< int32_ts > int32_tsPtr;
-typedef boost::shared_ptr< uint16_ts > uint16_tsPtr;
-typedef boost::shared_ptr< uint32_ts > uint32_tsPtr;
-typedef boost::shared_ptr< floats > floatsPtr;
-typedef boost::shared_ptr< Vector2is > Vector2isPtr;
-typedef boost::shared_ptr< Vector3fs > Vector3fsPtr;
-typedef boost::shared_ptr< Vector4fs > Vector4fsPtr;
-typedef boost::shared_ptr< Vector3ds > Vector3dsPtr;
-typedef boost::shared_ptr< Vector4ds > Vector4dsPtr;
-typedef boost::shared_ptr< SectionTypes > SectionTypesPtr;
+typedef std::shared_ptr< int32_ts > int32_tsPtr;
+typedef std::shared_ptr< uint16_ts > uint16_tsPtr;
+typedef std::shared_ptr< uint32_ts > uint32_tsPtr;
+typedef std::shared_ptr< floats > floatsPtr;
+typedef std::shared_ptr< Vector2is > Vector2isPtr;
+typedef std::shared_ptr< Vector3fs > Vector3fsPtr;
+typedef std::shared_ptr< Vector4fs > Vector4fsPtr;
+typedef std::shared_ptr< Vector3ds > Vector3dsPtr;
+typedef std::shared_ptr< Vector4ds > Vector4dsPtr;
+typedef std::shared_ptr< SectionTypes > SectionTypesPtr;
 
 /** Ordered set of GIDs of neurons. */
 typedef std::set< uint32_t > GIDSet;

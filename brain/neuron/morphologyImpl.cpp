@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -37,7 +37,7 @@ namespace
 {
 template< typename T >
 void _serializeArray( unsigned char*& dst,
-                      const boost::shared_ptr< std::vector< T > >& src )
+                      const std::shared_ptr< std::vector< T >>& src )
 {
     const size_t arraySize = src->size();
     *reinterpret_cast< size_t* >( dst ) = arraySize;
@@ -47,7 +47,7 @@ void _serializeArray( unsigned char*& dst,
 }
 
 template< typename T >
-void _deserializeArray( boost::shared_ptr< std::vector< T > >& dst,
+void _deserializeArray( std::shared_ptr< std::vector< T >>& dst,
                         const unsigned char*& src )
 {
     const size_t arraySize = *reinterpret_cast< const size_t* >( src );
