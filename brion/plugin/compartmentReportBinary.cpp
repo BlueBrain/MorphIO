@@ -223,7 +223,7 @@ floatsPtr CompartmentReportBinary::loadFrame( const float timestamp ) const
     if( _header.byteswap )
     {
 #pragma omp parallel for
-        for( int32_t i = 0; i < _header.numCompartments; ++i )
+        for( ssize_t i = 0; i < ssize_t( _comps ); ++i )
             lunchbox::byteswap( (*buffer)[i] );
     }
 
@@ -263,24 +263,14 @@ void CompartmentReportBinary::updateMapping( const GIDSet& gids )
     if( !_subtarget )
         return;
 
-    GIDSet intersection;
-    std::set_intersection( _gids.begin(), _gids.end(),
-                           _originalGIDs.begin(), _originalGIDs.end(),
-                           std::inserter( intersection, intersection.begin( )));
+    GIDSet intersection = _computeIntersection( _originalGIDs, _gids );
+    if( intersection.empty( ))
+    {
+        LBTHROW( std::runtime_error( "CompartmentReportBinary::updateMapping:"
+                                     " GIDs out of range" ));
+    }
     if( intersection != _gids )
     {
-        LBWARN << "Requested GIDs [" << *_gids.begin() << ":" <<*_gids.rbegin()
-               << "] are not a subset of the GIDs in the report ["
-               << *_originalGIDs.begin() << ":" << *_originalGIDs.rbegin();
-        if( intersection.empty( ))
-        {
-            LBWARN << " with no GIDs in common" << std::endl;
-            LBTHROW( std::runtime_error("CompartmentReportBinary::updateMapping"
-                                        ": GIDs out of range" ));
-        }
-
-        LBWARN << "], using intersection [" << *intersection.begin() << ":"
-               << *intersection.rbegin() << "]" << std::endl;
         updateMapping( intersection );
         return;
     }

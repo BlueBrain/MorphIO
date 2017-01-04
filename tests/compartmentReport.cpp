@@ -172,8 +172,8 @@ void test_compare( const brion::URI& uri1, const brion::URI& uri2 )
 {
     std::cout << "Compare " << uri1 << " == " << uri2 << std::endl;
 
-    const brion::CompartmentReport report1( uri1, brion::MODE_READ );
-    const brion::CompartmentReport report2( uri2, brion::MODE_READ );
+    brion::CompartmentReport report1( uri1, brion::MODE_READ );
+    brion::CompartmentReport report2( uri2, brion::MODE_READ );
 
     BOOST_CHECK_EQUAL( report1.getStartTime(), report2.getStartTime( ));
     BOOST_CHECK_EQUAL( report1.getEndTime(), report2.getEndTime( ));
@@ -220,6 +220,16 @@ void test_compare( const brion::URI& uri1, const brion::URI& uri2 )
             BOOST_CHECK_EQUAL( (*frame1)[j], (*frame2)[j] );
         }
     }
+
+    brion::GIDSet gids;
+    gids.insert( 394 );
+    report1.updateMapping( gids );
+    report2.updateMapping( gids );
+
+    BOOST_CHECK_EQUAL( report1.getGIDs().size(), 1 );
+    BOOST_CHECK_EQUAL( *report1.getGIDs().begin(), 394 );
+    BOOST_CHECK_EQUAL( report2.getGIDs().size(), 1 );
+    BOOST_CHECK_EQUAL( *report2.getGIDs().begin(), 394 );
 }
 
 /** @return false if no "from" or "to" report plugin was found, true otherwise*/
@@ -331,6 +341,7 @@ BOOST_AUTO_TEST_CASE( test_convert_and_compare )
 
     uris.push_back( brion::URI( temp.string() + ".h5" ));
     uris.push_back( brion::URI( "leveldb://" ));
+    uris.push_back( brion::URI( "memcached:///briontest" ));
 
     while( !uris.empty( ))
     {

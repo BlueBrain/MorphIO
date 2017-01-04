@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -441,7 +441,7 @@ bool CompartmentReportHDF5::writeCompartments( const uint32_t gid,
         const size_t compCount = std::accumulate( counts.begin(),
                                                   counts.end(), 0 );
         LBASSERT( !counts.empty( ));
-        LBASSERTINFO( compCount > 0, gid );
+        LBASSERTINFO( compCount > 0, "No compartments for GID " << gid );
         H5::DataSet dataset = _createDataset( gid, compCount );
 
         const size_t sections = counts.size();

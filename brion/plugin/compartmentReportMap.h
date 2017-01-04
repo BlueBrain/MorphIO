@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2014-2017, EPFL/Blue Brain Project
  *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -38,13 +38,10 @@ public:
     static bool handles( const CompartmentReportInitData& initData );
 
     float getStartTime() const final { return _header.startTime; }
-
     float getEndTime() const final { return _header.endTime; }
-
     float getTimestep() const final { return _header.timestep; }
 
     const std::string& getDataUnit() const final { return _dunit; }
-
     const std::string& getTimeUnit() const final { return _tunit; }
 
     const brion::GIDSet& getGIDs() const final { return _gids; }
@@ -76,7 +73,7 @@ public:
     };
 
 private:
-    URI _uri;
+    const std::string _uri;
     std::vector< keyv::Map > _stores;
 
     Header _header;

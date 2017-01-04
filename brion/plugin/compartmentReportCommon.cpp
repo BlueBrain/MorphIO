@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -18,6 +18,7 @@
  */
 
 #include "compartmentReportCommon.h"
+#include <lunchbox/log.h>
 
 namespace brion
 {
@@ -56,6 +57,28 @@ size_t CompartmentReportCommon::_getFrameNumber( float timestamp ) const
                                getTimestep( ))) - 1,
                  size_t(round(timestamp / getTimestep( ))));
     return frame;
+}
+
+GIDSet CompartmentReportCommon::_computeIntersection( const GIDSet& all,
+                                                      const GIDSet& subset )
+{
+    GIDSet intersection;
+    std::set_intersection( subset.begin(), subset.end(), all.begin(), all.end(),
+                           std::inserter( intersection, intersection.begin( )));
+    if( intersection != subset || intersection.empty( ))
+    {
+        LBWARN << "Requested " << subset.size() << " GIDs [" << *subset.begin()
+               << ":" <<*subset.rbegin() << "] are not a subset of the "
+               << all.size() << " GIDs in the report [" << *all.begin() << ":"
+               << *all.rbegin();
+        if( intersection.empty( ))
+            LBWARN << " with no GIDs in common" << std::endl;
+        else
+            LBWARN << "], using intersection size " << intersection.size()
+                   << " [" << *intersection.begin() << ":"
+                   << *intersection.rbegin() << "]" << std::endl;
+    }
+    return intersection;
 }
 
 }

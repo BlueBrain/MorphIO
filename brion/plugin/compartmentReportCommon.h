@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -38,12 +38,12 @@ public:
     size_t getNumCompartments( size_t index ) const final;
 
 protected:
-
     void _cacheNeuronCompartmentCounts( const GIDSet& gids );
     size_t _getFrameNumber( float timestamp ) const;
+    static GIDSet _computeIntersection( const GIDSet& all,
+                                        const GIDSet& subset );
 
 private:
-
     size_ts _neuronCompartments;
 };
 

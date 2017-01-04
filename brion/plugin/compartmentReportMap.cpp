@@ -57,12 +57,6 @@ const size_t _nThreads = omp_get_num_procs();
 #else
 const size_t _nThreads = 1;
 #endif
-
-std::string _getScope( const URI& uri )
-{
-    return uri.findQuery( "name" )->second + "_" +
-        uri.findQuery( "target" )->second + "_";
-}
 }
 
 namespace plugin
@@ -74,35 +68,31 @@ namespace
 
 CompartmentReportMap::CompartmentReportMap(
                                 const CompartmentReportInitData& initData )
-    : _uri( initData.getURI( ))
+    : _uri( std::to_string( initData.getURI( )) + "_" )
     , _readable( false )
 {
     // have at least one store
-    _stores.emplace_back( keyv::Map( _uri ));
+    const auto& uri = initData.getURI();
+    _stores.emplace_back( keyv::Map( uri ));
     _stores.back().setQueueDepth( _queueDepth );
-    if( _uri.getScheme() == "memcached" ) // parallelize loading with memcached
+    if( uri.getScheme() == "memcached" ) // parallelize loading with memcached
         while( _stores.size() < _nThreads )
         {
-            _stores.emplace_back( keyv::Map( _uri ));
+            _stores.emplace_back( keyv::Map( uri ));
             _stores.back().setQueueDepth( _queueDepth );
         }
-
-    if( _uri.findQuery( "name" ) == _uri.queryEnd( ))
-        _uri.addQuery( "name", "default" );
-    if( _uri.findQuery( "target" ) == _uri.queryEnd( ))
-        _uri.addQuery( "target", "allCompartments" );
 
     const int accessMode = initData.getAccessMode();
 
     if(( accessMode & MODE_READ ) && !_loadHeader( ))
         LBTHROW( std::runtime_error( "Incomplete or missing report at " +
-                                     _uri.getPath( )));
+                                     std::to_string( uri )));
 
     if( accessMode == MODE_WRITE || accessMode == MODE_READWRITE )
     {
         if( _loadHeader( ))
             LBTHROW( std::runtime_error( "Cannot overwrite existing report at "+
-                                         _uri.getPath( )));
+                                         std::to_string( uri )));
         _clear(); // reset after loading header
     }
 
@@ -173,7 +163,7 @@ bool CompartmentReportMap::writeCompartments( const uint32_t gid,
     LBASSERTINFO( !counts.empty(), gid );
     _gids.insert( gid );
     return _stores.front().insert(
-        _getScope( _uri ) + countsKey + std::to_string( gid ), counts );
+        _uri + countsKey + std::to_string( gid ), counts );
 }
 
 bool CompartmentReportMap::writeFrame( const uint32_t gid,
@@ -183,10 +173,9 @@ bool CompartmentReportMap::writeFrame( const uint32_t gid,
     if( !_flushHeader( ))
         return false;
 
-    const std::string& scope = _getScope( _uri );
 #ifndef NDEBUG
     const uint16_ts& counts =
-        _stores.front().getVector< uint16_t >( scope + countsKey +
+        _stores.front().getVector< uint16_t >( _uri + countsKey +
                                                std::to_string( gid ));
     const size_t size = std::accumulate( counts.begin(), counts.end(), 0 );
     LBASSERTINFO( size == voltages.size(), "gid " << gid << " should have " <<
@@ -194,7 +183,8 @@ bool CompartmentReportMap::writeFrame( const uint32_t gid,
 #endif
 
     const size_t index = _getFrameNumber( time );
-    const std::string& key = scope + std::to_string( gid ) + "_" + std::to_string( index );
+    const std::string& key = _uri + std::to_string( gid ) + "_" +
+                             std::to_string( index );
     return _stores.front().insert( key, voltages );
 }
 
@@ -217,12 +207,11 @@ bool CompartmentReportMap::_flushHeader()
 
     _header.nGIDs = uint32_t(_gids.size( ));
 
-    const std::string& scope = _getScope( _uri );
     auto& store = _stores.front();
-    if( !store.insert( scope + headerKey, _header ) ||
-        !store.insert( scope + gidsKey, _gids ) ||
-        !store.insert( scope + dunitKey, _dunit ) ||
-        !store.insert( scope + tunitKey, _tunit ))
+    if( !store.insert( _uri + headerKey, _header ) ||
+        !store.insert( _uri + gidsKey, _gids ) ||
+        !store.insert( _uri + dunitKey, _dunit ) ||
+        !store.insert( _uri + tunitKey, _tunit ))
     {
         return false;
     }
@@ -233,13 +222,14 @@ bool CompartmentReportMap::_flushHeader()
 
 bool CompartmentReportMap::_loadHeader()
 {
+    const auto gids = _gids; // keep requested gids
     _clear();
-    const std::string& scope = _getScope( _uri );
+    _gids = gids; // restore after clear
 
     try
     {
         auto& store = _stores.front();
-        _header = store.get< Header >( scope + headerKey );
+        _header = store.get< Header >( _uri + headerKey );
         const bool byteswap = ( _header.magic != _magic );
         if( byteswap )
         {
@@ -253,6 +243,7 @@ bool CompartmentReportMap::_loadHeader()
         {
             LBWARN << "report header has wrong magic " << _header.magic
                    << " instead of " << _magic << std::endl;
+            _clear();
             return false;
         }
 
@@ -260,6 +251,7 @@ bool CompartmentReportMap::_loadHeader()
         {
             LBWARN << "report has version " << _header.version
                    << ", can only read version " << _version << std::endl;
+            _clear();
             return false;
         }
         LBASSERTINFO( _header.endTime - _header.startTime >= _header.timestep,
@@ -267,28 +259,31 @@ bool CompartmentReportMap::_loadHeader()
                       _header.endTime << "/" << _header.timestep );
 
         const bool loadGIDs = _gids.empty();
-        store.fetch( scope + dunitKey );
-        store.fetch( scope + tunitKey );
+        store.fetch( _uri + dunitKey );
+        store.fetch( _uri + tunitKey );
         if( loadGIDs )
-            store.fetch( scope + gidsKey, _header.nGIDs * sizeof( uint32_t ));
+            store.fetch( _uri + gidsKey, _header.nGIDs * sizeof( uint32_t ));
         for( const uint32_t gid : _gids )
-            store.fetch( scope + countsKey + std::to_string( gid ));
+            store.fetch( _uri + countsKey + std::to_string( gid ));
 
-        _dunit = store[ scope + dunitKey ];
-        _tunit = store[ scope + tunitKey ];
+        _dunit = store[ _uri + dunitKey ];
+        _tunit = store[ _uri + tunitKey ];
         if( loadGIDs )
-            _gids = store.getSet< uint32_t >( scope + gidsKey );
+            _gids = store.getSet< uint32_t >( _uri + gidsKey );
 
-        _readable = true;
-        if( !loadGIDs )
-            return true;
+        if( _gids.empty( ))
+        {
+            LBWARN << "No gids for report" << std::endl;
+            _clear();
+            return false;
+        }
 
         Strings keys;
         keys.reserve( _gids.size( ));
         std::unordered_map< std::string, uint32_t > gidMap;
         for( const uint32_t gid : _gids )
         {
-            keys.push_back( scope + countsKey + std::to_string( gid ));
+            keys.push_back( _uri + countsKey + std::to_string( gid ));
             gidMap.emplace( keys.back(), gid );
         }
 
@@ -308,9 +303,9 @@ bool CompartmentReportMap::_loadHeader()
         store.takeValues( keys, takeValue );
         if( taken != _gids.size( ))
         {
-            LBWARN << "Missing " << _gids.size() - taken << " of "
-                   << _gids.size() << " gids in report header" << std::endl;
-            _cellCounts.clear();
+            LBWARN << "Missing mapping " << _gids.size() - taken << " of "
+                   << _gids.size() << " gids" << std::endl;
+            _clear();
             return false;
         }
 
@@ -337,11 +332,14 @@ bool CompartmentReportMap::_loadHeader()
             _totalCompartments += std::accumulate( cellCounts.begin(),
                                                    cellCounts.end(), 0 );
         }
+
+        _readable = true;
         return true;
     }
     catch( const std::runtime_error& e )
     {
         LBWARN << "Missing header information: " << e.what() << std::endl;
+        _clear();
         return false;
     }
 
@@ -353,7 +351,14 @@ void CompartmentReportMap::updateMapping( const GIDSet& gids )
     if( _gids == gids && !gids.empty() && _readable )
         return;
 
-    _gids = gids;
+    const auto all = _stores.front().getSet< uint32_t >( _uri + gidsKey );
+    const auto& subset = gids.empty() ? all : gids;
+
+    _gids = all.empty() ? subset : _computeIntersection( all, subset );
+
+    if( _gids.empty( ))
+        LBTHROW( std::runtime_error( "CompartmentReportMap::updateMapping:"
+                                     " GIDs out of range" ));
     if( !_loadHeader( ))
         LBTHROW( std::runtime_error( "Incomplete data source" ));
 }
@@ -363,7 +368,6 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
     if( !_readable )
         return floatsPtr();
 
-    const std::string& scope = _getScope( _uri );
     const std::string& index = std::string( "_" ) +
                                std::to_string( _getFrameNumber( time ));
 
@@ -378,7 +382,7 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
 
     for( const uint32_t gid : _gids )
     {
-        keys.push_back( scope + std::to_string( gid ) + index );
+        keys.push_back( _uri + std::to_string( gid ) + index );
         offsetMap.emplace( keys.back(), offset );
         const CellCompartments::const_iterator i = _cellCounts.find( gid );
         if( i == _cellCounts.end( ))
