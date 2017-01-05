@@ -106,9 +106,13 @@ private:
 
     bool _readable;
 
+    using OffsetMap = std::unordered_map< std::string, size_t >;
+
     void _clear();
     bool _loadHeader();
     bool _flushHeader();
+    bool _load( floatsPtr buffer, const Strings& keys,
+                const OffsetMap& offsets) const;
 };
 
 }

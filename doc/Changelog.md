@@ -4,7 +4,7 @@ Changelog {#Changelog}
 # git master
 
 * [122](https://github.com/BlueBrain/Brion/pull/122):
-  Add loadNeuron for binary and map compartment reports
+  Support loading of individual neurons for binary and map compartment reports
 * [121](https://github.com/BlueBrain/Brion/pull/121):
   Performance optimizations for map and binary compartment reports, fix
   sub target loading of map compartment reports

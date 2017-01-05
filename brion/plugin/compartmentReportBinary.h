@@ -113,7 +113,7 @@ private:
 
     SectionOffsets _conversionOffsets;
 
-    size_t _subNumCompartments;  // subtarget
+    size_t _subNumCompartments;
 
     GIDSet _originalGIDs;
     bool _subtarget;

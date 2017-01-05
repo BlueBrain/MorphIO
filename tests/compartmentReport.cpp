@@ -232,6 +232,7 @@ void test_compare( const brion::URI& uri1, const brion::URI& uri2 )
         BOOST_CHECK( frame1 );
         BOOST_CHECK( frame2 );
         BOOST_CHECK( size > 0  );
+        BOOST_CHECK_CLOSE( (*frame1)[2017], -65.1365891f, 0.000001f );
         BOOST_CHECK_EQUAL( size, report2.getNeuronSize( gid ));
 
         for( size_t i = 0; i < size; ++i )

@@ -24,6 +24,7 @@
 #include <brion/types.h>
 #include <brion/pluginInitData.h>
 
+#include <lunchbox/log.h>
 #include <boost/noncopyable.hpp>
 
 namespace brion
@@ -52,11 +53,7 @@ public:
         , _gids( gids )
     {}
 
-    /**
-     *
-     * @return Returns the gids.
-     * @version 1.4
-     */
+    /** @return Returns the gids. @version 1.4 */
     const GIDSet& getGids() const { return _gids; }
 
 private:
@@ -140,10 +137,7 @@ public:
 
     /** @copydoc brion::CompartmentReport::setBufferSize */
     virtual void setBufferSize( size_t size )
-    {
-        // To keep doxygen happy
-        (void)size;
-    }
+        { /* To keep doxygen happy */ (void)size; }
 
     /** @copydoc brion::CompartmentReport::clearBuffer */
     virtual void clearBuffer() {}
@@ -153,21 +147,30 @@ public:
 
     /** @copydoc brion::CompartmentReport::writeHeader */
     virtual void writeHeader( float startTime, float endTime,
-                                        float timestep,
-                                        const std::string& dunit,
-                                        const std::string& tunit ) = 0;
+                              float timestep, const std::string& dunit,
+                              const std::string& tunit ) = 0;
 
     /** @copydoc brion::CompartmentReport::writeCompartments */
-    virtual bool writeCompartments( uint32_t gid,
-                                              const uint16_ts& counts ) = 0;
+    virtual bool writeCompartments( uint32_t gid, const uint16_ts& counts ) = 0;
 
     /** @copydoc brion::CompartmentReport::writeFrame */
     virtual bool writeFrame( uint32_t gid, const floats& voltages,
-                                       float timestamp ) = 0;
+                             float timestamp ) = 0;
 
     /** @copydoc brion::CompartmentReport::flush */
     virtual bool flush() = 0;
     //@}
+
+    /** @copydoc brion::CompartmentReport::getIndex */
+    size_t getIndex( const uint32_t gid ) const
+    {
+        const auto& gids = getGIDs();
+        const size_t index = std::distance( gids.begin(), gids.find( gid ));
+        if( index >= gids.size( ))
+            LBTHROW( std::runtime_error( "Gid " + std::to_string( gid ) +
+                                         " not in report" ));
+        return index;
+    }
 };
 
 }

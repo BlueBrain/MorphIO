@@ -80,7 +80,7 @@ int main( const int argc, char** argv )
         ( "maxFrames,m", po::value< size_t >(),
           "Convert at most the given number of frames" )
         ( "gids,g", po::value< std::vector< uint32_t >>()->multitoken(),
-          "List of whitespace-separated sub-GIDs to convert" )
+          "List of whitespace separated GIDs to convert" )
         ( "compare,c", "Compare written report with input" )
         ( "dump,d", "Dump input report information (no output conversion)" );
     po::variables_map vm;

@@ -73,6 +73,13 @@ public:
     /** @return the current considered GIDs. @version 1.0 */
     BRION_API const GIDSet& getGIDs() const;
 
+    /**
+     * @return the index of the given gid.
+     * @version 1.10
+     * @throw std::runtime_error if the gid is not mapped
+     */
+    BRION_API size_t getIndex( const uint32_t gid ) const;
+
     /** Get the current mapping of each section of each neuron in each
      *  simulation frame buffer.
      *
@@ -133,14 +140,19 @@ public:
      */
     BRION_API floatsPtr loadFrame( float timestamp ) const;
 
-    /** @return the number of values of the given neuron report. @version 1.0 */
+    /**
+     * @param gid the neuron report to be loaded.
+     * @return the number of values of the given neuron report.
+     * @throw std::runtime_error if gid is not mapped.
+     * @version 1.10
+     */
     BRION_API size_t getNeuronSize( uint32_t gid ) const;
 
     /** Load report values for the given neuron.
      *
-     * @param gid the cell identifier
-     * @return the report values if cell is found, nullptr otherwise
-     * @version 1.0
+     * @param gid the neuron identifier
+     * @return the report values if neuron is found, nullptr otherwise
+     * @version 1.10
      */
     BRION_API floatsPtr loadNeuron( uint32_t gid ) const;
 

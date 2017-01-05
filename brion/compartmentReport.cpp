@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -62,6 +62,11 @@ const GIDSet& CompartmentReport::getGIDs() const
     return _impl->plugin->getGIDs();
 }
 
+size_t CompartmentReport::getIndex( const uint32_t gid ) const
+{
+    return _impl->plugin->getIndex( gid );
+}
+
 const SectionOffsets& CompartmentReport::getOffsets() const
 {
     return _impl->plugin->getOffsets();
@@ -122,8 +127,7 @@ floatsPtr CompartmentReport::loadFrame( const float timestamp ) const
 
 size_t CompartmentReport::getNeuronSize( const uint32_t gid ) const
 {
-    const auto& gids = getGIDs();
-    const size_t index = std::distance( gids.begin(), gids.find( gid ));
+    const size_t index = getIndex( gid );
     const size_t nTimesteps = (getEndTime() - getStartTime( )) / getTimestep();
     return getNumCompartments( index ) * nTimesteps;
 }

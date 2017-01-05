@@ -372,7 +372,7 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
     const std::string index = std::string( "_" ) +
                               std::to_string( _getFrameNumber( time ));
 
-    std::unordered_map< std::string, size_t > offsetMap;
+    OffsetMap offsetMap;
     size_t offset = 0;
 
     Strings keys;
@@ -394,44 +394,8 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
     }
 
     floatsPtr buffer( new floats( getFrameSize( )));
-    float* const ptr = buffer->data();
-
-#ifdef BRION_USE_OPENMP
-    lunchbox::a_ssize_t taken;
-    omp_set_num_threads( _stores.size( ));
-#else
-    size_t taken = 0;
-#endif
-#pragma omp parallel
-    {
-#ifdef BRION_USE_OPENMP
-        auto& store = _stores[ omp_get_thread_num( )];
-        const size_t start = float( omp_get_thread_num( )) *
-                          float( keys.size( )) / float( omp_get_num_threads( ));
-        const size_t end = float( omp_get_thread_num() + 1 ) *
-                          float( keys.size( )) / float( omp_get_num_threads( ));
-        const Strings subKeys( keys.begin() + start, keys.begin() + end );
-#else
-        auto& store = _stores.front();
-        const Strings& subKeys = keys;
-#endif
-
-        const auto takeValue = [ ptr, &offsetMap, &taken ]
-            ( const std::string& key, char* data, const size_t size )
-        {
-            ::memcpy( ptr + offsetMap[ key ], data, size );
-            std::free( data );
-            ++taken;
-        };
-
-        store.takeValues( subKeys, takeValue );
-    }
-
-    if( size_t( taken ) == _gids.size( ))
+    if( _load( buffer, keys, offsetMap ))
         return buffer;
-
-    LBWARN << "Missing " << _gids.size() - taken << " of " << _gids.size()
-           << " gids in report frame at " << time << " ms" << std::endl;
     return floatsPtr();
 }
 
@@ -440,20 +404,16 @@ floatsPtr CompartmentReportMap::loadNeuron( const uint32_t gid ) const
     if( !_readable )
         return floatsPtr();
 
-    const size_t index = std::distance( _gids.begin(), _gids.find( gid ));
-    if( index >= _gids.size( ))
-        return floatsPtr();
-
+    const size_t index = getIndex( gid );
     const std::string& scope = _uri + std::to_string( gid ) + "_";
     const size_t nFrames = (_header.endTime - _header.startTime) /
                            _header.timestep;
     const size_t nCompartments = getNumCompartments( index );
 
     floatsPtr buffer( new floats( nFrames * nCompartments ));
-    float* const ptr = buffer->data();
 
-    std::unordered_map< std::string, size_t > offsetMap;
     Strings keys;
+    OffsetMap offsetMap;
     keys.reserve( nFrames );
 
     for( size_t i = 0; i < nFrames; ++i )
@@ -461,6 +421,16 @@ floatsPtr CompartmentReportMap::loadNeuron( const uint32_t gid ) const
         keys.push_back( scope + std::to_string( i ));
         offsetMap.emplace( keys.back(), i * nCompartments );
     }
+
+    if( _load( buffer, keys, offsetMap ))
+        return buffer;
+    return floatsPtr();
+}
+
+bool CompartmentReportMap::_load( floatsPtr buffer, const Strings& keys,
+                                  const OffsetMap& offsets ) const
+{
+    float* const ptr = buffer->data();
 
 #ifdef BRION_USE_OPENMP
     lunchbox::a_ssize_t taken;
@@ -482,23 +452,27 @@ floatsPtr CompartmentReportMap::loadNeuron( const uint32_t gid ) const
         const Strings& subKeys = keys;
 #endif
 
-        const auto takeValue = [ ptr, &offsetMap, &taken ]
+        const auto takeValue = [ ptr, &offsets, &taken ]
             ( const std::string& key, char* data, const size_t size )
         {
-            ::memcpy( ptr + offsetMap[ key ], data, size );
+            const auto i = offsets.find( key );
+            if( i != offsets.end( ))
+            {
+                ::memcpy( ptr + i->second, data, size );
+                ++taken;
+            }
             std::free( data );
-            ++taken;
         };
 
         store.takeValues( subKeys, takeValue );
     }
 
-    if( size_t( taken ) == nFrames )
-        return buffer;
+    if( size_t( taken ) == keys.size( ))
+        return true;
 
-    LBWARN << "Missing " << nFrames - taken << " of " << nFrames
-           << " time steps of gid " << gid << std::endl;
-    return floatsPtr();
+    LBWARN << "Missing " << keys.size() - taken << " of " << keys.size()
+           << " values in report frame" << std::endl;
+    return false;
 }
 
 }

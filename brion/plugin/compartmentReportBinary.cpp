@@ -266,10 +266,7 @@ floatsPtr CompartmentReportBinary::loadNeuron( const uint32_t gid ) const
     if( !bytePtr || _offsets[_subtarget].empty( ))
         return floatsPtr();
 
-    const size_t index = std::distance( _gids.begin(), _gids.find( gid ));
-    if( index >= _gids.size( ))
-        return floatsPtr();
-
+    const size_t index = getIndex( gid );
     const float* const ptr = (const float*)(bytePtr + _header.dataBlockOffset);
 
     const size_t frameSize = _header.numCompartments;
@@ -282,7 +279,7 @@ floatsPtr CompartmentReportBinary::loadNeuron( const uint32_t gid ) const
     const CompartmentCounts& compCounts = getCompartmentCounts();
     for( size_t i = 0; i < nFrames; ++i )
     {
-        const size_t srcOffset = i * frameSize;
+        const size_t frameOffset = i * frameSize;
         size_t dstOffset = i * nCompartments;
         for( size_t j = 0; j < offsets[index].size(); ++j )
         {
@@ -290,7 +287,7 @@ floatsPtr CompartmentReportBinary::loadNeuron( const uint32_t gid ) const
             const uint64_t sourceOffset = offsets[index][j];
 
             ::memcpy( buffer->data() + dstOffset,
-                      ptr + srcOffset + sourceOffset,
+                      ptr + frameOffset + sourceOffset,
                       numCompartments * sizeof( float ));
             dstOffset += numCompartments;
         }
