@@ -75,7 +75,6 @@ public:
     };
 
 private:
-    const std::string _uri;
     std::vector< keyv::Map > _stores;
 
     Header _header;
@@ -113,6 +112,15 @@ private:
     bool _flushHeader();
     bool _load( floatsPtr buffer, const Strings& keys,
                 const OffsetMap& offsets) const;
+
+    std::string _getHeaderKey() const { return "header"; }
+    std::string _getGidsKey() const { return "gids"; }
+    std::string _getTunitKey() const { return "tunit"; }
+    std::string _getDunitKey() const { return "dunit"; }
+    std::string _getCountsKey( const uint32_t gid ) const
+        { return "counts_" + std::to_string( gid ); }
+    std::string _getValueKey( const uint32_t gid, const size_t frame ) const
+        { return std::to_string( gid ) + "_" + std::to_string( frame ); }
 };
 
 }

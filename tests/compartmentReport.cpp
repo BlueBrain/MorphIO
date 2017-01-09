@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE( test_convert_and_compare )
     std::vector< brion::URI > uris;
 
     uris.push_back( brion::URI( temp.string() + ".h5" ));
-    uris.push_back( brion::URI( "leveldb://" ));
+    uris.push_back( brion::URI( "leveldb:///briontest" ));
     uris.push_back( brion::URI( "memcached:///briontest" ));
 
     while( !uris.empty( ))

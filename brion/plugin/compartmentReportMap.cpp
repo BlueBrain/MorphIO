@@ -42,12 +42,6 @@ namespace brion
 {
 namespace
 {
-const std::string countsKey( "cellCount" );
-const std::string dunitKey( "dunit" );
-const std::string frameKey( "frame" );
-const std::string gidsKey( "gids" );
-const std::string headerKey( "header" );
-const std::string tunitKey( "tunit" );
 
 const uint32_t _version = 3; // Increase with each change in a k/v pair
 const uint32_t _magic = 0xdb;
@@ -63,16 +57,18 @@ namespace plugin
 {
 namespace
 {
-    lunchbox::PluginRegisterer< CompartmentReportMap > registerer;
+lunchbox::PluginRegisterer< CompartmentReportMap > registerer;
 }
 
 CompartmentReportMap::CompartmentReportMap(
                                 const CompartmentReportInitData& initData )
-    : _uri( std::to_string( initData.getURI( )) + "_" )
-    , _readable( false )
+    : _readable( false )
 {
-    // have at least one store
     const auto& uri = initData.getURI();
+    if( uri.getPath().empty( ))
+        LBTHROW( std::runtime_error( "Empty report path for " +
+                                     std::to_string( uri )));
+    // have at least one store
     _stores.emplace_back( keyv::Map( uri ));
     _stores.back().setQueueDepth( _queueDepth );
     if( uri.getScheme() == "memcached" ) // parallelize loading with memcached
@@ -162,8 +158,7 @@ bool CompartmentReportMap::writeCompartments( const uint32_t gid,
 {
     LBASSERTINFO( !counts.empty(), gid );
     _gids.insert( gid );
-    return _stores.front().insert(
-        _uri + countsKey + std::to_string( gid ), counts );
+    return _stores.front().insert( _getCountsKey( gid ), counts );
 }
 
 bool CompartmentReportMap::writeFrame( const uint32_t gid,
@@ -175,16 +170,14 @@ bool CompartmentReportMap::writeFrame( const uint32_t gid,
 
 #ifndef NDEBUG
     const uint16_ts& counts =
-        _stores.front().getVector< uint16_t >( _uri + countsKey +
-                                               std::to_string( gid ));
+        _stores.front().getVector< uint16_t >( _getCountsKey( gid ));
     const size_t size = std::accumulate( counts.begin(), counts.end(), 0 );
     LBASSERTINFO( size == voltages.size(), "gid " << gid << " should have " <<
                   size << " voltages not " << voltages.size( ));
 #endif
 
     const size_t index = _getFrameNumber( time );
-    const std::string& key = _uri + std::to_string( gid ) + "_" +
-                             std::to_string( index );
+    const std::string& key = _getValueKey( gid, index );
     return _stores.front().insert( key, voltages );
 }
 
@@ -208,15 +201,14 @@ bool CompartmentReportMap::_flushHeader()
     _header.nGIDs = uint32_t(_gids.size( ));
 
     auto& store = _stores.front();
-    if( !store.insert( _uri + headerKey, _header ) ||
-        !store.insert( _uri + gidsKey, _gids ) ||
-        !store.insert( _uri + dunitKey, _dunit ) ||
-        !store.insert( _uri + tunitKey, _tunit ))
+    if( !store.insert( _getHeaderKey(), _header ) ||
+        !store.insert( _getGidsKey(), _gids ) ||
+        !store.insert( _getDunitKey(), _dunit ) ||
+        !store.insert( _getTunitKey(), _tunit ))
     {
         return false;
     }
 
-    LBVERB << "Wrote meta information of " << _uri << std::endl;
     return _loadHeader();
 }
 
@@ -230,7 +222,7 @@ bool CompartmentReportMap::_loadHeader()
     try
     {
         auto& store = _stores.front();
-        _header = store.get< Header >( _uri + headerKey );
+        _header = store.get< Header >( _getHeaderKey( ));
         const bool byteswap = ( _header.magic != _magic );
         if( byteswap )
         {
@@ -260,17 +252,10 @@ bool CompartmentReportMap::_loadHeader()
                       _header.endTime << "/" << _header.timestep );
 
         const bool loadGIDs = _gids.empty();
-        store.fetch( _uri + dunitKey );
-        store.fetch( _uri + tunitKey );
+        _dunit = store[ _getDunitKey( )];
+        _tunit = store[ _getTunitKey( )];
         if( loadGIDs )
-            store.fetch( _uri + gidsKey, _header.nGIDs * sizeof( uint32_t ));
-        for( const uint32_t gid : _gids )
-            store.fetch( _uri + countsKey + std::to_string( gid ));
-
-        _dunit = store[ _uri + dunitKey ];
-        _tunit = store[ _uri + tunitKey ];
-        if( loadGIDs )
-            _gids = store.getSet< uint32_t >( _uri + gidsKey );
+            _gids = store.getSet< uint32_t >( _getGidsKey( ));
 
         if( _gids.empty( ))
         {
@@ -284,7 +269,7 @@ bool CompartmentReportMap::_loadHeader()
         std::unordered_map< std::string, uint32_t > gidMap;
         for( const uint32_t gid : _gids )
         {
-            keys.push_back( _uri + countsKey + std::to_string( gid ));
+            keys.push_back( _getCountsKey( gid ));
             gidMap.emplace( keys.back(), gid );
         }
 
@@ -352,7 +337,7 @@ void CompartmentReportMap::updateMapping( const GIDSet& gids )
     if( _gids == gids && !gids.empty() && _readable )
         return;
 
-    const auto all = _stores.front().getSet< uint32_t >( _uri + gidsKey );
+    const auto all = _stores.front().getSet< uint32_t >( _getGidsKey( ));
     const auto& subset = gids.empty() ? all : gids;
 
     _gids = _computeIntersection( all, subset );
@@ -369,18 +354,17 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
     if( !_readable )
         return floatsPtr();
 
-    const std::string index = std::string( "_" ) +
-                              std::to_string( _getFrameNumber( time ));
 
     OffsetMap offsetMap;
     size_t offset = 0;
 
     Strings keys;
     keys.reserve( _gids.size( ));
+    const size_t index = _getFrameNumber( time );
 
     for( const uint32_t gid : _gids )
     {
-        keys.push_back( _uri + std::to_string( gid ) + index );
+        keys.push_back( _getValueKey( gid, index ));
         offsetMap.emplace( keys.back(), offset );
         const CellCompartments::const_iterator i = _cellCounts.find( gid );
         if( i == _cellCounts.end( ))
@@ -405,9 +389,8 @@ floatsPtr CompartmentReportMap::loadNeuron( const uint32_t gid ) const
         return floatsPtr();
 
     const size_t index = getIndex( gid );
-    const std::string& scope = _uri + std::to_string( gid ) + "_";
     const size_t nFrames = (_header.endTime - _header.startTime) /
-                           _header.timestep;
+                            _header.timestep;
     const size_t nCompartments = getNumCompartments( index );
 
     floatsPtr buffer( new floats( nFrames * nCompartments ));
@@ -418,7 +401,7 @@ floatsPtr CompartmentReportMap::loadNeuron( const uint32_t gid ) const
 
     for( size_t i = 0; i < nFrames; ++i )
     {
-        keys.push_back( scope + std::to_string( i ));
+        keys.push_back( _getValueKey( gid, i ));
         offsetMap.emplace( keys.back(), i * nCompartments );
     }
 
