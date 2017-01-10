@@ -44,14 +44,38 @@ enum class branch_type{
     soma =0x00,
     axon = 0x01,
     dentrite_basal = 0x02,
-    dentrite_apical = 0x03
+    dentrite_apical = 0x03,
+    unknown = 0x04
 };
 
 
 ///
+/// \brief base node element for a morphology node
+///
+///  A common node can be a dentrite, an axon or a soma
+///
+class morpho_node{
+public:
+    inline morpho_node(branch_type my_node_type) : _my_type(my_node_type){}
+
+    inline virtual ~morpho_node(){};
+
+    inline branch_type get_type() const{
+        return _my_type;
+    }
+
+protected:
+    branch_type _my_type;
+
+private:
+    morpho_node(const morpho_node&) = delete;
+    morpho_node & operator =(const morpho_node &) = delete;
+};
+
+///
 /// \brief generic container for a branch of a morphology
 ///
-class branch : private boost::noncopyable{
+class branch : public morpho_node{
 public:
 
     typedef boost::numeric::ublas::matrix<double> mat_points;
@@ -72,7 +96,7 @@ public:
 
 
 
-    inline branch(branch_type type_b) : _type(type_b), _parent(nullptr), _id(0) {}
+    inline branch(branch_type type_b) : morpho_node(type_b), _parent(nullptr), _id(0) {}
 
     inline virtual ~branch(){}
 
@@ -139,10 +163,6 @@ public:
     ///
     inline circle_pipe get_circle_pipe() const;
 
-    inline branch_type get_type() const{
-        return _type;
-    }
-
     inline const std::vector<std::size_t> & get_childrens() const{
         return _childrens;
     }
@@ -159,7 +179,6 @@ public:
     }
 
 private:
-    branch_type _type;
 
     branch* _parent;
 
