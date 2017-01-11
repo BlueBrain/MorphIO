@@ -21,13 +21,13 @@
 #include "spikeReport.h"
 
 #include "spikeReportPlugin.h"
+
 #include "pluginInitData.h"
 #include <brion/version.h>
 
 #include <lunchbox/plugin.h>
 #include <lunchbox/pluginFactory.h>
 #include <lunchbox/uint128_t.h>
-#include <boost/scoped_ptr.hpp>
 
 namespace
 {
@@ -68,7 +68,7 @@ public:
         plugin.reset( SpikePluginFactory::getInstance().create( initData ) );
     }
 
-    boost::scoped_ptr< SpikeReportPlugin > plugin;
+    std::unique_ptr<SpikeReportPlugin> plugin;
 };
 }
 

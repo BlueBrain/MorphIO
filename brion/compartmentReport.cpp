@@ -22,8 +22,6 @@
 
 #include <lunchbox/log.h>
 #include <lunchbox/pluginFactory.h>
-#include <boost/filesystem.hpp>
-#include <boost/scoped_ptr.hpp>
 
 namespace brion
 {
@@ -43,8 +41,7 @@ public:
         : plugin( CompartmentPluginFactory::getInstance().create( initData ))
     {}
 
-    const boost::scoped_ptr< CompartmentReportPlugin > plugin;
-
+    const std::unique_ptr<CompartmentReportPlugin> plugin;
 };
 }
 
