@@ -1,4 +1,4 @@
-/* Copyright (c) 2015, EPFL/Blue Brain Project
+/* Copyright (c) 2015-2017, EPFL/Blue Brain Project
  *                     Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -39,6 +39,7 @@ public:
 
     static bool handles( const CompartmentReportInitData& initData )
         { return initData.getURI().getScheme() == "null"; }
+    static std::string getDescription() { return "Benchmark drain: null://"; }
 
     float getStartTime() const final { return 0.f; }
     float getEndTime() const final { return 0.f; }

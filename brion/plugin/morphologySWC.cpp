@@ -187,6 +187,12 @@ bool MorphologySWC::handles( const MorphologyInitData& initData )
     return path.substr( pos ) == ".swc";
 }
 
+std::string MorphologySWC::getDescription()
+{
+    return "SWC morphologies:\n"
+           "  [file://]/path/to/morphology.swc";
+}
+
 CellFamily MorphologySWC::getCellFamily() const
 {
     return FAMILY_NEURON;

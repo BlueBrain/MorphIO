@@ -36,6 +36,7 @@ public:
     virtual ~CompartmentReportMap();
 
     static bool handles( const CompartmentReportInitData& initData );
+    static std::string getDescription();
 
     float getStartTime() const final { return _header.startTime; }
     float getEndTime() const final { return _header.endTime; }

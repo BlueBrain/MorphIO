@@ -1,5 +1,5 @@
-/* Copyright (c) 2015, EPFL/Blue Brain Project
- *                     Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2015-2017, EPFL/Blue Brain Project
+ *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -82,6 +82,12 @@ bool SpikeReportBinary::handles( const SpikeReportInitData& initData )
     const boost::filesystem::path ext =
         boost::filesystem::path( uri.getPath() ).extension();
     return ext == BINARY_REPORT_FILE_EXT;
+}
+
+std::string SpikeReportBinary::getDescription()
+{
+    return "Blue Brain binary spike reports:\n"
+           "  [file://]/path/to/report" BINARY_REPORT_FILE_EXT;
 }
 
 const URI& SpikeReportBinary::getURI() const

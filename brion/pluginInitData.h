@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Ahmet Bilgili <ahmet.bilgili@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -17,10 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_PLUGININITDATA
-#define BRION_PLUGININITDATA
+#pragma once
 
-#include <boost/lexical_cast.hpp>
 #include <brion/types.h>
 
 namespace brion
@@ -47,8 +45,7 @@ public:
      * @param accessMode the brion::AccessMode bitmask
      * @version 1.4
      */
-    explicit PluginInitData( const URI& uri,
-                             const int accessMode = MODE_READ )
+    explicit PluginInitData( const URI& uri, const int accessMode = MODE_READ )
         : _uri( uri ), _accessMode( accessMode )
     {}
 
@@ -68,5 +65,3 @@ protected:
 };
 
 }
-
-#endif

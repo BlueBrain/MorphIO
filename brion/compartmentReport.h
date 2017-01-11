@@ -56,6 +56,9 @@ public:
     BRION_API CompartmentReport( const URI& uri, int mode,
                                  const GIDSet& gids = GIDSet( ));
 
+    /** @return the descriptions of all loaded report backends. @version 1.10 */
+    BRION_API static std::string getDescriptions();
+
     /** @name Read API */
     //@{
     /** Update compartment mapping wrt the given GIDs.

@@ -1,5 +1,5 @@
-/* Copyright (c) 2015, EPFL/Blue Brain Project
- *                     Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2015-2017, EPFL/Blue Brain Project
+ *                          Stefan.Eilemann@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -45,6 +45,7 @@ public:
 
     /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );
+    static std::string getDescription();
 
     const URI& getURI() const final;
 

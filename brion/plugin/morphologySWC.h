@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
@@ -35,6 +35,7 @@ public:
 
     /** Check if this plugin can handle the given uri. */
     static bool handles( const MorphologyInitData& initData );
+    static std::string getDescription();
 
     CellFamily getCellFamily() const final;
 

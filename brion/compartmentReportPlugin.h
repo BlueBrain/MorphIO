@@ -17,8 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_COMPARTMENTREPORT_PLUGIN
-#define BRION_COMPARTMENTREPORT_PLUGIN
+#pragma once
 
 #include <brion/api.h>
 #include <brion/types.h>
@@ -182,5 +181,3 @@ inline string to_string( const brion::CompartmentReportInitData& data )
     return to_string( data.getURI( ));
 }
 }
-
-#endif

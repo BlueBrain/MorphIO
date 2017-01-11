@@ -1,6 +1,6 @@
-/* Copyright (c) 2015-2016, EPFL/Blue Brain Project
- *                     Stefan Eilemann <stefan.eilemann@epfl.ch>
- *                     Raphael Dumusc <raphael.dumusc@epfl.ch>
+/* Copyright (c) 2015-2017, EPFL/Blue Brain Project
+ *                          Stefan Eilemann <stefan.eilemann@epfl.ch>
+ *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -22,6 +22,7 @@
 #include <lunchbox/clock.h>
 #include <lunchbox/log.h>
 #include <lunchbox/sleep.h>
+#include <lunchbox/string.h>
 
 #define STREAM_READ_TIMEOUT_MS  500
 #define STREAM_SEND_DELAY_MS   1000
@@ -39,7 +40,11 @@ int main( int argc, char* argv[] )
 {
     if( argc != 3 )
     {
-        LBERROR << "Usage: " << argv[0] <<  " <inURI> <outURI>" << std::endl;
+        std::cerr << "Usage: " << argv[0] <<  " <inURI> <outURI>" << std::endl
+                  << "  Supported input and output URIs:" << std::endl
+                  << lunchbox::string::prepend(
+                         brion::CompartmentReport::getDescriptions(), "    " )
+                  << std::endl;
         return EXIT_FAILURE;
     }
 

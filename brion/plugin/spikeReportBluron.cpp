@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -56,6 +56,12 @@ bool SpikeReportBluron::handles( const SpikeReportInitData& initData )
     const boost::filesystem::path ext =
             boost::filesystem::path( uri.getPath() ).extension();
     return ext == BLURON_REPORT_FILE_EXT;
+}
+
+std::string SpikeReportBluron::getDescription()
+{
+    return "Blue Brain ASCII spike reports:\n"
+           "  [file://]/path/to/report" BLURON_REPORT_FILE_EXT;
 }
 
 const URI& SpikeReportBluron::getURI() const

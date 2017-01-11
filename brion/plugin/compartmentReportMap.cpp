@@ -23,6 +23,9 @@
 #include <lunchbox/bitOperation.h>
 #include <lunchbox/debug.h>
 #include <lunchbox/pluginRegisterer.h>
+#include <lunchbox/string.h>
+
+#include <cstring>
 
 namespace lunchbox
 {
@@ -104,6 +107,12 @@ bool CompartmentReportMap::handles(const CompartmentReportInitData& initData )
 {
     return keyv::Map::handles( initData.getURI( )) &&
            !initData.getURI().getScheme().empty();
+}
+
+std::string CompartmentReportMap::getDescription()
+{
+    return "Blue Brain map-based compartment reports:\n" +
+           lunchbox::string::prepend( keyv::Map::getDescriptions(), "  " );
 }
 
 void CompartmentReportMap::_clear()

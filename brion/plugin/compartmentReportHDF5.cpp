@@ -216,6 +216,12 @@ bool CompartmentReportHDF5::handles( const CompartmentReportInitData& initData )
     return ext == ".h5" || ext == ".hdf5";
 }
 
+std::string CompartmentReportHDF5::getDescription()
+{
+    return "Blue Brain HDF5 compartment reports:"
+           "  [file://]/path/to/report.(h5|hdf5)";
+}
+
 const GIDSet& CompartmentReportHDF5::getGIDs() const
 {
     return _gids;

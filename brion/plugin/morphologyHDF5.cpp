@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -188,6 +188,12 @@ bool MorphologyHDF5::handles( const MorphologyInitData& initData )
         return false;
 
     return path.substr( pos ) == ".h5";
+}
+
+std::string MorphologyHDF5::getDescription()
+{
+    return "Blue Brain hdf5 morphologies:\n"
+           "  [file://]/path/to/morphology.h5";
 }
 
 CellFamily MorphologyHDF5::getCellFamily() const

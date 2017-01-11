@@ -19,6 +19,9 @@
 
 #include <brion/brion.h>
 #include <lunchbox/clock.h>
+#include <lunchbox/file.h>
+#include <lunchbox/string.h>
+#include <lunchbox/term.h>
 #ifdef BRION_USE_BBPTESTDATA
 #  include <BBP/TestDatasets.h>
 #endif
@@ -67,7 +70,14 @@ template< class T > void requireEqualCollections( const T& a, const T& b )
  */
 int main( const int argc, char** argv )
 {
-    po::options_description options( "Options" );
+    const std::string help = lunchbox::getFilename( std::string( argv[0] ));
+    const std::string uriHelp = std::string( "Output report URI\n" ) +
+        "  Supported input and output URIs:\n" +
+        lunchbox::string::prepend( brion::CompartmentReport::getDescriptions(),
+                                   "    " );
+
+    po::options_description options( help.c_str(),
+                                     lunchbox::term::getSize().first );
 
     options.add_options()
         ( "help,h", "Produce help message" )
@@ -77,8 +87,8 @@ int main( const int argc, char** argv )
 #else
         ( "input,i", po::value< std::string >()->required(), "Input report URI")
 #endif
-        ( "output,o", po::value< std::string >()->default_value( "out.h5" ),
-          "Output report URI" )
+        ( "output,o", po::value< std::string >()->default_value( "null://" ),
+          uriHelp.c_str( ))
         ( "maxFrames,m", po::value< size_t >(),
           "Convert at most the given number of frames" )
         ( "gids,g", po::value< std::vector< uint32_t >>()->multitoken(),

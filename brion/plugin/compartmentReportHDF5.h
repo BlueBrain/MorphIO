@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -38,6 +38,7 @@ public:
     virtual ~CompartmentReportHDF5();
 
     static bool handles( const CompartmentReportInitData& initData );
+    static std::string getDescription();
 
     float getStartTime() const final { return _startTime; }
 

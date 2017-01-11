@@ -21,22 +21,24 @@
 #include "compartmentReportPlugin.h"
 
 #include <lunchbox/log.h>
-#include <lunchbox/plugin.h>
 #include <lunchbox/pluginFactory.h>
 #include <boost/filesystem.hpp>
 #include <boost/scoped_ptr.hpp>
 
 namespace brion
 {
+namespace
+{
+using CompartmentPluginFactory =
+    lunchbox::PluginFactory< CompartmentReportPlugin >;
+}
+
 namespace detail
 {
 
 class CompartmentReport
 {
 public:
-    typedef lunchbox::PluginFactory< CompartmentReportPlugin >
-        CompartmentPluginFactory;
-
     explicit CompartmentReport( const CompartmentReportInitData& initData )
         : plugin( CompartmentPluginFactory::getInstance().create( initData ))
     {}
@@ -55,6 +57,11 @@ CompartmentReport::CompartmentReport( const URI& uri, const int mode,
 CompartmentReport::~CompartmentReport()
 {
     delete _impl;
+}
+
+std::string CompartmentReport::getDescriptions()
+{
+    return CompartmentPluginFactory::getInstance().getDescriptions();
 }
 
 const GIDSet& CompartmentReport::getGIDs() const

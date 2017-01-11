@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -66,6 +66,12 @@ bool SpikeReportSimpleStreamer::handles( const SpikeReportInitData& initData )
     const boost::filesystem::path ext =
             boost::filesystem::path( uri.getPath() ).extension();
     return ext == NEST_REPORT_FILE_EXT;
+}
+
+std::string SpikeReportSimpleStreamer::getDescription()
+{
+    return std::string( "Spike stream test reports:\n"
+                        "  [spikes://]/path/to/report" ) + NEST_REPORT_FILE_EXT;
 }
 
 const URI& SpikeReportSimpleStreamer::getURI() const
