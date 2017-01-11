@@ -94,6 +94,9 @@ public:
     /** Destructor. @version 1.3 */
     BRION_API ~SpikeReport();
 
+    /** @return the descriptions of all loaded report backends. @version 1.10 */
+    BRION_API static std::string getDescriptions();
+
     /**
      * Get the URI used to instantiate the report. It could be different from
      * the input URI, depending on the plugin implementation.

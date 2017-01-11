@@ -40,11 +40,12 @@ int main( int argc, char* argv[] )
 {
     if( argc != 3 )
     {
-        std::cerr << "Usage: " << argv[0] <<  " <inURI> <outURI>" << std::endl
+        const auto uriHelp =
+            lunchbox::string::prepend( brion::SpikeReport::getDescriptions(),
+                                       "    " );
+        std::cerr << "Usage: " << argv[0] << " <inURI> <outURI>" << std::endl
                   << "  Supported input and output URIs:" << std::endl
-                  << lunchbox::string::prepend(
-                         brion::CompartmentReport::getDescriptions(), "    " )
-                  << std::endl;
+                  << uriHelp << std::endl;
         return EXIT_FAILURE;
     }
 

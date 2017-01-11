@@ -70,8 +70,9 @@ bool SpikeReportSimpleStreamer::handles( const SpikeReportInitData& initData )
 
 std::string SpikeReportSimpleStreamer::getDescription()
 {
-    return std::string( "Spike stream test reports:\n"
-                        "  [spikes://]/path/to/report" ) + NEST_REPORT_FILE_EXT;
+    return std::string(
+               "Spike stream test reports: [spikes://]/path/to/report" ) +
+           NEST_REPORT_FILE_EXT;
 }
 
 const URI& SpikeReportSimpleStreamer::getURI() const

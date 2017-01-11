@@ -86,8 +86,8 @@ bool SpikeReportBinary::handles( const SpikeReportInitData& initData )
 
 std::string SpikeReportBinary::getDescription()
 {
-    return "Blue Brain binary spike reports:\n"
-           "  [file://]/path/to/report" BINARY_REPORT_FILE_EXT;
+    return "Blue Brain binary spike reports: "
+           "[file://]/path/to/report" BINARY_REPORT_FILE_EXT;
 }
 
 const URI& SpikeReportBinary::getURI() const

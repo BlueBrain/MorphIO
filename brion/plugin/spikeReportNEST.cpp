@@ -119,8 +119,8 @@ bool SpikeReportNEST::handles( const SpikeReportInitData& initData )
 
 std::string SpikeReportNEST::getDescription()
 {
-    return "NEST spike reports:\n"
-           "  [file://]/path/to/report" NEST_REPORT_FILE_EXT;
+    return "NEST spike reports: "
+           "[file://]/path/to/report" NEST_REPORT_FILE_EXT;
 }
 
 float SpikeReportNEST::getStartTime() const

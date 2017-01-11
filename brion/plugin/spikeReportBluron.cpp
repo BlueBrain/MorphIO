@@ -21,7 +21,6 @@
 
 #include "../pluginInitData.h"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/filesystem.hpp>
 #include <lunchbox/pluginRegisterer.h>
 #include <lunchbox/stdExt.h>
@@ -60,8 +59,8 @@ bool SpikeReportBluron::handles( const SpikeReportInitData& initData )
 
 std::string SpikeReportBluron::getDescription()
 {
-    return "Blue Brain ASCII spike reports:\n"
-           "  [file://]/path/to/report" BLURON_REPORT_FILE_EXT;
+    return "Blue Brain ASCII spike reports: "
+           "[file://]/path/to/report" BLURON_REPORT_FILE_EXT;
 }
 
 const URI& SpikeReportBluron::getURI() const

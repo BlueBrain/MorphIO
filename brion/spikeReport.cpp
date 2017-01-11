@@ -36,28 +36,36 @@ const std::string spikePluginDSONamePattern( "Brion.*SpikeReport" );
 
 namespace brion
 {
+namespace
+{
+using SpikePluginFactory = lunchbox::PluginFactory<SpikeReportPlugin>;
+
+class PluginLoader
+{
+public:
+    PluginLoader()
+    {
+        SpikePluginFactory::getInstance().load( BRION_VERSION_ABI,
+                                                lunchbox::getLibraryPaths(),
+                                                spikePluginDSONamePattern );
+    }
+};
+
+void _loadPlugins()
+{
+    static PluginLoader loader; // Use static class instantion for thread-safety
+}
+}
+
 namespace detail
 {
 class SpikeReport
 {
 public:
-    typedef lunchbox::PluginFactory< SpikeReportPlugin > SpikePluginFactory;
-
-    class DSOPluginsLoader
-    {
-    public:
-        DSOPluginsLoader()
-        {
-            SpikePluginFactory::getInstance().load( BRION_VERSION_ABI,
-                                                    lunchbox::getLibraryPaths(),
-                                                    spikePluginDSONamePattern );
-        }
-    };
-
     explicit SpikeReport( const SpikeReportInitData& initData )
     {
-        static DSOPluginsLoader loader;
-        plugin.reset( SpikePluginFactory::getInstance().create( initData ));
+        _loadPlugins();
+        plugin.reset( SpikePluginFactory::getInstance().create( initData ) );
     }
 
     boost::scoped_ptr< SpikeReportPlugin > plugin;
@@ -73,6 +81,12 @@ SpikeReport::~SpikeReport()
 {
     close();
     delete _impl;
+}
+
+std::string SpikeReport::getDescriptions()
+{
+    _loadPlugins();
+    return SpikePluginFactory::getInstance().getDescriptions();
 }
 
 const URI& SpikeReport::getURI() const
