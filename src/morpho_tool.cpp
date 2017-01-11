@@ -33,6 +33,7 @@
 
 #include "mesh_exporter.hpp"
 #include "x3d_exporter.hpp"
+#include "morpho_mesher.hpp"
 
 using namespace std;
 using namespace morpho;
@@ -52,6 +53,7 @@ po::parsed_options parse_args(int argc, char** argv,
                                     "\t\t\n"
                                     "  export gmsh [morphology-file] [geo-file]:\texport morphology file to .geo file format\n"
                                     "  export x3d [morphology-file] [x3d-file]:\texport morphology file to .x3d file format\n"
+                                    "  mesh [morphology-file] [output_mesh_file]:\tCreate a mesh from a morphology\n"
                                     "\n\n"
                                     "Options");
     general.add_options()
@@ -128,6 +130,10 @@ void export_morpho_to_x3d(const std::string & filename_morpho, const std::string
 }
 
 
+std::shared_ptr<morpho_tree> load_morphology(const std::string & morphology_file){
+    h5_v1::morpho_reader reader(morphology_file);
+    return std::shared_ptr<morpho_tree>(new morpho_tree(reader.create_morpho_tree()));
+}
 
 
 int main(int argc, char** argv){
@@ -157,7 +163,15 @@ int main(int argc, char** argv){
                     export_morpho_to_x3d(subargs[2], subargs[3], options);
                     return 0;
                 }
-            };
+            }else if(command == "mesh"){
+                if(subargs.size() == 3){
+                    auto tree = load_morphology(subargs[1]);
+                    morpho_mesher mesher(tree, subargs[2]);
+                    mesher.execute();
+                    return 0;
+                }
+
+            }
         }
 
         fmt::scat(std::cout, "\nWrong command usage, see --help for details\n\n");

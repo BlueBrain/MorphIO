@@ -41,7 +41,6 @@ using namespace boost::numeric;
 class morpho_reader{
 public:
 
-    typedef ublas::matrix<double> mat_points;
     typedef ublas::matrix<int> mat_index;
 
     typedef std::pair<std::size_t, std::size_t> range;

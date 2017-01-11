@@ -24,7 +24,6 @@
 #include <memory>
 #include <bitset>
 
-#include <boost/noncopyable.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 
@@ -34,6 +33,28 @@
 
 namespace morpho{
 
+namespace hg = hadoken::geometry::cartesian;
+
+
+typedef boost::numeric::ublas::matrix<double> mat_points;
+typedef boost::numeric::ublas::matrix_range<mat_points> mat_range_points;
+
+typedef boost::numeric::ublas::vector<double> vec_double;
+typedef boost::numeric::ublas::vector_range<vec_double> vec_double_range;
+
+using range =  boost::numeric::ublas::range;
+
+using point = hg::point3d;
+
+using vector = hg::vector3d;
+
+using linestring = hg::linestring3d;
+
+using sphere = hadoken::geometry::cartesian::sphere3d;
+
+using circle_pipe = std::vector<hg::circle3d>;
+
+using box = hg::box3d;
 
 class branch;
 class morpho_tree;
@@ -77,24 +98,6 @@ private:
 ///
 class branch : public morpho_node{
 public:
-
-    typedef boost::numeric::ublas::matrix<double> mat_points;
-    typedef boost::numeric::ublas::matrix_range<mat_points> mat_range_points;
-
-    typedef boost::numeric::ublas::vector<double> vec_double;
-    typedef boost::numeric::ublas::vector_range<vec_double> vec_double_range;
-
-    using range =  boost::numeric::ublas::range;
-
-    using point = hadoken::geometry::cartesian::point3d;
-
-    using vector = hadoken::geometry::cartesian::vector3d;
-
-    using linestring = hadoken::geometry::cartesian::linestring3d;
-
-    using circle_pipe = std::vector<hadoken::geometry::cartesian::circle3d>;
-
-
 
     inline branch(branch_type type_b) : morpho_node(type_b), _parent(nullptr), _id(0) {}
 
@@ -151,6 +154,63 @@ public:
                       _points(id, 2));
     }
 
+    inline virtual box get_bounding_box() const{
+        typedef point::value_type float_type;
+        const float_type max_val = std::numeric_limits<float_type>::max();
+
+        float_type x_min(max_val), y_min(max_val), z_min(max_val);
+        float_type radius(-max_val);
+        float_type x_max(-max_val), y_max(-max_val), z_max(-max_val);
+
+        if( get_size() == 0){
+            std::out_of_range("impossible to get bounding box of null node");
+        }
+
+        for(std::size_t i =0; i < get_size(); ++i){
+            point current_point = get_point(i);
+            x_min = std::min(x_min, hg::get_x(current_point));
+            y_min = std::min(y_min, hg::get_y(current_point));
+            z_min = std::min(z_min, hg::get_z(current_point));
+
+            x_max = std::max(x_max, hg::get_x(current_point));
+            y_max = std::max(y_max, hg::get_y(current_point));
+            z_max = std::max(z_max, hg::get_z(current_point));
+
+            radius = std::max(radius, _distances[i]);
+        }
+
+        return box(point(x_min - radius, y_min - radius , z_min - radius), point(x_max + radius, y_max + radius , z_max + radius));
+    }
+
+
+    ///
+    /// \brief get_segment_bounding_box
+    /// \param pos
+    /// \return bounding box of segment n of the given branch
+    ///
+    inline box get_segment_bounding_box(std::size_t n) const{
+        if(n >= get_size()){
+            throw std::out_of_range(hadoken::format::scat("segment ", n, " is out of bound"));
+        }
+
+        auto p1 = get_point(n);
+        auto p2 = get_point(n+1);
+        double radius = std::max(_distances[n], _distances[n+1]);
+
+        const point p_min(std::min(get_x(p1), get_x(p2)),
+                    std::min(get_y(p1), get_y(p2)),
+                    std::min(get_z(p1), get_z(p2)));
+
+        const point p_max(std::max(get_x(p1), get_x(p2)),
+                    std::max(get_y(p1), get_y(p2)),
+                    std::max(get_z(p1), get_z(p2)));
+
+        const point offset_radius(radius, radius, radius);
+
+
+        return box(p_min - offset_radius, p_max + offset_radius);
+    }
+
     ///
     /// \brief get_linestring
     /// \return
@@ -199,13 +259,21 @@ private:
 ///
 class branch_soma : public branch{
 public:
-    using sphere = hadoken::geometry::cartesian::sphere3d;
-
     inline branch_soma() : branch(branch_type::soma) {}
     inline virtual ~branch_soma(){}
 
-
    inline  sphere get_sphere() const;
+
+
+   inline virtual box get_bounding_box() const{
+       auto s = get_sphere();
+       auto radius = s.get_radius();
+       auto center = s.get_center();
+
+
+       return box( center - point(radius, radius, radius),
+                   center + point (radius, radius, radius));
+   }
 
 
 private:
@@ -244,6 +312,7 @@ public:
     }
 
 
+
     ///
     /// \brief insert a new child branch intro the tree, as children of parent_id branch
     /// \param parent_id
@@ -278,6 +347,23 @@ public:
         return *(_branches[id_branch]);
     }
 
+
+    inline box get_bounding_box() const{
+        typedef point::value_type float_type;
+        const float_type max_val = std::numeric_limits<float_type>::max();
+
+        float_type x_min(max_val), y_min(max_val), z_min(max_val);
+        float_type x_max(-max_val), y_max(-max_val), z_max(-max_val);
+
+        box res(point(x_min, y_min, z_min), point(x_max, y_max, z_max));
+
+        std::for_each(_branches.begin(), _branches.end(), [&](const std::unique_ptr<branch> &  b_ptr){
+            box branch_box = b_ptr->get_bounding_box();
+            res = merge_box(branch_box, res);
+        });
+
+        return res;
+    }
 
     ///
     /// \brief get number of branch

@@ -31,12 +31,12 @@ namespace morpho{
 
 
 
-void points_distance_to_sphere(const branch::point & point, double distance,
+void points_distance_to_sphere(const point & my_point, double distance,
                                const std::string & sphere_unit_name,
                                std::ostream & output){
 
     fmt::scat(output,
-    "<Transform translation='", geo::get_x(point), " ", geo::get_y(point), " ", geo::get_z(point),
+    "<Transform translation='", geo::get_x(my_point), " ", geo::get_y(my_point), " ", geo::get_z(my_point),
             "' scale='", distance/2," ", distance/2 ," ",distance/2 ,"' >" "\n"
     "  <Shape USE=\"",sphere_unit_name,"\" />"  "\n"
     "</Transform>"  "\n"

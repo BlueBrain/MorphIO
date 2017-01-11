@@ -36,17 +36,25 @@ class spatial_index_impl;
 ///
 /// Able to load any morphology and to check if a given point is part of a morphology or not
 ///
-
 class spatial_index
 {
 public:
     spatial_index();
+    ~spatial_index();
 
     ///
     /// \brief include a morpho tree and all its elements to the current spatial index
     /// \param tree
     ///
     void add_morpho_tree(const std::shared_ptr<morpho_tree> & tree);
+
+
+    ///
+    /// test if a point p is withing a morphology volume or not
+    ///
+    /// \return true if p is part of a morphology volume, else false
+    ///
+    bool is_within(point p) const;
 
 private:
 

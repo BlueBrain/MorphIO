@@ -7,8 +7,8 @@ namespace morpho{
 
 namespace {
 
-inline void soma_gravity_center(const branch::mat_points & raw_points,
-                                                             branch::point & center,
+inline void soma_gravity_center(const mat_points & raw_points,
+                                                             point & center,
                                                              double & distance){
     namespace geo = hadoken::geometry::cartesian;
     distance =0;
@@ -26,7 +26,7 @@ inline void soma_gravity_center(const branch::mat_points & raw_points,
 
     // compute average distance from gravity center
     for(std::size_t i = 0; i < raw_points.size1(); ++i){
-        const branch::point p( raw_points(i,0),
+        const point p( raw_points(i,0),
                               raw_points(i,1),
                               raw_points(i,2) );
 
@@ -38,9 +38,9 @@ inline void soma_gravity_center(const branch::mat_points & raw_points,
 
 
 // return the tangeante of a 3 points linestring in point 2
-inline branch::vector get_tangente_axis(const branch::point & p1, const branch::point & p2, const branch::point & p3){
+inline vector get_tangente_axis(const point & p1, const point & p2, const point & p3){
     namespace geo = hadoken::geometry::cartesian;
-    branch::vector v1 = p2 - p1, v2 = p3 - p2;
+    vector v1 = p2 - p1, v2 = p3 - p2;
 
     return v1 + v2;
 }
@@ -49,7 +49,7 @@ inline branch::vector get_tangente_axis(const branch::point & p1, const branch::
 }
 
 
-branch::linestring branch::get_linestring() const{
+linestring branch::get_linestring() const{
     namespace geo = hadoken::geometry::cartesian;
     linestring res;
     res.reserve(get_size()+1);
@@ -77,7 +77,7 @@ branch::linestring branch::get_linestring() const{
 
 
 
-branch::circle_pipe branch::get_circle_pipe() const{
+circle_pipe branch::get_circle_pipe() const{
     namespace geo = hadoken::geometry::cartesian;
     circle_pipe res;
     res.reserve(get_size());
@@ -97,7 +97,7 @@ branch::circle_pipe branch::get_circle_pipe() const{
             res.emplace_back(geo::circle3d(center, radius, axis));
 
         }else{
-            branch::circle_pipe parent_circle_pipe = _parent->get_circle_pipe();
+            circle_pipe parent_circle_pipe = _parent->get_circle_pipe();
             if(parent_circle_pipe.size() < 1){
                 throw std::runtime_error("Invalid parent circle pipe, requires at least parent to have circle pipe >= 1 circle element");
             }
@@ -110,7 +110,7 @@ branch::circle_pipe branch::get_circle_pipe() const{
     for(std::size_t i =0; i < get_size(); ++i){
         const auto  & prev_center = res.back().get_center();
         auto center = get_point(i);
-        branch::vector axis;
+        vector axis;
 
         // compute the axis based on the tangente if we are not the last point
         if(i < get_size() -1){
@@ -136,7 +136,7 @@ branch::circle_pipe branch::get_circle_pipe() const{
 }
 
 
-branch_soma::sphere branch_soma::get_sphere() const{
+sphere branch_soma::get_sphere() const{
     namespace fmt = hadoken::format;
     switch(get_size()){
         case 0:
@@ -145,7 +145,7 @@ branch_soma::sphere branch_soma::get_sphere() const{
             return sphere(get_point(0), get_distances()[0]);
         default:{
             double radius;
-            branch::point center;
+            point center;
             soma_gravity_center(get_points(), center, radius);
             return sphere(center, radius);
         }

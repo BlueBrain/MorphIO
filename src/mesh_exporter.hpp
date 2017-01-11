@@ -16,8 +16,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef MESH_EXPORTER_H
-#define MESH_EXPORTER_H
+#ifndef MESH_EXPORTER_HPP
+#define MESH_EXPORTER_HPP
 
 #include <fstream>
 #include <iostream>

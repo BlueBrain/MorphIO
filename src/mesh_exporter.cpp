@@ -435,7 +435,7 @@ void gmsh_abstract_file::export_volume_to_stream_dmg(ostream &out){
 //++nreg;
         fmt::scat(out, p->id, " 1\n", " ", p->ids.size(), "\n");
         for(auto & id: p->ids){
-            fmt::scat(out, "  ", std::abs(id));
+            fmt::scat(out, "  ", id);
             if (id > 0)
                 fmt::scat(out, " 1\n");
             else
@@ -939,7 +939,7 @@ void create_gmsh_truncated_pipe(gmsh_abstract_file & vfile, const std::vector<ge
 void gmsh_exporter::construct_gmsh_3d_object(morpho_tree & tree, branch & current_branch, gmsh_abstract_file & vfile){
 
     if(current_branch.get_type() == branch_type::soma){
-        branch_soma::sphere soma_sphere = static_cast<branch_soma&>(current_branch).get_sphere();
+        sphere soma_sphere = static_cast<branch_soma&>(current_branch).get_sphere();
         create_gmsh_sphere(vfile, soma_sphere);
     }else{
 
