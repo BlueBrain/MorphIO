@@ -28,6 +28,7 @@
 #include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
 #include <lunchbox/log.h>
+#include <servus/uint128_t.h>
 
 using boost::lexical_cast;
 
@@ -358,11 +359,12 @@ BOOST_AUTO_TEST_CASE( test_convert_and_compare )
     test_compare( source, brion::URI( path.string() + "allCompartments.h5" ));
 
     const boost::filesystem::path& temp = createUniquePath();
+    const std::string random = servus::make_UUID().getString();
     std::vector< brion::URI > uris;
 
     uris.push_back( brion::URI( temp.string() + ".h5" ));
-    uris.push_back( brion::URI( "leveldb:///briontest" ));
-    uris.push_back( brion::URI( "memcached:///briontest" ));
+    uris.push_back( brion::URI( std::string( "leveldb:///" ) + random ));
+    uris.push_back( brion::URI( std::string( "memcached:///" ) + random ));
 
     while( !uris.empty( ))
     {
@@ -386,6 +388,19 @@ BOOST_AUTO_TEST_CASE( test_convert_and_compare )
                 }
             }
         }
+    }
+
+    for( const auto& uri : uris )
+    {
+        try
+        {
+            brion::CompartmentReport report( uri, brion::MODE_READ );
+            if( report.erase( ))
+                BOOST_CHECK_THROW(
+                    brion::CompartmentReport( uri, brion::MODE_READ ),
+                    std::runtime_error );
+        }
+        catch( const std::runtime_error&  ) { /* ignore */ }
     }
 }
 
