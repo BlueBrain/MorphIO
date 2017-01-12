@@ -21,14 +21,27 @@
 #define BRION_PLUGIN_COMPARTMENTREPORTMAP
 
 #include "compartmentReportCommon.h"
-#include <lunchbox/stdExt.h>
 #include <keyv/Map.h>
+#include <lunchbox/stdExt.h>
 
 namespace brion
 {
 namespace plugin
 {
-/** A read/write report using a keyv::Map as backend */
+/**
+ * A read/write report using a keyv::Map as backend
+ *
+ * Stores the report as a set of fine-grained key-value pairs. A namespace for
+ * the underlying keyv::Map is enforced and serves as the "filename" for the
+ * report. The private _getFOOKey() methods define the key names. The header,
+ * gids, dunit and tunit KV pairs contain the corresponding global information
+ * about the report. Each counts key stores the mapping for the corresponding
+ * neuron. Consequently, the ctor and updateMapping() reads four header KV pairs
+ * and gids.size() mapping KV pairs. The value KV pair contains all values for
+ * one neuron at one time step. loadFrame() reads gids.size() KV-pairs, and
+ * loadNeuron reads nTimesteps KV pairs. These two, and reading the mapping, use
+ * the asynchronous bulk operation keyv::Map::takeValues() for performance.
+ */
 class CompartmentReportMap : public CompartmentReportCommon
 {
 public:
@@ -49,15 +62,17 @@ public:
     const SectionOffsets& getOffsets() const final { return _offsets; }
     size_t getFrameSize() const final { return _totalCompartments; }
     const CompartmentCounts& getCompartmentCounts() const final
-        { return _counts; }
+    {
+        return _counts;
+    }
 
     floatsPtr loadFrame( float timestamp ) const final;
     floatsPtr loadNeuron( uint32_t gid ) const final;
 
     void updateMapping( const GIDSet& gids ) final;
 
-    void writeHeader( float startTime, float endTime,
-                      float timestep, const std::string& dunit,
+    void writeHeader( float startTime, float endTime, float timestep,
+                      const std::string& dunit,
                       const std::string& tunit ) final;
     bool writeCompartments( uint32_t gid, const uint16_ts& counts ) final;
     bool writeFrame( uint32_t gid, const floats& voltages,
@@ -76,7 +91,7 @@ public:
     };
 
 private:
-    std::vector< keyv::Map > _stores;
+    std::vector<keyv::Map> _stores;
 
     Header _header;
 
@@ -101,29 +116,32 @@ private:
     uint64_t _totalCompartments;
 
     // <GID, num compartments per section>
-    typedef std::map< uint32_t, brion::uint16_ts > CellCompartments;
+    typedef std::map<uint32_t, brion::uint16_ts> CellCompartments;
     CellCompartments _cellCounts;
 
     bool _readable;
 
-    using OffsetMap = std::unordered_map< std::string, size_t >;
+    using OffsetMap = std::unordered_map<std::string, size_t>;
 
     void _clear();
     bool _loadHeader();
     bool _flushHeader();
     bool _load( floatsPtr buffer, const Strings& keys,
-                const OffsetMap& offsets) const;
+                const OffsetMap& offsets ) const;
 
     std::string _getHeaderKey() const { return "header"; }
     std::string _getGidsKey() const { return "gids"; }
     std::string _getTunitKey() const { return "tunit"; }
     std::string _getDunitKey() const { return "dunit"; }
     std::string _getCountsKey( const uint32_t gid ) const
-        { return "counts_" + std::to_string( gid ); }
+    {
+        return "counts_" + std::to_string( gid );
+    }
     std::string _getValueKey( const uint32_t gid, const size_t frame ) const
-        { return std::to_string( gid ) + "_" + std::to_string( frame ); }
+    {
+        return std::to_string( gid ) + "_" + std::to_string( frame );
+    }
 };
-
 }
 }
 
