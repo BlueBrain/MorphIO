@@ -54,7 +54,7 @@ public:
     ///
     /// \return true if p is part of a morphology volume, else false
     ///
-    bool is_within(point p) const;
+    bool is_within(const point & p) const;
 
 private:
 

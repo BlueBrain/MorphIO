@@ -52,6 +52,8 @@ using linestring = hg::linestring3d;
 
 using sphere = hadoken::geometry::cartesian::sphere3d;
 
+using cone = hadoken::geometry::cartesian::cone3d;
+
 using circle_pipe = std::vector<hg::circle3d>;
 
 using box = hg::box3d;
@@ -182,6 +184,13 @@ public:
         return box(point(x_min - radius, y_min - radius , z_min - radius), point(x_max + radius, y_max + radius , z_max + radius));
     }
 
+    inline cone get_segment(std::size_t n){
+        if(n >= get_size()){
+            throw std::out_of_range(hadoken::format::scat("segment ", n, " is out of bound"));
+        }
+
+        return cone(get_point(n), _distances[n], get_point(n+1), _distances[n+1]);
+    }
 
     ///
     /// \brief get_segment_bounding_box
@@ -210,6 +219,29 @@ public:
 
         return box(p_min - offset_radius, p_max + offset_radius);
     }
+
+
+    inline sphere get_junction(std::size_t n){
+        if(n >= get_size()){
+            throw std::out_of_range(hadoken::format::scat("segment ", n, " is out of bound"));
+        }
+        n+=1;
+
+        return sphere(get_point(n), _distances[n]);
+    }
+
+    ///
+    /// \brief get_junction_sphere_bounding_box
+    /// \param n
+    /// \return bounding box for each junction between two segment
+    ///
+    ///  The junction is modelise as a sphere of the radius at junction point.
+    ///  Only the junction of the end of each segment is return
+    ///  e.g junction 0 = end of the segment 0
+    inline box get_junction_sphere_bounding_box(std::size_t n){
+        return hg::envelope_sphere_return<box, sphere>(get_junction(n));
+    }
+
 
     ///
     /// \brief get_linestring
@@ -267,12 +299,7 @@ public:
 
    inline virtual box get_bounding_box() const{
        auto s = get_sphere();
-       auto radius = s.get_radius();
-       auto center = s.get_center();
-
-
-       return box( center - point(radius, radius, radius),
-                   center + point (radius, radius, radius));
+       return hg::envelope_sphere_return<box, sphere>(s);
    }
 
 

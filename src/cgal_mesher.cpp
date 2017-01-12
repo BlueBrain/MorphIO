@@ -119,8 +119,9 @@ void morpho_mesher::execute(){
     Mesh_domain domain(domain_distance,
                        K::Sphere_3(CGAL::ORIGIN, max_distance*max_distance));
     // Mesh criteria
-    Mesh_criteria criteria(facet_angle=30, facet_size=0.1*10, facet_distance=0.025*10,
-                           cell_radius_edge_ratio=2, cell_size=0.1*10);
+    //Spherical_sizing_field size;
+    Mesh_criteria criteria(facet_angle=30, facet_size=0.1*8, facet_distance=0.025*8,
+                           cell_radius_edge_ratio=2, cell_size=0.3 /*0.1*8*/);
 
     // Mesh generation
     std::cout << "4- Start mesh generation " << std::endl;
@@ -136,12 +137,21 @@ void morpho_mesher::execute(){
 
 
     // Output
-    const std::string local_mesh_output_file =_output_mesh_file + ".mesh";
-    std::cout << "output meshing to " << local_mesh_output_file << std::endl;
+    {
+        const std::string local_3dmesh_output_file =_output_mesh_file + ".3d.mesh";
+        std::cout << "- output 3D mesh to " << local_3dmesh_output_file << std::endl;
 
-    std::ofstream medit_file(local_mesh_output_file);
-    c3t3.output_to_medit(medit_file);
+        std::ofstream medit_file(local_3dmesh_output_file);
+        c3t3.output_to_medit(medit_file);
+    }
 
+    {
+        const std::string local_surface_mesh_output_file =_output_mesh_file + ".surface.off";
+        std::cout << "- output surface mesh to " << local_surface_mesh_output_file << std::endl;
+
+        std::ofstream off_file(local_surface_mesh_output_file);
+        c3t3.output_boundary_to_off(off_file);
+    }
 }
 
 
