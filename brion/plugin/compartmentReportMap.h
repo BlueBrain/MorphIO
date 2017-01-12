@@ -78,6 +78,7 @@ public:
     bool writeFrame( uint32_t gid, const floats& voltages,
                      float timestamp ) final;
     bool flush() final;
+    bool erase() final;
 
     struct Header
     {

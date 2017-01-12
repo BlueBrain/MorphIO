@@ -89,6 +89,8 @@ int main( const int argc, char** argv )
 #endif
         ( "output,o", po::value< std::string >()->default_value( "null://" ),
           uriHelp.c_str( ))
+        ( "erase,e", po::value< std::string >(),
+          "Erase the given report (map-based reports only)" )
         ( "maxFrames,m", po::value< size_t >(),
           "Convert at most the given number of frames" )
         ( "gids,g", po::value< std::vector< uint32_t >>()->multitoken(),
@@ -120,6 +122,16 @@ int main( const int argc, char** argv )
         std::cout << "Brion compartment report converter "
                   << brion::Version::getString() << std::endl;
         return EXIT_SUCCESS;
+    }
+
+    if( vm.count( "erase" ))
+    {
+        lunchbox::URI outURI( vm[ "erase" ].as< std::string >( ));
+        brion::CompartmentReport report( outURI, brion::MODE_READ );
+        if( report.erase( ))
+            return EXIT_SUCCESS;
+        std::cerr << "Could not erase " << outURI << std::endl;
+        return EXIT_FAILURE;
     }
 
     std::string input;

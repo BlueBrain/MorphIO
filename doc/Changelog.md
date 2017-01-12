@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [126](https://github.com/BlueBrain/Brion/pull/126):
+  Add erase for map compartment reports
 * [122](https://github.com/BlueBrain/Brion/pull/122):
   Support loading of individual neurons for binary and map compartment reports
 * [121](https://github.com/BlueBrain/Brion/pull/121):

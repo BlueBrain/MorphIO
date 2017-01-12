@@ -199,6 +199,34 @@ bool CompartmentReportMap::flush()
     return true;
 }
 
+bool CompartmentReportMap::erase()
+{
+    if( !_readable )
+    {
+        LBINFO << "Can't remove report, missing header information in store"
+               << std::endl;
+        return false;
+    }
+
+    auto& store = _stores.front();
+    for( const uint32_t gid : _gids )
+    {
+        const size_t nFrames =
+            ( _header.endTime - _header.startTime ) / _header.timestep;
+        for( size_t i = 0; i < nFrames; ++i )
+            store.erase( _getValueKey( gid, i ) );
+
+        store.erase( _getCountsKey( gid ) );
+    }
+    store.erase( _getHeaderKey() );
+    store.erase( _getGidsKey() );
+    store.erase( _getDunitKey() );
+    store.erase( _getTunitKey() );
+
+    _clear();
+    return true;
+}
+
 bool CompartmentReportMap::_flushHeader()
 {
     if( _readable )
@@ -362,7 +390,6 @@ floatsPtr CompartmentReportMap::loadFrame( const float time ) const
 {
     if( !_readable )
         return floatsPtr();
-
 
     OffsetMap offsetMap;
     size_t offset = 0;

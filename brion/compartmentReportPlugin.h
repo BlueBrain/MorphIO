@@ -20,11 +20,11 @@
 #pragma once
 
 #include <brion/api.h>
-#include <brion/types.h>
 #include <brion/pluginInitData.h>
+#include <brion/types.h>
 
-#include <lunchbox/log.h>
 #include <boost/noncopyable.hpp>
+#include <lunchbox/log.h>
 
 namespace brion
 {
@@ -145,8 +145,8 @@ public:
     virtual size_t getBufferSize() const { return 0; }
 
     /** @copydoc brion::CompartmentReport::writeHeader */
-    virtual void writeHeader( float startTime, float endTime,
-                              float timestep, const std::string& dunit,
+    virtual void writeHeader( float startTime, float endTime, float timestep,
+                              const std::string& dunit,
                               const std::string& tunit ) = 0;
 
     /** @copydoc brion::CompartmentReport::writeCompartments */
@@ -158,6 +158,9 @@ public:
 
     /** @copydoc brion::CompartmentReport::flush */
     virtual bool flush() = 0;
+
+    /** @copydoc brion::CompartmentReport::erase */
+    virtual bool erase() { return false; }
     //@}
 
     /** @copydoc brion::CompartmentReport::getIndex */

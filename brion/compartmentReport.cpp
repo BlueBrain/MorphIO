@@ -181,4 +181,8 @@ bool CompartmentReport::flush()
     return _impl->plugin->flush();
 }
 
+bool CompartmentReport::erase()
+{
+    return _impl->plugin->erase();
+}
 }

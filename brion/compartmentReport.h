@@ -153,6 +153,8 @@ public:
 
     /** Load report values for the given neuron.
      *
+     * May not be implemented by all backends (e.g. HDF5).
+     *
      * @param gid the neuron identifier
      * @return the report values if neuron is found, nullptr otherwise
      * @version 1.10
@@ -178,7 +180,6 @@ public:
     BRION_API void clearBuffer();
     //@}
 
-
     /** @name Write API */
     //@{
     /** Write the header information of this report.
@@ -191,8 +192,8 @@ public:
      * @throw std::invalid_argument if any passed argument is invalid
      * @version 1.0
      */
-    BRION_API void writeHeader( float startTime, float endTime,
-                                float timestep, const std::string& dunit,
+    BRION_API void writeHeader( float startTime, float endTime, float timestep,
+                                const std::string& dunit,
                                 const std::string& tunit );
 
     /** Write the compartment counts for each section for one cell.
@@ -204,8 +205,7 @@ public:
      * @return false if saving was not successful, true otherwise
      * @version 1.0
      */
-    BRION_API bool writeCompartments( uint32_t gid,
-                                      const uint16_ts& counts );
+    BRION_API bool writeCompartments( uint32_t gid, const uint16_ts& counts );
 
     /** Write the voltages for one cell at a point in time.
      *
@@ -223,12 +223,20 @@ public:
 
     /** Flush data to output. @return true on success. @version 1.0 */
     BRION_API bool flush();
+
+    /**
+     * Remove all data of the report from storage.
+     *
+     * May not be implemented by all backends, such as file-based reports.
+     * @return true if data was removed.
+     * @version 1.10
+     */
+    BRION_API bool erase();
     //@}
 
 private:
     detail::CompartmentReport* _impl;
 };
-
 }
 
 #endif
