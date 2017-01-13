@@ -3,8 +3,10 @@
 #include <tuple>
 
 #include <hadoken/containers/small_vector.hpp>
+#include <hadoken/math/math_floating_point.hpp>
+
 #include <boost/geometry/index/rtree.hpp>
- #include <boost/geometry/index/indexable.hpp>
+#include <boost/geometry/index/indexable.hpp>
 
 namespace morpho{
 
@@ -74,6 +76,8 @@ inline bool point_is_in_sphere(const sphere & s, const point & p1){
 }
 
 inline bool point_is_in_truncated_cones(const cone & c, const point & p1){
+    using namespace hadoken::math;
+
     const point x1_cone = c.get_center<0>();
     const point x2_cone = c.get_center<1>();
 
@@ -83,16 +87,24 @@ inline bool point_is_in_truncated_cones(const cone & c, const point & p1){
    /* std::cout << "test cone" << x1_cone << "," << x1_radius << " " << x2_cone
               << "," << x2_radius << std::endl;*/
 
-    const vector v_axis = hg::normalize(vector(x2_cone - x1_cone));
-    const vector v_to_point(p1 - x1_cone);
-    double lenght = hg::distance(x2_cone, x1_cone);
+    const vector v_axis_diff = vector(x2_cone - x1_cone);
+    double length = hg::norm(v_axis_diff);
 
-    double dotprodv = hg::dot_product(v_to_point, v_axis);
-    if( dotprodv < 0 || dotprodv > lenght){
+    if(close_to_abs<double>(length, 0.0)){
+        // null segment
         return false;
     }
 
-    double radius_at_projection = (dotprodv / lenght * (x2_radius - x1_radius)) + x1_radius;
+
+    const vector v_axis = v_axis_diff * (1.0 / length);
+    const vector v_to_point(p1 - x1_cone);
+
+    double dotprodv = hg::dot_product(v_to_point, v_axis);
+    if( dotprodv < 0 || dotprodv > length){
+        return false;
+    }
+
+    double radius_at_projection = (dotprodv / length * (x2_radius - x1_radius)) + x1_radius;
 
     const point proj_point = v_axis * dotprodv + x1_cone;
 

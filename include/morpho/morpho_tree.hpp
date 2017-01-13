@@ -225,7 +225,6 @@ public:
         if(n >= get_size()){
             throw std::out_of_range(hadoken::format::scat("segment ", n, " is out of bound"));
         }
-        n+=1;
 
         return sphere(get_point(n), _distances[n]);
     }

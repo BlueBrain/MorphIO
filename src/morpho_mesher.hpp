@@ -20,6 +20,7 @@
 #define MORPHO_MESHER_HPP
 
 #include <morpho/morpho_tree.hpp>
+#include <bitset>
 
 namespace morpho{
 
@@ -28,12 +29,40 @@ namespace morpho{
 ///
 class morpho_mesher{
 public:
+    enum mesh_tag{
+        mesh_optimisation = 0,
+        only_surface = 1,
+        force_manifold = 2,
+
+    };
+
+    ///
+    /// \brief construct a Mesher object from a morphology tree
+    /// \param tree morphology tree to use
+    /// \param output_mesh_file filepath of the mesh to export
+    ///
     morpho_mesher(const std::shared_ptr<morpho_tree> & tree, const std::string & output_mesh_file);
 
+
+    ///
+    /// \brief enable or disable an option for the meshing process
+    /// \param value
+    ///
+    void set_mesh_tag(mesh_tag, bool value);
+
+    ///
+    /// \brief start meshing process
+    ///
     void execute();
+
+
 private:
+    std::bitset<64> _flags;
     std::string _output_mesh_file;
     std::shared_ptr<morpho_tree> _tree;
+
+    void execute_3d_meshing();
+    void execute_surface_meshing();
 };
 
 

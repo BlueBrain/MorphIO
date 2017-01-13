@@ -66,6 +66,8 @@ po::parsed_options parse_args(int argc, char** argv,
         ("with-bounding-box", "gmsh: add a bounding box to the geometry based on neurons info")
         ("single-soma", "gmsh: represent soma as a single element, point or sphere")
         ("sphere", "x3d: export cloud of sphere (default)")
+        ("only-surface", "mesh: do only surface meshing")
+        ("force-manifold", "mesh: force generation of manifold mesh, valid only for surface mesh")
         ("command", po::value<std::string>(), "command to execute")
         ("subargs", po::value<std::vector<std::string> >(), "Arguments for command");
         ;
@@ -167,6 +169,17 @@ int main(int argc, char** argv){
                 if(subargs.size() == 3){
                     auto tree = load_morphology(subargs[1]);
                     morpho_mesher mesher(tree, subargs[2]);
+
+
+                    if(options.count("only-surface")){
+                        mesher.set_mesh_tag(morpho_mesher::only_surface, true);
+                    }
+
+                    if(options.count("force-manifold")){
+                        mesher.set_mesh_tag(morpho_mesher::force_manifold, true);
+                    }
+
+
                     mesher.execute();
                     return 0;
                 }

@@ -38,6 +38,7 @@ class spatial_index_impl;
 ///
 class spatial_index
 {
+
 public:
     spatial_index();
     ~spatial_index();
