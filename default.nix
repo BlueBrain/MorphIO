@@ -1,25 +1,16 @@
 # Nix development environment
 #
-# build:
-# nix-build -I "BBPpkgs=https://github.com/BlueBrain/bbp-nixpkgs/archive/master.tar.gz" default.nix
+# nix-build -I "BPPpkgs=https://github.com/adevress/bbp-nixpkgs/archive/master.tar.gz" default.nix
+# nix-shell -I "BPPpkgs=https://github.com/adevress/bbp-nixpkgs/archive/master.tar.gz"  default.nix
 #
-# build and test:
-# nix-build -I "BBPpkgs=https://github.com/BlueBrain/bbp-nixpkgs/archive/master.tar.gz" --arg testExec true  default.nix  -j 4
-#
-# dev shell:
-# nix-shell -I "BBPpkgs=https://github.com/BlueBrain/bbp-nixpkgs/archive/master.tar.gz"  default.nix
-#
-with import <BBPpkgs> { };
+with import <BBPpkgs> {};
+{
 
-
-
-stdenv.mkDerivation rec {
-      name = "mvdtool-DEV";
-      src = ./.;
-      buildInputs = [stdenv pkgconfig boost cmake hdf5 doxygen zlib];
-
-      doCheck = true;
-      checkPhase = "ctest -V";
+    morpho-tool = morpho-tool.overrideDerivation (oldAttr: rec {
+      name = "morpho-tool-DEV_ENV";
+      src = ./.;      
+    });
 
 }
+
 
