@@ -51,9 +51,9 @@ public:
 
 
     ///
-    /// test if a point p is withing a morphology volume or not
+    /// test if a point p is within a morphology space or not
     ///
-    /// \return true if p is part of a morphology volume, else false
+    /// \return true if p is part of a morphology space else false
     ///
     bool is_within(const point & p) const;
 
