@@ -177,14 +177,6 @@ bool CompartmentReportMap::writeFrame( const uint32_t gid,
     if( !_flushHeader( ))
         return false;
 
-#ifndef NDEBUG
-    const uint16_ts& counts =
-        _stores.front().getVector< uint16_t >( _getCountsKey( gid ));
-    const size_t size = std::accumulate( counts.begin(), counts.end(), 0 );
-    LBASSERTINFO( size == voltages.size(), "gid " << gid << " should have " <<
-                  size << " voltages not " << voltages.size( ));
-#endif
-
     const size_t index = _getFrameNumber( time );
     const std::string& key = _getValueKey( gid, index );
     return _stores.front().insert( key, voltages );
@@ -209,19 +201,19 @@ bool CompartmentReportMap::erase()
     }
 
     auto& store = _stores.front();
+    const size_t nFrames =
+        ( _header.endTime - _header.startTime ) / _header.timestep;
     for( const uint32_t gid : _gids )
     {
-        const size_t nFrames =
-            ( _header.endTime - _header.startTime ) / _header.timestep;
         for( size_t i = 0; i < nFrames; ++i )
-            store.erase( _getValueKey( gid, i ) );
+            store.erase( _getValueKey( gid, i ));
 
-        store.erase( _getCountsKey( gid ) );
+        store.erase( _getCountsKey( gid ));
     }
-    store.erase( _getHeaderKey() );
-    store.erase( _getGidsKey() );
-    store.erase( _getDunitKey() );
-    store.erase( _getTunitKey() );
+    store.erase( _getHeaderKey( ));
+    store.erase( _getGidsKey( ));
+    store.erase( _getDunitKey( ));
+    store.erase( _getTunitKey( ));
 
     _clear();
     return true;

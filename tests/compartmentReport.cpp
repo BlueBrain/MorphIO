@@ -366,17 +366,18 @@ BOOST_AUTO_TEST_CASE( test_convert_and_compare )
     uris.push_back( brion::URI( std::string( "leveldb:///" ) + random ));
     uris.push_back( brion::URI( std::string( "memcached:///" ) + random ));
 
-    while( !uris.empty( ))
+    auto remaining = uris;
+    while( !remaining.empty( ))
     {
-        const brion::URI first = uris.back();
-        uris.pop_back();
+        const brion::URI first = remaining.back();
+        remaining.pop_back();
 
         if( convert( source, first )) // bootstrap first from source
         {
             test_compare( source, first );
             testPerf( first );
 
-            BOOST_FOREACH( const brion::URI& second, uris )
+            for( const brion::URI& second : remaining )
             {
                 if( convert( source, second )) // bootstrap second from source
                 {
