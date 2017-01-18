@@ -371,25 +371,28 @@ BOOST_AUTO_TEST_CASE( test_convert_and_compare )
     test_compare( source, brion::URI( path.string() + "allCompartments.h5" ));
 
     const boost::filesystem::path& temp = createUniquePath();
-    const std::string random = servus::make_UUID().getString();
+    const std::string store = std::string( "?store=" ) + temp.string() + ".ldb";
+
     std::vector< brion::URI > uris;
-
     uris.push_back( brion::URI( temp.string() + ".h5" ));
-    uris.push_back( brion::URI( std::string( "leveldb:///" ) + random ));
-    uris.push_back( brion::URI( std::string( "memcached:///" ) + random ));
+    uris.push_back( brion::URI( std::string( "leveldb:///" ) + temp.string() +
+                                store ));
+    uris.push_back( brion::URI( std::string( "leveldb:///" ) + temp.string() +
+                                store + "o" ));
+    // uris.push_back( brion::URI( std::string( "memcached:///" ) + random ));
+    // uris.push_back( brion::URI( std::string( "memcached:///o" ) + random ));
 
-    auto remaining = uris;
-    while( !remaining.empty( ))
+    while( !uris.empty( ))
     {
-        const brion::URI first = remaining.back();
-        remaining.pop_back();
+        const brion::URI first = uris.back();
+        uris.pop_back();
 
         if( convert( source, first )) // bootstrap first from source
         {
             test_compare( source, first );
             testPerf( first );
 
-            for( const brion::URI& second : remaining )
+            for( const brion::URI& second : uris )
             {
                 if( convert( source, second )) // bootstrap second from source
                 {
@@ -401,20 +404,19 @@ BOOST_AUTO_TEST_CASE( test_convert_and_compare )
                 }
             }
         }
-    }
-
-    for( const auto& uri : uris )
-    {
         try
         {
-            brion::CompartmentReport report( uri, brion::MODE_READ );
+            brion::CompartmentReport report( first, brion::MODE_READ );
             if( report.erase( ))
                 BOOST_CHECK_THROW(
-                    brion::CompartmentReport( uri, brion::MODE_READ ),
+                    brion::CompartmentReport( first, brion::MODE_READ ),
                     std::runtime_error );
         }
         catch( const std::runtime_error&  ) { /* ignore */ }
     }
+
+    boost::filesystem::remove_all({ temp.string() + ".ldb" });
+    boost::filesystem::remove_all({ temp.string() + ".ldbo" });
 }
 
 BOOST_AUTO_TEST_CASE( test_read_soma_binary )

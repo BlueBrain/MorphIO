@@ -214,7 +214,7 @@ bool CompartmentReportMap::erase()
     store.erase( _getGidsKey( ));
     store.erase( _getDunitKey( ));
     store.erase( _getTunitKey( ));
-
+    store.flush();
     _clear();
     return true;
 }
