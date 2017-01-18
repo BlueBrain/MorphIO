@@ -128,7 +128,7 @@ public:
     virtual floatsPtr loadFrame( float timestamp ) const = 0;
 
     /** @copydoc brion::CompartmentReport::loadNeuron */
-    virtual floatsPtr loadNeuron( uint32_t ) const
+    virtual floatsPtr loadNeuron( uint32_t gid LB_UNUSED ) const
         { throw std::runtime_error( "loadNeuron() not implemented" ); }
 
     /** @copydoc brion::CompartmentReport::updateMapping */

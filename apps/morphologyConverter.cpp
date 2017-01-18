@@ -1,10 +1,12 @@
 
-/* Copyright (c) 2015, EPFL/Blue Brain Project
- *                     Stefan.Eilemann@epfl.ch
+/* Copyright (c) 2015-2017, EPFL/Blue Brain Project
+ *                          Stefan.Eilemann@epfl.ch
  */
 
 #include <brion/brion.h>
 #include <lunchbox/clock.h>
+#include <lunchbox/file.h>
+#include <lunchbox/term.h>
 #include <boost/program_options.hpp>
 #include <boost/foreach.hpp>
 
@@ -13,7 +15,8 @@ using boost::lexical_cast;
 
 int main( int argc, char* argv[] )
 {
-    po::options_description options( "Options" );
+    po::options_description options( lunchbox::getFilename( argv[0] ),
+                                     lunchbox::term::getSize().first );
     options.add_options()
         ( "help,h", "Produce help message" )
         ( "version,v", "Show program name/version banner and exit" )
