@@ -119,7 +119,7 @@ void morpho_mesher::set_mesh_tag(mesh_tag tag, bool value){
 
 void morpho_mesher::execute_3d_meshing(){
     std::cout << "1- Start meshing 3D" << std::endl;
-    std::cout << "-- optimisation of mesh " << (_flags[mesh_optimisation])?"ENABLED":"DISABLED" << "\n";
+    std::cout << "-- optimisation of mesh " << ((_flags[mesh_optimisation])?("ENABLED"):("DISABLED")) << "\n";
 
     // get global bounding box
     box g_box = _tree->get_bounding_box();
