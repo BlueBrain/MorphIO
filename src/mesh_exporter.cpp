@@ -41,7 +41,7 @@ const std::string gmsh_header =
 
 std::size_t gmsh_abstract_file::add_point(const gmsh_point &point){
     gmsh_point new_point(point);
-    new_point.id = _points.size();
+    new_point.id = _points.size()+1;
    //std::cout << "points " << geo::get_x(point.coords ) << " " << geo::get_y(point.coords ) << " " << geo::get_z(point.coords ) << std::endl;
     return _points.insert(new_point).first->id;
 }
@@ -82,7 +82,7 @@ std::size_t gmsh_abstract_file::add_line_loop(const gmsh_line_loop &l){
 
 std::size_t gmsh_abstract_file::add_volume(const gmsh_volume &v){
     gmsh_volume volume(v);
-    volume.id = _volumes.size();
+    volume.id = _volumes.size() +1;
     return _volumes.insert(volume).first->id;
 }
 
@@ -268,10 +268,6 @@ void gmsh_abstract_file::export_points_to_stream(ostream &out){
         fmt::scat(out,
                   "Point(", p->id,") = {", clean_coordinate(geo::get_x(p->coords)),", ", clean_coordinate(geo::get_y(p->coords)), ", ", clean_coordinate(geo::get_z(p->coords)), "};\n");
 //                  "Point(", p->id,") = {", clean_coordinate(geo::get_x(p->coords)),", ", clean_coordinate(geo::get_y(p->coords)), ", ", clean_coordinate(geo::get_z(p->coords)), ", ", p->diameter, "*h};\n");
-        if(p->isPhysical){
-            fmt::scat(out,
-                      "Physical Point(", p->id,") = {", p->id,"};\n");
-        }
     }
 
     out << "\n\n";
@@ -297,10 +293,6 @@ void gmsh_abstract_file::export_segments_to_stream(ostream &out){
     for(auto p = all_segments.begin(); p != all_segments.end(); ++p){
         fmt::scat(out,
                   "Line(", p->id,") = {" , find_point(p->point1),", ", find_point(p->point2),"};\n");
-        if(p->isPhysical){
-            fmt::scat(out,
-                      "Physical Line(", p->id,") = {", p->id,"};\n");
-        }
     }
 
     out << "\n\n";
@@ -327,10 +319,6 @@ void gmsh_abstract_file::export_circle_to_stream(ostream &out){
     for(auto p = all_circles.begin(); p != all_circles.end(); ++p){
         fmt::scat(out,
                   "Circle(", p->id,") = {" , find_point(p->point1),", ", find_point(p->center), ", ", find_point(p->point2),"};\n");
-        if(p->isPhysical){
-            fmt::scat(out,
-                      "Physical Line(", p->id,") = {", p->id,"};\n");
-        }
     }
 
     out << "\n\n";
@@ -368,10 +356,6 @@ void gmsh_abstract_file::export_line_loop_to_stream(ostream &out){
         if(p->isRuled){
             fmt::scat(out,
                       "Ruled Surface(", p->id,") = {", p->id,"};\n");
-        }
-        if(p->isPhysical){
-            fmt::scat(out,
-                      "Physical Surface(", p->id,") = {", p->id,"};\n");
         }
     }
 
@@ -449,7 +433,7 @@ void gmsh_abstract_file::export_volume_to_stream_dmg(ostream &out){
 // Line id need to be unique for all line elements
 //
 std::size_t gmsh_abstract_file::create_id_line_element(){
-    return _segments.size() + _circles.size() + _line_loop.size();
+    return _segments.size() + _circles.size() + _line_loop.size() + 1;
 }
 
 gmsh_exporter::gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags my_flags) :
