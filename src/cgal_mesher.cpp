@@ -118,8 +118,8 @@ void morpho_mesher::set_mesh_tag(mesh_tag tag, bool value){
 
 
 void morpho_mesher::execute_3d_meshing(){
-    std::cout << "1- Start meshing" << std::endl;
-    std::cout << "-- optimisation of mesh " << _flags[mesh_optimisation] << "\n";
+    std::cout << "1- Start meshing 3D" << std::endl;
+    std::cout << "-- optimisation of mesh " << (_flags[mesh_optimisation])?"ENABLED":"DISABLED" << "\n";
 
     // get global bounding box
     box g_box = _tree->get_bounding_box();
@@ -193,7 +193,7 @@ void morpho_mesher::execute_surface_meshing(){
     C2t3_2D c2t3 (tr);   // 2D-complex in 3D-Delaunay triangulation
 
 
-    std::cout << "1- Start Surface meshing" << std::endl;
+    std::cout << "1- Start meshing 2D (surface)" << std::endl;
 
     // get global bounding box
     box g_box = _tree->get_bounding_box();
