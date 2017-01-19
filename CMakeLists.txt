@@ -16,6 +16,7 @@ include(ReleaseDebugAutoFlags)
 
 
 option(MORPHOTOOL_UNIT_TESTS "Enable or disable unit tests" ON)
+option(ENABLE_MESHER_CGAL "Enable or disable integrated mesher based on CGAL" ON)
 
 set(Boost_NO_BOOST_CMAKE TRUE)
 
@@ -23,9 +24,15 @@ set(Boost_NO_BOOST_CMAKE TRUE)
 find_package(Threads)
 find_package(Boost 1.41 QUIET REQUIRED COMPONENTS system thread filesystem program_options)
 find_package(HDF5 QUIET REQUIRED)
-find_package(CGAL)
 
-add_definitions( -std=c++11 )
+
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}" )
+
+if(ENABLE_MESHER_CGAL)
+    add_definitions( -DENABLE_MESHER_CGAL=1)
+    set(MOPHO_MESHER_TARGET "morpho_mesher")
+endif()
+
 
 
 file(GLOB MORPHO_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/morpho/*)

@@ -9,7 +9,7 @@
 
 #include <morpho/morpho_tree.hpp>
 
-#include <src/mesh_exporter.hpp>
+#include <src/tool/mesh_exporter.hpp>
 
 
 BOOST_AUTO_TEST_CASE( test_gmsh_point )
@@ -27,14 +27,14 @@ BOOST_AUTO_TEST_CASE( test_gmsh_point )
     BOOST_CHECK( (p1 == p2 ) == false);
 
 
-    BOOST_CHECK_EQUAL(mfile.add_point(p1), 0);
-    BOOST_CHECK_EQUAL(mfile.add_point(p2), 1);
+    BOOST_CHECK_EQUAL(mfile.add_point(p1), 1);
+    BOOST_CHECK_EQUAL(mfile.add_point(p2), 2);
 
     // check if duplicate insert filtering is working
-    BOOST_CHECK_EQUAL(mfile.add_point(p1), 0);
-    BOOST_CHECK_EQUAL(mfile.add_point(p2), 1);
+    BOOST_CHECK_EQUAL(mfile.add_point(p1), 1);
+    BOOST_CHECK_EQUAL(mfile.add_point(p2), 2);
 
-    BOOST_CHECK_EQUAL(mfile.add_point(p3), 2);
+    BOOST_CHECK_EQUAL(mfile.add_point(p3), 3);
 
     auto all_points = mfile.get_all_points();
 
@@ -60,9 +60,9 @@ BOOST_AUTO_TEST_CASE( test_gmsh_point_duplication_filter )
     BOOST_CHECK( p1.close_to(p1_far_copy) == false);
 
 
-    BOOST_CHECK_EQUAL(mfile.add_point(p1), 0);
-    BOOST_CHECK_EQUAL(mfile.add_point(p1_far_copy), 1);
-    BOOST_CHECK_EQUAL(mfile.add_point(p1_close_copy), 0);
+    BOOST_CHECK_EQUAL(mfile.add_point(p1), 1);
+    BOOST_CHECK_EQUAL(mfile.add_point(p1_far_copy), 2);
+    BOOST_CHECK_EQUAL(mfile.add_point(p1_close_copy), 1);
 }
 
 
@@ -81,8 +81,8 @@ BOOST_AUTO_TEST_CASE( test_gmsh_lines )
     std::size_t id1 = mfile.add_segment(segment1);
     std::size_t id2 = mfile.add_segment(segment2);
 
-    BOOST_CHECK_EQUAL(id1, 0);
-    BOOST_CHECK_EQUAL(id2, 1);
+    BOOST_CHECK_EQUAL(id1, 1);
+    BOOST_CHECK_EQUAL(id2, 2);
 
     BOOST_CHECK_EQUAL(mfile.get_all_points().size(), 3);
 
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE( test_gmsh_lines )
 
     BOOST_CHECK_EQUAL(mfile.get_all_segments().size(), 2);
 
-    BOOST_CHECK_EQUAL(mfile.find_point(geo::point3d(0.5, 0.2, 0.6)), 0);
+    BOOST_CHECK_EQUAL(mfile.find_point(geo::point3d(0.5, 0.2, 0.6)), 1);
 
 }
 

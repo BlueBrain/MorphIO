@@ -1,4 +1,5 @@
-#include "morpho_spatial.hpp"
+
+#include <morpho/morpho_spatial.hpp>
 
 #include <tuple>
 

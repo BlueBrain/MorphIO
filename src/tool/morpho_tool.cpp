@@ -30,10 +30,10 @@
 #include <hadoken/format/format.hpp>
 
 #include <morpho/morpho_h5_v1.hpp>
+#include <morpho/morpho_mesher.hpp>
 
 #include "mesh_exporter.hpp"
 #include "x3d_exporter.hpp"
-#include "morpho_mesher.hpp"
 
 using namespace std;
 using namespace morpho;
@@ -165,8 +165,9 @@ int main(int argc, char** argv){
                     export_morpho_to_x3d(subargs[2], subargs[3], options);
                     return 0;
                 }
-            }else if(command == "mesh"){
+            }else if(command == "mesh"){         
                 if(subargs.size() == 3){
+#ifdef DENABLE_MESHER_CGAL
                     auto tree = load_morphology(subargs[1]);
                     morpho_mesher mesher(tree, subargs[2]);
 
@@ -182,6 +183,9 @@ int main(int argc, char** argv){
 
                     mesher.execute();
                     return 0;
+#else
+                    throw std::runtime_error("ERROR: morpho-tool has been compiled without mesh support");
+#endif
                 }
 
             }
