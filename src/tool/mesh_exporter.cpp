@@ -257,6 +257,28 @@ void gmsh_abstract_file::add_bounding_box(){
 }
 
 
+
+template<typename CollectionElements>
+inline void exportPhysicalsElements(const CollectionElements & elements, const std::string & name,
+                                    const std::string & tag, std::ostream & out){
+    bool first = true;
+    for(auto p = elements.begin(); p != elements.end(); ++p){
+        if(p->isPhysical){
+            if(first){
+                fmt::scat(out, "Physical ", name, "(\", ", tag, "\") = { ", p->id);
+                first = false;
+            }else{
+                fmt::scat(out, ", ", p->id);
+            }
+        }
+
+    }
+
+    if(first == false){
+        fmt::scat(out, " };\n");
+    }
+}
+
 void gmsh_abstract_file::export_points_to_stream(ostream &out){
     out << "\n";
     out << "// export morphology points \n";
@@ -270,7 +292,9 @@ void gmsh_abstract_file::export_points_to_stream(ostream &out){
 //                  "Point(", p->id,") = {", clean_coordinate(geo::get_x(p->coords)),", ", clean_coordinate(geo::get_y(p->coords)), ", ", clean_coordinate(geo::get_z(p->coords)), ", ", p->diameter, "*h};\n");
     }
 
-    out << "\n\n";
+    out << "\n";
+    exportPhysicalsElements(all_points, "Point", "Points", out);
+    out << "\n";
 }
 
 
@@ -295,7 +319,9 @@ void gmsh_abstract_file::export_segments_to_stream(ostream &out){
                   "Line(", p->id,") = {" , find_point(p->point1),", ", find_point(p->point2),"};\n");
     }
 
-    out << "\n\n";
+    out << "\n";
+    exportPhysicalsElements(all_segments, "Line", "Segments", out);
+    out << "\n";
 }
 
 
@@ -321,7 +347,9 @@ void gmsh_abstract_file::export_circle_to_stream(ostream &out){
                   "Circle(", p->id,") = {" , find_point(p->point1),", ", find_point(p->center), ", ", find_point(p->point2),"};\n");
     }
 
-    out << "\n\n";
+    out << "\n";
+    exportPhysicalsElements(all_circles, "Line", "Circles", out);
+    out << "\n";
 }
 
 
@@ -359,7 +387,9 @@ void gmsh_abstract_file::export_line_loop_to_stream(ostream &out){
         }
     }
 
-    out << "\n\n";
+    out << "\n";
+    exportPhysicalsElements(all_loop, "Surface", "Surfaces", out);
+    out << "\n";
 }
 
 
@@ -730,7 +760,7 @@ void check_points_on_circle(double radius, gmsh_point & center, std::array<gmsh_
 // if dot_product == 1, the vector are colinear and the cross product will be null
 // consequently, looking for the minimum value of the dot product
 geo::vector3d get_unit_vec(const geo::vector3d & p1){
-    const std::array<geo::vector3d, 2> unit_vec = { geo::vector3d({ 1.0, 0, 0}), geo::vector3d({ 0, 1.0, 0 }) };
+    const std::array<geo::vector3d, 2> unit_vec = {{ geo::vector3d({ 1.0, 0, 0}), geo::vector3d({ 0, 1.0, 0 }) }};
 
     double prev_dot = std::numeric_limits<double>::max();
     geo::vector3d res;
