@@ -83,7 +83,7 @@ public:
      * @throws std::runtime_error if an error occured during parsing or file
      *         is opened for writing.
      */
-    bool fillReportMap( Spikes& spikes,
+    bool fillReportMap( SpikeMap& spikes,
                         const size_t maxLines =
                             std::numeric_limits< size_t >::max( ));
 
@@ -96,9 +96,6 @@ public:
 
     /** Close file. */
     void close();
-
-    /** A spike value. */
-    typedef std::pair< Spikes::key_type, Spikes::mapped_type > Spike;
 
 private:
     // Returns true if parsing succeeded

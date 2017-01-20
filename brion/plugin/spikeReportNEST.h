@@ -20,10 +20,10 @@
 #ifndef BRION_PLUGIN_SPIKEREPORTNEST_H
 #define BRION_PLUGIN_SPIKEREPORTNEST_H
 
-#include <brion/types.h>
+#include "spikeReportASCII.h"
+
 #include <brion/spikeReportPlugin.h>
-#include "spikeReportFile.h"
-#include "../pluginInitData.h"
+#include <brion/types.h>
 
 namespace brion
 {
@@ -31,41 +31,17 @@ namespace plugin
 {
 
 /** A NEST spike report reader. */
-class SpikeReportNEST : public SpikeReportPlugin
+class SpikeReportNEST : public SpikeReportASCII
 {
 public:
-    /** Create a new NEST report. */
     explicit SpikeReportNEST( const SpikeReportInitData& initData );
-    virtual ~SpikeReportNEST();
 
-    const URI& getURI() const final;
-
-    /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );
     static std::string getDescription();
 
-    float getStartTime() const final;
-
-    float getEndTime() const final;
-
-    const Spikes& getSpikes() const final;
-
-    void writeSpikes( const Spikes& spikes ) final;
-
     void close() final;
-
-    SpikeReport::ReadMode getReadMode() const final
-    {
-        return SpikeReport::STATIC;
-    }
-
-private:
-    const URI _uri;
-    Spikes _spikes;
-    SpikeReportFile _spikeReportFile;
+    virtual void write( const Spikes& spikes ) final;
 };
-
 }
 }
-
 #endif

@@ -1,5 +1,7 @@
 /* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
+ *                          Juan Hernando <juan.hernando@epfl.ch>
+ *                          Mohamed-Ghaith Kaabi <mohamed.kaabi@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -22,21 +24,21 @@
 
 #include <lunchbox/log.h>
 #include <lunchbox/stdExt.h>
+
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <boost/version.hpp>
+
 #include <fstream>
 
 namespace brion
 {
 namespace plugin
 {
-
 namespace
 {
-
 template< typename T >
 static std::string lexical_cast( const T& t )
 {
@@ -48,31 +50,26 @@ static std::string lexical_cast( const T& t )
 // However, it seems that in combination with the OpenMP parallel for, the
 // code with sscanf is performing slightly better than lexical_cast.
 
-bool parseBluronLine( const std::string& buffer,
-                      SpikeReportFile::Spike &spike )
+bool parseBluronLine( const std::string& buffer, Spike& spike )
 {
     return sscanf( buffer.data( ), "%20f%20ud",
                    &spike.first, &spike.second ) == 2;
 }
 
-bool parseNESTLine( const std::string& buffer,
-                    SpikeReportFile::Spike &spike )
+bool parseNESTLine( const std::string& buffer, Spike& spike )
 {
     return sscanf (buffer.data( ), "%20d%20f",
                    &spike.second, &spike.first ) == 2;
 }
 
-
-void writeBluronLine( std::fstream& file,
-                      const SpikeReportFile::Spike &spike  )
+void writeBluronLine( std::fstream& file, const Spike& spike )
 {
-    file << spike.first << " " << spike.second << std::endl;
+    file << spike.first << " " << spike.second << '\n';
 }
 
-void writeNESTLine( std::fstream& file,
-                      const SpikeReportFile::Spike &spike  )
+void writeNESTLine( std::fstream& file, const Spike& spike )
 {
-    file << spike.second << " " << spike.first << std::endl;
+    file << spike.second << " " << spike.first << '\n';
 }
 
 }
@@ -136,7 +133,7 @@ SpikeReportFile::~SpikeReportFile()
 {
 }
 
-bool SpikeReportFile::fillReportMap( Spikes& spikes, const size_t maxLines )
+bool SpikeReportFile::fillReportMap( SpikeMap& spikes, const size_t maxLines )
 {
     if( _spikeWriteFunction )
         LBTHROW( std::runtime_error( "File is not opened for reading " +
@@ -180,7 +177,7 @@ bool SpikeReportFile::fillReportMap( Spikes& spikes, const size_t maxLines )
 
         // Parsing strings
         #pragma omp parallel for
-        for( int64_t i = 0; i < int64_t(linesRead); ++i )
+        for( int64_t i = 0; i < int64_t( linesRead ); ++i )
         {
             const std::string& line = lines[i];
             if( !_spikeParseFunction( line.c_str( ), spikeArray[first + i] ))
@@ -229,14 +226,17 @@ bool SpikeReportFile::fillReportMap( Spikes& spikes, const size_t maxLines )
     return _file->eof();
 }
 
+
 void SpikeReportFile::writeReportMap( const Spikes& spikes )
 {
     if( !_spikeWriteFunction )
         LBTHROW( std::runtime_error( "File is not opened for writing " +
                                      _filename ));
 
-    for( Spikes::const_iterator it = spikes.begin(); it != spikes.end(); ++it )
-        _spikeWriteFunction( *_file, *it );
+    for( const Spike& spike : spikes )
+        _spikeWriteFunction( *_file, spike );
+
+    _file->flush();
 }
 
 void SpikeReportFile::close()

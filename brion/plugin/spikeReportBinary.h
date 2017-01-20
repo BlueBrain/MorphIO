@@ -23,10 +23,37 @@
 #include <brion/types.h>
 #include <brion/spikeReportPlugin.h>
 
+namespace lunchbox
+{
+class MemoryMap;
+}
+
 namespace brion
 {
 namespace plugin
 {
+
+class BinaryReportFileMemMap
+{
+public:
+    BinaryReportFileMemMap() = default;
+
+    void mapForRead( const std::string& path );
+    void mapForReadWrite( const std::string& path, size_t spikeCount );
+
+    size_t getSpikeCount() const;
+    Spike* getSpikes() const;
+
+    bool isMappedForRead()const;
+
+    operator bool() const;
+
+private:
+    std::unique_ptr< lunchbox::MemoryMap > _memFile;
+    Spike* _begin = nullptr;
+    size_t _spikeCount = 0;
+    bool _mappedForRead = false;
+};
 
 /**
  * A Binary spike report reader.
@@ -40,33 +67,22 @@ namespace plugin
 class SpikeReportBinary : public SpikeReportPlugin
 {
 public:
-    /** Create a new Binary report. */
     explicit SpikeReportBinary( const SpikeReportInitData& initData );
 
-    /** Check if this plugin can handle the given uri. */
     static bool handles( const SpikeReportInitData& initData );
     static std::string getDescription();
 
-    const URI& getURI() const final;
-
-    float getStartTime() const final;
-
-    float getEndTime() const final;
-
-    const Spikes& getSpikes() const final;
-
-    void writeSpikes( const Spikes& spikes );
-
-    void close();
-
-    SpikeReport::ReadMode getReadMode() const final
-        { return SpikeReport::STATIC; }
+    void close() final;
+    Spikes read( float min ) final;
+    Spikes readUntil( float max ) final;
+    void readSeek( float toTimeStamp ) final;
+    void writeSeek( float toTimeStamp ) final;
+    void write( const Spikes& spikes ) final;
 
 private:
-    const URI _uri;
-    Spikes _spikes;
+    BinaryReportFileMemMap _memFile;
+    size_t _startIndex = 0;
 };
-
 }
 }
 

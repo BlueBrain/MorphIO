@@ -34,7 +34,7 @@ namespace brain
  * Following RAII, a writer is ready for use after the creation and will
  * ensure release of resources upon destruction.
  *
- * @version 0.2
+ * @version 1.0
  */
 class SpikeReportWriter : public boost::noncopyable
 {
@@ -43,14 +43,14 @@ public:
      * Construct a new writer for the given URI.
      * @param uri URI to spike report
      * @param accessMode Access mode
-     * @version 0.2
+     * @version 1.0
      */
     SpikeReportWriter( const brion::URI& uri,
                        const int accessMode = brion::MODE_WRITE );
 
     /**
      * Destructor.
-     * @version 0.2
+     * @version 1.0
      */
     ~SpikeReportWriter();
 
@@ -58,9 +58,9 @@ public:
      * Writes the spike times and cell GIDs.
      *
      * @param spikes Spikes to write.
-     * @version 0.2
+     * @version 1.0
      */
-    void writeSpikes( const Spikes& spikes );
+    void writeSpikes( const brion::Spikes& spikes );
 
     /**
      * Get the URI where the writer is publishing. It could be same as the one
@@ -68,14 +68,14 @@ public:
      * complete) once the publisher is bound to it.
      *
      * @return the fully-qualified URI that the writer uses to publish spikes
-     * @version 0.3
+     * @version 1.0
      */
     const lunchbox::URI& getURI() const;
 
     /**
      * Closes the report. ( It is implicitly called on destruction ).
      *
-     * @version 0.2
+     * @version 1.0
      */
     void close();
 

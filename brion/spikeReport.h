@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2014-2017, EPFL/Blue Brain Project
  *                          Juan Hernando Vieites <jhernando@fi.upm.es>
  *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
  *                          Ahmet Bilgili <ahmet.bilgili@epfl.ch>
@@ -27,11 +27,16 @@
 
 #include <boost/noncopyable.hpp>
 
+#include <future>
+
 namespace brion
 {
-namespace detail { class SpikeReport; }
+namespace detail
+{
+class SpikeReport;
+}
 
-/** Read access to a SpikeReport.
+/** Read/writes access to a spike report.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
  * release of resources upon destruction.
@@ -44,22 +49,7 @@ namespace detail { class SpikeReport; }
  * - Stream based reports: Spikes are read from a network stream. The stream
  *   always moves forward in time. The reader cannot steer or control how the
  *   source produces the spikes. Spikes are cached internally and made
- *   available by calling waitUntil. The user can clear spikes stored inside
- *   a given time window.
- *   In this report type, getStartTime and getEndTime return the time window
- *   of the spikes that are available to the client.
- *
- *   Client code can implement a moving window using waitUntil() and
- *   getNextSpikeTime(). The conceived usage is to decide a window width, and
- *   call waitUntil() using getNextSpikeTime() + width.
- *
- *   The loop
- *   \code
- *       while( report.waitUntil( report.getNextSpikeTime( )))
- *           ;
- *   \endcode
- *   is guaranteed to always make progress until the end of the stream is
- *   reached.
+ *   available by calling read/readUntil
  *
  * This class is not thread-safe except where stated otherwise.
  */
@@ -67,10 +57,17 @@ class SpikeReport : public boost::noncopyable
 {
 public:
     /**
-     * A type to specify how spikes are read by this SpikeReport.
-     * @version 1.4
+     * The State enum : describe the state of the report
+     * State::ok means that the report is ready to be read/written
+     * State::ended means that the report end is reached (in read mode)
+     * State::failed means that a error occured when readyn or writing the report
      */
-    enum ReadMode { STATIC = 0, STREAM };
+    enum class State : uint8_t
+    {
+        ok,
+        ended,
+        failed
+    };
 
     /**
      * Create a SpikeReport object given a URI.
@@ -81,165 +78,234 @@ public:
      *        - NEST ('gdf' extension). NEST file based reports. In read mode,
      *          shell wildcards are accepted at the file path leaf to load
      *          multiple report files.
+     *        - Binary ('spikes' extension)
      *        Support for additional types can be added through plugins; see
      *        SpikeReportPlugin for the details.
      *
-     * @param mode the brion::AccessMode bitmask
+     * @param mode the brion::AccessMode bitmask. The report can be open only in
+     *        brion::MODE_READ or brion::MODE_WRITE modes.
+     *
      * @throw std::runtime_error if the input URI is not handled by any
      *        registered spike report plugin.
-     * @version 1.4
+     * @version 2.0
      */
-    BRION_API SpikeReport( const URI& uri, const int mode );
-
-    /** Destructor. @version 1.3 */
-    BRION_API ~SpikeReport();
+    BRION_API SpikeReport( const URI& uri, int mode = MODE_READ );
 
     /** @return the descriptions of all loaded report backends. @version 1.10 */
     BRION_API static std::string getDescriptions();
 
     /**
-     * Get the URI used to instantiate the report. It could be different from
-     * the input URI, depending on the plugin implementation.
+     * Open a report in read mode with a subset selection.
      *
-     * @return The URI used in the instance. It could be the same as the input
-     * URI or a different one, depending on the implementation
-     * @version 1.6
+     * @param uri thre port uri
+     * @param subset The set of gids to be reported. This set should be
+     *        understood as a filter: any included GID which is not
+     *        actually part of the report will be silently ignored when reading
+     *        data.
+     * @version 2.0
      */
+    BRION_API SpikeReport( const URI& uri, const GIDSet& ids );
+
+    /**
+     * Release all resources.
+     * Any pending read/seek tasks will be interrupted and calling
+     * get on the corresponding future will throw std::runtime_error.
+     */
+    BRION_API ~SpikeReport();
+
+    /**
+     * Close the report. The close operation is blocking and it interrupts
+     * all the pending read/seek operations.
+     * @version 2.0
+     */
+    BRION_API void close();
+    /**
+     * \return true if the report was closed
+     * @version 2.0
+     */
+    BRION_API bool isClosed() const;
+
+    /**
+     * Interrupt any pending read/seek operation.
+     * This method is blocking.
+     * @version 2.0
+     */
+    BRION_API void interrupt();
+
+    /**
+    * Get the URI used to instantiate the report. It could be different from
+    * the input URI, depending on the plugin implementation.
+    *
+    * @return The URI used in the instance. It could be the same as the input
+    * URI or a different one, depending on the implementation
+    * @version 2.0
+    */
     BRION_API const URI& getURI() const;
 
     /**
-     * @version 1.4
+     * @return the end time of the latest complete read/write operation or
+     *         -inf if no operation has been issued.
+     *
+     * Read operations are deemed as complete when the returned future is
+     * ready.
+     *
+     * The time inverval to which getCurrentTime refers is open on the
+     * right. That means that upon completion of a read or write operation
+     * no spike read or written may have a timestamp >= getCurrentTime().
+     * @version 2.0
      */
-    BRION_API ReadMode getReadMode() const;
+    BRION_API float getCurrentTime() const;
 
     /**
-     * Get the time of the first spike.
-     * @return The time in milliseconds, or UNDEFINED_TIMESTAMP if there
-     *         are no spikes.
-     * @version 1.3
+     * @return The state after the last completed operation.
+     * @version 2.0
      */
-    BRION_API float getStartTime() const;
+    BRION_API State getState() const;
 
     /**
-     * Get the time of the last spike.
-     * @return The time in milliseconds, or UNDEFINED_TIMESTAMP if there
-     *         are no spikes.
-     * @version 1.3
+     * Read spikes until getCurrentTime becomes > min, the end of the report
+     * is reached or the report closed.
+     *
+     * This function fetches all the available data from the source.
+     * If no error occurs and the end is not reached, the min value passed
+     * is also guaranteed to be inside the time window of the data returned.
+     *
+     * Preconditions:
+     * - r.getState() is State::ok
+     * - The report was open in read mode.
+     * - There is no previous read or seek operation with a pending
+     *   future.
+     * - min >= getCurrentTime() or UNDEFINED_TIMESTAMP.
+     *
+     * Postconditions:
+     * Let:
+     *  - r be the SpikeReport
+     *  - f be the returned future by r.read(min)
+     *  - and s = r.getCurrentTime() before read is called:
+     * After f.wait() returns the following are all true:
+     *  - r.getCurrentTime() >= s
+     *  - If r.getState() == State::ok, then r.getCurrentTime() > min
+     *  - For each spike timestamp t_s in f.get(),
+     *    s <= t_s < r.getCurrentTime() (Note this could collapse to an
+     *    empty interval if r.getState() != State::ok)
+     *
+     * After successful f.wait_for or f.wait_until, the result is the same
+     * as above. If they time out, no observable state changes.
+     *
+     * If the state is FAILED or some other operation is still pending
+     * when read is called the result is undefined.
+     *
+     * @param min The minimum end time until which spikes will be read. If
+     *        UNDEFINED_TIMESTAMP, it will be considered as -infinite. This
+     *        means that as much data as possible will be fetched without
+     *        a minimum.
+     * @throw std::logic_error if one of the preconditions is not fulfilled.
+     * @note Until the completion of this operation, the internal state of the SpikeReport
+     * may change.
+     * @version 2.0
      */
-    BRION_API float getEndTime() const;
+    BRION_API std::future< Spikes > read( float min );
 
     /**
-     * Get the spike times and cell GIDs.
+     * Read spikes until getCurrentTime() >= max, the end of the report is
+     * reached or the report closed.
      *
-     * In STREAM reports this method returns all the spikes than have been
-     * moved from the receive cache.
+     * This function is very similar to the normal read, but instead of
+     * specifying a lower bound of getCurrentTime at return, it specifies
+     * a requested strict value. The preconditions and postconditions
+     * are the same except for those involving the parameter min which
+     * become:
      *
-     * @version 1.3 */
-    BRION_API const Spikes& getSpikes() const;
-
-    /**
-     * Writes the spike times and cell GIDs.
-     *
-     * @param spikes Spikes to write.
-     * @throw std::runtime_error if invoked on spike readers.
-     * @version 1.4 */
-    BRION_API void writeSpikes( const Spikes& spikes );
-
-    /**
-     * Lock the caller until the first spike past the given time stamp arrives
-     * or the network stream is closed by the source.
-     *
-     * This is the only function that updates the Spikes data set returned by
-     * getSpikes() with the spikes received from the stream.
-     *
-     * @param timeStamp The spike time to wait for in milliseconds. Using
-     *        UNDEFINED_TIMESTAMP will make this function wait until the end
-     *        of the stream.
-     * @param timeout An optional timeout in milliseconds.
-     * @return true at the moment a spike with time stamp larger than the input
-     *         parameter arrives. False if any of the events below occur
-     *         before the desired timestamp arrives:
-     *         - The timeout goes off.
-     *         - The network stream is closed or reaches the end.
-     *         - The report is closed.
-     *
-     * @throw std::runtime_error if invoked on STATIC readers.
-     * @version 1.4
+     * Precondition: max > getCurrentTime()
+     * Postcondition: If r.getState() == State::ok, then
+     *                r.getCurrentTime() >= max
+     * @throw std::runtime_error if the precondition does not hold.
+     * @note Until the completion of this operation, the internal state of the SpikeReport
+     * may change.
+     * @sa seek()
+     * @version 2.0
      */
-    BRION_API bool waitUntil( const float timeStamp,
-                              const uint32_t timeout = LB_TIMEOUT_INDEFINITE );
+    BRION_API std::future< Spikes > readUntil( float max );
 
     /**
-     * Return the time of the next spike available in the internal cache.
+     * Seek to a given absolute timestamp.
      *
-     * @return undefined in STATIC reports. In STREAM reports there are several
-     *         cases:
-     *         - 0 if no spikes have been received.
-     *         - The earliest spike time in milliseconds than has been
-     *           received, but has not been digested by waitUntil() if the
-     *           internal cache is not empty.
-     *         - The latest timestamp that was extracted from the cache if
-     *           the cache is empty.
-     *         - UNDEFINED_TIMESTAMP if the end of the stream has been reached
-     *           and the cache is empty.
-     * @throw std::runtime_error if invoked on non STREAM writers.
-     * @version 1.4
+     * If toTimestamp >= getCurrentTime() and the report was open for reading,
+     * data will be skipped forward until the timestamp is made current. In write
+     * mode for streams, consumers are notified about the new timestamp.
+     *
+     * The case toTimestamp < getCurrentTime() is only supported by file
+     * based reports.
+     * In write mode, seeks are only supported in binary reports. Forward seeking
+     * simply updates getCurrentTime() and backward seeking followed by a write,
+     * will overwrite the existing data.
+     *
+     * If the seek operation is not supported, a std::runtime_error will be
+     * thrown if this method is called.
+     *
+     * Preconditions:
+     * - There is no standing read or readUntil operation.
+     *
+     * Postconditions:
+     * Let:
+     *  - r be the SpikeReport
+     *  - f be the returned future by r.seek(toTimestamp)
+     * Then:
+     *  - After f.wait() returns r.getCurrentTime() == toTimestamp.
+     *  - The postconditions of read operations imply that in forward skips
+     *    this function throws away the data previous to toTimestamp (or
+     *    avoids reading it at all if possible).
+     *
+     * @throw std::runtime_error if a precondition does not hold or the
+     *        operation is not supported by the implementation.
+     * @note Until the completion of this operation, the internal state of the SpikeReport
+     * may change.
+     * @version 2.0
      */
-    BRION_API float getNextSpikeTime();
+    BRION_API std::future< void > seek( float toTimeStamp );
 
     /**
-     * Return the time of the latest spike that has been received.
+     * Write the given spikes to the output.
      *
-     * @return undefined in STATIC reports. Let t be the timestamp of the
-     *         latest spike received, in STREAM reports it returns:
-     *         - UNDEFINED_TIMESTAMP is no spike has been received
-     *         - t if at least one spike has been received and the end
-     *           of the stream has not been reahed.
-     *         - An unspecified value x, such as x > t, if at least one
-     *           spike has been received and the end of the stream has been
-     *           reached.
+     * Upon return getCurrenTime() is the greatest of all the spike times
+     * plus an epsilon.
      *
-     *         In any case, the function waitUntil() is guaranteed to not
-     *         block if it takes as input a valid timestamp smaller than
-     *         the value returned by getLatestSpikeTime().
-     * @throw std::runtime_error if invoked on non STREAM writers.
-     * @version 1.4
+     * @param spikes A collection of spikes sorted by timestamp in ascending
+     *        order. For every spike, its timestamp must be >= getCurrentTime().
+     * @throw std::runtime_error if the input spikes are not sorted or a
+     *        timestamp is < getCurrentTime().
+     * @version 2.0
      */
-    BRION_API float getLatestSpikeTime();
-
-    /**
-     * Remove all spikes contained in the given time interval
-     *
-     * The purpose of this method is to implement a moving window on top of
-     * this API.
-     *
-     * @param startTime The start point of the interval
-     * @param endTime The end point, if smaller than startTime no operation is
-     *        performed
-     * @throw std::runtime_error is the operation is not supported by the
-     *        reader.
-     * @version 1.4
-     */
-    BRION_API void clear( const float startTime, const float endTime );
-
-    /**
-     * Closes the report.
-     *
-     * Only meaningful for STREAM based reports. For reports opened in write
-     * mode it finishes the reporting. For reports opened in read mode it
-     * disconnects from the source, any call waiting in waitUntil will be
-     * unblocked.
-     *
-     * Implicitly called by the destructor. Calling any other function after
-     * the report has been closed has undefined behavior.
-     *
-     * @version 1.4
-     */
-    BRION_API void close();
+    BRION_API void write( const Spikes& spikes );
 
 private:
     detail::SpikeReport* _impl;
 };
-
 }
+
+namespace std
+{
+
+inline std::ostream& operator<<( std::ostream& stream,
+                                 const brion::SpikeReport::State state )
+{
+    using State = brion::SpikeReport::State;
+    switch ( state )
+    {
+    case State::ok:
+        stream << "ok";
+        break;
+    case State::ended:
+        stream << "ended";
+        break;
+    case State::failed:
+        stream << "failed";
+        break;
+    default:
+        break;
+    }
+    return stream;
+}
+}
+
 #endif

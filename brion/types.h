@@ -104,11 +104,14 @@ typedef boost::multi_array< float, 2 > SynapseMatrix;
 /** Data matrix storing GID, numEfferent, numAfferent for each neuron. */
 typedef boost::multi_array< uint32_t, 2 > SynapseSummaryMatrix;
 
-/** A list of Spikes events per cell gid, indexed by spikes times. */
-typedef std::multimap< float, uint32_t > Spikes;
-
 /** A spike */
 typedef std::pair< float, uint32_t > Spike;
+typedef std::vector<Spike> Spikes;
+
+/** A list of Spikes events per cell gid, indexed by spikes times. */
+typedef std::multimap< float, uint32_t > SpikeMap;
+
+
 
 /** A value for undefined timestamps */
 

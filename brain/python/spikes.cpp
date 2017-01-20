@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2006-2016, Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2006-2017, Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -18,7 +18,7 @@
  */
 #include <boost/python.hpp>
 
-#include <brain/spikes.h>
+#include <brion/types.h>
 
 namespace bp = boost::python;
 
@@ -29,10 +29,10 @@ namespace
 {
 struct Conversion
 {
-    static PyObject* convert(const std::pair< float, unsigned int >& pair)
+    static PyObject* convert( const brion::Spike& spike )
     {
-        bp::tuple t = bp::make_tuple(pair.first, pair.second);
-        Py_INCREF(t.ptr());
+        bp::tuple t = bp::make_tuple( spike.first, spike.second );
+        Py_INCREF( t.ptr( ));
         return t.ptr();
     }
 };
@@ -40,13 +40,12 @@ struct Conversion
 
 void export_Spikes()
 {
+    bp::to_python_converter< brion::Spike, Conversion >();
 
-bp::to_python_converter< brion::Spike, Conversion >();
-
-bp::class_< Spikes >( "Spikes", bp::no_init )
-    .def( "__iter__", bp::range( &Spikes::begin, &Spikes::end ))
-    .def( "__len__", &Spikes::size )
-;
+    bp::class_< brion::Spikes >( "Spikes", bp::no_init )
+        .def( "__iter__", bp::iterator<brion::Spikes>( ))
+        .def( "__len__", &brion::Spikes::size )
+    ;
 
 }
 

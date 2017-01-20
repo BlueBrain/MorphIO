@@ -1,6 +1,5 @@
-/* Copyright (c) 2014-2016, EPFL/Blue Brain Project
- *                          Juan Hernando Vieites <jhernando@fi.upm.es>
- *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
+/* Copyright (c) 2017, EPFL/Blue Brain Project
+ *                     Mohamed-Ghaith Kaabi <mohamed.kaabi@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -19,35 +18,40 @@
  */
 
 #include "spikeReport.h"
-
 #include "spikeReportPlugin.h"
 
 #include "pluginInitData.h"
+
 #include <brion/version.h>
 
 #include <lunchbox/plugin.h>
 #include <lunchbox/pluginFactory.h>
+#include <lunchbox/threadPool.h>
 #include <lunchbox/uint128_t.h>
+
+#include <memory>
 
 namespace
 {
 const std::string spikePluginDSONamePattern( "Brion.*SpikeReport" );
 }
 
+using SpikeReportInitData = ::brion::PluginInitData;
+
 namespace brion
 {
 namespace
 {
-using SpikePluginFactory = lunchbox::PluginFactory<SpikeReportPlugin>;
+using SpikePluginFactory = lunchbox::PluginFactory< SpikeReportPlugin >;
 
 class PluginLoader
+
 {
 public:
     PluginLoader()
     {
-        SpikePluginFactory::getInstance().load( BRION_VERSION_ABI,
-                                                lunchbox::getLibraryPaths(),
-                                                spikePluginDSONamePattern );
+        SpikePluginFactory::getInstance().load(
+            BRION_VERSION_ABI, lunchbox::getLibraryPaths(), spikePluginDSONamePattern );
     }
 };
 
@@ -68,13 +72,33 @@ public:
         plugin.reset( SpikePluginFactory::getInstance().create( initData ) );
     }
 
-    std::unique_ptr<SpikeReportPlugin> plugin;
+public:
+    std::unique_ptr< SpikeReportPlugin > plugin;
+    lunchbox::ThreadPool threadPool{1};
 };
 }
+}
 
-SpikeReport::SpikeReport( const URI& uri, const int mode )
-    : _impl( new detail::SpikeReport( SpikeReportInitData( uri, mode )))
+namespace brion
 {
+
+SpikeReport::SpikeReport( const URI& uri, int mode )
+    : _impl( new detail::SpikeReport( SpikeReportInitData( uri, mode ) ) )
+{
+    switch ( mode )
+    {
+    case MODE_READ:
+    case MODE_WRITE:
+        break;
+    default:
+        LBTHROW( std::runtime_error( "Unhandled open mode" ) );
+    }
+}
+
+SpikeReport::SpikeReport( const URI& uri, const GIDSet& ids )
+    : SpikeReport( uri, MODE_READ )
+{
+    _impl->plugin->setFilter( ids );
 }
 
 SpikeReport::~SpikeReport()
@@ -89,59 +113,125 @@ std::string SpikeReport::getDescriptions()
     return SpikePluginFactory::getInstance().getDescriptions();
 }
 
+void SpikeReport::close()
+{
+    if ( _impl->plugin->isClosed() )
+        return;
+
+    if ( _impl->threadPool.hasPendingJobs() )
+    {
+        // interrupt the jobs
+        _impl->plugin->_setInterrupted( true );
+        // blocks until all the pending jobs are done
+        _impl->threadPool.post( [] {} ).get();
+    }
+    _impl->plugin->close();
+    _impl->plugin->_setClosed();
+}
+
 const URI& SpikeReport::getURI() const
 {
     return _impl->plugin->getURI();
 }
 
-SpikeReport::ReadMode SpikeReport::getReadMode() const
+float SpikeReport::getCurrentTime() const
 {
-    return _impl->plugin->getReadMode();
+    return _impl->plugin->getCurrentTime();
 }
 
-float SpikeReport::getStartTime() const
+SpikeReport::State SpikeReport::getState() const
 {
-    return _impl->plugin->getStartTime();
+    return _impl->plugin->getState();
 }
 
-float SpikeReport::getEndTime() const
+bool SpikeReport::isClosed() const
 {
-    return _impl->plugin->getEndTime();
+    return _impl->plugin->isClosed();
 }
 
-const Spikes& SpikeReport::getSpikes() const
+void SpikeReport::interrupt()
 {
-    return _impl->plugin->getSpikes();
+    if ( _impl->threadPool.hasPendingJobs() )
+    {
+        _impl->plugin->_setInterrupted( true );
+        // blocks until all the pending jobs are done
+        _impl->threadPool.post( [] {} ).get();
+        _impl->plugin->_setInterrupted( false );
+    }
 }
 
-void SpikeReport::writeSpikes( const Spikes& spikes )
+std::future< Spikes > SpikeReport::read( float min )
 {
-    _impl->plugin->writeSpikes( spikes );
+    _impl->plugin->_checkNotClosed();
+    _impl->plugin->_checkCanRead();
+    _impl->plugin->_checkStateOk();
+
+    if ( min < getCurrentTime() )
+    {
+        LBTHROW( std::logic_error(
+            "Can't read to a time stamp inferior to the current time" ) );
+    }
+
+    if ( _impl->threadPool.hasPendingJobs() )
+    {
+        LBTHROW( std::runtime_error( "Can't read : Pending read operation" ) );
+    }
+
+    return _impl->threadPool.post( [&, min] { return _impl->plugin->read( min ); } );
 }
 
-bool SpikeReport::waitUntil( const float timeStamp, const uint32_t timeout )
+std::future< Spikes > SpikeReport::readUntil( const float max )
 {
-    return _impl->plugin->waitUntil( timeStamp, timeout );
+    _impl->plugin->_checkNotClosed();
+    _impl->plugin->_checkCanRead();
+    _impl->plugin->_checkStateOk();
+
+    if ( max <= getCurrentTime() )
+    {
+        LBTHROW( std::logic_error(
+            "Can't read to a time stamp inferior to the current time" ) );
+    }
+
+    if ( _impl->threadPool.hasPendingJobs() )
+    {
+        LBTHROW( std::runtime_error( "Can't read : Pending read operation" ) );
+    }
+    return _impl->threadPool.post( [&, max] { return _impl->plugin->readUntil( max ); } );
 }
 
-float SpikeReport::getNextSpikeTime()
+std::future< void > SpikeReport::seek( const float toTimeStamp )
 {
-    return _impl->plugin->getNextSpikeTime();
+    _impl->plugin->_checkNotClosed();
+    if ( _impl->plugin->getAccessMode() == MODE_READ )
+    {
+        if ( _impl->threadPool.hasPendingJobs() )
+        {
+            LBTHROW( std::runtime_error( "Can't seek : Pending read operation" ) );
+        }
+        return _impl->threadPool.post(
+            [&, toTimeStamp] { return _impl->plugin->readSeek( toTimeStamp ); } );
+    }
+
+    return _impl->threadPool.post(
+        [&, toTimeStamp] { return _impl->plugin->writeSeek( toTimeStamp ); } );
 }
 
-float SpikeReport::getLatestSpikeTime()
+void SpikeReport::write( const Spikes& spikes )
 {
-    return _impl->plugin->getLatestSpikeTime();
-}
+    _impl->plugin->_checkCanWrite();
+    _impl->plugin->_checkNotClosed();
 
-void SpikeReport::clear( const float startTime, const float endTime )
-{
-    _impl->plugin->clear( startTime, endTime );
-}
+    if ( _impl->threadPool.hasPendingJobs() )
+    {
+        LBTHROW( std::runtime_error( "Can't write spikes : Pending seek operation" ) );
+    }
 
-void SpikeReport::close()
-{
-    _impl->plugin->close();
-}
+    if ( spikes.size() && spikes.front().first < getCurrentTime() )
+    {
+        LBTHROW( std::logic_error( "Can't write spikes: first spike"
+                                   " time inferior to the current time" ) );
+    }
 
+    _impl->plugin->write( spikes );
+}
 }

@@ -1,5 +1,6 @@
 /* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
+ *                          Mohamed-Ghaith Kaabi <mohamed.kaabi@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -18,86 +19,90 @@
  */
 
 #include "spikeReportBluron.h"
-
+#include "../detail/skipWhiteSpace.h"
 #include "../pluginInitData.h"
+#include "spikeReportTypes.h"
 
 #include <boost/filesystem.hpp>
+
 #include <lunchbox/pluginRegisterer.h>
 #include <lunchbox/stdExt.h>
 
-#define BLURON_REPORT_FILE_EXT ".dat"
+#include <cstdio>
+#include <fstream>
 
 namespace brion
 {
 namespace plugin
 {
+
 namespace
 {
-    lunchbox::PluginRegisterer< SpikeReportBluron > registerer;
+lunchbox::PluginRegisterer< SpikeReportBluron > registerer;
 }
 
+using brion::Spike;
+
 SpikeReportBluron::SpikeReportBluron( const SpikeReportInitData& initData )
-    : _uri( initData.getURI( ))
-    , _spikeReportFile( _uri.getPath(), BLURON_SPIKE_REPORT,
-                        initData.getAccessMode( ))
+    : SpikeReportASCII( initData )
 {
-    if( initData.getAccessMode() == MODE_READ )
-        _spikeReportFile.fillReportMap( _spikes );
+    if ( initData.getAccessMode() == MODE_READ )
+    {
+        SpikeReportFile reader{_uri.getPath(), BLURON_SPIKE_REPORT,
+                               initData.getAccessMode()};
+        SpikeMap spikes;
+        reader.fillReportMap( spikes );
+
+        _spikes.resize( spikes.size() );
+        size_t i = 0;
+        for ( auto& spike : spikes )
+            _spikes[i++] = {spike.first, spike.second};
+    }
+
+    _lastReadPosition = _spikes.begin();
 }
 
 bool SpikeReportBluron::handles( const SpikeReportInitData& initData )
 {
     const URI& uri = initData.getURI();
-
-    if( !uri.getScheme().empty() && uri.getScheme() != "file" )
+    if ( !uri.getScheme().empty() && uri.getScheme() != "file" )
         return false;
 
     const boost::filesystem::path ext =
-            boost::filesystem::path( uri.getPath() ).extension();
-    return ext == BLURON_REPORT_FILE_EXT;
+        boost::filesystem::path( uri.getPath() ).extension();
+    return ext == brion::plugin::BLURON_REPORT_FILE_EXT; // .dat
 }
 
 std::string SpikeReportBluron::getDescription()
 {
     return "Blue Brain ASCII spike reports: "
-           "[file://]/path/to/report" BLURON_REPORT_FILE_EXT;
-}
-
-const URI& SpikeReportBluron::getURI() const
-{
-    return _uri;
-}
-
-float SpikeReportBluron::getStartTime() const
-{
-    if ( _spikes.empty( ))
-        return std::numeric_limits< float >::max();
-
-    return _spikes.begin()->first;
-}
-
-float SpikeReportBluron::getEndTime() const
-{
-    if ( _spikes.empty( ))
-        return std::numeric_limits< float >::max();
-
-    return _spikes.rbegin()->first;
-}
-
-const Spikes& SpikeReportBluron::getSpikes() const
-{
-    return _spikes;
-}
-
-void SpikeReportBluron::writeSpikes( const Spikes &spikes )
-{
-    _spikeReportFile.writeReportMap( spikes );
+           "[file://]/path/to/report" +
+           std::string( BLURON_REPORT_FILE_EXT );
 }
 
 void SpikeReportBluron::close()
 {
-    _spikeReportFile.close();
 }
 
+void SpikeReportBluron::write( const Spikes& spikes )
+{
+    if ( !spikes.size() )
+        return;
+
+    std::fstream file{getURI().getPath(),
+                      std::ios_base::binary | std::ios::out | std::ios::app};
+    if ( !file.is_open() )
+    {
+        _state = State::failed;
+        return;
+    }
+
+    for ( const Spike& spike : spikes )
+        file << spike.first << " " << spike.second << "\n";
+
+    file.flush();
+
+    _currentTime = spikes.rbegin()->first + std::numeric_limits< float >::epsilon();
+}
 }
 }

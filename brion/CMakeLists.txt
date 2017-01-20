@@ -35,13 +35,14 @@ set(BRION_HEADERS
   plugin/spikeReportBluron.h
   plugin/spikeReportFile.h
   plugin/spikeReportNEST.h
-  plugin/spikeReportSimpleStreamer.h
+  plugin/spikeReportASCII.h
   detail/mesh.h
   detail/meshBinary.h
   detail/meshHDF5.h
   detail/lockHDF5.h
   detail/silenceHDF5.h
   detail/utilsHDF5.h
+  detail/skipWhiteSpace.h
   )
 
 set(BRION_SOURCES
@@ -66,7 +67,7 @@ set(BRION_SOURCES
   plugin/spikeReportBluron.cpp
   plugin/spikeReportFile.cpp
   plugin/spikeReportNEST.cpp
-  plugin/spikeReportSimpleStreamer.cpp
+  plugin/spikeReportASCII.cpp
   )
 
 if(MSVC)

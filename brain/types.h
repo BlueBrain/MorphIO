@@ -66,6 +66,9 @@ using brion::floats;
 using brion::uint32_ts;
 using brion::size_ts;
 
+using brion::SectionOffsets;
+using brion::CompartmentCounts;
+
 typedef std::vector< Matrix4f > Matrix4fs;
 typedef std::vector< Quaternionf > Quaternionfs;
 

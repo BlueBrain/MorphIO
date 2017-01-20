@@ -25,84 +25,61 @@
 #include <lunchbox/sleep.h>
 #include <lunchbox/string.h>
 
-#define STREAM_READ_TIMEOUT_MS  500
-#define STREAM_SEND_DELAY_MS   1000
-#define STREAM_SEND_FREQ_MS     500
-#define STREAM_FRAME_LENGTH_MS   10
+#define STREAM_READ_TIMEOUT_MS 500
+#define STREAM_SEND_DELAY_MS 1000
+#define STREAM_SEND_FREQ_MS 500
+#define STREAM_FRAME_LENGTH_MS 10
 
 void printSentFrame( const unsigned int index, const size_t count )
 {
-    LBINFO << "Sent frame " << index << ": " << index * STREAM_FRAME_LENGTH_MS
-           << "-" << (index+1) * STREAM_FRAME_LENGTH_MS << " [ms], "
-           << count << " spikes" << std::endl;
+    LBINFO << "Sent frame " << index << ": " << index * STREAM_FRAME_LENGTH_MS << "-"
+           << ( index + 1 ) * STREAM_FRAME_LENGTH_MS << " [ms], " << count << " spikes"
+           << std::endl;
 }
 
 int main( int argc, char* argv[] )
 {
-    if( argc != 3 )
+    if ( argc != 3 )
     {
         const auto uriHelp =
             lunchbox::string::prepend( brion::SpikeReport::getDescriptions(),
                                        "    " );
         std::cout << "Usage: " << lunchbox::getFilename( argv[0] )
-                  << " <inURI> <outURI>" << std::endl
+                  << " <inURI> <outURI>" 
                   << "  Supported input and output URIs:" << std::endl
                   << uriHelp << std::endl;
         return EXIT_FAILURE;
     }
 
     lunchbox::Clock clock;
-    brion::SpikeReport in( brion::URI( argv[1] ), brion::MODE_READ );
     const float readTime = clock.resetTimef();
 
-    brion::SpikeReport out( brion::URI( argv[2] ), brion::MODE_WRITE );
-
-    if( in.getReadMode() == brion::SpikeReport::STREAM )
+    try
     {
-        // Stream-to-File conversion
-        while( in.getNextSpikeTime() != brion::UNDEFINED_TIMESTAMP )
+        brion::SpikeReport in( brion::URI( argv[1] ), brion::MODE_READ );
+        brion::SpikeReport out( brion::URI( argv[2] ), brion::MODE_WRITE );
+
+        const float step = 0.1; // arbitrary value
+
+        float t = std::max( step, in.getCurrentTime() );
+        std::vector< brion::Spike > spikes;
+        while ( in.getState() == brion::SpikeReport::State::ok )
         {
-            in.waitUntil( brion::UNDEFINED_TIMESTAMP, STREAM_READ_TIMEOUT_MS );
-            out.writeSpikes( in.getSpikes( ));
-            in.clear( in.getStartTime( ), in.getEndTime( ));
+            spikes = in.read( t ).get();
+            out.write( spikes );
+            t = std::max( t + step, in.getCurrentTime() );
         }
     }
-    else if( out.getReadMode() == brion::SpikeReport::STREAM )
+    catch ( const std::exception& exception )
     {
-        // File-to-Stream conversion
-
-        // leave time for a Zeq connection to establish
-        lunchbox::sleep( STREAM_SEND_DELAY_MS );
-
-        brion::Spikes outSpikes;
-        unsigned int frameIndex = 0;
-
-        const brion::Spikes& inSpikes = in.getSpikes();
-        for( brion::Spikes::const_iterator spikeIt = inSpikes.begin();
-             spikeIt != inSpikes.end(); ++spikeIt )
-        {
-            if( spikeIt->first >= (frameIndex+1) * STREAM_FRAME_LENGTH_MS )
-            {
-                out.writeSpikes( outSpikes );
-                printSentFrame( frameIndex++, outSpikes.size( ));
-                outSpikes.clear();
-                lunchbox::sleep( STREAM_SEND_FREQ_MS );
-            }
-            outSpikes.insert( *spikeIt );
-        }
-        out.writeSpikes( outSpikes );
-        printSentFrame( frameIndex, outSpikes.size( ));
-    }
-    else
-    {
-        // File-to-File conversion
-        out.writeSpikes( in.getSpikes( ));
+        LBINFO << "Failed to conver spikes : " << exception.what() << std::endl;
+        return EXIT_FAILURE;
     }
 
-    out.close();
     const float writeTime = clock.resetTimef();
 
-    LBINFO << "Converted " << argv[1] << " => " << argv[2] << " in " << readTime
-           << " + " << writeTime << " ms" << std::endl;
+    LBINFO << "Converted " << argv[1] << " => " << argv[2] << " in " << readTime << " + "
+           << writeTime << " ms" << std::endl;
+
     return EXIT_SUCCESS;
 }

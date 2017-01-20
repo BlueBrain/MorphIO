@@ -19,7 +19,6 @@
  */
 
 #include "spikeReportWriter.h"
-#include "spikes.h"
 
 #include <brion/spikeReport.h>
 
@@ -47,11 +46,9 @@ SpikeReportWriter::~SpikeReportWriter()
     delete _impl;
 }
 
-void SpikeReportWriter::writeSpikes( const Spikes &spikes )
+void SpikeReportWriter::writeSpikes( const brion::Spikes& spikes )
 {
-    brion::Spikes brionSpikes;
-    brionSpikes.insert( spikes.begin(), spikes.end() );
-    _impl->_report.writeSpikes( brionSpikes );
+    _impl->_report.write(spikes);
 }
 
 const lunchbox::URI& SpikeReportWriter::getURI() const

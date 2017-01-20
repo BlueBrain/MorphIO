@@ -21,7 +21,6 @@
 
 #include <brain/types.h>
 #include <brain/spikeReportReader.h>
-#include <brain/spikes.h>
 
 namespace bp = boost::python;
 
@@ -42,17 +41,11 @@ void export_SpikeReportReader()
 bp::class_< SpikeReportReader, boost::noncopyable >(
     "SpikeReportReader", bp::no_init )
     .def( "__init__", bp::make_constructor( _initURI ))
-    .def( "close", &SpikeReportReader::close )
-    .def( "getStartTime", &SpikeReportReader::getStartTime )
-    .def( "getEndTime", &SpikeReportReader::getEndTime )
-    .def( "getSpikes", ( Spikes (SpikeReportReader::* )( ))
-          &SpikeReportReader::getSpikes )
+    .def( "close", &SpikeReportReader::close )        
     .def( "getSpikes",
-          ( Spikes (SpikeReportReader::* )( float, float ))
+          ( brion::Spikes (SpikeReportReader::* )( float, float ))
           &SpikeReportReader::getSpikes )
-    .def( "hasEnded", &SpikeReportReader::hasEnded )
-    .def( "isStream", &SpikeReportReader::isStream );
-
+    .def( "hasEnded", &SpikeReportReader::hasEnded );
 }
 
 }

@@ -48,6 +48,12 @@ struct SkipWhiteSpace
     size_t* const _line_count;
 };
 
+
+inline void skipWhiteSpace( std::istream& in )
+{
+    while( isspace( in.peek()));
+}
+
 inline std::istream& operator >> ( std::istream& in, const SkipWhiteSpace& ws )
 {
     return ws( in );

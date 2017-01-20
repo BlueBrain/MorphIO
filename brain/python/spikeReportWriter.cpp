@@ -21,7 +21,6 @@
 
 #include <brain/types.h>
 #include <brain/spikeReportWriter.h>
-#include <brain/spikes.h>
 
 namespace bp = boost::python;
 

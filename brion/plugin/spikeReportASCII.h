@@ -1,5 +1,5 @@
-/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
- *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
+/* Copyright (c) 2017, EPFL/Blue Brain Project
+ *                     Mohamed-Ghaith Kaabi <mohamed.kaabi@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -17,31 +17,37 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_PLUGIN_SPIKEREPORTBLURON_H
-#define BRION_PLUGIN_SPIKEREPORTBLURON_H
+#ifndef BRION_PLUGIN_SPIKEREPORTASCII_H
+#define BRION_PLUGIN_SPIKEREPORTASCII_H
 
-#include "spikeReportASCII.h"
+#include "spikeReportFile.h"
+#include "../pluginInitData.h"
 
-#include <brion/spikeReportPlugin.h>
 #include <brion/types.h>
+#include <brion/spikeReportPlugin.h>
+
 
 namespace brion
 {
 namespace plugin
 {
 
-/** A Bluron spike report reader. */
-class SpikeReportBluron : public SpikeReportASCII
+class SpikeReportASCII : public SpikeReportPlugin
 {
 public:
-    explicit SpikeReportBluron( const SpikeReportInitData& initData );
+    explicit SpikeReportASCII( const SpikeReportInitData& initData );
 
-    static bool handles( const SpikeReportInitData& initData );
-    static std::string getDescription();
+    Spikes read(float min) final;
+    Spikes readUntil(float toTimeStamp) final;
+    void readSeek(float toTimeStamp) final;
+    void writeSeek(float toTimeStamp) final;
 
-    void close() final;
-    virtual void write( const Spikes& spikes ) final;
+protected:
+    Spikes _spikes;
+    Spikes::iterator _lastReadPosition;
 };
+
 }
 }
-#endif
+
+#endif //BRION_PLUGIN_SPIKEREPORTFILEBASED_H

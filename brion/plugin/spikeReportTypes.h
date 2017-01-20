@@ -25,6 +25,10 @@ namespace brion
 namespace plugin
 {
 
+const char* const BLURON_REPORT_FILE_EXT = ".dat";
+const char* const NEST_REPORT_FILE_EXT   = ".gdf";
+const char* const BINARY_REPORT_FILE_EXT = ".spikes";
+
 enum SpikeReportType
 {
     BLURON_SPIKE_REPORT,
