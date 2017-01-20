@@ -22,7 +22,7 @@ set(Boost_NO_BOOST_CMAKE TRUE)
 
 ## find dependencies
 find_package(Threads)
-find_package(Boost 1.41 QUIET REQUIRED COMPONENTS system thread filesystem program_options)
+find_package(Boost 1.55 QUIET REQUIRED COMPONENTS system thread filesystem program_options)
 find_package(HDF5 QUIET REQUIRED)
 
 

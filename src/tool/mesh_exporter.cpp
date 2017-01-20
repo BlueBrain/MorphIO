@@ -265,7 +265,7 @@ inline void exportPhysicalsElements(const CollectionElements & elements, const s
     for(auto p = elements.begin(); p != elements.end(); ++p){
         if(p->isPhysical){
             if(first){
-                fmt::scat(out, "Physical ", name, "(\", ", tag, "\") = { ", p->id);
+                fmt::scat(out, "Physical ", name, "(\"", tag, "\") = { ", p->id);
                 first = false;
             }else{
                 fmt::scat(out, ", ", p->id);
