@@ -167,7 +167,7 @@ int main(int argc, char** argv){
                 }
             }else if(command == "mesh"){         
                 if(subargs.size() == 3){
-#ifdef DENABLE_MESHER_CGAL
+#ifdef ENABLE_MESHER_CGAL
                     auto tree = load_morphology(subargs[1]);
                     morpho_mesher mesher(tree, subargs[2]);
 

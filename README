@@ -22,6 +22,12 @@ cmake ../
 make
 
 
+# cmake options 
+
+## Disable the usage of the CGAL Library 
+cmake -DENABLE_MESHER_CGAL=FALSE     
+
+
 ** Authors
 Adrien Devresse <adrien.devresse@epfl.ch>
 
