@@ -41,6 +41,8 @@
 #include <morpho/morpho_mesher.hpp>
 #include <morpho/morpho_spatial.hpp>
 
+#include "../utils/morpho_utils.hpp"
+
 
 // global
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
@@ -79,6 +81,9 @@ typedef CGAL::Implicit_surface_3<GT_2D, Function> Surface_3;
 namespace morpho{
 
 
+namespace fmt = hadoken::format;
+
+
 struct scan_stats{
     inline scan_stats() : total_iterations(0), within_iterations(0) {}
 
@@ -92,7 +97,7 @@ FT is_part_of_morphotree(const Point& p, const morpho_tree & tree, const spatial
     stats.total_iterations++;
 
    if(stats.total_iterations%100000 ==0){
-        hadoken::format::scat(std::cout, "Geometry scan progress: ", stats.total_iterations, " points check with ",
+        fmt::scat(std::cout, "Geometry scan progress: ", stats.total_iterations, " points check with ",
                               stats.within_iterations," positives matches", "\r");
     }
 
@@ -119,7 +124,9 @@ void morpho_mesher::set_mesh_tag(mesh_tag tag, bool value){
 
 
 void morpho_mesher::execute_3d_meshing(){
-    std::cout << "1- Start meshing 3D" << std::endl;
+    step_logger mesh_logger;
+
+    mesh_logger("Start meshing 3D");
     std::cout << "-- optimisation of mesh " << ((_flags[mesh_optimisation])?("ENABLED"):("DISABLED")) << "\n";
 
     // get global bounding box
@@ -127,10 +134,10 @@ void morpho_mesher::execute_3d_meshing(){
     double max_distance = hg::distance(g_box.min_corner(), point(0,0,0));
     max_distance = std::max(max_distance, hg::distance(g_box.min_corner(), point(0,0,0)));
 
-    std::cout << "2- Configure bounding sphere with radius of " << max_distance << std::endl;
+    mesh_logger(fmt::scat("Configure bounding sphere with radius of ", max_distance));
 
     // spatial indexing
-    std::cout << "3- Create spatial index " << std::endl;
+    mesh_logger("Create spatial index ");
 
     spatial_index morpho_indexer;
     morpho_indexer.add_morpho_tree(_tree);
@@ -146,32 +153,35 @@ void morpho_mesher::execute_3d_meshing(){
                        K::Sphere_3(CGAL::ORIGIN, max_distance*max_distance), 1.0 /1000000);
     // Mesh criteria
     //Spherical_sizing_field size;
-    Mesh_criteria criteria(facet_angle=30, facet_size=0.1*8, facet_distance=0.025*8,
+    Mesh_criteria criteria(facet_angle=30,
+                           facet_size=0.1*8, facet_distance=0.025*8,
                            cell_radius_edge_ratio=2, cell_size=0.3 /*0.1*8*/);
 
     // Mesh generation
-    std::cout << "4- Start mesh generation " << std::endl;
+    mesh_logger("Start mesh generation ");
 
    auto t1 = std::chrono::system_clock::now();
     C3t3 c3t3;
     if(_flags[mesh_optimisation]){
         c3t3 = CGAL::make_mesh_3<C3t3>(domain, criteria);
     } else{
-        c3t3 = CGAL::make_mesh_3<C3t3>(domain, criteria, CGAL::parameters::no_perturb(), CGAL::parameters::no_exude());
+        c3t3 = CGAL::make_mesh_3<C3t3>(domain, criteria, CGAL::parameters::no_lloyd(),
+                                       CGAL::parameters::no_odt(),
+                                       CGAL::parameters::no_perturb(), CGAL::parameters::no_exude());
     }
 
     auto t2 = std::chrono::system_clock::now();
 
-    std::cout << "\n";
-    std::cout << "5- End mesh generation in " << std::chrono::duration_cast<std::chrono::seconds>(t2 -t1).count() << "s" << "\n";
-    std::cout << "6- Meshing domain scan done with " << stats.total_iterations << " points checks and "
-              << double(stats.within_iterations)/stats.total_iterations <<  " of positive matches " << "\n";
+    fmt::scat(std::cout, "\n");
+    mesh_logger(fmt::scat("End mesh generation in ", std::chrono::duration_cast<std::chrono::seconds>(t2 -t1).count(), "s"));
+    mesh_logger(fmt::scat("Meshing domain scan done with ", stats.total_iterations, " points checks and "
+              , double(stats.within_iterations)/stats.total_iterations, " of positive matches "));
 
 
     // Output
     {
         const std::string local_3dmesh_output_file =_output_mesh_file + ".3d.mesh";
-        std::cout << "- output 3D mesh to " << local_3dmesh_output_file << std::endl;
+        fmt::scat(std::cout, "- output 3D mesh to ", local_3dmesh_output_file, "\n");
 
         std::ofstream medit_file(local_3dmesh_output_file);
         c3t3.output_to_medit(medit_file);
@@ -179,13 +189,13 @@ void morpho_mesher::execute_3d_meshing(){
 
     {
         const std::string local_surface_mesh_output_file =_output_mesh_file + ".surface.off";
-        std::cout << "- output surface mesh to " << local_surface_mesh_output_file << std::endl;
+        fmt::scat(std::cout, "- output surface mesh to ", local_surface_mesh_output_file, "\n");
 
         std::ofstream off_file(local_surface_mesh_output_file);
         c3t3.output_boundary_to_off(off_file);
     }
 
-    std::cout << "7- End meshing " << std::endl;
+    mesh_logger("End meshing ");
 }
 
 
@@ -194,17 +204,20 @@ void morpho_mesher::execute_surface_meshing(){
     C2t3_2D c2t3 (tr);   // 2D-complex in 3D-Delaunay triangulation
 
 
-    std::cout << "1- Start meshing 2D (surface)" << std::endl;
+    step_logger mesh_logger;
+
+
+    mesh_logger("Start meshing 2D (surface)");
 
     // get global bounding box
     box g_box = _tree->get_bounding_box();
     double max_distance = hg::distance(g_box.min_corner(), point(0,0,0));
     max_distance = std::max(max_distance, hg::distance(g_box.min_corner(), point(0,0,0)));
 
-    std::cout << "2- Configure bounding sphere with radius of " << max_distance << std::endl;
+    mesh_logger(fmt::scat("Configure bounding sphere with radius of ", max_distance));
 
     // spatial indexing
-    std::cout << "3- Create spatial index " << std::endl;
+    mesh_logger(fmt::scat("Create spatial index "));
 
     spatial_index morpho_indexer;
     morpho_indexer.add_morpho_tree(_tree);
@@ -222,8 +235,8 @@ void morpho_mesher::execute_surface_meshing(){
     // Note that "2." above is the *squared* radius of the bounding sphere!
     // defining meshing criteria
     CGAL::Surface_mesh_default_criteria_3<Tr_2D> criteria(30.,  // angular bound
-                                                       0.1*2,  // radius bound
-                                                       0.1*2); // distance bound
+                                                       0.1*3,  // radius bound
+                                                       0.1*3); // distance bound
     // meshing surface
     auto t1 = std::chrono::system_clock::now();
     if(_flags[force_manifold]){
@@ -234,14 +247,14 @@ void morpho_mesher::execute_surface_meshing(){
 
     auto t2 = std::chrono::system_clock::now();
 
-    std::cout << "\n";
-    std::cout << "5- End mesh generation in " << std::chrono::duration_cast<std::chrono::seconds>(t2 -t1).count() << "s" << "\n";
-    std::cout << "6- Meshing domain scan done with " << stats.total_iterations << " points checks and "
-              << double(stats.within_iterations)/stats.total_iterations <<  " of positive matches " << "\n";
+    fmt::scat(std::cout, "\n");
+    mesh_logger(fmt::scat("End mesh generation in ", std::chrono::duration_cast<std::chrono::seconds>(t2 -t1).count(), "s"));
+    mesh_logger(fmt::scat("Meshing domain scan done with ", stats.total_iterations, " points checks and ",
+               double(stats.within_iterations)/stats.total_iterations,  " of positive matches "));
 
     {
         const std::string local_surface_mesh_output_file =_output_mesh_file + ".surface.off";
-        std::cout << "- output surface mesh to " << local_surface_mesh_output_file << std::endl;
+        fmt::scat(std::cout, "- output surface mesh to ", local_surface_mesh_output_file, "\n");
 
         std::ofstream out(local_surface_mesh_output_file);
         CGAL::output_surface_facets_to_off (out, c2t3);
