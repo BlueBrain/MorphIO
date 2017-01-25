@@ -103,16 +103,18 @@ FT is_part_of_morphotree(const Point& p, const morpho_tree & tree, const spatial
 
     if(index.is_within(my_point)){
             stats.within_iterations++;
-            return -1;
+            return -0.5;
     }
 
-    return 1;
+    return 0.5;
 }
 
 
 
 morpho_mesher::morpho_mesher(const std::shared_ptr<morpho_tree> & tree, const std::string &output_mesh_file) :
     _flags(),
+    _error_bound(1.0/100000),
+    _facet_size(0.3),
     _output_mesh_file(output_mesh_file),
     _tree(tree){
 
@@ -122,12 +124,28 @@ void morpho_mesher::set_mesh_tag(mesh_tag tag, bool value){
     _flags[int(tag)] = value;
 }
 
+void morpho_mesher::set_error_bound(double v){
+    _error_bound = 1.0 / v;
+}
+
+void morpho_mesher::set_face_size(double facet_size){
+    _facet_size = facet_size;
+}
+
+
+void morpho_mesher::log_parameters(){
+    std::cout << "-- error bound (precision) " << _error_bound << std::endl;
+    std::cout << "-- facet size " << _facet_size << "\n";
+    std::cout << "-- optimisation of mesh " << ((_flags[mesh_optimisation])?("ENABLED"):("DISABLED")) << "\n";
+}
 
 void morpho_mesher::execute_3d_meshing(){
     step_logger mesh_logger;
 
     mesh_logger("Start meshing 3D");
-    std::cout << "-- optimisation of mesh " << ((_flags[mesh_optimisation])?("ENABLED"):("DISABLED")) << "\n";
+    log_parameters();
+
+
 
     // get global bounding box
     box g_box = _tree->get_bounding_box();
@@ -150,12 +168,12 @@ void morpho_mesher::execute_3d_meshing(){
     };
 
     Mesh_domain domain(domain_distance,
-                       K::Sphere_3(CGAL::ORIGIN, max_distance*max_distance), 1.0 /1000000);
+                       K::Sphere_3(CGAL::ORIGIN, max_distance*max_distance), _error_bound);
     // Mesh criteria
     //Spherical_sizing_field size;
     Mesh_criteria criteria(facet_angle=30,
-                           facet_size=0.1*8, facet_distance=0.025*8,
-                           cell_radius_edge_ratio=2, cell_size=0.3 /*0.1*8*/);
+                           facet_size=_facet_size, facet_distance=_facet_size/4,
+                           cell_radius_edge_ratio=2, cell_size=_facet_size /*0.1*8*/);
 
     // Mesh generation
     mesh_logger("Start mesh generation ");
@@ -208,6 +226,7 @@ void morpho_mesher::execute_surface_meshing(){
 
 
     mesh_logger("Start meshing 2D (surface)");
+    log_parameters();
 
     // get global bounding box
     box g_box = _tree->get_bounding_box();
@@ -231,12 +250,12 @@ void morpho_mesher::execute_surface_meshing(){
 
     // defining the surface
     Surface_3 surface(domain_distance,             // pointer to function
-                      K::Sphere_3(CGAL::ORIGIN, max_distance*max_distance), 1.0/1000000); // bounding sphere
+                      K::Sphere_3(CGAL::ORIGIN, max_distance*max_distance), _error_bound); // bounding sphere
     // Note that "2." above is the *squared* radius of the bounding sphere!
     // defining meshing criteria
     CGAL::Surface_mesh_default_criteria_3<Tr_2D> criteria(30.,  // angular bound
-                                                       0.1*3,  // radius bound
-                                                       0.1*3); // distance bound
+                                                       _facet_size,  // radius bound
+                                                       _facet_size); // distance bound
     // meshing surface
     auto t1 = std::chrono::system_clock::now();
     if(_flags[force_manifold]){

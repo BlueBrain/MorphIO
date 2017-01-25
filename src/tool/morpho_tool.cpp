@@ -68,6 +68,8 @@ po::parsed_options parse_args(int argc, char** argv,
         ("sphere", "x3d: export cloud of sphere (default)")
         ("only-surface", "mesh: do only surface meshing")
         ("force-manifold", "mesh: force generation of manifold mesh, valid only for surface mesh")
+        ("error-bound", po::value<double>(), "mesh: error bound for the dichotomy search during meshing 1/v (default : 100000)")
+        ("facet-size", po::value<double>(), "mesh: set facet size of the mesh (default : auto)")
         ("command", po::value<std::string>(), "command to execute")
         ("subargs", po::value<std::vector<std::string> >(), "Arguments for command");
         ;
@@ -179,6 +181,15 @@ int main(int argc, char** argv){
                     if(options.count("force-manifold")){
                         mesher.set_mesh_tag(morpho_mesher::force_manifold, true);
                     }
+
+                    if(options.count("error-bound")){
+                        mesher.set_error_bound(options["error-bound"].as<double>());
+                    }
+
+                    if(options.count("facet-size")){
+                        mesher.set_face_size(options["facet-size"].as<double>());
+                    }
+
 
 
                     mesher.execute();

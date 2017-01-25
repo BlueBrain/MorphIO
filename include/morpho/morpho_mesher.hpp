@@ -51,6 +51,17 @@ public:
     void set_mesh_tag(mesh_tag, bool value);
 
     ///
+    /// \brief set the error bound value for the surface's dichotomy search ( higher is more precise )
+    /// \param inv_error
+    ///
+    void set_error_bound(double inv_error);
+
+    ///
+    /// \brief set the facet size of the mesh ( delaunay ball radius )
+    ///
+    void set_face_size(double face_size);
+
+    ///
     /// \brief start meshing process
     ///
     void execute();
@@ -58,11 +69,14 @@ public:
 
 private:
     std::bitset<64> _flags;
+    double _error_bound, _facet_size;
+
     std::string _output_mesh_file;
     std::shared_ptr<morpho_tree> _tree;
 
     void execute_3d_meshing();
     void execute_surface_meshing();
+    void log_parameters();
 };
 
 
