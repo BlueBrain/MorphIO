@@ -109,6 +109,7 @@ SpikeReportNEST::SpikeReportNEST( const SpikeReportInitData& initData )
             _spikes[i++] = {spike.first, spike.second};
         }
     }
+
     _lastReadPosition = _spikes.begin();
 }
 

@@ -137,10 +137,7 @@ BOOST_AUTO_TEST_CASE( test_out_of_window )
 
     const float start = spikes.back().first + 1;
 
-    BOOST_CHECK_THROW(
-        const brion::Spikes& window = reader.getSpikes(start, start + 1 ),
-        std::logic_error
-    ) ;
+    BOOST_CHECK_THROW( reader.getSpikes(start, start + 1 ), std::logic_error );
 }
 
 BOOST_AUTO_TEST_CASE( test_simple_stream_read )
@@ -235,5 +232,3 @@ BOOST_AUTO_TEST_CASE( TestSpikes_bluron_spikes_read_write )
     BOOST_CHECK_EQUAL_COLLECTIONS( readSpikes.begin(), readSpikes.end(),
                                    reReadSpikes.begin(), reReadSpikes.end( ));
 }
-
-

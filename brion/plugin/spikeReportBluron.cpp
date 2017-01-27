@@ -48,8 +48,8 @@ SpikeReportBluron::SpikeReportBluron( const SpikeReportInitData& initData )
 {
     if ( initData.getAccessMode() == MODE_READ )
     {
-        SpikeReportFile reader{_uri.getPath(), BLURON_SPIKE_REPORT,
-                               initData.getAccessMode()};
+        SpikeReportFile reader{ _uri.getPath(), BLURON_SPIKE_REPORT,
+                                initData.getAccessMode()};
         SpikeMap spikes;
         reader.fillReportMap( spikes );
 

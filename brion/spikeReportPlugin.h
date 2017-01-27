@@ -139,17 +139,13 @@ public:
                      "Operation not supported in spike report plugin" ));
     }
 
-    void setFilter( const GIDSet & ids )
+    void setFilter( const GIDSet& ids )
     {
         _idsSubset = ids;
         if( !_idsSubset.empty( ))
-        {
-           _pushBackFunction = &SpikeReportPlugin::_pushBackFiltered;
-        }
+            _pushBackFunction = &SpikeReportPlugin::_pushBackFiltered;
         else
-        {
             _pushBackFunction = &SpikeReportPlugin::_pushBack;
-        }
     }
 
     virtual const URI& getURI() const
@@ -190,7 +186,7 @@ protected:
     URI _uri;
     brion::GIDSet _idsSubset;
     int _accessMode = brion::MODE_READ;
-    float _currentTime = -std::numeric_limits< float >::max();
+    float _currentTime = 0;
     State _state = State::ok;
 
     void pushBack( const Spike& spike, Spikes& spikes ) const
@@ -237,7 +233,7 @@ private:
         if( _accessMode != MODE_READ )
         {
             LBTHROW( std::runtime_error(
-                         "Can't read : Not open in read mode" ));
+                         "Can't read: Not open in read mode" ));
         }
     }
     void _checkCanWrite()
@@ -245,13 +241,14 @@ private:
         if( _accessMode != MODE_WRITE )
         {
             LBTHROW( std::runtime_error(
-                         "Can't write : Not open in write mode" ));
+                         "Can't write: Not open in write mode" ));
         }
     }
 
     void _checkStateOk()
     {
-        switch ( _state ) {
+        switch ( _state )
+        {
         case State::ended:
             LBTHROW( std::logic_error( "State is ENDED" ));
         case State::failed:

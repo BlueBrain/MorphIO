@@ -92,7 +92,7 @@ public:
 
 // uri
 
-BOOST_AUTO_TEST_CASE( test_spikes_uri )
+BOOST_AUTO_TEST_CASE( spikes_uri )
 {
     TemporaryData data( "dat" );
 
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE( test_spikes_uri )
 }
 
 // invalid_extension
-BOOST_AUTO_TEST_CASE( test_invalid_open_unknown_extension )
+BOOST_AUTO_TEST_CASE( invalid_open_unknown_extension )
 {
     BOOST_CHECK_THROW( brion::SpikeReport report0( brion::URI( "./bla" ),
                                                    brion::MODE_READ ),
@@ -125,21 +125,21 @@ BOOST_AUTO_TEST_CASE( test_invalid_open_unknown_extension )
 
 // invalid_open::file_notfound
 
-BOOST_AUTO_TEST_CASE( test_invalid_open_file_notfound_binary )
+BOOST_AUTO_TEST_CASE( invalid_open_file_notfound_binary )
 {
     BOOST_CHECK_THROW( brion::SpikeReport report(
                            brion::URI( "/path/file.spikes" ), brion::MODE_READ ),
                        std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_invalid_open_file_notfound_bluron )
+BOOST_AUTO_TEST_CASE( invalid_open_file_notfound_bluron )
 {
     BOOST_CHECK_THROW( brion::SpikeReport report( brion::URI( "/path/file.dat" ),
                                                   brion::MODE_READ ),
                        std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_invalid_open_file_notfound_nest )
+BOOST_AUTO_TEST_CASE( invalid_open_file_notfound_nest )
 {
     BOOST_CHECK_THROW( brion::SpikeReport report( brion::URI( "/path/file.gdf" ),
                                                   brion::MODE_READ ),
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE( test_invalid_open_file_notfound_nest )
 }
 
 
-BOOST_AUTO_TEST_CASE( test_bluron_invalid_report_information )
+BOOST_AUTO_TEST_CASE( bluron_invalid_report_information )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= BLURON_SPIKE_REPORT_FILE;
@@ -160,7 +160,7 @@ BOOST_AUTO_TEST_CASE( test_bluron_invalid_report_information )
 
 // invoke_invalid_method
 
-BOOST_AUTO_TEST_CASE( test_invoke_invalid_method_binary )
+BOOST_AUTO_TEST_CASE( invoke_invalid_method_binary )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= BINARY_SPIKE_REPORT_FILE;
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE( test_invoke_invalid_method_binary )
 }
 
 
-BOOST_AUTO_TEST_CASE( test_invoke_invalid_method_bluron )
+BOOST_AUTO_TEST_CASE( invoke_invalid_method_bluron )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= BLURON_SPIKE_REPORT_FILE;
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_CASE( test_invoke_invalid_method_bluron )
                        std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_invoke_invalid_method_nest )
+BOOST_AUTO_TEST_CASE( invoke_invalid_method_nest )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     const std::string& files = "NESTSpikeData/spike_detector-65537-*.gdf";
@@ -194,9 +194,6 @@ BOOST_AUTO_TEST_CASE( test_invoke_invalid_method_nest )
     BOOST_CHECK_THROW( report.write( brion::Spikes {} ),
                        std::runtime_error );
 }
-
-
-// write_data
 
 inline void testWrite (const char * format)
 {
@@ -215,22 +212,20 @@ inline void testWrite (const char * format)
                                    readSpikes.begin(), readSpikes.end( ));
 }
 
-BOOST_AUTO_TEST_CASE( test_write_data_binary )
+BOOST_AUTO_TEST_CASE( write_data_binary )
 {
     testWrite( "spikes" );
 }
 
-BOOST_AUTO_TEST_CASE( test_write_data_nest )
+BOOST_AUTO_TEST_CASE( write_data_nest )
 {
     testWrite( "gdf" );
 }
 
-BOOST_AUTO_TEST_CASE( test_write_data_bluron )
+BOOST_AUTO_TEST_CASE( write_data_bluron )
 {
     testWrite( "dat" );
 }
-
-// read
 
 inline void testRead(const char * format)
 {
@@ -274,37 +269,37 @@ inline void testReadFiltered(const char * format)
     BOOST_CHECK_EQUAL( reportRead.getState(), brion::SpikeReport::State::ended );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_binary )
+BOOST_AUTO_TEST_CASE( read_binary )
 {
     testRead( "spikes" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_nest )
+BOOST_AUTO_TEST_CASE( read_nest )
 {
     testRead( "gdf" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_bluron )
+BOOST_AUTO_TEST_CASE( read_bluron )
 {
     testRead( "dat" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_filtered_binary )
+BOOST_AUTO_TEST_CASE( read_filtered_binary )
 {
     testReadFiltered( "spikes" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_filtered_nest )
+BOOST_AUTO_TEST_CASE( read_filtered_nest )
 {
     testReadFiltered( "gdf" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_filtered_bluron )
+BOOST_AUTO_TEST_CASE( read_filtered_bluron )
 {
     testReadFiltered( "dat" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_content_bluron )
+BOOST_AUTO_TEST_CASE( read_content_bluron )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= BLURON_SPIKE_REPORT_FILE;
@@ -321,7 +316,7 @@ BOOST_AUTO_TEST_CASE( test_read_content_bluron )
     BOOST_CHECK_EQUAL( spikes.rbegin()->second, BLURON_LAST_SPIKE_GID );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_content_nest )
+BOOST_AUTO_TEST_CASE( read_content_nest )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     const std::string& files = "NESTSpikeData/spike_detector-65537-*.gdf";
@@ -352,7 +347,6 @@ BOOST_AUTO_TEST_CASE( test_read_content_nest )
     BOOST_CHECK_EQUAL( spikes.rbegin()->second, NEST_LAST_SPIKE_GID );
 }
 
-// read_until
 inline void testReadUntil(const char * format)
 {
     TemporaryData data {format} ;
@@ -404,32 +398,32 @@ inline void testReadUntilFiltered(const char * format)
                        std::logic_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_until_binary )
+BOOST_AUTO_TEST_CASE( read_until_binary )
 {
     testReadUntil( "spikes" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_until_nest )
+BOOST_AUTO_TEST_CASE( read_until_nest )
 {
     testReadUntil( "gdf" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_until_bluron )
+BOOST_AUTO_TEST_CASE( read_until_bluron )
 {
     testReadUntil( "dat" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_until_filtered_binary )
+BOOST_AUTO_TEST_CASE( read_until_filtered_binary )
 {
     testReadUntilFiltered( "spikes" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_until_filtered_nest )
+BOOST_AUTO_TEST_CASE( read_until_filtered_nest )
 {
     testReadUntilFiltered( "gdf" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_until_filtered_bluron )
+BOOST_AUTO_TEST_CASE( read_until_filtered_bluron )
 {
     testReadUntilFiltered( "dat" );
 }
@@ -478,17 +472,17 @@ inline void testReadSeek(const char* format)
     BOOST_CHECK_EQUAL( reportRead.getState(), brion::SpikeReport::State::ended );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_seek_binary )
+BOOST_AUTO_TEST_CASE( read_seek_binary )
 {
     testReadSeek( "spikes" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_seek_nest )
+BOOST_AUTO_TEST_CASE( read_seek_nest )
 {
     testReadSeek( "gdf" );
 }
 
-BOOST_AUTO_TEST_CASE( test_read_seek_bluron )
+BOOST_AUTO_TEST_CASE( read_seek_bluron )
 {
     testReadSeek( "dat" );
 }
@@ -512,17 +506,17 @@ inline void testInvalidRead(const char * format)
     BOOST_CHECK_THROW( reportRead.readUntil( 0.1 ), std::logic_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_invalid_read_binary )
+BOOST_AUTO_TEST_CASE( invalid_read_binary )
 {
     testInvalidRead( "spikes" );
 }
 
-BOOST_AUTO_TEST_CASE( test_invalid_read_nest )
+BOOST_AUTO_TEST_CASE( invalid_read_nest )
 {
     testInvalidRead( "gdf" );
 }
 
-BOOST_AUTO_TEST_CASE( test_invalid_read_bluron )
+BOOST_AUTO_TEST_CASE( invalid_read_bluron )
 {
     testInvalidRead( "dat" );
 }
@@ -536,27 +530,31 @@ inline void testInvalidWrite(const char * format)
                                     brion::MODE_WRITE );
     reportWrite.write( data.spikes );
 
-    BOOST_CHECK_THROW( reportWrite.write({{0.0, 0 }}), std::logic_error );
+    BOOST_CHECK_THROW( reportWrite.write({{ 0.0, 0 }}), std::logic_error );
+
+    brion::SpikeReport reportRead { brion::URI( data.tmpFileName ),
+                                    brion::MODE_READ };
+    BOOST_CHECK_THROW( reportRead.write({{ 100.0, 0 }}), std::runtime_error );
 }
 
-BOOST_AUTO_TEST_CASE( test_invalid_write_binary )
+BOOST_AUTO_TEST_CASE( invalid_write_binary )
 {
     testInvalidWrite( "spikes" );
 }
 
-BOOST_AUTO_TEST_CASE( test_invalid_write_nest )
+BOOST_AUTO_TEST_CASE( invalid_write_nest )
 {
     testInvalidWrite( "gdf" );
 }
 
-BOOST_AUTO_TEST_CASE( test_invalid_write_bluron )
+BOOST_AUTO_TEST_CASE( invalid_write_bluron )
 {
     testInvalidWrite( "dat" );
 }
 
 // write incremental
 
-inline void testWriteIncreamental (const char * format)
+inline void testWriteIncremental (const char * format)
 {
     TemporaryData data{ format };
     brion::SpikeReport reportWrite( brion::URI( data.tmpFileName ),
@@ -573,19 +571,19 @@ inline void testWriteIncreamental (const char * format)
     BOOST_CHECK_EQUAL( spikes.size(), 3 );
 }
 
-BOOST_AUTO_TEST_CASE( test_write_incremental_binary )
+BOOST_AUTO_TEST_CASE( write_incremental_binary )
 {
-    testWriteIncreamental( "spikes" );
+    testWriteIncremental( "spikes" );
 }
 
-BOOST_AUTO_TEST_CASE( test_write_incremental_nest )
+BOOST_AUTO_TEST_CASE( write_incremental_nest )
 {
-    testWriteIncreamental( "gdf" );
+    testWriteIncremental( "gdf" );
 }
 
-BOOST_AUTO_TEST_CASE( test_write_incremental_bluron )
+BOOST_AUTO_TEST_CASE( write_incremental_bluron )
 {
-    testWriteIncreamental( "dat" );
+    testWriteIncremental( "dat" );
 }
 
 // seek and write
@@ -618,17 +616,17 @@ inline void testSeekAndWrite( const char * format )
                                    expected.begin(), expected.end( ));
 }
 
-BOOST_AUTO_TEST_CASE( test_seek_and_write_binary )
+BOOST_AUTO_TEST_CASE( seek_and_write_binary )
 {
     testSeekAndWrite( "spikes" );
 }
 
-BOOST_AUTO_TEST_CASE( test_seek_and_write_nest )
+BOOST_AUTO_TEST_CASE( seek_and_write_nest )
 {
     // Not supported
 }
 
-BOOST_AUTO_TEST_CASE( test_seek_and_write_bluron )
+BOOST_AUTO_TEST_CASE( seek_and_write_bluron )
 {
     // Not supported
 }

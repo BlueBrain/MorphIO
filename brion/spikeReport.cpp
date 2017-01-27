@@ -189,7 +189,8 @@ std::future< Spikes > SpikeReport::readUntil( const float max )
     if ( max <= getCurrentTime() )
     {
         LBTHROW( std::logic_error(
-            "Can't read to a time stamp inferior to the current time" ) );
+            "Can't read to " + std::to_string( max ) + " with current time " +
+            std::to_string( getCurrentTime( ))));
     }
 
     if ( _impl->threadPool.hasPendingJobs() )

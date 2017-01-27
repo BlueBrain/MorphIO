@@ -23,37 +23,11 @@
 #include <brion/types.h>
 #include <brion/spikeReportPlugin.h>
 
-namespace lunchbox
-{
-class MemoryMap;
-}
-
 namespace brion
 {
 namespace plugin
 {
-
-class BinaryReportFileMemMap
-{
-public:
-    BinaryReportFileMemMap() = default;
-
-    void mapForRead( const std::string& path );
-    void mapForReadWrite( const std::string& path, size_t spikeCount );
-
-    size_t getSpikeCount() const;
-    Spike* getSpikes() const;
-
-    bool isMappedForRead()const;
-
-    operator bool() const;
-
-private:
-    std::unique_ptr< lunchbox::MemoryMap > _memFile;
-    Spike* _begin = nullptr;
-    size_t _spikeCount = 0;
-    bool _mappedForRead = false;
-};
+class BinaryReportMap;
 
 /**
  * A Binary spike report reader.
@@ -72,7 +46,7 @@ public:
     static bool handles( const SpikeReportInitData& initData );
     static std::string getDescription();
 
-    void close() final;
+    void close() final {}
     Spikes read( float min ) final;
     Spikes readUntil( float max ) final;
     void readSeek( float toTimeStamp ) final;
@@ -80,7 +54,7 @@ public:
     void write( const Spikes& spikes ) final;
 
 private:
-    BinaryReportFileMemMap _memFile;
+    std::unique_ptr< BinaryReportMap > _memFile;
     size_t _startIndex = 0;
 };
 }

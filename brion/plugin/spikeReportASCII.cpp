@@ -29,8 +29,6 @@
 
 #include <fstream>
 
-using brion::Spike;
-
 namespace brion
 {
 namespace plugin
@@ -67,9 +65,7 @@ Spikes SpikeReportASCII::readUntil( const float toTimeStamp )
         []( const Spike& spike, float val ) { return spike.first < val; });
 
     if( _lastReadPosition != _spikes.end( ))
-    {
          _currentTime = _lastReadPosition->first;
-    }
     else
     {
         _currentTime = UNDEFINED_TIMESTAMP;
@@ -122,7 +118,7 @@ void SpikeReportASCII::writeSeek( const float toTimeStamp )
 {
     if( toTimeStamp < _currentTime )
         LBTHROW(
-            std::runtime_error( "Backward seek is unsupported in write mode" ));
+            std::runtime_error( "Backward seek not supported in write mode" ));
 
     _currentTime = toTimeStamp;
 }

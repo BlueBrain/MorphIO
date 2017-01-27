@@ -38,113 +38,81 @@ namespace
 lunchbox::PluginRegisterer< SpikeReportBinary > registerer;
 }
 
-using brion::Spike;
-
 namespace fs = boost::filesystem;
 
 class Header
 {
 public:
-    void init()
-    {
-        _magic = 0xf0a;
-        _version = 1;
-    }
-
     bool isValid() const
     {
         return _magic == 0xf0a && _version == 1;
     }
 
 private:
-    uint32_t _magic = 0;
-    uint32_t _version = 0;
+    uint32_t _magic = 0xf0a;
+    uint32_t _version = 1;
 };
 
-void BinaryReportFileMemMap::mapForRead( const std::string& path )
+class BinaryReportMap
 {
-    _begin = nullptr;
-    _memFile.reset( new lunchbox::MemoryMap{path} );
-    const size_t totalSize = _memFile->getSize();
-
-    if ( totalSize == 0 || ( totalSize % sizeof( uint32_t ) ) != 0 )
+public:
+    // Read-only mapping
+    BinaryReportMap( const std::string& path )
+        : _map( path )
     {
-        LBTHROW( std::runtime_error( "Incompatible binary report: " + path ) );
-    }
-    const Header* header = _memFile->getAddress< Header >();
+        const size_t totalSize = _map.getSize();
+        if( totalSize < sizeof( Header ) ||
+            ( totalSize % sizeof( uint32_t ) ) != 0 )
+        {
+            LBTHROW( std::runtime_error( "Incompatible binary report: " + path ));
+        }
 
-    if ( !header->isValid() )
+        if( !_map.getAddress< Header >()->isValid( ))
+        {
+            LBTHROW( std::runtime_error( "Invalid binary spike report header: " + path ) );
+        }
+    }
+
+    // read-write mapping
+    BinaryReportMap( const std::string& path, size_t nSpikes )
+        : _map( path, sizeof( Header ) + sizeof( Spike ) * nSpikes )
     {
-        LBTHROW( std::runtime_error( "Invalid binary spike report header: " + path ) );
+        *(_map.getAddress< Header >( )) = Header();
     }
 
-    _spikeCount = ( totalSize - sizeof( Header ) ) / sizeof( Spike );
+    void resize( const size_t nSpikes )
+    {
+        _map.resize( sizeof( Header ) + sizeof( Spike ) * nSpikes );
+    }
 
-    _begin = _memFile->getAddress< Spike >();
-    ++_begin; // skip the header
-    _mappedForRead = true;
-}
+    size_t getNumSpikes() const
+    {
+        return ( _map.getSize() - sizeof( Header ) ) / sizeof( Spike );
+    }
 
-void BinaryReportFileMemMap::mapForReadWrite( const std::string& path,
-                                              const size_t spikeCount )
-{
-    _begin = nullptr;
-    _memFile.reset(
-        new lunchbox::MemoryMap{path, sizeof( Header ) + sizeof( Spike ) * spikeCount} );
+    const Spike* getReadableSpikes() const
+    {
+        return reinterpret_cast< const Spike* >( _map.getAddress< uint8_t >() +
+                                                 sizeof( Header ));
+    }
 
-    _memFile->getAddress< Header >()->init();
-    _spikeCount = spikeCount;
-    _begin = _memFile->getAddress< Spike >();
-    ++_begin; // skip the header
+    Spike* getWritableSpikes()
+    {
+        return reinterpret_cast< Spike* >( _map.getAddress< uint8_t >() +
+                                           sizeof( Header ));
+    }
 
-    _mappedForRead = false;
-}
-
-size_t BinaryReportFileMemMap::getSpikeCount() const
-{
-    return _spikeCount;
-}
-
-Spike* BinaryReportFileMemMap::getSpikes() const
-{
-    return _begin;
-}
-
-bool BinaryReportFileMemMap::isMappedForRead() const
-{
-    return _mappedForRead;
-}
-
-BinaryReportFileMemMap::operator bool() const
-{
-    return _begin != nullptr;
-}
+private:
+    lunchbox::MemoryMap _map;
+};
 
 SpikeReportBinary::SpikeReportBinary( const SpikeReportInitData& initData )
     : SpikeReportPlugin( initData )
 {
-    if ( _accessMode == MODE_READ )
-    {
-        if ( !fs::exists( getURI().getPath() ) )
-        {
-            LBTHROW(
-                std::runtime_error( "Cannot find file:'" + getURI().getPath() + "'." ) );
-        }
-        _memFile.mapForRead( getURI().getPath() );
-    }
+    if( _accessMode == MODE_READ )
+        _memFile.reset( new BinaryReportMap( getURI().getPath( )));
     else
-    {
-        if ( !boost::filesystem::exists( getURI().getPath() ) )
-        {
-            std::fstream fs;
-            fs.open( getURI().getPath(), std::ios::out );
-            if ( !fs )
-                LBTHROW( std::runtime_error( "Failed to create file: '" +
-                                             getURI().getPath() + "'." ) );
-            fs.close();
-            _memFile.mapForReadWrite( getURI().getPath(), 0 ); // create an empty file
-        }
-    }
+        _memFile.reset( new BinaryReportMap( getURI().getPath(), 0 ));
 }
 
 bool SpikeReportBinary::handles( const SpikeReportInitData& initData )
@@ -159,20 +127,16 @@ bool SpikeReportBinary::handles( const SpikeReportInitData& initData )
 
 std::string SpikeReportBinary::getDescription()
 {
-    return "Blue Brain binary spike reports:\n"
-           "  [file://]/path/to/report" +
-           std::string( BINARY_REPORT_FILE_EXT );
-}
-void SpikeReportBinary::close()
-{
+    return "Blue Brain binary spike reports:  "
+           "[file://]/path/to/report" + std::string( BINARY_REPORT_FILE_EXT );
 }
 
 Spikes SpikeReportBinary::read( const float )
 {
     // In file based reports, this function reads all remaining data.
     Spikes spikes;
-    Spike* spikeArray = _memFile.getSpikes();
-    const size_t nElems = _memFile.getSpikeCount();
+    const Spike* spikeArray = _memFile->getReadableSpikes();
+    const size_t nElems = _memFile->getNumSpikes();
 
     for ( ; _startIndex < nElems; ++_startIndex )
         pushBack( spikeArray[_startIndex], spikes );
@@ -186,8 +150,8 @@ Spikes SpikeReportBinary::readUntil( const float max )
 {
     Spikes spikes;
 
-    Spike* spikeArray = _memFile.getSpikes();
-    const size_t nElems = _memFile.getSpikeCount();
+    const Spike* spikeArray = _memFile->getReadableSpikes();
+    const size_t nElems = _memFile->getNumSpikes();
 
     for ( ; _startIndex < nElems; ++_startIndex )
     {
@@ -199,7 +163,7 @@ Spikes SpikeReportBinary::readUntil( const float max )
         pushBack( spikeArray[_startIndex], spikes );
     }
 
-    if ( _startIndex == nElems )
+    if( _startIndex == nElems )
     {
         _currentTime = UNDEFINED_TIMESTAMP;
         _state = State::ended;
@@ -207,16 +171,13 @@ Spikes SpikeReportBinary::readUntil( const float max )
 
     return spikes;
 }
+
 void SpikeReportBinary::readSeek( const float toTimeStamp )
 {
-    if ( !_memFile || !_memFile.isMappedForRead() )
-    {
-        _memFile.mapForRead( getURI().getPath() );
-    }
-    Spike* spikeArray = _memFile.getSpikes();
-    const size_t nElems = _memFile.getSpikeCount();
+    const Spike* spikeArray = _memFile->getReadableSpikes();
+    const size_t nElems = _memFile->getNumSpikes();
 
-    Spike* position = nullptr;
+    const Spike* position = nullptr;
 
     if ( toTimeStamp < _currentTime )
     {
@@ -247,32 +208,26 @@ void SpikeReportBinary::readSeek( const float toTimeStamp )
 
 void SpikeReportBinary::writeSeek( float toTimeStamp )
 {
-    if ( !_memFile )
-        _memFile.mapForReadWrite( getURI().getPath(),
-                                  fs::file_size( getURI().getPath() ) );
     readSeek( toTimeStamp );
 }
 
 void SpikeReportBinary::write( const Spikes& spikes )
 {
-    size_t totalSpikeCount = _startIndex + spikes.size();
+    size_t totalSpikes = _startIndex + spikes.size();
 
     if ( spikes.empty() )
         return;
 
     // create or resize the file
-    if ( !_memFile || _memFile.getSpikeCount() != totalSpikeCount )
-    {
-        _memFile.mapForReadWrite( getURI().getPath(), totalSpikeCount );
-    }
+    if ( _memFile->getNumSpikes() != totalSpikes )
+        _memFile->resize( totalSpikes );
 
-    Spike* spikeArray = _memFile.getSpikes();
-
-    for ( const Spike& spike : spikes )
-    {
+    Spike* spikeArray = _memFile->getWritableSpikes();
+    for( const Spike& spike : spikes )
         spikeArray[_startIndex++] = spike;
-    }
-    _currentTime = spikes.rbegin()->first + std::numeric_limits< float >::epsilon();
+
+    _currentTime = spikes.rbegin()->first +
+                   std::numeric_limits< float >::epsilon();
 }
 }
 } // namespaces

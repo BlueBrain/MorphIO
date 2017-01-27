@@ -83,7 +83,10 @@ int main( const int argc, char** argv )
         ( "help,h", "Produce help message" )
         ( "version,v", "Show program name/version banner and exit" )
 #ifdef BRION_USE_BBPTESTDATA
-        ( "input,i", po::value< std::string >(), "Input report URI" )
+        ( "input,i", po::value< std::string >()->default_value(
+            std::string( BBP_TESTDATA ) +
+            "/circuitBuilding_1000neurons/Neurodamus_output/voltages.bbp" ),
+          "Input report URI" )
 #else
         ( "input,i", po::value< std::string >()->required(), "Input report URI")
 #endif
@@ -134,23 +137,9 @@ int main( const int argc, char** argv )
         return EXIT_FAILURE;
     }
 
-    std::string input;
-    if( vm.count( "input" ))
-        input = vm["input"].as< std::string >();
-
+    const std::string input = vm["input"].as< std::string >();
     const size_t maxFrames = vm.count( "maxFrames" ) == 1 ?
         vm["maxFrames"].as< size_t >() : std::numeric_limits< size_t >::max();
-
-#ifdef BRION_USE_BBPTESTDATA
-    if( input.empty( ))
-        input = std::string( BBP_TESTDATA ) +
-                "/circuitBuilding_1000neurons/Neurodamus_output/voltages.bbp";
-#endif
-    if( input.empty( ))
-    {
-        std::cout << "Missing input URI" << std::endl;
-        return EXIT_FAILURE;
-    }
 
     lunchbox::URI inURI( input );
     lunchbox::Clock clock;

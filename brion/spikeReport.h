@@ -62,7 +62,7 @@ public:
      * State::ended means that the report end is reached (in read mode)
      * State::failed means that a error occured when readyn or writing the report
      */
-    enum class State : uint8_t
+    enum class State
     {
         ok,
         ended,
@@ -119,6 +119,7 @@ public:
      * @version 2.0
      */
     BRION_API void close();
+
     /**
      * \return true if the report was closed
      * @version 2.0
@@ -144,7 +145,7 @@ public:
 
     /**
      * @return the end time of the latest complete read/write operation or
-     *         -inf if no operation has been issued.
+     *         0 if no operation has been issued.
      *
      * Read operations are deemed as complete when the returned future is
      * ready.
@@ -272,8 +273,8 @@ public:
      *
      * @param spikes A collection of spikes sorted by timestamp in ascending
      *        order. For every spike, its timestamp must be >= getCurrentTime().
-     * @throw std::runtime_error if the input spikes are not sorted or a
-     *        timestamp is < getCurrentTime().
+     * @throw std::runtime_error if the report is read-only, the input spikes
+     *        are not sorted, or a timestamp is < getCurrentTime().
      * @version 2.0
      */
     BRION_API void write( const Spikes& spikes );

@@ -82,7 +82,7 @@ SpikeReportFile::SpikeReportFile( const std::string& filename,
 {
     if( filename.empty( ))
     {
-        LBTHROW( std::runtime_error( "Error opening spike times file:'" +
+        LBTHROW( std::runtime_error( "Error opening spike times file: '" +
                                      _filename + "'." ));
     }
 
@@ -92,7 +92,7 @@ SpikeReportFile::SpikeReportFile( const std::string& filename,
         if(( accessMode & MODE_OVERWRITE ) != MODE_OVERWRITE
                 && boost::filesystem::exists( _filename ))
         {
-            LBTHROW( std::runtime_error( "Cannot overwrite existing file:'" +
+            LBTHROW( std::runtime_error( "Cannot overwrite existing file: '" +
                                          _filename + "'." ));
         }
 
@@ -142,7 +142,7 @@ bool SpikeReportFile::fillReportMap( SpikeMap& spikes, const size_t maxLines )
     size_t lineNumber = 0;
     *_file >> detail::SkipWhiteSpace( lineNumber );
 
-    std::vector< Spike > spikeArray;
+    Spikes spikeArray;
 
 #ifdef BRION_USE_OPENMP
     // The batch size is divisible by all reasonable core counts between 1
