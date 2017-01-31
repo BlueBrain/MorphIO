@@ -41,7 +41,6 @@ enum class SynapsePrefetch
 };
 
 class Circuit;
-class Spikes;
 class SpikeReportReader;
 class SpikeReportWriter;
 class Synapse;
@@ -67,6 +66,8 @@ using brion::uint32_ts;
 using brion::size_ts;
 
 using brion::SectionOffsets;
+using brion::Spike;
+using brion::Spikes;
 using brion::CompartmentCounts;
 
 typedef std::vector< Matrix4f > Matrix4fs;

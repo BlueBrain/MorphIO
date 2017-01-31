@@ -41,16 +41,42 @@ namespace
 // Helper clasess for template meta-programming of create_array_from_vector
 template< typename T > struct NumpyArrayInfo;
 
-#define DECLARE_ARRAY_INFO( T, NPY_TYPE, NUM_DIM, DIMENSIONS... ) \
+#define DECLARE_ARRAY_INFO( T, NPY_TYPE, NUM_DIM, /*DIMENSIONS*/...  ) \
 template<> struct NumpyArrayInfo< T >               \
 {                                                   \
-    NumpyArrayInfo( const T*, const npy_intp size ) \
-        : dims{ size, DIMENSIONS }                  \
+    NumpyArrayInfo( const npy_intp size )           \
+        : descr( PyArray_DescrFromType( NPY_TYPE )) \
+        , dims{ size, __VA_ARGS__ }                 \
     {}                                              \
     static const int ndims = NUM_DIM;               \
-    static const int type = NPY_TYPE;               \
+    PyArray_Descr* descr;                           \
     npy_intp dims[ndims];                           \
+};
+
+PyArray_Descr* createDtype( const char* dtype )
+{
+    bp::object format( dtype );
+    PyArray_Descr* descr;
+    if( PyArray_DescrConverter( format.ptr(), &descr ) == -1 )
+    {
+        PyErr_SetString( PyExc_RuntimeError, "Internal wrapping error in C++ to"
+                         " numpy array conversion" );
+        bp::throw_error_already_set();
+    }
+    return descr;
 }
+
+#define DECLARE_STRUCTURED_ARRAY_INFO( T, DTYPE_STR ) \
+template<> struct NumpyArrayInfo< T >      \
+{                                          \
+    NumpyArrayInfo( const npy_intp size )  \
+        : descr( createDtype( DTYPE_STR )) \
+        , dims{ size }                     \
+    {}                                     \
+    static const int ndims = 1;            \
+    PyArray_Descr* descr;                  \
+    npy_intp dims[1];                      \
+};
 
 DECLARE_ARRAY_INFO( uint32_t, NPY_UINT, 1 );
 DECLARE_ARRAY_INFO( int, NPY_INT, 1 );
@@ -62,20 +88,14 @@ DECLARE_ARRAY_INFO( Vector3f, NPY_FLOAT, 2, 3 );
 DECLARE_ARRAY_INFO( Vector4f, NPY_FLOAT, 2, 4 );
 DECLARE_ARRAY_INFO( Quaternionf, NPY_FLOAT, 2, 4 );
 DECLARE_ARRAY_INFO( Matrix4f, NPY_FLOAT, 3, 4, 4 );
+DECLARE_STRUCTURED_ARRAY_INFO( Spike, "f4, u4" );
 
 // Functions for the boost::shared_ptr< std::vector< T >> to numpy converter
 
-template< typename T >
-PyObject* _createNumpyArray( const T* data, const size_t size,
-                             const AbstractCustodianPtr& keeper )
+void _setBaseObject( PyObject* array, const AbstractCustodianPtr& keeper )
 {
-    typedef NumpyArrayInfo< T > Info;
-    Info info( data, size );
-    PyObject* array = PyArray_SimpleNewFromData(
-        Info::ndims, info.dims, Info::type, ( void* )data );
-
-    // Pointer sharing between the C++ shrared_ptr and the numpy array is only
-    // available for Numpy >= 1.7.
+    // Pointer sharing between the C++ shrared_ptr and the numpy array is
+    // only available for Numpy >= 1.7.
     // PyArray_SetBaseObject steels the reference.
     bp::object pykeeper( keeper );
     Py_INCREF( pykeeper.ptr( ));
@@ -87,8 +107,21 @@ PyObject* _createNumpyArray( const T* data, const size_t size,
         Py_DECREF( pykeeper.ptr( ));
         bp::throw_error_already_set();
     }
-    return array;
 }
+
+template< typename T >
+PyObject* _createNumpyArray( const T* data, const size_t size,
+                             const AbstractCustodianPtr& keeper )
+{
+    typedef NumpyArrayInfo< T > Info;
+    Info info( size );
+    PyObject* array = PyArray_NewFromDescr(
+        &PyArray_Type, info.descr, Info::ndims, info.dims, nullptr,
+        ( void* )data, 0, nullptr);
+    _setBaseObject( array, keeper );
+    return array;
+};
+
 
 template< typename T >
 PyObject* _createNumpyArray( const std::vector< T >& vector,
@@ -172,6 +205,7 @@ void importArray()
     REGISTER_ARRAY_CONVERTER( Vector4f );
     REGISTER_ARRAY_CONVERTER( Quaternionf );
     REGISTER_ARRAY_CONVERTER( Matrix4f );
+    REGISTER_ARRAY_CONVERTER( Spike );
 
     bp::class_< AbstractCustodian, AbstractCustodianPtr >( "_Custodian" );
 }

@@ -22,8 +22,10 @@
 #ifndef BRAIN_SPIKEREPORTREADER_H
 #define BRAIN_SPIKEREPORTREADER_H
 
+#include <brain/api.h>
+#include <brain/types.h>
+
 #include <boost/noncopyable.hpp>
-#include <brion/types.h>
 
 namespace brain
 {
@@ -45,13 +47,13 @@ public:
      * @version 1.0
      * @throw std::runtime_error if source is invalid.
      */
-    explicit SpikeReportReader( const brion::URI& uri );
+    BRAIN_API explicit SpikeReportReader( const brion::URI& uri );
 
     /**
      * Destructor.
      * @version 1.0
      */
-    ~SpikeReportReader();
+    BRAIN_API ~SpikeReportReader();
 
     /**
      * Get all spikes inside a time window.
@@ -64,7 +66,17 @@ public:
      * @throw std::logic_error if the precondition is not fulfilled.
      * @version 1.0
      */
-    brion::Spikes getSpikes( const float start, const float end );
+    BRAIN_API Spikes getSpikes( const float start, const float end );
+
+    /**
+     * @return the end timestamp of the report. This is the timestamp of the
+     *         last spike known to be available or larger if the implementation
+     *         has more metadata available.
+     *         For stream reports this time is 0 and it is updated when
+     *         getSpikes is called.
+     * @version 1.0
+     */
+     BRAIN_API float getEndTime() const;
 
     /**
      * @return true if any of the versions of getSpikes() reaches the end
@@ -72,8 +84,7 @@ public:
                called.
      * @version 1.0
      */
-    bool hasEnded() const;
-
+    BRAIN_API bool hasEnded() const;
 
     /**
      * Close the data source.
@@ -85,7 +96,7 @@ public:
      *
      * @version 1.0
      */
-    void close();
+    BRAIN_API void close();
 
 private:
     class _Impl;

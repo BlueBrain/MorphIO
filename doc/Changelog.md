@@ -3,6 +3,10 @@ Changelog {#Changelog}
 
 # git master
 
+* [120](https://github.com/BlueBrain/Brion/pull/120), [131](https://github.com/BlueBrain/Brion/pull/131):
+  - New SpikeReport API.
+  - Reimplementation of the high level SpikeReportReader. The new implementation
+    uses numpy arrays to provide the requested spikes.
 * [126](https://github.com/BlueBrain/Brion/pull/126):
   Add erase for map compartment reports
 * [122](https://github.com/BlueBrain/Brion/pull/122):

@@ -19,6 +19,9 @@
 
 #include <boost/python.hpp>
 
+#include "arrayHelpers.h"
+#include "docstrings.h"
+
 #include <brain/types.h>
 #include <brain/spikeReportReader.h>
 
@@ -33,19 +36,34 @@ SpikeReportReaderPtr _initURI( const std::string& uri )
 {
     return SpikeReportReaderPtr( new SpikeReportReader( brion::URI( uri )));
 }
+
+bp::object SpikeReportReader_getSpikes(SpikeReportReader& reader,
+                                       const float startTime,
+                                       const float endTime )
+{
+    return toNumpy( reader.getSpikes( startTime, endTime ));
+}
 }
 
 void export_SpikeReportReader()
 {
 
+const auto selfarg = bp::arg( "self" );
+
 bp::class_< SpikeReportReader, boost::noncopyable >(
     "SpikeReportReader", bp::no_init )
-    .def( "__init__", bp::make_constructor( _initURI ))
-    .def( "close", &SpikeReportReader::close )        
-    .def( "getSpikes",
-          ( brion::Spikes (SpikeReportReader::* )( float, float ))
-          &SpikeReportReader::getSpikes )
-    .def( "hasEnded", &SpikeReportReader::hasEnded );
+    .def( "__init__", bp::make_constructor( _initURI ),
+          DOXY_FN( brain::SpikeReportReader::SpikeReportReader ))
+    .def( "close", &SpikeReportReader::close,
+          DOXY_FN( brain::SpikeReportReader::close ))
+    .def( "get_spikes", SpikeReportReader_getSpikes,
+          ( selfarg, bp::arg( "start_time" ), bp::arg( "stop_time" )),
+          DOXY_FN( brain::SpikeReportReader::getSpikes ))
+    .add_property( "end_time", &SpikeReportReader::getEndTime,
+                   DOXY_FN( brain::SpikeReportReader::getEndTime ))
+    .add_property( "has_ended", &SpikeReportReader::hasEnded,
+                   DOXY_FN( brain::SpikeReportReader::hasEnded ))
+    ;
 }
 
 }

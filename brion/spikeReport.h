@@ -161,6 +161,16 @@ public:
     BRION_API float getCurrentTime() const;
 
     /**
+     * @return the end timestamp of the report. This is the timestamp of the
+     *         last spike known to be available or written or larger if the
+     *         implementation has more metadata available.
+     *         For stream reports this time is 0 before any operation is
+     *         completed.
+     * @version 2.0
+     */
+    BRION_API float getEndTime() const;
+
+    /**
      * @return The state after the last completed operation.
      * @version 2.0
      */
@@ -284,6 +294,12 @@ public:
      * @version 2.0
      */
     BRION_API void write( const Spikes& spikes );
+
+    /**
+     * @return Whether the report supports seek to t < getCurrentTime() or not.
+     * @version 2.0
+     */
+    BRION_API bool supportsBackwardSeek() const;
 
 private:
     std::unique_ptr< detail::SpikeReport > _impl;

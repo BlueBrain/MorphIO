@@ -30,7 +30,6 @@
 #define BLURON_SPIKE_REPORT_FILE  "local/simulations/may17_2011/Control/out.dat"
 #define BINARY_SPIKE_REPORT_FILE  "local/simulations/may17_2011/Control/out.spikes"
 
-
 #define BLURON_SPIKES_START_TIME 0.15f
 #define BLURON_SPIKES_END_TIME 9.975f
 
@@ -186,13 +185,31 @@ BOOST_AUTO_TEST_CASE( invoke_invalid_method_bluron )
 BOOST_AUTO_TEST_CASE( invoke_invalid_method_nest )
 {
     boost::filesystem::path path( BBP_TESTDATA );
-    const std::string& files = "NESTSpikeData/spike_detector-65537-*.gdf";
-
-    brion::SpikeReport report(
-                brion::URI(( path / files ).string( )),
-                brion::MODE_READ );
+    const std::string files( "NESTSpikeData/spike_detector-65537-*.gdf" );
+    brion::SpikeReport report( brion::URI(( path / files ).string( )),
+                               brion::MODE_READ );
     BOOST_CHECK_THROW( report.write( brion::Spikes {} ),
                        std::runtime_error );
+}
+
+BOOST_AUTO_TEST_CASE( end_time )
+{
+    boost::filesystem::path path( BBP_TESTDATA );
+
+    const std::string filename1( "NESTSpikeData/spike_detector-65537-*.gdf" );
+    brion::SpikeReport report1( brion::URI(( path / filename1 ).string( )),
+                               brion::MODE_READ );
+    BOOST_CHECK_EQUAL( report1.getEndTime(), 98.90f );
+
+    const std::string filename2( BLURON_SPIKE_REPORT_FILE );
+    brion::SpikeReport report2( brion::URI(( path / filename2 ).string( )),
+                               brion::MODE_READ );
+    BOOST_CHECK_EQUAL( report2.getEndTime(), 9.975f );
+
+    const std::string filename3( BINARY_SPIKE_REPORT_FILE );
+    brion::SpikeReport report3( brion::URI(( path / filename3 ).string( )),
+                               brion::MODE_READ );
+    BOOST_CHECK_EQUAL( report3.getEndTime(), 9.975f );
 }
 
 inline void testWrite (const char * format)
@@ -373,14 +390,18 @@ inline void testReadUntil(const char * format)
     brion::SpikeReport reportRead( brion::URI( data.tmpFileName ),
                                    brion::MODE_READ );
 
-    auto spikes = reportRead.readUntil( 0.25 ).get();
-    BOOST_CHECK_EQUAL( spikes.size(), 3);
-    BOOST_CHECK( reportRead.getCurrentTime() >= 0.25f );
-    BOOST_CHECK( spikes.rbegin()->first < 0.25 );
+    auto spikes = reportRead.readUntil( 0.15 ).get();
+    BOOST_CHECK_EQUAL( spikes.size(), 1 );
+    BOOST_CHECK( reportRead.getCurrentTime() >= 0.15f );
+
+    spikes = reportRead.readUntil( 0.3 ).get();
+    BOOST_CHECK_EQUAL( spikes.size(), 2);
+    BOOST_CHECK( reportRead.getCurrentTime() >= 0.3f );
+    BOOST_CHECK( spikes.rbegin()->first < 0.3 );
     BOOST_CHECK_EQUAL( reportRead.getState(), brion::SpikeReport::State::ok );
 
     spikes = reportRead.read( brion::UNDEFINED_TIMESTAMP ).get();
-    BOOST_CHECK_EQUAL( spikes.size(), 2);
+    BOOST_CHECK_EQUAL( spikes.size(), 2 );
     BOOST_CHECK_EQUAL( reportRead.getCurrentTime(), brion::UNDEFINED_TIMESTAMP );
     BOOST_CHECK_EQUAL( reportRead.getState(), brion::SpikeReport::State::ended );
 }
@@ -397,10 +418,10 @@ inline void testReadUntilFiltered(const char * format)
     brion::SpikeReport reportRead( brion::URI( data.tmpFileName ),
                                    brion::GIDSet{ 22, 25 });
 
-    auto spikes = reportRead.readUntil( 0.25 ).get();
+    auto spikes = reportRead.readUntil( 0.4 ).get();
     BOOST_CHECK_EQUAL( spikes.size(), 1 );
-    BOOST_CHECK( reportRead.getCurrentTime() >= 0.25f );
-    BOOST_CHECK( spikes.rbegin()->first < 0.25 );
+    BOOST_CHECK( reportRead.getCurrentTime() >= 0.4f );
+    BOOST_CHECK( spikes.rbegin()->first < 0.4 );
     BOOST_CHECK_EQUAL( reportRead.getState(), brion::SpikeReport::State::ok );
 
     spikes = reportRead.readUntil( brion::UNDEFINED_TIMESTAMP ).get();
@@ -455,6 +476,7 @@ inline void testReadSeek(const char* format)
 
     brion::SpikeReport reportRead{ brion::URI( data.tmpFileName ),
                                    brion::MODE_READ };
+    BOOST_CHECK( reportRead.supportsBackwardSeek( ));
     reportRead.seek( 0.3f ).get();
 
     BOOST_CHECK_EQUAL( reportRead.getCurrentTime(), 0.3f );

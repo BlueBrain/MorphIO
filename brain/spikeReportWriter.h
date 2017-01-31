@@ -60,7 +60,7 @@ public:
      * @param spikes Spikes to write.
      * @version 1.0
      */
-    void writeSpikes( const brion::Spikes& spikes );
+    void writeSpikes( const Spikes& spikes );
 
     /**
      * Get the URI where the writer is publishing. It could be same as the one

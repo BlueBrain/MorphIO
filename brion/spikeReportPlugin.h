@@ -139,6 +139,9 @@ public:
                      "Operation not supported in spike report plugin" ));
     }
 
+    /** @copydoc brion::SpikeReport::supportsBackwardSeek */
+    virtual bool supportsBackwardSeek() const = 0;
+
     void setFilter( const GIDSet& ids )
     {
         _idsSubset = ids;
@@ -168,6 +171,11 @@ public:
         return _currentTime;
     }
 
+    virtual float getEndTime() const
+    {
+        return _endTime;
+    }
+
     bool isClosed() const
     {
         return  _closed;
@@ -187,6 +195,7 @@ protected:
     brion::GIDSet _idsSubset;
     int _accessMode = brion::MODE_READ;
     float _currentTime = 0;
+    float _endTime = 0;
     State _state = State::ok;
 
     void pushBack( const Spike& spike, Spikes& spikes ) const

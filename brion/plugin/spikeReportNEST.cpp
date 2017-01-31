@@ -99,6 +99,8 @@ SpikeReportNEST::SpikeReportNEST( const SpikeReportInitData& initData )
     }
 
     _lastReadPosition = _spikes.begin();
+    if( !_spikes.empty( ))
+        _endTime = _spikes.rbegin()->first;
 }
 
 bool SpikeReportNEST::handles( const SpikeReportInitData& initData )

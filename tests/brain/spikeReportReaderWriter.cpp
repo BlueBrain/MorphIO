@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE( test_moving_window )
         {
 
             BOOST_CHECK( spikes.begin()->first >= start );
-            BOOST_CHECK( ( --spikes.end( ))->first >= start );
+            BOOST_CHECK( spikes.rbegin()->first < start + 1 );
         }
         start += 1;
     }

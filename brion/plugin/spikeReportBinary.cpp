@@ -113,6 +113,11 @@ SpikeReportBinary::SpikeReportBinary( const SpikeReportInitData& initData )
         _memFile.reset( new BinaryReportMap( getURI().getPath( )));
     else
         _memFile.reset( new BinaryReportMap( getURI().getPath(), 0 ));
+
+    const Spike* spikeArray = _memFile->getReadableSpikes();
+    const size_t nElems = _memFile->getNumSpikes();
+    if( nElems != 0 )
+        _endTime = spikeArray[nElems - 1].first;
 }
 
 bool SpikeReportBinary::handles( const SpikeReportInitData& initData )
@@ -155,7 +160,7 @@ Spikes SpikeReportBinary::readUntil( const float max )
 
     for ( ; _startIndex < nElems; ++_startIndex )
     {
-        if ( spikeArray[_startIndex].first > max )
+        if ( spikeArray[_startIndex].first >= max )
         {
             _currentTime = spikeArray[_startIndex].first;
             break;
@@ -226,8 +231,10 @@ void SpikeReportBinary::write( const Spikes& spikes )
     for( const Spike& spike : spikes )
         spikeArray[_startIndex++] = spike;
 
-    _currentTime = spikes.rbegin()->first +
-                   std::numeric_limits< float >::epsilon();
+    const float lastTimestamp = spikes.rbegin()->first;
+    _currentTime = std::nextafter( lastTimestamp,
+                                   std::numeric_limits< float >::max( ));
+    _endTime = std::max(_endTime, lastTimestamp);
 }
 }
 } // namespaces

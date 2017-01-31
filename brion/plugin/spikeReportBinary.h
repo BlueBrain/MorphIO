@@ -52,6 +52,7 @@ public:
     void readSeek( float toTimeStamp ) final;
     void writeSeek( float toTimeStamp ) final;
     void write( const Spikes& spikes ) final;
+    bool supportsBackwardSeek() const final { return true; }
 
 private:
     std::unique_ptr< BinaryReportMap > _memFile;

@@ -148,6 +148,11 @@ float SpikeReport::getCurrentTime() const
     return _impl->plugin->getCurrentTime();
 }
 
+float SpikeReport::getEndTime() const
+{
+    return _impl->plugin->getEndTime();
+}
+
 SpikeReport::State SpikeReport::getState() const
 {
     return _impl->plugin->getState();
@@ -255,5 +260,10 @@ void SpikeReport::write( const Spikes& spikes )
     }        
 
     _impl->plugin->write( spikes );
+}
+
+bool SpikeReport::supportsBackwardSeek() const
+{
+    return _impl->plugin->supportsBackwardSeek();
 }
 }

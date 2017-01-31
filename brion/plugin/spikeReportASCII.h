@@ -40,6 +40,7 @@ public:
     Spikes readUntil(float toTimeStamp) final;
     void readSeek(float toTimeStamp) final;
     void writeSeek(float toTimeStamp) final;
+    bool supportsBackwardSeek() const final { return true; }
 
 protected:
     Spikes _spikes;

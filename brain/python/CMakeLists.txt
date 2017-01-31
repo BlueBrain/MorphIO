@@ -18,6 +18,7 @@ include(PythonDocstrings)
 set(BRAIN_PYTHON_SOURCES
   brain.cpp
   circuit.cpp
+  spikeReportReader.cpp
   synapses.cpp
   neuron/morphology.cpp
 )
@@ -29,7 +30,6 @@ list(APPEND BRAIN_PYTHON_SOURCES
   arrayHelpers.cpp
   helpers.cpp
   spikeReportWriter.cpp
-  spikeReportReader.cpp
   spikes.cpp
   submodules.cpp
   test.cpp

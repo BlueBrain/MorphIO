@@ -35,11 +35,12 @@ void export_test()
     for( const auto& config : bbp::test::getBlueconfigs( ))
         configs.append( config );
 
-    boost::python::scope test = brain::exportSubmodule("test");
+    boost::python::scope test = brain::exportSubmodule( "test" );
 
     test.attr("blue_config") = bbp::test::getBlueconfig();
     test.attr("blue_configs") = configs;
     test.attr("circuit_config") = bbp::test::getCircuitconfig();
+    test.attr("root_data_path") = std::string( BBP_TESTDATA );
 }
 
 }

@@ -29,6 +29,7 @@
 #include <lunchbox/stdExt.h>
 
 #include <fstream>
+#include <cmath>
 
 namespace brion
 {
@@ -248,8 +249,10 @@ void SpikeReportASCII::append( const Spikes& spikes, const WriteFunc& writefunc 
 
     file.flush();
 
-    _currentTime = spikes.rbegin()->first +
-                   std::numeric_limits< float >::epsilon();
+    const float lastTimestamp = spikes.rbegin()->first;
+    _currentTime = std::nextafter( lastTimestamp,
+                                   std::numeric_limits< float >::max( ));
+    _endTime = std::max(_endTime, lastTimestamp);
 }
 
 }
