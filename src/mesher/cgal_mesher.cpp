@@ -91,7 +91,7 @@ struct scan_stats{
 };
 
 
-FT is_part_of_morphotree(const Point& p, const morpho_tree & tree, const spatial_index & index,
+FT is_part_of_morphotree(const Point& p, const spatial_index & index,
                          scan_stats & stats){
     point my_point(p.x(), p.y(), p.z());
     stats.total_iterations++;
@@ -99,6 +99,7 @@ FT is_part_of_morphotree(const Point& p, const morpho_tree & tree, const spatial
    if(stats.total_iterations%100000 ==0){
         fmt::scat(std::cout, "Geometry scan progress: ", stats.total_iterations, " points check with ",
                               stats.within_iterations," positives matches", "\r");
+        std::flush(std::cout);
     }
 
     if(index.is_within(my_point)){
@@ -164,7 +165,7 @@ void morpho_mesher::execute_3d_meshing(){
     // Domain (Warning: Sphere_3 constructor uses squared radius !)
     scan_stats stats;
     Function domain_distance = [&](const Point& p){
-        return is_part_of_morphotree(p, *_tree, morpho_indexer, stats);
+        return is_part_of_morphotree(p, morpho_indexer, stats);
     };
 
     Mesh_domain domain(domain_distance,
@@ -245,7 +246,7 @@ void morpho_mesher::execute_surface_meshing(){
     // Domain (Warning: Sphere_3 constructor uses squared radius !)
     scan_stats stats;
     Function domain_distance = [&](const Point& p){
-        return is_part_of_morphotree(p, *_tree, morpho_indexer, stats);
+        return is_part_of_morphotree(p, morpho_indexer, stats);
     };
 
     // defining the surface
