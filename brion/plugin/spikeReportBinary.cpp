@@ -19,7 +19,6 @@
  */
 
 #include "spikeReportBinary.h"
-#include "spikeReportTypes.h"
 
 #include <lunchbox/memoryMap.h>
 #include <lunchbox/pluginRegisterer.h>
@@ -36,6 +35,7 @@ namespace plugin
 namespace
 {
 lunchbox::PluginRegisterer< SpikeReportBinary > registerer;
+const char* const BINARY_REPORT_FILE_EXT = ".spikes";
 }
 
 namespace fs = boost::filesystem;
@@ -127,7 +127,7 @@ bool SpikeReportBinary::handles( const SpikeReportInitData& initData )
 
 std::string SpikeReportBinary::getDescription()
 {
-    return "Blue Brain binary spike reports:  "
+    return "Blue Brain binary spike reports: "
            "[file://]/path/to/report" + std::string( BINARY_REPORT_FILE_EXT );
 }
 

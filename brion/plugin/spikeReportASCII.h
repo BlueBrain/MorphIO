@@ -20,7 +20,6 @@
 #ifndef BRION_PLUGIN_SPIKEREPORTASCII_H
 #define BRION_PLUGIN_SPIKEREPORTASCII_H
 
-#include "spikeReportFile.h"
 #include "../pluginInitData.h"
 
 #include <brion/types.h>
@@ -45,6 +44,15 @@ public:
 protected:
     Spikes _spikes;
     Spikes::iterator _lastReadPosition;
+
+    // Returns true if parsing succeeded
+    using ParseFunc = std::function< bool( const std::string&, Spike& ) >;
+
+    using WriteFunc = std::function< void( std::ostream&, const Spike& ) >;
+
+    static Spikes parse( const Strings& files, const ParseFunc& parse );
+    static Spikes parse( const std::string& filename, const ParseFunc& parse );
+    void write( const Spikes& spikes, const WriteFunc& parse );
 };
 
 }

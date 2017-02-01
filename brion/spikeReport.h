@@ -91,9 +91,6 @@ public:
      */
     BRION_API SpikeReport( const URI& uri, int mode = MODE_READ );
 
-    /** @return the descriptions of all loaded report backends. @version 1.10 */
-    BRION_API static std::string getDescriptions();
-
     /**
      * Open a report in read mode with a subset selection.
      *
@@ -112,6 +109,9 @@ public:
      * get on the corresponding future will throw std::runtime_error.
      */
     BRION_API ~SpikeReport();
+
+    /** @return the descriptions of all loaded report backends. @version 1.10 */
+    BRION_API static std::string getDescriptions();
 
     /**
      * Close the report. The close operation is blocking and it interrupts
@@ -294,18 +294,14 @@ inline std::ostream& operator<<( std::ostream& stream,
     switch ( state )
     {
     case State::ok:
-        stream << "ok";
-        break;
+        return stream << "ok";
     case State::ended:
-        stream << "ended";
-        break;
+        return stream << "ended";
     case State::failed:
-        stream << "failed";
-        break;
+        return stream << "failed";
     default:
-        break;
+        return stream;
     }
-    return stream;
 }
 }
 

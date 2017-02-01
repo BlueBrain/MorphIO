@@ -19,6 +19,7 @@
  */
 
 #include "spikeReportNEST.h"
+
 #include "../pluginInitData.h"
 #include "spikeReportBluron.h"
 
@@ -39,6 +40,7 @@ namespace plugin
 namespace
 {
 lunchbox::PluginRegisterer< SpikeReportNEST > registerer;
+const char* const NEST_REPORT_FILE_EXT = ".gdf";
 }
 
 boost::regex convertToRegex( const std::string& stringWithShellLikeWildcard )
@@ -82,32 +84,18 @@ SpikeReportNEST::SpikeReportNEST( const SpikeReportInitData& initData )
 
     if ( accessMode == MODE_READ )
     {
-        const Strings& reportFiles = expandShellWildcard( _uri.getPath() );
+        const Strings& files = expandShellWildcard( _uri.getPath() );
 
-        if ( reportFiles.empty() )
+        if( files.empty() )
             LBTHROW(
-                std::runtime_error( "No file(s) to read found in " + _uri.getPath() ) );
+                std::runtime_error( "No files to read found in " + _uri.getPath() ) );
 
-        for ( auto& filePath : reportFiles )
-        {
-            if ( !boost::filesystem::exists( filePath ) )
-            {
-                LBTHROW( std::runtime_error( "Cannot find file:'" + filePath + "'." ) );
-            }
-        }
-
-        SpikeMap spikes;
-        for ( const std::string& reportFile : reportFiles )
-        {
-            SpikeReportFile reader( reportFile, NEST_SPIKE_REPORT, MODE_READ );
-            reader.fillReportMap( spikes );
-        }
-        _spikes.resize( spikes.size() );
-        size_t i = 0;
-        for ( auto& spike : spikes )
-        {
-            _spikes[i++] = {spike.first, spike.second};
-        }
+        _spikes = parse( files,
+                         []( const std::string& buffer, Spike& spike )
+                         {
+                             return sscanf( buffer.data( ), "%20d%20f",
+                                            &spike.second, &spike.first ) == 2;
+                         });
     }
 
     _lastReadPosition = _spikes.begin();
@@ -138,26 +126,9 @@ void SpikeReportNEST::close()
 
 void SpikeReportNEST::write( const Spikes& spikes )
 {
-    if ( spikes.empty() )
-        return;
-
-    std::fstream file{getURI().getPath(),
-                      std::ios_base::binary | std::ios::out | std::ios::app};
-
-    if ( !file.is_open() )
-    {
-        _state = State::failed;
-        return;
-    }
-
-    for ( const Spike& spike : spikes )
-    {
-        file << spike.second << " " << spike.first << '\n';
-    }
-
-    file << std::flush;
-
-    _currentTime = spikes.rbegin()->first + std::numeric_limits< float >::epsilon();
+    SpikeReportASCII::write(
+        spikes, []( std::ostream& file, const Spike& spike ){
+            file << spike.second << " " << spike.first << '\n'; });
 }
 }
 } // namespaces

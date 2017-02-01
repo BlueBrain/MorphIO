@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2016, EPFL/Blue Brain Project
+# Copyright (c) 2013-2017, EPFL/Blue Brain Project
 #                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
 #
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -33,7 +33,6 @@ set(BRION_HEADERS
   plugin/morphologySWC.h
   plugin/spikeReportBinary.h
   plugin/spikeReportBluron.h
-  plugin/spikeReportFile.h
   plugin/spikeReportNEST.h
   plugin/spikeReportASCII.h
   detail/mesh.h
@@ -65,7 +64,6 @@ set(BRION_SOURCES
   plugin/morphologySWC.cpp
   plugin/spikeReportBinary.cpp
   plugin/spikeReportBluron.cpp
-  plugin/spikeReportFile.cpp
   plugin/spikeReportNEST.cpp
   plugin/spikeReportASCII.cpp
   )

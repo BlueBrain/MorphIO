@@ -62,16 +62,16 @@ int main( int argc, char* argv[] )
 #endif
         ( "output,o", po::value< std::string >()->default_value( "out.spikes" ),
           uriHelp.c_str( ));
-    
+
     po::positional_options_description positional;
     positional.add("input", 1);
-    positional.add("output", 2);    
-    
+    positional.add("output", 2);
+
     po::variables_map vm;
     try
     {
         po::store( po::command_line_parser( argc, argv ).
-                   options( options ).positional( positional ).run(), vm );       
+                   options( options ).positional( positional ).run(), vm );
         po::notify( vm );
     }
     catch( const po::error& e )
@@ -92,6 +92,13 @@ int main( int argc, char* argv[] )
         std::cout << "Brion spike report converter "
                   << brion::Version::getString() << std::endl;
         return EXIT_SUCCESS;
+    }
+    if( vm["input"].as< std::string >() == vm["output"].as< std::string >( ))
+    {
+        std::cerr << "Cowardly refusing to convert "
+                  << vm["input"].as< std::string >() << " onto itself"
+                  << std::endl;
+        return EXIT_FAILURE;
     }
 
     try
