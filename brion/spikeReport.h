@@ -189,7 +189,6 @@ public:
      * - The report was open in read mode.
      * - There is no previous read or seek operation with a pending
      *   future.
-     * - min >= getCurrentTime() or UNDEFINED_TIMESTAMP.
      *
      * Postconditions:
      * Let:

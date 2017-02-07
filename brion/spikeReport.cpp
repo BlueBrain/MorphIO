@@ -180,12 +180,6 @@ std::future< Spikes > SpikeReport::read( float min )
     _impl->plugin->_checkCanRead();
     _impl->plugin->_checkStateOk();
 
-    if ( min < getCurrentTime() )
-    {
-        LBTHROW( std::logic_error(
-            "Can't read to a time stamp inferior to the current time" ) );
-    }
-
     if ( _impl->threadPool.hasPendingJobs() )
     {
         LBTHROW( std::runtime_error( "Can't read: Pending read operation" ) );

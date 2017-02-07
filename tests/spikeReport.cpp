@@ -538,7 +538,7 @@ inline void testInvalidRead(const char * format)
                                    brion::MODE_READ };
     reportRead.readUntil( 0.3 ).get();
 
-    BOOST_CHECK_THROW( reportRead.read( 0.1 ), std::logic_error );
+    BOOST_CHECK_NO_THROW( reportRead.read( 0.1 ));
     BOOST_CHECK_THROW( reportRead.readUntil( 0.1 ), std::logic_error );
 }
 
