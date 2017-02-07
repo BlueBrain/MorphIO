@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE( test_simple_load_static )
 
 
 
-BOOST_AUTO_TEST_CASE( test_simple_read )
+BOOST_AUTO_TEST_CASE( test_simple_read_bluron )
 {
     boost::filesystem::path path( BBP_TESTDATA );
     path /= BLURON_SPIKE_REPORT_FILE;
@@ -119,6 +119,35 @@ BOOST_AUTO_TEST_CASE( test_simple_read )
     BOOST_CHECK_EQUAL( ( --spikes.end( ))->second, BLURON_LAST_SPIKE_GID );
 }
 
+BOOST_AUTO_TEST_CASE( test_simple_read_nest )
+{
+    boost::filesystem::path path( BBP_TESTDATA );
+    path /= NEST_SPIKE_REPORT_FILE;
+
+    brain::SpikeReportReader reader( brion::URI( path.string( )));
+    const brion::Spikes& spikes = reader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
+
+    BOOST_REQUIRE_EQUAL( spikes.size(), NEST_SPIKES_COUNT );
+
+    BOOST_CHECK_EQUAL( spikes.begin()->first, NEST_FIRST_SPIKE_TIME );
+    BOOST_CHECK_EQUAL( spikes.begin()->second, NEST_FIRST_SPIKE_GID );
+
+    BOOST_CHECK_EQUAL( ( --spikes.end( ))->first, NEST_LAST_SPIKE_TIME );
+    BOOST_CHECK_EQUAL( ( --spikes.end( ))->second, NEST_LAST_SPIKE_GID );
+}
+
+BOOST_AUTO_TEST_CASE( test_simple_read_filtered )
+{
+    boost::filesystem::path path( BBP_TESTDATA );
+    path /= BLURON_SPIKE_REPORT_FILE;
+
+    brain::GIDSet gids{ 1, 10, 100 };
+    brain::SpikeReportReader reader( brion::URI( path.string( )), gids );
+    const auto spikes = reader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
+    BOOST_REQUIRE( !spikes.empty( ));
+    for (auto spike : spikes )
+        BOOST_CHECK( gids.find( spike.second ) != gids.end());
+}
 
 BOOST_AUTO_TEST_CASE( test_closed_window )
 {
@@ -138,24 +167,6 @@ BOOST_AUTO_TEST_CASE( test_out_of_window )
     const float start = spikes.back().first + 1;
 
     BOOST_CHECK_THROW( reader.getSpikes(start, start + 1 ), std::logic_error );
-}
-
-BOOST_AUTO_TEST_CASE( test_simple_stream_read )
-{
-    boost::filesystem::path path( BBP_TESTDATA );
-    path /= NEST_SPIKE_REPORT_FILE;
-
-    brain::SpikeReportReader reader( brion::URI( path.string( )));
-
-    const brion::Spikes& spikes = reader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
-
-    BOOST_REQUIRE_EQUAL( spikes.size(), NEST_SPIKES_COUNT );
-
-    BOOST_CHECK_EQUAL( spikes.begin()->first, NEST_FIRST_SPIKE_TIME );
-    BOOST_CHECK_EQUAL( spikes.begin()->second, NEST_FIRST_SPIKE_GID );
-
-    BOOST_CHECK_EQUAL( ( --spikes.end( ))->first, NEST_LAST_SPIKE_TIME );
-    BOOST_CHECK_EQUAL( ( --spikes.end( ))->second, NEST_LAST_SPIKE_GID );
 }
 
 BOOST_AUTO_TEST_CASE( test_moving_window )

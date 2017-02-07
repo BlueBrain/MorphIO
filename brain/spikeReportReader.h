@@ -50,6 +50,17 @@ public:
     BRAIN_API explicit SpikeReportReader( const brion::URI& uri );
 
     /**
+     * Construct a new reader opening a spike data source.
+     * @param uri URI to spike report (can contain a wildcard to specify several
+     * files).
+     * @param subset Subset of cells to be reported.
+     * files).
+     * @version 1.0
+     * @throw std::runtime_error if source is invalid.
+     */
+    BRAIN_API SpikeReportReader( const brion::URI& uri, const GIDSet& subset );
+
+    /**
      * Destructor.
      * @version 1.0
      */

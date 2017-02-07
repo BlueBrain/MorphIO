@@ -33,12 +33,22 @@ public:
         : _report( uri, brion::MODE_READ )
     {}
 
+    _Impl( const brion::URI& uri, const GIDSet& subset )
+        : _report( uri, subset )
+    {}
+
     brion::SpikeReport _report;
     brion::Spikes _collected;
 };
 
 SpikeReportReader::SpikeReportReader( const brion::URI& uri )
     : _impl( new _Impl( uri ))
+{
+}
+
+SpikeReportReader::SpikeReportReader( const brion::URI& uri,
+                                      const GIDSet& subset )
+    : _impl( new _Impl( uri, subset ))
 {
 }
 

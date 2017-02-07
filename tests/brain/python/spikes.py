@@ -54,6 +54,13 @@ class TestSpikeReportReader(unittest.TestCase):
         assert(spikes[0][0] >= 7)
         assert(spikes[-1][0] < 9)
 
+    def test_get_spikes_filtered(self):
+        gids = {1, 10, 100}
+        reader = brain.SpikeReportReader(self.filename, gids)
+        spikes = reader.get_spikes(0, float("inf"))
+        for time, gid in spikes:
+            assert(gid in gids)
+
     def test_properties(self):
         reader = brain.SpikeReportReader(self.filename)
         # assertAlmostEqual fails due to a float <-> double conversion error
