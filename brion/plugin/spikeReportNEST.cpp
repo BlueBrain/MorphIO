@@ -126,9 +126,8 @@ void SpikeReportNEST::close()
 
 void SpikeReportNEST::write( const Spikes& spikes )
 {
-    SpikeReportASCII::write(
-        spikes, []( std::ostream& file, const Spike& spike ){
-            file << spike.second << " " << spike.first << '\n'; });
+    append( spikes, []( std::ostream& file, const Spike& spike ){
+                        file << spike.second << " " << spike.first << '\n'; });
 }
 }
 } // namespaces

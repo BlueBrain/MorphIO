@@ -53,7 +53,7 @@ class SpikeReport;
  *
  * This class is not thread-safe except where stated otherwise.
  */
-class SpikeReport : public boost::noncopyable
+class SpikeReport
 {
 public:
     /**
@@ -109,6 +109,9 @@ public:
      * get on the corresponding future will throw std::runtime_error.
      */
     BRION_API ~SpikeReport();
+
+    BRION_API SpikeReport( SpikeReport&& );
+    BRION_API SpikeReport& operator = ( SpikeReport&& );
 
     /** @return the descriptions of all loaded report backends. @version 1.10 */
     BRION_API static std::string getDescriptions();
@@ -264,23 +267,29 @@ public:
      * @version 2.0
      */
     BRION_API std::future< void > seek( float toTimeStamp );
-
+    
     /**
      * Write the given spikes to the output.
+     * Preconditions:
+     * - spikes is a sorted by time stamp
+     * - spikes.front().first < getCurrentTime()
      *
      * Upon return getCurrenTime() is the greatest of all the spike times
      * plus an epsilon.
      *
      * @param spikes A collection of spikes sorted by timestamp in ascending
      *        order. For every spike, its timestamp must be >= getCurrentTime().
-     * @throw std::runtime_error if the report is read-only, the input spikes
-     *        are not sorted, or a timestamp is < getCurrentTime().
+     * @throw std::runtime_error if the report is read-only,
+     * @throw std::logic_error if a precondition does not hold
      * @version 2.0
      */
     BRION_API void write( const Spikes& spikes );
 
 private:
-    detail::SpikeReport* _impl;
+    std::unique_ptr< detail::SpikeReport > _impl;
+
+    SpikeReport( const SpikeReport& ) = delete;
+    SpikeReport& operator = ( const SpikeReport& ) = delete;
 };
 }
 

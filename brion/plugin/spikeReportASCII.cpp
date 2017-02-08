@@ -39,6 +39,14 @@ SpikeReportASCII::SpikeReportASCII( const SpikeReportInitData& initData )
     : SpikeReportPlugin( initData )
     , _lastReadPosition( _spikes.begin( ))
 {
+    // clear the file if it exists
+    if( initData.getAccessMode() == MODE_WRITE &&
+        boost::filesystem::exists(initData.getURI().getPath()) )
+    {
+        std::ofstream ofs;
+        ofs.open( initData.getURI().getPath(), std::ofstream::out | std::ofstream::trunc );
+        ofs.close();
+    }
 }
 
 Spikes SpikeReportASCII::read( const float )
@@ -222,7 +230,7 @@ Spikes SpikeReportASCII::parse( const std::string& filename,
     return spikes;
 }
 
-void SpikeReportASCII::write( const Spikes& spikes, const WriteFunc& writefunc )
+void SpikeReportASCII::append( const Spikes& spikes, const WriteFunc& writefunc )
 {
     if ( !spikes.size() )
         return;

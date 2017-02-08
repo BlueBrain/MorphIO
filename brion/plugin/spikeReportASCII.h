@@ -52,7 +52,7 @@ protected:
 
     static Spikes parse( const Strings& files, const ParseFunc& parse );
     static Spikes parse( const std::string& filename, const ParseFunc& parse );
-    void write( const Spikes& spikes, const WriteFunc& parse );
+    void append( const Spikes& spikes, const WriteFunc& parse );
 };
 
 }

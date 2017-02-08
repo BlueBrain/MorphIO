@@ -198,18 +198,32 @@ BOOST_AUTO_TEST_CASE( invoke_invalid_method_nest )
 inline void testWrite (const char * format)
 {
     TemporaryData data {format};
-    brion::SpikeReport reportWrite { brion::URI( data.tmpFileName ),
-                                     brion::MODE_WRITE };
-    reportWrite.write( data.spikes );
-    reportWrite.close();
+    {
+        brion::SpikeReport report { brion::URI( data.tmpFileName ),
+                                    brion::MODE_WRITE };
+        report.write( data.spikes );
+        report.close();
+    }
 
-    brion::SpikeReport reportRead { brion::URI( data.tmpFileName ),
-                                    brion::MODE_READ };
-
-    brion::Spikes readSpikes = reportRead.read(brion::UNDEFINED_TIMESTAMP).get();
-
+    brion::SpikeReport report{ brion::URI( data.tmpFileName ),
+                               brion::MODE_READ };
+    brion::Spikes spikes = report.read(brion::UNDEFINED_TIMESTAMP).get();
     BOOST_CHECK_EQUAL_COLLECTIONS( data.spikes.begin(), data.spikes.end(),
-                                   readSpikes.begin(), readSpikes.end( ));
+                                   spikes.begin(), spikes.end( ));
+
+    // test writing multiple chunks
+    report = brion::SpikeReport{ brion::URI( data.tmpFileName ),
+                                 brion::MODE_WRITE };
+    report.write( brion::Spikes{ data.spikes.begin(),
+                                 data.spikes.begin() + 3 });
+    report.write( brion::Spikes{ data.spikes.begin() + 3,
+                                 data.spikes.end( )});
+
+    report = brion::SpikeReport{ brion::URI( data.tmpFileName ),
+                                 brion::MODE_READ };
+    spikes = report.read(brion::UNDEFINED_TIMESTAMP).get();
+    BOOST_CHECK_EQUAL_COLLECTIONS( data.spikes.begin(), data.spikes.end(),
+                                   spikes.begin(), spikes.end( ));
 }
 
 BOOST_AUTO_TEST_CASE( write_data_binary )
@@ -531,6 +545,10 @@ inline void testInvalidWrite(const char * format)
     reportWrite.write( data.spikes );
 
     BOOST_CHECK_THROW( reportWrite.write({{ 0.0, 0 }}), std::logic_error );
+    
+    BOOST_CHECK_THROW( reportWrite.write(
+                           {{10.0, 0}, {10.0, 1}, {11.0, 0}, {0.5, 1}}),
+                       std::logic_error);
 
     brion::SpikeReport reportRead { brion::URI( data.tmpFileName ),
                                     brion::MODE_READ };

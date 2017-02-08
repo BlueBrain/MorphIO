@@ -82,9 +82,8 @@ void SpikeReportBluron::close()
 
 void SpikeReportBluron::write( const Spikes& spikes )
 {
-    SpikeReportASCII::write(
-        spikes, []( std::ostream& file, const Spike& spike ){
-                    file << spike.first << " " << spike.second << "\n"; });
+    append( spikes, []( std::ostream& file, const Spike& spike ){
+                        file << spike.first << " " << spike.second << "\n"; });
 }
 }
 }

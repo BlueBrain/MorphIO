@@ -45,7 +45,6 @@ namespace
 using SpikePluginFactory = lunchbox::PluginFactory< SpikeReportPlugin >;
 
 class PluginLoader
-
 {
 public:
     PluginLoader()
@@ -69,10 +68,9 @@ public:
     explicit SpikeReport( const SpikeReportInitData& initData )
     {
         _loadPlugins();
-        plugin.reset( SpikePluginFactory::getInstance().create( initData ) );
+        plugin.reset( SpikePluginFactory::getInstance().create( initData ));
     }
 
-public:
     std::unique_ptr< SpikeReportPlugin > plugin;
     lunchbox::ThreadPool threadPool{1};
 };
@@ -83,7 +81,7 @@ namespace brion
 {
 
 SpikeReport::SpikeReport( const URI& uri, int mode )
-    : _impl( new detail::SpikeReport( SpikeReportInitData( uri, mode ) ) )
+    : _impl( new detail::SpikeReport( SpikeReportInitData( uri, mode )))
 {
     switch ( mode )
     {
@@ -103,8 +101,19 @@ SpikeReport::SpikeReport( const URI& uri, const GIDSet& ids )
 
 SpikeReport::~SpikeReport()
 {
-    close();
-    delete _impl;
+    if( _impl )
+        close();
+}
+
+SpikeReport::SpikeReport( SpikeReport&& from )
+    : _impl( std::move( from._impl ))
+{}
+
+SpikeReport& SpikeReport::operator = ( SpikeReport&& from )
+{
+    if( this != &from )
+        _impl = std::move( from._impl );
+    return *this;
 }
 
 std::string SpikeReport::getDescriptions()
@@ -174,7 +183,7 @@ std::future< Spikes > SpikeReport::read( float min )
 
     if ( _impl->threadPool.hasPendingJobs() )
     {
-        LBTHROW( std::runtime_error( "Can't read : Pending read operation" ) );
+        LBTHROW( std::runtime_error( "Can't read: Pending read operation" ) );
     }
 
     return _impl->threadPool.post( [&, min] { return _impl->plugin->read( min ); } );
@@ -195,7 +204,7 @@ std::future< Spikes > SpikeReport::readUntil( const float max )
 
     if ( _impl->threadPool.hasPendingJobs() )
     {
-        LBTHROW( std::runtime_error( "Can't read : Pending read operation" ) );
+        LBTHROW( std::runtime_error( "Can't read: Pending read operation" ) );
     }
     return _impl->threadPool.post( [&, max] { return _impl->plugin->readUntil( max ); } );
 }
@@ -207,7 +216,7 @@ std::future< void > SpikeReport::seek( const float toTimeStamp )
     {
         if ( _impl->threadPool.hasPendingJobs() )
         {
-            LBTHROW( std::runtime_error( "Can't seek : Pending read operation" ) );
+            LBTHROW( std::runtime_error( "Can't seek: Pending read operation" ) );
         }
         return _impl->threadPool.post(
             [&, toTimeStamp] { return _impl->plugin->readSeek( toTimeStamp ); } );
@@ -224,14 +233,26 @@ void SpikeReport::write( const Spikes& spikes )
 
     if ( _impl->threadPool.hasPendingJobs() )
     {
-        LBTHROW( std::runtime_error( "Can't write spikes : Pending seek operation" ) );
+        LBTHROW( std::runtime_error( "Can't write spikes: Pending seek operation" ) );
     }
 
-    if ( spikes.size() && spikes.front().first < getCurrentTime() )
+    if( !spikes.empty() && spikes.front().first < getCurrentTime() )
     {
-        LBTHROW( std::logic_error( "Can't write spikes: first spike"
-                                   " time inferior to the current time" ) );
+        LBTHROW( std::logic_error( "Can't write spikes: first spike at " +
+                                   std::to_string( spikes.front().first ) +
+                                   " time inferior to current time " +
+                                   std::to_string( getCurrentTime( ))));
     }
+    
+    if ( !spikes.empty() &&
+         !std::is_sorted( spikes.begin(), spikes.end(),
+                         [](const Spike& x, const Spike& y) {
+                                return x.first < y.first;
+                         }) )
+    {
+        LBTHROW(std::logic_error(
+            "Can't write spikes: Expecting a sorted spikes"));
+    }        
 
     _impl->plugin->write( spikes );
 }
