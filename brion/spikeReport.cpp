@@ -165,13 +165,10 @@ bool SpikeReport::isClosed() const
 
 void SpikeReport::interrupt()
 {
-    if ( _impl->threadPool.hasPendingJobs() )
-    {
-        _impl->plugin->_setInterrupted( true );
-        // blocks until all the pending jobs are done
-        _impl->threadPool.post( [] {} ).get();
-        _impl->plugin->_setInterrupted( false );
-    }
+    _impl->plugin->_setInterrupted( true );
+    // blocks until all the pending jobs are done
+    _impl->threadPool.post( []{} ).get();
+    _impl->plugin->_setInterrupted( false );
 }
 
 std::future< Spikes > SpikeReport::read( float min )
@@ -242,7 +239,7 @@ void SpikeReport::write( const Spikes& spikes )
                                    " time inferior to current time " +
                                    std::to_string( getCurrentTime( ))));
     }
-    
+
     if ( !spikes.empty() &&
          !std::is_sorted( spikes.begin(), spikes.end(),
                          [](const Spike& x, const Spike& y) {
@@ -251,7 +248,7 @@ void SpikeReport::write( const Spikes& spikes )
     {
         LBTHROW(std::logic_error(
             "Can't write spikes: Expecting a sorted spikes"));
-    }        
+    }
 
     _impl->plugin->write( spikes );
 }
