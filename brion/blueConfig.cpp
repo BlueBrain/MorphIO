@@ -28,8 +28,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <lunchbox/log.h>
-#include <lunchbox/stdExt.h>
 #include <fstream>
+#include <unordered_map>
 
 namespace fs = boost::filesystem;
 namespace boost
@@ -75,8 +75,8 @@ inline std::string lexical_cast( const brion::BlueConfigSection& b )
 namespace brion
 {
 
-typedef stde::hash_map< std::string, std::string > KVStore;
-typedef stde::hash_map< std::string, KVStore > ValueTable;
+typedef std::unordered_map< std::string, std::string > KVStore;
+typedef std::unordered_map< std::string, KVStore > ValueTable;
 
 namespace detail
 {

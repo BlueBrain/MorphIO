@@ -26,7 +26,6 @@
 #include <boost/regex.hpp>
 
 #include <lunchbox/pluginRegisterer.h>
-#include <lunchbox/stdExt.h>
 
 #include <fstream>
 #include <cmath>

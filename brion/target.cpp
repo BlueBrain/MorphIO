@@ -20,12 +20,12 @@
 #include "target.h"
 
 #include <lunchbox/log.h>
-#include <lunchbox/stdExt.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <fstream>
+#include <unordered_map>
 
 namespace boost
 {
@@ -110,8 +110,8 @@ public:
     }
 
 private:
-    typedef stde::hash_map< uint32_t, Strings > NameTable;
-    typedef stde::hash_map< std::string, Strings > ValueTable;
+    typedef std::unordered_map< uint32_t, Strings > NameTable;
+    typedef std::unordered_map< std::string, Strings > ValueTable;
     NameTable _targetNames;
     ValueTable _targetValues;
 };
@@ -216,4 +216,3 @@ std::ostream& operator << ( std::ostream& os, const Target& target )
 }
 
 }
-

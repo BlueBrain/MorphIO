@@ -24,7 +24,6 @@
 #include <lunchbox/debug.h>
 #include <lunchbox/log.h>
 #include <lunchbox/pluginRegisterer.h>
-#include <lunchbox/stdExt.h>
 #include <map>
 
 namespace
@@ -330,7 +329,7 @@ void CompartmentReportBinary::updateMapping( const GIDSet& gids )
     }
 
     // build gid to mapping index lookup table
-    stde::hash_map< uint32_t, size_t > gidIndex;
+    std::unordered_map< uint32_t, size_t > gidIndex;
     size_t c = 0;
     for ( GIDSetCIter i = _originalGIDs.begin(); i != _originalGIDs.end(); ++i )
         gidIndex[*i] = c++;

@@ -26,7 +26,6 @@
 #include <boost/filesystem.hpp>
 
 #include <lunchbox/pluginRegisterer.h>
-#include <lunchbox/stdExt.h>
 
 #include <cstdio>
 #include <fstream>

@@ -22,7 +22,7 @@
 
 #include "compartmentReportCommon.h"
 #include <keyv/Map.h>
-#include <lunchbox/stdExt.h>
+#include <unordered_map>
 
 namespace brion
 {

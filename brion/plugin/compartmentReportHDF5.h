@@ -23,8 +23,8 @@
 #include "compartmentReportCommon.h"
 
 #include <boost/filesystem/path.hpp>
-#include <lunchbox/stdExt.h>
 #include <H5Cpp.h>
+#include <unordered_map>
 
 namespace brion
 {
@@ -41,13 +41,10 @@ public:
     static std::string getDescription();
 
     float getStartTime() const final { return _startTime; }
-
     float getEndTime() const final { return _endTime; }
-
     float getTimestep() const final { return _timestep; }
 
     const std::string& getDataUnit() const final { return _dunit; }
-
     const std::string& getTimeUnit() const final { return _tunit; }
 
     const GIDSet& getGIDs() const final;
@@ -76,9 +73,9 @@ private:
     void _createMappingAttributes( H5::DataSet& dataset );
     void _createDataAttributes( H5::DataSet& dataset );
 
-    typedef stde::hash_map< uint32_t, H5::H5File > Files;
-    typedef stde::hash_map< uint32_t, H5::DataSet > Datasets;
-    typedef stde::hash_map< uint32_t, H5::DataSpace > Dataspaces;
+    typedef std::unordered_map< uint32_t, H5::H5File > Files;
+    typedef std::unordered_map< uint32_t, H5::DataSet > Datasets;
+    typedef std::unordered_map< uint32_t, H5::DataSpace > Dataspaces;
 
     double _startTime;
     double _endTime;

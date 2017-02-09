@@ -306,22 +306,17 @@ private:
     SpikeReport( const SpikeReport& ) = delete;
     SpikeReport& operator = ( const SpikeReport& ) = delete;
 };
-}
-
-namespace std
-{
 
 inline std::ostream& operator<<( std::ostream& stream,
                                  const brion::SpikeReport::State state )
 {
-    using State = brion::SpikeReport::State;
     switch ( state )
     {
-    case State::ok:
+    case brion::SpikeReport::State::ok:
         return stream << "ok";
-    case State::ended:
+    case brion::SpikeReport::State::ended:
         return stream << "ended";
-    case State::failed:
+    case brion::SpikeReport::State::failed:
         return stream << "failed";
     default:
         return stream;
