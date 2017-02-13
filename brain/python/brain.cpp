@@ -18,7 +18,7 @@
  */
 
 #ifdef _MSC_VER
-#pragma warning(disable:4127)
+#pragma warning(disable : 4127)
 #endif
 
 #include <boost/python.hpp>
@@ -27,43 +27,45 @@
 
 #include "docstrings.h"
 
+#include "../compartmentReportReader.h"
+
 #include <vmmlib/vector.hpp>
 
 namespace brain
 {
-
 void export_Circuit();
 void export_Spikes();
 void export_SpikeReportReader();
 void export_SpikeReportWriter();
 void export_Synapses();
 void export_test();
+void export_CompartmentReportReader();
 
 namespace neuron
 {
-    void export_module();
+void export_module();
 }
-
 }
 
 struct Vector3fToTuple
 {
-    static PyObject* convert( const brain::Vector3f& v )
+    static PyObject* convert(const brain::Vector3f& v)
     {
         boost::python::object tuple =
-            boost::python::make_tuple( v.x(), v.y(), v.z( ));
+            boost::python::make_tuple(v.x(), v.y(), v.z());
         return boost::python::incref(tuple.ptr());
     }
 };
 
 struct URItoString
 {
-    static PyObject* convert( const servus::URI& uri )
+    static PyObject* convert(const servus::URI& uri)
     {
-        boost::python::object result( std::to_string( uri ));
+        boost::python::object result(std::to_string(uri));
         return boost::python::incref(result.ptr());
     }
 };
+
 
 BOOST_PYTHON_MODULE(_brain)
 {
@@ -73,17 +75,18 @@ BOOST_PYTHON_MODULE(_brain)
     boost::python::docstring_options doc_options(true, true, false);
 #endif
 
-    boost::python::to_python_converter< servus::URI, URItoString >();
-    boost::python::to_python_converter< brain::Vector3f, Vector3fToTuple >();
+    boost::python::to_python_converter<servus::URI, URItoString>();
+    boost::python::to_python_converter<brain::Vector3f, Vector3fToTuple>();
 
     brain::importArray();
 
-    boost::python::enum_< brain::SynapsePrefetch >(
-        "SynapsePrefetch", DOXY_ENUM( brain::SynapsePrefetch ))
-        .value( "none", brain::SynapsePrefetch::none )
-        .value( "attributes", brain::SynapsePrefetch::attributes )
-        .value( "positions", brain::SynapsePrefetch::positions )
-        .value( "all", brain::SynapsePrefetch::all );
+    boost::python::enum_<brain::SynapsePrefetch>("SynapsePrefetch",
+                                                 DOXY_ENUM(
+                                                     brain::SynapsePrefetch))
+        .value("none", brain::SynapsePrefetch::none)
+        .value("attributes", brain::SynapsePrefetch::attributes)
+        .value("positions", brain::SynapsePrefetch::positions)
+        .value("all", brain::SynapsePrefetch::all);
 
     brain::neuron::export_module();
 
@@ -93,5 +96,6 @@ BOOST_PYTHON_MODULE(_brain)
     brain::export_Spikes();
     brain::export_SpikeReportReader();
     brain::export_SpikeReportWriter();
+    brain::export_CompartmentReportReader();
     brain::export_Synapses();
 }

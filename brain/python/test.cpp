@@ -23,17 +23,15 @@ namespace brain { void export_test() {} }
 #include <boost/python.hpp>
 
 #include "submodules.h"
-
 #include <BBP/TestDatasets.h>
 
 namespace brain
 {
-
 void export_test()
 {
     boost::python::list configs;
-    for( const auto& config : bbp::test::getBlueconfigs( ))
-        configs.append( config );
+    for (const auto& config : bbp::test::getBlueconfigs())
+        configs.append(config);
 
     boost::python::scope test = brain::exportSubmodule( "test" );
 
@@ -42,6 +40,5 @@ void export_test()
     test.attr("circuit_config") = bbp::test::getCircuitconfig();
     test.attr("root_data_path") = std::string( BBP_TESTDATA );
 }
-
 }
 #endif

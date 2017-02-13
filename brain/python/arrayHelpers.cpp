@@ -20,6 +20,8 @@
 #include "../types.h"
 #include "../neuron/types.h"
 
+#include "brain/compartmentReportReader.h"
+
 #include <vmmlib/matrix.hpp>
 #include <vmmlib/quaternion.hpp>
 #include <vmmlib/vector.hpp>
@@ -78,6 +80,7 @@ template<> struct NumpyArrayInfo< T >      \
     npy_intp dims[1];                      \
 };
 
+DECLARE_ARRAY_INFO( uint16_t, NPY_USHORT, 1 );
 DECLARE_ARRAY_INFO( uint32_t, NPY_UINT, 1 );
 DECLARE_ARRAY_INFO( int, NPY_INT, 1 );
 DECLARE_ARRAY_INFO( size_t, NPY_LONG, 1 );
@@ -88,6 +91,8 @@ DECLARE_ARRAY_INFO( Vector3f, NPY_FLOAT, 2, 3 );
 DECLARE_ARRAY_INFO( Vector4f, NPY_FLOAT, 2, 4 );
 DECLARE_ARRAY_INFO( Quaternionf, NPY_FLOAT, 2, 4 );
 DECLARE_ARRAY_INFO( Matrix4f, NPY_FLOAT, 3, 4, 4 );
+DECLARE_STRUCTURED_ARRAY_INFO( CompartmentReportMapping::IndexEntry,
+                               "u8, u4, u2, u2" );
 DECLARE_STRUCTURED_ARRAY_INFO( Spike, "f4, u4" );
 
 // Functions for the boost::shared_ptr< std::vector< T >> to numpy converter
@@ -195,17 +200,19 @@ void importArray()
 {
     _importArray();
 
+    REGISTER_ARRAY_CONVERTER( uint16_t );
     REGISTER_ARRAY_CONVERTER( uint32_t );
     REGISTER_ARRAY_CONVERTER( int );
     REGISTER_ARRAY_CONVERTER( size_t );
     REGISTER_ARRAY_CONVERTER( float );
     REGISTER_ARRAY_CONVERTER( neuron::SectionType );
+    REGISTER_ARRAY_CONVERTER( CompartmentReportMapping::IndexEntry );
+    REGISTER_ARRAY_CONVERTER( Matrix4f );
+    REGISTER_ARRAY_CONVERTER( Quaternionf );
+    REGISTER_ARRAY_CONVERTER( Spike );
     REGISTER_ARRAY_CONVERTER( Vector2i );
     REGISTER_ARRAY_CONVERTER( Vector3f );
     REGISTER_ARRAY_CONVERTER( Vector4f );
-    REGISTER_ARRAY_CONVERTER( Quaternionf );
-    REGISTER_ARRAY_CONVERTER( Matrix4f );
-    REGISTER_ARRAY_CONVERTER( Spike );
 
     bp::class_< AbstractCustodian, AbstractCustodianPtr >( "_Custodian" );
 }

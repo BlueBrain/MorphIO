@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [130](https://github.com/BlueBrain/Brion/pull/130):
+  Added brain::CompartmentReportReader and its Python wrapping.
 * [120](https://github.com/BlueBrain/Brion/pull/120), [131](https://github.com/BlueBrain/Brion/pull/131):
   - New SpikeReport API.
   - Reimplementation of the high level SpikeReportReader. The new implementation

@@ -41,8 +41,13 @@ enum class SynapsePrefetch
 };
 
 class Circuit;
+class CompartmentReportReader;
+class CompartmentReportFrame;
+class CompartmentReportMapping;
+class CompartmentReportView;
 class SpikeReportReader;
 class SpikeReportWriter;
+class CompartmentReportReader;
 class Synapse;
 class Synapses;
 class SynapsesIterator;
@@ -70,11 +75,15 @@ using brion::Spike;
 using brion::Spikes;
 using brion::CompartmentCounts;
 
+typedef std::vector< CompartmentReportFrame > CompartmentReportFrames;
 typedef std::vector< Matrix4f > Matrix4fs;
 typedef std::vector< Quaternionf > Quaternionfs;
 
 typedef std::shared_ptr< SpikeReportReader > SpikeReportReaderPtr;
 typedef std::shared_ptr< SpikeReportWriter > SpikeReportWriterPtr;
+
+typedef std::shared_ptr< CompartmentReportReader > CompartmentReportReaderPtr;
+
 
 /**
  * The GID of a synapse is the a tuple of two numbers:
