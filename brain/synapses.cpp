@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel.Nachbaur@epfl.ch
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -437,7 +437,7 @@ struct Synapses::Impl : public Synapses::BaseImpl
     mutable floatPtr _decay;
     mutable IntPtr _efficacy;
 
-    mutable lunchbox::Lock _lock;
+    mutable std::mutex _lock;
 };
 
 Synapses::Synapses( const Circuit& circuit, const GIDSet& pre,

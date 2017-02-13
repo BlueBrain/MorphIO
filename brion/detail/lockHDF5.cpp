@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -27,9 +27,9 @@ namespace detail
 {
 
 #ifdef H5_HAVE_THREADSAFE
-    lunchbox::Lock* _hdf5Lock( 0 );
+std::mutex *_hdf5Lock(nullptr);
 #else
-    lunchbox::Lock* _hdf5Lock( new lunchbox::Lock );
+std::mutex *_hdf5Lock(new std::mutex);
 #endif
 
 }

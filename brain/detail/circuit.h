@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *                          Adrien.Devresse@epfl.ch
  *                          Daniel.Nachbaur@epfl.ch
@@ -31,7 +31,6 @@
 #include <brion/detail/silenceHDF5.h>
 
 #include <keyv/Map.h>
-#include <lunchbox/lock.h>
 #include <lunchbox/lockable.h>
 #include <lunchbox/log.h>
 #include <lunchbox/scopedMutex.h>

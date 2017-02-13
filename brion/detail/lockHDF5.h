@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -20,7 +20,7 @@
 #ifndef BRION_DETAIL_LOCKHDF5
 #define BRION_DETAIL_LOCKHDF5
 
-#include <lunchbox/lock.h>
+#include <mutex>
 
 namespace brion
 {
@@ -30,7 +30,7 @@ namespace detail
 // Every access to hdf5 must be serialized if HDF5 does not take care of it
 // which needs a thread-safe built of the library.
 // http://www.hdfgroup.org/hdf5-quest.html#gconc
-extern lunchbox::Lock* _hdf5Lock;
+extern std::mutex *_hdf5Lock;
 
 }
 }
