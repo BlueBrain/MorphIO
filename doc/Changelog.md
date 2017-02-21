@@ -4,7 +4,7 @@ Changelog {#Changelog}
 # git master
 
 * [130](https://github.com/BlueBrain/Brion/pull/130):
-  Added brain::CompartmentReportReader and its Python wrapping.
+  Added brain::CompartmentReportReader and its Python wrapping
 * [120](https://github.com/BlueBrain/Brion/pull/120), [131](https://github.com/BlueBrain/Brion/pull/131):
   - New SpikeReport API.
   - Reimplementation of the high level SpikeReportReader. The new implementation
@@ -25,15 +25,15 @@ Changelog {#Changelog}
 * [117](https://github.com/BlueBrain/Brion/pull/117):
   Changes and fixes in Brain Python module:
   - Functions that take gids now preserve the iteration order of the input in
-    the output arrays/lists.
-  - Replaced Python sets with numpy arrays in functions returning GID sets.
-  - Circuit::getXYZNames functions renamed to Circuit::getXYZTypeNames.
+    the output arrays/lists
+  - Replaced Python sets with numpy arrays in functions returning GID sets
+  - Circuit::getXYZNames functions renamed to Circuit::getXYZTypeNames
 * [113](https://github.com/BlueBrain/Brion/pull/113):
-  Support for old circuits containing only synapse center positions.
+  Support for old circuits containing only synapse center positions
 * [110](https://github.com/BlueBrain/Brion/pull/110):
   Break PersistentMap out into keyv::Map
 * [107](https://github.com/BlueBrain/Brion/pull/107):
-  Added Sphinx generated documentation of the brain python module.
+  Added Sphinx generated documentation of the brain python module
 * [102](https://github.com/BlueBrain/Brion/pull/102):
   Use PersistentMap for caching synapse positions loaded from brain::Circuit
 * [94](https://github.com/BlueBrain/Brion/pull/94):
@@ -41,11 +41,11 @@ Changelog {#Changelog}
   creating invalid soma sections when the first order sections where connected
   to arbitrary soma sample points.
 * [89](https://github.com/BlueBrain/Brion/pull/89):
-  Python wrapping of brain classes.
+  Python wrapping of brain classes
 * [88](https://github.com/BlueBrain/Brion/pull/88):
-  - Brain namespace enums made strongly typed.
+  - Brain namespace enums made strongly typed
   - Fix for brain::Section::getSamples for sections where the first point
-    appears repeated.
+    appears repeated
 * [85](https://github.com/BlueBrain/Brion/pull/85):
   Implement brain synapses specification
 * [84](https://github.com/BlueBrain/Brion/pull/84):
