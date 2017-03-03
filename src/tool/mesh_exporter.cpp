@@ -309,18 +309,88 @@ void gmsh_abstract_file::export_points_to_stream_dmg(ostream &out){
 }
 
 
-void gmsh_abstract_file::export_segments_to_stream(ostream &out){
-    out << "\n";
-    out << "// export morphology segments \n";
+template<typename Collection, typename AbstractFile >
+void export_segments_single(const Collection & all_segments, AbstractFile & f, ostream & out){
+    out << "// export morphology segments  \n";
 
-    auto all_segments = get_all_segments();
+
     for(auto p = all_segments.begin(); p != all_segments.end(); ++p){
         fmt::scat(out,
-                  "Line(", p->id,") = {" , find_point(p->point1),", ", find_point(p->point2),"};\n");
+                  "Line(", p->id,") = {" , f.find_point(p->point1),", ", f.find_point(p->point2),"};\n");
     }
 
     out << "\n";
     exportPhysicalsElements(all_segments, "Line", "Segments", out);
+}
+
+
+template<typename Collection, typename AbstractFile >
+void export_segments_packed(const Collection & all_segments, AbstractFile & f, ostream & out){
+    out << "// export morphology segments packed \n";
+    
+    struct packed_line{
+        packed_line(int my_id) : id(my_id), isPhysical(true){}
+        
+        std::size_t id;
+        
+        bool isPhysical;
+    };
+
+    std::vector<Collection> packed_segments;
+    std::vector<packed_line> packed_lines;
+
+    for(auto p = all_segments.begin(); p != all_segments.end(); ++p){
+
+        if(packed_segments.size() > 0){
+            Collection & back_group = packed_segments.back();   
+            
+            if(back_group.size() > 0 
+                && back_group.back().point2 == p->point1
+                && back_group.back().branch_id == p->branch_id){
+                back_group.push_back(*p);
+                continue;
+            }
+        }
+        // create a new polyline
+        std::size_t packed_line_id = packed_lines.size() +1;        
+        Collection new_back;
+        new_back.push_back(*p);
+        new_back.back().id = packed_line_id;
+        packed_segments.emplace_back(std::move(new_back));
+        packed_lines.push_back(packed_line(packed_line_id));
+
+    }
+    
+    for( const auto & elem_group : packed_segments){
+        
+        const auto & first_elem = elem_group.front();
+        
+        fmt::scat(out,
+                  "Line(", first_elem.id,") = {" , f.find_point(first_elem.point1));
+        
+        for(auto p = elem_group.begin(); p  <  elem_group.end(); ++p){
+            fmt::scat(out, ", ", f.find_point(p->point2));
+        };
+        
+        fmt::scat(out, "};\n");
+        
+    }
+
+    out << "\n";
+    exportPhysicalsElements(packed_lines, "Line", "Segments", out);
+}
+
+
+
+void gmsh_abstract_file::export_segments_to_stream(ostream &out, bool packed){
+    out << "\n";
+    auto all_segments = get_all_segments();
+
+    if(packed){
+        export_segments_packed(all_segments, *this, out);
+    }else{
+        export_segments_single(all_segments, *this, out);
+    }
     out << "\n";
 }
 
@@ -505,6 +575,10 @@ bool gmsh_exporter::is_bbox_enabled() const{
     return flags & exporter_bounding_box;
 }
 
+bool gmsh_exporter::is_packed() const{
+    return flags & exporter_packed;
+}
+
 void gmsh_exporter::export_to_point_cloud(){
     serialize_header();
     serialize_points_raw();
@@ -533,7 +607,8 @@ void gmsh_exporter::export_to_wireframe(){
 
     fmt::scat(std::cout, "export gmsh objects to output file", "\n");
     vfile.export_points_to_stream(geo_stream);
-    vfile.export_segments_to_stream(geo_stream);
+    
+    vfile.export_segments_to_stream(geo_stream, is_packed());
 
     if (is_bbox_enabled()) {
         vfile.export_line_loop_to_stream(geo_stream);
@@ -682,6 +757,7 @@ void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree & tree, branch & curr
 
             gmsh_segment segment(p1, p2);
             segment.setPhysical(true);
+            segment.setBranchId(current_branch.get_id());
             vfile.add_segment(segment);
         }
     }

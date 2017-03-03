@@ -81,11 +81,15 @@ struct gmsh_point{
 struct gmsh_segment{
     inline gmsh_segment(const gmsh_point & p1, const gmsh_point & p2) :
         point1(p1), point2(p2),
-        id(0),
+        id(0), branch_id(0),
         isPhysical(false){}
 
     inline void setPhysical(bool phys){
         isPhysical = phys;
+    }
+
+    inline void setBranchId(int id){
+        branch_id = id;
     }
 
     /// operator == for Equal requirement
@@ -96,6 +100,7 @@ struct gmsh_segment{
 
     gmsh_point point1, point2;
     std::size_t id;
+    std::size_t branch_id;
     bool isPhysical;
 };
 
@@ -218,7 +223,7 @@ public:
     void export_points_to_stream_dmg(std::ostream & out);
 
     /// export all segments to stream in gmsh format
-    void export_segments_to_stream(std::ostream & out);
+    void export_segments_to_stream(std::ostream & out, bool packed = false);
     void export_segments_to_stream_dmg(std::ostream & out);
 
     /// export all segments to the stream in gmsh format
@@ -294,6 +299,7 @@ public:
     static constexpr int exporter_single_soma = 0x01;
     static constexpr int exporter_write_dmg = 0x02;
     static constexpr int exporter_bounding_box = 0x04;
+    static constexpr int exporter_packed = 0x08;
 
 
     gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
@@ -315,6 +321,7 @@ private:
 
     bool is_dmg_enabled() const;
     bool is_bbox_enabled() const;
+    bool is_packed() const;
 
     void serialize_header();
 

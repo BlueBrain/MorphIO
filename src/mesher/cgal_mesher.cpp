@@ -91,6 +91,19 @@ struct scan_stats{
 };
 
 
+
+// bounding box to a bounding sphere of
+static sphere bounding_box_to_bounding_sphere(const box & g_box){
+    point center = hg::return_centroid<point, box>(g_box);
+    double max_distance = hg::distance(g_box.min_corner(), g_box.max_corner())/2.0;
+    return sphere(center, max_distance);
+}
+
+static Point hadoken_to_cgal_point(const point & point){
+    return Point(hg::get_x(point), hg::get_y(point), hg::get_z(point));
+}
+
+
 FT is_part_of_morphotree(const Point& p, const spatial_index & index,
                          scan_stats & stats){
     point my_point(p.x(), p.y(), p.z());
@@ -148,12 +161,10 @@ void morpho_mesher::execute_3d_meshing(){
 
 
 
-    // get global bounding box
-    box g_box = _tree->get_bounding_box();
-    double max_distance = hg::distance(g_box.min_corner(), point(0,0,0));
-    max_distance = std::max(max_distance, hg::distance(g_box.min_corner(), point(0,0,0)));
+    // get global bounding sphere
+    sphere bounding_sphere = bounding_box_to_bounding_sphere(_tree->get_bounding_box());
 
-    mesh_logger(fmt::scat("Configure bounding sphere with radius of ", max_distance));
+    mesh_logger(fmt::scat("Configure bounding sphere with radius of ", bounding_sphere.get_radius()));
 
     // spatial indexing
     mesh_logger("Create spatial index ");
@@ -169,7 +180,8 @@ void morpho_mesher::execute_3d_meshing(){
     };
 
     Mesh_domain domain(domain_distance,
-                       K::Sphere_3(CGAL::ORIGIN, max_distance*max_distance), _error_bound);
+                       K::Sphere_3(hadoken_to_cgal_point(bounding_sphere.get_center()), bounding_sphere.get_radius()*bounding_sphere.get_radius()),
+                       _error_bound);
     // Mesh criteria
     //Spherical_sizing_field size;
     Mesh_criteria criteria(facet_angle=30,
@@ -229,12 +241,10 @@ void morpho_mesher::execute_surface_meshing(){
     mesh_logger("Start meshing 2D (surface)");
     log_parameters();
 
-    // get global bounding box
-    box g_box = _tree->get_bounding_box();
-    double max_distance = hg::distance(g_box.min_corner(), point(0,0,0));
-    max_distance = std::max(max_distance, hg::distance(g_box.min_corner(), point(0,0,0)));
+    // get global bounding sphere
+    sphere bounding_sphere = bounding_box_to_bounding_sphere(_tree->get_bounding_box());
 
-    mesh_logger(fmt::scat("Configure bounding sphere with radius of ", max_distance));
+    mesh_logger(fmt::scat("Configure bounding sphere with radius of ", bounding_sphere.get_radius()));
 
     // spatial indexing
     mesh_logger(fmt::scat("Create spatial index "));
@@ -250,8 +260,10 @@ void morpho_mesher::execute_surface_meshing(){
     };
 
     // defining the surface
-    Surface_3 surface(domain_distance,             // pointer to function
-                      K::Sphere_3(CGAL::ORIGIN, max_distance*max_distance), _error_bound); // bounding sphere
+    Surface_3 surface(domain_distance,
+                      K::Sphere_3(hadoken_to_cgal_point(bounding_sphere.get_center()), bounding_sphere.get_radius()*bounding_sphere.get_radius()),
+                      _error_bound);
+
     // Note that "2." above is the *squared* radius of the bounding sphere!
     // defining meshing criteria
     CGAL::Surface_mesh_default_criteria_3<Tr_2D> criteria(30.,  // angular bound

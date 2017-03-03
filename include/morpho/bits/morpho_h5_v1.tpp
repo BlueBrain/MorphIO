@@ -229,6 +229,11 @@ morpho_tree morpho_reader::create_morpho_tree() const{
             branch_points = range_points_raw;
             branch_distance = ublas::subrange( ublas::column(points_raw, 3), raw_mat_range.first, raw_mat_range.first+ n_row);
 
+            // convert diameter into radius
+            std::for_each(branch_distance.begin(), branch_distance.end(), [](vec_double::value_type & elem){
+               elem /= 2.0;
+            });
+
             std::unique_ptr<branch> b(new branch(branch_type_from_h5v1(struct_raw(i, 1))));
             b->set_points(std::move(branch_points), std::move(branch_distance));
 
