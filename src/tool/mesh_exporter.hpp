@@ -132,7 +132,7 @@ struct gmsh_line_loop{
     inline gmsh_line_loop(const std::vector<std::int64_t> & id_list) :
         ids(id_list),
         id(0),
-        isPhysical(false), isRuled(false){}
+        isPhysical(false), isSurface(false){}
 
     /// operator == for Equal requirement
     inline bool operator==(const gmsh_line_loop & other) const noexcept{
@@ -146,13 +146,13 @@ struct gmsh_line_loop{
         isPhysical = phys;
     }
 
-    inline void setRuled(bool r){
-        isRuled = r;
+    inline void setSurface(bool s){
+        isSurface = s;
     }
 
     std::vector<std::int64_t> ids;
     std::size_t id;
-    bool isPhysical, isRuled;
+    bool isPhysical, isSurface;
 };
 
 

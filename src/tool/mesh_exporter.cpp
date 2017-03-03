@@ -209,16 +209,19 @@ void gmsh_abstract_file::add_bounding_box(){
     for (int i = 0; i < 4; ++i) {
         gmsh_segment seg(pnts[i], pnts[(i+1)%4]);
         seg.setPhysical(true);
+        seg.branch_id = create_id_line_element();
         seg_ids.push_back(add_segment(seg));
     }
     for (int i = 0; i < 4; ++i) {
         gmsh_segment seg(pnts[i], pnts[i+4]);
         seg.setPhysical(true);
+        seg.branch_id = create_id_line_element();
         seg_ids.push_back(add_segment(seg));
     }
     for (int i = 0; i < 4; ++i) {
         gmsh_segment seg(pnts[i+4], pnts[(i+1)%4+4]);
         seg.setPhysical(true);
+        seg.branch_id = create_id_line_element();
         seg_ids.push_back(add_segment(seg));
     }
 
@@ -227,27 +230,27 @@ void gmsh_abstract_file::add_bounding_box(){
 ///from seg_ids
     gmsh_line_loop lloop0({seg_ids[0], seg_ids[1], seg_ids[2], seg_ids[3]});
     lloop0.setPhysical(true);
-    lloop0.setRuled(true);
+    lloop0.setSurface(true);
     lloop_ids.push_back(add_line_loop(lloop0));
     gmsh_line_loop lloop1({seg_ids[3], seg_ids[4], -seg_ids[11], -seg_ids[7]});
     lloop1.setPhysical(true);
-    lloop1.setRuled(true);
+    lloop1.setSurface(true);
     lloop_ids.push_back(add_line_loop(lloop1));
     gmsh_line_loop lloop2({-seg_ids[0], seg_ids[4], seg_ids[8], -seg_ids[5]});
     lloop2.setPhysical(true);
-    lloop2.setRuled(true);
+    lloop2.setSurface(true);
     lloop_ids.push_back(add_line_loop(lloop2));
     gmsh_line_loop lloop3({-seg_ids[1], seg_ids[5], seg_ids[9], -seg_ids[6]});
     lloop3.setPhysical(true);
-    lloop3.setRuled(true);
+    lloop3.setSurface(true);
     lloop_ids.push_back(add_line_loop(lloop3));
     gmsh_line_loop lloop4({seg_ids[2], seg_ids[7], -seg_ids[10], -seg_ids[6]});
     lloop4.setPhysical(true);
-    lloop4.setRuled(true);
+    lloop4.setSurface(true);
     lloop_ids.push_back(add_line_loop(lloop4));
     gmsh_line_loop lloop5({seg_ids[8], seg_ids[9], seg_ids[10], seg_ids[11]});
     lloop5.setPhysical(true);
-    lloop5.setRuled(true);
+    lloop5.setSurface(true);
     lloop_ids.push_back(add_line_loop(lloop5));
 
     /// Create region
@@ -451,9 +454,9 @@ void gmsh_abstract_file::export_line_loop_to_stream(ostream &out){
             delimiter.assign(", ");
         }
         fmt::scat(out, "};\n");
-        if(p->isRuled){
+        if(p->isSurface){
             fmt::scat(out,
-                      "Ruled Surface(", p->id,") = {", p->id,"};\n");
+                      "Surface(", p->id,") = {", p->id,"};\n");
         }
     }
 
@@ -808,7 +811,7 @@ void create_gmsh_sphere(gmsh_abstract_file & vfile, const geo::sphere3d & sphere
 
                 gmsh_line_loop line_loop({ int64_t(xy_circle_id), int64_t(yz_circle_id), int64_t(-1* xz_circle_id) });
                 line_loop.setPhysical(true);
-                line_loop.setRuled(true);
+                line_loop.setSurface(true);
                 line_loops.push_back(vfile.add_line_loop(line_loop));
             }
         }
@@ -929,7 +932,7 @@ std::vector<std::size_t> create_gmsh_disk(gmsh_abstract_file & vfile, const geo:
 
             gmsh_line_loop part_disk(ids);
             part_disk.setPhysical(true);
-            part_disk.setRuled(true);
+            part_disk.setSurface(true);
             const std::size_t part_disk_id = vfile.add_line_loop(part_disk);
             surfaces.push_back(part_disk_id);
 
@@ -978,7 +981,7 @@ std::vector<std::size_t> create_gmsh_pipe_surfaces(gmsh_abstract_file & vfile,
 
         gmsh_line_loop pipe_surface(ids);
         pipe_surface.setPhysical(true);
-        pipe_surface.setRuled(true);
+        pipe_surface.setSurface(true);
         res.emplace_back(vfile.add_line_loop(pipe_surface));
     }
     return res;

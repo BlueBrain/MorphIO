@@ -16,7 +16,7 @@ include(ReleaseDebugAutoFlags)
 
 
 option(MORPHOTOOL_UNIT_TESTS "Enable or disable unit tests" ON)
-option(ENABLE_MESHER_CGAL "Enable or disable integrated mesher based on CGAL" ON)
+option(ENABLE_MESHER_CGAL "Enable or disable integrated mesher based on CGAL" OFF)
 
 set(Boost_NO_BOOST_CMAKE TRUE)
 
