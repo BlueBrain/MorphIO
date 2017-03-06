@@ -74,9 +74,7 @@ void CompartmentReportView::_initIndices()
     auto gidCount = report->getGIDs().size();
 
     while (gidCount--)
-    {
         indicesCount += report->getOffsets()[index++].size();
-    }
 
     indices.reserve(indicesCount);
     index = 0;

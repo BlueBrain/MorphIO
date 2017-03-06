@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [136](https://github.com/BlueBrain/Brion/pull/136):
+  Implement readable null:// compartment report for benchmarking
 * [130](https://github.com/BlueBrain/Brion/pull/130):
   Added brain::CompartmentReportReader and its Python wrapping
 * [120](https://github.com/BlueBrain/Brion/pull/120), [131](https://github.com/BlueBrain/Brion/pull/131):

@@ -153,7 +153,7 @@ public:
     virtual bool writeCompartments( uint32_t gid, const uint16_ts& counts ) = 0;
 
     /** @copydoc brion::CompartmentReport::writeFrame */
-    virtual bool writeFrame( uint32_t gid, const floats& voltages,
+    virtual bool writeFrame( uint32_t gid, const float* values, size_t size,
                              float timestamp ) = 0;
 
     /** @copydoc brion::CompartmentReport::flush */

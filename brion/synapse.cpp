@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          bbp-open-source@googlegroups.com
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
@@ -127,7 +127,6 @@ public:
     ~SynapseFile()
     {
         lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
-
         _file.close();
     }
 

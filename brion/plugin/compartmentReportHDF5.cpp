@@ -472,8 +472,8 @@ bool CompartmentReportHDF5::writeCompartments( const uint32_t gid,
     return false;
 }
 
-bool CompartmentReportHDF5::writeFrame( const uint32_t gid,
-                                        const floats& voltages,
+bool CompartmentReportHDF5::writeFrame( const uint32_t gid, const float* values,
+                                        const size_t /*size*/,
                                         const float timestamp )
 {
     lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
@@ -496,7 +496,7 @@ bool CompartmentReportHDF5::writeFrame( const uint32_t gid,
         H5::DataSpace dataMspace( 1, &dataDim[1] );
 
         // Write data to the dataset
-        dataset.write( &voltages[0], H5::PredType::NATIVE_FLOAT, dataMspace,
+        dataset.write( values, H5::PredType::NATIVE_FLOAT, dataMspace,
                        dataFspace );
         return true;
     }

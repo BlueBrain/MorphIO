@@ -405,7 +405,8 @@ bool CompartmentReportBinary::writeCompartments( const uint32_t /*gid*/,
 }
 
 bool CompartmentReportBinary::writeFrame( const uint32_t /*gid*/,
-                                          const floats& /*voltages*/,
+                                          const float* /*values*/,
+                                          const size_t /*size*/,
                                           const float /*timestamp*/ )
 {
     LBUNIMPLEMENTED;

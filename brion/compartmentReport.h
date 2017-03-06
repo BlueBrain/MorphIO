@@ -207,19 +207,23 @@ public:
      */
     BRION_API bool writeCompartments( uint32_t gid, const uint16_ts& counts );
 
-    /** Write the voltages for one cell at a point in time.
+    /** Write the values for one cell at a point in time.
      *
      * This should only be called after all the required mapping has been saved
      * before.
      *
      * @param gid the GID of the cell
-     * @param voltages the voltages per compartment to save
-     * @param timestamp the timestamp in ms where for this voltages
+     * @param values the values per compartment to save
+     * @param timestamp the timestamp in ms where for this values
      * @return false if saving was not successful, true otherwise
      * @version 1.0
      */
-    BRION_API bool writeFrame( uint32_t gid, const floats& voltages,
-                               float timestamp );
+    bool writeFrame( uint32_t gid, const floats& values, float timestamp )
+    {
+        return writeFrame( gid, values.data(), values.size(), timestamp );
+    }
+    BRION_API bool writeFrame( uint32_t gid, const float* values,
+                               size_t size, float timestamp );
 
     /** Flush data to output. @return true on success. @version 1.0 */
     BRION_API bool flush();

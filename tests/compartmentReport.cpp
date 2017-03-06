@@ -254,14 +254,15 @@ void test_compare( const brion::URI& uri1, const brion::URI& uri2 )
     catch( const std::runtime_error& ) {} // loadNeuron(gid) is optional, ignore
 
     brion::GIDSet gids;
-    gids.insert( 394 );
+    const uint32_t gid = *report1.getGIDs().begin();
+    gids.insert( gid );
     report1.updateMapping( gids );
     report2.updateMapping( gids );
 
     BOOST_CHECK_EQUAL( report1.getGIDs().size(), 1 );
-    BOOST_CHECK_EQUAL( *report1.getGIDs().begin(), 394 );
+    BOOST_CHECK_EQUAL( *report1.getGIDs().begin(), gid );
     BOOST_CHECK_EQUAL( report2.getGIDs().size(), 1 );
-    BOOST_CHECK_EQUAL( *report2.getGIDs().begin(), 394 );
+    BOOST_CHECK_EQUAL( *report2.getGIDs().begin(), gid );
 }
 
 /** @return false if no "from" or "to" report plugin was found, true otherwise*/
@@ -417,6 +418,23 @@ BOOST_AUTO_TEST_CASE( test_convert_and_compare )
 
     boost::filesystem::remove_all({ temp.string() + ".ldb" });
     boost::filesystem::remove_all({ temp.string() + ".ldbo" });
+}
+
+BOOST_AUTO_TEST_CASE( dummy_report )
+{
+    const boost::filesystem::path& temp = createUniquePath();
+    const std::string base = std::string("dummy://") + temp.string();
+    const brion::URI dummy3a( base + "a?size=3" );
+    const brion::URI dummy3b( base + "b?size=3" );
+    const brion::URI dummy2( base + "?size=2" );
+
+    BOOST_CHECK( convert( dummy3a, dummy3b ));
+    test_compare( dummy3a, dummy3b );
+
+    brion::CompartmentReport report3a( dummy3a, brion::MODE_READ );
+    brion::CompartmentReport report2( dummy2, brion::MODE_READ );
+
+    BOOST_CHECK_NE( report3a.getFrameSize(), report2.getFrameSize( ));
 }
 
 BOOST_AUTO_TEST_CASE( test_read_soma_binary )

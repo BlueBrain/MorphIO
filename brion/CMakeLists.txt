@@ -24,11 +24,11 @@ set(BRION_PUBLIC_HEADERS
 
 set(BRION_HEADERS
   constants.h
-  plugin/compartmentReportCommon.h
   plugin/compartmentReportBinary.h
+  plugin/compartmentReportCommon.h
+  plugin/compartmentReportDummy.h
   plugin/compartmentReportHDF5.h
   plugin/compartmentReportMap.h
-  plugin/compartmentReportNull.h
   plugin/morphologyHDF5.h
   plugin/morphologySWC.h
   plugin/spikeReportBinary.h
@@ -55,11 +55,11 @@ set(BRION_SOURCES
   synapse.cpp
   target.cpp
   detail/lockHDF5.cpp
-  plugin/compartmentReportCommon.cpp
   plugin/compartmentReportBinary.cpp
+  plugin/compartmentReportCommon.cpp
+  plugin/compartmentReportDummy.cpp
   plugin/compartmentReportHDF5.cpp
   plugin/compartmentReportMap.cpp
-  plugin/compartmentReportNull.cpp
   plugin/morphologyHDF5.cpp
   plugin/morphologySWC.cpp
   plugin/spikeReportBinary.cpp

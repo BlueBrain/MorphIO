@@ -75,7 +75,7 @@ public:
                       const std::string& dunit,
                       const std::string& tunit ) final;
     bool writeCompartments( uint32_t gid, const uint16_ts& counts ) final;
-    bool writeFrame( uint32_t gid, const floats& voltages,
+    bool writeFrame( uint32_t gid, const float* values, size_t size,
                      float timestamp ) final;
     bool flush() final;
     bool erase() final;

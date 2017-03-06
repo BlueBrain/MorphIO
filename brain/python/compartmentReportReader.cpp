@@ -36,7 +36,7 @@ typedef boost::shared_ptr<CompartmentReportFrame> CompartmentReportFramePtr;
 
 // This proxy object is needed because when converting C++ vectors to numpy
 // arrays we need a shared_ptr to act as a custodian. As CompartmentReportMapping
-// is indeed a wrapper than holds a pointer to a CompartmentReportMapping, the
+// is indeed a wrapper that holds a pointer to a CompartmentReportView, the
 // best solution for the wrapping is to make the proxy be a wrapper of a
 // shared_ptr to a view. This way we can use that pointer as the custodian.
 class CompartmentReportMappingProxy

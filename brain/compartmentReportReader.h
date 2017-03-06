@@ -203,7 +203,7 @@ private:
 };
 
 /**
- * Data mapping of a compertment report frame.
+ * Data mapping of a compartment report frame.
  *
  * The mapping provides the number of compartments per neuron/section pair and
  * the start offset of each neuron/section pair within a data frame. Mappings
@@ -216,8 +216,8 @@ class CompartmentReportMapping
 public:
     struct IndexEntry
     {
-        // To ensure proper alignment and compactness the order of this fields
-        // mustn't be changed.
+        // To ensure proper alignment and compactness for the python binding the
+        // order of these fields mustn't be changed.
         uint64_t offset;
         uint32_t gid;
         uint16_t section;

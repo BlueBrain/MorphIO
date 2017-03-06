@@ -170,16 +170,15 @@ bool CompartmentReportMap::writeCompartments( const uint32_t gid,
     return _stores.front().insert( _getCountsKey( gid ), counts );
 }
 
-bool CompartmentReportMap::writeFrame( const uint32_t gid,
-                                       const floats& voltages,
-                                       const float time )
+bool CompartmentReportMap::writeFrame( const uint32_t gid, const float* values,
+                                       const size_t size, const float time )
 {
     if( !_flushHeader( ))
         return false;
 
     const size_t index = _getFrameNumber( time );
     const std::string& key = _getValueKey( gid, index );
-    return _stores.front().insert( key, voltages );
+    return _stores.front().insert( key, values, size * sizeof( float ));
 }
 
 bool CompartmentReportMap::flush()

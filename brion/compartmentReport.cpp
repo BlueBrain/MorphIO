@@ -170,10 +170,10 @@ bool CompartmentReport::writeCompartments( const uint32_t gid,
     return _impl->plugin->writeCompartments( gid, counts );
 }
 
-bool CompartmentReport::writeFrame( const uint32_t gid, const floats& voltages,
-                                    const float timestamp )
+bool CompartmentReport::writeFrame( uint32_t gid, const float* values,
+                                    const size_t size, float timestamp )
 {
-    return _impl->plugin->writeFrame( gid, voltages, timestamp );
+    return _impl->plugin->writeFrame( gid, values, size, timestamp );
 }
 
 bool CompartmentReport::flush()
