@@ -9,7 +9,7 @@
 
 #include <morpho/morpho_tree.hpp>
 
-#include <src/tool/mesh_exporter.hpp>
+#include <src/morpho/gmsh_exporter.hpp>
 
 
 BOOST_AUTO_TEST_CASE( test_gmsh_point )
@@ -76,10 +76,10 @@ BOOST_AUTO_TEST_CASE( test_gmsh_lines )
 
     gmsh_point p1(geo::point3d(0.5, 0.2, 0.6)), p2(geo::point3d(0.5, 0.2, 0.7)), p3(geo::point3d(1, 2, 3));
 
-    gmsh_segment segment1(p1, p2), segment2(p2, p3);
+    gmsh_polyline segment1(p1, p2), segment2(p2, p3);
 
-    std::size_t id1 = mfile.add_segment(segment1);
-    std::size_t id2 = mfile.add_segment(segment2);
+    std::size_t id1 = mfile.add_polyline(segment1);
+    std::size_t id2 = mfile.add_polyline(segment2);
 
     BOOST_CHECK_EQUAL(id1, 1);
     BOOST_CHECK_EQUAL(id2, 2);
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE( test_gmsh_lines )
     BOOST_CHECK_EQUAL(mfile.get_all_points().size(), 3);
 
     gmsh_point p11(geo::point3d(0.5, 0.2, 0.6)), p12(geo::point3d(0.5, 0.2, 0.7));
-    std::size_t id3 = mfile.add_segment(gmsh_segment(p11, p12));
+    std::size_t id3 = mfile.add_polyline(gmsh_polyline(p11, p12));
 
     BOOST_CHECK_EQUAL(id1, id3);
 

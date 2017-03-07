@@ -32,7 +32,7 @@
 #include <morpho/morpho_h5_v1.hpp>
 #include <morpho/morpho_mesher.hpp>
 
-#include "mesh_exporter.hpp"
+#include "gmsh_exporter.hpp"
 #include "x3d_exporter.hpp"
 
 using namespace std;
@@ -131,6 +131,7 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
 
 void export_morpho_to_x3d(const std::string & filename_morpho, const std::string & filename_x3d,
                           po::variables_map & options){
+    (void) options;
     x3d_exporter exporter(filename_morpho, filename_x3d);
 
     exporter.export_to_sphere();

@@ -1,7 +1,9 @@
 
 
 
-list(APPEND SRC_EXPORTER "mesh_exporter.cpp" "morpho_tool.cpp" "x3d_exporter.cpp" )
+list(APPEND SRC_EXPORTER "morpho_tool.cpp" )
+
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/../morpho )
 
 
 add_executable(morpho-tool ${SRC_EXPORTER} ${SRC_MESHER} ${MORPHO_HEADERS_BITS} ${MORPHO_HEADERS})
@@ -14,8 +16,8 @@ target_link_libraries(morpho-tool
                                 ## additional dependencies required for CGAL
                                 ${Boost_THREAD_LIBRARIES}
 
-								morpho
-                                                                ${MOPHO_MESHER_TARGET}
+                                morpho
+                                ${MOPHO_MESHER_TARGET}
                              )
 
 

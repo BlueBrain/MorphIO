@@ -26,6 +26,7 @@
 #include <functional>
 #include <unordered_set>
 #include <cstddef>
+#include <stdexcept>
 
 #include <hadoken/geometry/geometry.hpp>
 #include <hadoken/math/math_floating_point.hpp>
@@ -78,29 +79,47 @@ struct gmsh_point{
 
 
 /// \brief representation of a segment in 3D
-struct gmsh_segment{
-    inline gmsh_segment(const gmsh_point & p1, const gmsh_point & p2) :
-        point1(p1), point2(p2),
-        id(0), branch_id(0),
+struct gmsh_polyline{
+    inline gmsh_polyline(const gmsh_point & p1, const gmsh_point & p2) :
+        points({p1, p2}),
+        id(0),
         isPhysical(false){}
+
+    inline gmsh_polyline(const std::vector<gmsh_point> & list_points) :
+        points(list_points),
+        id(0),
+        isPhysical(false){
+        if(points.size() < 2){
+            throw std::out_of_range("Invalid gmsh_polyline : a polyline should have at least 2 points");
+        }
+    }
+
 
     inline void setPhysical(bool phys){
         isPhysical = phys;
     }
 
-    inline void setBranchId(int id){
-        branch_id = id;
+
+    inline const gmsh_point & get_point(std::size_t id) const{
+        return points[id];
     }
+
 
     /// operator == for Equal requirement
-    inline bool operator==(const gmsh_segment & other) const noexcept{
-        return (point1 == other.point1) && (point2 == other.point2);
+    inline bool operator==(const gmsh_polyline & other) const noexcept{
+        if(other.points.size() != points.size()){
+            return false;
+        }
+        for(std::size_t i = 0; i < points.size(); ++i){
+            if( (points[i] == other.points[i]) == false){
+                return false;
+            }
+        }
+        return true;
     }
 
-
-    gmsh_point point1, point2;
+    std::vector<gmsh_point> points;
     std::size_t id;
-    std::size_t branch_id;
     bool isPhysical;
 };
 
@@ -119,6 +138,20 @@ struct gmsh_circle{
 
     inline void setPhysical(bool phys){
         isPhysical = phys;
+    }
+
+    inline const gmsh_point & get_point(std::size_t id) const{
+        switch(id){
+            case 0:{
+                return point1;
+            }
+            case 1:{
+                return point2;
+            }
+            default:{
+                throw std::out_of_range("only 2 points accessible in gmsh_circle");
+            }
+        }
     }
 
     gmsh_point center, point1, point2;
@@ -193,7 +226,7 @@ public:
     std::size_t find_point(const gmsh_point & point);
 
     /// add a segment and return its id
-    std::size_t add_segment(const gmsh_segment & s);
+    std::size_t add_polyline(const gmsh_polyline & s);
 
     /// add a new gmsh circle
     std::size_t add_circle(const gmsh_circle & c);
@@ -208,7 +241,7 @@ public:
     std::vector<gmsh_point> get_all_points() const;
 
     /// get all segments
-    std::vector<gmsh_segment> get_all_segments() const;
+    std::vector<gmsh_polyline> get_all_segments() const;
 
     /// get all circles
     std::vector<gmsh_circle> get_all_circles() const;
@@ -216,14 +249,14 @@ public:
     /// get all line loop
     std::vector<gmsh_line_loop> get_all_line_loops() const;
 
-   std::vector<gmsh_volume> get_all_volumes() const;
+    std::vector<gmsh_volume> get_all_volumes() const;
 
     /// export all points to stream in gmsh format
     void export_points_to_stream(std::ostream & out);
     void export_points_to_stream_dmg(std::ostream & out);
 
     /// export all segments to stream in gmsh format
-    void export_segments_to_stream(std::ostream & out, bool packed = false);
+    void export_segments_to_stream(std::ostream & out);
     void export_segments_to_stream_dmg(std::ostream & out);
 
     /// export all segments to the stream in gmsh format
@@ -260,7 +293,7 @@ private:
     struct hash_geometry_point{
         std::size_t operator()(const GeometryType & s) const noexcept{
             std::hash<double> hd;
-            return hd(geo::get_x(s.point1.coords));
+            return hd(geo::get_x(s.get_point(0).coords));
         }
     };
 
@@ -278,7 +311,7 @@ private:
 
     std::unordered_set<gmsh_point, hash_gmsh_point> _points;
 
-    std::unordered_set<gmsh_segment, hash_geometry_point<gmsh_segment> > _segments;
+    std::unordered_set<gmsh_polyline, hash_geometry_point<gmsh_polyline> > _segments;
 
     std::unordered_set<gmsh_circle, hash_geometry_point<gmsh_circle> > _circles;
 

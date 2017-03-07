@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#include "mesh_exporter.hpp"
+#include "gmsh_exporter.hpp"
 
 #include <algorithm>
 #include <vector>
@@ -55,10 +55,12 @@ std::size_t gmsh_abstract_file::find_point(const gmsh_point &point){
     return it->id;
 }
 
-std::size_t gmsh_abstract_file::add_segment(const gmsh_segment & s){
-    gmsh_segment segment(s);
-    add_point(segment.point1);
-    add_point(segment.point2);
+std::size_t gmsh_abstract_file::add_polyline(const gmsh_polyline & s){
+    gmsh_polyline segment(s);
+    const auto & points = s.points;
+    std::for_each(points.begin(), points.end(), [this](const gmsh_point & p){
+       this->add_point(p);
+    });
     segment.id = create_id_line_element();
 
     return _segments.insert(segment).first->id;
@@ -108,8 +110,8 @@ std::vector<gmsh_point> gmsh_abstract_file::get_all_points() const{
     return sort_by_id<gmsh_point>(_points);
 }
 
-std::vector<gmsh_segment> gmsh_abstract_file::get_all_segments() const{
-    return sort_by_id<gmsh_segment>(_segments);
+std::vector<gmsh_polyline> gmsh_abstract_file::get_all_segments() const{
+    return sort_by_id<gmsh_polyline>(_segments);
 }
 
 std::vector<gmsh_circle> gmsh_abstract_file::get_all_circles() const{
@@ -136,6 +138,9 @@ double clean_coordinate(double val){
 
 
 void gmsh_abstract_file::add_bounding_box(){
+
+    fmt::scat(std::cout, " add bounding box to the export");
+
     double minp[3] = {1e+6, 1e+6, 1e+6};
     double maxp[3] = {-1e+6, -1e+6, -1e+6};
 
@@ -143,26 +148,24 @@ void gmsh_abstract_file::add_bounding_box(){
     auto all_points = get_all_points();
     for(auto p = all_points.begin(); p != all_points.end(); ++p){
         double x = clean_coordinate(geo::get_x(p->coords));
-        if (x < minp[0])
-            minp[0] = x;
-        if (x > maxp[0])
-            maxp[0] = x;
+        minp[0] = std::min(x, minp[0]);
+        maxp[0] = std::max(x, maxp[0]);
 
         double y = clean_coordinate(geo::get_y(p->coords));
-        if (y < minp[1])
-            minp[1] = y;
-        if (y > maxp[1])
-            maxp[1] = y;
+        minp[1] = std::min(y, minp[1]);
+        maxp[1] = std::max(y, maxp[1]);
+
 
         double z = clean_coordinate(geo::get_z(p->coords));
-        if (z < minp[2])
-            minp[2] = z;
-        if (z > maxp[2])
-            maxp[2] = z;
+        minp[2] = std::min(z, minp[2]);
+        maxp[2] = std::max(z, maxp[2]);
     }
 
     /// Set the offset of a bounding box such that the neuron doesn't immediately touch the bounding face
-    const double offset = 20.;
+    /// define the offset as box distance + 10%
+    const double distance_min_max = geo::distance(geo::point3d(minp[0], minp[1], minp[2]), geo::point3d(maxp[0], maxp[1], maxp[2]));
+    const double offset = distance_min_max * 10.0 / 100.0;
+
     for (int i = 0; i < 3; ++i){
        minp[i] -= offset;
        maxp[i] += offset;
@@ -207,22 +210,19 @@ void gmsh_abstract_file::add_bounding_box(){
     /// Create segments (lines, edges)
     std::vector<int64_t> seg_ids;
     for (int i = 0; i < 4; ++i) {
-        gmsh_segment seg(pnts[i], pnts[(i+1)%4]);
+        gmsh_polyline seg(pnts[i], pnts[(i+1)%4]);
         seg.setPhysical(true);
-        seg.branch_id = create_id_line_element();
-        seg_ids.push_back(add_segment(seg));
+        seg_ids.push_back(add_polyline(seg));
     }
     for (int i = 0; i < 4; ++i) {
-        gmsh_segment seg(pnts[i], pnts[i+4]);
+        gmsh_polyline seg(pnts[i], pnts[i+4]);
         seg.setPhysical(true);
-        seg.branch_id = create_id_line_element();
-        seg_ids.push_back(add_segment(seg));
+        seg_ids.push_back(add_polyline(seg));
     }
     for (int i = 0; i < 4; ++i) {
-        gmsh_segment seg(pnts[i+4], pnts[(i+1)%4+4]);
+        gmsh_polyline seg(pnts[i+4], pnts[(i+1)%4+4]);
         seg.setPhysical(true);
-        seg.branch_id = create_id_line_element();
-        seg_ids.push_back(add_segment(seg));
+        seg_ids.push_back(add_polyline(seg));
     }
 
     /// Create line loops
@@ -313,13 +313,21 @@ void gmsh_abstract_file::export_points_to_stream_dmg(ostream &out){
 
 
 template<typename Collection, typename AbstractFile >
-void export_segments_single(const Collection & all_segments, AbstractFile & f, ostream & out){
+void export_polyline(const Collection & all_segments, AbstractFile & f, ostream & out){
     out << "// export morphology segments  \n";
 
 
     for(auto p = all_segments.begin(); p != all_segments.end(); ++p){
         fmt::scat(out,
-                  "Line(", p->id,") = {" , f.find_point(p->point1),", ", f.find_point(p->point2),"};\n");
+                  "Line(", p->id,") = {");
+
+        bool not_first = false;
+        std::for_each(p->points.begin(), p->points.end(), [&f, &out, &not_first](const gmsh_point & p){
+           fmt::scat(out, ((not_first)?", ":" "), f.find_point(p));
+           not_first = true;
+        });
+
+        fmt::scat(out, "};\n");
     }
 
     out << "\n";
@@ -327,73 +335,12 @@ void export_segments_single(const Collection & all_segments, AbstractFile & f, o
 }
 
 
-template<typename Collection, typename AbstractFile >
-void export_segments_packed(const Collection & all_segments, AbstractFile & f, ostream & out){
-    out << "// export morphology segments packed \n";
-    
-    struct packed_line{
-        packed_line(int my_id) : id(my_id), isPhysical(true){}
-        
-        std::size_t id;
-        
-        bool isPhysical;
-    };
 
-    std::vector<Collection> packed_segments;
-    std::vector<packed_line> packed_lines;
-
-    for(auto p = all_segments.begin(); p != all_segments.end(); ++p){
-
-        if(packed_segments.size() > 0){
-            Collection & back_group = packed_segments.back();   
-            
-            if(back_group.size() > 0 
-                && back_group.back().point2 == p->point1
-                && back_group.back().branch_id == p->branch_id){
-                back_group.push_back(*p);
-                continue;
-            }
-        }
-        // create a new polyline
-        std::size_t packed_line_id = packed_lines.size() +1;        
-        Collection new_back;
-        new_back.push_back(*p);
-        new_back.back().id = packed_line_id;
-        packed_segments.emplace_back(std::move(new_back));
-        packed_lines.push_back(packed_line(packed_line_id));
-
-    }
-    
-    for( const auto & elem_group : packed_segments){
-        
-        const auto & first_elem = elem_group.front();
-        
-        fmt::scat(out,
-                  "Line(", first_elem.id,") = {" , f.find_point(first_elem.point1));
-        
-        for(auto p = elem_group.begin(); p  <  elem_group.end(); ++p){
-            fmt::scat(out, ", ", f.find_point(p->point2));
-        };
-        
-        fmt::scat(out, "};\n");
-        
-    }
-
-    out << "\n";
-    exportPhysicalsElements(packed_lines, "Line", "Segments", out);
-}
-
-
-
-void gmsh_abstract_file::export_segments_to_stream(ostream &out, bool packed){
+void gmsh_abstract_file::export_segments_to_stream(ostream &out){
     out << "\n";
     auto all_segments = get_all_segments();
 
-    if(packed){
-        export_segments_packed(all_segments, *this, out);
-    }else{
-        export_segments_single(all_segments, *this, out);
-    }
+    export_polyline(all_segments, *this, out);
     out << "\n";
 }
 
@@ -403,7 +350,7 @@ void gmsh_abstract_file::export_segments_to_stream_dmg(ostream &out){
     for(auto p = all_segments.begin(); p != all_segments.end(); ++p){
         if(p->isPhysical){
             fmt::scat(out,
-                  p->id," ", find_point(p->point1), " ", find_point(p->point2),"\n");
+                  p->id," ", find_point(p->points.front()), " ", find_point(p->points.back()),"\n");
         }
     }
 }
@@ -456,7 +403,7 @@ void gmsh_abstract_file::export_line_loop_to_stream(ostream &out){
         fmt::scat(out, "};\n");
         if(p->isSurface){
             fmt::scat(out,
-                      "Surface(", p->id,") = {", p->id,"};\n");
+                      "Plane Surface(", p->id,") = {", p->id,"};\n");
         }
     }
 
@@ -611,7 +558,7 @@ void gmsh_exporter::export_to_wireframe(){
     fmt::scat(std::cout, "export gmsh objects to output file", "\n");
     vfile.export_points_to_stream(geo_stream);
     
-    vfile.export_segments_to_stream(geo_stream, is_packed());
+    vfile.export_segments_to_stream(geo_stream);
 
     if (is_bbox_enabled()) {
         vfile.export_line_loop_to_stream(geo_stream);
@@ -748,20 +695,39 @@ void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree & tree, branch & curr
 
     const auto linestring = current_branch.get_linestring();
     if(linestring.size() > 1 && !(current_branch.get_type() == branch_type::soma && (flags & exporter_single_soma))){
-        for(std::size_t i =0; i < (linestring.size()-1); ++i){
-            auto dist = geo::distance(linestring[i], linestring[i+1]);
-            gmsh_point p1(linestring[i], dist);
-            p1.setPhysical(true);
 
-            if (i < linestring.size()-2)
-                dist = geo::distance(linestring[i+1], linestring[i+2]);
-            gmsh_point p2(linestring[i+1], dist);
-            p2.setPhysical(true);
+        if(is_packed()){ // packed mode, single polyline
+            typedef decltype(linestring)::value_type line_point;
 
-            gmsh_segment segment(p1, p2);
+            std::vector<gmsh_point> gmsh_polyline_points;
+            gmsh_polyline_points.reserve(linestring.size());
+
+            std::for_each(linestring.begin(), linestring.end(), [&](const line_point & p ){
+                gmsh_point p1(p, 0.0);
+                p1.setPhysical(true);
+
+                gmsh_polyline_points.push_back(p);
+            });
+
+            gmsh_polyline segment(gmsh_polyline_points);
             segment.setPhysical(true);
-            segment.setBranchId(current_branch.get_id());
-            vfile.add_segment(segment);
+            vfile.add_polyline(segment);
+
+        } else{ // no pack mode independent  point
+            for(std::size_t i =0; i < (linestring.size()-1); ++i){
+                auto dist = geo::distance(linestring[i], linestring[i+1]);
+                gmsh_point p1(linestring[i], dist);
+                p1.setPhysical(true);
+
+                if (i < linestring.size()-2)
+                    dist = geo::distance(linestring[i+1], linestring[i+2]);
+                gmsh_point p2(linestring[i+1], dist);
+                p2.setPhysical(true);
+
+                gmsh_polyline segment(p1, p2);
+                segment.setPhysical(true);
+                vfile.add_polyline(segment);
+            }
         }
     }
 
@@ -915,9 +881,9 @@ std::vector<std::size_t> create_gmsh_disk(gmsh_abstract_file & vfile, const geo:
    radius_segment_ids.reserve(4);
 
    for(auto & point : circle1_points){
-        gmsh_segment radius_segment(point, center);
+        gmsh_polyline radius_segment(point, center);
         radius_segment.setPhysical(true);
-        const std::size_t id_segment = vfile.add_segment(radius_segment);
+        const std::size_t id_segment = vfile.add_polyline(radius_segment);
         radius_segment_ids.emplace_back(id_segment);
    }
 
@@ -962,15 +928,15 @@ std::vector<std::size_t> create_gmsh_pipe_surfaces(gmsh_abstract_file & vfile,
 
         std::size_t line_id1, line_id2;
         {
-            gmsh_segment seg1(disk1_points[id], disk2_points[id]);
+            gmsh_polyline seg1(disk1_points[id], disk2_points[id]);
             seg1.setPhysical(true);
-            line_id1 = vfile.add_segment(seg1);
+            line_id1 = vfile.add_polyline(seg1);
         }
 
         {
-            gmsh_segment seg2(disk1_points[next_id], disk2_points[next_id]);
+            gmsh_polyline seg2(disk1_points[next_id], disk2_points[next_id]);
             seg2.setPhysical(true);
-            line_id2 = vfile.add_segment(seg2);
+            line_id2 = vfile.add_polyline(seg2);
         }
 
 

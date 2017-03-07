@@ -25,9 +25,9 @@ add_test(NAME test_morpho COMMAND tests_morpho_bin)
 
 ## gmsh tests
 file(GLOB  tests_gmsh_src "*gmsh*.cpp")
-add_executable(tests_gmsh_bin ${tests_gmsh_src} ${CMAKE_CURRENT_SOURCE_DIR}/../../src/tool/mesh_exporter.cpp )
+add_executable(tests_gmsh_bin ${tests_gmsh_src}  )
 
-target_link_libraries(tests_gmsh_bin ${HDF5_LIBRARIES} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARIES} )
+target_link_libraries(tests_gmsh_bin ${HDF5_LIBRARIES} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARIES} morpho)
 
 add_test(NAME test_gmsh COMMAND tests_gmsh_bin)
 
