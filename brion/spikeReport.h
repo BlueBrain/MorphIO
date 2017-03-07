@@ -276,7 +276,7 @@ public:
      * @version 2.0
      */
     BRION_API std::future< void > seek( float toTimeStamp );
-    
+
     /**
      * Write the given spikes to the output.
      * Preconditions:

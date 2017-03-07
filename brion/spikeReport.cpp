@@ -73,8 +73,17 @@ public:
 
     std::unique_ptr< SpikeReportPlugin > plugin;
     lunchbox::ThreadPool threadPool{1};
+    bool busy = false;
 };
 }
+
+struct BusyGuard
+{
+    BusyGuard(bool &busy_) : busy(busy_) {}
+    ~BusyGuard() { busy = false; }
+    bool& busy;
+};
+
 }
 
 namespace brion
@@ -168,6 +177,7 @@ void SpikeReport::interrupt()
     _impl->plugin->_setInterrupted( true );
     // blocks until all the pending jobs are done
     _impl->threadPool.post( []{} ).get();
+    _impl->busy = false;
     _impl->plugin->_setInterrupted( false );
 }
 
@@ -177,12 +187,15 @@ std::future< Spikes > SpikeReport::read( float min )
     _impl->plugin->_checkCanRead();
     _impl->plugin->_checkStateOk();
 
-    if ( _impl->threadPool.hasPendingJobs() )
-    {
+    if (_impl->busy)
         LBTHROW( std::runtime_error( "Can't read: Pending read operation" ) );
-    }
 
-    return _impl->threadPool.post( [&, min] { return _impl->plugin->read( min ); } );
+    _impl->busy = true;
+    return _impl->threadPool.post([&, min]
+                                  {
+                                      BusyGuard guard(_impl->busy);
+                                      return _impl->plugin->read( min );
+                                  });
 }
 
 std::future< Spikes > SpikeReport::readUntil( const float max )
@@ -198,11 +211,15 @@ std::future< Spikes > SpikeReport::readUntil( const float max )
             std::to_string( getCurrentTime( ))));
     }
 
-    if ( _impl->threadPool.hasPendingJobs() )
-    {
+    if ( _impl->busy )
         LBTHROW( std::runtime_error( "Can't read: Pending read operation" ) );
-    }
-    return _impl->threadPool.post( [&, max] { return _impl->plugin->readUntil( max ); } );
+
+    _impl->busy = true;
+    return _impl->threadPool.post([&, max]
+                                  {
+                                      BusyGuard guard(_impl->busy);
+                                      return _impl->plugin->readUntil( max );
+                                  });
 }
 
 std::future< void > SpikeReport::seek( const float toTimeStamp )
@@ -210,12 +227,15 @@ std::future< void > SpikeReport::seek( const float toTimeStamp )
     _impl->plugin->_checkNotClosed();
     if ( _impl->plugin->getAccessMode() == MODE_READ )
     {
-        if ( _impl->threadPool.hasPendingJobs() )
-        {
-            LBTHROW( std::runtime_error( "Can't seek: Pending read operation" ) );
-        }
-        return _impl->threadPool.post(
-            [&, toTimeStamp] { return _impl->plugin->readSeek( toTimeStamp ); } );
+        if (_impl->busy)
+            LBTHROW(std::runtime_error("Can't seek: Pending read operation"));
+
+        _impl->busy = true;
+        return _impl->threadPool.post([&, toTimeStamp]
+                                      {
+                                          BusyGuard guard(_impl->busy);
+                                          _impl->plugin->readSeek( toTimeStamp );
+                                      });
     }
 
     return _impl->threadPool.post(
@@ -227,10 +247,9 @@ void SpikeReport::write( const Spikes& spikes )
     _impl->plugin->_checkCanWrite();
     _impl->plugin->_checkNotClosed();
 
-    if ( _impl->threadPool.hasPendingJobs() )
-    {
-        LBTHROW( std::runtime_error( "Can't write spikes: Pending seek operation" ) );
-    }
+    if (_impl->busy)
+        LBTHROW(std::runtime_error(
+                    "Can't write spikes: Pending seek operation"));
 
     if( !spikes.empty() && spikes.front().first < getCurrentTime() )
     {
