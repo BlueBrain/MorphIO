@@ -286,8 +286,6 @@ void gmsh_abstract_file::export_points_to_stream(ostream &out){
     out << "\n";
     out << "// export morphology points \n";
 
-    /// Setting the scaling factor
-    fmt::scat(out, "h=1;\n");
     auto all_points = get_all_points();
     for(auto p = all_points.begin(); p != all_points.end(); ++p){
         fmt::scat(out,
@@ -560,20 +558,28 @@ void gmsh_exporter::export_to_wireframe(){
     
     vfile.export_segments_to_stream(geo_stream);
 
+    /// Ids for the segments
+    auto all_segments = vfile.get_all_segments();
+    size_t seg_id_beg = all_segments[0].id;
+    size_t seg_id_end = all_segments[all_segments.size()-13].id;
+
     if (is_bbox_enabled()) {
         vfile.export_line_loop_to_stream(geo_stream);
         vfile.export_volume_to_stream(geo_stream);
 
-        /// Insert lines in the cube for geo file
-        auto all_segments = vfile.get_all_segments();
-        size_t seg_id_beg = all_segments[0].id;
-        size_t seg_id_end = all_segments[all_segments.size()-13].id;
-
         auto all_volumes = vfile.get_all_volumes();
         size_t vol_id_end = all_volumes[all_volumes.size()-1].id;
 
-        fmt::scat(geo_stream, "For s In {", seg_id_beg, ":", seg_id_end, "}\n  Line{s} In Volume{", vol_id_end, "};\nEndFor");
+        /// Insert lines in the cube for geo file
+        fmt::scat(geo_stream, "For s In {", seg_id_beg, ":", seg_id_end, "}\n  Line{s} In Volume{", vol_id_end, "};\nEndFor\n\n");
     }
+
+    /// Writing the size field
+    fmt::scat(geo_stream, "Mesh.OldRefinement=0;\nMesh.Algorithm3D = 2;\n\n");
+    fmt::scat(geo_stream, "Field[1] = Attractor;\nField[1].EdgesList = {", seg_id_beg, ":", seg_id_end, "};\nField[1].NNodesByEdge = 3;\n\n");
+    fmt::scat(geo_stream, "Field[2] = Threshold;\nField[2].DistMax = 50;\nField[2].DistMin = 5;\nField[2].IField = 1;\n");
+    fmt::scat(geo_stream, "Field[2].LcMax = 300;\nField[2].LcMin = 1;\nField[2].Sigmoid = 1;\nField[3] = Octree;\nField[3].InField = 2;\n\n");
+    fmt::scat(geo_stream, "Background Field = 3;\nMesh.CharacteristicLengthExtendFromBoundary=0;\nGeometry.Points = 0;\n");
 
     if (is_dmg_enabled()) {
         fmt::scat(std::cout, "export gmsh geometry objects to dmg file format", "\n");
