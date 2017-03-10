@@ -2,5 +2,5 @@
 git_subproject(Servus https://github.com/HBPVIS/Servus.git 36180b5)
 git_subproject(Lunchbox https://github.com/Eyescale/Lunchbox.git 7933465)
 git_subproject(Keyv https://github.com/BlueBrain/Keyv.git 3fe9927)
-git_subproject(vmmlib https://github.com/Eyescale/vmmlib.git 126533c)
+git_subproject(vmmlib https://github.com/Eyescale/vmmlib.git cfa6243)
 git_subproject(MVDTool https://github.com/BlueBrain/MVDTool.git 4e2f0f4)
