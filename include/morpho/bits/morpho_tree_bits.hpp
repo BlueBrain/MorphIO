@@ -152,6 +152,14 @@ sphere branch_soma::get_sphere() const{
     }
 }
 
+
+void morpho_tree::swap(morpho_tree & other){
+    morpho_tree tmp = std::move(other);
+    other = std::move(*this);
+    *this = std::move(tmp);
+}
+
+
 } //morpho
 
 #endif // MORPHO_TREE_BITS_HPP

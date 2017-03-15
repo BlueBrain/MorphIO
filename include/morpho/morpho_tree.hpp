@@ -320,11 +320,17 @@ public:
     inline morpho_tree() : _branches(), _flags(0) {}
     inline virtual ~morpho_tree(){}
 
-    morpho_tree(morpho_tree && other){
+    inline morpho_tree(morpho_tree && other){
         _branches = std::move(other._branches);
         _flags = other._flags;
     }
-
+    
+    inline morpho_tree & operator=(morpho_tree && other){
+        assert(&other != this);
+        _branches = std::move(other._branches);
+        _flags = other._flags;
+        return *this;
+    }  
 
     ///
     /// \brief set the root element of the tree
@@ -406,6 +412,12 @@ public:
     inline int get_flags() const{
         return _flags;
     }
+    
+    
+    /// swap two morpho tree
+    inline void swap(morpho_tree & other);
+    
+
 
 
 private:

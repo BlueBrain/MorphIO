@@ -41,7 +41,14 @@ BOOST_AUTO_TEST_CASE( test_morpho_tree )
 
 
     BOOST_CHECK_EQUAL(tree.get_branch(1).get_parent(), 0);
-
+    
+    // test swap method
+    morpho_tree tree_copy;
+    BOOST_CHECK_EQUAL(tree_copy.get_tree_size(), 0);
+    
+    tree_copy.swap(tree);
+    BOOST_CHECK_EQUAL(tree_copy.get_tree_size(), 2); 
+    BOOST_CHECK_EQUAL(tree.get_tree_size(), 0); 
 }
 
 
