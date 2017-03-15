@@ -45,13 +45,13 @@ namespace geo = hadoken::geometry::cartesian;
 struct gmsh_point{
     inline gmsh_point() :
         coords(),
-        diameter(),
+        radius(),
         id(0),
         isPhysical(false){}
 
     inline gmsh_point(const geo::point3d & my_coords, double d = 1.0) :
         coords(my_coords),
-        diameter(d),
+        radius(d),
         id(0),
         isPhysical(false){}
 
@@ -72,7 +72,7 @@ struct gmsh_point{
     }
 
     geo::point3d coords;
-    double diameter;
+    double radius;
     std::size_t id;
     bool isPhysical;
 };
