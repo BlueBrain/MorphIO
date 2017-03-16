@@ -100,9 +100,9 @@ public:
 
 
 
-    inline void set_points(mat_points && points, vec_double && distances){
+    inline void set_points(mat_points && points, vec_double && radius){
         _points = std::move(points);
-        _distances = std::move(distances);
+        _radius = std::move(radius);
     }
 
     ///
@@ -117,11 +117,11 @@ public:
     }
 
     ///
-    /// \brief get_distances
+    /// \brief get_radius
     /// \return
     ///
-    inline const vec_double & get_distances() const{
-        return _distances;
+    inline const vec_double & get_radius() const{
+        return _radius;
     }
 
     ///
@@ -129,8 +129,8 @@ public:
     /// \return number of point composing the branch
     ///
     inline std::size_t get_size() const{
-        assert(_distances.size() == _points.size1());
-        return _distances.size();
+        assert(_radius.size() == _points.size1());
+        return _radius.size();
     }
 
     ///
@@ -149,40 +149,18 @@ public:
                       _points(id, 2));
     }
 
-    inline virtual box get_bounding_box() const{
-        typedef point::value_type float_type;
-        const float_type max_val = std::numeric_limits<float_type>::max();
-
-        float_type x_min(max_val), y_min(max_val), z_min(max_val);
-        float_type radius(-max_val);
-        float_type x_max(-max_val), y_max(-max_val), z_max(-max_val);
-
-        if( get_size() == 0){
-            std::out_of_range("impossible to get bounding box of null node");
-        }
-
-        for(std::size_t i =0; i < get_size(); ++i){
-            point current_point = get_point(i);
-            x_min = std::min(x_min, hg::get_x(current_point));
-            y_min = std::min(y_min, hg::get_y(current_point));
-            z_min = std::min(z_min, hg::get_z(current_point));
-
-            x_max = std::max(x_max, hg::get_x(current_point));
-            y_max = std::max(y_max, hg::get_y(current_point));
-            z_max = std::max(z_max, hg::get_z(current_point));
-
-            radius = std::max(radius, _distances[i]);
-        }
-
-        return box(point(x_min - radius, y_min - radius , z_min - radius), point(x_max + radius, y_max + radius , z_max + radius));
-    }
-
+    ///
+    /// return bounding box of the entire branch
+    ///
+    inline virtual box get_bounding_box() const;
+    
+    
     inline cone get_segment(std::size_t n){
         if(n >= get_size()){
             throw std::out_of_range(hadoken::format::scat("segment ", n, " is out of bound"));
         }
 
-        return cone(get_point(n), _distances[n], get_point(n+1), _distances[n+1]);
+        return cone(get_point(n), _radius[n], get_point(n+1), _radius[n+1]);
     }
 
     ///
@@ -197,7 +175,7 @@ public:
 
         auto p1 = get_point(n);
         auto p2 = get_point(n+1);
-        double radius = std::max(_distances[n], _distances[n+1]);
+        double radius = std::max(_radius[n], _radius[n+1]);
 
         const point p_min(std::min(get_x(p1), get_x(p2)),
                     std::min(get_y(p1), get_y(p2)),
@@ -219,7 +197,7 @@ public:
             throw std::out_of_range(hadoken::format::scat("segment ", n, " is out of bound"));
         }
 
-        return sphere(get_point(n), _distances[n]);
+        return sphere(get_point(n), _radius[n]);
     }
 
     ///
@@ -270,7 +248,7 @@ private:
 
     mat_points _points;
 
-    vec_double _distances;
+    vec_double _radius;
 
     std::vector<std::size_t > _childrens;
 

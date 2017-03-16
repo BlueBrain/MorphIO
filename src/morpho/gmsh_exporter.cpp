@@ -1008,7 +1008,7 @@ void gmsh_exporter::construct_gmsh_3d_object(morpho_tree & tree, branch & curren
         create_gmsh_sphere(vfile, soma_sphere);
     }else{
 
-        auto & distance = current_branch.get_distances();
+        auto & distance = current_branch.get_radius();
         std::size_t last_elem = distance.size()-1;
 
         create_gmsh_sphere(vfile, geo::sphere3d(current_branch.get_point(last_elem), distance(last_elem)));

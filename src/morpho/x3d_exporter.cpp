@@ -37,7 +37,7 @@ void points_distance_to_sphere(const point & my_point, double distance,
 
     fmt::scat(output,
     "<Transform translation='", geo::get_x(my_point), " ", geo::get_y(my_point), " ", geo::get_z(my_point),
-            "' scale='", distance/2," ", distance/2 ," ",distance/2 ,"' >" "\n"
+            "' scale='", distance," ", distance ," ",distance ,"' >" "\n"
     "  <Shape USE=\"",sphere_unit_name,"\" />"  "\n"
     "</Transform>"  "\n"
 
@@ -90,7 +90,7 @@ void x3d_exporter::export_all_points(){
 
         auto & branch = tree.get_branch(b_id);
         auto & points = branch.get_points();
-        auto & distance = branch.get_distances();
+        auto & distance = branch.get_radius();
 
         assert(points.size1() == distance.size());
         for(std::size_t i = 0; i < points.size1(); ++i){

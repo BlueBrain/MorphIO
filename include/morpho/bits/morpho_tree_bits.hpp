@@ -75,6 +75,34 @@ linestring branch::get_linestring() const{
 }
 
 
+inline box branch::get_bounding_box() const{
+    typedef point::value_type float_type;
+    const float_type max_val = std::numeric_limits<float_type>::max();
+
+    float_type x_min(max_val), y_min(max_val), z_min(max_val);
+    float_type radius(-max_val);
+    float_type x_max(-max_val), y_max(-max_val), z_max(-max_val);
+
+    if( get_size() == 0){
+        std::out_of_range("impossible to get bounding box of null node");
+    }
+
+    for(std::size_t i =0; i < get_size(); ++i){
+        point current_point = get_point(i);
+        x_min = std::min(x_min, hg::get_x(current_point));
+        y_min = std::min(y_min, hg::get_y(current_point));
+        z_min = std::min(z_min, hg::get_z(current_point));
+
+        x_max = std::max(x_max, hg::get_x(current_point));
+        y_max = std::max(y_max, hg::get_y(current_point));
+        z_max = std::max(z_max, hg::get_z(current_point));
+
+        radius = std::max(radius, _radius[i]);
+    }
+
+    return box(point(x_min - radius, y_min - radius , z_min - radius), point(x_max + radius, y_max + radius , z_max + radius));
+}
+
 
 
 circle_pipe branch::get_circle_pipe() const{
@@ -119,7 +147,7 @@ circle_pipe branch::get_circle_pipe() const{
             axis = prev_center - center;
         }
 
-        auto radius = _distances[i];
+        auto radius = _radius[i];
 
         if(prev_center.close_to(center)){
             namespace fmt = hadoken::format;
@@ -142,7 +170,7 @@ sphere branch_soma::get_sphere() const{
         case 0:
             throw std::runtime_error(fmt::scat("invalid branch ", get_id(), " : null size "));
         case 1:
-            return sphere(get_point(0), get_distances()[0]);
+            return sphere(get_point(0), get_radius()[0]);
         default:{
             double radius;
             point center;
@@ -151,6 +179,12 @@ sphere branch_soma::get_sphere() const{
         }
     }
 }
+
+
+//
+// morpho tree
+//
+
 
 
 void morpho_tree::swap(morpho_tree & other){
