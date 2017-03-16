@@ -84,7 +84,7 @@ public:
      * If this sections is a soma section return the list of points of the
      * soma profile poly-line.
      *
-     * @return A list of point positions with radius. For a section consisting
+     * @return A list of point positions with diameter. For a section consisting
      *         of n segments, this list will have n + 1 points.
      */
     BRAIN_API Vector4fs getSamples() const;

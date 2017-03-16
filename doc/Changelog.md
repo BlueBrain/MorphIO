@@ -3,6 +3,9 @@ Changelog {#Changelog}
 
 # git master
 
+* [141](https://github.com/BlueBrain/Brion/pull/141):
+  Fixed documentation to specify that morphology section samples report
+  diameters and not radii.
 * [136](https://github.com/BlueBrain/Brion/pull/136):
   Implement readable null:// compartment report for benchmarking
 * [130](https://github.com/BlueBrain/Brion/pull/130):

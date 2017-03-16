@@ -133,7 +133,7 @@ public:
     /** Return the object with the information about the neuron soma */
     BRAIN_API Soma getSoma() const;
 
-    /** Return \if pybind a 4x4 numpry arry with \endif
+    /** Return \if pybind a 4x4 numpy array with \endif
      *  the transformation that was passed to the constructor or the
      *  identity matrix is no transformation was given.
      */

@@ -26,7 +26,7 @@ available in your environemnt. In the Blue Brain clusters you have two
 possibilities depending on the Python version you want to use:
 
  * For Python 3.4: ``module load BBP/viz/latest``
- * For Python 2.7: ``module load memcache/bbpviz nix/viz/brion/1.8 nix/python2.7-full``
+ * For Python 2.7: ``module load memcache/bbpviz nix/viz/brion/2.0 nix/python2.7-full``
 
 .. code:: python
 
@@ -319,7 +319,7 @@ Some functions also provide access to the low raw data arrays.
 
 .. code:: python
 
-    # The soma object provides the cenroid, radius and profile points if any.
+    # The soma object provides the centroid, radius and profile points if any.
     soma = morphology.soma()
     print(soma.centroid())
     print(soma.mean_radius())
@@ -391,7 +391,7 @@ Some functions also provide access to the low raw data arrays.
     print("Children:", [s.id() for s in section.children()])
     print("Parent:", section.parent())
     
-    # To retrieve the sample locations and radii the method is samples.
+    # To retrieve the sample locations and diameters the method is samples.
     print(section.samples())
     
     # This method can take a list of relative position to obtain linearly interpolated sample positions.
