@@ -19,12 +19,15 @@
 #ifndef MORPHO_H5_V1_HPP
 #define MORPHO_H5_V1_HPP
 
+#ifndef H5_USE_BOOST
+#define H5_USE_BOOST
+#endif
+
 #include <string>
 #include <utility>
 
 #include <boost/numeric/ublas/blas.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
-
 
 #include <highfive/H5File.hpp>
 
@@ -32,7 +35,6 @@
 
 
 namespace morpho{
-
 
 namespace h5_v1{
 
