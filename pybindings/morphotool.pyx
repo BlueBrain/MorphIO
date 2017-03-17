@@ -22,6 +22,7 @@ from libc.string cimport memcpy
 # We need to initialize NumPy.
 np.import_array()
 
+
 # --------------------- BASE CLASS ---------------------
 
 cdef enum OPERATOR:
@@ -35,6 +36,7 @@ cdef class _py__base:
             return self._ptr==other._ptr    
 
 
+
 include "datastructs.pxi"
 
 
@@ -42,7 +44,6 @@ include "datastructs.pxi"
 # Python bindings to namespace morpho
 # ======================================================================================================================
 
-# ----------------------------------------------------------------------------------------------------------------------
 cdef class Branch(_py__base):
     "Python wrapper class for branch (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
