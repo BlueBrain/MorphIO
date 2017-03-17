@@ -1,6 +1,4 @@
-[TOC]
-
-# Introduction {#Introduction}
+# Brion
 
 ![](doc/BBPLOGO350.jpg)
 
@@ -18,14 +16,14 @@ Additional documentation exists for the [Python wrapping of Brain]
 
 To keep track of the changes between releases check the [changelog](@ref Changelog).
 
-# Features {#Features}
+## Features
 
 Brion provides two libraries Brion and Brain. The former is a collection of file
 readers and writers intended for low level access to the data model. The latter
 is a set of higher level classes that wrap low level data objects with a
 use-case oriented API.
 
-## IO library
+### IO library
 
 This is the core library provided by Brion. It includes classes for reading
 and writing files which store the Blue Brain data model.
@@ -49,7 +47,7 @@ and writing files which store the Blue Brain data model.
   [Lunchbox](http://eyescale.github.io/Lunchbox-1.14/index.html),
   [vmmlib](http://eyescale.github.io/vmmlib-1.12/index.html).
 
-## High level library
+### High level library
 
 The higher level library is called Brain and it provides:
 
@@ -59,19 +57,19 @@ The higher level library is called Brain and it provides:
   morphologies.
 * brain::Synapses and brain::Synapse for array and object access to synapses.
 
-# Building {#Building}
+## Building
 
 Brion is a cross-platform library, designed to run on any modern operating
 system, including all Unix variants. Brion uses CMake to create a
 platform-specific build environment. The following platforms and build
 environments are tested:
 
-* Linux: Ubuntu 16.04 and RHEL 6 (Makefile, x64)
+* Linux: Ubuntu 16.04, RHEL 6.8 (Makefile, Ninja)
 
 Building from source is as simple as:
 
     git clone https://github.com/BlueBrain/Brion.git
     mkdir Brion/build
     cd Brion/build
-    cmake ..
-    make
+    cmake -GNinja ..
+    ninja
