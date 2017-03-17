@@ -82,7 +82,7 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         branch(branch_type)
         void set_points(mat_points&&, vec_double&&)
         mat_points& get_points()
-        vec_double& get_distances()
+        #vec_double& get_distances()
         std.size_t get_size()
         point get_point(std.size_t)
         box get_bounding_box()
