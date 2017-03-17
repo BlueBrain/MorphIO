@@ -17,6 +17,7 @@ include(ReleaseDebugAutoFlags)
 
 option(MORPHOTOOL_UNIT_TESTS "Enable or disable unit tests" ON)
 option(ENABLE_MESHER_CGAL "Enable or disable integrated mesher based on CGAL" OFF)
+option(BUILD_PYTHON_MODULE "Build a Python library" ON)
 
 set(Boost_NO_BOOST_CMAKE TRUE)
 
@@ -49,11 +50,17 @@ add_definitions( -DH5_USE_BOOST -DMORPHO_VERSION_MAJOR=\"${MORPHOTOOL_VERSION_MA
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/morpho DESTINATION ${INCLUDE_INSTALL_DIR})
 
+# Targets
 add_subdirectory(src)
+
+if(BUILD_PYTHON_MODULE)
+    find_package(PythonInterpLibs)
+    find_package(PythonLibs) # python_add_module support
+    find_package(Cython REQUIRED)
+    add_subdirectory(pybindings)
+endif()
 
 add_subdirectory(deps/hadoken)
 add_subdirectory(deps/highfive)
-
-
 add_subdirectory(tests/unit)
 
