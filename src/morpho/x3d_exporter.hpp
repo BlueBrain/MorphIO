@@ -31,13 +31,17 @@ namespace morpho{
 class x3d_exporter
 {
 public:
-    x3d_exporter(const std::string & morphology_filename, const std::string & mesh_filename);
+    x3d_exporter(std::vector<morpho_tree> && trees, const std::string & mesh_filename);
 
+    inline void set_identifier_string(const std::string & id){
+        identifier_string = id;
+    }
 
     void export_to_sphere();
 
 private:
-    morpho::h5_v1::morpho_reader reader;
+    std::vector<morpho_tree> morphotrees;
+    std::string identifier_string;    
     std::ofstream x3d_stream;
     std::string dest_filename;
 

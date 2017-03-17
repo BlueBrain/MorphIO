@@ -334,9 +334,6 @@ public:
     static constexpr int exporter_bounding_box = 0x04;
     static constexpr int exporter_packed = 0x08;
 
-
-    gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
-
     gmsh_exporter(std::vector<morpho_tree> && trees, const std::string & mesh_filename, exporter_flags flags = exporter_flags());
 
     void export_to_point_cloud();
@@ -344,13 +341,18 @@ public:
     void export_to_wireframe();
 
     void export_to_3d_object();
+    
+    inline void set_identifier(const std::string & id){
+        identifier_string = id;
+    }
 
 
 private:
     std::ofstream geo_stream, dmg_stream;
-    morpho::h5_v1::morpho_reader reader;
     exporter_flags flags;
     std::vector<morpho_tree> morphotrees;
+    
+    std::string identifier_string;
 
     bool is_dmg_enabled() const;
     bool is_bbox_enabled() const;

@@ -484,27 +484,13 @@ std::size_t gmsh_abstract_file::create_id_line_element(){
     return _segments.size() + _circles.size() + _line_loop.size() + 1;
 }
 
-gmsh_exporter::gmsh_exporter(const std::string & morphology_filename, const std::string & mesh_filename, exporter_flags my_flags) :
-    geo_stream(mesh_filename),
-    dmg_stream(),
-    reader(morphology_filename),
-    flags(my_flags)
-{
-    if (is_dmg_enabled()) {
-        std::string dmg_filename(mesh_filename);
-        dmg_filename.erase(dmg_filename.find_last_of('.'), std::string::npos);
-        dmg_filename.append(".dmg");
-        dmg_stream.open(dmg_filename);
-    }
-
-}
 
 gmsh_exporter::gmsh_exporter(std::vector<morpho_tree> && trees, const std::string & mesh_filename, exporter_flags my_flags) :
     geo_stream(mesh_filename),
     dmg_stream(),
-    reader("default.h5"),
     flags(my_flags),
-    morphotrees(std::move(trees))
+    morphotrees(std::move(trees)),
+    identifier_string()
 {
     if (is_dmg_enabled()) {
         std::string dmg_filename(mesh_filename);
@@ -535,12 +521,6 @@ void gmsh_exporter::export_to_point_cloud(){
 
 void gmsh_exporter::export_to_wireframe(){
     serialize_header();
-
-    if (morphotrees.size()<1){
-      fmt::scat(std::cout, "load morphology tree ", reader.get_filename(), "\n");
-      morpho_tree tree = reader.create_morpho_tree();
-      morphotrees.push_back(std::move(tree));
-    }
 
     gmsh_abstract_file vfile;
     fmt::scat(std::cout, "convert morphology tree to gmsh set of wireframe geometries", "\n");
@@ -617,13 +597,13 @@ void gmsh_exporter::export_to_wireframe(){
 void gmsh_exporter::export_to_3d_object(){
     serialize_header();
 
-    fmt::scat(std::cout, "load morphology tree ", reader.get_filename(), "\n");
-    morpho_tree tree = reader.create_morpho_tree();
-
 
     gmsh_abstract_file vfile;
     fmt::scat(std::cout, "convert morphology tree to gmsh set of 3D geometries", "\n");
-    construct_gmsh_3d_object(tree, tree.get_branch(0), vfile);
+
+    for(auto & tree : morphotrees){
+        construct_gmsh_3d_object(tree, tree.get_branch(0), vfile);
+    }
 
     fmt::scat(std::cout, "export gmsh objects to output file", "\n");
 
@@ -679,22 +659,29 @@ void gmsh_exporter::serialize_header(){
 
     fmt::scat(geo_stream,
               gmsh_header,
-              "// converted to GEO format from ", reader.get_filename(), "\n");
+              "// converted to GEO format from ", identifier_string, "\n");
 
 }
 
 
 void gmsh_exporter::construct_gmsh_vfile_raw(gmsh_abstract_file & vfile){
 
-    auto points = reader.get_points_raw();
-
     assert(points.size2() > 3);
+    
+    for(auto & tree : morphotrees){
+    
+        const std::size_t tree_size = tree.get_tree_size();
+        
+        for(std::size_t b = 0; b < tree_size; ++b){
+            auto points = tree.get_branch(b).get_points();
 
-    for(std::size_t row =0; row < points.size1(); ++row){
-        gmsh_point point(geo::point3d( points(row, 0), points(row, 1), points(row, 2)), points(row, 3));
-        vfile.add_point(point);
+            for(std::size_t row =0; row < points.size1(); ++row){
+                gmsh_point point(geo::point3d( points(row, 0), points(row, 1), points(row, 2)), points(row, 3));
+                vfile.add_point(point);
+            }
+        }
+
     }
-
 }
 
 void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree & tree, branch & current_branch, gmsh_abstract_file & vfile){

@@ -99,6 +99,7 @@ po::parsed_options parse_args(int argc, char** argv,
 void export_morpho_to_mesh(const std::string & filename_morpho, const std::string & filename_geo,
                           po::variables_map & options){
 
+    std::vector<morpho_tree> trees;
     gmsh_exporter::exporter_flags flags = 0;
     if(options.count("single-soma")){
         flags |= gmsh_exporter::exporter_single_soma;
@@ -116,7 +117,16 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
         flags |= gmsh_exporter::exporter_packed;
     }
 
-    gmsh_exporter exporter(filename_morpho, filename_geo, flags);
+    fmt::scat(std::cout, "load morphology tree ", filename_morpho, "\n");
+ 
+    {
+        h5_v1::morpho_reader reader(filename_morpho);
+        morpho_tree tree = reader.create_morpho_tree();
+        trees.emplace_back(std::move(tree));
+    }
+    
+    gmsh_exporter exporter(std::move(trees), filename_geo, flags);
+    exporter.set_identifier(std::string("morphology: ") + filename_morpho);
 
     if(options.count("point-cloud")){
         exporter.export_to_point_cloud();
@@ -132,7 +142,17 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
 void export_morpho_to_x3d(const std::string & filename_morpho, const std::string & filename_x3d,
                           po::variables_map & options){
     (void) options;
-    x3d_exporter exporter(filename_morpho, filename_x3d);
+    std::vector<morpho_tree> trees;
+    
+    fmt::scat(std::cout, "load morphology tree ", filename_morpho, "\n");
+ 
+    {
+        h5_v1::morpho_reader reader(filename_morpho);
+        morpho_tree tree = reader.create_morpho_tree();
+        trees.emplace_back(std::move(tree));
+    }    
+        
+    x3d_exporter exporter(std::move(trees), filename_x3d);
 
     exporter.export_to_sphere();
 
