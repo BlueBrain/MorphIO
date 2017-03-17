@@ -124,13 +124,34 @@ cdef class Morpho_Node(_py__base):
 
 # Data Structures wrappers
 cdef class Mat_Points(_py__base):
+    cdef object nparray
+
     cdef morpho.mat_points * ptr(self):
         return <morpho.mat_points *> self._ptr
 
+    def __repr__(self):
+        leng = len(self.nparray)
+        if leng>3: leng=3
+        return """<morphotool.Mat_Points object:
+%s...
+[Full np.array accesible at object.np_array]>""" % (repr(self.nparray[:leng]),)
+
+    @property
+    def np_array(self):
+        return self.nparray
+
     @staticmethod
-    cdef Mat_Points from_ptr(morpho.mat_points * ptr):
-        cdef Mat_Points obj = Mat_Points.__new__(Mat_Points)
-        obj._ptr = ptr
+    cdef Mat_Points from_ptr(morpho.mat_points * matpoints):
+        cdef Mat_Points obj = Mat_Points()
+        obj._ptr = matpoints
+
+        # Create a numpy array (memviews dont expose no nicely to python)
+        cdef np.npy_intp[2] dim
+        dim[0] = matpoints.size1()
+        dim[1] = matpoints.size2()
+        cdef np.ndarray[np.double_t, ndim=2] arr = np.PyArray_SimpleNewFromData(2, dim, np.NPY_DOUBLE, matpoints.data().begin())
+        obj.nparray = arr
+
         return obj
 
     @staticmethod

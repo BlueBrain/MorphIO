@@ -51,7 +51,7 @@ add_definitions( -DH5_USE_BOOST -DMORPHO_VERSION_MAJOR=\"${MORPHOTOOL_VERSION_MA
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/morpho DESTINATION ${INCLUDE_INSTALL_DIR})
 
 # Targets
-add_subdirectory(src)
+#add_subdirectory(src)
 
 if(BUILD_PYTHON_MODULE)
     find_package(PythonInterpLibs)
@@ -60,7 +60,8 @@ if(BUILD_PYTHON_MODULE)
     add_subdirectory(pybindings)
 endif()
 
-add_subdirectory(deps/hadoken)
-add_subdirectory(deps/highfive)
-add_subdirectory(tests/unit)
-
+if(FALSE)
+ add_subdirectory(deps/hadoken)
+ add_subdirectory(deps/highfive)
+ add_subdirectory(tests/unit)
+endif()

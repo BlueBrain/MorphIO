@@ -60,15 +60,10 @@ cdef class Branch(_py__base):
     #def set_points(self, _py_mat_points points, _py_vec_double distances):
     #    return self.ptr().set_points(deref(points.ptr()), deref(distances.ptr()))
 
+
     def get_points(self, ):
-        # Memory shall stay valid, so no alloc
-        cdef morpho.mat_points* matpoints = Mat_Points.ptr_from_ref(self.ptr().get_points())
-        # Create a numpy array (memviews dont expose no nicely to python)
-        cdef np.npy_intp[2] dim
-        dim[0] = matpoints.size1()
-        dim[1] = matpoints.size2()
-        cdef np.ndarray[np.double_t, ndim=2] points = np.PyArray_SimpleNewFromData(2, dim, np.NPY_DOUBLE, matpoints.data().begin())
-        return points
+        return Mat_Points.from_ref( self.ptr().get_points() )
+
 
     #Testing purposes only
     def _change_point0(self):
