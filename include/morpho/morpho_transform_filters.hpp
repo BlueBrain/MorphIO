@@ -37,6 +37,6 @@ private:
 
 } // morpho
 
-#include <morpho/bits/morpho_transform_filter_bits.hpp>
+#include <morpho/bits/morpho_transform_filters_bits.hpp>
 
 #endif // MORPHO_TRANSFORM_FILTERS_HPP

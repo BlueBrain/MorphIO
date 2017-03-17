@@ -43,19 +43,12 @@ typedef boost::numeric::ublas::vector<double> vec_double;
 typedef boost::numeric::ublas::vector_range<vec_double> vec_double_range;
 
 using range =  boost::numeric::ublas::range;
-
 using point = hg::point3d;
-
 using vector = hg::vector3d;
-
 using linestring = hg::linestring3d;
-
 using sphere = hadoken::geometry::cartesian::sphere3d;
-
 using cone = hadoken::geometry::cartesian::cone3d;
-
 using circle_pipe = std::vector<hg::circle3d>;
-
 using box = hg::box3d;
 
 class branch;
