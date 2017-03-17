@@ -1,0 +1,109 @@
+/* Copyright (c) 2017, EPFL/Blue Brain Project
+ *                     Juan Hernando <juan.hernando@epfl.ch>
+ *                     Mohamed-Ghaith Kaabi <mohamed.kaabi@epfl.ch>
+ *
+ * This file is part of Brion <https://github.com/BlueBrain/Brion>
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+#pragma once
+
+#include "compartmentReportView.h"
+
+#include <brain/api.h>
+#include <brain/types.h>
+#include <future>
+
+namespace brain
+{
+namespace detail
+{
+struct CompartmentReportReader;
+struct CompartmentReportFrame;
+struct CompartmentReportView;
+}
+
+/**
+ * Compartment report meta data.
+ */
+struct CompartmentReportMetaData
+{
+    /** The  start time of the report */
+    double startTime = 0;
+
+    /** The  end time of the report */
+    double endTime = 0;
+
+    /** The sampling time interval of the report*/
+    double timeStep = 0;
+
+    /** The  time unit of the report */
+    std::string timeUnit;
+
+    /** The  data unit of the report */
+    std::string dataUnit;
+};
+
+/**
+ * Reader for compartment reports.
+ *
+ * \ifnot pybind
+ * Following RAII, all readers are ready for use after the creation and will
+ * ensure release of resources upon destruction.
+ * \endif
+ */
+class CompartmentReport
+{
+public:
+    /**
+     * Open a report in read mode.
+     * @param uri URI to compartment report
+     * @throw std::runtime_error if compartment report could be opened
+     * for read or it is not valid.
+     * @version 2.0
+     */
+    BRAIN_API CompartmentReport(const URI& uri);
+    BRAIN_API ~CompartmentReport();
+
+    /** @return the metadata of the report */
+    BRAIN_API const CompartmentReportMetaData& getMetaData() const;
+
+    /**
+     * Create a view of a subset of neurons. An empty gid
+     * set creates a view containing all the data.
+     *
+     * @param gids the neurons of interest
+     * @throw std::runtime_error if invalid GID set.
+     * @version 2.0
+     */
+    BRAIN_API CompartmentReportView createView(const GIDSet& gids);
+
+    /**
+     * Create a view with all the neurons in the report.
+     *
+     * @version 2.0
+     */
+    BRAIN_API CompartmentReportView createView();
+
+private:
+    CompartmentReport() = delete;
+    CompartmentReport(const CompartmentReport&) = delete;
+    CompartmentReport(CompartmentReport&&) = delete;
+    CompartmentReport& operator=(const CompartmentReport&) = delete;
+    CompartmentReport& operator=(CompartmentReport&&) = delete;
+
+    std::shared_ptr<detail::CompartmentReportReader> _impl;
+};
+}

@@ -20,30 +20,32 @@
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  */
 
-
 #define BOOST_TEST_MODULE brain::CompartmentReportReader
 
 #include <BBP/TestDatasets.h>
-#include <brain/compartmentReportReader.h>
+#include <brain/compartmentReport.h>
+#include <brain/compartmentReportMapping.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
 
+#define TIMESTEP_PRECISION 0.000005
+
 BOOST_AUTO_TEST_CASE(invalid_open)
 {
-    BOOST_CHECK_THROW(brain::CompartmentReportReader(brion::URI("/bla")),
+    BOOST_CHECK_THROW(brain::CompartmentReport(brion::URI("/bla")),
                       std::runtime_error);
-    BOOST_CHECK_THROW(brain::CompartmentReportReader(brion::URI("bla")),
+    BOOST_CHECK_THROW(brain::CompartmentReport(brion::URI("bla")),
                       std::runtime_error);
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/README";
-    BOOST_CHECK_THROW(brain::CompartmentReportReader(brion::URI(path.string())),
+    BOOST_CHECK_THROW(brain::CompartmentReport(brion::URI(path.string())),
                       std::runtime_error);
 
     path = BBP_TESTDATA;
     path /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
-    BOOST_CHECK_THROW(brain::CompartmentReportReader(brion::URI(path.string())),
+    BOOST_CHECK_THROW(brain::CompartmentReport(brion::URI(path.string())),
                       std::runtime_error);
 }
 
@@ -51,16 +53,14 @@ BOOST_AUTO_TEST_CASE(open_binary)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/simulations/may17_2011/Control/voltage.bbp";
-    BOOST_CHECK_NO_THROW(
-        brain::CompartmentReportReader(brion::URI(path.string())));
+    BOOST_CHECK_NO_THROW(brain::CompartmentReport(brion::URI(path.string())));
 }
 
 BOOST_AUTO_TEST_CASE(open_hdf5)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/simulations/may17_2011/Control/voltage.h5";
-    BOOST_CHECK_NO_THROW(
-        brain::CompartmentReportReader(brion::URI(path.string())));
+    BOOST_CHECK_NO_THROW(brain::CompartmentReport(brion::URI(path.string())));
 }
 
 BOOST_AUTO_TEST_CASE(invalid_mapping)
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(invalid_mapping)
     brion::GIDSet gids;
     gids.insert(123456789);
 
-    brain::CompartmentReportReader reader(brion::URI(path.string()));
+    brain::CompartmentReport reader(brion::URI(path.string()));
 
     BOOST_CHECK_THROW(reader.createView(gids), std::runtime_error);
 }
@@ -83,18 +83,17 @@ void testBounds(const char* relativePath)
 
     brion::GIDSet gids;
     gids.insert(1);
-    brain::CompartmentReportReader report(brion::URI(path.string()));
+    brain::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
-
 
     auto frame = view.load(report.getMetaData().startTime).get();
     BOOST_CHECK(!frame.getData().empty());
 
-    frame = view.load(report.getMetaData().endTime).get();
-    BOOST_CHECK(!frame.getData().empty());
+    BOOST_CHECK_THROW(frame = view.load(report.getMetaData().endTime).get(),
+                      std::logic_error);
 
-    frame = view.load(report.getMetaData().endTime + 1).get();
-    BOOST_CHECK(frame.getData().empty());
+    BOOST_CHECK_THROW(frame = view.load(report.getMetaData().endTime + 1).get(),
+                      std::logic_error);
 }
 
 BOOST_AUTO_TEST_CASE(bounds_binary)
@@ -115,19 +114,19 @@ inline void testReadSoma(const char* relativePath)
 
     brion::GIDSet gids;
     gids.insert(1);
-    brain::CompartmentReportReader report(brion::URI(path.string()));
+    brain::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
-    BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.f);
-    BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.f);
-    BOOST_CHECK_EQUAL(report.getMetaData().timeStep, 0.1f);
+    BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
+    BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
+    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1,TIMESTEP_PRECISION);
 
     auto frame = view.load(report.getMetaData().startTime).get();
 
     BOOST_CHECK(!frame.getData().empty());
     BOOST_CHECK_EQUAL(frame.getData()[0], -65);
 
-    frame = view.load(4.5f).get();
+    frame = view.load(4.5).get();
     BOOST_CHECK(!frame.getData().empty());
     BOOST_CHECK_CLOSE(frame.getData()[0], -10.1440039f, .000001f);
 }
@@ -148,12 +147,12 @@ inline void testReadAllComps(const char* relativePath)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= relativePath;
 
-    brain::CompartmentReportReader report(brion::URI(path.string()));
+    brain::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(brion::GIDSet());
 
-    BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.f);
-    BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.f);
-    BOOST_CHECK_EQUAL(report.getMetaData().timeStep, 0.1f);
+    BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
+    BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
+    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1,TIMESTEP_PRECISION);
 
     auto frame = view.load(.8f).get();
     BOOST_CHECK(!frame.getData().empty());
@@ -182,15 +181,15 @@ void testRead(const char* relativePath)
     gids.insert(394);
     gids.insert(400);
 
-    brain::CompartmentReportReader report(brion::URI(path.string()));
+    brain::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
     const brion::SectionOffsets& offsets = view.getMapping().getOffsets();
     BOOST_CHECK_EQUAL(offsets.size(), 2);
 
-    BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.f);
-    BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.f);
-    BOOST_CHECK_EQUAL(report.getMetaData().timeStep, 0.1f);
+    BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
+    BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
+    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1,TIMESTEP_PRECISION);
 
     auto frame = view.load(report.getMetaData().startTime).get();
 
@@ -217,11 +216,11 @@ void testReadRange(const char* relativePath)
     gids.insert(394);
     gids.insert(400);
 
-    brain::CompartmentReportReader report(brion::URI(path.string()));
+    brain::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
-    const float start = report.getMetaData().startTime;
-    const float step = report.getMetaData().timeStep;
+    const double start = report.getMetaData().startTime;
+    const double step = report.getMetaData().timeStep;
 
     auto frames = view.load(start, start + step).get();
     BOOST_REQUIRE_EQUAL(frames.size(), 1);
@@ -258,15 +257,15 @@ void testReadAll(const char* relativePath)
     gids.insert(394);
     gids.insert(400);
 
-    brain::CompartmentReportReader report(brion::URI(path.string()));
+    brain::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
     const brion::SectionOffsets& offsets = view.getMapping().getOffsets();
     BOOST_CHECK_EQUAL(offsets.size(), 2);
 
-    BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.f);
-    BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.f);
-    BOOST_CHECK_EQUAL(report.getMetaData().timeStep, 0.1f);
+    BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
+    BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
+    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1,TIMESTEP_PRECISION);
 
     auto frames = view.loadAll().get();
 
@@ -294,7 +293,7 @@ void testIndices(const char* relativePath)
 
     brion::GIDSet gids{400};
 
-    brain::CompartmentReportReader report(brion::URI(path.string()));
+    brain::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
     BOOST_CHECK_EQUAL(view.getMapping().getIndex().size(), 110);
@@ -309,5 +308,3 @@ BOOST_AUTO_TEST_CASE(indices_binary)
 {
     testIndices("local/simulations/may17_2011/Control/allCompartments.bbp");
 }
-
-

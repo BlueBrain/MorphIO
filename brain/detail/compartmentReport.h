@@ -19,7 +19,8 @@
  */
 #pragma once
 
-#include "../compartmentReportReader.h"
+#include "../compartmentReport.h"
+#include "../compartmentReportMapping.h"
 #include "brion/compartmentReport.h"
 #include <lunchbox/threadPool.h>
 
@@ -51,8 +52,9 @@ struct CompartmentReportView
     CompartmentReportView(
         const std::shared_ptr<CompartmentReportReader>& readerImpl_,
         const brion::GIDSet& gids)
-        : report(std::make_shared<brion::CompartmentReport>(
-                     readerImpl_->uri, brion::MODE_READ, gids))
+        : report(std::make_shared<brion::CompartmentReport>(readerImpl_->uri,
+                                                            brion::MODE_READ,
+                                                            gids))
         , readerImpl{readerImpl_}
     {
         _initIndices();
@@ -96,7 +98,7 @@ void CompartmentReportView::_initIndices()
 
 struct CompartmentReportFrame
 {
-    float timeStamp = 0;
+    double timeStamp = -1.0;
     brion::floats data;
 };
 }

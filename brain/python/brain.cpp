@@ -27,7 +27,7 @@
 
 #include "docstrings.h"
 
-#include "../compartmentReportReader.h"
+#include "../compartmentReport.h"
 
 #include <vmmlib/vector.hpp>
 
@@ -39,7 +39,7 @@ void export_SpikeReportReader();
 void export_SpikeReportWriter();
 void export_Synapses();
 void export_test();
-void export_CompartmentReportReader();
+void export_CompartmentReport();
 
 namespace neuron
 {
@@ -96,6 +96,6 @@ BOOST_PYTHON_MODULE(_brain)
     brain::export_Spikes();
     brain::export_SpikeReportReader();
     brain::export_SpikeReportWriter();
-    brain::export_CompartmentReportReader();
+    brain::export_CompartmentReport();
     brain::export_Synapses();
 }

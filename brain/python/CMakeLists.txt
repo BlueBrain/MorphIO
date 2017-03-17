@@ -18,7 +18,7 @@ include(PythonDocstrings)
 set(BRAIN_PYTHON_SOURCES
   brain.cpp
   circuit.cpp
-  compartmentReportReader.cpp
+  compartmentReport.cpp
   spikeReportReader.cpp
   synapses.cpp
   neuron/morphology.cpp

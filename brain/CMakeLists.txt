@@ -6,7 +6,10 @@
 
 set(BRAIN_PUBLIC_HEADERS
   circuit.h
-  compartmentReportReader.h
+  compartmentReport.h
+  compartmentReportView.h
+  compartmentReportFrame.h
+  compartmentReportMapping.h
   neuron/morphology.h
   neuron/section.h
   neuron/soma.h
@@ -22,14 +25,17 @@ set(BRAIN_PUBLIC_HEADERS
 
 set(BRAIN_HEADERS
   detail/circuit.h
-  detail/compartmentReportReader.h
+  detail/compartmentReport.h
   detail/synapsesStream.h
   neuron/morphologyImpl.h
   )
 
 set(BRAIN_SOURCES
   circuit.cpp
-  compartmentReportReader.cpp
+  compartmentReport.cpp
+  compartmentReportView.cpp
+  compartmentReportFrame.cpp
+  compartmentReportMapping.cpp
   neuron/morphology.cpp
   neuron/morphologyImpl.cpp
   neuron/section.cpp

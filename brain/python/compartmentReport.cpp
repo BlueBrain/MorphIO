@@ -22,7 +22,9 @@
 #include "docstrings.h"
 #include "helpers.h"
 
-#include <brain/compartmentReportReader.h>
+#include <brain/compartmentReport.h>
+#include <brain/compartmentReportMapping.h>
+
 #include <brain/types.h>
 
 #include <boost/python.hpp>
@@ -32,11 +34,11 @@ namespace bp = boost::python;
 namespace brain
 {
 typedef boost::shared_ptr<CompartmentReportView> CompartmentReportViewPtr;
-typedef boost::shared_ptr<CompartmentReportFrame> CompartmentReportFramePtr;
 
 // This proxy object is needed because when converting C++ vectors to numpy
-// arrays we need a shared_ptr to act as a custodian. As CompartmentReportMapping
-// is indeed a wrapper that holds a pointer to a CompartmentReportView, the
+// arrays we need a shared_ptr to act as a custodian. As
+// CompartmentReportMapping
+// is indeed a wrapper than holds a pointer to a CompartmentReportMapping, the
 // best solution for the wrapping is to make the proxy be a wrapper of a
 // shared_ptr to a view. This way we can use that pointer as the custodian.
 class CompartmentReportMappingProxy
@@ -59,37 +61,35 @@ public:
     CompartmentReportViewPtr view;
 };
 
-CompartmentReportReaderPtr CompartmentReportReader_initURI(
-    const std::string& uri)
+CompartmentReportPtr CompartmentReport_initURI(const std::string& uri)
 {
-    return std::make_shared<CompartmentReportReader>(brion::URI(uri));
+    return std::make_shared<CompartmentReport>(brion::URI(uri));
 }
 
-CompartmentReportViewPtr CompartmentReportReader_createView(
-    CompartmentReportReader& reader, bp::object gids)
+CompartmentReportViewPtr CompartmentReport_createViewEmptyGIDs(
+    CompartmentReport& reader)
+{
+    auto view = reader.createView();
+    return CompartmentReportViewPtr(new CompartmentReportView(std::move(view)));
+}
+
+CompartmentReportViewPtr CompartmentReport_createView(CompartmentReport& reader,
+                                                      bp::object gids)
 {
     auto view = reader.createView(gidsFromPython(gids));
     return CompartmentReportViewPtr(new CompartmentReportView(std::move(view)));
 }
 
-bp::object CompartmentReportReader_getMetaData(
-    const CompartmentReportReader& reader)
+bp::object CompartmentReport_getMetaData(const CompartmentReport& reader)
 {
     const CompartmentReportMetaData& md = reader.getMetaData();
 
-    bp::object dict{bp::handle<>(PyDict_New())};
-
-    PyDict_SetItemString(dict.ptr(), "start_time",
-                         PyFloat_FromDouble(md.startTime));
-    PyDict_SetItemString(dict.ptr(), "end_time",
-                         PyFloat_FromDouble(md.endTime));
-    PyDict_SetItemString(dict.ptr(), "time_step",
-                         PyFloat_FromDouble(md.timeStep));
-
-    PyDict_SetItemString(dict.ptr(), "time_unit",
-                         PyUnicode_FromString(md.timeUnit.c_str()));
-    PyDict_SetItemString(dict.ptr(), "data_unit",
-                         PyUnicode_FromString(md.dataUnit.c_str()));
+    bp::dict dict;
+    dict["start_time"] = md.startTime;
+    dict["end_time"] = md.endTime;
+    dict["time_step"] = md.timeStep;
+    dict["time_unit"] = md.timeUnit;
+    dict["data_unit"] = md.dataUnit;
 
     return dict;
 }
@@ -105,46 +105,29 @@ CompartmentReportMappingProxy CompartmentReportView_getMapping(
     return view;
 }
 
-CompartmentReportFramePtr CompartmentReportView_loadAt(
-    CompartmentReportView& view, float time)
+bp::object CompartmentReportView_loadAt(CompartmentReportView& view,
+                                        double time)
 {
-    return CompartmentReportFramePtr(
-        new CompartmentReportFrame(view.load(time).get()));
+    return frameToTuple(view.load(time).get());
 }
 
 bp::object CompartmentReportView_load(CompartmentReportView& view,
-                                      const float start, const float end)
+                                      const double start, const double end)
 {
-    auto frames = view.load(start, end).get();
-    boost::python::list result;
-    for (auto& frame : frames)
-        result.append(CompartmentReportFramePtr(
-            new CompartmentReportFrame(std::move(frame))));
-    return result;
+    return framesToTuple(view.load(start, end).get());
 }
 
 bp::object CompartmentReportView_loadAll(CompartmentReportView& view)
 {
-    auto frames = view.loadAll().get();
-    boost::python::list result;
-    for (auto& frame : frames)
-        result.append(CompartmentReportFramePtr(
-            new CompartmentReportFrame(std::move(frame))));
-    return result;
-}
-
-bp::object CompartmentReportFrame_getData(
-    const CompartmentReportFramePtr& frame)
-{
-    return toNumpy(frame->getData(), frame);
+    return framesToTuple(view.loadAll().get());
 }
 
 bp::object CompartmentReportMapping_getIndex(
     const CompartmentReportMappingProxy& mapping)
 {
     static_assert(sizeof(CompartmentReportMapping::IndexEntry) ==
-                  sizeof(uint64_t) + sizeof(uint32_t) +
-                  sizeof(uint16_t) + sizeof(uint16_t),
+                      sizeof(uint64_t) + sizeof(uint32_t) + sizeof(uint16_t) +
+                          sizeof(uint16_t),
                   "Bad alignment of IndexEntry");
     return toNumpy(mapping.view->getMapping().getIndex(), mapping.view);
 }
@@ -173,24 +156,22 @@ bp::object CompartmentReportMapping_getCompartmentCounts(
     return result;
 }
 
-void export_CompartmentReportReader()
-{
+void export_CompartmentReport()
 // clang-format off
+{
 const auto selfarg = bp::arg("self");
 
-bp::class_<CompartmentReportReader, boost::noncopyable>(
-    "CompartmentReportReader", bp::no_init)
-    .def("__init__", bp::make_constructor(CompartmentReportReader_initURI),
-         DOXY_FN(brain::CompartmentReportReader::CompartmentReportReader))
-    .add_property("metadata", CompartmentReportReader_getMetaData,
-                  DOXY_FN(brain::CompartmentReportReader::getMetaData))
-    .def("create_view", CompartmentReportReader_createView,
+bp::class_<CompartmentReport, boost::noncopyable>(
+    "CompartmentReport", bp::no_init)
+    .def("__init__", bp::make_constructor(CompartmentReport_initURI),
+         DOXY_FN(brain::CompartmentReport::CompartmentReport))
+    .add_property("metadata", CompartmentReport_getMetaData,
+                  DOXY_FN(brain::CompartmentReport::getMetaData))
+    .def("create_view", CompartmentReport_createView,
          (selfarg, bp::arg("gids")),
-         DOXY_FN(brain::CompartmentReportReader::createView(const GIDSet&)))
-    .def("create_view",
-         (CompartmentReportView(CompartmentReportReader::*)())
-         &CompartmentReportReader::createView,
-         DOXY_FN(brain::CompartmentReportReader::createView()));
+         DOXY_FN(brain::CompartmentReport::createView(const GIDSet&)))
+    .def("create_view", CompartmentReport_createViewEmptyGIDs, (selfarg),
+         DOXY_FN(brain::CompartmentReport::createView()));
 
 bp::class_<CompartmentReportMappingProxy>("CompartmentReportMapping",
                                           bp::no_init)
@@ -210,23 +191,13 @@ bp::class_<CompartmentReportView, CompartmentReportViewPtr, boost::noncopyable>(
                   DOXY_FN(brain::CompartmentReportView::getGIDs))
     .add_property("mapping", CompartmentReportView_getMapping,
                   DOXY_FN(brain::CompartmentReportView::getMapping))
-    .def("load", &CompartmentReportView_loadAt, (selfarg, bp::arg("time")),
-         DOXY_FN(brain::CompartmentReportView::load(float)))
-    .def("load", &CompartmentReportView_load,
+    .def("load", CompartmentReportView_loadAt, (selfarg, bp::arg("time")),
+         DOXY_FN(brain::CompartmentReportView::load(double)))
+    .def("load", CompartmentReportView_load,
          (selfarg, bp::arg("start"), bp::arg("end")),
-         DOXY_FN(brain::CompartmentReportView::load(float,float)))
-    .def("load_all", &CompartmentReportView_loadAll, (selfarg),
+         DOXY_FN(brain::CompartmentReportView::load(double,double)))
+    .def("load_all", CompartmentReportView_loadAll, (selfarg),
          DOXY_FN(brain::CompartmentReportView::loadAll));
-
-bp::class_<CompartmentReportFrame, CompartmentReportFramePtr,
-           boost::noncopyable>(
-    "CompartmentReportFrame", bp::no_init)
-    .def_readonly("empty", &CompartmentReportFrame::empty,
-                  DOXY_FN(brain::CompartmentReportFrame::empty))
-    .def_readonly("timestamp", &CompartmentReportFrame::getTimestamp,
-                  DOXY_FN(brain::CompartmentReportFrame::getTimestamp))
-    .add_property("data", CompartmentReportFrame_getData,
-                  DOXY_FN(brain::CompartmentReportFrame::getData));
-// clang-format on
 }
+// clang-format on
 }

@@ -6,10 +6,11 @@ Changelog {#Changelog}
 * [141](https://github.com/BlueBrain/Brion/pull/141):
   Fixed documentation to specify that morphology section samples report
   diameters and not radii.
+* [130](https://github.com/BlueBrain/Brion/pull/130),[138](https://github.com/BlueBrain/Brion/pull/138):
+  Added brain::CompartmentReportReader and its Python wrapping
+  brain::CompartmentReport : python API v2
 * [136](https://github.com/BlueBrain/Brion/pull/136):
   Implement readable null:// compartment report for benchmarking
-* [130](https://github.com/BlueBrain/Brion/pull/130):
-  Added brain::CompartmentReportReader and its Python wrapping
 * [120](https://github.com/BlueBrain/Brion/pull/120), [131](https://github.com/BlueBrain/Brion/pull/131):
   - New SpikeReport API.
   - Reimplementation of the high level SpikeReportReader. The new implementation
