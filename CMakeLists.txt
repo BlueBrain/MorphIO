@@ -24,7 +24,7 @@ set(Boost_NO_BOOST_CMAKE TRUE)
 find_package(Threads)
 find_package(Boost 1.55 QUIET REQUIRED COMPONENTS system thread filesystem program_options)
 find_package(HDF5 QUIET REQUIRED)
-find_package(MPI)
+
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}" )
 
@@ -43,7 +43,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/highfive/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/hadoken/include)
 
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS} ${MPI_INCLUDE_PATH})
+include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
 add_definitions( -DH5_USE_BOOST -DMORPHO_VERSION_MAJOR=\"${MORPHOTOOL_VERSION_MAJOR}\" -DMORPHO_VERSION_MINOR=\"${MORPHOTOOL_VERSION_MINOR}\" )
 
 
