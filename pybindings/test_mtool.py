@@ -16,4 +16,5 @@ children = b.get_childrens()
 children.count(1)
 
 pts = b.get_points()
+print "pts:", pts
 

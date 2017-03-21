@@ -1,32 +1,26 @@
 # ----------------------------------------------------------------------------------------------------------------------
+# Box wrapper. Notice that this class automatically allocates a morpho.box c++ object (support for .from_value)
+# -------------------------------------------------------------------------------------------------------------
 cdef class Box(_py__base):
-    cdef morpho.box * ptr(self):
-        return < morpho.box *> self._ptr
+    cdef morpho.box _obj
+
+    @property
+    def min_corner(self):
+        cdef morpho.point p = self._obj.min_corner()
+        cdef const double* pts = p.data()
+        return [pts[0], pts[1], pts[2]]
+
+    @property
+    def max_corner(self):
+        cdef morpho.point p = self._obj.max_corner()
+        cdef const double* pts = p.data()
+        return [pts[0], pts[1], pts[2]]
 
     @staticmethod
-    cdef Box from_ptr(morpho.box *ptr):
-        cdef Box obj = Box.__new__(Box)
-        obj._ptr = ptr
-        return obj
-
-    @staticmethod
-    cdef Box from_ref(const morpho.box &ref):
-        return Box.from_ptr(<morpho.box*>&ref)
-
-# ----------------------------------------------------------------------------------------------------------------------
-cdef class Point(_py__base):
-    cdef morpho.point * ptr(self):
-        return < morpho.point *> self._ptr
-
-    @staticmethod
-    cdef Point from_ptr(morpho.point *ptr):
-        cdef Point obj = Point.__new__(Point)
-        obj._ptr = ptr
-        return obj
-
-    @staticmethod
-    cdef Point from_ref(const morpho.point &ref):
-        return Point.from_ptr(<morpho.point*>&ref)
+    cdef Box from_value(const morpho.box &box):
+        cdef Box pybox = Box()
+        pybox._obj = box
+        return pybox
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -44,6 +38,7 @@ cdef class Vector(_py__base):
     cdef Vector from_ref(const morpho.vector &ref):
         return Vector.from_ptr(<morpho.vector*>&ref)
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Linestring(_py__base):
     cdef morpho.linestring * ptr(self):
@@ -59,20 +54,26 @@ cdef class Linestring(_py__base):
     cdef Linestring from_ref(const morpho.linestring &ref):
         return Linestring.from_ptr(<morpho.linestring*>&ref)
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Cone(_py__base):
-    cdef morpho.cone * ptr(self):
-        return < morpho.cone *> self._ptr
+    cdef morpho.cone _obj
+
+    @property
+    def center(self):
+        cdef morpho.point p = self._obj.get_center()
+        cdef const double* pts = p.data()
+        return [pts[0], pts[1], pts[2]]
+
+    @property
+    def radius(self):
+        return <double> self._obj.get_radius()
 
     @staticmethod
-    cdef Cone from_ptr(morpho.cone *ptr):
-        cdef Cone obj = Cone.__new__(Cone)
-        obj._ptr = ptr
-        return obj
-
-    @staticmethod
-    cdef Cone from_ref(const morpho.cone &ref):
-        return Cone.from_ptr(<morpho.cone*>&ref)
+    cdef Cone from_value(const morpho.cone& cone):
+        cdef Cone pycone = Cone()
+        pycone._obj = cone
+        return pycone
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Sphere(_py__base):
@@ -136,6 +137,14 @@ cdef class Mat_Points(_py__base):
 %s...
 [Full np.array accesible at object.np_array]>""" % (repr(self.nparray[:leng]),)
 
+    # Pass on the array API
+    def __getitem__(self, item):
+        return self.nparray.__getitem__(item)
+
+    # Pass on the iterator API
+    def __iter__(self):
+        return iter(self.nparray)
+
     @property
     def np_array(self):
         return self.nparray
@@ -157,10 +166,6 @@ cdef class Mat_Points(_py__base):
     @staticmethod
     cdef Mat_Points from_ref(const morpho.mat_points &ref):
         return Mat_Points.from_ptr(<morpho.mat_points*>&ref)
-
-    @staticmethod
-    cdef morpho.mat_points* ptr_from_ref(const morpho.mat_points &ref):
-        return <morpho.mat_points*>&ref
 
 
 cdef class Vec_Double(_py__base):

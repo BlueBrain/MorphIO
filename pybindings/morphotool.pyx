@@ -64,20 +64,9 @@ cdef class Branch(_py__base):
     def get_points(self, ):
         return Mat_Points.from_ref( self.ptr().get_points() )
 
-
-    #Testing purposes only
-    def _change_point0(self):
-        cdef morpho.mat_points * matpoints = Mat_Points.ptr_from_ref(self.ptr().get_points())
-        cdef double * ptr = matpoints.data().begin()
-        ptr[0] = 100010001
-
-    # def get_distances(self, ):
-    #     return Vec_Double.from_ref( self.ptr().get_distances() )
-
     def get_size(self, ):
         return self.ptr().get_size()
 
-    #Point is unwrapped
     def get_point(self, std.size_t id_):
         # Point object is volatile,
         cdef morpho.point p = self.ptr().get_point(id_)
@@ -87,19 +76,19 @@ cdef class Branch(_py__base):
         return arr
 
     def get_bounding_box(self, ):
-        return Box.from_ref(self.ptr().get_bounding_box())
+        return Box.from_value(self.ptr().get_bounding_box())
 
     def get_segment(self, std.size_t n):
-        return Cone.from_ref(self.ptr().get_segment(n))
+        return Cone.from_value(self.ptr().get_segment(n))
 
     def get_segment_bounding_box(self, std.size_t n):
-        return Box.from_ref(self.ptr().get_segment_bounding_box(n))
+        return Box.from_value(self.ptr().get_segment_bounding_box(n))
 
     def get_junction(self, std.size_t n):
         return Sphere.from_ref(self.ptr().get_junction(n))
 
     def get_junction_sphere_bounding_box(self, std.size_t n):
-        return Box.from_ref(self.ptr().get_junction_sphere_bounding_box(n))
+        return Box.from_value(self.ptr().get_junction_sphere_bounding_box(n))
 
     def get_linestring(self, ):
         return Linestring.from_ref(self.ptr().get_linestring())
@@ -149,7 +138,7 @@ cdef class Branch_Soma(_py__base):
         return Sphere.from_ref(self.ptr().get_sphere())
 
     def get_bounding_box(self, ):
-        return Box.from_ref(self.ptr().get_bounding_box())
+        return Box.from_value(self.ptr().get_bounding_box())
 
     @staticmethod
     cdef Branch_Soma from_ptr(morpho.branch_soma *ptr):
@@ -202,7 +191,7 @@ cdef class Morpho_Tree(_py__base):
         return Branch.from_ref(self.ptr().get_branch(id_branch))
 
     def get_bounding_box(self, ):
-        return Box.from_ref(self.ptr().get_bounding_box())
+        return Box.from_value(self.ptr().get_bounding_box())
 
     def get_tree_size(self, ):
         return self.ptr().get_tree_size()
