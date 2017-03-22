@@ -3,10 +3,11 @@ cdef extern from "hadoken/geometry/geometry.hpp" namespace "hadoken::geometry::c
 # ----------------------------------------------------------------------------------------------------------------------
 
     cdef cppclass point3d:
-        double * data()
+        double* data()
 
     cdef cppclass vector3d:
-        double * data()
+        double* data()
+        size_t size()
 
     cdef cppclass box3d:
         box3d(box3d&)
@@ -20,7 +21,8 @@ cdef extern from "hadoken/geometry/geometry.hpp" namespace "hadoken::geometry::c
 
     cdef cppclass linestring3d:
         linestring3d(linestring3d&)
-        double * data()
+        double* data()
+        size_t size()
 
     cdef cppclass sphere3d:
         sphere3d(sphere3d&)

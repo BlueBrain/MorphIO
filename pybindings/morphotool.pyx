@@ -8,23 +8,22 @@ __copyright__ = "Copyright 2016 EPFL BBP-project"
 from cython.operator cimport dereference as deref
 cimport std
 from libcpp cimport bool
+from libc.string cimport memcpy
 
 cimport morpho
-from statics cimport morpho_morpho_mesher
 cimport morpho_h5_v1
+from statics cimport morpho_morpho_mesher
 from statics cimport morpho_h5_v1_morpho_reader
+
 import numpy as np
 cimport numpy as np
-cimport boost_numeric_ublas as ublas
-from libc.string cimport memcpy
 
 
 # We need to initialize NumPy.
 np.import_array()
 
 
-# --------------------- BASE CLASS ---------------------
-
+# --------------------- BASE CLASS -----------------------
 cdef enum OPERATOR:
     LESS = 0, LESS_EQUAL, EQUAL, DIFF, GREATER, GREATER_EQUAL
 
@@ -33,17 +32,16 @@ cdef class _py__base:
     # Basic comparison is done by comparing the inner obj ptr
     def __richcmp__(_py__base self, _py__base other, operation):
         if operation == OPERATOR.EQUAL:
-            return self._ptr==other._ptr    
+            return self._ptr==other._ptr
+#//-- BASE CLASS ------------------------------------------
 
-
-
+## Include data structures
 include "datastructs.pxi"
 
 
 # ======================================================================================================================
 # Python bindings to namespace morpho
 # ======================================================================================================================
-
 cdef class Branch(_py__base):
     "Python wrapper class for branch (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
@@ -118,6 +116,37 @@ cdef class Branch(_py__base):
     @staticmethod
     cdef list vector2list( std.vector[morpho.branch*] vec ):
         return [ Branch.from_ptr(elem) for elem in vec ]
+
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+cdef class Morpho_Node(_py__base):
+    "Python wrapper class for morpho_node (ns=morpho)"
+# ----------------------------------------------------------------------------------------------------------------------
+    cdef std.unique_ptr[morpho.morpho_node] _autodealoc
+    cdef morpho.morpho_node *ptr(self):
+        return <morpho.morpho_node*> self._ptr
+
+    def __init__(self, int my_node_type):
+        self._ptr = new morpho.morpho_node(<morpho.branch_type> my_node_type)
+        self._autodealoc.reset(self.ptr())
+
+    def get_type(self, ):
+        return self.ptr().get_type()
+
+    @staticmethod
+    cdef Morpho_Node from_ptr(morpho.morpho_node *ptr):
+        cdef Morpho_Node obj = Morpho_Node.__new__(Morpho_Node)
+        obj._ptr = ptr
+        return obj
+
+    @staticmethod
+    cdef Morpho_Node from_ref(const morpho.morpho_node &ref):
+        return Morpho_Node.from_ptr(<morpho.morpho_node*>&ref)
+
+    @staticmethod
+    cdef list vector2list( std.vector[morpho.morpho_node*] vec ):
+        return [ Morpho_Node.from_ptr(elem) for elem in vec ]
 
 
 

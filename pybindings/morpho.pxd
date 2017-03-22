@@ -12,42 +12,6 @@ cimport hadoken_geometry
 cimport std
 
 
-# --> Mesher has no implementation!
-## ======================================================================================================================
-#cdef extern from "morpho/morpho_mesher.hpp" namespace "morpho":
-## ----------------------------------------------------------------------------------------------------------------------
-#
-#    ###### Cybinding for class morpho_mesher ######
-#    cdef cppclass morpho_mesher:
-#        enum mesh_tag:
-#            pass
-#
-#        morpho_mesher(std.shared_ptr[morpho_tree], std.string)
-#        void set_mesh_tag(morpho_mesher.mesh_tag, bool)
-#        void set_error_bound(double)
-#        void set_face_size(double)
-#        void execute()
-
-# --> morpho_transform_filters has no implementation!
-## ======================================================================================================================
-#cdef extern from "morpho/morpho_transform_filters.hpp" namespace "morpho":
-## ----------------------------------------------------------------------------------------------------------------------
-#
-#    ###### Cybinding for class filter_duplicate_point_operation ######
-#    cdef cppclass filter_duplicate_point_operation:
-#        filter_duplicate_point_operation(double)
-
-# --> morpho_spatial without implementation
-## ======================================================================================================================
-#cdef extern from "morpho/morpho_spatial.hpp" namespace "morpho":
-## ----------------------------------------------------------------------------------------------------------------------
-#
-#    ###### Cybinding for class spatial_index ######
-#    cdef cppclass spatial_index:
-#        spatial_index()
-#        void add_morpho_tree(std.shared_ptr[morpho_tree])
-#        bool is_within(int)
-#
 # ======================================================================================================================
 cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
 # ----------------------------------------------------------------------------------------------------------------------
@@ -114,6 +78,45 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         void add_flag(int)
         int get_flags()
         void swap(morpho_tree&)
+
+
+
+# --> Mesher has no implementation!
+## ======================================================================================================================
+#cdef extern from "morpho/morpho_mesher.hpp" namespace "morpho":
+## ----------------------------------------------------------------------------------------------------------------------
+#
+#    ###### Cybinding for class morpho_mesher ######
+#    cdef cppclass morpho_mesher:
+#        enum mesh_tag:
+#            pass
+#
+#        morpho_mesher(std.shared_ptr[morpho_tree], std.string)
+#        void set_mesh_tag(morpho_mesher.mesh_tag, bool)
+#        void set_error_bound(double)
+#        void set_face_size(double)
+#        void execute()
+
+# --> morpho_transform_filters has no implementation!
+## ======================================================================================================================
+#cdef extern from "morpho/morpho_transform_filters.hpp" namespace "morpho":
+## ----------------------------------------------------------------------------------------------------------------------
+#
+#    ###### Cybinding for class filter_duplicate_point_operation ######
+#    cdef cppclass filter_duplicate_point_operation:
+#        filter_duplicate_point_operation(double)
+
+# --> morpho_spatial without implementation
+## ======================================================================================================================
+#cdef extern from "morpho/morpho_spatial.hpp" namespace "morpho":
+## ----------------------------------------------------------------------------------------------------------------------
+#
+#    ###### Cybinding for class spatial_index ######
+#    cdef cppclass spatial_index:
+#        spatial_index()
+#        void add_morpho_tree(std.shared_ptr[morpho_tree])
+#        bool is_within(int)
+
 
 ## ======================================================================================================================
 #cdef extern from "morpho/morpho_transform.hpp" namespace "morpho":

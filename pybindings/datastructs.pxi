@@ -1,4 +1,43 @@
+# ----------------------------------------------------------------------------------------------------------------------
+# cdef class Vector(_py__base):
+#     cdef morpho.vector * ptr(self):
+#         return < morpho.vector *> self._ptr
+#
+#     @staticmethod
+#     cdef Vector from_ptr(morpho.vector *ptr):
+#         cdef Vector obj = Vector.__new__(Vector)
+#         obj._ptr = ptr
+#         return obj
+#
+#     @staticmethod
+#     cdef Vector from_ref(const morpho.vector &ref):
+#         return Vector.from_ptr(<morpho.vector*>&ref)
+#
+
 # -------------------------------------------------------------------------------------------------------------
+
+cdef class _ArrayT(_py__base):
+    #Numpy array object
+    cdef readonly object nparray
+
+    # Pass on the array API
+    def __getitem__(self, item):
+        return self.nparray.__getitem__(item)
+
+    # Pass on the iterator API
+    def __iter__(self):
+        return iter(self.nparray)
+
+    # Get a nice representation
+    def __repr__(self):
+        leng = len(self.nparray)
+        if leng > 3: leng = 3
+        return ("<%s object\n"
+                "%s...\n"
+                " (Full numpy array accessible at .nparray) >" % (str(type(self)), repr(self.nparray[:leng])))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 cdef class Box(_py__base):
     cdef std.unique_ptr[morpho.box] _autodealoc
     cdef morpho.box* ptr(self):
@@ -29,24 +68,8 @@ cdef class Box(_py__base):
         return Box.from_ptr(ptr, True)
 
 
-# # ----------------------------------------------------------------------------------------------------------------------
-# cdef class Vector(_py__base):
-#     cdef morpho.vector * ptr(self):
-#         return < morpho.vector *> self._ptr
-#
-#     @staticmethod
-#     cdef Vector from_ptr(morpho.vector *ptr):
-#         cdef Vector obj = Vector.__new__(Vector)
-#         obj._ptr = ptr
-#         return obj
-#
-#     @staticmethod
-#     cdef Vector from_ref(const morpho.vector &ref):
-#         return Vector.from_ptr(<morpho.vector*>&ref)
-
-
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class Linestring(_py__base):
+cdef class Linestring(_ArrayT):
     cdef std.unique_ptr[morpho.linestring] _autodealoc
     cdef morpho.linestring * ptr(self):
         return < morpho.linestring *> self._ptr
@@ -55,6 +78,12 @@ cdef class Linestring(_py__base):
     cdef Linestring from_ptr(morpho.linestring *ptr, bool owner=False):
         cdef Linestring obj = Linestring.__new__(Linestring)
         obj._ptr = ptr
+        #Create np array
+        cdef np.npy_intp size[2]
+        size[0] = ptr.size()
+        size[1] = 3
+        obj.nparray = np.PyArray_SimpleNewFromData(2, size, np.NPY_DOUBLE, ptr.data())
+
         if owner: obj._autodealoc.reset(ptr)
         return obj
 
@@ -122,63 +151,16 @@ cdef class Sphere(_py__base):
         return Sphere.from_ptr(ptr, True)
 
 
+
+
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class Morpho_Node(_py__base):
-    "Python wrapper class for morpho_node (ns=morpho)"
+# Main Data Structures
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef std.unique_ptr[morpho.morpho_node] _autodealoc
-    cdef morpho.morpho_node *ptr(self):
-        return <morpho.morpho_node*> self._ptr
 
-
-    def __init__(self, int my_node_type):
-        self._ptr = new morpho.morpho_node(<morpho.branch_type> my_node_type)
-        self._autodealoc.reset(self.ptr())
-
-    def get_type(self, ):
-        return self.ptr().get_type()
-
-    @staticmethod
-    cdef Morpho_Node from_ptr(morpho.morpho_node *ptr):
-        cdef Morpho_Node obj = Morpho_Node.__new__(Morpho_Node)
-        obj._ptr = ptr
-        return obj
-
-    @staticmethod
-    cdef Morpho_Node from_ref(const morpho.morpho_node &ref):
-        return Morpho_Node.from_ptr(<morpho.morpho_node*>&ref)
-
-    @staticmethod
-    cdef list vector2list( std.vector[morpho.morpho_node*] vec ):
-        return [ Morpho_Node.from_ptr(elem) for elem in vec ]
-
-
-
-# Data Structures wrappers
-cdef class Mat_Points(_py__base):
-    cdef object nparray
-
+cdef class Mat_Points(_ArrayT):
     cdef morpho.mat_points * ptr(self):
         return <morpho.mat_points *> self._ptr
 
-    def __repr__(self):
-        leng = len(self.nparray)
-        if leng>3: leng=3
-        return """<morphotool.Mat_Points object:
-%s...
-[Full np.array accesible at object.np_array]>""" % (repr(self.nparray[:leng]),)
-
-    # Pass on the array API
-    def __getitem__(self, item):
-        return self.nparray.__getitem__(item)
-
-    # Pass on the iterator API
-    def __iter__(self):
-        return iter(self.nparray)
-
-    @property
-    def np_array(self):
-        return self.nparray
 
     @staticmethod
     cdef Mat_Points from_ptr(morpho.mat_points * matpoints):
@@ -197,19 +179,4 @@ cdef class Mat_Points(_py__base):
     @staticmethod
     cdef Mat_Points from_ref(const morpho.mat_points &ref):
         return Mat_Points.from_ptr(<morpho.mat_points*>&ref)
-
-
-cdef class Vec_Double(_py__base):
-    cdef morpho.vec_double* ptr(self):
-        return <morpho.vec_double *> self._ptr
-
-    @staticmethod
-    cdef Vec_Double from_ptr(morpho.vec_double *ptr):
-        cdef Vec_Double obj = Vec_Double.__new__(Vec_Double)
-        obj._ptr = ptr
-        return obj
-
-    @staticmethod
-    cdef Vec_Double from_ref(const morpho.vec_double &ref):
-        return Vec_Double.from_ptr(<morpho.vec_double*>&ref)
 
