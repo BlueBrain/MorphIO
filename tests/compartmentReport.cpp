@@ -25,7 +25,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/foreach.hpp>
+
 #include <boost/test/unit_test.hpp>
 #include <lunchbox/log.h>
 #include <servus/uint128_t.h>
@@ -124,10 +124,10 @@ BOOST_AUTO_TEST_CASE(test_create_write_report)
                       std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(test_bounds_binary)
+void testBounds(const char* relativePath)
 {
     boost::filesystem::path path(BBP_TESTDATA);
-    path /= "local/simulations/may17_2011/Control/voltage.bbp";
+    path /= relativePath;
 
     brion::GIDSet gids;
     gids.insert(1);
@@ -135,35 +135,24 @@ BOOST_AUTO_TEST_CASE(test_bounds_binary)
                                     gids);
     brion::floatsPtr frame;
 
-    frame = report.loadFrame(report.getStartTime());
+    frame = report.loadFrame(report.getStartTime()).get();
     BOOST_CHECK(frame);
 
-    frame = report.loadFrame(report.getEndTime());
+    frame = report.loadFrame(report.getEndTime()).get();
     BOOST_CHECK(frame);
 
-    frame = report.loadFrame(report.getEndTime() + 1);
+    frame = report.loadFrame(report.getEndTime() + 1).get();
     BOOST_CHECK(!frame);
+}
+
+BOOST_AUTO_TEST_CASE(test_bounds_binary)
+{
+    testBounds("local/simulations/may17_2011/Control/voltage.bbp");
 }
 
 BOOST_AUTO_TEST_CASE(test_bounds_hdf5)
 {
-    boost::filesystem::path path(BBP_TESTDATA);
-    path /= "local/simulations/may17_2011/Control/voltage.h5";
-
-    brion::GIDSet gids;
-    gids.insert(1);
-    brion::CompartmentReport report(brion::URI(path.string()), brion::MODE_READ,
-                                    gids);
-    brion::floatsPtr frame;
-
-    frame = report.loadFrame(report.getStartTime());
-    BOOST_CHECK(frame);
-
-    frame = report.loadFrame(report.getEndTime());
-    BOOST_CHECK(frame);
-
-    frame = report.loadFrame(report.getEndTime() + 1);
-    BOOST_CHECK(!frame);
+    testBounds("local/simulations/may17_2011/Control/voltage.h5");
 }
 
 void test_compare(const brion::URI& uri1, const brion::URI& uri2)
@@ -207,8 +196,8 @@ void test_compare(const brion::URI& uri1, const brion::URI& uri2)
     for (float i = report1.getStartTime(); i < report1.getEndTime();
          i += report1.getTimestep())
     {
-        brion::floatsPtr frame1 = report1.loadFrame(i);
-        brion::floatsPtr frame2 = report2.loadFrame(i);
+        brion::floatsPtr frame1 = report1.loadFrame(i).get();
+        brion::floatsPtr frame2 = report2.loadFrame(i).get();
 
         BOOST_CHECK(frame1);
         BOOST_CHECK(frame2);
@@ -225,7 +214,7 @@ void test_compare(const brion::URI& uri1, const brion::URI& uri2)
     {
         // cross-check second GID's voltage report
         brion::floatsPtr frame =
-            report1.loadNeuron(*(++report1.getGIDs().begin()));
+            report1.loadNeuron(*(++report1.getGIDs().begin())).get();
         BOOST_CHECK(frame);
         if (frame)
             BOOST_CHECK_CLOSE((*frame)[2017], -65.1365891f, 0.000001f);
@@ -233,8 +222,8 @@ void test_compare(const brion::URI& uri1, const brion::URI& uri2)
         // compare full reports
         for (const uint32_t gid : report1.getGIDs())
         {
-            brion::floatsPtr frame1 = report1.loadNeuron(gid);
-            brion::floatsPtr frame2 = report2.loadNeuron(gid);
+            brion::floatsPtr frame1 = report1.loadNeuron(gid).get();
+            brion::floatsPtr frame2 = report2.loadNeuron(gid).get();
             const size_t size = report1.getNeuronSize(gid);
 
             BOOST_CHECK(frame1);
@@ -293,43 +282,43 @@ bool convert(const brion::URI& fromURI, const brion::URI& toURI)
         BOOST_CHECK_EQUAL(gids.size(), counts.size());
 
         size_t i = 0;
-        BOOST_FOREACH (const uint32_t gid, gids)
+        for (const uint32_t gid : gids)
         {
             BOOST_CHECK(!counts[i].empty());
             BOOST_CHECK(to.writeCompartments(gid, counts[i++]));
         }
 
-        for (float t = start; t < end; t += step)
+        for (int n = 0; start + n * step < end; ++n)
         {
-            brion::floatsPtr data = from.loadFrame(t);
+            const float time = start + n * step;
+            brion::floatsPtr data = from.loadFrame(time).get();
             BOOST_CHECK(data);
             if (!data)
                 return false;
 
-            const brion::floats& voltages = *data.get();
+            const brion::floats& values = *data.get();
             const brion::SectionOffsets& offsets = from.getOffsets();
             BOOST_CHECK_EQUAL(offsets.size(), gids.size());
 
             i = 0;
             for (const uint32_t gid : gids)
             {
-                brion::floats cellVoltages;
-                cellVoltages.reserve(from.getNumCompartments(i));
+                brion::floats cellValues;
+                cellValues.reserve(from.getNumCompartments(i));
 
                 for (size_t j = 0; j < offsets[i].size(); ++j)
                     for (size_t k = 0; k < counts[i][j]; ++k)
-                        cellVoltages.push_back(voltages[offsets[i][j] + k]);
+                        cellValues.push_back(values[offsets[i][j] + k]);
 
-                BOOST_CHECK_EQUAL(cellVoltages.size(),
+                BOOST_CHECK_EQUAL(cellValues.size(),
                                   from.getNumCompartments(i));
-                BOOST_CHECK(!cellVoltages.empty());
-                BOOST_CHECK(to.writeFrame(gid, cellVoltages, t));
+                BOOST_CHECK(!cellValues.empty());
+                BOOST_CHECK(to.writeFrame(gid, cellValues, time));
                 ++i;
             }
         }
         std::cout << (bp::microsec_clock::local_time() - startTime)
-                         .total_milliseconds()
-                  << " ms" << std::endl;
+                         .total_milliseconds() << " ms" << std::endl;
         return true;
     }
     catch (const std::runtime_error& e)
@@ -353,7 +342,7 @@ void testPerf(const brion::URI& uri)
     for (float i = report.getStartTime(); i < report.getEndTime();
          i += report.getTimestep())
     {
-        brion::floatsPtr frame = report.loadFrame(i);
+        brion::floatsPtr frame = report.loadFrame(i).get();
         BOOST_CHECK(frame);
     }
     const bp::time_duration readTime =
@@ -361,6 +350,204 @@ void testPerf(const brion::URI& uri)
 
     std::cout << uri << ": open " << openTime.total_milliseconds() << ", load "
               << readTime.total_milliseconds() << " ms" << std::endl;
+}
+
+void testReadSoma(const char* relativePath)
+{
+    boost::filesystem::path path(BBP_TESTDATA);
+    path /= relativePath;
+
+    brion::GIDSet gids;
+    gids.insert(1);
+    brion::CompartmentReport report(brion::URI(path.string()), brion::MODE_READ,
+                                    gids);
+
+    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
+    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
+    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
+    BOOST_CHECK_EQUAL(report.getFrameSize(), 1);
+
+    brion::floatsPtr frame = report.loadFrame(report.getStartTime()).get();
+    BOOST_CHECK(frame);
+    BOOST_CHECK_EQUAL((*frame)[0], -65);
+
+    frame = report.loadFrame(4.5f).get();
+    BOOST_CHECK(frame);
+    BOOST_CHECK_CLOSE((*frame)[0], -10.1440039f, .000001f);
+}
+
+BOOST_AUTO_TEST_CASE(test_read_soma_binary)
+{
+    testReadSoma("local/simulations/may17_2011/Control/voltage.bbp");
+}
+
+BOOST_AUTO_TEST_CASE(test_read_soma_hdf5)
+{
+    testReadSoma("local/simulations/may17_2011/Control/voltage.h5");
+}
+
+void testReadAllCompartments(const char* relativePath)
+{
+    boost::filesystem::path path(BBP_TESTDATA);
+    path /= relativePath;
+    brion::CompartmentReport report(brion::URI(path.string()),
+                                    brion::MODE_READ);
+
+    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
+    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
+    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
+    BOOST_CHECK_EQUAL(report.getFrameSize(), 20360);
+
+    brion::floatsPtr frame = report.loadFrame(.8f).get();
+    BOOST_CHECK(frame);
+    BOOST_CHECK_CLOSE((*frame)[0], -65.2919388, .000001f);
+    BOOST_CHECK_CLOSE((*frame)[1578], -65.2070618, .000001f);
+
+    brion::GIDSet gids;
+    gids.insert(394);
+    report.updateMapping(gids);
+
+    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
+    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
+    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
+    BOOST_CHECK_EQUAL(report.getFrameSize(), 629);
+
+    frame = report.loadFrame(report.getStartTime()).get();
+
+    BOOST_CHECK(frame);
+    BOOST_CHECK_EQUAL((*frame)[0], -65);
+
+    frame = report.loadFrame(4.5f).get();
+    BOOST_CHECK(frame);
+
+    BOOST_CHECK_CLOSE((*frame)[0], -65.3935928f, .000001f);
+}
+
+BOOST_AUTO_TEST_CASE(test_read_allcomps_binary)
+{
+    testReadAllCompartments(
+        "local/simulations/may17_2011/Control/allCompartments.bbp");
+}
+
+BOOST_AUTO_TEST_CASE(test_read_allcomps_hdf5)
+{
+    testReadAllCompartments(
+        "local/simulations/may17_2011/Control/allCompartments.h5");
+}
+
+void testReadSubtarget(const char* relativePath)
+{
+    boost::filesystem::path path(BBP_TESTDATA);
+    path /= relativePath;
+
+    brion::GIDSet gids;
+    gids.insert(394);
+    gids.insert(400);
+    brion::CompartmentReport report(brion::URI(path.string()), brion::MODE_READ,
+                                    gids);
+
+    const brion::SectionOffsets& offsets = report.getOffsets();
+    BOOST_CHECK_EQUAL(offsets.size(), 2);
+
+    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
+    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
+    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
+    BOOST_CHECK_EQUAL(report.getFrameSize(), 938);
+
+    brion::floatsPtr frame = report.loadFrame(report.getStartTime()).get();
+    BOOST_CHECK(frame);
+    BOOST_CHECK_EQUAL((*frame)[offsets[0][0]], -65);
+    BOOST_CHECK_EQUAL((*frame)[offsets[1][0]], -65);
+    BOOST_CHECK_EQUAL((*frame)[offsets[0][1]], -65);
+    BOOST_CHECK_EQUAL((*frame)[offsets[1][1]], -65);
+
+    frame = report.loadFrame(4.5f).get();
+    BOOST_CHECK(frame);
+    BOOST_CHECK_CLOSE((*frame)[offsets[0][0]], -65.3935928f, .000001f);
+    BOOST_CHECK_CLOSE((*frame)[offsets[1][0]], -65.9297104f, .000001f);
+    BOOST_CHECK_CLOSE((*frame)[offsets[0][1]], -65.4166641f, .000001f);
+    BOOST_CHECK_CLOSE((*frame)[offsets[1][1]], -65.9334106f, .000001f);
+}
+
+BOOST_AUTO_TEST_CASE(test_read_subtarget_binary)
+{
+    testReadSubtarget(
+        "local/simulations/may17_2011/Control/allCompartments.bbp");
+}
+
+BOOST_AUTO_TEST_CASE(test_read_subtarget_hdf5)
+{
+    testReadSubtarget(
+        "local/simulations/may17_2011/Control/allCompartments.h5");
+}
+
+void testReadFrames(const char* relativePath)
+{
+    boost::filesystem::path path(BBP_TESTDATA);
+    path /= relativePath;
+    brion::CompartmentReport report(brion::URI(path.string()),
+                                    brion::MODE_READ);
+
+    const float startTime = report.getStartTime();
+    brion::Frames frames =
+        report.loadFrames(startTime, startTime + report.getTimestep() * 3)
+            .get();
+
+    size_t index = 0;
+    for (float time : *frames.timeStamps)
+    {
+        brion::floatsPtr frame = report.loadFrame(time).get();
+        BOOST_CHECK(frame);
+        auto frameBegin =
+            frames.data->begin() + report.getFrameSize() * index++;
+
+        BOOST_CHECK_EQUAL_COLLECTIONS(frame->begin(), frame->end(), frameBegin,
+                                      frameBegin + report.getFrameSize());
+    }
+
+    brion::GIDSet gids;
+    gids.insert(394);
+    report.updateMapping(gids);
+
+    frames = report.loadFrames(startTime, startTime + report.getTimestep() * 3)
+                 .get();
+
+    index = 0;
+    for (float time : *frames.timeStamps)
+    {
+        brion::floatsPtr frame = report.loadFrame(time).get();
+        BOOST_CHECK(frame);
+        auto frameBegin =
+            frames.data->begin() + report.getFrameSize() * index++;
+
+        BOOST_CHECK_EQUAL_COLLECTIONS(frame->begin(), frame->end(), frameBegin,
+                                      frameBegin + report.getFrameSize());
+    }
+}
+
+BOOST_AUTO_TEST_CASE(test_read_frames_binary)
+{
+    testReadFrames("local/simulations/may17_2011/Control/allCompartments.bbp");
+}
+
+BOOST_AUTO_TEST_CASE(test_read_frames_hdf5)
+{
+    testReadFrames("local/simulations/may17_2011/Control/allCompartments.h5");
+}
+
+BOOST_AUTO_TEST_CASE(test_perf_binary)
+{
+    boost::filesystem::path path(BBP_TESTDATA);
+    path /= "local/simulations/may17_2011/Control/allCompartments.bbp";
+    testPerf(brion::URI(path.string()));
+}
+
+BOOST_AUTO_TEST_CASE(test_perf_hdf5)
+
+{
+    boost::filesystem::path path(BBP_TESTDATA);
+    path /= "local/simulations/may17_2011/Control/allCompartments.h5";
+    testPerf(brion::URI(path.string()));
 }
 
 BOOST_AUTO_TEST_CASE(test_convert_and_compare)
@@ -437,204 +624,4 @@ BOOST_AUTO_TEST_CASE(dummy_report)
     brion::CompartmentReport report2(dummy2, brion::MODE_READ);
 
     BOOST_CHECK_NE(report3a.getFrameSize(), report2.getFrameSize());
-}
-
-BOOST_AUTO_TEST_CASE(test_read_soma_binary)
-{
-    boost::filesystem::path path(BBP_TESTDATA);
-    path /= "local/simulations/may17_2011/Control/voltage.bbp";
-
-    brion::GIDSet gids;
-    gids.insert(1);
-    brion::CompartmentReport report(brion::URI(path.string()), brion::MODE_READ,
-                                    gids);
-
-    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
-    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
-    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
-    BOOST_CHECK_EQUAL(report.getFrameSize(), 1);
-
-    brion::floatsPtr frame = report.loadFrame(report.getStartTime());
-    BOOST_CHECK(frame);
-    BOOST_CHECK_EQUAL((*frame)[0], -65);
-
-    frame = report.loadFrame(4.5f);
-    BOOST_CHECK(frame);
-    BOOST_CHECK_CLOSE((*frame)[0], -10.1440039f, .000001f);
-}
-
-BOOST_AUTO_TEST_CASE(test_read_soma_hdf5)
-{
-    boost::filesystem::path path(BBP_TESTDATA);
-    path /= "local/simulations/may17_2011/Control/voltage.h5";
-
-    brion::GIDSet gids;
-    gids.insert(1);
-    brion::CompartmentReport report(brion::URI(path.string()), brion::MODE_READ,
-                                    gids);
-
-    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
-    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
-    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
-    BOOST_CHECK_EQUAL(report.getFrameSize(), 1);
-
-    brion::floatsPtr frame = report.loadFrame(report.getStartTime());
-    BOOST_CHECK(frame);
-    BOOST_CHECK_EQUAL((*frame)[0], -65);
-
-    frame = report.loadFrame(4.5f);
-    BOOST_CHECK(frame);
-    BOOST_CHECK_CLOSE((*frame)[0], -10.1440039f, .000001f);
-}
-
-BOOST_AUTO_TEST_CASE(test_read_allcomps_binary)
-{
-    boost::filesystem::path path(BBP_TESTDATA);
-    path /= "local/simulations/may17_2011/Control/allCompartments.bbp";
-    brion::CompartmentReport report(brion::URI(path.string()),
-                                    brion::MODE_READ);
-
-    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
-    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
-    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
-    BOOST_CHECK_EQUAL(report.getFrameSize(), 20360);
-
-    brion::floatsPtr frame = report.loadFrame(.8f);
-    BOOST_CHECK(frame);
-    BOOST_CHECK_CLOSE((*frame)[0], -65.2919388, .000001f);
-    BOOST_CHECK_CLOSE((*frame)[1578], -65.2070618, .000001f);
-
-    brion::GIDSet gids;
-    gids.insert(394);
-    report.updateMapping(gids);
-
-    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
-    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
-    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
-    BOOST_CHECK_EQUAL(report.getFrameSize(), 629);
-
-    frame = report.loadFrame(report.getStartTime());
-    BOOST_CHECK(frame);
-    BOOST_CHECK_EQUAL((*frame)[0], -65);
-
-    frame = report.loadFrame(4.5f);
-    BOOST_CHECK(frame);
-    BOOST_CHECK_CLOSE((*frame)[0], -65.3935928f, .000001f);
-}
-
-BOOST_AUTO_TEST_CASE(test_read_allcomps_hdf5)
-{
-    boost::filesystem::path path(BBP_TESTDATA);
-    path /= "local/simulations/may17_2011/Control/allCompartments.h5";
-    brion::CompartmentReport report(brion::URI(path.string()),
-                                    brion::MODE_READ);
-
-    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
-    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
-    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
-    BOOST_CHECK_EQUAL(report.getFrameSize(), 20360);
-
-    brion::floatsPtr frame = report.loadFrame(.8f);
-    BOOST_CHECK(frame);
-    BOOST_CHECK_CLOSE((*frame)[0], -65.2919388, .000001f);
-    BOOST_CHECK_CLOSE((*frame)[1578], -65.2070618, .000001f);
-
-    brion::GIDSet gids;
-    gids.insert(394);
-    report.updateMapping(gids);
-
-    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
-    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
-    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
-    BOOST_CHECK_EQUAL(report.getFrameSize(), 629);
-
-    frame = report.loadFrame(report.getStartTime());
-    BOOST_CHECK(frame);
-    BOOST_CHECK_EQUAL((*frame)[0], -65);
-
-    frame = report.loadFrame(4.5f);
-    BOOST_CHECK(frame);
-    BOOST_CHECK_CLOSE((*frame)[0], -65.3935928f, .000001f);
-}
-
-BOOST_AUTO_TEST_CASE(test_read_subtarget_binary)
-{
-    boost::filesystem::path path(BBP_TESTDATA);
-    path /= "local/simulations/may17_2011/Control/allCompartments.bbp";
-
-    brion::GIDSet gids;
-    gids.insert(394);
-    gids.insert(400);
-    brion::CompartmentReport report(brion::URI(path.string()), brion::MODE_READ,
-                                    gids);
-
-    const brion::SectionOffsets& offsets = report.getOffsets();
-    BOOST_CHECK_EQUAL(offsets.size(), 2);
-
-    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
-    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
-    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
-    BOOST_CHECK_EQUAL(report.getFrameSize(), 938);
-
-    brion::floatsPtr frame = report.loadFrame(report.getStartTime());
-    BOOST_CHECK(frame);
-    BOOST_CHECK_EQUAL((*frame)[offsets[0][0]], -65);
-    BOOST_CHECK_EQUAL((*frame)[offsets[1][0]], -65);
-    BOOST_CHECK_EQUAL((*frame)[offsets[0][1]], -65);
-    BOOST_CHECK_EQUAL((*frame)[offsets[1][1]], -65);
-
-    frame = report.loadFrame(4.5f);
-    BOOST_CHECK(frame);
-    BOOST_CHECK_CLOSE((*frame)[offsets[0][0]], -65.3935928f, .000001f);
-    BOOST_CHECK_CLOSE((*frame)[offsets[1][0]], -65.9297104f, .000001f);
-    BOOST_CHECK_CLOSE((*frame)[offsets[0][1]], -65.4166641f, .000001f);
-    BOOST_CHECK_CLOSE((*frame)[offsets[1][1]], -65.9334106f, .000001f);
-}
-
-BOOST_AUTO_TEST_CASE(test_read_subtarget_hdf5)
-{
-    boost::filesystem::path path(BBP_TESTDATA);
-    path /= "local/simulations/may17_2011/Control/allCompartments.h5";
-
-    brion::GIDSet gids;
-    gids.insert(394);
-    gids.insert(400);
-    brion::CompartmentReport report(brion::URI(path.string()), brion::MODE_READ,
-                                    gids);
-
-    const brion::SectionOffsets& offsets = report.getOffsets();
-    BOOST_CHECK_EQUAL(offsets.size(), 2);
-
-    BOOST_CHECK_EQUAL(report.getStartTime(), 0.f);
-    BOOST_CHECK_EQUAL(report.getEndTime(), 10.f);
-    BOOST_CHECK_EQUAL(report.getTimestep(), 0.1f);
-    BOOST_CHECK_EQUAL(report.getFrameSize(), 938);
-
-    brion::floatsPtr frame = report.loadFrame(report.getStartTime());
-    BOOST_CHECK(frame);
-    BOOST_CHECK_EQUAL((*frame)[offsets[0][0]], -65);
-    BOOST_CHECK_EQUAL((*frame)[offsets[1][0]], -65);
-    BOOST_CHECK_EQUAL((*frame)[offsets[0][1]], -65);
-    BOOST_CHECK_EQUAL((*frame)[offsets[1][1]], -65);
-
-    frame = report.loadFrame(4.5f);
-    BOOST_CHECK(frame);
-    BOOST_CHECK_CLOSE((*frame)[offsets[0][0]], -65.3935928f, .000001f);
-    BOOST_CHECK_CLOSE((*frame)[offsets[1][0]], -65.9297104f, .000001f);
-    BOOST_CHECK_CLOSE((*frame)[offsets[0][1]], -65.4166641f, .000001f);
-    BOOST_CHECK_CLOSE((*frame)[offsets[1][1]], -65.9334106f, .000001f);
-}
-
-BOOST_AUTO_TEST_CASE(test_perf_binary)
-{
-    boost::filesystem::path path(BBP_TESTDATA);
-    path /= "local/simulations/may17_2011/Control/allCompartments.bbp";
-    testPerf(brion::URI(path.string()));
-}
-
-BOOST_AUTO_TEST_CASE(test_perf_hdf5)
-{
-    boost::filesystem::path path(BBP_TESTDATA);
-    path /= "local/simulations/may17_2011/Control/allCompartments.h5";
-    testPerf(brion::URI(path.string()));
 }

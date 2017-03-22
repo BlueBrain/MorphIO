@@ -65,28 +65,6 @@ void requireEqualCollections(const T& a, const T& b)
     REQUIRE_EQUAL(i, a.end());
     REQUIRE_EQUAL(j, b.end());
 }
-
-/** @return true if the cell occupies a continuous region in the report frame */
-bool _isCompact(const brion::CompartmentReport& report, const size_t gidIndex)
-{
-    const auto& offsets = report.getOffsets()[gidIndex];
-    const auto& counts = report.getCompartmentCounts()[gidIndex];
-
-    // sections are not guaranteed to be enumerated in order - sort them:
-    std::map<uint64_t, uint16_t> mapping;
-    for (size_t i = 0; i < offsets.size(); ++i)
-        mapping.emplace(offsets[i], counts[i]);
-
-    auto i = mapping.begin();
-    uint64_t next = i->first + i->second;
-    for (++i; i != mapping.end(); ++i)
-    {
-        if (i->first != next)
-            return false;
-        next = i->first + i->second;
-    }
-    return true;
-}
 }
 
 /**
@@ -112,12 +90,12 @@ int main(const int argc, char** argv)
         ( "help,h", "Produce help message" )
         ( "version,v", "Show program name/version banner and exit" )
 #ifdef BRION_USE_BBPTESTDATA
-        ( "input,i", po::value< std::string >()->default_value(
-            std::string( BBP_TESTDATA ) +
-            "/circuitBuilding_1000neurons/Neurodamus_output/voltages.bbp" ),
-          "Input report URI" )
+        ( "input,i", po::value<std::string>()->default_value(
+             std::string(BBP_TESTDATA) +
+             "/circuitBuilding_1000neurons/Neurodamus_output/voltages.bbp"),
+          "Input report URI")
 #else
-        ( "input,i", po::value< std::string >()->required(), "Input report URI")
+        ( "input,i", po::value<std::string>()->required(), "Input report URI" )
 #endif
         ( "output,o", po::value< std::string >()->default_value( "dummy://" ),
           uriHelp.c_str( ))
@@ -234,17 +212,31 @@ int main(const int argc, char** argv)
     float writeTime = clock.getTimef();
 
     const size_t nFrames = (end - start) / step;
+
     boost::progress_display progress(nFrames);
 
-    for (size_t i = 0; i < nFrames; ++i)
+    for (size_t frameIndex = 0; frameIndex < nFrames; ++frameIndex)
     {
-        const float t = start + i * step;
+        const float t = start + frameIndex * step;
+
         clock.reset();
-        brion::floatsPtr data = in.loadFrame(t);
+
+        brion::floatsPtr data;
+        try
+        {
+            data = in.loadFrame(t).get();
+        }
+        catch (...)
+        {
+            LBERROR << std::endl
+                    << "Can't load frame at " << t << " ms" << std::endl;
+            ::exit(EXIT_FAILURE);
+        }
         loadTime += clock.getTimef();
         if (!data)
         {
-            LBERROR << "Can't load frame at " << t << " ms" << std::endl;
+            LBERROR << std::endl
+                    << "Can't load frame at " << t << " ms" << std::endl;
             ::exit(EXIT_FAILURE);
         }
 
@@ -255,30 +247,13 @@ int main(const int argc, char** argv)
         clock.reset();
         for (const uint32_t gid : gids)
         {
-            if (_isCompact(in, index))
-            {
-                const float* cellValues = &values[offsets[index][0]];
-                const size_t size = std::accumulate(counts[index].begin(),
-                                                    counts[index].end(), 0);
-                if (!to.writeFrame(gid, cellValues, size, t))
-                    return EXIT_FAILURE;
-                ++index;
-                continue;
-            }
-
-            brion::floats cellvalues;
-            cellvalues.reserve(in.getNumCompartments(index));
-
-            for (size_t j = 0; j < offsets[index].size(); ++j)
-            {
-                const auto offset = offsets[index][j];
-                for (size_t k = 0; k < counts[index][j]; ++k)
-                    cellvalues.emplace_back(values[offset + k]);
-            }
-
-            if (!to.writeFrame(gid, cellvalues, t))
+            const float* cellValues = &values[offsets[index][0]];
+            const size_t size =
+                std::accumulate(counts[index].begin(), counts[index].end(), 0);
+            if (!to.writeFrame(gid, cellValues, size, t))
                 return EXIT_FAILURE;
             ++index;
+            continue;
         }
         writeTime += clock.getTimef();
         ++progress;
@@ -286,6 +261,7 @@ int main(const int argc, char** argv)
 
     clock.reset();
     to.flush();
+
     writeTime += clock.getTimef();
 
     std::cout << "Converted " << inURI << " to " << outURI << " (in "
@@ -327,8 +303,8 @@ int main(const int argc, char** argv)
 
         for (float t = start; t < end; t += step)
         {
-            brion::floatsPtr frame1 = in.loadFrame(t);
-            brion::floatsPtr frame2 = result.loadFrame(t);
+            brion::floatsPtr frame1 = in.loadFrame(t).get();
+            brion::floatsPtr frame2 = result.loadFrame(t).get();
 
             REQUIRE(frame1);
             REQUIRE(frame2);

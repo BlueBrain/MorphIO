@@ -245,40 +245,37 @@ bp::object frameToTuple(CompartmentReportFrame&& frame)
     return bp::make_tuple(frame.getTimestamp(), toNumpy(frame.takeData()));
 }
 
-bp::object framesToTuple(CompartmentReportFrames&& frames)
+bp::object framesToTuple(brion::Frames&& frames)
 {
-    if (frames.empty())
+    if (!frames.data)
         return bp::object(); // None
 
-    size_t frameCount = frames.size();
-    size_t frameSize = frames[0].getData().size();
+    size_t frameCount = frames.timeStamps->size();
+    size_t frameSize = frames.data->size() / frameCount;
 
-    std::vector<double> timestamps;
-    timestamps.reserve(frameCount);
-    for (const auto& frame : frames)
-        timestamps.push_back(frame.getTimestamp());
+    // TODO :remove this when time stamps will be doubles in brion::CR
+    std::vector<double> timestamps(frameCount);
+    size_t index = 0;
+    for (auto val : *frames.timeStamps)
+        timestamps[index++] = val;
+
+    auto data = frames.data;
 
     npy_intp dimensions[2] = {(npy_intp)frameCount, (npy_intp)frameSize};
 
-    float* matrixData = (float*)malloc(sizeof(float) * frameCount * frameSize);
-    if (!matrixData)
+    PyObject* array = PyArray_New(&PyArray_Type, 2, dimensions, NPY_FLOAT, 0,
+                                  data->data(), 0, NPY_ARRAY_C_CONTIGUOUS, 0);
+
+    bp::object pykeeper(data);
+    Py_INCREF(pykeeper.ptr());
+    if (PyArray_SetBaseObject((PyArrayObject*)array, pykeeper.ptr()) == -1)
     {
-        PyErr_SetString(PyExc_MemoryError,
-                        "Allocating numpy array for Matrix4f");
+        // The reference is not clear about the error string having been
+        // set or not. Let's assume it has been.
+        Py_DECREF(array);
+        Py_DECREF(pykeeper.ptr());
         bp::throw_error_already_set();
     }
-
-    float* tmpMatrixData = matrixData;
-    for (const auto& frame : frames)
-    {
-        std::copy(frame.getData().begin(), frame.getData().end(),
-                  tmpMatrixData);
-        tmpMatrixData += frameSize;
-    }
-
-    PyObject* array =
-        PyArray_New(&PyArray_Type, 2, dimensions, NPY_FLOAT, 0, matrixData, 0,
-                    NPY_ARRAY_OWNDATA | NPY_ARRAY_C_CONTIGUOUS, 0);
 
     return bp::make_tuple(brain::toNumpy(std::move(timestamps)),
                           bp::handle<>(array));

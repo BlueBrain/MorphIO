@@ -22,6 +22,7 @@
 
 #include <lunchbox/log.h>
 #include <lunchbox/pluginFactory.h>
+#include <lunchbox/threadPool.h>
 
 namespace brion
 {
@@ -42,6 +43,7 @@ public:
     }
 
     const std::unique_ptr<CompartmentReportPlugin> plugin;
+    lunchbox::ThreadPool threadPool;
 };
 }
 
@@ -122,12 +124,27 @@ size_t CompartmentReport::getBufferSize() const
     return _impl->plugin->getBufferSize();
 }
 
-floatsPtr CompartmentReport::loadFrame(const float timestamp) const
-{
-    if (timestamp < getStartTime() || timestamp > getEndTime())
-        return floatsPtr();
+std::future<floatsPtr> CompartmentReport::loadFrame(const float timestamp) const
 
-    return _impl->plugin->loadFrame(timestamp);
+{
+    auto task = [timestamp, this] {
+        if (timestamp < getStartTime() || timestamp > getEndTime())
+            return floatsPtr();
+
+        return _impl->plugin->loadFrame(timestamp);
+    };
+    return _impl->threadPool.post(task);
+}
+
+std::future<Frames> CompartmentReport::loadFrames(const float start,
+                                                  const float end) const
+{
+    auto task = [start, end, this] {
+        if (start < getStartTime() || end > getEndTime())
+            return Frames();
+        return _impl->plugin->loadFrames(start, end);
+    };
+    return _impl->threadPool.post(task);
 }
 
 size_t CompartmentReport::getNeuronSize(const uint32_t gid) const
@@ -137,9 +154,10 @@ size_t CompartmentReport::getNeuronSize(const uint32_t gid) const
     return getNumCompartments(index) * nTimesteps;
 }
 
-floatsPtr CompartmentReport::loadNeuron(const uint32_t gid) const
+std::future<floatsPtr> CompartmentReport::loadNeuron(const uint32_t gid) const
 {
-    return _impl->plugin->loadNeuron(gid);
+    auto task = [gid, this] { return _impl->plugin->loadNeuron(gid); };
+    return _impl->threadPool.post(task);
 }
 
 void CompartmentReport::setBufferSize(const size_t size)

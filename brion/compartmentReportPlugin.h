@@ -23,8 +23,11 @@
 #include <brion/pluginInitData.h>
 #include <brion/types.h>
 
-#include <boost/noncopyable.hpp>
 #include <lunchbox/log.h>
+
+#include <boost/noncopyable.hpp>
+
+#include <future>
 
 namespace brion
 {
@@ -124,6 +127,9 @@ public:
 
     /** @copydoc brion::CompartmentReport::loadFrame */
     virtual floatsPtr loadFrame(float timestamp) const = 0;
+
+    /** @copydoc brion::CompartmentReport::loadFrames */
+    virtual Frames loadFrames(float start, float end) const = 0;
 
     /** @copydoc brion::CompartmentReport::loadNeuron */
     virtual floatsPtr loadNeuron(uint32_t gid LB_UNUSED) const

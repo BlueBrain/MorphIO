@@ -19,12 +19,26 @@
 
 #include "compartmentReportBinary.h"
 
+#include <lunchbox/debug.h>
+#include <lunchbox/intervalSet.h>
+#include <lunchbox/log.h>
+#include <lunchbox/memoryMap.h>
+#include <lunchbox/pluginRegisterer.h>
+
 #include <boost/filesystem/path.hpp>
 #include <boost/foreach.hpp>
-#include <lunchbox/debug.h>
-#include <lunchbox/log.h>
-#include <lunchbox/pluginRegisterer.h>
+
 #include <map>
+
+#if defined __linux__ || defined __APPLE__
+#define HAS_AIO
+#endif
+
+#ifdef HAS_AIO
+#include <aio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#endif
 
 namespace
 {
@@ -114,6 +128,82 @@ const T* getPtr(const uint8_t* buffer, const size_t offset)
 {
     return reinterpret_cast<const T*>(buffer + offset);
 }
+
+#ifdef HAS_AIO
+
+const size_t _maxAIOops = 4096;
+
+std::string getErrorString(int errnum)
+{
+    char buffer[1024];
+    buffer[1023] = '\0';
+#if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && !_GNU_SOURCE
+    if (strerror_r(errnum, buffer, 1023) == -1)
+        return "Uknown error";
+    return buffer;
+#else
+    return strerror_r(errnum, buffer, 1023);
+#endif
+}
+
+struct AIOReadData
+{
+    int fileDescriptor;
+    void* buffer;
+    size_t size;
+    size_t offset;
+};
+
+void _initAIOControlBlock(aiocb& block, const AIOReadData& readData)
+{
+    bzero(&block, sizeof(aiocb));
+    block.aio_buf = readData.buffer;
+    block.aio_fildes = readData.fileDescriptor;
+    block.aio_nbytes = readData.size;
+    block.aio_offset = readData.offset;
+    block.aio_lio_opcode = LIO_READ;
+}
+
+void _readAsync(aiocb** operations, size_t length)
+{
+    if (lio_listio(LIO_WAIT, operations, length, nullptr) == -1)
+        throw std::runtime_error("Error in AIO operation setup" +
+                                 getErrorString(errno));
+    for (size_t i = 0; i != length; ++i)
+    {
+        const size_t bytesRead = aio_return(operations[i]);
+        if (bytesRead != operations[i]->aio_nbytes)
+            throw std::runtime_error("AIO read failed");
+    }
+}
+
+void _readAsync(const std::vector<AIOReadData>& readData)
+{
+    std::vector<aiocb> controlBlocks(readData.size());
+    std::vector<aiocb*> pointers(readData.size());
+    size_t i = 0;
+    for (auto& opData : readData)
+    {
+        auto& block = controlBlocks[i];
+        _initAIOControlBlock(block, opData);
+        pointers[i++] = &block;
+    }
+    auto** operations = pointers.data();
+
+    size_t remaining = readData.size();
+    while (remaining)
+    {
+        const size_t batchSize = std::min(remaining, _maxAIOops);
+        _readAsync(operations, batchSize);
+        remaining -= batchSize;
+        operations += batchSize;
+    }
+}
+
+#else
+// If AIO is not available always use memory mapped files
+const bool _useMemoryMap = true;
+#endif
 }
 
 namespace lunchbox
@@ -147,12 +237,29 @@ CompartmentReportBinary::CompartmentReportBinary(
     , _header()
     , _subNumCompartments(0)
     , _subtarget(false)
+#ifdef HAS_AIO
+    , _ioAPI(IOapi::posix_aio)
+#else
+    , _ioAPI(IOapi::mmap)
+#endif
 {
+#ifdef HAS_AIO
+    if (getenv("BRION_USE_MEM_MAP") != nullptr)
+        _ioAPI = IOapi::mmap;
+#endif
+
     if (initData.getAccessMode() != MODE_READ)
         LBTHROW(
             std::runtime_error("Writing of binary compartments not "
                                "implemented"));
 
+#ifdef HAS_AIO
+    int flags = O_RDONLY;
+    _fileDescriptor = open(initData.getURI().getPath().c_str(), flags);
+    if (_fileDescriptor < 0)
+        throw std::runtime_error("Failed to open " +
+                                 initData.getURI().getPath());
+#endif
     _file.map(initData.getURI().getPath());
 
     if (!_parseHeader())
@@ -166,6 +273,7 @@ CompartmentReportBinary::CompartmentReportBinary(
 
 CompartmentReportBinary::~CompartmentReportBinary()
 {
+    close(_fileDescriptor);
 }
 
 bool CompartmentReportBinary::handles(const CompartmentReportInitData& initData)
@@ -195,12 +303,12 @@ const GIDSet& CompartmentReportBinary::getGIDs() const
 
 const SectionOffsets& CompartmentReportBinary::getOffsets() const
 {
-    return _offsets[_subtarget ? 1 : 0];
+    return _perSectionOffsets[_subtarget];
 }
 
 const CompartmentCounts& CompartmentReportBinary::getCompartmentCounts() const
 {
-    return _counts[_subtarget ? 1 : 0];
+    return _perSectionCounts[_subtarget];
 }
 
 size_t CompartmentReportBinary::getFrameSize() const
@@ -208,66 +316,149 @@ size_t CompartmentReportBinary::getFrameSize() const
     return _subtarget ? _subNumCompartments : _header.numCompartments;
 }
 
-floatsPtr CompartmentReportBinary::loadFrame(const float timestamp) const
+bool CompartmentReportBinary::_loadFrame(const size_t frameNumber,
+                                         float* buffer) const
+{
+    if (_ioAPI == IOapi::mmap)
+        return _loadFrameMemMap(frameNumber, buffer);
+    else
+    {
+        _loadFramesAIO(frameNumber, 1, buffer);
+        return true;
+    }
+}
+
+bool CompartmentReportBinary::_loadFrames(const size_t startFrame,
+                                          const size_t count,
+                                          float* buffer) const
+{
+    if (_ioAPI == IOapi::mmap)
+        return CompartmentReportCommon::_loadFrames(startFrame, count, buffer);
+    else
+    {
+        _loadFramesAIO(startFrame, count, buffer);
+        return true;
+    }
+}
+
+bool CompartmentReportBinary::_loadFrameMemMap(const size_t frameNumber,
+                                               float* buffer) const
 {
     const uint8_t* ptr = _file.getAddress<const uint8_t>();
-    if (!ptr || _offsets[_subtarget].empty())
-        return floatsPtr();
+    if (!ptr)
+        return false;
 
-    const size_t frameNumber = _getFrameNumber(timestamp);
     const size_t frameOffset =
         _header.dataBlockOffset +
         _header.numCompartments * sizeof(float) * frameNumber;
 
     if (!_subtarget)
     {
-        floatsPtr buffer(new floats(_header.numCompartments));
-        memcpy(buffer->data(), ptr + frameOffset,
+        memcpy(buffer, ptr + frameOffset,
                _header.numCompartments * sizeof(float));
 
         if (_header.byteswap)
         {
 #pragma omp parallel for
             for (int32_t i = 0; i < _header.numCompartments; ++i)
-                lunchbox::byteswap((*buffer)[i]);
+                lunchbox::byteswap(buffer[i]);
         }
-        return buffer;
+        return true;
     }
 
-    if (_subNumCompartments == 0)
-        return floatsPtr();
+    // Empty frames are detected in CompartmentReportCommon
+    assert(_subNumCompartments != 0);
 
-    floatsPtr buffer(new floats(_subNumCompartments));
     const float* const source = (const float*)(ptr + frameOffset);
-    const SectionOffsets& offsets = getOffsets();
-    const CompartmentCounts& compCounts = getCompartmentCounts();
+    const auto& sourceOffsets = _perCellOffsets[0];
+    const auto& targetOffsets = _perCellOffsets[1];
 
     for (size_t i = 0; i < _gids.size(); ++i)
     {
-        for (size_t j = 0; j < offsets[i].size(); ++j)
-        {
-            const uint16_t numCompartments = compCounts[i][j];
-            const uint64_t sourceOffset = _conversionOffsets[i][j];
-            const uint64_t targetOffset = offsets[i][j];
-
-            for (uint16_t k = 0; k < numCompartments; ++k)
-                (*buffer)[k + targetOffset] = source[k + sourceOffset];
-        }
+        const uint32_t originalIndex = _subOriginalIndices[i];
+        const uint16_t numCompartments = _perCellCounts[originalIndex];
+        const uint64_t sourceOffset = sourceOffsets[originalIndex];
+        const uint64_t targetOffset = targetOffsets[i];
+        for (uint16_t k = 0; k < numCompartments; ++k)
+            buffer[targetOffset + k] = source[sourceOffset + k];
     }
 
     if (_header.byteswap)
     {
 #pragma omp parallel for
         for (ssize_t i = 0; i < ssize_t(_subNumCompartments); ++i)
-            lunchbox::byteswap((*buffer)[i]);
+            lunchbox::byteswap(buffer[i]);
     }
-    return buffer;
+    return true;
 }
+
+#ifdef HAS_AIO
+void CompartmentReportBinary::_loadFramesAIO(const size_t frameNumber,
+                                             const size_t count,
+                                             float* buffer) const
+{
+    const size_t originalFrameSize = _header.numCompartments * sizeof(float);
+    size_t frameOffset =
+        _header.dataBlockOffset + originalFrameSize * frameNumber;
+    float* targetFrame = buffer;
+    std::vector<AIOReadData> readData;
+    readData.reserve(count * (_subtarget ? _gids.size() : 1));
+
+    for (size_t n = 0; n < count; ++n)
+    {
+        if (_subtarget)
+        {
+            // Empty frames are detected in CompartmentReportCommon
+            assert(_subNumCompartments != 0);
+
+            const auto& sourceOffsets = _perCellOffsets[0];
+            const auto& targetOffsets = _perCellOffsets[1];
+
+            for (size_t i = 0; i < _gids.size(); ++i)
+            {
+                const uint32_t originalIndex = _subOriginalIndices[i];
+                const size_t readSize =
+                    _perCellCounts[originalIndex] * sizeof(float);
+                const uint64_t sourceOffset =
+                    frameOffset + sourceOffsets[originalIndex] * sizeof(float);
+                void* targetBuffer = targetFrame + targetOffsets[i];
+                readData.push_back(
+                    {_fileDescriptor, targetBuffer, readSize, sourceOffset});
+            }
+            targetFrame += _subNumCompartments;
+        }
+        else
+        {
+            readData.push_back({_fileDescriptor, targetFrame,
+                                _header.numCompartments * sizeof(float),
+                                frameOffset});
+            targetFrame += _header.numCompartments;
+        }
+        frameOffset += originalFrameSize;
+    }
+    const size_t readCount =
+        (_subtarget ? _subNumCompartments : _header.numCompartments) * count;
+
+    _readAsync(readData);
+
+    if (_header.byteswap)
+    {
+#pragma omp parallel for
+        for (size_t i = 0; i < readCount; ++i)
+            lunchbox::byteswap(buffer[i]);
+    }
+}
+#else
+void CompartmentReportBinary::_loadFramesAIO(const size_t, const size_t,
+                                             float*) const
+{
+}
+#endif
 
 floatsPtr CompartmentReportBinary::loadNeuron(const uint32_t gid) const
 {
     const uint8_t* const bytePtr = _file.getAddress<const uint8_t>();
-    if (!bytePtr || _offsets[_subtarget].empty())
+    if (!bytePtr || _perSectionOffsets[_subtarget].empty())
         return floatsPtr();
 
     const size_t index = getIndex(gid);
@@ -279,7 +470,7 @@ floatsPtr CompartmentReportBinary::loadNeuron(const uint32_t gid) const
     const size_t nValues = nFrames * nCompartments;
     floatsPtr buffer(new floats(nValues));
 
-    const SectionOffsets& offsets = _offsets[0];
+    const SectionOffsets& offsets = _perSectionOffsets[0];
     const CompartmentCounts& compCounts = getCompartmentCounts();
     for (size_t i = 0; i < nFrames; ++i)
     {
@@ -315,7 +506,7 @@ void CompartmentReportBinary::updateMapping(const GIDSet& gids)
     if (!_subtarget)
         return;
 
-    GIDSet intersection = _computeIntersection(_originalGIDs, _gids);
+    const GIDSet intersection = _computeIntersection(_originalGIDs, _gids);
     if (intersection.empty())
     {
         LBTHROW(
@@ -331,60 +522,30 @@ void CompartmentReportBinary::updateMapping(const GIDSet& gids)
     // build gid to mapping index lookup table
     std::unordered_map<uint32_t, size_t> gidIndex;
     size_t c = 0;
-    for (GIDSetCIter i = _originalGIDs.begin(); i != _originalGIDs.end(); ++i)
-        gidIndex[*i] = c++;
+    for (const auto gid : _originalGIDs)
+        gidIndex[gid] = c++;
 
-    _conversionOffsets.resize(gids.size());
-    _counts[1].resize(gids.size());
+    _perSectionCounts[1].resize(gids.size());
+    _perSectionOffsets[1].resize(gids.size());
+    _perCellOffsets[1].resize(gids.size());
+    _subOriginalIndices.resize(gids.size());
 
-    // then build conversion mapping from original to subtarget
-    size_t cellIndex = 0;
     _subNumCompartments = 0;
-    for (GIDSetCIter i = _gids.begin(); i != _gids.end(); ++i)
+    size_t index = 0;
+    for (const auto gid : _gids)
     {
-        const size_t index = gidIndex[*i];
-
-        uint64_ts& sectionOffsets = _conversionOffsets[cellIndex];
-        uint16_ts& sectionCounts = _counts[1][cellIndex];
-
-        const size_t numSections = _offsets[0][index].size();
-        sectionOffsets.resize(numSections);
-        sectionCounts.resize(numSections);
-
-        for (uint16_t sid = 0; sid < numSections; ++sid)
-        {
-            const uint16_t compCount = _counts[0][index][sid];
-            sectionOffsets[sid] = _offsets[0][index][sid];
-            sectionCounts[sid] = compCount;
-            _subNumCompartments += compCount;
-        }
-        ++cellIndex;
-    }
-
-    _offsets[1].resize(gids.size());
-
-    cellIndex = 0;
-    uint64_t offset = 0;
-    for (GIDSetCIter i = _gids.begin(); i != _gids.end(); ++i)
-    {
-        uint64_ts& sectionOffsets = _offsets[1][cellIndex];
-        uint16_ts& sectionCounts = _counts[1][cellIndex];
-
-        sectionOffsets.resize(_offsets[0][gidIndex[*i]].size(),
-                              std::numeric_limits<uint64_t>::max());
-
-        // This assignment implies that report values will be resorted
-        // according to section IDs when the information of the original
-        // frame is copied into the subtarget frame
-        for (size_t j = 0; j < sectionOffsets.size(); ++j)
-        {
-            const uint16_t numCompartments = sectionCounts[j];
-            if (numCompartments == 0)
-                continue;
-            sectionOffsets[j] = offset;
-            offset += numCompartments;
-        }
-        ++cellIndex;
+        const size_t originalIndex = gidIndex[gid];
+        _subOriginalIndices[index] = originalIndex;
+        auto& offsets = _perSectionOffsets[1][index];
+        offsets = _perSectionOffsets[0][originalIndex];
+        const ssize_t offsetShift =
+            _subNumCompartments - _perCellOffsets[0][originalIndex];
+        for (auto& offset : offsets)
+            offset += offsetShift;
+        _perSectionCounts[1][index] = _perSectionCounts[0][originalIndex];
+        _perCellOffsets[1][index] = _subNumCompartments;
+        _subNumCompartments += _perCellCounts[originalIndex];
+        ++index;
     }
 }
 
@@ -497,10 +658,13 @@ bool CompartmentReportBinary::_parseMapping()
     _header.dataBlockOffset = cells[0].dataOffset;
 
     std::sort(cells.begin(), cells.end());
-    SectionOffsets& offsetMapping = _offsets[0];
+    SectionOffsets& offsetMapping = _perSectionOffsets[0];
     offsetMapping.resize(cells.size());
-    CompartmentCounts& compartmentCounts = _counts[0];
-    compartmentCounts.resize(cells.size());
+    CompartmentCounts& perSectionCounts = _perSectionCounts[0];
+    perSectionCounts.resize(cells.size());
+    std::vector<size_t>& perCellOffsets = _perCellOffsets[0];
+    perCellOffsets.resize(cells.size());
+    _perCellCounts.resize(cells.size());
 
     // According to Garik Suess, all compartments of a cell in a frame are next
     // to each other, and all compartments of a section are next to each other.
@@ -510,7 +674,8 @@ bool CompartmentReportBinary::_parseMapping()
     // 22 8 could be next to each other, while the compartments inside these
     // sections are in order.
     size_t idx = 0;
-    BOOST_FOREACH (const CellInfo& info, cells)
+    size_t totalCompartments = 0;
+    for (const CellInfo& info : cells)
     {
         uint16_t current = LB_UNDEFINED_UINT16;
         uint16_t previous = LB_UNDEFINED_UINT16;
@@ -520,6 +685,10 @@ bool CompartmentReportBinary::_parseMapping()
         typedef std::map<uint16_t, std::pair<uint64_t, uint16_t>>
             SectionMapping;
         SectionMapping sectionsMapping;
+
+        _perCellCounts[idx] = info.numCompartments;
+        perCellOffsets[idx] = totalCompartments;
+        totalCompartments += info.numCompartments;
 
         for (int32_t j = 0; j < info.numCompartments; ++j)
         {
@@ -552,7 +721,7 @@ bool CompartmentReportBinary::_parseMapping()
 
         // now convert the maps into the desired mapping format
         uint64_ts& sectionOffsets = offsetMapping[idx];
-        uint16_ts& sectionCompartmentCounts = compartmentCounts[idx];
+        uint16_ts& sectionCompartmentCounts = perSectionCounts[idx];
         ++idx;
 
         // get maximum section id
@@ -560,11 +729,10 @@ bool CompartmentReportBinary::_parseMapping()
         sectionOffsets.resize(maxID + 1, LB_UNDEFINED_UINT64);
         sectionCompartmentCounts.resize(maxID + 1, 0);
 
-        for (SectionMapping::const_iterator k = sectionsMapping.begin();
-             k != sectionsMapping.end(); ++k)
+        for (auto k : sectionsMapping)
         {
-            sectionOffsets[k->first] = k->second.first;
-            sectionCompartmentCounts[k->first] = k->second.second;
+            sectionOffsets[k.first] = k.second.first;
+            sectionCompartmentCounts[k.first] = k.second.second;
         }
 
         _originalGIDs.insert(info.gid);

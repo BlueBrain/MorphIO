@@ -20,9 +20,12 @@
 #ifndef BRION_COMPARTMENTREPORT
 #define BRION_COMPARTMENTREPORT
 
-#include <boost/noncopyable.hpp>
 #include <brion/api.h>
 #include <brion/types.h>
+
+#include <boost/noncopyable.hpp>
+
+#include <future>
 
 namespace brion
 {
@@ -53,12 +56,12 @@ public:
      * @throw std::runtime_error if compartment report could be opened for read
      *                           or write, cannot be overwritten or it is not
      *                           valid
-     * @version 1.4
+     * @version 1.0
      */
     BRION_API CompartmentReport(const URI& uri, int mode,
                                 const GIDSet& gids = GIDSet());
 
-    /** @return the descriptions of all loaded report backends. @version 1.10 */
+    /** @return the descriptions of all loaded report backends. @version 1.0 */
     BRION_API static std::string getDescriptions();
 
     /** @name Read API */
@@ -80,7 +83,7 @@ public:
 
     /**
      * @return the index of the given gid.
-     * @version 1.10
+     * @version 1.0
      * @throw std::runtime_error if the gid is not mapped
      */
     BRION_API size_t getIndex(const uint32_t gid) const;
@@ -141,15 +144,29 @@ public:
      *
      * @param timestamp the time stamp of interest
      * @return the report values if found at timestamp, nullptr otherwise
-     * @version 1.0
+     * @note Until the completion of this operation, the report shouldn't be
+     * modified
+     * @version 2.0
      */
-    BRION_API floatsPtr loadFrame(float timestamp) const;
+    BRION_API std::future<floatsPtr> loadFrame(float timestamp) const;
+
+    /** Load all frames inside a given time window.
+     *
+     * The result will be empty if the window is invalid or falls outside the
+     * report window.
+     * @param start close left side of the time interval
+     * @param end open right side of time interval
+     * @return a future with the frames overlapped by the time window
+     *         [start, end) and the start timestamps of these frames.
+     * @version 2.0
+     */
+    BRION_API std::future<Frames> loadFrames(float start, float end) const;
 
     /**
      * @param gid the neuron report to be loaded.
      * @return the number of values of the given neuron report.
      * @throw std::runtime_error if gid is not mapped.
-     * @version 1.10
+     * @version 1.0
      */
     BRION_API size_t getNeuronSize(uint32_t gid) const;
 
@@ -159,9 +176,11 @@ public:
      *
      * @param gid the neuron identifier
      * @return the report values if neuron is found, nullptr otherwise
-     * @version 1.10
+     * @note Until the completion of this operation, the report shouldn't be
+     * modified
+     * @version 2.0
      */
-    BRION_API floatsPtr loadNeuron(uint32_t gid) const;
+    BRION_API std::future<floatsPtr> loadNeuron(uint32_t gid) const;
 
     /** Set the size of the stream buffer for loaded frames.
      *
@@ -235,7 +254,7 @@ public:
      *
      * May not be implemented by all backends, such as file-based reports.
      * @return true if data was removed.
-     * @version 1.10
+     * @version 1.0
      */
     BRION_API bool erase();
     //@}

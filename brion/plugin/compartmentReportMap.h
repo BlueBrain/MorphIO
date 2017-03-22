@@ -64,7 +64,6 @@ public:
         return _counts;
     }
 
-    floatsPtr loadFrame(float timestamp) const final;
     floatsPtr loadNeuron(uint32_t gid) const final;
 
     void updateMapping(const GIDSet& gids) final;
@@ -124,8 +123,9 @@ private:
     void _clear();
     bool _loadHeader();
     bool _flushHeader();
-    bool _load(floatsPtr buffer, const Strings& keys,
+    bool _load(float* buffer, const Strings& keys,
                const OffsetMap& offsets) const;
+    bool _loadFrame(size_t frameNumber, float* buffer) const final;
 
     std::string _getHeaderKey() const { return "header"; }
     std::string _getGidsKey() const { return "gids"; }

@@ -73,20 +73,18 @@ public:
      * @param end the end time stamp
      * @return the frames overlapped by the given time window. The start time
      *         doesn't need to be aligned with the report timestep and the time
-     *         interval is open on the right. The result may be empty is the
-     * time
-     *         window falls out of the report window.
+     *         interval is open on the right. The result may be empty if the
+     *         time window falls out of the report window.
      * @throw std::logic_error if invalid interval
      * @version 2.0
      */
-    BRAIN_API std::future<CompartmentReportFrames> load(double start,
-                                                        double end);
+    BRAIN_API std::future<brion::Frames> load(double start, double end);
 
     /** Load all the frames.
      * This is equivalent to call load(starTime, endTime)
      * @version 2.0
      */
-    BRAIN_API std::future<CompartmentReportFrames> loadAll();
+    BRAIN_API std::future<brion::Frames> loadAll();
 
 private:
     CompartmentReportView(

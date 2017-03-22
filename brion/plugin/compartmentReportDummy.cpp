@@ -151,20 +151,18 @@ size_t CompartmentReportDummy::getFrameSize() const
     return frameSize;
 }
 
-floatsPtr CompartmentReportDummy::loadFrame(const float time) const
+bool CompartmentReportDummy::_loadFrame(size_t frameNumber, float* buffer) const
 {
-    floatsPtr buffer(new floats(getFrameSize()));
     if (_randomValues)
     {
         std::random_device dev;
         std::mt19937_64 engine(dev());
         std::uniform_int_distribution<int16_t> distribution;
-        engine.seed(unsigned(time)); // reproducible randomness, please
-
-        for (float& value : *buffer)
-            value = float(distribution(engine)) / 1000.f;
+        engine.seed(frameNumber); // reproducible randomness, please
+        for (size_t i = 0; i < getFrameSize(); ++i)
+            buffer[i] = float(distribution(engine)) / 1000.f;
     }
-    return buffer;
+    return true;
 }
 }
 }

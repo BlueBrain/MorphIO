@@ -240,18 +240,13 @@ size_t CompartmentReportHDF5::getFrameSize() const
     return _comps;
 }
 
-floatsPtr CompartmentReportHDF5::loadFrame(const float timestamp) const
+bool CompartmentReportHDF5::_loadFrame(const size_t frameNumber,
+                                       float* buffer) const
 {
-    if (_offsets.empty())
-        return floatsPtr();
-
     lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
 
     // The offset for the first comparment of the cell being processed
     hsize_t firstCompartmentOffset = 0;
-
-    const size_t frameNumber = _getFrameNumber(timestamp);
-    floatsPtr buffer(new floats(getFrameSize()));
 
     for (GIDSetCIter cellID = _gids.begin(); cellID != _gids.end(); ++cellID)
     {
@@ -270,13 +265,11 @@ floatsPtr CompartmentReportHDF5::loadFrame(const float timestamp) const
         const hsize_t targetOffsets[2] = {0, firstCompartmentOffset};
         targetSpace.selectHyperslab(H5S_SELECT_SET, readCounts, targetOffsets);
 
-        dataset.read(buffer->data(), H5::PredType::NATIVE_FLOAT, targetSpace,
-                     space);
+        dataset.read(buffer, H5::PredType::NATIVE_FLOAT, targetSpace, space);
 
         firstCompartmentOffset += sourceSizes[1];
     }
-
-    return buffer;
+    return true;
 }
 
 void CompartmentReportHDF5::updateMapping(const GIDSet& gids)

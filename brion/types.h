@@ -110,6 +110,12 @@ typedef std::vector<Spike> Spikes;
 /** A list of Spikes events per cell gid, indexed by spikes times. */
 typedef std::multimap<float, uint32_t> SpikeMap;
 
+struct Frames
+{
+    floatsPtr timeStamps;
+    floatsPtr data;
+};
+
 /** A value for undefined timestamps */
 
 const float UNDEFINED_TIMESTAMP LB_UNUSED = std::numeric_limits<float>::max();

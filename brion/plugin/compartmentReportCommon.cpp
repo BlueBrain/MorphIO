@@ -48,11 +48,15 @@ size_t CompartmentReportCommon::getNumCompartments(const size_t index) const
 
 size_t CompartmentReportCommon::_getFrameNumber(float timestamp) const
 {
-    timestamp = std::max(0.f, timestamp - getStartTime());
-    size_t frame = std::min(
-        size_t(round((getEndTime() - getStartTime()) / getTimestep())) - 1,
-        size_t(round(timestamp / getTimestep())));
-    return frame;
+    const auto startTime = getStartTime();
+    const auto endTime = getEndTime();
+    assert(endTime > startTime);
+    const auto step = getTimestep();
+    timestamp =
+        std::max(std::min(timestamp, std::nextafter(endTime, -INFINITY)),
+                 startTime) -
+        startTime;
+    return size_t(timestamp / step);
 }
 
 GIDSet CompartmentReportCommon::_computeIntersection(const GIDSet& all,
@@ -75,6 +79,54 @@ GIDSet CompartmentReportCommon::_computeIntersection(const GIDSet& all,
                    << *intersection.rbegin() << "]" << std::endl;
     }
     return intersection;
+}
+
+floatsPtr CompartmentReportCommon::loadFrame(const float timestamp) const
+{
+    const size_t size = getFrameSize();
+    floatsPtr buffer(new floats(size));
+    if (size != 0)
+        _loadFrame(_getFrameNumber(timestamp), buffer->data());
+    return buffer;
+}
+
+Frames CompartmentReportCommon::loadFrames(float start, float end) const
+{
+    const auto startTime = getStartTime();
+    if (start >= getEndTime() || end < startTime || end <= start)
+        return Frames();
+
+    const float timestep = getTimestep();
+    const size_t startFrame = _getFrameNumber(start);
+    const size_t count = _getFrameNumber(end) - startFrame + 1;
+
+    Frames frames;
+
+    frames.timeStamps.reset(new floats);
+    for (size_t i = 0; i < count; ++i)
+        frames.timeStamps->push_back((i + startFrame) * timestep);
+
+    const auto frameSize = getFrameSize();
+    frames.data.reset(new floats(frameSize * count));
+    if (frameSize == 0)
+        return frames;
+
+    if (!_loadFrames(startFrame, count, frames.data->data()))
+        return Frames();
+
+    return frames;
+}
+
+bool CompartmentReportCommon::_loadFrames(const size_t startFrame,
+                                          const size_t count,
+                                          float* buffer) const
+{
+    for (size_t i = 0; i != count; ++i, buffer += getFrameSize())
+    {
+        if (!_loadFrame(startFrame + i, buffer))
+            return false;
+    }
+    return true;
 }
 }
 }

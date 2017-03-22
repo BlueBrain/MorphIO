@@ -85,7 +85,7 @@ std::future<CompartmentReportFrame> CompartmentReportView::load(
         CompartmentReportFrame frame;
         frame._impl->timeStamp = timestamp;
 
-        auto data = report->loadFrame(timestamp);
+        auto data = report->loadFrame(timestamp).get();
         if (data)
             frame._impl->data = std::move(*data);
 
@@ -95,8 +95,7 @@ std::future<CompartmentReportFrame> CompartmentReportView::load(
     return _impl->readerImpl->threadPool.post(loadFrameTask);
 }
 
-std::future<CompartmentReportFrames> CompartmentReportView::load(double start,
-                                                                 double end)
+std::future<brion::Frames> CompartmentReportView::load(double start, double end)
 {
     if (end <= start)
         throw std::logic_error("Invalid interval");
@@ -104,36 +103,10 @@ std::future<CompartmentReportFrames> CompartmentReportView::load(double start,
     start = std::max(start, (double)_impl->report->getStartTime());
     end = std::min(end, (double)_impl->report->getEndTime());
 
-    const double timestep = _impl->report->getTimestep();
-    auto report = _impl->report;
-
-    auto loadFrameTask = [start, end, timestep, report] {
-
-        // If the input time window is outside the report the clamping done
-        // above will make end <= start
-        CompartmentReportFrames frames;
-        if (end <= start)
-            return frames;
-
-        // The first timestamp is snapped to the closest smaller frame start
-        // according to the timestep.
-        for (size_t i = std::floor(start / timestep); i * timestep < end; ++i)
-        {
-            CompartmentReportFrame frame;
-            const double t = i * timestep;
-            frame._impl->timeStamp = t;
-            auto data = report->loadFrame(t);
-            if (data)
-                frame._impl->data = std::move(*data);
-
-            frames.push_back(std::move(frame));
-        }
-        return frames;
-    };
-    return _impl->readerImpl->threadPool.post(loadFrameTask);
+    return _impl->report->loadFrames(start, end);
 }
 
-std::future<CompartmentReportFrames> CompartmentReportView::loadAll()
+std::future<brion::Frames> CompartmentReportView::loadAll()
 {
     return load(_impl->report->getStartTime(), _impl->report->getEndTime());
 }

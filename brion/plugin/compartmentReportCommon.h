@@ -35,10 +35,19 @@ public:
     ~CompartmentReportCommon() {}
     size_t getNumCompartments(size_t index) const final;
 
+    floatsPtr loadFrame(float timestamp) const final;
+    Frames loadFrames(float start, float end) const final;
+
 protected:
     void _cacheNeuronCompartmentCounts(const GIDSet& gids);
+    /** @return The frame number of a given timestamp clamped to the simulation
+        window. */
     size_t _getFrameNumber(float timestamp) const;
     static GIDSet _computeIntersection(const GIDSet& all, const GIDSet& subset);
+
+    virtual bool _loadFrame(size_t frameNumber, float* buffer) const = 0;
+    virtual bool _loadFrames(size_t frameNumber, size_t frameCount,
+                             float* buffer) const;
 
 private:
     size_ts _neuronCompartments;

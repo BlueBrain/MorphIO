@@ -64,7 +64,7 @@ boost::python::object frameToTuple(CompartmentReportFrame&& frame);
 
 /// tuple(timestamps : 1D ndarray, data : 2D ndarray )
 /// or tuple(timestamp : double, data : 1D ndarray) if frames.size == 1
-boost::python::object framesToTuple(CompartmentReportFrames&& frames);
+boost::python::object framesToTuple(brion::Frames&& frames);
 
 // Implemented for: Matrix4f
 template <typename T>
