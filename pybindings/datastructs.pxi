@@ -1,46 +1,48 @@
-# ----------------------------------------------------------------------------------------------------------------------
-# Box wrapper. Notice that this class automatically allocates a morpho.box c++ object (support for .from_value)
 # -------------------------------------------------------------------------------------------------------------
 cdef class Box(_py__base):
-    cdef morpho.box _obj
+    cdef std.unique_ptr[morpho.box] _autodealoc
+    cdef morpho.box* ptr(self):
+        return < morpho.box * > self._ptr
 
     @property
     def min_corner(self):
-        cdef morpho.point p = self._obj.min_corner()
+        cdef morpho.point p = self.ptr().min_corner()
         cdef const double* pts = p.data()
         return [pts[0], pts[1], pts[2]]
 
     @property
     def max_corner(self):
-        cdef morpho.point p = self._obj.max_corner()
+        cdef morpho.point p = self.ptr().max_corner()
         cdef const double* pts = p.data()
         return [pts[0], pts[1], pts[2]]
 
     @staticmethod
     cdef Box from_value(const morpho.box &box):
         cdef Box pybox = Box()
-        pybox._obj = box
+        pybox._ptr = new morpho.box(box)
+        pybox._autodealoc.reset(pybox.ptr())
         return pybox
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-cdef class Vector(_py__base):
-    cdef morpho.vector * ptr(self):
-        return < morpho.vector *> self._ptr
-
-    @staticmethod
-    cdef Vector from_ptr(morpho.vector *ptr):
-        cdef Vector obj = Vector.__new__(Vector)
-        obj._ptr = ptr
-        return obj
-
-    @staticmethod
-    cdef Vector from_ref(const morpho.vector &ref):
-        return Vector.from_ptr(<morpho.vector*>&ref)
+# # ----------------------------------------------------------------------------------------------------------------------
+# cdef class Vector(_py__base):
+#     cdef morpho.vector * ptr(self):
+#         return < morpho.vector *> self._ptr
+#
+#     @staticmethod
+#     cdef Vector from_ptr(morpho.vector *ptr):
+#         cdef Vector obj = Vector.__new__(Vector)
+#         obj._ptr = ptr
+#         return obj
+#
+#     @staticmethod
+#     cdef Vector from_ref(const morpho.vector &ref):
+#         return Vector.from_ptr(<morpho.vector*>&ref)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Linestring(_py__base):
+    cdef std.unique_ptr[morpho.linestring] _autodealoc
     cdef morpho.linestring * ptr(self):
         return < morpho.linestring *> self._ptr
 
@@ -57,26 +59,30 @@ cdef class Linestring(_py__base):
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Cone(_py__base):
-    cdef morpho.cone _obj
+    cdef std.unique_ptr[morpho.cone] _autodealoc
+    cdef morpho.cone * ptr(self):
+        return <morpho.cone *> self._ptr
 
     @property
     def center(self):
-        cdef morpho.point p = self._obj.get_center()
+        cdef morpho.point p = self.ptr().get_center()
         cdef const double* pts = p.data()
         return [pts[0], pts[1], pts[2]]
 
     @property
     def radius(self):
-        return <double> self._obj.get_radius()
+        return self.ptr().get_radius()
 
     @staticmethod
     cdef Cone from_value(const morpho.cone& cone):
         cdef Cone pycone = Cone()
-        pycone._obj = cone
+        pycone._ptr = new morpho.cone(cone)
+        pycone._autodealoc.reset(pycone.ptr())
         return pycone
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Sphere(_py__base):
+    cdef std.unique_ptr[morpho.sphere] _autodealoc
     cdef morpho.sphere * ptr(self):
         return < morpho.sphere *> self._ptr
 
