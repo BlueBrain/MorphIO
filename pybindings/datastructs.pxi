@@ -17,11 +17,16 @@ cdef class Box(_py__base):
         return [pts[0], pts[1], pts[2]]
 
     @staticmethod
-    cdef Box from_value(const morpho.box &box):
-        cdef Box pybox = Box()
-        pybox._ptr = new morpho.box(box)
-        pybox._autodealoc.reset(pybox.ptr())
-        return pybox
+    cdef Box from_ptr(morpho.box *ptr, bool owner=False):
+        cdef Box obj = Box.__new__(Box)
+        obj._ptr = ptr
+        if owner: obj._autodealoc.reset(ptr)
+        return obj
+
+    @staticmethod
+    cdef Box from_value(const morpho.box &ref):
+        cdef morpho.box *ptr = new morpho.box(ref)
+        return Box.from_ptr(ptr, True)
 
 
 # # ----------------------------------------------------------------------------------------------------------------------
