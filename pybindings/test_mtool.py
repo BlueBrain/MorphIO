@@ -13,8 +13,17 @@ b=tree.get_branch(1)
 print "Branch length:", b.get_size()
 
 children = b.get_childrens()
-children.count(1)
+print "Branch childrens in 1", children.count(1)
 
 pts = b.get_points()
-print "pts:", pts
+print "Branch points:", pts, "length:", len(pts)
+
+bbox = b.get_bounding_box()
+print "Bounding Box:", bbox
+
+ls = b.get_linestring()
+print "Linestring:", ls, "length:", len(ls)
+
+cp = b.get_circle_pipe()
+print "circle pipe:", cp, "length:", len(cp)
 

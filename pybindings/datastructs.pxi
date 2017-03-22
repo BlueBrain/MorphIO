@@ -21,6 +21,9 @@ cdef class _ArrayT(_py__base):
     cdef readonly object nparray
 
     # Pass on the array API
+    def __len__(self):
+        return len(self.nparray)
+
     def __getitem__(self, item):
         return self.nparray.__getitem__(item)
 
@@ -94,6 +97,39 @@ cdef class Linestring(_ArrayT):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+cdef class Circle(_py__base):
+    cdef std.unique_ptr[morpho.circle] _autodealoc
+    cdef morpho.circle * ptr(self):
+        return < morpho.circle *> self._ptr
+
+    @property
+    def center(self):
+        cdef morpho.point p = self.ptr().get_center()
+        cdef const double* pts = p.data()
+        return [pts[0], pts[1], pts[2]]
+
+    @property
+    def radius(self):
+        return self.ptr().get_radius()
+
+    @staticmethod
+    cdef Circle from_ptr(morpho.circle *ptr, bool owner=False):
+        cdef Circle obj = Circle.__new__(Circle)
+        obj._ptr = ptr
+        if owner: obj._autodealoc.reset(ptr)
+        return obj
+
+    @staticmethod
+    cdef Circle from_ref(const morpho.circle &ref):
+        return Circle.from_ptr(<morpho.circle*>&ref)
+
+    @staticmethod
+    cdef Circle from_value(const morpho.circle &ref):
+        cdef morpho.circle* ptr = new morpho.circle(ref)
+        return Circle.from_ptr(ptr, True)
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 cdef class Cone(_py__base):
     cdef std.unique_ptr[morpho.cone] _autodealoc
     cdef morpho.cone * ptr(self):
@@ -151,6 +187,54 @@ cdef class Sphere(_py__base):
         return Sphere.from_ptr(ptr, True)
 
 
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Circle pipe
+#  - This class is somewhat special in the sense that it represents a Vector of circles
+#  - However circles are not stack-alloc'able in Cyhton (no default ctor) so we cant iterate
+# over them directly to create a list
+#  - Therefore we implemented array and iterator interface by getting the elements from their address and wrapping
+# in their corresponding Python class, which is executed the exact moment the object is required.
+#  - By using this technique, the circle_pipe can be passed on to another function without even incurring
+# wrapping/unwrapping of its elements
+# ----------------------------------------------------------------------------------------------------------------------
+cdef class CirclePipe(_py__base):
+    cdef std.unique_ptr[morpho.circle_pipe] _autodealoc
+    cdef morpho.circle_pipe * ptr(self):
+        return < morpho.circle_pipe *> self._ptr
+
+    # Pass on the array API
+    def __getitem__(self, int index):
+        if index >= len(self) or index < 0:
+            raise IndexError("Circle pipe object is %d circles long. Requested:%d"%(len(self), index))
+        cdef std.vector[morpho.circle] *cp = <std.vector[morpho.circle]*>self._ptr
+        cdef morpho.circle * mcircle = cp.data()
+        # This circle doesnt own C data, we lend him memory from the vector
+        return Circle.from_ptr( &mcircle[index] )
+
+    def __iter__(self):
+        cdef int i
+        #Generator is also iterator
+        return (self[i] for i in range(len(self)))
+
+    def __len__(self):
+        return self.ptr().size()
+
+    def size(self):
+        print("Info: the current object implements iterator and array interface. use len(obj) instead of .size()")
+        return len(self)
+
+    @staticmethod
+    cdef CirclePipe from_ptr(morpho.circle_pipe *ptr, bool owner=False):
+        cdef CirclePipe obj = CirclePipe.__new__(CirclePipe)
+        obj._ptr = ptr
+        if owner: obj._autodealoc.reset(ptr)
+        return obj
+
+    @staticmethod
+    cdef CirclePipe from_value(const morpho.circle_pipe &ref):
+        cdef morpho.circle_pipe* ptr = new morpho.circle_pipe(ref)
+        return CirclePipe.from_ptr(ptr, True)
 
 
 # ----------------------------------------------------------------------------------------------------------------------

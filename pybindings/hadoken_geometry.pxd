@@ -31,5 +31,6 @@ cdef extern from "hadoken/geometry/geometry.hpp" namespace "hadoken::geometry::c
 
     cdef cppclass circle3d:
         circle3d(circle3d&)
-        double * data()
+        point3d get_center()
+        double get_radius()
 

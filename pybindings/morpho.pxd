@@ -25,8 +25,9 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
     ctypedef hadoken_geometry.vector3d vector
     ctypedef hadoken_geometry.linestring3d linestring
     ctypedef hadoken_geometry.sphere3d sphere
+    ctypedef hadoken_geometry.circle3d circle
     ctypedef hadoken_geometry.cone3d cone
-    ctypedef std.vector[hadoken_geometry.circle3d] circle_pipe
+    ctypedef std.vector[circle] circle_pipe
     ctypedef hadoken_geometry.box3d box
 
     cpdef enum branch_type:
