@@ -22,60 +22,56 @@
 
 #include "compartmentReportCommon.h"
 
-#include <boost/filesystem/path.hpp>
 #include <H5Cpp.h>
+#include <boost/filesystem/path.hpp>
 #include <unordered_map>
 
 namespace brion
 {
 namespace plugin
 {
-
 class CompartmentReportHDF5 : public CompartmentReportCommon
 {
 public:
-    explicit CompartmentReportHDF5( const CompartmentReportInitData& initData );
+    explicit CompartmentReportHDF5(const CompartmentReportInitData& initData);
     virtual ~CompartmentReportHDF5();
 
-    static bool handles( const CompartmentReportInitData& initData );
+    static bool handles(const CompartmentReportInitData& initData);
     static std::string getDescription();
 
     float getStartTime() const final { return _startTime; }
     float getEndTime() const final { return _endTime; }
     float getTimestep() const final { return _timestep; }
-
     const std::string& getDataUnit() const final { return _dunit; }
     const std::string& getTimeUnit() const final { return _tunit; }
-
     const GIDSet& getGIDs() const final;
     const SectionOffsets& getOffsets() const final;
     const CompartmentCounts& getCompartmentCounts() const final;
     size_t getFrameSize() const final;
 
-    floatsPtr loadFrame( float timestamp ) const final;
-    void updateMapping( const GIDSet& gids ) final;
+    floatsPtr loadFrame(float timestamp) const final;
+    void updateMapping(const GIDSet& gids) final;
 
-    void writeHeader( float startTime, float endTime,
-                      float timestep, const std::string& dunit,
-                      const std::string& tunit ) final;
-    bool writeCompartments( uint32_t gid, const uint16_ts& counts ) final;
-    bool writeFrame( uint32_t gid, const float* values, size_t size,
-                     float timestamp ) final;
+    void writeHeader(float startTime, float endTime, float timestep,
+                     const std::string& dunit, const std::string& tunit) final;
+    bool writeCompartments(uint32_t gid, const uint16_ts& counts) final;
+    bool writeFrame(uint32_t gid, const float* values, size_t size,
+                    float timestamp) final;
     bool flush() final;
 
 private:
-    void _openFile( const uint32_t cellID );
-    H5::DataSet _openDataset( const H5::H5File& file, const uint32_t cellID );
+    void _openFile(const uint32_t cellID);
+    H5::DataSet _openDataset(const H5::H5File& file, const uint32_t cellID);
 
-    H5::DataSet _createDataset( const uint32_t gid, const size_t compCount );
-    H5::DataSet& _getDataset( const uint32_t gid );
+    H5::DataSet _createDataset(const uint32_t gid, const size_t compCount);
+    H5::DataSet& _getDataset(const uint32_t gid);
     void _createMetaData();
-    void _createMappingAttributes( H5::DataSet& dataset );
-    void _createDataAttributes( H5::DataSet& dataset );
+    void _createMappingAttributes(H5::DataSet& dataset);
+    void _createDataAttributes(H5::DataSet& dataset);
 
-    typedef std::unordered_map< uint32_t, H5::H5File > Files;
-    typedef std::unordered_map< uint32_t, H5::DataSet > Datasets;
-    typedef std::unordered_map< uint32_t, H5::DataSpace > Dataspaces;
+    typedef std::unordered_map<uint32_t, H5::H5File> Files;
+    typedef std::unordered_map<uint32_t, H5::DataSet> Datasets;
+    typedef std::unordered_map<uint32_t, H5::DataSpace> Dataspaces;
 
     double _startTime;
     double _endTime;
@@ -95,7 +91,6 @@ private:
     Dataspaces _fspaces;
     Dataspaces _mspaces;
 };
-
 }
 }
 

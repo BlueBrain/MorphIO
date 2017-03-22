@@ -21,8 +21,8 @@
 #define BRAIN_NEURON_MORPHOLOGY
 
 #include <brain/api.h>
-#include <brain/types.h>
 #include <brain/neuron/types.h>
+#include <brain/types.h>
 
 #include <boost/noncopyable.hpp>
 #include <servus/serializable.h>
@@ -31,7 +31,6 @@ namespace brain
 {
 namespace neuron
 {
-
 /**
  * Wrapper around brion::Morphology with higher level functions.
  *
@@ -61,7 +60,7 @@ public:
      *        Radii will not be affected by this transformation.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
-    BRAIN_API Morphology( const URI& source, const Matrix4f& transform );
+    BRAIN_API Morphology(const URI& source, const Matrix4f& transform);
 
     /**
      * Create a morphology from a brion::Morphology, load all the data
@@ -72,8 +71,8 @@ public:
      *        Radii will not be affected by this transformation.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
-    BRAIN_API Morphology( const brion::Morphology& morphology,
-                          const Matrix4f& transform );
+    BRAIN_API Morphology(const brion::Morphology& morphology,
+                         const Matrix4f& transform);
 
     /**
      * Create a morphology from a URI and load all the data.
@@ -81,7 +80,7 @@ public:
      * @param source URI of the morphology data source.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
-    BRAIN_API explicit Morphology( const URI& source );
+    BRAIN_API explicit Morphology(const URI& source);
 
     /**
      * Create a morphology from a brion::Morphology and load all the data.
@@ -89,7 +88,7 @@ public:
      * @param morphology the brion::Morphology to load from.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
-    BRAIN_API explicit Morphology( const brion::Morphology& morphology );
+    BRAIN_API explicit Morphology(const brion::Morphology& morphology);
 
     BRAIN_API ~Morphology();
 
@@ -108,19 +107,19 @@ public:
     BRAIN_API const Vector2is& getApicals() const;
 
     /** Return the list of ids for the given section types. */
-    BRAIN_API uint32_ts getSectionIDs( const SectionTypes& types ) const;
+    BRAIN_API uint32_ts getSectionIDs(const SectionTypes& types) const;
 
     /**
      * Return the sections which have the given section type.
      * If type is SectionType::Soma an empty list is returned.
      */
-    BRAIN_API Sections getSections( SectionType type ) const;
+    BRAIN_API Sections getSections(SectionType type) const;
 
     /**
      * Return the sections which have any of the given section types.
      * No sections are returned for the type SectionType::Soma.
      */
-    BRAIN_API Sections getSections( const SectionTypes& types ) const;
+    BRAIN_API Sections getSections(const SectionTypes& types) const;
 
     /**
      * Return the Section with the given id.
@@ -128,7 +127,7 @@ public:
      * @throw runtime_error if the id is out of range or the given id refers to
      * a soma section.
      */
-    BRAIN_API Section getSection( const uint32_t& id ) const;
+    BRAIN_API Section getSection(const uint32_t& id) const;
 
     /** Return the object with the information about the neuron soma */
     BRAIN_API Soma getSoma() const;
@@ -141,12 +140,11 @@ public:
 
 private:
     friend class brain::Circuit;
-    Morphology( const void* data, const size_t size );
+    Morphology(const void* data, const size_t size);
     servus::Serializable::Data toBinary() const;
 
     Impl* const _impl;
 };
-
 }
 }
 #endif

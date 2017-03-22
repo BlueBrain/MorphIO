@@ -20,14 +20,16 @@
 #ifndef BRION_MESH
 #define BRION_MESH
 
+#include <boost/noncopyable.hpp>
 #include <brion/api.h>
 #include <brion/types.h>
-#include <boost/noncopyable.hpp>
 
 namespace brion
 {
-
-namespace detail { class Mesh; }
+namespace detail
+{
+class Mesh;
+}
 
 /** Read & write access to a Mesh file.
  *
@@ -49,7 +51,7 @@ public:
      * @param source filepath to mesh file
      * @throw std::runtime_error if file is not a valid mesh file
      */
-    BRION_API explicit Mesh( const std::string& source );
+    BRION_API explicit Mesh(const std::string& source);
 
     /** @return the version of the mesh */
     BRION_API MeshVersion getVersion() const;
@@ -98,7 +100,7 @@ public:
      * @param type the mesh structure type to look for
      * @return number of structural meshes
      */
-    BRION_API size_t getNumStructures( MeshStructure type ) const;
+    BRION_API size_t getNumStructures(MeshStructure type) const;
 
     /** Get the vertices of the given structure.
      *
@@ -108,8 +110,8 @@ public:
      * @param index the index of the mesh structure
      * @return vertices describing the structural mesh
      */
-    BRION_API Vector3fsPtr readStructureVertices( MeshStructure type,
-                                                  size_t index ) const;
+    BRION_API Vector3fsPtr readStructureVertices(MeshStructure type,
+                                                 size_t index) const;
 
     /**  Get the triangles of the given structure.
      *
@@ -119,8 +121,8 @@ public:
      * @param index the index of the mesh structure
      * @return triangles describing the structural mesh
      */
-    BRION_API uint32_tsPtr readStructureTriangles( MeshStructure type,
-                                                   size_t index ) const;
+    BRION_API uint32_tsPtr readStructureTriangles(MeshStructure type,
+                                                  size_t index) const;
 
     /** Get the triangle strip of the given structure.
      *
@@ -130,10 +132,9 @@ public:
      * @param index the index of the mesh structure
      * @return triangle strip describing the structural mesh
      */
-    BRION_API uint32_tsPtr readStructureTriStrip( MeshStructure type,
-                                                  size_t index ) const;
+    BRION_API uint32_tsPtr readStructureTriStrip(MeshStructure type,
+                                                 size_t index) const;
     //@}
-
 
     /** @name Write API */
     //@{
@@ -145,16 +146,16 @@ public:
      * @param version the output file format version
      * @throw std::runtime_error if file could not be opened for write access
      */
-    BRION_API Mesh( const std::string& source,
-                    MeshFormat format, bool overwrite = false,
-                    MeshVersion version = MESH_VERSION_1 );
+    BRION_API Mesh(const std::string& source, MeshFormat format,
+                   bool overwrite = false,
+                   MeshVersion version = MESH_VERSION_1);
 
     /** Write vertices describing the surface/membrane mesh of a neuron.
      *
      * @param vertices the vertices describing the surface/membrane mesh
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeVertices( const Vector3fs& vertices );
+    BRION_API void writeVertices(const Vector3fs& vertices);
 
     /** Write section indices for each vertex of the surface/membrane mesh.
      *
@@ -162,7 +163,7 @@ public:
      * @throw std::runtime_error if number of vertices does not match
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeVertexSections( const uint16_ts& vSections );
+    BRION_API void writeVertexSections(const uint16_ts& vSections);
 
     /** Write relative distances in the section for each vertex of the
      *  surface/membrane mesh.
@@ -171,7 +172,7 @@ public:
      * @throw std::runtime_error if number of vertices does not match
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeVertexDistances( const floats& vDistances );
+    BRION_API void writeVertexDistances(const floats& vDistances);
 
     /** Write triangles describing the surface/membrane mesh of a neuron.
      *
@@ -179,7 +180,7 @@ public:
      * @throw std::runtime_error if vertices were not written before
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeTriangles( const uint32_ts& triangles );
+    BRION_API void writeTriangles(const uint32_ts& triangles);
 
     /** Write section indices for each triangle of the surface/membrane mesh.
      *
@@ -188,7 +189,7 @@ public:
      * @throw std::runtime_error if called for binary meshes
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeTriangleSections( const uint16_ts& tSections );
+    BRION_API void writeTriangleSections(const uint16_ts& tSections);
 
     /** Write relative distances in the section for each triangle of the
      *  surface/membrane mesh.
@@ -198,7 +199,7 @@ public:
      * @throw std::runtime_error if called for binary meshes
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeTriangleDistances( const floats& tDistances );
+    BRION_API void writeTriangleDistances(const floats& tDistances);
 
     /** Write triangle strip describing the surface/membrane mesh of a neuron.
      *
@@ -206,7 +207,7 @@ public:
      * @throw std::runtime_error if vertices were not written before
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeTriStrip( const uint32_ts& tristrip );
+    BRION_API void writeTriStrip(const uint32_ts& tristrip);
 
     /** Write per-vertex normals for the surface/membrane mesh of a neuron.
      *
@@ -215,7 +216,7 @@ public:
      * @throw std::runtime_error if called for binary meshes
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeNormals( const Vector3fs& normals );
+    BRION_API void writeNormals(const Vector3fs& normals);
 
     /** Write vertices for one type of structural mesh.
      *
@@ -225,8 +226,8 @@ public:
      * @throw std::runtime_error if called for binary meshes
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeStructureVertices( const Vector3fs& vertices,
-                                           MeshStructure type, size_t index );
+    BRION_API void writeStructureVertices(const Vector3fs& vertices,
+                                          MeshStructure type, size_t index);
 
     /** Write triangles for one type of structural mesh.
      *
@@ -236,8 +237,8 @@ public:
      * @throw std::runtime_error if called for binary meshes
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeStructureTriangles( const uint32_ts& triangles,
-                                            MeshStructure type, size_t index);
+    BRION_API void writeStructureTriangles(const uint32_ts& triangles,
+                                           MeshStructure type, size_t index);
 
     /** Write the triangle strip for one type of structural mesh.
      *
@@ -247,8 +248,8 @@ public:
      * @throw std::runtime_error if called for binary meshes
      * @throw std::runtime_error if object not created with write ctor
      */
-    BRION_API void writeStructureTriStrip( const uint32_ts& tristrip,
-                                           MeshStructure type, size_t index);
+    BRION_API void writeStructureTriStrip(const uint32_ts& tristrip,
+                                          MeshStructure type, size_t index);
 
     /** Flush data to output. */
     BRION_API void flush();
@@ -257,7 +258,6 @@ public:
 private:
     detail::Mesh* _impl;
 };
-
 }
 
 #endif

@@ -18,8 +18,8 @@
  */
 
 #include "soma.h"
-#include "section.h"
 #include "morphologyImpl.h"
+#include "section.h"
 
 #include <boost/foreach.hpp>
 
@@ -27,22 +27,19 @@ namespace brain
 {
 namespace neuron
 {
-
 namespace
 {
-
-Vector3f _computeCentroid( const Vector4fs& points )
+Vector3f _computeCentroid(const Vector4fs& points)
 {
     Vector3f centroid;
-    BOOST_FOREACH( const Vector4f& point, points )
-        centroid += point.get_sub_vector< 3, 0 >();
-    centroid /= float( points.size( ));
+    BOOST_FOREACH (const Vector4f& point, points)
+        centroid += point.get_sub_vector<3, 0>();
+    centroid /= float(points.size());
     return centroid;
 }
-
 }
 
-Soma::Soma( Morphology::Impl* morphology )
+Soma::Soma(Morphology::Impl* morphology)
     : _morphology(morphology)
 {
     _morphology->ref();
@@ -53,17 +50,17 @@ Soma::~Soma()
     _morphology->unref();
 }
 
-Soma::Soma( const Soma& soma )
+Soma::Soma(const Soma& soma)
     : _morphology(soma._morphology)
 {
     _morphology->ref();
 }
 
-Soma& Soma::operator=( const Soma& soma )
+Soma& Soma::operator=(const Soma& soma)
 {
-    if( &soma == this )
+    if (&soma == this)
         return *this;
-    if( _morphology )
+    if (_morphology)
         _morphology->unref();
     _morphology = soma._morphology;
     _morphology->ref();
@@ -72,33 +69,32 @@ Soma& Soma::operator=( const Soma& soma )
 
 Vector4fs Soma::getProfilePoints() const
 {
-    return _morphology->getSectionSamples( _morphology->somaSection );
+    return _morphology->getSectionSamples(_morphology->somaSection);
 }
 
 float Soma::getMeanRadius() const
 {
     const Vector4fs points = getProfilePoints();
-    const Vector3f centroid = _computeCentroid( points );
+    const Vector3f centroid = _computeCentroid(points);
     float radius = 0;
-    BOOST_FOREACH( const Vector4f point, points )
-        radius += ( point.get_sub_vector< 3, 0 >() - centroid ).length();
-    return radius /= float( points.size( ));
+    BOOST_FOREACH (const Vector4f point, points)
+        radius += (point.get_sub_vector<3, 0>() - centroid).length();
+    return radius /= float(points.size());
 }
 
 Vector3f Soma::getCentroid() const
 {
-    return _computeCentroid( getProfilePoints( ));
+    return _computeCentroid(getProfilePoints());
 }
 
 Sections Soma::getChildren() const
 {
     const uint32_ts& children =
-        _morphology->getChildren( _morphology->somaSection );
+        _morphology->getChildren(_morphology->somaSection);
     Sections result;
-    BOOST_FOREACH( uint32_t id, children )
-        result.push_back( Section( id, _morphology ));
+    BOOST_FOREACH (uint32_t id, children)
+        result.push_back(Section(id, _morphology));
     return result;
 }
-
 }
 }

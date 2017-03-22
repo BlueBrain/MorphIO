@@ -29,15 +29,14 @@ namespace brain
 {
 namespace neuron
 {
-
-Section::Section( const uint32_t id, Morphology::Impl* morphology )
+Section::Section(const uint32_t id, Morphology::Impl* morphology)
     : _id(id)
     , _morphology(morphology)
 {
     _morphology->ref();
 
-    SectionRange range = morphology->getSectionRange( id );
-    if( range.second <= range.first )
+    SectionRange range = morphology->getSectionRange(id);
+    if (range.second <= range.first)
         LBWARN << "Dereferencing broken morphology section " << _id
                << std::endl;
 }
@@ -47,18 +46,18 @@ Section::~Section()
     _morphology->unref();
 }
 
-Section::Section( const Section& section)
+Section::Section(const Section& section)
     : _id(section._id)
     , _morphology(section._morphology)
 {
     _morphology->ref();
 }
 
-Section& Section::operator=( const Section& section)
+Section& Section::operator=(const Section& section)
 {
-    if( &section == this )
+    if (&section == this)
         return *this;
-    if( _morphology )
+    if (_morphology)
         _morphology->unref();
     _id = section._id;
     _morphology = section._morphology;
@@ -66,14 +65,14 @@ Section& Section::operator=( const Section& section)
     return *this;
 }
 
-bool Section::operator==( const Section& other ) const
+bool Section::operator==(const Section& other) const
 {
     return other._id == _id && other._morphology == _morphology;
 }
 
-bool Section::operator!=( const Section& other ) const
+bool Section::operator!=(const Section& other) const
 {
-    return !( *this == other );
+    return !(*this == other);
 }
 uint32_t Section::getID() const
 {
@@ -82,56 +81,55 @@ uint32_t Section::getID() const
 
 SectionType Section::getType() const
 {
-    return static_cast< SectionType >(( *_morphology->types )[_id] );
+    return static_cast<SectionType>((*_morphology->types)[_id]);
 }
 
 float Section::getLength() const
 {
-    return _morphology->getSectionLength( _id );
+    return _morphology->getSectionLength(_id);
 }
 
 Vector4fs Section::getSamples() const
 {
-    return _morphology->getSectionSamples( _id );
+    return _morphology->getSectionSamples(_id);
 }
 
-Vector4fs Section::getSamples( const floats& points ) const
+Vector4fs Section::getSamples(const floats& points) const
 {
-    return _morphology->getSectionSamples( _id, points );
+    return _morphology->getSectionSamples(_id, points);
 }
 
 float Section::getDistanceToSoma() const
 {
-    return _morphology->getDistanceToSoma( _id );
+    return _morphology->getDistanceToSoma(_id);
 }
 
 floats Section::getSampleDistancesToSoma() const
 {
-    return _morphology->getSampleDistancesToSoma( _id );
+    return _morphology->getSampleDistancesToSoma(_id);
 }
 
 bool Section::hasParent() const
 {
-    const int32_t parent = ( *_morphology->sections )[_id][1];
+    const int32_t parent = (*_morphology->sections)[_id][1];
     return parent != -1 && uint32_t(parent) != _morphology->somaSection;
 }
 Section Section::getParent() const
 {
-    const int32_t parent = ( *_morphology->sections )[_id][1];
-    if( parent == -1 || uint32_t(parent) == _morphology->somaSection )
-        LBTHROW( std::runtime_error( "Cannot access parent section" ));
-    return Section( parent, _morphology );
+    const int32_t parent = (*_morphology->sections)[_id][1];
+    if (parent == -1 || uint32_t(parent) == _morphology->somaSection)
+        LBTHROW(std::runtime_error("Cannot access parent section"));
+    return Section(parent, _morphology);
 }
 
 Sections Section::getChildren() const
 {
-    const uint32_ts& children = _morphology->getChildren( _id );
+    const uint32_ts& children = _morphology->getChildren(_id);
     Sections result;
-    result.reserve( children.size( ));
-    BOOST_FOREACH( uint32_t id, children )
-        result.push_back( Section( id, _morphology ));
+    result.reserve(children.size());
+    BOOST_FOREACH (uint32_t id, children)
+        result.push_back(Section(id, _morphology));
     return result;
 }
-
 }
 }

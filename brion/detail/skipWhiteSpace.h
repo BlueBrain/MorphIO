@@ -26,20 +26,20 @@ namespace brion
 {
 namespace detail
 {
-
 struct SkipWhiteSpace
 {
-    explicit SkipWhiteSpace( size_t& line_count )
-        : _line_count( &line_count )
-    {}
-
-    std::istream& operator()( std::istream& in ) const
+    explicit SkipWhiteSpace(size_t& line_count)
+        : _line_count(&line_count)
     {
-        while ( isspace( in.peek( )))
+    }
+
+    std::istream& operator()(std::istream& in) const
+    {
+        while (isspace(in.peek()))
         {
-            if ( in.get() == '\n' )
+            if (in.get() == '\n')
             {
-                ++( *_line_count );
+                ++(*_line_count);
             }
         }
         return in;
@@ -48,11 +48,10 @@ struct SkipWhiteSpace
     size_t* const _line_count;
 };
 
-inline std::istream& operator >> ( std::istream& in, const SkipWhiteSpace& ws )
+inline std::istream& operator>>(std::istream& in, const SkipWhiteSpace& ws)
 {
-    return ws( in );
+    return ws(in);
 }
-
 }
 }
 #endif

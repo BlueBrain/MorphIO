@@ -29,18 +29,17 @@ namespace brion
 {
 namespace plugin
 {
-
 /** A NEST spike report reader. */
 class SpikeReportNEST : public SpikeReportASCII
 {
 public:
-    explicit SpikeReportNEST( const SpikeReportInitData& initData );
+    explicit SpikeReportNEST(const SpikeReportInitData& initData);
 
-    static bool handles( const SpikeReportInitData& initData );
+    static bool handles(const SpikeReportInitData& initData);
     static std::string getDescription();
 
     void close() final;
-    void write( const Spikes& spikes ) final;
+    void write(const Spikes& spikes) final;
 };
 }
 }

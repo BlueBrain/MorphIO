@@ -22,76 +22,73 @@
 #include "detail/lockHDF5.h"
 #include "detail/silenceHDF5.h"
 
-#include <boost/lexical_cast.hpp>
 #include <H5Cpp.h>
+#include <boost/lexical_cast.hpp>
 #include <lunchbox/debug.h>
 #include <lunchbox/log.h>
 #include <lunchbox/scopedMutex.h>
-
 
 namespace brion
 {
 namespace detail
 {
-
 const hsize_t NUMATTRIBUTES = 3;
 
 class SynapseSummary
 {
 public:
-    explicit SynapseSummary( const std::string& source )
+    explicit SynapseSummary(const std::string& source)
     {
-        lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
+        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
 
         try
         {
             SilenceHDF5 silence;
-            _file.openFile( source, H5F_ACC_RDONLY, H5P_DEFAULT );
+            _file.openFile(source, H5F_ACC_RDONLY, H5P_DEFAULT);
         }
-        catch( ... )
+        catch (...)
         {
-            const std::string error = "Could not open summary HDF5 file: '" +
-                                      source + "'";
-            LBTHROW( std::runtime_error( error ));
+            const std::string error =
+                "Could not open summary HDF5 file: '" + source + "'";
+            LBTHROW(std::runtime_error(error));
         }
 
         try
         {
             SilenceHDF5 silence;
-            const std::string& datasetName = _file.getObjnameByIdx( 0 );
-            const uint32_t gid = boost::lexical_cast< uint32_t >
-                                                     ( datasetName.substr( 1 ));
-            if( !_loadDataset( gid ))
+            const std::string& datasetName = _file.getObjnameByIdx(0);
+            const uint32_t gid =
+                boost::lexical_cast<uint32_t>(datasetName.substr(1));
+            if (!_loadDataset(gid))
                 throw "error";
         }
-        catch( ... )
+        catch (...)
         {
-            LBTHROW( std::runtime_error( source + " not a valid synapse summary"
-                                         " file"));
+            LBTHROW(std::runtime_error(source + " not a valid synapse summary"
+                                                " file"));
         }
     }
 
     ~SynapseSummary()
     {
-        lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
+        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
 
-        if( _file.getId( ))
+        if (_file.getId())
             _file.close();
     }
 
-    SynapseSummaryMatrix read( const uint32_t gid )
+    SynapseSummaryMatrix read(const uint32_t gid)
     {
-        lunchbox::ScopedWrite mutex( detail::_hdf5Lock );
+        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
 
-        if( !_loadDataset( gid ))
+        if (!_loadDataset(gid))
             return SynapseSummaryMatrix();
 
-        SynapseSummaryMatrix values( boost::extents[_dims[0]][_dims[1]] );
-        const hsize_t targetSizes[2] = { _dims[0], _dims[1] };
-        H5::DataSpace targetspace( 2, targetSizes );
+        SynapseSummaryMatrix values(boost::extents[_dims[0]][_dims[1]]);
+        const hsize_t targetSizes[2] = {_dims[0], _dims[1]};
+        H5::DataSpace targetspace(2, targetSizes);
 
-        _dataset.read( values.data(), H5::PredType::NATIVE_UINT32,
-                       targetspace );
+        _dataset.read(values.data(), H5::PredType::NATIVE_UINT32, targetspace);
 
         return values;
     }
@@ -102,7 +99,7 @@ private:
     mutable H5::DataSpace _dataspace;
     mutable hsize_t _dims[2];
 
-    bool _loadDataset( const uint32_t gid ) const
+    bool _loadDataset(const uint32_t gid) const
     {
         std::stringstream name;
         name << "a" << gid;
@@ -110,9 +107,9 @@ private:
         try
         {
             SilenceHDF5 silence;
-            _dataset = _file.openDataSet( name.str( ));
+            _dataset = _file.openDataSet(name.str());
         }
-        catch( const H5::Exception& )
+        catch (const H5::Exception&)
         {
             LBVERB << "Could not find synapse summary dataset for "
                    << name.str() << ": " << std::endl;
@@ -120,28 +117,28 @@ private:
         }
 
         _dataspace = _dataset.getSpace();
-        if( _dataspace.getSimpleExtentNdims() != 2 )
+        if (_dataspace.getSimpleExtentNdims() != 2)
         {
             LBERROR << "Synapse summary dataset is not 2 dimensional"
                     << std::endl;
             return false;
         }
 
-        if( _dataspace.getSimpleExtentDims( _dims ) < 0 )
+        if (_dataspace.getSimpleExtentDims(_dims) < 0)
         {
             LBERROR << "Synapse summary dataset dimensions could not be "
                     << "retrieved" << std::endl;
             return false;
         }
 
-        if( _dims[1] != NUMATTRIBUTES )
+        if (_dims[1] != NUMATTRIBUTES)
         {
-            LBERROR << "Synapse summary dataset does not have "
-                    << NUMATTRIBUTES << " attributes" << std::endl;
+            LBERROR << "Synapse summary dataset does not have " << NUMATTRIBUTES
+                    << " attributes" << std::endl;
             return false;
         }
 
-        if( _dims[0] == 0 )
+        if (_dims[0] == 0)
         {
             LBINFO << "No synapse summary for GID " << gid << std::endl;
             return false;
@@ -152,8 +149,8 @@ private:
 };
 }
 
-SynapseSummary::SynapseSummary( const std::string& source )
-    : _impl( new detail::SynapseSummary( source ))
+SynapseSummary::SynapseSummary(const std::string& source)
+    : _impl(new detail::SynapseSummary(source))
 {
 }
 
@@ -162,9 +159,8 @@ SynapseSummary::~SynapseSummary()
     delete _impl;
 }
 
-SynapseSummaryMatrix SynapseSummary::read( const uint32_t gid ) const
+SynapseSummaryMatrix SynapseSummary::read(const uint32_t gid) const
 {
-    return _impl->read( gid );
+    return _impl->read(gid);
 }
-
 }

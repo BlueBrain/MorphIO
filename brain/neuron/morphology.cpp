@@ -33,43 +33,42 @@ namespace brain
 {
 namespace neuron
 {
-
 servus::Serializable::Data Morphology::toBinary() const
 {
     return _impl->toBinary();
 }
 
-Morphology::Morphology( const void* data, const size_t size )
-    : _impl( new Impl( data, size ))
+Morphology::Morphology(const void* data, const size_t size)
+    : _impl(new Impl(data, size))
 {
     _impl->ref();
 }
 
-Morphology::Morphology( const URI& source, const Matrix4f& transform )
-    : _impl( new Impl( brion::Morphology( source.getPath( ))))
+Morphology::Morphology(const URI& source, const Matrix4f& transform)
+    : _impl(new Impl(brion::Morphology(source.getPath())))
 {
     _impl->ref();
-    _impl->transform( transform );
+    _impl->transform(transform);
     _impl->transformation = transform;
 }
 
-Morphology::Morphology( const brion::Morphology& morphology,
-                        const Matrix4f& transform )
-    : _impl( new Impl( morphology ))
+Morphology::Morphology(const brion::Morphology& morphology,
+                       const Matrix4f& transform)
+    : _impl(new Impl(morphology))
 {
     _impl->ref();
-    _impl->transform( transform );
+    _impl->transform(transform);
     _impl->transformation = transform;
 }
 
-Morphology::Morphology( const URI& source )
-    : _impl( new Impl( brion::Morphology( source.getPath( ))))
+Morphology::Morphology(const URI& source)
+    : _impl(new Impl(brion::Morphology(source.getPath())))
 {
     _impl->ref();
 }
 
-Morphology::Morphology( const brion::Morphology& morphology )
-    : _impl( new Impl( morphology ))
+Morphology::Morphology(const brion::Morphology& morphology)
+    : _impl(new Impl(morphology))
 {
     _impl->ref();
 }
@@ -91,7 +90,7 @@ const Vector2is& Morphology::getSections() const
 
 const SectionTypes& Morphology::getSectionTypes() const
 {
-    return reinterpret_cast< std::vector<SectionType>& >( *_impl->types );
+    return reinterpret_cast<std::vector<SectionType>&>(*_impl->types);
 }
 
 const Vector2is& Morphology::getApicals() const
@@ -99,55 +98,53 @@ const Vector2is& Morphology::getApicals() const
     return *_impl->apicals;
 }
 
-uint32_ts Morphology::getSectionIDs( const SectionTypes& types ) const
+uint32_ts Morphology::getSectionIDs(const SectionTypes& types) const
 {
-    return _impl->getSectionIDs( types, false );
+    return _impl->getSectionIDs(types, false);
 }
 
-Sections Morphology::getSections( const SectionType type ) const
+Sections Morphology::getSections(const SectionType type) const
 {
-    const SectionTypes types( 1, type );
-    const uint32_ts ids = _impl->getSectionIDs( types, true );
+    const SectionTypes types(1, type);
+    const uint32_ts ids = _impl->getSectionIDs(types, true);
     Sections result;
-    BOOST_FOREACH( const uint32_t id, ids )
-        result.push_back( Section( id, _impl ));
+    BOOST_FOREACH (const uint32_t id, ids)
+        result.push_back(Section(id, _impl));
     return result;
 }
 
-Sections Morphology::getSections( const SectionTypes& types ) const
+Sections Morphology::getSections(const SectionTypes& types) const
 {
-    const uint32_ts ids = _impl->getSectionIDs( types, true );
+    const uint32_ts ids = _impl->getSectionIDs(types, true);
     Sections result;
-    BOOST_FOREACH( const uint32_t id, ids )
-        result.push_back( Section( id, _impl ));
+    BOOST_FOREACH (const uint32_t id, ids)
+        result.push_back(Section(id, _impl));
     return result;
 }
 
-Section Morphology::getSection( const uint32_t& id ) const
+Section Morphology::getSection(const uint32_t& id) const
 {
-    if(( *_impl->types )[id] == brion::enums::SECTION_SOMA )
-        LBTHROW(
-            std::runtime_error( "The soma cannot be accessed as a Section" ));
+    if ((*_impl->types)[id] == brion::enums::SECTION_SOMA)
+        LBTHROW(std::runtime_error("The soma cannot be accessed as a Section"));
 
-    if( _impl->sections->size() <= id )
+    if (_impl->sections->size() <= id)
     {
         std::stringstream msg;
         msg << "Section ID out of range: " << id;
-        LBTHROW( std::runtime_error( msg.str( )));
+        LBTHROW(std::runtime_error(msg.str()));
     }
 
-    return Section( id, _impl );
+    return Section(id, _impl);
 }
 
 Soma Morphology::getSoma() const
 {
-    return Soma( _impl );
+    return Soma(_impl);
 }
 
 const Matrix4f& Morphology::getTransformation() const
 {
     return _impl->transformation;
 }
-
 }
 }

@@ -25,7 +25,6 @@
 
 namespace brain
 {
-
 /**
  * A proxy object returned by the Synapses container to access data for a
  * particular synapse.
@@ -114,12 +113,11 @@ public:
 
 private:
     friend class Synapses;
-    Synapse( const Synapses& synapses, size_t index );
+    Synapse(const Synapses& synapses, size_t index);
 
     const Synapses& _synapses;
     const size_t _index;
 };
-
 }
 
 #endif

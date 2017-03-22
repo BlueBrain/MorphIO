@@ -25,30 +25,31 @@
 
 namespace brain
 {
-
 class SpikeReportReader::_Impl
 {
 public:
-    explicit _Impl( const brion::URI& uri )
-        : _report( uri, brion::MODE_READ )
-    {}
+    explicit _Impl(const brion::URI& uri)
+        : _report(uri, brion::MODE_READ)
+    {
+    }
 
-    _Impl( const brion::URI& uri, const GIDSet& subset )
-        : _report( uri, subset )
-    {}
+    _Impl(const brion::URI& uri, const GIDSet& subset)
+        : _report(uri, subset)
+    {
+    }
 
     brion::SpikeReport _report;
     brion::Spikes _collected;
 };
 
-SpikeReportReader::SpikeReportReader( const brion::URI& uri )
-    : _impl( new _Impl( uri ))
+SpikeReportReader::SpikeReportReader(const brion::URI& uri)
+    : _impl(new _Impl(uri))
 {
 }
 
-SpikeReportReader::SpikeReportReader( const brion::URI& uri,
-                                      const GIDSet& subset )
-    : _impl( new _Impl( uri, subset ))
+SpikeReportReader::SpikeReportReader(const brion::URI& uri,
+                                     const GIDSet& subset)
+    : _impl(new _Impl(uri, subset))
 {
 }
 
@@ -57,17 +58,16 @@ SpikeReportReader::~SpikeReportReader()
     delete _impl;
 }
 
-Spikes SpikeReportReader::getSpikes( const float startTime,
-                                     const float endTime )
+Spikes SpikeReportReader::getSpikes(const float startTime, const float endTime)
 {
-    if( endTime <= startTime )
-        LBTHROW( std::logic_error(
-                     "Start time should be strictly inferior to end time" ));
+    if (endTime <= startTime)
+        LBTHROW(std::logic_error(
+            "Start time should be strictly inferior to end time"));
 
-    if( _impl->_report.supportsBackwardSeek( ))
+    if (_impl->_report.supportsBackwardSeek())
     {
-        _impl->_report.seek( startTime ).get();
-        return _impl->_report.readUntil( endTime ).get();
+        _impl->_report.seek(startTime).get();
+        return _impl->_report.readUntil(endTime).get();
     }
 
     // In reports that don't support seek we just want to move forward at
@@ -76,20 +76,22 @@ Spikes SpikeReportReader::getSpikes( const float startTime,
     // the latest value possible. We also try to read always, even if all spikes
     // in the requested window have been already collected.
     auto& collected = _impl->_collected;
-    auto spikes = _impl->_report.read( endTime ).get();
-    if( !spikes.empty( ))
+    auto spikes = _impl->_report.read(endTime).get();
+    if (!spikes.empty())
     {
-        collected.reserve( collected.size() + spikes.size( ));
-        collected.insert( collected.end(), spikes.begin(), spikes.end( ));
+        collected.reserve(collected.size() + spikes.size());
+        collected.insert(collected.end(), spikes.begin(), spikes.end());
     }
 
-    return Spikes(
-        std::lower_bound( collected.begin(), collected.end(), startTime,
-                          []( const Spike& spike, const float val ){
-                              return spike.first < val; }),
-        std::lower_bound( collected.begin(), collected.end(), endTime,
-                          []( const Spike& spike, const float val ){
-                              return spike.first < val; }));
+    return Spikes(std::lower_bound(collected.begin(), collected.end(),
+                                   startTime,
+                                   [](const Spike& spike, const float val) {
+                                       return spike.first < val;
+                                   }),
+                  std::lower_bound(collected.begin(), collected.end(), endTime,
+                                   [](const Spike& spike, const float val) {
+                                       return spike.first < val;
+                                   }));
 }
 
 float SpikeReportReader::getEndTime() const
@@ -106,5 +108,4 @@ void SpikeReportReader::close()
 {
     _impl->_report.close();
 }
-
 }

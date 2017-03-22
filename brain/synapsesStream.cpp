@@ -19,24 +19,23 @@
  */
 
 #include "synapsesStream.h"
-
 #include "synapses.h"
+
 #include "detail/synapsesStream.h"
 
 namespace brain
 {
-
-SynapsesStream::SynapsesStream( const Circuit& circuit, const GIDSet& gids,
-                                const bool afferent,
-                                const SynapsePrefetch prefetch )
-    : _impl( new detail::SynapsesStream( circuit, gids, afferent, prefetch ))
+SynapsesStream::SynapsesStream(const Circuit& circuit, const GIDSet& gids,
+                               const bool afferent,
+                               const SynapsePrefetch prefetch)
+    : _impl(new detail::SynapsesStream(circuit, gids, afferent, prefetch))
 {
 }
 
-SynapsesStream::SynapsesStream( const Circuit& circuit, const GIDSet& preGIDs,
-                                const GIDSet& postGIDs,
-                                const SynapsePrefetch prefetch )
-    : _impl( new detail::SynapsesStream( circuit, preGIDs, postGIDs, prefetch ))
+SynapsesStream::SynapsesStream(const Circuit& circuit, const GIDSet& preGIDs,
+                               const GIDSet& postGIDs,
+                               const SynapsePrefetch prefetch)
+    : _impl(new detail::SynapsesStream(circuit, preGIDs, postGIDs, prefetch))
 {
 }
 
@@ -44,15 +43,15 @@ SynapsesStream::~SynapsesStream()
 {
 }
 
-SynapsesStream::SynapsesStream( SynapsesStream&& rhs )
-    : _impl( std::move( rhs._impl ))
+SynapsesStream::SynapsesStream(SynapsesStream&& rhs)
+    : _impl(std::move(rhs._impl))
 {
 }
 
-SynapsesStream& SynapsesStream::operator=( SynapsesStream&& rhs )
+SynapsesStream& SynapsesStream::operator=(SynapsesStream&& rhs)
 {
-    if( this != &rhs )
-        _impl = std::move( rhs._impl );
+    if (this != &rhs)
+        _impl = std::move(rhs._impl);
     return *this;
 }
 
@@ -66,9 +65,8 @@ size_t SynapsesStream::getRemaining() const
     return _impl->getRemaining();
 }
 
-std::future< Synapses > SynapsesStream::read( const size_t count )
+std::future<Synapses> SynapsesStream::read(const size_t count)
 {
-    return _impl->read( count );
+    return _impl->read(count);
 }
-
 }

@@ -28,8 +28,10 @@
 
 namespace brion
 {
-
-namespace detail { class BlueConfig; }
+namespace detail
+{
+class BlueConfig;
+}
 
 /** Read access to a BlueConfig or CircuitConfig file.
  *
@@ -51,7 +53,7 @@ public:
      *                           CircuitConfig file
      * @version 1.0
      */
-    BRION_API explicit BlueConfig( const std::string& source );
+    BRION_API explicit BlueConfig(const std::string& source);
 
     /** Get names of given section type.
      *
@@ -60,7 +62,7 @@ public:
      * @version 1.0
      */
     BRION_API
-    const Strings& getSectionNames( const BlueConfigSection section ) const;
+    const Strings& getSectionNames(const BlueConfigSection section) const;
 
     /** Get value as string for key in given section.
      *
@@ -70,9 +72,9 @@ public:
      * @return value as string of the given section & key, empty if not found
      * @version 1.0
      */
-    BRION_API const std::string& get( const BlueConfigSection section,
-                                      const std::string& sectionName,
-                                      const std::string& key ) const;
+    BRION_API const std::string& get(const BlueConfigSection section,
+                                     const std::string& sectionName,
+                                     const std::string& key) const;
 
     /** Get value as type T for key in given section.
      *
@@ -83,12 +85,12 @@ public:
      * @throw boost::bad_lexical_cast if value cannot be casted to type T
      * @version 1.0
      */
-    template< typename T >
-    T get( const BlueConfigSection section, const std::string& sectionName,
-           const std::string& key ) const
+    template <typename T>
+    T get(const BlueConfigSection section, const std::string& sectionName,
+          const std::string& key) const
     {
-        const std::string& val = get( section, sectionName, key );
-        return val.empty() ? T() : boost::lexical_cast< T >( val );
+        const std::string& val = get(section, sectionName, key);
+        return val.empty() ? T() : boost::lexical_cast<T>(val);
     }
 
     /**
@@ -97,7 +99,6 @@ public:
      */
     BRION_API Targets getTargets() const;
     //@}
-
 
     /** @name Semantic read API */
     //@{
@@ -124,7 +125,7 @@ public:
     /** @return the URI to the named report. @sa CompartmentReport
      * @version 1.7
      */
-    BRION_API URI getReportSource( const std::string& report ) const;
+    BRION_API URI getReportSource(const std::string& report) const;
 
     /**
      * @return the URI to the default spike data source. @sa SpikeReport
@@ -149,7 +150,7 @@ public:
      * @throw  std::runtime_error if target is invalid
      * @version 1.7
      */
-    BRION_API GIDSet parseTarget( const std::string& target ) const;
+    BRION_API GIDSet parseTarget(const std::string& target) const;
 
     /** @return the simulation timestep in ms or NaN if undefined.
      * @version 1.7
@@ -158,14 +159,13 @@ public:
     //@}
 
 private:
-    friend std::ostream& operator << ( std::ostream&, const BlueConfig& );
+    friend std::ostream& operator<<(std::ostream&, const BlueConfig&);
 
     detail::BlueConfig* const _impl;
 };
 
 /** Stream out content of BlueConfig or CircuitConfig file. */
-std::ostream& operator << ( std::ostream&, const BlueConfig& );
-
+std::ostream& operator<<(std::ostream&, const BlueConfig&);
 }
 
 #endif

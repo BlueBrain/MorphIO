@@ -29,24 +29,23 @@ namespace brion
 {
 namespace plugin
 {
-
 class MorphologyHDF5 : public MorphologyPlugin
 {
 public:
     /** Create a new parser for an H5 morphology */
-    explicit MorphologyHDF5( const MorphologyInitData& initData );
+    explicit MorphologyHDF5(const MorphologyInitData& initData);
 
     ~MorphologyHDF5();
 
     /** Check if this plugin can handle the given uri. */
-    static bool handles( const MorphologyInitData& initData );
+    static bool handles(const MorphologyInitData& initData);
     static std::string getDescription();
 
     CellFamily getCellFamily() const final;
 
-    Vector4fsPtr readPoints( MorphologyRepairStage stage ) const final;
+    Vector4fsPtr readPoints(MorphologyRepairStage stage) const final;
 
-    Vector2isPtr readSections( MorphologyRepairStage stage ) const final;
+    Vector2isPtr readSections(MorphologyRepairStage stage) const final;
 
     SectionTypesPtr readSectionTypes() const final;
 
@@ -56,17 +55,17 @@ public:
 
     MorphologyVersion getVersion() const final;
 
-    void writePoints( const Vector4fs& points,
-                      MorphologyRepairStage stage ) final;
+    void writePoints(const Vector4fs& points,
+                     MorphologyRepairStage stage) final;
 
-    void writeSections( const Vector2is& sections,
-                        MorphologyRepairStage stage ) final;
+    void writeSections(const Vector2is& sections,
+                       MorphologyRepairStage stage) final;
 
-    void writeSectionTypes( const SectionTypes& types ) final;
+    void writeSectionTypes(const SectionTypes& types) final;
 
-    void writeApicals( const Vector2is& apicals ) final;
+    void writeApicals(const Vector2is& apicals) final;
 
-    void writePerimeters( const floats& perimeters ) final;
+    void writePerimeters(const floats& perimeters) final;
 
     void flush() final;
 
@@ -84,20 +83,19 @@ private:
     CellFamily _family;
     bool _write;
 
-    void _checkVersion( const std::string& source );
+    void _checkVersion(const std::string& source);
     void _selectRepairStage();
 
     void _resolveV1();
 
-    void _writeV11Metadata( const MorphologyInitData& initData );
+    void _writeV11Metadata(const MorphologyInitData& initData);
     bool _readV11Metadata();
 
     bool _readV2Metadata();
     void _writeV2Metadata();
 
-    H5::DataSet _getStructureDataSet( size_t nSections );
+    H5::DataSet _getStructureDataSet(size_t nSections);
 };
-
 }
 }
 

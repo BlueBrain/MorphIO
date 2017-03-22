@@ -25,12 +25,10 @@ namespace brion
 {
 namespace detail
 {
-
 #ifdef H5_HAVE_THREADSAFE
-std::mutex *_hdf5Lock(nullptr);
+std::mutex* _hdf5Lock(nullptr);
 #else
-std::mutex *_hdf5Lock(new std::mutex);
+std::mutex* _hdf5Lock(new std::mutex);
 #endif
-
 }
 }

@@ -23,42 +23,39 @@
 #include "docstrings.h"
 #include "helpers.h"
 
-#include <brain/types.h>
 #include <brain/spikeReportReader.h>
+#include <brain/types.h>
 
 namespace bp = boost::python;
 
 namespace brain
 {
-
 namespace
 {
-SpikeReportReaderPtr _initURI( const std::string& uri )
+SpikeReportReaderPtr _initURI(const std::string& uri)
 {
-    return SpikeReportReaderPtr( new SpikeReportReader( brion::URI( uri )));
+    return SpikeReportReaderPtr(new SpikeReportReader(brion::URI(uri)));
 }
 
-SpikeReportReaderPtr _initURIandGIDSet( const std::string& uri,
-                                        bp::object gids )
+SpikeReportReaderPtr _initURIandGIDSet(const std::string& uri, bp::object gids)
 {
     return SpikeReportReaderPtr(
-        new SpikeReportReader( brion::URI( uri ), gidsFromPython( gids )));
+        new SpikeReportReader(brion::URI(uri), gidsFromPython(gids)));
 }
 
 bp::object SpikeReportReader_getSpikes(SpikeReportReader& reader,
                                        const float startTime,
-                                       const float endTime )
+                                       const float endTime)
 {
-    return toNumpy( reader.getSpikes( startTime, endTime ));
+    return toNumpy(reader.getSpikes(startTime, endTime));
 }
 }
 
 void export_SpikeReportReader()
 {
+    const auto selfarg = bp::arg("self");
 
-const auto selfarg = bp::arg( "self" );
-
-// clang-format off
+    // clang-format off
 bp::class_< SpikeReportReader, boost::noncopyable >(
     "SpikeReportReader", bp::no_init )
     .def( "__init__", bp::make_constructor( _initURI ),
@@ -75,7 +72,6 @@ bp::class_< SpikeReportReader, boost::noncopyable >(
     .add_property( "has_ended", &SpikeReportReader::hasEnded,
                    DOXY_FN( brain::SpikeReportReader::hasEnded ))
     ;
-// clang-format on
+    // clang-format on
 }
-
 }

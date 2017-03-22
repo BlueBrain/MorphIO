@@ -60,7 +60,8 @@ public:
      * The State enum : describe the state of the report
      * State::ok means that the report is ready to be read/written
      * State::ended means that the report end is reached (in read mode)
-     * State::failed means that a error occured when readyn or writing the report
+     * State::failed means that a error occured when readyn or writing the
+     * report
      */
     enum class State
     {
@@ -89,7 +90,7 @@ public:
      *        registered spike report plugin.
      * @version 2.0
      */
-    BRION_API SpikeReport( const URI& uri, int mode = MODE_READ );
+    BRION_API SpikeReport(const URI& uri, int mode = MODE_READ);
 
     /**
      * Open a report in read mode with a subset selection.
@@ -101,7 +102,7 @@ public:
      *        data.
      * @version 2.0
      */
-    BRION_API SpikeReport( const URI& uri, const GIDSet& ids );
+    BRION_API SpikeReport(const URI& uri, const GIDSet& ids);
 
     /**
      * Release all resources.
@@ -110,8 +111,8 @@ public:
      */
     BRION_API ~SpikeReport();
 
-    BRION_API SpikeReport( SpikeReport&& );
-    BRION_API SpikeReport& operator = ( SpikeReport&& );
+    BRION_API SpikeReport(SpikeReport&&);
+    BRION_API SpikeReport& operator=(SpikeReport&&);
 
     /** @return the descriptions of all loaded report backends. @version 1.10 */
     BRION_API static std::string getDescriptions();
@@ -213,11 +214,12 @@ public:
      *        means that as much data as possible will be fetched without
      *        a minimum.
      * @throw std::logic_error if one of the preconditions is not fulfilled.
-     * @note Until the completion of this operation, the internal state of the SpikeReport
+     * @note Until the completion of this operation, the internal state of the
+     * SpikeReport
      * may change.
      * @version 2.0
      */
-    BRION_API std::future< Spikes > read( float min );
+    BRION_API std::future<Spikes> read(float min);
 
     /**
      * Read spikes until getCurrentTime() >= max, the end of the report is
@@ -233,23 +235,26 @@ public:
      * Postcondition: If r.getState() == State::ok, then
      *                r.getCurrentTime() >= max
      * @throw std::runtime_error if the precondition does not hold.
-     * @note Until the completion of this operation, the internal state of the SpikeReport
+     * @note Until the completion of this operation, the internal state of the
+     * SpikeReport
      * may change.
      * @sa seek()
      * @version 2.0
      */
-    BRION_API std::future< Spikes > readUntil( float max );
+    BRION_API std::future<Spikes> readUntil(float max);
 
     /**
      * Seek to a given absolute timestamp.
      *
      * If toTimestamp >= getCurrentTime() and the report was open for reading,
-     * data will be skipped forward until the timestamp is made current. In write
+     * data will be skipped forward until the timestamp is made current. In
+     * write
      * mode for streams, consumers are notified about the new timestamp.
      *
      * The case toTimestamp < getCurrentTime() is only supported by file
      * based reports.
-     * In write mode, seeks are only supported in binary reports. Forward seeking
+     * In write mode, seeks are only supported in binary reports. Forward
+     * seeking
      * simply updates getCurrentTime() and backward seeking followed by a write,
      * will overwrite the existing data.
      *
@@ -271,11 +276,12 @@ public:
      *
      * @throw std::runtime_error if a precondition does not hold or the
      *        operation is not supported by the implementation.
-     * @note Until the completion of this operation, the internal state of the SpikeReport
+     * @note Until the completion of this operation, the internal state of the
+     * SpikeReport
      * may change.
      * @version 2.0
      */
-    BRION_API std::future< void > seek( float toTimeStamp );
+    BRION_API std::future<void> seek(float toTimeStamp);
 
     /**
      * Write the given spikes to the output.
@@ -292,7 +298,7 @@ public:
      * @throw std::logic_error if a precondition does not hold
      * @version 2.0
      */
-    BRION_API void write( const Spikes& spikes );
+    BRION_API void write(const Spikes& spikes);
 
     /**
      * @return Whether the report supports seek to t < getCurrentTime() or not.
@@ -301,16 +307,16 @@ public:
     BRION_API bool supportsBackwardSeek() const;
 
 private:
-    std::unique_ptr< detail::SpikeReport > _impl;
+    std::unique_ptr<detail::SpikeReport> _impl;
 
-    SpikeReport( const SpikeReport& ) = delete;
-    SpikeReport& operator = ( const SpikeReport& ) = delete;
+    SpikeReport(const SpikeReport&) = delete;
+    SpikeReport& operator=(const SpikeReport&) = delete;
 };
 
-inline std::ostream& operator<<( std::ostream& stream,
-                                 const brion::SpikeReport::State state )
+inline std::ostream& operator<<(std::ostream& stream,
+                                const brion::SpikeReport::State state)
 {
-    switch ( state )
+    switch (state)
     {
     case brion::SpikeReport::State::ok:
         return stream << "ok";

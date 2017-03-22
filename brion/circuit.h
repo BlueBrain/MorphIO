@@ -19,13 +19,12 @@
 #ifndef BRION_CIRCUIT
 #define BRION_CIRCUIT
 
+#include <boost/noncopyable.hpp>
 #include <brion/api.h>
 #include <brion/types.h>
-#include <boost/noncopyable.hpp>
 
 namespace brion
 {
-
 /** Read access to a Circuit file.
  *
  * This class loads the circuit data at creation and will ensure release of
@@ -45,7 +44,7 @@ public:
      * @throw std::runtime_error if file is not a valid circuit file
      * @version 1.0
      */
-    BRION_API explicit Circuit( const std::string& source );
+    BRION_API explicit Circuit(const std::string& source);
 
     /** Open given filepath to a circuit file for reading.
      *
@@ -53,7 +52,7 @@ public:
      * @throw std::runtime_error if file is not a valid circuit file
      * @version 1.7
      */
-    BRION_API explicit Circuit( const URI& source );
+    BRION_API explicit Circuit(const URI& source);
 
     /** Retrieve neuron attributes for set of neurons.
      *
@@ -66,8 +65,8 @@ public:
      * @throw std::runtime_error if any GID is out of range.
      * @version 1.0
      */
-    BRION_API NeuronMatrix get( const GIDSet& gids,
-                                const uint32_t attributes ) const;
+    BRION_API NeuronMatrix get(const GIDSet& gids,
+                               const uint32_t attributes) const;
 
     /** @return number of neurons stored in the circuit file. @version 1.0 */
     BRION_API size_t getNumNeurons() const;
@@ -78,14 +77,13 @@ public:
      * @return list of type information
      * @version 1.0
      */
-    BRION_API Strings getTypes( const NeuronClass type ) const;
+    BRION_API Strings getTypes(const NeuronClass type) const;
     //@}
 
 private:
     class Impl;
     Impl* const _impl;
 };
-
 }
 
 #endif

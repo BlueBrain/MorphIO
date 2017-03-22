@@ -29,7 +29,6 @@ namespace brain
 {
 namespace neuron
 {
-
 /**
  * A class to represent a morphological section.
  *
@@ -55,14 +54,14 @@ public:
     friend class Morphology;
     friend class Soma;
 
-    BRAIN_API Section( const Section& section );
+    BRAIN_API Section(const Section& section);
 
     BRAIN_API ~Section();
 
-    BRAIN_API Section& operator=( const Section& section );
+    BRAIN_API Section& operator=(const Section& section);
 
-    BRAIN_API bool operator==( const Section& section ) const;
-    BRAIN_API bool operator!=( const Section& section ) const;
+    BRAIN_API bool operator==(const Section& section) const;
+    BRAIN_API bool operator!=(const Section& section) const;
 
     /** Return the ID of this section. */
     BRAIN_API uint32_t getID() const;
@@ -100,7 +99,7 @@ public:
      *        section. Values will be clampled to [0, 1] before sampling.
      * @return The section sampled at the given relative positions.
      */
-    BRAIN_API Vector4fs getSamples( const floats& points ) const;
+    BRAIN_API Vector4fs getSamples(const floats& points) const;
 
     /**
      * Return the absolute distance from the start of the section to the soma.
@@ -137,13 +136,12 @@ public:
     BRAIN_API Sections getChildren() const;
 
 protected:
-    BRAIN_API Section( uint32_t id, Morphology::Impl* morphology );
+    BRAIN_API Section(uint32_t id, Morphology::Impl* morphology);
 
 private:
     uint32_t _id;
     Morphology::Impl* _morphology;
 };
-
 }
 }
 #endif

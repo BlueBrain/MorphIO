@@ -119,7 +119,7 @@ inline void testReadSoma(const char* relativePath)
 
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
     BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
-    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1,TIMESTEP_PRECISION);
+    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1, TIMESTEP_PRECISION);
 
     auto frame = view.load(report.getMetaData().startTime).get();
 
@@ -152,7 +152,7 @@ inline void testReadAllComps(const char* relativePath)
 
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
     BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
-    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1,TIMESTEP_PRECISION);
+    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1, TIMESTEP_PRECISION);
 
     auto frame = view.load(.8f).get();
     BOOST_CHECK(!frame.getData().empty());
@@ -189,7 +189,7 @@ void testRead(const char* relativePath)
 
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
     BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
-    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1,TIMESTEP_PRECISION);
+    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1, TIMESTEP_PRECISION);
 
     auto frame = view.load(report.getMetaData().startTime).get();
 
@@ -265,7 +265,7 @@ void testReadAll(const char* relativePath)
 
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
     BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
-    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1,TIMESTEP_PRECISION);
+    BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1, TIMESTEP_PRECISION);
 
     auto frames = view.loadAll().get();
 

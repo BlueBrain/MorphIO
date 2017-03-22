@@ -28,28 +28,29 @@ namespace brion
 namespace
 {
 using CompartmentPluginFactory =
-    lunchbox::PluginFactory< CompartmentReportPlugin >;
+    lunchbox::PluginFactory<CompartmentReportPlugin>;
 }
 
 namespace detail
 {
-
 class CompartmentReport
 {
 public:
-    explicit CompartmentReport( const CompartmentReportInitData& initData )
-        : plugin( CompartmentPluginFactory::getInstance().create( initData ))
-    {}
+    explicit CompartmentReport(const CompartmentReportInitData& initData)
+        : plugin(CompartmentPluginFactory::getInstance().create(initData))
+    {
+    }
 
     const std::unique_ptr<CompartmentReportPlugin> plugin;
 };
 }
 
-CompartmentReport::CompartmentReport( const URI& uri, const int mode,
-                                      const GIDSet& gids )
-    : _impl( new detail::CompartmentReport(
-                 CompartmentReportInitData( uri, mode, gids )))
-{}
+CompartmentReport::CompartmentReport(const URI& uri, const int mode,
+                                     const GIDSet& gids)
+    : _impl(new detail::CompartmentReport(
+          CompartmentReportInitData(uri, mode, gids)))
+{
+}
 
 CompartmentReport::~CompartmentReport()
 {
@@ -66,9 +67,9 @@ const GIDSet& CompartmentReport::getGIDs() const
     return _impl->plugin->getGIDs();
 }
 
-size_t CompartmentReport::getIndex( const uint32_t gid ) const
+size_t CompartmentReport::getIndex(const uint32_t gid) const
 {
-    return _impl->plugin->getIndex( gid );
+    return _impl->plugin->getIndex(gid);
 }
 
 const SectionOffsets& CompartmentReport::getOffsets() const
@@ -81,9 +82,9 @@ const CompartmentCounts& CompartmentReport::getCompartmentCounts() const
     return _impl->plugin->getCompartmentCounts();
 }
 
-size_t CompartmentReport::getNumCompartments( const size_t index ) const
+size_t CompartmentReport::getNumCompartments(const size_t index) const
 {
-    return _impl->plugin->getNumCompartments( index );
+    return _impl->plugin->getNumCompartments(index);
 }
 
 float CompartmentReport::getStartTime() const
@@ -121,29 +122,29 @@ size_t CompartmentReport::getBufferSize() const
     return _impl->plugin->getBufferSize();
 }
 
-floatsPtr CompartmentReport::loadFrame( const float timestamp ) const
+floatsPtr CompartmentReport::loadFrame(const float timestamp) const
 {
-    if( timestamp < getStartTime() || timestamp > getEndTime( ))
+    if (timestamp < getStartTime() || timestamp > getEndTime())
         return floatsPtr();
 
-    return _impl->plugin->loadFrame( timestamp );
+    return _impl->plugin->loadFrame(timestamp);
 }
 
-size_t CompartmentReport::getNeuronSize( const uint32_t gid ) const
+size_t CompartmentReport::getNeuronSize(const uint32_t gid) const
 {
-    const size_t index = getIndex( gid );
-    const size_t nTimesteps = (getEndTime() - getStartTime( )) / getTimestep();
-    return getNumCompartments( index ) * nTimesteps;
+    const size_t index = getIndex(gid);
+    const size_t nTimesteps = (getEndTime() - getStartTime()) / getTimestep();
+    return getNumCompartments(index) * nTimesteps;
 }
 
-floatsPtr CompartmentReport::loadNeuron( const uint32_t gid ) const
+floatsPtr CompartmentReport::loadNeuron(const uint32_t gid) const
 {
-    return _impl->plugin->loadNeuron( gid );
+    return _impl->plugin->loadNeuron(gid);
 }
 
-void CompartmentReport::setBufferSize( const size_t size )
+void CompartmentReport::setBufferSize(const size_t size)
 {
-    _impl->plugin->setBufferSize( size );
+    _impl->plugin->setBufferSize(size);
 }
 
 void CompartmentReport::clearBuffer()
@@ -151,29 +152,29 @@ void CompartmentReport::clearBuffer()
     _impl->plugin->clearBuffer();
 }
 
-void CompartmentReport::updateMapping( const GIDSet& gids )
+void CompartmentReport::updateMapping(const GIDSet& gids)
 {
-    _impl->plugin->updateMapping( gids );
+    _impl->plugin->updateMapping(gids);
 }
 
-void CompartmentReport::writeHeader( const float startTime, const float endTime,
-                                     const float timestep,
-                                     const std::string& dunit,
-                                     const std::string& tunit )
+void CompartmentReport::writeHeader(const float startTime, const float endTime,
+                                    const float timestep,
+                                    const std::string& dunit,
+                                    const std::string& tunit)
 {
-    _impl->plugin->writeHeader( startTime, endTime, timestep, dunit, tunit );
+    _impl->plugin->writeHeader(startTime, endTime, timestep, dunit, tunit);
 }
 
-bool CompartmentReport::writeCompartments( const uint32_t gid,
-                                           const uint16_ts& counts )
+bool CompartmentReport::writeCompartments(const uint32_t gid,
+                                          const uint16_ts& counts)
 {
-    return _impl->plugin->writeCompartments( gid, counts );
+    return _impl->plugin->writeCompartments(gid, counts);
 }
 
-bool CompartmentReport::writeFrame( uint32_t gid, const float* values,
-                                    const size_t size, float timestamp )
+bool CompartmentReport::writeFrame(uint32_t gid, const float* values,
+                                   const size_t size, float timestamp)
 {
-    return _impl->plugin->writeFrame( gid, values, size, timestamp );
+    return _impl->plugin->writeFrame(gid, values, size, timestamp);
 }
 
 bool CompartmentReport::flush()

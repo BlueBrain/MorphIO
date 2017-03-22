@@ -20,33 +20,29 @@
 #ifndef BRION_PLUGIN_COMPARTMENTREPORTCOMMON
 #define BRION_PLUGIN_COMPARTMENTREPORTCOMMON
 
+#include "../compartmentReportPlugin.h"
 #include "../pluginInitData.h"
 #include "../types.h"
-#include "../compartmentReportPlugin.h"
 
 namespace brion
 {
 namespace plugin
 {
-
 class CompartmentReportCommon : public CompartmentReportPlugin
 {
 public:
     CompartmentReportCommon();
     ~CompartmentReportCommon() {}
-
-    size_t getNumCompartments( size_t index ) const final;
+    size_t getNumCompartments(size_t index) const final;
 
 protected:
-    void _cacheNeuronCompartmentCounts( const GIDSet& gids );
-    size_t _getFrameNumber( float timestamp ) const;
-    static GIDSet _computeIntersection( const GIDSet& all,
-                                        const GIDSet& subset );
+    void _cacheNeuronCompartmentCounts(const GIDSet& gids);
+    size_t _getFrameNumber(float timestamp) const;
+    static GIDSet _computeIntersection(const GIDSet& all, const GIDSet& subset);
 
 private:
     size_ts _neuronCompartments;
 };
-
 }
 }
 

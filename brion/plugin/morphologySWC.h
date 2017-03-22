@@ -27,21 +27,20 @@ namespace brion
 {
 namespace plugin
 {
-
 class MorphologySWC : public MorphologyPlugin
 {
 public:
-    explicit MorphologySWC( const MorphologyInitData& initData );
+    explicit MorphologySWC(const MorphologyInitData& initData);
 
     /** Check if this plugin can handle the given uri. */
-    static bool handles( const MorphologyInitData& initData );
+    static bool handles(const MorphologyInitData& initData);
     static std::string getDescription();
 
     CellFamily getCellFamily() const final;
 
-    Vector4fsPtr readPoints( MorphologyRepairStage stage ) const final;
+    Vector4fsPtr readPoints(MorphologyRepairStage stage) const final;
 
-    Vector2isPtr readSections( MorphologyRepairStage stage ) const final;
+    Vector2isPtr readSections(MorphologyRepairStage stage) const final;
 
     SectionTypesPtr readSectionTypes() const final;
 
@@ -51,17 +50,17 @@ public:
 
     MorphologyVersion getVersion() const final;
 
-    void writePoints( const Vector4fs& points,
-                      MorphologyRepairStage stage ) final;
+    void writePoints(const Vector4fs& points,
+                     MorphologyRepairStage stage) final;
 
-    void writeSections( const Vector2is& sections,
-                        MorphologyRepairStage stage ) final;
+    void writeSections(const Vector2is& sections,
+                       MorphologyRepairStage stage) final;
 
-    void writeSectionTypes( const SectionTypes& types ) final;
+    void writeSectionTypes(const SectionTypes& types) final;
 
-    void writeApicals( const Vector2is& apicals ) final;
+    void writeApicals(const Vector2is& apicals) final;
 
-    void writePerimeters( const floats& perimeters ) final;
+    void writePerimeters(const floats& perimeters) final;
 
     void flush() final;
 
@@ -72,13 +71,12 @@ private:
     Vector2isPtr _sections;
     SectionTypesPtr _types;
 
-    void _readSamples( RawSWCInfo& info );
+    void _readSamples(RawSWCInfo& info);
 
-    void _buildSampleTree( RawSWCInfo& info );
+    void _buildSampleTree(RawSWCInfo& info);
 
-    void _buildStructure( RawSWCInfo& info );
+    void _buildStructure(RawSWCInfo& info);
 };
-
 }
 }
 #endif

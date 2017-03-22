@@ -24,54 +24,50 @@ namespace brion
 {
 namespace plugin
 {
-
 CompartmentReportCommon::CompartmentReportCommon()
 {
-
 }
 
-void CompartmentReportCommon::_cacheNeuronCompartmentCounts(
-                                                    const GIDSet& gids )
+void CompartmentReportCommon::_cacheNeuronCompartmentCounts(const GIDSet& gids)
 {
-    if( gids.empty() || gids != getGIDs() || _neuronCompartments.empty( ))
+    if (gids.empty() || gids != getGIDs() || _neuronCompartments.empty())
     {
-        updateMapping( gids );
+        updateMapping(gids);
         const CompartmentCounts& counts = getCompartmentCounts();
-        _neuronCompartments.resize( counts.size( ) );
-        for( size_t i = 0; i < counts.size(); ++i )
-            _neuronCompartments[i] = std::accumulate( counts[i].begin(),
-                                                      counts[i].end(), 0 );
+        _neuronCompartments.resize(counts.size());
+        for (size_t i = 0; i < counts.size(); ++i)
+            _neuronCompartments[i] =
+                std::accumulate(counts[i].begin(), counts[i].end(), 0);
     }
 }
 
-size_t CompartmentReportCommon::getNumCompartments( const size_t index ) const
+size_t CompartmentReportCommon::getNumCompartments(const size_t index) const
 {
-    return _neuronCompartments[ index ];
+    return _neuronCompartments[index];
 }
 
-size_t CompartmentReportCommon::_getFrameNumber( float timestamp ) const
+size_t CompartmentReportCommon::_getFrameNumber(float timestamp) const
 {
-    timestamp = std::max( 0.f, timestamp - getStartTime( ));
-    size_t frame =
-        std::min(size_t(round((getEndTime() - getStartTime( )) /
-                               getTimestep( ))) - 1,
-                 size_t(round(timestamp / getTimestep( ))));
+    timestamp = std::max(0.f, timestamp - getStartTime());
+    size_t frame = std::min(
+        size_t(round((getEndTime() - getStartTime()) / getTimestep())) - 1,
+        size_t(round(timestamp / getTimestep())));
     return frame;
 }
 
-GIDSet CompartmentReportCommon::_computeIntersection( const GIDSet& all,
-                                                      const GIDSet& subset )
+GIDSet CompartmentReportCommon::_computeIntersection(const GIDSet& all,
+                                                     const GIDSet& subset)
 {
     GIDSet intersection;
-    std::set_intersection( subset.begin(), subset.end(), all.begin(), all.end(),
-                           std::inserter( intersection, intersection.begin( )));
-    if( intersection != subset || intersection.empty( ))
+    std::set_intersection(subset.begin(), subset.end(), all.begin(), all.end(),
+                          std::inserter(intersection, intersection.begin()));
+    if (intersection != subset || intersection.empty())
     {
         LBWARN << "Requested " << subset.size() << " GIDs [" << *subset.begin()
-               << ":" <<*subset.rbegin() << "] are not a subset of the "
+               << ":" << *subset.rbegin() << "] are not a subset of the "
                << all.size() << " GIDs in the report [" << *all.begin() << ":"
                << *all.rbegin();
-        if( intersection.empty( ))
+        if (intersection.empty())
             LBWARN << " with no GIDs in common" << std::endl;
         else
             LBWARN << "], using intersection size " << intersection.size()
@@ -80,6 +76,5 @@ GIDSet CompartmentReportCommon::_computeIntersection( const GIDSet& all,
     }
     return intersection;
 }
-
 }
 }

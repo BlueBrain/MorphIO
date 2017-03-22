@@ -24,8 +24,6 @@
 
 namespace brain
 {
-
-boost::python::scope exportSubmodule( const std::string& name );
-
+boost::python::scope exportSubmodule(const std::string& name);
 }
 #endif

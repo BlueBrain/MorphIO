@@ -18,7 +18,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-
 #ifndef BRAIN_SPIKEREPORTREADER_H
 #define BRAIN_SPIKEREPORTREADER_H
 
@@ -47,7 +46,7 @@ public:
      * @version 1.0
      * @throw std::runtime_error if source is invalid.
      */
-    BRAIN_API explicit SpikeReportReader( const brion::URI& uri );
+    BRAIN_API explicit SpikeReportReader(const brion::URI& uri);
 
     /**
      * Construct a new reader opening a spike data source.
@@ -58,7 +57,7 @@ public:
      * @version 1.0
      * @throw std::runtime_error if source is invalid.
      */
-    BRAIN_API SpikeReportReader( const brion::URI& uri, const GIDSet& subset );
+    BRAIN_API SpikeReportReader(const brion::URI& uri, const GIDSet& subset);
 
     /**
      * Destructor.
@@ -77,7 +76,7 @@ public:
      * @throw std::logic_error if the precondition is not fulfilled.
      * @version 1.0
      */
-    BRAIN_API Spikes getSpikes( const float start, const float end );
+    BRAIN_API Spikes getSpikes(const float start, const float end);
 
     /**
      * @return the end timestamp of the report. This is the timestamp of the
@@ -87,7 +86,7 @@ public:
      *         getSpikes is called.
      * @version 1.0
      */
-     BRAIN_API float getEndTime() const;
+    BRAIN_API float getEndTime() const;
 
     /**
      * @return true if any of the versions of getSpikes() reaches the end
@@ -113,6 +112,5 @@ private:
     class _Impl;
     _Impl* _impl;
 };
-
 }
 #endif

@@ -28,27 +28,26 @@ namespace brain
 {
 namespace detail
 {
-
 struct SynapsesStream
 {
-    SynapsesStream( const Circuit& circuit, const GIDSet& gids,
-                    const bool afferent, const SynapsePrefetch prefetch )
-        : _circuit( circuit )
-        , _afferent( afferent )
-        , _gids( gids )
-        , _prefetch( prefetch )
-        , _it( _gids.begin( ))
+    SynapsesStream(const Circuit& circuit, const GIDSet& gids,
+                   const bool afferent, const SynapsePrefetch prefetch)
+        : _circuit(circuit)
+        , _afferent(afferent)
+        , _gids(gids)
+        , _prefetch(prefetch)
+        , _it(_gids.begin())
     {
     }
 
-    SynapsesStream( const Circuit& circuit, const GIDSet& preGIDs,
-                    const GIDSet& postGIDs, const SynapsePrefetch prefetch )
-        : _circuit( circuit )
-        , _afferent( preGIDs.empty() || (postGIDs.size() < preGIDs.size( )))
-        , _gids( _afferent ? postGIDs : preGIDs )
-        , _filterGIDs( _afferent ? preGIDs : postGIDs  )
-        , _prefetch( prefetch )
-        , _it( _gids.begin( ))
+    SynapsesStream(const Circuit& circuit, const GIDSet& preGIDs,
+                   const GIDSet& postGIDs, const SynapsePrefetch prefetch)
+        : _circuit(circuit)
+        , _afferent(preGIDs.empty() || (postGIDs.size() < preGIDs.size()))
+        , _gids(_afferent ? postGIDs : preGIDs)
+        , _filterGIDs(_afferent ? preGIDs : postGIDs)
+        , _prefetch(prefetch)
+        , _it(_gids.begin())
     {
     }
 
@@ -61,24 +60,21 @@ struct SynapsesStream
 
     size_t getRemaining() const
     {
-        return size_t( std::abs( std::distance( _it, _gids.end( ))));
+        return size_t(std::abs(std::distance(_it, _gids.end())));
     }
 
-    std::future< Synapses > read( size_t count )
+    std::future<Synapses> read(size_t count)
     {
-        count = std::min( count, getRemaining( ));
+        count = std::min(count, getRemaining());
         GIDSet::const_iterator start = _it;
-        std::advance( _it, count );
+        std::advance(_it, count);
         GIDSet::const_iterator end = _it;
-        return std::async( std::launch::async, [&, start, end]
-        {
-            return Synapses( _circuit, GIDSet( start, end ), _filterGIDs,
-                             _afferent, _prefetch );
+        return std::async(std::launch::async, [&, start, end] {
+            return Synapses(_circuit, GIDSet(start, end), _filterGIDs,
+                            _afferent, _prefetch);
         });
     }
 };
-
-
 }
 }
 

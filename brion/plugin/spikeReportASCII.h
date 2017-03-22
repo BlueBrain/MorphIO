@@ -22,41 +22,37 @@
 
 #include "../pluginInitData.h"
 
-#include <brion/types.h>
 #include <brion/spikeReportPlugin.h>
-
+#include <brion/types.h>
 
 namespace brion
 {
 namespace plugin
 {
-
 class SpikeReportASCII : public SpikeReportPlugin
 {
 public:
-    explicit SpikeReportASCII( const SpikeReportInitData& initData );
+    explicit SpikeReportASCII(const SpikeReportInitData& initData);
 
     Spikes read(float min) final;
     Spikes readUntil(float toTimeStamp) final;
     void readSeek(float toTimeStamp) final;
     void writeSeek(float toTimeStamp) final;
     bool supportsBackwardSeek() const final { return true; }
-
 protected:
     Spikes _spikes;
     Spikes::iterator _lastReadPosition;
 
     // Returns true if parsing succeeded
-    using ParseFunc = std::function< bool( const std::string&, Spike& ) >;
+    using ParseFunc = std::function<bool(const std::string&, Spike&)>;
 
-    using WriteFunc = std::function< void( std::ostream&, const Spike& ) >;
+    using WriteFunc = std::function<void(std::ostream&, const Spike&)>;
 
-    static Spikes parse( const Strings& files, const ParseFunc& parse );
-    static Spikes parse( const std::string& filename, const ParseFunc& parse );
-    void append( const Spikes& spikes, const WriteFunc& parse );
+    static Spikes parse(const Strings& files, const ParseFunc& parse);
+    static Spikes parse(const std::string& filename, const ParseFunc& parse);
+    void append(const Spikes& spikes, const WriteFunc& parse);
 };
-
 }
 }
 
-#endif //BRION_PLUGIN_SPIKEREPORTFILEBASED_H
+#endif // BRION_PLUGIN_SPIKEREPORTFILEBASED_H

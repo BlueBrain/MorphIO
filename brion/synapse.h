@@ -20,14 +20,16 @@
 #ifndef BRION_SYNAPSE
 #define BRION_SYNAPSE
 
+#include <boost/noncopyable.hpp>
 #include <brion/api.h>
 #include <brion/types.h>
-#include <boost/noncopyable.hpp>
 
 namespace brion
 {
-
-namespace detail { class Synapse; }
+namespace detail
+{
+class Synapse;
+}
 
 /** Read access to a Synapse file.
  *
@@ -67,7 +69,7 @@ public:
      * @throw std::runtime_error if file is not a valid synapse file
      * @version 1.0
      */
-    BRION_API explicit Synapse( const std::string& source );
+    BRION_API explicit Synapse(const std::string& source);
 
     /** Read requested synapse attributes for a given neuron.
      *
@@ -77,8 +79,8 @@ public:
      *         each connected neuron
      * @version 1.0
      */
-    BRION_API SynapseMatrix read( const uint32_t gid,
-                                  const uint32_t attributes ) const;
+    BRION_API SynapseMatrix read(const uint32_t gid,
+                                 const uint32_t attributes) const;
 
     /** Get the number of synapses for a set of neurons.
      *
@@ -86,7 +88,7 @@ public:
      * @return number of synapses for the set of neurons.
      * @version 1.0
      */
-    BRION_API size_t getNumSynapses( const GIDSet& gids ) const;
+    BRION_API size_t getNumSynapses(const GIDSet& gids) const;
 
     /** Return the number of columns of the synapse file.
      * @version 1.9
@@ -97,7 +99,6 @@ public:
 private:
     detail::Synapse* const _impl;
 };
-
 }
 
 #endif

@@ -25,7 +25,6 @@
 /** @namespace brain Algorithmic interface to Blue Brain data model */
 namespace brain
 {
-
 /**
  * Loading of data during SynapsesStream::read(), otherwise load happens
  * on-demand.
@@ -75,15 +74,14 @@ using brion::Spike;
 using brion::Spikes;
 using brion::CompartmentCounts;
 
-typedef std::vector< CompartmentReportFrame > CompartmentReportFrames;
-typedef std::vector< Matrix4f > Matrix4fs;
-typedef std::vector< Quaternionf > Quaternionfs;
+typedef std::vector<CompartmentReportFrame> CompartmentReportFrames;
+typedef std::vector<Matrix4f> Matrix4fs;
+typedef std::vector<Quaternionf> Quaternionfs;
 
-typedef std::shared_ptr< SpikeReportReader > SpikeReportReaderPtr;
-typedef std::shared_ptr< SpikeReportWriter > SpikeReportWriterPtr;
+typedef std::shared_ptr<SpikeReportReader> SpikeReportReaderPtr;
+typedef std::shared_ptr<SpikeReportWriter> SpikeReportWriterPtr;
 
-typedef std::shared_ptr< CompartmentReport > CompartmentReportPtr;
-
+typedef std::shared_ptr<CompartmentReport> CompartmentReportPtr;
 
 /**
  * The GID of a synapse is the a tuple of two numbers:
@@ -93,9 +91,11 @@ typedef std::shared_ptr< CompartmentReport > CompartmentReportPtr;
  * GIDs are invariant regardless of how the structural touches are
  * converted into functional synapses during circuit building.
  */
-typedef std::pair< uint32_t, size_t > SynapseGID;
+typedef std::pair<uint32_t, size_t> SynapseGID;
 
-namespace detail { struct SynapsesStream; }
-
+namespace detail
+{
+struct SynapsesStream;
+}
 }
 #endif

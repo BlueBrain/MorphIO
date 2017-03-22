@@ -20,8 +20,8 @@
 #ifndef BRION_PLUGIN_SPIKEREPORTBINARY_H
 #define BRION_PLUGIN_SPIKEREPORTBINARY_H
 
-#include <brion/types.h>
 #include <brion/spikeReportPlugin.h>
+#include <brion/types.h>
 
 namespace brion
 {
@@ -41,21 +41,20 @@ class BinaryReportMap;
 class SpikeReportBinary : public SpikeReportPlugin
 {
 public:
-    explicit SpikeReportBinary( const SpikeReportInitData& initData );
+    explicit SpikeReportBinary(const SpikeReportInitData& initData);
 
-    static bool handles( const SpikeReportInitData& initData );
+    static bool handles(const SpikeReportInitData& initData);
     static std::string getDescription();
 
     void close() final {}
-    Spikes read( float min ) final;
-    Spikes readUntil( float max ) final;
-    void readSeek( float toTimeStamp ) final;
-    void writeSeek( float toTimeStamp ) final;
-    void write( const Spikes& spikes ) final;
+    Spikes read(float min) final;
+    Spikes readUntil(float max) final;
+    void readSeek(float toTimeStamp) final;
+    void writeSeek(float toTimeStamp) final;
+    void write(const Spikes& spikes) final;
     bool supportsBackwardSeek() const final { return true; }
-
 private:
-    std::unique_ptr< BinaryReportMap > _memFile;
+    std::unique_ptr<BinaryReportMap> _memFile;
     size_t _startIndex = 0;
 };
 }

@@ -17,7 +17,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-
 #include "synapse.h"
 #include "synapses.h"
 
@@ -25,10 +24,9 @@
 
 namespace brain
 {
-
-Synapse::Synapse( const Synapses& synapses, const size_t index )
-    : _synapses( synapses )
-    , _index( index )
+Synapse::Synapse(const Synapses& synapses, const size_t index)
+    : _synapses(synapses)
+    , _index(index)
 {
 }
 
@@ -38,8 +36,7 @@ Synapse::~Synapse()
 
 SynapseGID Synapse::getGID() const
 {
-    return std::make_pair( getPostsynapticGID(),
-                           _synapses.indices()[_index] );
+    return std::make_pair(getPostsynapticGID(), _synapses.indices()[_index]);
 }
 
 uint32_t Synapse::getPresynapticGID() const
@@ -65,18 +62,18 @@ float Synapse::getPresynapticDistance() const
 Vector3f Synapse::getPresynapticSurfacePosition() const
 {
     if (!_synapses.preSurfaceXPositions())
-        throw std::runtime_error( "Surface synapse positions not available" );
+        throw std::runtime_error("Surface synapse positions not available");
 
-    return Vector3f( _synapses.preSurfaceXPositions()[_index],
-                     _synapses.preSurfaceYPositions()[_index],
-                     _synapses.preSurfaceZPositions()[_index] );
+    return Vector3f(_synapses.preSurfaceXPositions()[_index],
+                    _synapses.preSurfaceYPositions()[_index],
+                    _synapses.preSurfaceZPositions()[_index]);
 }
 
 Vector3f Synapse::getPresynapticCenterPosition() const
 {
-    return Vector3f( _synapses.preCenterXPositions()[_index],
-                     _synapses.preCenterYPositions()[_index],
-                     _synapses.preCenterZPositions()[_index] );
+    return Vector3f(_synapses.preCenterXPositions()[_index],
+                    _synapses.preCenterYPositions()[_index],
+                    _synapses.preCenterZPositions()[_index]);
 }
 
 uint32_t Synapse::getPostsynapticGID() const
@@ -102,18 +99,18 @@ float Synapse::getPostsynapticDistance() const
 Vector3f Synapse::getPostsynapticSurfacePosition() const
 {
     if (!_synapses.postSurfaceXPositions())
-        throw std::runtime_error( "Surface synapse positions not available" );
+        throw std::runtime_error("Surface synapse positions not available");
 
-    return Vector3f( _synapses.postSurfaceXPositions()[_index],
-                     _synapses.postSurfaceYPositions()[_index],
-                     _synapses.postSurfaceZPositions()[_index] );
+    return Vector3f(_synapses.postSurfaceXPositions()[_index],
+                    _synapses.postSurfaceYPositions()[_index],
+                    _synapses.postSurfaceZPositions()[_index]);
 }
 
 Vector3f Synapse::getPostsynapticCenterPosition() const
 {
-    return Vector3f( _synapses.postCenterXPositions()[_index],
-                     _synapses.postCenterYPositions()[_index],
-                     _synapses.postCenterZPositions()[_index] );
+    return Vector3f(_synapses.postCenterXPositions()[_index],
+                    _synapses.postCenterYPositions()[_index],
+                    _synapses.postCenterZPositions()[_index]);
 }
 
 float Synapse::getDelay() const
@@ -150,5 +147,4 @@ int Synapse::getEfficacy() const
 {
     return _synapses.efficacies()[_index];
 }
-
 }

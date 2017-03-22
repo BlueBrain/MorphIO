@@ -21,10 +21,9 @@
 
 namespace brain
 {
-
 namespace bp = boost::python;
 
-bp::scope exportSubmodule( const std::string& name )
+bp::scope exportSubmodule(const std::string& name)
 {
     // I'm not fully sure that the module stack is left in a conventional
     // state after this code is run. For example the module neuron appears
@@ -37,17 +36,16 @@ bp::scope exportSubmodule( const std::string& name )
     //
     // And that's good enough.
 
-    bp::object module( bp::handle<>( bp::borrowed(
-                      PyImport_AddModule(( "brain._brain._" + name).c_str( )))));
-    bp::scope().attr(( "_" + name).c_str( )) = module;
+    bp::object module(bp::handle<>(
+        bp::borrowed(PyImport_AddModule(("brain._brain._" + name).c_str()))));
+    bp::scope().attr(("_" + name).c_str()) = module;
     bp::scope moduleScope = module;
     // Despite these paths are not completely true in the build directory,
     // they ensures that _brain._neuron can be found and that
     // _brain.so is not loaded twice.
-    moduleScope.attr( "__package__" ) = "brain._brain";
-    moduleScope.attr( "__path__" ) = "brain._brain";
+    moduleScope.attr("__package__") = "brain._brain";
+    moduleScope.attr("__path__") = "brain._brain";
 
     return moduleScope;
 }
-
 }

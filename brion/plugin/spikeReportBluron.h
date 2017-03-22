@@ -29,18 +29,17 @@ namespace brion
 {
 namespace plugin
 {
-
 /** A Bluron spike report reader. */
 class SpikeReportBluron : public SpikeReportASCII
 {
 public:
-    explicit SpikeReportBluron( const SpikeReportInitData& initData );
+    explicit SpikeReportBluron(const SpikeReportInitData& initData);
 
-    static bool handles( const SpikeReportInitData& initData );
+    static bool handles(const SpikeReportInitData& initData);
     static std::string getDescription();
 
     void close() final;
-    virtual void write( const Spikes& spikes ) final;
+    virtual void write(const Spikes& spikes) final;
 };
 }
 }

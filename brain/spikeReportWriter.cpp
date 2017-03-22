@@ -24,20 +24,20 @@
 
 namespace brain
 {
-
 class SpikeReportWriter::_Impl
 {
 public:
-    _Impl( const brion::URI& uri, const int accessMode )
-        : _report( uri, accessMode )
-    {}
+    _Impl(const brion::URI& uri, const int accessMode)
+        : _report(uri, accessMode)
+    {
+    }
 
     brion::SpikeReport _report;
 };
 
-SpikeReportWriter::SpikeReportWriter( const brion::URI& uri,
-                                      const int accessMode )
-    : _impl( new _Impl( uri, accessMode ))
+SpikeReportWriter::SpikeReportWriter(const brion::URI& uri,
+                                     const int accessMode)
+    : _impl(new _Impl(uri, accessMode))
 {
 }
 
@@ -46,7 +46,7 @@ SpikeReportWriter::~SpikeReportWriter()
     delete _impl;
 }
 
-void SpikeReportWriter::writeSpikes( const brion::Spikes& spikes )
+void SpikeReportWriter::writeSpikes(const brion::Spikes& spikes)
 {
     _impl->_report.write(spikes);
 }
@@ -60,5 +60,4 @@ void SpikeReportWriter::close()
 {
     _impl->_report.close();
 }
-
 }

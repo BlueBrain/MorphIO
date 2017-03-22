@@ -22,15 +22,14 @@
 #define BRAIN_CIRCUIT
 
 #include <brain/api.h>
-#include <brain/types.h>
 #include <brain/neuron/types.h>
+#include <brain/types.h>
 
-#include <vmmlib/matrix.hpp> // return value
 #include <memory>
+#include <vmmlib/matrix.hpp> // return value
 
 namespace brain
 {
-
 /** Read access to a circuit database
  *
  * This class provides convenience functions to access information about the
@@ -51,13 +50,13 @@ public:
      *
      * @param source the URI to the CircuitConfig or BlueConfig file.
      */
-    BRAIN_API explicit Circuit( const URI& source );
+    BRAIN_API explicit Circuit(const URI& source);
 
     /**
      * Opens a circuit for read access.
      * @param blueConfig The object representing the BlueConfig.
      */
-    BRAIN_API explicit Circuit( const brion::BlueConfig& blueConfig );
+    BRAIN_API explicit Circuit(const brion::BlueConfig& blueConfig);
 
     BRAIN_API ~Circuit();
 
@@ -66,7 +65,7 @@ public:
      *         target name.
      * @throw std::runtime_error if the target cannot be found.
      */
-    BRAIN_API GIDSet getGIDs( const std::string& target ) const;
+    BRAIN_API GIDSet getGIDs(const std::string& target) const;
 
     /** @return The \if pybind array \else set \endif of all GIDs held by the
      *          circuit.
@@ -79,18 +78,18 @@ public:
      * @throw std::runtime_error if the fraction is not in the range [0,1].
      * @throw std::runtime_error if the target cannot be found.
      */
-    BRAIN_API GIDSet getRandomGIDs( float fraction,
-                                    const std::string& target ) const;
+    BRAIN_API GIDSet getRandomGIDs(float fraction,
+                                   const std::string& target) const;
 
     /**
      * @return A random fraction of GIDs from the circuit.
      * @env BRAIN_CIRCUIT_SEED set the seed for deterministic randomness
      * @throw std::runtime_error if the fraction is not in the range [0,1].
      */
-    BRAIN_API GIDSet getRandomGIDs( float fraction ) const;
+    BRAIN_API GIDSet getRandomGIDs(float fraction) const;
 
     /** @return The set of URIs to access the morphologies of the given cells */
-    BRAIN_API URIs getMorphologyURIs( const GIDSet& gids ) const;
+    BRAIN_API URIs getMorphologyURIs(const GIDSet& gids) const;
 
     /**
      * @return The list of morpholgies for the GID set. If local coordinates
@@ -98,18 +97,18 @@ public:
      *         will shared the same Morphology object in the list. If global
      *         coordinates are requested, all Morphology objects are unique.
      */
-    BRAIN_API neuron::Morphologies loadMorphologies( const GIDSet& gids,
-                                                     Coordinates coords ) const;
+    BRAIN_API neuron::Morphologies loadMorphologies(const GIDSet& gids,
+                                                    Coordinates coords) const;
 
     /** @return The positions of the given cells in the iteration order of the
      *          input gids.
      */
-    BRAIN_API Vector3fs getPositions( const GIDSet& gids ) const;
+    BRAIN_API Vector3fs getPositions(const GIDSet& gids) const;
 
     /** @return The morphology type indices of the given cells in the iteration
      *          order of the input gids.
      */
-    BRAIN_API size_ts getMorphologyTypes( const GIDSet& gids ) const;
+    BRAIN_API size_ts getMorphologyTypes(const GIDSet& gids) const;
 
     /**
      * @return The morphology type names of the circuit, indexed by
@@ -120,7 +119,7 @@ public:
     /** @return The electrophysiology type indices of the given cells in the
      *          iteration order of the input gids.
      */
-    BRAIN_API size_ts getElectrophysiologyTypes( const GIDSet& gids ) const;
+    BRAIN_API size_ts getElectrophysiologyTypes(const GIDSet& gids) const;
 
     /**
      * @return The electrophysiology type names of the circuit, indexed by
@@ -132,12 +131,12 @@ public:
      *          local to world transformations of the given cells in the
      *          iteration
      */
-    BRAIN_API Matrix4fs getTransforms( const GIDSet& gids ) const;
+    BRAIN_API Matrix4fs getTransforms(const GIDSet& gids) const;
 
     /** @return \if pybind A Nx4 numpy array with the \else The \endif
      *          local to world rotation of the given cells.
      */
-    BRAIN_API Quaternionfs getRotations( const GIDSet& gids ) const;
+    BRAIN_API Quaternionfs getRotations(const GIDSet& gids) const;
 
     /** @return The number of neurons in the circuit. */
     BRAIN_API size_t getNumNeurons() const;
@@ -155,7 +154,7 @@ public:
      */
     BRAIN_API SynapsesStream getAfferentSynapses(
         const GIDSet& gids,
-        SynapsePrefetch prefetch = SynapsePrefetch::none ) const;
+        SynapsePrefetch prefetch = SynapsePrefetch::none) const;
 
     /**
      * Access all efferent synapses of the given GIDs.
@@ -170,7 +169,7 @@ public:
      */
     BRAIN_API SynapsesStream getEfferentSynapses(
         const GIDSet& gids,
-        SynapsePrefetch prefetch = SynapsePrefetch::none ) const;
+        SynapsePrefetch prefetch = SynapsePrefetch::none) const;
 
     /**
      * Access all synapses along the projection from the pre- to the postGIDs.
@@ -186,17 +185,16 @@ public:
      */
     BRAIN_API SynapsesStream getProjectedSynapses(
         const GIDSet& preGIDs, const GIDSet& postGIDs,
-        SynapsePrefetch prefetch = SynapsePrefetch::none ) const;
+        SynapsePrefetch prefetch = SynapsePrefetch::none) const;
 
     class Impl; //!< @internal, public for inheritance MVD2/3 impls
 
 private:
-    Circuit( const Circuit& ) = delete;
-    Circuit& operator=( const Circuit& ) = delete;
+    Circuit(const Circuit&) = delete;
+    Circuit& operator=(const Circuit&) = delete;
 
     friend class Synapses;
-    std::unique_ptr< const Impl > _impl;
+    std::unique_ptr<const Impl> _impl;
 };
-
 }
 #endif

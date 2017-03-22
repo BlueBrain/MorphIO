@@ -26,12 +26,10 @@ namespace brion
 {
 namespace detail
 {
-
 // Every access to hdf5 must be serialized if HDF5 does not take care of it
 // which needs a thread-safe built of the library.
 // http://www.hdfgroup.org/hdf5-quest.html#gconc
-extern std::mutex *_hdf5Lock;
-
+extern std::mutex* _hdf5Lock;
 }
 }
 

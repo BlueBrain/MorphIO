@@ -22,16 +22,15 @@
 #define BRION_MORPHOLOGYPLUGIN_H
 
 #include <brion/api.h>
-#include <brion/types.h>
 #include <brion/morphology.h> // Needed by doxygen
 #include <brion/pluginInitData.h>
+#include <brion/types.h>
 
-#include <boost/noncopyable.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace brion
 {
-
 /**
  * Basic plugin init data for MorphologyPlugin.
  * @version 1.4
@@ -39,37 +38,30 @@ namespace brion
 class MorphologyInitData : public PluginInitData
 {
 public:
-    explicit MorphologyInitData( const URI& uri )
-        : PluginInitData( uri, MODE_READ )
-        , _version( MORPHOLOGY_VERSION_H5_1_1 )
-        , _family( FAMILY_NEURON )
-    {}
-
-    MorphologyInitData( const URI& uri,
-                        const MorphologyVersion version,
-                        const unsigned int accessMode )
-        : PluginInitData( uri, accessMode )
-        , _version( version )
-        , _family( FAMILY_NEURON )
-    {}
-
-    MorphologyInitData( const URI& uri,
-                        const CellFamily family )
-        : PluginInitData( uri, MODE_WRITE )
-        , _version( MORPHOLOGY_VERSION_H5_1_1 )
-        , _family( family )
-    {}
-
-    MorphologyVersion getVersion() const
+    explicit MorphologyInitData(const URI& uri)
+        : PluginInitData(uri, MODE_READ)
+        , _version(MORPHOLOGY_VERSION_H5_1_1)
+        , _family(FAMILY_NEURON)
     {
-        return _version;
     }
 
-    CellFamily getFamily() const
+    MorphologyInitData(const URI& uri, const MorphologyVersion version,
+                       const unsigned int accessMode)
+        : PluginInitData(uri, accessMode)
+        , _version(version)
+        , _family(FAMILY_NEURON)
     {
-        return _family;
     }
 
+    MorphologyInitData(const URI& uri, const CellFamily family)
+        : PluginInitData(uri, MODE_WRITE)
+        , _version(MORPHOLOGY_VERSION_H5_1_1)
+        , _family(family)
+    {
+    }
+
+    MorphologyVersion getVersion() const { return _version; }
+    CellFamily getFamily() const { return _family; }
 protected:
     const MorphologyVersion _version;
     const CellFamily _family;
@@ -107,17 +99,16 @@ public:
 
     /** @internal */
     virtual ~MorphologyPlugin() {}
-
     /** @name Read API */
     //@{
     /** @copydoc brion::Morphology::getCellFamily */
     virtual CellFamily getCellFamily() const = 0;
 
     /** @copydoc brion::Morphology::readPoints */
-    virtual Vector4fsPtr readPoints( MorphologyRepairStage stage ) const = 0;
+    virtual Vector4fsPtr readPoints(MorphologyRepairStage stage) const = 0;
 
     /** @copydoc brion::Morphology::readSections */
-    virtual Vector2isPtr readSections( MorphologyRepairStage stage ) const = 0;
+    virtual Vector2isPtr readSections(MorphologyRepairStage stage) const = 0;
 
     /** @copydoc brion::Morphology::readSectionTypes */
     virtual SectionTypesPtr readSectionTypes() const = 0;
@@ -134,34 +125,33 @@ public:
     /** @name Write API */
     //@{
     /** @copydoc brion::Morphology::writePoints */
-    virtual void writePoints( const Vector4fs& points,
-                              MorphologyRepairStage stage ) = 0;
+    virtual void writePoints(const Vector4fs& points,
+                             MorphologyRepairStage stage) = 0;
 
     /** @copydoc brion::Morphology::writeSections */
-    virtual void writeSections( const Vector2is& sections,
-                                MorphologyRepairStage stage ) = 0;
+    virtual void writeSections(const Vector2is& sections,
+                               MorphologyRepairStage stage) = 0;
 
     /** @copydoc brion::Morphology::writeSectionTypes */
-    virtual void writeSectionTypes( const SectionTypes& types ) = 0;
+    virtual void writeSectionTypes(const SectionTypes& types) = 0;
 
     /** @copydoc brion::Morphology::writeApicals */
-    virtual void writeApicals( const Vector2is& apicals ) = 0;
+    virtual void writeApicals(const Vector2is& apicals) = 0;
 
     /** @copydoc brion::Morphology::writePerimeters */
-    virtual void writePerimeters( const floats& perimeters ) = 0;
+    virtual void writePerimeters(const floats& perimeters) = 0;
 
     /** @copydoc brion::Morphology::flush */
     virtual void flush() = 0;
     //@}
 };
-
 }
 
 namespace std
 {
-inline string to_string( const brion::MorphologyInitData& data )
+inline string to_string(const brion::MorphologyInitData& data)
 {
-    return to_string( data.getURI( ));
+    return to_string(data.getURI());
 }
 }
 #endif

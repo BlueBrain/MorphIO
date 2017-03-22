@@ -25,8 +25,10 @@
 
 namespace brion
 {
-
-namespace detail { class Target; }
+namespace detail
+{
+class Target;
+}
 
 /** Read access to a Target file.
  *
@@ -37,13 +39,13 @@ class Target
 {
 public:
     /** Copy-construct a target file. @version 1.6 */
-    BRION_API Target( const Target& from );
+    BRION_API Target(const Target& from);
 
     /** Close target file. @version 1.0 */
     BRION_API ~Target();
 
     /** Assign a different target. @version 1.6 */
-    BRION_API Target& operator = ( const Target& rhs );
+    BRION_API Target& operator=(const Target& rhs);
 
     /** @name Read API */
     //@{
@@ -53,7 +55,7 @@ public:
      * @throw std::runtime_error if file is not a valid target file
      * @version 1.0
      */
-    BRION_API explicit Target( const std::string& source );
+    BRION_API explicit Target(const std::string& source);
 
     /** Get list of targets for the desired type.
      *
@@ -61,10 +63,10 @@ public:
      * @return list of target names
      * @version 1.0
      */
-    BRION_API const Strings& getTargetNames( const TargetType type ) const;
+    BRION_API const Strings& getTargetNames(const TargetType type) const;
 
     /** @return true if the target exists. @version 1.7 */
-    BRION_API bool contains( const std::string& name ) const;
+    BRION_API bool contains(const std::string& name) const;
 
     /** Get targets and/or GIDSet grouped by the given target
      *
@@ -73,14 +75,14 @@ public:
      * @throw std::runtime_error if name is an invalid target
      * @version 1.0
      */
-    BRION_API const Strings& get( const std::string& name ) const;
+    BRION_API const Strings& get(const std::string& name) const;
 
     /**
      * Parse a given target into a GID set.
      *
      * All given targets are searched for the given name. If found, the named
      * target is recursively resolved to a GID set.
-     * Empty targets are valid, i.e., does not throw when an empty target is 
+     * Empty targets are valid, i.e., does not throw when an empty target is
      * found.
      *
      * @param targets the targets to parse
@@ -89,19 +91,18 @@ public:
      * @throw std::runtime_error if a non-existent (sub)target is given.
      * @version 1.6
      */
-    BRION_API static GIDSet parse( const Targets& targets,
-                                   const std::string& name );
+    BRION_API static GIDSet parse(const Targets& targets,
+                                  const std::string& name);
     //@}
 
 private:
-    friend std::ostream& operator << ( std::ostream&, const Target& );
+    friend std::ostream& operator<<(std::ostream&, const Target&);
 
     detail::Target* _impl;
 };
 
 /** Stream out content of target file. */
-std::ostream& operator << ( std::ostream&, const Target& );
-
+std::ostream& operator<<(std::ostream&, const Target&);
 }
 
 #endif

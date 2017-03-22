@@ -22,92 +22,86 @@
 
 namespace brain
 {
-
 namespace
 {
-
-bool _gidsFromIterable( const boost::python::object& iterable,
-                        uint32_ts& result )
+bool _gidsFromIterable(const boost::python::object& iterable, uint32_ts& result)
 {
     bool sorted = true;
     try
     {
         result.clear();
-        result.reserve( len( iterable ));
-        // Copying the elements in the iterable to std vector for using insertion
+        result.reserve(len(iterable));
+        // Copying the elements in the iterable to std vector for using
+        // insertion
         // from an iterable
-        boost::python::stl_input_iterator< unsigned int > i( iterable ), end;
+        boost::python::stl_input_iterator<unsigned int> i(iterable), end;
         uint32_t last = 0;
-        for( ; i != end; ++i )
+        for (; i != end; ++i)
         {
             const uint32_t gid = *i;
-            if( last >= gid )
+            if (last >= gid)
                 sorted = false;
             else
                 last = gid;
-            result.push_back( gid );
+            result.push_back(gid);
         }
     }
-    catch(...)
+    catch (...)
     {
-        PyErr_SetString( PyExc_ValueError,
-                         "Cannot convert argument to GID set" );
+        PyErr_SetString(PyExc_ValueError, "Cannot convert argument to GID set");
         boost::python::throw_error_already_set();
     }
     return sorted;
 }
-
 }
 
-GIDSet gidsFromPython( const boost::python::object& object )
+GIDSet gidsFromPython(const boost::python::object& object)
 {
     uint32_ts vector;
 
-    if( isArray( object ))
-        gidsFromNumpy( object, vector );
+    if (isArray(object))
+        gidsFromNumpy(object, vector);
     else
-        _gidsFromIterable( object, vector );
+        _gidsFromIterable(object, vector);
 
     GIDSet gids;
-    gids.insert( vector.begin(), vector.end( ));
+    gids.insert(vector.begin(), vector.end());
     return gids;
 }
 
-void gidsFromPython( const boost::python::object& object,
-                     GIDSet& result, uint32_ts& mapping )
+void gidsFromPython(const boost::python::object& object, GIDSet& result,
+                    uint32_ts& mapping)
 {
     uint32_ts vector;
 
-    const bool sorted =
-        isArray( object ) ? gidsFromNumpy( object, vector ) :
-                            _gidsFromIterable( object, vector );
+    const bool sorted = isArray(object) ? gidsFromNumpy(object, vector)
+                                        : _gidsFromIterable(object, vector);
 
-    std::unordered_map< uint32_t, uint32_t > gidToInput;
-    if( !sorted )
+    std::unordered_map<uint32_t, uint32_t> gidToInput;
+    if (!sorted)
     {
-        gidToInput.reserve( vector.size( ));
+        gidToInput.reserve(vector.size());
         // Building the GID to input index table
-        for( size_t i = 0; i != vector.size(); ++i )
+        for (size_t i = 0; i != vector.size(); ++i)
         {
-            auto iter = gidToInput.insert( std::make_pair( vector[i],  i ));
-            if( !iter.second )
+            auto iter = gidToInput.insert(std::make_pair(vector[i], i));
+            if (!iter.second)
             {
-                PyErr_SetString( PyExc_ValueError, "Repeated GID found" );
+                PyErr_SetString(PyExc_ValueError, "Repeated GID found");
                 boost::python::throw_error_already_set();
             }
         }
     }
 
     result.clear();
-    result.insert( vector.begin(), vector.end( ));
+    result.insert(vector.begin(), vector.end());
 
     mapping.clear();
-    if( !sorted )
+    if (!sorted)
     {
-        mapping.reserve( result.size( ));
-        for( auto gid : result )
-            mapping.push_back( gidToInput[gid] );
+        mapping.reserve(result.size());
+        for (auto gid : result)
+            mapping.push_back(gidToInput[gid]);
     }
 }
-
 }

@@ -25,17 +25,16 @@
 
 namespace brain
 {
-
 /** A forward iterator for the Synapses container. */
-class SynapsesIterator :
-        public std::iterator< std::forward_iterator_tag, Synapse >
+class SynapsesIterator
+    : public std::iterator<std::forward_iterator_tag, Synapse>
 {
 public:
-    BRAIN_API SynapsesIterator( const Synapses& synapses, size_t index );
+    BRAIN_API SynapsesIterator(const Synapses& synapses, size_t index);
     BRAIN_API ~SynapsesIterator();
 
-    BRAIN_API bool operator ==( const SynapsesIterator& rhs ) const;
-    BRAIN_API bool operator !=( const SynapsesIterator& rhs ) const;
+    BRAIN_API bool operator==(const SynapsesIterator& rhs) const;
+    BRAIN_API bool operator!=(const SynapsesIterator& rhs) const;
 
     BRAIN_API SynapsesIterator& operator++();
 
@@ -45,7 +44,6 @@ private:
     const Synapses& _synapses;
     size_t _index;
 };
-
 }
 
 #endif

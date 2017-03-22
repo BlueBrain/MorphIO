@@ -27,7 +27,6 @@
 
 namespace brain
 {
-
 /**
  * A container providing read-only access to Synapses retrieved by
  * getXXXSynapses() functions from brain::Circuit. It provides per-object and
@@ -46,18 +45,18 @@ public:
     BRAIN_API ~Synapses();
 
     /** Conversion constructor for direct access from getXXXSynapses(). */
-    BRAIN_API Synapses( const SynapsesStream& stream );
+    BRAIN_API Synapses(const SynapsesStream& stream);
 
     /** @name Copy semantics by data sharing. */
     //@{
-    BRAIN_API Synapses( const Synapses& );
-    BRAIN_API Synapses& operator=( const Synapses& );
+    BRAIN_API Synapses(const Synapses&);
+    BRAIN_API Synapses& operator=(const Synapses&);
     //@}
 
     /** @name Move semantics. */
     //@{
-    BRAIN_API Synapses( Synapses&& rhs );
-    BRAIN_API Synapses& operator=( Synapses&& rhs );
+    BRAIN_API Synapses(Synapses&& rhs);
+    BRAIN_API Synapses& operator=(Synapses&& rhs);
     //@}
 
     /** @return number of synapses available in this container. */
@@ -75,7 +74,7 @@ public:
     BRAIN_API const_iterator end() const;
 
     /** return the Synapse at the index-th position. */
-    BRAIN_API Synapse operator[]( size_t index ) const;
+    BRAIN_API Synapse operator[](size_t index) const;
 
     /**
      * @return the synapse GIDs containing GIDs of the post-synaptic cells and
@@ -218,17 +217,16 @@ protected:
     // the wrapping needs.
     struct BaseImpl
     {
-        virtual ~BaseImpl() {};
+        virtual ~BaseImpl(){};
     };
     struct Impl;
-    std::shared_ptr< const BaseImpl > _impl;
+    std::shared_ptr<const BaseImpl> _impl;
 
 private:
     friend struct detail::SynapsesStream;
-    Synapses( const Circuit& circuit, const GIDSet& gids,
-              const GIDSet& filterGIDs, bool afferent, SynapsePrefetch prefetch );
+    Synapses(const Circuit& circuit, const GIDSet& gids,
+             const GIDSet& filterGIDs, bool afferent, SynapsePrefetch prefetch);
 };
-
 }
 
 #endif

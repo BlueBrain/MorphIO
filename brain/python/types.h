@@ -20,13 +20,12 @@
 #ifndef BRAIN_PYTHON_TYPES
 #define BRAIN_PYTHON_TYPES
 
-#include <brain/synapses.h>
 #include <brain/synapse.h>
+#include <brain/synapses.h>
 #include <brain/types.h>
 
 namespace brain
 {
-
 typedef boost::shared_ptr<Circuit> CircuitPtr;
 
 /** Synapse container wrapping helper.
@@ -37,10 +36,11 @@ typedef boost::shared_ptr<Circuit> CircuitPtr;
 class SynapsesWrapper : public Synapses
 {
 public:
-    SynapsesWrapper( const SynapsesStream& stream, const CircuitPtr& circuit )
-        : Synapses( stream)
-        , _circuit( circuit )
-    {}
+    SynapsesWrapper(const SynapsesStream& stream, const CircuitPtr& circuit)
+        : Synapses(stream)
+        , _circuit(circuit)
+    {
+    }
 
     CircuitPtr _circuit;
 
@@ -57,16 +57,16 @@ public:
 class SynapseWrapper : public Synapse
 {
 public:
-    SynapseWrapper( Synapse&& synapse,
-                    const Synapses& synapses, const CircuitPtr& circuit )
-        : Synapse( std::move( synapse ))
-        , _synapses( synapses )
-        , _circuit( circuit )
-    {}
+    SynapseWrapper(Synapse&& synapse, const Synapses& synapses,
+                   const CircuitPtr& circuit)
+        : Synapse(std::move(synapse))
+        , _synapses(synapses)
+        , _circuit(circuit)
+    {
+    }
 
     Synapses _synapses;
     CircuitPtr _circuit;
 };
-
 }
 #endif

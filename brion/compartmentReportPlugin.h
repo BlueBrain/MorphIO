@@ -28,7 +28,6 @@
 
 namespace brion
 {
-
 /**
  * Basic plugin init data for CompartmentReportPlugin.
  * @version 1.5
@@ -45,16 +44,16 @@ public:
      * @param gids the neurons of interest in READ_MODE
      * @version 1.4
      */
-    explicit CompartmentReportInitData( const URI& uri,
-                                        const int accessMode = MODE_READ,
-                                        const GIDSet& gids = GIDSet( ))
-        : PluginInitData( uri, accessMode )
-        , _gids( gids )
-    {}
+    explicit CompartmentReportInitData(const URI& uri,
+                                       const int accessMode = MODE_READ,
+                                       const GIDSet& gids = GIDSet())
+        : PluginInitData(uri, accessMode)
+        , _gids(gids)
+    {
+    }
 
     /** @return Returns the gids. @version 1.4 */
     const GIDSet& getGids() const { return _gids; }
-
 private:
     const GIDSet _gids;
 };
@@ -91,7 +90,6 @@ public:
 
     /** @internal */
     virtual ~CompartmentReportPlugin() {}
-
     /** @name Abstract interface */
     //@{
     /** @copydoc brion::CompartmentReport::getStartTime */
@@ -116,7 +114,7 @@ public:
     virtual const SectionOffsets& getOffsets() const = 0;
 
     /** @copydoc brion::CompartmentReport::getNumCompartments */
-    virtual size_t getNumCompartments( size_t index ) const = 0;
+    virtual size_t getNumCompartments(size_t index) const = 0;
 
     /** @copydoc brion::CompartmentReport::getCompartmentCounts */
     virtual const CompartmentCounts& getCompartmentCounts() const = 0;
@@ -125,36 +123,35 @@ public:
     virtual size_t getFrameSize() const = 0;
 
     /** @copydoc brion::CompartmentReport::loadFrame */
-    virtual floatsPtr loadFrame( float timestamp ) const = 0;
+    virtual floatsPtr loadFrame(float timestamp) const = 0;
 
     /** @copydoc brion::CompartmentReport::loadNeuron */
-    virtual floatsPtr loadNeuron( uint32_t gid LB_UNUSED ) const
-        { throw std::runtime_error( "loadNeuron() not implemented" ); }
+    virtual floatsPtr loadNeuron(uint32_t gid LB_UNUSED) const
+    {
+        throw std::runtime_error("loadNeuron() not implemented");
+    }
 
     /** @copydoc brion::CompartmentReport::updateMapping */
-    virtual void updateMapping( const GIDSet& gids ) = 0;
+    virtual void updateMapping(const GIDSet& gids) = 0;
 
     /** @copydoc brion::CompartmentReport::setBufferSize */
-    virtual void setBufferSize( size_t size )
-        { /* To keep doxygen happy */ (void)size; }
+    virtual void setBufferSize(size_t size) { /* To keep doxygen happy */ (void)size; }
 
     /** @copydoc brion::CompartmentReport::clearBuffer */
     virtual void clearBuffer() {}
-
     /** @copydoc brion::CompartmentReport::getBufferSize */
     virtual size_t getBufferSize() const { return 0; }
-
     /** @copydoc brion::CompartmentReport::writeHeader */
-    virtual void writeHeader( float startTime, float endTime, float timestep,
-                              const std::string& dunit,
-                              const std::string& tunit ) = 0;
+    virtual void writeHeader(float startTime, float endTime, float timestep,
+                             const std::string& dunit,
+                             const std::string& tunit) = 0;
 
     /** @copydoc brion::CompartmentReport::writeCompartments */
-    virtual bool writeCompartments( uint32_t gid, const uint16_ts& counts ) = 0;
+    virtual bool writeCompartments(uint32_t gid, const uint16_ts& counts) = 0;
 
     /** @copydoc brion::CompartmentReport::writeFrame */
-    virtual bool writeFrame( uint32_t gid, const float* values, size_t size,
-                             float timestamp ) = 0;
+    virtual bool writeFrame(uint32_t gid, const float* values, size_t size,
+                            float timestamp) = 0;
 
     /** @copydoc brion::CompartmentReport::flush */
     virtual bool flush() = 0;
@@ -164,23 +161,22 @@ public:
     //@}
 
     /** @copydoc brion::CompartmentReport::getIndex */
-    size_t getIndex( const uint32_t gid ) const
+    size_t getIndex(const uint32_t gid) const
     {
         const auto& gids = getGIDs();
-        const size_t index = std::distance( gids.begin(), gids.find( gid ));
-        if( index >= gids.size( ))
-            LBTHROW( std::runtime_error( "Gid " + std::to_string( gid ) +
-                                         " not in report" ));
+        const size_t index = std::distance(gids.begin(), gids.find(gid));
+        if (index >= gids.size())
+            LBTHROW(std::runtime_error("Gid " + std::to_string(gid) +
+                                       " not in report"));
         return index;
     }
 };
-
 }
 
 namespace std
 {
-inline string to_string( const brion::CompartmentReportInitData& data )
+inline string to_string(const brion::CompartmentReportInitData& data)
 {
-    return to_string( data.getURI( ));
+    return to_string(data.getURI());
 }
 }

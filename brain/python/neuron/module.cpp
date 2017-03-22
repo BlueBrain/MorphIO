@@ -25,9 +25,9 @@ namespace brain
 {
 namespace neuron
 {
-
 void export_Morphology();
 
+// clang-format off
 void export_module()
 {
     boost::python::scope neuron = exportSubmodule("neuron");
@@ -41,6 +41,6 @@ void export_module()
 
     export_Morphology();
 }
-
+// clang-format on
 }
 }

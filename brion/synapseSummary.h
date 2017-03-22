@@ -20,14 +20,16 @@
 #ifndef BBP_SYNAPSESUMMARY
 #define BBP_SYNAPSESUMMARY
 
+#include <boost/noncopyable.hpp>
 #include <brion/api.h>
 #include <brion/types.h>
-#include <boost/noncopyable.hpp>
 
 namespace brion
 {
-
-namespace detail { class SynapseSummary; }
+namespace detail
+{
+class SynapseSummary;
+}
 
 /** Read access to a Synapse summary file.
  *
@@ -48,7 +50,7 @@ public:
      * @throw std::runtime_error if file is not a valid synapse information file
      * @version 1.0
      */
-    BRION_API explicit SynapseSummary( const std::string& source );
+    BRION_API explicit SynapseSummary(const std::string& source);
 
     /**
      * Read afferent and efferent information for a given neuron.
@@ -58,13 +60,12 @@ public:
      *         synapses for each connected neuron
      * @version 1.0
      */
-    BRION_API SynapseSummaryMatrix read( const uint32_t gid ) const;
+    BRION_API SynapseSummaryMatrix read(const uint32_t gid) const;
     //@}
 
 private:
     detail::SynapseSummary* const _impl;
 };
-
 }
 
 #endif

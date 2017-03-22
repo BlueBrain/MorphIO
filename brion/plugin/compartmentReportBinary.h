@@ -25,12 +25,10 @@
 #include <lunchbox/bitOperation.h>
 #include <lunchbox/memoryMap.h>
 
-
 namespace brion
 {
 namespace plugin
 {
-
 struct HeaderInfo
 {
     int32_t headerSize;
@@ -58,37 +56,31 @@ struct HeaderInfo
 class CompartmentReportBinary : public CompartmentReportCommon
 {
 public:
-    explicit CompartmentReportBinary( const CompartmentReportInitData& data );
+    explicit CompartmentReportBinary(const CompartmentReportInitData& data);
     virtual ~CompartmentReportBinary();
 
-    static bool handles( const CompartmentReportInitData& initData );
+    static bool handles(const CompartmentReportInitData& initData);
     static std::string getDescription();
 
     float getStartTime() const final { return _startTime; }
-
     float getEndTime() const final { return _endTime; }
-
     float getTimestep() const final { return _timestep; }
-
     const std::string& getDataUnit() const final { return _dunit; }
-
     const std::string& getTimeUnit() const final { return _tunit; }
-
     const GIDSet& getGIDs() const final;
     const SectionOffsets& getOffsets() const final;
     const CompartmentCounts& getCompartmentCounts() const final;
     size_t getFrameSize() const final;
 
-    floatsPtr loadFrame( float timestamp ) const final;
-    floatsPtr loadNeuron( const uint32_t gid ) const final;
-    void updateMapping( const GIDSet& gids ) final;
+    floatsPtr loadFrame(float timestamp) const final;
+    floatsPtr loadNeuron(const uint32_t gid) const final;
+    void updateMapping(const GIDSet& gids) final;
 
-    void writeHeader( float startTime, float endTime,
-                      float timestep, const std::string& dunit,
-                      const std::string& tunit ) final;
-    bool writeCompartments( uint32_t gid, const uint16_ts& counts ) final;
-    bool writeFrame( uint32_t gid, const float* values, size_t size,
-                     float timestamp ) final;
+    void writeHeader(float startTime, float endTime, float timestep,
+                     const std::string& dunit, const std::string& tunit) final;
+    bool writeCompartments(uint32_t gid, const uint16_ts& counts) final;
+    bool writeFrame(uint32_t gid, const float* values, size_t size,
+                    float timestamp) final;
     bool flush() final;
 
 private:
@@ -119,21 +111,21 @@ private:
     GIDSet _originalGIDs;
     bool _subtarget;
 };
-
 }
 }
 
 namespace lunchbox
 {
-template<> inline void byteswap( brion::plugin::HeaderInfo& value )
+template <>
+inline void byteswap(brion::plugin::HeaderInfo& value)
 {
-    byteswap( value.headerSize );
-    byteswap( value.numCells );
-    byteswap( value.numCompartments );
-    byteswap( value.extraMappingSize );
-    byteswap( value.numFrames );
-    byteswap( value.mappingSize );
-    byteswap( value.identifier );
+    byteswap(value.headerSize);
+    byteswap(value.numCells);
+    byteswap(value.numCompartments);
+    byteswap(value.extraMappingSize);
+    byteswap(value.numFrames);
+    byteswap(value.mappingSize);
+    byteswap(value.identifier);
 }
 }
 

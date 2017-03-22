@@ -34,40 +34,38 @@ namespace brion
 {
 namespace plugin
 {
-
 namespace
 {
-lunchbox::PluginRegisterer< SpikeReportBluron > registerer;
+lunchbox::PluginRegisterer<SpikeReportBluron> registerer;
 const char* const BLURON_REPORT_FILE_EXT = ".dat";
 }
 
-SpikeReportBluron::SpikeReportBluron( const SpikeReportInitData& initData )
-    : SpikeReportASCII( initData )
+SpikeReportBluron::SpikeReportBluron(const SpikeReportInitData& initData)
+    : SpikeReportASCII(initData)
 {
-    if ( initData.getAccessMode() == MODE_READ )
+    if (initData.getAccessMode() == MODE_READ)
     {
-        _spikes = parse( _uri.getPath(),
-                         []( const std::string& buffer, Spike& spike )
-                         {
-                             return sscanf( buffer.data(), "%20f%20ud",
-                                            &spike.first, &spike.second ) == 2;
-                         });
+        _spikes =
+            parse(_uri.getPath(), [](const std::string& buffer, Spike& spike) {
+                return sscanf(buffer.data(), "%20f%20ud", &spike.first,
+                              &spike.second) == 2;
+            });
     }
 
     _lastReadPosition = _spikes.begin();
 
-    if( !_spikes.empty( ))
+    if (!_spikes.empty())
         _endTime = _spikes.rbegin()->first;
 }
 
-bool SpikeReportBluron::handles( const SpikeReportInitData& initData )
+bool SpikeReportBluron::handles(const SpikeReportInitData& initData)
 {
     const URI& uri = initData.getURI();
-    if ( !uri.getScheme().empty() && uri.getScheme() != "file" )
+    if (!uri.getScheme().empty() && uri.getScheme() != "file")
         return false;
 
     const boost::filesystem::path ext =
-        boost::filesystem::path( uri.getPath() ).extension();
+        boost::filesystem::path(uri.getPath()).extension();
     return ext == brion::plugin::BLURON_REPORT_FILE_EXT; // .dat
 }
 
@@ -75,17 +73,18 @@ std::string SpikeReportBluron::getDescription()
 {
     return "Blue Brain ASCII spike reports: "
            "[file://]/path/to/report" +
-           std::string( BLURON_REPORT_FILE_EXT );
+           std::string(BLURON_REPORT_FILE_EXT);
 }
 
 void SpikeReportBluron::close()
 {
 }
 
-void SpikeReportBluron::write( const Spikes& spikes )
+void SpikeReportBluron::write(const Spikes& spikes)
 {
-    append( spikes, []( std::ostream& file, const Spike& spike ){
-                        file << spike.first << " " << spike.second << "\n"; });
+    append(spikes, [](std::ostream& file, const Spike& spike) {
+        file << spike.first << " " << spike.second << "\n";
+    });
 }
 }
 }

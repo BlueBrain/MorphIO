@@ -28,7 +28,6 @@ namespace brion
 {
 namespace enums
 {
-
 /** The supported sections in a BlueConfig file. */
 enum BlueConfigSection
 {
@@ -44,12 +43,12 @@ enum BlueConfigSection
 /** The supported structural mesh types. */
 enum MeshStructure
 {
-    MESH_SPINES = 0,    //!< spines
-    MESH_BOUTONS,       //!< boutons
-    MESH_PSD,           //!< post-synaptic densities
-    MESH_AZ,            //!< active zones
-    MESH_ENDO,          //!< endoplasmic reticulum
-    MESH_ALL            //!< @internal must be last
+    MESH_SPINES = 0, //!< spines
+    MESH_BOUTONS,    //!< boutons
+    MESH_PSD,        //!< post-synaptic densities
+    MESH_AZ,         //!< active zones
+    MESH_ENDO,       //!< endoplasmic reticulum
+    MESH_ALL         //!< @internal must be last
 };
 
 /** The supported formats for mesh files. */
@@ -93,9 +92,9 @@ enum CellFamily
 };
 
 /** Output stream formatter for MorphologyVersion */
-inline std::ostream& operator << ( std::ostream& os, const MorphologyVersion v )
+inline std::ostream& operator<<(std::ostream& os, const MorphologyVersion v)
 {
-    switch( v )
+    switch (v)
     {
     case MORPHOLOGY_VERSION_H5_1:
         return os << "h5v1";
@@ -132,10 +131,10 @@ enum NeuronAttributes
 /** The supported classifications for a neuron. */
 enum NeuronClass
 {
-    NEURONCLASS_MTYPE = 0,              //!< L2PC, L5CSPC, ...
-    NEURONCLASS_MORPHOLOGY_CLASS = 1,   //!< PYR, INT
-    NEURONCLASS_FUNCTION_CLASS = 2,     //!< EXC, INH
-    NEURONCLASS_ETYPE,                  //!< cAD, dAL, ...
+    NEURONCLASS_MTYPE = 0,            //!< L2PC, L5CSPC, ...
+    NEURONCLASS_MORPHOLOGY_CLASS = 1, //!< PYR, INT
+    NEURONCLASS_FUNCTION_CLASS = 2,   //!< EXC, INH
+    NEURONCLASS_ETYPE,                //!< cAD, dAL, ...
     NEURONCLASS_INVALID
 };
 
@@ -151,7 +150,7 @@ enum TargetType
 enum SectionType
 {
     SECTION_UNDEFINED = 0,
-    SECTION_SOMA = 1,            //!< neuron cell body
+    SECTION_SOMA = 1, //!< neuron cell body
     SECTION_AXON = 2,
     SECTION_DENDRITE = 3,        //!< general or basal dendrite (near to soma)
     SECTION_APICAL_DENDRITE = 4, //!< apical dendrite (far from soma)
@@ -197,14 +196,11 @@ enum SynapseAttributes
                                   SYNAPSE_POSTSYNAPTIC_SEGMENT |
                                   SYNAPSE_POSTSYNAPTIC_SEGMENT_DISTANCE,
 
-    SYNAPSE_ALL_ATTRIBUTES = SYNAPSE_CONNECTED_NEURON | SYNAPSE_TYPE |
-                             SYNAPSE_PRESYNAPTIC_MTYPE |
-                             SYNAPSE_DENDRITE_BRANCHORDER |
-                             SYNAPSE_AXON_BRANCHORDER |
-                             SYNAPSE_POSTSYNAPTIC_BRANCH_TYPE |
-                             SYNAPSE_DYNAMICS_CONSTANTS |
-                             SYNAPSE_PRESYNAPTIC_NEURON |
-                             SYNAPSE_POSTSYNAPTIC_NEURON
+    SYNAPSE_ALL_ATTRIBUTES =
+        SYNAPSE_CONNECTED_NEURON | SYNAPSE_TYPE | SYNAPSE_PRESYNAPTIC_MTYPE |
+        SYNAPSE_DENDRITE_BRANCHORDER | SYNAPSE_AXON_BRANCHORDER |
+        SYNAPSE_POSTSYNAPTIC_BRANCH_TYPE | SYNAPSE_DYNAMICS_CONSTANTS |
+        SYNAPSE_PRESYNAPTIC_NEURON | SYNAPSE_POSTSYNAPTIC_NEURON
 };
 
 /** The positions of a synapse. */
@@ -225,22 +221,17 @@ enum SynapsePositions
     SYNAPSE_POSITION_NO_ATTRIBUTES = 1 << 13,
     SYNAPSE_POSITION_ALL = 13,
 
-    SYNAPSE_PRESYNAPTIC_POSITION = SYNAPSE_PRESYNAPTIC_SURFACE_X |
-                                   SYNAPSE_PRESYNAPTIC_SURFACE_Y |
-                                   SYNAPSE_PRESYNAPTIC_SURFACE_Z |
-                                   SYNAPSE_PRESYNAPTIC_CENTER_X |
-                                   SYNAPSE_PRESYNAPTIC_CENTER_Y |
-                                   SYNAPSE_PRESYNAPTIC_CENTER_Z,
+    SYNAPSE_PRESYNAPTIC_POSITION =
+        SYNAPSE_PRESYNAPTIC_SURFACE_X | SYNAPSE_PRESYNAPTIC_SURFACE_Y |
+        SYNAPSE_PRESYNAPTIC_SURFACE_Z | SYNAPSE_PRESYNAPTIC_CENTER_X |
+        SYNAPSE_PRESYNAPTIC_CENTER_Y | SYNAPSE_PRESYNAPTIC_CENTER_Z,
 
-    SYNAPSE_POSTSYNAPTIC_POSITION = SYNAPSE_POSTSYNAPTIC_SURFACE_X |
-                                    SYNAPSE_POSTSYNAPTIC_SURFACE_Y |
-                                    SYNAPSE_POSTSYNAPTIC_SURFACE_Z |
-                                    SYNAPSE_POSTSYNAPTIC_CENTER_X |
-                                    SYNAPSE_POSTSYNAPTIC_CENTER_Y |
-                                    SYNAPSE_POSTSYNAPTIC_CENTER_Z,
+    SYNAPSE_POSTSYNAPTIC_POSITION =
+        SYNAPSE_POSTSYNAPTIC_SURFACE_X | SYNAPSE_POSTSYNAPTIC_SURFACE_Y |
+        SYNAPSE_POSTSYNAPTIC_SURFACE_Z | SYNAPSE_POSTSYNAPTIC_CENTER_X |
+        SYNAPSE_POSTSYNAPTIC_CENTER_Y | SYNAPSE_POSTSYNAPTIC_CENTER_Z,
 
-    SYNAPSE_POSITION = SYNAPSE_CONNECTED_NEURON |
-                       SYNAPSE_PRESYNAPTIC_POSITION |
+    SYNAPSE_POSITION = SYNAPSE_CONNECTED_NEURON | SYNAPSE_PRESYNAPTIC_POSITION |
                        SYNAPSE_POSTSYNAPTIC_POSITION
 };
 
@@ -279,7 +270,6 @@ enum AccessMode
     MODE_READWRITE = MODE_READ | MODE_WRITE,
     MODE_READOVERWRITE = MODE_READ | MODE_OVERWRITE
 };
-
 }
 }
 

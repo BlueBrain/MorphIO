@@ -28,7 +28,6 @@
 
 namespace brain
 {
-
 /**
  * A class which allows sequential and forward-only iterations through the
  * synapses from the involved GIDs retrieved by getXXXSynapses() functions from
@@ -43,8 +42,8 @@ public:
 
     /** @name Move semantics. */
     //@{
-    BRAIN_API SynapsesStream( SynapsesStream&& rhs );
-    BRAIN_API SynapsesStream& operator=( SynapsesStream&& rhs );
+    BRAIN_API SynapsesStream(SynapsesStream&& rhs);
+    BRAIN_API SynapsesStream& operator=(SynapsesStream&& rhs);
     //@}
 
     /**
@@ -64,22 +63,21 @@ public:
      * @return a future to the Synapses containing the requested fraction of
      *         synapses
      */
-    BRAIN_API std::future< Synapses > read( size_t count = 1 );
+    BRAIN_API std::future<Synapses> read(size_t count = 1);
 
 private:
-    SynapsesStream( const SynapsesStream& ) = delete;
-    SynapsesStream& operator=( const SynapsesStream& ) = delete;
+    SynapsesStream(const SynapsesStream&) = delete;
+    SynapsesStream& operator=(const SynapsesStream&) = delete;
 
     friend class Circuit;
-    SynapsesStream( const Circuit& circuit, const GIDSet& gids,
-                    bool afferent, SynapsePrefetch prefetch );
-    SynapsesStream( const Circuit& circuit, const GIDSet& preGIDs,
-                    const GIDSet& postGIDs, SynapsePrefetch prefetch );
+    SynapsesStream(const Circuit& circuit, const GIDSet& gids, bool afferent,
+                   SynapsePrefetch prefetch);
+    SynapsesStream(const Circuit& circuit, const GIDSet& preGIDs,
+                   const GIDSet& postGIDs, SynapsePrefetch prefetch);
 
     friend class Synapses;
-    std::unique_ptr< detail::SynapsesStream > _impl;
+    std::unique_ptr<detail::SynapsesStream> _impl;
 };
-
 }
 
 #endif

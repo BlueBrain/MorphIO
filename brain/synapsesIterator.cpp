@@ -24,27 +24,27 @@
 
 namespace brain
 {
-
-SynapsesIterator::SynapsesIterator( const Synapses& synapses,
-                                    const size_t index )
-    : _synapses( synapses )
-    , _index( index )
-{}
+SynapsesIterator::SynapsesIterator(const Synapses& synapses, const size_t index)
+    : _synapses(synapses)
+    , _index(index)
+{
+}
 
 SynapsesIterator::~SynapsesIterator()
-{}
+{
+}
 
-bool SynapsesIterator::operator ==( const SynapsesIterator& rhs ) const
+bool SynapsesIterator::operator==(const SynapsesIterator& rhs) const
 {
     return _index == rhs._index;
 }
 
-bool SynapsesIterator::operator !=( const SynapsesIterator& rhs ) const
+bool SynapsesIterator::operator!=(const SynapsesIterator& rhs) const
 {
     return _index != rhs._index;
 }
 
-SynapsesIterator& SynapsesIterator::operator ++()
+SynapsesIterator& SynapsesIterator::operator++()
 {
     ++_index;
     return *this;
@@ -54,5 +54,4 @@ Synapse SynapsesIterator::operator*() const
 {
     return _synapses[_index];
 }
-
 }

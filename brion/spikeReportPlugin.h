@@ -21,12 +21,12 @@
 #define SPIKEREPORTPLUGIN_H
 
 #include <brion/api.h>
-#include <brion/types.h>
 #include <brion/enums.h>
-#include <brion/spikeReport.h>
 #include <brion/pluginInitData.h>
+#include <brion/spikeReport.h>
+#include <brion/types.h>
 
-#include <lunchbox/debug.h>  // LBTHROW
+#include <lunchbox/debug.h> // LBTHROW
 
 #include <boost/noncopyable.hpp>
 
@@ -34,12 +34,11 @@
 
 namespace brion
 {
-
 /**
  * Basic plugin init data for SpikeReportPlugin.
  * @version 2.0
  */
-using SpikeReportInitData = PluginInitData ;
+using SpikeReportInitData = PluginInitData;
 
 /** Base interface for spike report readers plugins.
  *
@@ -83,113 +82,84 @@ class SpikeReportPlugin : public boost::noncopyable
 {
 public:
     /** @internal Needed by the PluginRegisterer. */
-    typedef SpikeReportPlugin InterfaceT ;
+    typedef SpikeReportPlugin InterfaceT;
     /** @internal Needed by the PluginRegisterer. */
-    typedef PluginInitData InitDataT ;
+    typedef PluginInitData InitDataT;
 
     using State = SpikeReport::State;
 
-    SpikeReportPlugin( const PluginInitData & initData )
-        : _uri( initData.getURI( )), _accessMode( initData.getAccessMode( ))
-    {}
+    SpikeReportPlugin(const PluginInitData& initData)
+        : _uri(initData.getURI())
+        , _accessMode(initData.getAccessMode())
+    {
+    }
 
     /** @internal */
     virtual ~SpikeReportPlugin() {}
-
     /** @copydoc brion::SpikeReport::close */
     virtual void close()
     {
-        LBTHROW( std::runtime_error(
-                     "Operation not supported in spike report plugin" ));
+        LBTHROW(std::runtime_error(
+            "Operation not supported in spike report plugin"));
     }
 
     /** @copydoc brion::SpikeReport::read */
-    virtual Spikes read( float min LB_UNUSED )
+    virtual Spikes read(float min LB_UNUSED)
     {
-        LBTHROW( std::runtime_error(
-                     "Operation not supported in spike report plugin" ));
+        LBTHROW(std::runtime_error(
+            "Operation not supported in spike report plugin"));
     }
 
     /** @copydoc brion::SpikeReport::readUntil */
-    virtual Spikes readUntil( float max LB_UNUSED )
+    virtual Spikes readUntil(float max LB_UNUSED)
     {
-        LBTHROW( std::runtime_error(
-                     "Operation not supported in spike report plugin" ));
+        LBTHROW(std::runtime_error(
+            "Operation not supported in spike report plugin"));
     }
 
     /** @copydoc brion::SpikeReport::seek */
-    virtual void readSeek( float toTimeStamp LB_UNUSED )
+    virtual void readSeek(float toTimeStamp LB_UNUSED)
     {
-        LBTHROW( std::runtime_error(
-                     "Operation not supported in spike report plugin" ));
+        LBTHROW(std::runtime_error(
+            "Operation not supported in spike report plugin"));
     }
 
-
     /** @copydoc brion::SpikeReport::writeSeek */
-    virtual void writeSeek( float toTimeStamp LB_UNUSED )
+    virtual void writeSeek(float toTimeStamp LB_UNUSED)
     {
-        LBTHROW( std::runtime_error(
-                     "Operation not supported in spike report plugin" ));
+        LBTHROW(std::runtime_error(
+            "Operation not supported in spike report plugin"));
     }
 
     /** @copydoc brion::SpikeReport::write */
-    virtual void write( const Spikes& spikes LB_UNUSED )
+    virtual void write(const Spikes& spikes LB_UNUSED)
     {
-        LBTHROW( std::runtime_error(
-                     "Operation not supported in spike report plugin" ));
+        LBTHROW(std::runtime_error(
+            "Operation not supported in spike report plugin"));
     }
 
     /** @copydoc brion::SpikeReport::supportsBackwardSeek */
     virtual bool supportsBackwardSeek() const = 0;
 
-    void setFilter( const GIDSet& ids )
+    void setFilter(const GIDSet& ids)
     {
         _idsSubset = ids;
-        if( !_idsSubset.empty( ))
+        if (!_idsSubset.empty())
             _pushBackFunction = &SpikeReportPlugin::_pushBackFiltered;
         else
             _pushBackFunction = &SpikeReportPlugin::_pushBack;
     }
 
-    virtual const URI& getURI() const
-    {
-        return _uri;
-    }
-
-    State getState() const
-    {
-        return _state;
-    }
-
-    int getAccessMode() const
-    {
-        return _accessMode;
-    }
-
-    virtual float getCurrentTime() const
-    {
-        return _currentTime;
-    }
-
-    virtual float getEndTime() const
-    {
-        return _endTime;
-    }
-
-    bool isClosed() const
-    {
-        return  _closed;
-    }
-
-
-    bool isInInterruptedState() const
-    {
-        return _interrupted;
-    }
-
+    virtual const URI& getURI() const { return _uri; }
+    State getState() const { return _state; }
+    int getAccessMode() const { return _accessMode; }
+    virtual float getCurrentTime() const { return _currentTime; }
+    virtual float getEndTime() const { return _endTime; }
+    bool isClosed() const { return _closed; }
+    bool isInInterruptedState() const { return _interrupted; }
 protected:
-    typedef void( SpikeReportPlugin::*SpikeInsertFunction )( const Spike&,
-                                                             Spikes& ) const;
+    typedef void (SpikeReportPlugin::*SpikeInsertFunction)(const Spike&,
+                                                           Spikes&) const;
 
     URI _uri;
     brion::GIDSet _idsSubset;
@@ -198,16 +168,16 @@ protected:
     float _endTime = 0;
     State _state = State::ok;
 
-    void pushBack( const Spike& spike, Spikes& spikes ) const
+    void pushBack(const Spike& spike, Spikes& spikes) const
     {
-        ( this->*_pushBackFunction )( spike, spikes );
+        (this->*_pushBackFunction)(spike, spikes);
     }
 
     void checkNotInterrupted()
     {
-        if( isInInterruptedState( ))
+        if (isInInterruptedState())
         {
-            LBTHROW( std::runtime_error( "Interrupted" ));
+            LBTHROW(std::runtime_error("Interrupted"));
         }
     }
 
@@ -219,49 +189,44 @@ private:
     bool _interrupted = false;
 
     // Spike filtering.
-    void _pushBack( const Spike& spike, Spikes& spikes ) const
+    void _pushBack(const Spike& spike, Spikes& spikes) const
     {
         spikes.push_back(spike);
     }
 
-    void _pushBackFiltered( const Spike& spike, Spikes& spikes ) const
+    void _pushBackFiltered(const Spike& spike, Spikes& spikes) const
     {
-        if( _idsSubset.find(spike.second) != _idsSubset.end( ))
+        if (_idsSubset.find(spike.second) != _idsSubset.end())
         {
-            spikes.push_back( spike );
+            spikes.push_back(spike);
         }
     }
 
     // Used in SpikeReport.
-    void _setClosed()
-    {
-        _closed = true;
-    }
+    void _setClosed() { _closed = true; }
     void _checkCanRead()
     {
-        if( _accessMode != MODE_READ )
+        if (_accessMode != MODE_READ)
         {
-            LBTHROW( std::runtime_error(
-                         "Can't read: Not open in read mode" ));
+            LBTHROW(std::runtime_error("Can't read: Not open in read mode"));
         }
     }
     void _checkCanWrite()
     {
-        if( _accessMode != MODE_WRITE )
+        if (_accessMode != MODE_WRITE)
         {
-            LBTHROW( std::runtime_error(
-                         "Can't write: Not open in write mode" ));
+            LBTHROW(std::runtime_error("Can't write: Not open in write mode"));
         }
     }
 
     void _checkStateOk()
     {
-        switch ( _state )
+        switch (_state)
         {
         case State::ended:
-            LBTHROW( std::logic_error( "State is ENDED" ));
+            LBTHROW(std::logic_error("State is ENDED"));
         case State::failed:
-            LBTHROW( std::logic_error( "State is FAILED" ));
+            LBTHROW(std::logic_error("State is FAILED"));
         default:
             break;
         }
@@ -269,25 +234,21 @@ private:
 
     void _checkNotClosed()
     {
-        if( _closed )
+        if (_closed)
         {
-            LBTHROW( std::runtime_error( "Report closed" ));
+            LBTHROW(std::runtime_error("Report closed"));
         }
     }
 
-
-    void _setInterrupted( const bool i )
-    {
-        _interrupted = i;
-    }
+    void _setInterrupted(const bool i) { _interrupted = i; }
 };
 }
 
 namespace std
 {
-inline string to_string( const brion::SpikeReportInitData& data )
+inline string to_string(const brion::SpikeReportInitData& data)
 {
-    return to_string( data.getURI( ));
+    return to_string(data.getURI());
 }
 }
 #endif // SPIKEREPORTPLUGIN_H

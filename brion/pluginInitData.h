@@ -23,7 +23,6 @@
 
 namespace brion
 {
-
 /**
  * Basic plugin init data for Brion plugin classes. SpikeReportInitData and
  * CompartmentReportInitData classes extend this class to initialize the
@@ -45,23 +44,22 @@ public:
      * @param accessMode the brion::AccessMode bitmask
      * @version 1.4
      */
-    explicit PluginInitData( const URI& uri, const int accessMode = MODE_READ )
-        : _uri( uri ), _accessMode( accessMode )
-    {}
+    explicit PluginInitData(const URI& uri, const int accessMode = MODE_READ)
+        : _uri(uri)
+        , _accessMode(accessMode)
+    {
+    }
 
     /** @return the URI. @version 1.4 */
     const URI& getURI() const { return _uri; }
-
     /**
      *
      * @return Returns the access mode.
      * @version 1.4
      */
     int getAccessMode() const { return _accessMode; }
-
 protected:
     const URI _uri;
     const int _accessMode;
 };
-
 }

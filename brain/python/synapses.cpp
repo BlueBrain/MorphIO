@@ -19,12 +19,11 @@
 
 #include <boost/python.hpp>
 
-#include "types.h"
 #include "arrayHelpers.h"
 #include "docstrings.h"
+#include "types.h"
 
 #include <brain/synapses.h>
-
 
 #include <vmmlib/vector.hpp>
 
@@ -32,66 +31,66 @@ namespace bp = boost::python;
 
 namespace brain
 {
-
 namespace
 {
-
-bool nonzero( const SynapsesWrapper& )
+bool nonzero(const SynapsesWrapper&)
 {
     return true;
 }
 
-SynapseWrapper Synapses_get( const SynapsesWrapper& synapses, long int index )
+SynapseWrapper Synapses_get(const SynapsesWrapper& synapses, long int index)
 {
-    if( index < 0 )
+    if (index < 0)
         index = synapses.size() + index;
-    if( index < 0 || size_t(index) >= synapses.size( ))
+    if (index < 0 || size_t(index) >= synapses.size())
     {
-        PyErr_SetString( PyExc_IndexError, "Index out of bounds" );
+        PyErr_SetString(PyExc_IndexError, "Index out of bounds");
         bp::throw_error_already_set();
     }
-    return SynapseWrapper( synapses[index], synapses, synapses._circuit );
+    return SynapseWrapper(synapses[index], synapses, synapses._circuit);
 }
 
-#define GET_SYNAPSES_ARRAY_PROPERTY( type, name ) \
-bp::object Synapses_##name( const SynapsesWrapper& synapses ) \
-    { if( !synapses.name() ) return bp::object();             \
-      return toNumpy( synapses.name(), synapses.size(), synapses._impl ); }
+#define GET_SYNAPSES_ARRAY_PROPERTY(type, name)                           \
+    bp::object Synapses_##name(const SynapsesWrapper& synapses)           \
+    {                                                                     \
+        if (!synapses.name())                                             \
+            return bp::object();                                          \
+        return toNumpy(synapses.name(), synapses.size(), synapses._impl); \
+    }
 
-GET_SYNAPSES_ARRAY_PROPERTY( size_t, indices )
-GET_SYNAPSES_ARRAY_PROPERTY( uin32_t, preGIDs )
-GET_SYNAPSES_ARRAY_PROPERTY( uin32_t, preSectionIDs )
-GET_SYNAPSES_ARRAY_PROPERTY( uin32_t, preSegmentIDs )
-GET_SYNAPSES_ARRAY_PROPERTY( float, preDistances )
-GET_SYNAPSES_ARRAY_PROPERTY( float, preSurfaceXPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, preSurfaceYPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, preSurfaceZPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, preCenterXPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, preCenterYPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, preCenterZPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( uint32_t, postGIDs )
-GET_SYNAPSES_ARRAY_PROPERTY( uint32_t, postSectionIDs )
-GET_SYNAPSES_ARRAY_PROPERTY( uint32_t, postSegmentIDs )
-GET_SYNAPSES_ARRAY_PROPERTY( float, postDistances )
-GET_SYNAPSES_ARRAY_PROPERTY( float, postSurfaceXPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, postSurfaceYPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, postSurfaceZPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, postCenterXPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, postCenterYPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, postCenterZPositions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, delays )
-GET_SYNAPSES_ARRAY_PROPERTY( float, conductances )
-GET_SYNAPSES_ARRAY_PROPERTY( float, utilizations )
-GET_SYNAPSES_ARRAY_PROPERTY( float, depressions )
-GET_SYNAPSES_ARRAY_PROPERTY( float, facilitations )
-GET_SYNAPSES_ARRAY_PROPERTY( float, decays )
-GET_SYNAPSES_ARRAY_PROPERTY( int, efficacies )
-
+GET_SYNAPSES_ARRAY_PROPERTY(size_t, indices)
+GET_SYNAPSES_ARRAY_PROPERTY(uin32_t, preGIDs)
+GET_SYNAPSES_ARRAY_PROPERTY(uin32_t, preSectionIDs)
+GET_SYNAPSES_ARRAY_PROPERTY(uin32_t, preSegmentIDs)
+GET_SYNAPSES_ARRAY_PROPERTY(float, preDistances)
+GET_SYNAPSES_ARRAY_PROPERTY(float, preSurfaceXPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, preSurfaceYPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, preSurfaceZPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, preCenterXPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, preCenterYPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, preCenterZPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(uint32_t, postGIDs)
+GET_SYNAPSES_ARRAY_PROPERTY(uint32_t, postSectionIDs)
+GET_SYNAPSES_ARRAY_PROPERTY(uint32_t, postSegmentIDs)
+GET_SYNAPSES_ARRAY_PROPERTY(float, postDistances)
+GET_SYNAPSES_ARRAY_PROPERTY(float, postSurfaceXPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, postSurfaceYPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, postSurfaceZPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, postCenterXPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, postCenterYPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, postCenterZPositions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, delays)
+GET_SYNAPSES_ARRAY_PROPERTY(float, conductances)
+GET_SYNAPSES_ARRAY_PROPERTY(float, utilizations)
+GET_SYNAPSES_ARRAY_PROPERTY(float, depressions)
+GET_SYNAPSES_ARRAY_PROPERTY(float, facilitations)
+GET_SYNAPSES_ARRAY_PROPERTY(float, decays)
+GET_SYNAPSES_ARRAY_PROPERTY(int, efficacies)
 }
 
+// clang-format off
 void export_Synapses()
 {
-
 const auto selfarg = bp::arg( "self" );
 
 bp::class_< SynapseWrapper >( "Synapse",
@@ -204,5 +203,5 @@ bp::class_< SynapsesWrapper >( "Synapses", DOXY_CLASS( brain::Synapses ),
     ;
 
 }
-
+// clang-format on
 }

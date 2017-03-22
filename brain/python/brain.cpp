@@ -66,7 +66,6 @@ struct URItoString
     }
 };
 
-
 BOOST_PYTHON_MODULE(_brain)
 {
 #ifdef BRAIN_HAS_DOCSTRINGS

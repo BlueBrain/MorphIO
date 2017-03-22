@@ -35,11 +35,12 @@ namespace plugin
 class CompartmentReportDummy : public CompartmentReportCommon
 {
 public:
-    explicit CompartmentReportDummy( const CompartmentReportInitData& );
+    explicit CompartmentReportDummy(const CompartmentReportInitData&);
     virtual ~CompartmentReportDummy() {}
-
-    static bool handles( const CompartmentReportInitData& initData )
-        { return initData.getURI().getScheme() == "dummy"; }
+    static bool handles(const CompartmentReportInitData& initData)
+    {
+        return initData.getURI().getScheme() == "dummy";
+    }
     static std::string getDescription();
 
     float getStartTime() const final;
@@ -52,18 +53,22 @@ public:
     const SectionOffsets& getOffsets() const final { return _offsets; }
     size_t getFrameSize() const final;
     const CompartmentCounts& getCompartmentCounts() const final
-        { return _counts; }
+    {
+        return _counts;
+    }
 
-    floatsPtr loadFrame( float ) const final;
-    void updateMapping( const GIDSet& ) final;
-    void writeHeader( float, float, float, const std::string&,
-                      const std::string& ) final {}
-    bool writeCompartments( uint32_t, const uint16_ts& ) final
-        { return true; }
-    bool writeFrame( uint32_t, const float*, size_t, float ) final
-        { return true; }
+    floatsPtr loadFrame(float) const final;
+    void updateMapping(const GIDSet&) final;
+    void writeHeader(float, float, float, const std::string&,
+                     const std::string&) final
+    {
+    }
+    bool writeCompartments(uint32_t, const uint16_ts&) final { return true; }
+    bool writeFrame(uint32_t, const float*, size_t, float) final
+    {
+        return true;
+    }
     bool flush() final { return true; }
-
 private:
     brion::GIDSet _gids;
     SectionOffsets _offsets;
@@ -71,6 +76,5 @@ private:
     size_t _defaultGIDs;
     const bool _randomValues;
 };
-
 }
 }

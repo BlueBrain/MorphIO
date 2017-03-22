@@ -45,19 +45,17 @@ namespace plugin
 class CompartmentReportMap : public CompartmentReportCommon
 {
 public:
-    explicit CompartmentReportMap( const CompartmentReportInitData& initData );
+    explicit CompartmentReportMap(const CompartmentReportInitData& initData);
     virtual ~CompartmentReportMap();
 
-    static bool handles( const CompartmentReportInitData& initData );
+    static bool handles(const CompartmentReportInitData& initData);
     static std::string getDescription();
 
     float getStartTime() const final { return _header.startTime; }
     float getEndTime() const final { return _header.endTime; }
     float getTimestep() const final { return _header.timestep; }
-
     const std::string& getDataUnit() const final { return _dunit; }
     const std::string& getTimeUnit() const final { return _tunit; }
-
     const brion::GIDSet& getGIDs() const final { return _gids; }
     const SectionOffsets& getOffsets() const final { return _offsets; }
     size_t getFrameSize() const final { return _totalCompartments; }
@@ -66,17 +64,16 @@ public:
         return _counts;
     }
 
-    floatsPtr loadFrame( float timestamp ) const final;
-    floatsPtr loadNeuron( uint32_t gid ) const final;
+    floatsPtr loadFrame(float timestamp) const final;
+    floatsPtr loadNeuron(uint32_t gid) const final;
 
-    void updateMapping( const GIDSet& gids ) final;
+    void updateMapping(const GIDSet& gids) final;
 
-    void writeHeader( float startTime, float endTime, float timestep,
-                      const std::string& dunit,
-                      const std::string& tunit ) final;
-    bool writeCompartments( uint32_t gid, const uint16_ts& counts ) final;
-    bool writeFrame( uint32_t gid, const float* values, size_t size,
-                     float timestamp ) final;
+    void writeHeader(float startTime, float endTime, float timestep,
+                     const std::string& dunit, const std::string& tunit) final;
+    bool writeCompartments(uint32_t gid, const uint16_ts& counts) final;
+    bool writeFrame(uint32_t gid, const float* values, size_t size,
+                    float timestamp) final;
     bool flush() final;
     bool erase() final;
 
@@ -127,20 +124,20 @@ private:
     void _clear();
     bool _loadHeader();
     bool _flushHeader();
-    bool _load( floatsPtr buffer, const Strings& keys,
-                const OffsetMap& offsets ) const;
+    bool _load(floatsPtr buffer, const Strings& keys,
+               const OffsetMap& offsets) const;
 
     std::string _getHeaderKey() const { return "header"; }
     std::string _getGidsKey() const { return "gids"; }
     std::string _getTunitKey() const { return "tunit"; }
     std::string _getDunitKey() const { return "dunit"; }
-    std::string _getCountsKey( const uint32_t gid ) const
+    std::string _getCountsKey(const uint32_t gid) const
     {
-        return "counts_" + std::to_string( gid );
+        return "counts_" + std::to_string(gid);
     }
-    std::string _getValueKey( const uint32_t gid, const size_t frame ) const
+    std::string _getValueKey(const uint32_t gid, const size_t frame) const
     {
-        return std::to_string( gid ) + "_" + std::to_string( frame );
+        return std::to_string(gid) + "_" + std::to_string(frame);
     }
 };
 }

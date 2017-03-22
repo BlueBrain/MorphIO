@@ -20,14 +20,13 @@
 #ifndef BRION_MORPHOLOGY
 #define BRION_MORPHOLOGY
 
+#include <boost/noncopyable.hpp>
 #include <brion/api.h>
 #include <brion/types.h>
 #include <vmmlib/vector.hpp> // return value
-#include <boost/noncopyable.hpp>
 
 namespace brion
 {
-
 /** Read & write access to a Morphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
@@ -47,7 +46,7 @@ public:
      * @throw std::runtime_error if file is not a valid morphology file
      * @version 1.0
      */
-    BRION_API explicit Morphology( const std::string& source );
+    BRION_API explicit Morphology(const std::string& source);
 
     /** @return the cell family of that morphology. @version 1.8 */
     BRION_API CellFamily getCellFamily() const;
@@ -59,7 +58,7 @@ public:
      * @version 1.0
      */
     BRION_API Vector4fsPtr
-    readPoints( MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED ) const;
+        readPoints(MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED) const;
 
     /** Read sections of morphology, representing section start index and index
      *  of the parent section.
@@ -70,7 +69,7 @@ public:
      * @version 1.0
      */
     BRION_API Vector2isPtr
-    readSections( MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED ) const;
+        readSections(MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED) const;
 
     /** Read section types of morphology.
      *
@@ -110,8 +109,8 @@ public:
      * @version 1.0
      * @deprecated
      */
-    BRION_API Morphology( const std::string& target,
-                          MorphologyVersion version, bool overwrite = false );
+    BRION_API Morphology(const std::string& target, MorphologyVersion version,
+                         bool overwrite = false);
 
     /**
      * Open the given morphology file for write access.
@@ -121,7 +120,7 @@ public:
      * @throw std::runtime_error if file could not be created
      * @version 1.8
      */
-    BRION_API Morphology( const std::string& file, CellFamily family );
+    BRION_API Morphology(const std::string& file, CellFamily family);
 
     /** Write points of morphology, representing x,y,z coordinates + diameter.
      *
@@ -133,8 +132,9 @@ public:
      *                           perimeters
      * @version 1.0
      */
-    BRION_API void writePoints( const Vector4fs& points,
-                           MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED );
+    BRION_API void writePoints(
+        const Vector4fs& points,
+        MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED);
 
     /** Write sections of morphology, representing section start index and index
      *  of parent the section.
@@ -144,8 +144,9 @@ public:
      * @throw std::runtime_error if object not writable
      * @version 1.0
      */
-    BRION_API void writeSections( const Vector2is& sections,
-                           MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED );
+    BRION_API void writeSections(
+        const Vector2is& sections,
+        MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED);
 
     /** Write section types of morphology.
      *
@@ -153,7 +154,7 @@ public:
      * @throw std::runtime_error if object not writable
      * @version 1.0
      */
-    BRION_API void writeSectionTypes( const SectionTypes& types );
+    BRION_API void writeSectionTypes(const SectionTypes& types);
 
     /** Write apical points of morphology, representing section and point index.
      *
@@ -163,7 +164,7 @@ public:
      * @version 1.0
      * @deprecated
      */
-    BRION_API void writeApicals( const Vector2is& apicals );
+    BRION_API void writeApicals(const Vector2is& apicals);
 
     /**
      * Write perimeters of morphology.
@@ -177,7 +178,7 @@ public:
      * @throw std::runtime_error if not supported by implementation
      * @version 1.8
      */
-    BRION_API void writePerimeters( const floats& perimeters );
+    BRION_API void writePerimeters(const floats& perimeters);
 
     /** Flush data to output. @version 1.0 */
     BRION_API void flush();
@@ -187,6 +188,5 @@ private:
     class Impl;
     Impl* const _impl;
 };
-
 }
 #endif

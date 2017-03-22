@@ -19,22 +19,22 @@
 
 #include <boost/python.hpp>
 
-#include <brain/types.h>
 #include <brain/spikeReportWriter.h>
+#include <brain/types.h>
 
 namespace bp = boost::python;
 
 namespace brain
 {
-
 namespace
 {
-SpikeReportWriterPtr _initURI( const std::string& uri )
+SpikeReportWriterPtr _initURI(const std::string& uri)
 {
-    return SpikeReportWriterPtr( new SpikeReportWriter( brion::URI( uri )));
+    return SpikeReportWriterPtr(new SpikeReportWriter(brion::URI(uri)));
 }
 }
 
+// clang-format off
 void export_SpikeReportWriter()
 {
 
@@ -43,8 +43,7 @@ bp::class_< SpikeReportWriter, boost::noncopyable >(
     .def( "__init__", bp::make_constructor( _initURI ))
     .def( "close", &SpikeReportWriter::close )
     .def( "writeSpikes", &SpikeReportWriter::writeSpikes )
-;
-
+    ;
 }
-
+// clang-format on
 }

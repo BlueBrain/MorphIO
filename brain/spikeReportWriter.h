@@ -21,13 +21,12 @@
 #ifndef BRAIN_SPIKEREPORTWRITER_H
 #define BRAIN_SPIKEREPORTWRITER_H
 
+#include <boost/noncopyable.hpp>
 #include <brain/types.h>
 #include <lunchbox/uri.h>
-#include <boost/noncopyable.hpp>
 
 namespace brain
 {
-
 /**
  * Writer for spike data.
  *
@@ -45,8 +44,8 @@ public:
      * @param accessMode Access mode
      * @version 1.0
      */
-    SpikeReportWriter( const brion::URI& uri,
-                       const int accessMode = brion::MODE_WRITE );
+    SpikeReportWriter(const brion::URI& uri,
+                      const int accessMode = brion::MODE_WRITE);
 
     /**
      * Destructor.
@@ -60,7 +59,7 @@ public:
      * @param spikes Spikes to write.
      * @version 1.0
      */
-    void writeSpikes( const Spikes& spikes );
+    void writeSpikes(const Spikes& spikes);
 
     /**
      * Get the URI where the writer is publishing. It could be same as the one
@@ -83,6 +82,5 @@ private:
     class _Impl;
     _Impl* _impl;
 };
-
 }
 #endif

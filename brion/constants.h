@@ -22,7 +22,6 @@
 
 namespace brion
 {
-
 const char* const SPIKE_FILE = "/out.dat";
 const char* const CIRCUIT_FILE_MVD2 = "/circuit.mvd2";
 const char* const CIRCUIT_FILE_MVD3 = "/circuit.mvd3";
@@ -40,7 +39,6 @@ const char* const BLUECONFIG_SPIKES_PATH_KEY = "SpikesPath";
 const char* const BLUECONFIG_CIRCUIT_TARGET_KEY = "CircuitTarget";
 const char* const BLUECONFIG_REPORT_FORMAT_KEY = "Format";
 const char* const BLUECONFIG_DT_KEY = "Dt";
-
 }
 
 #endif

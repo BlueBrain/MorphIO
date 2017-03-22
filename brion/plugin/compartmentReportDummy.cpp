@@ -30,15 +30,15 @@ namespace plugin
 {
 namespace
 {
-    lunchbox::PluginRegisterer< CompartmentReportDummy > registerer;
+lunchbox::PluginRegisterer<CompartmentReportDummy> registerer;
 }
 
 CompartmentReportDummy::CompartmentReportDummy(
-    const CompartmentReportInitData& initData )
-    : _randomValues( initData.getURI().findQuery("randomValues") !=
-                     initData.getURI().queryEnd( ))
+    const CompartmentReportInitData& initData)
+    : _randomValues(initData.getURI().findQuery("randomValues") !=
+                    initData.getURI().queryEnd())
 {
-    if( initData.getAccessMode() != MODE_READ )
+    if (initData.getAccessMode() != MODE_READ)
         return;
 
     // Prepare pseudo-random read data
@@ -46,9 +46,9 @@ CompartmentReportDummy::CompartmentReportDummy(
     const auto& i = uri.findQuery("size");
 
     // we use <size> GIDs * ~1KB/GID compartments * 1024 frames
-    _defaultGIDs = (i == uri.queryEnd( )) ? 1024 :
-                       boost::lexical_cast< size_t >( i->second );
-    _cacheNeuronCompartmentCounts( _gids );
+    _defaultGIDs =
+        (i == uri.queryEnd()) ? 1024 : boost::lexical_cast<size_t>(i->second);
+    _cacheNeuronCompartmentCounts(_gids);
 }
 
 std::string CompartmentReportDummy::getDescription()
@@ -85,25 +85,25 @@ float CompartmentReportDummy::getTimestep() const
     return 1.f;
 }
 
-void CompartmentReportDummy::updateMapping( const GIDSet& gids )
+void CompartmentReportDummy::updateMapping(const GIDSet& gids)
 {
-    if( _gids == gids && !gids.empty( ))
+    if (_gids == gids && !gids.empty())
         return;
 
     std::random_device dev;
-    std::mt19937_64 engine( dev( ));
-    std::uniform_int_distribution < uint32_t > distribution;
-    engine.seed( _defaultGIDs ); // reproducible randomness, please
+    std::mt19937_64 engine(dev());
+    std::uniform_int_distribution<uint32_t> distribution;
+    engine.seed(_defaultGIDs); // reproducible randomness, please
 
     GIDSet all;
-    while( all.size() < _defaultGIDs )
-        all.insert( distribution( engine ));
+    while (all.size() < _defaultGIDs)
+        all.insert(distribution(engine));
 
     const auto& subset = gids.empty() ? all : gids;
-    _gids = _computeIntersection( all, subset );
+    _gids = _computeIntersection(all, subset);
     _counts.clear();
     _offsets.clear();
-    if( _gids.empty( ))
+    if (_gids.empty())
         return;
 
     // aim for ~1k compartments/cell
@@ -111,30 +111,30 @@ void CompartmentReportDummy::updateMapping( const GIDSet& gids )
     static const size_t maxCompartments = 256 /* x 4B/value */ - spread / 2;
     uint64_t offset = 0;
 
-    while( _counts.size() < _gids.size() - 1 )
+    while (_counts.size() < _gids.size() - 1)
     {
-        _counts.push_back( uint16_ts( ));
-        _offsets.push_back( uint64_ts( ));
+        _counts.push_back(uint16_ts());
+        _offsets.push_back(uint64_ts());
 
-        for( size_t nCompartments = 0; nCompartments < maxCompartments;
-             nCompartments += _counts.back().back( ))
+        for (size_t nCompartments = 0; nCompartments < maxCompartments;
+             nCompartments += _counts.back().back())
         {
             _counts.back().push_back(
-                uint16_t( distribution( engine ) % (spread-1) + 1 ));
-            _offsets.back().push_back( offset );
+                uint16_t(distribution(engine) % (spread - 1) + 1));
+            _offsets.back().push_back(offset);
             offset += _counts.back().back();
         }
     }
 
     // Last cell: fill up to desired size to correct random errors above
     const size_t targetSize = _gids.size() * 256 /* x 4B/value */;
-    _counts.push_back( uint16_ts( ));
-    _offsets.push_back( uint64_ts( ));
-    while( offset < targetSize )
+    _counts.push_back(uint16_ts());
+    _offsets.push_back(uint64_ts());
+    while (offset < targetSize)
     {
         _counts.back().push_back(
-            uint16_t( distribution( engine ) % (spread-1) + 1 ));
-        _offsets.back().push_back( offset );
+            uint16_t(distribution(engine) % (spread - 1) + 1));
+        _offsets.back().push_back(offset);
         offset += _counts.back().back();
     }
 
@@ -146,26 +146,25 @@ void CompartmentReportDummy::updateMapping( const GIDSet& gids )
 size_t CompartmentReportDummy::getFrameSize() const
 {
     size_t frameSize = 0;
-    for( const auto& counts : _counts )
-        frameSize += std::accumulate( counts.begin(), counts.end(), 0 );
+    for (const auto& counts : _counts)
+        frameSize += std::accumulate(counts.begin(), counts.end(), 0);
     return frameSize;
 }
 
-floatsPtr CompartmentReportDummy::loadFrame( const float time ) const
+floatsPtr CompartmentReportDummy::loadFrame(const float time) const
 {
-    floatsPtr buffer( new floats( getFrameSize( )));
-    if( _randomValues )
+    floatsPtr buffer(new floats(getFrameSize()));
+    if (_randomValues)
     {
         std::random_device dev;
-        std::mt19937_64 engine( dev( ));
-        std::uniform_int_distribution < int16_t > distribution;
-        engine.seed( unsigned( time )); // reproducible randomness, please
+        std::mt19937_64 engine(dev());
+        std::uniform_int_distribution<int16_t> distribution;
+        engine.seed(unsigned(time)); // reproducible randomness, please
 
-        for( float& value : *buffer )
-            value = float( distribution( engine )) / 1000.f;
+        for (float& value : *buffer)
+            value = float(distribution(engine)) / 1000.f;
     }
     return buffer;
 }
-
 }
 }

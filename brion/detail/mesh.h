@@ -31,14 +31,20 @@ public:
     const bool _write;
     MeshVersion _version;
 
-    explicit Mesh( const std::string& source )
-        : _source( source ), _write( false ), _version( MESH_VERSION_1 ) {}
-    Mesh( const std::string& source, const MeshVersion version )
-        : _source( source ), _write( true ), _version( version ) {}
+    explicit Mesh(const std::string& source)
+        : _source(source)
+        , _write(false)
+        , _version(MESH_VERSION_1)
+    {
+    }
+    Mesh(const std::string& source, const MeshVersion version)
+        : _source(source)
+        , _write(true)
+        , _version(version)
+    {
+    }
     virtual ~Mesh() {}
-
     MeshVersion getVersion() const { return _version; }
-
     /** @name Read API for membrane/surface mesh */
     //@{
     virtual size_t getNumVertices() const = 0;
@@ -60,45 +66,44 @@ public:
 
     /** @name Read API for structural mesh */
     //@{
-    virtual size_t getNumStructures( const MeshStructure type ) const = 0;
-    virtual Vector3fsPtr readStructureVertices( const MeshStructure type,
-                                                const size_t index  ) const = 0;
-    virtual uint32_tsPtr readStructureTriangles( const MeshStructure type,
-                                                 const size_t index  ) const = 0;
-    virtual uint32_tsPtr readStructureTriStrip( const MeshStructure type,
-                                                const size_t index  ) const = 0;
+    virtual size_t getNumStructures(const MeshStructure type) const = 0;
+    virtual Vector3fsPtr readStructureVertices(const MeshStructure type,
+                                               const size_t index) const = 0;
+    virtual uint32_tsPtr readStructureTriangles(const MeshStructure type,
+                                                const size_t index) const = 0;
+    virtual uint32_tsPtr readStructureTriStrip(const MeshStructure type,
+                                               const size_t index) const = 0;
     //@}
 
     /** @name Write API for membrane/surface mesh */
     //@{
-    virtual void writeVertices( const Vector3fs& vertices ) = 0;
-    virtual void writeVertexSections( const uint16_ts& vSections ) = 0;
-    virtual void writeVertexDistances( const floats& vDistances ) = 0;
+    virtual void writeVertices(const Vector3fs& vertices) = 0;
+    virtual void writeVertexSections(const uint16_ts& vSections) = 0;
+    virtual void writeVertexDistances(const floats& vDistances) = 0;
 
-    virtual void writeTriangles( const uint32_ts& triangles ) = 0;
-    virtual void writeTriangleSections( const uint16_ts& tSections ) = 0;
-    virtual void writeTriangleDistances( const floats& tDistances ) = 0;
+    virtual void writeTriangles(const uint32_ts& triangles) = 0;
+    virtual void writeTriangleSections(const uint16_ts& tSections) = 0;
+    virtual void writeTriangleDistances(const floats& tDistances) = 0;
 
-    virtual void writeTriStrip( const uint32_ts& tristrip ) = 0;
+    virtual void writeTriStrip(const uint32_ts& tristrip) = 0;
 
-    virtual void writeNormals( const Vector3fs& normals ) = 0;
+    virtual void writeNormals(const Vector3fs& normals) = 0;
     //@}
 
     /** @name Write API for structural mesh */
     //@{
-    virtual void writeStructureVertices( const Vector3fs& vertices,
-                                         const MeshStructure type,
-                                         const size_t index ) = 0;
-    virtual void writeStructureTriangles( const uint32_ts& triangles,
-                                          const MeshStructure type,
-                                          const size_t index) = 0;
-    virtual void writeStructureTriStrip( const uint32_ts& tristrip,
+    virtual void writeStructureVertices(const Vector3fs& vertices,
+                                        const MeshStructure type,
+                                        const size_t index) = 0;
+    virtual void writeStructureTriangles(const uint32_ts& triangles,
                                          const MeshStructure type,
                                          const size_t index) = 0;
+    virtual void writeStructureTriStrip(const uint32_ts& tristrip,
+                                        const MeshStructure type,
+                                        const size_t index) = 0;
     virtual void flush() = 0;
     //@}
 };
-
 }
 }
 

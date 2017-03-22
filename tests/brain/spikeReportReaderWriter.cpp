@@ -29,12 +29,12 @@
 #include <brion/types.h>
 
 #define BOOST_TEST_MODULE SpikeReportReader
-#include <boost/filesystem/path.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/thread/thread.hpp>
 
-#define BLURON_SPIKE_REPORT_FILE  "local/simulations/may17_2011/Control/out.dat"
+#define BLURON_SPIKE_REPORT_FILE "local/simulations/may17_2011/Control/out.dat"
 
 #define BLURON_SPIKES_START_TIME 0.15f
 #define BLURON_SPIKES_END_TIME 9.975f
@@ -61,185 +61,188 @@ struct TmpFile
 {
     const std::string name;
 
-    explicit TmpFile( const std::string& suffix = std::string( ))
+    explicit TmpFile(const std::string& suffix = std::string())
         : name("/tmp/" + servus::make_UUID().getString() + suffix)
     {
     }
 
     ~TmpFile()
     {
-        if( boost::filesystem::exists( name ))
-            boost::filesystem::remove( name );
+        if (boost::filesystem::exists(name))
+            boost::filesystem::remove(name);
     }
 };
 
 namespace std
 {
-    std::ostream& operator<<( std::ostream &os, const brion::Spike& spike )
-    {
-        return os << spike.first << ", " << spike.second;
-    }
+std::ostream& operator<<(std::ostream& os, const brion::Spike& spike)
+{
+    return os << spike.first << ", " << spike.second;
+}
 }
 
-BOOST_AUTO_TEST_CASE( test_invalid_report )
+BOOST_AUTO_TEST_CASE(test_invalid_report)
 {
-    BOOST_CHECK_THROW( brain::SpikeReportReader report0( brion::URI( "./bla" )),
-                       std::runtime_error );
+    BOOST_CHECK_THROW(brain::SpikeReportReader report0(brion::URI("./bla")),
+                      std::runtime_error);
 
-    boost::filesystem::path path( BBP_TESTDATA );
+    boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/README";
-    BOOST_CHECK_THROW( brain::SpikeReportReader( brion::URI( path.string( ))),
-                       std::runtime_error );
+    BOOST_CHECK_THROW(brain::SpikeReportReader(brion::URI(path.string())),
+                      std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE( test_simple_load_static )
+BOOST_AUTO_TEST_CASE(test_simple_load_static)
 {
-    boost::filesystem::path path( BBP_TESTDATA );
+    boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader( brion::URI( path.string( )));
+    brain::SpikeReportReader reader(brion::URI(path.string()));
 }
 
-
-
-BOOST_AUTO_TEST_CASE( test_simple_read_bluron )
+BOOST_AUTO_TEST_CASE(test_simple_read_bluron)
 {
-    boost::filesystem::path path( BBP_TESTDATA );
+    boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader( brion::URI( path.string( )));
-    const brion::Spikes& spikes = reader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
+    brain::SpikeReportReader reader(brion::URI(path.string()));
+    const brion::Spikes& spikes =
+        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
-    BOOST_REQUIRE_EQUAL( spikes.size(), BLURON_SPIKES_COUNT );
+    BOOST_REQUIRE_EQUAL(spikes.size(), BLURON_SPIKES_COUNT);
 
-    BOOST_CHECK_EQUAL( spikes.begin()->first, BLURON_SPIKES_START_TIME );
-    BOOST_CHECK_EQUAL( spikes.begin()->second, BLURON_FIRST_SPIKE_GID );
+    BOOST_CHECK_EQUAL(spikes.begin()->first, BLURON_SPIKES_START_TIME);
+    BOOST_CHECK_EQUAL(spikes.begin()->second, BLURON_FIRST_SPIKE_GID);
 
-    BOOST_CHECK_EQUAL( ( --spikes.end( ))->first, BLURON_LAST_SPIKE_TIME );
-    BOOST_CHECK_EQUAL( ( --spikes.end( ))->second, BLURON_LAST_SPIKE_GID );
+    BOOST_CHECK_EQUAL((--spikes.end())->first, BLURON_LAST_SPIKE_TIME);
+    BOOST_CHECK_EQUAL((--spikes.end())->second, BLURON_LAST_SPIKE_GID);
 }
 
-BOOST_AUTO_TEST_CASE( test_simple_read_nest )
+BOOST_AUTO_TEST_CASE(test_simple_read_nest)
 {
-    boost::filesystem::path path( BBP_TESTDATA );
+    boost::filesystem::path path(BBP_TESTDATA);
     path /= NEST_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader( brion::URI( path.string( )));
-    const brion::Spikes& spikes = reader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
+    brain::SpikeReportReader reader(brion::URI(path.string()));
+    const brion::Spikes& spikes =
+        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
-    BOOST_REQUIRE_EQUAL( spikes.size(), NEST_SPIKES_COUNT );
+    BOOST_REQUIRE_EQUAL(spikes.size(), NEST_SPIKES_COUNT);
 
-    BOOST_CHECK_EQUAL( spikes.begin()->first, NEST_FIRST_SPIKE_TIME );
-    BOOST_CHECK_EQUAL( spikes.begin()->second, NEST_FIRST_SPIKE_GID );
+    BOOST_CHECK_EQUAL(spikes.begin()->first, NEST_FIRST_SPIKE_TIME);
+    BOOST_CHECK_EQUAL(spikes.begin()->second, NEST_FIRST_SPIKE_GID);
 
-    BOOST_CHECK_EQUAL( ( --spikes.end( ))->first, NEST_LAST_SPIKE_TIME );
-    BOOST_CHECK_EQUAL( ( --spikes.end( ))->second, NEST_LAST_SPIKE_GID );
+    BOOST_CHECK_EQUAL((--spikes.end())->first, NEST_LAST_SPIKE_TIME);
+    BOOST_CHECK_EQUAL((--spikes.end())->second, NEST_LAST_SPIKE_GID);
 }
 
-BOOST_AUTO_TEST_CASE( test_simple_read_filtered )
+BOOST_AUTO_TEST_CASE(test_simple_read_filtered)
 {
-    boost::filesystem::path path( BBP_TESTDATA );
+    boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    brain::GIDSet gids{ 1, 10, 100 };
-    brain::SpikeReportReader reader( brion::URI( path.string( )), gids );
-    const auto spikes = reader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
-    BOOST_REQUIRE( !spikes.empty( ));
-    for (auto spike : spikes )
-        BOOST_CHECK( gids.find( spike.second ) != gids.end());
+    brain::GIDSet gids{1, 10, 100};
+    brain::SpikeReportReader reader(brion::URI(path.string()), gids);
+    const auto spikes = reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
+    BOOST_REQUIRE(!spikes.empty());
+    for (auto spike : spikes)
+        BOOST_CHECK(gids.find(spike.second) != gids.end());
 }
 
-BOOST_AUTO_TEST_CASE( test_closed_window )
+BOOST_AUTO_TEST_CASE(test_closed_window)
 {
-    boost::filesystem::path path( BBP_TESTDATA );
+    boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
-    brain::SpikeReportReader reader( brion::URI( path.string( )));
-    BOOST_CHECK_THROW(reader.getSpikes( 2.5f, 2.5f ),std::logic_error);
+    brain::SpikeReportReader reader(brion::URI(path.string()));
+    BOOST_CHECK_THROW(reader.getSpikes(2.5f, 2.5f), std::logic_error);
 }
 
-BOOST_AUTO_TEST_CASE( test_out_of_window )
+BOOST_AUTO_TEST_CASE(test_out_of_window)
 {
-    boost::filesystem::path path( BBP_TESTDATA );
+    boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
-    brain::SpikeReportReader reader( brion::URI( path.string( )));
-    const brion::Spikes& spikes = reader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
+    brain::SpikeReportReader reader(brion::URI(path.string()));
+    const brion::Spikes& spikes =
+        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
     const float start = spikes.back().first + 1;
 
-    BOOST_CHECK_THROW( reader.getSpikes(start, start + 1 ), std::logic_error );
+    BOOST_CHECK_THROW(reader.getSpikes(start, start + 1), std::logic_error);
 }
 
-BOOST_AUTO_TEST_CASE( test_moving_window )
+BOOST_AUTO_TEST_CASE(test_moving_window)
 {
-    boost::filesystem::path path( BBP_TESTDATA );
+    boost::filesystem::path path(BBP_TESTDATA);
     path /= NEST_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader( brion::URI( path.string( )));
+    brain::SpikeReportReader reader(brion::URI(path.string()));
 
     float start = 0;
-    while( !reader.hasEnded( ))
+    while (!reader.hasEnded())
     {
         const brion::Spikes& spikes = reader.getSpikes(start, start + 1);
-        if( !spikes.empty( ))
+        if (!spikes.empty())
         {
-
-            BOOST_CHECK( spikes.begin()->first >= start );
-            BOOST_CHECK( spikes.rbegin()->first < start + 1 );
+            BOOST_CHECK(spikes.begin()->first >= start);
+            BOOST_CHECK(spikes.rbegin()->first < start + 1);
         }
         start += 1;
     }
 
-    const brion::Spikes& spikes = reader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
+    const brion::Spikes& spikes =
+        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
-    BOOST_REQUIRE_EQUAL( spikes.size(), NEST_SPIKES_COUNT );
+    BOOST_REQUIRE_EQUAL(spikes.size(), NEST_SPIKES_COUNT);
 
+    BOOST_CHECK_EQUAL(spikes.begin()->first, NEST_FIRST_SPIKE_TIME);
+    BOOST_CHECK_EQUAL(spikes.begin()->second, NEST_FIRST_SPIKE_GID);
 
-    BOOST_CHECK_EQUAL( spikes.begin()->first, NEST_FIRST_SPIKE_TIME );
-    BOOST_CHECK_EQUAL( spikes.begin()->second, NEST_FIRST_SPIKE_GID );
-
-    BOOST_CHECK_EQUAL( ( --spikes.end( ))->first, NEST_LAST_SPIKE_TIME );
-    BOOST_CHECK_EQUAL( ( --spikes.end( ))->second, NEST_LAST_SPIKE_GID );
+    BOOST_CHECK_EQUAL((--spikes.end())->first, NEST_LAST_SPIKE_TIME);
+    BOOST_CHECK_EQUAL((--spikes.end())->second, NEST_LAST_SPIKE_GID);
 }
 
-BOOST_AUTO_TEST_CASE( TestSpikes_nest_spikes_read_write )
+BOOST_AUTO_TEST_CASE(TestSpikes_nest_spikes_read_write)
 {
-    boost::filesystem::path path( BBP_TESTDATA );
+    boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader( brion::URI( path.string( )));
-    const brion::Spikes& readSpikes = reader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
+    brain::SpikeReportReader reader(brion::URI(path.string()));
+    const brion::Spikes& readSpikes =
+        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
-    TmpFile file( ".gdf" );
+    TmpFile file(".gdf");
 
-    brain::SpikeReportWriter writer( brion::URI( file.name ));
-    writer.writeSpikes( readSpikes );
+    brain::SpikeReportWriter writer(brion::URI(file.name));
+    writer.writeSpikes(readSpikes);
     writer.close();
 
-    brain::SpikeReportReader reReader( brion::URI( file.name ));
-    const brion::Spikes& reReadSpikes = reReader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
+    brain::SpikeReportReader reReader(brion::URI(file.name));
+    const brion::Spikes& reReadSpikes =
+        reReader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
-    BOOST_CHECK_EQUAL_COLLECTIONS(
-        readSpikes.begin(), readSpikes.end(),
-        reReadSpikes.begin(), reReadSpikes.end( ));
+    BOOST_CHECK_EQUAL_COLLECTIONS(readSpikes.begin(), readSpikes.end(),
+                                  reReadSpikes.begin(), reReadSpikes.end());
 }
 
-BOOST_AUTO_TEST_CASE( TestSpikes_bluron_spikes_read_write )
+BOOST_AUTO_TEST_CASE(TestSpikes_bluron_spikes_read_write)
 {
-    boost::filesystem::path path( BBP_TESTDATA );
+    boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader( brion::URI( path.string( )));
-    const brion::Spikes& readSpikes = reader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
+    brain::SpikeReportReader reader(brion::URI(path.string()));
+    const brion::Spikes& readSpikes =
+        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
-    TmpFile file( ".dat" );
+    TmpFile file(".dat");
 
-    brain::SpikeReportWriter writer( brion::URI( file.name ));
-    writer.writeSpikes( readSpikes );
+    brain::SpikeReportWriter writer(brion::URI(file.name));
+    writer.writeSpikes(readSpikes);
     writer.close();
 
-    brain::SpikeReportReader reReader( brion::URI( file.name ));
-    const brion::Spikes& reReadSpikes = reReader.getSpikes(0,brion::UNDEFINED_TIMESTAMP);
+    brain::SpikeReportReader reReader(brion::URI(file.name));
+    const brion::Spikes& reReadSpikes =
+        reReader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
-    BOOST_CHECK_EQUAL_COLLECTIONS( readSpikes.begin(), readSpikes.end(),
-                                   reReadSpikes.begin(), reReadSpikes.end( ));
+    BOOST_CHECK_EQUAL_COLLECTIONS(readSpikes.begin(), readSpikes.end(),
+                                  reReadSpikes.begin(), reReadSpikes.end());
 }

@@ -26,15 +26,13 @@ namespace brion
 {
 namespace detail
 {
-
 /** Add a string attribute to the given H5 object. */
-inline void addStringAttribute( H5::H5Object& object, const std::string& name,
-                                const std::string& value )
+inline void addStringAttribute(H5::H5Object& object, const std::string& name,
+                               const std::string& value)
 {
-    const H5::StrType strType( H5::PredType::C_S1, value.length( ));
-    object.createAttribute( name, strType, H5S_SCALAR ).write( strType, value );
+    const H5::StrType strType(H5::PredType::C_S1, value.length());
+    object.createAttribute(name, strType, H5S_SCALAR).write(strType, value);
 }
-
 }
 }
 

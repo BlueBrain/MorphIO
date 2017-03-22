@@ -24,20 +24,20 @@ namespace bp = boost::python;
 
 namespace brain
 {
-
 namespace
 {
 struct Conversion
 {
-    static PyObject* convert( const brion::Spike& spike )
+    static PyObject* convert(const brion::Spike& spike)
     {
-        bp::tuple t = bp::make_tuple( spike.first, spike.second );
-        Py_INCREF( t.ptr( ));
+        bp::tuple t = bp::make_tuple(spike.first, spike.second);
+        Py_INCREF(t.ptr());
         return t.ptr();
     }
 };
 }
 
+// clang-format off
 void export_Spikes()
 {
     bp::to_python_converter< brion::Spike, Conversion >();
@@ -46,7 +46,6 @@ void export_Spikes()
         .def( "__iter__", bp::iterator<brion::Spikes>( ))
         .def( "__len__", &brion::Spikes::size )
     ;
-
 }
-
+// clang-format on
 }
