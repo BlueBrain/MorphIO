@@ -85,13 +85,13 @@ cdef class Branch(_py__base):
         return Box.from_value(self.ptr().get_segment_bounding_box(n))
 
     def get_junction(self, std.size_t n):
-        return Sphere.from_ref(self.ptr().get_junction(n))
+        return Sphere.from_value(self.ptr().get_junction(n))
 
     def get_junction_sphere_bounding_box(self, std.size_t n):
         return Box.from_value(self.ptr().get_junction_sphere_bounding_box(n))
 
     def get_linestring(self, ):
-        return Linestring.from_ref(self.ptr().get_linestring())
+        return Linestring.from_value(self.ptr().get_linestring())
 
     # def get_circle_pipe(self, ):
     #     return self.ptr().get_circle_pipe()
@@ -135,7 +135,7 @@ cdef class Branch_Soma(_py__base):
         self._autodealoc.reset(self.ptr())
 
     def get_sphere(self, ):
-        return Sphere.from_ref(self.ptr().get_sphere())
+        return Sphere.from_value(self.ptr().get_sphere())
 
     def get_bounding_box(self, ):
         return Box.from_value(self.ptr().get_bounding_box())

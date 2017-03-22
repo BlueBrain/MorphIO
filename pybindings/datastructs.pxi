@@ -47,14 +47,16 @@ cdef class Linestring(_py__base):
         return < morpho.linestring *> self._ptr
 
     @staticmethod
-    cdef Linestring from_ptr(morpho.linestring *ptr):
+    cdef Linestring from_ptr(morpho.linestring *ptr, bool owner=False):
         cdef Linestring obj = Linestring.__new__(Linestring)
         obj._ptr = ptr
+        if owner: obj._autodealoc.reset(ptr)
         return obj
 
     @staticmethod
-    cdef Linestring from_ref(const morpho.linestring &ref):
-        return Linestring.from_ptr(<morpho.linestring*>&ref)
+    cdef Linestring from_value(const morpho.linestring &ref):
+        cdef morpho.linestring* ptr = new morpho.linestring(ref)
+        return Linestring.from_ptr(ptr, True)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -74,11 +76,17 @@ cdef class Cone(_py__base):
         return self.ptr().get_radius()
 
     @staticmethod
-    cdef Cone from_value(const morpho.cone& cone):
-        cdef Cone pycone = Cone()
-        pycone._ptr = new morpho.cone(cone)
-        pycone._autodealoc.reset(pycone.ptr())
-        return pycone
+    cdef Cone from_ptr(morpho.cone *ptr, bool owner=False):
+        cdef Cone obj = Cone.__new__(Cone)
+        obj._ptr = ptr
+        if owner: obj._autodealoc.reset(ptr)
+        return obj
+
+    @staticmethod
+    cdef Cone from_value(const morpho.cone &ref):
+        cdef morpho.cone* ptr = new morpho.cone(ref)
+        return Cone.from_ptr(ptr, True)
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Sphere(_py__base):
@@ -86,15 +94,27 @@ cdef class Sphere(_py__base):
     cdef morpho.sphere * ptr(self):
         return < morpho.sphere *> self._ptr
 
+    @property
+    def center(self):
+        cdef morpho.point p = self.ptr().get_center()
+        cdef const double* pts = p.data()
+        return [pts[0], pts[1], pts[2]]
+
+    @property
+    def radius(self):
+        return self.ptr().get_radius()
+
     @staticmethod
-    cdef Sphere from_ptr(morpho.sphere *ptr):
+    cdef Sphere from_ptr(morpho.sphere *ptr, bool owner=False):
         cdef Sphere obj = Sphere.__new__(Sphere)
         obj._ptr = ptr
+        if owner: obj._autodealoc.reset(ptr)
         return obj
 
     @staticmethod
-    cdef Sphere from_ref(const morpho.sphere &ref):
-        return Sphere.from_ptr(<morpho.sphere*>&ref)
+    cdef Sphere from_value(const morpho.sphere &ref):
+        cdef morpho.sphere* ptr = new morpho.sphere(ref)
+        return Sphere.from_ptr(ptr, True)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
