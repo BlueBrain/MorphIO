@@ -35,6 +35,17 @@ cdef class _py__base:
         if operation == OPERATOR.EQUAL:
             return self._ptr==other._ptr
 
+cdef class _Enum:
+    def __cinit__(self):
+        raise TypeError("Cant instantiate Enum")
+
+    @classmethod
+    def get_description(cls, int item):
+        for name, value in cls.__dict__.items():
+            if not name.startswith("_") and value==item:
+                return name
+        raise IndexError("No such Enumerator index")
+
 #//-- BASE CLASS ------------------------------------------
 
 ## Include data structures
@@ -45,26 +56,14 @@ include "datastructs.pxi"
 # Python bindings to namespace morpho
 # ======================================================================================================================
 
-cdef class _Enum:
-    def __cinit__(self):
-        raise TypeError("Cant instantiate Enum")
-
-    @classmethod
-    def get_desc(cls, item):
-        #Build _reverse_dict
-        if not cls._reverse_dict:
-            cls._reverse_dict.update( { nr: name for name, nr in cls.__dict__.items() if not name.startswith("_") } )
-        print (cls._reverse_dict[item])
 
 # ======================================================================================================================
 cdef class BRANCH_TYPE(_Enum):
-    _reverse_dict = dict()
     soma = morpho.soma
     axon = morpho.axon
     dentrite_basal = morpho.dentrite_basal
     dentrite_apical = morpho.dentrite_apical
     unknown = morpho.unknown
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Morpho_Node(_py__base):
