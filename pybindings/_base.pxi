@@ -26,6 +26,32 @@ cdef class _py__base:
             return self._ptr==other._ptr
 
 
+# --------------------- BASE Array Type -----------------------
+# -------------------------------------------------------------
+cdef class _ArrayT(_py__base):
+    #Numpy array object
+    cdef readonly object nparray
+
+    # Pass on the array API
+    def __len__(self):
+        return len(self.nparray)
+
+    def __getitem__(self, item):
+        return self.nparray.__getitem__(item)
+
+    # Pass on the iterator API
+    def __iter__(self):
+        return iter(self.nparray)
+
+    # Get a nice representation
+    def __repr__(self):
+        leng = len(self.nparray)
+        if leng > 3: leng = 3
+        return ("<%s object\n"
+                "%s...\n"
+                " (Full numpy array accessible at .nparray) >" % (str(type(self)), repr(self.nparray[:leng])))
+
+
 # --------------------- BASE Enum -----------------------
 # --------------------------------------------------------
 cdef class _Enum:
