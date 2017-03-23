@@ -6,10 +6,7 @@
 from __future__ import print_function
 __copyright__ = "Copyright 2016 EPFL BBP-project"
 # =====================================================================================================================
-from cython.operator cimport dereference as deref
-cimport std
-from libcpp cimport bool
-from libc.string cimport memcpy
+include "_base.pxi"
 
 cimport morpho
 cimport morpho_h5_v1
@@ -19,43 +16,15 @@ from statics cimport morpho_h5_v1_morpho_reader
 import numpy as np
 cimport numpy as np
 
-
 # We need to initialize NumPy.
 np.import_array()
-
-
-# --------------------- BASE CLASS -----------------------
-cdef enum OPERATOR:
-    LESS = 0, LESS_EQUAL, EQUAL, DIFF, GREATER, GREATER_EQUAL
-
-cdef class _py__base:
-    cdef void *_ptr
-    # Basic comparison is done by comparing the inner obj ptr
-    def __richcmp__(_py__base self, _py__base other, operation):
-        if operation == OPERATOR.EQUAL:
-            return self._ptr==other._ptr
-
-cdef class _Enum:
-    def __cinit__(self):
-        raise TypeError("Cant instantiate Enum")
-
-    @classmethod
-    def get_description(cls, int item):
-        for name, value in cls.__dict__.items():
-            if not name.startswith("_") and value==item:
-                return name
-        raise IndexError("No such Enumerator index")
-
-#//-- BASE CLASS ------------------------------------------
 
 ## Include data structures
 include "datastructs.pxi"
 
-
 # ======================================================================================================================
 # Python bindings to namespace morpho
 # ======================================================================================================================
-
 
 # ======================================================================================================================
 cdef class BRANCH_TYPE(_Enum):
@@ -93,7 +62,7 @@ cdef class Morpho_Node(_py__base):
         return [ Morpho_Node.from_ptr(elem) for elem in vec ]
 
 
-
+# ----------------------------------------------------------------------------------------------------------------------
 cdef class Branch(Morpho_Node):
     "Python wrapper class for branch (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
