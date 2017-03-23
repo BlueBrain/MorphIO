@@ -15,11 +15,14 @@ add_custom_command(
 
 # .cpp -> .so
 python_add_module(${cymod_name} ${cymod_cpp})
+target_compile_options(${cymod_name} PRIVATE -fno-strict-aliasing)
 
 get_directory_property(INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
 target_include_directories(${cymod_name} PUBLIC ${PYTHON_INCLUDE_DIR} ${INCLUDE_DIRECTORIES})
 
-target_link_libraries(${cymod_name}  ${CMAKE_THREAD_LIBS_INIT}
-                               ${HDF5_C_LIBRARIES}  
-                               ${Boost_FILESYSTEM_LIBRARIES}
-)
+target_link_libraries( ${cymod_name}  
+                       ${CMAKE_THREAD_LIBS_INIT}
+                       ${HDF5_C_LIBRARIES}  
+                       ${Boost_FILESYSTEM_LIBRARIES} 
+                      )
+

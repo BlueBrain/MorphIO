@@ -11,6 +11,19 @@ cimport boost_numeric_ublas
 cimport hadoken_geometry
 cimport std
 
+# Enums are special in which the declaration can be a cpdef to be directly accessible from Python
+# but must lie in the same source file (no cimport)
+# Since cpdef enums still pollute the python namespace (which happens to be global) we use normal cdef with wrapper class
+# This enmu maps to a C++ num class, and therefore the trick with both "morpho::branch_type" renames
+# ======================================================================================================================
+cdef extern from "morpho/morpho_tree.hpp" namespace "morpho::branch_type":
+# ----------------------------------------------------------------------------------------------------------------------
+    cdef enum branch_type "morpho::branch_type":
+        soma = 0
+        axon = 1
+        dentrite_basal = 2
+        dentrite_apical = 3
+        unknown = 4
 
 # ======================================================================================================================
 cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
@@ -30,12 +43,6 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
     ctypedef std.vector[circle] circle_pipe
     ctypedef hadoken_geometry.box3d box
 
-    cpdef enum branch_type:
-        soma = 0
-        axon = 1
-        dentrite_basal = 2
-        dentrite_apical = 3
-        unknown = 4
 
     ###### Cybinding for class morpho_node ######
     cdef cppclass morpho_node:
@@ -43,7 +50,7 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         branch_type get_type()
 
     ###### Cybinding for class branch ######
-    cdef cppclass branch:
+    cdef cppclass branch(morpho_node):
         branch(branch_type)
         void set_points(mat_points&&, vec_double&&)
         mat_points& get_points()
@@ -62,10 +69,11 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         std.size_t get_id()
 
     ###### Cybinding for class branch_soma ######
-    cdef cppclass branch_soma:
+    cdef cppclass branch_soma(branch):
         branch_soma()
         sphere get_sphere()
-        box get_bounding_box()
+        # method is already declared in parent class, shall not be again
+        # box get_bounding_box()
 
     ###### Cybinding for class morpho_tree ######
     cdef cppclass morpho_tree:

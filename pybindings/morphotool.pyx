@@ -34,6 +34,7 @@ cdef class _py__base:
     def __richcmp__(_py__base self, _py__base other, operation):
         if operation == OPERATOR.EQUAL:
             return self._ptr==other._ptr
+
 #//-- BASE CLASS ------------------------------------------
 
 ## Include data structures
@@ -43,17 +44,51 @@ include "datastructs.pxi"
 # ======================================================================================================================
 # Python bindings to namespace morpho
 # ======================================================================================================================
-cdef class Branch(_py__base):
+
+
+# ======================================================================================================================
+cdef class BRANCH_TYPE:
+    soma = morpho.soma
+    axon = morpho.axon
+    dentrite_basal = morpho.dentrite_basal
+    dentrite_apical = morpho.dentrite_apical
+    unknown = morpho.unknown
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+cdef class Morpho_Node(_py__base):
+    "Python wrapper class for morpho_node (ns=morpho)"
+# ----------------------------------------------------------------------------------------------------------------------
+    cdef morpho.morpho_node *ptr_(self):
+        return <morpho.morpho_node*> self._ptr
+
+    def __init__(self, int my_node_type):
+        self._ptr = new morpho.morpho_node(<morpho.branch_type> my_node_type)
+
+    def get_type(self, ):
+        return self.ptr_().get_type()
+
+    @staticmethod
+    cdef Morpho_Node from_ptr(morpho.morpho_node *ptr):
+        cdef Morpho_Node obj = Morpho_Node.__new__(Morpho_Node)
+        obj._ptr = ptr
+        return obj
+
+    @staticmethod
+    cdef Morpho_Node from_ref(const morpho.morpho_node &ref):
+        return Morpho_Node.from_ptr(<morpho.morpho_node*>&ref)
+
+    @staticmethod
+    cdef list vector2list( std.vector[morpho.morpho_node*] vec ):
+        return [ Morpho_Node.from_ptr(elem) for elem in vec ]
+
+
+
+cdef class Branch(Morpho_Node):
     "Python wrapper class for branch (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef std.unique_ptr[morpho.branch] _autodealoc
     cdef morpho.branch *ptr(self):
         return <morpho.branch*> self._ptr
-
-
-    def __init__(self, int type_b):
-        self._ptr = new morpho.branch(<morpho.branch_type> type_b)
-        self._autodealoc.reset(self.ptr())
 
     # def set_points(self, _py_mat_points points, _py_vec_double distances):
     def set_points(self, ):
@@ -122,54 +157,21 @@ cdef class Branch(_py__base):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class Morpho_Node(_py__base):
-    "Python wrapper class for morpho_node (ns=morpho)"
-# ----------------------------------------------------------------------------------------------------------------------
-    cdef std.unique_ptr[morpho.morpho_node] _autodealoc
-    cdef morpho.morpho_node *ptr(self):
-        return <morpho.morpho_node*> self._ptr
-
-    def __init__(self, int my_node_type):
-        self._ptr = new morpho.morpho_node(<morpho.branch_type> my_node_type)
-        self._autodealoc.reset(self.ptr())
-
-    def get_type(self, ):
-        return self.ptr().get_type()
-
-    @staticmethod
-    cdef Morpho_Node from_ptr(morpho.morpho_node *ptr):
-        cdef Morpho_Node obj = Morpho_Node.__new__(Morpho_Node)
-        obj._ptr = ptr
-        return obj
-
-    @staticmethod
-    cdef Morpho_Node from_ref(const morpho.morpho_node &ref):
-        return Morpho_Node.from_ptr(<morpho.morpho_node*>&ref)
-
-    @staticmethod
-    cdef list vector2list( std.vector[morpho.morpho_node*] vec ):
-        return [ Morpho_Node.from_ptr(elem) for elem in vec ]
-
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-cdef class Branch_Soma(_py__base):
+cdef class Branch_Soma(Branch):
     "Python wrapper class for branch_soma (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef std.unique_ptr[morpho.branch_soma] _autodealoc
-    cdef morpho.branch_soma *ptr(self):
+    cdef morpho.branch_soma *ptrx(self):
         return <morpho.branch_soma*> self._ptr
 
-
-    def __init__(self, ):
-        self._ptr = new morpho.branch_soma()
-        self._autodealoc.reset(self.ptr())
+    #def __init__(self, ):
+    #    self._ptr = new morpho.branch_soma()
+    #    self._autodealoc.reset(self.ptrx())
 
     def get_sphere(self, ):
-        return Sphere.from_value(self.ptr().get_sphere())
+        return Sphere.from_value(self.ptrx().get_sphere())
 
     def get_bounding_box(self, ):
-        return Box.from_value(self.ptr().get_bounding_box())
+        return Box.from_value(self.ptrx().get_bounding_box())
 
     @staticmethod
     cdef Branch_Soma from_ptr(morpho.branch_soma *ptr):
