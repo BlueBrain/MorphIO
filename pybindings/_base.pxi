@@ -6,13 +6,13 @@
 __copyright__ = "Copyright 2016 EPFL BBP-project"
 # =====================================================================================================================
 
-from cython.operator cimport dereference as deref
 cimport std
+from cython.operator cimport dereference as deref
 from libcpp cimport bool
 from libc.string cimport memcpy
 
 
-# --------------------- BASE CLASS -----------------------
+# --------------------- BASE Class -----------------------
 # --------------------------------------------------------
 cdef enum OPERATOR:
     LESS = 0, LESS_EQUAL, EQUAL, DIFF, GREATER, GREATER_EQUAL
@@ -26,6 +26,8 @@ cdef class _py__base:
             return self._ptr==other._ptr
 
 
+# --------------------- BASE Enum -----------------------
+# --------------------------------------------------------
 cdef class _Enum:
     def __cinit__(self):
         raise TypeError("Cant instantiate Enum")

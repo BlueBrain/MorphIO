@@ -34,6 +34,7 @@ cdef class BRANCH_TYPE(_Enum):
     dentrite_apical = morpho.dentrite_apical
     unknown = morpho.unknown
 
+
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Morpho_Node(_py__base):
     "Python wrapper class for morpho_node (ns=morpho)"
@@ -134,7 +135,6 @@ cdef class Branch(Morpho_Node):
         return [ Branch.from_ptr(elem) for elem in vec ]
 
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Branch_Soma(Branch):
     "Python wrapper class for branch_soma (ns=morpho)"
@@ -165,7 +165,6 @@ cdef class Branch_Soma(Branch):
     @staticmethod
     cdef list vector2list( std.vector[morpho.branch_soma*] vec ):
         return [ Branch_Soma.from_ptr(elem) for elem in vec ]
-
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -300,4 +299,3 @@ cdef class Morpho_Reader(_py__base):
     @staticmethod
     cdef list vector2list( std.vector[morpho_h5_v1.morpho_reader*] vec ):
         return [ Morpho_Reader.from_ptr(elem) for elem in vec ]
-
