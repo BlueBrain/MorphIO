@@ -239,26 +239,13 @@ cdef class Morpho_Tree(_py__base):
 # Python bindings to namespace morpho::h5_v1
 # ======================================================================================================================
 
-cdef class Morpho_Reader_Mat_Index(_py__base):
-    cdef morpho_h5_v1_morpho_reader.mat_index* ptr(self):
-        return <morpho_h5_v1_morpho_reader.mat_index *> self._ptr
 
-    @staticmethod
-    cdef Morpho_Reader_Mat_Index from_ptr(morpho_h5_v1_morpho_reader.mat_index *ptr):
-        cdef Morpho_Reader_Mat_Index obj = Morpho_Reader_Mat_Index.__new__(Morpho_Reader_Mat_Index)
-        obj._ptr = ptr
-        return obj
-
-    @staticmethod
-    cdef Morpho_Reader_Mat_Index from_ref(const morpho_h5_v1_morpho_reader.mat_index &ref):
-        return Morpho_Reader_Mat_Index.from_ptr(<morpho_h5_v1_morpho_reader.mat_index*>&ref)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class Morpho_Reader(_py__base):
     "Python wrapper class for morpho_reader (ns=morpho::h5_v1)"
 # ----------------------------------------------------------------------------------------------------------------------
-    pass
     cdef std.unique_ptr[morpho_h5_v1.morpho_reader] _autodealoc
     cdef morpho_h5_v1.morpho_reader *ptr(self):
         return <morpho_h5_v1.morpho_reader*> self._ptr
@@ -268,13 +255,13 @@ cdef class Morpho_Reader(_py__base):
         self._autodealoc.reset(self.ptr())
 
     def get_points_raw(self, ):
-        return Mat_Points.from_ref(self.ptr().get_points_raw())
+        return Mat_Points.from_value(self.ptr().get_points_raw())
 
     def get_soma_points_raw(self, ):
-        return Mat_Points.from_ref(self.ptr().get_soma_points_raw())
+        return Mat_Points.from_value(self.ptr().get_soma_points_raw())
 
     def get_struct_raw(self, ):
-        return Morpho_Reader_Mat_Index.from_ref(self.ptr().get_struct_raw())
+        return Morpho_Reader_Mat_Index.from_value(self.ptr().get_struct_raw())
 
     def get_branch_range_raw(self, int id_):
         return self.ptr().get_branch_range_raw(id_)
@@ -299,3 +286,4 @@ cdef class Morpho_Reader(_py__base):
     @staticmethod
     cdef list vector2list( std.vector[morpho_h5_v1.morpho_reader*] vec ):
         return [ Morpho_Reader.from_ptr(elem) for elem in vec ]
+

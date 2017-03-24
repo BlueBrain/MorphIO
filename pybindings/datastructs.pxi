@@ -1,3 +1,5 @@
+from libc.stdio cimport printf
+
 # ----------------------------------------------------------------------------------------------------------------------
 # cdef class Vector(_py__base):
 #     cdef morpho.vector * ptr(self):
@@ -60,7 +62,6 @@ cdef class Linestring(_ArrayT):
         size[0] = ptr.size()
         size[1] = 3
         obj.nparray = np.PyArray_SimpleNewFromData(2, size, np.NPY_DOUBLE, ptr.data())
-
         if owner: obj._autodealoc.reset(ptr)
         return obj
 
@@ -214,27 +215,56 @@ cdef class CirclePipe(_py__base):
 # ----------------------------------------------------------------------------------------------------------------------
 # Main Data Structures
 # ----------------------------------------------------------------------------------------------------------------------
-
 cdef class Mat_Points(_ArrayT):
+    cdef std.unique_ptr[morpho.mat_points] _autodealoc
     cdef morpho.mat_points * ptr(self):
         return <morpho.mat_points *> self._ptr
 
-
     @staticmethod
-    cdef Mat_Points from_ptr(morpho.mat_points * matpoints):
+    cdef Mat_Points from_ptr(morpho.mat_points * matpoints, bool owner=False):
         cdef Mat_Points obj = Mat_Points()
         obj._ptr = matpoints
+        if owner: obj._autodealoc.reset(matpoints)
 
         # Create a numpy array (memviews dont expose no nicely to python)
         cdef np.npy_intp[2] dim
         dim[0] = matpoints.size1()
         dim[1] = matpoints.size2()
-        cdef np.ndarray[np.double_t, ndim=2] arr = np.PyArray_SimpleNewFromData(2, dim, np.NPY_DOUBLE, matpoints.data().begin())
-        obj.nparray = arr
-
+        obj.nparray = np.PyArray_SimpleNewFromData(2, dim, np.NPY_DOUBLE, matpoints.data().begin())
         return obj
 
     @staticmethod
     cdef Mat_Points from_ref(const morpho.mat_points &ref):
         return Mat_Points.from_ptr(<morpho.mat_points*>&ref)
 
+    @staticmethod
+    cdef Mat_Points from_value(const morpho.mat_points &ref):
+        cdef morpho.mat_points* ptr = new morpho.mat_points(ref)
+        return Mat_Points.from_ptr(ptr, True)
+
+
+cdef class Morpho_Reader_Mat_Index(_ArrayT):
+    cdef std.unique_ptr[morpho_h5_v1_morpho_reader.mat_index ] _autodealoc
+    cdef morpho_h5_v1_morpho_reader.mat_index* ptr(self):
+        return <morpho_h5_v1_morpho_reader.mat_index *> self._ptr
+
+    @staticmethod
+    cdef Morpho_Reader_Mat_Index from_ptr(morpho_h5_v1_morpho_reader.mat_index *ptr, bool owner=False):
+        cdef Morpho_Reader_Mat_Index obj = Morpho_Reader_Mat_Index.__new__(Morpho_Reader_Mat_Index)
+        obj._ptr = ptr
+        if owner: obj._autodealoc.reset(ptr)
+        # Create a numpy array
+        cdef np.npy_intp[2] dim
+        dim[0] = ptr.size1()
+        dim[1] = ptr.size2()
+        obj.nparray = np.PyArray_SimpleNewFromData(2, dim, np.NPY_INT, ptr.data().begin())
+        return obj
+
+    @staticmethod
+    cdef Morpho_Reader_Mat_Index from_ref(const morpho_h5_v1_morpho_reader.mat_index &ref):
+        return Morpho_Reader_Mat_Index.from_ptr(<morpho_h5_v1_morpho_reader.mat_index*>&ref)
+
+    @staticmethod
+    cdef Morpho_Reader_Mat_Index from_value(const morpho_h5_v1_morpho_reader.mat_index &ref):
+        cdef morpho_h5_v1_morpho_reader.mat_index *ptr = new morpho_h5_v1_morpho_reader.mat_index(ref)
+        return Morpho_Reader_Mat_Index.from_ptr(ptr, True)
