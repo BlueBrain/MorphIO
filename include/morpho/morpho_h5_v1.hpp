@@ -26,12 +26,13 @@
 #include <string>
 #include <utility>
 
-#include <boost/numeric/ublas/blas.hpp>
-#include <boost/numeric/ublas/matrix.hpp>
+
+#include "morpho_types.hpp"
 
 #include <highfive/H5File.hpp>
 
 #include "morpho_tree.hpp"
+
 
 
 namespace morpho{

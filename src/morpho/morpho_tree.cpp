@@ -237,9 +237,8 @@ circle_pipe neuron_branch::get_circle_pipe() const{
 
     circle_pipe res;
     if(get_number_points() < 2){
-        std::out_of_range("a circle pipe can not be cosntructed on a branch < 2 points");
+        std::out_of_range("a circle pipe can not be constructed on a branch < 2 points");
     }
-        return res;
 
     res.reserve(get_number_points());
 
@@ -360,7 +359,7 @@ sphere neuron_soma::get_sphere() const{
         case _morpho_soma_type::soma_line_loop:{
             double radius;
             point center;
-            soma_gravity_center(get_points(), center, radius);
+            soma_gravity_center(get_line_loop(), center, radius);
             return sphere(center, radius);
         }
        default:{
@@ -371,10 +370,34 @@ sphere neuron_soma::get_sphere() const{
 
 box neuron_soma::get_bounding_box() const{
     auto s = get_sphere();
-    return hg::envelope_sphere_return<box, sphere>(s);
+    auto box_sphere = hg::envelope_sphere_return<box, sphere>(s);
+
+    typedef point::value_type float_type;
+
+    const point min_corner = box_sphere.min_corner();
+    const point max_corner = box_sphere.max_corner();
+
+    float_type x_min(min_corner(0)), y_min(min_corner(1)), z_min(min_corner(2));
+
+    float_type x_max(max_corner(0)), y_max(max_corner(1)), z_max(max_corner(2));
+
+
+    for(const auto & current_point : _dptr->points){
+
+        x_min = std::min(x_min, hg::get_x(current_point));
+        y_min = std::min(y_min, hg::get_y(current_point));
+        z_min = std::min(z_min, hg::get_z(current_point));
+
+        x_max = std::max(x_max, hg::get_x(current_point));
+        y_max = std::max(y_max, hg::get_y(current_point));
+        z_max = std::max(z_max, hg::get_z(current_point));
+
+    }
+
+    return box(point(x_min, y_min, z_min), point(x_max, y_max, z_max));
 }
 
-const std::vector<point> & neuron_soma::get_points() const{
+const std::vector<point> & neuron_soma::get_line_loop() const{
     return _dptr->points;
 }
 
@@ -425,12 +448,20 @@ void morpho_tree::swap(morpho_tree &other){
     std::swap(_dptr, other._dptr);
 }
 
-const morpho_node & morpho_tree::get_node(int id){
+const morpho_node & morpho_tree::get_node(int id) const{
     if(id < 0 ||  std::size_t(id) >= _dptr->nodes.size()){
         throw std::out_of_range("Invalid node in morpholo tree, out of range");
     }
 
     return *(_dptr->nodes[id]);
+}
+
+int morpho_tree::get_parent(int id) const{
+    if(id < 0 ||  std::size_t(id) >= _dptr->nodes.size()){
+        throw std::out_of_range("Invalid node in morpholo tree, out of range");
+    }
+
+    return _dptr->parents[id];
 }
 
 int morpho_tree::add_node(int parent_id, const std::shared_ptr<morpho_node> & new_node){
@@ -451,11 +482,11 @@ int morpho_tree::add_node(int parent_id, const std::shared_ptr<morpho_node> & ne
 
     _dptr->nodes.push_back(new_node);
     _dptr->parents.push_back(parent_id);
-    return _dptr->nodes.size();
+    return _dptr->nodes.size()-1;
 }
 
 
-std::vector<int> morpho_tree::get_children(int id){
+std::vector<int> morpho_tree::get_children(int id) const{
     std::vector<int> res;
     res.reserve(_dptr->nodes.size());
 

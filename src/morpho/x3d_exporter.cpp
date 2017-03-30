@@ -82,20 +82,20 @@ void x3d_exporter::export_all_points(){
         
 
         // export soma
-        auto & soma = static_cast<branch_soma&>(tree.get_branch(0));
+        auto & soma = static_cast<const neuron_soma&>(tree.get_node(0));
         auto sphere = soma.get_sphere();
         points_distance_to_sphere(sphere.get_center(), sphere.get_radius(), sphere_unit_name, x3d_stream);
 
         // export points
         for(std::size_t b_id =1; b_id < tree.get_tree_size(); ++b_id){
 
-            auto & branch = tree.get_branch(b_id);
+            auto & branch = static_cast<const neuron_branch&>(tree.get_node(b_id));
             auto & points = branch.get_points();
             auto & distance = branch.get_radius();
 
-            assert(points.size1() == distance.size());
-            for(std::size_t i = 0; i < points.size1(); ++i){
-                points_distance_to_sphere({ points(i,0), points(i,1), points(i,2) }, distance[i],
+            assert(points.size() == distance.size());
+            for(std::size_t i = 0; i < points.size(); ++i){
+                points_distance_to_sphere(points[i], distance[i],
                                           sphere_unit_name,
                                           x3d_stream);
             }

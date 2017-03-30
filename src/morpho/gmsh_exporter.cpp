@@ -525,7 +525,7 @@ void gmsh_exporter::export_to_wireframe(){
     gmsh_abstract_file vfile;
     fmt::scat(std::cout, "convert morphology tree to gmsh set of wireframe geometries", "\n");
     for(unsigned int i=0;i<morphotrees.size();i++){
-      construct_gmsh_vfile_lines(morphotrees[i], morphotrees[i].get_branch(0), vfile);
+        construct_gmsh_vfile_lines(morphotrees[i], 0, vfile);
     }
 
     if (is_bbox_enabled()) {
@@ -602,7 +602,7 @@ void gmsh_exporter::export_to_3d_object(){
     fmt::scat(std::cout, "convert morphology tree to gmsh set of 3D geometries", "\n");
 
     for(auto & tree : morphotrees){
-        construct_gmsh_3d_object(tree, tree.get_branch(0), vfile);
+        construct_gmsh_3d_object(tree, 0, vfile);
     }
 
     fmt::scat(std::cout, "export gmsh objects to output file", "\n");
@@ -666,17 +666,26 @@ void gmsh_exporter::serialize_header(){
 
 void gmsh_exporter::construct_gmsh_vfile_raw(gmsh_abstract_file & vfile){
 
-    assert(points.size2() > 3);
     
     for(auto & tree : morphotrees){
     
         const std::size_t tree_size = tree.get_tree_size();
         
         for(std::size_t b = 0; b < tree_size; ++b){
-            auto points = tree.get_branch(b).get_points();
+            std::vector<point> points;
 
-            for(std::size_t row =0; row < points.size1(); ++row){
-                gmsh_point point(geo::point3d( points(row, 0), points(row, 1), points(row, 2)), points(row, 3));
+            const morpho_node & node =  tree.get_node(b);
+
+            if(node.is_of_type(morpho_node_type::neuron_soma_type)){
+                points = static_cast<const neuron_soma&>(node).get_line_loop();
+            }else if(node.is_of_type(morpho_node_type::neuron_branch_type)){
+                points = static_cast<const neuron_branch&>(node).get_points();
+            }else{
+                throw std::invalid_argument("invalide node type, should be branch or soma");
+            }
+
+            for(std::size_t row =0; row < points.size(); ++row){
+                gmsh_point point(points[row], 0.01);
                 vfile.add_point(point);
             }
         }
@@ -684,11 +693,19 @@ void gmsh_exporter::construct_gmsh_vfile_raw(gmsh_abstract_file & vfile){
     }
 }
 
-void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree & tree, branch & current_branch, gmsh_abstract_file & vfile){
+void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree & tree, int node_id, gmsh_abstract_file & vfile){
+    const morpho_node & current_node = tree.get_node(node_id);
 
-    const auto linestring = current_branch.get_linestring();
-    if(linestring.size() > 1 && !(current_branch.get_type() == branch_type::soma && (flags & exporter_single_soma))){
+    if(current_node.is_of_type(morpho_node_type::neuron_node_3d_type) == false){
+                throw std::invalid_argument("Impossible to export in gmsh format morpho_tree with non-branch elements");
+    }
 
+
+    if(current_node.is_of_type(morpho_node_type::neuron_branch_type)){
+
+        const neuron_branch & current_branch = static_cast<const neuron_branch&>(current_node);
+
+        const auto linestring = current_branch.get_linestring();
         if(is_packed()){ // packed mode, single polyline
             typedef decltype(linestring)::value_type line_point;
 
@@ -722,12 +739,35 @@ void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree & tree, branch & curr
                 vfile.add_polyline(segment);
             }
         }
+    } else if (current_node.is_of_type(morpho_node_type::neuron_soma_type)){
+
+        const neuron_soma & current_soma = static_cast<const neuron_soma&>(current_node);
+        const auto linestring = current_soma.get_line_loop();
+
+        if(linestring.size() > 1 && !((flags & exporter_single_soma))){
+
+            for(std::size_t i =0; i < (linestring.size()-1); ++i){
+                auto dist = geo::distance(linestring[i], linestring[i+1]);
+                gmsh_point p1(linestring[i], dist);
+                p1.setPhysical(true);
+
+                if (i < linestring.size()-2)
+                    dist = geo::distance(linestring[i+1], linestring[i+2]);
+                gmsh_point p2(linestring[i+1], dist);
+                p2.setPhysical(true);
+
+                gmsh_polyline segment(p1, p2);
+                segment.setPhysical(true);
+                vfile.add_polyline(segment);
+            }
+        }
     }
 
-    const auto & childrens = current_branch.get_childrens();
-    for( auto & c : childrens){
-        branch & child_branch = tree.get_branch(c);
-        construct_gmsh_vfile_lines(tree, child_branch, vfile);
+
+
+    const auto & childrens = tree.get_children(node_id);
+    for( auto child_id : childrens){
+        construct_gmsh_vfile_lines(tree, child_id, vfile);
     }
 }
 
@@ -988,28 +1028,31 @@ void create_gmsh_truncated_pipe(gmsh_abstract_file & vfile, const std::vector<ge
 
 
 
-void gmsh_exporter::construct_gmsh_3d_object(morpho_tree & tree, branch & current_branch, gmsh_abstract_file & vfile){
+void gmsh_exporter::construct_gmsh_3d_object(morpho_tree & tree, int node_id, gmsh_abstract_file & vfile){
+    const morpho_node & current_node = tree.get_node(node_id);
 
-    if(current_branch.get_type() == branch_type::soma){
-        sphere soma_sphere = static_cast<branch_soma&>(current_branch).get_sphere();
+    if(current_node.is_of_type(morpho_node_type::neuron_soma_type)){
+        sphere soma_sphere = static_cast<const neuron_soma&>(current_node).get_sphere();
         create_gmsh_sphere(vfile, soma_sphere);
+    }else if (current_node.is_of_type(morpho_node_type::neuron_branch_type)){
+        const neuron_branch & current_branch = static_cast<const neuron_branch&>(current_node);
+
+        const auto & all_radius = current_branch.get_radius();
+        std::size_t last_elem = all_radius.size()-1;
+
+        create_gmsh_sphere(vfile, geo::sphere3d(current_branch.get_points()[last_elem], all_radius[last_elem]));
     }else{
-
-        auto & distance = current_branch.get_radius();
-        std::size_t last_elem = distance.size()-1;
-
-        create_gmsh_sphere(vfile, geo::sphere3d(current_branch.get_point(last_elem), distance(last_elem)));
+        std::cerr << "Unsupported type of node, skip" << std::endl;
     }
 
-   const auto & childrens = current_branch.get_childrens();
+   const auto & childrens = tree.get_children(node_id);
     for( auto & c : childrens){
-        branch & child_branch = tree.get_branch(c);
+
+        const neuron_branch & child_branch = static_cast<const neuron_branch&>(tree.get_node(c));
         auto pipe = child_branch.get_circle_pipe();
 
- /*       decltype(pipe) copy;
-        std::copy_n(pipe.begin(), 4, std::back_inserter(copy));*/
         create_gmsh_truncated_pipe(vfile, pipe);
-        construct_gmsh_3d_object(tree, child_branch, vfile);
+        construct_gmsh_3d_object(tree, c, vfile);
     }
 }
 

@@ -365,9 +365,9 @@ private:
 
    void construct_gmsh_vfile_raw(gmsh_abstract_file & vfile);
 
-   void construct_gmsh_vfile_lines(morpho_tree & tree, branch & current_branch, gmsh_abstract_file & vfile);
+   void construct_gmsh_vfile_lines(morpho_tree & tree, int node_id, gmsh_abstract_file & vfile);
 
-   void construct_gmsh_3d_object(morpho_tree & tree, branch & current_branch, gmsh_abstract_file & vfile);
+   void construct_gmsh_3d_object(morpho_tree & tree, int node_id, gmsh_abstract_file & vfile);
 
 };
 

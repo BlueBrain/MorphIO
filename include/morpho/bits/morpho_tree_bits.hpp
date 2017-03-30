@@ -37,13 +37,6 @@ inline void soma_gravity_center(const mat_points & raw_points,
 }
 
 
-// return the tangeante of a 3 points linestring in point 2
-inline vector get_tangente_axis(const point & p1, const point & p2, const point & p3){
-    namespace geo = hadoken::geometry::cartesian;
-    vector v1 = p2 - p1, v2 = p3 - p2;
-
-    return v1 + v2;
-}
 
 
 }
@@ -56,7 +49,7 @@ linestring branch::get_linestring() const{
 
     // if not first point, add the parent last point
     if(_parent != nullptr){
-        if(_parent->get_type() == branch_type::soma){
+        if(_parent->get_type() == neuron_struct_type::soma){
             auto & soma = static_cast<branch_soma&>(*_parent);
             auto sphere = soma.get_sphere();
             geo::append(res, sphere.get_center());
@@ -116,7 +109,7 @@ circle_pipe branch::get_circle_pipe() const{
     // if not first point, add the parent last point
     if(_parent != nullptr){
         // if our parent is the soma, add a circle based on the soma sphere, oriented
-        if(_parent->get_type() == branch_type::soma){
+        if(_parent->get_type() == neuron_struct_type::soma){
             auto & soma = static_cast<branch_soma&>(*_parent);
             auto sphere = soma.get_sphere();
             auto center = sphere.get_center();
