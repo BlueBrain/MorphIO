@@ -500,6 +500,17 @@ std::vector<int> morpho_tree::get_children(int id) const{
 }
 
 
+std::vector<morpho_node const *> morpho_tree::get_all_nodes() const{
+    std::vector<morpho_node const *> res;
+    res.reserve(_dptr->nodes.size());
+
+    for(auto & node : _dptr->nodes){
+        res.push_back(node.get());
+    }
+    return res;
+}
+
+
 morpho_tree& morpho_tree::operator = (morpho_tree && other){
     if(&other == this){
         return *this;

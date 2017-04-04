@@ -31,6 +31,7 @@
 
 #include <morpho/morpho_h5_v1.hpp>
 #include <morpho/morpho_mesher.hpp>
+#include <morpho/morpho_stats.hpp>
 
 #include "gmsh_exporter.hpp"
 #include "x3d_exporter.hpp"
@@ -51,8 +52,9 @@ po::parsed_options parse_args(int argc, char** argv,
                              ){
     po::options_description general("Commands:\n"
                                     "\t\t\n"
+                                    "  stats [morphology-file]:\t morphology statistics\n"
                                     "  export gmsh [morphology-file] [geo-file]:\texport morphology file to .geo file format\n"
-                                    "  export x3d [morphology-file] [x3d-file]:\texport morphology file to .x3d file format\n"
+                                    "  export x3d [morphology-file] [x3d-file]:\texport morphology file to .x3d file format\n"                                  
                                     "  mesh [morphology-file] [output_mesh_file]:\tCreate a mesh from a morphology\n"
                                     "\n\n"
                                     "Options");
@@ -165,6 +167,19 @@ std::shared_ptr<morpho_tree> load_morphology(const std::string & morphology_file
     return std::shared_ptr<morpho_tree>(new morpho_tree(reader.create_morpho_tree()));
 }
 
+void print_morpho_stats(const std::string & morpho_file){
+    std::shared_ptr<morpho_tree> tree = load_morphology(morpho_file);
+    fmt::scat(std::cout, "\n");
+    fmt::scat(std::cout, "filename =  \"", morpho_file, "\"", "\n");
+    fmt::scat(std::cout, "morphology_type = [\"detailed\", \"cones\" ]", "\n");
+    fmt::scat(std::cout, "number_of_branch = ", stats::total_number_branches(*tree), "\n");
+    fmt::scat(std::cout, "number_of_points = ", stats::total_number_point(*tree), "\n");
+    fmt::scat(std::cout, "min_radius_segment = ", stats::min_radius_segment(*tree), "\n");
+    fmt::scat(std::cout, "max_radius_segment = ", stats::max_radius_segment(*tree), "\n");
+    fmt::scat(std::cout, "median_radius_segment = ", stats::median_radius_segment(*tree), "\n");
+    fmt::scat(std::cout, "\n");
+}
+
 
 int main(int argc, char** argv){
     po::variables_map options;
@@ -191,6 +206,11 @@ int main(int argc, char** argv){
                 if(subargs.size() == 4
                     && subargs[1] == "x3d"){
                     export_morpho_to_x3d(subargs[2], subargs[3], options);
+                    return 0;
+                }
+            }else if(command == "stats"){
+                if(subargs.size() == 2){
+                    print_morpho_stats(subargs[1]);
                     return 0;
                 }
             }else if(command == "mesh"){         

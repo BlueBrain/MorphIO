@@ -78,7 +78,6 @@ private:
 };
 
 
-
 ///
 /// \brief generic element for any neuron element
 ///     in cone
@@ -296,6 +295,10 @@ public:
     /// all children of a node of a given id
     ///
     std::vector<int> get_children(int id) const;
+
+
+    ///
+    std::vector<morpho_node const*> get_all_nodes() const;
 
 private:
     morpho_tree(const morpho_tree &) = delete;
