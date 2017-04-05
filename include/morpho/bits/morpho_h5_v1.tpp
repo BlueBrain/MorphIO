@@ -301,7 +301,7 @@ inline void export_tree_to_raw(const morpho_tree & tree, mat_index & raw_index, 
                 raw_points(offset_points, 0) = point(0);
                 raw_points(offset_points, 1) = point(1);
                 raw_points(offset_points, 2) = point(2);
-                raw_points(offset_points, 3) = 0.01; // arbitrary radius for soma ring
+                raw_points(offset_points, 3) = 0.0; // arbitrary radius for soma ring
                 offset_points ++;
             }
         }else if(node.is_of_type(morpho_node_type::neuron_branch_type)){
@@ -339,8 +339,8 @@ void morpho_writer::write(const morpho_tree &tree){
     mat_points raw_points(number_of_points, 4);
     mat_index raw_struct(number_of_branch, 3);
 
-    std::vector<std::string> comment = { fmt::scat(" created out by morpho_toolv1",
-                                            " at ", std::ctime(&time_point)) };
+    std::vector<std::string> comment = { fmt::scat(" created out by morpho_tool v1",
+                                            " the ", std::ctime(&time_point)) };
 
     DataSet dpoints = h5_file.createDataSet<double>("/points", DataSpace::From(raw_points));
     DataSet dstructures = h5_file.createDataSet<int32_t>("/structure",DataSpace::From(raw_struct));

@@ -44,6 +44,9 @@ using namespace morpho;
 namespace fmt = hadoken::format;
 namespace po = boost::program_options;
 
+const std::string delete_duplicate_point_operation_str("delete_duplicate_point");
+const std::string duplicate_first_point_operation_str("duplicate_first_point");
+
 std::string version(){
     return std::string( MORPHO_VERSION_MAJOR "." MORPHO_VERSION_MINOR );
 }
@@ -109,9 +112,14 @@ std::shared_ptr<morpho_tree> load_morphology(const std::string & morphology_file
 void transform_show_help(){
     fmt::scat(std::cout, "Invalid --transform usage \n",
               "\t Syntax: --transform=[operation1,operation2] \n",
+              "\n"
               "\t \n",
               "\t Available operations: \n",
-              "\t\t *delete_duplicate_point*: remove duplicated point in the morphology \n",
+              "\t\t *", delete_duplicate_point_operation_str, "*:\t remove duplicated points in every branch\n",
+              "\t\t *", duplicate_first_point_operation_str, "*:\t duplicate the last point of every branch as first point of its children \n",
+              "\n",
+              "\n",
+              "\tNote: Most operations are NOT commutative"
               "\n");
     exit(1);
 }
@@ -132,28 +140,31 @@ morpho_operation_chain parse_transform_option(po::variables_map & options){
     }
 
     for(const auto & operation : vals ){
-        if(operation == std::string("delete_duplicate_point")){
+        if(operation == delete_duplicate_point_operation_str){
             filters.push_back(std::make_shared<delete_duplicate_point_operation>());
-        }else{
+        }else if(operation == duplicate_first_point_operation_str){
+            filters.push_back(std::make_shared<duplicate_first_point_operation>());
+        }else {
             transform_show_help();
         }
 
     }
     return filters;
-
 }
 
 void transform_ops_print(const morpho_operation_chain & ops){
     std::string res;
     if(ops.size() > 0){
-        fmt::scat(std::cout, " apply the the following filters: ");
+        fmt::scat(std::cout, "\napply the the filters: [ ");
         for(const auto & op : ops){
             fmt::scat(std::cout, op->name(), " ");
         }
+
+        fmt::scat(std::cout, "]\n");
     }
 }
 
-void export_morpho_to_mesh(const std::string & filename_morpho, const std::string & filename_geo,
+void export_morpho_to_gmsh(const std::string & filename_morpho, const std::string & filename_geo,
                           po::variables_map & options){
 
     std::vector<morpho_tree> trees;
@@ -178,7 +189,12 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
  
     {
         h5_v1::morpho_reader reader(filename_morpho);
-        morpho_tree tree = reader.create_morpho_tree();
+        // create tree and apply some basic filter adapted for gmsh
+        morpho_tree tree = morpho_transform(reader.create_morpho_tree(), {
+            std::make_shared<delete_duplicate_point_operation>(),
+            std::make_shared<duplicate_first_point_operation>(),
+        });
+
         trees.emplace_back(std::move(tree));
     }
     
@@ -271,7 +287,7 @@ int main(int argc, char** argv){
 
                 if(subargs.size() == 4
                     && subargs[1] == "gmsh"){
-                    export_morpho_to_mesh(subargs[2], subargs[3], options);
+                    export_morpho_to_gmsh(subargs[2], subargs[3], options);
                     return 0;
                 }
 

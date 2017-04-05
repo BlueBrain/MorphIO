@@ -44,6 +44,23 @@ public:
 };
 
 
+///
+/// \brief  duplicate_first_point_operation
+///
+/// transform operations : duplicate the last point of every branch as
+/// first point of the next branch
+///
+class duplicate_first_point_operation : public morpho_operation{
+public:
+    duplicate_first_point_operation();
+
+
+    morpho_tree apply(const morpho_tree &tree) override;
+
+    std::string name() const override;
+
+};
+
 
 } // morpho
 

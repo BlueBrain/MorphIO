@@ -49,7 +49,7 @@ using morpho_operation_chain = std::vector<std::shared_ptr<morpho_operation>>;
 /// \param ops
 /// \return morpho_tree after the transformation by all the selected operations
 ///
-morpho_tree morpho_transform(const morpho_tree & tree, morpho_operation_chain & ops);
+morpho_tree morpho_transform(const morpho_tree & tree, morpho_operation_chain ops);
 
 
 } // morpho
