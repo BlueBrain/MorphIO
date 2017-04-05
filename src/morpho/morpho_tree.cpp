@@ -88,9 +88,13 @@ bool neuron_node_3d::is_of_type(morpho_node_type mtype) const{
 struct neuron_branch::neuron_branch_internal{
     inline neuron_branch_internal(std::vector<point> && p, std::vector<double> && r) :
     points(std::move(p)), radius(std::move(r)){
+        if(points.size() < 1){
+            throw std::invalid_argument("a neuron branch should have at least one point");
+        }
         if(points.size() != radius.size()){
             throw std::invalid_argument(" points and radius vector for neuron branch should have the same size ");
         }
+
     }
 
     std::vector<point> points;
@@ -417,6 +421,10 @@ morpho_tree::morpho_tree(morpho_tree && other) : _dptr(nullptr){
     std::swap(_dptr, other._dptr);
 }
 
+morpho_tree::morpho_tree(const morpho_tree & other) :  _dptr(new morpho_tree_intern(*(other._dptr))){
+
+}
+
 
 morpho_tree::~morpho_tree(){
 }
@@ -486,6 +494,20 @@ int morpho_tree::add_node(int parent_id, const std::shared_ptr<morpho_node> & ne
 }
 
 
+int morpho_tree::copy_node(const morpho_tree &other, int id, int new_parent_id){
+     if(id < 0 || id >= other.get_tree_size()){
+         throw std::logic_error("Invalid node id for copy tree operation");
+     }
+     if(new_parent_id < 0 && _dptr->nodes.size() > 0){
+         throw std::logic_error("Only one root without parent can be defined");
+     }
+
+     _dptr->nodes.push_back(other._dptr->nodes[id]);
+     _dptr->parents.push_back(new_parent_id);
+    return _dptr->nodes.size()-1;
+}
+
+
 std::vector<int> morpho_tree::get_children(int id) const{
     std::vector<int> res;
     res.reserve(_dptr->nodes.size());
@@ -518,6 +540,17 @@ morpho_tree& morpho_tree::operator = (morpho_tree && other){
 
     swap(other);
     other._dptr.reset();
+    return *this;
+}
+
+
+morpho_tree& morpho_tree::operator =(const morpho_tree & other){
+    if(&other == this){
+        return *this;
+    }
+
+    morpho_tree new_tree(other);
+    swap(new_tree);
     return *this;
 }
 

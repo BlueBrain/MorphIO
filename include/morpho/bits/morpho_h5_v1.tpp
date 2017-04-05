@@ -21,8 +21,10 @@
 
 
 #include "../morpho_h5_v1.hpp"
+#include "../morpho_stats.hpp"
 
 #include <tuple>
+#include <chrono>
 
 #include <boost/numeric/ublas/blas.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -63,6 +65,21 @@ inline neuron_struct_type branch_type_from_h5v1(const int type_id){
             return neuron_struct_type::dentrite_basal;
         case 4:
             return neuron_struct_type::dentrite_apical;
+         default:
+            throw std::runtime_error("invalid cell type in morphology");
+    }
+}
+
+inline int h5v1_from_branch_type(neuron_struct_type btype){
+    switch(btype){
+        case neuron_struct_type::soma:
+            return 1;
+        case neuron_struct_type::axon:
+            return 2;
+        case neuron_struct_type::dentrite_basal:
+            return 3;
+        case neuron_struct_type::dentrite_apical:
+            return 4;
          default:
             throw std::runtime_error("invalid cell type in morphology");
     }
@@ -153,7 +170,7 @@ mat_points morpho_reader::get_soma_points_raw() const {
 }
 
 
-morpho_reader::mat_index morpho_reader::get_struct_raw() const {
+mat_index morpho_reader::get_struct_raw() const {
     mat_index res;
 
     structures.read<mat_index>(res);
@@ -256,7 +273,89 @@ morpho_tree morpho_reader::create_morpho_tree() const{
 
 
 
+morpho_writer::morpho_writer(const std::string & f)  :
+    h5_file(f, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate),
+    filename(f)
+{
 
+}
+
+
+inline void export_tree_to_raw(const morpho_tree & tree, mat_index & raw_index, mat_points & raw_points){
+    const std::size_t number_node = tree.get_tree_size();
+    std::size_t offset_struct = 0;
+    std::size_t offset_points = 0;
+
+    for(std::size_t i = 0 ; i < number_node; ++i){
+        const morpho_node & node = tree.get_node(i);
+
+        if(node.is_of_type(morpho_node_type::neuron_soma_type)){
+            const neuron_soma & soma = static_cast<const neuron_soma&>(node);
+            auto line_loop = soma.get_line_loop();
+            raw_index(offset_struct, 0) = offset_points;
+            raw_index(offset_struct, 1) = h5v1_from_branch_type(neuron_struct_type::soma); // soma
+            raw_index(offset_struct, 2) = -1;
+            offset_struct++;
+
+            for(const auto & point : line_loop){
+                raw_points(offset_points, 0) = point(0);
+                raw_points(offset_points, 1) = point(1);
+                raw_points(offset_points, 2) = point(2);
+                raw_points(offset_points, 3) = 0.01; // arbitrary radius for soma ring
+                offset_points ++;
+            }
+        }else if(node.is_of_type(morpho_node_type::neuron_branch_type)){
+            const neuron_branch & branch = static_cast<const neuron_branch&>(node);
+            const auto & points = branch.get_points();
+            const auto & radius = branch.get_radius();
+            assert(points.size() == radius.size());
+
+            raw_index(offset_struct, 0) = offset_points;
+            raw_index(offset_struct, 1) = h5v1_from_branch_type(branch.get_branch_type()); // soma
+            raw_index(offset_struct, 2) = tree.get_parent(i);
+            offset_struct++;
+
+            std::size_t index = 0;
+            for(const auto & point : points){
+                raw_points(offset_points, 0) = point(0);
+                raw_points(offset_points, 1) = point(1);
+                raw_points(offset_points, 2) = point(2);
+                raw_points(offset_points, 3) = radius[index] * 2.0 ; // h5v1 store diameter
+                index ++;
+                offset_points ++;
+            }
+        }
+    }
+
+}
+
+void morpho_writer::write(const morpho_tree &tree){
+    using namespace HighFive;
+    const std::size_t number_of_branch = stats::total_number_branches(tree);
+    const std::size_t number_of_points = stats::total_number_point(tree);
+
+    std::time_t time_point = std::chrono::system_clock::to_time_t(std::chrono::system_clock::time_point());
+
+    mat_points raw_points(number_of_points, 4);
+    mat_index raw_struct(number_of_branch, 3);
+
+    std::vector<std::string> comment = { fmt::scat(" created out by morpho_toolv1",
+                                            " at ", std::ctime(&time_point)) };
+
+    DataSet dpoints = h5_file.createDataSet<double>("/points", DataSpace::From(raw_points));
+    DataSet dstructures = h5_file.createDataSet<int32_t>("/structure",DataSpace::From(raw_struct));
+    Attribute acomment = h5_file.createAttribute<std::string>("comment", DataSpace::From(comment));
+
+
+    export_tree_to_raw(tree, raw_struct, raw_points);
+
+
+    dpoints.write(raw_points);
+    dstructures.write(raw_struct);
+    // add a comment to trace generation
+    acomment.write(comment);
+
+}
 
 
 } //h5_v1

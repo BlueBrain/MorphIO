@@ -34,4 +34,12 @@ target_link_libraries(tests_gmsh_bin ${HDF5_LIBRARIES} ${Boost_UNIT_TEST_FRAMEWO
 add_test(NAME test_gmsh COMMAND tests_gmsh_bin)
 
 
+## h5v1 tests
+file(GLOB  tests_h5v1_src "*h5v1*.cpp")
+add_executable(tests_h5v1_bin ${tests_h5v1_src}  )
+
+target_link_libraries(tests_h5v1_bin ${HDF5_LIBRARIES} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARIES} morpho)
+
+add_test(NAME test_h5v1 COMMAND tests_h5v1_bin)
+
 endif()

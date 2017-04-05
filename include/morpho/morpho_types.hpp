@@ -33,6 +33,8 @@ namespace morpho{
 typedef boost::numeric::ublas::matrix<double> mat_points;
 typedef boost::numeric::ublas::matrix_range<mat_points> mat_range_points;
 
+typedef boost::numeric::ublas::matrix<int> mat_index;
+
 typedef boost::numeric::ublas::vector<double> vec_double;
 typedef boost::numeric::ublas::vector_range<vec_double> vec_double_range;
 

@@ -19,7 +19,7 @@
 
 
 #include <morpho/morpho_stats.hpp>
-
+#include <numeric>
 
 
 namespace morpho{
@@ -112,6 +112,37 @@ double median_radius_segment(const morpho_tree &tree){
 
     std::sort(all_radius.begin(), all_radius.end());
     return all_radius[all_radius.size()/2];
+}
+
+
+bool has_duplicated_points(const morpho_tree &tree){
+    std::vector<int> index_node(tree.get_tree_size());
+    std::iota(index_node.begin(), index_node.end(), 0);
+
+    return std::any_of(index_node.begin(), index_node.end(), [&](int i){
+       const morpho_node & node = tree.get_node(i);
+       const int parent_id = tree.get_parent(i);
+       point last_point(std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max());
+
+       if(parent_id >= 0){ // get the parent point if it exists
+           const morpho_node & parent_node = tree.get_node(parent_id);
+           if(node.is_of_type(morpho_node_type::neuron_branch_type)){
+                const neuron_branch & parent_b = static_cast<const neuron_branch&>(parent_node);
+                const std::size_t size_branch = parent_b.get_number_points();
+                last_point = parent_b.get_points()[size_branch -1];
+           }
+       }
+
+       if(node.is_of_type(morpho_node_type::neuron_branch_type)){
+            const neuron_branch & b = static_cast<const neuron_branch&>(node);
+            for(const auto & point : b.get_points()){
+                if(last_point.close_to(point))
+                    return true;
+                last_point = point;
+            }
+       }
+       return false;
+    });
 }
 
 } // stats

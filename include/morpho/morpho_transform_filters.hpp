@@ -24,19 +24,28 @@
 
 namespace morpho{
 
+class morpho_operation;
 
-class filter_duplicate_point_operation : public morpho_operation{
+///
+/// \brief  delete_duplicate_point_operation
+///
+/// transform operations : Remove any consecutive duplicated point in every branch
+///  of a given morpho-tree
+///
+class delete_duplicate_point_operation : public morpho_operation{
 public:
-    filter_duplicate_point_operation(double min_distance = 0.001);
+    delete_duplicate_point_operation();
 
-private:
-    double _min_distance;
+
+    morpho_tree apply(const morpho_tree &tree) override;
+
+    std::string name() const override;
+
 };
 
 
 
 } // morpho
 
-#include <morpho/bits/morpho_transform_filters_bits.hpp>
 
 #endif // MORPHO_TRANSFORM_FILTERS_HPP

@@ -57,6 +57,12 @@ double max_radius_segment(const morpho_tree & tree);
 ///  the soma is not taken into consideration
 double median_radius_segment(const morpho_tree & tree);
 
+///
+/// \brief return true if duplicated points has been seen in any branch
+/// or between the end of a branch and the beginning of the next branch
+///
+bool has_duplicated_points(const morpho_tree & tree);
+
 } // stats
 
 } //morpho

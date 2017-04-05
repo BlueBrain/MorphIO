@@ -44,8 +44,6 @@ using namespace boost::numeric;
 class morpho_reader{
 public:
 
-    typedef ublas::matrix<int> mat_index;
-
     typedef std::pair<std::size_t, std::size_t> range;
 
     inline morpho_reader(const std::string & filename);
@@ -106,6 +104,20 @@ private:
     HighFive::DataSet structures, points;
 };
 
+
+class morpho_writer{
+public:
+    // create a new h5v1 morphology file at filename path
+    inline morpho_writer(const std::string & filename);
+
+    // write a new morphology file out of the given morpho_tree
+    inline void write(const morpho_tree & tree);
+
+private:
+    HighFive::File h5_file;
+    std::string filename;
+
+};
 
 
 } //h5_v1

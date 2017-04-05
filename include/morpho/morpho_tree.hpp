@@ -254,7 +254,7 @@ private:
 };
 
 
-///
+///    const std::size_t total_nb_nodes = tree.get_tree_size();
 /// \brief container for an entire morphology tree
 ///
 class morpho_tree{
@@ -263,8 +263,10 @@ public:
 
     morpho_tree();
     morpho_tree(morpho_tree && other);
+    morpho_tree(const morpho_tree &);
 
     morpho_tree& operator = (morpho_tree && other);
+    morpho_tree & operator = (const morpho_tree &);
 
     virtual ~morpho_tree();
 
@@ -284,6 +286,11 @@ public:
     int add_node(int parent_id, const std::shared_ptr<morpho_node> & new_node);
 
 
+    ///
+    /// copy node with a given id from an other tree to the current tree
+    /// and assign it as child node of a given parent in the new tree
+    int copy_node(const morpho_tree & other, int id, int new_parent_id);
+
     /// get a node, by id
     const morpho_node & get_node(int id) const;
 
@@ -301,8 +308,6 @@ public:
     std::vector<morpho_node const*> get_all_nodes() const;
 
 private:
-    morpho_tree(const morpho_tree &) = delete;
-    morpho_tree & operator = (const morpho_tree &) = delete;
 
     std::unique_ptr<morpho_tree_intern> _dptr;
 };

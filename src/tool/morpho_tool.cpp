@@ -28,10 +28,12 @@
 #include <boost/geometry.hpp>
 
 #include <hadoken/format/format.hpp>
+#include <hadoken/string/algorithm.hpp>
 
 #include <morpho/morpho_h5_v1.hpp>
 #include <morpho/morpho_mesher.hpp>
 #include <morpho/morpho_stats.hpp>
+#include <morpho/morpho_transform_filters.hpp>
 
 #include "gmsh_exporter.hpp"
 #include "x3d_exporter.hpp"
@@ -53,6 +55,7 @@ po::parsed_options parse_args(int argc, char** argv,
     po::options_description general("Commands:\n"
                                     "\t\t\n"
                                     "  stats [morphology-file]:\t morphology statistics\n"
+                                    "  export h5v1 [morphology-file] [output-h5v1-file]:\texport morphology file to h5v1 format\n"
                                     "  export gmsh [morphology-file] [geo-file]:\texport morphology file to .geo file format\n"
                                     "  export x3d [morphology-file] [x3d-file]:\texport morphology file to .x3d file format\n"                                  
                                     "  mesh [morphology-file] [output_mesh_file]:\tCreate a mesh from a morphology\n"
@@ -61,6 +64,7 @@ po::parsed_options parse_args(int argc, char** argv,
     general.add_options()
         ("help", "produce a help message")
         ("version", "output the version number")
+        ("transform", po::value<std::string>(), "apply a transform operation to the morphology, --transform for a list")
         ("point-cloud", "gmsh: export to a point cloud")
         ("wireframe", "gmsh: export to a wired morphology (default)")
         ("3d-object", "gmsh: export to a 3D object model")
@@ -97,6 +101,57 @@ po::parsed_options parse_args(int argc, char** argv,
 }
 
 
+std::shared_ptr<morpho_tree> load_morphology(const std::string & morphology_file){
+    h5_v1::morpho_reader reader(morphology_file);
+    return std::shared_ptr<morpho_tree>(new morpho_tree(reader.create_morpho_tree()));
+}
+
+void transform_show_help(){
+    fmt::scat(std::cout, "Invalid --transform usage \n",
+              "\t Syntax: --transform=[operation1,operation2] \n",
+              "\t \n",
+              "\t Available operations: \n",
+              "\t\t *delete_duplicate_point*: remove duplicated point in the morphology \n",
+              "\n");
+    exit(1);
+}
+
+// parse transformation operations
+morpho_operation_chain parse_transform_option(po::variables_map & options){
+    morpho_operation_chain filters;
+
+    if( options.count("transform") <1 ){
+        return filters;
+    }
+
+    const std::string string_option = options["transform"].as<std::string>();
+    std::vector<std::string> vals = hadoken::string::tokenize(string_option ,",");
+
+    if(vals.size() == 0){
+        transform_show_help();
+    }
+
+    for(const auto & operation : vals ){
+        if(operation == std::string("delete_duplicate_point")){
+            filters.push_back(std::make_shared<delete_duplicate_point_operation>());
+        }else{
+            transform_show_help();
+        }
+
+    }
+    return filters;
+
+}
+
+void transform_ops_print(const morpho_operation_chain & ops){
+    std::string res;
+    if(ops.size() > 0){
+        fmt::scat(std::cout, " apply the the following filters: ");
+        for(const auto & op : ops){
+            fmt::scat(std::cout, op->name(), " ");
+        }
+    }
+}
 
 void export_morpho_to_mesh(const std::string & filename_morpho, const std::string & filename_geo,
                           po::variables_map & options){
@@ -148,11 +203,8 @@ void export_morpho_to_x3d(const std::string & filename_morpho, const std::string
     
     fmt::scat(std::cout, "load morphology tree ", filename_morpho, "\n");
  
-    {
-        h5_v1::morpho_reader reader(filename_morpho);
-        morpho_tree tree = reader.create_morpho_tree();
-        trees.emplace_back(std::move(tree));
-    }    
+    auto tree_shared = load_morphology(filename_morpho);
+    trees.emplace_back(std::move(*tree_shared));
         
     x3d_exporter exporter(std::move(trees), filename_x3d);
 
@@ -162,9 +214,28 @@ void export_morpho_to_x3d(const std::string & filename_morpho, const std::string
 }
 
 
-std::shared_ptr<morpho_tree> load_morphology(const std::string & morphology_file){
-    h5_v1::morpho_reader reader(morphology_file);
-    return std::shared_ptr<morpho_tree>(new morpho_tree(reader.create_morpho_tree()));
+void export_morpho_to_h5v1(const std::string & filename_morpho, const std::string & filename_h5v1_output,
+                          po::variables_map & options){
+
+    fmt::scat(std::cout, "load morphology tree ", filename_morpho, "\n");
+
+    auto tree_sptr = load_morphology(filename_morpho);
+
+    morpho_operation_chain transform_ops = parse_transform_option(options);
+    transform_ops_print(transform_ops);
+
+    auto transformed_tree = morpho_transform(*tree_sptr, transform_ops);
+
+    h5_v1::morpho_writer writer(filename_h5v1_output);
+
+    fmt::scat(std::cout, "\nconvert ", filename_morpho, " to h5v1 file format.... ", filename_h5v1_output, "\n\n");
+
+    writer.write(transformed_tree);
+}
+
+
+std::string bool_to_string(bool v){
+    return (v) ? "true" : "false";
 }
 
 void print_morpho_stats(const std::string & morpho_file){
@@ -177,6 +248,7 @@ void print_morpho_stats(const std::string & morpho_file){
     fmt::scat(std::cout, "min_radius_segment = ", stats::min_radius_segment(*tree), "\n");
     fmt::scat(std::cout, "max_radius_segment = ", stats::max_radius_segment(*tree), "\n");
     fmt::scat(std::cout, "median_radius_segment = ", stats::median_radius_segment(*tree), "\n");
+    fmt::scat(std::cout, "has_duplicated_points = ", bool_to_string(stats::has_duplicated_points(*tree)), "\n");
     fmt::scat(std::cout, "\n");
 }
 
@@ -206,6 +278,12 @@ int main(int argc, char** argv){
                 if(subargs.size() == 4
                     && subargs[1] == "x3d"){
                     export_morpho_to_x3d(subargs[2], subargs[3], options);
+                    return 0;
+                }
+
+                if(subargs.size() == 4
+                    && subargs[1] == "h5v1"){
+                    export_morpho_to_h5v1(subargs[2], subargs[3], options);
                     return 0;
                 }
             }else if(command == "stats"){
