@@ -127,9 +127,9 @@ public:
      */
     BRAIN_API Strings getElectrophysiologyTypeNames() const;
 
-    /** @return \if pybind A Nx4 numpy array with the \else The \endif
-     *          local to world transformations of the given cells in the
-     *          iteration
+    /** @return \if pybind A Nx4x4 numpy array with the \else The \endif
+     *          local to world transformations of the given cells in their
+     *          iteration order.
      */
     BRAIN_API Matrix4fs getTransforms(const GIDSet& gids) const;
 

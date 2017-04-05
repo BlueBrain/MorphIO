@@ -26,7 +26,7 @@ available in your environemnt. In the Blue Brain clusters you have two
 possibilities depending on the Python version you want to use:
 
  * For Python 3.4: ``module load BBP/viz/latest``
- * For Python 2.7: ``module load memcache/bbpviz nix/viz/brion/2.0 nix/python2.7-full``
+ * For Python 2.7: ``module load memcache/bbpviz nix/viz/brion nix/python/2.7-full``
 
 .. code:: python
 
