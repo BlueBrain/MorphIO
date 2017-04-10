@@ -129,122 +129,123 @@ int main(const int argc, char** argv)
           "List of whitespace separated GIDs to convert" )
         ( "compare,c", "Compare written report with input" )
         ( "dump,d", "Dump input report information (no output conversion)" );
-    // clang-format off
+    // clang-format on
+
     po::variables_map vm;
 
     try
     {
-        po::store( po::parse_command_line( argc, argv, options ), vm );
-        po::notify( vm );
+        po::store(po::parse_command_line(argc, argv, options), vm);
+        po::notify(vm);
     }
-    catch( const po::error& e )
+    catch (const po::error& e)
     {
         std::cerr << "Command line parse error: " << e.what() << std::endl
                   << options << std::endl;
         return EXIT_FAILURE;
     }
 
-    if( vm.count( "help" ))
+    if (vm.count("help"))
     {
         std::cout << options << std::endl;
         return EXIT_SUCCESS;
     }
 
-    if( vm.count( "version" ))
+    if (vm.count("version"))
     {
         std::cout << "Brion compartment report converter "
                   << brion::Version::getString() << std::endl;
         return EXIT_SUCCESS;
     }
 
-    if( vm.count( "erase" ))
+    if (vm.count("erase"))
     {
-        lunchbox::URI outURI( vm[ "erase" ].as< std::string >( ));
-        brion::CompartmentReport report( outURI, brion::MODE_READ );
-        if( report.erase( ))
+        lunchbox::URI outURI(vm["erase"].as<std::string>());
+        brion::CompartmentReport report(outURI, brion::MODE_READ);
+        if (report.erase())
             return EXIT_SUCCESS;
         std::cerr << "Could not erase " << outURI << std::endl;
         return EXIT_FAILURE;
     }
 
-    const std::string input = vm["input"].as< std::string >();
-    const size_t maxFrames = vm.count( "maxFrames" ) == 1 ?
-        vm["maxFrames"].as< size_t >() : std::numeric_limits< size_t >::max();
+    const std::string input = vm["input"].as<std::string>();
+    const size_t maxFrames = vm.count("maxFrames") == 1
+                                 ? vm["maxFrames"].as<size_t>()
+                                 : std::numeric_limits<size_t>::max();
 
-    lunchbox::URI inURI( input );
+    lunchbox::URI inURI(input);
     lunchbox::Clock clock;
-    brion::CompartmentReport in( inURI, brion::MODE_READ );
+    brion::CompartmentReport in(inURI, brion::MODE_READ);
     float loadTime = clock.getTimef();
 
     const float start = in.getStartTime();
     const float step = in.getTimestep();
     float end = in.getEndTime();
 
-    if( vm.count( "dump" ))
+    if (vm.count("dump"))
     {
         std::cout << "Compartment report " << inURI << ":" << std::endl
-                  << "  " << (end - start) / step << " frames: "
-                  << start << ".." << end << " / " << step << " "
-                  << in.getTimeUnit() << std::endl
+                  << "  " << (end - start) / step << " frames: " << start
+                  << ".." << end << " / " << step << " " << in.getTimeUnit()
+                  << std::endl
                   << "  " << in.getGIDs().size() << " neurons" << std::endl
-                  << "  " << in.getFrameSize() << " compartments"
-                  << std::endl;
+                  << "  " << in.getFrameSize() << " compartments" << std::endl;
         return EXIT_SUCCESS;
     }
 
-    if( vm.count( "gids" ))
+    if (vm.count("gids"))
     {
         brion::GIDSet gids;
-        for( const auto gid : vm["gids"].as< std::vector< uint32_t >>( ))
-            gids.emplace( gid );
-        in.updateMapping( gids );
+        for (const auto gid : vm["gids"].as<std::vector<uint32_t>>())
+            gids.emplace(gid);
+        in.updateMapping(gids);
     }
 
     const float maxEnd = start + maxFrames * step;
-    end = std::min( end, maxEnd );
+    end = std::min(end, maxEnd);
     const brion::CompartmentCounts& counts = in.getCompartmentCounts();
     const brion::GIDSet& gids = in.getGIDs();
 
-    lunchbox::URI outURI( vm[ "output" ].as< std::string >( ));
-    if( outURI.getPath().empty( ))
+    lunchbox::URI outURI(vm["output"].as<std::string>());
+    if (outURI.getPath().empty())
     {
         try
         {
-            outURI.setPath( boost::filesystem::canonical(
-                                inURI.getPath( )).generic_string( ));
+            outURI.setPath(
+                boost::filesystem::canonical(inURI.getPath()).generic_string());
         }
-        catch( const boost::filesystem::filesystem_error& )
+        catch (const boost::filesystem::filesystem_error&)
         {
             // For non-filebased reports, the canonical above will throw.
-            outURI.setPath( inURI.getPath( ));
+            outURI.setPath(inURI.getPath());
         }
     }
 
     clock.reset();
-    brion::CompartmentReport to( outURI, brion::MODE_OVERWRITE );
-    to.writeHeader( start, end, step, in.getDataUnit(), in.getTimeUnit( ));
+    brion::CompartmentReport to(outURI, brion::MODE_OVERWRITE);
+    to.writeHeader(start, end, step, in.getDataUnit(), in.getTimeUnit());
     {
         size_t index = 0;
-        for( const uint32_t gid : gids )
-            if( !to.writeCompartments( gid, counts[ index++ ] ))
+        for (const uint32_t gid : gids)
+            if (!to.writeCompartments(gid, counts[index++]))
                 return EXIT_FAILURE;
     }
 
     float writeTime = clock.getTimef();
 
     const size_t nFrames = (end - start) / step;
-    boost::progress_display progress( nFrames );
+    boost::progress_display progress(nFrames);
 
-    for( size_t i = 0; i < nFrames; ++i )
+    for (size_t i = 0; i < nFrames; ++i)
     {
         const float t = start + i * step;
         clock.reset();
-        brion::floatsPtr data = in.loadFrame( t );
+        brion::floatsPtr data = in.loadFrame(t);
         loadTime += clock.getTimef();
-        if( !data )
+        if (!data)
         {
             LBERROR << "Can't load frame at " << t << " ms" << std::endl;
-            ::exit( EXIT_FAILURE );
+            ::exit(EXIT_FAILURE);
         }
 
         const brion::floats& values = *data.get();
@@ -252,30 +253,30 @@ int main(const int argc, char** argv)
 
         size_t index = 0;
         clock.reset();
-        for( const uint32_t gid : gids )
+        for (const uint32_t gid : gids)
         {
-            if( _isCompact( in, index ))
+            if (_isCompact(in, index))
             {
-                const float* cellValues = &values[ offsets[index][0] ];
-                const size_t size = std::accumulate( counts[index].begin(),
-                                                     counts[index].end(), 0 );
-                if( !to.writeFrame( gid, cellValues, size, t ))
+                const float* cellValues = &values[offsets[index][0]];
+                const size_t size = std::accumulate(counts[index].begin(),
+                                                    counts[index].end(), 0);
+                if (!to.writeFrame(gid, cellValues, size, t))
                     return EXIT_FAILURE;
                 ++index;
                 continue;
             }
 
             brion::floats cellvalues;
-            cellvalues.reserve( in.getNumCompartments( index ));
+            cellvalues.reserve(in.getNumCompartments(index));
 
-            for( size_t j = 0; j < offsets[index].size(); ++j )
+            for (size_t j = 0; j < offsets[index].size(); ++j)
             {
                 const auto offset = offsets[index][j];
-                for( size_t k = 0; k < counts[index][j]; ++k )
-                    cellvalues.emplace_back( values[ offset + k ] );
+                for (size_t k = 0; k < counts[index][j]; ++k)
+                    cellvalues.emplace_back(values[offset + k]);
             }
 
-            if( !to.writeFrame( gid, cellvalues, t ))
+            if (!to.writeFrame(gid, cellvalues, t))
                 return EXIT_FAILURE;
             ++index;
         }
@@ -287,53 +288,53 @@ int main(const int argc, char** argv)
     to.flush();
     writeTime += clock.getTimef();
 
-    std::cout << "Converted " << inURI << " to " << outURI
-              << " (in " << size_t( loadTime ) << " out " << size_t( writeTime )
-              << " ms, " << gids.size() << " cells X " <<  nFrames << " frames)"
+    std::cout << "Converted " << inURI << " to " << outURI << " (in "
+              << size_t(loadTime) << " out " << size_t(writeTime) << " ms, "
+              << gids.size() << " cells X " << nFrames << " frames)"
               << std::endl;
 
-    if( vm.count( "compare" ))
+    if (vm.count("compare"))
     {
-        progress.restart( nFrames );
-        brion::CompartmentReport result( outURI, brion::MODE_READ );
+        progress.restart(nFrames);
+        brion::CompartmentReport result(outURI, brion::MODE_READ);
 
-        REQUIRE_EQUAL( in.getStartTime(), result.getStartTime( ));
-        REQUIRE_EQUAL( in.getEndTime(), result.getEndTime( ));
-        REQUIRE_EQUAL( in.getTimestep(), result.getTimestep( ));
-        REQUIRE_EQUAL( in.getFrameSize(), result.getFrameSize( ));
-        requireEqualCollections( gids,  result.getGIDs( ));
-        REQUIRE_EQUAL( in.getDataUnit(), result.getDataUnit( ));
-        REQUIRE_EQUAL( in.getTimeUnit(), result.getTimeUnit( ));
-        REQUIRE( !in.getDataUnit().empty( ));
-        REQUIRE( !in.getTimeUnit().empty( ));
+        REQUIRE_EQUAL(in.getStartTime(), result.getStartTime());
+        REQUIRE_EQUAL(in.getEndTime(), result.getEndTime());
+        REQUIRE_EQUAL(in.getTimestep(), result.getTimestep());
+        REQUIRE_EQUAL(in.getFrameSize(), result.getFrameSize());
+        requireEqualCollections(gids, result.getGIDs());
+        REQUIRE_EQUAL(in.getDataUnit(), result.getDataUnit());
+        REQUIRE_EQUAL(in.getTimeUnit(), result.getTimeUnit());
+        REQUIRE(!in.getDataUnit().empty());
+        REQUIRE(!in.getTimeUnit().empty());
 
         const brion::SectionOffsets& offsets1 = in.getOffsets();
         const brion::SectionOffsets& offsets2 = result.getOffsets();
         const brion::CompartmentCounts& counts1 = in.getCompartmentCounts();
         const brion::CompartmentCounts& counts2 = result.getCompartmentCounts();
 
-        REQUIRE_EQUAL( offsets1.size(), offsets2.size( ));
-        REQUIRE_EQUAL( counts1.size(), counts2.size( ));
+        REQUIRE_EQUAL(offsets1.size(), offsets2.size());
+        REQUIRE_EQUAL(counts1.size(), counts2.size());
 
-        for( size_t i = 0; i < offsets1.size(); ++i )
+        for (size_t i = 0; i < offsets1.size(); ++i)
         {
-            requireEqualCollections( offsets1[i], offsets2[i] );
+            requireEqualCollections(offsets1[i], offsets2[i]);
 
-            for( size_t j = 0; j < offsets1[i].size(); ++j )
-                REQUIRE( offsets1[i][j] < in.getFrameSize() ||
-                     offsets1[i][j] == std::numeric_limits< uint64_t >::max( ));
+            for (size_t j = 0; j < offsets1[i].size(); ++j)
+                REQUIRE(offsets1[i][j] < in.getFrameSize() ||
+                        offsets1[i][j] == std::numeric_limits<uint64_t>::max());
         }
 
-        for( float t = start; t < end; t += step )
+        for (float t = start; t < end; t += step)
         {
-            brion::floatsPtr frame1 = in.loadFrame( t );
-            brion::floatsPtr frame2 = result.loadFrame( t );
+            brion::floatsPtr frame1 = in.loadFrame(t);
+            brion::floatsPtr frame2 = result.loadFrame(t);
 
-            REQUIRE( frame1 );
-            REQUIRE( frame2 );
+            REQUIRE(frame1);
+            REQUIRE(frame2);
 
-            for( size_t i = 0; i < in.getFrameSize(); ++i )
-                REQUIRE_EQUAL( (*frame1)[i], (*frame2)[i] );
+            for (size_t i = 0; i < in.getFrameSize(); ++i)
+                REQUIRE_EQUAL((*frame1)[i], (*frame2)[i]);
             ++progress;
         }
     }
