@@ -19,14 +19,16 @@
  */
 
 #include <brion/brion.h>
+
 #include <lunchbox/clock.h>
 #include <lunchbox/file.h>
 #include <lunchbox/log.h>
 #include <lunchbox/sleep.h>
 #include <lunchbox/string.h>
 #include <lunchbox/term.h>
+
 #ifdef BRION_USE_BBPTESTDATA
-#  include <BBP/TestDatasets.h>
+#include <BBP/TestDatasets.h>
 #endif
 
 #define STREAM_READ_TIMEOUT_MS 500
@@ -39,16 +41,19 @@
 
 namespace po = boost::program_options;
 
-int main( int argc, char* argv[] )
+int main(int argc, char* argv[])
 {
-    const std::string help = lunchbox::getFilename( std::string( argv[0] ));
-    const std::string uriHelp = std::string( "Output report URI\n" ) +
+    const std::string help = lunchbox::getFilename(std::string(argv[0]));
+    const std::string uriHelp =
+        std::string("Output report URI\n") +
         "  Supported input and output URIs:\n" +
-        lunchbox::string::prepend( brion::SpikeReport::getDescriptions(),
-                                   "    " );
+        lunchbox::string::prepend(brion::SpikeReport::getDescriptions(),
+                                  "    ");
 
-    po::options_description options( help.c_str(),
-                                     lunchbox::term::getSize().first );
+    po::options_description options(help.c_str(),
+                                    lunchbox::term::getSize().first);
+
+    // clang-format off
     options.add_options()
         ( "help,h", "Produce help message" )
         ( "version,v", "Show program name/version banner and exit" )
@@ -62,6 +67,7 @@ int main( int argc, char* argv[] )
 #endif
         ( "output,o", po::value< std::string >()->default_value( "out.spikes" ),
           uriHelp.c_str( ));
+    // clang-format on
 
     po::positional_options_description positional;
     positional.add("input", 1);
@@ -70,33 +76,36 @@ int main( int argc, char* argv[] )
     po::variables_map vm;
     try
     {
-        po::store( po::command_line_parser( argc, argv ).
-                   options( options ).positional( positional ).run(), vm );
-        po::notify( vm );
+        po::store(po::command_line_parser(argc, argv)
+                      .options(options)
+                      .positional(positional)
+                      .run(),
+                  vm);
+        po::notify(vm);
     }
-    catch( const po::error& e )
+    catch (const po::error& e)
     {
         std::cerr << "Command line parse error: " << e.what() << std::endl
                   << options << std::endl;
         return EXIT_FAILURE;
     }
 
-    if( vm.count( "help" ))
+    if (vm.count("help"))
     {
         std::cout << options << std::endl;
         return EXIT_SUCCESS;
     }
 
-    if( vm.count( "version" ))
+    if (vm.count("version"))
     {
         std::cout << "Brion spike report converter "
                   << brion::Version::getString() << std::endl;
         return EXIT_SUCCESS;
     }
-    if( vm["input"].as< std::string >() == vm["output"].as< std::string >( ))
+    if (vm["input"].as<std::string>() == vm["output"].as<std::string>())
     {
         std::cerr << "Cowardly refusing to convert "
-                  << vm["input"].as< std::string >() << " onto itself"
+                  << vm["input"].as<std::string>() << " onto itself"
                   << std::endl;
         return EXIT_FAILURE;
     }
@@ -106,30 +115,30 @@ int main( int argc, char* argv[] )
         lunchbox::Clock clock;
 
         float readTime = 0.f;
-        brion::SpikeReport in( brion::URI( vm["input"].as< std::string >( )),
-                               brion::MODE_READ );
+        brion::SpikeReport in(brion::URI(vm["input"].as<std::string>()),
+                              brion::MODE_READ);
         readTime += clock.resetTimef();
 
         float writeTime = 0.f;
-        brion::SpikeReport out( brion::URI( vm["output"].as< std::string >( )),
-                                brion::MODE_WRITE );
+        brion::SpikeReport out(brion::URI(vm["output"].as<std::string>()),
+                               brion::MODE_WRITE);
         writeTime += clock.resetTimef();
 
-        const float step = 10.f; //ms, arbitrary value
-        while( in.getState() == brion::SpikeReport::State::ok )
+        const float step = 10.f; // ms, arbitrary value
+        while (in.getState() == brion::SpikeReport::State::ok)
         {
-            const auto spikes = in.readUntil( in.getCurrentTime() + step ).get();
+            const auto spikes = in.readUntil(in.getCurrentTime() + step).get();
             readTime += clock.resetTimef();
 
-            out.write( spikes );
+            out.write(spikes);
             writeTime += clock.resetTimef();
         }
 
-        std::cout << "Converted " << vm["input"].as< std::string >() << " => "
-                  << vm["output"].as< std::string >() << " in " << readTime
+        std::cout << "Converted " << vm["input"].as<std::string>() << " => "
+                  << vm["output"].as<std::string>() << " in " << readTime
                   << " + " << writeTime << " ms" << std::endl;
     }
-    catch ( const std::exception& exception )
+    catch (const std::exception& exception)
     {
         LBINFO << "Failed to convert spikes: " << exception.what() << std::endl;
         return EXIT_FAILURE;

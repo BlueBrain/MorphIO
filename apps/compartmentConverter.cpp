@@ -18,12 +18,14 @@
  */
 
 #include <brion/brion.h>
+
 #include <lunchbox/clock.h>
 #include <lunchbox/file.h>
 #include <lunchbox/string.h>
 #include <lunchbox/term.h>
+
 #ifdef BRION_USE_BBPTESTDATA
-#  include <BBP/TestDatasets.h>
+#include <BBP/TestDatasets.h>
 #endif
 
 #include <boost/filesystem.hpp>
@@ -33,53 +35,53 @@
 namespace po = boost::program_options;
 using boost::lexical_cast;
 
-#define REQUIRE_EQUAL( a, b )                           \
-    if( (a) != (b) )                                    \
-    {                                                   \
-        std::cerr << #a << " != " << #b << std::endl;   \
-        ::exit( EXIT_FAILURE );                         \
+#define REQUIRE_EQUAL(a, b)                           \
+    if ((a) != (b))                                   \
+    {                                                 \
+        std::cerr << #a << " != " << #b << std::endl; \
+        ::exit(EXIT_FAILURE);                         \
     }
 
-#define REQUIRE( a )                                    \
-    if( !(a) )                                          \
-    {                                                   \
-        std::cerr << #a << " failed" << std::endl;      \
-        ::exit( EXIT_FAILURE );                         \
+#define REQUIRE(a)                                 \
+    if (!(a))                                      \
+    {                                              \
+        std::cerr << #a << " failed" << std::endl; \
+        ::exit(EXIT_FAILURE);                      \
     }
 
 namespace
 {
-template< class T > void requireEqualCollections( const T& a, const T& b )
+template <class T>
+void requireEqualCollections(const T& a, const T& b)
 {
     typename T::const_iterator i = a.begin();
     typename T::const_iterator j = b.begin();
-    while( i != a.end() && j != b.end( ))
+    while (i != a.end() && j != b.end())
     {
-        REQUIRE_EQUAL( *i, *j );
+        REQUIRE_EQUAL(*i, *j);
         ++i;
         ++j;
     }
-    REQUIRE_EQUAL( i, a.end( ));
-    REQUIRE_EQUAL( j, b.end( ));
+    REQUIRE_EQUAL(i, a.end());
+    REQUIRE_EQUAL(j, b.end());
 }
 
 /** @return true if the cell occupies a continuous region in the report frame */
-bool _isCompact( const brion::CompartmentReport& report,
-                    const size_t gidIndex )
+bool _isCompact(const brion::CompartmentReport& report, const size_t gidIndex)
 {
     const auto& offsets = report.getOffsets()[gidIndex];
     const auto& counts = report.getCompartmentCounts()[gidIndex];
 
     // sections are not guaranteed to be enumerated in order - sort them:
-    std::map< uint64_t, uint16_t > mapping;
-    for( size_t i = 0; i < offsets.size(); ++i )
+    std::map<uint64_t, uint16_t> mapping;
+    for (size_t i = 0; i < offsets.size(); ++i)
         mapping.emplace(offsets[i], counts[i]);
 
     auto i = mapping.begin();
     uint64_t next = i->first + i->second;
-    for( ++i; i != mapping.end(); ++i )
+    for (++i; i != mapping.end(); ++i)
     {
-        if( i->first != next )
+        if (i->first != next)
             return false;
         next = i->first + i->second;
     }
@@ -94,17 +96,18 @@ bool _isCompact( const brion::CompartmentReport& report,
  * @param argv argument list, use -h for help
  * @return EXIT_SUCCESS or EXIT_FAILURE
  */
-int main( const int argc, char** argv )
+int main(const int argc, char** argv)
 {
-    const std::string help = lunchbox::getFilename( std::string( argv[0] ));
-    const std::string uriHelp = std::string( "Output report URI\n" ) +
+    const std::string help = lunchbox::getFilename(std::string(argv[0]));
+    const std::string uriHelp =
+        std::string("Output report URI\n") +
         "  Supported input and output URIs:\n" +
-        lunchbox::string::prepend( brion::CompartmentReport::getDescriptions(),
-                                   "    " );
+        lunchbox::string::prepend(brion::CompartmentReport::getDescriptions(),
+                                  "    ");
 
-    po::options_description options( help.c_str(),
-                                     lunchbox::term::getSize().first );
-
+    po::options_description options(help.c_str(),
+                                    lunchbox::term::getSize().first);
+    // clang-format off
     options.add_options()
         ( "help,h", "Produce help message" )
         ( "version,v", "Show program name/version banner and exit" )
@@ -126,6 +129,7 @@ int main( const int argc, char** argv )
           "List of whitespace separated GIDs to convert" )
         ( "compare,c", "Compare written report with input" )
         ( "dump,d", "Dump input report information (no output conversion)" );
+    // clang-format off
     po::variables_map vm;
 
     try
