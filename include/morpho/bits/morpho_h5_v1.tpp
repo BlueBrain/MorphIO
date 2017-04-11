@@ -21,8 +21,10 @@
 
 
 #include "../morpho_h5_v1.hpp"
+#include "../morpho_stats.hpp"
 
 #include <tuple>
+#include <chrono>
 
 #include <boost/numeric/ublas/blas.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -42,29 +44,42 @@ namespace h5_v1{
 
 namespace {
 
-inline void split_xyz_and_distance(const mat_points & raw_points, mat_points & points, vec_double & distance){
-    points.resize(raw_points.size1(), 3);
-    distance.resize(raw_points.size1());
+inline void split_xyz_and_distance(const mat_points & raw_points, std::vector<point> & points, std::vector<double> & radius){
+    points.resize(raw_points.size1());
+    radius.resize(raw_points.size1());
 
     for(auto i = std::size_t(0); i < raw_points.size1(); ++i ){
-        points(i,0) = raw_points(i,0);
-        points(i,1) = raw_points(i,1);
-        points(i,2) = raw_points(i,2);
-        distance(i) = raw_points(i,3);
+        points[i] = point( raw_points(i,0), raw_points(i,1), raw_points(i,2));
+        radius[i] = raw_points(i,3) / 2.0 ; // radius -> /2
     }
 }
 
 
-inline branch_type branch_type_from_h5v1(const int type_id){
+inline neuron_struct_type branch_type_from_h5v1(const int type_id){
     switch(type_id){
         case 1:
-            return branch_type::soma;
+            return neuron_struct_type::soma;
         case 2:
-            return branch_type::axon;
+            return neuron_struct_type::axon;
         case 3:
-            return branch_type::dentrite_basal;
+            return neuron_struct_type::dentrite_basal;
         case 4:
-            return branch_type::dentrite_apical;
+            return neuron_struct_type::dentrite_apical;
+         default:
+            throw std::runtime_error("invalid cell type in morphology");
+    }
+}
+
+inline int h5v1_from_branch_type(neuron_struct_type btype){
+    switch(btype){
+        case neuron_struct_type::soma:
+            return 1;
+        case neuron_struct_type::axon:
+            return 2;
+        case neuron_struct_type::dentrite_basal:
+            return 3;
+        case neuron_struct_type::dentrite_apical:
+            return 4;
          default:
             throw std::runtime_error("invalid cell type in morphology");
     }
@@ -155,7 +170,7 @@ mat_points morpho_reader::get_soma_points_raw() const {
 }
 
 
-morpho_reader::mat_index morpho_reader::get_struct_raw() const {
+mat_index morpho_reader::get_struct_raw() const {
     mat_index res;
 
     structures.read<mat_index>(res);
@@ -190,17 +205,26 @@ morpho_tree morpho_reader::create_morpho_tree() const{
 
     {
         // create soma
-        std::unique_ptr<branch> soma(new branch_soma());
 
+        std::shared_ptr<neuron_soma> soma;
         mat_points raw_soma_points  =  get_soma_points_raw();
 
-        mat_points soma_points;
-        vec_double soma_distance;
+        std::vector<point> soma_points;
+        std::vector<double> soma_distance;
 
         split_xyz_and_distance(raw_soma_points, soma_points, soma_distance);
 
-        soma->set_points(std::move(soma_points), std::move(soma_distance));
-        res.set_root(std::move(soma));
+        // if single element
+        //  -> we need to modelise the soma as a sphere : one point + radius
+        // else
+        //  -> we have a line loop, import all points
+        if(soma_points.size() == 1 ){
+            soma.reset(new neuron_soma(soma_points[0], soma_distance[0]));
+        }else {
+            soma.reset(new neuron_soma(std::move(soma_points)));
+        }
+
+        res.add_node(-1, std::static_pointer_cast<morpho_node>(soma));
     }
 
     {
@@ -212,32 +236,33 @@ morpho_tree morpho_reader::create_morpho_tree() const{
         // create branch
         const std::size_t n_branch = structures.getSpace().getDimensions()[0];
         for(std::size_t i = 1; i < n_branch; ++i){
-            mat_points branch_points;
-            vec_double branch_distance;
+            mat_points branch_raw;
 
             auto raw_mat_range = get_branch_range_raw(i);
 
             const std::size_t n_row = raw_mat_range.second;
-            const std::size_t n_col = 3;
-            branch_points.resize(n_row, n_col);
-            branch_distance.resize(n_row);
+            const std::size_t n_col = 4;
+            branch_raw.resize(n_row, n_col);
 
             // first line -> end segment previous branch
             const int prev_id = struct_raw(i, 2);
 
             mat_range_points range_points_raw(points_raw, morpho::range(raw_mat_range.first, raw_mat_range.first+ n_row), morpho::range(0, n_col));
-            branch_points = range_points_raw;
-            branch_distance = ublas::subrange( ublas::column(points_raw, 3), raw_mat_range.first, raw_mat_range.first+ n_row);
+            branch_raw = range_points_raw;
 
-            // convert diameter into radius
-            std::for_each(branch_distance.begin(), branch_distance.end(), [](vec_double::value_type & elem){
-               elem /= 2.0;
-            });
+            std::vector<point> branch_points;
+            std::vector<double> branch_radius;
 
-            std::unique_ptr<branch> b(new branch(branch_type_from_h5v1(struct_raw(i, 1))));
-            b->set_points(std::move(branch_points), std::move(branch_distance));
+            split_xyz_and_distance(range_points_raw, branch_points, branch_radius);
 
-            res.add_child(prev_id, std::move(b));
+
+            std::shared_ptr<neuron_branch> b(new neuron_branch(
+                                                 branch_type_from_h5v1(struct_raw(i, 1)),
+                                                 std::move(branch_points),
+                                                 std::move(branch_radius))
+                                            );
+
+            res.add_node(prev_id, b);
 
         }
     }
@@ -248,7 +273,89 @@ morpho_tree morpho_reader::create_morpho_tree() const{
 
 
 
+morpho_writer::morpho_writer(const std::string & f)  :
+    h5_file(f, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate),
+    filename(f)
+{
 
+}
+
+
+inline void export_tree_to_raw(const morpho_tree & tree, mat_index & raw_index, mat_points & raw_points){
+    const std::size_t number_node = tree.get_tree_size();
+    std::size_t offset_struct = 0;
+    std::size_t offset_points = 0;
+
+    for(std::size_t i = 0 ; i < number_node; ++i){
+        const morpho_node & node = tree.get_node(i);
+
+        if(node.is_of_type(morpho_node_type::neuron_soma_type)){
+            const neuron_soma & soma = static_cast<const neuron_soma&>(node);
+            auto line_loop = soma.get_line_loop();
+            raw_index(offset_struct, 0) = offset_points;
+            raw_index(offset_struct, 1) = h5v1_from_branch_type(neuron_struct_type::soma); // soma
+            raw_index(offset_struct, 2) = -1;
+            offset_struct++;
+
+            for(const auto & point : line_loop){
+                raw_points(offset_points, 0) = point(0);
+                raw_points(offset_points, 1) = point(1);
+                raw_points(offset_points, 2) = point(2);
+                raw_points(offset_points, 3) = 0.0; // arbitrary radius for soma ring
+                offset_points ++;
+            }
+        }else if(node.is_of_type(morpho_node_type::neuron_branch_type)){
+            const neuron_branch & branch = static_cast<const neuron_branch&>(node);
+            const auto & points = branch.get_points();
+            const auto & radius = branch.get_radius();
+            assert(points.size() == radius.size());
+
+            raw_index(offset_struct, 0) = offset_points;
+            raw_index(offset_struct, 1) = h5v1_from_branch_type(branch.get_branch_type()); // soma
+            raw_index(offset_struct, 2) = tree.get_parent(i);
+            offset_struct++;
+
+            std::size_t index = 0;
+            for(const auto & point : points){
+                raw_points(offset_points, 0) = point(0);
+                raw_points(offset_points, 1) = point(1);
+                raw_points(offset_points, 2) = point(2);
+                raw_points(offset_points, 3) = radius[index] * 2.0 ; // h5v1 store diameter
+                index ++;
+                offset_points ++;
+            }
+        }
+    }
+
+}
+
+void morpho_writer::write(const morpho_tree &tree){
+    using namespace HighFive;
+    const std::size_t number_of_branch = stats::total_number_branches(tree);
+    const std::size_t number_of_points = stats::total_number_point(tree);
+
+    std::time_t time_point = std::chrono::system_clock::to_time_t(std::chrono::system_clock::time_point());
+
+    mat_points raw_points(number_of_points, 4);
+    mat_index raw_struct(number_of_branch, 3);
+
+    std::vector<std::string> comment = { fmt::scat(" created out by morpho_tool v1",
+                                            " the ", std::ctime(&time_point)) };
+
+    DataSet dpoints = h5_file.createDataSet<double>("/points", DataSpace::From(raw_points));
+    DataSet dstructures = h5_file.createDataSet<int32_t>("/structure",DataSpace::From(raw_struct));
+    Attribute acomment = h5_file.createAttribute<std::string>("comment", DataSpace::From(comment));
+
+
+    export_tree_to_raw(tree, raw_struct, raw_points);
+
+
+    dpoints.write(raw_points);
+    dstructures.write(raw_struct);
+    // add a comment to trace generation
+    acomment.write(comment);
+
+}
 
 
 } //h5_v1

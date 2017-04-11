@@ -13,12 +13,14 @@ if(NOT Boost_USE_STATIC_LIBS)
         add_definitions(-DBOOST_TEST_DYN_LINK=TRUE)
 endif()
 
+# add info about test file
+add_definitions( -DH5V1_MORPHO_TEST_FILE=\"${CMAKE_CURRENT_SOURCE_DIR}/dend-C090905B_axon-sm110125a1-3_idA.h5\" )
 
 ## morpho tool export
 file(GLOB  tests_morpho_src "*morpho*.cpp")
 add_executable(tests_morpho_bin ${tests_morpho_src})
 
-target_link_libraries(tests_morpho_bin ${Boost_UNIT_TEST_FRAMEWORK_LIBRARIES})
+target_link_libraries(tests_morpho_bin ${Boost_UNIT_TEST_FRAMEWORK_LIBRARIES} morpho)
 
 add_test(NAME test_morpho COMMAND tests_morpho_bin)
 
@@ -31,5 +33,13 @@ target_link_libraries(tests_gmsh_bin ${HDF5_LIBRARIES} ${Boost_UNIT_TEST_FRAMEWO
 
 add_test(NAME test_gmsh COMMAND tests_gmsh_bin)
 
+
+## h5v1 tests
+file(GLOB  tests_h5v1_src "*h5v1*.cpp")
+add_executable(tests_h5v1_bin ${tests_h5v1_src}  )
+
+target_link_libraries(tests_h5v1_bin ${HDF5_LIBRARIES} ${Boost_UNIT_TEST_FRAMEWORK_LIBRARIES} morpho)
+
+add_test(NAME test_h5v1 COMMAND tests_h5v1_bin)
 
 endif()

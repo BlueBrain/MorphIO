@@ -20,48 +20,40 @@
 #define MORPHO_TRANSFORM_HPP
 
 #include <vector>
+#include <memory>
+
 #include <morpho/morpho_tree.hpp>
 
 namespace morpho{
 
-/// \brief  generic interface for morphology transformation operations
+/// \brief  abstract interface for morphology transformation operations
 class morpho_operation{
 public:
-    virtual ~morpho_operation(){};
+    morpho_operation();
+    virtual ~morpho_operation();
 
     /// apply the given operation on a morphology
-    virtual morpho_tree apply(morpho_tree && morphology) = 0;
+    virtual morpho_tree apply(const morpho_tree & tree) = 0;
 
     /// return the name id of the operation
-    virtual std::string name() =0;
-};
-
-///
-/// \brief chain of operaitons on morphology for \ref morpho_transform
-///
-class morpho_operation_chain{
-public:
-    morpho_operation_chain();
-
-    void append(morpho_operation* new_operation);
-
-    morpho_operation& get(std::size_t chain_elem) const;
-
-    std::size_t size() const;
-
-
-private:
-    std::vector<std::unique_ptr<morpho_operation> > _chain;
+    virtual std::string name() const = 0;
 };
 
 
+using morpho_operation_chain = std::vector<std::shared_ptr<morpho_operation>>;
 
-morpho_tree morpho_transform(morpho_tree && morphology, morpho_operation_chain & ops);
+
+///
+/// \brief morpho_transform
+/// \param tree
+/// \param ops
+/// \return morpho_tree after the transformation by all the selected operations
+///
+morpho_tree morpho_transform(const morpho_tree & tree, morpho_operation_chain ops);
 
 
 } // morpho
 
 
-#include "bits/morpho_transform_bits.hpp"
 
 #endif // MORPHO_TRANSFORM_HPP

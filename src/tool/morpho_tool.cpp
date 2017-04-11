@@ -28,9 +28,12 @@
 #include <boost/geometry.hpp>
 
 #include <hadoken/format/format.hpp>
+#include <hadoken/string/algorithm.hpp>
 
 #include <morpho/morpho_h5_v1.hpp>
 #include <morpho/morpho_mesher.hpp>
+#include <morpho/morpho_stats.hpp>
+#include <morpho/morpho_transform_filters.hpp>
 
 #include "gmsh_exporter.hpp"
 #include "x3d_exporter.hpp"
@@ -40,6 +43,9 @@ using namespace morpho;
 
 namespace fmt = hadoken::format;
 namespace po = boost::program_options;
+
+const std::string delete_duplicate_point_operation_str("delete_duplicate_point");
+const std::string duplicate_first_point_operation_str("duplicate_first_point");
 
 std::string version(){
     return std::string( MORPHO_VERSION_MAJOR "." MORPHO_VERSION_MINOR );
@@ -51,14 +57,17 @@ po::parsed_options parse_args(int argc, char** argv,
                              ){
     po::options_description general("Commands:\n"
                                     "\t\t\n"
+                                    "  stats [morphology-file]:\t morphology statistics\n"
+                                    "  export h5v1 [morphology-file] [output-h5v1-file]:\texport morphology file to h5v1 format\n"
                                     "  export gmsh [morphology-file] [geo-file]:\texport morphology file to .geo file format\n"
-                                    "  export x3d [morphology-file] [x3d-file]:\texport morphology file to .x3d file format\n"
+                                    "  export x3d [morphology-file] [x3d-file]:\texport morphology file to .x3d file format\n"                                  
                                     "  mesh [morphology-file] [output_mesh_file]:\tCreate a mesh from a morphology\n"
                                     "\n\n"
                                     "Options");
     general.add_options()
         ("help", "produce a help message")
         ("version", "output the version number")
+        ("transform", po::value<std::string>(), "apply a transform operation to the morphology, --transform for a list")
         ("point-cloud", "gmsh: export to a point cloud")
         ("wireframe", "gmsh: export to a wired morphology (default)")
         ("3d-object", "gmsh: export to a 3D object model")
@@ -95,10 +104,70 @@ po::parsed_options parse_args(int argc, char** argv,
 }
 
 
+std::shared_ptr<morpho_tree> load_morphology(const std::string & morphology_file){
+    h5_v1::morpho_reader reader(morphology_file);
+    return std::shared_ptr<morpho_tree>(new morpho_tree(reader.create_morpho_tree()));
+}
 
-void export_morpho_to_mesh(const std::string & filename_morpho, const std::string & filename_geo,
+void transform_show_help(){
+    fmt::scat(std::cout, "Invalid --transform usage \n",
+              "\t Syntax: --transform=[operation1,operation2] \n",
+              "\n"
+              "\t \n",
+              "\t Available operations: \n",
+              "\t\t *", delete_duplicate_point_operation_str, "*:\t remove duplicated points in every branch\n",
+              "\t\t *", duplicate_first_point_operation_str, "*:\t duplicate the last point of every branch as first point of its children \n",
+              "\n",
+              "\n",
+              "\tNote: Most operations are NOT commutative"
+              "\n");
+    exit(1);
+}
+
+// parse transformation operations
+morpho_operation_chain parse_transform_option(po::variables_map & options){
+    morpho_operation_chain filters;
+
+    if( options.count("transform") <1 ){
+        return filters;
+    }
+
+    const std::string string_option = options["transform"].as<std::string>();
+    std::vector<std::string> vals = hadoken::string::tokenize(string_option ,",");
+
+    if(vals.size() == 0){
+        transform_show_help();
+    }
+
+    for(const auto & operation : vals ){
+        if(operation == delete_duplicate_point_operation_str){
+            filters.push_back(std::make_shared<delete_duplicate_point_operation>());
+        }else if(operation == duplicate_first_point_operation_str){
+            filters.push_back(std::make_shared<duplicate_first_point_operation>());
+        }else {
+            transform_show_help();
+        }
+
+    }
+    return filters;
+}
+
+void transform_ops_print(const morpho_operation_chain & ops){
+    std::string res;
+    if(ops.size() > 0){
+        fmt::scat(std::cout, "\napply the the filters: [ ");
+        for(const auto & op : ops){
+            fmt::scat(std::cout, op->name(), " ");
+        }
+
+        fmt::scat(std::cout, "]\n");
+    }
+}
+
+void export_morpho_to_gmsh(const std::string & filename_morpho, const std::string & filename_geo,
                           po::variables_map & options){
 
+    std::vector<morpho_tree> trees;
     gmsh_exporter::exporter_flags flags = 0;
     if(options.count("single-soma")){
         flags |= gmsh_exporter::exporter_single_soma;
@@ -116,7 +185,21 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
         flags |= gmsh_exporter::exporter_packed;
     }
 
-    gmsh_exporter exporter(filename_morpho, filename_geo, flags);
+    fmt::scat(std::cout, "load morphology tree ", filename_morpho, "\n");
+ 
+    {
+        h5_v1::morpho_reader reader(filename_morpho);
+        // create tree and apply some basic filter adapted for gmsh
+        morpho_tree tree = morpho_transform(reader.create_morpho_tree(), {
+            std::make_shared<delete_duplicate_point_operation>(),
+            std::make_shared<duplicate_first_point_operation>(),
+        });
+
+        trees.emplace_back(std::move(tree));
+    }
+    
+    gmsh_exporter exporter(std::move(trees), filename_geo, flags);
+    exporter.set_identifier(std::string("morphology: ") + filename_morpho);
 
     if(options.count("point-cloud")){
         exporter.export_to_point_cloud();
@@ -132,7 +215,14 @@ void export_morpho_to_mesh(const std::string & filename_morpho, const std::strin
 void export_morpho_to_x3d(const std::string & filename_morpho, const std::string & filename_x3d,
                           po::variables_map & options){
     (void) options;
-    x3d_exporter exporter(filename_morpho, filename_x3d);
+    std::vector<morpho_tree> trees;
+    
+    fmt::scat(std::cout, "load morphology tree ", filename_morpho, "\n");
+ 
+    auto tree_shared = load_morphology(filename_morpho);
+    trees.emplace_back(std::move(*tree_shared));
+        
+    x3d_exporter exporter(std::move(trees), filename_x3d);
 
     exporter.export_to_sphere();
 
@@ -140,9 +230,42 @@ void export_morpho_to_x3d(const std::string & filename_morpho, const std::string
 }
 
 
-std::shared_ptr<morpho_tree> load_morphology(const std::string & morphology_file){
-    h5_v1::morpho_reader reader(morphology_file);
-    return std::shared_ptr<morpho_tree>(new morpho_tree(reader.create_morpho_tree()));
+void export_morpho_to_h5v1(const std::string & filename_morpho, const std::string & filename_h5v1_output,
+                          po::variables_map & options){
+
+    fmt::scat(std::cout, "load morphology tree ", filename_morpho, "\n");
+
+    auto tree_sptr = load_morphology(filename_morpho);
+
+    morpho_operation_chain transform_ops = parse_transform_option(options);
+    transform_ops_print(transform_ops);
+
+    auto transformed_tree = morpho_transform(*tree_sptr, transform_ops);
+
+    h5_v1::morpho_writer writer(filename_h5v1_output);
+
+    fmt::scat(std::cout, "\nconvert ", filename_morpho, " to h5v1 file format.... ", filename_h5v1_output, "\n\n");
+
+    writer.write(transformed_tree);
+}
+
+
+std::string bool_to_string(bool v){
+    return (v) ? "true" : "false";
+}
+
+void print_morpho_stats(const std::string & morpho_file){
+    std::shared_ptr<morpho_tree> tree = load_morphology(morpho_file);
+    fmt::scat(std::cout, "\n");
+    fmt::scat(std::cout, "filename =  \"", morpho_file, "\"", "\n");
+    fmt::scat(std::cout, "morphology_type = [\"detailed\", \"cones\" ]", "\n");
+    fmt::scat(std::cout, "number_of_branch = ", stats::total_number_branches(*tree), "\n");
+    fmt::scat(std::cout, "number_of_points = ", stats::total_number_point(*tree), "\n");
+    fmt::scat(std::cout, "min_radius_segment = ", stats::min_radius_segment(*tree), "\n");
+    fmt::scat(std::cout, "max_radius_segment = ", stats::max_radius_segment(*tree), "\n");
+    fmt::scat(std::cout, "median_radius_segment = ", stats::median_radius_segment(*tree), "\n");
+    fmt::scat(std::cout, "has_duplicated_points = ", bool_to_string(stats::has_duplicated_points(*tree)), "\n");
+    fmt::scat(std::cout, "\n");
 }
 
 
@@ -164,13 +287,24 @@ int main(int argc, char** argv){
 
                 if(subargs.size() == 4
                     && subargs[1] == "gmsh"){
-                    export_morpho_to_mesh(subargs[2], subargs[3], options);
+                    export_morpho_to_gmsh(subargs[2], subargs[3], options);
                     return 0;
                 }
 
                 if(subargs.size() == 4
                     && subargs[1] == "x3d"){
                     export_morpho_to_x3d(subargs[2], subargs[3], options);
+                    return 0;
+                }
+
+                if(subargs.size() == 4
+                    && subargs[1] == "h5v1"){
+                    export_morpho_to_h5v1(subargs[2], subargs[3], options);
+                    return 0;
+                }
+            }else if(command == "stats"){
+                if(subargs.size() == 2){
+                    print_morpho_stats(subargs[1]);
                     return 0;
                 }
             }else if(command == "mesh"){         

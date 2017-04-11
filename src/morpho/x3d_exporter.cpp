@@ -45,8 +45,9 @@ void points_distance_to_sphere(const point & my_point, double distance,
 }
 
 
-x3d_exporter::x3d_exporter(const std::string & morphology_filename, const std::string & x3d_filename) :
-    reader(morphology_filename),
+x3d_exporter::x3d_exporter(std::vector<morpho_tree> && trees, const std::string & x3d_filename) :
+    morphotrees(std::move(trees)),
+    identifier_string(),
     x3d_stream(x3d_filename),
     dest_filename(x3d_filename)
 {
@@ -70,50 +71,50 @@ static std::string get_sphere(const std::string reference_name){
 
 
 void x3d_exporter::export_all_points(){
-    fmt::scat(x3d_stream, "    <Group>" "\n");
+    
+    for(auto & tree : morphotrees){
+        fmt::scat(x3d_stream, "    <Group>" "\n");
 
-    const std::string sphere_unit_name = "baseSphere";
+        const std::string sphere_unit_name = "baseSphere";
 
-    // export base sphere
-    fmt::scat(x3d_stream, get_sphere(sphere_unit_name));
+        // export base sphere
+        fmt::scat(x3d_stream, get_sphere(sphere_unit_name));
+        
 
+        // export soma
+        auto & soma = static_cast<const neuron_soma&>(tree.get_node(0));
+        auto sphere = soma.get_sphere();
+        points_distance_to_sphere(sphere.get_center(), sphere.get_radius(), sphere_unit_name, x3d_stream);
 
-    morpho_tree tree = reader.create_morpho_tree();
+        // export points
+        for(std::size_t b_id =1; b_id < tree.get_tree_size(); ++b_id){
 
-    // export soma
-    auto & soma = static_cast<branch_soma&>(tree.get_branch(0));
-    auto sphere = soma.get_sphere();
-    points_distance_to_sphere(sphere.get_center(), sphere.get_radius(), sphere_unit_name, x3d_stream);
+            auto & branch = static_cast<const neuron_branch&>(tree.get_node(b_id));
+            auto & points = branch.get_points();
+            auto & distance = branch.get_radius();
 
-    // export points
-    for(std::size_t b_id =1; b_id < tree.get_tree_size(); ++b_id){
-
-        auto & branch = tree.get_branch(b_id);
-        auto & points = branch.get_points();
-        auto & distance = branch.get_radius();
-
-        assert(points.size1() == distance.size());
-        for(std::size_t i = 0; i < points.size1(); ++i){
-            points_distance_to_sphere({ points(i,0), points(i,1), points(i,2) }, distance[i],
-                                      sphere_unit_name,
-                                      x3d_stream);
+            assert(points.size() == distance.size());
+            for(std::size_t i = 0; i < points.size(); ++i){
+                points_distance_to_sphere(points[i], distance[i],
+                                          sphere_unit_name,
+                                          x3d_stream);
+            }
         }
-    }
 
-    fmt::scat(x3d_stream, "    </Group>" "\n");
+        fmt::scat(x3d_stream, "    </Group>" "\n");
+    }
 }
 
 
 void x3d_exporter::envelop_header_and_footer(const std::function<void ()> & fcontent){
 
-    fmt::scat(x3d_stream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" "\n"
-            "<!DOCTYPE X3D PUBLIC \"ISO//Web3D//DTD X3D 3.3//EN\" \"http://www.web3d.org/specifications/x3d-3.3.dtd\">" "\n"
+    fmt::scat(x3d_stream, 
             "<X3D profile='Immersive' version='3.3' xmlns:xsd='http://www.w3.org/2001/XMLSchema-instance' xsd:noNamespaceSchemaLocation='http://www.web3d.org/specifications/x3d-3.3.xsd'>" "\n"
             "  <head>" "\n"
             "  </head>" "\n"
             "  <Scene>" "\n"
-            "<!-- Scene generated with morpho-tool from morphology", reader.get_filename() ," -->" "\n"
-            " <WorldInfo title='", fs::path(reader.get_filename()).filename(),"'/>" "\n");
+            "<!-- Scene generated with morpho-tool from morphology", identifier_string ," -->" "\n"
+            " <WorldInfo title='", identifier_string,"'/>" "\n");
 
     fcontent();
     fmt::scat(x3d_stream,

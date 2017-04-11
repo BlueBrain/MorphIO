@@ -70,20 +70,31 @@ void spatial_index::add_morpho_tree(const std::shared_ptr<morpho_tree> &tree){
 
 
     // add soma bounding box
-    box soma_box = tree->get_branch(0).get_bounding_box();
-    _pimpl->sp_index.insert(std::make_tuple(soma_box, morpho_position, 0, 0, 0));
+
     //std::cout << "soma box" << soma_box.min_corner() << " " << soma_box.max_corner() << "\n";
 
     // insert boundinx box for each segment
-    for(std::size_t i =1; i < tree->get_tree_size(); ++i){
-        branch & current_branch = tree->get_branch(i);
+    for(std::size_t i  = 0; i < tree->get_tree_size(); ++i){
+        const morpho_node & current_node = tree->get_node(i);
 
-        for(std::size_t j =0; j < current_branch.get_size() -1; ++j){
-            auto segment_box = current_branch.get_segment_bounding_box(j);
-            _pimpl->sp_index.insert(std::make_tuple(segment_box, morpho_position, i, j, 1));
+        if(current_node.is_of_type(morpho_node_type::neuron_soma_type)){
+            const neuron_soma & soma  = static_cast<const neuron_soma &>(current_node);
 
-            auto junction_box = current_branch.get_junction_sphere_bounding_box(j);
-            _pimpl->sp_index.insert(std::make_tuple(junction_box, morpho_position, i, j, 2));
+            box soma_box = soma.get_bounding_box();
+            _pimpl->sp_index.insert(std::make_tuple(soma_box, morpho_position, 0, 0, 0));
+
+        }else if (current_node.is_of_type(morpho_node_type::neuron_branch_type)){
+            const neuron_branch & current_branch  = static_cast<const neuron_branch &>(current_node);
+
+            for(std::size_t j =0; j < current_branch.get_number_points() -1; ++j){
+                auto segment_box = current_branch.get_segment_bounding_box(j);
+                _pimpl->sp_index.insert(std::make_tuple(segment_box, morpho_position, i, j, 1));
+
+                auto junction_box = current_branch.get_junction_sphere_bounding_box(j);
+                _pimpl->sp_index.insert(std::make_tuple(junction_box, morpho_position, i, j, 2));
+            }
+        }else {
+            std::cerr << " skip morphology element " << i << " : unknown type " << std::endl;
         }
     }
 }
@@ -131,6 +142,8 @@ inline bool point_is_in_truncated_cones(const cone & c, const point & p1){
 }
 
 bool spatial_index::is_within(const point & p) const{
+    using value_type = decltype(p(0));
+    
     box fake_box(p - point(0.01, 0.01, 0.01), p + point(0.01, 0.01, 0.01));
 
     hadoken::containers::small_vector<spatial_index_impl::indexed_box, 64> res;
@@ -148,9 +161,11 @@ bool spatial_index::is_within(const point & p) const{
         const int n_segment = std::get<3>(*it);
         const int indexed_type = std::get<4>(*it);
 
+        const morpho_node & node = _pimpl->morphos[n_morpho]->get_node(n_branch);
+
         switch(indexed_type){
             case 0:{
-                branch_soma & soma = static_cast<branch_soma&>(_pimpl->morphos[n_morpho]->get_branch(n_branch));
+                const neuron_soma & soma = static_cast<const neuron_soma&>(node);
                 if(point_is_in_sphere(soma.get_sphere(), p)){
                     return true;
                 }
@@ -159,7 +174,7 @@ bool spatial_index::is_within(const point & p) const{
 
             case 1:{
                 //return true;
-                branch & my_branch = _pimpl->morphos[n_morpho]->get_branch(n_branch);
+                const neuron_branch & my_branch = static_cast<const neuron_branch&>(node);
                 if(point_is_in_truncated_cones(my_branch.get_segment(n_segment), p)){
                     return true;
                 }
@@ -167,7 +182,7 @@ bool spatial_index::is_within(const point & p) const{
             }
 
             case 2:{
-                branch & my_branch = _pimpl->morphos[n_morpho]->get_branch(n_branch);
+                const neuron_branch & my_branch = static_cast<const neuron_branch&>(node);
                 if(point_is_in_sphere(my_branch.get_junction(n_segment), p)){
                     return true;
                 }
