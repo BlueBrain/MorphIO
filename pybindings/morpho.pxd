@@ -89,29 +89,35 @@ cdef extern from "morpho/morpho_transform.hpp" namespace "morpho":
 
 
 
-# ======================================================================================================================
-cdef extern from "morpho/morpho_tree.hpp" namespace "morpho::morpho_node_type":
-# ----------------------------------------------------------------------------------------------------------------------
-    cdef enum morpho_node_type "morpho::morpho_node_type":
-        unknown = 0
-        neuron_node_3d_type = 1
-        neuron_branch_type = 2
-        neuron_soma_type = 3
-
-# ======================================================================================================================
-cdef extern from "morpho/morpho_tree.hpp" namespace "morpho::neuron_struct_type":
-# ----------------------------------------------------------------------------------------------------------------------
-    cdef enum neuron_struct_type "morpho::neuron_struct_type":
-        soma = 0
-        axon = 1
-        dentrite_basal = 2
-        dentrite_apical = 3
-        unknown = 4
+# # ======================================================================================================================
+# cdef extern from "morpho/morpho_tree.hpp" namespace "morpho::morpho_node_type":
+# # ----------------------------------------------------------------------------------------------------------------------
+#     cdef enum morpho_node_type "morpho::morpho_node_type":
+#         unknown = 0
+#         neuron_node_3d_type = 1
+#         neuron_branch_type = 2
+#         neuron_soma_type = 3
+#
+# # ======================================================================================================================
+# cdef extern from "morpho/morpho_tree.hpp" namespace "morpho::neuron_struct_type":
+# # ----------------------------------------------------------------------------------------------------------------------
+#     cdef enum neuron_struct_type "morpho::neuron_struct_type":
+#         soma = 0
+#         axon = 1
+#         dentrite_basal = 2
+#         dentrite_apical = 3
+#         unknown = 4
 
 
 # ======================================================================================================================
 cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
 # ----------------------------------------------------------------------------------------------------------------------
+
+    cdef cppclass morpho_node_type:
+        pass
+
+    cdef cppclass neuron_struct_type:
+        pass
 
     ###### Cybinding for class morpho_node ######
     cdef cppclass morpho_node:

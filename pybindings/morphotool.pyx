@@ -7,14 +7,16 @@ __copyright__ = "Copyright 2016 EPFL BBP-project"
 # =====================================================================================================================
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
+from libcpp.memory cimport unique_ptr
 cimport std
 include "_base.pxi"
+
 cimport morpho
 from .statics cimport morpho_morpho_mesher
+from .statics cimport morpho_morpho_node_type
+from .statics cimport morpho_neuron_struct_type
 cimport morpho_h5_v1
 from .statics cimport morpho_h5_v1_morpho_reader
-from libcpp.memory cimport unique_ptr
-from libcpp cimport bool
 
 import numpy as np
 cimport numpy as np
@@ -37,55 +39,56 @@ include "datastructs.pxi"
 # ======================================================================================================================
 
 
-# ----------------------------------------------------------------------------------------------------------------------
-cdef class _py_morpho_mesher(_py__base):
-    "Python wrapper class for morpho_mesher (ns=morpho)"
-# ----------------------------------------------------------------------------------------------------------------------
-    cdef unique_ptr[morpho.morpho_mesher] _autodealoc
-    cdef morpho.morpho_mesher *ptr(self):
-        return <morpho.morpho_mesher*> self._ptr
 
-    def __init__(self, _py_morpho_tree tree, std.string output_mesh_file):
-        self._ptr = new morpho.morpho_mesher(tree._sharedPtr, output_mesh_file)
-        self._autodealoc.reset(self.ptr())
-
-    def set_mesh_tag(self, int arg0, bool value):
-        return self.ptr().set_mesh_tag(<morpho_morpho_mesher.mesh_tag> arg0, value)
-
-    def set_error_bound(self, double inv_error):
-        return self.ptr().set_error_bound(inv_error)
-
-    def set_face_size(self, double face_size):
-        return self.ptr().set_face_size(face_size)
-
-    def execute(self, ):
-        return self.ptr().execute()
-
-    @staticmethod
-    cdef _py_morpho_mesher from_ptr(morpho.morpho_mesher *ptr, bool owner=False):
-        cdef _py_morpho_mesher obj = _py_morpho_mesher.__new__(_py_morpho_mesher)
-        obj._ptr = ptr
-        if owner: obj._autodealoc.reset(obj.ptr())
-        return obj
-    
-    @staticmethod
-    cdef _py_morpho_mesher from_ref(const morpho.morpho_mesher &ref):
-        return _py_morpho_mesher.from_ptr(<morpho.morpho_mesher*>&ref)
-
-    @staticmethod
-    cdef _py_morpho_mesher from_value(const morpho.morpho_mesher &ref):
-        cdef morpho.morpho_mesher *ptr = new morpho.morpho_mesher(ref)
-        return _py_morpho_mesher.from_ptr(ptr, True)
-
-    @staticmethod
-    cdef list vectorPtr2list(std.vector[morpho.morpho_mesher*] vec):
-        return [_py_morpho_mesher.from_ptr(elem) for elem in vec]
-
-    # morpho_mesher missing nullary ctor
-    # @staticmethod
-    # cdef list vector2list(std.vector[morpho.morpho_mesher] vec):
-    #     return [_py_morpho_mesher.from_value(elem) for elem in vec]
-
+# # ----------------------------------------------------------------------------------------------------------------------
+# cdef class _py_morpho_mesher(_py__base):
+#     "Python wrapper class for morpho_mesher (ns=morpho)"
+# # ----------------------------------------------------------------------------------------------------------------------
+#     cdef unique_ptr[morpho.morpho_mesher] _autodealoc
+#     cdef morpho.morpho_mesher *ptr(self):
+#         return <morpho.morpho_mesher*> self._ptr
+#
+#     def __init__(self, _py_morpho_tree tree, std.string output_mesh_file):
+#         self._ptr = new morpho.morpho_mesher(tree._sharedPtr, output_mesh_file)
+#         self._autodealoc.reset(self.ptr())
+#
+#     def set_mesh_tag(self, int arg0, bool value):
+#         return self.ptr().set_mesh_tag(<morpho_morpho_mesher.mesh_tag> arg0, value)
+#
+#     def set_error_bound(self, double inv_error):
+#         return self.ptr().set_error_bound(inv_error)
+#
+#     def set_face_size(self, double face_size):
+#         return self.ptr().set_face_size(face_size)
+#
+#     def execute(self, ):
+#         return self.ptr().execute()
+#
+#     @staticmethod
+#     cdef _py_morpho_mesher from_ptr(morpho.morpho_mesher *ptr, bool owner=False):
+#         cdef _py_morpho_mesher obj = _py_morpho_mesher.__new__(_py_morpho_mesher)
+#         obj._ptr = ptr
+#         if owner: obj._autodealoc.reset(obj.ptr())
+#         return obj
+#
+#     @staticmethod
+#     cdef _py_morpho_mesher from_ref(const morpho.morpho_mesher &ref):
+#         return _py_morpho_mesher.from_ptr(<morpho.morpho_mesher*>&ref)
+#
+#     @staticmethod
+#     cdef _py_morpho_mesher from_value(const morpho.morpho_mesher &ref):
+#         cdef morpho.morpho_mesher *ptr = new morpho.morpho_mesher(ref)
+#         return _py_morpho_mesher.from_ptr(ptr, True)
+#
+#     @staticmethod
+#     cdef list vectorPtr2list(std.vector[morpho.morpho_mesher*] vec):
+#         return [_py_morpho_mesher.from_ptr(elem) for elem in vec]
+#
+#     # morpho_mesher missing nullary ctor
+#     # @staticmethod
+#     # cdef list vector2list(std.vector[morpho.morpho_mesher] vec):
+#     #     return [_py_morpho_mesher.from_value(elem) for elem in vec]
+#
 
 
 
@@ -274,19 +277,19 @@ cdef class _py_spatial_index(_py__base):
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class _py_morpho_node_type(_Enum):
-    unknown = morpho.unknown
-    neuron_node_3d_type = morpho.neuron_node_3d_type
-    neuron_branch_type = morpho.neuron_branch_type
-    neuron_soma_type = morpho.neuron_soma_type
+    unknown = morpho_morpho_node_type.unknown
+    neuron_node_3d_type = morpho_morpho_node_type.neuron_node_3d_type
+    neuron_branch_type = morpho_morpho_node_type.neuron_branch_type
+    neuron_soma_type = morpho_morpho_node_type.neuron_soma_type
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class _py_neuron_struct_type(_Enum):
-    soma = morpho.soma
-    axon = morpho.axon
-    dentrite_basal = morpho.dentrite_basal
-    dentrite_apical = morpho.dentrite_apical
-    unknown = morpho.unknown
+    soma = morpho_neuron_struct_type.soma
+    axon = morpho_neuron_struct_type.axon
+    dentrite_basal = morpho_neuron_struct_type.dentrite_basal
+    dentrite_apical = morpho_neuron_struct_type.dentrite_apical
+    unknown = morpho_neuron_struct_type.unknown
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -351,7 +354,7 @@ cdef class _py_neuron_node_3d(_py__base):
     #     self._autodealoc.reset(self.ptr())
 
     def get_branch_type(self, ):
-        return self.ptr().get_branch_type()
+        return <int>self.ptr().get_branch_type()
 
     def is_of_type(self, int mtype):
         return self.ptr().is_of_type(<morpho.morpho_node_type> mtype)
