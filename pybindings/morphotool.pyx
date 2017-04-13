@@ -521,12 +521,12 @@ cdef class SpatialIndex(_py__base):
 # >> morpho_operation is an abstract class. No need to create bindings
 # ----------------------------------------------------------------------------------------------------------------------
 
-## Optional bindings for morpho_mesher
+## Optional bindings for morpho_mesher, overridable by cython exec
 # ----------------------------------------------------------------------------------------------------------------------
-# include "morpho_mesher.pxi"
-# >> This is currently being done indirectly via optional_mods.pix, modded my cmake
-# ----------------------------------------------------------------------------------------------------------------------
-include "optional_mods.pxi"
+DEF ENABLE_MESHER_GCAL = 0
+IF ENABLE_MESHER_GCAL:
+    include "morpho_mesher.pxi"
+
 
 # *********************
 # Class-Namespace alias
