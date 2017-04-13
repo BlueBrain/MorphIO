@@ -8,7 +8,6 @@ __copyright__ = "Copyright 2016 EPFL BBP-project"
 include "_base.pxi"
 
 cimport morpho
-from .statics cimport morpho_morpho_mesher
 from .statics cimport morpho_morpho_node_type
 from .statics cimport morpho_neuron_struct_type
 cimport morpho_h5_v1
@@ -16,6 +15,7 @@ from .statics cimport morpho_h5_v1_morpho_reader
 cimport stats
 
 include "datastructs.pxi"
+
 
 # ======================================================================================================================
 # Python bindings to namespace morpho
@@ -383,58 +383,6 @@ cdef class MorphoWriter(_py__base):
 
 
 
-# Class mesher compiled on demand
-# # ----------------------------------------------------------------------------------------------------------------------
-# cdef class _py_morpho_mesher(_py__base):
-#     "Python wrapper class for morpho_mesher (ns=morpho)"
-# # ----------------------------------------------------------------------------------------------------------------------
-#     cdef unique_ptr[morpho.morpho_mesher] _autodealoc
-#     cdef morpho.morpho_mesher *ptr(self):
-#         return <morpho.morpho_mesher*> self._ptr
-#
-#     def __init__(self, MorphoTree tree, std.string output_mesh_file):
-#         self._ptr = new morpho.morpho_mesher(tree._sharedPtr, output_mesh_file)
-#         self._autodealoc.reset(self.ptr())
-#
-#     def set_mesh_tag(self, int arg0, bool value):
-#         return self.ptr().set_mesh_tag(<morpho_morpho_mesher.mesh_tag> arg0, value)
-#
-#     def set_error_bound(self, double inv_error):
-#         return self.ptr().set_error_bound(inv_error)
-#
-#     def set_face_size(self, double face_size):
-#         return self.ptr().set_face_size(face_size)
-#
-#     def execute(self, ):
-#         return self.ptr().execute()
-#
-#     @staticmethod
-#     cdef _py_morpho_mesher from_ptr(morpho.morpho_mesher *ptr, bool owner=False):
-#         cdef _py_morpho_mesher obj = _py_morpho_mesher.__new__(_py_morpho_mesher)
-#         obj._ptr = ptr
-#         if owner: obj._autodealoc.reset(obj.ptr())
-#         return obj
-#
-#     @staticmethod
-#     cdef _py_morpho_mesher from_ref(const morpho.morpho_mesher &ref):
-#         return _py_morpho_mesher.from_ptr(<morpho.morpho_mesher*>&ref)
-#
-#     @staticmethod
-#     cdef _py_morpho_mesher from_value(const morpho.morpho_mesher &ref):
-#         cdef morpho.morpho_mesher *ptr = new morpho.morpho_mesher(ref)
-#         return _py_morpho_mesher.from_ptr(ptr, True)
-#
-#     @staticmethod
-#     cdef list vectorPtr2list(std.vector[morpho.morpho_mesher*] vec):
-#         return [_py_morpho_mesher.from_ptr(elem) for elem in vec]
-#
-#     # morpho_mesher missing nullary ctor
-#     # @staticmethod
-#     # cdef list vector2list(std.vector[morpho.morpho_mesher] vec):
-#     #     return [_py_morpho_mesher.from_value(elem) for elem in vec]
-
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class _py_delete_duplicate_point_operation(_py__base):
     "Python wrapper class for delete_duplicate_point_operation (ns=morpho)"
@@ -524,7 +472,6 @@ cdef class _py_duplicate_first_point_operation(_py__base):
 
 
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class SpatialIndex(_py__base):
     "Python wrapper class for spatial_index (ns=morpho)"
@@ -568,50 +515,18 @@ cdef class SpatialIndex(_py__base):
     #     return [SpatialIndex.from_value(elem) for elem in vec]
 
 
-
-# # ----------------------------------------------------------------------------------------------------------------------
+## Bindings for class morpho_operation
+# ----------------------------------------------------------------------------------------------------------------------
 # cdef class _py_morpho_operation(_py__base):
-#     "Python wrapper class for morpho_operation (ns=morpho)"
-# # ----------------------------------------------------------------------------------------------------------------------
-#     cdef unique_ptr[morpho.morpho_operation] _autodealoc
-#     cdef morpho.morpho_operation *ptr(self):
-#         return <morpho.morpho_operation*> self._ptr
-#
-#     def __init__(self, ):
-#         self._ptr = new morpho.morpho_operation()
-#         self._autodealoc.reset(self.ptr())
-#
-#     def apply(self, MorphoTree tree):
-#         return MorphoTree.from_value(self.ptr().apply(deref(tree.ptr())))
-#
-#     def name(self, ):
-#         return self.ptr().name()
-#
-#     @staticmethod
-#     cdef _py_morpho_operation from_ptr(morpho.morpho_operation *ptr, bool owner=False):
-#         cdef _py_morpho_operation obj = _py_morpho_operation.__new__(_py_morpho_operation)
-#         obj._ptr = ptr
-#         if owner: obj._autodealoc.reset(obj.ptr())
-#         return obj
-#
-#     @staticmethod
-#     cdef _py_morpho_operation from_ref(const morpho.morpho_operation &ref):
-#         return _py_morpho_operation.from_ptr(<morpho.morpho_operation*>&ref)
-#
-#     @staticmethod
-#     cdef _py_morpho_operation from_value(const morpho.morpho_operation &ref):
-#         cdef morpho.morpho_operation *ptr = new morpho.morpho_operation(ref)
-#         return _py_morpho_operation.from_ptr(ptr, True)
-#
-#     @staticmethod
-#     cdef list vectorPtr2list(std.vector[morpho.morpho_operation*] vec):
-#         return [_py_morpho_operation.from_ptr(elem) for elem in vec]
-#
-#     @staticmethod
-#     cdef list vector2list(std.vector[morpho.morpho_operation] vec):
-#         return [_py_morpho_operation.from_value(elem) for elem in vec]
-#
+# >> morpho_operation is an abstract class. No need to create bindings
+# ----------------------------------------------------------------------------------------------------------------------
 
+## Optional bindings for morpho_mesher
+# ----------------------------------------------------------------------------------------------------------------------
+# include "morpho_mesher.pxi"
+# >> This is currently being done indirectly via optional_mods.pix, modded my cmake
+# ----------------------------------------------------------------------------------------------------------------------
+include "optional_mods.pxi"
 
 # *********************
 # Class-Namespace alias
