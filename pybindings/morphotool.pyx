@@ -13,6 +13,7 @@ from .statics cimport morpho_morpho_node_type
 from .statics cimport morpho_neuron_struct_type
 cimport morpho_h5_v1
 from .statics cimport morpho_h5_v1_morpho_reader
+cimport stats
 
 include "datastructs.pxi"
 
@@ -616,7 +617,33 @@ cdef class SpatialIndex(_py__base):
 # Class-Namespace alias
 # *********************
 
-class Types:
+cdef class Stats:
+    @staticmethod
+    def total_number_branches(MorphoTree tree):
+        return stats.total_number_branches(deref(tree.ptr()))
+
+    @staticmethod
+    def total_number_point(MorphoTree tree):
+        return stats.total_number_point(deref(tree.ptr()))
+
+    @staticmethod
+    def min_radius_segment(MorphoTree tree):
+        return stats.min_radius_segment(deref(tree.ptr()))
+
+    @staticmethod
+    def max_radius_segment(MorphoTree tree):
+        return stats.max_radius_segment(deref(tree.ptr()))
+
+    @staticmethod
+    def median_radius_segment(MorphoTree tree):
+        return stats.median_radius_segment(deref(tree.ptr()))
+
+    @staticmethod
+    def has_duplicated_points(MorphoTree tree):
+        return stats.has_duplicated_points(deref(tree.ptr()))
+
+
+cdef class Types:
     Point = _Point
     Box = _Box
     Linestring = _Linestring
@@ -628,10 +655,9 @@ class Types:
     Mat_Points = _Mat_Points
     Mat_index = _Mat_Index
 
-class Transforms:
+
+cdef class Transforms:
     Delete_Duplicate_Point_Operation = _py_delete_duplicate_point_operation
     Duplicate_First_Point_Operation = _py_duplicate_first_point_operation
 
-class Stats:
-    pass
 
