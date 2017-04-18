@@ -63,3 +63,17 @@ cdef class _Enum:
             if not name.startswith("_") and value == item:
                 return name
         raise IndexError("No such Enumerator index")
+
+
+cdef class _EnumItem:
+    cdef object cls
+    cdef int ord
+    def __init__(self, object cls, int numeric):
+        self.cls = cls
+        self.ord = numeric
+
+    def __int__(self):
+        return self.ord
+
+    def __repr__(self):
+        return "<ENUM %s.%s: %d>" % (self.cls.__name__, self.cls.get_description(self.ord), self.ord)

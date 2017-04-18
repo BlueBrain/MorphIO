@@ -88,7 +88,7 @@ cdef class NeuronNode3D(MorphoNode):
         return <morpho.neuron_node_3d*> self._ptr
 
     def get_branch_type(self, ):
-        return <int>self.ptr1().get_branch_type()
+        return _EnumItem(NEURON_STRUCT_TYPE, <int>self.ptr1().get_branch_type())
 
     def is_of_type(self, int mtype):
         return self.ptr1().is_of_type(<morpho.morpho_node_type> mtype)
@@ -261,7 +261,7 @@ cdef class MorphoTree(_py__base):
     def find_nodes(self, int mtype):
         return MorphoNode.vectorPtr2list(self.ptr().find_nodes(<morpho.neuron_struct_type>mtype))
 
-    def get_soma(self, int mtype):
+    def get_soma(self):
         return NeuronSoma.from_ptr(self.ptr().get_soma())
 
     @staticmethod
