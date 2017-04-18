@@ -43,20 +43,31 @@ cdef class MorphoNode(_py__base):
     "Python wrapper class for morpho_node (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
     cdef std.shared_ptr[morpho.morpho_node] _autodealoc
-    cdef morpho.morpho_node *ptr(self):
+    cdef morpho.morpho_node *ptr0(self):
         return <morpho.morpho_node*> self._ptr
 
     def get_bounding_box(self, ):
-        return _Box.from_value(self.ptr().get_bounding_box())
+        return _Box.from_value(self.ptr0().get_bounding_box())
 
     def is_of_type(self, int mtype):
-        return self.ptr().is_of_type(<morpho.morpho_node_type> mtype)
+        return self.ptr0().is_of_type(<morpho.morpho_node_type> mtype)
 
     @staticmethod
     cdef MorphoNode from_ptr(const morpho.morpho_node *ptr, bool owner=False):
+        # Downcast nodes to specific types
+        # this is the only function that introduces some program logic.
+        # The same could be done with dynamic_cast, but would be less obvious and more verbose
+        if ptr.is_of_type(morpho_morpho_node_type.neuron_branch_type):
+            return NeuronBranch.from_ptr(<const morpho.neuron_branch *>ptr, owner)
+        if ptr.is_of_type(morpho_morpho_node_type.neuron_soma_type):
+            return NeuronSoma.from_ptr(<const morpho.neuron_soma*>ptr, owner)
+        if ptr.is_of_type(morpho_morpho_node_type.neuron_node_3d_type):
+            return NeuronNode3D.from_ptr(<const morpho.neuron_node_3d*>ptr, owner)
+
+        # default return just "MorphoNode"
         cdef MorphoNode obj = MorphoNode.__new__(MorphoNode)
         obj._ptr = <morpho.morpho_node*>ptr
-        if owner: obj._autodealoc.reset(obj.ptr())
+        if owner: obj._autodealoc.reset(obj.ptr0())
         return obj
     
     @staticmethod
@@ -70,24 +81,23 @@ cdef class MorphoNode(_py__base):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class NeuronNode3D(_py__base):
+cdef class NeuronNode3D(MorphoNode):
     "Python wrapper class for neuron_node_3d (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef unique_ptr[morpho.neuron_node_3d] _autodealoc
-    cdef morpho.neuron_node_3d *ptr(self):
+    cdef morpho.neuron_node_3d *ptr1(self):
         return <morpho.neuron_node_3d*> self._ptr
 
     def get_branch_type(self, ):
-        return <int>self.ptr().get_branch_type()
+        return <int>self.ptr1().get_branch_type()
 
     def is_of_type(self, int mtype):
-        return self.ptr().is_of_type(<morpho.morpho_node_type> mtype)
+        return self.ptr1().is_of_type(<morpho.morpho_node_type> mtype)
 
     @staticmethod
-    cdef NeuronNode3D from_ptr(morpho.neuron_node_3d *ptr, bool owner=False):
+    cdef NeuronNode3D from_ptr(const morpho.neuron_node_3d *ptr, bool owner=False):
         cdef NeuronNode3D obj = NeuronNode3D.__new__(NeuronNode3D)
-        obj._ptr = ptr
-        if owner: obj._autodealoc.reset(obj.ptr())
+        obj._ptr = <morpho.neuron_node_3d *>ptr
+        if owner: obj._autodealoc.reset(obj.ptr1())
         return obj
     
     @staticmethod
@@ -101,55 +111,54 @@ cdef class NeuronNode3D(_py__base):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class NeuronBranch(_py__base):
+cdef class NeuronBranch(NeuronNode3D):
     "Python wrapper class for neuron_branch (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef unique_ptr[morpho.neuron_branch] _autodealoc
-    cdef morpho.neuron_branch *ptr(self):
+    cdef morpho.neuron_branch *ptr2(self):
         return <morpho.neuron_branch*> self._ptr
 
     def __init__(self, int neuron_type, _PointVector points, std.vector[double] radius):
         self._ptr = new morpho.neuron_branch(<morpho.neuron_struct_type> neuron_type, morpho.move_PointVector(deref(points.ptr())), morpho.move_DoubleVec(radius))
-        self._autodealoc.reset(self.ptr())
+        self._autodealoc.reset(self.ptr2())
 
     def is_of_type(self, int mtype):
-        return self.ptr().is_of_type(<morpho.morpho_node_type> mtype)
+        return self.ptr2().is_of_type(<morpho.morpho_node_type> mtype)
 
     def get_number_points(self, ):
-        return self.ptr().get_number_points()
+        return self.ptr2().get_number_points()
 
     def get_points(self, ):
-        return _PointVector.from_ref(self.ptr().get_points())
+        return _PointVector.from_ref(self.ptr2().get_points())
 
     def get_radius(self, ):
-        return self.ptr().get_radius()
+        return self.ptr2().get_radius()
 
     def get_segment(self, size_t n):
-        return _Cone.from_value(self.ptr().get_segment(n))
+        return _Cone.from_value(self.ptr2().get_segment(n))
 
     def get_bounding_box(self, ):
-        return _Box.from_value(self.ptr().get_bounding_box())
+        return _Box.from_value(self.ptr2().get_bounding_box())
 
     def get_segment_bounding_box(self, size_t n):
-        return _Box.from_value(self.ptr().get_segment_bounding_box(n))
+        return _Box.from_value(self.ptr2().get_segment_bounding_box(n))
 
     def get_junction(self, size_t n):
-        return _Sphere.from_value(self.ptr().get_junction(n))
+        return _Sphere.from_value(self.ptr2().get_junction(n))
 
     def get_junction_sphere_bounding_box(self, size_t n):
-        return _Box.from_value(self.ptr().get_junction_sphere_bounding_box(n))
+        return _Box.from_value(self.ptr2().get_junction_sphere_bounding_box(n))
 
     def get_linestring(self, ):
-        return _Linestring.from_value(self.ptr().get_linestring())
+        return _Linestring.from_value(self.ptr2().get_linestring())
 
     def get_circle_pipe(self, ):
-        return _CirclePipe.from_value(self.ptr().get_circle_pipe())
+        return _CirclePipe.from_value(self.ptr2().get_circle_pipe())
 
     @staticmethod
-    cdef NeuronBranch from_ptr(morpho.neuron_branch *ptr, bool owner=False):
+    cdef NeuronBranch from_ptr(const morpho.neuron_branch *ptr, bool owner=False):
         cdef NeuronBranch obj = NeuronBranch.__new__(NeuronBranch)
-        obj._ptr = ptr
-        if owner: obj._autodealoc.reset(obj.ptr())
+        obj._ptr = <morpho.neuron_branch *>ptr
+        if owner: obj._autodealoc.reset(obj.ptr2())
         return obj
     
     @staticmethod
@@ -172,30 +181,29 @@ cdef class NeuronBranch(_py__base):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class NeuronSoma(_py__base):
+cdef class NeuronSoma(NeuronNode3D):
     "Python wrapper class for neuron_soma (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef unique_ptr[morpho.neuron_soma] _autodealoc
-    cdef morpho.neuron_soma *ptr(self):
+    cdef morpho.neuron_soma *ptr2(self):
         return <morpho.neuron_soma*> self._ptr
 
     def is_of_type(self, int mtype):
-        return self.ptr().is_of_type(<morpho.morpho_node_type> mtype)
+        return self.ptr2().is_of_type(<morpho.morpho_node_type> mtype)
 
     def get_sphere(self, ):
-        return _Sphere.from_value(self.ptr().get_sphere())
+        return _Sphere.from_value(self.ptr2().get_sphere())
 
     def get_bounding_box(self, ):
-        return _Box.from_value(self.ptr().get_bounding_box())
+        return _Box.from_value(self.ptr2().get_bounding_box())
 
     def get_line_loop(self, ):
-        return _PointVector.from_ref(self.ptr().get_line_loop())
+        return _PointVector.from_ref(self.ptr2().get_line_loop())
 
     @staticmethod
-    cdef NeuronSoma from_ptr(morpho.neuron_soma *ptr, bool owner=False):
+    cdef NeuronSoma from_ptr(const morpho.neuron_soma *ptr, bool owner=False):
         cdef NeuronSoma obj = NeuronSoma.__new__(NeuronSoma)
-        obj._ptr = ptr
-        if owner: obj._autodealoc.reset(obj.ptr())
+        obj._ptr = <morpho.neuron_soma *>ptr
+        if owner: obj._autodealoc.reset(obj.ptr2())
         return obj
     
     @staticmethod
@@ -250,9 +258,9 @@ cdef class MorphoTree(_py__base):
         return MorphoNode.vectorPtr2list(self.ptr().get_all_nodes())
 
     @staticmethod
-    cdef MorphoTree from_ptr(morpho.morpho_tree *ptr, bool owner=False):
+    cdef MorphoTree from_ptr(const morpho.morpho_tree *ptr, bool owner=False):
         cdef MorphoTree obj = MorphoTree.__new__(MorphoTree)
-        obj._ptr = ptr
+        obj._ptr = <morpho.morpho_tree *>ptr
         if owner: obj._sharedPtr.reset(obj.ptr())
         return obj
     
@@ -264,6 +272,12 @@ cdef class MorphoTree(_py__base):
     cdef MorphoTree from_value(const morpho.morpho_tree &ref):
         cdef morpho.morpho_tree *ptr = new morpho.morpho_tree(ref)
         return MorphoTree.from_ptr(ptr, True)
+
+    @staticmethod
+    cdef MorphoTree from_move(morpho.morpho_tree &&ref):
+        cdef MorphoTree obj = MorphoTree()
+        obj.ptr().swap(ref)
+        return obj
 
     @staticmethod
     cdef list vectorPtr2list(std.vector[morpho.morpho_tree*] vec):
@@ -307,7 +321,7 @@ cdef class MorphoReader(_py__base):
         return self.ptr().get_filename()
 
     def create_morpho_tree(self, ):
-        return MorphoTree.from_value(self.ptr().create_morpho_tree())
+        return MorphoTree.from_move(self.ptr().create_morpho_tree())
 
     @staticmethod
     cdef MorphoReader from_ptr(morpho_h5_v1.morpho_reader *ptr, bool owner=False):
@@ -568,5 +582,3 @@ cdef class Types:
 cdef class Transforms:
     Delete_Duplicate_Point_Operation = _py_delete_duplicate_point_operation
     Duplicate_First_Point_Operation = _py_duplicate_first_point_operation
-
-
