@@ -112,10 +112,6 @@ cdef class NeuronBranch(_py__base):
         self._ptr = new morpho.neuron_branch(<morpho.neuron_struct_type> neuron_type, morpho.move_PointVector(deref(points.ptr())), morpho.move_DoubleVec(radius))
         self._autodealoc.reset(self.ptr())
 
-    def __init__(self, NeuronBranch other):
-        self._ptr = new morpho.neuron_branch(deref(other.ptr()))
-        self._autodealoc.reset(self.ptr())
-
     def is_of_type(self, int mtype):
         return self.ptr().is_of_type(<morpho.morpho_node_type> mtype)
 
@@ -220,12 +216,10 @@ cdef class MorphoTree(_py__base):
     cdef morpho.morpho_tree *ptr(self):
         return <morpho.morpho_tree*> self._ptr
 
-    def __init__(self, ):
-        self._ptr = new morpho.morpho_tree()
-        self._sharedPtr.reset(self.ptr())
-
-    def __init__(self, MorphoTree other):
-        self._ptr = new morpho.morpho_tree(deref(other.ptr()))
+    def __init__(self, MorphoTree other=None):
+        if other:
+            self._ptr = new morpho.morpho_tree(deref(other.ptr()))
+        else: new morpho.morpho_tree()
         self._sharedPtr.reset(self.ptr())
 
     def get_bounding_box(self, ):
@@ -567,8 +561,8 @@ cdef class Types:
     Sphere = _Sphere
     CurclePipe = _CirclePipe
     PointVector = _PointVector
-    Mat_Points = _Mat_Points
-    Mat_index = _Mat_Index
+    MatPoints = _Mat_Points
+    MatIndex = _Mat_Index
 
 
 cdef class Transforms:
