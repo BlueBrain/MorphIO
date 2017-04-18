@@ -275,6 +275,7 @@ cdef class MorphoTree(_py__base):
 
     @staticmethod
     cdef MorphoTree from_move(morpho.morpho_tree &&ref):
+        # this is currently not working...
         cdef MorphoTree obj = MorphoTree()
         obj.ptr().swap(ref)
         return obj
@@ -321,7 +322,7 @@ cdef class MorphoReader(_py__base):
         return self.ptr().get_filename()
 
     def create_morpho_tree(self, ):
-        return MorphoTree.from_move(self.ptr().create_morpho_tree())
+        return MorphoTree.from_value(self.ptr().create_morpho_tree())
 
     @staticmethod
     cdef MorphoReader from_ptr(morpho_h5_v1.morpho_reader *ptr, bool owner=False):

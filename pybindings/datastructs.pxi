@@ -31,8 +31,12 @@ cdef class _Point(_py__base):
         cdef double *_data = <double*>self.ptr().data()
         _data[item] = value
 
+    def as_tuple(self):
+        cdef double *_data = <double*>self.ptr().data()
+        return (_data[0], _data[1], _data[2])
+
     def __repr__(self):
-        return repr(list(self._data))
+        return repr(self.as_tuple())
 
     @staticmethod
     cdef _Point from_ptr(morpho.point* ptr, bool owner=False):
@@ -215,6 +219,10 @@ cdef class _CirclePipe(_py__base):
         # This circle doesnt own C data, we lend him memory from the vector
         return _Circle.from_ptr( &mcircle[index] )
 
+    def __repr__(self):
+        cdef int i, lim = min(3, len(self))
+        return "<CirclePipe object. Length: %d>" % (len(self),)
+
     def __iter__(self):
         cdef int i
         #Generator is also iterator
@@ -246,12 +254,16 @@ cdef class _PointVector(_py__base):
         return <vector[morpho.point] *> self._ptr
 
     # Pass on the array API
-    def __getitem__(self, int index):
+    def __getitem__(self, index):
         if index >= len(self) or index < 0:
             raise IndexError("Length is %d. Requested:%d"%(len(self), index))
         cdef morpho.point * point0 = self.ptr().data()
         # This point doesnt own C data, we lend him memory from the vector
         return _Point.from_ptr( &point0[index] )
+
+    def __repr__(self):
+        cdef int i, lim = min(3, len(self))
+        return "<PointVector object\n" + repr([repr(self[i]) for i in range(lim)]) + "\n...>"
 
     def __iter__(self):
         cdef int i
