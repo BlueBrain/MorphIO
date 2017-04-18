@@ -4,7 +4,7 @@ except Exception as e:
     print "\033[93m[ERROR] Please run test program from morpho-tool root dir with iPython or set PYTHONPATH to ROOTDIR\033[0m"
     raise e
     
-mreader=morphotool.MorphoReader("/gpfs/bbp.cscs.ch/release/l2/2012.07.23/morphologies/h5/C010306C.h5")
+mreader=morphotool.MorphoReader("pybindings/C010306C.h5")
 
 tree=mreader.create_morpho_tree()
 print "Tree size:", tree.get_tree_size()

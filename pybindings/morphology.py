@@ -1,9 +1,12 @@
 import morphotool
-from morphotool import BRANCH_TYPE
+from morphotool import NEURON_STRUCT_TYPE
 from os import path
 import re
 
-class Morphology(morphotool.Morpho_Reader):
+# loader: by default morpho_h5_v1
+_h5loader = morphotool.MorphoReader
+
+class Morphology(_h5loader, object):
     """
     A class representing a Morphology.
     It builds on a Morphology Reader, but will keep a Morpho_Tree instance if any of these methods are used.
@@ -18,6 +21,21 @@ class Morphology(morphotool.Morpho_Reader):
         self._name_attrs = MorphNameExtract(morpho_name)
         self.layer = layer
         self.mtype = mtype
+
+    def __repr__(self):
+        return "<%s Morphology>" % (self.label,)
+
+    def __getattr__(self, item):
+        if hasattr(morphotool.MorphoTree, item):
+            if self._morpho_tree is None:
+                self._morpho_tree = self.create_morpho_tree()
+            attr = getattr(self._morpho_tree, item)
+            # print attr
+            # if hasattr(attr, '__get__'):
+            #     attr = attr.__get__(self, Morphology)
+            # print attr
+            return attr
+        raise AttributeError(item)
 
     @property
     def morpho_tree(self):
@@ -38,40 +56,41 @@ class Morphology(morphotool.Morpho_Reader):
         return None
 
     def get_section(self, section_id):
-        return Section(self.morpho_tree.get_branch(section_id), self._morpho_tree)
+        return self.get_node(section_id)
 
     @property
     def soma(self):
-        s = self.morpho_tree.find_section(BRANCH_TYPE.soma)
-        return Soma(s, self._morpho_tree)
+        #s = self.morpho_tree.get_soma()
+        #return Soma(s, self._morpho_tree)
+        return self.get_soma()
 
     @property
     def neurites(self):
-        return None
+        return self.axon + self.dendrites
 
     @property
     def axon(self):
-        return None
+        return self.find_nodes(NEURON_STRUCT_TYPE.axon)
 
     @property
     def dendrites(self):
-        return None
+        return self.basal_dendrites + self.apical_dendrites
 
     @property
     def basal_dendrites(self):
-        return None
+        return self.find_nodes(NEURON_STRUCT_TYPE.dentrite_basal)
 
     @property
     def apical_dendrites(self):
-        return None
+        return self.find_nodes(NEURON_STRUCT_TYPE.dentrite_apical)
 
     @property
     def sections(self):
-        return None
+        return self.get_all_nodes()
 
     @property
     def root(self):
-        return self.get_branch(0)
+        return self.get_node(0)
 
     @property
     def path_to_soma(self):
@@ -81,133 +100,128 @@ class Morphology(morphotool.Morpho_Reader):
     def mesh(self):
         return None
 
-    @property
-    def bounding_box(self):
-        return None
+    # @property
+    # def bounding_box(self):
+    #     return self.get_bounding_box()
 
     def __str__(self):
         pass
 
 
-class Section(object):
-
-    _inherited_attrs_branch = ['id']
-
-    def __init__(self, branch_object, tree):    # type: (morphotool.Branch, morphotool.Morpho_Tree) -> None
-        self._branch_obj  = branch_object         # type: morphotool.Branch
-        self._morpho_tree = tree                 # type: morphotool.Morpho_Tree
-
-    # Forward attr lookup to branch obj
-    def __getattr__(self, item):
-        if item in self._inherited_attrs_branch:
-            return self._branch_obj.__getattribute__(item)
-        raise AttributeError(item + " is not a member of Section")
-
-    @property
-    def children(self):
-        return None
-
-    @property
-    def compartments(self):
-        return None
-
-    @property
-    def compartment(self):
-        return None
-
-    @property
-    def cross_section(self):
-        return None
-
-    @property
-    def cross_sections(self):
-        return None
-
-    @property
-    def num_compartments(self):
-        return None
-
-    @property
-    def graft(self):
-        return None
-
-    @property
-    def has_parent(self):
-        return None
-
-    @property
-    def has_compartments(self):
-        return None
-
-    @property
-    def is_ancestor_of(self):
-        return None
-
-    @property
-    def is_descendent_of(self):
-        return None
-
-    @property
-    def length(self):
-        return None
-
-    @property
-    def morphology(self):
-        return None
-
-    def move_point(self):
-        pass
-
-    @property
-    def parent(self):
-        parent_id = self.branch_obj.get_parent()
-        if parent_id == 0:
-            return None
-        return Section(self.morpho_tree.get_branch(self.branch_obj.get_parent()))
-
-    @property
-    def path_to_soma(self):
-        return None
-
-    @property
-    def type(self):
-        return None
-
-    def section_distance(self, segment_id, middle_point=True):
-        pass
-
-    @property
-    def segments(self):
-        return None
-
-    def get_segment(self, id):
-        pass
-
-    def split_segment(self):
-        pass
-
-    def resize_diameter(self):
-        pass
-
-    def __str__(self):
-        pass
-
-
-class Soma(Section,):
-    def position(self):
-        pass
-
-    def mean_radius(self):
-        pass
-
-    def max_radius(self):
-        pass
-
-    def surface_points(self):
-        pass
-
-    def __str__(self):
-        pass
+# class Section(object):
+#
+#     def __new__(cls, branch_obj, tree):
+#         branch_obj.__class__= cls
+#         return branch_obj
+#
+#     def __init__(self, branch_object, tree):    # type: (morphotool.NeuronBranch, morphotool.MorphoTree) -> None
+#         self._morpho_tree = tree                # type: morphotool.MorphoTree
+#
+#     @property
+#     def children(self):
+#         return None
+#
+#     @property
+#     def compartments(self):
+#         return None
+#
+#     @property
+#     def compartment(self):
+#         return None
+#
+#     @property
+#     def cross_section(self):
+#         return None
+#
+#     @property
+#     def cross_sections(self):
+#         return None
+#
+#     @property
+#     def num_compartments(self):
+#         return None
+#
+#     @property
+#     def graft(self):
+#         return None
+#
+#     @property
+#     def has_parent(self):
+#         return None
+#
+#     @property
+#     def has_compartments(self):
+#         return None
+#
+#     @property
+#     def is_ancestor_of(self):
+#         return None
+#
+#     @property
+#     def is_descendent_of(self):
+#         return None
+#
+#     @property
+#     def length(self):
+#         return self.get_number_points()
+#
+#     @property
+#     def morphology(self):
+#         return None
+#
+#     def move_point(self):
+#         pass
+#
+#     @property
+#     def parent(self):
+#         parent_id = self.branch_obj.get_parent()
+#         if parent_id == 0:
+#             return None
+#         return Section(self.morpho_tree.get_branch(self.branch_obj.get_parent()))
+#
+#     @property
+#     def path_to_soma(self):
+#         return None
+#
+#     @property
+#     def type(self):
+#         return None
+#
+#     def section_distance(self, segment_id, middle_point=True):
+#         pass
+#
+#     @property
+#     def segments(self):
+#         return None
+#
+#     def get_segment(self, id):
+#         pass
+#
+#     def split_segment(self):
+#         pass
+#
+#     def resize_diameter(self):
+#         pass
+#
+#     def __str__(self):
+#         pass
+#
+#
+# class Soma(Section,):
+#     def position(self):
+#         pass
+#
+#     def mean_radius(self):
+#         pass
+#
+#     def max_radius(self):
+#         pass
+#
+#     def surface_points(self):
+#         pass
+#
+#     def __str__(self):
+#         pass
 
 
 

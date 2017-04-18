@@ -263,7 +263,7 @@ cdef class _PointVector(_py__base):
 
     def __repr__(self):
         cdef int i, lim = min(3, len(self))
-        return "<PointVector object\n" + repr([repr(self[i]) for i in range(lim)]) + "\n...>"
+        return "<PointVector object. Length: %d>" % (len(self),)
 
     def __iter__(self):
         cdef int i
