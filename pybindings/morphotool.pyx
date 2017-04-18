@@ -201,6 +201,7 @@ cdef class NeuronSoma(NeuronNode3D):
 
     @staticmethod
     cdef NeuronSoma from_ptr(const morpho.neuron_soma *ptr, bool owner=False):
+        if not ptr: return None
         cdef NeuronSoma obj = NeuronSoma.__new__(NeuronSoma)
         obj._ptr = <morpho.neuron_soma *>ptr
         if owner: obj._autodealoc.reset(obj.ptr2())
@@ -256,6 +257,12 @@ cdef class MorphoTree(_py__base):
 
     def get_all_nodes(self, ):
         return MorphoNode.vectorPtr2list(self.ptr().get_all_nodes())
+
+    def find_nodes(self, int mtype):
+        return MorphoNode.vectorPtr2list(self.ptr().find_nodes(<morpho.neuron_struct_type>mtype))
+
+    def get_soma(self, int mtype):
+        return NeuronSoma.from_ptr(self.ptr().get_soma())
 
     @staticmethod
     cdef MorphoTree from_ptr(const morpho.morpho_tree *ptr, bool owner=False):

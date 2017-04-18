@@ -307,6 +307,13 @@ public:
     ///
     std::vector<morpho_node const*> get_all_nodes() const;
 
+    /// return by neuron struct type
+    std::vector<morpho_node const*> find_nodes(neuron_struct_type mtype) const;
+
+    // find return soma
+    neuron_soma const* get_soma() const;
+
+
 private:
 
     std::unique_ptr<morpho_tree_intern> _dptr;

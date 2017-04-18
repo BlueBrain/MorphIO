@@ -173,6 +173,9 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         int get_parent(int)
         std.vector[int] get_children(int)
         std.vector[morpho_node*] get_all_nodes()
+        std.vector[morpho_node*] find_nodes(neuron_struct_type)
+        neuron_soma* get_soma()
+
 
 cdef extern from "<utility>" namespace "std":
     cdef std.vector[point] move_PointVector "std::move" (std.vector[point])

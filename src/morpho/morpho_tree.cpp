@@ -532,6 +532,31 @@ std::vector<morpho_node const *> morpho_tree::get_all_nodes() const{
     return res;
 }
 
+std::vector<morpho_node const*> morpho_tree::find_nodes(neuron_struct_type mtype) const {
+    std::vector<morpho_node const *> res;
+    for(auto & node : _dptr->nodes){
+        if(node->is_of_type(morpho_node_type::neuron_node_3d_type)){
+            neuron_node_3d *nodex = dynamic_cast<neuron_node_3d*>(node.get());
+            if(nodex->get_branch_type() == mtype) {
+                res.push_back(nodex);
+            }
+        }
+
+    }
+    return res;
+}
+
+neuron_soma const* morpho_tree::get_soma() const {
+    for(auto & node : _dptr->nodes){
+        if(node->is_of_type(morpho_node_type::neuron_node_3d_type)){
+            neuron_node_3d *node3d = dynamic_cast<neuron_node_3d*>(node.get());
+            if(node3d->get_branch_type() == neuron_struct_type::soma)
+                return dynamic_cast<neuron_soma*>(node3d);
+        }
+    }
+    return nullptr;
+}
+
 
 morpho_tree& morpho_tree::operator = (morpho_tree && other){
     if(&other == this){
