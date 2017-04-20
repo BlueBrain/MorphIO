@@ -36,7 +36,7 @@ cdef class _Point(_py__base):
         return (_data[0], _data[1], _data[2])
 
     def __repr__(self):
-        return repr(self.as_tuple())
+        return "<_Point" + repr(self.as_tuple()) + ">"
 
     @staticmethod
     cdef _Point from_ptr(morpho.point* ptr, bool owner=False):
@@ -250,6 +250,8 @@ cdef class _CirclePipe(_py__base):
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class _PointVector(_py__base):
+    #Numpy array object
+    cdef readonly object nparray
     cdef vector[morpho.point] * ptr(self):
         return <vector[morpho.point] *> self._ptr
 
@@ -281,6 +283,11 @@ cdef class _PointVector(_py__base):
     cdef _PointVector from_ptr(const vector[morpho.point] *ptr):
         cdef _PointVector obj = _PointVector.__new__(_PointVector)
         obj._ptr = <vector[morpho.point] *>ptr
+        #Create np array
+        cdef np.npy_intp size[2]
+        size[0] = ptr.size()
+        size[1] = 3
+        obj.nparray = np.PyArray_SimpleNewFromData(2, size, np.NPY_DOUBLE, <void*>ptr.data().data())
         return obj
 
     @staticmethod

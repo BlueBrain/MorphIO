@@ -26,15 +26,12 @@ class Morphology(_h5loader, object):
         return "<%s Morphology>" % (self.label,)
 
     def __getattr__(self, item):
+        # Failed attr lookups will be caught by this func.
+        # We attemp to resolve them with a morphotree
         if hasattr(morphotool.MorphoTree, item):
             if self._morpho_tree is None:
                 self._morpho_tree = self.create_morpho_tree()
-            attr = getattr(self._morpho_tree, item)
-            # print attr
-            # if hasattr(attr, '__get__'):
-            #     attr = attr.__get__(self, Morphology)
-            # print attr
-            return attr
+            return getattr(self._morpho_tree, item)
         raise AttributeError(item)
 
     @property
@@ -51,17 +48,15 @@ class Morphology(_h5loader, object):
     def label(self):
         return self._name_attrs.name
 
-    @property
-    def type(self):
-        return None
+    # @property
+    # def type(self):
+    #     return self.get_branch_type()
 
     def get_section(self, section_id):
         return self.get_node(section_id)
 
     @property
     def soma(self):
-        #s = self.morpho_tree.get_soma()
-        #return Soma(s, self._morpho_tree)
         return self.get_soma()
 
     @property
@@ -100,9 +95,9 @@ class Morphology(_h5loader, object):
     def mesh(self):
         return None
 
-    # @property
-    # def bounding_box(self):
-    #     return self.get_bounding_box()
+    @property
+    def bounding_box(self):
+        return self.get_bounding_box()
 
     def __str__(self):
         pass
