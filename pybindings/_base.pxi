@@ -80,3 +80,8 @@ cdef class _EnumItem:
 
     def __repr__(self):
         return "<ENUM %s.%s: %d>" % (self.cls.__name__, self.cls.get_description(self.ord), self.ord)
+
+    def __richcmp__(_EnumItem self, other, operation):
+        if operation == OPERATOR.EQUAL:
+            return isinstance(other, (int, self.cls)) and int(self) == int(other)
+        raise TypeError("Operation not supported by enums")

@@ -1,6 +1,7 @@
 import morphotool
 from morphotool import NEURON_STRUCT_TYPE, MorphoTree
 from os import path
+import numpy
 import re
 
 # loader: by default morpho_h5_v1
@@ -17,14 +18,20 @@ class cached_property(object):
         if obj is None:
             return self
         value = obj.__dict__[self.func.__name__] = self.func(obj)
+        # Shallow copy if mutable
+        if isinstance(value, list):
+            return value[:]
+        if isinstance(value, dict):
+            return value.copy()
         return value
 
 
 class Morphology(MorphoTree, object):
     """
-    A class representing a Morphology.
-    It builds on a Morphology Reader, but will keep a Morpho_Tree instance if any of these methods are used.
-    This avoids creating the tree if everything the user does is getting raw data
+    A class representing a Morphology, builds on a Morpho_Tree instance.
+    Loader object available in .loader property.
+    Methods suffixed with _s return Section objects, which provide extended functionality and 
+    are guaranteed to cache results and always return the same object. 
     """
     # morpho_tree cache. Default is None (avoid AttributeError)
     _morpho_tree = None
@@ -49,7 +56,7 @@ class Morphology(MorphoTree, object):
 
     # @property
     # def type(self):
-    #     return self.get_branch_type()
+    #     return
 
     @property
     def neurites(self):
@@ -57,19 +64,36 @@ class Morphology(MorphoTree, object):
 
     @property
     def axon(self):
+        """Axon sections, as node objects"""
         return self.find_nodes(NEURON_STRUCT_TYPE.axon)
+
+    @property
+    def axon_s(self):
+        return [s for s in self.sections if s.branch_type == NEURON_STRUCT_TYPE.axon]
 
     @property
     def dendrites(self):
         return self.basal_dendrites + self.apical_dendrites
 
     @property
+    def dendrites_s(self):
+        return self.basal_dendrites_s + self.apical_dendrites_s
+
+    @property
     def basal_dendrites(self):
         return self.find_nodes(NEURON_STRUCT_TYPE.dentrite_basal)
 
     @property
+    def basal_dendrites_s(self):
+        return [s for s in self.sections if s.branch_type == NEURON_STRUCT_TYPE.dentrite_basal]
+
+    @property
     def apical_dendrites(self):
         return self.find_nodes(NEURON_STRUCT_TYPE.dentrite_apical)
+
+    @property
+    def apical_dendrites_s(self):
+        return [s for s in self.sections if s.branch_type == NEURON_STRUCT_TYPE.dentrite_apical]
 
     def get_section(self, section_id):
         return self.sections[section_id]
@@ -81,7 +105,7 @@ class Morphology(MorphoTree, object):
 
     @property
     def root(self):
-        return self.get_node(0)
+        return self.sections[0]
 
     # ??
     # @property
@@ -92,26 +116,6 @@ class Morphology(MorphoTree, object):
     # def mesh(self):
     #     return None
 
-    # functions from Loader ----
-    @property
-    def points_raw(self, ):
-        return self.loader.points_raw
-
-    @property
-    def soma_points_raw(self, ):
-        return self.loader.soma_points_raw
-
-    @property
-    def struct_raw(self, ):
-        return self.loader.struct_raw
-
-    def get_branch_range_raw(self, id_):
-        return self.loader.get_branch_range_raw(id_)
-
-    @property
-    def filename(self, ):
-        return self.loader.filename
-
 
 class Section(object):
     def __init__(self, branch_object, tree):    # type: (morphotool.NeuronBranch, morphotool.MorphoTree) -> None
@@ -119,7 +123,8 @@ class Section(object):
         self._tree = tree                # type: morphotool.MorphoTree
 
     # From branch object
-    index         = property(lambda self: self.branch_object.index)
+    index         = property(lambda self: self.branch_obj.index)
+    branch_type   = property(lambda self: self.branch_obj.branch_type)
     number_points = property(lambda self: self.branch_obj.number_points)
     pointsVector  = property(lambda self: self.branch_obj.pointsVector)
     points        = property(lambda self: self.branch_obj.points)
@@ -179,14 +184,12 @@ class Section(object):
 
     @property
     def length(self):
-        return self.get_number_points()
+        return numpy.linalg.norm(self.points[-1] - self.points[1])
 
     @property
     def morphology(self):
         return None
 
-    def move_point(self):
-        pass
 
     @property
     def parent(self):
@@ -199,10 +202,6 @@ class Section(object):
     def path_to_soma(self):
         return None
 
-    @property
-    def type(self):
-        return None
-
     def section_distance(self, segment_id, middle_point=True):
         pass
 
@@ -210,11 +209,14 @@ class Section(object):
     def segments(self):
         return None
 
-    def split_segment(self):
-        pass
-
-    def resize_diameter(self):
-        pass
+    # def move_point(self):
+    #     pass
+    #
+    # def split_segment(self):
+    #     pass
+    #
+    # def resize_diameter(self):
+    #     pass
 
     def __str__(self):
         pass
