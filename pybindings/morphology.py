@@ -18,11 +18,6 @@ class cached_property(object):
         if obj is None:
             return self
         value = obj.__dict__[self.func.__name__] = self.func(obj)
-        # Shallow copy if mutable
-        if isinstance(value, list):
-            return value[:]
-        if isinstance(value, dict):
-            return value.copy()
         return value
 
 
@@ -101,7 +96,7 @@ class Morphology(MorphoTree, object):
     @cached_property
     def sections(self):
         """Nodes converted to Section instances for detailed stats (cached)"""
-        return [Section(node, self) for i, node in enumerate(self.all_nodes)]
+        return tuple(Section(node, self) for i, node in enumerate(self.all_nodes))
 
     @property
     def root(self):
@@ -122,6 +117,9 @@ class Section(object):
         self.branch_obj = branch_object
         self._tree = tree                # type: morphotool.MorphoTree
 
+    def __repr__(self):
+        return "<Section %d of %s>" % (self.index, self._tree.label)
+
     # From branch object
     index         = property(lambda self: self.branch_obj.index)
     branch_type   = property(lambda self: self.branch_obj.branch_type)
@@ -130,85 +128,90 @@ class Section(object):
     points        = property(lambda self: self.branch_obj.points)
     radius        = property(lambda self: self.branch_obj.radius)
     bounding_box  = property(lambda self: self.branch_obj.bounding_box)
-    linestring    = property(lambda self: self.branch_obj.linestring)
-    circle_pipe   = property(lambda self: self.branch_obj.circle_pipe)
+    # Segments / these are replaced by better names, and cached
+    #linestring   = property(lambda self: self.branch_obj.linestring)
+    #circle_pipe  = property(lambda self: self.branch_obj.circle_pipe)
     get_segment              = lambda self, n: self.branch_obj.get_segment(n)
     get_segment_bounding_box = lambda self, n: self.branch_obj.get_segment_bounding_box(n)
     get_junction             = lambda self, n: self.branch_obj.get_junction(n)
-    get_junction_sphere_bounding_box = lambda self, n: self.branch_obj.get_junction_sphere_bounding_box(n)
+    get_junction_bounding_box = lambda self, n: self.branch_obj.get_junction_sphere_bounding_box(n)
 
-    @property
+    @cached_property
     def children(self):
-        return [Section(self._tree.get_section(child_id), self._tree)
-                    for child_id in self._tree.get_children(self.index)]
+        return tuple(Section(self._tree.get_section(child_id), self._tree)
+                    for child_id in self._tree.get_children(self.index))
 
-    @property
-    def compartments(self):
-        return None
+    # ? did it mean
+    # @property
+    # def graft(self):
+    #     return None
 
-    @property
-    def compartment(self):
-        return None
+    def is_ancestor_of(self, descendant):
+        assert isinstance(descendant, Section)
+        return self in descendant.path_to_soma
 
-    @property
-    def cross_section(self):
-        return None
-
-    @property
-    def cross_sections(self):
-        return None
-
-    @property
-    def num_compartments(self):
-        return None
-
-    @property
-    def graft(self):
-        return None
-
-    @property
-    def has_parent(self):
-        return None
-
-    @property
-    def has_compartments(self):
-        return None
-
-    @property
-    def is_ancestor_of(self):
-        return None
-
-    @property
-    def is_descendent_of(self):
-        return None
+    def is_descendent_of(self, ancestor):
+        return ancestor in self.path_to_soma
 
     @property
     def length(self):
         return numpy.linalg.norm(self.points[-1] - self.points[1])
 
-    @property
-    def morphology(self):
-        return None
+    # ? did it mean
+    # @property
+    # def morphology(self):
+    #     return None
 
+    @property
+    def parent_id(self):
+        return self._tree.get_parent(self.index)
+
+    def has_parent(self):
+        return self.parent_id != -1
 
     @property
     def parent(self):
-        parent_id = self.branch_obj.get_parent()
-        if parent_id == 0:
-            return None
-        return self._tree.get_section(parent_id)
+        parent_id = self.parent_id
+        return self._tree.get_section(parent_id) if parent_id > -1 else None
 
-    @property
+    @cached_property
     def path_to_soma(self):
-        return None
+        parents = []
+        node = self.parent
+        while node:
+            parents.append(node)
+            node = node.parent
+        return tuple(parents)
 
-    def section_distance(self, segment_id, middle_point=True):
-        pass
+
+
+    # Previous segment API. Replace with points, segments_disks, segments_lines
+    # def compartments(self):
+    # def compartment(self):
+    # def cross_section(self):
+    # def cross_sections(self):
+    # def num_compartments(self):
 
     @property
-    def segments(self):
-        return None
+    def segment_count(self):
+        return len(self.points)
 
+    @cached_property
+    def segment_lengths(self):
+        return numpy.linalg.norm(self.points[:-1] - self.points[1:], axis=1)
+
+    def get_segment_length(self, segment_id, middle_point=True):
+        return self.segment_lengths[segment_id]
+
+    @cached_property
+    def segments_disks(self):
+        return self.branch_obj.circle_pipe
+
+    @cached_property
+    def segments_lines(self):
+        return self.branch_obj.linestring
+
+    # Modifiers not available
     # def move_point(self):
     #     pass
     #
@@ -217,9 +220,6 @@ class Section(object):
     #
     # def resize_diameter(self):
     #     pass
-
-    def __str__(self):
-        pass
 
 
 # class Soma(Section,):
