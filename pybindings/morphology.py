@@ -3,6 +3,7 @@ from morphotool import NEURON_STRUCT_TYPE, MorphoTree
 from os import path
 import numpy
 import re
+from contextlib import contextmanager
 
 # loader: by default morpho_h5_v1
 _h5loader = morphotool.MorphoReader
@@ -28,8 +29,6 @@ class Morphology(MorphoTree, object):
     Methods suffixed with _s return Section objects, which provide extended functionality and 
     are guaranteed to cache results and always return the same object. 
     """
-    # morpho_tree cache. Default is None (avoid AttributeError)
-    _morpho_tree = None
 
     def __init__(self, morpho_dir, morpho_name, layer=None, mtype=None):
         self.loader = _h5loader(path.join(morpho_dir, morpho_name+".h5"))
@@ -37,6 +36,7 @@ class Morphology(MorphoTree, object):
         self.layer = layer
         self.mtype = mtype
         self.swap(self.loader.create_morpho_tree())
+        self.raw = False
 
     def __repr__(self):
         return "<%s Morphology>" % (self.label,)
@@ -49,9 +49,25 @@ class Morphology(MorphoTree, object):
     def label(self):
         return self._name_attrs.name
 
-    # @property
-    # def type(self):
-    #     return
+    @contextmanager
+    def RawNodesContext(self):
+        """This context manager enables functions to operate in RAW mode, in case performance is an issue"""
+        self.raw = True
+        yield
+        self.raw = False
+
+    @cached_property
+    def all_nodes(self):
+        """All nodes is a cached version of MorphoTree nodes"""
+        return super(Morphology, self).all_nodes
+
+    @cached_property
+    def sections(self):
+        """Nodes converted to Section instances for detailed stats"""
+        return tuple(Section(node, self) for i, node in enumerate(self.all_nodes))
+
+    def get_section(self, section_id):
+        return self.sections[section_id]
 
     @property
     def neurites(self):
@@ -59,57 +75,26 @@ class Morphology(MorphoTree, object):
 
     @property
     def axon(self):
-        """Axon sections, as node objects"""
-        return self.find_nodes(NEURON_STRUCT_TYPE.axon)
+        source = self.sections if not self.raw else self.all_nodes
+        return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.axon)
 
     @property
-    def axon_s(self):
-        return [s for s in self.sections if s.branch_type == NEURON_STRUCT_TYPE.axon]
-
-    @property
-    def dendrites(self):
+    def dendrite_nodes(self):
         return self.basal_dendrites + self.apical_dendrites
 
     @property
-    def dendrites_s(self):
-        return self.basal_dendrites_s + self.apical_dendrites_s
-
-    @property
     def basal_dendrites(self):
-        return self.find_nodes(NEURON_STRUCT_TYPE.dentrite_basal)
-
-    @property
-    def basal_dendrites_s(self):
-        return [s for s in self.sections if s.branch_type == NEURON_STRUCT_TYPE.dentrite_basal]
+        source = self.sections if not self.raw else self.all_nodes
+        return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.dentrite_basal)
 
     @property
     def apical_dendrites(self):
-        return self.find_nodes(NEURON_STRUCT_TYPE.dentrite_apical)
+        source = self.sections if not self.raw else self.all_nodes
+        return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.dentrite_apical)
 
-    @property
-    def apical_dendrites_s(self):
-        return [s for s in self.sections if s.branch_type == NEURON_STRUCT_TYPE.dentrite_apical]
-
-    def get_section(self, section_id):
-        return self.sections[section_id]
-
-    @cached_property
-    def sections(self):
-        """Nodes converted to Section instances for detailed stats (cached)"""
-        return tuple(Section(node, self) for i, node in enumerate(self.all_nodes))
-
-    @property
-    def root(self):
-        return self.sections[0]
-
-    # ??
-    # @property
+    # ? BBPSDK functions that might not be required
     # def path_to_soma(self):
-    #     return None
-    #
-    # @property
     # def mesh(self):
-    #     return None
 
 
 class Section(object):

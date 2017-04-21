@@ -495,7 +495,7 @@ int morpho_tree::add_node(int parent_id, const std::shared_ptr<morpho_node> & ne
 
 
 int morpho_tree::copy_node(const morpho_tree &other, int id, int new_parent_id){
-     if(id < 0 || id >= other.get_tree_size()){
+     if(id < 0 || id >= (int)other.get_tree_size()){
          throw std::logic_error("Invalid node id for copy tree operation");
      }
      if(new_parent_id < 0 && _dptr->nodes.size() > 0){
@@ -532,8 +532,10 @@ std::vector<morpho_node const *> morpho_tree::get_all_nodes() const{
     return res;
 }
 
+
 std::vector<morpho_node const*> morpho_tree::find_nodes(neuron_struct_type mtype) const {
     std::vector<morpho_node const *> res;
+
     for(auto & node : _dptr->nodes){
         if(node->is_of_type(morpho_node_type::neuron_node_3d_type)){
             neuron_node_3d *nodex = dynamic_cast<neuron_node_3d*>(node.get());
@@ -546,13 +548,10 @@ std::vector<morpho_node const*> morpho_tree::find_nodes(neuron_struct_type mtype
     return res;
 }
 
+
 neuron_soma const* morpho_tree::get_soma() const {
-    for(auto & node : _dptr->nodes){
-        if(node->is_of_type(morpho_node_type::neuron_node_3d_type)){
-            neuron_node_3d *node3d = dynamic_cast<neuron_node_3d*>(node.get());
-            if(node3d->get_branch_type() == neuron_struct_type::soma)
-                return dynamic_cast<neuron_soma*>(node3d);
-        }
+    if (_dptr->nodes.size() > 0) {
+        return dynamic_cast<neuron_soma*>(_dptr->nodes[0].get());
     }
     return nullptr;
 }
