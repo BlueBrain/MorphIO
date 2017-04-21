@@ -53,6 +53,10 @@ cdef class MorphoNode(_py__base):
     def is_of_type(self, int mtype):
         return self.ptr0().is_of_type(<morpho.morpho_node_type> mtype)
 
+    # @property
+    # def index(self):
+    #     return self.ptr0().index
+
     @staticmethod
     cdef MorphoNode from_ptr(const morpho.morpho_node *ptr, bool owner=False):
         # Downcast nodes to specific types
@@ -253,7 +257,7 @@ cdef class MorphoTree(_py__base):
         self._sharedPtr.reset(self.ptr())
 
     @property
-    def get_bounding_box(self, ):
+    def bounding_box(self, ):
         return _Box.from_value(self.ptr().get_bounding_box())
 
     @property
@@ -261,7 +265,9 @@ cdef class MorphoTree(_py__base):
         return self.ptr().get_tree_size()
 
     def swap(self, MorphoTree other):
-        return self.ptr().swap(deref(other.ptr()))
+        """Python side swap only swaps pointers"""
+        self._ptr = other._ptr
+        self._sharedPtr = other._sharedPtr
 
     def add_node(self, int parent_id, MorphoNode new_node):
         return self.ptr().add_node(parent_id, new_node._autodealoc)
@@ -619,3 +625,4 @@ cdef class Types:
 cdef class Transforms:
     Delete_Duplicate_Point_Operation = _py_delete_duplicate_point_operation
     Duplicate_First_Point_Operation = _py_duplicate_first_point_operation
+
