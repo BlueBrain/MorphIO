@@ -72,9 +72,10 @@ public:
 
     virtual bool is_of_type(morpho_node_type mtype) const = 0;
 
+    size_t index;
+
 private:
     std::unique_ptr<morpho_node_internal> _dptr;
-
 };
 
 

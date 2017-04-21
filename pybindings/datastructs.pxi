@@ -275,8 +275,8 @@ cdef class _PointVector(_py__base):
     def __len__(self):
         return self.ptr().size()
 
+    @property
     def size(self):
-        print("Info: the current object implements iterator and array interface. use len(obj) instead of .size()")
         return len(self)
 
     @staticmethod

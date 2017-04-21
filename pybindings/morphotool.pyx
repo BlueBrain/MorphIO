@@ -53,9 +53,9 @@ cdef class MorphoNode(_py__base):
     def is_of_type(self, int mtype):
         return self.ptr0().is_of_type(<morpho.morpho_node_type> mtype)
 
-    # @property
-    # def index(self):
-    #     return self.ptr0().index
+    @property
+    def index(self):
+        return self.ptr0().index
 
     @staticmethod
     cdef MorphoNode from_ptr(const morpho.morpho_node *ptr, bool owner=False):

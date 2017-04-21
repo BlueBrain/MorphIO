@@ -119,7 +119,7 @@ class Section(object):
         self._tree = tree                # type: morphotool.MorphoTree
 
     # From branch object
-    #index         = property(lambda self: self.branch_object.index)
+    index         = property(lambda self: self.branch_object.index)
     number_points = property(lambda self: self.branch_obj.number_points)
     pointsVector  = property(lambda self: self.branch_obj.pointsVector)
     points        = property(lambda self: self.branch_obj.points)
@@ -132,10 +132,10 @@ class Section(object):
     get_junction             = lambda self, n: self.branch_obj.get_junction(n)
     get_junction_sphere_bounding_box = lambda self, n: self.branch_obj.get_junction_sphere_bounding_box(n)
 
-    # @property
-    # def children(self):
-    #     return [Section(self._tree.get_section(child_id), self._tree)
-    #                 for child_id in self._tree.get_children(self.index)]
+    @property
+    def children(self):
+        return [Section(self._tree.get_section(child_id), self._tree)
+                    for child_id in self._tree.get_children(self.index)]
 
     @property
     def compartments(self):

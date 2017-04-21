@@ -125,6 +125,7 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         morpho_node(const morpho_node)
         box get_bounding_box()
         bool is_of_type(morpho_node_type)
+        std.size_t index
 
     ###### Cybinding for class neuron_node_3d ######
     cdef cppclass neuron_node_3d(morpho_node):
