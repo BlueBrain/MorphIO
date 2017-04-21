@@ -57,6 +57,9 @@ cdef class MorphoNode(_py__base):
     def index(self):
         return self.ptr0().index
 
+    def __repr__(self):
+        return "<MorphoNode nr.%d>" % (self.index,)
+
     @staticmethod
     cdef MorphoNode from_ptr(const morpho.morpho_node *ptr, bool owner=False):
         # Downcast nodes to specific types
@@ -89,15 +92,24 @@ cdef class MorphoNode(_py__base):
 cdef class NeuronNode3D(MorphoNode):
     "Python wrapper class for neuron_node_3d (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
+    cdef _EnumItem enumObj
     cdef morpho.neuron_node_3d *ptr1(self):
         return <morpho.neuron_node_3d*> self._ptr
 
+    def __cinit__(self):
+        self.enumObj = None
+
     @property
     def branch_type(self, ):
-        return _EnumItem(NEURON_STRUCT_TYPE, <int>self.ptr1().get_branch_type())
+        if self.enumObj is None:
+            self.enumObj = _EnumItem(NEURON_STRUCT_TYPE, <int>self.ptr1().get_branch_type())
+        return self.enumObj
 
     def is_of_type(self, int mtype):
         return self.ptr1().is_of_type(<morpho.morpho_node_type> mtype)
+
+    def __repr__(self):
+        return "<MorphoNode::%s nr.%d>" % (self.enumObj.name, self.index)
 
     @staticmethod
     cdef NeuronNode3D from_ptr(const morpho.neuron_node_3d *ptr, bool owner=False):

@@ -60,6 +60,10 @@ cdef class _Enum:
         raise TypeError("Cant instantiate Enum")
 
     @classmethod
+    def get_name(cls):
+        return cls.__name__
+
+    @classmethod
     def get_description(cls, int item):
         for name, value in cls.__dict__.items():
             if not name.startswith("_") and value == item:
@@ -68,20 +72,27 @@ cdef class _Enum:
 
 # --------------------------------------------------------
 cdef class _EnumItem:
-    cdef object cls
+    cdef object enumcls
     cdef int ord
 
-    def __init__(self, object cls, int numeric):
-        self.cls = cls
+    def __init__(self, object enumcls, int numeric):
+        self.enumcls = enumcls
         self.ord = numeric
 
     def __int__(self):
         return self.ord
 
     def __repr__(self):
-        return "<ENUM %s.%s: %d>" % (self.cls.__name__, self.cls.get_description(self.ord), self.ord)
+        return "<ENUM %s.%s: %d>" % (self.enumcls.get_name(), self.enumcls.get_description(self.ord), self.ord)
+
+    def __str__(self):
+        return "%s.%s (%d)" % (self.enumcls.get_name(), self.enumcls.get_description(self.ord), self.ord)
+
+    @property
+    def name(self):
+        return self.enumcls.get_description(self.ord)
 
     def __richcmp__(_EnumItem self, other, operation):
         if operation == OPERATOR.EQUAL:
-            return isinstance(other, (int, self.cls)) and int(self) == int(other)
+            return isinstance(other, (int, self.enumcls)) and int(self) == int(other)
         raise TypeError("Operation not supported by enums")
