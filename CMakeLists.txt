@@ -63,5 +63,6 @@ endif()
 if(FALSE)
  add_subdirectory(deps/hadoken)
  add_subdirectory(deps/highfive)
- add_subdirectory(tests/unit)
 endif()
+ add_subdirectory(tests/unit)
+

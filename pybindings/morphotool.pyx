@@ -109,7 +109,7 @@ cdef class NeuronNode3D(MorphoNode):
         return self.ptr1().is_of_type(<morpho.morpho_node_type> mtype)
 
     def __repr__(self):
-        return "<MorphoNode::%s nr.%d>" % (self.enumObj.name, self.index)
+        return "<MorphoNode::%s nr.%d>" % (self.branch_type.name, self.index)
 
     @staticmethod
     cdef NeuronNode3D from_ptr(const morpho.neuron_node_3d *ptr, bool owner=False):
@@ -265,7 +265,9 @@ cdef class MorphoTree(_py__base):
     def __init__(self, MorphoTree other=None):
         if other:
             self._ptr = new morpho.morpho_tree(deref(other.ptr()))
-        else: new morpho.morpho_tree()
+        else:
+            self._ptr = new morpho.morpho_tree()
+
         self._sharedPtr.reset(self.ptr())
 
     @property
@@ -325,7 +327,6 @@ cdef class MorphoTree(_py__base):
 
     @staticmethod
     cdef MorphoTree from_move(morpho.morpho_tree &&ref):
-        # this is currently not working...
         cdef MorphoTree obj = MorphoTree()
         obj.ptr().swap(ref)
         return obj
@@ -338,6 +339,16 @@ cdef class MorphoTree(_py__base):
     # cdef list vector2list(std.vector[morpho.morpho_tree] vec):
     #     return [MorphoTree.from_value(elem) for elem in vec]
 
+
+    # Transform support
+    # -----------------
+    def transform(self, list operations):
+        cdef std.vector[std.shared_ptr[morpho.morpho_operation]] vec
+        cdef _py_morpho_operation item
+        for item in operations:
+            vec.push_back(item._sharedPtr)
+        morpho.morpho_transform(deref(self.ptr()), vec)
+        return self
 
 
 # ======================================================================================================================
@@ -376,7 +387,8 @@ cdef class MorphoReader(_py__base):
         return self.ptr().get_filename()
 
     def create_morpho_tree(self, ):
-        return MorphoTree.from_value(self.ptr().create_morpho_tree())
+        #return MorphoTree.from_value(self.ptr().create_morpho_tree())
+        return MorphoTree.from_move(self.ptr().create_morpho_tree())
 
     @staticmethod
     cdef MorphoReader from_ptr(morpho_h5_v1.morpho_reader *ptr, bool owner=False):
@@ -447,33 +459,42 @@ cdef class MorphoWriter(_py__base):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class _py_delete_duplicate_point_operation(_py__base):
+# Bindings for class morpho_operation
+# ----------------------------------------------------------------------------------------------------------------------
+cdef class _py_morpho_operation(_py__base):
+    cdef std.shared_ptr[morpho.morpho_operation] _sharedPtr
+    cdef morpho.morpho_operation *ptr0(self):
+        return <morpho.morpho_operation*> self._ptr
+
+    @property
+    def name(self):
+        return self.ptr0().name()
+
+    def apply(self, MorphoTree tree):
+        MorphoTree.from_value(self.ptr0().apply(deref(tree.ptr())))
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+cdef class _py_delete_duplicate_point_operation(_py_morpho_operation):
     "Python wrapper class for delete_duplicate_point_operation (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef unique_ptr[morpho.delete_duplicate_point_operation] _autodealoc
     cdef morpho.delete_duplicate_point_operation *ptr(self):
         return <morpho.delete_duplicate_point_operation*> self._ptr
 
     def __init__(self, ):
         self._ptr = new morpho.delete_duplicate_point_operation()
-        self._autodealoc.reset(self.ptr())
-
-    def apply(self, MorphoTree tree):
-        return MorphoTree.from_value(self.ptr().apply(deref(tree.ptr())))
-
-    def name(self, ):
-        return self.ptr().name()
+        self._sharedPtr.reset(self.ptr())
 
     @staticmethod
     cdef _py_delete_duplicate_point_operation from_ptr(morpho.delete_duplicate_point_operation *ptr, bool owner=False):
         cdef _py_delete_duplicate_point_operation obj = _py_delete_duplicate_point_operation.__new__(_py_delete_duplicate_point_operation)
         obj._ptr = ptr
-        if owner: obj._autodealoc.reset(obj.ptr())
+        if owner: obj._sharedPtr.reset(obj.ptr())
         return obj
 
     @staticmethod
     cdef _py_delete_duplicate_point_operation from_ref(const morpho.delete_duplicate_point_operation &ref):
-        return _py_delete_duplicate_point_operation.from_ptr(<morpho.delete_duplicate_point_operation*>&ref)
+        return _py_delete_duplicate_point_operation.from_ptr(<morpho.delete_duplicate_point_operation*> &ref)
 
     @staticmethod
     cdef _py_delete_duplicate_point_operation from_value(const morpho.delete_duplicate_point_operation &ref):
@@ -489,31 +510,22 @@ cdef class _py_delete_duplicate_point_operation(_py__base):
         return [_py_delete_duplicate_point_operation.from_value(elem) for elem in vec]
 
 
-
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class _py_duplicate_first_point_operation(_py__base):
+cdef class _py_duplicate_first_point_operation(_py_morpho_operation):
     "Python wrapper class for duplicate_first_point_operation (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef unique_ptr[morpho.duplicate_first_point_operation] _autodealoc
     cdef morpho.duplicate_first_point_operation *ptr(self):
         return <morpho.duplicate_first_point_operation*> self._ptr
 
-
     def __init__(self, ):
         self._ptr = new morpho.duplicate_first_point_operation()
-        self._autodealoc.reset(self.ptr())
-
-    def apply(self, MorphoTree tree):
-        return MorphoTree.from_value(self.ptr().apply(deref(tree.ptr())))
-
-    def name(self, ):
-        return self.ptr().name()
+        self._sharedPtr.reset(self.ptr())
 
     @staticmethod
     cdef _py_duplicate_first_point_operation from_ptr(morpho.duplicate_first_point_operation *ptr, bool owner=False):
         cdef _py_duplicate_first_point_operation obj = _py_duplicate_first_point_operation.__new__(_py_duplicate_first_point_operation)
         obj._ptr = ptr
-        if owner: obj._autodealoc.reset(obj.ptr())
+        if owner: obj._sharedPtr.reset(obj.ptr())
         return obj
 
     @staticmethod
@@ -578,11 +590,7 @@ cdef class SpatialIndex(_py__base):
     #     return [SpatialIndex.from_value(elem) for elem in vec]
 
 
-## Bindings for class morpho_operation
-# ----------------------------------------------------------------------------------------------------------------------
-# cdef class _py_morpho_operation(_py__base):
-# >> morpho_operation is an abstract class. No need to create bindings
-# ----------------------------------------------------------------------------------------------------------------------
+
 
 ## Optional bindings for morpho_mesher, overridable by cython exec
 # ----------------------------------------------------------------------------------------------------------------------
@@ -634,7 +642,7 @@ cdef class Types:
     MatIndex = _Mat_Index
 
 
-cdef class Transforms:
+
+class Transforms:
     Delete_Duplicate_Point_Operation = _py_delete_duplicate_point_operation
     Duplicate_First_Point_Operation = _py_duplicate_first_point_operation
-

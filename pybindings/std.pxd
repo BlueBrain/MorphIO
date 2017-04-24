@@ -16,3 +16,6 @@ cdef extern from "stddef.h" namespace "std":
 
 cdef extern from "<utility>" namespace "std":
     cdef T&& std_move "std::move"[T] (T &t)
+
+cdef extern from "<memory>" namespace "std":
+    shared_ptr[T] static_pointer_cast[T](...)

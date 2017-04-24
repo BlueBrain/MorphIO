@@ -12,7 +12,7 @@ endif()
 # .pyx -> .cpp
 add_custom_command(
     OUTPUT ${cymod_cpp}
-    COMMAND PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR} ${CYTHON_EXECUTABLE} ${CYTHON_FLAGS} --cplus --output-file ${cymod_cpp} ${cymod_src}
+    COMMAND PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR} ${CYTHON_EXECUTABLE} ${CYTHON_FLAGS} --fast-fail --cplus --output-file ${cymod_cpp} ${cymod_src}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${cy_srcs} morpho ${mesher_lib}
     COMMENT "Cythonizing ${cymod_src}"

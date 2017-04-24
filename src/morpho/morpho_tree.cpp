@@ -538,7 +538,7 @@ std::vector<morpho_node const*> morpho_tree::find_nodes(neuron_struct_type mtype
 
     for(auto & node : _dptr->nodes){
         if(node->is_of_type(morpho_node_type::neuron_node_3d_type)){
-            neuron_node_3d *nodex = dynamic_cast<neuron_node_3d*>(node.get());
+            neuron_node_3d *nodex = static_cast<neuron_node_3d*>(node.get());
             if(nodex->get_branch_type() == mtype) {
                 res.push_back(nodex);
             }

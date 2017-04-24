@@ -47,23 +47,31 @@ cdef extern from "morpho/morpho_mesher.hpp" namespace "morpho":
         void set_face_size(double)
         void execute()
 
+
+# ======================================================================================================================
+cdef extern from "morpho/morpho_transform.hpp" namespace "morpho":
+# ----------------------------------------------------------------------------------------------------------------------
+    cdef cppclass morpho_operation:
+        morpho_tree apply(morpho_tree)
+        std.string name()
+
+    morpho_tree morpho_transform(const morpho_tree &, std.vector[std.shared_ptr[morpho_operation]])
+
+
 # ======================================================================================================================
 cdef extern from "morpho/morpho_transform_filters.hpp" namespace "morpho":
 # ----------------------------------------------------------------------------------------------------------------------
 
     ###### Cybinding for class delete_duplicate_point_operation ######
-    cdef cppclass delete_duplicate_point_operation:
+    cdef cppclass delete_duplicate_point_operation(morpho_operation):
         delete_duplicate_point_operation()
         delete_duplicate_point_operation(const delete_duplicate_point_operation&)
-        morpho_tree apply(morpho_tree)
-        std.string name()
 
     ###### Cybinding for class duplicate_first_point_operation ######
-    cdef cppclass duplicate_first_point_operation:
+    cdef cppclass duplicate_first_point_operation(morpho_operation):
         duplicate_first_point_operation()
         duplicate_first_point_operation(const duplicate_first_point_operation&)
-        morpho_tree apply(morpho_tree)
-        std.string name()
+
 
 # ======================================================================================================================
 cdef extern from "morpho/morpho_spatial.hpp" namespace "morpho":
@@ -88,31 +96,10 @@ cdef extern from "morpho/morpho_transform.hpp" namespace "morpho":
         std.string name()
 
 
-
-# # ======================================================================================================================
-# cdef extern from "morpho/morpho_tree.hpp" namespace "morpho::morpho_node_type":
-# # ----------------------------------------------------------------------------------------------------------------------
-#     cdef enum morpho_node_type "morpho::morpho_node_type":
-#         unknown = 0
-#         neuron_node_3d_type = 1
-#         neuron_branch_type = 2
-#         neuron_soma_type = 3
-#
-# # ======================================================================================================================
-# cdef extern from "morpho/morpho_tree.hpp" namespace "morpho::neuron_struct_type":
-# # ----------------------------------------------------------------------------------------------------------------------
-#     cdef enum neuron_struct_type "morpho::neuron_struct_type":
-#         soma = 0
-#         axon = 1
-#         dentrite_basal = 2
-#         dentrite_apical = 3
-#         unknown = 4
-
-
 # ======================================================================================================================
 cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
 # ----------------------------------------------------------------------------------------------------------------------
-
+    # Enum classes have their members inner -> Declared under /statics
     cdef cppclass morpho_node_type:
         pass
 

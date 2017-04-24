@@ -98,24 +98,35 @@ class Morphology(MorphoTree, object):
 
 
 class Section(object):
+    def __new__(cls, branch_object, tree):
+        # If it's a soma return a Soma object
+        if isinstance(branch_object, morphotool.NeuronSoma):
+            return object.__new__(Soma)
+        # Otherwise a Neurite
+        return object.__new__(Neurite)
+
     def __init__(self, branch_object, tree):    # type: (morphotool.NeuronBranch, morphotool.MorphoTree) -> None
         self.branch_obj = branch_object
-        self._tree = tree                # type: morphotool.MorphoTree
+        self._tree = tree
 
+    # From NeuronNode3D
+    index = property(lambda self: self.branch_obj.index)
+    branch_type = property(lambda self: self.branch_obj.branch_type)
+
+
+class Neurite(Section):
     def __repr__(self):
-        return "<Section %d of %s>" % (self.index, self._tree.label)
+        return "<Neurite section %d of %s>" % (self.index, self._tree.label)
 
     # From branch object
-    index         = property(lambda self: self.branch_obj.index)
-    branch_type   = property(lambda self: self.branch_obj.branch_type)
     number_points = property(lambda self: self.branch_obj.number_points)
     pointsVector  = property(lambda self: self.branch_obj.pointsVector)
     points        = property(lambda self: self.branch_obj.points)
     radius        = property(lambda self: self.branch_obj.radius)
     bounding_box  = property(lambda self: self.branch_obj.bounding_box)
     # Segments / these are replaced by better names, and cached
-    #linestring   = property(lambda self: self.branch_obj.linestring)
-    #circle_pipe  = property(lambda self: self.branch_obj.circle_pipe)
+    # linestring   = property(lambda self: self.branch_obj.linestring)
+    # circle_pipe  = property(lambda self: self.branch_obj.circle_pipe)
     get_segment              = lambda self, n: self.branch_obj.get_segment(n)
     get_segment_bounding_box = lambda self, n: self.branch_obj.get_segment_bounding_box(n)
     get_junction             = lambda self, n: self.branch_obj.get_junction(n)
@@ -214,22 +225,25 @@ class Section(object):
     #     pass
 
 
-# class Soma(Section,):
-#     def position(self):
-#         pass
-#
-#     def mean_radius(self):
-#         pass
-#
-#     def max_radius(self):
-#         pass
-#
-#     def surface_points(self):
-#         pass
-#
-#     def __str__(self):
-#         pass
-#
+class Soma(Section):
+    def __repr__(self):
+        return "<Soma of %s>" % (self._tree.label,)
+
+    def position(self):
+        pass
+
+    def mean_radius(self):
+        pass
+
+    def max_radius(self):
+        pass
+
+    def surface_points(self):
+        pass
+
+    def __str__(self):
+        pass
+
 
 
 class MorphologyDB(object):
