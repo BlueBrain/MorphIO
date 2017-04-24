@@ -140,7 +140,8 @@ class Section(object):
 
     @property
     def length(self):
-        return numpy.linalg.norm(self.points[-1] - self.points[1])
+        return numpy.sum(self.segments_length)
+
 
     # ? did it mean
     # @property
@@ -169,7 +170,6 @@ class Section(object):
         return tuple(parents)
 
 
-
     # Previous segment API. Replace with points, segments_disks, segments_lines
     # def compartments(self):
     # def compartment(self):
@@ -182,11 +182,18 @@ class Section(object):
         return len(self.points)
 
     @cached_property
-    def segment_lengths(self):
+    def segments_length(self):
         return numpy.linalg.norm(self.points[:-1] - self.points[1:], axis=1)
 
     def get_segment_length(self, segment_id, middle_point=True):
-        return self.segment_lengths[segment_id]
+        return self.segments_length[segment_id]
+
+    def get_point_from_segment_offset(self, segment, offset):
+        if self.index == 0:
+            # on-soma synapse
+            return numpy.zeros(3)
+        alpha = offset / self.segments_length[segment]
+        return (1 - alpha) * self.points[segment] + alpha * self.points[segment + 1]
 
     @cached_property
     def segments_disks(self):

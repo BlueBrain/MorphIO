@@ -591,9 +591,9 @@ IF ENABLE_MESHER_GCAL:
     include "morpho_mesher.pxi"
 
 
-# *********************
+# ************************
 # Class-Namespace alias
-# *********************
+# ************************
 
 cdef class Stats:
     @staticmethod

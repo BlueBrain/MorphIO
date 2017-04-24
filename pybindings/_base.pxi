@@ -70,6 +70,7 @@ cdef class _Enum:
                 return name
         raise IndexError("No such Enumerator index")
 
+
 # --------------------------------------------------------
 cdef class _EnumItem:
     cdef object enumcls
