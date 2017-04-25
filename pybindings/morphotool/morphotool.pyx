@@ -5,14 +5,14 @@
 #
 __copyright__ = "Copyright 2017 EPFL BBP-project"
 # =====================================================================================================================
-include "_base.pxi"
+include "includes/_base.pxi"
 
-cimport morpho
-from .statics cimport morpho_morpho_node_type
-from .statics cimport morpho_neuron_struct_type
-cimport morpho_h5_v1
-from .statics cimport morpho_h5_v1_morpho_reader
-cimport stats
+from .includes cimport morpho
+from .includes.statics cimport morpho_morpho_node_type
+from .includes.statics cimport morpho_neuron_struct_type
+from .includes cimport morpho_h5_v1
+from .includes.statics cimport morpho_h5_v1_morpho_reader
+from .includes cimport stats
 
 include "datastructs.pxi"
 

@@ -5,10 +5,10 @@
 #
 __copyright__ = "Copyright 2016 EPFL BBP-project"
 # =====================================================================================================================
-from cython.operator cimport dereference as deref
-from libcpp cimport bool
-cimport std
-cimport morpho_h5_v1
+# from cython.operator cimport dereference as deref
+# from libcpp cimport bool
+# from .. cimport std
+# from .. cimport morpho_h5_v1
 
 # # ======================================================================================================================
 # cdef extern from "morpho/morpho_h5_v1.hpp" namespace "morpho::h5_v1::morpho_reader":
