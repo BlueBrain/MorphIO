@@ -72,8 +72,6 @@ public:
 
     virtual bool is_of_type(morpho_node_type mtype) const = 0;
 
-    size_t index;
-
 private:
     std::unique_ptr<morpho_node_internal> _dptr;
 };
@@ -309,7 +307,7 @@ public:
     std::vector<morpho_node const*> get_all_nodes() const;
 
     /// return by neuron struct type
-    std::vector<morpho_node const*> find_nodes(neuron_struct_type mtype) const;
+    std::vector<unsigned int> find_nodes(neuron_struct_type mtype) const;
 
     // find return soma
     neuron_soma const* get_soma() const;

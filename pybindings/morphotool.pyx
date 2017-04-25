@@ -46,6 +46,9 @@ cdef class MorphoNode(_py__base):
     cdef morpho.morpho_node *ptr0(self):
         return <morpho.morpho_node*> self._ptr
 
+    # Index property, calculated in python only
+    cdef readonly int index
+
     @property
     def bounding_box(self, ):
         return _Box.from_value(self.ptr0().get_bounding_box())
@@ -53,38 +56,49 @@ cdef class MorphoNode(_py__base):
     def is_of_type(self, int mtype):
         return self.ptr0().is_of_type(<morpho.morpho_node_type> mtype)
 
-    @property
-    def index(self):
-        return self.ptr0().index
-
     def __repr__(self):
         return "<MorphoNode nr.%d>" % (self.index,)
 
     @staticmethod
-    cdef MorphoNode from_ptr(const morpho.morpho_node *ptr, bool owner=False):
+    cdef MorphoNode from_ptr_index(const morpho.morpho_node *ptr, int index, bool owner=False):
         # Downcast nodes to specific types
         # this is the only function that introduces some program logic.
         # The same could be done with dynamic_cast, but would be less obvious and more verbose
+        cdef MorphoNode obj = None
         if ptr.is_of_type(morpho_morpho_node_type.neuron_branch_type):
-            return NeuronBranch.from_ptr(<const morpho.neuron_branch *>ptr, owner)
+            obj = NeuronBranch.from_ptr(<const morpho.neuron_branch *>ptr, owner)
         if ptr.is_of_type(morpho_morpho_node_type.neuron_soma_type):
-            return NeuronSoma.from_ptr(<const morpho.neuron_soma*>ptr, owner)
+            obj = NeuronSoma.from_ptr(<const morpho.neuron_soma*>ptr, owner)
         if ptr.is_of_type(morpho_morpho_node_type.neuron_node_3d_type):
-            return NeuronNode3D.from_ptr(<const morpho.neuron_node_3d*>ptr, owner)
+            obj = NeuronNode3D.from_ptr(<const morpho.neuron_node_3d*>ptr, owner)
 
-        # default return just "MorphoNode"
-        cdef MorphoNode obj = MorphoNode.__new__(MorphoNode)
-        obj._ptr = <morpho.morpho_node*>ptr
-        if owner: obj._autodealoc.reset(obj.ptr0())
+        if obj is None:
+            # default return just "MorphoNode"
+            obj = MorphoNode.__new__(MorphoNode)
+            obj._ptr = <morpho.morpho_node*>ptr
+            if owner: obj._autodealoc.reset(obj.ptr0())
+
+        obj.index = index
         return obj
     
     @staticmethod
     cdef MorphoNode from_ref(const morpho.morpho_node &ref):
-        return MorphoNode.from_ptr(<morpho.morpho_node*>&ref)
+        return MorphoNode.from_ptr_index(<morpho.morpho_node*>&ref, -1)
+
+    @staticmethod
+    cdef list vectorPtrSel2list(std.vector[const morpho.morpho_node*] vec, std.vector[unsigned int] selection):
+        cdef int idx=0
+        return [MorphoNode.from_ptr_index(vec[idx], idx) for idx in selection]
 
     @staticmethod
     cdef list vectorPtr2list(std.vector[const morpho.morpho_node*] vec):
-        return [MorphoNode.from_ptr(elem) for elem in vec]
+        cdef int idx=0
+        cdef const morpho.morpho_node* item
+        cdef list lst = []
+        for item in vec:
+            lst.append(MorphoNode.from_ptr_index(item, idx))
+            idx += 1
+        return lst
 
 
 
@@ -92,18 +106,12 @@ cdef class MorphoNode(_py__base):
 cdef class NeuronNode3D(MorphoNode):
     "Python wrapper class for neuron_node_3d (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef _EnumItem enumObj
+    cdef readonly _EnumItem branch_type
     cdef morpho.neuron_node_3d *ptr1(self):
         return <morpho.neuron_node_3d*> self._ptr
 
     def __cinit__(self):
-        self.enumObj = None
-
-    @property
-    def branch_type(self, ):
-        if self.enumObj is None:
-            self.enumObj = _EnumItem(NEURON_STRUCT_TYPE, <int>self.ptr1().get_branch_type())
-        return self.enumObj
+        self.branch_type = _EnumItem(NEURON_STRUCT_TYPE, <int>self.ptr1().get_branch_type())
 
     def is_of_type(self, int mtype):
         return self.ptr1().is_of_type(<morpho.morpho_node_type> mtype)
@@ -121,10 +129,6 @@ cdef class NeuronNode3D(MorphoNode):
     @staticmethod
     cdef NeuronNode3D from_ref(const morpho.neuron_node_3d &ref):
         return NeuronNode3D.from_ptr(<morpho.neuron_node_3d*>&ref)
-
-    @staticmethod
-    cdef list vectorPtr2list(std.vector[morpho.neuron_node_3d*] vec):
-        return [NeuronNode3D.from_ptr(elem) for elem in vec]
 
 
 
@@ -204,14 +208,6 @@ cdef class NeuronBranch(NeuronNode3D):
         cdef morpho.neuron_branch *ptr = new morpho.neuron_branch(ref)
         return NeuronBranch.from_ptr(ptr, True)
 
-    @staticmethod
-    cdef list vectorPtr2list(std.vector[morpho.neuron_branch*] vec):
-        return [NeuronBranch.from_ptr(elem) for elem in vec]
-
-    # @staticmethod
-    # cdef list vector2list(std.vector[morpho.neuron_branch] vec):
-    #     return [NeuronBranch.from_value(elem) for elem in vec]
-
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -247,10 +243,6 @@ cdef class NeuronSoma(NeuronNode3D):
     @staticmethod
     cdef NeuronSoma from_ref(const morpho.neuron_soma &ref):
         return NeuronSoma.from_ptr(<morpho.neuron_soma*>&ref)
-
-    @staticmethod
-    cdef list vectorPtr2list(std.vector[morpho.neuron_soma*] vec):
-        return [NeuronSoma.from_ptr(elem) for elem in vec]
 
 
 
@@ -303,7 +295,7 @@ cdef class MorphoTree(_py__base):
         return MorphoNode.vectorPtr2list(self.ptr().get_all_nodes())
 
     def find_nodes(self, int mtype):
-        return MorphoNode.vectorPtr2list(self.ptr().find_nodes(<morpho.neuron_struct_type>mtype))
+        return self.ptr().find_nodes(<morpho.neuron_struct_type>mtype)
 
     @property
     def soma(self):
@@ -335,13 +327,7 @@ cdef class MorphoTree(_py__base):
     cdef list vectorPtr2list(std.vector[morpho.morpho_tree*] vec):
         return [MorphoTree.from_ptr(elem) for elem in vec]
 
-    # @staticmethod
-    # cdef list vector2list(std.vector[morpho.morpho_tree] vec):
-    #     return [MorphoTree.from_value(elem) for elem in vec]
-
-
     # Transform support
-    # -----------------
     def transform(self, list operations):
         cdef std.vector[std.shared_ptr[morpho.morpho_operation]] vec
         cdef _py_morpho_operation item
@@ -351,283 +337,23 @@ cdef class MorphoTree(_py__base):
         return self
 
 
-# ======================================================================================================================
-# Python bindings to namespace morpho::h5_v1
-# ======================================================================================================================
 
-# ----------------------------------------------------------------------------------------------------------------------
-cdef class MorphoReader(_py__base):
-    "Python wrapper class for morpho_reader (ns=morpho::h5_v1)"
-# ----------------------------------------------------------------------------------------------------------------------
-    cdef unique_ptr[morpho_h5_v1.morpho_reader] _autodealoc
-    cdef morpho_h5_v1.morpho_reader *ptr(self):
-        return <morpho_h5_v1.morpho_reader*> self._ptr
+# Add bindings for h5_v1 loader and exporter
+include "morpho_h5_v1.pxi"
 
-    def __init__(self, std.string filename):
-        self._ptr = new morpho_h5_v1.morpho_reader(filename)
-        self._autodealoc.reset(self.ptr())
+# Add bindings for transformations and spatial index
+include "morpho_transform_spatial.pxi"
 
-    @property
-    def points_raw(self, ):
-        return _Mat_Points.from_value(self.ptr().get_points_raw())
-
-    @property
-    def soma_points_raw(self, ):
-        return _Mat_Points.from_value(self.ptr().get_soma_points_raw())
-
-    @property
-    def struct_raw(self, ):
-        return _Mat_Index.from_value(self.ptr().get_struct_raw())
-
-    def get_branch_range_raw(self, int id_):
-        return self.ptr().get_branch_range_raw(id_)
-
-    @property
-    def filename(self, ):
-        return self.ptr().get_filename()
-
-    def create_morpho_tree(self, ):
-        #return MorphoTree.from_value(self.ptr().create_morpho_tree())
-        return MorphoTree.from_move(self.ptr().create_morpho_tree())
-
-    @staticmethod
-    cdef MorphoReader from_ptr(morpho_h5_v1.morpho_reader *ptr, bool owner=False):
-        cdef MorphoReader obj = MorphoReader.__new__(MorphoReader)
-        obj._ptr = ptr
-        if owner: obj._autodealoc.reset(obj.ptr())
-        return obj
-    
-    @staticmethod
-    cdef MorphoReader from_ref(const morpho_h5_v1.morpho_reader &ref):
-        return MorphoReader.from_ptr(<morpho_h5_v1.morpho_reader*>&ref)
-
-    @staticmethod
-    cdef MorphoReader from_value(const morpho_h5_v1.morpho_reader &ref):
-        cdef morpho_h5_v1.morpho_reader *ptr = new morpho_h5_v1.morpho_reader(ref)
-        return MorphoReader.from_ptr(ptr, True)
-
-    @staticmethod
-    cdef list vectorPtr2list(std.vector[morpho_h5_v1.morpho_reader*] vec):
-        return [MorphoReader.from_ptr(elem) for elem in vec]
-
-    # @staticmethod
-    # cdef list vector2list(std.vector[morpho_h5_v1.morpho_reader] vec):
-    #     return [MorphoReader.from_value(elem) for elem in vec]
-
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-cdef class MorphoWriter(_py__base):
-    "Python wrapper class for morpho_writer (ns=morpho::h5_v1)"
-# ----------------------------------------------------------------------------------------------------------------------
-    cdef unique_ptr[morpho_h5_v1.morpho_writer] _autodealoc
-    cdef morpho_h5_v1.morpho_writer *ptr(self):
-        return <morpho_h5_v1.morpho_writer*> self._ptr
-
-
-    def __init__(self, std.string filename):
-        self._ptr = new morpho_h5_v1.morpho_writer(filename)
-        self._autodealoc.reset(self.ptr())
-
-    def write(self, MorphoTree tree):
-        return self.ptr().write(deref(tree.ptr()))
-
-    @staticmethod
-    cdef MorphoWriter from_ptr(morpho_h5_v1.morpho_writer *ptr, bool owner=False):
-        cdef MorphoWriter obj = MorphoWriter.__new__(MorphoWriter)
-        obj._ptr = ptr
-        if owner: obj._autodealoc.reset(obj.ptr())
-        return obj
-    
-    @staticmethod
-    cdef MorphoWriter from_ref(const morpho_h5_v1.morpho_writer &ref):
-        return MorphoWriter.from_ptr(<morpho_h5_v1.morpho_writer*>&ref)
-
-    @staticmethod
-    cdef MorphoWriter from_value(const morpho_h5_v1.morpho_writer &ref):
-        cdef morpho_h5_v1.morpho_writer *ptr = new morpho_h5_v1.morpho_writer(ref)
-        return MorphoWriter.from_ptr(ptr, True)
-
-    @staticmethod
-    cdef list vectorPtr2list(std.vector[morpho_h5_v1.morpho_writer*] vec):
-        return [MorphoWriter.from_ptr(elem) for elem in vec]
-
-    # @staticmethod
-    # cdef list vector2list(std.vector[morpho_h5_v1.morpho_writer] vec):
-    #     return [MorphoWriter.from_value(elem) for elem in vec]
-
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-# Bindings for class morpho_operation
-# ----------------------------------------------------------------------------------------------------------------------
-cdef class _py_morpho_operation(_py__base):
-    cdef std.shared_ptr[morpho.morpho_operation] _sharedPtr
-    cdef morpho.morpho_operation *ptr0(self):
-        return <morpho.morpho_operation*> self._ptr
-
-    @property
-    def name(self):
-        return self.ptr0().name()
-
-    def apply(self, MorphoTree tree):
-        MorphoTree.from_value(self.ptr0().apply(deref(tree.ptr())))
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-cdef class _py_delete_duplicate_point_operation(_py_morpho_operation):
-    "Python wrapper class for delete_duplicate_point_operation (ns=morpho)"
-# ----------------------------------------------------------------------------------------------------------------------
-    cdef morpho.delete_duplicate_point_operation *ptr(self):
-        return <morpho.delete_duplicate_point_operation*> self._ptr
-
-    def __init__(self, ):
-        self._ptr = new morpho.delete_duplicate_point_operation()
-        self._sharedPtr.reset(self.ptr())
-
-    @staticmethod
-    cdef _py_delete_duplicate_point_operation from_ptr(morpho.delete_duplicate_point_operation *ptr, bool owner=False):
-        cdef _py_delete_duplicate_point_operation obj = _py_delete_duplicate_point_operation.__new__(_py_delete_duplicate_point_operation)
-        obj._ptr = ptr
-        if owner: obj._sharedPtr.reset(obj.ptr())
-        return obj
-
-    @staticmethod
-    cdef _py_delete_duplicate_point_operation from_ref(const morpho.delete_duplicate_point_operation &ref):
-        return _py_delete_duplicate_point_operation.from_ptr(<morpho.delete_duplicate_point_operation*> &ref)
-
-    @staticmethod
-    cdef _py_delete_duplicate_point_operation from_value(const morpho.delete_duplicate_point_operation &ref):
-        cdef morpho.delete_duplicate_point_operation *ptr = new morpho.delete_duplicate_point_operation(ref)
-        return _py_delete_duplicate_point_operation.from_ptr(ptr, True)
-
-    @staticmethod
-    cdef list vectorPtr2list(std.vector[morpho.delete_duplicate_point_operation*] vec):
-        return [_py_delete_duplicate_point_operation.from_ptr(elem) for elem in vec]
-
-    @staticmethod
-    cdef list vector2list(std.vector[morpho.delete_duplicate_point_operation] vec):
-        return [_py_delete_duplicate_point_operation.from_value(elem) for elem in vec]
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-cdef class _py_duplicate_first_point_operation(_py_morpho_operation):
-    "Python wrapper class for duplicate_first_point_operation (ns=morpho)"
-# ----------------------------------------------------------------------------------------------------------------------
-    cdef morpho.duplicate_first_point_operation *ptr(self):
-        return <morpho.duplicate_first_point_operation*> self._ptr
-
-    def __init__(self, ):
-        self._ptr = new morpho.duplicate_first_point_operation()
-        self._sharedPtr.reset(self.ptr())
-
-    @staticmethod
-    cdef _py_duplicate_first_point_operation from_ptr(morpho.duplicate_first_point_operation *ptr, bool owner=False):
-        cdef _py_duplicate_first_point_operation obj = _py_duplicate_first_point_operation.__new__(_py_duplicate_first_point_operation)
-        obj._ptr = ptr
-        if owner: obj._sharedPtr.reset(obj.ptr())
-        return obj
-
-    @staticmethod
-    cdef _py_duplicate_first_point_operation from_ref(const morpho.duplicate_first_point_operation &ref):
-        return _py_duplicate_first_point_operation.from_ptr(<morpho.duplicate_first_point_operation*>&ref)
-
-    @staticmethod
-    cdef _py_duplicate_first_point_operation from_value(const morpho.duplicate_first_point_operation &ref):
-        cdef morpho.duplicate_first_point_operation *ptr = new morpho.duplicate_first_point_operation(ref)
-        return _py_duplicate_first_point_operation.from_ptr(ptr, True)
-
-    @staticmethod
-    cdef list vectorPtr2list(std.vector[morpho.duplicate_first_point_operation*] vec):
-        return [_py_duplicate_first_point_operation.from_ptr(elem) for elem in vec]
-
-    @staticmethod
-    cdef list vector2list(std.vector[morpho.duplicate_first_point_operation] vec):
-        return [_py_duplicate_first_point_operation.from_value(elem) for elem in vec]
-
-
-
-# ----------------------------------------------------------------------------------------------------------------------
-cdef class SpatialIndex(_py__base):
-    "Python wrapper class for spatial_index (ns=morpho)"
-# ----------------------------------------------------------------------------------------------------------------------
-    cdef unique_ptr[morpho.spatial_index] _autodealoc
-    cdef morpho.spatial_index *ptr(self):
-        return <morpho.spatial_index*> self._ptr
-
-    def __init__(self, ):
-        self._ptr = new morpho.spatial_index()
-        self._autodealoc.reset(self.ptr())
-
-    def add_morpho_tree(self, MorphoTree tree):
-        return self.ptr().add_morpho_tree(tree._sharedPtr)
-
-    def is_within(self, _Point p):
-        return self.ptr().is_within(deref(p.ptr()))
-
-    @staticmethod
-    cdef SpatialIndex from_ptr(morpho.spatial_index *ptr, bool owner=False):
-        cdef SpatialIndex obj = SpatialIndex.__new__(SpatialIndex)
-        obj._ptr = ptr
-        if owner: obj._autodealoc.reset(obj.ptr())
-        return obj
-
-    @staticmethod
-    cdef SpatialIndex from_ref(const morpho.spatial_index &ref):
-        return SpatialIndex.from_ptr(<morpho.spatial_index*>&ref)
-
-    # @staticmethod
-    # cdef SpatialIndex from_value(const morpho.spatial_index &ref):
-    #     cdef morpho.spatial_index *ptr = new morpho.spatial_index(ref)
-    #     return SpatialIndex.from_ptr(ptr, True)
-
-    @staticmethod
-    cdef list vectorPtr2list(std.vector[morpho.spatial_index*] vec):
-        return [SpatialIndex.from_ptr(elem) for elem in vec]
-
-    # @staticmethod
-    # cdef list vector2list(std.vector[morpho.spatial_index] vec):
-    #     return [SpatialIndex.from_value(elem) for elem in vec]
-
-
-
-
-## Optional bindings for morpho_mesher, overridable by cython exec
+# Optional bindings for morpho_mesher, overridable by cython exec
 # ----------------------------------------------------------------------------------------------------------------------
 DEF ENABLE_MESHER_GCAL = 0
 IF ENABLE_MESHER_GCAL:
     include "morpho_mesher.pxi"
 
 
-# ************************
+# ************************************
 # Class-Namespace alias
-# ************************
-
-cdef class Stats:
-    @staticmethod
-    def total_number_branches(MorphoTree tree):
-        return stats.total_number_branches(deref(tree.ptr()))
-
-    @staticmethod
-    def total_number_point(MorphoTree tree):
-        return stats.total_number_point(deref(tree.ptr()))
-
-    @staticmethod
-    def min_radius_segment(MorphoTree tree):
-        return stats.min_radius_segment(deref(tree.ptr()))
-
-    @staticmethod
-    def max_radius_segment(MorphoTree tree):
-        return stats.max_radius_segment(deref(tree.ptr()))
-
-    @staticmethod
-    def median_radius_segment(MorphoTree tree):
-        return stats.median_radius_segment(deref(tree.ptr()))
-
-    @staticmethod
-    def has_duplicated_points(MorphoTree tree):
-        return stats.has_duplicated_points(deref(tree.ptr()))
-
+# ************************************
 
 cdef class Types:
     Point = _Point
@@ -640,7 +366,6 @@ cdef class Types:
     PointVector = _PointVector
     MatPoints = _Mat_Points
     MatIndex = _Mat_Index
-
 
 
 class Transforms:

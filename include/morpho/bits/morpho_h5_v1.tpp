@@ -223,7 +223,6 @@ morpho_tree morpho_reader::create_morpho_tree() const{
         }else {
             soma.reset(new neuron_soma(std::move(soma_points)));
         }
-        soma->index = 0;
 
         res.add_node(-1, std::static_pointer_cast<morpho_node>(soma));
     }
@@ -262,7 +261,6 @@ morpho_tree morpho_reader::create_morpho_tree() const{
                                                  std::move(branch_points),
                                                  std::move(branch_radius))
                                             );
-            b->index = i;
             res.add_node(prev_id, b);
 
         }
