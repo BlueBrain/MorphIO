@@ -93,6 +93,31 @@ BOOST_AUTO_TEST_CASE(afferent_synapses)
     BOOST_CHECK_THROW(synapses[3].getGID(), std::runtime_error);
 }
 
+BOOST_AUTO_TEST_CASE(bad_external_afferent_synapses)
+{
+    const brain::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
+    const brain::Synapses& bad =
+        circuit.getExternalAfferentSynapses({1}, "Unexistent");
+    BOOST_CHECK_THROW(bad.size(), std::runtime_error);
+}
+
+BOOST_AUTO_TEST_CASE(external_afferent_synapses)
+{
+    const brain::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
+
+    const std::string label("Thalamocortical_fake_input");
+    const brain::Synapses& synapses =
+        circuit.getExternalAfferentSynapses(circuit.getGIDs("Layer1"), label,
+                                            brain::SynapsePrefetch::all);
+    BOOST_CHECK_EQUAL(synapses.size(), 1172);
+    BOOST_CHECK_EQUAL(synapses[0].getPresynapticGID(), 10);
+    BOOST_CHECK_CLOSE(synapses[1].getPostsynapticDistance(), 1.34995711f,
+                      0.00001f);
+    BOOST_CHECK_CLOSE(synapses[2].getConductance(), 0.34758395f, 0.00001f);
+    // Positions never available for these datasets
+    BOOST_CHECK_THROW(synapses.preSurfaceXPositions(), std::runtime_error);
+}
+
 BOOST_AUTO_TEST_CASE(efferent_synapses)
 {
     const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
@@ -139,6 +164,25 @@ BOOST_AUTO_TEST_CASE(lazy_loading_afferent)
                       synapsesLazy[0].getConductance());
     BOOST_CHECK_EQUAL(synapses[0].getPostsynapticCenterPosition(),
                       synapsesLazy[0].getPostsynapticCenterPosition());
+}
+
+BOOST_AUTO_TEST_CASE(lazy_loading_external_afferent_synapses)
+{
+    const brain::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
+
+    const std::string label("Thalamocortical_fake_input");
+    const brain::Synapses& synapses =
+        circuit.getExternalAfferentSynapses(circuit.getGIDs("Layer1"), label,
+                                            brain::SynapsePrefetch::all);
+    const brain::Synapses& synapsesLazy =
+        circuit.getExternalAfferentSynapses(circuit.getGIDs("Layer1"), label);
+    BOOST_CHECK_EQUAL(synapses.size(), synapsesLazy.size());
+    for (auto s1 = synapses.begin(), s2 = synapsesLazy.begin();
+         s1 != synapses.end(); ++s1, ++s2)
+    {
+        BOOST_CHECK_EQUAL((*s1).getPresynapticGID(), (*s2).getPresynapticGID());
+        BOOST_CHECK_EQUAL((*s1).getConductance(), (*s2).getConductance());
+    }
 }
 
 BOOST_AUTO_TEST_CASE(lazy_loading_efferent)

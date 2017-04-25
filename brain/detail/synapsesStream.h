@@ -51,10 +51,23 @@ struct SynapsesStream
     {
     }
 
+    SynapsesStream(const Circuit& circuit, const GIDSet& gids,
+                   const std::string& source, const SynapsePrefetch prefetch)
+        : _circuit(circuit)
+        , _afferent(true)
+        , _gids(gids)
+        , _externalSource(source)
+        , _prefetch(prefetch)
+        , _it(_gids.begin())
+    {
+    }
+
     const Circuit& _circuit;
     const bool _afferent;
     const GIDSet _gids;
     const GIDSet _filterGIDs;
+    // Source name for external afferent projections
+    const std::string _externalSource;
     const SynapsePrefetch _prefetch;
     GIDSet::const_iterator _it;
 
@@ -69,9 +82,17 @@ struct SynapsesStream
         GIDSet::const_iterator start = _it;
         std::advance(_it, count);
         GIDSet::const_iterator end = _it;
+
+        if (_externalSource.empty())
+        {
+            return std::async(std::launch::async, [&, start, end] {
+                return Synapses(_circuit, GIDSet(start, end), _filterGIDs,
+                                _afferent, _prefetch);
+            });
+        }
         return std::async(std::launch::async, [&, start, end] {
-            return Synapses(_circuit, GIDSet(start, end), _filterGIDs,
-                            _afferent, _prefetch);
+            return Synapses(_circuit, GIDSet(start, end), _externalSource,
+                            _prefetch);
         });
     }
 };

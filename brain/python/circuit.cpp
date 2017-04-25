@@ -171,6 +171,15 @@ SynapsesWrapper Circuit_getAfferentSynapses(
                            circuit);
 }
 
+SynapsesWrapper Circuit_getExternalAfferentSynapses(
+    const CircuitPtr& circuit, bp::object gids, const std::string& source,
+    const brain::SynapsePrefetch prefetch)
+{
+    return SynapsesWrapper(circuit->getExternalAfferentSynapses(
+                               gidsFromPython(gids), source, prefetch),
+                           circuit);
+}
+
 SynapsesWrapper Circuit_getEfferentSynapses(
     const CircuitPtr& circuit, bp::object gids,
     const brain::SynapsePrefetch prefetch)
@@ -249,6 +258,10 @@ circuitWrapper
          (selfarg, bp::arg("gids"),
           bp::arg("prefetch") = SynapsePrefetch::none),
          DOXY_FN(brain::Circuit::getAfferentSynapses))
+    .def("external_afferent_synapses", Circuit_getExternalAfferentSynapses,
+         (selfarg, bp::arg("gids"), bp::arg("source"),
+          bp::arg("prefetch") = SynapsePrefetch::none),
+         DOXY_FN(brain::Circuit::getExternalAfferentSynapses))
     .def("efferent_synapses", Circuit_getEfferentSynapses,
          (selfarg, bp::arg("gids"),
           bp::arg("prefetch") = SynapsePrefetch::none),

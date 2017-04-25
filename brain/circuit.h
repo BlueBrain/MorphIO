@@ -157,6 +157,27 @@ public:
         SynapsePrefetch prefetch = SynapsePrefetch::none) const;
 
     /**
+     * Access all afferent synapses projected from another circuit into the
+     * given GIDs.
+     *
+     * @param gids the gids of the post-synaptic cells
+     * @param source the name of the projecting circuit. This corresponds
+     *        to the label of a Projection section in the CircuitConfig.
+     *        If the source doesn't exist an exception will be thrown by the
+     *        first operation that tries to access the data.
+     * \if pybind
+     * @param prefetch which synapse data to preload
+     * \else
+     * @param prefetch which synapse data to load on SynapsesStream.read()
+     * @return synapse data stream. The pre-synaptic GIDs in the synapses refer
+     *         to cells in the projecting circuit.
+     * \endif
+     */
+    BRAIN_API SynapsesStream getExternalAfferentSynapses(
+        const GIDSet& gids, const std::string& source,
+        SynapsePrefetch prefetch = SynapsePrefetch::none) const;
+
+    /**
      * Access all efferent synapses of the given GIDs.
      *
      * @param gids the gids to load efferent synapses for

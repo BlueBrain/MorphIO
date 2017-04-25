@@ -3,6 +3,10 @@ Changelog {#Changelog}
 
 # git master
 
+* [150](https://github.com/BlueBrain/Brion/pull/150):
+  - Added a new method in brain::Circuit to obtain synapses for afferent
+    projections from outside the circuit (e.g. thalamocortical projections).
+  - Support for Projections sections in brion::BlueConfig
 * [141](https://github.com/BlueBrain/Brion/pull/141):
   Fixed documentation to specify that morphology section samples report
   diameters and not radii.

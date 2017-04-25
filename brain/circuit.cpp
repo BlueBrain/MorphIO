@@ -207,6 +207,13 @@ SynapsesStream Circuit::getAfferentSynapses(
     return SynapsesStream(*this, gids, true, prefetch);
 }
 
+SynapsesStream Circuit::getExternalAfferentSynapses(
+    const GIDSet& gids, const std::string& source,
+    const SynapsePrefetch prefetch) const
+{
+    return SynapsesStream(*this, gids, source, prefetch);
+}
+
 SynapsesStream Circuit::getEfferentSynapses(
     const GIDSet& gids, const SynapsePrefetch prefetch) const
 {

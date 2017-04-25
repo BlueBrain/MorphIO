@@ -124,7 +124,7 @@ public:
 
     /**
       * @return the full path to the morphology database. A suffix may be
-      *         prepended to the to the bare path from the BlueConfig.
+      *         prepended to the bare path from the BlueConfig.
       * @version 1.7
       */
     BRION_API URI getMorphologySource() const;

@@ -80,6 +80,22 @@ struct Synapses::Impl : public Synapses::BaseImpl
             _loadPositions(gids, filterGIDs);
     }
 
+    Impl(const Circuit& circuit, const GIDSet& gids, const std::string& source,
+         const SynapsePrefetch prefetch)
+        : _circuit(circuit)
+        , _gids(prefetch != SynapsePrefetch::all ? gids : GIDSet())
+        , _afferent(true)
+        , _externalSource(source)
+        , _size(0)
+    {
+        if (prefetch == SynapsePrefetch::none)
+            // We don't have a summary file for projected afferent synapses.
+            return;
+
+        if (int(prefetch) & int(SynapsePrefetch::attributes))
+            _loadAttributes(gids, GIDSet());
+    }
+
 #define FILTER(gid)                                                      \
     if (!filterGIDs.empty() && filterGIDs.find(gid) == filterGIDs.end()) \
         continue;
@@ -123,14 +139,19 @@ struct Synapses::Impl : public Synapses::BaseImpl
             return;
 
         const brion::Synapse& synapseAttributes =
-            _circuit._impl->getSynapseAttributes(_afferent);
-        const brion::Synapse* synapseExtra = _circuit._impl->getSynapseExtra();
+            _externalSource.empty()
+                ? _circuit._impl->getSynapseAttributes(_afferent)
+                : _circuit._impl->getAfferentProjectionAttributes(
+                      _externalSource);
+        const brion::Synapse* synapseExtra =
+            _externalSource.empty() ? _circuit._impl->getSynapseExtra() : 0;
 
         const bool haveExtra = _afferent && synapseExtra;
         const bool haveSize = _size > 0;
         _allocateAttributes(haveSize ? _size
                                      : synapseAttributes.getNumSynapses(gids),
                             haveExtra);
+        const bool haveGIDs = _externalSource.empty() && haveSize;
 
         size_t i = 0;
         for (const auto gid : gids)
@@ -144,7 +165,7 @@ struct Synapses::Impl : public Synapses::BaseImpl
                 const uint32_t preGid = attr[j][0];
                 FILTER(preGid);
 
-                if (!haveSize)
+                if (!haveGIDs)
                 {
                     _preGID.get()[i] = preGid;
                     _postGID.get()[i] = gid;
@@ -180,6 +201,13 @@ struct Synapses::Impl : public Synapses::BaseImpl
 
     void _loadPositions(const GIDSet& gids, const GIDSet& filterGIDs) const
     {
+        if (!_externalSource.empty())
+        {
+            LBTHROW(
+                std::runtime_error("Synapse positions are not available "
+                                   "for external projection synapses"));
+        }
+
         if (_preCenterPositionX)
             return;
 
@@ -353,6 +381,17 @@ struct Synapses::Impl : public Synapses::BaseImpl
         _allocate(_postCenterPositionZ, size);
     }
 
+    void _ensureGIDs() const
+    {
+        if (_externalSource.empty() || _hasAttributes())
+            return;
+
+        lunchbox::ScopedWrite mutex(_lock);
+        // For external projections we don't have a summary file, so we load
+        // all the attributes instead.
+        _loadAttributes(_gids, _filterGIDs);
+    }
+
     void _ensureAttributes() const
     {
         if (_hasAttributes())
@@ -383,10 +422,25 @@ struct Synapses::Impl : public Synapses::BaseImpl
         return _preCenterPositionX.get() != nullptr;
     }
 
+    size_t _getSize() const
+    {
+        lunchbox::ScopedRead mutex(_lock);
+
+        if (!_externalSource.empty() && _size == 0)
+        {
+            const brion::Synapse& attributes =
+                _circuit._impl->getAfferentProjectionAttributes(
+                    _externalSource);
+            _size = attributes.getNumSynapses(_gids);
+        }
+        return _size;
+    }
+
     const Circuit& _circuit;
     const GIDSet _gids;
     const GIDSet _filterGIDs;
     const bool _afferent;
+    std::string _externalSource;
 
     template <typename T>
     struct FreeDeleter
@@ -436,10 +490,16 @@ struct Synapses::Impl : public Synapses::BaseImpl
     mutable std::mutex _lock;
 };
 
-Synapses::Synapses(const Circuit& circuit, const GIDSet& pre,
-                   const GIDSet& post, const bool afferent,
+Synapses::Synapses(const Circuit& circuit, const GIDSet& gids,
+                   const GIDSet& filterGIDs, const bool afferent,
                    const SynapsePrefetch prefetch)
-    : _impl(new Impl(circuit, pre, post, afferent, prefetch))
+    : _impl(new Impl(circuit, gids, filterGIDs, afferent, prefetch))
+{
+}
+
+Synapses::Synapses(const Circuit& circuit, const GIDSet& gids,
+                   const std::string& source, const SynapsePrefetch prefetch)
+    : _impl(new Impl(circuit, gids, source, prefetch))
 {
 }
 
@@ -448,9 +508,13 @@ Synapses::~Synapses()
 }
 
 Synapses::Synapses(const SynapsesStream& stream)
-    : _impl(new Impl(stream._impl->_circuit, stream._impl->_gids,
-                     stream._impl->_filterGIDs, stream._impl->_afferent,
-                     stream._impl->_prefetch))
+    : _impl(stream._impl->_externalSource.empty()
+                ? new Impl(stream._impl->_circuit, stream._impl->_gids,
+                           stream._impl->_filterGIDs, stream._impl->_afferent,
+                           stream._impl->_prefetch)
+                : new Impl(stream._impl->_circuit, stream._impl->_gids,
+                           stream._impl->_externalSource,
+                           stream._impl->_prefetch))
 {
 }
 
@@ -481,8 +545,7 @@ Synapses& Synapses::operator=(Synapses&& rhs)
 size_t Synapses::size() const
 {
     const Impl& impl = static_cast<const Impl&>(*_impl);
-    lunchbox::ScopedRead mutex(impl._lock);
-    return impl._size;
+    return impl._getSize();
 }
 
 bool Synapses::empty() const
@@ -517,6 +580,7 @@ const size_t* Synapses::indices() const
 const uint32_t* Synapses::preGIDs() const
 {
     const Impl& impl = static_cast<const Impl&>(*_impl);
+    impl._ensureGIDs();
     return impl._preGID.get();
 }
 
@@ -586,6 +650,7 @@ const float* Synapses::preCenterZPositions() const
 const uint32_t* Synapses::postGIDs() const
 {
     const Impl& impl = static_cast<const Impl&>(*_impl);
+    impl._ensureGIDs();
     return impl._postGID.get();
 }
 

@@ -74,6 +74,9 @@ private:
                    SynapsePrefetch prefetch);
     SynapsesStream(const Circuit& circuit, const GIDSet& preGIDs,
                    const GIDSet& postGIDs, SynapsePrefetch prefetch);
+    // Constructor for afferent external projections
+    SynapsesStream(const Circuit& circuit, const GIDSet& gids,
+                   const std::string& source, SynapsePrefetch prefetch);
 
     friend class Synapses;
     std::unique_ptr<detail::SynapsesStream> _impl;

@@ -226,6 +226,8 @@ private:
     friend struct detail::SynapsesStream;
     Synapses(const Circuit& circuit, const GIDSet& gids,
              const GIDSet& filterGIDs, bool afferent, SynapsePrefetch prefetch);
+    Synapses(const Circuit& circuit, const GIDSet& gids,
+             const std::string& source, SynapsePrefetch prefetch);
 };
 }
 

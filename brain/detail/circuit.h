@@ -53,6 +53,7 @@ namespace brain
 {
 const std::string summaryFilename("/nrn_summary.h5");
 const std::string afferentFilename("/nrn.h5");
+const std::string externalAfferentFilename("/proj_nrn.h5");
 const std::string efferentFilename("/nrn_efferent.h5");
 const std::string afferentPositionsFilename("/nrn_positions.h5");
 const std::string efferentPositionsFilename("/nrn_positions_efferent.h5");
@@ -156,6 +157,12 @@ public:
         , _cache(keyv::Map::createCache())
         , _synapsePositionColumns(0)
     {
+        for (auto&& projection :
+             config.getSectionNames(brion::CONFIGSECTION_PROJECTION))
+        {
+            _afferentProjectionSources[projection] =
+                config.getProjectionSource(projection);
+        }
     }
 
     virtual ~Impl() {}
@@ -241,6 +248,32 @@ public:
                 _synapseSource.getPath() +
                 (afferent ? afferentFilename : efferentFilename)));
         return **_synapseAttributes[i];
+    }
+
+    const brion::Synapse& getAfferentProjectionAttributes(
+        const std::string& name) const
+    {
+        auto& lockable = _externalAfferents[name];
+        lunchbox::ScopedWrite mutex(lockable);
+        auto& synapses = *lockable;
+        if (!synapses)
+        {
+            auto&& source = _afferentProjectionSources.find(name);
+            if (source == _afferentProjectionSources.end())
+            {
+                _externalAfferents.erase(name);
+                LBTHROW(std::runtime_error(
+                    "Afferent synaptic projection not found: " + name));
+            }
+            fs::path path(source->second.getPath() + externalAfferentFilename);
+            if (fs::is_regular_file(path) || fs::is_symlink(path))
+                synapses.reset(new brion::Synapse(path.string()));
+            else
+                // Trying with the afferent synapses filename as a fallback
+                synapses.reset(new brion::Synapse(source->second.getPath() +
+                                                  afferentFilename));
+        }
+        return *synapses;
     }
 
     const brion::Synapse* getSynapseExtra() const
@@ -401,6 +434,7 @@ public:
     const brion::URI _circuitSource;
     const brion::URI _morphologySource;
     const brion::URI _synapseSource;
+    std::unordered_map<std::string, brion::URI> _afferentProjectionSources;
     const brion::URIs _targetSources;
     mutable brion::Targets _targetParsers;
     mutable keyv::MapPtr _cache;
@@ -413,6 +447,9 @@ public:
     mutable LockPtr<brion::Synapse> _synapseExtra;
     mutable LockPtr<brion::Synapse> _synapsePositions[2];
     mutable size_t _synapsePositionColumns;
+
+    mutable std::unordered_map<std::string, LockPtr<brion::Synapse>>
+        _externalAfferents;
 };
 
 class MVD2 : public Circuit::Impl

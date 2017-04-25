@@ -39,6 +39,13 @@ SynapsesStream::SynapsesStream(const Circuit& circuit, const GIDSet& preGIDs,
 {
 }
 
+SynapsesStream::SynapsesStream(const Circuit& circuit, const GIDSet& gids,
+                               const std::string& source,
+                               const SynapsePrefetch prefetch)
+    : _impl(new detail::SynapsesStream(circuit, gids, source, prefetch))
+{
+}
+
 SynapsesStream::~SynapsesStream()
 {
 }
