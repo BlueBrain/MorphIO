@@ -1,5 +1,6 @@
 from libcpp.memory cimport unique_ptr
 from libcpp.vector cimport vector
+from libc.stdio cimport sprintf
 import numpy as np
 cimport numpy as np
 
@@ -9,6 +10,7 @@ np.import_array()
 # cython hack for having integer template
 cdef extern from *:
     ctypedef int zero_t "0"
+    ctypedef int one_t "1"
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class _Point(_py__base):
@@ -35,8 +37,14 @@ cdef class _Point(_py__base):
         cdef double *_data = <double*>self.ptr().data()
         return (_data[0], _data[1], _data[2])
 
+    def __str__(self):
+        cdef double * _data = < double * > self.ptr().data()
+        cdef char outstr[30]
+        sprintf(outstr, "(%.3lf, %.3lf, %.3lf)", _data[0], _data[1], _data[2])
+        return outstr
+
     def __repr__(self):
-        return "<_Point" + repr(self.as_tuple()) + ">"
+        return "<_Point" + str(self) + ">"
 
     @staticmethod
     cdef _Point from_ptr(morpho.point* ptr, bool owner=False):
@@ -57,6 +65,9 @@ cdef class _Box(_py__base):
     cdef unique_ptr[morpho.box] _autodealoc
     cdef morpho.box* ptr(self):
         return < morpho.box * > self._ptr
+
+    def __repr__(self):
+        return "<_Box [%s - %s]>" % (str(self.min_corner), str(self.max_corner))
 
     @property
     def min_corner(self):
@@ -80,7 +91,7 @@ cdef class _Box(_py__base):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class _Linestring(_ArrayT):
+cdef class _Linestring(_py__base):
     cdef unique_ptr[morpho.linestring] _autodealoc
     cdef morpho.linestring * ptr(self):
         return < morpho.linestring *> self._ptr
@@ -89,11 +100,12 @@ cdef class _Linestring(_ArrayT):
     cdef _Linestring from_ptr(morpho.linestring *ptr, bool owner=False):
         cdef _Linestring obj = _Linestring.__new__(_Linestring)
         obj._ptr = ptr
-        #Create np array
-        cdef np.npy_intp size[2]
-        size[0] = ptr.size()
-        size[1] = 3
-        obj.nparray = np.PyArray_SimpleNewFromData(2, size, np.NPY_DOUBLE, ptr.data())
+        # _ArrayT was giving problems with the numpy array
+        # #Create np array
+        # cdef np.npy_intp size[2]
+        # size[0] = ptr.size()
+        # size[1] = 3
+        # obj.nparray = np.PyArray_SimpleNewFromData(2, size, np.NPY_DOUBLE, ptr.data())
         if owner: obj._autodealoc.reset(ptr)
         return obj
 
@@ -109,11 +121,12 @@ cdef class _Circle(_py__base):
     cdef morpho.circle * ptr(self):
         return < morpho.circle *> self._ptr
 
+    def __repr__(self):
+        return "<_Circle: pos %s, radius %.3f>" % (str(self.center), self.radius)
+
     @property
     def center(self):
-        cdef morpho.point p = self.ptr().get_center()
-        cdef const double* pts = p.data()
-        return [pts[0], pts[1], pts[2]]
+        return _Point.from_value(self.ptr().get_center())
 
     @property
     def radius(self):
@@ -143,14 +156,20 @@ cdef class _Cone(_py__base):
         return <morpho.cone *> self._ptr
 
     @property
-    def center(self):
-        cdef morpho.point p = self.ptr().get_center[zero_t]()
-        cdef const double* pts = p.data()
-        return [pts[0], pts[1], pts[2]]
+    def center0(self):
+        return _Point.from_value(self.ptr().get_center[zero_t]())
 
     @property
-    def radius(self):
+    def radius0(self):
         return self.ptr().get_radius[zero_t]()
+
+    @property
+    def center1(self):
+        return _Point.from_value(self.ptr().get_center[one_t]())
+
+    @property
+    def radius1(self):
+        return self.ptr().get_radius[one_t]()
 
     @staticmethod
     cdef _Cone from_ptr(morpho.cone *ptr, bool owner=False):
@@ -171,11 +190,12 @@ cdef class _Sphere(_py__base):
     cdef morpho.sphere * ptr(self):
         return < morpho.sphere *> self._ptr
 
+    def __repr__(self):
+        return "<_Sphere: center %s, radius %.3f" % (self.center, self.radius)
+
     @property
     def center(self):
-        cdef morpho.point p = self.ptr().get_center()
-        cdef const double* pts = p.data()
-        return [pts[0], pts[1], pts[2]]
+        return _Point.from_value(self.ptr().get_center())
 
     @property
     def radius(self):

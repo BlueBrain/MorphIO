@@ -10,7 +10,6 @@ from cython.operator cimport dereference as deref
 from libcpp cimport bool
 from libc.string cimport memcpy
 
-
 # -------------------------------------------------------------
 # BASE Class
 # -------------------------------------------------------------

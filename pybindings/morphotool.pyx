@@ -169,6 +169,7 @@ cdef class NeuronBranch(NeuronNode3D):
 
     @property
     def points(self):
+        # Check if cache is filled
         p_vec = self._points_vec or self.pointsVector
         return p_vec.nparray
 
