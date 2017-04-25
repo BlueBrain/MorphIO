@@ -64,15 +64,14 @@ cdef class MorphoNode(_py__base):
         # Downcast nodes to specific types
         # this is the only function that introduces some program logic.
         # The same could be done with dynamic_cast, but would be less obvious and more verbose
-        cdef MorphoNode obj = None
+        cdef MorphoNode obj
         if ptr.is_of_type(morpho_morpho_node_type.neuron_branch_type):
             obj = NeuronBranch.from_ptr(<const morpho.neuron_branch *>ptr, owner)
-        if ptr.is_of_type(morpho_morpho_node_type.neuron_soma_type):
+        elif ptr.is_of_type(morpho_morpho_node_type.neuron_soma_type):
             obj = NeuronSoma.from_ptr(<const morpho.neuron_soma*>ptr, owner)
-        if ptr.is_of_type(morpho_morpho_node_type.neuron_node_3d_type):
+        elif ptr.is_of_type(morpho_morpho_node_type.neuron_node_3d_type):
             obj = NeuronNode3D.from_ptr(<const morpho.neuron_node_3d*>ptr, owner)
-
-        if obj is None:
+        else:
             # default return just "MorphoNode"
             obj = MorphoNode.__new__(MorphoNode)
             obj._ptr = <morpho.morpho_node*>ptr
@@ -84,6 +83,10 @@ cdef class MorphoNode(_py__base):
     @staticmethod
     cdef MorphoNode from_ref(const morpho.morpho_node &ref):
         return MorphoNode.from_ptr_index(<morpho.morpho_node*>&ref, -1)
+
+    @staticmethod
+    cdef MorphoNode from_ref_id(const morpho.morpho_node &ref, int id):
+        return MorphoNode.from_ptr_index(<morpho.morpho_node*>&ref, id)
 
     @staticmethod
     cdef list vectorPtrSel2list(std.vector[const morpho.morpho_node*] vec, std.vector[unsigned int] selection):
@@ -110,9 +113,6 @@ cdef class NeuronNode3D(MorphoNode):
     cdef morpho.neuron_node_3d *ptr1(self):
         return <morpho.neuron_node_3d*> self._ptr
 
-    def __cinit__(self):
-        self.branch_type = _EnumItem(NEURON_STRUCT_TYPE, <int>self.ptr1().get_branch_type())
-
     def is_of_type(self, int mtype):
         return self.ptr1().is_of_type(<morpho.morpho_node_type> mtype)
 
@@ -123,6 +123,7 @@ cdef class NeuronNode3D(MorphoNode):
     cdef NeuronNode3D from_ptr(const morpho.neuron_node_3d *ptr, bool owner=False):
         cdef NeuronNode3D obj = NeuronNode3D.__new__(NeuronNode3D)
         obj._ptr = <morpho.neuron_node_3d *>ptr
+        obj.branch_type = _EnumItem(NEURON_STRUCT_TYPE, <int>obj.ptr1().get_branch_type())
         if owner: obj._autodealoc.reset(obj.ptr1())
         return obj
     
@@ -282,7 +283,7 @@ cdef class MorphoTree(_py__base):
         return self.ptr().copy_node(deref(other.ptr()), id_, new_parent_id)
 
     def get_node(self, int id_):
-        return MorphoNode.from_ref(self.ptr().get_node(id_))
+        return MorphoNode.from_ref_id(self.ptr().get_node(id_), id_)
 
     def get_parent(self, int id_):
         return self.ptr().get_parent(id_)
