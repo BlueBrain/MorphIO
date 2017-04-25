@@ -74,7 +74,7 @@ cdef class MorphoNode(_py__base):
         else:
             # default return just "MorphoNode"
             obj = MorphoNode.__new__(MorphoNode)
-            obj._ptr = <morpho.morpho_node*>ptr
+            obj._ptr = <void*>ptr
             if owner: obj._autodealoc.reset(obj.ptr0())
 
         obj.index = index
@@ -119,13 +119,20 @@ cdef class NeuronNode3D(MorphoNode):
     def __repr__(self):
         return "<MorphoNode::%s nr.%d>" % (self.branch_type.name, self.index)
 
+    cdef _init(self):
+        self.branch_type = _EnumItem(NEURON_STRUCT_TYPE, <int>self.ptr1().get_branch_type())
+
     @staticmethod
-    cdef NeuronNode3D from_ptr(const morpho.neuron_node_3d *ptr, bool owner=False):
-        cdef NeuronNode3D obj = NeuronNode3D.__new__(NeuronNode3D)
-        obj._ptr = <morpho.neuron_node_3d *>ptr
-        obj.branch_type = _EnumItem(NEURON_STRUCT_TYPE, <int>obj.ptr1().get_branch_type())
+    cdef NeuronNode3D from_ptr0(type cls, const morpho.neuron_node_3d *ptr, bool owner=False):
+        cdef NeuronNode3D obj = cls.__new__(cls)
+        obj._ptr = <void*>ptr
+        obj._init()
         if owner: obj._autodealoc.reset(obj.ptr1())
         return obj
+
+    @staticmethod
+    cdef NeuronNode3D from_ptr(const morpho.neuron_node_3d *ptr, bool owner=False):
+        return NeuronNode3D.from_ptr0(NeuronNode3D, ptr, owner)
     
     @staticmethod
     cdef NeuronNode3D from_ref(const morpho.neuron_node_3d &ref):
@@ -195,11 +202,8 @@ cdef class NeuronBranch(NeuronNode3D):
 
     @staticmethod
     cdef NeuronBranch from_ptr(const morpho.neuron_branch *ptr, bool owner=False):
-        cdef NeuronBranch obj = NeuronBranch.__new__(NeuronBranch)
-        obj._ptr = <morpho.neuron_branch *>ptr
-        if owner: obj._autodealoc.reset(obj.ptr2())
-        return obj
-    
+        return <NeuronBranch>NeuronNode3D.from_ptr0(NeuronBranch, ptr, owner)
+
     @staticmethod
     cdef NeuronBranch from_ref(const morpho.neuron_branch &ref):
         return NeuronBranch.from_ptr(<morpho.neuron_branch*>&ref)
@@ -235,12 +239,8 @@ cdef class NeuronSoma(NeuronNode3D):
 
     @staticmethod
     cdef NeuronSoma from_ptr(const morpho.neuron_soma *ptr, bool owner=False):
-        if not ptr: return None
-        cdef NeuronSoma obj = NeuronSoma.__new__(NeuronSoma)
-        obj._ptr = <morpho.neuron_soma *>ptr
-        if owner: obj._autodealoc.reset(obj.ptr2())
-        return obj
-    
+        return <NeuronSoma>NeuronSoma.from_ptr0(NeuronSoma, ptr, owner)
+
     @staticmethod
     cdef NeuronSoma from_ref(const morpho.neuron_soma &ref):
         return NeuronSoma.from_ptr(<morpho.neuron_soma*>&ref)
