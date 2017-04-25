@@ -25,7 +25,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(test_invalid_open)
+BOOST_AUTO_TEST_CASE(invalid_open)
 {
     BOOST_CHECK_THROW(brion::BlueConfig("/bla"), std::runtime_error);
     BOOST_CHECK_THROW(brion::BlueConfig("bla"), std::runtime_error);
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(test_invalid_open)
     BOOST_CHECK_THROW(brion::BlueConfig(path.string()), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(test_verify_loaded_data)
+BOOST_AUTO_TEST_CASE(verify_raw_data)
 {
     brion::BlueConfig config(bbp::test::getBlueconfig());
     std::cout << config << std::endl;
@@ -147,6 +147,30 @@ BOOST_AUTO_TEST_CASE(test_verify_loaded_data)
     BOOST_CHECK_EQUAL(config.get<float>(brion::CONFIGSECTION_REPORT, "voltage",
                                         "EndTime"),
                       99.f);
+}
+
+BOOST_AUTO_TEST_CASE(projection_section)
+{
+    brion::BlueConfig config(bbp::test::getCircuitconfig());
+    std::cout << config << std::endl;
+
+    const std::string prefix(BBP_TESTDATA);
+    const brion::Strings& projections =
+        config.getSectionNames(brion::CONFIGSECTION_PROJECTION);
+
+    BOOST_REQUIRE(projections.size() == 1);
+    BOOST_CHECK_EQUAL(projections[0], "Thalamocortical_fake_input");
+
+    const std::string path = prefix +
+                             "/circuitBuilding_1000neurons/MesoBuilder_output/"
+                             "merged_circuit/ncsThalamocortical_L4_tcS2F_3p0";
+
+    BOOST_CHECK_EQUAL(config.get(brion::CONFIGSECTION_PROJECTION,
+                                 "Thalamocortical_fake_input", "Path"),
+                      path);
+
+    BOOST_CHECK_EQUAL(config.getProjectionSource("Thalamocortical_fake_input"),
+                      brion::URI(path));
 }
 
 BOOST_AUTO_TEST_CASE(semantic_api)

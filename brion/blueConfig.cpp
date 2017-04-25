@@ -24,7 +24,6 @@
 
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <fstream>
@@ -41,12 +40,14 @@ inline brion::BlueConfigSection lexical_cast(const std::string& s)
         return brion::CONFIGSECTION_RUN;
     if (s == "Connection")
         return brion::CONFIGSECTION_CONNECTION;
+    if (s == "Projection")
+        return brion::CONFIGSECTION_PROJECTION;
+    if (s == "Report")
+        return brion::CONFIGSECTION_REPORT;
     if (s == "Stimulus")
         return brion::CONFIGSECTION_STIMULUS;
     if (s == "StimulusInject")
         return brion::CONFIGSECTION_STIMULUSINJECT;
-    if (s == "Report")
-        return brion::CONFIGSECTION_REPORT;
     return brion::CONFIGSECTION_UNKNOWN;
 }
 
@@ -59,12 +60,14 @@ inline std::string lexical_cast(const brion::BlueConfigSection& b)
         return "Run";
     case brion::CONFIGSECTION_CONNECTION:
         return "Connection";
+    case brion::CONFIGSECTION_PROJECTION:
+        return "Projection";
+    case brion::CONFIGSECTION_REPORT:
+        return "Report";
     case brion::CONFIGSECTION_STIMULUS:
         return "Stimulus";
     case brion::CONFIGSECTION_STIMULUSINJECT:
         return "StimulusInject";
-    case brion::CONFIGSECTION_REPORT:
-        return "Report";
     default:
         return "UNKNOWN";
     }
@@ -128,7 +131,7 @@ public:
             boost::split(lines, content, boost::is_any_of("\n"),
                          boost::token_compress_on);
 
-            BOOST_FOREACH (std::string line, lines)
+            for (std::string line : lines)
             {
                 boost::trim(line);
                 if (line.empty())
@@ -237,7 +240,7 @@ brion::Targets BlueConfig::getTargets() const
 {
     Targets targets;
     const URIs& uris = getTargetSources();
-    BOOST_FOREACH (const URI& uri, uris)
+    for (const URI& uri : uris)
         targets.push_back(Target(uri.getPath()));
     return targets;
 }
@@ -263,6 +266,21 @@ URI BlueConfig::getSynapseSource() const
     uri.setScheme("file");
     uri.setPath(
         get(CONFIGSECTION_RUN, _impl->getRun(), BLUECONFIG_NRN_PATH_KEY));
+    return uri;
+}
+
+URI BlueConfig::getProjectionSource(const std::string& name) const
+{
+    std::string path =
+        get(CONFIGSECTION_PROJECTION, name, BLUECONFIG_PROJECTION_PATH_KEY);
+    if (path.empty())
+    {
+        LBWARN << "Invalid or missing projection  " << name << std::endl;
+        return URI();
+    }
+    URI uri;
+    uri.setScheme("file");
+    uri.setPath(path);
     return uri;
 }
 
@@ -368,12 +386,11 @@ std::ostream& operator<<(std::ostream& os, const BlueConfig& config)
 {
     for (size_t i = 0; i < CONFIGSECTION_ALL; ++i)
     {
-        BOOST_FOREACH (const ValueTable::value_type& entry,
-                       config._impl->table[i])
+        for (const ValueTable::value_type& entry : config._impl->table[i])
         {
             os << boost::lexical_cast<std::string>(BlueConfigSection(i)) << " "
                << entry.first << std::endl;
-            BOOST_FOREACH (const KVStore::value_type& pair, entry.second)
+            for (const KVStore::value_type& pair : entry.second)
             {
                 os << "   " << pair.first << " " << pair.second << std::endl;
             }

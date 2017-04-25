@@ -116,10 +116,17 @@ public:
     BRION_API URI getSynapseSource() const;
 
     /**
-     * @return the full path to the morphology database. A suffix may be
-     *         prepended to the to the bare path from the BlueConfig.
-     * @version 1.7
+     * @return the URI to the location of synapse nrn files for projections from
+     *         external circuits (e.g. thalamocortical projections)
+     * @version 2.0
      */
+    BRION_API URI getProjectionSource(const std::string& name) const;
+
+    /**
+      * @return the full path to the morphology database. A suffix may be
+      *         prepended to the to the bare path from the BlueConfig.
+      * @version 1.7
+      */
     BRION_API URI getMorphologySource() const;
 
     /** @return the URI to the named report. @sa CompartmentReport

@@ -39,6 +39,8 @@ const char* const BLUECONFIG_SPIKES_PATH_KEY = "SpikesPath";
 const char* const BLUECONFIG_CIRCUIT_TARGET_KEY = "CircuitTarget";
 const char* const BLUECONFIG_REPORT_FORMAT_KEY = "Format";
 const char* const BLUECONFIG_DT_KEY = "Dt";
+
+const char* const BLUECONFIG_PROJECTION_PATH_KEY = "Path";
 }
 
 #endif
