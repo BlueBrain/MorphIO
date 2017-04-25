@@ -16,7 +16,7 @@ cdef extern from *:
 cdef class _Point(_py__base):
     cdef unique_ptr[morpho.point] _autodealoc
     cdef morpho.point* ptr(self):
-        return <morpho.point*>self._ptr
+        return <morpho.point *> self._ptr
 
     def __init__(self, vector[double] p):
         self._ptr = new morpho.point(p[0], p[1], p[2])
@@ -25,20 +25,22 @@ cdef class _Point(_py__base):
     def close_to(self, _Point other):
         return self.ptr().close_to(deref(other.ptr()))
 
-    def __getattr__(self, int item):
+    def __getitem__(self, unsigned int item):
+        assert item <= 2, IndexError(item)
         cdef const double *_data = self.ptr().data()
         return _data[item]
 
-    def __setattr__(self, int item, double value):
-        cdef double *_data = <double*>self.ptr().data()
+    def __setitem__(self, unsigned int item, double value):
+        assert item <= 2, IndexError(item)
+        cdef double *_data = <double *> self.ptr().data()
         _data[item] = value
 
     def as_tuple(self):
-        cdef double *_data = <double*>self.ptr().data()
+        cdef double *_data = <double *> self.ptr().data()
         return (_data[0], _data[1], _data[2])
 
     def __str__(self):
-        cdef double * _data = < double * > self.ptr().data()
+        cdef double * _data = <double *> self.ptr().data()
         cdef char outstr[30]
         sprintf(outstr, "(%.3lf, %.3lf, %.3lf)", _data[0], _data[1], _data[2])
         return outstr
@@ -277,11 +279,16 @@ cdef class _PointVector(_py__base):
 
     # Pass on the array API
     def __getitem__(self, index):
+        if isinstance(index, int):
+            return self.get_point(index)
+        return self.nparray[index]
+
+    def get_point(self, int index):
         if index >= len(self) or index < 0:
             raise IndexError("Length is %d. Requested:%d"%(len(self), index))
         cdef morpho.point * point0 = self.ptr().data()
         # This point doesnt own C data, we lend him memory from the vector
-        return _Point.from_ptr( &point0[index] )
+        return _Point.from_ptr(&point0[index])
 
     def __repr__(self):
         cdef int i, lim = min(3, len(self))
