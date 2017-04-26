@@ -1,10 +1,6 @@
-try:
-    import morphotool
-except Exception as e:
-    print "\033[93m[ERROR] Please run test program from morpho-tool root dir with iPython or set PYTHONPATH to ROOTDIR\033[0m"
-    raise e
+import morphotool
     
-mreader=morphotool.MorphoReader("pybindings/C010306C.h5")
+mreader=morphotool.MorphoReader("C010306C.h5")
 
 tree=mreader.create_morpho_tree()
 print "Tree size:", tree.tree_size
@@ -22,7 +18,7 @@ bbox = b.bounding_box
 print "Bounding Box:", bbox
 
 ls = b.linestring
-print "Linestring:", ls, "length:", len(ls)
+print "Linestring:", ls
 
 cp = b.circle_pipe
 print "circle pipe:", cp, "length:", len(cp)

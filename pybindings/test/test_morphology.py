@@ -1,4 +1,4 @@
-from morphology import MorphologyDB
+from morphotool import MorphologyDB
 morphoDB = MorphologyDB("pybindings")
 
 mor = morphoDB["C010306C"]
