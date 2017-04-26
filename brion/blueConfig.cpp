@@ -247,13 +247,15 @@ brion::Targets BlueConfig::getTargets() const
 
 URI BlueConfig::getCircuitSource() const
 {
-    const std::string& path =
-        get(CONFIGSECTION_RUN, _impl->getRun(), BLUECONFIG_CIRCUIT_PATH_KEY);
-    const std::string filename =
-        path + (fs::exists(fs::path(path) / CIRCUIT_FILE_MVD3)
-                    ? CIRCUIT_FILE_MVD3
-                    : CIRCUIT_FILE_MVD2);
-
+    const fs::path path(
+        get(CONFIGSECTION_RUN, _impl->getRun(), BLUECONFIG_CIRCUIT_PATH_KEY));
+    std::string filename = path.string();
+    if (fs::exists(path) && !fs::is_regular_file(fs::canonical(path)))
+    {
+        filename = fs::exists(path / CIRCUIT_FILE_MVD3)
+                       ? (path / CIRCUIT_FILE_MVD3).string()
+                       : (path / CIRCUIT_FILE_MVD2).string();
+    }
     URI uri;
     uri.setScheme("file");
     uri.setPath(filename);

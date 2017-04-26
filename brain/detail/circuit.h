@@ -266,7 +266,7 @@ public:
                     "Afferent synaptic projection not found: " + name));
             }
             fs::path path(source->second.getPath() + externalAfferentFilename);
-            if (fs::is_regular_file(path) || fs::is_symlink(path))
+            if (fs::exists(path) && fs::is_regular_file(fs::canonical(path)))
                 synapses.reset(new brion::Synapse(path.string()));
             else
                 // Trying with the afferent synapses filename as a fallback

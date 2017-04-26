@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [151](https://github.com/BlueBrain/Brion/pull/151):
+  brain::Circuit accepts full paths to mvd files in CircuitPath
 * [150](https://github.com/BlueBrain/Brion/pull/150):
   - Added a new method in brain::Circuit to obtain synapses for afferent
     projections from outside the circuit (e.g. thalamocortical projections).
