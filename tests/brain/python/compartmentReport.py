@@ -41,7 +41,7 @@ class TestReader(unittest.TestCase):
 
     def test_create_view(self):
         view = self.report.create_view({1, 2, 3})
-        assert(view.gids == {1, 2, 3})
+        assert((view.gids == [1, 2, 3]).all())
 
     def test_mapping(self):
         view = self.report.create_view({1, 2, 3})
@@ -116,7 +116,7 @@ class TestMemoryManagement(unittest.TestCase):
 
     def test_view(self):
         view = CompartmentReport(report_path).create_view({1, 2, 3})
-        assert(view.gids == {1, 2, 3})
+        assert((view.gids == [1, 2, 3]).all())
 
     def test_frame(self):
         timestamp, frame = CompartmentReport(report_path).create_view(

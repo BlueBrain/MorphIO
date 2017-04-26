@@ -96,7 +96,7 @@ bp::object CompartmentReport_getMetaData(const CompartmentReport& reader)
 
 bp::object CompartmentReportView_getGids(const CompartmentReportView& view)
 {
-    return toPythonSet(view.getGIDs());
+    return toNumpy(toVector(view.getGIDs()));
 }
 
 CompartmentReportMappingProxy CompartmentReportView_getMapping(

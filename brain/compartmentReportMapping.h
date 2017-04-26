@@ -62,7 +62,8 @@ public:
      * simulation frame buffer.
      * For instance, getOffsets()[1][15] retrieves the lookup index for the
      * frame buffer for section 15 of neuron with index 1. The neuron index is
-     * derived from the order in the GID set provided in the view constructor.
+     * derived from its positions in the sorted list of GIDs provided in the
+     * view constructor.
      *
      * @return the offset for each section for each neuron
      * @version 2.0
