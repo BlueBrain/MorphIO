@@ -1,2 +1,0 @@
-cython --cplus pybindings/morphotool.pyx |& less
-g++ -shared -fPIC -std=c++11 pybindings/morphotool.cpp -I include -I deps/hadoken/include -I deps/highfive/include -I /gpfs/bbp.cscs.ch/home/leite/Functionalizer/spykfunc/pyenv/include/python2.7 -isystem /gpfs/bbp.cscs.ch/apps/viz/bbp/dev/boost/1.58.0/include -o morphotool.so -L /gpfs/bbp.cscs.ch/apps/viz/bbp/dev/boost/1.58.0/lib -lboost_system -lhdf5
