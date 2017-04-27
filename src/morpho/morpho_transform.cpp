@@ -20,6 +20,8 @@
 #include <tuple>
 #include <memory>
 
+#include <hadoken/format/format.hpp>
+
 #include <morpho/morpho_transform.hpp>
 #include <morpho/morpho_transform_filters.hpp>
 
@@ -280,6 +282,54 @@ morpho_tree soma_sphere_operation::apply(const morpho_tree &tree){
 
 std::string soma_sphere_operation::name() const{
     return "soma_sphere_operation";
+}
+
+
+
+simplify_branch_extreme_operation::simplify_branch_extreme_operation(){
+
+}
+
+
+morpho_tree simplify_branch_extreme_operation::apply(const morpho_tree &tree){
+    morpho_tree res;
+
+    const std::size_t number_branches = tree.get_tree_size();
+
+    for(std::size_t node_id = 0; node_id < number_branches; ++node_id){
+        const morpho_node & node = tree.get_node(node_id);
+
+        if(node.is_of_type(morpho_node_type::neuron_branch_type)){
+            // if we have a branch
+            // take only the first and last point
+
+            const neuron_branch & branch = static_cast<const neuron_branch&>(node);
+            const std::vector<point> & origin_points = branch.get_points();
+            const std::vector<double> & origin_radius = branch.get_radius();
+
+            if(origin_points.size() < 2 ){
+                throw std::invalid_argument(hadoken::format::scat("Invalid morphology branch ", node_id, " with less than 2 points"));
+            }
+
+            std::vector<point> points = { origin_points.front(), origin_points.back() };
+            std::vector<double> radius = { origin_radius.front(), origin_radius.back() };
+
+            res.add_node(tree.get_parent(node_id), std::shared_ptr<morpho_node>(
+               new neuron_branch(branch.get_branch_type(), std::move(points), std::move(radius))
+            ));
+        }else{
+            res.copy_node(tree, node_id, tree.get_parent(node_id));
+        }
+
+    }
+
+
+    return res;
+}
+
+
+std::string simplify_branch_extreme_operation::name() const{
+    return "simplify_branch_extreme";
 }
 
 

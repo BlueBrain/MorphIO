@@ -85,6 +85,25 @@ public:
 };
 
 
+///
+/// \brief  simplify_branch_extreme
+///
+/// transform operations : simplify all morphology branch to the extreme by keeping only first and last point
+///
+///
+///
+class simplify_branch_extreme_operation : public morpho_operation{
+public:
+    simplify_branch_extreme_operation();
+
+
+    morpho_tree apply(const morpho_tree &tree) override;
+
+    std::string name() const override;
+
+};
+
+
 } // morpho
 
 
