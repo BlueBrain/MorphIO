@@ -46,6 +46,7 @@ namespace po = boost::program_options;
 
 const std::string delete_duplicate_point_operation_str("delete_duplicate_point");
 const std::string duplicate_first_point_operation_str("duplicate_first_point");
+const std::string soma_sphere_operation_str("soma_sphere");
 
 std::string version(){
     return std::string( MORPHO_VERSION_MAJOR "." MORPHO_VERSION_MINOR );
@@ -117,6 +118,7 @@ void transform_show_help(){
               "\t Available operations: \n",
               "\t\t *", delete_duplicate_point_operation_str, "*:\t remove duplicated points in every branch\n",
               "\t\t *", duplicate_first_point_operation_str, "*:\t duplicate the last point of every branch as first point of its children \n",
+              "\t\t *", soma_sphere_operation_str, "*:\t transform a line-loop soma into a single point sphere soma \n",
               "\n",
               "\n",
               "\tNote: Most operations are NOT commutative"
@@ -142,8 +144,12 @@ morpho_operation_chain parse_transform_option(po::variables_map & options){
     for(const auto & operation : vals ){
         if(operation == delete_duplicate_point_operation_str){
             filters.push_back(std::make_shared<delete_duplicate_point_operation>());
+
         }else if(operation == duplicate_first_point_operation_str){
             filters.push_back(std::make_shared<duplicate_first_point_operation>());
+
+        } else if(operation == soma_sphere_operation_str){
+            filters.push_back(std::make_shared<soma_sphere_operation>());
         }else {
             transform_show_help();
         }

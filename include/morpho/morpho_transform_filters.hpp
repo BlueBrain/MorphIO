@@ -62,6 +62,29 @@ public:
 };
 
 
+
+///
+/// \brief  soma_sphere
+///
+/// transform operations : transform a morphology with a soma based on a line-loop into a morphology
+///  with a soma modelized as a sphere.
+///
+///  The sphere is computed from the gravity center of the lineloop and from the average distance between the center
+///  and the points of the lineloop
+///
+///
+class soma_sphere_operation : public morpho_operation{
+public:
+    soma_sphere_operation();
+
+
+    morpho_tree apply(const morpho_tree &tree) override;
+
+    std::string name() const override;
+
+};
+
+
 } // morpho
 
 
