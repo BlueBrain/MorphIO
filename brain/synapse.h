@@ -56,7 +56,8 @@ public:
     /** @return the segment ID on the presynaptic neuron. */
     BRAIN_API uint32_t getPresynapticSegmentID() const;
 
-    /** @return the distance in micrometer to the presynaptic neuron. */
+    /** @return the distance from the beginning of the presynaptic segment
+                to the synapse in micrometers. */
     BRAIN_API float getPresynapticDistance() const;
 
     /** @return the presynaptic touch position on the surface of the segment. */
@@ -77,7 +78,8 @@ public:
     /** @return the segment ID on the postsynaptic neuron. */
     BRAIN_API uint32_t getPostsynapticSegmentID() const;
 
-    /** @return the distance in micrometer to the postsynaptic neuron. */
+    /** @return the distance from the beginning of the postsynaptic segment
+                to the synapse in micrometers. */
     BRAIN_API float getPostsynapticDistance() const;
 
     /** @return the postsynaptic touch position on the surface of the segment.*/

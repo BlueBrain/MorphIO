@@ -95,7 +95,8 @@ public:
     /** @return the segment IDs on the presynaptic neurons. */
     BRAIN_API const uint32_t* preSegmentIDs() const;
 
-    /** @return the distances in micrometer to the presynaptic neurons. */
+    /** @return the distances between each synapse and the beginning of theirs
+                presynaptic segments in micrometers. */
     BRAIN_API const float* preDistances() const;
 
     /**
@@ -146,7 +147,8 @@ public:
     /** @return the segment IDs on the postsynaptic neurons. */
     BRAIN_API const uint32_t* postSegmentIDs() const;
 
-    /** @return the distances in micrometer to the postsynaptic neurons. */
+    /** @return the distances between each synapse and the beginning of theirs
+                postsynaptic segments in micrometers. */
     BRAIN_API const float* postDistances() const;
 
     /**

@@ -3,6 +3,9 @@ Changelog {#Changelog}
 
 # git master
 
+* [152](https://github.com/BlueBrain/Brion/pull/151):
+  Added the function brain.neuron.compute_morphological_samples to help getting
+  sample positions from morphologies
 * [151](https://github.com/BlueBrain/Brion/pull/151):
   brain::Circuit accepts full paths to mvd files in CircuitPath
 * [150](https://github.com/BlueBrain/Brion/pull/150):
