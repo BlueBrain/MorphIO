@@ -69,7 +69,7 @@ po::parsed_options parse_args(int argc, char** argv,
     general.add_options()
         ("help", "produce a help message")
         ("version", "output the version number")
-        ("transform", po::value<std::string>(), "apply a transform operation to the morphology, --transform for a list")
+        ("transform", po::value<std::string>(), "h5v1,gmsh: apply a transform operation to the morphology, --transform for a list")
         ("point-cloud", "gmsh: export to a point cloud")
         ("wireframe", "gmsh: export to a wired morphology (default)")
         ("3d-object", "gmsh: export to a 3D object model")
@@ -173,6 +173,8 @@ void transform_ops_print(const morpho_operation_chain & ops){
 
         fmt::scat(std::cout, "]\n");
     }
+
+    fmt::scat(std::cout, "\n");
 }
 
 void export_morpho_to_gmsh(const std::string & filename_morpho, const std::string & filename_geo,
@@ -200,8 +202,17 @@ void export_morpho_to_gmsh(const std::string & filename_morpho, const std::strin
  
     {
         h5_v1::morpho_reader reader(filename_morpho);
+
+
         // create tree and apply some basic filter adapted for gmsh
-        morpho_tree tree = morpho_transform(reader.create_morpho_tree(), {
+        morpho_tree raw_tree = reader.create_morpho_tree();
+
+        // apply all the specified transform ops
+        morpho_operation_chain transform_ops = parse_transform_option(options);
+        transform_ops_print(transform_ops);
+        morpho_tree filtered_tree = morpho_transform(raw_tree, transform_ops);
+
+        morpho_tree tree = morpho_transform(filtered_tree, {
             std::make_shared<delete_duplicate_point_operation>(),
             std::make_shared<duplicate_first_point_operation>(),
         });

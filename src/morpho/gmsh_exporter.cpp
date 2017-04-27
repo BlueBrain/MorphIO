@@ -139,7 +139,7 @@ double clean_coordinate(double val){
 
 void gmsh_abstract_file::add_bounding_box(){
 
-    fmt::scat(std::cout, " add bounding box to the export");
+    fmt::scat(std::cout, "add bounding box to the export\n");
 
     double minp[3] = {1e+6, 1e+6, 1e+6};
     double maxp[3] = {-1e+6, -1e+6, -1e+6};
