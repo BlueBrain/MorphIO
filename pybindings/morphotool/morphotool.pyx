@@ -12,7 +12,6 @@ from .includes.statics cimport morpho_morpho_node_type
 from .includes.statics cimport morpho_neuron_struct_type
 from .includes cimport morpho_h5_v1
 from .includes.statics cimport morpho_h5_v1_morpho_reader
-from .includes cimport stats
 
 include "datastructs.pxi"
 
@@ -347,6 +346,9 @@ include "morpho_h5_v1.pxi"
 
 # Add bindings for transformations and spatial index
 include "morpho_transform_spatial.pxi"
+
+# Add bindings for MorphoStats
+include "morpho_stats.pxi"
 
 # Optional bindings for morpho_mesher, overridable by cython exec
 # ----------------------------------------------------------------------------------------------------------------------

@@ -1,6 +1,7 @@
 cimport std
 from libcpp cimport bool
-cimport morpho
+from . cimport morpho
+from . cimport stats
 
 # ======================================================================================================================
 cdef extern from "morpho/morpho_stats.hpp" namespace "morpho::stats":
