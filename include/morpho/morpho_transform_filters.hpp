@@ -104,6 +104,32 @@ public:
 };
 
 
+
+///
+/// \brief  simplify_branch_extreme
+///
+/// transform operations : transpose and rotate the morphology using a vector and a quaternion
+///
+///
+///
+class transpose_operation : public morpho_operation{
+public:
+    typedef std::array<double, 3> vector3d;
+    typedef std::array<double, 4> quaternion3d;
+
+    transpose_operation(const vector3d & vector_transpose, quaternion3d & quaternion_transpose);
+
+
+    morpho_tree apply(const morpho_tree & tree) override;
+
+    std::string name() const override;
+private:
+    vector3d _trans;
+    quaternion3d _rotate;
+};
+
+
+
 } // morpho
 
 

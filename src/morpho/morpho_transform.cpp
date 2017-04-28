@@ -320,10 +320,7 @@ morpho_tree simplify_branch_extreme_operation::apply(const morpho_tree &tree){
         }else{
             res.copy_node(tree, node_id, tree.get_parent(node_id));
         }
-
     }
-
-
     return res;
 }
 
@@ -331,6 +328,88 @@ morpho_tree simplify_branch_extreme_operation::apply(const morpho_tree &tree){
 std::string simplify_branch_extreme_operation::name() const{
     return "simplify_branch_extreme";
 }
+
+
+transpose_operation::transpose_operation(const vector3d &vector_transpose, quaternion3d &quaternion_transpose) :
+    _trans(vector_transpose),
+    _rotate(quaternion_transpose){
+
+}
+
+
+std::string transpose_operation::name() const{
+    return hadoken::format::scat("transpose_operation", "(",
+                          "transpose:{", _trans[0], ",", _trans[1], ",", _trans[2], "}, ",
+                          "rotate:{", _rotate[0], ",", _rotate[1], ",", _rotate[2], ",", _rotate[3], "}",
+                          ")"
+    );
+}
+
+
+std::vector<point> point_transpose_rotate(const std::vector<point> & origin_points,
+                                          const transpose_operation::vector3d & transpose,
+                                          const transpose_operation::quaternion3d & quad){
+    std::vector<point> points(origin_points.size());
+    std::transform(origin_points.begin(), origin_points.end(),
+                   points.begin(), [&](const point & p){
+
+        transpose_operation::vector3d res, origin_point({ p(0), p(1), p(2) });
+
+        // translate
+        std::transform(origin_point.begin(), origin_point.end(),
+                       transpose.begin(), res.begin(), std::plus<double>());
+        // rotate
+        hadoken::geometry::rotate<double, decltype(quad), decltype(res)>(quad, res);
+
+        return point(res[0], res[1], res[2]);
+    });
+    return points;
+}
+
+morpho_tree transpose_operation::apply(const morpho_tree &tree){
+    morpho_tree res;
+
+    const std::size_t number_branches = tree.get_tree_size();
+
+    for(std::size_t node_id = 0; node_id < number_branches; ++node_id){
+        const morpho_node & node = tree.get_node(node_id);
+
+        if(node.is_of_type(morpho_node_type::neuron_branch_type)){
+            // rotate translate all the points of the branch
+
+            const neuron_branch & branch = static_cast<const neuron_branch&>(node);
+            const std::vector<point> & origin_points = branch.get_points();
+
+            std::vector<point> points = point_transpose_rotate(origin_points, _trans, _rotate);
+            std::vector<double> radius = branch.get_radius();
+
+            res.add_node(tree.get_parent(node_id),
+                         std::shared_ptr<morpho_node>(
+                                new neuron_branch(branch.get_branch_type(), std::move(points), std::move(radius))
+                         )
+            );
+        } else if(node.is_of_type(morpho_node_type::neuron_soma_type)){
+
+            const neuron_soma & soma = static_cast<const neuron_soma&>(node);
+            const std::vector<point> & origin_points = soma.get_line_loop();
+
+            std::vector<point> points = point_transpose_rotate(origin_points, _trans, _rotate);
+
+            res.add_node(tree.get_parent(node_id),
+                         std::shared_ptr<morpho_node>(
+                                new neuron_soma(std::move(points))
+                             )
+                        );
+
+        }else{
+            res.copy_node(tree, node_id, tree.get_parent(node_id));
+        }
+
+    }
+
+    return res;
+}
+
 
 
 } // morpho
