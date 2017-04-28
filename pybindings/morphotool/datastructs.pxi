@@ -1,6 +1,7 @@
 from libcpp.memory cimport unique_ptr
 from libcpp.vector cimport vector
-from libc.stdio cimport sprintf
+from libc.stdio cimport sprintf, printf
+from cpython cimport PyObject, Py_INCREF
 import numpy as np
 cimport numpy as np
 
@@ -11,6 +12,7 @@ np.import_array()
 cdef extern from *:
     ctypedef int zero_t "0"
     ctypedef int one_t "1"
+ctypedef unsigned int uint
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class _Point(_py__base):
@@ -271,11 +273,14 @@ cdef class _CirclePipe(_py__base):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class _PointVector(_py__base):
+cdef class _PointVector(_ArrayT):
     #Numpy array object
-    cdef readonly object nparray
     cdef vector[morpho.point] * ptr(self):
         return <vector[morpho.point] *> self._ptr
+
+    def __repr__(self):
+        cdef int i, lim = min(3, len(self))
+        return "<PointVector object. Length: %d>" % (len(self),)
 
     # Pass on the array API
     def __getitem__(self, index):
@@ -290,17 +295,10 @@ cdef class _PointVector(_py__base):
         # This point doesnt own C data, we lend him memory from the vector
         return _Point.from_ptr(&point0[index])
 
-    def __repr__(self):
-        cdef int i, lim = min(3, len(self))
-        return "<PointVector object. Length: %d>" % (len(self),)
-
     def __iter__(self):
         cdef int i
         #Generator is also iterator
         return (self[i] for i in range(len(self)))
-
-    def __len__(self):
-        return self.ptr().size()
 
     @property
     def size(self):
@@ -310,11 +308,11 @@ cdef class _PointVector(_py__base):
     cdef _PointVector from_ptr(const vector[morpho.point] *ptr):
         cdef _PointVector obj = _PointVector.__new__(_PointVector)
         obj._ptr = <vector[morpho.point] *>ptr
-        #Create np array
+        #NumPy Array
         cdef np.npy_intp size[2]
         size[0] = ptr.size()
         size[1] = 3
-        obj.nparray = np.PyArray_SimpleNewFromData(2, size, np.NPY_DOUBLE, <void*>ptr.data().data())
+        obj.init_nparray(2, size, np.NPY_DOUBLE, <void*>ptr.data().data())
         return obj
 
     @staticmethod
@@ -325,6 +323,7 @@ cdef class _PointVector(_py__base):
 # ----------------------------------------------------------------------------------------------------------------------
 # Main Data Structures
 # ----------------------------------------------------------------------------------------------------------------------
+
 cdef class _Mat_Points(_ArrayT):
     cdef unique_ptr[morpho.mat_points] _autodealoc
     cdef morpho.mat_points * ptr(self):
@@ -336,12 +335,14 @@ cdef class _Mat_Points(_ArrayT):
         obj._ptr = matpoints
         if owner: obj._autodealoc.reset(matpoints)
 
-        # Create a numpy array (memviews dont expose no nicely to python)
-        cdef np.npy_intp[2] dim
-        dim[0] = matpoints.size1()
-        dim[1] = matpoints.size2()
-        obj.nparray = np.PyArray_SimpleNewFromData(2, dim, np.NPY_DOUBLE, matpoints.data().begin())
+        # Create a numpy array (memviews dont expose so nicely to python)
+        cdef np.npy_intp size[2]
+        size[0] = matpoints.size1()
+        size[1] = matpoints.size2()
+        obj.init_nparray(2, size, np.NPY_DOUBLE, matpoints.data().begin())
+
         return obj
+
 
     @staticmethod
     cdef _Mat_Points from_ref(const morpho.mat_points &ref):
@@ -368,7 +369,7 @@ cdef class _Mat_Index(_ArrayT):
         cdef np.npy_intp[2] dim
         dim[0] = ptr.size1()
         dim[1] = ptr.size2()
-        obj.nparray = np.PyArray_SimpleNewFromData(2, dim, np.NPY_INT, ptr.data().begin())
+        obj.init_nparray(2, dim, np.NPY_INT, ptr.data().begin())
         return obj
 
     @staticmethod

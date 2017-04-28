@@ -9,7 +9,9 @@ from .includes cimport std
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
 from libc.string cimport memcpy
-
+from libc.stdio cimport printf
+from cpython cimport PyObject, Py_INCREF
+from numpy cimport npy_intp
 # -------------------------------------------------------------
 # BASE Class
 # -------------------------------------------------------------
@@ -49,6 +51,16 @@ cdef class _ArrayT(_py__base):
         return ("<%s object\n"
                 "%s...\n"
                 " (Full numpy array accessible at .nparray) >" % (str(type(self)), str(self.nparray[:leng])))
+
+    cdef void init_nparray(_ArrayT self, unsigned int dims, npy_intp size[], int t, void* base_addr):
+        # Create NP wrapper
+        cdef np.ndarray npa = np.PyArray_SimpleNewFromData(dims, size, t, base_addr)
+
+        # This is the ugly way (before NP 1.7) to reference the memory owner from the NP array, to keep it alive
+        npa.base = <PyObject*>self
+        Py_INCREF(self)
+
+        self.nparray = npa
 
 
 # --------------------------------------------------------

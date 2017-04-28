@@ -284,6 +284,8 @@ cdef class MorphoTree(_py__base):
         return self.ptr().copy_node(deref(other.ptr()), id_, new_parent_id)
 
     def get_node(self, int id_):
+        if id_ > self.tree_size:
+            return None
         return MorphoNode.from_ref_id(self.ptr().get_node(id_), id_)
 
     def get_parent(self, int id_):
