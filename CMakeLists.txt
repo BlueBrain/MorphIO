@@ -41,6 +41,7 @@ file(GLOB MORPHO_HEADERS_BITS ${CMAKE_CURRENT_SOURCE_DIR}/include/morpho/*/*)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/highfive/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/hadoken/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/mvd-tool/include)
 
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})

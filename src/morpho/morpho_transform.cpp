@@ -330,7 +330,7 @@ std::string simplify_branch_extreme_operation::name() const{
 }
 
 
-transpose_operation::transpose_operation(const vector3d &vector_transpose, quaternion3d &quaternion_transpose) :
+transpose_operation::transpose_operation(const vector3d &vector_transpose, const quaternion3d &quaternion_transpose) :
     _trans(vector_transpose),
     _rotate(quaternion_transpose){
 

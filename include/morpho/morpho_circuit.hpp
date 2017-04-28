@@ -16,22 +16,47 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef MORPHO_TRANSFORM_FILTERS_BITS_HPP
-#define MORPHO_TRANSFORM_FILTERS_BITS_HPP
+#ifndef MORPHO_CIRCUIT_HPP
+#define MORPHO_CIRCUIT_HPP
 
-#include <morpho/morpho_transform_filters.hpp>
+#ifndef H5_USE_BOOST
+#define H5_USE_BOOST
+#endif
+
+#include <string>
+#include <utility>
+
+
+#include "morpho_types.hpp"
+#include "morpho_tree.hpp"
+
+#include <mvd/mvd3.hpp>
+
+
+
+
 
 namespace morpho{
 
+namespace circuit{
 
 
-filter_duplicate_point_operation::filter_duplicate_point_operation(double min_distance) : _min_distance(min_distance) {}
+class circuit_reader{
+public:
+
+    circuit_reader(const std::string & filename_mvd3, const std::string & morpho_directory);
 
 
-std::string filter_duplicate_point_operation::name(){
-    return "filter_duplicate";
-}
 
+    std::vector<morpho_tree> create_all_morpho_tree() const;
+
+
+private:
+    std::string _filename, _morpho_directory;
+};
+
+
+} // circuit
 
 
 
@@ -39,4 +64,5 @@ std::string filter_duplicate_point_operation::name(){
 
 
 
-#endif // MORPHO_TRANSFORM_FILTERS_HPP
+#endif // MORPHO_CIRCUIT_HPP
+

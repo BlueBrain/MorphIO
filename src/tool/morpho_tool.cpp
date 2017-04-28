@@ -31,6 +31,7 @@
 #include <hadoken/string/algorithm.hpp>
 
 #include <morpho/morpho_h5_v1.hpp>
+#include <morpho/morpho_circuit.hpp>
 #include <morpho/morpho_mesher.hpp>
 #include <morpho/morpho_stats.hpp>
 #include <morpho/morpho_transform_filters.hpp>
@@ -60,16 +61,18 @@ po::parsed_options parse_args(int argc, char** argv,
     po::options_description general("Commands:\n"
                                     "\t\t\n"
                                     "  stats [morphology-file]:\t morphology statistics\n"
-                                    "  export h5v1 [morphology-file] [output-h5v1-file]:\texport morphology file to h5v1 format\n"
-                                    "  export gmsh [morphology-file] [geo-file]:\texport morphology file to .geo file format\n"
-                                    "  export x3d [morphology-file] [x3d-file]:\texport morphology file to .x3d file format\n"                                  
-                                    "  mesh [morphology-file] [output_mesh_file]:\tCreate a mesh from a morphology\n"
+                                    "  export h5v1 [morphology-file] [output-h5v1-file]:\t\texport morphology file to h5v1 format\n"
+                                    "  export gmsh [morphology-file] [geo-file]:\t\texport morphology file to .geo file format\n"
+                                    "  export gmsh [mvd-file] --morpho-dir [morpho_dir] [geo-file]:\t\t export entire circuit to .geo file format\n"
+                                    "  export x3d [morphology-file] [x3d-file]:\t\texport morphology file to .x3d file format\n"
+                                    "  mesh [morphology-file] [output_mesh_file]:\t\tCreate a mesh from a morphology\n"
                                     "\n\n"
                                     "Options");
     general.add_options()
         ("help", "produce a help message")
         ("version", "output the version number")
         ("transform", po::value<std::string>(), "h5v1,gmsh: apply a transform operation to the morphology, --transform for a list")
+        ("morpho-dir", po::value<std::string>(), "circuit mode: directory to use to load morphologies")
         ("point-cloud", "gmsh: export to a point cloud")
         ("wireframe", "gmsh: export to a wired morphology (default)")
         ("3d-object", "gmsh: export to a 3D object model")
@@ -198,27 +201,50 @@ void export_morpho_to_gmsh(const std::string & filename_morpho, const std::strin
         flags |= gmsh_exporter::exporter_packed;
     }
 
-    fmt::scat(std::cout, "load morphology tree ", filename_morpho, "\n");
- 
-    {
-        h5_v1::morpho_reader reader(filename_morpho);
+
+    if(options.count("morpho-dir")){
+        const std::string morpho_dir = options["morpho-dir"].as<std::string>();
+        const std::string circuit_filename = filename_morpho;
+
+        fmt::scat(std::cout, "load circuit ", circuit_filename, " with morphology directory ", morpho_dir, "\n");
+        circuit::circuit_reader reader(circuit_filename, morpho_dir);
+
+        trees = reader.create_all_morpho_tree();
+
+    } else{
+        fmt::scat(std::cout, "load one morphology into morphology tree ", filename_morpho, "\n");
+
+        {
+            h5_v1::morpho_reader reader(filename_morpho);
 
 
-        // create tree and apply some basic filter adapted for gmsh
-        morpho_tree raw_tree = reader.create_morpho_tree();
+            // create tree and apply some basic filter adapted for gmsh
+            morpho_tree tree = reader.create_morpho_tree();
 
-        // apply all the specified transform ops
-        morpho_operation_chain transform_ops = parse_transform_option(options);
-        transform_ops_print(transform_ops);
-        morpho_tree filtered_tree = morpho_transform(raw_tree, transform_ops);
+            trees.emplace_back(std::move(tree));
+        }
+    }
 
-        morpho_tree tree = morpho_transform(filtered_tree, {
+
+    // apply all the specified transform ops
+
+    morpho_operation_chain transform_ops = parse_transform_option(options);
+    transform_ops_print(transform_ops);
+
+    std::for_each(trees.begin(), trees.end(), [&](morpho_tree & tree){
+        // apply user filters
+        morpho_tree user_filtered_tree = morpho_transform(tree, transform_ops);
+
+        // apply gmsh required filtered
+        morpho_tree final_tree = morpho_transform(user_filtered_tree, {
             std::make_shared<delete_duplicate_point_operation>(),
             std::make_shared<duplicate_first_point_operation>(),
         });
 
-        trees.emplace_back(std::move(tree));
-    }
+        // we swap back the tree inside the vector
+        tree.swap(final_tree);
+    });
+
     
     gmsh_exporter exporter(std::move(trees), filename_geo, flags);
     exporter.set_identifier(std::string("morphology: ") + filename_morpho);

@@ -117,7 +117,7 @@ public:
     typedef std::array<double, 3> vector3d;
     typedef std::array<double, 4> quaternion3d;
 
-    transpose_operation(const vector3d & vector_transpose, quaternion3d & quaternion_transpose);
+    transpose_operation(const vector3d & vector_transpose, const quaternion3d & quaternion_transpose);
 
 
     morpho_tree apply(const morpho_tree & tree) override;
