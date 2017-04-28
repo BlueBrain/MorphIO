@@ -202,6 +202,9 @@ void export_morpho_to_gmsh(const std::string & filename_morpho, const std::strin
     }
 
 
+    morpho_operation_chain transform_ops = parse_transform_option(options);
+    transform_ops_print(transform_ops);
+
     if(options.count("morpho-dir")){
         const std::string morpho_dir = options["morpho-dir"].as<std::string>();
         const std::string circuit_filename = filename_morpho;
@@ -227,9 +230,6 @@ void export_morpho_to_gmsh(const std::string & filename_morpho, const std::strin
 
 
     // apply all the specified transform ops
-
-    morpho_operation_chain transform_ops = parse_transform_option(options);
-    transform_ops_print(transform_ops);
 
     std::for_each(trees.begin(), trees.end(), [&](morpho_tree & tree){
         // apply user filters
