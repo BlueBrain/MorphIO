@@ -63,8 +63,11 @@ std::vector<morpho_tree> circuit_reader::create_all_morpho_tree() const{
 
 
     for(std::size_t i =0; i < all_morphologies_name.size(); ++i){
-        const std::string morphology_name = hadoken::format::scat(_morpho_directory,"/",all_morphologies_name[i]);
+        const std::string morphology_name = hadoken::format::scat(_morpho_directory,"/",all_morphologies_name[i], ".h5");
         try{
+
+            hadoken::format::scat(std::cout, "load morphology ", morphology_name, "...\n");
+
             h5_v1::morpho_reader reader(morphology_name);
 
             morpho_tree raw_morpho = reader.create_morpho_tree();
