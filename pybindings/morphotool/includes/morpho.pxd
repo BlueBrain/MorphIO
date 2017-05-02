@@ -154,10 +154,10 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         box get_bounding_box()
         std.size_t get_tree_size()
         void swap(morpho_tree)
-        int add_node(int, std.shared_ptr[morpho_node])
-        int copy_node(morpho_tree, int, int)
+        int add_node(int, std.shared_ptr[morpho_node]) except+
+        int copy_node(morpho_tree, int, int) except+
         morpho_node get_node(int)
-        int get_parent(int)
+        int get_parent(int) except+
         std.vector[int] get_children(int)
         std.vector[morpho_node*] get_all_nodes()
         std.vector[unsigned int] find_nodes(neuron_struct_type)

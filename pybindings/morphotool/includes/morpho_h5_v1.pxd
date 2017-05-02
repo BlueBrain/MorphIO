@@ -33,7 +33,7 @@ cdef extern from "morpho/morpho_h5_v1.hpp" namespace "morpho::h5_v1":
         mat_index get_struct_raw()
         morpho_reader.range get_branch_range_raw(int)
         std.string get_filename()
-        morpho.morpho_tree create_morpho_tree() except+
+        morpho.morpho_tree create_morpho_tree()
 
     ###### Cybinding for class morpho_writer ######
     cdef cppclass morpho_writer:
