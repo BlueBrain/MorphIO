@@ -321,7 +321,7 @@ cdef class MorphoTree(_py__base):
         return MorphoTree.from_ptr(ptr, True)
 
     @staticmethod
-    cdef MorphoTree from_move(morpho.morpho_tree &&ref):
+    cdef MorphoTree from_move(morpho.morpho_tree &ref):
         cdef MorphoTree obj = MorphoTree()
         obj.ptr().swap(ref)
         return obj

@@ -72,6 +72,10 @@ public:
 
     virtual bool is_of_type(morpho_node_type mtype) const = 0;
 
+    // Serialization
+    // virtual int serialize( const std::ostream & output ) const = 0;
+    // static std::shared_ptr<morpho_node> deserialize( const std::istream & input );
+
 private:
     std::unique_ptr<morpho_node_internal> _dptr;
 };
@@ -94,6 +98,7 @@ public:
 
 
     bool is_of_type(morpho_node_type mtype) const override;
+
 
 private:
     neuron_struct_type _my_type;
@@ -303,13 +308,13 @@ public:
     std::vector<int> get_children(int id) const;
 
 
-    ///
+    /// all nodes
     std::vector<morpho_node const*> get_all_nodes() const;
 
-    /// return by neuron struct type
+    /// return IDs by neuron struct type
     std::vector<unsigned int> find_nodes(neuron_struct_type mtype) const;
 
-    // find return soma
+    /// find return soma
     neuron_soma const* get_soma() const;
 
 

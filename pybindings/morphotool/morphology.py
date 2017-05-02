@@ -250,7 +250,10 @@ class MorphologyDB(object):
     @staticmethod
     def split_line_to_details(line):
         parts = line.split()
-        return parts[0], (int(parts[1]), parts[2])
+        try:
+            return parts[0], (int(parts[1]), parts[2])
+        except:
+            raise ValueError(line)
 
     def __init__(self, db_path, db_file=None):
         self.db_path = db_path
