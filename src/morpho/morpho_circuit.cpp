@@ -74,8 +74,11 @@ std::vector<morpho_tree> circuit_reader::create_all_morpho_tree() const{
 
         all_futures.emplace_back( std::async(std::launch::async, [&](){
 
-            std::size_t i = total_number_morphos++;
-            while(i < all_morphologies_name.size()){
+	    while(1){
+	        std::size_t i = total_number_morphos++;
+            	if(i >= all_morphologies_name.size()){
+			break;
+		}
                 const std::string morphology_name = hadoken::format::scat(_morpho_directory,"/",all_morphologies_name[i], ".h5");
                 try{
 
