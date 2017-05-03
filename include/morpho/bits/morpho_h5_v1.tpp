@@ -312,7 +312,7 @@ inline void export_tree_to_raw(const morpho_tree & tree, mat_index & raw_index, 
                 raw_points(offset_points, 0) = soma_sphere.get_center()(0);
                 raw_points(offset_points, 1) = soma_sphere.get_center()(1);
                 raw_points(offset_points, 2) = soma_sphere.get_center()(2);
-                raw_points(offset_points, 3) = soma_sphere.get_radius();
+                raw_points(offset_points, 3) = soma_sphere.get_radius() *2.0;
                 offset_points ++;
             }
         }else if(node.is_of_type(morpho_node_type::neuron_branch_type)){
