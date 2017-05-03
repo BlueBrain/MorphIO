@@ -234,7 +234,9 @@ void recursive_soma_simplify(const morpho_tree & input_tree,
             std::shared_ptr<morpho_node> new_node(new neuron_soma(res.get_center(), res.get_radius()));
             out_tree.add_node(input_tree.get_parent(node_id), new_node);
 
-            parent_point = std::make_tuple(res.get_center(), res.get_radius());
+            // setup the soma center as the point for all the direct connexion to the soma
+            // set the radius of this point to 90% to avoid any surface conflict
+            parent_point = std::make_tuple(res.get_center(), res.get_radius()*0.90);
         }
     }else {
         if(parent_point && node.is_of_type(morpho_node_type::neuron_branch_type)){
