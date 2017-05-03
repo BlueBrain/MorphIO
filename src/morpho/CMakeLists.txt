@@ -1,8 +1,11 @@
 
 
-list(APPEND SRC_SPATIAL "morpho_spatial.cpp" "gmsh_exporter.cpp"
+list(APPEND SRC_SPATIAL "morpho_spatial.cpp"
+                 "gmsh_exporter.cpp"
 		 "x3d_exporter.cpp"
-		 "morpho_tree.cpp" "morpho_stats.cpp"
+                 "morpho_tree.cpp"
+                 "morpho_circuit.cpp"
+                 "morpho_stats.cpp"
 		 "morpho_transform.cpp")
 
 

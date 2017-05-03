@@ -62,6 +62,74 @@ public:
 };
 
 
+
+///
+/// \brief  soma_sphere
+///
+/// transform operations : transform a morphology with a soma based on a line-loop into a morphology
+///  with a soma modelized as a sphere.
+///
+///  The sphere is computed from the gravity center of the lineloop and from the average distance between the center
+///  and the points of the lineloop
+///
+///
+class soma_sphere_operation : public morpho_operation{
+public:
+    soma_sphere_operation();
+
+
+    morpho_tree apply(const morpho_tree &tree) override;
+
+    std::string name() const override;
+
+};
+
+
+///
+/// \brief  simplify_branch_extreme
+///
+/// transform operations : simplify all morphology branch to the extreme by keeping only first and last point
+///
+///
+///
+class simplify_branch_extreme_operation : public morpho_operation{
+public:
+    simplify_branch_extreme_operation();
+
+
+    morpho_tree apply(const morpho_tree &tree) override;
+
+    std::string name() const override;
+
+};
+
+
+
+///
+/// \brief  simplify_branch_extreme
+///
+/// transform operations : transpose and rotate the morphology using a vector and a quaternion
+///
+///
+///
+class transpose_operation : public morpho_operation{
+public:
+    typedef std::array<double, 3> vector3d;
+    typedef std::array<double, 4> quaternion3d;
+
+    transpose_operation(const vector3d & vector_transpose, const quaternion3d & quaternion_transpose);
+
+
+    morpho_tree apply(const morpho_tree & tree) override;
+
+    std::string name() const override;
+private:
+    vector3d _trans;
+    quaternion3d _rotate;
+};
+
+
+
 } // morpho
 
 

@@ -41,10 +41,6 @@ struct morpho_node::morpho_node_internal{
 
 
 
-
-
-
-
 morpho_node::morpho_node() : _dptr(new morpho_node_internal()){
 
 }

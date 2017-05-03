@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.2)
 
 enable_testing()
 
-set(MORPHOTOOL_VERSION_MAJOR "1")
+set(MORPHOTOOL_VERSION_MAJOR "0")
 set(MORPHOTOOL_VERSION_MINOR "2")
 set(MORPHOTOOL_VERSION "${MORPHOTOOL_VERSION_MAJOR}.${MORPHOTOOL_VERSION_MINOR}")
 
@@ -43,6 +43,7 @@ file(GLOB MORPHO_HEADERS_BITS ${CMAKE_CURRENT_SOURCE_DIR}/include/morpho/*/*)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/highfive/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/hadoken/include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/mvd-tool/include)
 
 
 include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
@@ -53,6 +54,9 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/morpho DESTINATION ${INCLUDE_INS
 
 # Targets
 add_subdirectory(src)
+add_subdirectory(deps/hadoken)
+add_subdirectory(deps/highfive)
+add_subdirectory(tests/unit)
 
 if(BUILD_PYTHON_MODULE)
     find_package(PythonInterpLibs)
@@ -60,10 +64,4 @@ if(BUILD_PYTHON_MODULE)
     find_package(Cython REQUIRED)
     add_subdirectory(pybindings)
 endif()
-
-if(FALSE)
- add_subdirectory(deps/hadoken)
- add_subdirectory(deps/highfive)
-endif()
- add_subdirectory(tests/unit)
 

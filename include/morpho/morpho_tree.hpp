@@ -314,7 +314,7 @@ public:
     /// return IDs by neuron struct type
     std::vector<unsigned int> find_nodes(neuron_struct_type mtype) const;
 
-    /// find return soma
+    /// return soma
     neuron_soma const* get_soma() const;
 
 

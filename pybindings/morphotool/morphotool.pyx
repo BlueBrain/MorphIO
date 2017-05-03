@@ -368,7 +368,7 @@ cdef class Types:
     Circle = _Circle
     Cone = _Cone
     Sphere = _Sphere
-    CurclePipe = _CirclePipe
+    CirclePipe = _CirclePipe
     PointVector = _PointVector
     MatPoints = _Mat_Points
     MatIndex = _Mat_Index
