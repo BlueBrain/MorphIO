@@ -4,3 +4,6 @@
 [submodule "deps/highfive"]
 	path = deps/highfive
 	url = https://github.com/BlueBrain/highfive.git
+[submodule "deps/mvd-tool"]
+	path = deps/mvd-tool
+	url = https://github.com/BlueBrain/MVDTool.git

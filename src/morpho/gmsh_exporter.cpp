@@ -139,7 +139,7 @@ double clean_coordinate(double val){
 
 void gmsh_abstract_file::add_bounding_box(){
 
-    fmt::scat(std::cout, " add bounding box to the export");
+    fmt::scat(std::cout, "add bounding box to the export\n");
 
     double minp[3] = {1e+6, 1e+6, 1e+6};
     double maxp[3] = {-1e+6, -1e+6, -1e+6};
@@ -524,7 +524,7 @@ void gmsh_exporter::export_to_wireframe(){
 
     gmsh_abstract_file vfile;
     fmt::scat(std::cout, "convert morphology tree to gmsh set of wireframe geometries", "\n");
-    for(unsigned int i=0;i<morphotrees.size();i++){
+    for(unsigned int i=0;i< morphotrees.size();i++){
         construct_gmsh_vfile_lines(morphotrees[i], 0, vfile);
     }
 
