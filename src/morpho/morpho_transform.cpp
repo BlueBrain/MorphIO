@@ -254,7 +254,7 @@ void recursive_soma_simplify(const morpho_tree & input_tree,
             radius.reserve(branch.get_number_points() +1);
 
             points.push_back(std::get<0>(parent_point.get()));
-            radius.push_back( radius.front());
+            radius.push_back( origin_radius.front());
 
             std::copy(origin_points.begin(), origin_points.end(), std::back_inserter(points));
             std::copy(origin_radius.begin(), origin_radius.end(), std::back_inserter(radius));
