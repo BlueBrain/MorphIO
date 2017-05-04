@@ -4,7 +4,7 @@ from .includes cimport stats
 # Python bindings to namespace morpho::stats
 # ======================================================================================================================
 
-cdef class MorphoStats:
+cdef class Stats:
     """This class is a namespace for statistic (static) functions"""
 
     @staticmethod

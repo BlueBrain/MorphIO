@@ -51,11 +51,24 @@ cdef extern from "morpho/morpho_mesher.hpp" namespace "morpho":
 # ======================================================================================================================
 cdef extern from "morpho/morpho_transform.hpp" namespace "morpho":
 # ----------------------------------------------------------------------------------------------------------------------
+
+    ###### Cybinding for class morpho_operation ######
     cdef cppclass morpho_operation:
         morpho_tree apply(morpho_tree)
         std.string name()
 
+    # morpho_transform function
     morpho_tree morpho_transform(const morpho_tree &, std.vector[std.shared_ptr[morpho_operation]])
+
+
+# ======================================================================================================================
+cdef extern from "morpho/morpho_transform_filters.hpp" namespace "morpho::transpose_operation":
+# ----------------------------------------------------------------------------------------------------------------------
+    # cython hack for having integer template
+    ctypedef int three_t "3"
+    ctypedef int four_t "4"
+    ctypedef std.array[double, three_t] vector3d
+    ctypedef std.array[double, four_t] quaternion3d
 
 
 # ======================================================================================================================
@@ -72,6 +85,21 @@ cdef extern from "morpho/morpho_transform_filters.hpp" namespace "morpho":
         duplicate_first_point_operation()
         duplicate_first_point_operation(const duplicate_first_point_operation&)
 
+    ###### Cybinding for class soma_sphere_operation ######
+    cdef cppclass soma_sphere_operation(morpho_operation):
+        soma_sphere_operation()
+        soma_sphere_operation(soma_sphere_operation&)
+
+    ###### Cybinding for class simplify_branch_extreme_operation ######
+    cdef cppclass simplify_branch_extreme_operation(morpho_operation):
+        simplify_branch_extreme_operation()
+        simplify_branch_extreme_operation(simplify_branch_extreme_operation&)
+
+    ###### Cybinding for class transpose_operation ######
+    cdef cppclass transpose_operation(morpho_operation):
+        transpose_operation(const vector3d&, const quaternion3d&)
+        transpose_operation(transpose_operation&)
+
 
 # ======================================================================================================================
 cdef extern from "morpho/morpho_spatial.hpp" namespace "morpho":
@@ -83,17 +111,6 @@ cdef extern from "morpho/morpho_spatial.hpp" namespace "morpho":
         #spatial_index(const spatial_index&)
         void add_morpho_tree(std.shared_ptr[morpho_tree])
         bool is_within(point)
-
-# ======================================================================================================================
-cdef extern from "morpho/morpho_transform.hpp" namespace "morpho":
-# ----------------------------------------------------------------------------------------------------------------------
-
-    ###### Cybinding for class morpho_operation ######
-    cdef cppclass morpho_operation:
-        morpho_operation()
-        morpho_operation(const morpho_operation&)
-        morpho_tree apply(morpho_tree)
-        std.string name()
 
 
 # ======================================================================================================================
@@ -164,6 +181,8 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         neuron_soma* get_soma()
 
 
+# Specialize std::move (only way of using it in cython)
+# -----------------------------------------------------
 cdef extern from "<utility>" namespace "std":
     cdef std.vector[point] move_PointVector "std::move" (std.vector[point])
 

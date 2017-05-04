@@ -19,3 +19,7 @@ cdef extern from "<utility>" namespace "std":
 
 cdef extern from "<memory>" namespace "std":
     shared_ptr[T] static_pointer_cast[T](...)
+
+cdef extern from "<array>" namespace "std":
+    cdef cppclass array[T, N]:
+        T& operator[](int)

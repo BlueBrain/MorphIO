@@ -356,24 +356,3 @@ DEF ENABLE_MESHER_GCAL = 0
 IF ENABLE_MESHER_GCAL:
     include "morpho_mesher.pxi"
 
-
-# ************************************
-# Class-Namespace alias
-# ************************************
-
-cdef class Types:
-    Point = _Point
-    Box = _Box
-    Linestring = _Linestring
-    Circle = _Circle
-    Cone = _Cone
-    Sphere = _Sphere
-    CirclePipe = _CirclePipe
-    PointVector = _PointVector
-    MatPoints = _Mat_Points
-    MatIndex = _Mat_Index
-
-
-class Transforms:
-    Delete_Duplicate_Point_Operation = _py_delete_duplicate_point_operation
-    Duplicate_First_Point_Operation = _py_duplicate_first_point_operation

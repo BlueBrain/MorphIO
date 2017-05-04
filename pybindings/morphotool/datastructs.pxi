@@ -12,6 +12,7 @@ np.import_array()
 cdef extern from *:
     ctypedef int zero_t "0"
     ctypedef int one_t "1"
+
 ctypedef unsigned int uint
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -380,3 +381,22 @@ cdef class _Mat_Index(_ArrayT):
     cdef _Mat_Index from_value(const morpho.mat_index &ref):
         cdef morpho.mat_index *ptr = new morpho.mat_index(ref)
         return _Mat_Index.from_ptr(ptr, True)
+
+
+
+# ************************************
+# Class-Namespace alias
+# ************************************
+
+class Types:
+    Point = _Point
+    Box = _Box
+    Linestring = _Linestring
+    Circle = _Circle
+    Cone = _Cone
+    Sphere = _Sphere
+    CirclePipe = _CirclePipe
+    PointVector = _PointVector
+    MatPoints = _Mat_Points
+    MatIndex = _Mat_Index
+

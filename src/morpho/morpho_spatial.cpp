@@ -142,7 +142,7 @@ inline bool point_is_in_truncated_cones(const cone & c, const point & p1){
 }
 
 bool spatial_index::is_within(const point & p) const{
-    using value_type = decltype(p(0));
+    // using value_type = decltype(p(0));  // local typedef not used
     
     box fake_box(p - point(0.01, 0.01, 0.01), p + point(0.01, 0.01, 0.01));
 

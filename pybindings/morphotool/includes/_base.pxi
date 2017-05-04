@@ -26,6 +26,10 @@ cdef class _py__base:
         if operation == OPERATOR.EQUAL:
             return self._ptr == other._ptr
 
+    @staticmethod
+    cdef _py__base _create(type cls, const void * ptr):
+        cdef _py__base obj = cls.__new__(cls)
+        obj._ptr = <void*> ptr
 
 # -------------------------------------------------------------
 # BASE Array Type
