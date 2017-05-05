@@ -714,10 +714,10 @@ void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree & tree, int node_id, 
             gmsh_polyline_points.reserve(linestring.size());
 
             std::for_each(linestring.begin(), linestring.end(), [&](const line_point & p ){
-                gmsh_point p1(p, 0.0);
-                p1.setPhysical(true);
+                gmsh_point new_point(p, 0.0);
+                new_point.setPhysical(true);
 
-                gmsh_polyline_points.push_back(p);
+                gmsh_polyline_points.push_back(new_point);
             });
 
             gmsh_polyline segment(gmsh_polyline_points);
