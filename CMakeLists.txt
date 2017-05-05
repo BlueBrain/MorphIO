@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.2)
 enable_testing()
 
 set(MORPHOTOOL_VERSION_MAJOR "0")
-set(MORPHOTOOL_VERSION_MINOR "2")
+set(MORPHOTOOL_VERSION_MINOR "3")
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
       ${PROJECT_SOURCE_DIR}/CMake/portability
