@@ -3,7 +3,10 @@
 """A setuptools based setup module."""
 import os.path
 from distutils.core import setup
-                    
+import sys
+          
+IN_VIRTUAL_ENV = hasattr(sys, 'real_prefix')
+
 def find_packages(where="."):
     """Short version of setuptools.find_packages"""
     all_pkgs=[]
@@ -19,6 +22,7 @@ def find_packages(where="."):
                 all_pkgs.append(package)
                 dirs.append(cdir)  # Search package subdirectories
     return all_pkgs
+
 
 setup_opts = {
     'name'         : 'morphotool',
@@ -38,5 +42,8 @@ setup_opts = {
     #'package_dir'  : {'':''},
 }
 
+
 if __name__ == '__main__':
+    if not IN_VIRTUAL_ENV:
+        sys.argv.append("--user")
     setup(**setup_opts)
