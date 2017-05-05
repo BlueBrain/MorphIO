@@ -51,7 +51,7 @@ public:
     Spikes readUntil(float max) final;
     void readSeek(float toTimeStamp) final;
     void writeSeek(float toTimeStamp) final;
-    void write(const Spikes& spikes) final;
+    void write(const Spike* spikes, size_t size) final;
     bool supportsBackwardSeek() const final { return true; }
 private:
     std::unique_ptr<BinaryReportMap> _memFile;

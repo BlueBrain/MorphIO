@@ -132,7 +132,7 @@ public:
     }
 
     /** @copydoc brion::SpikeReport::write */
-    virtual void write(const Spikes& spikes LB_UNUSED)
+    virtual void write(const Spike* spikes LB_UNUSED, size_t size LB_UNUSED)
     {
         LBTHROW(std::runtime_error(
             "Operation not supported in spike report plugin"));

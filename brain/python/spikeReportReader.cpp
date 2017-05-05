@@ -53,25 +53,24 @@ bp::object SpikeReportReader_getSpikes(SpikeReportReader& reader,
 
 void export_SpikeReportReader()
 {
-    const auto selfarg = bp::arg("self");
-
     // clang-format off
-bp::class_< SpikeReportReader, boost::noncopyable >(
-    "SpikeReportReader", bp::no_init )
-    .def( "__init__", bp::make_constructor( _initURI ),
-          DOXY_FN( brain::SpikeReportReader::SpikeReportReader( const brion::URI& )))
-    .def( "__init__", bp::make_constructor( _initURIandGIDSet ),
-          DOXY_FN( brain::SpikeReportReader::SpikeReportReader( const brion::URI&, const GIDSet& )))
-    .def( "close", &SpikeReportReader::close,
-          DOXY_FN( brain::SpikeReportReader::close ))
-    .def( "get_spikes", SpikeReportReader_getSpikes,
-          ( selfarg, bp::arg( "start_time" ), bp::arg( "stop_time" )),
-          DOXY_FN( brain::SpikeReportReader::getSpikes ))
-    .add_property( "end_time", &SpikeReportReader::getEndTime,
-                   DOXY_FN( brain::SpikeReportReader::getEndTime ))
-    .add_property( "has_ended", &SpikeReportReader::hasEnded,
-                   DOXY_FN( brain::SpikeReportReader::hasEnded ))
-    ;
+const auto selfarg = bp::arg("self");
+
+bp::class_<SpikeReportReader, boost::noncopyable>(
+    "SpikeReportReader", bp::no_init)
+    .def("__init__", bp::make_constructor(_initURI),
+         DOXY_FN(brain::SpikeReportReader::SpikeReportReader(const brion::URI&)))
+    .def("__init__", bp::make_constructor(_initURIandGIDSet),
+         DOXY_FN(brain::SpikeReportReader::SpikeReportReader(const brion::URI&, const GIDSet&)))
+    .def("close", &SpikeReportReader::close,
+         DOXY_FN(brain::SpikeReportReader::close))
+    .def("get_spikes", SpikeReportReader_getSpikes,
+         (selfarg, bp::arg("start_time"), bp::arg("stop_time")),
+         DOXY_FN(brain::SpikeReportReader::getSpikes))
+    .add_property("end_time", &SpikeReportReader::getEndTime,
+                  DOXY_FN(brain::SpikeReportReader::getEndTime))
+    .add_property("has_ended", &SpikeReportReader::hasEnded,
+                  DOXY_FN(brain::SpikeReportReader::hasEnded));
     // clang-format on
 }
 }

@@ -292,10 +292,17 @@ public:
      * Upon return getCurrenTime() is the greatest of all the spike times
      * plus an epsilon.
      *
-     * @param spikes A collection of spikes sorted by timestamp in ascending
+     * @param spikes An array of spikes sorted by timestamp in ascending
      *        order. For every spike, its timestamp must be >= getCurrentTime().
+     * @param size The size of the spies array.
      * @throw std::runtime_error if the report is read-only,
      * @throw std::logic_error if a precondition does not hold
+     * @version 2.0
+     */
+    BRION_API void write(const Spike* spikes, size_t size);
+
+    /**
+     * Overload of the function above provided for convenience
      * @version 2.0
      */
     BRION_API void write(const Spikes& spikes);

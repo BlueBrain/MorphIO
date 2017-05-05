@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2016, EPFL/Blue Brain Project
+# Copyright (c) 2013-2017, EPFL/Blue Brain Project
 #                          ahmet.bilgili@epfl.ch
 #                          juan.hernando@epfl.ch
 #
@@ -20,6 +20,7 @@ set(BRAIN_PYTHON_SOURCES
   circuit.cpp
   compartmentReport.cpp
   spikeReportReader.cpp
+  spikeReportWriter.cpp
   synapses.cpp
   neuron/morphology.cpp
 )
@@ -30,7 +31,6 @@ docstrings(BRAIN_PYTHON_SOURCES BRAIN_PUBLIC_HEADERS
 list(APPEND BRAIN_PYTHON_SOURCES
   arrayHelpers.cpp
   helpers.cpp
-  spikeReportWriter.cpp
   spikes.cpp
   submodules.cpp
   test.cpp

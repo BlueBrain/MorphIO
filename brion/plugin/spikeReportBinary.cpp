@@ -217,11 +217,11 @@ void SpikeReportBinary::writeSeek(float toTimeStamp)
     readSeek(toTimeStamp);
 }
 
-void SpikeReportBinary::write(const Spikes& spikes)
+void SpikeReportBinary::write(const Spike* spikes, const size_t size)
 {
-    size_t totalSpikes = _startIndex + spikes.size();
+    size_t totalSpikes = _startIndex + size;
 
-    if (spikes.empty())
+    if (size == 0)
         return;
 
     // create or resize the file
@@ -229,10 +229,10 @@ void SpikeReportBinary::write(const Spikes& spikes)
         _memFile->resize(totalSpikes);
 
     Spike* spikeArray = _memFile->getWritableSpikes();
-    for (const Spike& spike : spikes)
-        spikeArray[_startIndex++] = spike;
+    for (size_t i = 0; i != size; ++i)
+        spikeArray[_startIndex++] = spikes[i];
 
-    const float lastTimestamp = spikes.rbegin()->first;
+    const float lastTimestamp = spikes[size - 1].first;
     _currentTime =
         std::nextafter(lastTimestamp, std::numeric_limits<float>::max());
     _endTime = std::max(_endTime, lastTimestamp);

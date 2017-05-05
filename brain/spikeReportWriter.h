@@ -56,7 +56,11 @@ public:
     /**
      * Writes the spike times and cell GIDs.
      *
+     * \if pybind
      * @param spikes Spikes to write.
+     * \else
+     * @param spikes Spikes to write.
+     * \endif
      * @version 1.0
      */
     void writeSpikes(const Spikes& spikes);
@@ -77,6 +81,9 @@ public:
      * @version 1.0
      */
     void close();
+
+    /** @internal Use by the Python wrapping */
+    void writeSpikes(const Spike* spike, size_t size);
 
 private:
     class _Impl;

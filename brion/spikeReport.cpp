@@ -244,6 +244,11 @@ std::future<void> SpikeReport::seek(const float toTimeStamp)
 
 void SpikeReport::write(const Spikes& spikes)
 {
+    write(spikes.data(), spikes.size());
+}
+
+void SpikeReport::write(const Spike* spikes, const size_t size)
+{
     _impl->plugin->_checkCanWrite();
     _impl->plugin->_checkNotClosed();
 
@@ -251,16 +256,16 @@ void SpikeReport::write(const Spikes& spikes)
         LBTHROW(
             std::runtime_error("Can't write spikes: Pending seek operation"));
 
-    if (!spikes.empty() && spikes.front().first < getCurrentTime())
+    if (size != 0 && spikes[0].first < getCurrentTime())
     {
         LBTHROW(std::logic_error("Can't write spikes: first spike at " +
-                                 std::to_string(spikes.front().first) +
+                                 std::to_string(spikes[0].first) +
                                  " time inferior to current time " +
                                  std::to_string(getCurrentTime())));
     }
 
-    if (!spikes.empty() &&
-        !std::is_sorted(spikes.begin(), spikes.end(),
+    if (size != 0 &&
+        !std::is_sorted(spikes, spikes + size,
                         [](const Spike& x, const Spike& y) {
                             return x.first < y.first;
                         }))
@@ -269,7 +274,7 @@ void SpikeReport::write(const Spikes& spikes)
             std::logic_error("Can't write spikes: Expecting a sorted spikes"));
     }
 
-    _impl->plugin->write(spikes);
+    _impl->plugin->write(spikes, size);
 }
 
 bool SpikeReport::supportsBackwardSeek() const

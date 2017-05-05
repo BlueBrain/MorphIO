@@ -73,6 +73,9 @@ public:
      * open on the right, so assuming that spikes arrive in order, this
      * method will return a full snapshot of the spikes between [start, end).
      * Precondition : start < end
+     * \if pybind
+     * @return A numpy array of dytpe = "f4, u4"
+     * \endif
      * @throw std::logic_error if the precondition is not fulfilled.
      * @version 1.0
      */

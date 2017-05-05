@@ -39,7 +39,7 @@ public:
     static std::string getDescription();
 
     void close() final;
-    void write(const Spikes& spikes) final;
+    void write(const Spike* spikes, size_t size) final;
 };
 }
 }

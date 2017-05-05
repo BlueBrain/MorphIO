@@ -56,6 +56,9 @@ boost::python::object toNumpy(const Matrix4f& matrix);
  */
 bool gidsFromNumpy(const boost::python::object& object, uint32_ts& result);
 
+std::pair<const Spike*, size_t> spikesFromNumpy(
+    const boost::python::object& object);
+
 /// tuple(timestamp : double, data : 1D ndarray )
 boost::python::object frameToTuple(CompartmentReportFrame&& frame);
 
@@ -63,6 +66,7 @@ boost::python::object frameToTuple(CompartmentReportFrame&& frame);
 /// or tuple(timestamp : double, data : 1D ndarray) if frames.size == 1
 boost::python::object framesToTuple(CompartmentReportFrames&& frames);
 
+// Implemented for: Matrix4f
 template <typename T>
 T fromNumpy(const boost::python::object& object);
 }

@@ -80,9 +80,9 @@ void SpikeReportBluron::close()
 {
 }
 
-void SpikeReportBluron::write(const Spikes& spikes)
+void SpikeReportBluron::write(const Spike* spikes, const size_t size)
 {
-    append(spikes, [](std::ostream& file, const Spike& spike) {
+    append(spikes, size, [](std::ostream& file, const Spike& spike) {
         file << spike.first << " " << spike.second << "\n";
     });
 }

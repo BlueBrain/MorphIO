@@ -233,9 +233,10 @@ Spikes SpikeReportASCII::parse(const std::string& filename,
     return spikes;
 }
 
-void SpikeReportASCII::append(const Spikes& spikes, const WriteFunc& writefunc)
+void SpikeReportASCII::append(const Spike* spikes, const size_t size,
+                              const WriteFunc& writeFunc)
 {
-    if (!spikes.size())
+    if (size == 0)
         return;
 
     std::fstream file{getURI().getPath(),
@@ -246,12 +247,12 @@ void SpikeReportASCII::append(const Spikes& spikes, const WriteFunc& writefunc)
         return;
     }
 
-    for (const Spike& spike : spikes)
-        writefunc(file, spike);
+    for (size_t i = 0; i != size; ++i)
+        writeFunc(file, spikes[i]);
 
     file.flush();
 
-    const float lastTimestamp = spikes.rbegin()->first;
+    const float lastTimestamp = spikes[size - 1].first;
     _currentTime =
         std::nextafter(lastTimestamp, std::numeric_limits<float>::max());
     _endTime = std::max(_endTime, lastTimestamp);

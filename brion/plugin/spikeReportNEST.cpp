@@ -125,9 +125,9 @@ void SpikeReportNEST::close()
 {
 }
 
-void SpikeReportNEST::write(const Spikes& spikes)
+void SpikeReportNEST::write(const Spike* spikes, const size_t size)
 {
-    append(spikes, [](std::ostream& file, const Spike& spike) {
+    append(spikes, size, [](std::ostream& file, const Spike& spike) {
         file << spike.second << " " << spike.first << '\n';
     });
 }

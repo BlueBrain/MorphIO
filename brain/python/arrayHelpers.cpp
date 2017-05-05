@@ -351,6 +351,33 @@ bool gidsFromNumpy(const boost::python::object& object, uint32_ts& result)
     return false; // Unreachable
 }
 
+std::pair<const Spike*, size_t> spikesFromNumpy(
+    const boost::python::object& object)
+{
+    if (!PyArray_Check(object.ptr()))
+    {
+        PyErr_SetString(PyExc_ValueError,
+                        "Cannot convert argument to Spike array");
+        boost::python::throw_error_already_set();
+    }
+
+    PyArrayObject* array = reinterpret_cast<PyArrayObject*>(object.ptr());
+    PyArray_Descr* desc = PyArray_DESCR(array);
+    PyArray_Descr* expected = createDtype("f4, u4");
+    const bool equiv = PyArray_EquivTypes(desc, expected);
+    Py_DECREF(expected);
+    if (PyArray_NDIM(array) != 1 || !equiv)
+    {
+        PyErr_SetString(PyExc_ValueError,
+                        "Cannot convert argument to Spike array");
+        boost::python::throw_error_already_set();
+    }
+
+    return std::pair<const Spike*, size_t>(static_cast<Spike*>(
+                                               PyArray_GETPTR1(array, 0)),
+                                           PyArray_DIMS(array)[0]);
+}
+
 template <>
 Matrix4f fromNumpy(const bp::object& o)
 {

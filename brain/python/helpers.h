@@ -30,8 +30,8 @@
 namespace brain
 {
 template <typename T>
-inline std::vector<T> vectorFromPython(boost::python::object o,
-                                       const char* errorMessage)
+inline std::vector<T> vectorFromIterable(boost::python::object o,
+                                         const char* errorMessage)
 {
     std::vector<T> vector;
     try

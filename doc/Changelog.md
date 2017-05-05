@@ -3,7 +3,9 @@ Changelog {#Changelog}
 
 # git master
 
-* [152](https://github.com/BlueBrain/Brion/pull/151):
+* [153](https://github.com/BlueBrain/Brion/pull/153):
+  Updated Python wrapping of SpikeReportWriter to handle nympy arrays of spikes
+* [152](https://github.com/BlueBrain/Brion/pull/152):
   Added the function brain.neuron.compute_morphological_samples to help getting
   sample positions from morphologies
 * [151](https://github.com/BlueBrain/Brion/pull/151):

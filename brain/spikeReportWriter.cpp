@@ -51,6 +51,12 @@ void SpikeReportWriter::writeSpikes(const brion::Spikes& spikes)
     _impl->_report.write(spikes);
 }
 
+void SpikeReportWriter::writeSpikes(const brion::Spike* spikes,
+                                    const size_t size)
+{
+    _impl->_report.write(spikes, size);
+}
+
 const lunchbox::URI& SpikeReportWriter::getURI() const
 {
     return _impl->_report.getURI();
