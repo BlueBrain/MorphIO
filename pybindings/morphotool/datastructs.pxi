@@ -42,6 +42,12 @@ cdef class _Point(_py__base):
         cdef double *_data = <double *> self.ptr().data()
         return (_data[0], _data[1], _data[2])
 
+    @property
+    def nparray(self):
+        cdef double * _data = <double*> self.ptr().data()
+        cdef np.npy_intp dim = 3
+        return _ArrayT.nparray_create(1, &dim, np.NPY_DOUBLE, _data)
+
     def __str__(self):
         cdef double * _data = <double *> self.ptr().data()
         cdef char outstr[30]

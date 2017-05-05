@@ -59,12 +59,19 @@ cdef class _ArrayT(_py__base):
     cdef void init_nparray(_ArrayT self, unsigned int dims, npy_intp size[], int t, void* base_addr):
         # Create NP wrapper
         cdef np.ndarray npa = np.PyArray_SimpleNewFromData(dims, size, t, base_addr)
+        self.nparray = npa
 
         # This is the ugly way (before NP 1.7) to reference the memory owner from the NP array, to keep it alive
         npa.base = <PyObject*>self
         Py_INCREF(self)
 
-        self.nparray = npa
+
+    @staticmethod
+    cdef object nparray_create(int nd, npy_intp* size, int typenum, void * data):
+        """Function to create a np array from a C buffer, copying the data"""
+        cdef np.ndarray npa = np.PyArray_SimpleNew(nd, size, typenum)
+        memcpy(npa.data, data, np.PyArray_NBYTES(npa))
+        return npa
 
 
 # --------------------------------------------------------

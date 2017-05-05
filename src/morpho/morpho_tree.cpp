@@ -398,6 +398,7 @@ box neuron_soma::get_bounding_box() const{
 }
 
 const std::vector<point> & neuron_soma::get_line_loop() const{
+    // If soma is defined by a single point this makes little sense
     return _dptr->points;
 }
 

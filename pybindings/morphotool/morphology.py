@@ -24,7 +24,7 @@ class cached_property(object):
 
 class Morphology(MorphoTree, object):
     """
-    A class representing a Morphology, builds on a Morpho_Tree instance.
+    A class representing a Morphology, builds on a MorphoTree instance.
     Loader object available in .loader property.
     Methods suffixed with _s return Section objects, which provide extended functionality and 
     are guaranteed to cache results and always return the same object. 
@@ -74,6 +74,11 @@ class Morphology(MorphoTree, object):
         return self.axon + self.dendrites
 
     @property
+    def soma(self):
+        soma_node = super(Morphology, self).soma
+        return soma_node if self.raw else Section(soma_node, self)
+
+    @property
     def axon(self):
         source = self.sections if not self.raw else self.all_nodes
         return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.axon)
@@ -119,28 +124,24 @@ class Neurite(Section):
         return "<Neurite section %d of %s>" % (self.index, self._tree.label)
 
     # From branch object
-    number_points = property(lambda self: self.branch_obj.number_points)
-    pointsVector  = property(lambda self: self.branch_obj.pointsVector)
-    points        = property(lambda self: self.branch_obj.points)
-    radius        = property(lambda self: self.branch_obj.radius)
-    bounding_box  = property(lambda self: self.branch_obj.bounding_box)
-    # Segments / these are replaced by better names, and cached
-    # linestring   = property(lambda self: self.branch_obj.linestring)
-    # circle_pipe  = property(lambda self: self.branch_obj.circle_pipe)
-    get_segment              = lambda self, n: self.branch_obj.get_segment(n)
-    get_segment_bounding_box = lambda self, n: self.branch_obj.get_segment_bounding_box(n)
-    get_junction             = lambda self, n: self.branch_obj.get_junction(n)
+    # Properties
+    number_points  = property(lambda self: self.branch_obj.number_points)
+    pointsVector   = property(lambda self: self.branch_obj.pointsVector)
+    points         = property(lambda self: self.branch_obj.points)
+    radius         = property(lambda self: self.branch_obj.radius)
+    bounding_box   = property(lambda self: self.branch_obj.bounding_box)
+    segments_disks = cached_property(lambda self: self.branch_obj.circle_pipe)
+    segments_lines = cached_property(lambda self: self.branch_obj.linestring)
+    # Functions
+    get_segment               = lambda self, n: self.branch_obj.get_segment(n)
+    get_segment_bounding_box  = lambda self, n: self.branch_obj.get_segment_bounding_box(n)
+    get_junction              = lambda self, n: self.branch_obj.get_junction(n)
     get_junction_bounding_box = lambda self, n: self.branch_obj.get_junction_sphere_bounding_box(n)
 
     @cached_property
     def children(self):
         return tuple(Section(self._tree.get_section(child_id), self._tree)
-                    for child_id in self._tree.get_children(self.index))
-
-    # ? did it mean
-    # @property
-    # def graft(self):
-    #     return None
+                     for child_id in self._tree.get_children(self.index))
 
     def is_ancestor_of(self, descendant):
         assert isinstance(descendant, Section)
@@ -153,11 +154,9 @@ class Neurite(Section):
     def length(self):
         return numpy.sum(self.segments_length)
 
-
-    # ? did it mean
-    # @property
-    # def morphology(self):
-    #     return None
+    @property
+    def morphology(self):
+        return self._tree
 
     @property
     def parent_id(self):
@@ -206,15 +205,7 @@ class Neurite(Section):
         alpha = offset / self.segments_length[segment]
         return (1 - alpha) * self.points[segment] + alpha * self.points[segment + 1]
 
-    @cached_property
-    def segments_disks(self):
-        return self.branch_obj.circle_pipe
-
-    @cached_property
-    def segments_lines(self):
-        return self.branch_obj.linestring
-
-    # Modifiers not available
+    # Modifiers: not available
     # def move_point(self):
     #     pass
     #
@@ -229,21 +220,18 @@ class Soma(Section):
     def __repr__(self):
         return "<Soma of %s>" % (self._tree.label,)
 
-    def position(self):
-        pass
+    # Inherit props
+    sphere = cached_property(lambda self: self.branch_obj.sphere)
+    bounding_box = property(lambda self: self.branch_obj.bounding_box)
+    surface_points = cached_property(lambda self: self.branch_obj.line_loop)
 
-    def mean_radius(self):
-        pass
+    # Shortcuts from cached sphere
+    center = property(lambda self: self.sphere.center)
+    radius = property(lambda self: self.sphere.radius)
 
-    def max_radius(self):
-        pass
-
-    def surface_points(self):
-        pass
-
-    def __str__(self):
-        pass
-
+    @property
+    def radius_max(self):
+        return numpy.linalg.norm(self.surface_points.nparray - self.center.nparray, axis=1).max()
 
 
 class MorphologyDB(object):
