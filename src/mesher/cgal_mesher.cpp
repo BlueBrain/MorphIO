@@ -20,6 +20,7 @@
 #include <string>
 #include <functional>
 #include <chrono>
+#include <unistd.h>
 
 #include <hadoken/format/format.hpp>
 
@@ -110,8 +111,10 @@ FT is_part_of_morphotree(const Point& p, const spatial_index & index,
     stats.total_iterations++;
 
    if(stats.total_iterations%100000 ==0){
+        const bool is_atty = bool(isatty(fileno(stdout)));
+        const char * end_line = (is_atty) ? ("\r") : ("\n" );
         fmt::scat(std::cout, "Geometry scan progress: ", stats.total_iterations, " points check with ",
-                              stats.within_iterations," positives matches", "\r");
+                              stats.within_iterations," positives matches", end_line);
         std::flush(std::cout);
     }
 
