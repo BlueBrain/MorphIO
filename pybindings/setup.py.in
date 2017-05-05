@@ -3,9 +3,8 @@
 """A setuptools based setup module."""
 import os.path
 from distutils.core import setup
-import sys
           
-IN_VIRTUAL_ENV = hasattr(sys, 'real_prefix')
+#IN_VIRTUAL_ENV = hasattr(sys, 'real_prefix')
 
 def find_packages(where="."):
     """Short version of setuptools.find_packages"""
@@ -44,6 +43,4 @@ setup_opts = {
 
 
 if __name__ == '__main__':
-    if not IN_VIRTUAL_ENV:
-        sys.argv.append("--user")
     setup(**setup_opts)
