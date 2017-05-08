@@ -10,6 +10,7 @@ _h5loader = morphotool.MorphoReader
 
 
 # Cache properties
+# noinspection PyPep8Naming
 class cached_property(object):
     def __init__(self, func):
         self.__doc__ = getattr(func, '__doc__')
@@ -31,7 +32,7 @@ class Morphology(MorphoTree, object):
     """
 
     def __init__(self, morpho_dir, morpho_name, layer=None, mtype=None):
-        self.loader = _h5loader(path.join(morpho_dir, morpho_name+".h5"))
+        self.loader = _h5loader(path.join(morpho_dir, morpho_name + ".h5"))
         self._name_attrs = MorphNameExtract(morpho_name)
         self.layer = layer
         self.mtype = mtype
@@ -97,9 +98,9 @@ class Morphology(MorphoTree, object):
         source = self.sections if not self.raw else self.all_nodes
         return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.dentrite_apical)
 
-    # ? BBPSDK functions that might not be required
-    # def path_to_soma(self):
-    # def mesh(self):
+        # ? BBPSDK functions that might not be required
+        # def path_to_soma(self):
+        # def mesh(self):
 
 
 class Section(object):
@@ -110,7 +111,7 @@ class Section(object):
         # Otherwise a Neurite
         return object.__new__(Neurite)
 
-    def __init__(self, branch_object, tree):    # type: (morphotool.NeuronBranch, morphotool.MorphoTree) -> None
+    def __init__(self, branch_object, tree):  # type: (morphotool.NeuronBranch, morphotool.MorphoTree) -> None
         self.branch_obj = branch_object
         self._tree = tree
 
@@ -125,17 +126,17 @@ class Neurite(Section):
 
     # From branch object
     # Properties
-    number_points  = property(lambda self: self.branch_obj.number_points)
-    pointsVector   = property(lambda self: self.branch_obj.pointsVector)
-    points         = property(lambda self: self.branch_obj.points)
-    radius         = property(lambda self: self.branch_obj.radius)
-    bounding_box   = property(lambda self: self.branch_obj.bounding_box)
+    number_points = property(lambda self: self.branch_obj.number_points)
+    pointsVector  = property(lambda self: self.branch_obj.pointsVector)
+    points        = property(lambda self: self.branch_obj.points)
+    radius        = property(lambda self: self.branch_obj.radius)
+    bounding_box  = property(lambda self: self.branch_obj.bounding_box)
     segments_disks = cached_property(lambda self: self.branch_obj.circle_pipe)
     segments_lines = cached_property(lambda self: self.branch_obj.linestring)
     # Functions
-    get_segment               = lambda self, n: self.branch_obj.get_segment(n)
-    get_segment_bounding_box  = lambda self, n: self.branch_obj.get_segment_bounding_box(n)
-    get_junction              = lambda self, n: self.branch_obj.get_junction(n)
+    get_segment = lambda self, n: self.branch_obj.get_segment(n)
+    get_segment_bounding_box = lambda self, n: self.branch_obj.get_segment_bounding_box(n)
+    get_junction = lambda self, n: self.branch_obj.get_junction(n)
     get_junction_bounding_box = lambda self, n: self.branch_obj.get_junction_sphere_bounding_box(n)
 
     @cached_property
@@ -179,7 +180,6 @@ class Neurite(Section):
             node = node.parent
         return tuple(parents)
 
-
     # Previous segment API. Replace with points, segments_disks, segments_lines
     # def compartments(self):
     # def compartment(self):
@@ -205,15 +205,10 @@ class Neurite(Section):
         alpha = offset / self.segments_length[segment]
         return (1 - alpha) * self.points[segment] + alpha * self.points[segment + 1]
 
-    # Modifiers: not available
-    # def move_point(self):
-    #     pass
-    #
-    # def split_segment(self):
-    #     pass
-    #
-    # def resize_diameter(self):
-    #     pass
+        # Modifiers: not available
+        # def move_point(self):
+        # def split_segment(self):
+        # def resize_diameter(self):
 
 
 class Soma(Section):
@@ -249,21 +244,18 @@ class MorphologyDB(object):
         self._morphos_layer_mtype = {}
         if db_file:
             with open(path.join(db_path, db_file)) as f:
-                self._morphos_layer_mtype = { self.split_line_to_details(l) for l in f }
-
+                self._morphos_layer_mtype = {self.split_line_to_details(l) for l in f}
 
     def __getitem__(self, morpho_name):
         item = self._db.get(morpho_name)
         if not item:
-            item = self._db[morpho_name] = Morphology(self.db_path, morpho_name, *self._morphos_layer_mtype.get(item,()))
+            item = self._db[morpho_name] = Morphology(self.db_path, morpho_name,
+                                                      *self._morphos_layer_mtype.get(item, ()))
         return item
 
 
-
-# -----------------------------------------------------------
-# Aux functions
-# -----------------------------------------------------------
 class MorphNameExtract(object):
+    """Helper class holding info from naming scheme"""
     scaled_mixed_morphname_pattern = re.compile(
         r"dend\-(?P<dend>[\w\-\+]+)_axon\-(?P<axon>[\w\-\+]+)_\-"
         r"_Scale_x(?P<scale_x>[\d]+.[\d]+)_y(?P<scale_y>[\d]+.[\d]+)_z(?P<scale_z>[\d]+.[\d]+)"
@@ -277,10 +269,6 @@ class MorphNameExtract(object):
     )
 
     def __init__(self, name, mixed=None, scaled=None, cloned=None):
-        mixed =False
-        cloned=False
-        scaled=False
-
         """ Extraction results """
         if mixed is None:
             self.morphname_extract(name)
@@ -299,8 +287,8 @@ class MorphNameExtract(object):
         if self.cloned:
             name = name[0:str.find(name, '_-_Clone_')]  # Remove from name
 
-        m=None
-        attributes=None
+        m = None
+        attributes = ()
         if self.mixed and self.scaled:
             m = self.scaled_mixed_morphname_pattern.match(name)
             attributes = ("dend", "axon", "scale_x", "scale_y", "scale_z")
@@ -319,4 +307,3 @@ class MorphNameExtract(object):
 
         for a in attributes:
             setattr(self, a, m.group(a))
-

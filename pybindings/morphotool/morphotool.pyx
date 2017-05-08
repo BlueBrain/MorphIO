@@ -41,7 +41,7 @@ cdef class NEURON_STRUCT_TYPE(_Enum):
 cdef class MorphoNode(_py__base):
     "Python wrapper class for morpho_node (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef std.shared_ptr[morpho.morpho_node] _autodealoc
+    cdef std.shared_ptr[morpho.morpho_node] _sharedptr
     cdef morpho.morpho_node *ptr0(self):
         return <morpho.morpho_node*> self._ptr
 
@@ -74,7 +74,7 @@ cdef class MorphoNode(_py__base):
             # default return just "MorphoNode"
             obj = MorphoNode.__new__(MorphoNode)
             obj._ptr = <void*>ptr
-            if owner: obj._autodealoc.reset(obj.ptr0())
+            if owner: obj._sharedptr.reset(obj.ptr0())
 
         obj.index = index
         return obj
@@ -116,17 +116,20 @@ cdef class NeuronNode3D(MorphoNode):
         return self.ptr1().is_of_type(<morpho.morpho_node_type> mtype)
 
     def __repr__(self):
-        return "<MorphoNode::%s nr.%d>" % (self.branch_type.name, self.index)
+        if self.index > -1:
+            return "<MorphoNode::%s nr.%d>" % (self.branch_type.name, self.index)
+        return "<MorphoNode::%s>" % (self.branch_type.name,)
 
     cdef _init(self):
         self.branch_type = _EnumItem(NEURON_STRUCT_TYPE, <int>self.ptr1().get_branch_type())
+        self.index = -1
 
     @staticmethod
     cdef NeuronNode3D from_ptr0(type cls, const morpho.neuron_node_3d *ptr, bool owner=False):
         cdef NeuronNode3D obj = cls.__new__(cls)
         obj._ptr = <void*>ptr
         obj._init()
-        if owner: obj._autodealoc.reset(obj.ptr1())
+        if owner: obj._sharedptr.reset(obj.ptr1())
         return obj
 
     @staticmethod
@@ -147,10 +150,15 @@ cdef class NeuronBranch(NeuronNode3D):
     cdef morpho.neuron_branch *ptr2(self):
         return <morpho.neuron_branch*> self._ptr
 
-    def __init__(self, int neuron_type, _PointVector points, std.vector[double] radius):
-        self._ptr = new morpho.neuron_branch(<morpho.neuron_struct_type> neuron_type, morpho.move_PointVector(deref(points.ptr())), morpho.move_DoubleVec(radius))
-        self._autodealoc.reset(self.ptr2())
+    def __init__(self, int neuron_type, double[:,:] ptsVector, std.vector[double] radius):
+        cdef vector[morpho.point] ptsvec
+        cdef double [:] pt
+        for pt in ptsVector:
+            ptsvec.push_back(morpho.point(pt[0],pt[1], pt[2]))
+        self._ptr = new morpho.neuron_branch(<morpho.neuron_struct_type> neuron_type, morpho.move_PointVector(ptsvec), morpho.move_DoubleVec(radius))
+        self._sharedptr.reset(self.ptr2())
         self._points_vec = None
+        self._init()
 
     def is_of_type(self, int mtype):
         return self.ptr2().is_of_type(<morpho.morpho_node_type> mtype)
@@ -222,6 +230,14 @@ cdef class NeuronSoma(NeuronNode3D):
     cdef morpho.neuron_soma *ptr2(self):
         return <morpho.neuron_soma*> self._ptr
 
+    def __init__(self, point, double radius):
+        if isinstance(point, _Point):
+            self._ptr = new morpho.neuron_soma(deref((<_Point>point).ptr()), radius)
+        else:
+            self._ptr = new morpho.neuron_soma(morpho.point(point[0], point[1], point[2]), radius)
+        self._sharedptr.reset(self.ptr2())
+        self._init()
+
     def is_of_type(self, int mtype):
         return self.ptr2().is_of_type(<morpho.morpho_node_type> mtype)
 
@@ -274,10 +290,11 @@ cdef class MorphoTree(_py__base):
     def swap(self, MorphoTree other):
         """Python side swap only swaps pointers"""
         self._ptr = other._ptr
-        self._sharedPtr = other._sharedPtr
+        other._ptr = self._sharedPtr.get()
+        self._sharedPtr.swap(other._sharedPtr)
 
     def add_node(self, int parent_id, MorphoNode new_node):
-        return self.ptr().add_node(parent_id, new_node._autodealoc)
+        return self.ptr().add_node(parent_id, new_node._sharedptr)
 
     def copy_node(self, MorphoTree other, int id_, int new_parent_id):
         return self.ptr().copy_node(deref(other.ptr()), id_, new_parent_id)

@@ -21,8 +21,8 @@ cdef class _Point(_py__base):
     cdef morpho.point* ptr(self):
         return <morpho.point *> self._ptr
 
-    def __init__(self, vector[double] p):
-        self._ptr = new morpho.point(p[0], p[1], p[2])
+    def __init__(self, double x, double y, double z):
+        self._ptr = new morpho.point(x, y, z)
         self._autodealoc.reset(self.ptr())
 
     def close_to(self, _Point other):
@@ -201,6 +201,13 @@ cdef class _Sphere(_py__base):
     cdef morpho.sphere * ptr(self):
         return < morpho.sphere *> self._ptr
 
+    def __init__(self, point, double radius):
+        if isinstance(point, _Point):
+            self._ptr = new morpho.sphere(deref((<_Point>point).ptr()), radius)
+        else:
+            self._ptr = new morpho.sphere(morpho.point(point[0], point[1], point[2]), radius)
+        self._autodealoc.reset(self.ptr())
+
     def __repr__(self):
         return "<_Sphere: center %s, radius %.3f" % (self.center, self.radius)
 
@@ -284,6 +291,17 @@ cdef class _PointVector(_ArrayT):
     #Numpy array object
     cdef vector[morpho.point] * ptr(self):
         return <vector[morpho.point] *> self._ptr
+
+    def __init__(self, double[:,:] ptsVector):
+        self._ptr = new vector[morpho.point]()
+        cdef double [:] pt
+        for pt in ptsVector:
+            self.ptr().push_back(morpho.point(pt[0],pt[1], pt[2]))
+
+        cdef np.npy_intp size[2]
+        size[0] = ptsVector.shape[0]
+        size[1] = 3
+        self.init_nparray(2, size, np.NPY_DOUBLE, <void*>self.ptr().data().data())
 
     def __repr__(self):
         cdef int i, lim = min(3, len(self))

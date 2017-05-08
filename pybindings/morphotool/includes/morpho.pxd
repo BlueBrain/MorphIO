@@ -157,6 +157,7 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
     ###### Cybinding for class neuron_soma ######
     cdef cppclass neuron_soma(neuron_node_3d):
         neuron_soma(std.vector[point] &&)
+        neuron_soma(point, double)
         #bool is_of_type(morpho_node_type)
         sphere get_sphere()
         #box get_bounding_box()
