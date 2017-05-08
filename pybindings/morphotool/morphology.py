@@ -302,8 +302,6 @@ class MorphNameExtract(object):
 
         self.name = name
 
-        if not m:
-            raise ValueError("misformatted morph name %s" % name)
-
-        for a in attributes:
-            setattr(self, a, m.group(a))
+        if m:
+            for a in attributes:
+                setattr(self, a, m.group(a))
