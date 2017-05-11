@@ -296,11 +296,22 @@ inline void export_tree_to_raw(const morpho_tree & tree, mat_index & raw_index, 
             raw_index(offset_struct, 2) = -1;
             offset_struct++;
 
-            for(const auto & point : line_loop){
-                raw_points(offset_points, 0) = point(0);
-                raw_points(offset_points, 1) = point(1);
-                raw_points(offset_points, 2) = point(2);
-                raw_points(offset_points, 3) = 0.0; // arbitrary radius for soma ring
+            if(line_loop.size() != 1 ){ // real line loop
+
+                for(const auto & point : line_loop){
+                    raw_points(offset_points, 0) = point(0);
+                    raw_points(offset_points, 1) = point(1);
+                    raw_points(offset_points, 2) = point(2);
+                    raw_points(offset_points, 3) = 0.0; // arbitrary radius for soma ring
+                    offset_points ++;
+                }
+            }else{ // simple soma sphere
+                // single point with propre radius for soma sphere
+                sphere soma_sphere = soma.get_sphere();
+                raw_points(offset_points, 0) = soma_sphere.get_center()(0);
+                raw_points(offset_points, 1) = soma_sphere.get_center()(1);
+                raw_points(offset_points, 2) = soma_sphere.get_center()(2);
+                raw_points(offset_points, 3) = soma_sphere.get_radius() *2.0;
                 offset_points ++;
             }
         }else if(node.is_of_type(morpho_node_type::neuron_branch_type)){

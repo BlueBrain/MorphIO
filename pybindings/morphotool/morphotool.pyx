@@ -314,13 +314,6 @@ cdef class MorphoTree(_py__base):
     def all_nodes(self, ):
         return MorphoNode.vectorPtr2list(self.ptr().get_all_nodes())
 
-    def find_nodes(self, int mtype):
-        return self.ptr().find_nodes(<morpho.neuron_struct_type>mtype)
-
-    @property
-    def soma(self):
-        return NeuronSoma.from_ptr(self.ptr().get_soma())
-
     @staticmethod
     cdef MorphoTree from_ptr(const morpho.morpho_tree *ptr, bool owner=False):
         cdef MorphoTree obj = MorphoTree.__new__(MorphoTree)
@@ -355,6 +348,10 @@ cdef class MorphoTree(_py__base):
             vec.push_back(item._sharedPtr)
         morpho.morpho_transform(deref(self.ptr()), vec)
         return self
+
+    # algorithm mapping
+    def find_soma(self):
+        return NeuronSoma.from_ptr(morpho.find_neuron_soma(deref(self.ptr())))
 
 
 

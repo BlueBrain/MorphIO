@@ -1,12 +1,27 @@
 
-add_test(NAME "Morphotool_working" 
+add_test(NAME Morphotool_working
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
          COMMAND python test_mtool.py)
 
-add_test(NAME "Morphology_layer_working" 
+add_test(NAME Morphology_layer_working
          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
          COMMAND python test_morphology.py)
 
-add_test(NAME "Unit_tests"
+add_test(NAME Unit_tests
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMAND python unit.py -v)
+
+
+# setup pythonpath manually to allow test execution with a simple ctest 
+set_property(TEST Morphotool_working PROPERTY 
+    ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../:$ENV{PYTHONPATH}"
+)
+
+set_property(TEST Morphology_layer_working PROPERTY 
+    ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../:$ENV{PYTHONPATH}"
+)
+
+set_property(TEST Unit_tests PROPERTY
+    ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/../:$ENV{PYTHONPATH}"
+)
+

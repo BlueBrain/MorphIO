@@ -1,10 +1,10 @@
 project(morpho-tool)
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 2.8)
 
 enable_testing()
 
 set(MORPHOTOOL_VERSION_MAJOR "0")
-set(MORPHOTOOL_VERSION_MINOR "2")
+set(MORPHOTOOL_VERSION_MINOR "3")
 set(MORPHOTOOL_VERSION "${MORPHOTOOL_VERSION_MAJOR}.${MORPHOTOOL_VERSION_MINOR}")
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
@@ -58,10 +58,6 @@ add_subdirectory(deps/hadoken)
 add_subdirectory(deps/highfive)
 add_subdirectory(tests/unit)
 
-if(BUILD_PYTHON_MODULE)
-    find_package(PythonInterpLibs)
-    find_package(PythonLibs) # python_add_module support
-    find_package(Cython REQUIRED)
-    add_subdirectory(pybindings)
-endif()
+add_subdirectory(pybindings)
+
 

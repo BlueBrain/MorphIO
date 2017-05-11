@@ -4,6 +4,7 @@ list(APPEND SRC_SPATIAL "morpho_spatial.cpp"
                  "gmsh_exporter.cpp"
 		 "x3d_exporter.cpp"
                  "morpho_tree.cpp"
+                 "morpho_tree_algorithm.cpp"
                  "morpho_circuit.cpp"
                  "morpho_stats.cpp"
 		 "morpho_transform.cpp")

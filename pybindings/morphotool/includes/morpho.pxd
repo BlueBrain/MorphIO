@@ -178,8 +178,14 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         int get_parent(int) except +
         std.vector[int] get_children(int)
         std.vector[morpho_node*] get_all_nodes()
-        std.vector[unsigned int] find_nodes(neuron_struct_type)
-        neuron_soma* get_soma()
+
+
+# ======================================================================================================================
+cdef extern from "morpho/morpho_tree_algorithm.hpp" namespace "morpho":
+# ----------------------------------------------------------------------------------------------------------------------
+    std.vector[int] find_neuron_nodes(const morpho_tree&, neuron_struct_type)
+    neuron_soma* find_neuron_soma(const morpho_tree&)
+
 
 
 # Specialize std::move (only way of using it in cython)

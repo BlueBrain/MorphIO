@@ -258,7 +258,7 @@ private:
 };
 
 
-///    const std::size_t total_nb_nodes = tree.get_tree_size();
+///
 /// \brief container for an entire morphology tree
 ///
 class morpho_tree{
@@ -279,6 +279,7 @@ public:
     box get_bounding_box() const;
 
     /// get number of nodes in the tree
+    /// nodes id are always from 0 to tree_size -1
     std::size_t get_tree_size() const;
 
     /// swap two morpho tree
@@ -296,6 +297,7 @@ public:
     int copy_node(const morpho_tree & other, int id, int new_parent_id);
 
     /// get a node, by id
+    /// node ids are always from 0 to tree_size -1
     const morpho_node & get_node(int id) const;
 
 
@@ -310,12 +312,6 @@ public:
 
     /// all nodes
     std::vector<morpho_node const*> get_all_nodes() const;
-
-    /// return IDs by neuron struct type
-    std::vector<unsigned int> find_nodes(neuron_struct_type mtype) const;
-
-    /// return soma
-    neuron_soma const* get_soma() const;
 
 
 private:
