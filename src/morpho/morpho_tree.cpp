@@ -17,8 +17,10 @@
  *
 */
 
+#include <bitset>
 
 #include <morpho/morpho_tree.hpp>
+
 
 
 namespace morpho{
@@ -34,8 +36,7 @@ inline vector get_tangente_axis(const point & p1, const point & p2, const point 
 }
 
 struct morpho_node::morpho_node_internal{
-
-
+    std::bitset<64> _type_capability;
 };
 
 
@@ -43,6 +44,15 @@ struct morpho_node::morpho_node_internal{
 
 morpho_node::morpho_node() : _dptr(new morpho_node_internal()){
 
+}
+
+void morpho_node::add_type_capability(morpho_node_type mtype){
+    _dptr->_type_capability[int(mtype)] = true;
+}
+
+
+bool morpho_node::is_of_type(morpho_node_type mtype) const{
+    return _dptr->_type_capability[int(mtype)];
 }
 
 
@@ -57,22 +67,11 @@ morpho_node::~morpho_node(){
 
 
 neuron_node_3d::neuron_node_3d(neuron_struct_type my_node_type) : _my_type(my_node_type){
-
+    add_type_capability(morpho_node_type::neuron_node_3d_type);
 }
 
 neuron_node_3d::~neuron_node_3d(){
 
-}
-
-
-bool neuron_node_3d::is_of_type(morpho_node_type mtype) const{
-    switch(mtype){
-        case morpho_node_type::neuron_node_3d_type:
-            return true;
-
-        default:
-            return false;
-    }
 }
 
 
@@ -102,6 +101,7 @@ neuron_branch::neuron_branch(neuron_struct_type neuron_type, std::vector<point> 
     neuron_node_3d(neuron_type),
     _dptr(new neuron_branch_internal(std::move(points), std::move(radius))){
 
+    add_type_capability(morpho_node_type::neuron_branch_type);
 }
 
 neuron_branch::neuron_branch(const neuron_branch &other) :
@@ -117,17 +117,6 @@ neuron_branch::~neuron_branch(){}
 std::size_t neuron_branch::get_number_points() const{
     return _dptr->points.size();
 }
-
-bool neuron_branch::is_of_type(morpho_node_type mtype) const{
-    switch(mtype){
-        case morpho_node_type::neuron_node_3d_type:
-        case morpho_node_type::neuron_branch_type:
-            return true;
-        default:
-            return false;
-    }
-}
-
 
 const std::vector<point> & neuron_branch::get_points() const{
     return _dptr->points;
@@ -324,6 +313,8 @@ neuron_soma::neuron_soma(std::vector<point> && points) :
     _dptr(new neuron_soma_intern(std::move(points)))
 {
 
+    add_type_capability(morpho_node_type::neuron_soma_type);
+
 }
 
 
@@ -332,6 +323,7 @@ neuron_soma::neuron_soma(const point & p, double radius) :
     _dptr(new neuron_soma_intern(p, radius))
 {
 
+    add_type_capability(morpho_node_type::neuron_soma_type);
 }
 
 
@@ -339,16 +331,6 @@ neuron_soma::~neuron_soma(){
 
 }
 
-
-bool neuron_soma::is_of_type(morpho_node_type mtype) const{
-    switch(mtype){
-        case morpho_node_type::neuron_node_3d_type:
-        case morpho_node_type::neuron_soma_type:
-            return true;
-        default:
-            return false;
-    }
-}
 
 sphere neuron_soma::get_sphere() const{
     namespace fmt = hadoken::format;
