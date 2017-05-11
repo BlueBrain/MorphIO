@@ -7,3 +7,6 @@
 [submodule "deps/mvd-tool"]
 	path = deps/mvd-tool
 	url = https://github.com/BlueBrain/MVDTool.git
+[submodule "deps/cereal"]
+	path = deps/cereal
+	url = https://github.com/USCiLab/cereal.git

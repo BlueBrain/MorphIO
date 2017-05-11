@@ -398,6 +398,7 @@ box neuron_soma::get_bounding_box() const{
 }
 
 const std::vector<point> & neuron_soma::get_line_loop() const{
+    // If soma is defined by a single point this makes little sense
     return _dptr->points;
 }
 
@@ -491,7 +492,7 @@ int morpho_tree::add_node(int parent_id, const std::shared_ptr<morpho_node> & ne
 
 
 int morpho_tree::copy_node(const morpho_tree &other, int id, int new_parent_id){
-     if(id < 0 || id >= other.get_tree_size()){
+     if(id < 0 || id >= (int)other.get_tree_size()){
          throw std::logic_error("Invalid node id for copy tree operation");
      }
      if(new_parent_id < 0 && _dptr->nodes.size() > 0){
@@ -527,6 +528,7 @@ std::vector<morpho_node const *> morpho_tree::get_all_nodes() const{
     }
     return res;
 }
+
 
 
 morpho_tree& morpho_tree::operator = (morpho_tree && other){

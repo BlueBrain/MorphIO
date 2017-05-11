@@ -1,10 +1,11 @@
 project(morpho-tool)
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 2.8)
 
 enable_testing()
 
 set(MORPHOTOOL_VERSION_MAJOR "0")
 set(MORPHOTOOL_VERSION_MINOR "3")
+set(MORPHOTOOL_VERSION "${MORPHOTOOL_VERSION_MAJOR}.${MORPHOTOOL_VERSION_MINOR}")
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
       ${PROJECT_SOURCE_DIR}/CMake/portability
@@ -17,6 +18,7 @@ include(ReleaseDebugAutoFlags)
 
 option(MORPHOTOOL_UNIT_TESTS "Enable or disable unit tests" ON)
 option(ENABLE_MESHER_CGAL "Enable or disable integrated mesher based on CGAL" OFF)
+option(BUILD_PYTHON_MODULE "Build a Python library" ON)
 
 set(Boost_NO_BOOST_CMAKE TRUE)
 
@@ -50,11 +52,12 @@ add_definitions( -DH5_USE_BOOST -DMORPHO_VERSION_MAJOR=\"${MORPHOTOOL_VERSION_MA
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/morpho DESTINATION ${INCLUDE_INSTALL_DIR})
 
+# Targets
 add_subdirectory(src)
-
 add_subdirectory(deps/hadoken)
 add_subdirectory(deps/highfive)
-
-
 add_subdirectory(tests/unit)
+
+add_subdirectory(pybindings)
+
 

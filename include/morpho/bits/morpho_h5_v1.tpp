@@ -261,7 +261,6 @@ morpho_tree morpho_reader::create_morpho_tree() const{
                                                  std::move(branch_points),
                                                  std::move(branch_radius))
                                             );
-
             res.add_node(prev_id, b);
 
         }
@@ -365,9 +364,7 @@ void morpho_writer::write(const morpho_tree &tree){
     dstructures.write(raw_struct);
     // add a comment to trace generation
     acomment.write(comment);
-
 }
-
 
 } //h5_v1
 

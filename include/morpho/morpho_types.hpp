@@ -47,7 +47,8 @@ using vector = hg::vector3d;
 using linestring = hg::linestring3d;
 using sphere = hg::sphere3d;
 using cone = hg::cone3d;
-using circle_pipe = std::vector<hg::circle3d>;
+using circle = hg::circle3d;
+using circle_pipe = std::vector<circle>;
 using box = hg::box3d;
 
 

@@ -72,9 +72,12 @@ public:
 
     virtual bool is_of_type(morpho_node_type mtype) const = 0;
 
+    // Serialization
+    // virtual int serialize( const std::ostream & output ) const = 0;
+    // static std::shared_ptr<morpho_node> deserialize( const std::istream & input );
+
 private:
     std::unique_ptr<morpho_node_internal> _dptr;
-
 };
 
 
@@ -95,6 +98,7 @@ public:
 
 
     bool is_of_type(morpho_node_type mtype) const override;
+
 
 private:
     neuron_struct_type _my_type;
@@ -254,7 +258,7 @@ private:
 };
 
 
-///    const std::size_t total_nb_nodes = tree.get_tree_size();
+///
 /// \brief container for an entire morphology tree
 ///
 class morpho_tree{
@@ -275,6 +279,7 @@ public:
     box get_bounding_box() const;
 
     /// get number of nodes in the tree
+    /// nodes id are always from 0 to tree_size -1
     std::size_t get_tree_size() const;
 
     /// swap two morpho tree
@@ -292,6 +297,7 @@ public:
     int copy_node(const morpho_tree & other, int id, int new_parent_id);
 
     /// get a node, by id
+    /// node ids are always from 0 to tree_size -1
     const morpho_node & get_node(int id) const;
 
 
@@ -304,8 +310,9 @@ public:
     std::vector<int> get_children(int id) const;
 
 
-    ///
+    /// all nodes
     std::vector<morpho_node const*> get_all_nodes() const;
+
 
 private:
 
