@@ -103,6 +103,7 @@ class Test_H5V1(unittest.TestCase):
                 nptest.assert_array_almost_equal(point_raw, nbranch.points[j])
                 nptest.assert_array_almost_equal(radius_raw, nbranch.radius[j])
 
+
     @staticmethod
     def _is_inside_box(box, point):
         b_min = box.min_corner
@@ -114,11 +115,13 @@ class Test_H5V1(unittest.TestCase):
                 return False
         return True
 
+
     def test_bounding_box(self):
         global_tree_box = self.tree.bounding_box
         for node in self.tree.all_nodes:
             for point in (node.pointsVector if isinstance(node, NeuronBranch) else node.line_loop):
                 self.assertTrue(global_tree_box, point)
+
 
     def test_spatial(self):
         index = SpatialIndex()

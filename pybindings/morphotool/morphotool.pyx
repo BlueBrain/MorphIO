@@ -114,7 +114,6 @@ cdef class MorphoNode(_py__base):
         return lst
 
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class NeuronNode3D(MorphoNode):
     "Python wrapper class for neuron_node_3d (ns=morpho)"
@@ -366,7 +365,7 @@ cdef class MorphoTree(_py__base):
 
     @property
     def cell_type(self):
-        return _EnumItem(CELL_TYPE, <int> self.ptr().getCellType())
+        return _EnumItem(CELL_TYPE, <int> self.ptr().get_cell_type())
 
 
 

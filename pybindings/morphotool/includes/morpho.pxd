@@ -164,7 +164,6 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         linestring get_linestring()
         circle_pipe get_circle_pipe()
 
-
     ###### Cybinding for class neuron_soma ######
     cdef cppclass neuron_soma(neuron_node_3d):
         neuron_soma(std.vector[point] &&)
@@ -173,6 +172,7 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         sphere get_sphere()
         #box get_bounding_box()
         std.vector[point] get_line_loop()
+
 
     ###### Cybinding for class morpho_tree ######
     cdef cppclass morpho_tree:
@@ -189,7 +189,8 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         int get_parent(int) except +
         std.vector[int] get_children(int)
         std.vector[morpho_node*] get_all_nodes()
-        cell_family getCellType()
+        void set_cell_type(cell_family)
+        cell_family get_cell_type()
 
 
 # ======================================================================================================================

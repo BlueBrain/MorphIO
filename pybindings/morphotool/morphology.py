@@ -118,14 +118,14 @@ class GliaMorphology(Morphology):
     Represents Morphology of a Glia Cell
     """
     @property
-    def basal_dendrites(self):
+    def processes(self):
         source = self.sections if not self.raw else self.all_nodes
-        return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.dentrite_basal)
+        return tuple(s for s in source if s.branch_type == GLIA_STRUCT_TYPE.glia_process)
 
     @property
-    def apical_dendrites(self):
+    def endfeet(self):
         source = self.sections if not self.raw else self.all_nodes
-        return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.dentrite_apical)
+        return tuple(s for s in source if s.branch_type == GLIA_STRUCT_TYPE.glia_endfoot)
 
 
 # ----------------------------------------------------------------------------------------------------

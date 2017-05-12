@@ -316,8 +316,8 @@ public:
     /// all nodes
     std::vector<morpho_node const*> get_all_nodes() const;
 
-    void setCellType( cell_family cell_t );
-    cell_family getCellType() const;
+    void set_cell_type( cell_family cell_t );
+    cell_family get_cell_type() const;
 
 
 

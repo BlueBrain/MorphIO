@@ -536,11 +536,11 @@ morpho_tree& morpho_tree::operator =(const morpho_tree & other){
 }
 
 
-void morpho_tree::setCellType( cell_family cell_t ) {
+void morpho_tree::set_cell_type( cell_family cell_t ) {
     _dptr->cell_type = cell_t;
 }
 
-cell_family morpho_tree::getCellType() const {
+cell_family morpho_tree::get_cell_type() const {
     return _dptr->cell_type;
 }
 
