@@ -38,11 +38,12 @@
 #include <hadoken/geometry/geometry.hpp>
 #include <hadoken/ublas/ublas.hpp>
 
+#define _DEBUG true
+
 namespace morpho{
 
 namespace h5_v1{
 
-namespace {
 
 inline void split_xyz_and_distance(const mat_points & raw_points, std::vector<point> & points, std::vector<double> & radius){
     points.resize(raw_points.size1());
@@ -55,7 +56,7 @@ inline void split_xyz_and_distance(const mat_points & raw_points, std::vector<po
 }
 
 
-inline neuron_struct_type branch_type_from_h5v1(const int type_id){
+inline neuron_struct_type neuron_branch_type_from_h5v1(const int type_id){
     switch(type_id){
         case 1:
             return neuron_struct_type::soma;
@@ -66,7 +67,7 @@ inline neuron_struct_type branch_type_from_h5v1(const int type_id){
         case 4:
             return neuron_struct_type::dentrite_apical;
          default:
-            throw std::runtime_error("invalid cell type in morphology");
+            throw std::runtime_error("invalid neuron cell type in morphology");
     }
 }
 
@@ -85,7 +86,19 @@ inline int h5v1_from_branch_type(neuron_struct_type btype){
     }
 }
 
+inline glia_struct_type glia_branch_type_from_h5v1( const int type_id ){
+    switch(type_id) {
+        case 1:
+            return glia_struct_type::soma;
+        case 2:
+            return glia_struct_type::glia_process;
+        case 3:
+            return glia_struct_type::glia_endfoot;
+        default:
+            throw std::runtime_error("invalid glia cell type in morphology");
+    }
 }
+
 
 
 namespace fmt = hadoken::format;
@@ -94,8 +107,11 @@ morpho_reader::morpho_reader(const std::string & myfilename)  :
     h5_file(myfilename),
     filename(myfilename),
     structures(h5_file.getDataSet("/structure")),
-    points(h5_file.getDataSet("/points")){
+    points(h5_file.getDataSet("/points")) {
 
+    if ( h5_file.hasGroup("/metadata") ) {
+        metadata = h5_file.getGroup("/metadata");
+    }
 }
 
 mat_points morpho_reader::get_points_raw() const{
@@ -106,6 +122,7 @@ mat_points morpho_reader::get_points_raw() const{
 
     return res;
 }
+
 
 
 morpho_reader::range morpho_reader::get_branch_range_raw(int id) const{
@@ -144,13 +161,10 @@ morpho_reader::range morpho_reader::get_branch_range_raw(int id) const{
 
 mat_points morpho_reader::get_soma_points_raw() const {
 
-
-
     mat_points res;
     mat_index structure_soma;
 
     {
-
         auto slice = structures.select({0, 0}, {1, 3});
         slice.read<mat_index>(structure_soma);
 
@@ -161,22 +175,67 @@ mat_points morpho_reader::get_soma_points_raw() const {
     }
 
     auto range_soma = get_branch_range_raw(0);
-
     auto slice_soma = points.select({range_soma.first, 0}, {range_soma.second, 4});
 
     slice_soma.read(res);
-
     return res;
 }
 
 
 mat_index morpho_reader::get_struct_raw() const {
-    mat_index res;
 
+    mat_index res;
     structures.read<mat_index>(res);
 
     return res;
 }
+
+
+cell_family morpho_reader::get_cell_family() const  {
+
+    if( ! metadata.hasAttribute("cell_family") ) {
+        return cell_family::NEURON;
+    }
+
+    int cell_type = get_metadata<int>("cell_family");
+
+    if (_DEBUG)
+        std::cout << "Cell has specification of family: " << cell_type << std::endl;
+
+    if (cell_type == 0) {
+        return cell_family::NEURON;
+    }
+    if (cell_type == 1) {
+        return cell_family::GLIA;
+    }
+    throw std::runtime_error("invalid cell family in morphology: " + cell_type);
+}
+
+
+morpho_reader::meta_map morpho_reader::get_metadata() const {
+    morpho_reader::meta_map metaprops;
+
+    std::vector<std::string> all_metas = metadata.listAttributeNames();
+    std::string prop_value;
+
+    for(std::string attr_name : all_metas) {
+        HighFive::Attribute att = metadata.getAttribute(attr_name);
+        att.read(prop_value);
+        metaprops[attr_name] = prop_value;
+    }
+
+    return metaprops;
+}
+
+template<typename T>
+T morpho_reader::get_metadata(const std::string attr_name) const {
+    HighFive::Attribute att = metadata.getAttribute(attr_name);
+    T prop_value;
+    att.read_scalar(prop_value);
+    return prop_value;
+}
+
+
 
 /// check if branch has duplicted points with parent
 static inline bool check_duplicated_point(mat_range_points & prev_range, mat_range_points & range){
@@ -194,6 +253,9 @@ static inline bool check_duplicated_point(mat_range_points & prev_range, mat_ran
     std::cout << "not duplicated" << std::endl;
     return false;
  }
+
+
+
 
 
 morpho_tree morpho_reader::create_morpho_tree() const{
@@ -257,7 +319,7 @@ morpho_tree morpho_reader::create_morpho_tree() const{
 
 
             std::shared_ptr<neuron_branch> b(new neuron_branch(
-                                                 branch_type_from_h5v1(struct_raw(i, 1)),
+                                                 neuron_branch_type_from_h5v1(struct_raw(i, 1)),
                                                  std::move(branch_points),
                                                  std::move(branch_radius))
                                             );
@@ -366,9 +428,8 @@ void morpho_writer::write(const morpho_tree &tree){
     acomment.write(comment);
 }
 
+
 } //h5_v1
-
-
 
 } // morpho
 

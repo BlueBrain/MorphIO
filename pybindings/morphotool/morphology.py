@@ -1,5 +1,5 @@
 import morphotool
-from morphotool import NEURON_STRUCT_TYPE, MorphoTree
+from morphotool import MorphoTree, NEURON_STRUCT_TYPE, GLIA_STRUCT_TYPE
 from os import path
 import numpy
 import re
@@ -38,6 +38,9 @@ class Morphology(MorphoTree, object):
         self.mtype = mtype
         self.swap(self.loader.create_morpho_tree())
         self.raw = False
+        # Quick (& dirty) cast to subclass
+        self.__class__ = NeuronMorphology
+
 
     def __repr__(self):
         return "<%s Morphology>" % (self.label,)
@@ -49,13 +52,6 @@ class Morphology(MorphoTree, object):
     @property
     def label(self):
         return self._name_attrs.name
-
-    @contextmanager
-    def RawNodesContext(self):
-        """This context manager enables functions to operate in RAW mode, in case performance is an issue"""
-        self.raw = True
-        yield
-        self.raw = False
 
     @cached_property
     def all_nodes(self):
@@ -70,6 +66,16 @@ class Morphology(MorphoTree, object):
     def get_section(self, section_id):
         return self.sections[section_id]
 
+    # Context manager for enabling raw values
+    @contextmanager
+    def RawNodesContext(self):
+        """This context manager enables functions to operate in RAW mode, in case performance is an issue"""
+        self.raw = True
+        yield
+        self.raw = False
+
+
+class NeuronMorphology(Morphology):
     @property
     def neurites(self):
         return self.axon + self.dendrites
@@ -98,9 +104,12 @@ class Morphology(MorphoTree, object):
         source = self.sections if not self.raw else self.all_nodes
         return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.dentrite_apical)
 
-        # ? BBPSDK functions that might not be required
-        # def path_to_soma(self):
-        # def mesh(self):
+    # ? BBPSDK functions that might not be required
+    # def path_to_soma(self):
+    # def mesh(self):
+
+class GliaMorphology(Morphology):
+    pass
 
 
 class Section(object):
@@ -205,10 +214,10 @@ class Neurite(Section):
         alpha = offset / self.segments_length[segment]
         return (1 - alpha) * self.points[segment] + alpha * self.points[segment + 1]
 
-        # Modifiers: not available
-        # def move_point(self):
-        # def split_segment(self):
-        # def resize_diameter(self):
+    # Modifiers: not available
+    # def move_point(self):
+    # def split_segment(self):
+    # def resize_diameter(self):
 
 
 class Soma(Section):

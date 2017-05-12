@@ -21,6 +21,7 @@
 
 
 #include <vector>
+#include <unordered_map>
 #include <memory>
 #include <bitset>
 
@@ -31,10 +32,14 @@
 namespace morpho{
 
 
-
 class branch;
 class morpho_tree;
 
+
+enum class cell_family {
+    NEURON,
+    GLIA
+};
 
 enum class morpho_node_type{
     unknown = 0x00,
@@ -44,14 +49,19 @@ enum class morpho_node_type{
 };
 
 /// branch type
-enum class neuron_struct_type{
-    soma =0x00,
+enum class neuron_struct_type {
+    soma = 0x00,
     axon = 0x01,
     dentrite_basal = 0x02,
     dentrite_apical = 0x03,
     unknown = 0x04
 };
 
+enum class glia_struct_type {
+    soma = 0x00,
+    glia_process = 0x01,
+    glia_endfoot = 0x02
+};
 
 ///
 /// \brief generic element for a morphology node
@@ -312,6 +322,10 @@ public:
 
     /// all nodes
     std::vector<morpho_node const*> get_all_nodes() const;
+
+    void setCellType( cell_family cell_t );
+    cell_family getCellType() const;
+
 
 
 private:
