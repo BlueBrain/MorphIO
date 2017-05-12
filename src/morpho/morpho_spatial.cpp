@@ -81,17 +81,24 @@ void spatial_index::add_morpho_tree(const std::shared_ptr<morpho_tree> &tree){
             const neuron_soma & soma  = static_cast<const neuron_soma &>(current_node);
 
             box soma_box = soma.get_bounding_box();
-            _pimpl->sp_index.insert(std::make_tuple(soma_box, morpho_position, 0, 0, 0));
+	    const spatial_index_impl::indexed_box soma_elem = std::make_tuple(soma_box, morpho_position, 0, 0, 0);		
+
+	    const std::array<spatial_index_impl::indexed_box, 1> all_elems({ soma_elem });
+            _pimpl->sp_index.insert( all_elems.begin(), all_elems.end());
 
         }else if (current_node.is_of_type(morpho_node_type::neuron_branch_type)){
             const neuron_branch & current_branch  = static_cast<const neuron_branch &>(current_node);
 
             for(std::size_t j =0; j < current_branch.get_number_points() -1; ++j){
                 auto segment_box = current_branch.get_segment_bounding_box(j);
-                _pimpl->sp_index.insert(std::make_tuple(segment_box, morpho_position, i, j, 1));
+		const spatial_index_impl::indexed_box segment_elem = std::make_tuple(segment_box, morpho_position, i, j, 1);
 
                 auto junction_box = current_branch.get_junction_sphere_bounding_box(j);
-                _pimpl->sp_index.insert(std::make_tuple(junction_box, morpho_position, i, j, 2));
+		const spatial_index_impl::indexed_box junction_elem = std::make_tuple(junction_box, morpho_position, i, j, 2);
+	
+	
+	    	const std::array<spatial_index_impl::indexed_box, 2> all_elems( { segment_elem, junction_elem } );
+                _pimpl->sp_index.insert( all_elems.begin(), all_elems.end());
             }
         }else {
             std::cerr << " skip morphology element " << i << " : unknown type " << std::endl;

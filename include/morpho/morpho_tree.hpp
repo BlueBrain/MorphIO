@@ -80,11 +80,14 @@ public:
     ///
     virtual box get_bounding_box() const = 0;
 
-    virtual bool is_of_type(morpho_node_type mtype) const = 0;
+    bool is_of_type(morpho_node_type mtype) const;
 
     // Serialization
     // virtual int serialize( const std::ostream & output ) const = 0;
     // static std::shared_ptr<morpho_node> deserialize( const std::istream & input );
+
+protected:
+    void add_type_capability(morpho_node_type mtype);
 
 private:
     std::unique_ptr<morpho_node_internal> _dptr;
@@ -106,10 +109,6 @@ public:
         return _my_type;
     }
 
-
-    bool is_of_type(morpho_node_type mtype) const override;
-
-
 private:
     neuron_struct_type _my_type;
 };
@@ -127,9 +126,6 @@ public:
     neuron_branch(neuron_struct_type neuron_type, std::vector<point> && points, std::vector<double> && radius  );
     neuron_branch(const neuron_branch & other);
     virtual ~neuron_branch();
-
-
-    bool is_of_type(morpho_node_type mtype) const override;
 
     ///
     /// \brief get_number_points
@@ -221,7 +217,7 @@ private:
 ///
 /// \brief soma branch type
 ///
-class neuron_soma : public neuron_node_3d{
+class neuron_soma : public neuron_node_3d {
     struct neuron_soma_intern;
 public:
     /// construct a soma out of a line loop
@@ -230,9 +226,6 @@ public:
     neuron_soma(const point & p, double radius);
 
     virtual ~neuron_soma();
-
-
-    bool is_of_type(morpho_node_type mtype) const override;
 
     ///
     /// \brief compute simplified soma sphere
