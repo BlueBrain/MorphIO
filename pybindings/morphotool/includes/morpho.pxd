@@ -113,6 +113,14 @@ cdef extern from "morpho/morpho_spatial.hpp" namespace "morpho":
         bool is_within(point)
 
 
+
+# ======================================================================================================================
+cdef extern from "morpho/morpho_tree.hpp" namespace "morpho::cell_family":
+# ----------------------------------------------------------------------------------------------------------------------
+    cdef enum cell_family "morpho::cell_family":
+        NEURON
+        GLIA
+
 # ======================================================================================================================
 cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
 # ----------------------------------------------------------------------------------------------------------------------
@@ -121,6 +129,9 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         pass
 
     cdef cppclass neuron_struct_type:
+        pass
+
+    cdef cppclass glia_struct_type:
         pass
 
     ###### Cybinding for class morpho_node ######
@@ -178,6 +189,7 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         int get_parent(int) except +
         std.vector[int] get_children(int)
         std.vector[morpho_node*] get_all_nodes()
+        cell_family getCellType()
 
 
 # ======================================================================================================================

@@ -1,5 +1,5 @@
 import morphotool
-from morphotool import MorphoTree, NEURON_STRUCT_TYPE, GLIA_STRUCT_TYPE
+from morphotool import MorphoTree, CELL_TYPE, NEURON_STRUCT_TYPE, GLIA_STRUCT_TYPE
 from os import path
 import numpy
 import re
@@ -38,8 +38,12 @@ class Morphology(MorphoTree, object):
         self.mtype = mtype
         self.swap(self.loader.create_morpho_tree())
         self.raw = False
-        # Quick (& dirty) cast to subclass
+
+        # Quick cast to subclass
+        cell_t = self.cell_type
         self.__class__ = NeuronMorphology
+        if cell_t == CELL_TYPE.GLIA:
+            self.__class__ = GliaMorphology
 
 
     def __repr__(self):
@@ -108,10 +112,25 @@ class NeuronMorphology(Morphology):
     # def path_to_soma(self):
     # def mesh(self):
 
+
 class GliaMorphology(Morphology):
-    pass
+    """
+    Represents Morphology of a Glia Cell
+    """
+    @property
+    def basal_dendrites(self):
+        source = self.sections if not self.raw else self.all_nodes
+        return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.dentrite_basal)
+
+    @property
+    def apical_dendrites(self):
+        source = self.sections if not self.raw else self.all_nodes
+        return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.dentrite_apical)
 
 
+# ----------------------------------------------------------------------------------------------------
+# Sections are inespecific. Must be then specialized into Neurites, Somas or Glia Sections
+# ----------------------------------------------------------------------------------------------------
 class Section(object):
     def __new__(cls, branch_object, tree):
         # If it's a soma return a Soma object

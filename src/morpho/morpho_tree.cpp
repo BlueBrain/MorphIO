@@ -390,6 +390,7 @@ const std::vector<point> & neuron_soma::get_line_loop() const{
 struct morpho_tree::morpho_tree_intern{
     std::vector<std::shared_ptr<morpho_node>> nodes;
     std::vector<int> parents;
+    cell_family cell_type;
 };
 
 morpho_tree::morpho_tree() : _dptr(new morpho_tree_intern()){
@@ -533,6 +534,16 @@ morpho_tree& morpho_tree::operator =(const morpho_tree & other){
     swap(new_tree);
     return *this;
 }
+
+
+void morpho_tree::setCellType( cell_family cell_t ) {
+    _dptr->cell_type = cell_t;
+}
+
+cell_family morpho_tree::getCellType() const {
+    return _dptr->cell_type;
+}
+
 
 } //morpho
 

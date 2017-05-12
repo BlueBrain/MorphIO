@@ -20,6 +20,10 @@ include "datastructs.pxi"
 # Python bindings to namespace morpho
 # ======================================================================================================================
 
+cdef class CELL_TYPE(_Enum):
+    NEURON = morpho.NEURON
+    GLIA   = morpho.GLIA
+
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class MORPHO_NODE_TYPE(_Enum):
     unknown = morpho_morpho_node_type.unknown
@@ -359,6 +363,10 @@ cdef class MorphoTree(_py__base):
     # algorithm mapping
     def find_soma(self):
         return NeuronSoma.from_ptr(morpho.find_neuron_soma(deref(self.ptr())))
+
+    @property
+    def cell_type(self):
+        return _EnumItem(CELL_TYPE, <int> self.ptr().getCellType())
 
 
 
