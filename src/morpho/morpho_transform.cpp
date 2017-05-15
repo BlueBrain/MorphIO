@@ -94,6 +94,7 @@ boost::optional< tuple_point_radius > last_point_from_parent(const morpho_tree &
 void filter_duplicate(const morpho_tree & tree, int parent, int id, morpho_tree & output_tree){
     const morpho_node & node = tree.get_node(id);
     std::vector<int> children_ids = tree.get_children(id);
+    int new_id = -1;
 
     if(node.is_of_type(morpho_node_type::neuron_branch_type)){
         const neuron_branch & b = static_cast<const neuron_branch&>(node);
@@ -120,15 +121,15 @@ void filter_duplicate(const morpho_tree & tree, int parent, int id, morpho_tree 
             last_point = points[i];
         }
 
-        output_tree.add_node(parent, std::make_shared<neuron_branch>(b.get_branch_type(),
+        new_id = output_tree.add_node(parent, std::make_shared<neuron_branch>(b.get_branch_type(),
                                                              std::move(filtered_points),
                                                              std::move(filtered_radius)));
     }else{
-        output_tree.copy_node(tree, id, parent);
+        new_id = output_tree.copy_node(tree, id, parent);
     }
 
     for(auto i : children_ids){
-        filter_duplicate(tree, id, i , output_tree);
+        filter_duplicate(tree, new_id, i , output_tree);
     }
 
 }
@@ -158,6 +159,7 @@ std::string duplicate_first_point_operation::name() const {
 void duplicate_first_point(const morpho_tree & tree, int parent, int id, morpho_tree & output_tree){
     const morpho_node & node = tree.get_node(id);
     std::vector<int> children_ids = tree.get_children(id);
+    int new_id = -1;
 
     if(node.is_of_type(morpho_node_type::neuron_branch_type)){
         const neuron_branch & b = static_cast<const neuron_branch&>(node);
@@ -187,15 +189,15 @@ void duplicate_first_point(const morpho_tree & tree, int parent, int id, morpho_
         std::copy(radius.begin(), radius.end(), std::back_inserter(filtered_radius));
 
 
-        output_tree.add_node(parent, std::make_shared<neuron_branch>(b.get_branch_type(),
+        new_id = output_tree.add_node(parent, std::make_shared<neuron_branch>(b.get_branch_type(),
                                                              std::move(filtered_points),
                                                              std::move(filtered_radius)));
     }else{
-        output_tree.copy_node(tree, id, parent);
+        new_id = output_tree.copy_node(tree, id, parent);
     }
 
     for(auto i : children_ids){
-        duplicate_first_point(tree, id, i , output_tree);
+        duplicate_first_point(tree, new_id, i , output_tree);
     }
 
 }
