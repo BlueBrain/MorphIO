@@ -18,7 +18,7 @@ include(ReleaseDebugAutoFlags)
 
 option(MORPHOTOOL_UNIT_TESTS "Enable or disable unit tests" ON)
 option(ENABLE_MESHER_CGAL "Enable or disable integrated mesher based on CGAL" OFF)
-option(BUILD_PYTHON_MODULE "Build a Python library" ON)
+option(BUILD_PYTHON_MODULE "Build a Python library" OFF)
 
 set(Boost_NO_BOOST_CMAKE TRUE)
 
