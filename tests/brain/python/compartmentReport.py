@@ -61,7 +61,7 @@ class TestReader(unittest.TestCase):
         assert(numpy.isclose(frames, [[-65., -65., -65.],
             [-65.14350891, -65.29447937, -65.44480133]]).all())
 
-        timestamps ,frames = view.load(0.05,0.25)
+        timestamps, frames = view.load(0.05,0.25)
         # This window overlaps frames [0, 0.1), [0.1, 0.2), [0.2, 03)
         assert(len(timestamps) == 3)
         assert(frames.shape == (3,3))

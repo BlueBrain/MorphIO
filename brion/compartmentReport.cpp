@@ -89,17 +89,17 @@ size_t CompartmentReport::getNumCompartments(const size_t index) const
     return _impl->plugin->getNumCompartments(index);
 }
 
-float CompartmentReport::getStartTime() const
+double CompartmentReport::getStartTime() const
 {
     return _impl->plugin->getStartTime();
 }
 
-float CompartmentReport::getEndTime() const
+double CompartmentReport::getEndTime() const
 {
     return _impl->plugin->getEndTime();
 }
 
-float CompartmentReport::getTimestep() const
+double CompartmentReport::getTimestep() const
 {
     return _impl->plugin->getTimestep();
 }
@@ -124,8 +124,8 @@ size_t CompartmentReport::getBufferSize() const
     return _impl->plugin->getBufferSize();
 }
 
-std::future<floatsPtr> CompartmentReport::loadFrame(const float timestamp) const
-
+std::future<floatsPtr> CompartmentReport::loadFrame(
+    const double timestamp) const
 {
     auto task = [timestamp, this] {
         if (timestamp < getStartTime() || timestamp > getEndTime())
@@ -136,8 +136,8 @@ std::future<floatsPtr> CompartmentReport::loadFrame(const float timestamp) const
     return _impl->threadPool.post(task);
 }
 
-std::future<Frames> CompartmentReport::loadFrames(const float start,
-                                                  const float end) const
+std::future<Frames> CompartmentReport::loadFrames(const double start,
+                                                  const double end) const
 {
     auto task = [start, end, this] {
         if (start < getStartTime() || end > getEndTime())
@@ -175,8 +175,8 @@ void CompartmentReport::updateMapping(const GIDSet& gids)
     _impl->plugin->updateMapping(gids);
 }
 
-void CompartmentReport::writeHeader(const float startTime, const float endTime,
-                                    const float timestep,
+void CompartmentReport::writeHeader(const double startTime,
+                                    const double endTime, const double timestep,
                                     const std::string& dunit,
                                     const std::string& tunit)
 {
@@ -190,7 +190,7 @@ bool CompartmentReport::writeCompartments(const uint32_t gid,
 }
 
 bool CompartmentReport::writeFrame(uint32_t gid, const float* values,
-                                   const size_t size, float timestamp)
+                                   const size_t size, double timestamp)
 {
     return _impl->plugin->writeFrame(gid, values, size, timestamp);
 }

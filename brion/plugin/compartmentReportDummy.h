@@ -43,9 +43,9 @@ public:
     }
     static std::string getDescription();
 
-    float getStartTime() const final;
-    float getEndTime() const final;
-    float getTimestep() const final;
+    double getStartTime() const final;
+    double getEndTime() const final;
+    double getTimestep() const final;
 
     const std::string& getDataUnit() const final;
     const std::string& getTimeUnit() const final;
@@ -58,12 +58,12 @@ public:
     }
 
     void updateMapping(const GIDSet&) final;
-    void writeHeader(float, float, float, const std::string&,
+    void writeHeader(double, double, double, const std::string&,
                      const std::string&) final
     {
     }
     bool writeCompartments(uint32_t, const uint16_ts&) final { return true; }
-    bool writeFrame(uint32_t, const float*, size_t, float) final
+    bool writeFrame(uint32_t, const float*, size_t, double) final
     {
         return true;
     }

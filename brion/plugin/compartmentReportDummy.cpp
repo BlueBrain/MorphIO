@@ -70,17 +70,17 @@ const std::string& CompartmentReportDummy::getTimeUnit() const
     return tunit;
 }
 
-float CompartmentReportDummy::getStartTime() const
+double CompartmentReportDummy::getStartTime() const
 {
     return 0.f;
 }
 
-float CompartmentReportDummy::getEndTime() const
+double CompartmentReportDummy::getEndTime() const
 {
     return 1024.f;
 }
 
-float CompartmentReportDummy::getTimestep() const
+double CompartmentReportDummy::getTimestep() const
 {
     return 1.f;
 }

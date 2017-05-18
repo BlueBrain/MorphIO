@@ -401,9 +401,9 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
     }
 }
 
-void CompartmentReportHDF5::writeHeader(const float startTime,
-                                        const float endTime,
-                                        const float timestep,
+void CompartmentReportHDF5::writeHeader(const double startTime,
+                                        const double endTime,
+                                        const double timestep,
                                         const std::string& dunit,
                                         const std::string& tunit)
 {
@@ -443,15 +443,6 @@ bool CompartmentReportHDF5::writeCompartments(const uint32_t gid,
         LBASSERT(sections > 0);
         dataset.openAttribute(1).write(H5::PredType::NATIVE_INT, &sections);
 
-        //        dataset.openAttribute( 2 ).write( H5::PredType::NATIVE_INT,
-        //        &somas );
-        //        dataset.openAttribute( 3 ).write( H5::PredType::NATIVE_INT,
-        //        &axons );
-        //        dataset.openAttribute( 4 ).write( H5::PredType::NATIVE_INT,
-        //        &basals );
-        //        dataset.openAttribute( 5 ).write( H5::PredType::NATIVE_INT,
-        //        &apics );
-
         boost::scoped_array<float> mapping(new float[compCount]);
         size_t i = 0;
         for (size_t j = 0; j < counts.size(); ++j)
@@ -467,7 +458,7 @@ bool CompartmentReportHDF5::writeCompartments(const uint32_t gid,
 
 bool CompartmentReportHDF5::writeFrame(const uint32_t gid, const float* values,
                                        const size_t /*size*/,
-                                       const float timestamp)
+                                       const double timestamp)
 {
     lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
 
@@ -477,6 +468,7 @@ bool CompartmentReportHDF5::writeFrame(const uint32_t gid, const float* values,
         const H5::DataSpace& dataFspace = dataset.getSpace();
 
         const size_t frameNumber = _getFrameNumber(timestamp);
+
         hsize_t dims[2];
         dataFspace.getSimpleExtentDims(dims);
 
@@ -537,12 +529,9 @@ H5::DataSet CompartmentReportHDF5::_openDataset(const H5::H5File& file,
     H5E_END_TRY
     if (!dataset.getId())
     {
-        LBTHROW(
-            std::runtime_error("ReportReaderHDF5: "
-                               "Dataset " +
-                               datasetName + " not found "
-                                             "in file: " +
-                               file.getFileName()));
+        LBTHROW(std::runtime_error("ReportReaderHDF5: Dataset " + datasetName +
+                                   " not found in file: " +
+                                   file.getFileName()));
     }
 
     if (dataset.getSpace().getSimpleExtentNdims() != 2)
@@ -569,7 +558,10 @@ H5::DataSet CompartmentReportHDF5::_createDataset(const uint32_t gid,
     H5::Group reportGroup = neuronGroup.createGroup(_reportName);
 
     const int dims = 2;
-    const size_t numSteps = (getEndTime() - getStartTime()) / getTimestep();
+    const double step = getTimestep();
+    // Adding step / 2 to the window to avoid off by 1 errors during truncation
+    // after the division.
+    const size_t numSteps = (getEndTime() - getStartTime() + step * 0.5) / step;
     const hsize_t mappingDim[dims] = {1, compCount};
     const hsize_t dataDim[dims] = {numSteps, compCount};
     LBASSERT(numSteps > 0);
@@ -623,10 +615,7 @@ void CompartmentReportHDF5::_createMetaData()
 
 void CompartmentReportHDF5::_createMappingAttributes(H5::DataSet& dataset)
 {
-    //    const std::string type =
-    //                         boost::lexical_cast< std::string >( _spec.type(
-    //                         ));
-    const std::string type = "1"; // COMPARTMENT_REPORT
+    const std::string type = "compartment";
     detail::addStringAttribute(dataset, mappingAttributes[0], type);
     dataset.createAttribute(mappingAttributes[1], H5::PredType::NATIVE_INT,
                             H5S_SCALAR);

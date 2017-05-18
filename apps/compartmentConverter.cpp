@@ -156,9 +156,9 @@ int main(const int argc, char** argv)
     brion::CompartmentReport in(inURI, brion::MODE_READ);
     float loadTime = clock.getTimef();
 
-    const float start = in.getStartTime();
-    const float step = in.getTimestep();
-    float end = in.getEndTime();
+    const double start = in.getStartTime();
+    const double step = in.getTimestep();
+    double end = in.getEndTime();
 
     if (vm.count("dump"))
     {
@@ -179,7 +179,7 @@ int main(const int argc, char** argv)
         in.updateMapping(gids);
     }
 
-    const float maxEnd = start + maxFrames * step;
+    const double maxEnd = start + maxFrames * step;
     end = std::min(end, maxEnd);
     const brion::CompartmentCounts& counts = in.getCompartmentCounts();
     const brion::GIDSet& gids = in.getGIDs();
@@ -211,13 +211,15 @@ int main(const int argc, char** argv)
 
     float writeTime = clock.getTimef();
 
-    const size_t nFrames = (end - start) / step;
+    // Adding step / 2 to the window to avoid off by 1 errors during truncation
+    const size_t nFrames = (end - start + step * 0.5) / step;
 
     boost::progress_display progress(nFrames);
 
     for (size_t frameIndex = 0; frameIndex < nFrames; ++frameIndex)
     {
-        const float t = start + frameIndex * step;
+        // Making the timestamp fall in the middle of the frame
+        const double t = start + frameIndex * step + step * 0.5;
 
         clock.reset();
 
@@ -301,8 +303,10 @@ int main(const int argc, char** argv)
                         offsets1[i][j] == std::numeric_limits<uint64_t>::max());
         }
 
-        for (float t = start; t < end; t += step)
+        for (size_t frameIndex = 0; frameIndex < nFrames; ++frameIndex)
         {
+            // Making the timestamp fall in the middle of the frame
+            const double t = start + frameIndex * step + step * 0.5;
             brion::floatsPtr frame1 = in.loadFrame(t).get();
             brion::floatsPtr frame2 = result.loadFrame(t).get();
 
@@ -311,6 +315,7 @@ int main(const int argc, char** argv)
 
             for (size_t i = 0; i < in.getFrameSize(); ++i)
                 REQUIRE_EQUAL((*frame1)[i], (*frame2)[i]);
+
             ++progress;
         }
     }

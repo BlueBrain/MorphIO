@@ -62,6 +62,7 @@ typedef std::vector<uint16_t> uint16_ts;
 typedef std::vector<uint32_t> uint32_ts;
 typedef std::vector<uint64_t> uint64_ts;
 typedef std::vector<float> floats;
+typedef std::vector<double> doubles;
 typedef std::vector<Vector2i> Vector2is;
 typedef std::vector<Vector3f> Vector3fs;
 typedef std::vector<Vector4f> Vector4fs;
@@ -73,6 +74,7 @@ typedef std::shared_ptr<int32_ts> int32_tsPtr;
 typedef std::shared_ptr<uint16_ts> uint16_tsPtr;
 typedef std::shared_ptr<uint32_ts> uint32_tsPtr;
 typedef std::shared_ptr<floats> floatsPtr;
+typedef std::shared_ptr<doubles> doublesPtr;
 typedef std::shared_ptr<Vector2is> Vector2isPtr;
 typedef std::shared_ptr<Vector3fs> Vector3fsPtr;
 typedef std::shared_ptr<Vector4fs> Vector4fsPtr;
@@ -112,7 +114,7 @@ typedef std::multimap<float, uint32_t> SpikeMap;
 
 struct Frames
 {
-    floatsPtr timeStamps;
+    doublesPtr timeStamps;
     floatsPtr data;
 };
 

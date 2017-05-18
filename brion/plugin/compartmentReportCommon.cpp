@@ -46,16 +46,18 @@ size_t CompartmentReportCommon::getNumCompartments(const size_t index) const
     return _neuronCompartments[index];
 }
 
-size_t CompartmentReportCommon::_getFrameNumber(float timestamp) const
+size_t CompartmentReportCommon::_getFrameNumber(double timestamp) const
 {
     const auto startTime = getStartTime();
     const auto endTime = getEndTime();
     assert(endTime > startTime);
     const auto step = getTimestep();
+
     timestamp =
         std::max(std::min(timestamp, std::nextafter(endTime, -INFINITY)),
                  startTime) -
         startTime;
+
     return size_t(timestamp / step);
 }
 
@@ -81,7 +83,7 @@ GIDSet CompartmentReportCommon::_computeIntersection(const GIDSet& all,
     return intersection;
 }
 
-floatsPtr CompartmentReportCommon::loadFrame(const float timestamp) const
+floatsPtr CompartmentReportCommon::loadFrame(const double timestamp) const
 {
     const size_t size = getFrameSize();
     floatsPtr buffer(new floats(size));
@@ -90,19 +92,20 @@ floatsPtr CompartmentReportCommon::loadFrame(const float timestamp) const
     return buffer;
 }
 
-Frames CompartmentReportCommon::loadFrames(float start, float end) const
+Frames CompartmentReportCommon::loadFrames(double start, double end) const
 {
     const auto startTime = getStartTime();
     if (start >= getEndTime() || end < startTime || end <= start)
         return Frames();
 
-    const float timestep = getTimestep();
+    const double timestep = getTimestep();
     const size_t startFrame = _getFrameNumber(start);
+    end = std::nextafter(end, -INFINITY);
     const size_t count = _getFrameNumber(end) - startFrame + 1;
 
     Frames frames;
 
-    frames.timeStamps.reset(new floats);
+    frames.timeStamps.reset(new std::vector<double>);
     for (size_t i = 0; i < count; ++i)
         frames.timeStamps->push_back((i + startFrame) * timestep);
 

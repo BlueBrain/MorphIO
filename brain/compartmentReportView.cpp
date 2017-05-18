@@ -57,9 +57,7 @@ const CompartmentReportMapping& CompartmentReportView::getMapping() const
 
 namespace
 {
-// using float is necessary to match brion::CompartmentReport
-// frame index calculation
-inline float _snapTimestamp(float t, float start, float timestep)
+inline double _snapTimestamp(double t, double start, double timestep)
 {
     return start + timestep * (size_t)std::floor((t - start) / timestep);
 }

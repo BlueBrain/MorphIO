@@ -549,9 +549,9 @@ void CompartmentReportBinary::updateMapping(const GIDSet& gids)
     }
 }
 
-void CompartmentReportBinary::writeHeader(const float /*startTime*/,
-                                          const float /*endTime*/,
-                                          const float /*timestep*/,
+void CompartmentReportBinary::writeHeader(const double /*startTime*/,
+                                          const double /*endTime*/,
+                                          const double /*timestep*/,
                                           const std::string& /*dunit*/,
                                           const std::string& /*tunit*/)
 {
@@ -568,7 +568,7 @@ bool CompartmentReportBinary::writeCompartments(const uint32_t /*gid*/,
 bool CompartmentReportBinary::writeFrame(const uint32_t /*gid*/,
                                          const float* /*values*/,
                                          const size_t /*size*/,
-                                         const float /*timestamp*/)
+                                         const double /*timestamp*/)
 {
     LBUNIMPLEMENTED;
     return false;

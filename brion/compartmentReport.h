@@ -123,13 +123,13 @@ public:
     BRION_API size_t getNumCompartments(size_t index) const;
 
     /** @return the current start time of the report. @version 1.0 */
-    BRION_API float getStartTime() const;
+    BRION_API double getStartTime() const;
 
     /** @return the current end time of the report. @version 1.0 */
-    BRION_API float getEndTime() const;
+    BRION_API double getEndTime() const;
 
     /** @return the sampling time interval of the report. @version 1.0 */
-    BRION_API float getTimestep() const;
+    BRION_API double getTimestep() const;
 
     /** @return the data unit of the report. @version 1.0 */
     BRION_API const std::string& getDataUnit() const;
@@ -148,7 +148,7 @@ public:
      * modified
      * @version 2.0
      */
-    BRION_API std::future<floatsPtr> loadFrame(float timestamp) const;
+    BRION_API std::future<floatsPtr> loadFrame(double timestamp) const;
 
     /** Load all frames inside a given time window.
      *
@@ -160,7 +160,7 @@ public:
      *         [start, end) and the start timestamps of these frames.
      * @version 2.0
      */
-    BRION_API std::future<Frames> loadFrames(float start, float end) const;
+    BRION_API std::future<Frames> loadFrames(double start, double end) const;
 
     /**
      * @param gid the neuron report to be loaded.
@@ -213,8 +213,8 @@ public:
      * @throw std::invalid_argument if any passed argument is invalid
      * @version 1.0
      */
-    BRION_API void writeHeader(float startTime, float endTime, float timestep,
-                               const std::string& dunit,
+    BRION_API void writeHeader(double startTime, double endTime,
+                               double timestep, const std::string& dunit,
                                const std::string& tunit);
 
     /** Write the compartment counts for each section for one cell.
@@ -239,12 +239,12 @@ public:
      * @return false if saving was not successful, true otherwise
      * @version 1.0
      */
-    bool writeFrame(uint32_t gid, const floats& values, float timestamp)
+    bool writeFrame(uint32_t gid, const floats& values, double timestamp)
     {
         return writeFrame(gid, values.data(), values.size(), timestamp);
     }
     BRION_API bool writeFrame(uint32_t gid, const float* values, size_t size,
-                              float timestamp);
+                              double timestamp);
 
     /** Flush data to output. @return true on success. @version 1.0 */
     BRION_API bool flush();

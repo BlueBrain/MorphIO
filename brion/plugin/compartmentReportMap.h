@@ -51,9 +51,9 @@ public:
     static bool handles(const CompartmentReportInitData& initData);
     static std::string getDescription();
 
-    float getStartTime() const final { return _header.startTime; }
-    float getEndTime() const final { return _header.endTime; }
-    float getTimestep() const final { return _header.timestep; }
+    double getStartTime() const final { return _header.startTime; }
+    double getEndTime() const final { return _header.endTime; }
+    double getTimestep() const final { return _header.timestep; }
     const std::string& getDataUnit() const final { return _dunit; }
     const std::string& getTimeUnit() const final { return _tunit; }
     const brion::GIDSet& getGIDs() const final { return _gids; }
@@ -68,11 +68,11 @@ public:
 
     void updateMapping(const GIDSet& gids) final;
 
-    void writeHeader(float startTime, float endTime, float timestep,
+    void writeHeader(double startTime, double endTime, double timestep,
                      const std::string& dunit, const std::string& tunit) final;
     bool writeCompartments(uint32_t gid, const uint16_ts& counts) final;
     bool writeFrame(uint32_t gid, const float* values, size_t size,
-                    float timestamp) final;
+                    double timestamp) final;
     bool flush() final;
     bool erase() final;
 
@@ -82,9 +82,9 @@ public:
         uint32_t magic;
         uint32_t version;
         uint32_t nGIDs; // redundant, but opt for fetching the GIDSet
-        float startTime;
-        float endTime;
-        float timestep;
+        double startTime;
+        double endTime;
+        double timestep;
     };
 
 private:

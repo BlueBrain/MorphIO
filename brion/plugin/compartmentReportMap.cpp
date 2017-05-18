@@ -144,9 +144,9 @@ std::ostream& operator<<(std::ostream& os,
               << h.timestep;
 }
 
-void CompartmentReportMap::writeHeader(const float startTime,
-                                       const float endTime,
-                                       const float timestep,
+void CompartmentReportMap::writeHeader(const double startTime,
+                                       const double endTime,
+                                       const double timestep,
                                        const std::string& dunit,
                                        const std::string& tunit)
 {
@@ -171,7 +171,7 @@ bool CompartmentReportMap::writeCompartments(const uint32_t gid,
 }
 
 bool CompartmentReportMap::writeFrame(const uint32_t gid, const float* values,
-                                      const size_t size, const float time)
+                                      const size_t size, const double time)
 {
     if (!_flushHeader())
         return false;
@@ -201,7 +201,8 @@ bool CompartmentReportMap::erase()
 
     auto& store = _stores.front();
     const size_t nFrames =
-        (_header.endTime - _header.startTime) / _header.timestep;
+        (_header.endTime - _header.startTime + _header.timestep * 0.5) /
+        _header.timestep;
     for (const uint32_t gid : _gids)
     {
         for (size_t i = 0; i < nFrames; ++i)
@@ -417,7 +418,8 @@ floatsPtr CompartmentReportMap::loadNeuron(const uint32_t gid) const
 
     const size_t index = getIndex(gid);
     const size_t nFrames =
-        (_header.endTime - _header.startTime) / _header.timestep;
+        (_header.endTime - _header.startTime + _header.timestep * 0.5) /
+        _header.timestep;
     const size_t nCompartments = getNumCompartments(index);
 
     floatsPtr buffer(new floats(nFrames * nCompartments));

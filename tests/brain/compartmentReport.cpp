@@ -119,13 +119,16 @@ inline void testReadSoma(const char* relativePath)
     BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
     BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1, TIMESTEP_PRECISION);
 
-    auto frame = view.load(report.getMetaData().startTime).get();
+    auto timestamp = report.getMetaData().startTime;
+    auto frame = view.load(timestamp).get();
 
+    BOOST_CHECK(frame.getTimestamp() == timestamp);
     BOOST_CHECK(!frame.getData().empty());
     BOOST_CHECK_EQUAL(frame.getData()[0], -65);
 
     frame = view.load(4.5).get();
     BOOST_CHECK(!frame.getData().empty());
+    BOOST_CHECK(frame.getTimestamp() == 4.5);
     BOOST_CHECK_CLOSE(frame.getData()[0], -10.1440039f, .000001f);
 }
 

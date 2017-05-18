@@ -62,9 +62,9 @@ public:
     static bool handles(const CompartmentReportInitData& initData);
     static std::string getDescription();
 
-    float getStartTime() const final { return _startTime; }
-    float getEndTime() const final { return _endTime; }
-    float getTimestep() const final { return _timestep; }
+    double getStartTime() const final { return _startTime; }
+    double getEndTime() const final { return _endTime; }
+    double getTimestep() const final { return _timestep; }
     const std::string& getDataUnit() const final { return _dunit; }
     const std::string& getTimeUnit() const final { return _tunit; }
     const GIDSet& getGIDs() const final;
@@ -76,11 +76,11 @@ public:
 
     void updateMapping(const GIDSet& gids) final;
 
-    void writeHeader(float startTime, float endTime, float timestep,
+    void writeHeader(double startTime, double endTime, double timestep,
                      const std::string& dunit, const std::string& tunit) final;
     bool writeCompartments(uint32_t gid, const uint16_ts& counts) final;
     bool writeFrame(uint32_t gid, const float* values, size_t size,
-                    float timestamp) final;
+                    double timestamp) final;
     bool flush() final;
 
 private:

@@ -96,13 +96,13 @@ public:
     /** @name Abstract interface */
     //@{
     /** @copydoc brion::CompartmentReport::getStartTime */
-    virtual float getStartTime() const = 0;
+    virtual double getStartTime() const = 0;
 
     /** @copydoc brion::CompartmentReport::getEndTime */
-    virtual float getEndTime() const = 0;
+    virtual double getEndTime() const = 0;
 
     /** @copydoc brion::CompartmentReport::getTimestep */
-    virtual float getTimestep() const = 0;
+    virtual double getTimestep() const = 0;
 
     /** @copydoc brion::CompartmentReport::getDataUnit */
     virtual const std::string& getDataUnit() const = 0;
@@ -126,10 +126,10 @@ public:
     virtual size_t getFrameSize() const = 0;
 
     /** @copydoc brion::CompartmentReport::loadFrame */
-    virtual floatsPtr loadFrame(float timestamp) const = 0;
+    virtual floatsPtr loadFrame(double timestamp) const = 0;
 
     /** @copydoc brion::CompartmentReport::loadFrames */
-    virtual Frames loadFrames(float start, float end) const = 0;
+    virtual Frames loadFrames(double start, double end) const = 0;
 
     /** @copydoc brion::CompartmentReport::loadNeuron */
     virtual floatsPtr loadNeuron(uint32_t gid LB_UNUSED) const
@@ -148,7 +148,7 @@ public:
     /** @copydoc brion::CompartmentReport::getBufferSize */
     virtual size_t getBufferSize() const { return 0; }
     /** @copydoc brion::CompartmentReport::writeHeader */
-    virtual void writeHeader(float startTime, float endTime, float timestep,
+    virtual void writeHeader(double startTime, double endTime, double timestep,
                              const std::string& dunit,
                              const std::string& tunit) = 0;
 
@@ -157,7 +157,7 @@ public:
 
     /** @copydoc brion::CompartmentReport::writeFrame */
     virtual bool writeFrame(uint32_t gid, const float* values, size_t size,
-                            float timestamp) = 0;
+                            double timestamp) = 0;
 
     /** @copydoc brion::CompartmentReport::flush */
     virtual bool flush() = 0;
