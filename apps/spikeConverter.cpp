@@ -43,44 +43,59 @@ namespace po = boost::program_options;
 
 int main(int argc, char* argv[])
 {
-    const std::string help = lunchbox::getFilename(std::string(argv[0]));
-    const std::string uriHelp =
-        std::string("Output report URI\n") +
-        "  Supported input and output URIs:\n" +
-        lunchbox::string::prepend(brion::SpikeReport::getDescriptions(),
-                                  "    ");
-
-    po::options_description options(help.c_str(),
-                                    lunchbox::term::getSize().first);
-
     // clang-format off
+    po::options_description options("Options",
+                                    lunchbox::term::getSize().first);
     options.add_options()
         ( "help,h", "Produce help message" )
-        ( "version,v", "Show program name/version banner and exit" )
-#ifdef BRION_USE_BBPTESTDATA
-        ( "input,i", po::value< std::string >()->default_value(
-            std::string( BBP_TESTDATA ) +
-            "/circuitBuilding_1000neurons/Neurodamus_output/out.dat" ),
-          "Input report URI" )
-#else
-        ( "input,i", po::value< std::string >()->required(), "Input report URI")
-#endif
-        ( "output,o", po::value< std::string >()->default_value( "out.spikes" ),
-          uriHelp.c_str( ));
+        ( "version,v", "Show program name/version banner and exit" );
+
+    po::options_description hidden;
+    hidden.add_options()
+        ("input,i", po::value<std::string>()->required(), "Input report URI")
+        ("output,o", po::value<std::string>()->default_value("out.spikes"),
+         "Output report URI");
     // clang-format on
+
+    po::options_description allOptions;
+    allOptions.add(hidden).add(options);
 
     po::positional_options_description positional;
     positional.add("input", 1);
     positional.add("output", 2);
 
     po::variables_map vm;
+
+    auto parser = po::command_line_parser(argc, argv);
+    po::store(parser.options(allOptions).positional(positional).run(), vm);
+
+    if (vm.count("help") || vm.count("input") == 0)
+    {
+        std::cout
+            << "Usage: " << lunchbox::getFilename(std::string(argv[0]))
+            << " input-uri [output-uri=spikes.out] [options]" << std::endl
+            << std::endl
+            << "Supported input and output URIs:" << std::endl
+            << lunchbox::string::prepend(brion::SpikeReport::getDescriptions(),
+                                         "    ")
+            << std::endl
+#ifdef BRION_USE_BBPTESTDATA
+            << std::endl
+            << "    Test data set (only for input):\n        test:" << std::endl
+#endif
+            << std::endl
+            << options << std::endl;
+        return EXIT_SUCCESS;
+    }
+    if (vm.count("version"))
+    {
+        std::cout << "Brion spike report converter "
+                  << brion::Version::getString() << std::endl;
+        return EXIT_SUCCESS;
+    }
+
     try
     {
-        po::store(po::command_line_parser(argc, argv)
-                      .options(options)
-                      .positional(positional)
-                      .run(),
-                  vm);
         po::notify(vm);
     }
     catch (const po::error& e)
@@ -90,22 +105,17 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (vm.count("help"))
+    std::string input = vm["input"].as<std::string>();
+#ifdef BRION_USE_BBPTESTDATA
+    if (input == "test:")
     {
-        std::cout << options << std::endl;
-        return EXIT_SUCCESS;
+        input = std::string(BBP_TESTDATA) +
+                "/circuitBuilding_1000neurons/Neurodamus_output/out.dat";
     }
-
-    if (vm.count("version"))
+#endif
+    if (input == vm["output"].as<std::string>())
     {
-        std::cout << "Brion spike report converter "
-                  << brion::Version::getString() << std::endl;
-        return EXIT_SUCCESS;
-    }
-    if (vm["input"].as<std::string>() == vm["output"].as<std::string>())
-    {
-        std::cerr << "Cowardly refusing to convert "
-                  << vm["input"].as<std::string>() << " onto itself"
+        std::cerr << "Cowardly refusing to convert " << input << " onto itself"
                   << std::endl;
         return EXIT_FAILURE;
     }
@@ -115,8 +125,7 @@ int main(int argc, char* argv[])
         lunchbox::Clock clock;
 
         float readTime = 0.f;
-        brion::SpikeReport in(brion::URI(vm["input"].as<std::string>()),
-                              brion::MODE_READ);
+        brion::SpikeReport in(brion::URI(input), brion::MODE_READ);
         readTime += clock.resetTimef();
 
         float writeTime = 0.f;
@@ -134,7 +143,7 @@ int main(int argc, char* argv[])
             writeTime += clock.resetTimef();
         }
 
-        std::cout << "Converted " << vm["input"].as<std::string>() << " => "
+        std::cout << "Converted " << input << " => "
                   << vm["output"].as<std::string>() << " in " << readTime
                   << " + " << writeTime << " ms" << std::endl;
     }

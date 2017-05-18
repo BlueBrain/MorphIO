@@ -76,44 +76,67 @@ void requireEqualCollections(const T& a, const T& b)
  */
 int main(const int argc, char** argv)
 {
-    const std::string help = lunchbox::getFilename(std::string(argv[0]));
-    const std::string uriHelp =
-        std::string("Output report URI\n") +
-        "  Supported input and output URIs:\n" +
-        lunchbox::string::prepend(brion::CompartmentReport::getDescriptions(),
-                                  "    ");
-
-    po::options_description options(help.c_str(),
-                                    lunchbox::term::getSize().first);
     // clang-format off
+    po::options_description options("Options",
+                                    lunchbox::term::getSize().first);
     options.add_options()
-        ( "help,h", "Produce help message" )
-        ( "version,v", "Show program name/version banner and exit" )
-#ifdef BRION_USE_BBPTESTDATA
-        ( "input,i", po::value<std::string>()->default_value(
-             std::string(BBP_TESTDATA) +
-             "/circuitBuilding_1000neurons/Neurodamus_output/voltages.bbp"),
-          "Input report URI")
-#else
-        ( "input,i", po::value<std::string>()->required(), "Input report URI" )
-#endif
-        ( "output,o", po::value< std::string >()->default_value( "dummy://" ),
-          uriHelp.c_str( ))
-        ( "erase,e", po::value< std::string >(),
-          "Erase the given report (map-based reports only)" )
-        ( "maxFrames,m", po::value< size_t >(),
-          "Convert at most the given number of frames" )
-        ( "gids,g", po::value< std::vector< uint32_t >>()->multitoken(),
-          "List of whitespace separated GIDs to convert" )
-        ( "compare,c", "Compare written report with input" )
-        ( "dump,d", "Dump input report information (no output conversion)" );
+        ("help,h", "Produce help message")
+        ("version,v", "Show program name/version banner and exit")
+        ("erase,e", po::value< std::string >(),
+         "Erase the given report (map-based reports only)")
+        ("maxFrames,m", po::value< size_t >(),
+         "Convert at most the given number of frames")
+        ("gids,g", po::value< std::vector< uint32_t >>()->multitoken(),
+         "List of whitespace separated GIDs to convert")
+        ("compare,c", "Compare written report with input")
+        ("dump,d", "Dump input report information (no output conversion)");
+
+    po::options_description hidden;
+    hidden.add_options()
+        ("input,i", po::value<std::string>()->required(), "Input report URI")
+        ("output,o", po::value<std::string>()->default_value( "dummy://" ),
+         "Output report URI");
     // clang-format on
+
+    po::options_description allOptions;
+    allOptions.add(hidden).add(options);
+
+    po::positional_options_description positional;
+    positional.add("input", 1);
+    positional.add("output", 2);
 
     po::variables_map vm;
 
+    auto parser = po::command_line_parser(argc, argv);
+    po::store(parser.options(allOptions).positional(positional).run(), vm);
+
+    if (vm.count("help") || vm.count("input") == 0)
+    {
+        std::cout << "Usage: " << lunchbox::getFilename(std::string(argv[0]))
+                  << " input-uri [output-uri=dummy://] [options]" << std::endl
+                  << std::endl
+                  << "Supported input and output URIs:" << std::endl
+                  << lunchbox::string::prepend(
+                         brion::CompartmentReport::getDescriptions(), "    ")
+                  << std::endl
+#ifdef BRION_USE_BBPTESTDATA
+                  << std::endl
+                  << "    Test data set (only for input):\n        test:"
+                  << std::endl
+#endif
+                  << std::endl
+                  << options << std::endl;
+        return EXIT_SUCCESS;
+    }
+    if (vm.count("version"))
+    {
+        std::cout << "Brion compartment report converter "
+                  << brion::Version::getString() << std::endl;
+        return EXIT_SUCCESS;
+    }
+
     try
     {
-        po::store(po::parse_command_line(argc, argv, options), vm);
         po::notify(vm);
     }
     catch (const po::error& e)
@@ -121,19 +144,6 @@ int main(const int argc, char** argv)
         std::cerr << "Command line parse error: " << e.what() << std::endl
                   << options << std::endl;
         return EXIT_FAILURE;
-    }
-
-    if (vm.count("help"))
-    {
-        std::cout << options << std::endl;
-        return EXIT_SUCCESS;
-    }
-
-    if (vm.count("version"))
-    {
-        std::cout << "Brion compartment report converter "
-                  << brion::Version::getString() << std::endl;
-        return EXIT_SUCCESS;
     }
 
     if (vm.count("erase"))
@@ -146,10 +156,24 @@ int main(const int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    const std::string input = vm["input"].as<std::string>();
     const size_t maxFrames = vm.count("maxFrames") == 1
                                  ? vm["maxFrames"].as<size_t>()
                                  : std::numeric_limits<size_t>::max();
+
+    std::string input = vm["input"].as<std::string>();
+#ifdef BRION_USE_BBPTESTDATA
+    if (input == "test:")
+    {
+        input = std::string(BBP_TESTDATA) +
+                "/circuitBuilding_1000neurons/Neurodamus_output/voltages.bbp";
+    }
+#endif
+    if (input == vm["output"].as<std::string>())
+    {
+        std::cerr << "Cowardly refusing to convert " << input << " onto itself"
+                  << std::endl;
+        return EXIT_FAILURE;
+    }
 
     lunchbox::URI inURI(input);
     lunchbox::Clock clock;
