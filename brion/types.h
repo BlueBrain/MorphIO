@@ -112,9 +112,19 @@ typedef std::vector<Spike> Spikes;
 /** A list of Spikes events per cell gid, indexed by spikes times. */
 typedef std::multimap<float, uint32_t> SpikeMap;
 
+struct Frame
+{
+    double timestamp;
+    floatsPtr data;
+};
+
 struct Frames
 {
     doublesPtr timeStamps;
+    /** The data of multiple compartment frames in a flat array. The number
+        of frames equals timeStamp->size(). All frames have the same size,
+        this size and the mapping of values to entities is defined in the
+        report mapping. */
     floatsPtr data;
 };
 

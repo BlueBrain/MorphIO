@@ -60,7 +60,7 @@ std::pair<const Spike*, size_t> spikesFromNumpy(
     const boost::python::object& object);
 
 /// tuple(timestamp : double, data : 1D ndarray )
-boost::python::object frameToTuple(CompartmentReportFrame&& frame);
+boost::python::object frameToTuple(brion::Frame&& frame);
 
 /// tuple(timestamps : 1D ndarray, data : 2D ndarray )
 /// or tuple(timestamp : double, data : 1D ndarray) if frames.size == 1

@@ -63,8 +63,7 @@ inline double _snapTimestamp(double t, double start, double timestep)
 }
 }
 
-std::future<CompartmentReportFrame> CompartmentReportView::load(
-    double timestamp)
+std::future<brion::Frame> CompartmentReportView::load(double timestamp)
 {
     const double start = _impl->report->getStartTime();
     const double end = _impl->report->getEndTime();
@@ -80,14 +79,10 @@ std::future<CompartmentReportFrame> CompartmentReportView::load(
 
     auto loadFrameTask = [timestamp, report] {
 
-        CompartmentReportFrame frame;
-        frame._impl->timeStamp = timestamp;
-
         auto data = report->loadFrame(timestamp).get();
         if (data)
-            frame._impl->data = std::move(*data);
-
-        return frame;
+            return brion::Frame{timestamp, data};
+        return brion::Frame{0, brion::floatsPtr()};
     };
 
     return _impl->readerImpl->threadPool.post(loadFrameTask);

@@ -86,7 +86,7 @@ void testBounds(const char* relativePath)
     auto view = report.createView(gids);
 
     auto frame = view.load(report.getMetaData().startTime).get();
-    BOOST_CHECK(!frame.getData().empty());
+    BOOST_CHECK(frame.data);
 
     BOOST_CHECK_THROW(frame = view.load(report.getMetaData().endTime).get(),
                       std::logic_error);
@@ -122,14 +122,14 @@ inline void testReadSoma(const char* relativePath)
     auto timestamp = report.getMetaData().startTime;
     auto frame = view.load(timestamp).get();
 
-    BOOST_CHECK(frame.getTimestamp() == timestamp);
-    BOOST_CHECK(!frame.getData().empty());
-    BOOST_CHECK_EQUAL(frame.getData()[0], -65);
+    BOOST_CHECK(frame.timestamp == timestamp);
+    BOOST_CHECK(frame.data);
+    BOOST_CHECK_EQUAL((*frame.data)[0], -65);
 
     frame = view.load(4.5).get();
-    BOOST_CHECK(!frame.getData().empty());
-    BOOST_CHECK(frame.getTimestamp() == 4.5);
-    BOOST_CHECK_CLOSE(frame.getData()[0], -10.1440039f, .000001f);
+    BOOST_CHECK(frame.data);
+    BOOST_CHECK(frame.timestamp == 4.5);
+    BOOST_CHECK_CLOSE((*frame.data)[0], -10.1440039f, .000001f);
 }
 
 BOOST_AUTO_TEST_CASE(read_soma_binary)
@@ -155,9 +155,9 @@ inline void testReadAllComps(const char* relativePath)
     BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1, TIMESTEP_PRECISION);
 
     auto frame = view.load(.8f).get();
-    BOOST_CHECK(!frame.getData().empty());
-    BOOST_CHECK_CLOSE(frame.getData()[0], -65.2919388, .000001f);
-    BOOST_CHECK_CLOSE(frame.getData()[1578], -65.2070618, .000001f);
+    BOOST_CHECK(frame.data);
+    BOOST_CHECK_CLOSE((*frame.data)[0], -65.2919388, .000001f);
+    BOOST_CHECK_CLOSE((*frame.data)[1578], -65.2070618, .000001f);
 }
 
 BOOST_AUTO_TEST_CASE(read_allcomps_binary)
@@ -192,18 +192,18 @@ void testRead(const char* relativePath)
 
     auto frame = view.load(report.getMetaData().startTime).get();
 
-    BOOST_CHECK(!frame.getData().empty());
-    BOOST_CHECK_EQUAL(frame.getData()[offsets[0][0]], -65);
-    BOOST_CHECK_EQUAL(frame.getData()[offsets[1][0]], -65);
-    BOOST_CHECK_EQUAL(frame.getData()[offsets[0][1]], -65);
-    BOOST_CHECK_EQUAL(frame.getData()[offsets[1][1]], -65);
+    BOOST_CHECK(frame.data);
+    BOOST_CHECK_EQUAL((*frame.data)[offsets[0][0]], -65);
+    BOOST_CHECK_EQUAL((*frame.data)[offsets[1][0]], -65);
+    BOOST_CHECK_EQUAL((*frame.data)[offsets[0][1]], -65);
+    BOOST_CHECK_EQUAL((*frame.data)[offsets[1][1]], -65);
 
     frame = view.load(4.5f).get();
-    BOOST_CHECK(!frame.getData().empty());
-    BOOST_CHECK_CLOSE(frame.getData()[offsets[0][0]], -65.3935928f, .000001f);
-    BOOST_CHECK_CLOSE(frame.getData()[offsets[1][0]], -65.9297104f, .000001f);
-    BOOST_CHECK_CLOSE(frame.getData()[offsets[0][1]], -65.4166641f, .000001f);
-    BOOST_CHECK_CLOSE(frame.getData()[offsets[1][1]], -65.9334106f, .000001f);
+    BOOST_CHECK(frame.data);
+    BOOST_CHECK_CLOSE((*frame.data)[offsets[0][0]], -65.3935928f, .000001f);
+    BOOST_CHECK_CLOSE((*frame.data)[offsets[1][0]], -65.9297104f, .000001f);
+    BOOST_CHECK_CLOSE((*frame.data)[offsets[0][1]], -65.4166641f, .000001f);
+    BOOST_CHECK_CLOSE((*frame.data)[offsets[1][1]], -65.9334106f, .000001f);
 }
 
 void testReadRange(const char* relativePath)

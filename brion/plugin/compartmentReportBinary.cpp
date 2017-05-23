@@ -137,12 +137,12 @@ std::string getErrorString(int errnum)
 {
     char buffer[1024];
     buffer[1023] = '\0';
-#if (_POSIX_C_SOURCE >= 200112L || _XOPEN_SOURCE >= 600) && !_GNU_SOURCE
+#if _GNU_SOURCE
+    return strerror_r(errnum, buffer, 1023);
+#else
     if (strerror_r(errnum, buffer, 1023) == -1)
         return "Uknown error";
     return buffer;
-#else
-    return strerror_r(errnum, buffer, 1023);
 #endif
 }
 

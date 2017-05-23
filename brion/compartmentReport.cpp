@@ -128,7 +128,7 @@ std::future<floatsPtr> CompartmentReport::loadFrame(
     const double timestamp) const
 {
     auto task = [timestamp, this] {
-        if (timestamp < getStartTime() || timestamp > getEndTime())
+        if (timestamp < getStartTime() || timestamp >= getEndTime())
             return floatsPtr();
 
         return _impl->plugin->loadFrame(timestamp);
@@ -140,7 +140,7 @@ std::future<Frames> CompartmentReport::loadFrames(const double start,
                                                   const double end) const
 {
     auto task = [start, end, this] {
-        if (start < getStartTime() || end > getEndTime())
+        if (end < getStartTime() || start >= getEndTime())
             return Frames();
         return _impl->plugin->loadFrames(start, end);
     };
@@ -150,7 +150,10 @@ std::future<Frames> CompartmentReport::loadFrames(const double start,
 size_t CompartmentReport::getNeuronSize(const uint32_t gid) const
 {
     const size_t index = getIndex(gid);
-    const size_t nTimesteps = (getEndTime() - getStartTime()) / getTimestep();
+    const double step = getTimestep();
+    const size_t nTimesteps =
+        // Added timestep/2 to avoid round-off errors.
+        (getEndTime() - getStartTime() + step * 0.5) / step;
     return getNumCompartments(index) * nTimesteps;
 }
 

@@ -237,12 +237,12 @@ bp::object toNumpy(const brain::Matrix4f& matrix)
     return bp::object(bp::handle<>(array));
 }
 
-bp::object frameToTuple(CompartmentReportFrame&& frame)
+bp::object frameToTuple(brion::Frame&& frame)
 {
-    if (frame.empty())
+    if (!frame.data)
         return bp::object(); // None
 
-    return bp::make_tuple(frame.getTimestamp(), toNumpy(frame.takeData()));
+    return bp::make_tuple(frame.timestamp, toNumpy(std::move(*frame.data)));
 }
 
 bp::object framesToTuple(brion::Frames&& frames)
@@ -252,12 +252,6 @@ bp::object framesToTuple(brion::Frames&& frames)
 
     size_t frameCount = frames.timeStamps->size();
     size_t frameSize = frames.data->size() / frameCount;
-
-    // TODO :remove this when time stamps will be doubles in brion::CR
-    std::vector<double> timestamps(frameCount);
-    size_t index = 0;
-    for (auto val : *frames.timeStamps)
-        timestamps[index++] = val;
 
     auto data = frames.data;
 
@@ -277,7 +271,7 @@ bp::object framesToTuple(brion::Frames&& frames)
         bp::throw_error_already_set();
     }
 
-    return bp::make_tuple(brain::toNumpy(std::move(timestamps)),
+    return bp::make_tuple(brain::toNumpy(std::move(*frames.timeStamps)),
                           bp::handle<>(array));
 }
 

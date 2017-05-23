@@ -19,8 +19,6 @@
  */
 #pragma once
 
-#include "compartmentReportFrame.h"
-
 #include <brain/api.h>
 #include <brain/types.h>
 #include <future>
@@ -65,7 +63,7 @@ public:
      * otherwise
      * @version 2.0
      */
-    BRAIN_API std::future<CompartmentReportFrame> load(double timestamp);
+    BRAIN_API std::future<brion::Frame> load(double timestamp);
 
     /** Load frames between start and end time stamps.
      *

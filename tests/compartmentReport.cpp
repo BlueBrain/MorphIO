@@ -139,9 +139,6 @@ void testBounds(const char* relativePath)
     BOOST_CHECK(frame);
 
     frame = report.loadFrame(report.getEndTime()).get();
-    BOOST_CHECK(frame);
-
-    frame = report.loadFrame(report.getEndTime() + 1).get();
     BOOST_CHECK(!frame);
 }
 
