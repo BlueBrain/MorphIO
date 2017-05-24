@@ -423,4 +423,3 @@ class Types:
     PointVector = _PointVector
     MatPoints = _Mat_Points
     MatIndex = _Mat_Index
-

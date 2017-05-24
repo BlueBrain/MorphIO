@@ -14,6 +14,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
 
 include(DefineInstallationPaths)
 include(ReleaseDebugAutoFlags)
+include(Display)
 
 
 option(MORPHOTOOL_UNIT_TESTS "Enable or disable unit tests" ON)
@@ -58,6 +59,4 @@ add_subdirectory(deps/hadoken)
 add_subdirectory(deps/highfive)
 add_subdirectory(tests/unit)
 
-add_subdirectory(pybindings)
-
-
+add_subdirectory(python)
