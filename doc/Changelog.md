@@ -1,8 +1,13 @@
 Changelog {#Changelog}
 =========
 
-# git master
+# Release 2.0.0 (24-May-2017)
 
+* [154](https://github.com/BlueBrain/Brion/pull/154):
+  - Improved help and command line inverface for spikeConverter and
+    compartmentConverter.
+  - Timestamps in brion::CompartmentReport changed from float to double.
+  - New implementation of binary compartment report reader using POSIX AIO.
 * [153](https://github.com/BlueBrain/Brion/pull/153):
   Updated Python wrapping of SpikeReportWriter to handle nympy arrays of spikes
 * [152](https://github.com/BlueBrain/Brion/pull/152):

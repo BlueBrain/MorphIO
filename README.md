@@ -68,8 +68,8 @@ environments are tested:
 
 Building from source is as simple as:
 
-    git clone https://github.com/BlueBrain/Brion.git
+    git clone --recursive https://github.com/BlueBrain/Brion.git
     mkdir Brion/build
     cd Brion/build
-    cmake -GNinja ..
+    cmake -GNinja -DCLONE_SUBPROJECTS=ON ..
     ninja

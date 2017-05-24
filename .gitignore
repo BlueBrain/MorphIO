@@ -32,7 +32,6 @@
 /Lunchbox/
 /Servus/
 /vmmlib/
-CMake/common/
 CMakeLists.txt.user*
 Makefile
 build/
