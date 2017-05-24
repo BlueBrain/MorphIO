@@ -37,7 +37,6 @@ if(ENABLE_MESHER_CGAL)
 endif()
 
 
-
 file(GLOB MORPHO_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/morpho/*)
 file(GLOB MORPHO_HEADERS_BITS ${CMAKE_CURRENT_SOURCE_DIR}/include/morpho/*/*)
 
@@ -55,8 +54,9 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/morpho DESTINATION ${INCLUDE_INS
 
 # Targets
 add_subdirectory(src)
-add_subdirectory(deps/hadoken)
-add_subdirectory(deps/highfive)
 add_subdirectory(tests/unit)
-
 add_subdirectory(python)
+
+# Any reason to include them besides testing them?
+#add_subdirectory(deps/hadoken)
+#add_subdirectory(deps/highfive)
