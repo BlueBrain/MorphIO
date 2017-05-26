@@ -1,4 +1,5 @@
 if(BUILD_PYTHON_MODULE)
+option(BUILD_PYTHON_DISTRIBUTABLE "Builds a Self-contained Python compiled module (wheel)" OFF)
 
 # Even though we dont reqire the lib, we need headers
 find_package(PythonInterpLibs)
@@ -12,27 +13,42 @@ if(REBULD_BINDINGS OR (NOT EXISTS ${CYBINDINGS_CPP}))
 	message(STATUS "${Cyan}Will rebuild Cython bindings!${ColorReset}")
 endif()
 
+# Getting the INCLUDE_DIRECTORIES to pass on to the compilation of the extension
+get_target_property(dirs morpho INCLUDE_DIRECTORIES)
+set(dirstr .)
+foreach(dir ${dirs})
+    set(dirstr "${dirstr}:${dir}")
+endforeach()
+
 
 # Main target -> Requires libmorpho and Cython bindings
 # Uses setup.py to compile extension and link
-get_target_property(dirs morpho INCLUDE_DIRECTORIES)
 add_custom_target(pymorphotool ALL
-    COMMAND ${PYTHON_EXECUTABLE} setup.py build_ext "-I$<JOIN:${dirs},:>" -L${CMAKE_BINARY_DIR}/src/morpho  install --install-lib=${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${PYTHON_EXECUTABLE} setup.py build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp1 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src/morpho -R${CMAKE_BINARY_DIR}/src/morpho install --install-lib=${CMAKE_CURRENT_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${CYBINDINGS_CPP} morpho
 )
 
-# Create a python source distributable package
+# Self-contained distributable package (single lib morphotool)
+if(BUILD_PYTHON_DISTRIBUTABLE)
+set(libs_required_morpho hdf5)
+add_custom_target(pydist ALL
+    COMMAND ${PYTHON_EXECUTABLE} setup.py setuptools build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp2 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src/morpho/static "-l$<JOIN:${libs_required_morpho}, -l>" bdist_wheel --dist-dir ${CMAKE_BINARY_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDS ${CYBINDINGS_CPP} morphostatic
+)
+endif()
+
+# Python Source distributable package
 add_custom_target(pysdist
     COMMAND ${PYTHON_EXECUTABLE} setup.py sdist --dist-dir ${CMAKE_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS pymorphotool
 )
 
+
 # If at build time CYBINDINGS_CPP doesnt exist, it wil be generated
 add_subdirectory(bindings)
-
-#--------
 
 
 # TESTS
@@ -43,8 +59,9 @@ endif()
 
 
 # INSTALL
-set(PY_INSTALL_OPTIONS "--install-lib=${CMAKE_INSTALL_PREFIX}" CACHE STRING "Python install options. Defaults to deploy package to CMAKE_INSTALL_PREFIX")
-install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} setup.py build_ext -L${CMAKE_INSTALL_PREFIX}/lib64 install ${PY_INSTALL_OPTIONS} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
-# Also create the binary distributable
-install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} setup.py build_ext -L${CMAKE_INSTALL_PREFIX}/lib64 bdist --dist-dir ${CMAKE_BINARY_DIR} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
+set(PY_INSTALL_OPTIONS "--install-lib=${CMAKE_INSTALL_PREFIX}")
+# Install Python package linking to the lib at install destination
+install(CODE "execute_process(COMMAND python setup.py build_ext -I${dirstr} -L${CMAKE_INSTALL_PREFIX}/lib64 -R${CMAKE_INSTALL_PREFIX}/lib64 install ${PY_INSTALL_OPTIONS} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
+# Messsage to help users installing python package in other locations
+install(CODE "MESSAGE(STATUS \"${Cyan}All done. To install Python bindings to your current Python environment run 'python setup.py install' from the 'python' directory${ColorReset}\")")
 endif()
