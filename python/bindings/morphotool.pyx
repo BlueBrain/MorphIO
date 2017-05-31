@@ -89,7 +89,7 @@ cdef class MorphoNode(_py__base):
 
         obj.index = index
         return obj
-    
+
     @staticmethod
     cdef MorphoNode from_ref(const morpho.morpho_node &ref):
         return MorphoNode.from_ptr_index(<morpho.morpho_node*>&ref, -1)
@@ -145,7 +145,7 @@ cdef class NeuronNode3D(MorphoNode):
     @staticmethod
     cdef NeuronNode3D from_ptr(const morpho.neuron_node_3d *ptr, bool owner=False):
         return NeuronNode3D.from_ptr0(NeuronNode3D, ptr, owner)
-    
+
     @staticmethod
     cdef NeuronNode3D from_ref(const morpho.neuron_node_3d &ref):
         return NeuronNode3D.from_ptr(<morpho.neuron_node_3d*>&ref)
@@ -330,7 +330,7 @@ cdef class MorphoTree(_py__base):
         obj._ptr = <morpho.morpho_tree *>ptr
         if owner: obj._sharedPtr.reset(obj.ptr())
         return obj
-    
+
     @staticmethod
     cdef MorphoTree from_ref(const morpho.morpho_tree &ref):
         return MorphoTree.from_ptr(<morpho.morpho_tree*>&ref)
@@ -383,4 +383,3 @@ include "morpho_stats.pxi"
 DEF ENABLE_MESHER_GCAL = 0
 IF ENABLE_MESHER_GCAL:
     include "morpho_mesher.pxi"
-

@@ -109,7 +109,7 @@ morpho_reader::morpho_reader(const std::string & myfilename)  :
     structures(h5_file.getDataSet("/structure")),
     points(h5_file.getDataSet("/points")) {
 
-    if ( h5_file.hasGroup("/metadata") ) {
+    if ( h5_file.hasItem("metadata") ) {
         metadata = h5_file.getGroup("/metadata");
     }
 }

@@ -1,4 +1,5 @@
 if(BUILD_PYTHON_MODULE)
+
 option(BUILD_PYTHON_DISTRIBUTABLE "Builds a Self-contained Python compiled module (wheel)" OFF)
 
 # Even though we dont reqire the lib, we need headers
@@ -7,7 +8,6 @@ find_package(PythonInterpLibs)
 # Rebuild Cython?
 option(REBUILD_BINDINGS "Rebuild Python bindings from Cython sources" OFF)
 set(CYBINDINGS_CPP "${CMAKE_CURRENT_SOURCE_DIR}/morphotool/morphotool.cpp")
-message("CPP file: ${CYBINDINGS_CPP}")
 
 # Getting the INCLUDE_DIRECTORIES to pass on to the compilation of the extension
 get_target_property(dirs morpho INCLUDE_DIRECTORIES)
@@ -22,11 +22,12 @@ endforeach()
 add_custom_target(pymorphotool ALL
     COMMAND ${PYTHON_EXECUTABLE} setup.py build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp1 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src/morpho -R${CMAKE_BINARY_DIR}/src/morpho install --install-lib=${CMAKE_CURRENT_BINARY_DIR} --old-and-unmanageable > /dev/null
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${CYBINDINGS_CPP}
+    DEPENDS ${CYBINDINGS_CPP} morpho
     COMMENT "Writing morphotool Python module to ${CMAKE_CURRENT_BINARY_DIR}"
 )
 # Hack around cmake bug 14633 - use a target to communicate file dependencies across cmake files
 add_custom_command(OUTPUT ${CYBINDINGS_CPP} DEPENDS cybindings_cpp)
+
 
 # Self-contained distributable package (single lib morphotool)
 if(BUILD_PYTHON_DISTRIBUTABLE)
@@ -38,6 +39,7 @@ add_custom_target(pydist ALL
     COMMENT "Building distributable Python wheel in ${CMAKE_BINARY_DIR}"
 )
 endif()
+
 
 # Python Source distributable package
 add_custom_target(pysdist
@@ -51,12 +53,8 @@ add_custom_target(pysdist
 # If at build time CYBINDINGS_CPP doesnt exist, it wil be generated
 add_subdirectory(bindings)
 
-
 # TESTS
-if(MORPHOTOOL_UNIT_TESTS)
-	find_package(NumPy REQUIRED) # required for unit test execution
-	add_subdirectory(test)
-endif()
+add_subdirectory(test)
 
 
 # INSTALL
