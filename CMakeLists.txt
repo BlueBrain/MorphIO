@@ -27,6 +27,9 @@ set(Boost_NO_BOOST_CMAKE TRUE)
 find_package(Threads)
 find_package(Boost 1.55 QUIET REQUIRED COMPONENTS system thread filesystem program_options)
 find_package(HDF5 QUIET REQUIRED)
+# Eventually required for rebuilding bindings
+find_package(Cython 0.25.0)
+find_package(NumPy QUIET)
 
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}" )

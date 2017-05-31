@@ -5,7 +5,7 @@ from setuptools import setup, Extension
 morphotool_ext = Extension('morphotool.morphotool',
     libraries = ['morpho'],
     sources = ['morphotool/morphotool.cpp'],
-    extra_compile_args=['-std=c++11'],
+    extra_compile_args=['-std=c++11', '-Wno-unused-local-typedefs'],
     include_dirs=[]
 )
 
@@ -26,4 +26,3 @@ setup_opts = dict(
 
 if __name__ == '__main__':
     setup(**setup_opts)
-
