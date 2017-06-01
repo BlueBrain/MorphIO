@@ -16,12 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef MORPHO_H5_V1_TPP
-#define MORPHO_H5_V1_TPP
 
 
-#include "../morpho_h5_v1.hpp"
-#include "../morpho_stats.hpp"
+#include <morpho/morpho_h5_v1.hpp>
+#include <morpho/morpho_stats.hpp>
 
 #include <tuple>
 #include <chrono>
@@ -44,7 +42,7 @@ namespace h5_v1{
 
 namespace {
 
-inline void split_xyz_and_distance(const mat_points & raw_points, std::vector<point> & points, std::vector<double> & radius){
+void split_xyz_and_distance(const mat_points & raw_points, std::vector<point> & points, std::vector<double> & radius){
     points.resize(raw_points.size1());
     radius.resize(raw_points.size1());
 
@@ -55,7 +53,7 @@ inline void split_xyz_and_distance(const mat_points & raw_points, std::vector<po
 }
 
 
-inline neuron_struct_type branch_type_from_h5v1(const int type_id){
+neuron_struct_type branch_type_from_h5v1(const int type_id){
     switch(type_id){
         case 1:
             return neuron_struct_type::soma;
@@ -70,7 +68,7 @@ inline neuron_struct_type branch_type_from_h5v1(const int type_id){
     }
 }
 
-inline int h5v1_from_branch_type(neuron_struct_type btype){
+int h5v1_from_branch_type(neuron_struct_type btype){
     switch(btype){
         case neuron_struct_type::soma:
             return 1;
@@ -280,7 +278,7 @@ morpho_writer::morpho_writer(const std::string & f)  :
 }
 
 
-inline void export_tree_to_raw(const morpho_tree & tree, mat_index & raw_index, mat_points & raw_points){
+static void export_tree_to_raw(const morpho_tree & tree, mat_index & raw_index, mat_points & raw_points){
     const std::size_t number_node = tree.get_tree_size();
     std::size_t offset_struct = 0;
     std::size_t offset_points = 0;
@@ -373,4 +371,3 @@ void morpho_writer::write(const morpho_tree &tree){
 } // morpho
 
 
-#endif // MORPHO_H5_V1_TPP

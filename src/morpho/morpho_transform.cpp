@@ -20,6 +20,8 @@
 #include <tuple>
 #include <memory>
 
+#include <boost/optional.hpp>
+
 #include <hadoken/format/format.hpp>
 
 #include <morpho/morpho_transform.hpp>

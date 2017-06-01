@@ -46,7 +46,7 @@ public:
 
     typedef std::pair<std::size_t, std::size_t> range;
 
-    inline morpho_reader(const std::string & filename);
+    morpho_reader(const std::string & filename);
 
     ///
     /// \brief get all points associated with the morphology
@@ -59,7 +59,7 @@ public:
     ///  d: diameter of the segment associated with the points
     ///
     ///
-    inline mat_points get_points_raw() const;
+    mat_points get_points_raw() const;
 
 
     ///
@@ -72,16 +72,16 @@ public:
     ///  z: position on axis Z
     ///  d: not relevant
     ///
-    inline mat_points get_soma_points_raw() const;
+    mat_points get_soma_points_raw() const;
 
 
-    inline mat_index get_struct_raw() const;
+    mat_index get_struct_raw() const;
 
     ///
     /// \brief points range of a given branch by id
     /// \return range( offset, count )
     ///
-    inline range get_branch_range_raw(int id ) const;
+    range get_branch_range_raw(int id ) const;
 
 
     ///
@@ -93,7 +93,7 @@ public:
     }
 
 
-    inline morpho_tree create_morpho_tree() const;
+    morpho_tree create_morpho_tree() const;
 
 
 private:
@@ -108,10 +108,10 @@ private:
 class morpho_writer{
 public:
     // create a new h5v1 morphology file at filename path
-    inline morpho_writer(const std::string & filename);
+    morpho_writer(const std::string & filename);
 
     // write a new morphology file out of the given morpho_tree
-    inline void write(const morpho_tree & tree);
+    void write(const morpho_tree & tree);
 
 private:
     HighFive::File h5_file;
@@ -126,8 +126,6 @@ private:
 
 } // morpho
 
-
-#include "bits/morpho_h5_v1.tpp"
 
 #endif // MORPHO_H5_V1_HPP
 
