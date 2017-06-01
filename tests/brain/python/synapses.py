@@ -103,6 +103,10 @@ class TestSynapse(unittest.TestCase):
         self.synapse = self.synapses[0]
 
     def test_synapse(self):
+        # This data is not available in the test dataset, so we only check the
+        # function exists
+        self.assertRaises(RuntimeError, lambda: self.synapse.gid())
+
         pre_gid = self.synapse.pre_gid()
         pre_section_id = self.synapse.pre_section()
         pre_segment_id = self.synapse.pre_segment()

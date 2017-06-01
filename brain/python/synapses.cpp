@@ -95,6 +95,8 @@ const auto selfarg = bp::arg( "self" );
 
 bp::class_< SynapseWrapper >( "Synapse",
                               DOXY_CLASS( brain::Synapse ), bp::no_init )
+    .def( "gid", &Synapse::getGID, ( selfarg ),
+          DOXY_FN( brain::Synapse::getGID ))
     .def( "pre_gid", &Synapse::getPresynapticGID, ( selfarg ),
           DOXY_FN( brain::Synapse::getPresynapticGID ))
     .def( "pre_section", &Synapse::getPresynapticSectionID, ( selfarg ),

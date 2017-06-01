@@ -26,10 +26,8 @@
 #include <bitset>
 
 #include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
-#include <boost/unordered_map.hpp>
 
 #include <H5Cpp.h>
 
@@ -37,6 +35,7 @@
 #include <lunchbox/scopedMutex.h>
 
 #include <fstream>
+#include <unordered_map>
 
 namespace brion
 {
@@ -84,7 +83,6 @@ bool _openDataset(const H5::H5File& file, const std::string& name,
 }
 };
 namespace fs = boost::filesystem;
-using boost::lexical_cast;
 
 /** Access a single synapse file (nrn*.h5 or nrn*.h5.<int> */
 class SynapseFile : public boost::noncopyable
@@ -108,8 +106,8 @@ public:
         Dataset dataset;
         const std::string& datasetName = _file.getObjnameByIdx(0);
         if (!detail::_openDataset(_file, datasetName, dataset))
-            LBTHROW(std::runtime_error("Cannot open dataset in synapse file " +
-                                       source));
+            LBTHROW(std::runtime_error("Cannot open dataset " + datasetName +
+                                       " in synapse file " + source));
 
         _numAttributes = dataset.dims[1];
         if (_numAttributes != SYNAPSE_ALL &&
@@ -166,7 +164,7 @@ public:
         lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
 
         size_t numSynapses = 0;
-        BOOST_FOREACH (const uint32_t gid, gids)
+        for (const uint32_t gid : gids)
         {
             Dataset dataset;
             if (!_openDataset(gid, dataset))
@@ -223,14 +221,25 @@ public:
         }
         catch (const std::runtime_error&)
         {
-            LBINFO << "No merged synapse file found at " << source << std::endl;
-
             const fs::path sourcePath(source);
             const fs::path dir = sourcePath.parent_path();
             const std::string filename = sourcePath.filename().generic_string();
 
-            _createIndex(dir, filename);
+            // OPT: check if we have at least one unmerged file before fetching
+            // all the filenames. Much faster in case there is no merged and/or
+            // unmerged file at all.
+            if (!boost::filesystem::exists(fs::path(source + ".0")))
+            {
+                throw std::runtime_error(
+                    "No merged or unmerged synapse file found: " + source);
+            }
+
+            LBWARN << "Only unmerged synapse files found for " << source
+                   << "; consider using merged files for better performance."
+                   << std::endl;
+
             _findCandidateFiles(dir, filename);
+            _createIndex(dir, filename);
         }
     }
 
@@ -245,7 +254,7 @@ public:
     size_t getNumSynapses(const GIDSet& gids) const
     {
         size_t numSynapses = 0;
-        BOOST_FOREACH (const uint32_t gid, gids)
+        for (const uint32_t gid : gids)
         {
             if (!_findFile(gid))
                 continue;
@@ -284,7 +293,7 @@ public:
     }
 
 private:
-    typedef boost::unordered_map<uint32_t, std::string> GidFileMap;
+    typedef std::unordered_map<uint32_t, std::string> GidFileMap;
 
     mutable SynapseFile* _file;
     mutable uint32_t _gid; // current or 0 for all
@@ -384,7 +393,7 @@ private:
         SilenceHDF5 silence;
 
         // this trial-and-error is the 'fastest' path found
-        BOOST_FOREACH (const std::string& candidate, _fileNames)
+        for (const std::string& candidate : _fileNames)
         {
             try
             {
