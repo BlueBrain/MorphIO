@@ -71,34 +71,31 @@ private:
 
 void CompartmentReportView::_initIndices()
 {
-    size_t indicesCount = 0;
+    indices.resize(report->getFrameSize());
+
     const auto& gids = report->getGIDs();
-
-    const auto gidCount = gids.size();
-    std::vector<size_t> indexPositions(gidCount);
-    for (size_t i = 0; i < gids.size(); ++i)
-    {
-        indexPositions[i] = indicesCount;
-        indicesCount += report->getOffsets()[i].size();
-    }
-
-    indices.resize(indicesCount);
-
     const std::vector<uint32_t> gidList(report->getGIDs().begin(),
                                         report->getGIDs().end());
-    for (size_t i = 0; i < gids.size(); ++i)
+    size_t i = 0;
+    for (auto gid : gids)
     {
         const brion::uint16_ts& compartments =
             report->getCompartmentCounts()[i];
         const brion::uint64_ts& offsets = report->getOffsets()[i];
-        uint16_t section = 0;
-        auto pos = indexPositions[i];
-        for (auto offset : offsets)
+        for (size_t section = 0; section != compartments.size(); ++section)
         {
-            indices[pos + section] = {offset, gidList[i], section,
-                                      compartments[section]};
-            ++section;
+            const auto offset = offsets[section];
+            if (offset == LB_UNDEFINED_UINT64)
+                continue;
+
+            const auto count = compartments[section];
+            for (size_t k = 0; k != count; ++k)
+            {
+                indices[offset + k].gid = gid;
+                indices[offset + k].section = section;
+            }
         }
+        ++i;
     }
 }
 }

@@ -92,8 +92,7 @@ DECLARE_ARRAY_INFO(Vector3f, NPY_FLOAT, 2, 3)
 DECLARE_ARRAY_INFO(Vector4f, NPY_FLOAT, 2, 4)
 DECLARE_ARRAY_INFO(Quaternionf, NPY_FLOAT, 2, 4)
 DECLARE_ARRAY_INFO(Matrix4f, NPY_FLOAT, 3, 4, 4)
-DECLARE_STRUCTURED_ARRAY_INFO(CompartmentReportMapping::IndexEntry,
-                              "u8, u4, u2, u2")
+DECLARE_STRUCTURED_ARRAY_INFO(CompartmentReportMapping::IndexEntry, "u4, u4")
 DECLARE_STRUCTURED_ARRAY_INFO(Spike, "f4, u4")
 
 // Functions for the boost::shared_ptr< std::vector< T >> to numpy converter

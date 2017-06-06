@@ -126,8 +126,7 @@ bp::object CompartmentReportMapping_getIndex(
     const CompartmentReportMappingProxy& mapping)
 {
     static_assert(sizeof(CompartmentReportMapping::IndexEntry) ==
-                      sizeof(uint64_t) + sizeof(uint32_t) + sizeof(uint16_t) +
-                          sizeof(uint16_t),
+                      sizeof(uint32_t) + sizeof(uint32_t),
                   "Bad alignment of IndexEntry");
     return toNumpy(mapping.view->getMapping().getIndex(), mapping.view);
 }

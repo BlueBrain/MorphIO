@@ -45,10 +45,8 @@ public:
     {
         // To ensure proper alignment and compactness for the python binding the
         // order of these fields mustn't be changed.
-        uint64_t offset;
         uint32_t gid;
-        uint16_t section;
-        uint16_t compartmentCount;
+        uint32_t section;
     };
     using Index = std::vector<IndexEntry>;
 

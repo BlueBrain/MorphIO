@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # Release 2.0.0 (30-May-2017)
 
+* [159](https://github.com/BlueBrain/Brion/pull/157):
+  Changed mapping index according to Pandas requirements for indexing.
 * [157](https://github.com/BlueBrain/Brion/pull/157):
   - Add Synapse.gid() python wrapping
   - Improve synapse attribute reading performance

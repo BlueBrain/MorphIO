@@ -294,7 +294,11 @@ void testIndices(const char* relativePath)
     brain::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
-    BOOST_CHECK_EQUAL(view.getMapping().getIndex().size(), 110);
+    BOOST_CHECK_EQUAL(view.getMapping().getIndex().size(), 309);
+    for (auto& entry : view.getMapping().getIndex())
+    {
+        BOOST_CHECK_EQUAL(entry.gid, 400);
+    }
 }
 
 BOOST_AUTO_TEST_CASE(indices_hdf5)

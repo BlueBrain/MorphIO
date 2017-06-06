@@ -47,8 +47,7 @@ class TestReader(unittest.TestCase):
         view = self.report.create_view({1, 2, 3})
         mapping = view.mapping
         assert(mapping.num_compartments(1) == 1)
-        assert(mapping.index.tolist() ==
-               [(0, 1, 0, 1), (1, 2, 0, 1), (2, 3, 0, 1)])
+        assert(mapping.index.tolist() == [(1, 0), (2, 0), (3, 0)])
         assert(mapping.offsets == [[0], [1], [2]])
         assert(mapping.compartment_counts() ==  [[1], [1], [1]])
 
@@ -130,9 +129,7 @@ class TestMemoryManagement(unittest.TestCase):
         mapping = CompartmentReport(report_path).create_view(
             {1, 2, 3}).mapping
         assert(mapping.num_compartments(1) == 1)
-        assert(mapping.index.tolist() ==
-            [(0, 1, 0, 1), (1, 2, 0, 1), (2, 3, 0, 1)])
-
+        assert(mapping.index.tolist() == [(1, 0), (2, 0), (3, 0)])
 
 if __name__ == '__main__':
     unittest.main()
