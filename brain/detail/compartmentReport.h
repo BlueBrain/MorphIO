@@ -72,34 +72,34 @@ private:
 void CompartmentReportView::_initIndices()
 {
     size_t indicesCount = 0;
-    size_t index = 0;
-    auto gidCount = report->getGIDs().size();
+    const auto& gids = report->getGIDs();
 
-    while (gidCount--)
-        indicesCount += report->getOffsets()[index++].size();
+    const auto gidCount = gids.size();
+    std::vector<size_t> indexPositions(gidCount);
+    for (size_t i = 0; i < gids.size(); ++i)
+    {
+        indexPositions[i] = indicesCount;
+        indicesCount += report->getOffsets()[i].size();
+    }
 
-    indices.reserve(indicesCount);
-    index = 0;
+    indices.resize(indicesCount);
 
-    for (auto gid : report->getGIDs())
+    const std::vector<uint32_t> gidList(report->getGIDs().begin(),
+                                        report->getGIDs().end());
+    for (size_t i = 0; i < gids.size(); ++i)
     {
         const brion::uint16_ts& compartments =
-            report->getCompartmentCounts()[index];
-        const brion::uint64_ts& offsets = report->getOffsets()[index];
+            report->getCompartmentCounts()[i];
+        const brion::uint64_ts& offsets = report->getOffsets()[i];
         uint16_t section = 0;
+        auto pos = indexPositions[i];
         for (auto offset : offsets)
         {
-            indices.push_back({offset, gid, section, compartments[section]});
+            indices[pos + section] = {offset, gidList[i], section,
+                                      compartments[section]};
             ++section;
         }
-        ++index;
     }
 }
-
-struct CompartmentReportFrame
-{
-    double timeStamp = -1.0;
-    brion::floats data;
-};
 }
 } // namespaces

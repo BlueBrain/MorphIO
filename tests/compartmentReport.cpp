@@ -370,6 +370,19 @@ void testReadSoma(const char* relativePath)
     BOOST_CHECK_EQUAL(report.getTimestep(), 0.1);
     BOOST_CHECK_EQUAL(report.getFrameSize(), 1);
 
+    const auto& offsets = report.getOffsets();
+    for (size_t i = 0; i != offsets.size(); ++i)
+    {
+        BOOST_CHECK_EQUAL(offsets[i].size(), 1);
+        BOOST_CHECK_EQUAL(offsets[i][0], i);
+    }
+    const auto& counts = report.getCompartmentCounts();
+    for (auto&& c : counts)
+    {
+        BOOST_CHECK_EQUAL(c.size(), 1);
+        BOOST_CHECK_EQUAL(c[0], 1);
+    }
+
     brion::floatsPtr frame = report.loadFrame(report.getStartTime()).get();
     BOOST_CHECK(frame);
     BOOST_CHECK_EQUAL((*frame)[0], -65);
@@ -400,6 +413,14 @@ void testReadAllCompartments(const char* relativePath)
     BOOST_CHECK_EQUAL(report.getEndTime(), 10.);
     BOOST_CHECK_EQUAL(report.getTimestep(), 0.1);
     BOOST_CHECK_EQUAL(report.getFrameSize(), 20360);
+
+    const auto& offsets = report.getOffsets();
+    BOOST_CHECK_EQUAL(offsets.size(), report.getGIDs().size());
+    BOOST_CHECK_EQUAL(offsets[0][0], 0);
+    BOOST_CHECK_EQUAL(offsets[0][1], 1);
+    BOOST_CHECK_EQUAL(offsets[1][0], 629);
+    BOOST_CHECK_EQUAL(offsets[1][1], 630);
+    BOOST_CHECK_EQUAL(offsets.back().back(), 20359);
 
     brion::floatsPtr frame = report.loadFrame(.8).get();
     BOOST_CHECK(frame);
