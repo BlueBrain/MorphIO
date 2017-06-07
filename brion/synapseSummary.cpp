@@ -39,7 +39,7 @@ class SynapseSummary
 public:
     explicit SynapseSummary(const std::string& source)
     {
-        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
         try
         {
@@ -71,7 +71,7 @@ public:
 
     ~SynapseSummary()
     {
-        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
         if (_file.getId())
             _file.close();
@@ -79,7 +79,7 @@ public:
 
     SynapseSummaryMatrix read(const uint32_t gid)
     {
-        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
         if (!_loadDataset(gid))
             return SynapseSummaryMatrix();

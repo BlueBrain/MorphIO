@@ -119,7 +119,7 @@ CompartmentReportHDF5::CompartmentReportHDF5(
     const int accessMode = initData.getAccessMode();
 
     {
-        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
         namespace fs = boost::filesystem;
 
@@ -197,7 +197,7 @@ CompartmentReportHDF5::CompartmentReportHDF5(
 
 CompartmentReportHDF5::~CompartmentReportHDF5()
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     if (_file.getId())
         _file.close();
@@ -243,7 +243,7 @@ size_t CompartmentReportHDF5::getFrameSize() const
 bool CompartmentReportHDF5::_loadFrame(const size_t frameNumber,
                                        float* buffer) const
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     // The offset for the first comparment of the cell being processed
     hsize_t firstCompartmentOffset = 0;
@@ -274,7 +274,7 @@ bool CompartmentReportHDF5::_loadFrame(const size_t frameNumber,
 
 void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     _gids = gids;
 
@@ -429,7 +429,7 @@ void CompartmentReportHDF5::writeHeader(const double startTime,
 bool CompartmentReportHDF5::writeCompartments(const uint32_t gid,
                                               const uint16_ts& counts)
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     try
     {
@@ -460,7 +460,7 @@ bool CompartmentReportHDF5::writeFrame(const uint32_t gid, const float* values,
                                        const size_t /*size*/,
                                        const double timestamp)
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     try
     {
@@ -491,7 +491,7 @@ bool CompartmentReportHDF5::writeFrame(const uint32_t gid, const float* values,
 
 bool CompartmentReportHDF5::flush()
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
     _file.flush(H5F_SCOPE_GLOBAL);
     return true;
 }
@@ -597,8 +597,7 @@ void CompartmentReportHDF5::_createMetaData()
     H5::Group root = _file.openGroup("/");
 
     detail::addStringAttribute(root, "creator", "Brion");
-    detail::addStringAttribute(root, "software_version",
-                               brion::Version::getRevString());
+    detail::addStringAttribute(root, "software_version", BRION_REV_STRING);
 
     const time_t now = ::time(0);
 #ifdef _WIN32

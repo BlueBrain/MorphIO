@@ -98,7 +98,7 @@ MorphologyHDF5::MorphologyHDF5(const MorphologyInitData& initData)
     , _family(FAMILY_NEURON)
     , _write(false)
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     const std::string path = initData.getURI().getPath();
     unsigned int flags = 0;
@@ -170,7 +170,7 @@ MorphologyHDF5::MorphologyHDF5(const MorphologyInitData& initData)
 
 MorphologyHDF5::~MorphologyHDF5()
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     if (_points.getId())
         _points.close();
@@ -205,7 +205,7 @@ CellFamily MorphologyHDF5::getCellFamily() const
 
 Vector4fsPtr MorphologyHDF5::readPoints(MorphologyRepairStage stage) const
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     if (_version == MORPHOLOGY_VERSION_H5_2)
     {
@@ -248,7 +248,7 @@ Vector4fsPtr MorphologyHDF5::readPoints(MorphologyRepairStage stage) const
 
 Vector2isPtr MorphologyHDF5::readSections(MorphologyRepairStage stage) const
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     if (_version == MORPHOLOGY_VERSION_H5_2)
     {
@@ -304,7 +304,7 @@ Vector2isPtr MorphologyHDF5::readSections(MorphologyRepairStage stage) const
 
 SectionTypesPtr MorphologyHDF5::readSectionTypes() const
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     if (_version == MORPHOLOGY_VERSION_H5_2)
     {
@@ -341,7 +341,7 @@ SectionTypesPtr MorphologyHDF5::readSectionTypes() const
 
 Vector2isPtr MorphologyHDF5::readApicals() const
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     Vector2isPtr data(new Vector2is);
     if (_version == MORPHOLOGY_VERSION_H5_1)
@@ -372,7 +372,7 @@ floatsPtr MorphologyHDF5::readPerimeters() const
     if (_version != MORPHOLOGY_VERSION_H5_1_1)
         return floatsPtr(new floats());
 
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     try
     {
@@ -412,7 +412,7 @@ MorphologyVersion MorphologyHDF5::getVersion() const
 void MorphologyHDF5::writePoints(const Vector4fs& points,
                                  const MorphologyRepairStage stage)
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     ASSERT_WRITE;
 
@@ -476,7 +476,7 @@ void MorphologyHDF5::writePoints(const Vector4fs& points,
 void MorphologyHDF5::writeSections(const Vector2is& sections,
                                    const MorphologyRepairStage stage)
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     ASSERT_WRITE;
 
@@ -507,7 +507,7 @@ void MorphologyHDF5::writeSections(const Vector2is& sections,
 
 void MorphologyHDF5::writeSectionTypes(const SectionTypes& types)
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     ASSERT_WRITE;
 
@@ -547,7 +547,7 @@ void MorphologyHDF5::writeApicals(const Vector2is& apicals)
     if (apicals.empty())
         return;
 
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     const H5::Group& root = _file.openGroup(_g_root);
     hsize_t dims = 2 * apicals.size();
@@ -573,7 +573,7 @@ void MorphologyHDF5::writePerimeters(const floats& perimeters)
         return;
     }
 
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     try
     {
@@ -615,7 +615,7 @@ void MorphologyHDF5::writePerimeters(const floats& perimeters)
 
 void MorphologyHDF5::flush()
 {
-    lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+    lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     ASSERT_WRITE;
     _file.flush(H5F_SCOPE_GLOBAL);
@@ -718,7 +718,7 @@ void MorphologyHDF5::_writeV11Metadata(const MorphologyInitData& initData)
     detail::addStringAttribute(metadata, _a_creator, creator);
 
     detail::addStringAttribute(metadata, _a_software_version,
-                               Version::getString());
+                               BRION_VERSION_STRING);
 
     const time_t now = ::time(0);
 #ifdef _WIN32
@@ -815,8 +815,8 @@ void MorphologyHDF5::_writeV2Metadata()
     char gmtString[32];
     ::ctime_r(&now, gmtString);
 #endif
-    std::string creator =
-        "Brion " + Version::getString() + " brion::Morphology " + gmtString;
+    std::string creator = "Brion " + std::string(BRION_VERSION_STRING) +
+                          " brion::Morphology " + gmtString;
     creator = creator.substr(0, creator.size() - 1); // ctime_r ends with \n
     detail::addStringAttribute(root, _a_creator, creator);
 

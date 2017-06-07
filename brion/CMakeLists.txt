@@ -24,17 +24,6 @@ set(BRION_PUBLIC_HEADERS
 
 set(BRION_HEADERS
   constants.h
-  plugin/compartmentReportBinary.h
-  plugin/compartmentReportCommon.h
-  plugin/compartmentReportDummy.h
-  plugin/compartmentReportHDF5.h
-  plugin/compartmentReportMap.h
-  plugin/morphologyHDF5.h
-  plugin/morphologySWC.h
-  plugin/spikeReportBinary.h
-  plugin/spikeReportBluron.h
-  plugin/spikeReportNEST.h
-  plugin/spikeReportASCII.h
   detail/mesh.h
   detail/meshBinary.h
   detail/meshHDF5.h
@@ -54,18 +43,6 @@ set(BRION_SOURCES
   synapseSummary.cpp
   synapse.cpp
   target.cpp
-  detail/lockHDF5.cpp
-  plugin/compartmentReportBinary.cpp
-  plugin/compartmentReportCommon.cpp
-  plugin/compartmentReportDummy.cpp
-  plugin/compartmentReportHDF5.cpp
-  plugin/compartmentReportMap.cpp
-  plugin/morphologyHDF5.cpp
-  plugin/morphologySWC.cpp
-  plugin/spikeReportBinary.cpp
-  plugin/spikeReportBluron.cpp
-  plugin/spikeReportNEST.cpp
-  plugin/spikeReportASCII.cpp
   )
 
 if(MSVC)
@@ -73,13 +50,25 @@ if(MSVC)
     )
 endif()
 
+add_subdirectory(plugin)
+
+set(_plugin_lib BrionPlugins)
+
+# when linking Brion statically, only visible and used symbols from an
+# application or shared library will be linked. Meaning the plugin registerers
+# for spike- and compartmentreports are skipped. With whole-archive, we include
+# all symbols. As it serves as a switch, we have to reset it for any subsequent
+# library.
+if(COMMON_LIBRARY_TYPE MATCHES "STATIC" AND NOT MSVC)
+  set(_plugin_lib -Wl,--whole-archive BrionPlugins -Wl,--no-whole-archive)
+endif()
+
 set(BRION_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
 set(BRION_LINK_LIBRARIES
   PUBLIC Lunchbox Servus vmmlib
-  PRIVATE Keyv
-  ${Boost_SYSTEM_LIBRARIES} ${Boost_FILESYSTEM_LIBRARIES}
-  ${Boost_DATE_TIME_LIBRARIES} ${Boost_REGEX_LIBRARIES} ${Boost_THREAD_LIBRARIES}
-  ${HDF5_LIBRARIES} ${CMAKE_THREADS_LIB_INIT}
+  PRIVATE ${_plugin_lib} ${HDF5_LIBRARIES}
+          ${Boost_FILESYSTEM_LIBRARIES} ${Boost_REGEX_LIBRARIES}
+          ${CMAKE_THREADS_LIB_INIT}
 )
 
 common_library(Brion)

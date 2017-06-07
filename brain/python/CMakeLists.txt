@@ -6,10 +6,14 @@
 #
 
 if(NOT Boost_PYTHON${USE_BOOST_PYTHON_VERSION}_LIBRARY OR
-   NOT PYTHONLIBS_FOUND OR NOT PYTHON_EXECUTABLE OR
-   NOT NUMPY_FOUND)
+   NOT PYTHON_EXECUTABLE OR NOT NUMPY_FOUND)
 
   message(STATUS "Not configured brain.py: Boost.Python, Python or Numpy not found")
+  return()
+endif()
+
+if(COMMON_LIBRARY_TYPE MATCHES "SHARED" AND NOT PYTHONLIBS_FOUND)
+  message(STATUS "Not configured brain.py: PythonLibs not found")
   return()
 endif()
 
@@ -49,9 +53,13 @@ if(TARGET ${PROJECT_NAME}-docstrings)
   target_compile_definitions(brain_python PRIVATE BRAIN_HAS_DOCSTRINGS)
 endif()
 
-target_link_libraries(brain_python
-  PRIVATE Brain ${PYTHON_LIBRARIES}
-          ${Boost_PYTHON${USE_BOOST_PYTHON_VERSION}_LIBRARY})
+set(_brain_python_libs Brain ${Boost_PYTHON${USE_BOOST_PYTHON_VERSION}_LIBRARY})
+# this is needed for the python wheel case where we are STATIC and shall not
+# link python libraries.
+if(COMMON_LIBRARY_TYPE MATCHES "SHARED")
+  list(APPEND _brain_python_libs ${PYTHON_LIBRARIES})
+endif()
+target_link_libraries(brain_python PRIVATE ${_brain_python_libs})
 if(BBPTESTDATA_FOUND)
   target_link_libraries(brain_python PRIVATE BBPTestData)
 endif()

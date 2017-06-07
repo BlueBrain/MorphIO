@@ -90,7 +90,7 @@ class SynapseFile : public boost::noncopyable
 public:
     explicit SynapseFile(const std::string& source)
     {
-        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
         try
         {
@@ -121,7 +121,7 @@ public:
 
     ~SynapseFile()
     {
-        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
         _file.close();
     }
 
@@ -132,7 +132,7 @@ public:
         if (!bits.any())
             return SynapseMatrix();
 
-        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
         Dataset dataset;
         if (!_openDataset(gid, dataset))
             return SynapseMatrix();
@@ -161,7 +161,7 @@ public:
     size_t getNumAttributes() const { return _numAttributes; }
     size_t getNumSynapses(const GIDSet& gids) const
     {
-        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
         size_t numSynapses = 0;
         for (const uint32_t gid : gids)
@@ -389,7 +389,7 @@ private:
         // usually results in waiting for I/O and non-parallizable search thanks
         // to HDF5
 
-        lunchbox::ScopedWrite mutex(detail::_hdf5Lock);
+        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
         SilenceHDF5 silence;
 
         // this trial-and-error is the 'fastest' path found

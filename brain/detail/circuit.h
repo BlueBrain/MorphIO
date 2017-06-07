@@ -584,7 +584,7 @@ struct MVD3 : public Circuit::Impl
         try
         {
             brion::detail::SilenceHDF5 silence;
-            lunchbox::ScopedWrite mutex(brion::detail::_hdf5Lock);
+            lunchbox::ScopedWrite mutex(brion::detail::hdf5Lock());
             const ::MVD3::Positions& positions = _circuit.getPositions(range);
             assign(range, gids, positions, results, toVector3f);
             return results;
@@ -603,7 +603,7 @@ struct MVD3 : public Circuit::Impl
         try
         {
             brion::detail::SilenceHDF5 silence;
-            lunchbox::ScopedWrite mutex(brion::detail::_hdf5Lock);
+            lunchbox::ScopedWrite mutex(brion::detail::hdf5Lock());
             const size_ts& mtypes = _circuit.getIndexMtypes(range);
             assign(range, gids, mtypes, results, nop);
             return results;
@@ -627,7 +627,7 @@ struct MVD3 : public Circuit::Impl
         try
         {
             brion::detail::SilenceHDF5 silence;
-            lunchbox::ScopedWrite mutex(brion::detail::_hdf5Lock);
+            lunchbox::ScopedWrite mutex(brion::detail::hdf5Lock());
             const size_ts& etypes = _circuit.getIndexEtypes(range);
             assign(range, gids, etypes, results, nop);
             return results;
@@ -651,7 +651,7 @@ struct MVD3 : public Circuit::Impl
         try
         {
             brion::detail::SilenceHDF5 silence;
-            lunchbox::ScopedWrite mutex(brion::detail::_hdf5Lock);
+            lunchbox::ScopedWrite mutex(brion::detail::hdf5Lock());
             const ::MVD3::Rotations& rotations = _circuit.getRotations(range);
             assign(range, gids, rotations, results, toQuaternion);
             return results;
@@ -670,7 +670,7 @@ struct MVD3 : public Circuit::Impl
         try
         {
             brion::detail::SilenceHDF5 silence;
-            lunchbox::ScopedWrite mutex(brion::detail::_hdf5Lock);
+            lunchbox::ScopedWrite mutex(brion::detail::hdf5Lock());
             const Strings& morphos = _circuit.getMorphologies(range);
             assign(range, gids, morphos, results, toString);
             return results;

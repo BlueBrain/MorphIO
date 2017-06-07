@@ -1,6 +1,6 @@
 # -*- mode: cmake -*-
 git_subproject(Servus https://github.com/HBPVIS/Servus.git 6998512)
-git_subproject(Lunchbox https://github.com/Eyescale/Lunchbox.git 867f8d9)
+git_subproject(Lunchbox https://github.com/Eyescale/Lunchbox.git 1a96478)
 git_subproject(Keyv https://github.com/BlueBrain/Keyv.git 6387f84)
 git_subproject(vmmlib https://github.com/Eyescale/vmmlib.git 2635f7f)
 git_subproject(MVDTool https://github.com/BlueBrain/MVDTool.git 4e2f0f4)

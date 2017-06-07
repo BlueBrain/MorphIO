@@ -28,10 +28,14 @@
 *.app
 
 # Custom
-/BBPTestData/
-/Lunchbox/
-/Servus/
-/vmmlib/
+BBPTestData/
+Lunchbox/
+Servus/
+vmmlib/
 CMakeLists.txt.user*
 Makefile
 build/
+Keyv/
+MVDTool/
+Pression/
+Pydoxine/
