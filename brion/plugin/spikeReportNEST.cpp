@@ -23,9 +23,9 @@
 #include "../pluginInitData.h"
 #include "spikeReportBluron.h"
 
-#include <boost/algorithm/string.hpp>
 #include <lunchbox/pluginRegisterer.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 

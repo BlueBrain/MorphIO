@@ -24,8 +24,6 @@
 #include <lunchbox/plugin.h>
 #include <lunchbox/pluginFactory.h>
 
-#include <boost/scoped_ptr.hpp>
-
 namespace brion
 {
 class Morphology::Impl
@@ -38,7 +36,7 @@ public:
     {
     }
 
-    boost::scoped_ptr<MorphologyPlugin> plugin;
+    std::unique_ptr<MorphologyPlugin> plugin;
 };
 
 Morphology::Morphology(const std::string& source)

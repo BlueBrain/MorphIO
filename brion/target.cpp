@@ -20,7 +20,6 @@
 #include "target.h"
 
 #include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 #include <fstream>
@@ -184,7 +183,7 @@ GIDSet Target::parse(const Targets& targets, const std::string& root)
         }
 
         bool found = false;
-        BOOST_FOREACH (const Target& target, targets)
+        for (const Target& target : targets)
         {
             if (!target.contains(name))
                 continue;
@@ -205,11 +204,11 @@ GIDSet Target::parse(const Targets& targets, const std::string& root)
 std::ostream& operator<<(std::ostream& os, const Target& target)
 {
     const Strings& targetNames = target.getTargetNames(brion::TARGET_CELL);
-    BOOST_FOREACH (const std::string& name, targetNames)
+    for (const std::string& name : targetNames)
     {
         const Strings& values = target.get(name);
         os << "Target " << name << ": ";
-        BOOST_FOREACH (const std::string& value, values)
+        for (const std::string& value : values)
         {
             os << value << " ";
         }

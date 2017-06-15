@@ -20,8 +20,8 @@
 #ifndef BRAIN_NEURON_TYPES
 #define BRAIN_NEURON_TYPES
 
-#include <boost/shared_ptr.hpp>
 #include <brion/enums.h>
+#include <memory>
 #include <vector>
 
 namespace brain
@@ -42,7 +42,7 @@ enum class SectionType
     undefined = brion::enums::SECTION_UNDEFINED
 };
 
-typedef boost::shared_ptr<Morphology> MorphologyPtr;
+typedef std::shared_ptr<Morphology> MorphologyPtr;
 
 typedef std::vector<MorphologyPtr> Morphologies;
 typedef std::vector<Section> Sections;

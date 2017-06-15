@@ -24,8 +24,6 @@
 #define BOOST_TEST_MODULE Circuit
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/foreach.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/test/unit_test.hpp>
 #include <lunchbox/bitOperation.h>
 
@@ -230,7 +228,7 @@ BOOST_AUTO_TEST_CASE(test_gid_out_of_range)
 
     brion::GIDSet gids;
     gids.insert(10000000);
-    BOOST_FOREACH (const CircuitPtr& circuit, circuits)
+    for (const CircuitPtr& circuit : circuits)
     {
         BOOST_CHECK_THROW(circuit->getPositions(gids), std::runtime_error);
         BOOST_CHECK_THROW(circuit->getMorphologyTypes(gids),

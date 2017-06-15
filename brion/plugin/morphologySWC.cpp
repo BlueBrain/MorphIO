@@ -22,7 +22,6 @@
 
 #include "../detail/skipWhiteSpace.h"
 
-#include <boost/foreach.hpp>
 #include <fstream>
 #include <list>
 #include <lunchbox/debug.h>
@@ -322,7 +321,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
     // hit, the loop goes back to search the next end point.
     std::vector<bool> visited;
     Samples& samples = info.samples;
-    BOOST_FOREACH (Sample& sample, samples)
+    for (Sample& sample : samples)
         visited.push_back(!sample.valid);
 
     if (samples.empty())

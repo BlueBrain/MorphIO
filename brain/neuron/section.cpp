@@ -23,8 +23,6 @@
 #include "morphology.h"
 #include "morphologyImpl.h"
 
-#include <boost/foreach.hpp>
-
 namespace brain
 {
 namespace neuron
@@ -127,7 +125,7 @@ Sections Section::getChildren() const
     const uint32_ts& children = _morphology->getChildren(_id);
     Sections result;
     result.reserve(children.size());
-    BOOST_FOREACH (uint32_t id, children)
+    for (uint32_t id : children)
         result.push_back(Section(id, _morphology));
     return result;
 }

@@ -24,7 +24,6 @@
 #define BOOST_TEST_MODULE Morphology
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <cstdarg>
@@ -360,7 +359,7 @@ BOOST_AUTO_TEST_CASE(swc_invalid_open)
 template <typename T>
 std::ostream& operator<<(std::ostream& out, std::vector<T>& list)
 {
-    BOOST_FOREACH (T i, list)
+    for (T i : list)
         out << i << ' ';
     out << std::endl;
     return out;
@@ -369,7 +368,7 @@ std::ostream& operator<<(std::ostream& out, std::vector<T>& list)
 std::ostream& operator<<(std::ostream& out,
                          std::vector<brion::SectionType>& list)
 {
-    BOOST_FOREACH (brion::SectionType i, list)
+    for (brion::SectionType i : list)
         out << (int)i << ' ';
     out << std::endl;
     return out;

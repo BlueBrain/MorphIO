@@ -26,7 +26,6 @@
 #include <lunchbox/pluginRegisterer.h>
 
 #include <boost/filesystem/path.hpp>
-#include <boost/foreach.hpp>
 
 #include <map>
 

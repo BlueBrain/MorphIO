@@ -25,8 +25,6 @@
 
 #include <lunchbox/log.h>
 
-#include <boost/foreach.hpp>
-
 #include <bitset>
 
 namespace brain
@@ -134,7 +132,7 @@ uint32_ts Morphology::Impl::getSectionIDs(const SectionTypes& requestedTypes,
                                           const bool excludeSoma) const
 {
     std::bitset<size_t(SectionType::apicalDendrite)> bits;
-    BOOST_FOREACH (const SectionType type, requestedTypes)
+    for (const SectionType type : requestedTypes)
     {
         if (type != SectionType::soma || !excludeSoma)
             bits[size_t(type)] = true;
@@ -192,7 +190,7 @@ Vector4fs Morphology::Impl::getSectionSamples(const uint32_t sectionID,
     const floats accumLengths = _computeAccumulatedLengths(range);
     const float totalLength = accumLengths.back();
 
-    BOOST_FOREACH (const float point, samplePoints)
+    for (const float point : samplePoints)
     {
         // Finding the segment index for the requested sampling position.
         const float length = std::max(0.f, std::min(1.f, point)) * totalLength;
@@ -256,7 +254,7 @@ floats Morphology::Impl::getSampleDistancesToSoma(
     floats result;
     result.reserve(accumLengths.size());
     const float distance = getDistanceToSoma(sectionID);
-    BOOST_FOREACH (const float length, accumLengths)
+    for (const float length : accumLengths)
         result.push_back(distance + length);
 
     return result;
@@ -289,7 +287,7 @@ void Morphology::Impl::_extractChildrenLists()
             children[parent].push_back(i);
     }
     _sectionChildren.resize(sections->size());
-    BOOST_FOREACH (ChildrenMap::value_type& sectionAndChildren, children)
+    for (ChildrenMap::value_type& sectionAndChildren : children)
     {
         _sectionChildren[sectionAndChildren.first].swap(
             sectionAndChildren.second);

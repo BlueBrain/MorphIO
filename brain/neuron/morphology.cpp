@@ -27,8 +27,6 @@
 
 #include <lunchbox/log.h>
 
-#include <boost/foreach.hpp>
-
 namespace brain
 {
 namespace neuron
@@ -108,7 +106,7 @@ Sections Morphology::getSections(const SectionType type) const
     const SectionTypes types(1, type);
     const uint32_ts ids = _impl->getSectionIDs(types, true);
     Sections result;
-    BOOST_FOREACH (const uint32_t id, ids)
+    for (const uint32_t id : ids)
         result.push_back(Section(id, _impl));
     return result;
 }
@@ -117,7 +115,7 @@ Sections Morphology::getSections(const SectionTypes& types) const
 {
     const uint32_ts ids = _impl->getSectionIDs(types, true);
     Sections result;
-    BOOST_FOREACH (const uint32_t id, ids)
+    for (const uint32_t id : ids)
         result.push_back(Section(id, _impl));
     return result;
 }

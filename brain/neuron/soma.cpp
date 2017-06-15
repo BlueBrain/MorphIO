@@ -21,8 +21,6 @@
 #include "morphologyImpl.h"
 #include "section.h"
 
-#include <boost/foreach.hpp>
-
 namespace brain
 {
 namespace neuron
@@ -32,7 +30,7 @@ namespace
 Vector3f _computeCentroid(const Vector4fs& points)
 {
     Vector3f centroid;
-    BOOST_FOREACH (const Vector4f& point, points)
+    for (const Vector4f& point : points)
         centroid += point.get_sub_vector<3, 0>();
     centroid /= float(points.size());
     return centroid;
@@ -77,7 +75,7 @@ float Soma::getMeanRadius() const
     const Vector4fs points = getProfilePoints();
     const Vector3f centroid = _computeCentroid(points);
     float radius = 0;
-    BOOST_FOREACH (const Vector4f point, points)
+    for (const Vector4f point : points)
         radius += (point.get_sub_vector<3, 0>() - centroid).length();
     return radius /= float(points.size());
 }
@@ -92,7 +90,7 @@ Sections Soma::getChildren() const
     const uint32_ts& children =
         _morphology->getChildren(_morphology->somaSection);
     Sections result;
-    BOOST_FOREACH (uint32_t id, children)
+    for (uint32_t id : children)
         result.push_back(Section(id, _morphology));
     return result;
 }
