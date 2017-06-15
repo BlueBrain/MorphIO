@@ -31,7 +31,7 @@ include(Common)
 
 common_find_package(BBPTestData)
 common_find_package(Boost REQUIRED COMPONENTS
-  date_time filesystem program_options regex system thread unit_test_framework)
+  date_time filesystem program_options regex system unit_test_framework)
 common_find_package(Boost COMPONENTS python${USE_BOOST_PYTHON_VERSION})
 common_find_package(HDF5 SYSTEM REQUIRED COMPONENTS C CXX)
 common_find_package(Keyv REQUIRED)
@@ -46,7 +46,7 @@ common_find_package(Sphinx 1.3)
 common_find_package(vmmlib REQUIRED)
 common_find_package_post()
 
-list(APPEND BRION_DEPENDENT_LIBRARIES Boost Lunchbox Servus vmmlib)
+list(APPEND BRION_DEPENDENT_LIBRARIES Boost Servus vmmlib)
 
 add_subdirectory(brion)
 add_subdirectory(brain)

@@ -26,8 +26,6 @@
 #include <brion/spikeReport.h>
 #include <brion/types.h>
 
-#include <lunchbox/debug.h> // LBTHROW
-
 #include <boost/noncopyable.hpp>
 
 #include <functional>
@@ -99,43 +97,44 @@ public:
     /** @copydoc brion::SpikeReport::close */
     virtual void close()
     {
-        LBTHROW(std::runtime_error(
-            "Operation not supported in spike report plugin"));
+        throw std::runtime_error(
+            "Operation not supported in spike report plugin");
     }
 
-    /** @copydoc brion::SpikeReport::read */
-    virtual Spikes read(float min LB_UNUSED)
+    /** @sa brion::SpikeReport::read */
+    virtual Spikes read(float min BRION_UNUSED)
     {
-        LBTHROW(std::runtime_error(
-            "Operation not supported in spike report plugin"));
+        throw std::runtime_error(
+            "Operation not supported in spike report plugin");
     }
 
-    /** @copydoc brion::SpikeReport::readUntil */
-    virtual Spikes readUntil(float max LB_UNUSED)
+    /** @sa brion::SpikeReport::readUntil */
+    virtual Spikes readUntil(float max BRION_UNUSED)
     {
-        LBTHROW(std::runtime_error(
-            "Operation not supported in spike report plugin"));
+        throw std::runtime_error(
+            "Operation not supported in spike report plugin");
     }
 
-    /** @copydoc brion::SpikeReport::seek */
-    virtual void readSeek(float toTimeStamp LB_UNUSED)
+    /** @sa brion::SpikeReport::seek */
+    virtual void readSeek(float toTimeStamp BRION_UNUSED)
     {
-        LBTHROW(std::runtime_error(
-            "Operation not supported in spike report plugin"));
+        throw std::runtime_error(
+            "Operation not supported in spike report plugin");
     }
 
-    /** @copydoc brion::SpikeReport::writeSeek */
-    virtual void writeSeek(float toTimeStamp LB_UNUSED)
+    /** @sa brion::SpikeReport::seek */
+    virtual void writeSeek(float toTimeStamp BRION_UNUSED)
     {
-        LBTHROW(std::runtime_error(
-            "Operation not supported in spike report plugin"));
+        throw std::runtime_error(
+            "Operation not supported in spike report plugin");
     }
 
-    /** @copydoc brion::SpikeReport::write */
-    virtual void write(const Spike* spikes LB_UNUSED, size_t size LB_UNUSED)
+    /** @sa brion::SpikeReport::write */
+    virtual void write(const Spike* spikes BRION_UNUSED,
+                       size_t size BRION_UNUSED)
     {
-        LBTHROW(std::runtime_error(
-            "Operation not supported in spike report plugin"));
+        throw std::runtime_error(
+            "Operation not supported in spike report plugin");
     }
 
     /** @copydoc brion::SpikeReport::supportsBackwardSeek */
@@ -177,7 +176,7 @@ protected:
     {
         if (isInInterruptedState())
         {
-            LBTHROW(std::runtime_error("Interrupted"));
+            throw std::runtime_error("Interrupted");
         }
     }
 
@@ -208,14 +207,14 @@ private:
     {
         if (_accessMode != MODE_READ)
         {
-            LBTHROW(std::runtime_error("Can't read: Not open in read mode"));
+            throw std::runtime_error("Can't read: Not open in read mode");
         }
     }
     void _checkCanWrite()
     {
         if (_accessMode != MODE_WRITE)
         {
-            LBTHROW(std::runtime_error("Can't write: Not open in write mode"));
+            throw std::runtime_error("Can't write: Not open in write mode");
         }
     }
 
@@ -224,9 +223,9 @@ private:
         switch (_state)
         {
         case State::ended:
-            LBTHROW(std::logic_error("State is ENDED"));
+            throw std::logic_error("State is ENDED");
         case State::failed:
-            LBTHROW(std::logic_error("State is FAILED"));
+            throw std::logic_error("State is FAILED");
         default:
             break;
         }
@@ -236,7 +235,7 @@ private:
     {
         if (_closed)
         {
-            LBTHROW(std::runtime_error("Report closed"));
+            throw std::runtime_error("Report closed");
         }
     }
 

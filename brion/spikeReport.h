@@ -96,10 +96,9 @@ public:
      * Open a report in read mode with a subset selection.
      *
      * @param uri thre port uri
-     * @param subset The set of gids to be reported. This set should be
-     *        understood as a filter: any included GID which is not
-     *        actually part of the report will be silently ignored when reading
-     *        data.
+     * @param ids The set of gids to be reported. This set should be understood
+     *        as a filter: any included GID which is not actually part of the
+     *        report will be silently ignored when reading data.
      * @version 2.0
      */
     BRION_API SpikeReport(const URI& uri, const GIDSet& ids);

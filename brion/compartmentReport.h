@@ -243,8 +243,12 @@ public:
     {
         return writeFrame(gid, values.data(), values.size(), timestamp);
     }
+
+    // clang-format off
+    /** @overload brion::CompartmentReport::writeFrame(uint32_t gid, const floats& values, double timestamp) */
     BRION_API bool writeFrame(uint32_t gid, const float* values, size_t size,
                               double timestamp);
+    // clang-format on
 
     /** Flush data to output. @return true on success. @version 1.0 */
     BRION_API bool flush();

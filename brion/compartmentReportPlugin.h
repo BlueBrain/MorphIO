@@ -23,8 +23,6 @@
 #include <brion/pluginInitData.h>
 #include <brion/types.h>
 
-#include <lunchbox/log.h>
-
 #include <boost/noncopyable.hpp>
 
 #include <future>
@@ -131,8 +129,8 @@ public:
     /** @copydoc brion::CompartmentReport::loadFrames */
     virtual Frames loadFrames(double start, double end) const = 0;
 
-    /** @copydoc brion::CompartmentReport::loadNeuron */
-    virtual floatsPtr loadNeuron(uint32_t gid LB_UNUSED) const
+    /** @sa brion::CompartmentReport::loadNeuron */
+    virtual floatsPtr loadNeuron(uint32_t gid BRION_UNUSED) const
     {
         throw std::runtime_error("loadNeuron() not implemented");
     }
@@ -155,9 +153,11 @@ public:
     /** @copydoc brion::CompartmentReport::writeCompartments */
     virtual bool writeCompartments(uint32_t gid, const uint16_ts& counts) = 0;
 
-    /** @copydoc brion::CompartmentReport::writeFrame */
+    // clang-format off
+    /** @copydoc brion::CompartmentReport::writeFrame(uint32_t gid, const float* values, size_t size, double timestamp) */
     virtual bool writeFrame(uint32_t gid, const float* values, size_t size,
                             double timestamp) = 0;
+    // clang-format on
 
     /** @copydoc brion::CompartmentReport::flush */
     virtual bool flush() = 0;
@@ -172,8 +172,8 @@ public:
         const auto& gids = getGIDs();
         const size_t index = std::distance(gids.begin(), gids.find(gid));
         if (index >= gids.size())
-            LBTHROW(std::runtime_error("Gid " + std::to_string(gid) +
-                                       " not in report"));
+            throw std::runtime_error("Gid " + std::to_string(gid) +
+                                     " not in report");
         return index;
     }
 };

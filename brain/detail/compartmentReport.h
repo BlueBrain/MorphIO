@@ -22,7 +22,9 @@
 #include "../compartmentReport.h"
 #include "../compartmentReportMapping.h"
 #include "brion/compartmentReport.h"
+
 #include <lunchbox/threadPool.h>
+#include <lunchbox/types.h>
 
 namespace brain
 {

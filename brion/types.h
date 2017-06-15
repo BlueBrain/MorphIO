@@ -23,8 +23,6 @@
 #include <brion/enums.h>
 
 #include <boost/multi_array.hpp>
-#include <lunchbox/compiler.h>
-#include <lunchbox/types.h>
 #include <map>
 #include <servus/uri.h>
 #include <set>
@@ -33,6 +31,12 @@
 #pragma warning(disable : 4996)
 #include <vmmlib/types.hpp>
 #pragma warning(pop)
+
+#ifdef __GNUC__
+#define BRION_UNUSED __attribute__((unused))
+#else
+#define BRION_UNUSED
+#endif
 
 /** @namespace brion Blue Brain File IO classes */
 namespace brion
@@ -130,12 +134,13 @@ struct Frames
 
 /** A value for undefined timestamps */
 
-const float UNDEFINED_TIMESTAMP LB_UNUSED = std::numeric_limits<float>::max();
-const float RESTING_VOLTAGE LB_UNUSED = -67.; //!< Resting voltage in mV
+const float UNDEFINED_TIMESTAMP BRION_UNUSED =
+    std::numeric_limits<float>::max();
+const float RESTING_VOLTAGE BRION_UNUSED = -67.; //!< Resting voltage in mV
 /** Lowest voltage after hyperpolarisation */
-const float MINIMUM_VOLTAGE LB_UNUSED = -80.;
+const float MINIMUM_VOLTAGE BRION_UNUSED = -80.;
 
-using lunchbox::Strings;
+typedef std::vector<std::string> Strings;
 
 using servus::URI;
 

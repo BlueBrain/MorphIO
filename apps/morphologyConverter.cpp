@@ -7,6 +7,7 @@
 
 #include <lunchbox/clock.h>
 #include <lunchbox/file.h>
+#include <lunchbox/log.h>
 #include <lunchbox/term.h>
 
 #include <boost/foreach.hpp>

@@ -23,7 +23,6 @@
 
 #include <boost/noncopyable.hpp>
 #include <brain/types.h>
-#include <lunchbox/uri.h>
 
 namespace brain
 {
@@ -44,8 +43,7 @@ public:
      * @param accessMode Access mode
      * @version 1.0
      */
-    SpikeReportWriter(const brion::URI& uri,
-                      const int accessMode = brion::MODE_WRITE);
+    SpikeReportWriter(const URI& uri, const int accessMode = brion::MODE_WRITE);
 
     /**
      * Destructor.
@@ -73,7 +71,7 @@ public:
      * @return the fully-qualified URI that the writer uses to publish spikes
      * @version 1.0
      */
-    const lunchbox::URI& getURI() const;
+    const URI& getURI() const;
 
     /**
      * Closes the report. ( It is implicitly called on destruction ).

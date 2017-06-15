@@ -21,6 +21,7 @@
 
 #include <lunchbox/clock.h>
 #include <lunchbox/file.h>
+#include <lunchbox/log.h>
 #include <lunchbox/string.h>
 #include <lunchbox/term.h>
 

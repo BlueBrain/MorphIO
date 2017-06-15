@@ -32,7 +32,6 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/test/unit_test.hpp>
-#include <boost/thread/thread.hpp>
 
 #define BLURON_SPIKE_REPORT_FILE "local/simulations/may17_2011/Control/out.dat"
 
