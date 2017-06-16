@@ -14,8 +14,6 @@ if(NOT EXISTS ${CMAKE_SOURCE_DIR}/CMake/common/Common.cmake)
   message(FATAL_ERROR "CMake/common missing, run: git submodule update --init")
 endif()
 
-include(GitExternal)
-
 set(BRION_DESCRIPTION "The Blue Brain C++ I/O library")
 set(BRION_MAINTAINER
   "Blue Brain Project <bbp-open-source@googlegroups.com>")
