@@ -15,8 +15,9 @@ if(NOT EXISTS ${CMAKE_SOURCE_DIR}/CMake/common/Common.cmake)
 endif()
 
 set(BRION_DESCRIPTION "The Blue Brain C++ I/O library")
-set(BRION_MAINTAINER
-  "Blue Brain Project <bbp-open-source@googlegroups.com>")
+set(BRION_MAINTAINER_NAME "Blue Brain Project")
+set(BRION_MAINTAINER_EMAIL "<bbp-open-source@googlegroups.com>")
+set(BRION_MAINTAINER "${BRION_MAINTAINER_NAME} ${BRION_MAINTAINER_EMAIL}")
 set(BRION_LICENSE LGPL)
 set(BRION_DEB_DEPENDS libhdf5-serial-dev libboost-date-time-dev
   libboost-filesystem-dev libboost-regex-dev libboost-system-dev
@@ -60,3 +61,7 @@ set(DOXYGEN_PREDEFINED_MACROS "BRAIN_API:=")
 include(DoxygenRule)
 
 add_subdirectory(doc/python)
+
+# fill out setup.py metadata for wheel distribution
+configure_file(packaging/python_wheel/setup.py.in
+               ${PROJECT_BINARY_DIR}/packaging/python_wheel/setup.py)

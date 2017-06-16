@@ -31,3 +31,11 @@ Possible Improvements
    time, however, the time saving from this wouldn't be large, and potentially
    complicates the deployment.
  - Only recompile BoostPython, instead of all of Boost
+ - Revisit hardcoded versions of dependencies which are used by CMake and wheel
+   build, e.g. numpy, and source dependencies like boost
+
+Current limitations
+*******************
+  - No OpenMP support, thus compartment reports are slower
+  - No Sphinx and doxygen used in the build, thus no python docstrings
+  - No memcached, thus no caching of morphologies and synapses

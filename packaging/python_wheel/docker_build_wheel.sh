@@ -106,7 +106,7 @@ build_brain()
         -DHDF5_USE_STATIC_LIBRARIES=ON
     make -j8 brain_python
 
-    cp $PACKAGING_DIR/setup.py $PACKAGING_DIR/setup.cfg lib
+    cp packaging/python_wheel/setup.py $PACKAGING_DIR/setup.cfg lib
     pushd lib
     $PYTHON setup.py bdist_wheel
     auditwheel repair -w $WHEELHOUSE dist/*${version}*
