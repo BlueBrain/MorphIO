@@ -349,7 +349,7 @@ include "morpho_stats.pxi"
 
 # Optional bindings for morpho_mesher, overridable by cython exec
 # ----------------------------------------------------------------------------------------------------------------------
-DEF ENABLE_MESHER_GCAL = 0
+DEF ENABLE_MESHER_GCAL = ${with_mesher_gcal}
 IF ENABLE_MESHER_GCAL:
     include "morpho_mesher.pxi"
 

@@ -7,7 +7,7 @@ __copyright__ = "Copyright 2016 EPFL BBP-project"
 # =====================================================================================================================
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
-cimport std
+from .. cimport std
 
 # ======================================================================================================================
 cdef extern from "morpho/morpho_mesher.hpp" namespace "morpho::morpho_mesher":

@@ -4,6 +4,17 @@ set(cymod_cpp ${CMAKE_CURRENT_BINARY_DIR}/${cymod_name}.cpp)
 file(GLOB_RECURSE cy_srcs *.pyx *.pxd *.pxi)
 file(GLOB py_srcs *.py)
 
+if(ENABLE_MESHER_CGAL)
+    set(mesher_lib morpho_mesher)
+    set(with_mesher_gcal 1)
+else(ENABLE_MESHER_CGAL)
+    set(with_mesher_gcal 0)
+endif()
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/${cymod_src}.cmake
+    ${CMAKE_CURRENT_SOURCE_DIR}/${cymod_src}
+)
+
 # Pure python
 add_custom_target(pure_py)
 foreach(pyfile ${py_srcs})
@@ -15,7 +26,6 @@ endforeach()
 
 if(ENABLE_MESHER_CGAL)
     set(mesher_lib morpho_mesher)
-    set(CYTHON_FLAGS "-X ENABLE_MESHER_GCAL=1")
 endif()
 
 # .pyx -> .cpp
@@ -34,5 +44,5 @@ add_dependencies(${cymod_name} pure_py)
 target_link_libraries(${cymod_name} morpho ${mesher_lib})
 
 get_directory_property(INCLUDE_DIRECTORIES INCLUDE_DIRECTORIES)
-target_include_directories(${cymod_name} PUBLIC ${PYTHON_INCLUDE_DIR} ${INCLUDE_DIRECTORIES})
+target_include_directories(${cymod_name} PUBLIC ${PYTHON_INCLUDE_DIR} ${PYTHON_NUMPY_INCLUDE_DIR} ${INCLUDE_DIRECTORIES})
 
