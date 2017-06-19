@@ -9,7 +9,7 @@ project(Brion VERSION 2.0.0)
 set(Brion_VERSION_ABI 9)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
-  ${CMAKE_SOURCE_DIR}/CMake/common ${CMAKE_SOURCE_DIR}/Pydoxine/CMake)
+  ${CMAKE_SOURCE_DIR}/CMake/common ${PROJECT_SOURCE_DIR}/Pydoxine/CMake)
 if(NOT EXISTS ${CMAKE_SOURCE_DIR}/CMake/common/Common.cmake)
   message(FATAL_ERROR "CMake/common missing, run: git submodule update --init")
 endif()
