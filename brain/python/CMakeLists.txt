@@ -67,7 +67,7 @@ endif()
 set_target_properties(brain_python PROPERTIES
   OUTPUT_NAME "_brain" PREFIX ""
   LIBRARY_OUTPUT_DIRECTORY ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/brain)
-configure_file(brain/__init__.py
+configure_file(brain/__init__.py.in
                ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/brain/__init__.py)
 
 add_dependencies(Brion-all brain_python)
