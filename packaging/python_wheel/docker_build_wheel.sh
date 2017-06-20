@@ -16,7 +16,7 @@ get_python_include()
 
 install_reqs()
 {
-    yum install -y zlib-devel bzip2-devel
+    yum install -y zlib-devel bzip2-devel flex
 }
 
 # Need to build this from source, since the binaries from Kitware don't
@@ -77,6 +77,21 @@ build_boost()
         install
 }
 
+# Needed for docstrings generation and system doxygen is too old
+build_doxygen()
+{
+    [[ -e /usr/local/bin/doxygen ]] && return
+
+    # after 1.8.6, we can't use anymore system flex
+    # https://stackoverflow.com/questions/20844635
+    tar xfz $EXT_SRC/Release_1_8_5.tar.gz -C /tmp
+    cd /tmp/doxygen-Release_1_8_5
+
+    ./configure
+    make -j8
+    make install
+}
+
 build_brain()
 {
     local version=$1; shift
@@ -90,6 +105,7 @@ build_brain()
     build_boost $PYTHON $PYTHON_INC
 
     /opt/python/$version/bin/pip install "numpy==$NUMPY_VERSION"
+    /opt/python/$version/bin/pip install "sphinx==1.3.6" lxml
 
     cd /io/build
 
@@ -103,7 +119,8 @@ build_brain()
         -DCOMMON_LIBRARY_TYPE=STATIC                                    \
         -DOpenMP_CXX_FLAGS=''                                           \
         -DOpenMP_C_FLAGS=''                                             \
-        -DHDF5_USE_STATIC_LIBRARIES=ON
+        -DHDF5_USE_STATIC_LIBRARIES=ON                                  \
+        -DSPHINX_ROOT=/opt/python/$version
     make -j8 brain_python
 
     cp packaging/python_wheel/setup.py $PACKAGING_DIR/setup.cfg lib
@@ -116,6 +133,7 @@ build_brain()
 install_reqs
 build_cmake
 build_hdf
+build_doxygen
 
 for version in $PYTHON_VERSIONS; do
     build_brain $version

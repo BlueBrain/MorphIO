@@ -37,5 +37,4 @@ Possible Improvements
 Current limitations
 *******************
   - No OpenMP support, thus compartment reports are slower
-  - No Sphinx and doxygen used in the build, thus no python docstrings
   - No memcached, thus no caching of morphologies and synapses
