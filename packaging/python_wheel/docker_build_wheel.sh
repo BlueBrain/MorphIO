@@ -117,8 +117,6 @@ build_brain()
         -DPYTHON_INCLUDE_DIR=$PYTHON_INC                                \
         -DBOOST_INCLUDEDIR=/usr/local/include/                          \
         -DCOMMON_LIBRARY_TYPE=STATIC                                    \
-        -DOpenMP_CXX_FLAGS=''                                           \
-        -DOpenMP_C_FLAGS=''                                             \
         -DHDF5_USE_STATIC_LIBRARIES=ON                                  \
         -DSPHINX_ROOT=/opt/python/$version
     make -j8 brain_python

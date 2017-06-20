@@ -36,5 +36,4 @@ Possible Improvements
 
 Current limitations
 *******************
-  - No OpenMP support, thus compartment reports are slower
   - No memcached, thus no caching of morphologies and synapses
