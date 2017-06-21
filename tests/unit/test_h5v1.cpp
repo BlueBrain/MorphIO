@@ -12,6 +12,7 @@
 #include <morpho/morpho_h5_v1.hpp>
 #include <morpho/morpho_transform.hpp>
 #include <morpho/morpho_transform_filters.hpp>
+#include <morpho/morpho_reader.hpp>
 
 BOOST_AUTO_TEST_CASE( test_h5v1_rw )
 {
@@ -21,9 +22,7 @@ BOOST_AUTO_TEST_CASE( test_h5v1_rw )
     morpho_tree tree1, tree2;
 
     { // read
-        h5_v1::morpho_reader reader(H5V1_MORPHO_TEST_FILE);
-
-        tree1 = reader.create_morpho_tree();
+        tree1 = reader::create_morpho_tree(H5V1_MORPHO_TEST_FILE);
     }
 
     { // write
@@ -34,9 +33,7 @@ BOOST_AUTO_TEST_CASE( test_h5v1_rw )
 
     { // read back
 
-        h5_v1::morpho_reader reader(testfile_write);
-
-        tree2 = reader.create_morpho_tree();
+        tree2 = reader::create_morpho_tree(testfile_write);
 
 
         std::size_t n_branch1 = stats::total_number_branches(tree1);
@@ -68,11 +65,7 @@ BOOST_AUTO_TEST_CASE( test_h5v1_test_filter_duplicated )
 
     morpho_tree tree1, tree2;
 
-    { // read
-        h5_v1::morpho_reader reader(H5V1_MORPHO_TEST_FILE);
-
-        tree1 = reader.create_morpho_tree();
-    }
+    tree1 = reader::create_morpho_tree(H5V1_MORPHO_TEST_FILE);
 
     morpho_operation_chain chain;
     chain.push_back(std::make_shared<delete_duplicate_point_operation>());

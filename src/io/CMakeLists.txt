@@ -1,7 +1,9 @@
 
 
 list(APPEND SRC_SPATIAL "morpho_reader_h5v1.cpp"
-                        "morpho_circuit.cpp")
+                        "morpho_circuit.cpp"
+                        "morpho_reader.cpp"
+                        "morpho_swc.cpp")
 
 
 

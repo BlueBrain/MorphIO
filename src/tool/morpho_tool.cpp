@@ -35,6 +35,7 @@
 #include <morpho/morpho_mesher.hpp>
 #include <morpho/morpho_stats.hpp>
 #include <morpho/morpho_transform_filters.hpp>
+#include <morpho/morpho_reader.hpp>
 
 #include "gmsh_exporter.hpp"
 #include "x3d_exporter.hpp"
@@ -110,8 +111,8 @@ po::parsed_options parse_args(int argc, char** argv,
 
 
 std::shared_ptr<morpho_tree> load_morphology(const std::string & morphology_file){
-    h5_v1::morpho_reader reader(morphology_file);
-    return std::shared_ptr<morpho_tree>(new morpho_tree(reader.create_morpho_tree()));
+    return std::shared_ptr<morpho_tree>(
+        new morpho_tree(reader::create_morpho_tree(morphology_file)));
 }
 
 void transform_show_help(){
@@ -218,12 +219,7 @@ void export_morpho_to_gmsh(const std::string & filename_morpho, const std::strin
         fmt::scat(std::cout, "load one morphology into morphology tree ", filename_morpho, "\n");
 
         {
-            h5_v1::morpho_reader reader(filename_morpho);
-
-
-            // create tree and apply some basic filter adapted for gmsh
-            morpho_tree tree = reader.create_morpho_tree();
-
+            morpho_tree tree = morpho::reader::create_morpho_tree(filename_morpho);
             trees.emplace_back(std::move(tree));
         }
     }
