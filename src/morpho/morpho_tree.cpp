@@ -18,6 +18,7 @@
 */
 
 #include <bitset>
+#include <hadoken/format/format.hpp>
 
 #include <morpho/morpho_tree.hpp>
 
@@ -25,6 +26,7 @@
 
 namespace morpho{
 
+namespace fmt = hadoken::format;
 
 
 // return the tangeante of a 3 points linestring in point 2
@@ -454,8 +456,11 @@ int morpho_tree::get_parent(int id) const{
 
 int morpho_tree::add_node(int parent_id, const std::shared_ptr<morpho_node> & new_node){
 
-    if(parent_id != -1 && std::size_t(parent_id) >= _dptr->nodes.size()){
-        throw std::out_of_range("Invalid parent id, should match id of existing node or be -1 for new root");
+    const std::size_t current_tree_size =  _dptr->nodes.size();
+    if(parent_id != -1 && std::size_t(parent_id) >= current_tree_size){
+        throw std::out_of_range(fmt::scat("<add_node> invalid parent id ", parent_id,
+                                          " should be inferior to current tree size ", current_tree_size,
+                                          " or -1 for root"));
     }
 
     // insert new root

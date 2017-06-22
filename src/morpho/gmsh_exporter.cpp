@@ -264,21 +264,37 @@ void gmsh_abstract_file::add_bounding_box(){
 template<typename CollectionElements>
 inline void exportPhysicalsElements(const CollectionElements & elements, const std::string & name,
                                     const std::string & tag, std::ostream & out){
+    /// Get the first element id
     bool first = true;
-    for(auto p = elements.begin(); p != elements.end(); ++p){
+    auto p = elements.begin();
+    for(; p != elements.end(); ++p){
         if(p->isPhysical){
-            if(first){
-                fmt::scat(out, "Physical ", name, "(\"", tag, "\") = { ", p->id);
-                first = false;
-            }else{
-                fmt::scat(out, ", ", p->id);
-            }
+            fmt::scat(out, "Physical ", name, "(\"", tag, "\") = {", p->id);
+            first = false;
+            break;
         }
-
     }
 
+    /// Combine groups of ids with sequential numbering
     if(first == false){
-        fmt::scat(out, " };\n");
+        auto first_id = p->id;
+        auto last_id = first_id;
+        for(++p; p != elements.end(); ++p){
+            if(p->isPhysical){
+                if (p->id - last_id == 1)
+                    last_id = p->id;
+                else{
+                    if (last_id > first_id)
+                        fmt::scat(out, ":", last_id);
+                    fmt::scat(out, ", ", p->id);
+                    first_id = last_id = p->id;
+                }
+            }
+        }
+        if (last_id > first_id)
+            fmt::scat(out, ":", last_id);
+
+        fmt::scat(out, "};\n");
     }
 }
 
@@ -315,15 +331,27 @@ void export_polyline(const Collection & all_segments, AbstractFile & f, ostream 
     out << "// export morphology segments  \n";
 
 
-    for(auto p = all_segments.begin(); p != all_segments.end(); ++p){
+    for(auto s = all_segments.begin(); s != all_segments.end(); ++s){
         fmt::scat(out,
-                  "Line(", p->id,") = {");
+                  "Line(", s->id,") = {");
 
-        bool not_first = false;
-        std::for_each(p->points.begin(), p->points.end(), [&f, &out, &not_first](const gmsh_point & p){
-           fmt::scat(out, ((not_first)?", ":" "), f.find_point(p));
-           not_first = true;
+        /// Combine groups of point ids with sequential numbering
+        auto first_id = f.find_point(s->points.front());
+        auto last_id = first_id;
+        fmt::scat(out, first_id);
+        std::for_each(s->points.begin() + 1, s->points.end(), [&f, &out, &first_id, &last_id](const gmsh_point & p){
+            auto p_id = f.find_point(p);
+            if (p_id - last_id == 1)
+                last_id = p_id;
+            else{
+                if (last_id > first_id)
+                    fmt::scat(out, ":", last_id);
+                fmt::scat(out, ", ", p_id);
+                first_id = last_id = p_id;
+            }
         });
+        if (last_id > first_id)
+            fmt::scat(out, ":", last_id);
 
         fmt::scat(out, "};\n");
     }
@@ -556,10 +584,10 @@ void gmsh_exporter::export_to_wireframe(){
 
     /// Writing the size field
     fmt::scat(geo_stream, "Mesh.OldRefinement=0;\nMesh.Algorithm3D = 2;\n\n");
-    fmt::scat(geo_stream, "Field[1] = Attractor;\nField[1].EdgesList = {", seg_id_beg, ":", seg_id_end, "};\nField[1].NNodesByEdge = 1000;\n\n");
+    fmt::scat(geo_stream, "Field[1] = Attractor;\nField[1].EdgesList = {", seg_id_beg, ":", seg_id_end, "};\nField[1].NNodesByEdge = 3;\n\n");
     fmt::scat(geo_stream, "Field[2] = Threshold;\nField[2].DistMax = 100;\nField[2].DistMin = 5;\nField[2].IField = 1;\n");
-    fmt::scat(geo_stream, "Field[2].LcMax = 100;\nField[2].LcMin = 2;\nField[2].Sigmoid = 1;\nField[3] = Octree;\nField[3].InField = 2;\n\n");
-    fmt::scat(geo_stream, "Background Field = 3;\nMesh.CharacteristicLengthExtendFromBoundary=0;\nGeometry.Points = 0;\n");
+    fmt::scat(geo_stream, "Field[2].LcMax = 100;\nField[2].LcMin = 3;\nField[2].Sigmoid = 1;\n//Field[3] = Octree;\n//Field[3].InField = 2;\n\n");
+    fmt::scat(geo_stream, "Background Field = 2;\nMesh.CharacteristicLengthExtendFromBoundary=0;\nGeometry.Points = 0;\n");
     fmt::scat(geo_stream, "Characteristic Length {1 ... 100000} = 100000;\n");
 
     if (is_dmg_enabled()) {

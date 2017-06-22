@@ -16,12 +16,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-#ifndef MORPHO_H5_V1_TPP
-#define MORPHO_H5_V1_TPP
 
 
-#include "../morpho_h5_v1.hpp"
-#include "../morpho_stats.hpp"
+#include <morpho/morpho_h5_v1.hpp>
+#include <morpho/morpho_stats.hpp>
 
 #include <tuple>
 #include <chrono>
@@ -44,8 +42,9 @@ namespace morpho{
 
 namespace h5_v1{
 
+namespace {
 
-inline void split_xyz_and_distance(const mat_points & raw_points, std::vector<point> & points, std::vector<double> & radius){
+void split_xyz_and_distance(const mat_points & raw_points, std::vector<point> & points, std::vector<double> & radius){
     points.resize(raw_points.size1());
     radius.resize(raw_points.size1());
 
@@ -56,7 +55,7 @@ inline void split_xyz_and_distance(const mat_points & raw_points, std::vector<po
 }
 
 
-inline neuron_struct_type neuron_branch_type_from_h5v1(const int type_id){
+neuron_struct_type branch_type_from_h5v1(const int type_id){
     switch(type_id){
         case 1:
             return neuron_struct_type::soma;
@@ -67,11 +66,11 @@ inline neuron_struct_type neuron_branch_type_from_h5v1(const int type_id){
         case 4:
             return neuron_struct_type::dentrite_apical;
          default:
-            throw std::runtime_error("invalid neuron cell type in morphology");
+            throw std::runtime_error("invalid cell type in morphology");
     }
 }
 
-inline int h5v1_from_branch_type(neuron_struct_type btype){
+int h5v1_from_branch_type(neuron_struct_type btype){
     switch(btype){
         case neuron_struct_type::soma:
             return 1;
@@ -86,7 +85,7 @@ inline int h5v1_from_branch_type(neuron_struct_type btype){
     }
 }
 
-inline glia_struct_type glia_branch_type_from_h5v1( const int type_id ){
+glia_struct_type glia_branch_type_from_h5v1( const int type_id ){
     switch(type_id) {
         case 1:
             return glia_struct_type::soma;
@@ -97,6 +96,7 @@ inline glia_struct_type glia_branch_type_from_h5v1( const int type_id ){
         default:
             throw std::runtime_error("invalid glia cell type in morphology");
     }
+}
 }
 
 
@@ -109,7 +109,7 @@ morpho_reader::morpho_reader(const std::string & myfilename)  :
     structures(h5_file.getDataSet("/structure")),
     points(h5_file.getDataSet("/points")) {
 
-    if ( h5_file.hasItem("metadata") ) {
+    if ( h5_file.exist("metadata") ) {
         metadata = h5_file.getGroup("/metadata");
     }
 }
@@ -183,7 +183,6 @@ mat_points morpho_reader::get_soma_points_raw() const {
 
 
 mat_index morpho_reader::get_struct_raw() const {
-
     mat_index res;
     structures.read<mat_index>(res);
 
@@ -231,7 +230,7 @@ template<typename T>
 T morpho_reader::get_metadata(const std::string attr_name) const {
     HighFive::Attribute att = metadata.getAttribute(attr_name);
     T prop_value;
-    att.read_scalar(prop_value);
+    att.read(prop_value);
     return prop_value;
 }
 
@@ -253,9 +252,6 @@ static inline bool check_duplicated_point(mat_range_points & prev_range, mat_ran
     std::cout << "not duplicated" << std::endl;
     return false;
  }
-
-
-
 
 
 morpho_tree morpho_reader::create_morpho_tree() const{
@@ -319,7 +315,7 @@ morpho_tree morpho_reader::create_morpho_tree() const{
 
 
             std::shared_ptr<neuron_branch> b(new neuron_branch(
-                                                 neuron_branch_type_from_h5v1(struct_raw(i, 1)),
+                                                 branch_type_from_h5v1(struct_raw(i, 1)),
                                                  std::move(branch_points),
                                                  std::move(branch_radius))
                                             );
@@ -342,7 +338,7 @@ morpho_writer::morpho_writer(const std::string & f)  :
 }
 
 
-inline void export_tree_to_raw(const morpho_tree & tree, mat_index & raw_index, mat_points & raw_points){
+static void export_tree_to_raw(const morpho_tree & tree, mat_index & raw_index, mat_points & raw_points){
     const std::size_t number_node = tree.get_tree_size();
     std::size_t offset_struct = 0;
     std::size_t offset_points = 0;
@@ -434,4 +430,3 @@ void morpho_writer::write(const morpho_tree &tree){
 } // morpho
 
 
-#endif // MORPHO_H5_V1_TPP

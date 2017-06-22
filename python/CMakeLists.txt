@@ -20,7 +20,7 @@ endforeach()
 # Main target -> Requires libmorpho and Cython bindings
 # Uses setup.py to compile extension and link
 add_custom_target(pymorphotool ALL
-    COMMAND ${PYTHON_EXECUTABLE} setup.py build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp1 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src/morpho -R${CMAKE_BINARY_DIR}/src/morpho install --install-lib=${CMAKE_CURRENT_BINARY_DIR} --old-and-unmanageable > /dev/null
+    COMMAND ${PYTHON_EXECUTABLE} setup.py build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp1 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io -R${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io install --install-lib=${CMAKE_CURRENT_BINARY_DIR} --old-and-unmanageable > /dev/null
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${CYBINDINGS_CPP} morpho
     COMMENT "Writing morphotool Python module to ${CMAKE_CURRENT_BINARY_DIR}"

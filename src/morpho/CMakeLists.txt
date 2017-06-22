@@ -3,7 +3,6 @@ list(APPEND SRC_SPATIAL "morpho_spatial.cpp"
 		 "x3d_exporter.cpp"
                  "morpho_tree.cpp"
                  "morpho_tree_algorithm.cpp"
-                 "morpho_circuit.cpp"
                  "morpho_stats.cpp"
 		 "morpho_transform.cpp")
 
@@ -14,7 +13,9 @@ add_library(morpho SHARED $<TARGET_OBJECTS:morpho-obj>)
 
 target_link_libraries(morpho
                             ${CMAKE_THREAD_LIBS_INIT}
-                            ${HDF5_C_LIBRARIES}  ${Boost_FILESYSTEM_LIBRARIES}
+                            ${Boost_FILESYSTEM_LIBRARIES}
+                            ${Boost_SYSTEM_LIBRARIES}
+
                              )
 
 
