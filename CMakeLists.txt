@@ -52,6 +52,13 @@ add_definitions( -DH5_USE_BOOST -DMORPHO_VERSION_MAJOR=\"${MORPHOTOOL_VERSION_MA
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/morpho DESTINATION ${INCLUDE_INSTALL_DIR})
 
+option(CLANG_FORMAT_PRECOMMIT
+	   "Ensure git staging area is formatted according to clang-format"
+	   FALSE)
+if(CLANG_FORMAT_PRECOMMIT)
+    add_subdirectory(deps/git-cmake-format)
+endif()
+
 # Targets
 add_subdirectory(src)
 add_subdirectory(deps/hadoken)
