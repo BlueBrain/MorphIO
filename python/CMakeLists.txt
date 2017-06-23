@@ -20,7 +20,7 @@ endforeach()
 # Main target -> Requires libmorpho and Cython bindings
 # Uses setup.py to compile extension and link
 add_custom_target(pymorphotool ALL
-    COMMAND ${PYTHON_EXECUTABLE} setup.py build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp1 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io -R${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io install --install-lib=${CMAKE_CURRENT_BINARY_DIR} --old-and-unmanageable > /dev/null
+    COMMAND ${PYTHON_EXECUTABLE} setup.py build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp1 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io -R${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io -lmorpho_io install --install-lib=${CMAKE_CURRENT_BINARY_DIR} --old-and-unmanageable > /dev/null
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${CYBINDINGS_CPP} morpho
     COMMENT "Writing morphotool Python module to ${CMAKE_CURRENT_BINARY_DIR}"
@@ -33,7 +33,7 @@ add_custom_command(OUTPUT ${CYBINDINGS_CPP} DEPENDS cybindings_cpp)
 if(BUILD_PYTHON_DISTRIBUTABLE)
 set(libs_required_morpho hdf5)
 add_custom_target(pydist ALL
-    COMMAND ${PYTHON_EXECUTABLE} setup.py build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp2 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src/morpho/static "-l$<JOIN:${libs_required_morpho}, -l>" bdist_wheel --dist-dir ${CMAKE_BINARY_DIR} > /dev/null
+    COMMAND ${PYTHON_EXECUTABLE} setup.py build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp2 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src "-l$<JOIN:${libs_required_morpho}, -l>" bdist_wheel --dist-dir ${CMAKE_BINARY_DIR} > /dev/null
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${CYBINDINGS_CPP} morphostatic
     COMMENT "Building distributable Python wheel in ${CMAKE_BINARY_DIR}"

@@ -20,8 +20,3 @@ target_link_libraries(morpho
 
 
 install(TARGETS morpho DESTINATION ${LIB_INSTALL_DIR})
-
-# Create static lib - required by Python distributable package
-if(BUILD_PYTHON_DISTRIBUTABLE)
-    add_subdirectory(static)
-endif()
