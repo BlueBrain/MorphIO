@@ -61,7 +61,7 @@ add_subdirectory(test)
 # Defaults to install in the CMAKE_INSTALL_PREFIX. Setuptools requires --old-and-unmanageable to create a plain package and not complain for the PYTHONPATH
 set(PY_INSTALL_OPTIONS "--install-lib=${CMAKE_INSTALL_PREFIX} --old-and-unmanageable")
 # Install Python package linking to the lib at install destination
-install(CODE "execute_process(COMMAND python setup.py build_ext -I${dirstr} -L${CMAKE_INSTALL_PREFIX}/lib64 -R${CMAKE_INSTALL_PREFIX}/lib64 install ${PY_INSTALL_OPTIONS} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_QUIET)")
+install(CODE "execute_process(COMMAND python setup.py build_ext -I${dirstr} -L${CMAKE_INSTALL_PREFIX}/lib64 -R${CMAKE_INSTALL_PREFIX}/lib64 -lmorpho_io install ${PY_INSTALL_OPTIONS} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_QUIET)")
 # Messsage to help users installing python package in other locations
 install(CODE "MESSAGE(STATUS \"${Cyan}All done. To install Python bindings to your current Python environment run 'pip install .' from the 'python' directory${ColorReset}\")")
 endif()
