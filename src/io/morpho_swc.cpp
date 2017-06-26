@@ -29,7 +29,10 @@ namespace morpho {
 
 namespace swc_v1 {
 
-namespace fmt = hadoken::format;
+using hadoken::format::scat;
+
+typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+typedef tokenizer::iterator iterator;
 
 const char COMMENT_CHARACTER = '#';
 
@@ -37,11 +40,14 @@ morpho_reader::morpho_reader(const std::string & filename) :
     filename(filename) {
 }
 
-#define ENSURE_HAS_TOKEN \
-    if (token == tok.end()) { \
-        throw std::runtime_error(fmt::scat( \
-            "Parse error line ", linenum, ": unexpected EOL")); \
+static const iterator& ensure_has_token(const iterator& token, const tokenizer& tokenizer, size_t linenum) {
+
+    if (token == tokenizer.end()) {
+        throw std::runtime_error(scat(
+            "Parse error line ", linenum, ": unexpected EOL"));
     }
+    return token;
+}
 
 /**
  * Build a morpho_tree from a SWC filename
@@ -51,10 +57,8 @@ morpho_reader::morpho_reader(const std::string & filename) :
  */
 morpho_tree morpho_reader::create_morpho_tree() const {
     morpho_tree eax;
-    using namespace boost;
-    typedef tokenizer<char_separator<char> > tokenizer;
 
-    const char_separator<char> sep(" ");
+    const boost::char_separator<char> sep(" ");
     std::ifstream istr(filename);
     std::string line;
     std::size_t linenum = 0;
@@ -65,39 +69,33 @@ morpho_tree morpho_reader::create_morpho_tree() const {
         if (line.size() > 0 && line[0] == COMMENT_CHARACTER) {
             continue;
         }
-        std::vector<point> position(1);
-        std::vector<double> radius(1);
+        point position;
+        double radius;
         tokenizer tok(line, sep);
         tokenizer::iterator token = tok.begin();
 
         if (token == tok.end())
             continue;
         // first field is not used (Sample number)
-        ++token;
-        ENSURE_HAS_TOKEN;
+        ensure_has_token(++token, tok, linenum);
         const int structure_identifier = std::stoi(*token);
-        ++token;
-        ENSURE_HAS_TOKEN;
+        ensure_has_token(++token, tok, linenum);
         const double x = std::atof(token->c_str());
-        ++token;
-        ENSURE_HAS_TOKEN;
+        ensure_has_token(++token, tok, linenum);
         const double y = std::atof(token->c_str());
-        ++token;
-        ENSURE_HAS_TOKEN;
+        ensure_has_token(++token, tok, linenum);
         const double z = std::atof(token->c_str());
-        position[0] = point(x, y, z);
-        ++token;
-        ENSURE_HAS_TOKEN;
-        radius[0] = std::atof(token->c_str());
-        ++token;
-        ENSURE_HAS_TOKEN;
+        position = point(x, y, z);
+        ensure_has_token(++token, tok, linenum);
+        radius = std::atof(token->c_str());
+        ensure_has_token(++token, tok, linenum);
         int parent = std::stoi(*token) - 1; // index starts at 1 in SWC
         if (parent == -2) { // root
             parent = -1;
         }
         ++token;
         if (token != tok.end()) {
-            throw std::runtime_error(fmt::scat(
+            throw std::runtime_error(scat(
                 "Parse error line ", linenum,
                 ". Expected EOL but found '", *token, '\''));
         }
@@ -109,7 +107,7 @@ morpho_tree morpho_reader::create_morpho_tree() const {
                 if (root) {
                     eax.add_node(
                         parent,
-                        std::make_shared<neuron_soma>(position[0], radius[0])
+                        std::make_shared<neuron_soma>(position, radius)
                     );
                     root = false;
                 } else {
@@ -117,8 +115,8 @@ morpho_tree morpho_reader::create_morpho_tree() const {
                         parent,
                         std::make_shared<neuron_branch>(
                             neuron_struct_type::soma,
-                            std::move(position),
-                            std::move(radius)
+                            std::vector<point>({position}),
+                            std::vector<double>({radius})
                         )
                     );
                 }
@@ -129,8 +127,8 @@ morpho_tree morpho_reader::create_morpho_tree() const {
                     parent,
                     std::make_shared<neuron_branch>(
                         neuron_struct_type::axon,
-                        std::move(position),
-                        std::move(radius)
+                        std::vector<point>({position}),
+                        std::vector<double>({radius})
                     )
                 );
             break;
@@ -139,8 +137,8 @@ morpho_tree morpho_reader::create_morpho_tree() const {
                     parent,
                     std::make_shared<neuron_branch>(
                         neuron_struct_type::dentrite_basal,
-                        std::move(position),
-                        std::move(radius)
+                        std::vector<point>({position}),
+                        std::vector<double>({radius})
                     )
                 );
                 break;
@@ -149,13 +147,13 @@ morpho_tree morpho_reader::create_morpho_tree() const {
                     parent,
                     std::make_shared<neuron_branch>(
                         neuron_struct_type::dentrite_basal,
-                        std::move(position),
-                        std::move(radius)
+                        std::vector<point>({position}),
+                        std::vector<double>({radius})
                     )
                 );
                 break;
             default:
-                throw std::runtime_error(fmt::scat(
+                throw std::runtime_error(scat(
                     "Parser error line ", linenum,
                     ". Unknown structure identifier ", structure_identifier));
         }
