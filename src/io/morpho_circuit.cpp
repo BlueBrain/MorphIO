@@ -26,6 +26,10 @@
 #include <morpho/morpho_h5_v1.hpp>
 #include <morpho/morpho_transform_filters.hpp>
 
+#include <boost/filesystem.hpp>
+#include <morpho/morpho_reader.hpp>
+#include <hdf5_hl.h>
+
 
 namespace morpho{
 
@@ -43,6 +47,7 @@ circuit_reader::circuit_reader(const std::string & filename_mvd3, const std::str
 
 
 std::vector<morpho_tree> circuit_reader::create_all_morpho_tree() const{
+    using namespace boost::filesystem;
     std::vector<morpho_tree> circuit_morpho_tree;
     std::mutex reader, accumulate;
 
@@ -59,9 +64,10 @@ std::vector<morpho_tree> circuit_reader::create_all_morpho_tree() const{
 
     auto all_positions = file->getPositions();
     auto all_rotations = file->getRotations();
+    std::vector<std::string> extensions = {".h5", ".swc"};
 
     assert(all_positions.shape()[0] == all_rotations.shape()[0]);
-    assert(all_morphologies.size() == all_rotations.shape()[0]);
+    assert(all_morphologies_name.size() == all_rotations.shape()[0]);
 
     circuit_morpho_tree.reserve(all_morphologies_name.size());
 
@@ -74,50 +80,52 @@ std::vector<morpho_tree> circuit_reader::create_all_morpho_tree() const{
 
         all_futures.emplace_back( std::async(std::launch::async, [&](){
 
-	    while(1){
-	        std::size_t i = total_number_morphos++;
-            	if(i >= all_morphologies_name.size()){
-			break;
-		}
-                const std::string morphology_name = hadoken::format::scat(_morpho_directory,"/",all_morphologies_name[i], ".h5");
-                try{
-
-                    morpho_tree raw_morpho;
-                    hadoken::format::scat(std::cout, "load morphology ", morphology_name, "...\n");
-
-                    {
-                        std::unique_lock<std::mutex> l(reader);
-                        h5_v1::morpho_reader reader(morphology_name);
-
-                        raw_morpho = reader.create_morpho_tree();
-                    }
-
-                    morpho_tree morpho_transposed =
-                        morpho_transform(
-                            raw_morpho,
-                            {
-                                std::make_shared<transpose_operation>(
-                                    transpose_operation::vector3d({ all_positions[i][0], all_positions[i][1], all_positions[i][2] }),
-                                    transpose_operation::quaternion3d({ all_rotations[i][0], all_rotations[i][1], all_rotations[i][2],  all_rotations[i][3] })
-                                )
-                            }
-                   );
-
-                    {
-                        std::unique_lock<std::mutex> l(accumulate);
-                        circuit_morpho_tree.emplace_back(std::move(morpho_transposed));
-
-                    }
-
-                } catch(std::exception & e){
-                    throw std::runtime_error(hadoken::format::scat("Impossible to open morphology ", morphology_name,
-                                                                   " in circuit ",_filename,
-                                                                    "\n", e.what()));
+            while (1) {
+                const std::size_t i = total_number_morphos++;
+                if (i >= all_morphologies_name.size()) {
+                    break;
                 }
+                for (auto extension: extensions) {
+                    const auto morphology_path =
+                        path(_morpho_directory) /
+                        path(all_morphologies_name[i]).concat(extension);
+                    if (exists(morphology_path)) {
+                        try{
 
+                            morpho_tree raw_morpho;
+                            hadoken::format::scat(std::cout, "load morphology ", morphology_path, "...\n");
+                            {
+                                std::unique_lock<std::mutex> l(reader);
+                                raw_morpho = reader::create_morpho_tree(morphology_path.string());
+                            }
+
+                            morpho_tree morpho_transposed =
+                                morpho_transform(
+                                    raw_morpho,
+                                    {
+                                        std::make_shared<transpose_operation>(
+                                            transpose_operation::vector3d({ all_positions[i][0], all_positions[i][1], all_positions[i][2] }),
+                                            transpose_operation::quaternion3d({ all_rotations[i][0], all_rotations[i][1], all_rotations[i][2],  all_rotations[i][3] })
+                                        )
+                                    }
+                                );
+
+                            {
+                                std::unique_lock<std::mutex> l(accumulate);
+                                circuit_morpho_tree.emplace_back(std::move(morpho_transposed));
+
+                            }
+
+                        } catch(std::exception & e){
+                            throw std::runtime_error(hadoken::format::scat("Impossible to open morphology ", morphology_path,
+                                                                           " in circuit ",_filename,
+                                                                           "\n", e.what()));
+                        }
+
+                    }
+                }
             }
         }));
-
     }
 
 
@@ -134,3 +142,4 @@ std::vector<morpho_tree> circuit_reader::create_all_morpho_tree() const{
 } //morpho
 
 
+// if ( !boost::filesystem::exists( "myfile.txt" ) )

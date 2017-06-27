@@ -11,6 +11,7 @@
 #include <morpho/morpho_h5_v1.hpp>
 #include <morpho/morpho_spatial.hpp>
 
+#include <morpho/morpho_reader.hpp>
 
 
 BOOST_AUTO_TEST_CASE( test_morpho_tree )
@@ -86,14 +87,8 @@ BOOST_AUTO_TEST_CASE( test_load_h5v1 )
 {
     using namespace morpho;
 
-    morpho_tree tree;
-
     // load h5 file
-    {
-        h5_v1::morpho_reader reader(H5V1_MORPHO_TEST_FILE);
-
-        tree = reader.create_morpho_tree();
-    } // force destroy the loader to check any data dependencies
+    const morpho_tree tree = reader::create_morpho_tree(H5V1_MORPHO_TEST_FILE);
 
     {
          h5_v1::morpho_reader reader(H5V1_MORPHO_TEST_FILE);
@@ -203,16 +198,10 @@ bool is_inside_box(const morpho::box & b, const morpho::point & p){
 BOOST_AUTO_TEST_CASE( test_bounding_box )
 {
     using namespace morpho;
-    morpho_tree tree;
-
     // load h5 file
-    {
-        h5_v1::morpho_reader reader(H5V1_MORPHO_TEST_FILE);
+    const morpho_tree tree = reader::create_morpho_tree(H5V1_MORPHO_TEST_FILE);
 
-        tree = reader.create_morpho_tree();
-    }
-
-    box global_tree_box = tree.get_bounding_box();
+    const box global_tree_box = tree.get_bounding_box();
     std::cout << "global tree bounding box " << global_tree_box.min_corner() <<  " " << global_tree_box.max_corner() << std::endl;
 
     for_each_point_tree(tree, [&](const point & p){
@@ -238,14 +227,8 @@ BOOST_AUTO_TEST_CASE( test_bounding_box )
 BOOST_AUTO_TEST_CASE( test_spatial )
 {
     using namespace morpho;
-    std::shared_ptr<morpho_tree> tree;
-
     // load h5 file
-    {
-        h5_v1::morpho_reader reader(H5V1_MORPHO_TEST_FILE);
-
-        tree.reset( new morpho_tree(reader.create_morpho_tree()));
-    }
+    const std::shared_ptr<morpho_tree> tree(new morpho_tree(reader::create_morpho_tree(H5V1_MORPHO_TEST_FILE)));
 
     spatial_index index;
 
@@ -255,8 +238,5 @@ BOOST_AUTO_TEST_CASE( test_spatial )
     for_each_point_branch_tree(*tree, [&](const point & p){
         BOOST_CHECK(index.is_within(p) == true);
     });
-
-
-
 }
 
