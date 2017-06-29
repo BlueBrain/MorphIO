@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
 #ifndef MORPHO_CIRCUIT_HPP
@@ -26,43 +26,28 @@
 #include <string>
 #include <utility>
 
-
-#include "morpho_types.hpp"
 #include "morpho_tree.hpp"
+#include "morpho_types.hpp"
 
 #include <mvd/mvd3.hpp>
 
+namespace morpho {
 
+namespace circuit {
 
-
-
-namespace morpho{
-
-namespace circuit{
-
-
-class circuit_reader{
-public:
-
-    circuit_reader(const std::string & filename_mvd3, const std::string & morpho_directory);
-
-
+class circuit_reader {
+  public:
+    circuit_reader(const std::string& filename_mvd3,
+                   const std::string& morpho_directory);
 
     std::vector<morpho_tree> create_all_morpho_tree() const;
 
-
-private:
+  private:
     std::string _filename, _morpho_directory;
 };
 
-
 } // circuit
-
-
 
 } // morpho
 
-
-
 #endif // MORPHO_CIRCUIT_HPP
-

@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
 #ifndef MORPHO_H5_V1_HPP
@@ -26,27 +26,23 @@
 #include <string>
 #include <utility>
 
-
 #include "morpho_types.hpp"
 
 #include <highfive/H5File.hpp>
 
 #include "morpho_tree.hpp"
 
+namespace morpho {
 
-
-namespace morpho{
-
-namespace h5_v1{
+namespace h5_v1 {
 
 using namespace boost::numeric;
 
-class morpho_reader{
-public:
-
+class morpho_reader {
+  public:
     typedef std::pair<std::size_t, std::size_t> range;
 
-    morpho_reader(const std::string & filename);
+    morpho_reader(const std::string& filename);
 
     ///
     /// \brief get all points associated with the morphology
@@ -61,7 +57,6 @@ public:
     ///
     mat_points get_points_raw() const;
 
-
     ///
     /// \brief get all points associated with the soma
     /// \return all the points of the morphology
@@ -74,29 +69,23 @@ public:
     ///
     mat_points get_soma_points_raw() const;
 
-
     mat_index get_struct_raw() const;
 
     ///
     /// \brief points range of a given branch by id
     /// \return range( offset, count )
     ///
-    range get_branch_range_raw(int id ) const;
-
+    range get_branch_range_raw(int id) const;
 
     ///
     /// \brief get_filename
     /// \return filename of the associated morphology
     ///
-    inline const std::string & get_filename() const{
-        return filename;
-    }
-
+    inline const std::string& get_filename() const { return filename; }
 
     morpho_tree create_morpho_tree() const;
 
-
-private:
+  private:
     HighFive::File h5_file;
     std::string filename;
 
@@ -104,28 +93,21 @@ private:
     HighFive::DataSet structures, points;
 };
 
-
-class morpho_writer{
-public:
+class morpho_writer {
+  public:
     // create a new h5v1 morphology file at filename path
-    morpho_writer(const std::string & filename);
+    morpho_writer(const std::string& filename);
 
     // write a new morphology file out of the given morpho_tree
-    void write(const morpho_tree & tree);
+    void write(const morpho_tree& tree);
 
-private:
+  private:
     HighFive::File h5_file;
     std::string filename;
-
 };
 
-
-} //h5_v1
-
-
+} // h5_v1
 
 } // morpho
 
-
 #endif // MORPHO_H5_V1_HPP
-

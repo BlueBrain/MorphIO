@@ -13,23 +13,23 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
 #ifndef MORPHO_MESHER_HPP
 #define MORPHO_MESHER_HPP
 
-#include <morpho/morpho_tree.hpp>
 #include <bitset>
+#include <morpho/morpho_tree.hpp>
 
-namespace morpho{
+namespace morpho {
 
 ///
 /// \brief create mesh out of morphology
 ///
-class morpho_mesher{
-public:
-    enum mesh_tag{
+class morpho_mesher {
+  public:
+    enum mesh_tag {
         mesh_optimisation = 0,
         only_surface = 1,
         force_manifold = 2,
@@ -41,8 +41,8 @@ public:
     /// \param tree morphology tree to use
     /// \param output_mesh_file filepath of the mesh to export
     ///
-    morpho_mesher(const std::shared_ptr<morpho_tree> & tree, const std::string & output_mesh_file);
-
+    morpho_mesher(const std::shared_ptr<morpho_tree>& tree,
+                  const std::string& output_mesh_file);
 
     ///
     /// \brief enable or disable an option for the meshing process
@@ -51,7 +51,8 @@ public:
     void set_mesh_tag(mesh_tag, bool value);
 
     ///
-    /// \brief set the error bound value for the surface's dichotomy search ( higher is more precise )
+    /// \brief set the error bound value for the surface's dichotomy search (
+    /// higher is more precise )
     /// \param inv_error
     ///
     void set_error_bound(double inv_error);
@@ -66,8 +67,7 @@ public:
     ///
     void execute();
 
-
-private:
+  private:
     std::bitset<64> _flags;
     double _error_bound, _facet_size;
 
@@ -78,8 +78,6 @@ private:
     void execute_surface_meshing();
     void log_parameters();
 };
-
-
 }
 
 #endif // MORPHO_MESHER_HPP

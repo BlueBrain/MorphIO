@@ -2,20 +2,19 @@
 #define BOOST_TEST_MAIN
 
 #include <iostream>
-#include <sstream>
 #include <memory>
+#include <sstream>
 
 #include <boost/test/unit_test.hpp>
 
-#include <morpho/morpho_tree.hpp>
-#include <morpho/morpho_stats.hpp>
 #include <morpho/morpho_h5_v1.hpp>
+#include <morpho/morpho_reader.hpp>
+#include <morpho/morpho_stats.hpp>
 #include <morpho/morpho_transform.hpp>
 #include <morpho/morpho_transform_filters.hpp>
-#include <morpho/morpho_reader.hpp>
+#include <morpho/morpho_tree.hpp>
 
-BOOST_AUTO_TEST_CASE( test_h5v1_rw )
-{
+BOOST_AUTO_TEST_CASE(test_h5v1_rw) {
     using namespace morpho;
     const std::string testfile_write("testfile_write_h5v1.h5");
 
@@ -35,7 +34,6 @@ BOOST_AUTO_TEST_CASE( test_h5v1_rw )
 
         tree2 = reader::create_morpho_tree(testfile_write);
 
-
         std::size_t n_branch1 = stats::total_number_branches(tree1);
         std::size_t n_branch2 = stats::total_number_branches(tree2);
 
@@ -46,20 +44,14 @@ BOOST_AUTO_TEST_CASE( test_h5v1_rw )
 
         BOOST_CHECK_EQUAL(n_points1, n_points2);
 
-
         double median_radius1 = stats::median_radius_segment(tree1);
         double median_radius2 = stats::median_radius_segment(tree2);
 
         BOOST_CHECK_EQUAL(median_radius1, median_radius2);
-
     }
-
 }
 
-
-
-BOOST_AUTO_TEST_CASE( test_h5v1_test_filter_duplicated )
-{
+BOOST_AUTO_TEST_CASE(test_h5v1_test_filter_duplicated) {
     using namespace morpho;
     const std::string testfile_write("test_filter_dup.h5");
 
@@ -72,7 +64,6 @@ BOOST_AUTO_TEST_CASE( test_h5v1_test_filter_duplicated )
 
     tree2 = morpho_transform(tree1, chain);
 
-
     std::size_t n_branch1 = stats::total_number_branches(tree1);
     std::size_t n_branch2 = stats::total_number_branches(tree2);
 
@@ -83,7 +74,4 @@ BOOST_AUTO_TEST_CASE( test_h5v1_test_filter_duplicated )
 
     BOOST_CHECK_EQUAL(n_points1, 3334);
     BOOST_CHECK_EQUAL(n_points2, 3243);
-
-
 }
-

@@ -33,7 +33,7 @@ namespace reader {
  * @param file Path to the file to load. File's extension matters.
  * @return Memory representation of the tree
  */
-morpho_tree create_morpho_tree(const std::string &file);
+morpho_tree create_morpho_tree(const std::string& file);
 
 } // namespace reader
 } // namespace morpho

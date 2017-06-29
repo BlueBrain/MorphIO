@@ -13,16 +13,16 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
 
 #include <morpho/morpho_reader.hpp>
 
-#include <morpho/morpho_h5_v1.hpp>
-#include <morpho/morpho_swc.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <hadoken/format/format.hpp>
+#include <morpho/morpho_h5_v1.hpp>
+#include <morpho/morpho_swc.hpp>
 
 namespace morpho {
 namespace reader {
@@ -37,7 +37,8 @@ morpho_tree create_morpho_tree(const std::string& file) {
         morpho::swc_v1::morpho_reader reader(file);
         return reader.create_morpho_tree();
     } else {
-        throw std::logic_error(scat("Unsupported morphology file type: ", file));
+        throw std::logic_error(
+            scat("Unsupported morphology file type: ", file));
     }
 }
 

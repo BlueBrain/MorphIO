@@ -13,47 +13,43 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
 #ifndef X3D_EXPORTER_H
 #define X3D_EXPORTER_H
 
-
-#include <string>
 #include <fstream>
 #include <functional>
+#include <string>
 
 #include <morpho/morpho_h5_v1.hpp>
 
-namespace morpho{
+namespace morpho {
 
-class x3d_exporter
-{
-public:
-    x3d_exporter(std::vector<morpho_tree> && trees, const std::string & mesh_filename);
+class x3d_exporter {
+  public:
+    x3d_exporter(std::vector<morpho_tree>&& trees,
+                 const std::string& mesh_filename);
 
-    inline void set_identifier_string(const std::string & id){
+    inline void set_identifier_string(const std::string& id) {
         identifier_string = id;
     }
 
     void export_to_sphere();
 
-private:
+  private:
     std::vector<morpho_tree> morphotrees;
-    std::string identifier_string;    
+    std::string identifier_string;
     std::ofstream x3d_stream;
     std::string dest_filename;
 
-
-    void envelop_header_and_footer(const std::function<void (void)> & fcontent);
+    void envelop_header_and_footer(const std::function<void(void)>& fcontent);
 
     void html_viewer();
 
     void export_all_points();
 };
-
-
 }
 
 #endif // X3D_EXPORTER_H

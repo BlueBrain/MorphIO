@@ -13,35 +13,33 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
 #ifndef MORPHO_TRANSFORM_HPP
 #define MORPHO_TRANSFORM_HPP
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include <morpho/morpho_tree.hpp>
 
-namespace morpho{
+namespace morpho {
 
 /// \brief  abstract interface for morphology transformation operations
-class morpho_operation{
-public:
+class morpho_operation {
+  public:
     morpho_operation();
     virtual ~morpho_operation();
 
     /// apply the given operation on a morphology
-    virtual morpho_tree apply(const morpho_tree & tree) = 0;
+    virtual morpho_tree apply(const morpho_tree& tree) = 0;
 
     /// return the name id of the operation
     virtual std::string name() const = 0;
 };
 
-
 using morpho_operation_chain = std::vector<std::shared_ptr<morpho_operation>>;
-
 
 ///
 /// \brief morpho_transform
@@ -49,11 +47,9 @@ using morpho_operation_chain = std::vector<std::shared_ptr<morpho_operation>>;
 /// \param ops
 /// \return morpho_tree after the transformation by all the selected operations
 ///
-morpho_tree morpho_transform(const morpho_tree & tree, morpho_operation_chain ops);
-
+morpho_tree morpho_transform(const morpho_tree& tree,
+                             morpho_operation_chain ops);
 
 } // morpho
-
-
 
 #endif // MORPHO_TRANSFORM_HPP

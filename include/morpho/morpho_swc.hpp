@@ -13,14 +13,14 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
 #ifndef MORPHO_TOOLS_MORPHO_READER_SWC_V1
 #define MORPHO_TOOLS_MORPHO_READER_SWC_V1
 
-#include "morpho_types.hpp"
 #include "morpho_tree.hpp"
+#include "morpho_types.hpp"
 
 namespace morpho {
 
@@ -29,16 +29,16 @@ namespace swc_v1 {
 using namespace boost::numeric;
 
 class morpho_reader {
-public:
+  public:
     morpho_reader(const std::string& filename);
 
     morpho_tree create_morpho_tree() const;
 
-private:
+  private:
     std::string filename;
 };
 
 } // namespace morpho
 } // namespace swc_v1
 
-#endif //MORPHO_TOOLS_MORPHO_READER_SWC_V1
+#endif // MORPHO_TOOLS_MORPHO_READER_SWC_V1

@@ -15,7 +15,7 @@ AllowShortFunctionsOnASingleLine: All
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakAfterDefinitionReturnType: None
-AlwaysBreakAfterReturnType: AllDefinitions
+AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: true
 BinPackArguments: true
@@ -57,7 +57,7 @@ IncludeCategories:
     Priority:        1
 IncludeIsMainRegex: '$'
 IndentCaseLabels: false
-IndentWidth:     2
+IndentWidth:     4
 IndentWrappedFunctionNames: false
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true

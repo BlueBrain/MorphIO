@@ -13,16 +13,16 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
 
 #include <fstream>
 #include <string>
 
-#include <hadoken/format/format.hpp>
-#include <boost/tokenizer.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/tokenizer.hpp>
+#include <hadoken/format/format.hpp>
 #include <morpho/morpho_swc.hpp>
 
 namespace morpho {
@@ -31,27 +31,29 @@ namespace swc_v1 {
 
 using hadoken::format::scat;
 
-typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
 typedef tokenizer::iterator iterator;
 
 const char COMMENT_CHARACTER = '#';
 
-morpho_reader::morpho_reader(const std::string & filename) :
-    filename(filename) {
-}
+morpho_reader::morpho_reader(const std::string& filename)
+    : filename(filename) {}
 
-static const iterator& ensure_has_token(const iterator& token, const tokenizer& tokenizer, size_t linenum) {
+static const iterator& ensure_has_token(const iterator& token,
+                                        const tokenizer& tokenizer,
+                                        size_t linenum) {
 
     if (token == tokenizer.end()) {
-        throw std::runtime_error(scat(
-            "Parse error line ", linenum, ": unexpected EOL"));
+        throw std::runtime_error(
+            scat("Parse error line ", linenum, ": unexpected EOL"));
     }
     return token;
 }
 
 /**
  * Build a morpho_tree from a SWC filename
- * see http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
+ * see
+ * http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
  * for format specifications
  * @return loaded morphology
  */
@@ -90,74 +92,54 @@ morpho_tree morpho_reader::create_morpho_tree() const {
         radius = std::atof(token->c_str());
         ensure_has_token(++token, tok, linenum);
         int parent = std::stoi(*token) - 1; // index starts at 1 in SWC
-        if (parent == -2) { // root
+        if (parent == -2) {                 // root
             parent = -1;
         }
         ++token;
         if (token != tok.end()) {
-            throw std::runtime_error(scat(
-                "Parse error line ", linenum,
-                ". Expected EOL but found '", *token, '\''));
+            throw std::runtime_error(scat("Parse error line ", linenum,
+                                          ". Expected EOL but found '", *token,
+                                          '\''));
         }
         switch (structure_identifier) {
-            case 0: // undefined
-                break;
-            case 1: // soma
-            {
-                if (root) {
-                    eax.add_node(
-                        parent,
-                        std::make_shared<neuron_soma>(position, radius)
-                    );
-                    root = false;
-                } else {
-                    eax.add_node(
-                        parent,
-                        std::make_shared<neuron_branch>(
-                            neuron_struct_type::soma,
-                            std::vector<point>({position}),
-                            std::vector<double>({radius})
-                        )
-                    );
-                }
-            }
-                break;
-            case 2: // axon
-                eax.add_node(
-                    parent,
-                    std::make_shared<neuron_branch>(
-                        neuron_struct_type::axon,
-                        std::vector<point>({position}),
-                        std::vector<double>({radius})
-                    )
-                );
+        case 0: // undefined
             break;
-            case 3: // basal dendrite
-                eax.add_node(
-                    parent,
-                    std::make_shared<neuron_branch>(
-                        neuron_struct_type::dentrite_basal,
-                        std::vector<point>({position}),
-                        std::vector<double>({radius})
-                    )
-                );
-                break;
-            case 4: // apical dendrite
-                eax.add_node(
-                    parent,
-                    std::make_shared<neuron_branch>(
-                        neuron_struct_type::dentrite_basal,
-                        std::vector<point>({position}),
-                        std::vector<double>({radius})
-                    )
-                );
-                break;
-            default:
-                throw std::runtime_error(scat(
-                    "Parser error line ", linenum,
-                    ". Unknown structure identifier ", structure_identifier));
+        case 1: // soma
+        {
+            if (root) {
+                eax.add_node(parent,
+                             std::make_shared<neuron_soma>(position, radius));
+                root = false;
+            } else {
+                eax.add_node(parent, std::make_shared<neuron_branch>(
+                                         neuron_struct_type::soma,
+                                         std::vector<point>({position}),
+                                         std::vector<double>({radius})));
+            }
+        } break;
+        case 2: // axon
+            eax.add_node(parent, std::make_shared<neuron_branch>(
+                                     neuron_struct_type::axon,
+                                     std::vector<point>({position}),
+                                     std::vector<double>({radius})));
+            break;
+        case 3: // basal dendrite
+            eax.add_node(parent, std::make_shared<neuron_branch>(
+                                     neuron_struct_type::dentrite_basal,
+                                     std::vector<point>({position}),
+                                     std::vector<double>({radius})));
+            break;
+        case 4: // apical dendrite
+            eax.add_node(parent, std::make_shared<neuron_branch>(
+                                     neuron_struct_type::dentrite_basal,
+                                     std::vector<point>({position}),
+                                     std::vector<double>({radius})));
+            break;
+        default:
+            throw std::runtime_error(scat("Parser error line ", linenum,
+                                          ". Unknown structure identifier ",
+                                          structure_identifier));
         }
-
     }
     return eax;
 }
