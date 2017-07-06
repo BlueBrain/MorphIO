@@ -111,26 +111,26 @@ morpho_tree morpho_reader::create_morpho_tree() const {
                              std::make_shared<neuron_soma>(position, radius));
                 root = false;
             } else {
-                eax.add_node(parent, std::make_shared<neuron_branch>(
+                eax.add_node(parent, std::make_shared<neuron_section>(
                                          neuron_struct_type::soma,
                                          std::vector<point>({position}),
                                          std::vector<double>({radius})));
             }
         } break;
         case 2: // axon
-            eax.add_node(parent, std::make_shared<neuron_branch>(
+            eax.add_node(parent, std::make_shared<neuron_section>(
                                      neuron_struct_type::axon,
                                      std::vector<point>({position}),
                                      std::vector<double>({radius})));
             break;
         case 3: // basal dendrite
-            eax.add_node(parent, std::make_shared<neuron_branch>(
+            eax.add_node(parent, std::make_shared<neuron_section>(
                                      neuron_struct_type::dentrite_basal,
                                      std::vector<point>({position}),
                                      std::vector<double>({radius})));
             break;
         case 4: // apical dendrite
-            eax.add_node(parent, std::make_shared<neuron_branch>(
+            eax.add_node(parent, std::make_shared<neuron_section>(
                                      neuron_struct_type::dentrite_basal,
                                      std::vector<point>({position}),
                                      std::vector<double>({radius})));

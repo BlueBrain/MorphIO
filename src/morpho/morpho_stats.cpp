@@ -24,7 +24,7 @@ namespace morpho {
 
 namespace stats {
 
-std::size_t total_number_branches(const morpho_tree& tree) {
+std::size_t total_number_sectiones(const morpho_tree& tree) {
     return tree.get_tree_size();
 }
 
@@ -41,10 +41,10 @@ std::size_t total_number_point(const morpho_tree& tree) {
                     static_cast<const neuron_soma&>(*node_ref);
                 res += soma.get_line_loop().size();
             } else if (node_ref->is_of_type(
-                           morpho_node_type::neuron_branch_type)) {
-                const neuron_branch& branch =
-                    static_cast<const neuron_branch&>(*node_ref);
-                res += branch.get_number_points();
+                           morpho_node_type::neuron_section_type)) {
+                const neuron_section& section =
+                    static_cast<const neuron_section&>(*node_ref);
+                res += section.get_number_points();
             }
 
         });
@@ -62,10 +62,10 @@ T for_all_radius_reduction(const morpho_tree& tree, const Fun& f, T val) {
     std::for_each(
         all_nodes.begin(), all_nodes.end(), [&](morpho_node const* node) {
 
-            if (node->is_of_type(morpho_node_type::neuron_branch_type)) {
-                const neuron_branch& branch =
-                    static_cast<const neuron_branch&>(*node);
-                const std::vector<double>& all_radius = branch.get_radius();
+            if (node->is_of_type(morpho_node_type::neuron_section_type)) {
+                const neuron_section& section =
+                    static_cast<const neuron_section&>(*node);
+                const std::vector<double>& all_radius = section.get_radius();
 
                 res = std::accumulate(
                     all_radius.begin(), all_radius.end(), res,
@@ -97,12 +97,12 @@ double median_radius_segment(const morpho_tree& tree) {
     std::for_each(
         all_nodes.begin(), all_nodes.end(), [&](morpho_node const* node) {
 
-            if (node->is_of_type(morpho_node_type::neuron_branch_type)) {
-                const neuron_branch& branch =
-                    static_cast<const neuron_branch&>(*node);
-                const std::vector<double>& all_radius_branch =
-                    branch.get_radius();
-                std::copy(all_radius_branch.begin(), all_radius_branch.end(),
+            if (node->is_of_type(morpho_node_type::neuron_section_type)) {
+                const neuron_section& section =
+                    static_cast<const neuron_section&>(*node);
+                const std::vector<double>& all_radius_section =
+                    section.get_radius();
+                std::copy(all_radius_section.begin(), all_radius_section.end(),
                           std::back_inserter(all_radius));
             }
 
@@ -130,16 +130,16 @@ bool has_duplicated_points(const morpho_tree& tree) {
 
         if (parent_id >= 0) { // get the parent point if it exists
             const morpho_node& parent_node = tree.get_node(parent_id);
-            if (node.is_of_type(morpho_node_type::neuron_branch_type)) {
-                const neuron_branch& parent_b =
-                    static_cast<const neuron_branch&>(parent_node);
-                const std::size_t size_branch = parent_b.get_number_points();
-                last_point = parent_b.get_points()[size_branch - 1];
+            if (node.is_of_type(morpho_node_type::neuron_section_type)) {
+                const neuron_section& parent_b =
+                    static_cast<const neuron_section&>(parent_node);
+                const std::size_t size_section = parent_b.get_number_points();
+                last_point = parent_b.get_points()[size_section - 1];
             }
         }
 
-        if (node.is_of_type(morpho_node_type::neuron_branch_type)) {
-            const neuron_branch& b = static_cast<const neuron_branch&>(node);
+        if (node.is_of_type(morpho_node_type::neuron_section_type)) {
+            const neuron_section& b = static_cast<const neuron_section&>(node);
             for (const auto& point : b.get_points()) {
                 if (last_point.close_to(point))
                     return true;

@@ -694,11 +694,11 @@ void gmsh_exporter::construct_gmsh_vfile_raw(gmsh_abstract_file& vfile) {
 
             if (node.is_of_type(morpho_node_type::neuron_soma_type)) {
                 points = static_cast<const neuron_soma&>(node).get_line_loop();
-            } else if (node.is_of_type(morpho_node_type::neuron_branch_type)) {
-                points = static_cast<const neuron_branch&>(node).get_points();
+            } else if (node.is_of_type(morpho_node_type::neuron_section_type)) {
+                points = static_cast<const neuron_section&>(node).get_points();
             } else {
                 throw std::invalid_argument(
-                    "invalide node type, should be branch or soma");
+                    "invalide node type, should be section or soma");
             }
 
             for (std::size_t row = 0; row < points.size(); ++row) {
@@ -716,15 +716,15 @@ void gmsh_exporter::construct_gmsh_vfile_lines(morpho_tree& tree, int node_id,
     if (current_node.is_of_type(morpho_node_type::neuron_node_3d_type) ==
         false) {
         throw std::invalid_argument("Impossible to export in gmsh format "
-                                    "morpho_tree with non-branch elements");
+                                    "morpho_tree with non-section elements");
     }
 
-    if (current_node.is_of_type(morpho_node_type::neuron_branch_type)) {
+    if (current_node.is_of_type(morpho_node_type::neuron_section_type)) {
 
-        const neuron_branch& current_branch =
-            static_cast<const neuron_branch&>(current_node);
+        const neuron_section& current_section =
+            static_cast<const neuron_section&>(current_node);
 
-        const auto linestring = current_branch.get_linestring();
+        const auto linestring = current_section.get_linestring();
         if (is_packed()) { // packed mode, single polyline
             typedef decltype(linestring)::value_type line_point;
 
@@ -1065,15 +1065,15 @@ void gmsh_exporter::construct_gmsh_3d_object(morpho_tree& tree, int node_id,
         sphere soma_sphere =
             static_cast<const neuron_soma&>(current_node).get_sphere();
         create_gmsh_sphere(vfile, soma_sphere);
-    } else if (current_node.is_of_type(morpho_node_type::neuron_branch_type)) {
-        const neuron_branch& current_branch =
-            static_cast<const neuron_branch&>(current_node);
+    } else if (current_node.is_of_type(morpho_node_type::neuron_section_type)) {
+        const neuron_section& current_section =
+            static_cast<const neuron_section&>(current_node);
 
-        const auto& all_radius = current_branch.get_radius();
+        const auto& all_radius = current_section.get_radius();
         std::size_t last_elem = all_radius.size() - 1;
 
         create_gmsh_sphere(vfile,
-                           geo::sphere3d(current_branch.get_points()[last_elem],
+                           geo::sphere3d(current_section.get_points()[last_elem],
                                          all_radius[last_elem]));
     } else {
         std::cerr << "Unsupported type of node, skip" << std::endl;
@@ -1082,9 +1082,9 @@ void gmsh_exporter::construct_gmsh_3d_object(morpho_tree& tree, int node_id,
     const auto& childrens = tree.get_children(node_id);
     for (auto& c : childrens) {
 
-        const neuron_branch& child_branch =
-            static_cast<const neuron_branch&>(tree.get_node(c));
-        auto pipe = child_branch.get_circle_pipe();
+        const neuron_section& child_section =
+            static_cast<const neuron_section&>(tree.get_node(c));
+        auto pipe = child_section.get_circle_pipe();
 
         create_gmsh_truncated_pipe(vfile, pipe);
         construct_gmsh_3d_object(tree, c, vfile);

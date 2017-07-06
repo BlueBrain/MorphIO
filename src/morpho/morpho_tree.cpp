@@ -62,20 +62,20 @@ neuron_node_3d::neuron_node_3d(neuron_struct_type my_node_type)
 neuron_node_3d::~neuron_node_3d() {}
 
 //
-// neuron_branch
+// neuron_section
 //
 
-struct neuron_branch::neuron_branch_internal {
-    inline neuron_branch_internal(std::vector<point>&& p,
+struct neuron_section::neuron_section_internal {
+    inline neuron_section_internal(std::vector<point>&& p,
                                   std::vector<double>&& r)
         : points(std::move(p)), radius(std::move(r)) {
         if (points.size() < 1) {
             throw std::invalid_argument(
-                "a neuron branch should have at least one point");
+                "a neuron section should have at least one point");
         }
         if (points.size() != radius.size()) {
             throw std::invalid_argument(" points and radius vector for neuron "
-                                        "branch should have the same size ");
+                                        "section should have the same size ");
         }
     }
 
@@ -83,35 +83,35 @@ struct neuron_branch::neuron_branch_internal {
     std::vector<double> radius;
 };
 
-neuron_branch::neuron_branch(neuron_struct_type neuron_type,
+neuron_section::neuron_section(neuron_struct_type neuron_type,
                              std::vector<point>&& points,
                              std::vector<double>&& radius)
     : neuron_node_3d(neuron_type),
-      _dptr(new neuron_branch_internal(std::move(points), std::move(radius))) {
+      _dptr(new neuron_section_internal(std::move(points), std::move(radius))) {
 
-    add_type_capability(morpho_node_type::neuron_branch_type);
+    add_type_capability(morpho_node_type::neuron_section_type);
 }
 
-neuron_branch::neuron_branch(const neuron_branch& other)
-    : neuron_node_3d(other), _dptr(new neuron_branch_internal(*(other._dptr))) {
+neuron_section::neuron_section(const neuron_section& other)
+    : neuron_node_3d(other), _dptr(new neuron_section_internal(*(other._dptr))) {
 
 }
 
-neuron_branch::~neuron_branch() {}
+neuron_section::~neuron_section() {}
 
-std::size_t neuron_branch::get_number_points() const {
+std::size_t neuron_section::get_number_points() const {
     return _dptr->points.size();
 }
 
-const std::vector<point>& neuron_branch::get_points() const {
+const std::vector<point>& neuron_section::get_points() const {
     return _dptr->points;
 }
 
-const std::vector<double>& neuron_branch::get_radius() const {
+const std::vector<double>& neuron_section::get_radius() const {
     return _dptr->radius;
 }
 
-cone neuron_branch::get_segment(std::size_t n) const {
+cone neuron_section::get_segment(std::size_t n) const {
 
     if (n >= get_number_points()) {
         throw std::out_of_range(
@@ -122,7 +122,7 @@ cone neuron_branch::get_segment(std::size_t n) const {
                 _dptr->radius[n + 1]);
 }
 
-box neuron_branch::get_bounding_box() const {
+box neuron_section::get_bounding_box() const {
 
     if (get_number_points() == 0) {
         std::logic_error("impossible to get bounding box of null node");
@@ -154,7 +154,7 @@ box neuron_branch::get_bounding_box() const {
                point(x_max + radius, y_max + radius, z_max + radius));
 }
 
-box neuron_branch::get_segment_bounding_box(std::size_t n) const {
+box neuron_section::get_segment_bounding_box(std::size_t n) const {
     if (n >= get_number_points()) {
         throw std::out_of_range(
             hadoken::format::scat("segment ", n, " is out of bound"));
@@ -178,7 +178,7 @@ box neuron_branch::get_segment_bounding_box(std::size_t n) const {
     return box(p_min - offset_radius, p_max + offset_radius);
 }
 
-sphere neuron_branch::get_junction(std::size_t n) const {
+sphere neuron_section::get_junction(std::size_t n) const {
     if (n >= get_number_points()) {
         throw std::out_of_range(
             hadoken::format::scat("segment ", n, " is out of bound"));
@@ -187,11 +187,11 @@ sphere neuron_branch::get_junction(std::size_t n) const {
     return sphere(get_points()[n + 1], get_radius()[n + 1]);
 }
 
-box neuron_branch::get_junction_sphere_bounding_box(std::size_t n) const {
+box neuron_section::get_junction_sphere_bounding_box(std::size_t n) const {
     return hg::envelope_sphere_return<box, sphere>(get_junction(n));
 }
 
-linestring neuron_branch::get_linestring() const {
+linestring neuron_section::get_linestring() const {
     namespace geo = hadoken::geometry::cartesian;
     linestring res;
 
@@ -202,13 +202,13 @@ linestring neuron_branch::get_linestring() const {
     return res;
 }
 
-circle_pipe neuron_branch::get_circle_pipe() const {
+circle_pipe neuron_section::get_circle_pipe() const {
     namespace geo = hadoken::geometry::cartesian;
 
     circle_pipe res;
     if (get_number_points() < 2) {
         std::out_of_range(
-            "a circle pipe can not be constructed on a branch < 2 points");
+            "a circle pipe can not be constructed on a section < 2 points");
     }
 
     res.reserve(get_number_points());
@@ -375,8 +375,8 @@ box morpho_tree::get_bounding_box() const {
 
     std::for_each(_dptr->nodes.begin(), _dptr->nodes.end(),
                   [&](const std::shared_ptr<morpho_node>& nd) {
-                      box branch_box = nd->get_bounding_box();
-                      res = merge_box(branch_box, res);
+                      box section_box = nd->get_bounding_box();
+                      res = merge_box(section_box, res);
                   });
 
     return res;

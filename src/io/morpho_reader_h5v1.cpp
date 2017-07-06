@@ -53,7 +53,7 @@ void split_xyz_and_distance(const mat_points& raw_points,
     }
 }
 
-neuron_struct_type branch_type_from_h5v1(const int type_id) {
+neuron_struct_type section_type_from_h5v1(const int type_id) {
     switch (type_id) {
     case 1:
         return neuron_struct_type::soma;
@@ -68,7 +68,7 @@ neuron_struct_type branch_type_from_h5v1(const int type_id) {
     }
 }
 
-int h5v1_from_branch_type(neuron_struct_type btype) {
+int h5v1_from_section_type(neuron_struct_type btype) {
     switch (btype) {
     case neuron_struct_type::soma:
         return 1;
@@ -100,18 +100,18 @@ mat_points morpho_reader::get_points_raw() const {
     return res;
 }
 
-morpho_reader::range morpho_reader::get_branch_range_raw(int id) const {
+morpho_reader::range morpho_reader::get_section_range_raw(int id) const {
     mat_index structure_ids;
 
     const std::size_t n_struct = structures.getSpace().getDimensions()[0];
     const std::size_t n_points = points.getSpace().getDimensions()[0];
 
     if (id < 0 || std::size_t(id) >= n_struct) {
-        throw std::runtime_error(fmt::scat(" branch ", id, " out of range"));
+        throw std::runtime_error(fmt::scat(" section ", id, " out of range"));
     }
 
-    const bool is_last_branch = std::size_t(id) >= (n_struct - 1);
-    std::size_t nlines = (is_last_branch) ? 1 : 2;
+    const bool is_last_section = std::size_t(id) >= (n_struct - 1);
+    std::size_t nlines = (is_last_section) ? 1 : 2;
 
     auto slice = structures.select({std::size_t(id), std::size_t(0)},
                                    {nlines, std::size_t(3)});
@@ -121,18 +121,18 @@ morpho_reader::range morpho_reader::get_branch_range_raw(int id) const {
     assert(structure_ids.size2() == 3);
     assert(structure_ids.size1() == 1 || structure_ids.size1() == 2);
 
-    const std::size_t offset_branch = structure_ids(0, 0);
+    const std::size_t offset_section = structure_ids(0, 0);
 
-    const std::size_t nelem_branch =
+    const std::size_t nelem_section =
         ((structure_ids.size1() == 2) ? structure_ids(1, 0) : n_points) -
-        offset_branch;
+        offset_section;
 
-    if (offset_branch >= n_points || nelem_branch >= n_points) {
+    if (offset_section >= n_points || nelem_section >= n_points) {
         throw std::runtime_error(
-            fmt::scat("invalid offset/counter in morphology at branch ", id));
+            fmt::scat("invalid offset/counter in morphology at section ", id));
     }
 
-    return std::make_pair(offset_branch, nelem_branch);
+    return std::make_pair(offset_section, nelem_section);
 }
 
 mat_points morpho_reader::get_soma_points_raw() const {
@@ -152,7 +152,7 @@ mat_points morpho_reader::get_soma_points_raw() const {
         }
     }
 
-    auto range_soma = get_branch_range_raw(0);
+    auto range_soma = get_section_range_raw(0);
 
     auto slice_soma =
         points.select({range_soma.first, 0}, {range_soma.second, 4});
@@ -170,7 +170,7 @@ mat_index morpho_reader::get_struct_raw() const {
     return res;
 }
 
-/// check if branch has duplicted points with parent
+/// check if section has duplicted points with parent
 static inline bool check_duplicated_point(mat_range_points& prev_range,
                                           mat_range_points& range) {
     namespace geo = hadoken::geometry::cartesian;
@@ -224,35 +224,35 @@ morpho_tree morpho_reader::create_morpho_tree() const {
         auto points_raw = get_points_raw();
         auto struct_raw = get_struct_raw();
 
-        // create branch
-        const std::size_t n_branch = structures.getSpace().getDimensions()[0];
-        for (std::size_t i = 1; i < n_branch; ++i) {
-            mat_points branch_raw;
+        // create section
+        const std::size_t n_section = structures.getSpace().getDimensions()[0];
+        for (std::size_t i = 1; i < n_section; ++i) {
+            mat_points section_raw;
 
-            auto raw_mat_range = get_branch_range_raw(i);
+            auto raw_mat_range = get_section_range_raw(i);
 
             const std::size_t n_row = raw_mat_range.second;
             const std::size_t n_col = 4;
-            branch_raw.resize(n_row, n_col);
+            section_raw.resize(n_row, n_col);
 
-            // first line -> end segment previous branch
+            // first line -> end segment previous section
             const int prev_id = struct_raw(i, 2);
 
             mat_range_points range_points_raw(
                 points_raw,
                 morpho::range(raw_mat_range.first, raw_mat_range.first + n_row),
                 morpho::range(0, n_col));
-            branch_raw = range_points_raw;
+            section_raw = range_points_raw;
 
-            std::vector<point> branch_points;
-            std::vector<double> branch_radius;
+            std::vector<point> section_points;
+            std::vector<double> section_radius;
 
-            split_xyz_and_distance(range_points_raw, branch_points,
-                                   branch_radius);
+            split_xyz_and_distance(range_points_raw, section_points,
+                                   section_radius);
 
-            std::shared_ptr<neuron_branch> b(new neuron_branch(
-                branch_type_from_h5v1(struct_raw(i, 1)),
-                std::move(branch_points), std::move(branch_radius)));
+            std::shared_ptr<neuron_section> b(new neuron_section(
+                section_type_from_h5v1(struct_raw(i, 1)),
+                std::move(section_points), std::move(section_radius)));
             res.add_node(prev_id, b);
         }
     }
@@ -279,7 +279,7 @@ static void export_tree_to_raw(const morpho_tree& tree, mat_index& raw_index,
             auto line_loop = soma.get_line_loop();
             raw_index(offset_struct, 0) = offset_points;
             raw_index(offset_struct, 1) =
-                h5v1_from_branch_type(neuron_struct_type::soma); // soma
+                h5v1_from_section_type(neuron_struct_type::soma); // soma
             raw_index(offset_struct, 2) = -1;
             offset_struct++;
 
@@ -302,16 +302,16 @@ static void export_tree_to_raw(const morpho_tree& tree, mat_index& raw_index,
                 raw_points(offset_points, 3) = soma_sphere.get_radius() * 2.0;
                 offset_points++;
             }
-        } else if (node.is_of_type(morpho_node_type::neuron_branch_type)) {
-            const neuron_branch& branch =
-                static_cast<const neuron_branch&>(node);
-            const auto& points = branch.get_points();
-            const auto& radius = branch.get_radius();
+        } else if (node.is_of_type(morpho_node_type::neuron_section_type)) {
+            const neuron_section& section =
+                static_cast<const neuron_section&>(node);
+            const auto& points = section.get_points();
+            const auto& radius = section.get_radius();
             assert(points.size() == radius.size());
 
             raw_index(offset_struct, 0) = offset_points;
             raw_index(offset_struct, 1) =
-                h5v1_from_branch_type(branch.get_branch_type()); // soma
+                h5v1_from_section_type(section.get_section_type()); // soma
             raw_index(offset_struct, 2) = tree.get_parent(i);
             offset_struct++;
 
@@ -331,14 +331,14 @@ static void export_tree_to_raw(const morpho_tree& tree, mat_index& raw_index,
 
 void morpho_writer::write(const morpho_tree& tree) {
     using namespace HighFive;
-    const std::size_t number_of_branch = stats::total_number_branches(tree);
+    const std::size_t number_of_section = stats::total_number_sectiones(tree);
     const std::size_t number_of_points = stats::total_number_point(tree);
 
     std::time_t time_point = std::chrono::system_clock::to_time_t(
         std::chrono::system_clock::time_point());
 
     mat_points raw_points(number_of_points, 4);
-    mat_index raw_struct(number_of_branch, 3);
+    mat_index raw_struct(number_of_section, 3);
 
     std::vector<std::string> comment = {fmt::scat(
         " created out by morpho_tool v1", " the ", std::ctime(&time_point))};

@@ -58,8 +58,8 @@ morpho_operation::~morpho_operation() {}
 
 delete_duplicate_point_operation::delete_duplicate_point_operation() {}
 
-// return last point of the parent branch and its radius, or empty optional if
-// not possible (e.g root branch, no points in parent )
+// return last point of the parent section and its radius, or empty optional if
+// not possible (e.g root section, no points in parent )
 
 boost::optional<tuple_point_radius>
 last_point_from_parent(const morpho_tree& tree, int node_id) {
@@ -71,10 +71,10 @@ last_point_from_parent(const morpho_tree& tree, int node_id) {
     }
     const morpho_node& parent_node = tree.get_node(parent_id);
 
-    if (parent_node.is_of_type(morpho_node_type::neuron_branch_type)) {
-        const neuron_branch& b = static_cast<const neuron_branch&>(parent_node);
-        const std::size_t branch_size = b.get_points().size();
-        if (branch_size >= 1) {
+    if (parent_node.is_of_type(morpho_node_type::neuron_section_type)) {
+        const neuron_section& b = static_cast<const neuron_section&>(parent_node);
+        const std::size_t section_size = b.get_points().size();
+        if (section_size >= 1) {
             return boost::optional<tuple_point_radius>(
                 std::make_tuple(b.get_points().back(), b.get_radius().back()));
         }
@@ -88,8 +88,8 @@ void filter_duplicate(const morpho_tree& tree, int parent, int id,
     std::vector<int> children_ids = tree.get_children(id);
     int new_id = -1;
 
-    if (node.is_of_type(morpho_node_type::neuron_branch_type)) {
-        const neuron_branch& b = static_cast<const neuron_branch&>(node);
+    if (node.is_of_type(morpho_node_type::neuron_section_type)) {
+        const neuron_section& b = static_cast<const neuron_section&>(node);
         std::vector<point> points = b.get_points();
         std::vector<double> radius = b.get_radius();
         assert(radius.size() == points.size());
@@ -116,8 +116,8 @@ void filter_duplicate(const morpho_tree& tree, int parent, int id,
             last_point = points[i];
         }
 
-        new_id = output_tree.add_node(parent, std::make_shared<neuron_branch>(
-                                                  b.get_branch_type(),
+        new_id = output_tree.add_node(parent, std::make_shared<neuron_section>(
+                                                  b.get_section_type(),
                                                   std::move(filtered_points),
                                                   std::move(filtered_radius)));
     } else {
@@ -151,8 +151,8 @@ void duplicate_first_point(const morpho_tree& tree, int parent, int id,
     std::vector<int> children_ids = tree.get_children(id);
     int new_id = -1;
 
-    if (node.is_of_type(morpho_node_type::neuron_branch_type)) {
-        const neuron_branch& b = static_cast<const neuron_branch&>(node);
+    if (node.is_of_type(morpho_node_type::neuron_section_type)) {
+        const neuron_section& b = static_cast<const neuron_section&>(node);
         std::vector<point> points = b.get_points();
         std::vector<double> radius = b.get_radius();
         assert(radius.size() == points.size());
@@ -180,8 +180,8 @@ void duplicate_first_point(const morpho_tree& tree, int parent, int id,
         std::copy(radius.begin(), radius.end(),
                   std::back_inserter(filtered_radius));
 
-        new_id = output_tree.add_node(parent, std::make_shared<neuron_branch>(
-                                                  b.get_branch_type(),
+        new_id = output_tree.add_node(parent, std::make_shared<neuron_section>(
+                                                  b.get_section_type(),
                                                   std::move(filtered_points),
                                                   std::move(filtered_radius)));
     } else {
@@ -233,20 +233,20 @@ void recursive_soma_simplify(
         }
     } else {
         if (parent_point &&
-            node.is_of_type(morpho_node_type::neuron_branch_type)) {
+            node.is_of_type(morpho_node_type::neuron_section_type)) {
             // if we have a parent point setup
-            // use it as a first point of our branch
+            // use it as a first point of our section
             // we need to refer to the new soma sphere center
 
-            const neuron_branch& branch =
-                static_cast<const neuron_branch&>(node);
-            const std::vector<point>& origin_points = branch.get_points();
-            const std::vector<double>& origin_radius = branch.get_radius();
+            const neuron_section& section =
+                static_cast<const neuron_section&>(node);
+            const std::vector<point>& origin_points = section.get_points();
+            const std::vector<double>& origin_radius = section.get_radius();
 
             std::vector<point> points;
             std::vector<double> radius;
-            points.reserve(branch.get_number_points() + 1);
-            radius.reserve(branch.get_number_points() + 1);
+            points.reserve(section.get_number_points() + 1);
+            radius.reserve(section.get_number_points() + 1);
 
             points.push_back(std::get<0>(parent_point.get()));
             radius.push_back(origin_radius.front());
@@ -257,8 +257,8 @@ void recursive_soma_simplify(
                       std::back_inserter(radius));
 
             out_tree.add_node(input_tree.get_parent(node_id),
-                              std::shared_ptr<morpho_node>(new neuron_branch(
-                                  branch.get_branch_type(), std::move(points),
+                              std::shared_ptr<morpho_node>(new neuron_section(
+                                  section.get_section_type(), std::move(points),
                                   std::move(radius))));
         } else {
             out_tree.copy_node(input_tree, node_id,
@@ -285,28 +285,28 @@ std::string soma_sphere_operation::name() const {
     return "soma_sphere_operation";
 }
 
-simplify_branch_extreme_operation::simplify_branch_extreme_operation() {}
+simplify_section_extreme_operation::simplify_section_extreme_operation() {}
 
-morpho_tree simplify_branch_extreme_operation::apply(const morpho_tree& tree) {
+morpho_tree simplify_section_extreme_operation::apply(const morpho_tree& tree) {
     morpho_tree res;
 
-    const std::size_t number_branches = tree.get_tree_size();
+    const std::size_t number_sectiones = tree.get_tree_size();
 
-    for (std::size_t node_id = 0; node_id < number_branches; ++node_id) {
+    for (std::size_t node_id = 0; node_id < number_sectiones; ++node_id) {
         const morpho_node& node = tree.get_node(node_id);
 
-        if (node.is_of_type(morpho_node_type::neuron_branch_type)) {
-            // if we have a branch
+        if (node.is_of_type(morpho_node_type::neuron_section_type)) {
+            // if we have a section
             // take only the first and last point
 
-            const neuron_branch& branch =
-                static_cast<const neuron_branch&>(node);
-            const std::vector<point>& origin_points = branch.get_points();
-            const std::vector<double>& origin_radius = branch.get_radius();
+            const neuron_section& section =
+                static_cast<const neuron_section&>(node);
+            const std::vector<point>& origin_points = section.get_points();
+            const std::vector<double>& origin_radius = section.get_radius();
 
             if (origin_points.size() < 2) {
                 throw std::invalid_argument(
-                    hadoken::format::scat("Invalid morphology branch ", node_id,
+                    hadoken::format::scat("Invalid morphology section ", node_id,
                                           " with less than 2 points"));
             }
 
@@ -316,8 +316,8 @@ morpho_tree simplify_branch_extreme_operation::apply(const morpho_tree& tree) {
                                           origin_radius.back()};
 
             res.add_node(tree.get_parent(node_id),
-                         std::shared_ptr<morpho_node>(new neuron_branch(
-                             branch.get_branch_type(), std::move(points),
+                         std::shared_ptr<morpho_node>(new neuron_section(
+                             section.get_section_type(), std::move(points),
                              std::move(radius))));
         } else {
             res.copy_node(tree, node_id, tree.get_parent(node_id));
@@ -326,8 +326,8 @@ morpho_tree simplify_branch_extreme_operation::apply(const morpho_tree& tree) {
     return res;
 }
 
-std::string simplify_branch_extreme_operation::name() const {
-    return "simplify_branch_extreme";
+std::string simplify_section_extreme_operation::name() const {
+    return "simplify_section_extreme";
 }
 
 transpose_operation::transpose_operation(
@@ -367,25 +367,25 @@ point_transpose_rotate(const std::vector<point>& origin_points,
 morpho_tree transpose_operation::apply(const morpho_tree& tree) {
     morpho_tree res;
 
-    const std::size_t number_branches = tree.get_tree_size();
+    const std::size_t number_sectiones = tree.get_tree_size();
 
-    for (std::size_t node_id = 0; node_id < number_branches; ++node_id) {
+    for (std::size_t node_id = 0; node_id < number_sectiones; ++node_id) {
         const morpho_node& node = tree.get_node(node_id);
 
-        if (node.is_of_type(morpho_node_type::neuron_branch_type)) {
-            // rotate translate all the points of the branch
+        if (node.is_of_type(morpho_node_type::neuron_section_type)) {
+            // rotate translate all the points of the section
 
-            const neuron_branch& branch =
-                static_cast<const neuron_branch&>(node);
-            const std::vector<point>& origin_points = branch.get_points();
+            const neuron_section& section =
+                static_cast<const neuron_section&>(node);
+            const std::vector<point>& origin_points = section.get_points();
 
             std::vector<point> points =
                 point_transpose_rotate(origin_points, _trans, _rotate);
-            std::vector<double> radius = branch.get_radius();
+            std::vector<double> radius = section.get_radius();
 
             res.add_node(tree.get_parent(node_id),
-                         std::shared_ptr<morpho_node>(new neuron_branch(
-                             branch.get_branch_type(), std::move(points),
+                         std::shared_ptr<morpho_node>(new neuron_section(
+                             section.get_section_type(), std::move(points),
                              std::move(radius))));
         } else if (node.is_of_type(morpho_node_type::neuron_soma_type)) {
 

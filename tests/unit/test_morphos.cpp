@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(test_morpho_tree) {
     BOOST_CHECK_EQUAL(
         first_node.is_of_type(morpho_node_type::neuron_node_3d_type), true);
     BOOST_CHECK_EQUAL(
-        first_node.is_of_type(morpho_node_type::neuron_branch_type), false);
+        first_node.is_of_type(morpho_node_type::neuron_section_type), false);
 
     const neuron_soma& soma = static_cast<const neuron_soma&>(first_node);
     BOOST_CHECK_EQUAL(soma.get_line_loop().size(), 1);
@@ -44,11 +44,11 @@ BOOST_AUTO_TEST_CASE(test_morpho_tree) {
     BOOST_CHECK_EQUAL(ref_sphere.get_radius(), sphere_soma.get_radius());
     BOOST_CHECK(ref_sphere.get_center().close_to(sphere_soma.get_center()));
 
-    BOOST_CHECK(soma.get_branch_type() == neuron_struct_type::soma);
+    BOOST_CHECK(soma.get_section_type() == neuron_struct_type::soma);
 
     BOOST_CHECK_EQUAL(tree.get_children(0).size(), 0);
 
-    std::shared_ptr<morpho_node> node2(new neuron_branch(
+    std::shared_ptr<morpho_node> node2(new neuron_section(
         neuron_struct_type::dentrite_basal,
         {point(0.1, 0.1, 0.1), point(0.2, 0.2, 0.2)}, {0.5, 0.5}));
 
@@ -58,15 +58,15 @@ BOOST_AUTO_TEST_CASE(test_morpho_tree) {
     BOOST_CHECK_EQUAL(id, 1);
     BOOST_CHECK_EQUAL(tree.get_tree_size(), 2);
     BOOST_CHECK_EQUAL(
-        second_node.is_of_type(morpho_node_type::neuron_branch_type), true);
+        second_node.is_of_type(morpho_node_type::neuron_section_type), true);
     BOOST_CHECK_EQUAL(
         second_node.is_of_type(morpho_node_type::neuron_node_3d_type), true);
     BOOST_CHECK_EQUAL(
         second_node.is_of_type(morpho_node_type::neuron_soma_type), false);
 
-    const neuron_branch& branch1 =
-        static_cast<const neuron_branch&>(second_node);
-    BOOST_CHECK(branch1.get_branch_type() ==
+    const neuron_section& section1 =
+        static_cast<const neuron_section&>(second_node);
+    BOOST_CHECK(section1.get_section_type() ==
                 neuron_struct_type::dentrite_basal);
 
     BOOST_CHECK_EQUAL(tree.get_children(0).size(), 1);
@@ -103,41 +103,41 @@ BOOST_AUTO_TEST_CASE(test_load_h5v1) {
             true);
         const neuron_soma& soma =
             static_cast<const neuron_soma&>(tree.get_node(0));
-        BOOST_CHECK(soma.get_branch_type() == neuron_struct_type::soma);
+        BOOST_CHECK(soma.get_section_type() == neuron_struct_type::soma);
 
         BOOST_CHECK_EQUAL(soma.get_line_loop().size(),
-                          reader.get_branch_range_raw(0).second);
+                          reader.get_section_range_raw(0).second);
 
         for (std::size_t i = 1; i < tree.get_tree_size(); ++i) {
             BOOST_CHECK_EQUAL(tree.get_node(i).is_of_type(
-                                  morpho_node_type::neuron_branch_type),
+                                  morpho_node_type::neuron_section_type),
                               true);
 
-            const neuron_branch& nbranch =
-                static_cast<const neuron_branch&>(tree.get_node(i));
+            const neuron_section& nsection =
+                static_cast<const neuron_section&>(tree.get_node(i));
 
-            const std::size_t branch_raw_offset =
-                reader.get_branch_range_raw(i).first;
-            const std::size_t branch_raw_size =
-                reader.get_branch_range_raw(i).second;
-            BOOST_CHECK_EQUAL(nbranch.get_number_points(), branch_raw_size);
-            BOOST_CHECK_EQUAL(nbranch.get_points().size(), branch_raw_size);
-            BOOST_CHECK_EQUAL(nbranch.get_radius().size(), branch_raw_size);
+            const std::size_t section_raw_offset =
+                reader.get_section_range_raw(i).first;
+            const std::size_t section_raw_size =
+                reader.get_section_range_raw(i).second;
+            BOOST_CHECK_EQUAL(nsection.get_number_points(), section_raw_size);
+            BOOST_CHECK_EQUAL(nsection.get_points().size(), section_raw_size);
+            BOOST_CHECK_EQUAL(nsection.get_radius().size(), section_raw_size);
 
-            BOOST_CHECK(nbranch.get_branch_type() == neuron_struct_type::axon ||
-                        nbranch.get_branch_type() ==
+            BOOST_CHECK(nsection.get_section_type() == neuron_struct_type::axon ||
+                        nsection.get_section_type() ==
                             neuron_struct_type::dentrite_basal ||
-                        nbranch.get_branch_type() ==
+                        nsection.get_section_type() ==
                             neuron_struct_type::dentrite_apical);
 
-            for (std::size_t j = 0; j < nbranch.get_number_points(); ++j) {
-                const auto& points = nbranch.get_points();
-                const auto& radius = nbranch.get_radius();
+            for (std::size_t j = 0; j < nsection.get_number_points(); ++j) {
+                const auto& points = nsection.get_points();
+                const auto& radius = nsection.get_radius();
 
-                point point_raw(raw_points(branch_raw_offset + j, 0),
-                                raw_points(branch_raw_offset + j, 1),
-                                raw_points(branch_raw_offset + j, 2));
-                double radius_raw = raw_points(branch_raw_offset + j, 3) / 2;
+                point point_raw(raw_points(section_raw_offset + j, 0),
+                                raw_points(section_raw_offset + j, 1),
+                                raw_points(section_raw_offset + j, 2));
+                double radius_raw = raw_points(section_raw_offset + j, 3) / 2;
 
                 BOOST_CHECK(point_raw.close_to(points[j]));
                 BOOST_CHECK(hadoken::math::close_to_abs(radius_raw, radius[j]));
@@ -147,14 +147,14 @@ BOOST_AUTO_TEST_CASE(test_load_h5v1) {
 }
 
 template <typename Fun>
-void for_each_point_branch(const morpho::morpho_node& node, Fun f) {
+void for_each_point_section(const morpho::morpho_node& node, Fun f) {
     using namespace morpho;
     if (node.is_of_type(morpho_node_type::neuron_soma_type)) {
         const neuron_soma& b = static_cast<const neuron_soma&>(node);
         const auto& points = b.get_line_loop();
         std::for_each(points.begin(), points.end(), f);
-    } else if (node.is_of_type(morpho_node_type::neuron_branch_type)) {
-        const neuron_branch& b = static_cast<const neuron_branch&>(node);
+    } else if (node.is_of_type(morpho_node_type::neuron_section_type)) {
+        const neuron_section& b = static_cast<const neuron_section&>(node);
         const auto& points = b.get_points();
         std::for_each(points.begin(), points.end(), f);
     } else {
@@ -167,17 +167,17 @@ void for_each_point_tree(const morpho::morpho_tree& tree, Fun f) {
     using namespace morpho;
     for (std::size_t i = 0; i < tree.get_tree_size(); ++i) {
         const morpho_node& node = tree.get_node(i);
-        for_each_point_branch<Fun>(node, f);
+        for_each_point_section<Fun>(node, f);
     }
 }
 
 // same but ignore soma
 template <typename Fun>
-void for_each_point_branch_tree(const morpho::morpho_tree& tree, Fun f) {
+void for_each_point_section_tree(const morpho::morpho_tree& tree, Fun f) {
     using namespace morpho;
     for (std::size_t i = 1; i < tree.get_tree_size(); ++i) {
         const morpho_node& node = tree.get_node(i);
-        for_each_point_branch<Fun>(node, f);
+        for_each_point_section<Fun>(node, f);
     }
 }
 
@@ -213,10 +213,10 @@ BOOST_AUTO_TEST_CASE(test_bounding_box) {
     for (std::size_t i = 0; i < tree.get_tree_size(); ++i) {
         const morpho_node& node = tree.get_node(i);
         box node_box = node.get_bounding_box();
-        std::cout << "branch bounding box " << node_box.min_corner() << " "
+        std::cout << "section bounding box " << node_box.min_corner() << " "
                   << node_box.max_corner() << std::endl;
 
-        for_each_point_branch(node, [&](const point& p) {
+        for_each_point_section(node, [&](const point& p) {
 
             BOOST_CHECK(is_inside_box(node_box, p));
         });
@@ -233,7 +233,7 @@ BOOST_AUTO_TEST_CASE(test_spatial) {
 
     index.add_morpho_tree(tree);
 
-    for_each_point_branch_tree(*tree, [&](const point& p) {
+    for_each_point_section_tree(*tree, [&](const point& p) {
         BOOST_CHECK(index.is_within(p) == true);
     });
 }

@@ -35,7 +35,7 @@ class spatial_index_impl {
     // contain
     // 1- bounding box
     // 2- morpho id
-    // 3- branch id
+    // 3- section id
     // 4- segment id
     // 5- 0 -> soma, 1-> segment, 2 -> segment junction
     // please note that all ids are specific to a given morpho tree
@@ -83,18 +83,18 @@ void spatial_index::add_morpho_tree(const std::shared_ptr<morpho_tree>& tree) {
             _pimpl->sp_index.insert(all_elems.begin(), all_elems.end());
 
         } else if (current_node.is_of_type(
-                       morpho_node_type::neuron_branch_type)) {
-            const neuron_branch& current_branch =
-                static_cast<const neuron_branch&>(current_node);
+                       morpho_node_type::neuron_section_type)) {
+            const neuron_section& current_section =
+                static_cast<const neuron_section&>(current_node);
 
-            for (std::size_t j = 0; j < current_branch.get_number_points() - 1;
+            for (std::size_t j = 0; j < current_section.get_number_points() - 1;
                  ++j) {
-                auto segment_box = current_branch.get_segment_bounding_box(j);
+                auto segment_box = current_section.get_segment_bounding_box(j);
                 const spatial_index_impl::indexed_box segment_elem =
                     std::make_tuple(segment_box, morpho_position, i, j, 1);
 
                 auto junction_box =
-                    current_branch.get_junction_sphere_bounding_box(j);
+                    current_section.get_junction_sphere_bounding_box(j);
                 const spatial_index_impl::indexed_box junction_elem =
                     std::make_tuple(junction_box, morpho_position, i, j, 2);
 
@@ -168,11 +168,11 @@ bool spatial_index::is_within(const point& p) const {
     // check if individual element intersect
     for (auto it = res.begin(); it < res.end(); ++it) {
         const int n_morpho = std::get<1>(*it);
-        const int n_branch = std::get<2>(*it);
+        const int n_section = std::get<2>(*it);
         const int n_segment = std::get<3>(*it);
         const int indexed_type = std::get<4>(*it);
 
-        const morpho_node& node = _pimpl->morphos[n_morpho]->get_node(n_branch);
+        const morpho_node& node = _pimpl->morphos[n_morpho]->get_node(n_section);
 
         switch (indexed_type) {
         case 0: {
@@ -185,9 +185,9 @@ bool spatial_index::is_within(const point& p) const {
 
         case 1: {
             // return true;
-            const neuron_branch& my_branch =
-                static_cast<const neuron_branch&>(node);
-            if (point_is_in_truncated_cones(my_branch.get_segment(n_segment),
+            const neuron_section& my_section =
+                static_cast<const neuron_section&>(node);
+            if (point_is_in_truncated_cones(my_section.get_segment(n_segment),
                                             p)) {
                 return true;
             }
@@ -195,9 +195,9 @@ bool spatial_index::is_within(const point& p) const {
         }
 
         case 2: {
-            const neuron_branch& my_branch =
-                static_cast<const neuron_branch&>(node);
-            if (point_is_in_sphere(my_branch.get_junction(n_segment), p)) {
+            const neuron_section& my_section =
+                static_cast<const neuron_section&>(node);
+            if (point_is_in_sphere(my_section.get_junction(n_segment), p)) {
                 return true;
             }
             break;

@@ -30,7 +30,7 @@ class morpho_operation;
 /// \brief  delete_duplicate_point_operation
 ///
 /// transform operations : Remove any consecutive duplicated point in every
-/// branch
+/// section
 ///  of a given morpho-tree
 ///
 class delete_duplicate_point_operation : public morpho_operation {
@@ -45,8 +45,8 @@ class delete_duplicate_point_operation : public morpho_operation {
 ///
 /// \brief  duplicate_first_point_operation
 ///
-/// transform operations : duplicate the last point of every branch as
-/// first point of the next branch
+/// transform operations : duplicate the last point of every section as
+/// first point of the next section
 ///
 class duplicate_first_point_operation : public morpho_operation {
   public:
@@ -79,16 +79,16 @@ class soma_sphere_operation : public morpho_operation {
 };
 
 ///
-/// \brief  simplify_branch_extreme
+/// \brief  simplify_section_extreme
 ///
-/// transform operations : simplify all morphology branch to the extreme by
+/// transform operations : simplify all morphology section to the extreme by
 /// keeping only first and last point
 ///
 ///
 ///
-class simplify_branch_extreme_operation : public morpho_operation {
+class simplify_section_extreme_operation : public morpho_operation {
   public:
-    simplify_branch_extreme_operation();
+    simplify_section_extreme_operation();
 
     morpho_tree apply(const morpho_tree& tree) override;
 
@@ -96,7 +96,7 @@ class simplify_branch_extreme_operation : public morpho_operation {
 };
 
 ///
-/// \brief  simplify_branch_extreme
+/// \brief  simplify_section_extreme
 ///
 /// transform operations : transpose and rotate the morphology using a vector
 /// and a quaternion

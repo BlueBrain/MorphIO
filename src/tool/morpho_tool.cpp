@@ -50,7 +50,7 @@ const std::string
     delete_duplicate_point_operation_str("delete_duplicate_point");
 const std::string duplicate_first_point_operation_str("duplicate_first_point");
 const std::string soma_sphere_operation_str("soma_sphere");
-const std::string simplify_branch_extreme_str("simplify_branch_extreme");
+const std::string simplify_section_extreme_str("simplify_section_extreme");
 
 std::string version() {
     return std::string(MORPHO_VERSION_MAJOR "." MORPHO_VERSION_MINOR);
@@ -86,7 +86,7 @@ po::parsed_options parse_args(int argc, char** argv, po::variables_map& res,
         "with-dmg", "gmsh: export to a dmg file format as well")(
         "with-bounding-box",
         "gmsh: add a bounding box to the geometry based on neurons info")(
-        "dont-pack", "gmsh: do not pack the geometrical elements by branch")(
+        "dont-pack", "gmsh: do not pack the geometrical elements by section")(
         "single-soma",
         "gmsh: represent soma as a single element, point or sphere")(
         "sphere", "x3d: export cloud of sphere (default)")(
@@ -133,15 +133,15 @@ void transform_show_help() {
                                                              "\t \n",
         "\t Available operations: \n", "\t\t *",
         delete_duplicate_point_operation_str,
-        "*:\t remove duplicated points in every branch\n", "\t\t *",
+        "*:\t remove duplicated points in every section\n", "\t\t *",
         duplicate_first_point_operation_str, "*:\t duplicate the last point of "
-                                             "every branch as first point of "
+                                             "every section as first point of "
                                              "its children \n",
         "\t\t *", soma_sphere_operation_str,
         "*:\t transform a line-loop soma into a single point sphere soma \n",
-        "\t\t *", simplify_branch_extreme_str, "*:\t simplify morphology "
-                                               "branches to the extreme with 2 "
-                                               "points per branch \n",
+        "\t\t *", simplify_section_extreme_str, "*:\t simplify morphology "
+                                               "sectiones to the extreme with 2 "
+                                               "points per section \n",
         "\n", "\n", "\tNote: Most operations are NOT commutative"
                     "\n");
     exit(1);
@@ -175,9 +175,9 @@ morpho_operation_chain parse_transform_option(po::variables_map& options) {
         } else if (operation == soma_sphere_operation_str) {
             filters.push_back(std::make_shared<soma_sphere_operation>());
 
-        } else if (operation == simplify_branch_extreme_str) {
+        } else if (operation == simplify_section_extreme_str) {
             filters.push_back(
-                std::make_shared<simplify_branch_extreme_operation>());
+                std::make_shared<simplify_section_extreme_operation>());
         } else {
             transform_show_help();
         }
@@ -325,8 +325,8 @@ void print_morpho_stats(const std::string& morpho_file) {
     fmt::scat(std::cout, "\n");
     fmt::scat(std::cout, "filename =  \"", morpho_file, "\"", "\n");
     fmt::scat(std::cout, "morphology_type = [\"detailed\", \"cones\" ]", "\n");
-    fmt::scat(std::cout, "number_of_branch = ",
-              stats::total_number_branches(*tree), "\n");
+    fmt::scat(std::cout, "number_of_section = ",
+              stats::total_number_sectiones(*tree), "\n");
     fmt::scat(std::cout, "number_of_points = ",
               stats::total_number_point(*tree), "\n");
     fmt::scat(std::cout, "min_radius_segment = ",

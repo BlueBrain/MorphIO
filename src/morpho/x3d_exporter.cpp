@@ -92,10 +92,10 @@ void x3d_exporter::export_all_points() {
         // export points
         for (std::size_t b_id = 1; b_id < tree.get_tree_size(); ++b_id) {
 
-            auto& branch =
-                static_cast<const neuron_branch&>(tree.get_node(b_id));
-            auto& points = branch.get_points();
-            auto& distance = branch.get_radius();
+            auto& section =
+                static_cast<const neuron_section&>(tree.get_node(b_id));
+            auto& points = section.get_points();
+            auto& distance = section.get_radius();
 
             assert(points.size() == distance.size());
             for (std::size_t i = 0; i < points.size(); ++i) {

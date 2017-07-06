@@ -72,10 +72,10 @@ class morpho_reader {
     mat_index get_struct_raw() const;
 
     ///
-    /// \brief points range of a given branch by id
+    /// \brief points range of a given section by id
     /// \return range( offset, count )
     ///
-    range get_branch_range_raw(int id) const;
+    range get_section_range_raw(int id) const;
 
     ///
     /// \brief get_filename

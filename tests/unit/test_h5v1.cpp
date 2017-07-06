@@ -34,10 +34,10 @@ BOOST_AUTO_TEST_CASE(test_h5v1_rw) {
 
         tree2 = reader::create_morpho_tree(testfile_write);
 
-        std::size_t n_branch1 = stats::total_number_branches(tree1);
-        std::size_t n_branch2 = stats::total_number_branches(tree2);
+        std::size_t n_section1 = stats::total_number_sectiones(tree1);
+        std::size_t n_section2 = stats::total_number_sectiones(tree2);
 
-        BOOST_CHECK_EQUAL(n_branch1, n_branch2);
+        BOOST_CHECK_EQUAL(n_section1, n_section2);
 
         std::size_t n_points1 = stats::total_number_point(tree1);
         std::size_t n_points2 = stats::total_number_point(tree2);
@@ -64,10 +64,10 @@ BOOST_AUTO_TEST_CASE(test_h5v1_test_filter_duplicated) {
 
     tree2 = morpho_transform(tree1, chain);
 
-    std::size_t n_branch1 = stats::total_number_branches(tree1);
-    std::size_t n_branch2 = stats::total_number_branches(tree2);
+    std::size_t n_section1 = stats::total_number_sectiones(tree1);
+    std::size_t n_section2 = stats::total_number_sectiones(tree2);
 
-    BOOST_CHECK_EQUAL(n_branch1, n_branch2);
+    BOOST_CHECK_EQUAL(n_section1, n_section2);
 
     std::size_t n_points1 = stats::total_number_point(tree1);
     std::size_t n_points2 = stats::total_number_point(tree2);

@@ -27,17 +27,17 @@
 
 namespace morpho {
 
-class branch;
+class section;
 class morpho_tree;
 
 enum class morpho_node_type {
     unknown = 0x00,
     neuron_node_3d_type = 0x01,
-    neuron_branch_type = 0x02,
+    neuron_section_type = 0x02,
     neuron_soma_type = 0x03
 };
 
-/// branch type
+/// section type
 enum class neuron_struct_type {
     soma = 0x00,
     axon = 0x01,
@@ -60,7 +60,7 @@ class morpho_node {
 
     ///
     /// pure virtual function
-    /// return bounding box of the entire branch
+    /// return bounding box of the entire section
     ///
     virtual box get_bounding_box() const = 0;
 
@@ -89,35 +89,35 @@ class neuron_node_3d : public morpho_node {
 
     virtual ~neuron_node_3d();
 
-    inline neuron_struct_type get_branch_type() const { return _my_type; }
+    inline neuron_struct_type get_section_type() const { return _my_type; }
 
   private:
     neuron_struct_type _my_type;
 };
 
 ///
-/// \brief a neuron morphology branch (dentrite, axon )
+/// \brief a neuron morphology section (dentrite, axon )
 ///    modelised by a set of truncated cones
 ///
-class neuron_branch : public neuron_node_3d {
-    struct neuron_branch_internal;
+class neuron_section : public neuron_node_3d {
+    struct neuron_section_internal;
 
   public:
-    neuron_branch(neuron_struct_type neuron_type, std::vector<point>&& points,
+    neuron_section(neuron_struct_type neuron_type, std::vector<point>&& points,
                   std::vector<double>&& radius);
-    neuron_branch(const neuron_branch& other);
-    virtual ~neuron_branch();
+    neuron_section(const neuron_section& other);
+    virtual ~neuron_section();
 
     ///
     /// \brief get_number_points
-    /// \return  total number of points associated with the branch
+    /// \return  total number of points associated with the section
     ///
     std::size_t get_number_points() const;
 
     ///
     /// \brief get_points
     /// \param id
-    /// \return vector of all the points of the branch
+    /// \return vector of all the points of the section
     ///
     ///  each point has also its associated radius in order
     ///  accessible with get_radius
@@ -127,7 +127,7 @@ class neuron_branch : public neuron_node_3d {
     ///
     /// \brief get_radius
     /// \param id
-    /// \return vector of all the radius of the branch
+    /// \return vector of all the radius of the section
     ///
     ///  each radius has also its associated point in order
     ///  accessible with get_points
@@ -139,13 +139,13 @@ class neuron_branch : public neuron_node_3d {
     ///  segments id are from 0 to get_number_points() -1
     ///
     /// \param if of the segment
-    /// \return cone of the given branch segment
+    /// \return cone of the given section segment
     ///
     cone get_segment(std::size_t n) const;
 
     ///
     /// \brief bounding box
-    /// \return bounding box of the entire branch
+    /// \return bounding box of the entire section
     ///
     box get_bounding_box() const override;
 
@@ -179,9 +179,9 @@ class neuron_branch : public neuron_node_3d {
     ///
     /// \brief get_linestring
     ///
-    /// linestring object of the entire branch
+    /// linestring object of the entire section
     ///
-    /// \return linestring of the branch
+    /// \return linestring of the section
     ///
     linestring get_linestring() const;
 
@@ -192,11 +192,11 @@ class neuron_branch : public neuron_node_3d {
     circle_pipe get_circle_pipe() const;
 
   private:
-    std::unique_ptr<neuron_branch_internal> _dptr;
+    std::unique_ptr<neuron_section_internal> _dptr;
 };
 
 ///
-/// \brief soma branch type
+/// \brief soma section type
 ///
 class neuron_soma : public neuron_node_3d {
     struct neuron_soma_intern;
@@ -222,7 +222,7 @@ class neuron_soma : public neuron_node_3d {
 
     ///
     /// \brief bounding box
-    /// \return bounding box of the entire branch
+    /// \return bounding box of the entire section
     ///
     box get_bounding_box() const override;
 

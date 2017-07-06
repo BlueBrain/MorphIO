@@ -29,9 +29,9 @@ namespace morpho {
 namespace stats {
 
 ///
-/// \brief return total number of branches associated with a given morpho_tree
+/// \brief return total number of sectiones associated with a given morpho_tree
 ///
-std::size_t total_number_branches(const morpho_tree& tree);
+std::size_t total_number_sectiones(const morpho_tree& tree);
 
 ///
 /// \brief return total number of points associated with a given morpho_tree
@@ -54,8 +54,8 @@ double max_radius_segment(const morpho_tree& tree);
 double median_radius_segment(const morpho_tree& tree);
 
 ///
-/// \brief return true if duplicated points has been seen in any branch
-/// or between the end of a branch and the beginning of the next branch
+/// \brief return true if duplicated points has been seen in any section
+/// or between the end of a section and the beginning of the next section
 ///
 bool has_duplicated_points(const morpho_tree& tree);
 

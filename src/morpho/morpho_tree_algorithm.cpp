@@ -33,7 +33,7 @@ std::vector<int> find_neuron_nodes(const morpho_tree& tree,
         if (node->is_of_type(morpho_node_type::neuron_node_3d_type)) {
             neuron_node_3d const* nodex =
                 static_cast<neuron_node_3d const*>(node);
-            if (nodex->get_branch_type() == mtype) {
+            if (nodex->get_section_type() == mtype) {
                 res.push_back(cur_idx);
             }
         }
