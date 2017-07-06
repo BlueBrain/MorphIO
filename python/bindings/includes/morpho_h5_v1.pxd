@@ -7,9 +7,9 @@ __copyright__ = "Copyright 2016 EPFL BBP-project"
 # =====================================================================================================================
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
-from . cimport std
-from . cimport morpho
-from . cimport boost_numeric_ublas
+cimport std
+cimport morpho
+cimport boost_numeric_ublas
 
 # ======================================================================================================================
 cdef extern from "morpho/morpho_types.hpp" namespace "morpho":

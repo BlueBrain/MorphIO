@@ -1,4 +1,4 @@
-from .includes cimport stats
+cimport stats
 
 # ======================================================================================================================
 # Python bindings to namespace morpho::stats

@@ -6,7 +6,7 @@ option(BUILD_PYTHON_DISTRIBUTABLE "Builds a Self-contained Python compiled modul
 find_package(PythonInterpLibs)
 
 # Rebuild Cython?
-option(REBUILD_BINDINGS "Rebuild Python bindings from Cython sources" OFF)
+option(REBUILD_PYTHON_BINDINGS "Rebuild Python bindings from Cython sources" OFF)
 set(CYBINDINGS_CPP "${CMAKE_CURRENT_SOURCE_DIR}/morphotool/morphotool.cpp")
 
 # Getting the INCLUDE_DIRECTORIES to pass on to the compilation of the extension
@@ -36,7 +36,7 @@ add_custom_target(pydist ALL
     COMMAND ${PYTHON_EXECUTABLE} setup.py build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp2 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src "-l$<JOIN:${libs_required_morpho}, -l>" bdist_wheel --dist-dir ${CMAKE_BINARY_DIR} > /dev/null
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${CYBINDINGS_CPP} morphostatic
-    COMMENT "Building distributable Python wheel in ${CMAKE_BINARY_DIR}"
+    COMMENT "Building python source dist in ${CMAKE_BINARY_DIR}"
 )
 endif()
 
