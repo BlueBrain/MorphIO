@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Adrien Devresse <adrien.devresse@epfl.ch>
+ * Copyright (C) 2017 Tristan Carel <tristan.carel@epfl.ch>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,40 +16,31 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
-#ifndef X3D_EXPORTER_H
-#define X3D_EXPORTER_H
 
-#include <fstream>
-#include <functional>
-#include <string>
+#include <morpho/morpho_reader.hpp>
 
+#include <boost/algorithm/string/predicate.hpp>
+#include <hadoken/format/format.hpp>
 #include <morpho/morpho_h5_v1.hpp>
+#include <morpho/morpho_swc.hpp>
 
 namespace morpho {
+namespace reader {
 
-class x3d_exporter {
-  public:
-    x3d_exporter(std::vector<morpho_tree>&& trees,
-                 const std::string& mesh_filename);
-
-    inline void set_identifier_string(const std::string& id) {
-        identifier_string = id;
+morpho_tree create_morpho_tree(const std::string& file) {
+    using boost::algorithm::ends_with;
+    using hadoken::format::scat;
+    if (ends_with(file, ".h5")) {
+        morpho::h5_v1::morpho_reader reader(file);
+        return reader.create_morpho_tree();
+    } else if (ends_with(file, ".swc")) {
+        morpho::swc_v1::morpho_reader reader(file);
+        return reader.create_morpho_tree();
+    } else {
+        throw std::logic_error(
+            scat("Unsupported morphology file type: ", file));
     }
-
-    void export_to_sphere();
-
-  private:
-    std::vector<morpho_tree> morphotrees;
-    std::string identifier_string;
-    std::ofstream x3d_stream;
-    std::string dest_filename;
-
-    void envelop_header_and_footer(const std::function<void(void)>& fcontent);
-
-    void html_viewer();
-
-    void export_all_points();
-};
 }
 
-#endif // X3D_EXPORTER_H
+} // namespace reader
+} // namespace morpho

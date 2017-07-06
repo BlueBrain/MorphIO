@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Adrien Devresse <adrien.devresse@epfl.ch>
+ * Copyright (C) 2017 Tristan Carel <tristan.carel@epfl.ch>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,40 +16,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
  *
  */
-#ifndef X3D_EXPORTER_H
-#define X3D_EXPORTER_H
 
-#include <fstream>
-#include <functional>
+#ifndef MORPHO_TOOL_MORPHO_READER_HPP
+#define MORPHO_TOOL_MORPHO_READER_HPP
+
 #include <string>
 
-#include <morpho/morpho_h5_v1.hpp>
+#include <morpho/morpho_tree.hpp>
 
 namespace morpho {
+namespace reader {
 
-class x3d_exporter {
-  public:
-    x3d_exporter(std::vector<morpho_tree>&& trees,
-                 const std::string& mesh_filename);
+/**
+ * Load morpho tree from file, in either h5 or swc format.
+ *
+ * @param file Path to the file to load. File's extension matters.
+ * @return Memory representation of the tree
+ */
+morpho_tree create_morpho_tree(const std::string& file);
 
-    inline void set_identifier_string(const std::string& id) {
-        identifier_string = id;
-    }
+} // namespace reader
+} // namespace morpho
 
-    void export_to_sphere();
-
-  private:
-    std::vector<morpho_tree> morphotrees;
-    std::string identifier_string;
-    std::ofstream x3d_stream;
-    std::string dest_filename;
-
-    void envelop_header_and_footer(const std::function<void(void)>& fcontent);
-
-    void html_viewer();
-
-    void export_all_points();
-};
-}
-
-#endif // X3D_EXPORTER_H
+#endif // MORPHO_TOOL_MORPHO_READER_HPP

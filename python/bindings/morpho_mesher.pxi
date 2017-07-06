@@ -1,4 +1,4 @@
-from .statics cimport morpho_morpho_mesher
+from .includes.statics cimport morpho_morpho_mesher
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class _py_morpho_mesher(_py__base):

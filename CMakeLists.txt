@@ -19,7 +19,7 @@ include(Display)
 
 option(MORPHOTOOL_UNIT_TESTS "Enable or disable unit tests" ON)
 option(ENABLE_MESHER_CGAL "Enable or disable integrated mesher based on CGAL" OFF)
-option(BUILD_PYTHON_MODULE "Build a Python library" ON)
+option(BUILD_PYTHON_MODULE "Build a Python library" OFF)
 
 set(Boost_NO_BOOST_CMAKE TRUE)
 
@@ -27,9 +27,9 @@ set(Boost_NO_BOOST_CMAKE TRUE)
 find_package(Threads)
 find_package(Boost 1.55 QUIET REQUIRED COMPONENTS system thread filesystem program_options)
 find_package(HDF5 QUIET REQUIRED)
+find_package(CLANG_TIDY)
 # Eventually required for rebuilding bindings
 find_package(Cython 0.25.0)
-find_package(NumPy QUIET)
 
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}" )
@@ -38,6 +38,7 @@ if(ENABLE_MESHER_CGAL)
     add_definitions( -DENABLE_MESHER_CGAL=1)
     set(MOPHO_MESHER_TARGET "morpho_mesher")
 endif()
+
 
 
 file(GLOB MORPHO_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/include/morpho/*)
@@ -55,11 +56,17 @@ add_definitions( -DH5_USE_BOOST -DMORPHO_VERSION_MAJOR=\"${MORPHOTOOL_VERSION_MA
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/morpho DESTINATION ${INCLUDE_INSTALL_DIR})
 
+option(CLANG_FORMAT_PRECOMMIT
+	   "Ensure git staging area is formatted according to clang-format"
+	   FALSE)
+if(CLANG_FORMAT_PRECOMMIT)
+    add_subdirectory(deps/git-cmake-format)
+endif()
+
 # Targets
 add_subdirectory(src)
+add_subdirectory(deps/hadoken)
+add_subdirectory(deps/highfive)
 add_subdirectory(tests/unit)
 add_subdirectory(python)
 
-# Any reason to include them besides testing them?
-#add_subdirectory(deps/hadoken)
-#add_subdirectory(deps/highfive)

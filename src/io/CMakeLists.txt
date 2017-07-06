@@ -1,7 +1,9 @@
 
 
 list(APPEND SRC_SPATIAL "morpho_reader_h5v1.cpp"
-                        "morpho_circuit.cpp")
+                        "morpho_circuit.cpp"
+                        "morpho_reader.cpp"
+                        "morpho_swc.cpp")
 
 add_library(morphoio-obj OBJECT ${SRC_SPATIAL} )
 set_property(TARGET morphoio-obj PROPERTY POSITION_INDEPENDENT_CODE ON)
