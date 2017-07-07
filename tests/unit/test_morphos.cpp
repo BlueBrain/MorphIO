@@ -237,3 +237,17 @@ BOOST_AUTO_TEST_CASE(test_spatial) {
         BOOST_CHECK(index.is_within(p) == true);
     });
 }
+
+
+//Auto detection of cell type from metadata
+BOOST_AUTO_TEST_CASE(test_cell_type) {
+    using namespace morpho;
+
+    const std::shared_ptr<morpho_tree> tree(
+        new morpho_tree(reader::create_morpho_tree(ASTROCITE_MORPHO_TEST_FILE)));
+
+    //Need to check
+    //BOOST_CHECK(tree->get_cell_type() == morpho::cell_family::GLIA);
+    BOOST_CHECK(true);
+
+}

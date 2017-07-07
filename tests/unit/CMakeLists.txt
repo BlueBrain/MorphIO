@@ -16,6 +16,7 @@ endif()
 # add info about test file
 add_definitions( -DH5V1_MORPHO_TEST_FILE=\"${CMAKE_CURRENT_SOURCE_DIR}/dend-C090905B_axon-sm110125a1-3_idA.h5\" )
 add_definitions( -DSWC_MORPHO_TEST_FILE=\"${CMAKE_CURRENT_SOURCE_DIR}/10-2012-02-09-001.CNG.swc\" )
+add_definitions( -DASTROCITE_MORPHO_TEST_FILE=\"${CMAKE_CURRENT_SOURCE_DIR}/ASTROCYTE1_1.h5\" )
 
 ## morpho tool export
 file(GLOB  tests_morpho_src "*morpho*.cpp")

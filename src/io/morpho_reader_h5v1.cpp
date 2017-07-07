@@ -105,7 +105,7 @@ namespace fmt = hadoken::format;
 morpho_reader::morpho_reader(const std::string& myfilename)
     : h5_file(myfilename), filename(myfilename),
       structures(h5_file.getDataSet("/structure")),
-      points(h5_file.getDataSet("/points")) 
+      points(h5_file.getDataSet("/points"))
 {
     if ( h5_file.exist("metadata") ) {
         metadata = h5_file.getGroup("/metadata");
@@ -194,7 +194,7 @@ mat_index morpho_reader::get_struct_raw() const {
 
 cell_family morpho_reader::get_cell_family() const  {
 
-    if( ! metadata.hasAttribute("cell_family") ) {
+    if( !metadata.isValid() || ! metadata.exist("cell_family") ) {
         return cell_family::NEURON;
     }
 
@@ -258,6 +258,8 @@ morpho_tree morpho_reader::create_morpho_tree() const {
     namespace ublas = boost::numeric::ublas;
 
     morpho_tree res;
+    // Set type. Defaults to Neuron
+    res.set_cell_type(get_cell_family());
 
     {
         // create soma
