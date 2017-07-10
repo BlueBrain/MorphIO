@@ -29,21 +29,19 @@
 #include "morpho_tree.hpp"
 #include "morpho_types.hpp"
 
-#include <mvd/mvd3.hpp>
-
 namespace morpho {
 
 namespace circuit {
 
 class circuit_reader {
-  public:
-    circuit_reader(const std::string& filename_mvd3,
-                   const std::string& morpho_directory);
+public:
+  circuit_reader(const std::string &filename_mvd3,
+                 const std::string &morpho_directory);
 
-    std::vector<morpho_tree> create_all_morpho_tree() const;
+  std::vector<morpho_tree> create_all_morpho_tree() const;
 
-  private:
-    std::string _filename, _morpho_directory;
+private:
+  std::string _filename, _morpho_directory;
 };
 
 } // circuit

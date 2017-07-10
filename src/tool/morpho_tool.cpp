@@ -70,8 +70,6 @@ po::parsed_options parse_args(int argc, char** argv, po::variables_map& res,
         "export entire circuit to .geo file format\n"
         "  export x3d [morphology-file] [x3d-file]:\t\texport morphology file "
         "to .x3d file format\n"
-        "  mesh [morphology-file] [output_mesh_file]:\t\tCreate a mesh from a "
-        "morphology\n"
         "\n\n"
         "Options");
     general.add_options()("help", "produce a help message")(
@@ -90,14 +88,9 @@ po::parsed_options parse_args(int argc, char** argv, po::variables_map& res,
         "single-soma",
         "gmsh: represent soma as a single element, point or sphere")(
         "sphere", "x3d: export cloud of sphere (default)")(
-        "only-surface", "mesh: do only surface meshing")(
-        "force-manifold",
-        "mesh: force generation of manifold mesh, valid only for surface mesh")(
         "error-bound", po::value<double>(), "mesh: error bound for the "
                                             "dichotomy search during meshing "
                                             "1/v (default : 100000)")(
-        "facet-size", po::value<double>(),
-        "mesh: set facet size of the mesh (default : auto)")(
         "command", po::value<std::string>(),
         "command to execute")("subargs", po::value<std::vector<std::string>>(),
                               "Arguments for command");
@@ -375,38 +368,6 @@ int main(int argc, char** argv) {
                 if (subargs.size() == 2) {
                     print_morpho_stats(subargs[1]);
                     return 0;
-                }
-            } else if (command == "mesh") {
-                if (subargs.size() == 3) {
-#ifdef ENABLE_MESHER_CGAL
-                    auto tree = load_morphology(subargs[1]);
-                    morpho_mesher mesher(tree, subargs[2]);
-
-                    if (options.count("only-surface")) {
-                        mesher.set_mesh_tag(morpho_mesher::only_surface, true);
-                    }
-
-                    if (options.count("force-manifold")) {
-                        mesher.set_mesh_tag(morpho_mesher::force_manifold,
-                                            true);
-                    }
-
-                    if (options.count("error-bound")) {
-                        mesher.set_error_bound(
-                            options["error-bound"].as<double>());
-                    }
-
-                    if (options.count("facet-size")) {
-                        mesher.set_face_size(
-                            options["facet-size"].as<double>());
-                    }
-
-                    mesher.execute();
-                    return 0;
-#else
-                    throw std::runtime_error("ERROR: morpho-tool has been "
-                                             "compiled without mesh support");
-#endif
                 }
             }
         }
