@@ -123,6 +123,9 @@ public:
     /** @copydoc brion::CompartmentReport::getFrameSize */
     virtual size_t getFrameSize() const = 0;
 
+    /** @copydoc brion::CompartmentReport::getFrameCount */
+    virtual size_t getFrameCount() const = 0;
+
     /** @copydoc brion::CompartmentReport::loadFrame */
     virtual floatsPtr loadFrame(double timestamp) const = 0;
 

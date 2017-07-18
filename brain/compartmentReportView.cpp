@@ -99,6 +99,56 @@ std::future<brion::Frames> CompartmentReportView::load(double start, double end)
     return _impl->report->loadFrames(start, end);
 }
 
+std::future<brion::Frames> CompartmentReportView::load(double start, double end,
+                                                       const double step)
+{
+    const double reportTimeStep = _impl->report->getTimestep();
+    const double reportStartTime = _impl->report->getStartTime();
+
+    if (end <= start)
+        throw std::logic_error("Invalid interval");
+
+    if (step < reportTimeStep || step <= 0.)
+        throw std::logic_error("Invalid step");
+
+    // check step is multiple of timestep
+    if (fmod(step, reportTimeStep) > std::numeric_limits<double>::epsilon())
+        throw std::logic_error(
+            "Step should be a multiple of the report time step");
+
+    // Making sure the timestamps we are going to request always fall in the
+    // middle of a frame. For that we snap start to the beginning of the frame
+    // it's contained and then we add half the time step.
+    start = std::max(start, _impl->report->getStartTime());
+    size_t frameIndex = (start - reportStartTime) / reportTimeStep;
+    start = (frameIndex + 0.5) * reportTimeStep + reportStartTime;
+
+    end = std::min(end, _impl->report->getEndTime());
+
+    auto task = [this, start, end, step] {
+
+        brion::Frames frames;
+        frames.timeStamps.reset(new brion::doubles);
+        frames.data.reset(new floats);
+
+        double t = start;
+        uint32_t i = 0;
+        while (t < end)
+        {
+            auto frame = load(t).get();
+            frames.timeStamps->push_back(frame.timestamp);
+            std::copy(frame.data->begin(), frame.data->end(),
+                      std::back_inserter(*frames.data));
+            ++i;
+            t = start + i * step;
+        }
+
+        return frames;
+    };
+
+    return _impl->readerImpl->threadPool.post(task);
+}
+
 std::future<brion::Frames> CompartmentReportView::loadAll()
 {
     return load(_impl->report->getStartTime(), _impl->report->getEndTime());

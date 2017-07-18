@@ -140,6 +140,9 @@ public:
     /** @return the number of values of a loaded report frame. @version 1.0 */
     BRION_API size_t getFrameSize() const;
 
+    /** @return the total frame count in the report. @version 2.1 */
+    BRION_API size_t getFrameCount() const;
+
     /** Load report values at the given time stamp.
      *
      * @param timestamp the time stamp of interest

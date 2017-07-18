@@ -37,6 +37,7 @@ public:
 
     floatsPtr loadFrame(double timestamp) const final;
     Frames loadFrames(double start, double end) const final;
+    size_t getFrameCount() const final;
 
 protected:
     void _cacheNeuronCompartmentCounts(const GIDSet& gids);

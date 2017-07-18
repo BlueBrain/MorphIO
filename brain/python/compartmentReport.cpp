@@ -90,6 +90,10 @@ bp::object CompartmentReport_getMetaData(const CompartmentReport& reader)
     dict["time_step"] = md.timeStep;
     dict["time_unit"] = md.timeUnit;
     dict["data_unit"] = md.dataUnit;
+    dict["cell_count"] = md.cellCount;
+    dict["compartment_count"] = md.compartmentCount;
+    dict["frame_count"] = md.frameCount;
+    dict["gids"] = toNumpy(toVector(md.gids));
 
     return dict;
 }
@@ -115,6 +119,13 @@ bp::object CompartmentReportView_load(CompartmentReportView& view,
                                       const double start, const double end)
 {
     return framesToTuple(view.load(start, end).get());
+}
+
+bp::object CompartmentReportView_load2(CompartmentReportView& view,
+                                       const double start, const double end,
+                                       const double stride)
+{
+    return framesToTuple(view.load(start, end, stride).get());
 }
 
 bp::object CompartmentReportView_loadAll(CompartmentReportView& view)
@@ -195,6 +206,9 @@ bp::class_<CompartmentReportView, CompartmentReportViewPtr, boost::noncopyable>(
     .def("load", CompartmentReportView_load,
          (selfarg, bp::arg("start"), bp::arg("end")),
          DOXY_FN(brain::CompartmentReportView::load(double,double)))
+    .def("load", CompartmentReportView_load2,
+         (selfarg, bp::arg("start"), bp::arg("end"), bp::arg("stride")),
+         DOXY_FN(brain::CompartmentReportView::load(double,double,double)))
     .def("load_all", CompartmentReportView_loadAll, (selfarg),
          DOXY_FN(brain::CompartmentReportView::loadAll));
 }

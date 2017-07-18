@@ -42,6 +42,10 @@ struct CompartmentReportReader
         metaData.timeStep = report.getTimestep();
         metaData.timeUnit = report.getTimeUnit();
         metaData.dataUnit = report.getDataUnit();
+        metaData.gids = report.getGIDs();
+        metaData.cellCount = metaData.gids.size();
+        metaData.compartmentCount = report.getFrameSize();
+        metaData.frameCount = report.getFrameCount();
     }
 
     const brion::URI uri;

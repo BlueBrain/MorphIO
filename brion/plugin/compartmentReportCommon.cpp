@@ -61,6 +61,13 @@ size_t CompartmentReportCommon::_getFrameNumber(double timestamp) const
     return size_t(timestamp / step);
 }
 
+size_t CompartmentReportCommon::getFrameCount() const
+{
+    if (getStartTime() < getEndTime())
+        return _getFrameNumber(getEndTime()) + 1;
+    return 0;
+}
+
 GIDSet CompartmentReportCommon::_computeIntersection(const GIDSet& all,
                                                      const GIDSet& subset)
 {

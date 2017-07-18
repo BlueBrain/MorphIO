@@ -25,6 +25,24 @@ import unittest
 from brain import *
 
 report_path = brain.test.root_data_path + "/local/simulations/may17_2011/Control/voltage.h5"
+all_compartments_report_path = brain.test.root_data_path + "/local/simulations/may17_2011/Control/allCompartments.h5"
+
+
+class TestMetaData(unittest.TestCase):
+    def setUp(self):
+        self.report = CompartmentReport(all_compartments_report_path)
+
+    def test_metadata(self):
+        metadata = self.report.metadata
+        assert(metadata['data_unit'] == 'mV')
+        assert(metadata['time_unit'] == 'ms')
+        assert(metadata['start_time'] == 0.0)
+        assert(metadata['end_time'] == 10.0)
+        assert(numpy.isclose(metadata['time_step'], 0.1))
+        assert(metadata['compartment_count'] == 20360)
+        assert(metadata['frame_count'] == 100)
+        assert(metadata['cell_count'] == 35)
+
 
 class TestReader(unittest.TestCase):
     def setUp(self):
@@ -37,6 +55,10 @@ class TestReader(unittest.TestCase):
         assert(metadata['start_time'] == 0.0)
         assert(metadata['end_time'] == 10.0)
         assert(numpy.isclose(metadata['time_step'], 0.1))
+        assert(metadata['compartment_count'] == 600)
+        assert(metadata['frame_count'] == 100)
+        assert(metadata['cell_count'] == 600)
+        assert((metadata['gids'] == numpy.arange(1, 601, 1)).all())
 
 
     def test_create_view(self):
@@ -60,6 +82,7 @@ class TestReader(unittest.TestCase):
         assert(numpy.isclose(frames, [[-65., -65., -65.],
             [-65.14350891, -65.29447937, -65.44480133]]).all())
 
+        #### load(start,end)
         timestamps, frames = view.load(0.05,0.25)
         # This window overlaps frames [0, 0.1), [0.1, 0.2), [0.2, 03)
         assert(len(timestamps) == 3)
@@ -69,6 +92,15 @@ class TestReader(unittest.TestCase):
         # falling on a different frame, so we get two frames.
         assert(len(timestamps) == 2)
         assert(frames.shape == (2, 3))
+
+
+        ### load(start,end,step)
+        timestamps, frames = view.load(0.0,1.0,0.2)
+        assert(len(timestamps) == 5)
+        assert(numpy.isclose(timestamps,[ 0.0, 0.2, 0.4, 0.6, 0.8]).all())
+        assert(frames.shape == (5,3))
+
+        #### load_all()
         timestamps, frames = view.load_all()
         assert(len(timestamps) == 100)
         timestamp, frame = view.load(0.1)
@@ -84,6 +116,7 @@ class TestReader(unittest.TestCase):
         assert(frame.shape == (3,))
         assert((frame ==
             [-65.14350891113281, -65.29447937011719, -65.4448013305664]).all())
+
         # single neuron
         view = self.report.create_view({1})
 

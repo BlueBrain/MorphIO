@@ -237,6 +237,34 @@ void testReadRange(const char* relativePath)
     BOOST_CHECK_EQUAL((*frames.timeStamps)[2], start + 2 * step);
 }
 
+void testReadStep(const char* relativePath)
+{
+    boost::filesystem::path path(BBP_TESTDATA);
+    path /= relativePath;
+
+    brion::GIDSet gids;
+    gids.insert(394);
+    gids.insert(400);
+
+    brain::CompartmentReport report(brion::URI(path.string()));
+    auto view = report.createView(gids);
+
+    const double start = report.getMetaData().startTime;
+    const double step = report.getMetaData().timeStep;
+
+    auto frames = view.load(start, start + step * 4, step * 2).get();
+    BOOST_REQUIRE_EQUAL(frames.timeStamps->size(), 2);
+
+    BOOST_CHECK_THROW(view.load(start, start - step * 4, step),
+                      std::logic_error);
+    BOOST_CHECK_THROW(view.load(start, start + step * 4, -1.),
+                      std::logic_error);
+    BOOST_CHECK_THROW(view.load(start, start + step * 4, step * .5),
+                      std::logic_error);
+    BOOST_CHECK_THROW(view.load(start, start + step * 4, step * 1.5),
+                      std::logic_error);
+}
+
 BOOST_AUTO_TEST_CASE(read_binary)
 {
     testRead("local/simulations/may17_2011/Control/allCompartments.bbp");

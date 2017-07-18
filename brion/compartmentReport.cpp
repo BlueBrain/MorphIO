@@ -119,6 +119,11 @@ size_t CompartmentReport::getFrameSize() const
     return _impl->plugin->getFrameSize();
 }
 
+size_t CompartmentReport::getFrameCount() const
+{
+    return _impl->plugin->getFrameCount();
+}
+
 size_t CompartmentReport::getBufferSize() const
 {
     return _impl->plugin->getBufferSize();
