@@ -31,6 +31,7 @@ find_package(CLANG_TIDY)
 # Eventually required for rebuilding bindings
 find_package(Cython 0.25.0)
 find_package(NumPy)
+find_package(CEREAL QUIET REQUIRED)
 
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}" )
@@ -52,7 +53,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/hadoken/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/deps/mvd-tool/include)
 
 
-include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIR} ${HDF5_INCLUDE_DIRS} ${CEREAL_INCLUDE_DIR})
 add_definitions( -DH5_USE_BOOST -DMORPHO_VERSION_MAJOR=\"${MORPHOTOOL_VERSION_MAJOR}\" -DMORPHO_VERSION_MINOR=\"${MORPHOTOOL_VERSION_MINOR}\" )
 
 

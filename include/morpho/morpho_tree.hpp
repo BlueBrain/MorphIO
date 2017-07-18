@@ -102,7 +102,7 @@ class neuron_node_3d : public morpho_node {
     virtual ~neuron_node_3d();
 
     inline neuron_struct_type get_section_type() const { return _my_type; }
-
+    inline neuron_struct_type& get_section_type() { return _my_type; }
   private:
     neuron_struct_type _my_type;
 };
@@ -115,8 +115,10 @@ class neuron_section : public neuron_node_3d {
     struct neuron_section_internal;
 
   public:
+    /// \brief default constructor for serialization purpose
+    neuron_section();
     neuron_section(neuron_struct_type neuron_type, std::vector<point>&& points,
-                  std::vector<double>&& radius);
+                   std::vector<double>&& radius);
     neuron_section(const neuron_section& other);
     virtual ~neuron_section();
 
@@ -128,7 +130,6 @@ class neuron_section : public neuron_node_3d {
 
     ///
     /// \brief get_points
-    /// \param id
     /// \return vector of all the points of the section
     ///
     ///  each point has also its associated radius in order
@@ -137,14 +138,31 @@ class neuron_section : public neuron_node_3d {
     const std::vector<point>& get_points() const;
 
     ///
+    /// \brief get_points
+    /// \return vector of all the points of the section
+    ///
+    ///  each point has also its associated radius in order
+    ///  accessible with get_radius
+    ///
+    std::vector<point>& get_points();
+
+    ///
     /// \brief get_radius
-    /// \param id
     /// \return vector of all the radius of the section
     ///
     ///  each radius has also its associated point in order
     ///  accessible with get_points
     ///
     const std::vector<double>& get_radius() const;
+
+    ///
+    /// \brief get_radius
+    /// \return vector of all the radius of the section
+    ///
+    ///  each radius has also its associated point in order
+    ///  accessible with get_points
+    ///
+    std::vector<double>& get_radius();
 
     ///
     /// \brief provide a cone associated to a given segment
@@ -214,10 +232,25 @@ class neuron_soma : public neuron_node_3d {
     struct neuron_soma_intern;
 
   public:
+    /// \brief default constructor for serialization purpose
+    neuron_soma();
     /// construct a soma out of a line loop
     neuron_soma(std::vector<point>&& line_loop);
     /// construct a soma out of a point and radius
     neuron_soma(const point& p, double radius);
+
+    ///
+    /// \brief Consider this soma to be the specified line loop
+    /// \param line_loop list of points describing the loop
+    ///
+    void set_line_loop(std::vector<point>&& line_loop);
+
+    ///
+    /// \brief Consider this soma to be a surface
+    /// \param center Center of the circle
+    /// \param radius Radius of the circle
+    ///
+    void set_sphere(const point& center, double radius);
 
     virtual ~neuron_soma();
 
@@ -249,6 +282,8 @@ class neuron_soma : public neuron_node_3d {
   private:
     std::unique_ptr<neuron_soma_intern> _dptr;
 };
+
+typedef std::vector<std::shared_ptr<const morpho_node>> const_morpho_nodes_t;
 
 ///
 /// \brief container for an entire morphology tree
@@ -303,13 +338,16 @@ class morpho_tree {
     void set_cell_type( cell_family cell_t );
     cell_family get_cell_type() const;
 
-
+    /// \brief read-only accessor to the tree nodes
+    const const_morpho_nodes_t get_nodes() const;
+    /// \brief accessor to the tree nodes
+    const std::vector<int>& get_parents() const;
 
   private:
     std::unique_ptr<morpho_tree_intern> _dptr;
 };
 
-} // morpho
+} // namespace morpho
 
 #endif // MORPHO_TREE_HPP
 
