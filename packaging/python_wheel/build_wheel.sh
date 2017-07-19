@@ -2,8 +2,8 @@
 BASE=$(git rev-parse --show-toplevel)
 
 export PIPPROXY="-i https://bbpteam.epfl.ch/repository/devpi/simple"
-export http_proxy=$HTTP_PROXY
-export https_proxy=$HTTPS_PROXY
+export http_proxy=${HTTP_PROXY-$http_proxy}
+export https_proxy=${HTTPS_PROXY-$https_proxy}
 
 docker run --rm \
     -e http_proxy=$http_proxy \

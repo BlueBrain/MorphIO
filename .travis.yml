@@ -16,10 +16,10 @@ before_install:
   - brew update
   - brew outdated cmake || brew upgrade cmake
   - brew install cppcheck doxygen ninja
-  - brew install homebrew/science/hdf5
+  - brew install homebrew/science/hdf5@1.8
   - brew install boost-python
 script:
   - mkdir $BUILD_TYPE
   - cd $BUILD_TYPE
-  - cmake -GNinja -DCLONE_SUBPROJECTS=ON -DCMAKE_INSTALL_PREFIX=$PWD/install -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+  - HDF5_ROOT=/usr/local/opt/hdf5@1.8 cmake -GNinja -DCLONE_SUBPROJECTS=ON -DCMAKE_INSTALL_PREFIX=$PWD/install -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
   - ninja all && ninja $PROJECT_NAME-tests && ninja smoketests
