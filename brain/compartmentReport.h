@@ -58,9 +58,6 @@ struct CompartmentReportMetaData
     /** The cell count of the report */
     size_t cellCount;
 
-    /** The gids in the report */
-    brion::GIDSet gids;
-
     /** The total frame count in the report */
     size_t frameCount;
 
@@ -103,10 +100,12 @@ public:
      * - *compartment_count* (Numeric) : The total compartment count in the
      * report
      * - *frame_count* (Numeric) : The total frame count in the report
-     * - *gids* (Vector) : The gids in the report
     */
     dict getMetaData() const;
 #endif
+
+    /** @return the GIDs of the report */
+    BRAIN_API const brion::GIDSet& getGIDs() const;
 
     /**
      * Create a view of a subset of neurons. An empty gid

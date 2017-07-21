@@ -58,8 +58,9 @@ class TestReader(unittest.TestCase):
         assert(metadata['compartment_count'] == 600)
         assert(metadata['frame_count'] == 100)
         assert(metadata['cell_count'] == 600)
-        assert((metadata['gids'] == numpy.arange(1, 601, 1)).all())
 
+    def test_gids(self):
+        assert((self.report.gids == numpy.arange(1, 601, 1)).all())
 
     def test_create_view(self):
         view = self.report.create_view({1, 2, 3})

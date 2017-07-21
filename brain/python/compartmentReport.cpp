@@ -93,9 +93,13 @@ bp::object CompartmentReport_getMetaData(const CompartmentReport& reader)
     dict["cell_count"] = md.cellCount;
     dict["compartment_count"] = md.compartmentCount;
     dict["frame_count"] = md.frameCount;
-    dict["gids"] = toNumpy(toVector(md.gids));
 
     return dict;
+}
+
+bp::object CompartmentReport_getGids(const CompartmentReport& report)
+{
+    return toNumpy(toVector(report.getGIDs()));
 }
 
 bp::object CompartmentReportView_getGids(const CompartmentReportView& view)
@@ -177,6 +181,8 @@ bp::class_<CompartmentReport, boost::noncopyable>(
          DOXY_FN(brain::CompartmentReport::CompartmentReport))
     .add_property("metadata", CompartmentReport_getMetaData,
                   DOXY_FN(brain::CompartmentReport::getMetaData))
+    .add_property("gids", CompartmentReport_getGids,
+                  DOXY_FN(brain::CompartmentReport::getGIDs))
     .def("create_view", CompartmentReport_createView,
          (selfarg, bp::arg("gids")),
          DOXY_FN(brain::CompartmentReport::createView(const GIDSet&)))

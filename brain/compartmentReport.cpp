@@ -37,6 +37,11 @@ const CompartmentReportMetaData& CompartmentReport::getMetaData() const
     return _impl->metaData;
 }
 
+const brion::GIDSet& CompartmentReport::getGIDs() const
+{
+    return _impl->gids;
+}
+
 CompartmentReportView CompartmentReport::createView(const brion::GIDSet& cells)
 {
     return CompartmentReportView(_impl, cells);

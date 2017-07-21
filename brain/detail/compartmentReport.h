@@ -37,18 +37,20 @@ struct CompartmentReportReader
     {
         const brion::CompartmentReport report{uri, brion::MODE_READ};
 
+        gids = report.getGIDs();
+
         metaData.startTime = report.getStartTime();
         metaData.endTime = report.getEndTime();
         metaData.timeStep = report.getTimestep();
         metaData.timeUnit = report.getTimeUnit();
         metaData.dataUnit = report.getDataUnit();
-        metaData.gids = report.getGIDs();
-        metaData.cellCount = metaData.gids.size();
+        metaData.cellCount = gids.size();
         metaData.compartmentCount = report.getFrameSize();
         metaData.frameCount = report.getFrameCount();
     }
 
     const brion::URI uri;
+    brion::GIDSet gids;
     CompartmentReportMetaData metaData;
     lunchbox::ThreadPool threadPool;
 };
