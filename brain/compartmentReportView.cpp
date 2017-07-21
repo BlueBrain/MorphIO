@@ -22,6 +22,17 @@
 
 namespace brain
 {
+namespace
+{
+bool _isMultiple(const double a, const double b)
+{
+    const auto remainder = std::fmod(a, b);
+    // Using double epsilon is too strict for large values of a/b
+    const auto epsilon = b * std::numeric_limits<float>::epsilon();
+    return remainder <= epsilon || (b - remainder) <= epsilon;
+}
+}
+
 CompartmentReportView::CompartmentReportView(
     const std::shared_ptr<detail::CompartmentReportReader>& readerImpl,
     const brion::GIDSet& gids)
@@ -110,9 +121,7 @@ std::future<brion::Frames> CompartmentReportView::load(double start, double end,
 
     if (step < reportTimeStep || step <= 0.)
         throw std::logic_error("Invalid step");
-
-    // check step is multiple of timestep
-    if (fmod(step, reportTimeStep) > std::numeric_limits<double>::epsilon())
+    if (!_isMultiple(step, reportTimeStep))
         throw std::logic_error(
             "Step should be a multiple of the report time step");
 

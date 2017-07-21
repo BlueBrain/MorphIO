@@ -76,32 +76,36 @@ class TestReader(unittest.TestCase):
 
     def test_frames(self):
 
-        view = self.report.create_view({1,2,3})
-        timestamps, frames = view.load(0.0,0.2)
+        view = self.report.create_view({1, 2, 3})
+        timestamps, frames = view.load(0.0, 0.2)
 
         assert(numpy.isclose(timestamps,[ 0.0, 0.1]).all())
         assert(numpy.isclose(frames, [[-65., -65., -65.],
             [-65.14350891, -65.29447937, -65.44480133]]).all())
 
-        #### load(start,end)
-        timestamps, frames = view.load(0.05,0.25)
+        # load(start, end)
+        timestamps, frames = view.load(0.05, 0.25)
         # This window overlaps frames [0, 0.1), [0.1, 0.2), [0.2, 03)
         assert(len(timestamps) == 3)
-        assert(frames.shape == (3,3))
-        timestamps, frames = view.load(0.09,0.12)
+        assert(frames.shape == (3, 3))
+        timestamps, frames = view.load(0.09, 0.12)
         # Despite the time window is smaller than the timestep, each edge is
         # falling on a different frame, so we get two frames.
         assert(len(timestamps) == 2)
         assert(frames.shape == (2, 3))
 
-
-        ### load(start,end,step)
-        timestamps, frames = view.load(0.0,1.0,0.2)
+        # load(start, end, step)
+        timestamps, frames = view.load(0.0, 1.0, 0.2)
         assert(len(timestamps) == 5)
         assert(numpy.isclose(timestamps,[ 0.0, 0.2, 0.4, 0.6, 0.8]).all())
-        assert(frames.shape == (5,3))
+        assert(frames.shape == (5, 3))
 
-        #### load_all()
+        timestamps, frames = view.load(0.0, 1.0, 0.3)
+        assert(len(timestamps) == 4)
+        assert(numpy.isclose(timestamps,[ 0.0, 0.3, 0.6, 0.9]).all())
+        assert(frames.shape == (4, 3))
+
+        # load_all()
         timestamps, frames = view.load_all()
         assert(len(timestamps) == 100)
         timestamp, frame = view.load(0.1)
@@ -112,7 +116,7 @@ class TestReader(unittest.TestCase):
 
 
         # temp view
-        timestamp, frame = self.report.create_view({1,2,3}).load(0.1)
+        timestamp, frame = self.report.create_view({1, 2, 3}).load(0.1)
         assert(numpy.isclose(timestamp, 0.1))
         assert(frame.shape == (3,))
         assert((frame ==
@@ -126,15 +130,15 @@ class TestReader(unittest.TestCase):
         assert(numpy.isclose(frames,[-65.]).all())
 
         timestamps, frames = view.load(0.0, 0.2)
-        assert(numpy.isclose(timestamps,[ 0.0, 0.1]).all())
+        assert(numpy.isclose(timestamps, [0.0, 0.1]).all())
         assert(numpy.isclose(frames,[[-65.], [-65.14350891]]).all())
 
         timestamps, frames = view.load_all()
         assert(len(timestamps) == 100)
-        assert(frames.shape == (100,1))
+        assert(frames.shape == (100, 1))
 
         # temp view
-        timestamps, frames = self.report.create_view({1,2,3}).load(0.0,0.2)
+        timestamps, frames = self.report.create_view({1, 2, 3}).load(0.0, 0.2)
         assert(numpy.isclose(timestamps,[ 0.0, 0.1]).all())
         assert(numpy.isclose(frames, [[-65., -65., -65.],
             [-65.14350891, -65.29447937, -65.44480133]]).all())
@@ -142,8 +146,47 @@ class TestReader(unittest.TestCase):
         #load all
         timestamps, frames = self.report.create_view().load_all()
         assert(len(timestamps) == 100)
-        assert(frames.shape == (100,600))
+        assert(frames.shape == (100, 600))
 
+class TestReaderExceptions(unittest.TestCase):
+    def setUp(self):
+        self.report = CompartmentReport(report_path)
+        self.view = self.report.create_view({1, 2, 3})
+        metadata = self.report.metadata
+        self.start = metadata['start_time']
+        self.end = metadata['end_time']
+        self.step = metadata['time_step']
+
+    def test_load_timestamp(self):
+
+        self.assertRaises(RuntimeError, CompartmentReportView.load, self.view,
+                          self.start - 1)
+        self.assertRaises(RuntimeError, CompartmentReportView.load, self.view,
+                          self.end + 1)
+
+    def test_load_range(self):
+
+        self.assertRaises(RuntimeError, CompartmentReportView.load, self.view,
+                          self.end, self.start)
+        result = self.view.load(self.start - 20, self.start)
+        assert(result is None)
+        result = self.view.load(self.end, self.end + 10)
+        assert(result is None)
+        result = self.view.load(self.start - 10, self.end + 10)
+        assert(len(result[0]) == 100)
+
+    def test_load_range_step(self):
+
+        self.view.load(0, 100, self.step * 1000000000)
+
+        self.assertRaises(RuntimeError, CompartmentReportView.load, self.view,
+                          self.start, self.end, self.step * 0.9999)
+        self.assertRaises(RuntimeError, CompartmentReportView.load, self.view,
+                          self.start, self.end, self.step * 1.001)
+        self.assertRaises(RuntimeError, CompartmentReportView.load, self.view,
+                          self.start, self.end, -self.step)
+        self.assertRaises(RuntimeError, CompartmentReportView.load, self.view,
+                          self.start, self.end, 0)
 
 class TestMemoryManagement(unittest.TestCase):
 
