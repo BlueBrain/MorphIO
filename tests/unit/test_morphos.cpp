@@ -247,7 +247,5 @@ BOOST_AUTO_TEST_CASE(test_cell_type) {
         new morpho_tree(reader::create_morpho_tree(ASTROCITE_MORPHO_TEST_FILE)));
 
     //Need to check
-    //BOOST_CHECK(tree->get_cell_type() == morpho::cell_family::GLIA);
-    BOOST_CHECK(true);
-
+    BOOST_CHECK(tree->get_cell_type() == morpho::cell_family::GLIA);
 }

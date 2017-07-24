@@ -194,7 +194,7 @@ mat_index morpho_reader::get_struct_raw() const {
 
 cell_family morpho_reader::get_cell_family() const  {
 
-    if( !metadata.isValid() || ! metadata.exist("cell_family") ) {
+    if( !metadata.isValid() || ! metadata.hasAttribute("cell_family") ) {
         return cell_family::NEURON;
     }
 
