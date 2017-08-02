@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2014-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -101,10 +101,8 @@ BOOST_AUTO_TEST_CASE(test_parallel_acess_of_morphology)
     const brion::Morphology morphology(path.string());
 #pragma omp parallel
     {
-        const brion::Vector4fsPtr points =
-            morphology.readPoints(brion::MORPHOLOGY_RAW);
-        const brion::Vector2isPtr sections =
-            morphology.readSections(brion::MORPHOLOGY_RAW);
+        const brion::Vector4fsPtr points = morphology.readPoints();
+        const brion::Vector2isPtr sections = morphology.readSections();
         const brion::SectionTypesPtr types = morphology.readSectionTypes();
         BOOST_CHECK(!points->empty());
         BOOST_CHECK(!sections->empty());

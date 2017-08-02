@@ -52,23 +52,19 @@ public:
 
     /** Read points of morphology, representing x,y,z coordinates + diameter.
      *
-     * @param stage the repair stage to take the points from
      * @return x,y,z coords + diameter of all points of the morphology
      * @version 1.0
      */
-    BRION_API Vector4fsPtr
-        readPoints(MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED) const;
+    BRION_API Vector4fsPtr readPoints() const;
 
     /** Read sections of morphology, representing section start index and index
      *  of the parent section.
      *
-     * @param stage the repair stage to take the section information from
      * @return First point and parent indices of all the sections of the
      *         morphology.
      * @version 1.0
      */
-    BRION_API Vector2isPtr
-        readSections(MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED) const;
+    BRION_API Vector2isPtr readSections() const;
 
     /** Read section types of morphology.
      *
@@ -124,28 +120,22 @@ public:
     /** Write points of morphology, representing x,y,z coordinates + diameter.
      *
      * @param points x,y,z coords + diameter of all points of the morphology
-     * @param stage the repair stage to save those points to
      * @throw std::runtime_error if object not writable
      * @throw std::runtime_error points already written
      * @throw std::runtime_error number of points does not match number of
      *                           perimeters
      * @version 1.0
      */
-    BRION_API void writePoints(
-        const Vector4fs& points,
-        MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED);
+    BRION_API void writePoints(const Vector4fs& points);
 
     /** Write sections of morphology, representing section start index and index
      *  of parent the section.
      *
      * @param sections index and parent index of all sections of the morphology
-     * @param stage the repair stage to save those sections to
      * @throw std::runtime_error if object not writable
      * @version 1.0
      */
-    BRION_API void writeSections(
-        const Vector2is& sections,
-        MorphologyRepairStage stage = MORPHOLOGY_UNDEFINED);
+    BRION_API void writeSections(const Vector2is& sections);
 
     /** Write section types of morphology.
      *

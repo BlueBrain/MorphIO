@@ -67,14 +67,14 @@ CellFamily Morphology::getCellFamily() const
     return _impl->plugin->getCellFamily();
 }
 
-Vector4fsPtr Morphology::readPoints(const MorphologyRepairStage stage) const
+Vector4fsPtr Morphology::readPoints() const
 {
-    return _impl->plugin->readPoints(stage);
+    return _impl->plugin->readPoints();
 }
 
-Vector2isPtr Morphology::readSections(const MorphologyRepairStage stage) const
+Vector2isPtr Morphology::readSections() const
 {
-    return _impl->plugin->readSections(stage);
+    return _impl->plugin->readSections();
 }
 
 SectionTypesPtr Morphology::readSectionTypes() const
@@ -97,16 +97,14 @@ MorphologyVersion Morphology::getVersion() const
     return _impl->plugin->getVersion();
 }
 
-void Morphology::writePoints(const Vector4fs& points,
-                             const MorphologyRepairStage stage)
+void Morphology::writePoints(const Vector4fs& points)
 {
-    _impl->plugin->writePoints(points, stage);
+    _impl->plugin->writePoints(points);
 }
 
-void Morphology::writeSections(const Vector2is& sections,
-                               const MorphologyRepairStage stage)
+void Morphology::writeSections(const Vector2is& sections)
 {
-    _impl->plugin->writeSections(sections, stage);
+    _impl->plugin->writeSections(sections);
 }
 
 void Morphology::writeSectionTypes(const SectionTypes& types)

@@ -66,15 +66,6 @@ enum MeshVersion
     MESH_VERSION_2 = 2
 };
 
-/** The supported repair stages for morphologies. */
-enum MorphologyRepairStage
-{
-    MORPHOLOGY_RAW,
-    MORPHOLOGY_UNRAVELED,
-    MORPHOLOGY_REPAIRED,
-    MORPHOLOGY_UNDEFINED
-};
-
 /** The supported versions for morphology files. */
 enum MorphologyVersion
 {

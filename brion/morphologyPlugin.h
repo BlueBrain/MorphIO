@@ -97,20 +97,17 @@ public:
     }
 
     virtual ~MorphologyPlugin() {}
-
     /** @name Read API */
     //@{
     /** @copydoc brion::Morphology::getCellFamily */
     CellFamily getCellFamily() const { return _data.family; }
-
     /** @copydoc brion::Morphology::getVersion */
     MorphologyVersion getVersion() const { return _data.version; }
-
     /** @copydoc brion::Morphology::readPoints */
-    virtual Vector4fsPtr readPoints(MorphologyRepairStage stage) const = 0;
+    virtual Vector4fsPtr readPoints() const = 0;
 
     /** @copydoc brion::Morphology::readSections */
-    virtual Vector2isPtr readSections(MorphologyRepairStage stage) const = 0;
+    virtual Vector2isPtr readSections() const = 0;
 
     /** @copydoc brion::Morphology::readSectionTypes */
     virtual SectionTypesPtr readSectionTypes() const = 0;
@@ -126,12 +123,10 @@ public:
     /** @name Write API */
     //@{
     /** @copydoc brion::Morphology::writePoints */
-    virtual void writePoints(const Vector4fs& points,
-                             MorphologyRepairStage stage) = 0;
+    virtual void writePoints(const Vector4fs& points) = 0;
 
     /** @copydoc brion::Morphology::writeSections */
-    virtual void writeSections(const Vector2is& sections,
-                               MorphologyRepairStage stage) = 0;
+    virtual void writeSections(const Vector2is& sections) = 0;
 
     /** @copydoc brion::Morphology::writeSectionTypes */
     virtual void writeSectionTypes(const SectionTypes& types) = 0;

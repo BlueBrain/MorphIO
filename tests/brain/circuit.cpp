@@ -195,8 +195,7 @@ void _checkMorphology(const brain::neuron::Morphology& morphology,
 {
     const brion::Morphology reference(
         BBP_TESTDATA + ("/local/morphologies/01.07.08/h5/" + other));
-    BOOST_CHECK(morphology.getPoints() ==
-                *reference.readPoints(brion::MORPHOLOGY_UNDEFINED));
+    BOOST_CHECK(morphology.getPoints() == *reference.readPoints());
 }
 void _checkMorphology(const brain::neuron::Morphology& morphology,
                       const std::string& other,

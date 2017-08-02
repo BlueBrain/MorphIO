@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
@@ -96,10 +96,8 @@ const brion::URI TEST_MORPHOLOGY_URI =
 void checkEqualMorphologies(const brain::neuron::Morphology& first,
                             const brion::Morphology& second)
 {
-    BOOST_CHECK(*second.readPoints(brion::MORPHOLOGY_UNDEFINED) ==
-                first.getPoints());
-    BOOST_CHECK(*second.readSections(brion::MORPHOLOGY_UNDEFINED) ==
-                first.getSections());
+    BOOST_CHECK(*second.readPoints() == first.getPoints());
+    BOOST_CHECK(*second.readSections() == first.getSections());
     BOOST_CHECK(
         *second.readSectionTypes() ==
         reinterpret_cast<const brion::SectionTypes&>(first.getSectionTypes()));

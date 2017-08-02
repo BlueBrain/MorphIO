@@ -62,8 +62,8 @@ Morphology::Impl::Impl(const void* data, const size_t size)
 }
 
 Morphology::Impl::Impl(const brion::Morphology& morphology)
-    : points(morphology.readPoints(brion::enums::MORPHOLOGY_UNDEFINED))
-    , sections(morphology.readSections(brion::enums::MORPHOLOGY_UNDEFINED))
+    : points(morphology.readPoints())
+    , sections(morphology.readSections())
     , types(morphology.readSectionTypes())
     , apicals(morphology.readApicals())
 {

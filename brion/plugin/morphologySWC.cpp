@@ -187,12 +187,12 @@ std::string MorphologySWC::getDescription()
            "  [file://]/path/to/morphology.swc";
 }
 
-Vector4fsPtr MorphologySWC::readPoints(MorphologyRepairStage) const
+Vector4fsPtr MorphologySWC::readPoints() const
 {
     return _points;
 }
 
-Vector2isPtr MorphologySWC::readSections(MorphologyRepairStage) const
+Vector2isPtr MorphologySWC::readSections() const
 {
     return _sections;
 }
@@ -213,12 +213,12 @@ floatsPtr MorphologySWC::readPerimeters() const
     return floatsPtr(new floats());
 }
 
-void MorphologySWC::writePoints(const Vector4fs&, const MorphologyRepairStage)
+void MorphologySWC::writePoints(const Vector4fs&)
 {
     LBUNIMPLEMENTED
 }
 
-void MorphologySWC::writeSections(const Vector2is&, const MorphologyRepairStage)
+void MorphologySWC::writeSections(const Vector2is&)
 {
     LBUNIMPLEMENTED
 }

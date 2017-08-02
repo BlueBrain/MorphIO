@@ -36,9 +36,9 @@ public:
     static bool handles(const MorphologyInitData& initData);
     static std::string getDescription();
 
-    Vector4fsPtr readPoints(MorphologyRepairStage stage) const final;
+    Vector4fsPtr readPoints() const final;
 
-    Vector2isPtr readSections(MorphologyRepairStage stage) const final;
+    Vector2isPtr readSections() const final;
 
     SectionTypesPtr readSectionTypes() const final;
 
@@ -46,11 +46,9 @@ public:
 
     floatsPtr readPerimeters() const final;
 
-    void writePoints(const Vector4fs& points,
-                     MorphologyRepairStage stage) final;
+    void writePoints(const Vector4fs& points) final;
 
-    void writeSections(const Vector2is& sections,
-                       MorphologyRepairStage stage) final;
+    void writeSections(const Vector2is& sections) final;
 
     void writeSectionTypes(const SectionTypes& types) final;
 
