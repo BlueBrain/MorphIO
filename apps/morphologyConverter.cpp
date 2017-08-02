@@ -81,31 +81,38 @@ int main(int argc, char* argv[])
     float writeTime = 0.f;
 
     brion::Morphology out(output, outVersion, true);
-
     writeTime += clock.resetTimef();
-    brion::Vector4fsPtr points = in.readPoints();
 
-    brion::Vector2isPtr sections = in.readSections();
+    auto points = in.readPoints();
+    auto sections = in.readSections();
+    auto types = in.readSectionTypes();
+    auto apicals = in.readApicals();
+    auto perimeters = in.readPerimeters();
     readTime += clock.resetTimef();
 
     out.writePoints(*points);
     out.writeSections(*sections);
-    writeTime += clock.resetTimef();
-
-    LBDEBUG << points->size() << " points, " << sections->size() << " sections"
-            << std::endl;
-
-    brion::SectionTypesPtr types = in.readSectionTypes();
-    brion::Vector2isPtr apicals = in.readApicals();
-    readTime += clock.resetTimef();
-
     out.writeSectionTypes(*types);
-    if (out.getVersion() != brion::MORPHOLOGY_VERSION_H5_1)
+    try
+    {
         out.writeApicals(*apicals);
-
+    }
+    catch (const std::runtime_error&)
+    {
+    }
+    try
+    {
+        out.writePerimeters(*perimeters);
+    }
+    catch (const std::runtime_error&)
+    {
+    }
     writeTime += clock.resetTimef();
-    LBDEBUG << types->size() << " section types, " << apicals->size()
-            << " apicals in " << input << std::endl;
+
+    LBDEBUG << points->size() << " points, " << sections->size()
+            << " sections, " << types->size() << " section types, "
+            << apicals->size() << " apicals, " << perimeters->size()
+            << " perimeters in " << input << std::endl;
 
     LBINFO << "Converted " << input << " (" << in.getVersion() << ") => "
            << output << " (" << out.getVersion() << ") in " << readTime << " + "

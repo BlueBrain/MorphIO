@@ -1,9 +1,16 @@
 Changelog {#Changelog}
 =========
 
+# git master
+
+* [171](https://github.com/BlueBrain/Brion/pull/171):
+  Ban obsolete morphology repair stage from API: The stage parameter from
+  certain Morphology methods has been removed. In the case of h5v2 morphologies,
+  the implementation will pick the most complete repair stage.
+
 # Release 2.0.0 (30-May-2017)
 
-* [159](https://github.com/BlueBrain/Brion/pull/157):
+* [159](https://github.com/BlueBrain/Brion/pull/159):
   Changed mapping index according to Pandas requirements for indexing.
 * [157](https://github.com/BlueBrain/Brion/pull/157):
   - Add Synapse.gid() python wrapping
