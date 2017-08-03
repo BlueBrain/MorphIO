@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -24,7 +24,6 @@
 #include "morphology.h"
 
 #include <lunchbox/lfVector.h>
-#include <lunchbox/referenced.h>
 #include <vmmlib/matrix.hpp> // member
 
 namespace brain
@@ -33,8 +32,7 @@ namespace neuron
 {
 typedef std::pair<size_t, size_t> SectionRange;
 
-class Morphology::Impl : public lunchbox::Referenced,
-                         public servus::Serializable
+class Morphology::Impl : public servus::Serializable
 {
 public:
     brion::Vector4fsPtr points;

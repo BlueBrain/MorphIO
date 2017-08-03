@@ -34,7 +34,6 @@
 #include <boost/progress.hpp>
 
 namespace po = boost::program_options;
-using boost::lexical_cast;
 
 #define REQUIRE_EQUAL(a, b)                           \
     if ((a) != (b))                                   \

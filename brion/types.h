@@ -143,8 +143,7 @@ const float MINIMUM_VOLTAGE BRION_UNUSED = -80.;
 typedef std::vector<std::string> Strings;
 
 using servus::URI;
-
-typedef std::vector<URI> URIs;
+using URIs = std::vector<URI>;
 }
 
 // if you have a type T in namespace N, the operator << for T needs to be in

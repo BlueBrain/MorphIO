@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -48,8 +48,8 @@ namespace neuron
 class Morphology : public boost::noncopyable
 {
 public:
-    /** @internal */
-    class Impl;
+    class Impl;                            //!< @internal
+    using ImplPtr = std::shared_ptr<Impl>; //!< @internal
 
     /**
      * Create a morphology from a URI, load all the data and transform
@@ -143,7 +143,7 @@ private:
     Morphology(const void* data, const size_t size);
     servus::Serializable::Data toBinary() const;
 
-    Impl* const _impl;
+    ImplPtr _impl;
 };
 }
 }

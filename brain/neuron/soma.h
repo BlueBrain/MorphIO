@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -54,17 +54,13 @@ namespace neuron
 class Soma
 {
 public:
-    friend class Morphology;
-
-    ~Soma();
-
     BRAIN_API Soma(const Soma& soma);
 
     BRAIN_API Soma& operator=(const Soma& soma);
 
     /** Return the x,y,z and radius of the points of the soma
-      * profile \if pybind as a 4xN numpy array\endif.
-      */
+     * profile \if pybind as a 4xN numpy array\endif.
+     */
     BRAIN_API Vector4fs getProfilePoints() const;
 
     /** Return the mean distance between the profile points and the centroid. */
@@ -76,11 +72,11 @@ public:
     /** Return the first order sections starting from the soma. */
     BRAIN_API Sections getChildren() const;
 
-protected:
-    BRAIN_API explicit Soma(Morphology::Impl* morhology);
-
 private:
-    Morphology::Impl* _morphology;
+    BRAIN_API explicit Soma(Morphology::ImplPtr morphology);
+    friend class Morphology;
+
+    Morphology::ImplPtr _morphology;
 };
 }
 }

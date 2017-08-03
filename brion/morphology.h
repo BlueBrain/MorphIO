@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -20,7 +20,6 @@
 #ifndef BRION_MORPHOLOGY
 #define BRION_MORPHOLOGY
 
-#include <boost/noncopyable.hpp>
 #include <brion/api.h>
 #include <brion/types.h>
 #include <vmmlib/vector.hpp> // return value
@@ -32,7 +31,7 @@ namespace brion
  * Following RAII, this class is ready to use after the creation and will ensure
  * release of resources upon destruction.
  */
-class Morphology : public boost::noncopyable
+class Morphology
 {
 public:
     /** Close morphology file. @version 1.0 */
@@ -185,6 +184,11 @@ public:
     //@}
 
 private:
+    Morphology(const Morphology&) = delete;
+    Morphology(Morphology&&) = delete;
+    Morphology& operator=(const Morphology&) = delete;
+    Morphology& operator=(Morphology&&) = delete;
+
     class Impl;
     Impl* const _impl;
 };

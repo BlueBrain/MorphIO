@@ -166,11 +166,11 @@ void _initAIOControlBlock(aiocb& block, const AIOReadData& readData)
     block.aio_lio_opcode = LIO_READ;
 }
 
-void _readAsync(aiocb** operations, size_t length)
+void _readAsync(aiocb** operations, const size_t length)
 {
     if (lio_listio(LIO_WAIT, operations, length, nullptr) == -1)
-        throw std::runtime_error("Error in AIO operation setup" +
-                                 getErrorString(errno));
+        LBTHROW(std::runtime_error("Error in AIO setup: " +
+                                 getErrorString(errno)));
     for (size_t i = 0; i != length; ++i)
     {
         const size_t bytesRead = aio_return(operations[i]);
@@ -251,9 +251,8 @@ CompartmentReportBinary::CompartmentReportBinary(
 #endif
 
     if (initData.getAccessMode() != MODE_READ)
-        LBTHROW(
-            std::runtime_error("Writing of binary compartments not "
-                               "implemented"));
+        LBTHROW(std::runtime_error(
+            "Writing of binary compartments not implemented"));
 
 #ifdef HAS_AIO
     int flags = O_RDONLY;
@@ -511,9 +510,8 @@ void CompartmentReportBinary::updateMapping(const GIDSet& gids)
     const GIDSet intersection = _computeIntersection(_originalGIDs, _gids);
     if (intersection.empty())
     {
-        LBTHROW(
-            std::runtime_error("CompartmentReportBinary::updateMapping:"
-                               " GIDs out of range"));
+        LBTHROW(std::runtime_error(
+            "CompartmentReportBinary::updateMapping: GIDs out of range"));
     }
     if (intersection != _gids)
     {

@@ -102,8 +102,8 @@ BOOST_AUTO_TEST_CASE(test_create_write_report)
 
         ~Fixture()
         {
-            boost::filesystem::remove(lexical_cast<std::string>(h5));
-            boost::filesystem::remove(lexical_cast<std::string>(bin));
+            boost::filesystem::remove(std::to_string(h5));
+            boost::filesystem::remove(std::to_string(bin));
         }
         boost::filesystem::path temp;
         const brion::URI h5;

@@ -36,8 +36,6 @@ public:
     static bool handles(const MorphologyInitData& initData);
     static std::string getDescription();
 
-    CellFamily getCellFamily() const final;
-
     Vector4fsPtr readPoints(MorphologyRepairStage stage) const final;
 
     Vector2isPtr readSections(MorphologyRepairStage stage) const final;
@@ -47,8 +45,6 @@ public:
     Vector2isPtr readApicals() const final;
 
     floatsPtr readPerimeters() const final;
-
-    MorphologyVersion getVersion() const final;
 
     void writePoints(const Vector4fs& points,
                      MorphologyRepairStage stage) final;

@@ -107,7 +107,7 @@ neuron::Morphologies Circuit::loadMorphologies(const GIDSet& gids,
 
         if (coords == Coordinates::global)
             // store circuit + GID for transformed morphology
-            hash += circuitPath + boost::lexical_cast<std::string>(*gid);
+            hash += circuitPath + std::to_string(*gid);
 
         hash = servus::make_uint128(hash).getString();
         gidHashes.push_back(hash);
@@ -120,27 +120,25 @@ neuron::Morphologies Circuit::loadMorphologies(const GIDSet& gids,
     neuron::Morphologies result;
     result.reserve(uris.size());
 
-    const Matrix4fs transforms =
-        coords == Coordinates::global ? getTransforms(gids) : Matrix4fs();
+    const bool transform = coords == Coordinates::global;
+    const Matrix4fs transforms = transform ? getTransforms(gids) : Matrix4fs();
     for (size_t i = 0; i < uris.size(); ++i)
     {
         const URI& uri = uris[i];
-
         const std::string& hash = gidHashes[i];
+
         CachedMorphologies::const_iterator it = cached.find(hash);
         if (it == cached.end())
         {
             neuron::MorphologyPtr morphology;
             const brion::Morphology raw(uri.getPath());
-            if (coords == Coordinates::global)
+            if (transform)
                 morphology.reset(new neuron::Morphology(raw, transforms[i]));
             else
                 morphology.reset(new neuron::Morphology(raw));
 
+            _impl->saveMorphologyToCache(uri.getPath(), hash, morphology);
             cached.insert(std::make_pair(hash, morphology));
-
-            _impl->saveMorphologiesToCache(uri.getPath(), hash, morphology);
-
             result.push_back(morphology);
         }
         else

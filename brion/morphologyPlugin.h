@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
@@ -26,9 +26,6 @@
 #include <brion/pluginInitData.h>
 #include <brion/types.h>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/noncopyable.hpp>
-
 namespace brion
 {
 /**
@@ -40,31 +37,28 @@ class MorphologyInitData : public PluginInitData
 public:
     explicit MorphologyInitData(const URI& uri)
         : PluginInitData(uri, MODE_READ)
-        , _version(MORPHOLOGY_VERSION_H5_1_1)
-        , _family(FAMILY_NEURON)
+        , version(MORPHOLOGY_VERSION_H5_1_1)
+        , family(FAMILY_NEURON)
     {
     }
 
-    MorphologyInitData(const URI& uri, const MorphologyVersion version,
+    MorphologyInitData(const URI& uri, const MorphologyVersion v,
                        const unsigned int accessMode)
         : PluginInitData(uri, accessMode)
-        , _version(version)
-        , _family(FAMILY_NEURON)
+        , version(v)
+        , family(FAMILY_NEURON)
     {
     }
 
-    MorphologyInitData(const URI& uri, const CellFamily family)
+    MorphologyInitData(const URI& uri, const CellFamily f)
         : PluginInitData(uri, MODE_WRITE)
-        , _version(MORPHOLOGY_VERSION_H5_1_1)
-        , _family(family)
+        , version(MORPHOLOGY_VERSION_H5_1_1)
+        , family(f)
     {
     }
 
-    MorphologyVersion getVersion() const { return _version; }
-    CellFamily getFamily() const { return _family; }
-protected:
-    const MorphologyVersion _version;
-    const CellFamily _family;
+    MorphologyVersion version;
+    CellFamily family;
 };
 
 /**
@@ -88,7 +82,7 @@ protected:
  *
  * @version 1.4
  */
-class MorphologyPlugin : public boost::noncopyable
+class MorphologyPlugin
 {
 public:
     /** @internal Needed by the PluginRegisterer. */
@@ -97,12 +91,20 @@ public:
     /** @internal Needed by the PluginRegisterer. */
     typedef MorphologyInitData InitDataT;
 
-    /** @internal */
+    MorphologyPlugin(const MorphologyInitData& data)
+        : _data(data)
+    {
+    }
+
     virtual ~MorphologyPlugin() {}
+
     /** @name Read API */
     //@{
     /** @copydoc brion::Morphology::getCellFamily */
-    virtual CellFamily getCellFamily() const = 0;
+    CellFamily getCellFamily() const { return _data.family; }
+
+    /** @copydoc brion::Morphology::getVersion */
+    MorphologyVersion getVersion() const { return _data.version; }
 
     /** @copydoc brion::Morphology::readPoints */
     virtual Vector4fsPtr readPoints(MorphologyRepairStage stage) const = 0;
@@ -119,7 +121,6 @@ public:
     /** @copydoc brion::Morphology::readPerimeters */
     virtual floatsPtr readPerimeters() const = 0;
 
-    virtual MorphologyVersion getVersion() const = 0;
     //@}
 
     /** @name Write API */
@@ -144,6 +145,9 @@ public:
     /** @copydoc brion::Morphology::flush */
     virtual void flush() = 0;
     //@}
+
+protected:
+    MorphologyInitData _data;
 };
 }
 

@@ -90,12 +90,6 @@ typedef std::vector<Sample> Samples;
 
 lunchbox::PluginRegisterer<MorphologySWC> registerer;
 
-template <typename T>
-inline std::string string_cast(const T& t)
-{
-    return boost::lexical_cast<std::string>(t);
-}
-
 void _correctSampleType(Sample& sample, const Samples& samples)
 {
     SWCSectionType type = sample.type;
@@ -152,7 +146,8 @@ struct MorphologySWC::RawSWCInfo
 };
 
 MorphologySWC::MorphologySWC(const MorphologyInitData& initData)
-    : _points(new Vector4fs)
+    : MorphologyPlugin(initData)
+    , _points(new Vector4fs)
     , _sections(new Vector2is)
     , _types(new SectionTypes)
 {
@@ -173,6 +168,8 @@ MorphologySWC::MorphologySWC(const MorphologyInitData& initData)
     _readSamples(info);
     _buildSampleTree(info);
     _buildStructure(info);
+    _data.family = FAMILY_NEURON;
+    _data.version = MORPHOLOGY_VERSION_SWC_1;
 }
 
 bool MorphologySWC::handles(const MorphologyInitData& initData)
@@ -188,11 +185,6 @@ std::string MorphologySWC::getDescription()
 {
     return "SWC morphologies:\n"
            "  [file://]/path/to/morphology.swc";
-}
-
-CellFamily MorphologySWC::getCellFamily() const
-{
-    return FAMILY_NEURON;
 }
 
 Vector4fsPtr MorphologySWC::readPoints(MorphologyRepairStage) const
@@ -219,11 +211,6 @@ Vector2isPtr MorphologySWC::readApicals() const
 floatsPtr MorphologySWC::readPerimeters() const
 {
     return floatsPtr(new floats());
-}
-
-MorphologyVersion MorphologySWC::getVersion() const
-{
-    return MORPHOLOGY_VERSION_SWC_1;
 }
 
 void MorphologySWC::writePoints(const Vector4fs&, const MorphologyRepairStage)
@@ -283,14 +270,14 @@ void MorphologySWC::_readSamples(RawSWCInfo& info)
         {
             LBTHROW(std::runtime_error(
                 "Reading swc morphology file: " + info.filename +
-                ", parse error at line " + string_cast(lineNumber)));
+                ", parse error at line " + std::to_string(lineNumber)));
         }
         samples.resize(std::max(samples.size(), size_t(id + 1)));
         if (samples[id].valid)
         {
             LBWARN << "Reading swc morphology file: " << info.filename
                    << ", repeated sample id " << id << " at line "
-                   << string_cast(lineNumber) << std::endl;
+                   << std::to_string(lineNumber) << std::endl;
         }
         else
         {
@@ -300,7 +287,7 @@ void MorphologySWC::_readSamples(RawSWCInfo& info)
             {
                 LBTHROW(std::runtime_error(
                     "Reading swc morphology file: " + info.filename +
-                    ", parse error at line " + string_cast(lineNumber)));
+                    ", parse error at line " + std::to_string(lineNumber)));
             }
         }
 

@@ -141,9 +141,9 @@ void _shuffle(T& container)
     std::shuffle(container.begin(), container.end(), randomEngine);
 }
 
-typedef std::unordered_map<std::string, neuron::MorphologyPtr>
-    CachedMorphologies;
-typedef std::unordered_map<std::string, brion::SynapseMatrix> CachedSynapses;
+using CachedMorphologies =
+    std::unordered_map<std::string, neuron::MorphologyPtr>;
+using CachedSynapses = std::unordered_map<std::string, brion::SynapseMatrix>;
 } // anonymous namespace
 
 class Circuit::Impl
@@ -157,6 +157,8 @@ public:
         , _cache(keyv::Map::createCache())
         , _synapsePositionColumns(0)
     {
+        if (_morphologySource.getScheme().empty())
+            _morphologySource.setScheme("file");
         for (auto&& projection :
              config.getSectionNames(brion::CONFIGSECTION_PROJECTION))
         {
@@ -222,9 +224,8 @@ public:
 
     URI getMorphologyURI(const std::string& name) const
     {
-        URI uri;
-        uri.setPath(_morphologySource.getPath() + "/" + name + ".h5");
-        uri.setScheme("file");
+        URI uri(_morphologySource);
+        uri.setPath(uri.getPath() + "/" + name + ".h5");
         return uri;
     }
 
@@ -314,9 +315,8 @@ public:
         return *positions;
     }
 
-    void saveMorphologiesToCache(const std::string& uri,
-                                 const std::string& hash,
-                                 neuron::MorphologyPtr morphology) const
+    void saveMorphologyToCache(const std::string& uri, const std::string& hash,
+                               neuron::MorphologyPtr morphology) const
     {
         if (!_cache)
             return;
@@ -432,7 +432,7 @@ public:
     }
 
     const brion::URI _circuitSource;
-    const brion::URI _morphologySource;
+    brion::URI _morphologySource;
     const brion::URI _synapseSource;
     std::unordered_map<std::string, brion::URI> _afferentProjectionSources;
     const brion::URIs _targetSources;

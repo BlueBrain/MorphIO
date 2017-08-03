@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2016, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -37,31 +37,21 @@ Vector3f _computeCentroid(const Vector4fs& points)
 }
 }
 
-Soma::Soma(Morphology::Impl* morphology)
+Soma::Soma(Morphology::ImplPtr morphology)
     : _morphology(morphology)
 {
-    _morphology->ref();
-}
-
-Soma::~Soma()
-{
-    _morphology->unref();
 }
 
 Soma::Soma(const Soma& soma)
     : _morphology(soma._morphology)
 {
-    _morphology->ref();
 }
 
 Soma& Soma::operator=(const Soma& soma)
 {
     if (&soma == this)
         return *this;
-    if (_morphology)
-        _morphology->unref();
     _morphology = soma._morphology;
-    _morphology->ref();
     return *this;
 }
 
@@ -90,7 +80,7 @@ Sections Soma::getChildren() const
     const uint32_ts& children =
         _morphology->getChildren(_morphology->somaSection);
     Sections result;
-    for (uint32_t id : children)
+    for (const uint32_t id : children)
         result.push_back(Section(id, _morphology));
     return result;
 }

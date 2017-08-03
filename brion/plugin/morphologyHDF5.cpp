@@ -77,7 +77,7 @@ std::string toString(const brion::enums::MorphologyRepairStage& s)
         return "repaired";
     case brion::MORPHOLOGY_UNDEFINED:
     default:
-        throw boost::bad_lexical_cast();
+        throw std::runtime_error("Undefined morphology repair stage");
     }
 }
 
@@ -92,10 +92,8 @@ lunchbox::PluginRegisterer<MorphologyHDF5> registerer;
                                _file.getFileName()));
 
 MorphologyHDF5::MorphologyHDF5(const MorphologyInitData& initData)
-    : _file()
-    , _version(MORPHOLOGY_VERSION_UNDEFINED)
+    : MorphologyPlugin(initData)
     , _stage(MORPHOLOGY_UNDEFINED)
-    , _family(FAMILY_NEURON)
     , _write(false)
 {
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
@@ -139,17 +137,16 @@ MorphologyHDF5::MorphologyHDF5(const MorphologyInitData& initData)
 
     if (_write)
     {
-        _version = initData.getVersion();
-        switch (_version)
+        switch (_data.version)
         {
         case MORPHOLOGY_VERSION_H5_1:
             // no metadata for version 1
             break;
         case MORPHOLOGY_VERSION_H5_1_1:
-            _writeV11Metadata(initData);
+            _writeV11Metadata();
             break;
         case MORPHOLOGY_VERSION_UNDEFINED:
-            _version = MORPHOLOGY_VERSION_H5_2;
+            _data.version = MORPHOLOGY_VERSION_H5_2;
         // no break;
         case MORPHOLOGY_VERSION_H5_2:
             _writeV2Metadata();
@@ -198,16 +195,11 @@ std::string MorphologyHDF5::getDescription()
            "  [file://]/path/to/morphology.h5";
 }
 
-CellFamily MorphologyHDF5::getCellFamily() const
-{
-    return _family;
-}
-
 Vector4fsPtr MorphologyHDF5::readPoints(MorphologyRepairStage stage) const
 {
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
-    if (_version == MORPHOLOGY_VERSION_H5_2)
+    if (_data.version == MORPHOLOGY_VERSION_H5_2)
     {
         H5::DataSet dataset;
         try
@@ -250,7 +242,7 @@ Vector2isPtr MorphologyHDF5::readSections(MorphologyRepairStage stage) const
 {
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
-    if (_version == MORPHOLOGY_VERSION_H5_2)
+    if (_data.version == MORPHOLOGY_VERSION_H5_2)
     {
         if (stage == MORPHOLOGY_UNDEFINED)
             stage = _stage;
@@ -306,7 +298,7 @@ SectionTypesPtr MorphologyHDF5::readSectionTypes() const
 {
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
-    if (_version == MORPHOLOGY_VERSION_H5_2)
+    if (_data.version == MORPHOLOGY_VERSION_H5_2)
     {
         const H5::DataSet& dataset = _file.openDataSet(
             "/" + _g_root + "/" + _g_structure + "/" + _d_type);
@@ -344,7 +336,7 @@ Vector2isPtr MorphologyHDF5::readApicals() const
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
     Vector2isPtr data(new Vector2is);
-    if (_version == MORPHOLOGY_VERSION_H5_1)
+    if (_data.version == MORPHOLOGY_VERSION_H5_1)
         return data;
 
     try
@@ -369,7 +361,7 @@ Vector2isPtr MorphologyHDF5::readApicals() const
 
 floatsPtr MorphologyHDF5::readPerimeters() const
 {
-    if (_version != MORPHOLOGY_VERSION_H5_1_1)
+    if (_data.version != MORPHOLOGY_VERSION_H5_1_1)
         return floatsPtr(new floats());
 
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
@@ -404,11 +396,6 @@ floatsPtr MorphologyHDF5::readPerimeters() const
     }
 }
 
-MorphologyVersion MorphologyHDF5::getVersion() const
-{
-    return _version;
-}
-
 void MorphologyHDF5::writePoints(const Vector4fs& points,
                                  const MorphologyRepairStage stage)
 {
@@ -422,7 +409,7 @@ void MorphologyHDF5::writePoints(const Vector4fs& points,
     H5::DataSet dataset;
     H5::FloatType pointsDT(H5::PredType::NATIVE_DOUBLE);
     pointsDT.setOrder(H5T_ORDER_LE);
-    if (_version == MORPHOLOGY_VERSION_H5_2)
+    if (_data.version == MORPHOLOGY_VERSION_H5_2)
     {
         H5::Group root = _file.openGroup(_g_root);
         H5::Group group = root.createGroup(toString(stage));
@@ -480,7 +467,7 @@ void MorphologyHDF5::writeSections(const Vector2is& sections,
 
     ASSERT_WRITE;
 
-    if (_version == MORPHOLOGY_VERSION_H5_2)
+    if (_data.version == MORPHOLOGY_VERSION_H5_2)
     {
         hsize_t dim[2] = {sections.size(), 2};
         H5::DataSpace structureDS(2, dim);
@@ -511,7 +498,7 @@ void MorphologyHDF5::writeSectionTypes(const SectionTypes& types)
 
     ASSERT_WRITE;
 
-    if (_version == MORPHOLOGY_VERSION_H5_2)
+    if (_data.version == MORPHOLOGY_VERSION_H5_2)
     {
         hsize_t dim[2] = {types.size(), 1};
         H5::DataSpace structureDS(2, dim);
@@ -541,7 +528,7 @@ void MorphologyHDF5::writeApicals(const Vector2is& apicals)
 {
     ASSERT_WRITE;
 
-    if (_version != MORPHOLOGY_VERSION_H5_2)
+    if (_data.version != MORPHOLOGY_VERSION_H5_2)
         LBTHROW(std::runtime_error("Need version 2 to write apicals"));
 
     if (apicals.empty())
@@ -561,7 +548,7 @@ void MorphologyHDF5::writePerimeters(const floats& perimeters)
 {
     ASSERT_WRITE;
 
-    if (_version != MORPHOLOGY_VERSION_H5_1_1)
+    if (_data.version != MORPHOLOGY_VERSION_H5_1_1)
         LBTHROW(std::runtime_error("Need version 1.1 to write perimeters"));
 
     if (perimeters.empty())
@@ -632,7 +619,7 @@ void MorphologyHDF5::_checkVersion(const std::string& source)
     try
     {
         _resolveV1();
-        _version = MORPHOLOGY_VERSION_H5_1;
+        _data.version = MORPHOLOGY_VERSION_H5_1;
         return;
     }
     catch (...)
@@ -646,7 +633,7 @@ void MorphologyHDF5::_checkVersion(const std::string& source)
 
 void MorphologyHDF5::_selectRepairStage()
 {
-    if (_version != MORPHOLOGY_VERSION_H5_2)
+    if (_data.version != MORPHOLOGY_VERSION_H5_2)
         return;
 
     MorphologyRepairStage stages[3] = {MORPHOLOGY_REPAIRED,
@@ -694,7 +681,7 @@ void MorphologyHDF5::_resolveV1()
     }
 }
 
-void MorphologyHDF5::_writeV11Metadata(const MorphologyInitData& initData)
+void MorphologyHDF5::_writeV11Metadata()
 {
     ASSERT_WRITE;
 
@@ -711,8 +698,7 @@ void MorphologyHDF5::_writeV11Metadata(const MorphologyInitData& initData)
     H5::DataSpace familyDS(1, &dim);
     H5::Attribute familyAttr =
         metadata.createAttribute(_a_family, familyEnum, familyDS);
-    _family = initData.getFamily();
-    familyAttr.write(familyEnum, &_family);
+    familyAttr.write(familyEnum, &_data.family);
 
     const std::string creator = "Brion";
     detail::addStringAttribute(metadata, _a_creator, creator);
@@ -755,12 +741,12 @@ bool MorphologyHDF5::_readV11Metadata()
         if (version[0] != 1 || version[1] != 1)
             return false;
 
-        _version = MORPHOLOGY_VERSION_H5_1_1;
+        _data.version = MORPHOLOGY_VERSION_H5_1_1;
 
         const H5::Attribute& familyAttr = metadata.openAttribute(_a_family);
         H5::EnumType familyEnum = metadata.openEnumType(_e_family);
 
-        familyAttr.read(familyEnum, &_family);
+        familyAttr.read(familyEnum, &_data.family);
 
         _resolveV1();
         return true;
@@ -779,9 +765,9 @@ bool MorphologyHDF5::_readV2Metadata()
         const H5::Group& root = _file.openGroup(_g_root);
         const H5::Attribute& attr = root.openAttribute(_a_version);
 
-        attr.read(H5::PredType::NATIVE_INT, &_version);
+        attr.read(H5::PredType::NATIVE_INT, &_data.version);
 
-        if (_version == MORPHOLOGY_VERSION_H5_2)
+        if (_data.version == MORPHOLOGY_VERSION_H5_2)
             return true;
     }
     catch (const H5::Exception&)
@@ -792,7 +778,7 @@ bool MorphologyHDF5::_readV2Metadata()
     {
         detail::SilenceHDF5 silence;
         _file.openGroup(_g_root);
-        _version = MORPHOLOGY_VERSION_H5_2;
+        _data.version = MORPHOLOGY_VERSION_H5_2;
         return true;
     }
     catch (const H5::Exception&)

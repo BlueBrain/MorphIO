@@ -41,8 +41,6 @@ public:
     static bool handles(const MorphologyInitData& initData);
     static std::string getDescription();
 
-    CellFamily getCellFamily() const final;
-
     Vector4fsPtr readPoints(MorphologyRepairStage stage) const final;
 
     Vector2isPtr readSections(MorphologyRepairStage stage) const final;
@@ -52,8 +50,6 @@ public:
     Vector2isPtr readApicals() const final;
 
     floatsPtr readPerimeters() const final;
-
-    MorphologyVersion getVersion() const final;
 
     void writePoints(const Vector4fs& points,
                      MorphologyRepairStage stage) final;
@@ -78,9 +74,7 @@ private:
     H5::DataSet _sections;
     hsize_t _sectionsDims[2];
 
-    MorphologyVersion _version;
     MorphologyRepairStage _stage;
-    CellFamily _family;
     bool _write;
 
     void _checkVersion(const std::string& source);
@@ -88,7 +82,7 @@ private:
 
     void _resolveV1();
 
-    void _writeV11Metadata(const MorphologyInitData& initData);
+    void _writeV11Metadata();
     bool _readV11Metadata();
 
     bool _readV2Metadata();

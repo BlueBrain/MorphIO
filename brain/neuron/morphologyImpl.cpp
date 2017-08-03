@@ -72,7 +72,7 @@ Morphology::Impl::Impl(const brion::Morphology& morphology)
     const uint32_ts ids = getSectionIDs({SectionType::soma}, false);
     if (ids.size() != 1)
         LBTHROW(std::runtime_error(
-            "Bad input morphology. None or more than one soma found"));
+            "Bad input morphology: none or multiple somas found"));
     somaSection = ids[0];
 }
 
@@ -92,7 +92,7 @@ bool Morphology::Impl::_fromBinary(const void* data, const size_t size)
 
     if (ids.size() != 1)
         LBTHROW(std::runtime_error(
-            "Bad input morphology. None or more than one soma found"));
+            "Bad input morphology: none or multiple somas found"));
     somaSection = ids[0];
     return true;
 }

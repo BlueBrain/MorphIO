@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -27,39 +27,28 @@ namespace brain
 {
 namespace neuron
 {
-Section::Section(const uint32_t id, Morphology::Impl* morphology)
+Section::Section(const uint32_t id, Morphology::ImplPtr morphology)
     : _id(id)
     , _morphology(morphology)
 {
-    _morphology->ref();
-
     SectionRange range = morphology->getSectionRange(id);
     if (range.second <= range.first)
         LBWARN << "Dereferencing broken morphology section " << _id
                << std::endl;
 }
 
-Section::~Section()
-{
-    _morphology->unref();
-}
-
 Section::Section(const Section& section)
     : _id(section._id)
     , _morphology(section._morphology)
 {
-    _morphology->ref();
 }
 
 Section& Section::operator=(const Section& section)
 {
     if (&section == this)
         return *this;
-    if (_morphology)
-        _morphology->unref();
     _id = section._id;
     _morphology = section._morphology;
-    _morphology->ref();
     return *this;
 }
 
@@ -125,7 +114,7 @@ Sections Section::getChildren() const
     const uint32_ts& children = _morphology->getChildren(_id);
     Sections result;
     result.reserve(children.size());
-    for (uint32_t id : children)
+    for (const uint32_t id : children)
         result.push_back(Section(id, _morphology));
     return result;
 }

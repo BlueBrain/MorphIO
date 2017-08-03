@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -39,13 +39,11 @@ servus::Serializable::Data Morphology::toBinary() const
 Morphology::Morphology(const void* data, const size_t size)
     : _impl(new Impl(data, size))
 {
-    _impl->ref();
 }
 
 Morphology::Morphology(const URI& source, const Matrix4f& transform)
     : _impl(new Impl(brion::Morphology(source.getPath())))
 {
-    _impl->ref();
     _impl->transform(transform);
     _impl->transformation = transform;
 }
@@ -54,7 +52,6 @@ Morphology::Morphology(const brion::Morphology& morphology,
                        const Matrix4f& transform)
     : _impl(new Impl(morphology))
 {
-    _impl->ref();
     _impl->transform(transform);
     _impl->transformation = transform;
 }
@@ -62,18 +59,15 @@ Morphology::Morphology(const brion::Morphology& morphology,
 Morphology::Morphology(const URI& source)
     : _impl(new Impl(brion::Morphology(source.getPath())))
 {
-    _impl->ref();
 }
 
 Morphology::Morphology(const brion::Morphology& morphology)
     : _impl(new Impl(morphology))
 {
-    _impl->ref();
 }
 
 Morphology::~Morphology()
 {
-    _impl->unref();
 }
 
 const Vector4fs& Morphology::getPoints() const

@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -51,12 +51,7 @@ namespace neuron
 class Section
 {
 public:
-    friend class Morphology;
-    friend class Soma;
-
     BRAIN_API Section(const Section& section);
-
-    BRAIN_API ~Section();
 
     BRAIN_API Section& operator=(const Section& section);
 
@@ -135,12 +130,13 @@ public:
      */
     BRAIN_API Sections getChildren() const;
 
-protected:
-    BRAIN_API Section(uint32_t id, Morphology::Impl* morphology);
-
 private:
+    BRAIN_API Section(uint32_t id, Morphology::ImplPtr morphology);
+    friend class Morphology;
+    friend class Soma;
+
     uint32_t _id;
-    Morphology::Impl* _morphology;
+    Morphology::ImplPtr _morphology;
 };
 }
 }
