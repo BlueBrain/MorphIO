@@ -113,10 +113,10 @@ MorphologyHDF5::MorphologyHDF5(const MorphologyInitData& initData)
     }
     catch (const H5::Exception& exc)
     {
-        LBTHROW(std::runtime_error(_write
-                                       ? "Could not create morphology file "
-                                       : "Could not open morphology file " +
-                                             path + ": " + exc.getDetailMsg()));
+        LBTHROW(
+            std::runtime_error((_write ? "Could not create morphology file "
+                                       : "Could not open morphology file ") +
+                               path + ": " + exc.getDetailMsg()));
     }
 
     if (_write)
