@@ -34,10 +34,11 @@ find_package(Cython 0.25.0)
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}" )
 
-if(ENABLE_MESHER_CGAL)
-    add_definitions( -DENABLE_MESHER_CGAL=1)
-    set(MOPHO_MESHER_TARGET "morpho_mesher")
-endif()
+# GCAL Mesher is not part of this repository anymore
+# if(ENABLE_MESHER_CGAL)
+#     add_definitions( -DENABLE_MESHER_CGAL=1)
+#     set(MORPHO_MESHER_TARGET "morpho_mesher")
+# endif()
 
 
 
