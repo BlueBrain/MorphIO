@@ -11,7 +11,7 @@ morphotool_ext = Extension('morphotool.morphotool',
 
 setup_opts = dict(
     name         = 'morphotool',
-    version      = '0.4',
+    version      = '0.5',
     author       = 'EPFL - Blue Brain Project',
     author_email = 'bbp-ou-hpc@groupes.epfl.ch',
     url          = '',
