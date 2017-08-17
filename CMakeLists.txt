@@ -30,6 +30,7 @@ find_package(HDF5 QUIET REQUIRED)
 find_package(CLANG_TIDY)
 # Eventually required for rebuilding bindings
 find_package(Cython 0.25.0)
+find_package(NumPy)
 
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}" )
