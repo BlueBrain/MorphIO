@@ -10,8 +10,13 @@ cdef class MorphoReader(_py__base):
     cdef morpho_h5_v1.morpho_reader *ptr(self):
         return <morpho_h5_v1.morpho_reader*> self._ptr
 
-    def __init__(self, std.string filename):
-        self._ptr = new morpho_h5_v1.morpho_reader(filename)
+    def __init__(self, str filename):
+        cdef std.string fname
+        if isinstance(filename, unicode):
+            fname = filename.encode('ascii')
+        else:
+            fname = filename
+        self._ptr = new morpho_h5_v1.morpho_reader(fname)
         self._autodealoc.reset(self.ptr())
 
     @property

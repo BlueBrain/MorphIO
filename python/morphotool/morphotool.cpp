@@ -1322,7 +1322,7 @@ struct __pyx_opt_args_10morphotool_10MorphoTree_from_ptr {
   bool owner;
 };
 
-/* "morpho_h5_v1.pxi":40
+/* "morpho_h5_v1.pxi":45
  * 
  *     @staticmethod
  *     cdef MorphoReader from_ptr(morpho_h5_v1.morpho_reader *ptr, bool owner=False):             # <<<<<<<<<<<<<<
@@ -1334,7 +1334,7 @@ struct __pyx_opt_args_10morphotool_12MorphoReader_from_ptr {
   bool owner;
 };
 
-/* "morpho_h5_v1.pxi":77
+/* "morpho_h5_v1.pxi":82
  * 
  *     @staticmethod
  *     cdef MorphoWriter from_ptr(morpho_h5_v1.morpho_writer *ptr, bool owner=False):             # <<<<<<<<<<<<<<
@@ -1738,7 +1738,7 @@ struct __pyx_obj_10morphotool_MorphoReader {
 };
 
 
-/* "morpho_h5_v1.pxi":62
+/* "morpho_h5_v1.pxi":67
  * 
  * # ----------------------------------------------------------------------------------------------------------------------
  * cdef class MorphoWriter(_py__base):             # <<<<<<<<<<<<<<
@@ -2300,7 +2300,7 @@ struct __pyx_vtabstruct_10morphotool_MorphoReader {
 static struct __pyx_vtabstruct_10morphotool_MorphoReader *__pyx_vtabptr_10morphotool_MorphoReader;
 
 
-/* "morpho_h5_v1.pxi":62
+/* "morpho_h5_v1.pxi":67
  * 
  * # ----------------------------------------------------------------------------------------------------------------------
  * cdef class MorphoWriter(_py__base):             # <<<<<<<<<<<<<<
@@ -3667,6 +3667,7 @@ static const char __pyx_k_tree[] = "tree";
 static const char __pyx_k_ASCII[] = "ASCII";
 static const char __pyx_k_Point[] = "<_Point";
 static const char __pyx_k_Types[] = "Types";
+static const char __pyx_k_ascii[] = "ascii";
 static const char __pyx_k_class[] = "__class__";
 static const char __pyx_k_close[] = "close";
 static const char __pyx_k_error[] = "error";
@@ -3875,6 +3876,7 @@ static PyObject *__pyx_n_s__2;
 static PyObject *__pyx_kp_s__6;
 static PyObject *__pyx_n_s_allocate_buffer;
 static PyObject *__pyx_n_s_args;
+static PyObject *__pyx_n_s_ascii;
 static PyObject *__pyx_n_s_axon;
 static PyObject *__pyx_n_s_base;
 static PyObject *__pyx_n_s_c;
@@ -4079,7 +4081,7 @@ static PyObject *__pyx_pf_10morphotool_10MorphoTree_9all_nodes___get__(struct __
 static PyObject *__pyx_pf_10morphotool_10MorphoTree_14transform(struct __pyx_obj_10morphotool_MorphoTree *__pyx_v_self, PyObject *__pyx_v_operations); /* proto */
 static PyObject *__pyx_pf_10morphotool_10MorphoTree_16find_soma(struct __pyx_obj_10morphotool_MorphoTree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_10morphotool_10MorphoTree_9cell_type___get__(struct __pyx_obj_10morphotool_MorphoTree *__pyx_v_self); /* proto */
-static int __pyx_pf_10morphotool_12MorphoReader___init__(struct __pyx_obj_10morphotool_MorphoReader *__pyx_v_self, std::string __pyx_v_filename); /* proto */
+static int __pyx_pf_10morphotool_12MorphoReader___init__(struct __pyx_obj_10morphotool_MorphoReader *__pyx_v_self, PyObject *__pyx_v_filename); /* proto */
 static PyObject *__pyx_pf_10morphotool_12MorphoReader_10points_raw___get__(struct __pyx_obj_10morphotool_MorphoReader *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_10morphotool_12MorphoReader_15soma_points_raw___get__(struct __pyx_obj_10morphotool_MorphoReader *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_10morphotool_12MorphoReader_10struct_raw___get__(struct __pyx_obj_10morphotool_MorphoReader *__pyx_v_self); /* proto */
@@ -4190,9 +4192,9 @@ static PyObject *__pyx_tuple__5;
 static PyObject *__pyx_tuple__7;
 static PyObject *__pyx_tuple__8;
 static PyObject *__pyx_tuple__9;
-static PyObject *__pyx_slice__27;
 static PyObject *__pyx_slice__28;
 static PyObject *__pyx_slice__29;
+static PyObject *__pyx_slice__30;
 static PyObject *__pyx_tuple__10;
 static PyObject *__pyx_tuple__11;
 static PyObject *__pyx_tuple__12;
@@ -4210,24 +4212,25 @@ static PyObject *__pyx_tuple__23;
 static PyObject *__pyx_tuple__24;
 static PyObject *__pyx_tuple__25;
 static PyObject *__pyx_tuple__26;
-static PyObject *__pyx_tuple__30;
+static PyObject *__pyx_tuple__27;
 static PyObject *__pyx_tuple__31;
-static PyObject *__pyx_tuple__33;
-static PyObject *__pyx_tuple__35;
-static PyObject *__pyx_tuple__37;
-static PyObject *__pyx_tuple__39;
-static PyObject *__pyx_tuple__41;
-static PyObject *__pyx_tuple__43;
+static PyObject *__pyx_tuple__32;
+static PyObject *__pyx_tuple__34;
+static PyObject *__pyx_tuple__36;
+static PyObject *__pyx_tuple__38;
+static PyObject *__pyx_tuple__40;
+static PyObject *__pyx_tuple__42;
 static PyObject *__pyx_tuple__44;
 static PyObject *__pyx_tuple__45;
 static PyObject *__pyx_tuple__46;
 static PyObject *__pyx_tuple__47;
-static PyObject *__pyx_codeobj__32;
-static PyObject *__pyx_codeobj__34;
-static PyObject *__pyx_codeobj__36;
-static PyObject *__pyx_codeobj__38;
-static PyObject *__pyx_codeobj__40;
-static PyObject *__pyx_codeobj__42;
+static PyObject *__pyx_tuple__48;
+static PyObject *__pyx_codeobj__33;
+static PyObject *__pyx_codeobj__35;
+static PyObject *__pyx_codeobj__37;
+static PyObject *__pyx_codeobj__39;
+static PyObject *__pyx_codeobj__41;
+static PyObject *__pyx_codeobj__43;
 
 /* "includes/_base.pxi":25
  *     cdef void *_ptr
@@ -16067,7 +16070,7 @@ static morpho::h5_v1::morpho_reader *__pyx_f_10morphotool_12MorphoReader_ptr(str
  *     cdef morpho_h5_v1.morpho_reader *ptr(self):
  *         return <morpho_h5_v1.morpho_reader*> self._ptr             # <<<<<<<<<<<<<<
  * 
- *     def __init__(self, std.string filename):
+ *     def __init__(self, str filename):
  */
   __pyx_r = ((morpho::h5_v1::morpho_reader *)__pyx_v_self->__pyx_base._ptr);
   goto __pyx_L0;
@@ -16089,15 +16092,15 @@ static morpho::h5_v1::morpho_reader *__pyx_f_10morphotool_12MorphoReader_ptr(str
 /* "morpho_h5_v1.pxi":13
  *         return <morpho_h5_v1.morpho_reader*> self._ptr
  * 
- *     def __init__(self, std.string filename):             # <<<<<<<<<<<<<<
- *         self._ptr = new morpho_h5_v1.morpho_reader(filename)
- *         self._autodealoc.reset(self.ptr())
+ *     def __init__(self, str filename):             # <<<<<<<<<<<<<<
+ *         cdef std.string fname
+ *         if isinstance(filename, unicode):
  */
 
 /* Python wrapper */
 static int __pyx_pw_10morphotool_12MorphoReader_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static int __pyx_pw_10morphotool_12MorphoReader_1__init__(PyObject *__pyx_v_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  std::string __pyx_v_filename;
+  PyObject *__pyx_v_filename = 0;
   int __pyx_r;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__ (wrapper)", 0);
@@ -16126,7 +16129,7 @@ static int __pyx_pw_10morphotool_12MorphoReader_1__init__(PyObject *__pyx_v_self
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_filename = __pyx_convert_string_from_py_std__in_string(values[0]); if (unlikely(PyErr_Occurred())) __PYX_ERR(5, 13, __pyx_L3_error)
+    __pyx_v_filename = ((PyObject*)values[0]);
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
@@ -16136,30 +16139,91 @@ static int __pyx_pw_10morphotool_12MorphoReader_1__init__(PyObject *__pyx_v_self
   __Pyx_RefNannyFinishContext();
   return -1;
   __pyx_L4_argument_unpacking_done:;
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_filename), (&PyString_Type), 1, "filename", 1))) __PYX_ERR(5, 13, __pyx_L1_error)
   __pyx_r = __pyx_pf_10morphotool_12MorphoReader___init__(((struct __pyx_obj_10morphotool_MorphoReader *)__pyx_v_self), __pyx_v_filename);
 
   /* function exit code */
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __pyx_r = -1;
+  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-static int __pyx_pf_10morphotool_12MorphoReader___init__(struct __pyx_obj_10morphotool_MorphoReader *__pyx_v_self, std::string __pyx_v_filename) {
+static int __pyx_pf_10morphotool_12MorphoReader___init__(struct __pyx_obj_10morphotool_MorphoReader *__pyx_v_self, PyObject *__pyx_v_filename) {
+  std::string __pyx_v_fname;
   int __pyx_r;
   __Pyx_RefNannyDeclarations
+  int __pyx_t_1;
+  int __pyx_t_2;
+  PyObject *__pyx_t_3 = NULL;
+  PyObject *__pyx_t_4 = NULL;
+  std::string __pyx_t_5;
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "morpho_h5_v1.pxi":14
- * 
- *     def __init__(self, std.string filename):
- *         self._ptr = new morpho_h5_v1.morpho_reader(filename)             # <<<<<<<<<<<<<<
+  /* "morpho_h5_v1.pxi":15
+ *     def __init__(self, str filename):
+ *         cdef std.string fname
+ *         if isinstance(filename, unicode):             # <<<<<<<<<<<<<<
+ *             fname = filename.encode('ascii')
+ *         else:
+ */
+  __pyx_t_1 = PyUnicode_Check(__pyx_v_filename); 
+  __pyx_t_2 = (__pyx_t_1 != 0);
+  if (__pyx_t_2) {
+
+    /* "morpho_h5_v1.pxi":16
+ *         cdef std.string fname
+ *         if isinstance(filename, unicode):
+ *             fname = filename.encode('ascii')             # <<<<<<<<<<<<<<
+ *         else:
+ *             fname = filename
+ */
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_filename, __pyx_n_s_encode); if (unlikely(!__pyx_t_3)) __PYX_ERR(5, 16, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_3);
+    __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(5, 16, __pyx_L1_error)
+    __Pyx_GOTREF(__pyx_t_4);
+    __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
+    __pyx_t_5 = __pyx_convert_string_from_py_std__in_string(__pyx_t_4); if (unlikely(PyErr_Occurred())) __PYX_ERR(5, 16, __pyx_L1_error)
+    __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
+    __pyx_v_fname = __pyx_t_5;
+
+    /* "morpho_h5_v1.pxi":15
+ *     def __init__(self, str filename):
+ *         cdef std.string fname
+ *         if isinstance(filename, unicode):             # <<<<<<<<<<<<<<
+ *             fname = filename.encode('ascii')
+ *         else:
+ */
+    goto __pyx_L3;
+  }
+
+  /* "morpho_h5_v1.pxi":18
+ *             fname = filename.encode('ascii')
+ *         else:
+ *             fname = filename             # <<<<<<<<<<<<<<
+ *         self._ptr = new morpho_h5_v1.morpho_reader(fname)
+ *         self._autodealoc.reset(self.ptr())
+ */
+  /*else*/ {
+    __pyx_t_5 = __pyx_convert_string_from_py_std__in_string(__pyx_v_filename); if (unlikely(PyErr_Occurred())) __PYX_ERR(5, 18, __pyx_L1_error)
+    __pyx_v_fname = __pyx_t_5;
+  }
+  __pyx_L3:;
+
+  /* "morpho_h5_v1.pxi":19
+ *         else:
+ *             fname = filename
+ *         self._ptr = new morpho_h5_v1.morpho_reader(fname)             # <<<<<<<<<<<<<<
  *         self._autodealoc.reset(self.ptr())
  * 
  */
-  __pyx_v_self->__pyx_base._ptr = new morpho::h5_v1::morpho_reader(__pyx_v_filename);
+  __pyx_v_self->__pyx_base._ptr = new morpho::h5_v1::morpho_reader(__pyx_v_fname);
 
-  /* "morpho_h5_v1.pxi":15
- *     def __init__(self, std.string filename):
- *         self._ptr = new morpho_h5_v1.morpho_reader(filename)
+  /* "morpho_h5_v1.pxi":20
+ *             fname = filename
+ *         self._ptr = new morpho_h5_v1.morpho_reader(fname)
  *         self._autodealoc.reset(self.ptr())             # <<<<<<<<<<<<<<
  * 
  *     @property
@@ -16169,18 +16233,25 @@ static int __pyx_pf_10morphotool_12MorphoReader___init__(struct __pyx_obj_10morp
   /* "morpho_h5_v1.pxi":13
  *         return <morpho_h5_v1.morpho_reader*> self._ptr
  * 
- *     def __init__(self, std.string filename):             # <<<<<<<<<<<<<<
- *         self._ptr = new morpho_h5_v1.morpho_reader(filename)
- *         self._autodealoc.reset(self.ptr())
+ *     def __init__(self, str filename):             # <<<<<<<<<<<<<<
+ *         cdef std.string fname
+ *         if isinstance(filename, unicode):
  */
 
   /* function exit code */
   __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_3);
+  __Pyx_XDECREF(__pyx_t_4);
+  __Pyx_AddTraceback("morphotool.MorphoReader.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":18
+/* "morpho_h5_v1.pxi":23
  * 
  *     @property
  *     def points_raw(self ):             # <<<<<<<<<<<<<<
@@ -16207,7 +16278,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_10points_raw___get__(struc
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "morpho_h5_v1.pxi":19
+  /* "morpho_h5_v1.pxi":24
  *     @property
  *     def points_raw(self ):
  *         return _Mat_Points.from_value(self.ptr().get_points_raw())             # <<<<<<<<<<<<<<
@@ -16215,13 +16286,13 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_10points_raw___get__(struc
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_10morphotool_11_Mat_Points_from_value(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->get_points_raw())); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 19, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_10morphotool_11_Mat_Points_from_value(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->get_points_raw())); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 24, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":18
+  /* "morpho_h5_v1.pxi":23
  * 
  *     @property
  *     def points_raw(self ):             # <<<<<<<<<<<<<<
@@ -16240,7 +16311,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_10points_raw___get__(struc
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":22
+/* "morpho_h5_v1.pxi":27
  * 
  *     @property
  *     def soma_points_raw(self):             # <<<<<<<<<<<<<<
@@ -16267,7 +16338,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_15soma_points_raw___get__(
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "morpho_h5_v1.pxi":23
+  /* "morpho_h5_v1.pxi":28
  *     @property
  *     def soma_points_raw(self):
  *         return _Mat_Points.from_value(self.ptr().get_soma_points_raw())             # <<<<<<<<<<<<<<
@@ -16275,13 +16346,13 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_15soma_points_raw___get__(
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_10morphotool_11_Mat_Points_from_value(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->get_soma_points_raw())); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 23, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_10morphotool_11_Mat_Points_from_value(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->get_soma_points_raw())); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 28, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":22
+  /* "morpho_h5_v1.pxi":27
  * 
  *     @property
  *     def soma_points_raw(self):             # <<<<<<<<<<<<<<
@@ -16300,7 +16371,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_15soma_points_raw___get__(
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":26
+/* "morpho_h5_v1.pxi":31
  * 
  *     @property
  *     def struct_raw(self):             # <<<<<<<<<<<<<<
@@ -16327,7 +16398,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_10struct_raw___get__(struc
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "morpho_h5_v1.pxi":27
+  /* "morpho_h5_v1.pxi":32
  *     @property
  *     def struct_raw(self):
  *         return _Mat_Index.from_value(self.ptr().get_struct_raw())             # <<<<<<<<<<<<<<
@@ -16335,13 +16406,13 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_10struct_raw___get__(struc
  *     def get_section_range_raw(self, int id_):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_10morphotool_10_Mat_Index_from_value(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->get_struct_raw())); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 27, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_10morphotool_10_Mat_Index_from_value(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->get_struct_raw())); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 32, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":26
+  /* "morpho_h5_v1.pxi":31
  * 
  *     @property
  *     def struct_raw(self):             # <<<<<<<<<<<<<<
@@ -16360,7 +16431,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_10struct_raw___get__(struc
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":29
+/* "morpho_h5_v1.pxi":34
  *         return _Mat_Index.from_value(self.ptr().get_struct_raw())
  * 
  *     def get_section_range_raw(self, int id_):             # <<<<<<<<<<<<<<
@@ -16376,7 +16447,7 @@ static PyObject *__pyx_pw_10morphotool_12MorphoReader_3get_section_range_raw(PyO
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("get_section_range_raw (wrapper)", 0);
   assert(__pyx_arg_id_); {
-    __pyx_v_id_ = __Pyx_PyInt_As_int(__pyx_arg_id_); if (unlikely((__pyx_v_id_ == (int)-1) && PyErr_Occurred())) __PYX_ERR(5, 29, __pyx_L3_error)
+    __pyx_v_id_ = __Pyx_PyInt_As_int(__pyx_arg_id_); if (unlikely((__pyx_v_id_ == (int)-1) && PyErr_Occurred())) __PYX_ERR(5, 34, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -16397,7 +16468,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_2get_section_range_raw(str
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("get_section_range_raw", 0);
 
-  /* "morpho_h5_v1.pxi":30
+  /* "morpho_h5_v1.pxi":35
  * 
  *     def get_section_range_raw(self, int id_):
  *         return self.ptr().get_section_range_raw(id_)             # <<<<<<<<<<<<<<
@@ -16405,13 +16476,13 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_2get_section_range_raw(str
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert_pair_to_py_std_3a__3a_size_t____std_3a__3a_size_t(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->get_section_range_raw(__pyx_v_id_)); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 30, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert_pair_to_py_std_3a__3a_size_t____std_3a__3a_size_t(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->get_section_range_raw(__pyx_v_id_)); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 35, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":29
+  /* "morpho_h5_v1.pxi":34
  *         return _Mat_Index.from_value(self.ptr().get_struct_raw())
  * 
  *     def get_section_range_raw(self, int id_):             # <<<<<<<<<<<<<<
@@ -16430,7 +16501,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_2get_section_range_raw(str
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":33
+/* "morpho_h5_v1.pxi":38
  * 
  *     @property
  *     def filename(self):             # <<<<<<<<<<<<<<
@@ -16457,7 +16528,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_8filename___get__(struct _
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("__get__", 0);
 
-  /* "morpho_h5_v1.pxi":34
+  /* "morpho_h5_v1.pxi":39
  *     @property
  *     def filename(self):
  *         return self.ptr().get_filename()             # <<<<<<<<<<<<<<
@@ -16465,13 +16536,13 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_8filename___get__(struct _
  *     def create_morpho_tree(self):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->get_filename()); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 34, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->get_filename()); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 39, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":33
+  /* "morpho_h5_v1.pxi":38
  * 
  *     @property
  *     def filename(self):             # <<<<<<<<<<<<<<
@@ -16490,7 +16561,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_8filename___get__(struct _
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":36
+/* "morpho_h5_v1.pxi":41
  *         return self.ptr().get_filename()
  * 
  *     def create_morpho_tree(self):             # <<<<<<<<<<<<<<
@@ -16518,7 +16589,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_4create_morpho_tree(struct
   PyObject *__pyx_t_2 = NULL;
   __Pyx_RefNannySetupContext("create_morpho_tree", 0);
 
-  /* "morpho_h5_v1.pxi":37
+  /* "morpho_h5_v1.pxi":42
  * 
  *     def create_morpho_tree(self):
  *         return MorphoTree.from_move(self.ptr().create_morpho_tree())             # <<<<<<<<<<<<<<
@@ -16530,15 +16601,15 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_4create_morpho_tree(struct
     __pyx_t_1 = ((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->create_morpho_tree();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(5, 37, __pyx_L1_error)
+    __PYX_ERR(5, 42, __pyx_L1_error)
   }
-  __pyx_t_2 = ((PyObject *)__pyx_f_10morphotool_10MorphoTree_from_move(__pyx_t_1)); if (unlikely(!__pyx_t_2)) __PYX_ERR(5, 37, __pyx_L1_error)
+  __pyx_t_2 = ((PyObject *)__pyx_f_10morphotool_10MorphoTree_from_move(__pyx_t_1)); if (unlikely(!__pyx_t_2)) __PYX_ERR(5, 42, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_r = __pyx_t_2;
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":36
+  /* "morpho_h5_v1.pxi":41
  *         return self.ptr().get_filename()
  * 
  *     def create_morpho_tree(self):             # <<<<<<<<<<<<<<
@@ -16557,7 +16628,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoReader_4create_morpho_tree(struct
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":40
+/* "morpho_h5_v1.pxi":45
  * 
  *     @staticmethod
  *     cdef MorphoReader from_ptr(morpho_h5_v1.morpho_reader *ptr, bool owner=False):             # <<<<<<<<<<<<<<
@@ -16579,20 +16650,20 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
     }
   }
 
-  /* "morpho_h5_v1.pxi":41
+  /* "morpho_h5_v1.pxi":46
  *     @staticmethod
  *     cdef MorphoReader from_ptr(morpho_h5_v1.morpho_reader *ptr, bool owner=False):
  *         cdef MorphoReader obj = MorphoReader.__new__(MorphoReader)             # <<<<<<<<<<<<<<
  *         obj._ptr = ptr
  *         if owner: obj._autodealoc.reset(obj.ptr())
  */
-  __pyx_t_1 = __pyx_tp_new_10morphotool_MorphoReader(((PyTypeObject *)__pyx_ptype_10morphotool_MorphoReader), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 41, __pyx_L1_error)
+  __pyx_t_1 = __pyx_tp_new_10morphotool_MorphoReader(((PyTypeObject *)__pyx_ptype_10morphotool_MorphoReader), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_10morphotool_MorphoReader)))) __PYX_ERR(5, 41, __pyx_L1_error)
+  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_10morphotool_MorphoReader)))) __PYX_ERR(5, 46, __pyx_L1_error)
   __pyx_v_obj = ((struct __pyx_obj_10morphotool_MorphoReader *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "morpho_h5_v1.pxi":42
+  /* "morpho_h5_v1.pxi":47
  *     cdef MorphoReader from_ptr(morpho_h5_v1.morpho_reader *ptr, bool owner=False):
  *         cdef MorphoReader obj = MorphoReader.__new__(MorphoReader)
  *         obj._ptr = ptr             # <<<<<<<<<<<<<<
@@ -16601,7 +16672,7 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
  */
   __pyx_v_obj->__pyx_base._ptr = __pyx_v_ptr;
 
-  /* "morpho_h5_v1.pxi":43
+  /* "morpho_h5_v1.pxi":48
  *         cdef MorphoReader obj = MorphoReader.__new__(MorphoReader)
  *         obj._ptr = ptr
  *         if owner: obj._autodealoc.reset(obj.ptr())             # <<<<<<<<<<<<<<
@@ -16613,7 +16684,7 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
     __pyx_v_obj->_autodealoc.reset(((struct __pyx_vtabstruct_10morphotool_MorphoReader *)__pyx_v_obj->__pyx_base.__pyx_vtab)->ptr(__pyx_v_obj));
   }
 
-  /* "morpho_h5_v1.pxi":44
+  /* "morpho_h5_v1.pxi":49
  *         obj._ptr = ptr
  *         if owner: obj._autodealoc.reset(obj.ptr())
  *         return obj             # <<<<<<<<<<<<<<
@@ -16625,7 +16696,7 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
   __pyx_r = __pyx_v_obj;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":40
+  /* "morpho_h5_v1.pxi":45
  * 
  *     @staticmethod
  *     cdef MorphoReader from_ptr(morpho_h5_v1.morpho_reader *ptr, bool owner=False):             # <<<<<<<<<<<<<<
@@ -16645,7 +16716,7 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":47
+/* "morpho_h5_v1.pxi":52
  * 
  *     @staticmethod
  *     cdef MorphoReader from_ref(const morpho_h5_v1.morpho_reader &ref):             # <<<<<<<<<<<<<<
@@ -16659,7 +16730,7 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("from_ref", 0);
 
-  /* "morpho_h5_v1.pxi":48
+  /* "morpho_h5_v1.pxi":53
  *     @staticmethod
  *     cdef MorphoReader from_ref(const morpho_h5_v1.morpho_reader &ref):
  *         return MorphoReader.from_ptr(<morpho_h5_v1.morpho_reader*>&ref)             # <<<<<<<<<<<<<<
@@ -16667,13 +16738,13 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
  *     @staticmethod
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoReader->from_ptr(((morpho::h5_v1::morpho_reader *)(&__pyx_v_ref)), NULL)); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 48, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoReader->from_ptr(((morpho::h5_v1::morpho_reader *)(&__pyx_v_ref)), NULL)); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 53, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = ((struct __pyx_obj_10morphotool_MorphoReader *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":47
+  /* "morpho_h5_v1.pxi":52
  * 
  *     @staticmethod
  *     cdef MorphoReader from_ref(const morpho_h5_v1.morpho_reader &ref):             # <<<<<<<<<<<<<<
@@ -16692,7 +16763,7 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":51
+/* "morpho_h5_v1.pxi":56
  * 
  *     @staticmethod
  *     cdef MorphoReader from_value(const morpho_h5_v1.morpho_reader &ref):             # <<<<<<<<<<<<<<
@@ -16708,7 +16779,7 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
   struct __pyx_opt_args_10morphotool_12MorphoReader_from_ptr __pyx_t_2;
   __Pyx_RefNannySetupContext("from_value", 0);
 
-  /* "morpho_h5_v1.pxi":52
+  /* "morpho_h5_v1.pxi":57
  *     @staticmethod
  *     cdef MorphoReader from_value(const morpho_h5_v1.morpho_reader &ref):
  *         cdef morpho_h5_v1.morpho_reader *ptr = new morpho_h5_v1.morpho_reader(ref)             # <<<<<<<<<<<<<<
@@ -16717,7 +16788,7 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
  */
   __pyx_v_ptr = new morpho::h5_v1::morpho_reader(__pyx_v_ref);
 
-  /* "morpho_h5_v1.pxi":53
+  /* "morpho_h5_v1.pxi":58
  *     cdef MorphoReader from_value(const morpho_h5_v1.morpho_reader &ref):
  *         cdef morpho_h5_v1.morpho_reader *ptr = new morpho_h5_v1.morpho_reader(ref)
  *         return MorphoReader.from_ptr(ptr, True)             # <<<<<<<<<<<<<<
@@ -16727,13 +16798,13 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
   __Pyx_XDECREF(((PyObject *)__pyx_r));
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.owner = 1;
-  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoReader->from_ptr(__pyx_v_ptr, &__pyx_t_2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 53, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoReader->from_ptr(__pyx_v_ptr, &__pyx_t_2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 58, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = ((struct __pyx_obj_10morphotool_MorphoReader *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":51
+  /* "morpho_h5_v1.pxi":56
  * 
  *     @staticmethod
  *     cdef MorphoReader from_value(const morpho_h5_v1.morpho_reader &ref):             # <<<<<<<<<<<<<<
@@ -16752,7 +16823,7 @@ static struct __pyx_obj_10morphotool_MorphoReader *__pyx_f_10morphotool_12Morpho
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":56
+/* "morpho_h5_v1.pxi":61
  * 
  *     @staticmethod
  *     cdef list vectorPtr2list(std.vector[morpho_h5_v1.morpho_reader*] vec):             # <<<<<<<<<<<<<<
@@ -16770,7 +16841,7 @@ static PyObject *__pyx_f_10morphotool_12MorphoReader_vectorPtr2list(std::vector<
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("vectorPtr2list", 0);
 
-  /* "morpho_h5_v1.pxi":57
+  /* "morpho_h5_v1.pxi":62
  *     @staticmethod
  *     cdef list vectorPtr2list(std.vector[morpho_h5_v1.morpho_reader*] vec):
  *         return [MorphoReader.from_ptr(elem) for elem in vec]             # <<<<<<<<<<<<<<
@@ -16778,7 +16849,7 @@ static PyObject *__pyx_f_10morphotool_12MorphoReader_vectorPtr2list(std::vector<
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 57, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = __pyx_v_vec.begin();
   for (;;) {
@@ -16786,16 +16857,16 @@ static PyObject *__pyx_f_10morphotool_12MorphoReader_vectorPtr2list(std::vector<
     __pyx_t_3 = *__pyx_t_2;
     ++__pyx_t_2;
     __pyx_v_elem = __pyx_t_3;
-    __pyx_t_4 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoReader->from_ptr(__pyx_v_elem, NULL)); if (unlikely(!__pyx_t_4)) __PYX_ERR(5, 57, __pyx_L1_error)
+    __pyx_t_4 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoReader->from_ptr(__pyx_v_elem, NULL)); if (unlikely(!__pyx_t_4)) __PYX_ERR(5, 62, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) __PYX_ERR(5, 57, __pyx_L1_error)
+    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) __PYX_ERR(5, 62, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __pyx_r = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":56
+  /* "morpho_h5_v1.pxi":61
  * 
  *     @staticmethod
  *     cdef list vectorPtr2list(std.vector[morpho_h5_v1.morpho_reader*] vec):             # <<<<<<<<<<<<<<
@@ -16815,7 +16886,7 @@ static PyObject *__pyx_f_10morphotool_12MorphoReader_vectorPtr2list(std::vector<
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":66
+/* "morpho_h5_v1.pxi":71
  * # ----------------------------------------------------------------------------------------------------------------------
  *     cdef unique_ptr[morpho_h5_v1.morpho_writer] _autodealoc
  *     cdef morpho_h5_v1.morpho_writer *ptr(self):             # <<<<<<<<<<<<<<
@@ -16828,7 +16899,7 @@ static morpho::h5_v1::morpho_writer *__pyx_f_10morphotool_12MorphoWriter_ptr(str
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("ptr", 0);
 
-  /* "morpho_h5_v1.pxi":67
+  /* "morpho_h5_v1.pxi":72
  *     cdef unique_ptr[morpho_h5_v1.morpho_writer] _autodealoc
  *     cdef morpho_h5_v1.morpho_writer *ptr(self):
  *         return <morpho_h5_v1.morpho_writer*> self._ptr             # <<<<<<<<<<<<<<
@@ -16838,7 +16909,7 @@ static morpho::h5_v1::morpho_writer *__pyx_f_10morphotool_12MorphoWriter_ptr(str
   __pyx_r = ((morpho::h5_v1::morpho_writer *)__pyx_v_self->__pyx_base._ptr);
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":66
+  /* "morpho_h5_v1.pxi":71
  * # ----------------------------------------------------------------------------------------------------------------------
  *     cdef unique_ptr[morpho_h5_v1.morpho_writer] _autodealoc
  *     cdef morpho_h5_v1.morpho_writer *ptr(self):             # <<<<<<<<<<<<<<
@@ -16852,7 +16923,7 @@ static morpho::h5_v1::morpho_writer *__pyx_f_10morphotool_12MorphoWriter_ptr(str
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":69
+/* "morpho_h5_v1.pxi":74
  *         return <morpho_h5_v1.morpho_writer*> self._ptr
  * 
  *     def __init__(self, std.string filename):             # <<<<<<<<<<<<<<
@@ -16885,18 +16956,18 @@ static int __pyx_pw_10morphotool_12MorphoWriter_1__init__(PyObject *__pyx_v_self
         else goto __pyx_L5_argtuple_error;
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(5, 69, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "__init__") < 0)) __PYX_ERR(5, 74, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 1) {
       goto __pyx_L5_argtuple_error;
     } else {
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
     }
-    __pyx_v_filename = __pyx_convert_string_from_py_std__in_string(values[0]); if (unlikely(PyErr_Occurred())) __PYX_ERR(5, 69, __pyx_L3_error)
+    __pyx_v_filename = __pyx_convert_string_from_py_std__in_string(values[0]); if (unlikely(PyErr_Occurred())) __PYX_ERR(5, 74, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(5, 69, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("__init__", 1, 1, 1, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(5, 74, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("morphotool.MorphoWriter.__init__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -16914,7 +16985,7 @@ static int __pyx_pf_10morphotool_12MorphoWriter___init__(struct __pyx_obj_10morp
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__init__", 0);
 
-  /* "morpho_h5_v1.pxi":70
+  /* "morpho_h5_v1.pxi":75
  * 
  *     def __init__(self, std.string filename):
  *         self._ptr = new morpho_h5_v1.morpho_writer(filename)             # <<<<<<<<<<<<<<
@@ -16923,7 +16994,7 @@ static int __pyx_pf_10morphotool_12MorphoWriter___init__(struct __pyx_obj_10morp
  */
   __pyx_v_self->__pyx_base._ptr = new morpho::h5_v1::morpho_writer(__pyx_v_filename);
 
-  /* "morpho_h5_v1.pxi":71
+  /* "morpho_h5_v1.pxi":76
  *     def __init__(self, std.string filename):
  *         self._ptr = new morpho_h5_v1.morpho_writer(filename)
  *         self._autodealoc.reset(self.ptr())             # <<<<<<<<<<<<<<
@@ -16932,7 +17003,7 @@ static int __pyx_pf_10morphotool_12MorphoWriter___init__(struct __pyx_obj_10morp
  */
   __pyx_v_self->_autodealoc.reset(((struct __pyx_vtabstruct_10morphotool_MorphoWriter *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self));
 
-  /* "morpho_h5_v1.pxi":69
+  /* "morpho_h5_v1.pxi":74
  *         return <morpho_h5_v1.morpho_writer*> self._ptr
  * 
  *     def __init__(self, std.string filename):             # <<<<<<<<<<<<<<
@@ -16946,7 +17017,7 @@ static int __pyx_pf_10morphotool_12MorphoWriter___init__(struct __pyx_obj_10morp
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":73
+/* "morpho_h5_v1.pxi":78
  *         self._autodealoc.reset(self.ptr())
  * 
  *     def write(self, MorphoTree tree):             # <<<<<<<<<<<<<<
@@ -16960,7 +17031,7 @@ static PyObject *__pyx_pw_10morphotool_12MorphoWriter_3write(PyObject *__pyx_v_s
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("write (wrapper)", 0);
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_tree), __pyx_ptype_10morphotool_MorphoTree, 1, "tree", 0))) __PYX_ERR(5, 73, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_tree), __pyx_ptype_10morphotool_MorphoTree, 1, "tree", 0))) __PYX_ERR(5, 78, __pyx_L1_error)
   __pyx_r = __pyx_pf_10morphotool_12MorphoWriter_2write(((struct __pyx_obj_10morphotool_MorphoWriter *)__pyx_v_self), ((struct __pyx_obj_10morphotool_MorphoTree *)__pyx_v_tree));
 
   /* function exit code */
@@ -16978,7 +17049,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoWriter_2write(struct __pyx_obj_10
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("write", 0);
 
-  /* "morpho_h5_v1.pxi":74
+  /* "morpho_h5_v1.pxi":79
  * 
  *     def write(self, MorphoTree tree):
  *         return self.ptr().write(deref(tree.ptr()))             # <<<<<<<<<<<<<<
@@ -16986,13 +17057,13 @@ static PyObject *__pyx_pf_10morphotool_12MorphoWriter_2write(struct __pyx_obj_10
  *     @staticmethod
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(((struct __pyx_vtabstruct_10morphotool_MorphoWriter *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->write((*((struct __pyx_vtabstruct_10morphotool_MorphoTree *)__pyx_v_tree->__pyx_base.__pyx_vtab)->ptr(__pyx_v_tree)))); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 74, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(((struct __pyx_vtabstruct_10morphotool_MorphoWriter *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)->write((*((struct __pyx_vtabstruct_10morphotool_MorphoTree *)__pyx_v_tree->__pyx_base.__pyx_vtab)->ptr(__pyx_v_tree)))); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 79, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":73
+  /* "morpho_h5_v1.pxi":78
  *         self._autodealoc.reset(self.ptr())
  * 
  *     def write(self, MorphoTree tree):             # <<<<<<<<<<<<<<
@@ -17011,7 +17082,7 @@ static PyObject *__pyx_pf_10morphotool_12MorphoWriter_2write(struct __pyx_obj_10
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":77
+/* "morpho_h5_v1.pxi":82
  * 
  *     @staticmethod
  *     cdef MorphoWriter from_ptr(morpho_h5_v1.morpho_writer *ptr, bool owner=False):             # <<<<<<<<<<<<<<
@@ -17033,20 +17104,20 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
     }
   }
 
-  /* "morpho_h5_v1.pxi":78
+  /* "morpho_h5_v1.pxi":83
  *     @staticmethod
  *     cdef MorphoWriter from_ptr(morpho_h5_v1.morpho_writer *ptr, bool owner=False):
  *         cdef MorphoWriter obj = MorphoWriter.__new__(MorphoWriter)             # <<<<<<<<<<<<<<
  *         obj._ptr = ptr
  *         if owner: obj._autodealoc.reset(obj.ptr())
  */
-  __pyx_t_1 = __pyx_tp_new_10morphotool_MorphoWriter(((PyTypeObject *)__pyx_ptype_10morphotool_MorphoWriter), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 78, __pyx_L1_error)
+  __pyx_t_1 = __pyx_tp_new_10morphotool_MorphoWriter(((PyTypeObject *)__pyx_ptype_10morphotool_MorphoWriter), __pyx_empty_tuple, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 83, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_10morphotool_MorphoWriter)))) __PYX_ERR(5, 78, __pyx_L1_error)
+  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_10morphotool_MorphoWriter)))) __PYX_ERR(5, 83, __pyx_L1_error)
   __pyx_v_obj = ((struct __pyx_obj_10morphotool_MorphoWriter *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "morpho_h5_v1.pxi":79
+  /* "morpho_h5_v1.pxi":84
  *     cdef MorphoWriter from_ptr(morpho_h5_v1.morpho_writer *ptr, bool owner=False):
  *         cdef MorphoWriter obj = MorphoWriter.__new__(MorphoWriter)
  *         obj._ptr = ptr             # <<<<<<<<<<<<<<
@@ -17055,7 +17126,7 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
  */
   __pyx_v_obj->__pyx_base._ptr = __pyx_v_ptr;
 
-  /* "morpho_h5_v1.pxi":80
+  /* "morpho_h5_v1.pxi":85
  *         cdef MorphoWriter obj = MorphoWriter.__new__(MorphoWriter)
  *         obj._ptr = ptr
  *         if owner: obj._autodealoc.reset(obj.ptr())             # <<<<<<<<<<<<<<
@@ -17067,7 +17138,7 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
     __pyx_v_obj->_autodealoc.reset(((struct __pyx_vtabstruct_10morphotool_MorphoWriter *)__pyx_v_obj->__pyx_base.__pyx_vtab)->ptr(__pyx_v_obj));
   }
 
-  /* "morpho_h5_v1.pxi":81
+  /* "morpho_h5_v1.pxi":86
  *         obj._ptr = ptr
  *         if owner: obj._autodealoc.reset(obj.ptr())
  *         return obj             # <<<<<<<<<<<<<<
@@ -17079,7 +17150,7 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
   __pyx_r = __pyx_v_obj;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":77
+  /* "morpho_h5_v1.pxi":82
  * 
  *     @staticmethod
  *     cdef MorphoWriter from_ptr(morpho_h5_v1.morpho_writer *ptr, bool owner=False):             # <<<<<<<<<<<<<<
@@ -17099,7 +17170,7 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":84
+/* "morpho_h5_v1.pxi":89
  * 
  *     @staticmethod
  *     cdef MorphoWriter from_ref(const morpho_h5_v1.morpho_writer &ref):             # <<<<<<<<<<<<<<
@@ -17113,7 +17184,7 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("from_ref", 0);
 
-  /* "morpho_h5_v1.pxi":85
+  /* "morpho_h5_v1.pxi":90
  *     @staticmethod
  *     cdef MorphoWriter from_ref(const morpho_h5_v1.morpho_writer &ref):
  *         return MorphoWriter.from_ptr(<morpho_h5_v1.morpho_writer*>&ref)             # <<<<<<<<<<<<<<
@@ -17121,13 +17192,13 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
  *     @staticmethod
  */
   __Pyx_XDECREF(((PyObject *)__pyx_r));
-  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoWriter->from_ptr(((morpho::h5_v1::morpho_writer *)(&__pyx_v_ref)), NULL)); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 85, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoWriter->from_ptr(((morpho::h5_v1::morpho_writer *)(&__pyx_v_ref)), NULL)); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 90, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = ((struct __pyx_obj_10morphotool_MorphoWriter *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":84
+  /* "morpho_h5_v1.pxi":89
  * 
  *     @staticmethod
  *     cdef MorphoWriter from_ref(const morpho_h5_v1.morpho_writer &ref):             # <<<<<<<<<<<<<<
@@ -17146,7 +17217,7 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":88
+/* "morpho_h5_v1.pxi":93
  * 
  *     @staticmethod
  *     cdef MorphoWriter from_value(const morpho_h5_v1.morpho_writer &ref):             # <<<<<<<<<<<<<<
@@ -17162,7 +17233,7 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
   struct __pyx_opt_args_10morphotool_12MorphoWriter_from_ptr __pyx_t_2;
   __Pyx_RefNannySetupContext("from_value", 0);
 
-  /* "morpho_h5_v1.pxi":89
+  /* "morpho_h5_v1.pxi":94
  *     @staticmethod
  *     cdef MorphoWriter from_value(const morpho_h5_v1.morpho_writer &ref):
  *         cdef morpho_h5_v1.morpho_writer *ptr = new morpho_h5_v1.morpho_writer(ref)             # <<<<<<<<<<<<<<
@@ -17171,7 +17242,7 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
  */
   __pyx_v_ptr = new morpho::h5_v1::morpho_writer(__pyx_v_ref);
 
-  /* "morpho_h5_v1.pxi":90
+  /* "morpho_h5_v1.pxi":95
  *     cdef MorphoWriter from_value(const morpho_h5_v1.morpho_writer &ref):
  *         cdef morpho_h5_v1.morpho_writer *ptr = new morpho_h5_v1.morpho_writer(ref)
  *         return MorphoWriter.from_ptr(ptr, True)             # <<<<<<<<<<<<<<
@@ -17181,13 +17252,13 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
   __Pyx_XDECREF(((PyObject *)__pyx_r));
   __pyx_t_2.__pyx_n = 1;
   __pyx_t_2.owner = 1;
-  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoWriter->from_ptr(__pyx_v_ptr, &__pyx_t_2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 90, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoWriter->from_ptr(__pyx_v_ptr, &__pyx_t_2)); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 95, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = ((struct __pyx_obj_10morphotool_MorphoWriter *)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":88
+  /* "morpho_h5_v1.pxi":93
  * 
  *     @staticmethod
  *     cdef MorphoWriter from_value(const morpho_h5_v1.morpho_writer &ref):             # <<<<<<<<<<<<<<
@@ -17206,7 +17277,7 @@ static struct __pyx_obj_10morphotool_MorphoWriter *__pyx_f_10morphotool_12Morpho
   return __pyx_r;
 }
 
-/* "morpho_h5_v1.pxi":93
+/* "morpho_h5_v1.pxi":98
  * 
  *     @staticmethod
  *     cdef list vectorPtr2list(std.vector[morpho_h5_v1.morpho_writer*] vec):             # <<<<<<<<<<<<<<
@@ -17223,13 +17294,13 @@ static PyObject *__pyx_f_10morphotool_12MorphoWriter_vectorPtr2list(std::vector<
   PyObject *__pyx_t_4 = NULL;
   __Pyx_RefNannySetupContext("vectorPtr2list", 0);
 
-  /* "morpho_h5_v1.pxi":94
+  /* "morpho_h5_v1.pxi":99
  *     @staticmethod
  *     cdef list vectorPtr2list(std.vector[morpho_h5_v1.morpho_writer*] vec):
  *         return [MorphoWriter.from_ptr(elem) for elem in vec]             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 94, __pyx_L1_error)
+  __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(5, 99, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_t_2 = __pyx_v_vec.begin();
   for (;;) {
@@ -17237,16 +17308,16 @@ static PyObject *__pyx_f_10morphotool_12MorphoWriter_vectorPtr2list(std::vector<
     __pyx_t_3 = *__pyx_t_2;
     ++__pyx_t_2;
     __pyx_v_elem = __pyx_t_3;
-    __pyx_t_4 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoWriter->from_ptr(__pyx_v_elem, NULL)); if (unlikely(!__pyx_t_4)) __PYX_ERR(5, 94, __pyx_L1_error)
+    __pyx_t_4 = ((PyObject *)__pyx_vtabptr_10morphotool_MorphoWriter->from_ptr(__pyx_v_elem, NULL)); if (unlikely(!__pyx_t_4)) __PYX_ERR(5, 99, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) __PYX_ERR(5, 94, __pyx_L1_error)
+    if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_4))) __PYX_ERR(5, 99, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   }
   __pyx_r = ((PyObject*)__pyx_t_1);
   __pyx_t_1 = 0;
   goto __pyx_L0;
 
-  /* "morpho_h5_v1.pxi":93
+  /* "morpho_h5_v1.pxi":98
  * 
  *     @staticmethod
  *     cdef list vectorPtr2list(std.vector[morpho_h5_v1.morpho_writer*] vec):             # <<<<<<<<<<<<<<
@@ -18259,7 +18330,7 @@ static int __pyx_pf_10morphotool_23_py_transpose_operation___init__(struct __pyx
  *         if len(quaternion_transpose) !=4:
  *             raise ValueError("Quaternion transpose must have 4 doubles")
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__7, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 98, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 98, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -18292,7 +18363,7 @@ static int __pyx_pf_10morphotool_23_py_transpose_operation___init__(struct __pyx
  * 
  *         cdef int i = 0
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__8, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 100, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(3, 100, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -19662,7 +19733,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__9, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(6, 218, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(6, 218, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -19718,7 +19789,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  * 
  *             info.buf = PyArray_DATA(self)
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__10, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(6, 222, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(6, 222, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -20027,7 +20098,7 @@ static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, P
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__11, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(6, 259, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(6, 259, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -20842,7 +20913,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__12, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(6, 799, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(6, 799, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -20910,7 +20981,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__13, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(6, 803, __pyx_L1_error)
+      __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(6, 803, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       __Pyx_Raise(__pyx_t_3, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -21019,7 +21090,7 @@ static CYTHON_INLINE char *__pyx_f_5numpy__util_dtypestring(PyArray_Descr *__pyx
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__14, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(6, 823, __pyx_L1_error)
+        __pyx_t_4 = __Pyx_PyObject_Call(__pyx_builtin_RuntimeError, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(6, 823, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
         __Pyx_Raise(__pyx_t_4, 0, 0, 0);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -21700,7 +21771,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_array(void) {
  * 
  * cdef inline int import_umath() except -1:
  */
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__15, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(6, 989, __pyx_L5_except_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(6, 989, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_Raise(__pyx_t_8, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -21831,7 +21902,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_umath(void) {
  * 
  * cdef inline int import_ufunc() except -1:
  */
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__16, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(6, 995, __pyx_L5_except_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(6, 995, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_Raise(__pyx_t_8, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -21959,7 +22030,7 @@ static CYTHON_INLINE int __pyx_f_5numpy_import_ufunc(void) {
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
  */
-      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__17, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(6, 1001, __pyx_L5_except_error)
+      __pyx_t_8 = __Pyx_PyObject_Call(__pyx_builtin_ImportError, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_8)) __PYX_ERR(6, 1001, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_8);
       __Pyx_Raise(__pyx_t_8, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_8); __pyx_t_8 = 0;
@@ -22769,7 +22840,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __
  * 
  *         if itemsize <= 0:
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__18, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(7, 131, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(7, 131, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -22801,7 +22872,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __
  * 
  *         if not isinstance(format, bytes):
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__19, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(7, 134, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(7, 134, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -22836,7 +22907,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __
  */
     __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_v_format, __pyx_n_s_encode); if (unlikely(!__pyx_t_3)) __PYX_ERR(7, 137, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__20, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(7, 137, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(7, 137, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF_SET(__pyx_v_format, __pyx_t_5);
@@ -22912,7 +22983,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __
  * 
  * 
  */
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__21, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(7, 146, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(7, 146, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_Raise(__pyx_t_5, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -23196,7 +23267,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __
  * 
  *             if self.dtype_is_object:
  */
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__22, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(7, 174, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_MemoryError, __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(7, 174, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_Raise(__pyx_t_5, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -23434,7 +23505,7 @@ static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array_2__getbuffer__(stru
  *         info.buf = self.data
  *         info.len = self.len
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__23, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(7, 190, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(7, 190, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -26400,7 +26471,7 @@ static PyObject *__pyx_memoryview_convert_item_to_object(struct __pyx_memoryview
  *         else:
  *             if len(self.view.format) == 1:
  */
-      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__24, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(7, 484, __pyx_L5_except_error)
+      __pyx_t_6 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_6)) __PYX_ERR(7, 484, __pyx_L5_except_error)
       __Pyx_GOTREF(__pyx_t_6);
       __Pyx_Raise(__pyx_t_6, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
@@ -27241,7 +27312,7 @@ static PyObject *__pyx_pf_15View_dot_MemoryView_10memoryview_7strides___get__(st
  * 
  *         return tuple([stride for stride in self.view.strides[:self.view.ndim]])
  */
-    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__25, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(7, 556, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__26, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(7, 556, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_Raise(__pyx_t_2, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -27355,7 +27426,7 @@ static PyObject *__pyx_pf_15View_dot_MemoryView_10memoryview_10suboffsets___get_
     __Pyx_XDECREF(__pyx_r);
     __pyx_t_2 = __Pyx_PyInt_From_int(__pyx_v_self->view.ndim); if (unlikely(!__pyx_t_2)) __PYX_ERR(7, 563, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_3 = PyNumber_Multiply(__pyx_tuple__26, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(7, 563, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Multiply(__pyx_tuple__27, __pyx_t_2); if (unlikely(!__pyx_t_3)) __PYX_ERR(7, 563, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_r = __pyx_t_3;
@@ -28659,9 +28730,9 @@ static PyObject *_unellipsify(PyObject *__pyx_v_index, int __pyx_v_ndim) {
         __Pyx_GOTREF(__pyx_t_7);
         { Py_ssize_t __pyx_temp;
           for (__pyx_temp=0; __pyx_temp < ((__pyx_v_ndim - __pyx_t_8) + 1); __pyx_temp++) {
-            __Pyx_INCREF(__pyx_slice__27);
-            __Pyx_GIVEREF(__pyx_slice__27);
-            PyList_SET_ITEM(__pyx_t_7, __pyx_temp, __pyx_slice__27);
+            __Pyx_INCREF(__pyx_slice__28);
+            __Pyx_GIVEREF(__pyx_slice__28);
+            PyList_SET_ITEM(__pyx_t_7, __pyx_temp, __pyx_slice__28);
           }
         }
         __pyx_t_9 = __Pyx_PyList_Extend(__pyx_v_result, __pyx_t_7); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(7, 668, __pyx_L1_error)
@@ -28694,7 +28765,7 @@ static PyObject *_unellipsify(PyObject *__pyx_v_index, int __pyx_v_ndim) {
  *         else:
  */
       /*else*/ {
-        __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_result, __pyx_slice__28); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(7, 671, __pyx_L1_error)
+        __pyx_t_9 = __Pyx_PyList_Append(__pyx_v_result, __pyx_slice__29); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(7, 671, __pyx_L1_error)
       }
       __pyx_L7:;
 
@@ -28839,9 +28910,9 @@ static PyObject *_unellipsify(PyObject *__pyx_v_index, int __pyx_v_ndim) {
     __Pyx_GOTREF(__pyx_t_3);
     { Py_ssize_t __pyx_temp;
       for (__pyx_temp=0; __pyx_temp < __pyx_v_nslices; __pyx_temp++) {
-        __Pyx_INCREF(__pyx_slice__29);
-        __Pyx_GIVEREF(__pyx_slice__29);
-        PyList_SET_ITEM(__pyx_t_3, __pyx_temp, __pyx_slice__29);
+        __Pyx_INCREF(__pyx_slice__30);
+        __Pyx_GIVEREF(__pyx_slice__30);
+        PyList_SET_ITEM(__pyx_t_3, __pyx_temp, __pyx_slice__30);
       }
     }
     __pyx_t_9 = __Pyx_PyList_Extend(__pyx_v_result, __pyx_t_3); if (unlikely(__pyx_t_9 == -1)) __PYX_ERR(7, 682, __pyx_L1_error)
@@ -28965,7 +29036,7 @@ static PyObject *assert_direct_dimensions(Py_ssize_t *__pyx_v_suboffsets, int __
  * 
  * 
  */
-      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__30, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(7, 689, __pyx_L1_error)
+      __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__31, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(7, 689, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
       __Pyx_Raise(__pyx_t_5, 0, 0, 0);
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
@@ -38584,6 +38655,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s__6, __pyx_k__6, sizeof(__pyx_k__6), 0, 0, 1, 0},
   {&__pyx_n_s_allocate_buffer, __pyx_k_allocate_buffer, sizeof(__pyx_k_allocate_buffer), 0, 0, 1, 1},
   {&__pyx_n_s_args, __pyx_k_args, sizeof(__pyx_k_args), 0, 0, 1, 1},
+  {&__pyx_n_s_ascii, __pyx_k_ascii, sizeof(__pyx_k_ascii), 0, 0, 1, 1},
   {&__pyx_n_s_axon, __pyx_k_axon, sizeof(__pyx_k_axon), 0, 0, 1, 1},
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
@@ -38765,6 +38837,17 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
+  /* "morpho_h5_v1.pxi":16
+ *         cdef std.string fname
+ *         if isinstance(filename, unicode):
+ *             fname = filename.encode('ascii')             # <<<<<<<<<<<<<<
+ *         else:
+ *             fname = filename
+ */
+  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_n_s_ascii); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(5, 16, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__7);
+  __Pyx_GIVEREF(__pyx_tuple__7);
+
   /* "morpho_transform_spatial.pxi":98
  *         cdef morpho.quaternion3d vec4
  *         if len(vector_transpose) !=3:
@@ -38772,9 +38855,9 @@ static int __Pyx_InitCachedConstants(void) {
  *         if len(quaternion_transpose) !=4:
  *             raise ValueError("Quaternion transpose must have 4 doubles")
  */
-  __pyx_tuple__7 = PyTuple_Pack(1, __pyx_kp_s_Vector_transpose_must_have_3_dou); if (unlikely(!__pyx_tuple__7)) __PYX_ERR(3, 98, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__7);
-  __Pyx_GIVEREF(__pyx_tuple__7);
+  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_Vector_transpose_must_have_3_dou); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(3, 98, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__8);
+  __Pyx_GIVEREF(__pyx_tuple__8);
 
   /* "morpho_transform_spatial.pxi":100
  *             raise ValueError("Vector transpose must have 3 doubles")
@@ -38783,9 +38866,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         cdef int i = 0
  */
-  __pyx_tuple__8 = PyTuple_Pack(1, __pyx_kp_s_Quaternion_transpose_must_have_4); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(3, 100, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__8);
-  __Pyx_GIVEREF(__pyx_tuple__8);
+  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_s_Quaternion_transpose_must_have_4); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(3, 100, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__9);
+  __Pyx_GIVEREF(__pyx_tuple__9);
 
   /* "../../../../../../../usr/lib64/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":218
  *             if ((flags & pybuf.PyBUF_C_CONTIGUOUS == pybuf.PyBUF_C_CONTIGUOUS)
@@ -38794,9 +38877,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
  */
-  __pyx_tuple__9 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__9)) __PYX_ERR(6, 218, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__9);
-  __Pyx_GIVEREF(__pyx_tuple__9);
+  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_C_contiguous); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(6, 218, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__10);
+  __Pyx_GIVEREF(__pyx_tuple__10);
 
   /* "../../../../../../../usr/lib64/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":222
  *             if ((flags & pybuf.PyBUF_F_CONTIGUOUS == pybuf.PyBUF_F_CONTIGUOUS)
@@ -38805,9 +38888,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             info.buf = PyArray_DATA(self)
  */
-  __pyx_tuple__10 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(6, 222, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__10);
-  __Pyx_GIVEREF(__pyx_tuple__10);
+  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_u_ndarray_is_not_Fortran_contiguou); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(6, 222, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__11);
+  __Pyx_GIVEREF(__pyx_tuple__11);
 
   /* "../../../../../../../usr/lib64/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":259
  *                 if ((descr.byteorder == c'>' and little_endian) or
@@ -38816,9 +38899,9 @@ static int __Pyx_InitCachedConstants(void) {
  *                 if   t == NPY_BYTE:        f = "b"
  *                 elif t == NPY_UBYTE:       f = "B"
  */
-  __pyx_tuple__11 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__11)) __PYX_ERR(6, 259, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__11);
-  __Pyx_GIVEREF(__pyx_tuple__11);
+  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(6, 259, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__12);
+  __Pyx_GIVEREF(__pyx_tuple__12);
 
   /* "../../../../../../../usr/lib64/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":799
  * 
@@ -38827,9 +38910,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         if ((child.byteorder == c'>' and little_endian) or
  */
-  __pyx_tuple__12 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__12)) __PYX_ERR(6, 799, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__12);
-  __Pyx_GIVEREF(__pyx_tuple__12);
+  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(6, 799, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__13);
+  __Pyx_GIVEREF(__pyx_tuple__13);
 
   /* "../../../../../../../usr/lib64/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":803
  *         if ((child.byteorder == c'>' and little_endian) or
@@ -38838,9 +38921,9 @@ static int __Pyx_InitCachedConstants(void) {
  *             # One could encode it in the format string and have Cython
  *             # complain instead, BUT: < and > in format strings also imply
  */
-  __pyx_tuple__13 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__13)) __PYX_ERR(6, 803, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__13);
-  __Pyx_GIVEREF(__pyx_tuple__13);
+  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_u_Non_native_byte_order_not_suppor); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(6, 803, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__14);
+  __Pyx_GIVEREF(__pyx_tuple__14);
 
   /* "../../../../../../../usr/lib64/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":823
  *             t = child.type_num
@@ -38849,9 +38932,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             # Until ticket #99 is fixed, use integers to avoid warnings
  */
-  __pyx_tuple__14 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__14)) __PYX_ERR(6, 823, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__14);
-  __Pyx_GIVEREF(__pyx_tuple__14);
+  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_u_Format_string_allocated_too_shor_2); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(6, 823, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__15);
+  __Pyx_GIVEREF(__pyx_tuple__15);
 
   /* "../../../../../../../usr/lib64/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":989
  *         _import_array()
@@ -38860,9 +38943,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * cdef inline int import_umath() except -1:
  */
-  __pyx_tuple__15 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_multiarray_failed_to); if (unlikely(!__pyx_tuple__15)) __PYX_ERR(6, 989, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__15);
-  __Pyx_GIVEREF(__pyx_tuple__15);
+  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_multiarray_failed_to); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(6, 989, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__16);
+  __Pyx_GIVEREF(__pyx_tuple__16);
 
   /* "../../../../../../../usr/lib64/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":995
  *         _import_umath()
@@ -38871,18 +38954,18 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * cdef inline int import_ufunc() except -1:
  */
-  __pyx_tuple__16 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_umath_failed_to_impor); if (unlikely(!__pyx_tuple__16)) __PYX_ERR(6, 995, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__16);
-  __Pyx_GIVEREF(__pyx_tuple__16);
+  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_umath_failed_to_impor); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(6, 995, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__17);
+  __Pyx_GIVEREF(__pyx_tuple__17);
 
   /* "../../../../../../../usr/lib64/python2.7/site-packages/Cython/Includes/numpy/__init__.pxd":1001
  *         _import_umath()
  *     except Exception:
  *         raise ImportError("numpy.core.umath failed to import")             # <<<<<<<<<<<<<<
  */
-  __pyx_tuple__17 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_umath_failed_to_impor); if (unlikely(!__pyx_tuple__17)) __PYX_ERR(6, 1001, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__17);
-  __Pyx_GIVEREF(__pyx_tuple__17);
+  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_s_numpy_core_umath_failed_to_impor); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(6, 1001, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__18);
+  __Pyx_GIVEREF(__pyx_tuple__18);
 
   /* "View.MemoryView":131
  * 
@@ -38891,9 +38974,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         if itemsize <= 0:
  */
-  __pyx_tuple__18 = PyTuple_Pack(1, __pyx_kp_s_Empty_shape_tuple_for_cython_arr); if (unlikely(!__pyx_tuple__18)) __PYX_ERR(7, 131, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__18);
-  __Pyx_GIVEREF(__pyx_tuple__18);
+  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_s_Empty_shape_tuple_for_cython_arr); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(7, 131, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__19);
+  __Pyx_GIVEREF(__pyx_tuple__19);
 
   /* "View.MemoryView":134
  * 
@@ -38902,9 +38985,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         if not isinstance(format, bytes):
  */
-  __pyx_tuple__19 = PyTuple_Pack(1, __pyx_kp_s_itemsize_0_for_cython_array); if (unlikely(!__pyx_tuple__19)) __PYX_ERR(7, 134, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__19);
-  __Pyx_GIVEREF(__pyx_tuple__19);
+  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_kp_s_itemsize_0_for_cython_array); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(7, 134, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__20);
+  __Pyx_GIVEREF(__pyx_tuple__20);
 
   /* "View.MemoryView":137
  * 
@@ -38913,9 +38996,9 @@ static int __Pyx_InitCachedConstants(void) {
  *         self._format = format  # keep a reference to the byte string
  *         self.format = self._format
  */
-  __pyx_tuple__20 = PyTuple_Pack(1, __pyx_n_s_ASCII); if (unlikely(!__pyx_tuple__20)) __PYX_ERR(7, 137, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__20);
-  __Pyx_GIVEREF(__pyx_tuple__20);
+  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_n_s_ASCII); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(7, 137, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__21);
+  __Pyx_GIVEREF(__pyx_tuple__21);
 
   /* "View.MemoryView":146
  * 
@@ -38924,9 +39007,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__21 = PyTuple_Pack(1, __pyx_kp_s_unable_to_allocate_shape_and_str); if (unlikely(!__pyx_tuple__21)) __PYX_ERR(7, 146, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__21);
-  __Pyx_GIVEREF(__pyx_tuple__21);
+  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_s_unable_to_allocate_shape_and_str); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(7, 146, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__22);
+  __Pyx_GIVEREF(__pyx_tuple__22);
 
   /* "View.MemoryView":174
  *             self.data = <char *>malloc(self.len)
@@ -38935,9 +39018,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *             if self.dtype_is_object:
  */
-  __pyx_tuple__22 = PyTuple_Pack(1, __pyx_kp_s_unable_to_allocate_array_data); if (unlikely(!__pyx_tuple__22)) __PYX_ERR(7, 174, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__22);
-  __Pyx_GIVEREF(__pyx_tuple__22);
+  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_s_unable_to_allocate_array_data); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(7, 174, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__23);
+  __Pyx_GIVEREF(__pyx_tuple__23);
 
   /* "View.MemoryView":190
  *             bufmode = PyBUF_F_CONTIGUOUS | PyBUF_ANY_CONTIGUOUS
@@ -38946,9 +39029,9 @@ static int __Pyx_InitCachedConstants(void) {
  *         info.buf = self.data
  *         info.len = self.len
  */
-  __pyx_tuple__23 = PyTuple_Pack(1, __pyx_kp_s_Can_only_create_a_buffer_that_is); if (unlikely(!__pyx_tuple__23)) __PYX_ERR(7, 190, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__23);
-  __Pyx_GIVEREF(__pyx_tuple__23);
+  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_Can_only_create_a_buffer_that_is); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(7, 190, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__24);
+  __Pyx_GIVEREF(__pyx_tuple__24);
 
   /* "View.MemoryView":484
  *             result = struct.unpack(self.view.format, bytesitem)
@@ -38957,9 +39040,9 @@ static int __Pyx_InitCachedConstants(void) {
  *         else:
  *             if len(self.view.format) == 1:
  */
-  __pyx_tuple__24 = PyTuple_Pack(1, __pyx_kp_s_Unable_to_convert_item_to_object); if (unlikely(!__pyx_tuple__24)) __PYX_ERR(7, 484, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__24);
-  __Pyx_GIVEREF(__pyx_tuple__24);
+  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_kp_s_Unable_to_convert_item_to_object); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(7, 484, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__25);
+  __Pyx_GIVEREF(__pyx_tuple__25);
 
   /* "View.MemoryView":556
  *         if self.view.strides == NULL:
@@ -38968,9 +39051,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         return tuple([stride for stride in self.view.strides[:self.view.ndim]])
  */
-  __pyx_tuple__25 = PyTuple_Pack(1, __pyx_kp_s_Buffer_view_does_not_expose_stri); if (unlikely(!__pyx_tuple__25)) __PYX_ERR(7, 556, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__25);
-  __Pyx_GIVEREF(__pyx_tuple__25);
+  __pyx_tuple__26 = PyTuple_Pack(1, __pyx_kp_s_Buffer_view_does_not_expose_stri); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(7, 556, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__26);
+  __Pyx_GIVEREF(__pyx_tuple__26);
 
   /* "View.MemoryView":563
  *     def suboffsets(self):
@@ -38979,12 +39062,12 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *         return tuple([suboffset for suboffset in self.view.suboffsets[:self.view.ndim]])
  */
-  __pyx_tuple__26 = PyTuple_New(1); if (unlikely(!__pyx_tuple__26)) __PYX_ERR(7, 563, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__26);
+  __pyx_tuple__27 = PyTuple_New(1); if (unlikely(!__pyx_tuple__27)) __PYX_ERR(7, 563, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__27);
   __Pyx_INCREF(__pyx_int_neg_1);
   __Pyx_GIVEREF(__pyx_int_neg_1);
-  PyTuple_SET_ITEM(__pyx_tuple__26, 0, __pyx_int_neg_1);
-  __Pyx_GIVEREF(__pyx_tuple__26);
+  PyTuple_SET_ITEM(__pyx_tuple__27, 0, __pyx_int_neg_1);
+  __Pyx_GIVEREF(__pyx_tuple__27);
 
   /* "View.MemoryView":668
  *         if item is Ellipsis:
@@ -38993,9 +39076,9 @@ static int __Pyx_InitCachedConstants(void) {
  *                 seen_ellipsis = True
  *             else:
  */
-  __pyx_slice__27 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__27)) __PYX_ERR(7, 668, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_slice__27);
-  __Pyx_GIVEREF(__pyx_slice__27);
+  __pyx_slice__28 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__28)) __PYX_ERR(7, 668, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_slice__28);
+  __Pyx_GIVEREF(__pyx_slice__28);
 
   /* "View.MemoryView":671
  *                 seen_ellipsis = True
@@ -39004,9 +39087,9 @@ static int __Pyx_InitCachedConstants(void) {
  *             have_slices = True
  *         else:
  */
-  __pyx_slice__28 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__28)) __PYX_ERR(7, 671, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_slice__28);
-  __Pyx_GIVEREF(__pyx_slice__28);
+  __pyx_slice__29 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__29)) __PYX_ERR(7, 671, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_slice__29);
+  __Pyx_GIVEREF(__pyx_slice__29);
 
   /* "View.MemoryView":682
  *     nslices = ndim - len(result)
@@ -39015,9 +39098,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  *     return have_slices or nslices, tuple(result)
  */
-  __pyx_slice__29 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__29)) __PYX_ERR(7, 682, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_slice__29);
-  __Pyx_GIVEREF(__pyx_slice__29);
+  __pyx_slice__30 = PySlice_New(Py_None, Py_None, Py_None); if (unlikely(!__pyx_slice__30)) __PYX_ERR(7, 682, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_slice__30);
+  __Pyx_GIVEREF(__pyx_slice__30);
 
   /* "View.MemoryView":689
  *     for suboffset in suboffsets[:ndim]:
@@ -39026,9 +39109,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__30 = PyTuple_Pack(1, __pyx_kp_s_Indirect_dimensions_not_supporte); if (unlikely(!__pyx_tuple__30)) __PYX_ERR(7, 689, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__30);
-  __Pyx_GIVEREF(__pyx_tuple__30);
+  __pyx_tuple__31 = PyTuple_Pack(1, __pyx_kp_s_Indirect_dimensions_not_supporte); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(7, 689, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__31);
+  __Pyx_GIVEREF(__pyx_tuple__31);
 
   /* "morpho_stats.pxi":11
  * 
@@ -39037,10 +39120,10 @@ static int __Pyx_InitCachedConstants(void) {
  *         return stats.total_number_sections(deref(tree.ptr()))
  * 
  */
-  __pyx_tuple__31 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__31)) __PYX_ERR(0, 11, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__31);
-  __Pyx_GIVEREF(__pyx_tuple__31);
-  __pyx_codeobj__32 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__31, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_total_number_sections, 11, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__32)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __pyx_tuple__32 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 11, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__32);
+  __Pyx_GIVEREF(__pyx_tuple__32);
+  __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_total_number_sections, 11, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 11, __pyx_L1_error)
 
   /* "morpho_stats.pxi":15
  * 
@@ -39049,10 +39132,10 @@ static int __Pyx_InitCachedConstants(void) {
  *         return stats.total_number_point(deref(tree.ptr()))
  * 
  */
-  __pyx_tuple__33 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__33)) __PYX_ERR(0, 15, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__33);
-  __Pyx_GIVEREF(__pyx_tuple__33);
-  __pyx_codeobj__34 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__33, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_total_number_point, 15, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__34)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __pyx_tuple__34 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__34)) __PYX_ERR(0, 15, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__34);
+  __Pyx_GIVEREF(__pyx_tuple__34);
+  __pyx_codeobj__35 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__34, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_total_number_point, 15, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__35)) __PYX_ERR(0, 15, __pyx_L1_error)
 
   /* "morpho_stats.pxi":19
  * 
@@ -39061,10 +39144,10 @@ static int __Pyx_InitCachedConstants(void) {
  *         return stats.min_radius_segment(deref(tree.ptr()))
  * 
  */
-  __pyx_tuple__35 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__35)) __PYX_ERR(0, 19, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__35);
-  __Pyx_GIVEREF(__pyx_tuple__35);
-  __pyx_codeobj__36 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__35, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_min_radius_segment, 19, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__36)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __pyx_tuple__36 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__36)) __PYX_ERR(0, 19, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__36);
+  __Pyx_GIVEREF(__pyx_tuple__36);
+  __pyx_codeobj__37 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__36, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_min_radius_segment, 19, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__37)) __PYX_ERR(0, 19, __pyx_L1_error)
 
   /* "morpho_stats.pxi":23
  * 
@@ -39073,10 +39156,10 @@ static int __Pyx_InitCachedConstants(void) {
  *         return stats.max_radius_segment(deref(tree.ptr()))
  * 
  */
-  __pyx_tuple__37 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__37)) __PYX_ERR(0, 23, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__37);
-  __Pyx_GIVEREF(__pyx_tuple__37);
-  __pyx_codeobj__38 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__37, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_max_radius_segment, 23, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__38)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_tuple__38 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__38)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__38);
+  __Pyx_GIVEREF(__pyx_tuple__38);
+  __pyx_codeobj__39 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__38, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_max_radius_segment, 23, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__39)) __PYX_ERR(0, 23, __pyx_L1_error)
 
   /* "morpho_stats.pxi":27
  * 
@@ -39085,10 +39168,10 @@ static int __Pyx_InitCachedConstants(void) {
  *         return stats.median_radius_segment(deref(tree.ptr()))
  * 
  */
-  __pyx_tuple__39 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__39)) __PYX_ERR(0, 27, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__39);
-  __Pyx_GIVEREF(__pyx_tuple__39);
-  __pyx_codeobj__40 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__39, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_median_radius_segment, 27, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__40)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __pyx_tuple__40 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__40)) __PYX_ERR(0, 27, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__40);
+  __Pyx_GIVEREF(__pyx_tuple__40);
+  __pyx_codeobj__41 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__40, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_median_radius_segment, 27, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__41)) __PYX_ERR(0, 27, __pyx_L1_error)
 
   /* "morpho_stats.pxi":31
  * 
@@ -39096,10 +39179,10 @@ static int __Pyx_InitCachedConstants(void) {
  *     def has_duplicated_points(MorphoTree tree):             # <<<<<<<<<<<<<<
  *         return stats.has_duplicated_points(deref(tree.ptr()))
  */
-  __pyx_tuple__41 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__41)) __PYX_ERR(0, 31, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__41);
-  __Pyx_GIVEREF(__pyx_tuple__41);
-  __pyx_codeobj__42 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__41, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_has_duplicated_points, 31, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__42)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __pyx_tuple__42 = PyTuple_Pack(1, __pyx_n_s_tree); if (unlikely(!__pyx_tuple__42)) __PYX_ERR(0, 31, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__42);
+  __Pyx_GIVEREF(__pyx_tuple__42);
+  __pyx_codeobj__43 = (PyObject*)__Pyx_PyCode_New(1, 0, 1, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__42, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_has_duplicated_points, 31, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__43)) __PYX_ERR(0, 31, __pyx_L1_error)
 
   /* "View.MemoryView":282
  *         return self.name
@@ -39108,9 +39191,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_tuple__43 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__43)) __PYX_ERR(7, 282, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__43);
-  __Pyx_GIVEREF(__pyx_tuple__43);
+  __pyx_tuple__44 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct_or_indirect); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(7, 282, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__44);
+  __Pyx_GIVEREF(__pyx_tuple__44);
 
   /* "View.MemoryView":283
  * 
@@ -39119,9 +39202,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_tuple__44 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__44)) __PYX_ERR(7, 283, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__44);
-  __Pyx_GIVEREF(__pyx_tuple__44);
+  __pyx_tuple__45 = PyTuple_Pack(1, __pyx_kp_s_strided_and_direct); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(7, 283, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__45);
+  __Pyx_GIVEREF(__pyx_tuple__45);
 
   /* "View.MemoryView":284
  * cdef generic = Enum("<strided and direct or indirect>")
@@ -39130,9 +39213,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__45 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__45)) __PYX_ERR(7, 284, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__45);
-  __Pyx_GIVEREF(__pyx_tuple__45);
+  __pyx_tuple__46 = PyTuple_Pack(1, __pyx_kp_s_strided_and_indirect); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(7, 284, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__46);
+  __Pyx_GIVEREF(__pyx_tuple__46);
 
   /* "View.MemoryView":287
  * 
@@ -39141,9 +39224,9 @@ static int __Pyx_InitCachedConstants(void) {
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_tuple__46 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__46)) __PYX_ERR(7, 287, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__46);
-  __Pyx_GIVEREF(__pyx_tuple__46);
+  __pyx_tuple__47 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_direct); if (unlikely(!__pyx_tuple__47)) __PYX_ERR(7, 287, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__47);
+  __Pyx_GIVEREF(__pyx_tuple__47);
 
   /* "View.MemoryView":288
  * 
@@ -39152,9 +39235,9 @@ static int __Pyx_InitCachedConstants(void) {
  * 
  * 
  */
-  __pyx_tuple__47 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__47)) __PYX_ERR(7, 288, __pyx_L1_error)
-  __Pyx_GOTREF(__pyx_tuple__47);
-  __Pyx_GIVEREF(__pyx_tuple__47);
+  __pyx_tuple__48 = PyTuple_Pack(1, __pyx_kp_s_contiguous_and_indirect); if (unlikely(!__pyx_tuple__48)) __PYX_ERR(7, 288, __pyx_L1_error)
+  __Pyx_GOTREF(__pyx_tuple__48);
+  __Pyx_GIVEREF(__pyx_tuple__48);
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -39515,10 +39598,10 @@ PyMODINIT_FUNC PyInit_morphotool(void)
   __pyx_vtable_10morphotool_MorphoWriter.from_value = (struct __pyx_obj_10morphotool_MorphoWriter *(*)(morpho::h5_v1::morpho_writer const &))__pyx_f_10morphotool_12MorphoWriter_from_value;
   __pyx_vtable_10morphotool_MorphoWriter.vectorPtr2list = (PyObject *(*)(std::vector<morpho::h5_v1::morpho_writer *> ))__pyx_f_10morphotool_12MorphoWriter_vectorPtr2list;
   __pyx_type_10morphotool_MorphoWriter.tp_base = __pyx_ptype_10morphotool__py__base;
-  if (PyType_Ready(&__pyx_type_10morphotool_MorphoWriter) < 0) __PYX_ERR(5, 62, __pyx_L1_error)
+  if (PyType_Ready(&__pyx_type_10morphotool_MorphoWriter) < 0) __PYX_ERR(5, 67, __pyx_L1_error)
   __pyx_type_10morphotool_MorphoWriter.tp_print = 0;
-  if (__Pyx_SetVtable(__pyx_type_10morphotool_MorphoWriter.tp_dict, __pyx_vtabptr_10morphotool_MorphoWriter) < 0) __PYX_ERR(5, 62, __pyx_L1_error)
-  if (PyObject_SetAttrString(__pyx_m, "MorphoWriter", (PyObject *)&__pyx_type_10morphotool_MorphoWriter) < 0) __PYX_ERR(5, 62, __pyx_L1_error)
+  if (__Pyx_SetVtable(__pyx_type_10morphotool_MorphoWriter.tp_dict, __pyx_vtabptr_10morphotool_MorphoWriter) < 0) __PYX_ERR(5, 67, __pyx_L1_error)
+  if (PyObject_SetAttrString(__pyx_m, "MorphoWriter", (PyObject *)&__pyx_type_10morphotool_MorphoWriter) < 0) __PYX_ERR(5, 67, __pyx_L1_error)
   __pyx_ptype_10morphotool_MorphoWriter = &__pyx_type_10morphotool_MorphoWriter;
   __pyx_vtabptr_10morphotool__py_morpho_operation = &__pyx_vtable_10morphotool__py_morpho_operation;
   __pyx_vtable_10morphotool__py_morpho_operation.__pyx_base = *__pyx_vtabptr_10morphotool__py__base;
@@ -40473,7 +40556,7 @@ PyMODINIT_FUNC PyInit_morphotool(void)
  * cdef strided = Enum("<strided and direct>") # default
  * cdef indirect = Enum("<strided and indirect>")
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__43, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 282, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__44, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 282, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(generic);
   __Pyx_DECREF_SET(generic, __pyx_t_1);
@@ -40487,7 +40570,7 @@ PyMODINIT_FUNC PyInit_morphotool(void)
  * cdef indirect = Enum("<strided and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__44, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 283, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__45, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 283, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(strided);
   __Pyx_DECREF_SET(strided, __pyx_t_1);
@@ -40501,7 +40584,7 @@ PyMODINIT_FUNC PyInit_morphotool(void)
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__45, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 284, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__46, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 284, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect);
   __Pyx_DECREF_SET(indirect, __pyx_t_1);
@@ -40515,7 +40598,7 @@ PyMODINIT_FUNC PyInit_morphotool(void)
  * cdef indirect_contiguous = Enum("<contiguous and indirect>")
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__46, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 287, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__47, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 287, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(contiguous);
   __Pyx_DECREF_SET(contiguous, __pyx_t_1);
@@ -40529,7 +40612,7 @@ PyMODINIT_FUNC PyInit_morphotool(void)
  * 
  * 
  */
-  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__47, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 288, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_Call(((PyObject *)__pyx_MemviewEnum_type), __pyx_tuple__48, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(7, 288, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_XGOTREF(indirect_contiguous);
   __Pyx_DECREF_SET(indirect_contiguous, __pyx_t_1);
