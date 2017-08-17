@@ -30,7 +30,7 @@ mtree.bounding_box
 
 node = mtree.get_node(5)
 # node.bounding_box                      node.get_segment                       node.number_points
-# node.branch_type                       node.get_segment_bounding_box          node.points
+# node.section_type                       node.get_segment_bounding_box          node.points
 # node.circle_pipe                       node.index                             node.pointsVector
 # node.get_junction                      node.is_of_type                        node.radius
 # node.get_junction_sphere_bounding_box  node.linestring

@@ -92,7 +92,7 @@ class NeuronMorphology(Morphology):
     @property
     def axon(self):
         source = self.sections if not self.raw else self.all_nodes
-        return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.axon)
+        return tuple(s for s in source if s.section_type == NEURON_STRUCT_TYPE.axon)
 
     @property
     def dendrite_nodes(self):
@@ -101,12 +101,12 @@ class NeuronMorphology(Morphology):
     @property
     def basal_dendrites(self):
         source = self.sections if not self.raw else self.all_nodes
-        return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.dentrite_basal)
+        return tuple(s for s in source if s.section_type == NEURON_STRUCT_TYPE.dentrite_basal)
 
     @property
     def apical_dendrites(self):
         source = self.sections if not self.raw else self.all_nodes
-        return tuple(s for s in source if s.branch_type == NEURON_STRUCT_TYPE.dentrite_apical)
+        return tuple(s for s in source if s.section_type == NEURON_STRUCT_TYPE.dentrite_apical)
 
     # ? BBPSDK functions that might not be required
     # def path_to_soma(self):
@@ -120,52 +120,52 @@ class GliaMorphology(Morphology):
     @property
     def processes(self):
         source = self.sections if not self.raw else self.all_nodes
-        return tuple(s for s in source if s.branch_type == GLIA_STRUCT_TYPE.glia_process)
+        return tuple(s for s in source if s.section_type == GLIA_STRUCT_TYPE.glia_process)
 
     @property
     def endfeet(self):
         source = self.sections if not self.raw else self.all_nodes
-        return tuple(s for s in source if s.branch_type == GLIA_STRUCT_TYPE.glia_endfoot)
+        return tuple(s for s in source if s.section_type == GLIA_STRUCT_TYPE.glia_endfoot)
 
 
 # ----------------------------------------------------------------------------------------------------
 # Sections are inespecific. Must be then specialized into Neurites, Somas or Glia Sections
 # ----------------------------------------------------------------------------------------------------
 class Section(object):
-    def __new__(cls, branch_object, tree):
+    def __new__(cls, section_object, tree):
         # If it's a soma return a Soma object
-        if isinstance(branch_object, morphotool.NeuronSoma):
+        if isinstance(section_object, morphotool.NeuronSoma):
             return object.__new__(Soma)
         # Otherwise a Neurite
         return object.__new__(Neurite)
 
-    def __init__(self, branch_object, tree):  # type: (morphotool.NeuronBranch, morphotool.MorphoTree) -> None
-        self.branch_obj = branch_object
+    def __init__(self, section_object, tree):  # type: (morphotool.NeuronSection, morphotool.MorphoTree) -> None
+        self.section_obj = section_object
         self._tree = tree
 
     # From NeuronNode3D
-    index = property(lambda self: self.branch_obj.index)
-    branch_type = property(lambda self: self.branch_obj.branch_type)
+    index = property(lambda self: self.section_obj.index)
+    section_type = property(lambda self: self.section_obj.section_type)
 
 
 class Neurite(Section):
     def __repr__(self):
         return "<Neurite section %d of %s>" % (self.index, self._tree.label)
 
-    # From branch object
+    # From section object
     # Properties
-    number_points = property(lambda self: self.branch_obj.number_points)
-    pointsVector  = property(lambda self: self.branch_obj.pointsVector)
-    points        = property(lambda self: self.branch_obj.points)
-    radius        = property(lambda self: self.branch_obj.radius)
-    bounding_box  = property(lambda self: self.branch_obj.bounding_box)
-    segments_disks = cached_property(lambda self: self.branch_obj.circle_pipe)
-    segments_lines = cached_property(lambda self: self.branch_obj.linestring)
+    number_points = property(lambda self: self.section_obj.number_points)
+    pointsVector  = property(lambda self: self.section_obj.pointsVector)
+    points        = property(lambda self: self.section_obj.points)
+    radius        = property(lambda self: self.section_obj.radius)
+    bounding_box  = property(lambda self: self.section_obj.bounding_box)
+    segments_disks = cached_property(lambda self: self.section_obj.circle_pipe)
+    segments_lines = cached_property(lambda self: self.section_obj.linestring)
     # Functions
-    get_segment = lambda self, n: self.branch_obj.get_segment(n)
-    get_segment_bounding_box = lambda self, n: self.branch_obj.get_segment_bounding_box(n)
-    get_junction = lambda self, n: self.branch_obj.get_junction(n)
-    get_junction_bounding_box = lambda self, n: self.branch_obj.get_junction_sphere_bounding_box(n)
+    get_segment = lambda self, n: self.section_obj.get_segment(n)
+    get_segment_bounding_box = lambda self, n: self.section_obj.get_segment_bounding_box(n)
+    get_junction = lambda self, n: self.section_obj.get_junction(n)
+    get_junction_bounding_box = lambda self, n: self.section_obj.get_junction_sphere_bounding_box(n)
 
     @cached_property
     def children(self):
@@ -244,9 +244,9 @@ class Soma(Section):
         return "<Soma of %s>" % (self._tree.label,)
 
     # Inherit props
-    sphere = cached_property(lambda self: self.branch_obj.sphere)
-    bounding_box = property(lambda self: self.branch_obj.bounding_box)
-    surface_points = cached_property(lambda self: self.branch_obj.line_loop)
+    sphere = cached_property(lambda self: self.section_obj.sphere)
+    bounding_box = property(lambda self: self.section_obj.bounding_box)
+    surface_points = cached_property(lambda self: self.section_obj.line_loop)
 
     # Shortcuts from cached sphere
     center = property(lambda self: self.sphere.center)
