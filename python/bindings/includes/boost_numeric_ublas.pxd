@@ -1,4 +1,4 @@
-from . cimport std
+cimport std
 # ======================================================================================================================
 cdef extern from "boost/numeric/ublas/matrix.hpp" namespace "boost::numeric::ublas":
 # ----------------------------------------------------------------------------------------------------------------------
@@ -24,4 +24,3 @@ cdef extern from "boost/numeric/ublas/vector.hpp" namespace "boost::numeric::ubl
 
     cdef cppclass vector_range[T]:
         pass
-

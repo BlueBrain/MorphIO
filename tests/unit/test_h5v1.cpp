@@ -34,8 +34,8 @@ BOOST_AUTO_TEST_CASE(test_h5v1_rw) {
 
         tree2 = reader::create_morpho_tree(testfile_write);
 
-        std::size_t n_section1 = stats::total_number_sectiones(tree1);
-        std::size_t n_section2 = stats::total_number_sectiones(tree2);
+        std::size_t n_section1 = stats::total_number_sections(tree1);
+        std::size_t n_section2 = stats::total_number_sections(tree2);
 
         BOOST_CHECK_EQUAL(n_section1, n_section2);
 
@@ -64,8 +64,8 @@ BOOST_AUTO_TEST_CASE(test_h5v1_test_filter_duplicated) {
 
     tree2 = morpho_transform(tree1, chain);
 
-    std::size_t n_section1 = stats::total_number_sectiones(tree1);
-    std::size_t n_section2 = stats::total_number_sectiones(tree2);
+    std::size_t n_section1 = stats::total_number_sections(tree1);
+    std::size_t n_section2 = stats::total_number_sections(tree2);
 
     BOOST_CHECK_EQUAL(n_section1, n_section2);
 

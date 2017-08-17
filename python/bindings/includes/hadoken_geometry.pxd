@@ -31,6 +31,7 @@ cdef extern from "hadoken/geometry/geometry.hpp" namespace "hadoken::geometry::c
         size_t size()
 
     cdef cppclass sphere3d:
+        sphere3d(point3d, double)
         sphere3d(sphere3d&)
         point3d get_center()
         double get_radius()

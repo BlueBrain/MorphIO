@@ -25,6 +25,7 @@
 
 #include <string>
 #include <utility>
+#include <unordered_map>
 
 #include "morpho_types.hpp"
 
@@ -41,6 +42,7 @@ using namespace boost::numeric;
 class morpho_reader {
   public:
     typedef std::pair<std::size_t, std::size_t> range;
+    typedef std::unordered_map<std::string, std::string> meta_map;
 
     morpho_reader(const std::string& filename);
 
@@ -78,6 +80,16 @@ class morpho_reader {
     range get_section_range_raw(int id) const;
 
     ///
+    /// \brief hashmap of the properties (str->str)
+    /// \return meta_t
+    ///
+    inline meta_map   get_metadata() const;
+    template <typename T>
+    inline T get_metadata(const std::string attr) const;
+    inline cell_family get_cell_family() const;
+
+
+    ///
     /// \brief get_filename
     /// \return filename of the associated morphology
     ///
@@ -91,6 +103,9 @@ class morpho_reader {
 
     // datasets
     HighFive::DataSet structures, points;
+
+    // Metadata group
+    HighFive::Group metadata;
 };
 
 class morpho_writer {

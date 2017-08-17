@@ -1,0 +1,3 @@
+recursive-include docs *.rst *.py
+recursive-include test *
+prune morphotool.egg-info

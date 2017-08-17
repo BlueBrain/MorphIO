@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8)
 enable_testing()
 
 set(MORPHOTOOL_VERSION_MAJOR "0")
-set(MORPHOTOOL_VERSION_MINOR "4")
+set(MORPHOTOOL_VERSION_MINOR "5")
 set(MORPHOTOOL_VERSION "${MORPHOTOOL_VERSION_MAJOR}.${MORPHOTOOL_VERSION_MINOR}")
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
@@ -14,6 +14,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake
 
 include(DefineInstallationPaths)
 include(ReleaseDebugAutoFlags)
+include(Display)
 
 
 option(MORPHOTOOL_UNIT_TESTS "Enable or disable unit tests" ON)
@@ -27,6 +28,8 @@ find_package(Threads)
 find_package(Boost 1.55 QUIET REQUIRED COMPONENTS system thread filesystem program_options)
 find_package(HDF5 QUIET REQUIRED)
 find_package(CLANG_TIDY)
+# Eventually required for rebuilding bindings
+find_package(Cython 0.25.0)
 
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}" )
@@ -65,7 +68,5 @@ add_subdirectory(src)
 add_subdirectory(deps/hadoken)
 add_subdirectory(deps/highfive)
 add_subdirectory(tests/unit)
-
-add_subdirectory(pybindings)
-
+add_subdirectory(python)
 

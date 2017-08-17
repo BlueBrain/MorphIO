@@ -51,8 +51,8 @@ BOOST_AUTO_TEST_CASE(test_swc_parser) {
         const morpho_tree h5_tree =
             reader::create_morpho_tree(h5_file.string());
 
-        std::size_t n_section1 = stats::total_number_sectiones(swc_tree);
-        std::size_t n_section2 = stats::total_number_sectiones(h5_tree);
+        std::size_t n_section1 = stats::total_number_sections(swc_tree);
+        std::size_t n_section2 = stats::total_number_sections(h5_tree);
 
         BOOST_CHECK_EQUAL(n_section1, n_section2);
 

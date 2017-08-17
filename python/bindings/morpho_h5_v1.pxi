@@ -10,30 +10,35 @@ cdef class MorphoReader(_py__base):
     cdef morpho_h5_v1.morpho_reader *ptr(self):
         return <morpho_h5_v1.morpho_reader*> self._ptr
 
-    def __init__(self, std.string filename):
-        self._ptr = new morpho_h5_v1.morpho_reader(filename)
+    def __init__(self, str filename):
+        cdef std.string fname
+        if isinstance(filename, unicode):
+            fname = filename.encode('ascii')
+        else:
+            fname = filename
+        self._ptr = new morpho_h5_v1.morpho_reader(fname)
         self._autodealoc.reset(self.ptr())
 
     @property
-    def points_raw(self, ):
+    def points_raw(self ):
         return _Mat_Points.from_value(self.ptr().get_points_raw())
 
     @property
-    def soma_points_raw(self, ):
+    def soma_points_raw(self):
         return _Mat_Points.from_value(self.ptr().get_soma_points_raw())
 
     @property
-    def struct_raw(self, ):
+    def struct_raw(self):
         return _Mat_Index.from_value(self.ptr().get_struct_raw())
 
-    def get_branch_range_raw(self, int id_):
-        return self.ptr().get_branch_range_raw(id_)
+    def get_section_range_raw(self, int id_):
+        return self.ptr().get_section_range_raw(id_)
 
     @property
-    def filename(self, ):
+    def filename(self):
         return self.ptr().get_filename()
 
-    def create_morpho_tree(self, ):
+    def create_morpho_tree(self):
         return MorphoTree.from_move(self.ptr().create_morpho_tree())
 
     @staticmethod
@@ -92,4 +97,3 @@ cdef class MorphoWriter(_py__base):
     @staticmethod
     cdef list vectorPtr2list(std.vector[morpho_h5_v1.morpho_writer*] vec):
         return [MorphoWriter.from_ptr(elem) for elem in vec]
-
