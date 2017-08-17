@@ -13,14 +13,14 @@ print("Tree size:", tree.tree_size)
 
 b=tree.get_node(1)
 if _DEBUG:
-    print("Branch length:", b.number_points)
+    print("Section length:", b.number_points)
 
 #children = b.get_childrens()
-#print "Branch childrens in 1", children.count(1)
+#print "Section childrens in 1", children.count(1)
 
 pts = b.points
 if _DEBUG:
-    print("Branch points:", pts, "length:", len(pts))
+    print("Section points:", pts, "length:", len(pts))
 
 bbox = b.bounding_box
 if _DEBUG:

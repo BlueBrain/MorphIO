@@ -154,6 +154,6 @@ class Transforms:
     Delete_Duplicate_Point = _py_delete_duplicate_point_operation
     Duplicate_First_Point = _py_duplicate_first_point_operation
     Soma_Sphere = _py_soma_sphere_operation
-    Simplify_Branch_Extreme = _py_simplify_section_extreme_operation
+    Simplify_Section_Extreme = _py_simplify_section_extreme_operation
     Transpose = _py_transpose_operation
 
