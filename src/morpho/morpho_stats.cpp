@@ -24,7 +24,7 @@ namespace morpho {
 
 namespace stats {
 
-std::size_t total_number_sectiones(const morpho_tree& tree) {
+std::size_t total_number_sections(const morpho_tree& tree) {
     return tree.get_tree_size();
 }
 

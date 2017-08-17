@@ -82,16 +82,37 @@ int h5v1_from_section_type(neuron_struct_type btype) {
         throw std::runtime_error("invalid cell type in morphology");
     }
 }
+
+glia_struct_type glia_section_type_from_h5v1( const int type_id ){
+    switch(type_id) {
+        case 1:
+            return glia_struct_type::soma;
+        case 2:
+            return glia_struct_type::glia_process;
+        case 3:
+            return glia_struct_type::glia_endfoot;
+        default:
+            throw std::runtime_error("invalid glia cell type in morphology");
+    }
 }
+
+}
+
+
 
 namespace fmt = hadoken::format;
 
 morpho_reader::morpho_reader(const std::string& myfilename)
     : h5_file(myfilename), filename(myfilename),
       structures(h5_file.getDataSet("/structure")),
-      points(h5_file.getDataSet("/points")) {}
+      points(h5_file.getDataSet("/points"))
+{
+    if ( h5_file.exist("metadata") ) {
+        metadata = h5_file.getGroup("/metadata");
+    }
+}
 
-mat_points morpho_reader::get_points_raw() const {
+mat_points morpho_reader::get_points_raw() const{
 
     mat_points res;
 
@@ -170,6 +191,50 @@ mat_index morpho_reader::get_struct_raw() const {
     return res;
 }
 
+
+cell_family morpho_reader::get_cell_family() const  {
+
+    if( !metadata.isValid() || ! metadata.hasAttribute("cell_family") ) {
+        return cell_family::NEURON;
+    }
+
+    int cell_type = get_metadata<int>("cell_family");
+
+    if (cell_type == 0) {
+        return cell_family::NEURON;
+    }
+    if (cell_type == 1) {
+        return cell_family::GLIA;
+    }
+    throw std::runtime_error("invalid cell family in morphology: " + cell_type);
+}
+
+
+morpho_reader::meta_map morpho_reader::get_metadata() const {
+    morpho_reader::meta_map metaprops;
+
+    std::vector<std::string> all_metas = metadata.listAttributeNames();
+    std::string prop_value;
+
+    for(std::string attr_name : all_metas) {
+        HighFive::Attribute att = metadata.getAttribute(attr_name);
+        att.read(prop_value);
+        metaprops[attr_name] = prop_value;
+    }
+
+    return metaprops;
+}
+
+template<typename T>
+T morpho_reader::get_metadata(const std::string attr_name) const {
+    HighFive::Attribute att = metadata.getAttribute(attr_name);
+    T prop_value;
+    att.read(prop_value);
+    return prop_value;
+}
+
+
+
 /// check if section has duplicted points with parent
 static inline bool check_duplicated_point(mat_range_points& prev_range,
                                           mat_range_points& range) {
@@ -193,6 +258,8 @@ morpho_tree morpho_reader::create_morpho_tree() const {
     namespace ublas = boost::numeric::ublas;
 
     morpho_tree res;
+    // Set type. Defaults to Neuron
+    res.set_cell_type(get_cell_family());
 
     {
         // create soma
@@ -331,7 +398,7 @@ static void export_tree_to_raw(const morpho_tree& tree, mat_index& raw_index,
 
 void morpho_writer::write(const morpho_tree& tree) {
     using namespace HighFive;
-    const std::size_t number_of_section = stats::total_number_sectiones(tree);
+    const std::size_t number_of_section = stats::total_number_sections(tree);
     const std::size_t number_of_points = stats::total_number_point(tree);
 
     std::time_t time_point = std::chrono::system_clock::to_time_t(

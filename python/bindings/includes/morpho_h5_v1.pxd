@@ -7,9 +7,9 @@ __copyright__ = "Copyright 2016 EPFL BBP-project"
 # =====================================================================================================================
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
-from . cimport std
-from . cimport morpho
-from . cimport boost_numeric_ublas
+cimport std
+cimport morpho
+cimport boost_numeric_ublas
 
 # ======================================================================================================================
 cdef extern from "morpho/morpho_types.hpp" namespace "morpho":
@@ -31,7 +31,7 @@ cdef extern from "morpho/morpho_h5_v1.hpp" namespace "morpho::h5_v1":
         mat_points get_points_raw()
         mat_points get_soma_points_raw()
         mat_index get_struct_raw()
-        morpho_reader.range get_branch_range_raw(int)
+        morpho_reader.range get_section_range_raw(int)
         std.string get_filename()
         morpho.morpho_tree create_morpho_tree() except +
 

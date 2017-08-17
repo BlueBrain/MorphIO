@@ -22,7 +22,9 @@
 
 #include <morpho/morpho_tree.hpp>
 
-namespace morpho {
+
+
+namespace morpho{
 
 namespace fmt = hadoken::format;
 
@@ -349,6 +351,7 @@ const std::vector<point>& neuron_soma::get_line_loop() const {
 struct morpho_tree::morpho_tree_intern {
     std::vector<std::shared_ptr<morpho_node>> nodes;
     std::vector<int> parents;
+    cell_family cell_type;
 };
 
 morpho_tree::morpho_tree() : _dptr(new morpho_tree_intern()) {}
@@ -484,4 +487,16 @@ morpho_tree& morpho_tree::operator=(const morpho_tree& other) {
     return *this;
 }
 
-} // morpho
+
+void morpho_tree::set_cell_type( cell_family cell_t ) {
+    _dptr->cell_type = cell_t;
+}
+
+cell_family morpho_tree::get_cell_type() const {
+    return _dptr->cell_type;
+}
+
+
+} //morpho
+
+

@@ -5,7 +5,7 @@
 #
 __copyright__ = "Copyright 2017 EPFL BBP-project"
 # =====================================================================================================================
-from .includes cimport std
+cimport std
 from cython.operator cimport dereference as deref
 from libcpp cimport bool
 from libc.string cimport memcpy

@@ -133,7 +133,7 @@ void transform_show_help() {
         "\t\t *", soma_sphere_operation_str,
         "*:\t transform a line-loop soma into a single point sphere soma \n",
         "\t\t *", simplify_section_extreme_str, "*:\t simplify morphology "
-                                               "sectiones to the extreme with 2 "
+                                               "sections to the extreme with 2 "
                                                "points per section \n",
         "\n", "\n", "\tNote: Most operations are NOT commutative"
                     "\n");
@@ -319,7 +319,7 @@ void print_morpho_stats(const std::string& morpho_file) {
     fmt::scat(std::cout, "filename =  \"", morpho_file, "\"", "\n");
     fmt::scat(std::cout, "morphology_type = [\"detailed\", \"cones\" ]", "\n");
     fmt::scat(std::cout, "number_of_section = ",
-              stats::total_number_sectiones(*tree), "\n");
+              stats::total_number_sections(*tree), "\n");
     fmt::scat(std::cout, "number_of_points = ",
               stats::total_number_point(*tree), "\n");
     fmt::scat(std::cout, "min_radius_segment = ",

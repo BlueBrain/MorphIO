@@ -21,14 +21,14 @@ find_package(PythonInterp ${_required} ${_quiet})
 
 if(PYTHON_EXECUTABLE)
     set(_pylib_name "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c "import distutils.sysconfig as ds; print ds.PREFIX"
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c "import distutils.sysconfig as ds; print(ds.PREFIX)"
                     OUTPUT_VARIABLE _prefix OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(_prefix)
         # Find libpython, compatible with virtualenv (This shall not be used for compiling extensions, since they should link at runtime with the iterpreter!)
         find_library(PYTHON_LIBRARY "${_pylib_name}" PATHS "${_prefix}/lib/${_pylib_name}/config" PATH_SUFFIXES ${CMAKE_LIBRARY_ARCHITECTURE} NO_DEFAULT_PATH )
     endif()
    
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c "import distutils.sysconfig as ds; print ds.get_python_inc(True)"
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c "import distutils.sysconfig as ds; print(ds.get_python_inc(True))"
                     OUTPUT_VARIABLE _inc_path OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(_inc_path)
         set(PYTHON_INCLUDE_DIR "${_inc_path}" CACHE PATH "Path to where Python.h is found")

@@ -31,7 +31,7 @@ namespace stats {
 ///
 /// \brief return total number of sectiones associated with a given morpho_tree
 ///
-std::size_t total_number_sectiones(const morpho_tree& tree);
+std::size_t total_number_sections(const morpho_tree& tree);
 
 ///
 /// \brief return total number of points associated with a given morpho_tree

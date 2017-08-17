@@ -13,7 +13,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301 USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
 #ifndef MORPHO_TREE_HPP
@@ -30,7 +30,13 @@ namespace morpho {
 class section;
 class morpho_tree;
 
-enum class morpho_node_type {
+
+enum class cell_family {
+    NEURON,
+    GLIA
+};
+
+enum class morpho_node_type{
     unknown = 0x00,
     neuron_node_3d_type = 0x01,
     neuron_section_type = 0x02,
@@ -44,6 +50,12 @@ enum class neuron_struct_type {
     dentrite_basal = 0x02,
     dentrite_apical = 0x03,
     unknown = 0x04
+};
+
+enum class glia_struct_type {
+    soma = 0x00,
+    glia_process = 0x01,
+    glia_endfoot = 0x02
 };
 
 ///
@@ -288,6 +300,11 @@ class morpho_tree {
     /// all nodes
     std::vector<morpho_node const*> get_all_nodes() const;
 
+    void set_cell_type( cell_family cell_t );
+    cell_family get_cell_type() const;
+
+
+
   private:
     std::unique_ptr<morpho_tree_intern> _dptr;
 };
@@ -295,3 +312,4 @@ class morpho_tree {
 } // morpho
 
 #endif // MORPHO_TREE_HPP
+

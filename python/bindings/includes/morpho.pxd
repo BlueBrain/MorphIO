@@ -90,10 +90,10 @@ cdef extern from "morpho/morpho_transform_filters.hpp" namespace "morpho":
         soma_sphere_operation()
         soma_sphere_operation(soma_sphere_operation&)
 
-    ###### Cybinding for class simplify_branch_extreme_operation ######
-    cdef cppclass simplify_branch_extreme_operation(morpho_operation):
-        simplify_branch_extreme_operation()
-        simplify_branch_extreme_operation(simplify_branch_extreme_operation&)
+    ###### Cybinding for class simplify_section_extreme_operation ######
+    cdef cppclass simplify_section_extreme_operation(morpho_operation):
+        simplify_section_extreme_operation()
+        simplify_section_extreme_operation(simplify_section_extreme_operation&)
 
     ###### Cybinding for class transpose_operation ######
     cdef cppclass transpose_operation(morpho_operation):
@@ -113,6 +113,14 @@ cdef extern from "morpho/morpho_spatial.hpp" namespace "morpho":
         bool is_within(point)
 
 
+
+# ======================================================================================================================
+cdef extern from "morpho/morpho_tree.hpp" namespace "morpho::cell_family":
+# ----------------------------------------------------------------------------------------------------------------------
+    cdef enum cell_family "morpho::cell_family":
+        NEURON
+        GLIA
+
 # ======================================================================================================================
 cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
 # ----------------------------------------------------------------------------------------------------------------------
@@ -121,6 +129,9 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         pass
 
     cdef cppclass neuron_struct_type:
+        pass
+
+    cdef cppclass glia_struct_type:
         pass
 
     ###### Cybinding for class morpho_node ######
@@ -134,13 +145,13 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
     cdef cppclass neuron_node_3d(morpho_node):
         neuron_node_3d(neuron_struct_type)
         neuron_node_3d(const neuron_node_3d)
-        neuron_struct_type get_branch_type()
+        neuron_struct_type get_section_type()
         #bool is_of_type(morpho_node_type)
 
-    ###### Cybinding for class neuron_branch ######
-    cdef cppclass neuron_branch(neuron_node_3d):
-        neuron_branch(neuron_struct_type, std.vector[point], std.vector[double])
-        neuron_branch(neuron_branch)
+    ###### Cybinding for class neuron_section ######
+    cdef cppclass neuron_section(neuron_node_3d):
+        neuron_section(neuron_struct_type, std.vector[point], std.vector[double])
+        neuron_section(neuron_section)
         #bool is_of_type(morpho_node_type)
         std.size_t get_number_points()
         std.vector[point] get_points()
@@ -153,14 +164,15 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         linestring get_linestring()
         circle_pipe get_circle_pipe()
 
-
     ###### Cybinding for class neuron_soma ######
     cdef cppclass neuron_soma(neuron_node_3d):
         neuron_soma(std.vector[point] &&)
+        neuron_soma(point, double)
         #bool is_of_type(morpho_node_type)
         sphere get_sphere()
         #box get_bounding_box()
         std.vector[point] get_line_loop()
+
 
     ###### Cybinding for class morpho_tree ######
     cdef cppclass morpho_tree:
@@ -177,6 +189,8 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         int get_parent(int) except +
         std.vector[int] get_children(int)
         std.vector[morpho_node*] get_all_nodes()
+        void set_cell_type(cell_family)
+        cell_family get_cell_type()
 
 
 # ======================================================================================================================

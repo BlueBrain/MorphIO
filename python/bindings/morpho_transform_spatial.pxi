@@ -69,19 +69,19 @@ cdef class _py_soma_sphere_operation(_py_morpho_operation):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
-cdef class _py_simplify_branch_extreme_operation(_py_morpho_operation):
+cdef class _py_simplify_section_extreme_operation(_py_morpho_operation):
     "Python wrapper class for duplicate_first_point_operation (ns=morpho)"
 # ----------------------------------------------------------------------------------------------------------------------
-    cdef morpho.simplify_branch_extreme_operation *ptr(self):
-        return <morpho.simplify_branch_extreme_operation*> self._ptr
+    cdef morpho.simplify_section_extreme_operation *ptr(self):
+        return <morpho.simplify_section_extreme_operation*> self._ptr
 
     def __init__(self, ):
-        self._ptr = new morpho.simplify_branch_extreme_operation()
+        self._ptr = new morpho.simplify_section_extreme_operation()
         self._sharedPtr.reset(self.ptr())
 
     @staticmethod
-    cdef _py_simplify_branch_extreme_operation from_ptr(morpho.simplify_branch_extreme_operation *ptr, bool owner=False):
-        return _py_morpho_operation.from_ptr_base(_py_simplify_branch_extreme_operation, ptr, owner)
+    cdef _py_simplify_section_extreme_operation from_ptr(morpho.simplify_section_extreme_operation *ptr, bool owner=False):
+        return _py_morpho_operation.from_ptr_base(_py_simplify_section_extreme_operation, ptr, owner)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -154,6 +154,6 @@ class Transforms:
     Delete_Duplicate_Point = _py_delete_duplicate_point_operation
     Duplicate_First_Point = _py_duplicate_first_point_operation
     Soma_Sphere = _py_soma_sphere_operation
-    Simplify_Branch_Extreme = _py_simplify_branch_extreme_operation
+    Simplify_Branch_Extreme = _py_simplify_section_extreme_operation
     Transpose = _py_transpose_operation
 

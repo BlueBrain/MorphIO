@@ -1,4 +1,4 @@
-from .includes cimport stats
+cimport stats
 
 # ======================================================================================================================
 # Python bindings to namespace morpho::stats
@@ -8,8 +8,8 @@ cdef class Stats:
     """This class is a namespace for statistic (static) functions"""
 
     @staticmethod
-    def total_number_branches(MorphoTree tree):
-        return stats.total_number_branches(deref(tree.ptr()))
+    def total_number_sections(MorphoTree tree):
+        return stats.total_number_sections(deref(tree.ptr()))
 
     @staticmethod
     def total_number_point(MorphoTree tree):
