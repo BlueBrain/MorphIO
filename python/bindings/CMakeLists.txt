@@ -2,12 +2,7 @@
 set(cymod_src "morphotool.pyx")
 file(GLOB_RECURSE cy_srcs *.pyx *.pxd *.pxi)
 
-if(ENABLE_MESHER_CGAL)
-    set(mesher_lib morpho_mesher)
-    set(CYTHON_FLAGS "-X ENABLE_MESHER_GCAL=1")
-endif()
-
-if(REBULD_PYTHON_BINDINGS OR (NOT EXISTS ${CYBINDINGS_CPP}))
+if(REBUILD_PYTHON_BINDINGS OR (NOT EXISTS ${CYBINDINGS_CPP}))
     if(NOT CYTHON_FOUND)
         message(FATAL_ERROR "Cython is required to rebuild python bindings but was not found" )
     endif()

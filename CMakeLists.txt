@@ -30,14 +30,16 @@ find_package(HDF5 QUIET REQUIRED)
 find_package(CLANG_TIDY)
 # Eventually required for rebuilding bindings
 find_package(Cython 0.25.0)
+find_package(NumPy)
 
 
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}" )
 
-if(ENABLE_MESHER_CGAL)
-    add_definitions( -DENABLE_MESHER_CGAL=1)
-    set(MOPHO_MESHER_TARGET "morpho_mesher")
-endif()
+# GCAL Mesher is not part of this repository anymore
+# if(ENABLE_MESHER_CGAL)
+#     add_definitions( -DENABLE_MESHER_CGAL=1)
+#     set(MORPHO_MESHER_TARGET "morpho_mesher")
+# endif()
 
 
 
@@ -66,7 +68,7 @@ endif()
 # Targets
 add_subdirectory(src)
 add_subdirectory(deps/hadoken)
-add_subdirectory(deps/highfive)
+add_subdirectory(deps/highfive EXCLUDE_FROM_ALL)
 add_subdirectory(tests/unit)
 add_subdirectory(python)
 

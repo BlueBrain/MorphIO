@@ -18,7 +18,7 @@ target_link_libraries(morpho-tool
 
                                 morpho
                                 morpho_io
-                                ${MOPHO_MESHER_TARGET}
+                                ${MORPHO_MESHER_TARGET}
                              )
 
 
