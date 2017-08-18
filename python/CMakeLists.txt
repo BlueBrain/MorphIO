@@ -23,8 +23,8 @@ set(dirstr "${dirstr}:${PYTHON_NUMPY_INCLUDE_DIR}")
 add_custom_target(pymorphotool ALL
     COMMAND
         ${PYTHON_EXECUTABLE} setup.py build
-        --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp1 build_ext "
-        -I${dirstr}" -L${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io
+        --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp1 build_ext
+        "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io
         -R${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io
         -lmorpho_io install --install-lib=${CMAKE_CURRENT_BINARY_DIR}
         --old-and-unmanageable
@@ -40,7 +40,12 @@ add_custom_command(OUTPUT ${CYBINDINGS_CPP} DEPENDS cybindings_cpp)
 if(BUILD_PYTHON_DISTRIBUTABLE)
 set(libs_required_morpho hdf5)
 add_custom_target(pydist ALL
-    COMMAND ${PYTHON_EXECUTABLE} setup.py build --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp2 build_ext "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src "-l$<JOIN:${libs_required_morpho}, -l>" bdist_wheel --dist-dir ${CMAKE_BINARY_DIR} > /dev/null
+    COMMAND
+        ${PYTHON_EXECUTABLE} setup.py build
+        --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp2 build_ext
+        "-I${dirstr}" -L${CMAKE_BINARY_DIR}/src
+        "-l$<JOIN:${libs_required_morpho}, -l>"
+        bdist_wheel --dist-dir ${CMAKE_BINARY_DIR} > /dev/null
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${CYBINDINGS_CPP} morphostatic
     COMMENT "Building python source dist in ${CMAKE_BINARY_DIR}"
@@ -63,12 +68,18 @@ add_subdirectory(bindings)
 # TESTS
 add_subdirectory(test)
 
-
 # INSTALL
 # Defaults to install in the CMAKE_INSTALL_PREFIX. Setuptools requires --old-and-unmanageable to create a plain package and not complain for the PYTHONPATH
 set(PY_INSTALL_OPTIONS "--install-lib=${CMAKE_INSTALL_PREFIX} --old-and-unmanageable")
 # Install Python package linking to the lib at install destination
-install(CODE "execute_process(COMMAND python setup.py build_ext -I${dirstr} -L${CMAKE_INSTALL_PREFIX}/lib64 -R${CMAKE_INSTALL_PREFIX}/lib64 -lmorpho_io install ${PY_INSTALL_OPTIONS} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_QUIET)")
+install(CODE "\
+     execute_process(COMMAND python setup.py build_ext -I${dirstr} \
+     -L${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io \
+     -R${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io \
+     -lmorpho_io install ${PY_INSTALL_OPTIONS} \
+     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_QUIET)")
 # Messsage to help users installing python package in other locations
-install(CODE "MESSAGE(STATUS \"${Cyan}All done. To install Python bindings to your current Python environment run 'pip install .' from the 'python' directory${ColorReset}\")")
+install(CODE "MESSAGE(STATUS \"${Cyan}All done. To install Python bindings \
+to your current Python environment run 'pip install .' from the \
+'python' directory${ColorReset}\")")
 endif()
