@@ -4,3 +4,4 @@ build-bg
 *.cbp
 .python-version
 python/morphotool.egg-info/
+python/setup.py

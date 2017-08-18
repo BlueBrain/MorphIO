@@ -68,7 +68,7 @@ endif()
 # Targets
 add_subdirectory(src)
 add_subdirectory(deps/hadoken)
-add_subdirectory(deps/highfive)
+add_subdirectory(deps/highfive EXCLUDE_FROM_ALL)
 add_subdirectory(tests/unit)
 add_subdirectory(python)
 
