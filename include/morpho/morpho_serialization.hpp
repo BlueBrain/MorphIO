@@ -39,6 +39,16 @@ enum class serialization_format: unsigned char {
     XML = 0x08
 };
 
+
+/**
+ * \brief Serialize a morpho tree
+ * @param tree  morpho tree to serialize
+ * @param format serialization format
+ * @return serialized data
+ */
+std::string serialize(const morpho_tree& tree,
+                      const serialization_format& format);
+
 ///
 /// \brief Serialize a morpho tree to an output stream
 /// \param tree morpho tree to serialize
@@ -49,12 +59,21 @@ void serialize(const morpho_tree& tree, std::ostream& stream,
                const serialization_format& format);
 
 ///
-/// \briefInstantiate a morpho tree from serialized data
+/// \brief Instantiate a morpho tree from serialized data
 /// \param stream input stream to read data from
 /// \param format serialization format
 /// \return new morpho tree initialized with given data
 ///
 morpho_tree deserialize(std::istream& stream,
+                        const serialization_format& format);
+
+///
+/// \brief Instantiate a morpho tree from serialized data
+/// \param data serialized data
+/// \param format serialization format
+/// \return new morpho tree initialized with given data
+///
+morpho_tree deserialize(const std::string& data,
                         const serialization_format& format);
 
 } // namespace morpho

@@ -208,3 +208,20 @@ cdef extern from "<utility>" namespace "std":
 
 cdef extern from "<utility>" namespace "std":
     cdef std.vector[double] move_DoubleVec "std::move" (std.vector[double])
+
+
+# ======================================================================================================================
+cdef extern from "morpho/morpho_serialization.hpp" namespace "morpho":
+    # ----------------------------------------------------------------------------------------------------------------------
+    cdef cppclass serialization_format "morpho::serialization_format":
+        pass
+
+cdef extern from "morpho/morpho_serialization.hpp" namespace "morpho::serialization_format":
+    cdef serialization_format BINARY
+    cdef serialization_format PORTABLE_BINARY
+    cdef serialization_format JSON
+    cdef serialization_format XML
+
+cdef extern from "morpho/morpho_serialization.hpp" namespace "morpho":
+    cdef std.string serialize(const morpho_tree&, const serialization_format&)
+    cdef morpho_tree deserialize(const std.string&, const serialization_format&)

@@ -17,6 +17,8 @@
  *
  */
 
+#include <sstream>
+
 #include <morpho/morpho_tree.hpp>
 
 #include <cereal/details/helpers.hpp>
@@ -186,6 +188,13 @@ void serialize(const morpho_tree& tree, std::ostream& stream,
     }
 }
 
+std::string serialize(const morpho_tree& tree,
+                      const serialization_format& format) {
+    std::ostringstream oss;
+    serialize(tree, oss, format);
+    return oss.str();
+}
+
 morpho_tree deserialize(std::istream& stream,
                         const serialization_format& format) {
     switch (format) {
@@ -202,6 +211,12 @@ morpho_tree deserialize(std::istream& stream,
             "Unexpected serialization format: " +
             static_cast<unsigned char>(format));
     }
+}
+
+morpho_tree deserialize(const std::string& data,
+                        const serialization_format& format) {
+    std::istringstream istr(data);
+    return deserialize(istr, format);
 }
 
 } // namespace morpho
