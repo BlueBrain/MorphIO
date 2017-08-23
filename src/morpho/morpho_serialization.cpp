@@ -167,38 +167,40 @@ morpho::morpho_tree load_morpho(std::istream& istr) {
 void serialize(const morpho_tree& tree, std::ostream& stream,
                const serialization_format& format) {
     switch (format) {
-    case BINARY:
+    case serialization_format::BINARY:
         save_morpho<cereal::BinaryOutputArchive>(tree, stream);
         break;
-    case PORTABLE_BINARY:
+    case serialization_format::PORTABLE_BINARY:
         save_morpho<cereal::PortableBinaryOutputArchive>(tree, stream);
         break;
-    case XML:
+    case serialization_format::XML:
         save_morpho<cereal::XMLOutputArchive>(tree, stream);
         break;
-    case JSON:
+    case serialization_format::JSON:
         save_morpho<cereal::JSONOutputArchive>(tree, stream);
         break;
     default:
-        throw std::invalid_argument("Unexpected serialization format: " +
-                                    format);
+        throw std::invalid_argument(
+            "Unexpected serialization format: " +
+            static_cast<unsigned char>(format));
     }
 }
 
 morpho_tree deserialize(std::istream& stream,
                         const serialization_format& format) {
     switch (format) {
-    case BINARY:
+    case serialization_format::BINARY:
         return load_morpho<cereal::BinaryInputArchive>(stream);
-    case PORTABLE_BINARY:
+    case serialization_format::PORTABLE_BINARY:
         return load_morpho<cereal::PortableBinaryInputArchive>(stream);
-    case XML:
+    case serialization_format::XML:
         return load_morpho<cereal::XMLInputArchive>(stream);
-    case JSON:
+    case serialization_format::JSON:
         return load_morpho<cereal::JSONInputArchive>(stream);
     default:
-        throw std::invalid_argument("Unexpected serialization format: " +
-                                    format);
+        throw std::invalid_argument(
+            "Unexpected serialization format: " +
+            static_cast<unsigned char>(format));
     }
 }
 

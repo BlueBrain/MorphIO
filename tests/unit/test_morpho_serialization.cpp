@@ -6,7 +6,11 @@
 #include <morpho/morpho_tree.hpp>
 
 morpho::serialization_format ALL_FORMATS[] = {
-    morpho::BINARY, morpho::PORTABLE_BINARY, morpho::JSON, morpho::XML};
+    morpho::serialization_format::BINARY,
+    morpho::serialization_format::PORTABLE_BINARY,
+    morpho::serialization_format::JSON,
+    morpho::serialization_format::XML
+};
 
 BOOST_AUTO_TEST_CASE(neuron_soma_serialization) {
     using namespace morpho;

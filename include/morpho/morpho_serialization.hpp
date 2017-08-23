@@ -30,13 +30,13 @@ class morpho_tree;
 ///
 /// \brief Available serialization format supported
 ///
-enum serialization_format {
+enum class serialization_format: unsigned char {
     /// compact binary representation
-    BINARY,
+    BINARY = 0x01,
     /// compact binary representation portable over different architectures
-    PORTABLE_BINARY,
-    JSON,
-    XML
+    PORTABLE_BINARY = 0x02,
+    JSON = 0x04,
+    XML = 0x08
 };
 
 ///
