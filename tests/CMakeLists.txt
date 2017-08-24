@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2016, EPFL/Blue Brain Project
+# Copyright (c) 2013-2017, EPFL/Blue Brain Project
 #                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
 #
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -17,6 +17,11 @@ include_directories(${PROJECT_BINARY_DIR}/tests)
 
 set(TEST_LIBRARIES ${Boost_FILESYSTEM_LIBRARIES} ${Boost_SYSTEM_LIBRARIES}
   ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY} BBPTestData Brion Brain Lunchbox)
+
+if(TARGET ZeroEQ)
+  list(APPEND TEST_LIBRARIES BrionPlugins ZeroEQ)
+endif()
+
 include(CommonCTest)
 
 add_subdirectory(brain/python)

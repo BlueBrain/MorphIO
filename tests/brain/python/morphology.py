@@ -88,8 +88,6 @@ class TestMorphologyFunctions(unittest.TestCase):
         assert(sections.shape == (13, 2))
         section_types = self.morphology.section_types()
         assert(section_types.shape == (13,))
-        apicals = self.morphology.apicals()
-        assert(len(apicals) == 0)
 
     def test_section(self):
         Type = brain.neuron.SectionType

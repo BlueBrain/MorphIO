@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2016, EPFL/Blue Brain Project
+# Copyright (c) 2013-2017, EPFL/Blue Brain Project
 #                          Juan Hernando <jhernando@fi.upm.es>
 #
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -57,6 +57,7 @@ set(BRAIN_NAMESPACE brain)
 if(TARGET MVDTool)
   list(APPEND BRAIN_LINK_LIBRARIES PRIVATE MVDTool)
 endif()
+
 common_library(Brain)
 if(TARGET MVDTool)
   target_compile_definitions(Brain PUBLIC BRAIN_USE_MVD3)

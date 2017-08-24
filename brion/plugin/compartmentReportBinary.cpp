@@ -169,8 +169,8 @@ void _initAIOControlBlock(aiocb& block, const AIOReadData& readData)
 void _readAsync(aiocb** operations, const size_t length)
 {
     if (lio_listio(LIO_WAIT, operations, length, nullptr) == -1)
-        LBTHROW(std::runtime_error("Error in AIO setup: " +
-                                 getErrorString(errno)));
+        LBTHROW(
+            std::runtime_error("Error in AIO setup: " + getErrorString(errno)));
     for (size_t i = 0; i != length; ++i)
     {
         const size_t bytesRead = aio_return(operations[i]);

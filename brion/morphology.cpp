@@ -23,9 +23,48 @@
 
 #include <lunchbox/plugin.h>
 #include <lunchbox/pluginFactory.h>
+#include <lunchbox/threadPool.h>
 
 namespace brion
 {
+namespace
+{
+lunchbox::ThreadPool& _getWorkers()
+{
+    static lunchbox::ThreadPool workers;
+    return workers;
+}
+
+/**
+ * "Plugin" for copied and deserialized morphologies.
+ *
+ * Does not actually load any data, but holds the data gathered from the copy or
+ * deserialization.
+ */
+class BinaryMorphology : public MorphologyPlugin
+{
+public:
+    BinaryMorphology(const Morphology& from)
+        : MorphologyPlugin(from.getInitData())
+    {
+        _points = from.getPoints();
+        _sections = from.getSections();
+        _sectionTypes = from.getSectionTypes();
+        _perimeters = from.getPerimeters();
+    }
+
+    BinaryMorphology(const void* data, size_t size)
+        : MorphologyPlugin(MorphologyInitData({}))
+    {
+        if (!fromBinary(data, size))
+            LBTHROW(std::runtime_error(
+                "Failed to construct morphology from binary data"));
+    }
+
+    void load() final { /*NOP*/}
+};
+}
+
 class Morphology::Impl
 {
 public:
@@ -34,96 +73,153 @@ public:
     explicit Impl(const MorphologyInitData& initData)
         : plugin(MorphologyPluginFactory::getInstance().create(initData))
     {
+        loadFuture = _getWorkers().post([&] {
+            plugin->load();
+            if (plugin->getPoints().empty())
+                LBTHROW(std::runtime_error(
+                    "Failed to load morphology " +
+                    std::to_string(plugin->getInitData().getURI())));
+        });
+    }
+
+    Impl(const Morphology& from)
+        : plugin(new BinaryMorphology(from))
+    {
+    }
+
+    Impl(const void* data, size_t size)
+        : plugin(new BinaryMorphology(data, size))
+    {
+    }
+
+    ~Impl()
+    {
+        try
+        {
+            finishLoad();
+        }
+        catch (const std::exception& e)
+        {
+            LBERROR << e.what() << std::endl;
+        }
+        catch (...)
+        {
+            LBERROR << "Unknown exception during morphology load" << std::endl;
+        }
+    }
+
+    void finishLoad() const
+    {
+        std::lock_guard<std::mutex> lock(futureMutex);
+        if (!loadFuture.valid())
+            return;
+
+        loadFuture.get();
     }
 
     std::unique_ptr<MorphologyPlugin> plugin;
+    mutable std::future<void> loadFuture; // fulfilled by worker thread pool
+    mutable std::mutex futureMutex;
 };
 
-Morphology::Morphology(const std::string& source)
-    : _impl(new Impl(MorphologyInitData(URI(source))))
+Morphology::Morphology(const URI& source)
+    : _impl(new Impl(MorphologyInitData(source)))
 {
 }
 
-Morphology::Morphology(const std::string& target,
-                       const MorphologyVersion version, const bool overwrite)
-    : _impl(
-          new Impl(MorphologyInitData(URI(target), version,
-                                      overwrite ? MODE_OVERWRITE : MODE_WRITE)))
+Morphology::Morphology(const void* data, size_t size)
+    : _impl(new Impl(data, size))
 {
 }
 
-Morphology::Morphology(const std::string& file, const CellFamily family)
-    : _impl(new Impl(MorphologyInitData(URI(file), family)))
+Morphology::Morphology(const Morphology& from)
+    : _impl(new Impl(from))
 {
 }
+
+Morphology& Morphology::operator=(const Morphology& from)
+{
+    if (this != &from)
+        _impl.reset(new Impl(from));
+    return *this;
+}
+
+Morphology::Morphology(Morphology&&) = default;
+Morphology& Morphology::operator=(Morphology&&) = default;
 
 Morphology::~Morphology()
 {
-    delete _impl;
 }
 
 CellFamily Morphology::getCellFamily() const
 {
+    _impl->finishLoad();
     return _impl->plugin->getCellFamily();
 }
 
-Vector4fsPtr Morphology::readPoints() const
+Vector4fs& Morphology::getPoints()
 {
-    return _impl->plugin->readPoints();
+    _impl->finishLoad();
+    return _impl->plugin->getPoints();
 }
 
-Vector2isPtr Morphology::readSections() const
+const Vector4fs& Morphology::getPoints() const
 {
-    return _impl->plugin->readSections();
+    _impl->finishLoad();
+    return _impl->plugin->getPoints();
 }
 
-SectionTypesPtr Morphology::readSectionTypes() const
+Vector2is& Morphology::getSections()
 {
-    return _impl->plugin->readSectionTypes();
+    _impl->finishLoad();
+    return _impl->plugin->getSections();
 }
 
-Vector2isPtr Morphology::readApicals() const
+const Vector2is& Morphology::getSections() const
 {
-    return _impl->plugin->readApicals();
+    _impl->finishLoad();
+    return _impl->plugin->getSections();
 }
 
-floatsPtr Morphology::readPerimeters() const
+SectionTypes& Morphology::getSectionTypes()
 {
-    return _impl->plugin->readPerimeters();
+    _impl->finishLoad();
+    return _impl->plugin->getSectionTypes();
+}
+
+const SectionTypes& Morphology::getSectionTypes() const
+{
+    _impl->finishLoad();
+    return _impl->plugin->getSectionTypes();
+}
+
+floats& Morphology::getPerimeters()
+{
+    _impl->finishLoad();
+    return _impl->plugin->getPerimeters();
+}
+
+const floats& Morphology::getPerimeters() const
+{
+    _impl->finishLoad();
+    return _impl->plugin->getPerimeters();
 }
 
 MorphologyVersion Morphology::getVersion() const
 {
+    _impl->finishLoad();
     return _impl->plugin->getVersion();
 }
 
-void Morphology::writePoints(const Vector4fs& points)
+const MorphologyInitData& Morphology::getInitData() const
 {
-    _impl->plugin->writePoints(points);
+    _impl->finishLoad();
+    return _impl->plugin->getInitData();
 }
 
-void Morphology::writeSections(const Vector2is& sections)
+servus::Serializable::Data Morphology::toBinary() const
 {
-    _impl->plugin->writeSections(sections);
-}
-
-void Morphology::writeSectionTypes(const SectionTypes& types)
-{
-    _impl->plugin->writeSectionTypes(types);
-}
-
-void Morphology::writeApicals(const Vector2is& apicals)
-{
-    _impl->plugin->writeApicals(apicals);
-}
-
-void Morphology::writePerimeters(const floats& perimeters)
-{
-    _impl->plugin->writePerimeters(perimeters);
-}
-
-void Morphology::flush()
-{
-    _impl->plugin->flush();
+    _impl->finishLoad();
+    return _impl->plugin->toBinary();
 }
 }

@@ -89,60 +89,98 @@ URIs Circuit::getMorphologyURIs(const GIDSet& gids) const
 neuron::Morphologies Circuit::loadMorphologies(const GIDSet& gids,
                                                const Coordinates coords) const
 {
-    const URIs& uris = getMorphologyURIs(gids);
+    URIs uris = getMorphologyURIs(gids);
     const auto circuitPath =
         // cache outside of loop, canonical does stat() which is slow on GPFS
         fs::canonical(_impl->getCircuitSource().getPath()).generic_string();
+    const bool transform = coords == Coordinates::global;
 
     // < GID, hash >
-    Strings gidHashes;
-    gidHashes.reserve(uris.size());
-    std::set<std::string> hashes;
+    Strings hashes;
+    hashes.reserve(uris.size());
+    std::set<std::string> hashSet;
     GIDSet::const_iterator gid = gids.begin();
-    for (size_t i = 0; i < uris.size(); ++i, ++gid)
+    for (auto& uri : uris)
     {
-        auto hash = uris[i].getPath();
-        if (hash[0] != '/') // opt: don't stat abs file path (see above)
-            hash = fs::canonical(hash).generic_string();
+        // opt: don't stat abs file path (see above)
+        if (uri.getScheme() == "file" && uri.getPath()[0] != '/')
+            uri.setPath(fs::canonical(uri.getPath()).generic_string());
 
-        if (coords == Coordinates::global)
+        auto hash = uri.getPath();
+        if (transform)
             // store circuit + GID for transformed morphology
             hash += circuitPath + std::to_string(*gid);
 
-        hash = servus::make_uint128(hash).getString();
-        gidHashes.push_back(hash);
-        hashes.insert(hash);
+        hash = servus::make_uint128(hash + "v2").getString();
+        hashes.push_back(hash);
+        hashSet.insert(hash);
+        ++gid;
     }
 
-    CachedMorphologies cached = _impl->loadMorphologiesFromCache(hashes);
+    CachedMorphologies cached = _impl->loadMorphologiesFromCache(hashSet);
+    using MorphologyUse = std::pair<size_t, brion::MorphologyPtr>;
+    std::unordered_map<std::string, MorphologyUse> loading;
 
-    // resolve missing morphologies and put them in GID-order into result
-    neuron::Morphologies result;
-    result.reserve(uris.size());
-
-    const bool transform = coords == Coordinates::global;
-    const Matrix4fs transforms = transform ? getTransforms(gids) : Matrix4fs();
+    // resolve missing morphologies
     for (size_t i = 0; i < uris.size(); ++i)
     {
         const URI& uri = uris[i];
-        const std::string& hash = gidHashes[i];
+        const std::string& hash = hashes[i];
 
-        CachedMorphologies::const_iterator it = cached.find(hash);
-        if (it == cached.end())
+        if (cached.find(hash) == cached.end())
         {
-            neuron::MorphologyPtr morphology;
-            const brion::Morphology raw(uri.getPath());
-            if (transform)
-                morphology.reset(new neuron::Morphology(raw, transforms[i]));
+            const auto& key = std::to_string(uri);
+            auto load = loading.find(key);
+            if (load == loading.end())
+            { // delay data access to next loop to allow async loading
+                loading.insert(std::make_pair(
+                    key, std::make_pair(1, std::make_shared<brion::Morphology>(
+                                               uri))));
+            }
             else
-                morphology.reset(new neuron::Morphology(raw));
+                ++load->second.first;
+            cached.insert(std::make_pair(hash, nullptr));
+        }
+    }
+
+    // load and transform missing and put them in GID-order into result
+    neuron::Morphologies result;
+    result.reserve(uris.size());
+    const Matrix4fs transforms = transform ? getTransforms(gids) : Matrix4fs();
+
+    for (size_t i = 0; i < uris.size(); ++i)
+    {
+        const URI& uri = uris[i];
+        const std::string& hash = hashes[i];
+
+        auto it = cached.find(hash);
+        if (it->second)
+            result.push_back(it->second);
+        else
+        {
+            const auto& key = std::to_string(uri);
+            auto& load = loading.find(key)->second;
+            --load.first;
+
+            neuron::MorphologyPtr morphology;
+            if (transform)
+            {
+                if (load.first == 0) // last usage, take existing instance
+                    morphology.reset(
+                        new neuron::Morphology(load.second, transforms[i]));
+                else // make a copy
+                    morphology.reset(new neuron::Morphology(
+                        std::make_shared<brion::Morphology>(*load.second),
+                        transforms[i]));
+            }
+            else
+                // share unmodified brion data
+                morphology.reset(new neuron::Morphology(load.second));
 
             _impl->saveMorphologyToCache(uri.getPath(), hash, morphology);
-            cached.insert(std::make_pair(hash, morphology));
+            it->second = morphology;
             result.push_back(morphology);
         }
-        else
-            result.push_back(it->second);
     }
 
     return result;

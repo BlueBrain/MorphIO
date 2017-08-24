@@ -1,4 +1,4 @@
-/* Copyright (c) 2014-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2014-2017, EPFL/Blue Brain Project
  *                          Raphael Dumusc <raphael.dumusc@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -20,7 +20,7 @@
 
 #include <BBP/TestDatasets.h>
 #include <brion/brion.h>
-#include <lunchbox/uint128_t.h>
+#include <servus/uint128_t.h>
 
 #define BOOST_TEST_MODULE SpikeReport
 #include <boost/filesystem/operations.hpp>
@@ -68,7 +68,7 @@ public:
     const std::string tmpFileName;
 
     explicit TemporaryData(const std::string& reportType)
-        : tmpFileName("/tmp/" + lunchbox::make_UUID().getString() + "." +
+        : tmpFileName("/tmp/" + servus::make_UUID().getString() + "." +
                       reportType)
     {
         spikes.push_back({0.1f, 20});

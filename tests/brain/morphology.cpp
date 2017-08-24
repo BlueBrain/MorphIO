@@ -88,32 +88,30 @@ brion::uint32_ts getSectionIDs(const brain::neuron::Sections& sections)
     return result;
 }
 
-const std::string TEST_MORPHOLOGY_FILENAME =
-    std::string(BRION_TESTDATA) + "/h5/test_neuron.h5";
-const brion::URI TEST_MORPHOLOGY_URI =
-    brion::URI("file://" + TEST_MORPHOLOGY_FILENAME);
+const brion::URI TEST_MORPHOLOGY_URI(std::string("file://") + BRION_TESTDATA +
+                                     "/h5/test_neuron.h5");
 
 void checkEqualMorphologies(const brain::neuron::Morphology& first,
                             const brion::Morphology& second)
 {
-    BOOST_CHECK(*second.readPoints() == first.getPoints());
-    BOOST_CHECK(*second.readSections() == first.getSections());
+    BOOST_CHECK(second.getPoints() == first.getPoints());
+    BOOST_CHECK(second.getSections() == first.getSections());
     BOOST_CHECK(
-        *second.readSectionTypes() ==
+        second.getSectionTypes() ==
         reinterpret_cast<const brion::SectionTypes&>(first.getSectionTypes()));
-    BOOST_CHECK(*second.readApicals() == first.getApicals());
 }
 } // namespace
 
 BOOST_AUTO_TEST_CASE(v2_morphology_constructors)
 {
-    boost::shared_ptr<brion::Morphology> raw(
-        new brion::Morphology(TEST_MORPHOLOGY_FILENAME));
+    brion::ConstMorphologyPtr raw(new brion::Morphology(TEST_MORPHOLOGY_URI));
 
-    brain::neuron::Morphology morphology(TEST_MORPHOLOGY_URI);
-    BOOST_CHECK_EQUAL(morphology.getTransformation(), brain::Matrix4f());
-    checkEqualMorphologies(morphology, *raw);
-    checkEqualMorphologies(brain::neuron::Morphology(*raw), *raw);
+    const brain::neuron::Morphology morphology1(TEST_MORPHOLOGY_URI);
+    BOOST_CHECK_EQUAL(morphology1.getTransformation(), brain::Matrix4f());
+    checkEqualMorphologies(morphology1, *raw);
+
+    const brain::neuron::Morphology morphology2(raw);
+    checkEqualMorphologies(morphology2, *raw);
 
     BOOST_CHECK_THROW(brain::neuron::Morphology(brion::URI("/mars")),
                       std::runtime_error);

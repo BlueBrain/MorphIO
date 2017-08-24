@@ -27,7 +27,6 @@
 #include <lunchbox/plugin.h>
 #include <lunchbox/pluginFactory.h>
 #include <lunchbox/threadPool.h>
-#include <lunchbox/uint128_t.h>
 
 #include <memory>
 
@@ -264,11 +263,10 @@ void SpikeReport::write(const Spike* spikes, const size_t size)
                                  std::to_string(getCurrentTime())));
     }
 
-    if (size != 0 &&
-        !std::is_sorted(spikes, spikes + size,
-                        [](const Spike& x, const Spike& y) {
-                            return x.first < y.first;
-                        }))
+    if (size != 0 && !std::is_sorted(spikes, spikes + size,
+                                     [](const Spike& x, const Spike& y) {
+                                         return x.first < y.first;
+                                     }))
     {
         LBTHROW(
             std::logic_error("Can't write spikes: Expecting a sorted spikes"));

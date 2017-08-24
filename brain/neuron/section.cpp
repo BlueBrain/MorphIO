@@ -68,7 +68,7 @@ uint32_t Section::getID() const
 
 SectionType Section::getType() const
 {
-    return static_cast<SectionType>((*_morphology->types)[_id]);
+    return static_cast<SectionType>(_morphology->data->getSectionTypes()[_id]);
 }
 
 float Section::getLength() const
@@ -98,12 +98,12 @@ floats Section::getSampleDistancesToSoma() const
 
 bool Section::hasParent() const
 {
-    const int32_t parent = (*_morphology->sections)[_id][1];
+    const int32_t parent = _morphology->data->getSections()[_id][1];
     return parent != -1 && uint32_t(parent) != _morphology->somaSection;
 }
 Section Section::getParent() const
 {
-    const int32_t parent = (*_morphology->sections)[_id][1];
+    const int32_t parent = _morphology->data->getSections()[_id][1];
     if (parent == -1 || uint32_t(parent) == _morphology->somaSection)
         LBTHROW(std::runtime_error("Cannot access parent section"));
     return Section(parent, _morphology);

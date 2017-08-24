@@ -28,7 +28,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include <lunchbox/log.h>
-#include <servus/uint128_t.h>
 
 using boost::lexical_cast;
 

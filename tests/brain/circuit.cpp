@@ -193,9 +193,9 @@ namespace
 void _checkMorphology(const brain::neuron::Morphology& morphology,
                       const std::string& other)
 {
-    const brion::Morphology reference(
-        BBP_TESTDATA + ("/local/morphologies/01.07.08/h5/" + other));
-    BOOST_CHECK(morphology.getPoints() == *reference.readPoints());
+    const brion::Morphology reference(brion::URI(
+        BBP_TESTDATA + ("/local/morphologies/01.07.08/h5/" + other)));
+    BOOST_CHECK(morphology.getPoints() == reference.getPoints());
 }
 void _checkMorphology(const brain::neuron::Morphology& morphology,
                       const std::string& other,
@@ -204,8 +204,8 @@ void _checkMorphology(const brain::neuron::Morphology& morphology,
     const brain::neuron::Morphology reference(
         brion::URI(BBP_TESTDATA + ("/local/morphologies/01.07.08/h5/" + other)),
         transform);
-    const brain::Vector4fs& p = morphology.getPoints();
-    const brain::Vector4fs& q = reference.getPoints();
+    const auto& p = morphology.getPoints();
+    const auto& q = reference.getPoints();
     BOOST_CHECK(reference.getTransformation().equals(transform));
 
     BOOST_REQUIRE(p.size() == q.size());

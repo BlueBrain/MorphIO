@@ -18,13 +18,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_MORPHOLOGYPLUGIN_H
-#define BRION_MORPHOLOGYPLUGIN_H
+#pragma once
 
 #include <brion/api.h>
-#include <brion/morphology.h> // Needed by doxygen
-#include <brion/pluginInitData.h>
+#include <brion/morphology.h>     // Needed by doxygen
+#include <brion/pluginInitData.h> // base class
 #include <brion/types.h>
+#include <lunchbox/debug.h>
+#include <servus/serializable.h> // base class
 
 namespace brion
 {
@@ -35,11 +36,16 @@ namespace brion
 class MorphologyInitData : public PluginInitData
 {
 public:
-    explicit MorphologyInitData(const URI& uri)
+    explicit MorphologyInitData(
+        const URI& uri, const MorphologyVersion v = MORPHOLOGY_VERSION_H5_1_1,
+        const CellFamily f = FAMILY_NEURON)
         : PluginInitData(uri, MODE_READ)
-        , version(MORPHOLOGY_VERSION_H5_1_1)
-        , family(FAMILY_NEURON)
+        , version(v)
+        , family(f)
     {
+        if (f == FAMILY_GLIA && v != MORPHOLOGY_VERSION_H5_1_1)
+            LBTHROW(
+                std::runtime_error("Glia cells only support HDF5 version 1.1"));
     }
 
     MorphologyInitData(const URI& uri, const MorphologyVersion v,
@@ -82,67 +88,63 @@ public:
  *
  * @version 1.4
  */
-class MorphologyPlugin
+class MorphologyPlugin : public servus::Serializable
 {
 public:
     /** @internal Needed by the PluginRegisterer. */
-    typedef MorphologyPlugin InterfaceT;
+    using InterfaceT = MorphologyPlugin;
 
     /** @internal Needed by the PluginRegisterer. */
-    typedef MorphologyInitData InitDataT;
+    using InitDataT = MorphologyInitData;
 
-    MorphologyPlugin(const MorphologyInitData& data)
+    MorphologyPlugin(const InitDataT& data)
         : _data(data)
     {
     }
 
     virtual ~MorphologyPlugin() {}
-    /** @name Read API */
-    //@{
+    /** Load all data of the morphology.
+     *  Needs to be thread-safe wrt other instances. May throw std::exception.
+     */
+    virtual void load() = 0;
+
+    /** @internal */
+    InitDataT& getInitData() { return _data; }
+    const InitDataT& getInitData() const { return _data; }
+
     /** @copydoc brion::Morphology::getCellFamily */
     CellFamily getCellFamily() const { return _data.family; }
-    /** @copydoc brion::Morphology::getVersion */
+
+    /** @internal */
     MorphologyVersion getVersion() const { return _data.version; }
-    /** @copydoc brion::Morphology::readPoints */
-    virtual Vector4fsPtr readPoints() const = 0;
 
-    /** @copydoc brion::Morphology::readSections */
-    virtual Vector2isPtr readSections() const = 0;
+    /** @copydoc brion::Morphology::getPoints */
+    Vector4fs& getPoints() { return _points; }
+    const Vector4fs& getPoints() const { return _points; }
 
-    /** @copydoc brion::Morphology::readSectionTypes */
-    virtual SectionTypesPtr readSectionTypes() const = 0;
+    /** @copydoc brion::Morphology::getSections */
+    Vector2is& getSections() { return _sections; }
+    const Vector2is& getSections() const { return _sections; }
 
-    /** @copydoc brion::Morphology::readApicals */
-    virtual Vector2isPtr readApicals() const = 0;
+    /** @copydoc brion::Morphology::getSectionTypes */
+    SectionTypes& getSectionTypes() { return _sectionTypes; }
+    const SectionTypes& getSectionTypes() const { return _sectionTypes; }
 
-    /** @copydoc brion::Morphology::readPerimeters */
-    virtual floatsPtr readPerimeters() const = 0;
-
-    //@}
-
-    /** @name Write API */
-    //@{
-    /** @copydoc brion::Morphology::writePoints */
-    virtual void writePoints(const Vector4fs& points) = 0;
-
-    /** @copydoc brion::Morphology::writeSections */
-    virtual void writeSections(const Vector2is& sections) = 0;
-
-    /** @copydoc brion::Morphology::writeSectionTypes */
-    virtual void writeSectionTypes(const SectionTypes& types) = 0;
-
-    /** @copydoc brion::Morphology::writeApicals */
-    virtual void writeApicals(const Vector2is& apicals) = 0;
-
-    /** @copydoc brion::Morphology::writePerimeters */
-    virtual void writePerimeters(const floats& perimeters) = 0;
-
-    /** @copydoc brion::Morphology::flush */
-    virtual void flush() = 0;
-    //@}
+    /** @copydoc brion::Morphology::getPerimeters */
+    floats& getPerimeters() { return _perimeters; }
+    const floats& getPerimeters() const { return _perimeters; }
 
 protected:
-    MorphologyInitData _data;
+    InitDataT _data;
+    Vector4fs _points;
+    Vector2is _sections;
+    SectionTypes _sectionTypes;
+    floats _perimeters;
+
+    // Serializable API
+    std::string getTypeName() const final { return "brion::MorphologyPlugin"; }
+    bool _fromBinary(const void* data, const size_t size) final;
+    servus::Serializable::Data _toBinary() const final;
 };
 }
 
@@ -153,4 +155,5 @@ inline string to_string(const brion::MorphologyInitData& data)
     return to_string(data.getURI());
 }
 }
-#endif
+
+#include "morphologyPlugin.ipp" // inline impl to allow header-only usage

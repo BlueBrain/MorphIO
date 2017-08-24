@@ -23,6 +23,7 @@
 
 #include "morphology.h"
 
+#include <brion/morphology.h>
 #include <lunchbox/lfVector.h>
 #include <vmmlib/matrix.hpp> // member
 
@@ -32,21 +33,20 @@ namespace neuron
 {
 typedef std::pair<size_t, size_t> SectionRange;
 
-class Morphology::Impl : public servus::Serializable
+class Morphology::Impl
 {
 public:
-    brion::Vector4fsPtr points;
-    brion::Vector2isPtr sections;
-    brion::SectionTypesPtr types;
-    brion::Vector2isPtr apicals;
+    const brion::ConstMorphologyPtr data;
 
-    Matrix4f transformation;
+    const Matrix4f transformation;
 
     uint32_t somaSection;
 
+    explicit Impl(const URI& source);
+    Impl(const URI& source, const Matrix4f& transform);
+    explicit Impl(brion::ConstMorphologyPtr morphology);
+    Impl(brion::MorphologyPtr morphology, const Matrix4f& transform);
     Impl(const void* data, const size_t size);
-
-    explicit Impl(const brion::Morphology& morphology);
 
     SectionRange getSectionRange(const uint32_t sectionID) const;
 
@@ -66,16 +66,7 @@ public:
 
     const uint32_ts& getChildren(const uint32_t sectionID) const;
 
-    void transform(const Matrix4f& matrix);
-
 private:
-    std::string getTypeName() const final
-    {
-        return "brain::neuron::Morphology::Impl";
-    }
-    bool _fromBinary(const void* data, const size_t size) final;
-    servus::Serializable::Data _toBinary() const final;
-
     // Distances caches. These caches need to be thread-safe to follow the
     // recommendations for C++11 about mutable and const correctness.
     // (http://herbsutter.com/2013/05/24/gotw-6a-const-correctness-part-1-3/)
@@ -85,7 +76,8 @@ private:
 
     std::vector<uint32_ts> _sectionChildren;
 
-    void _extractChildrenLists();
+    void _transform(brion::MorphologyPtr morphology);
+    void _extractInformation();
     float _computeSectionLength(const uint32_t sectionID) const;
     floats _computeAccumulatedLengths(const SectionRange& range) const;
 };

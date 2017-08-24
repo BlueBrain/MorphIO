@@ -288,16 +288,15 @@ URI BlueConfig::getProjectionSource(const std::string& name) const
 
 URI BlueConfig::getMorphologySource() const
 {
-    URI uri;
-    uri.setScheme("file");
-    std::string bare =
-        get(CONFIGSECTION_RUN, _impl->getRun(), BLUECONFIG_MORPHOLOGY_PATH_KEY);
-    const fs::path barePath(bare);
+    URI uri(get(CONFIGSECTION_RUN, _impl->getRun(),
+                BLUECONFIG_MORPHOLOGY_PATH_KEY));
+    if (uri.getScheme().empty())
+        uri.setScheme("file");
+
+    const fs::path barePath(uri.getPath());
     const fs::path guessedPath = barePath / MORPHOLOGY_HDF5_FILES_SUBDIRECTORY;
     if (fs::exists(guessedPath) && fs::is_directory(guessedPath))
         uri.setPath(guessedPath.string());
-    else
-        uri.setPath(bare);
 
     return uri;
 }

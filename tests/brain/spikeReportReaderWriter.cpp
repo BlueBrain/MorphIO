@@ -1,5 +1,5 @@
 
-/* Copyright (c) 2006-2015, Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2006-2017, Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -24,9 +24,7 @@
 #include <BBP/TestDatasets.h>
 
 #include <lunchbox/sleep.h>
-#include <lunchbox/uint128_t.h>
-
-#include <brion/types.h>
+#include <servus/uint128_t.h>
 
 #define BOOST_TEST_MODULE SpikeReportReader
 #include <boost/filesystem/operations.hpp>

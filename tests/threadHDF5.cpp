@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_morphology)
     path /= "circuitBuilding_1000neurons/morphologies/h5/C040426.h5";
 
 #pragma omp parallel
-    TS_BOOST_CHECK_NO_THROW(brion::Morphology(path.string()));
+    TS_BOOST_CHECK_NO_THROW(brion::Morphology{brion::URI(path.string())});
 }
 
 BOOST_AUTO_TEST_CASE(test_parallel_acess_of_morphology)
@@ -98,14 +98,14 @@ BOOST_AUTO_TEST_CASE(test_parallel_acess_of_morphology)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "circuitBuilding_1000neurons/morphologies/h5/C040426.h5";
 
-    const brion::Morphology morphology(path.string());
+    const brion::Morphology morphology{brion::URI(path.string())};
 #pragma omp parallel
     {
-        const brion::Vector4fsPtr points = morphology.readPoints();
-        const brion::Vector2isPtr sections = morphology.readSections();
-        const brion::SectionTypesPtr types = morphology.readSectionTypes();
-        BOOST_CHECK(!points->empty());
-        BOOST_CHECK(!sections->empty());
-        BOOST_CHECK(!types->empty());
+        const auto points = morphology.getPoints();
+        const auto sections = morphology.getSections();
+        const auto types = morphology.getSectionTypes();
+        BOOST_CHECK(!points.empty());
+        BOOST_CHECK(!sections.empty());
+        BOOST_CHECK(!types.empty());
     }
 }

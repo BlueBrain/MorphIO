@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
@@ -19,6 +19,9 @@
 
 #ifndef BRION_CONSTANTS
 #define BRION_CONSTANTS
+
+#include <brion/types.h>
+#include <servus/uint128_t.h>
 
 namespace brion
 {
@@ -41,6 +44,10 @@ const char* const BLUECONFIG_REPORT_FORMAT_KEY = "Format";
 const char* const BLUECONFIG_DT_KEY = "Dt";
 
 const char* const BLUECONFIG_PROJECTION_PATH_KEY = "Path";
+
+const char* const ZEROEQ_SCHEME = "zeroeq";
+const uint128_t ZEROEQ_GET_MORPHOLOGY =
+    servus::make_uint128("brion::Morphology::get");
 }
 
 #endif

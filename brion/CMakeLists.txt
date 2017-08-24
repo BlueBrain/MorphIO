@@ -13,6 +13,7 @@ set(BRION_PUBLIC_HEADERS
   mesh.h
   morphology.h
   morphologyPlugin.h
+  morphologyPlugin.ipp
   pluginInitData.h
   spikeReport.h
   spikeReportPlugin.h
@@ -26,11 +27,12 @@ set(BRION_HEADERS
   constants.h
   detail/mesh.h
   detail/meshBinary.h
-  detail/meshHDF5.h
   detail/lockHDF5.h
+  detail/meshHDF5.h
+  detail/morphologyHDF5.h
   detail/silenceHDF5.h
-  detail/utilsHDF5.h
   detail/skipWhiteSpace.h
+  detail/utilsHDF5.h
   )
 
 set(BRION_SOURCES
@@ -46,8 +48,7 @@ set(BRION_SOURCES
   )
 
 if(MSVC)
-  add_definitions(/wd4251 # missing dll-interface for H5::Exception
-    )
+  add_definitions(/wd4251) # missing dll-interface for H5::Exception
 endif()
 
 add_subdirectory(plugin)

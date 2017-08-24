@@ -48,6 +48,7 @@ class CompartmentReport;
 class CompartmentReportPlugin;
 class Mesh;
 class Morphology;
+class MorphologyInitData;
 class SpikeReport;
 class SpikeReportPlugin;
 class Synapse;
@@ -59,6 +60,7 @@ using vmml::Vector3f;
 using vmml::Vector4f;
 using vmml::Vector3d;
 using vmml::Vector4d;
+using servus::uint128_t;
 
 typedef std::vector<size_t> size_ts;
 typedef std::vector<int32_t> int32_ts;
@@ -74,17 +76,18 @@ typedef std::vector<Vector3d> Vector3ds;
 typedef std::vector<Vector4d> Vector4ds;
 typedef std::vector<SectionType> SectionTypes;
 typedef std::vector<Target> Targets;
+
 typedef std::shared_ptr<int32_ts> int32_tsPtr;
 typedef std::shared_ptr<uint16_ts> uint16_tsPtr;
 typedef std::shared_ptr<uint32_ts> uint32_tsPtr;
 typedef std::shared_ptr<floats> floatsPtr;
 typedef std::shared_ptr<doubles> doublesPtr;
-typedef std::shared_ptr<Vector2is> Vector2isPtr;
 typedef std::shared_ptr<Vector3fs> Vector3fsPtr;
-typedef std::shared_ptr<Vector4fs> Vector4fsPtr;
 typedef std::shared_ptr<Vector3ds> Vector3dsPtr;
 typedef std::shared_ptr<Vector4ds> Vector4dsPtr;
-typedef std::shared_ptr<SectionTypes> SectionTypesPtr;
+
+using MorphologyPtr = std::shared_ptr<Morphology>;
+using ConstMorphologyPtr = std::shared_ptr<const Morphology>;
 
 /** Ordered set of GIDs of neurons. */
 typedef std::set<uint32_t> GIDSet;

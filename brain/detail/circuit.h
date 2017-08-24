@@ -157,8 +157,6 @@ public:
         , _cache(keyv::Map::createCache())
         , _synapsePositionColumns(0)
     {
-        if (_morphologySource.getScheme().empty())
-            _morphologySource.setScheme("file");
         for (auto&& projection :
              config.getSectionNames(brion::CONFIGSECTION_PROJECTION))
         {
@@ -432,7 +430,7 @@ public:
     }
 
     const brion::URI _circuitSource;
-    brion::URI _morphologySource;
+    const brion::URI _morphologySource;
     const brion::URI _synapseSource;
     std::unordered_map<std::string, brion::URI> _afferentProjectionSources;
     const brion::URIs _targetSources;

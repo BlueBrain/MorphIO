@@ -56,6 +56,7 @@ build_brain()
     cmake ..                                                            \
         -DCMAKE_BUILD_TYPE=Release                                      \
         -DCLONE_SUBPROJECTS=ON                                          \
+        -DSUBPROJECT_ZeroEQ=OFF                                         \
         -DUSE_PYTHON_VERSION=$MAJOR_VERSION                             \
         -DPYTHON_EXECUTABLE:FILEPATH=$PYTHON                            \
         -DPYTHON_INCLUDE_DIR=$PYTHON_INC                                \

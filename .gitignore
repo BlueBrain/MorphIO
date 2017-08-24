@@ -28,6 +28,7 @@
 *.app
 
 # Custom
+.tags
 BBPTestData/
 Lunchbox/
 Servus/

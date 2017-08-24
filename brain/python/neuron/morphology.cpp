@@ -115,7 +115,6 @@ MorphologyPtr Morphology_initFromURIAndTransform(const std::string& uri,
 
 GET_MORPHOLOGY_ARRAY(Points)
 GET_MORPHOLOGY_ARRAY(Sections)
-GET_MORPHOLOGY_ARRAY(Apicals)
 
 bp::object Morphology_getSectionIDs(const MorphologyPtr& morphology,
                                     bp::object types)
@@ -235,9 +234,6 @@ bp::class_<Morphology, boost::noncopyable, MorphologyPtr>(
          "offset of each section.")
     .def("section_types", Morphology_getSectionTypes, (selfarg),
          "Return a numpy array with the section types.")
-    .def("apicals", Morphology_getApicals, (selfarg),
-         "Return a 2xN numpy array with the section id and point index of "
-         "apical points.")
     .def("section_ids", Morphology_getSectionIDs, (selfarg, bp::arg("types")),
          DOXY_FN(brain::neuron::Morphology::getSectionIDs))
     .def("sections", Morphology_getSectionsByType, (selfarg, bp::arg("type")),

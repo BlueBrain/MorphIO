@@ -52,6 +52,14 @@ public:
     using ImplPtr = std::shared_ptr<Impl>; //!< @internal
 
     /**
+     * Create a morphology from a URI and load all the data.
+     *
+     * @param source URI of the morphology data source.
+     * @throw runtime_error if an inconsistency is detected in the input file.
+     */
+    BRAIN_API explicit Morphology(const URI& source);
+
+    /**
      * Create a morphology from a URI, load all the data and transform
      * the points.
      *
@@ -63,32 +71,24 @@ public:
     BRAIN_API Morphology(const URI& source, const Matrix4f& transform);
 
     /**
+     * Create a morphology from a brion::Morphology and load all the data.
+     *
+     * @param morphology the brion::Morphology to load from.
+     * @throw runtime_error if an inconsistency is detected in the input file.
+     */
+    BRAIN_API explicit Morphology(brion::ConstMorphologyPtr morphology);
+
+    /**
      * Create a morphology from a brion::Morphology, load all the data
-     * and transform the points.
+     * and transform the points. The given morphology is modified.
      *
      * @param morphology the brion::Morphology to load from.
      * @param transform the transformation matrix to apply to the points.
      *        Radii will not be affected by this transformation.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
-    BRAIN_API Morphology(const brion::Morphology& morphology,
+    BRAIN_API Morphology(brion::MorphologyPtr morphology,
                          const Matrix4f& transform);
-
-    /**
-     * Create a morphology from a URI and load all the data.
-     *
-     * @param source URI of the morphology data source.
-     * @throw runtime_error if an inconsistency is detected in the input file.
-     */
-    BRAIN_API explicit Morphology(const URI& source);
-
-    /**
-     * Create a morphology from a brion::Morphology and load all the data.
-     *
-     * @param morphology the brion::Morphology to load from.
-     * @throw runtime_error if an inconsistency is detected in the input file.
-     */
-    BRAIN_API explicit Morphology(const brion::Morphology& morphology);
 
     BRAIN_API ~Morphology();
 
@@ -102,9 +102,6 @@ public:
         This type is not brain::SectionTypes because brion::SectionType
         is not convertible to brain::neuron::SectionType. */
     BRAIN_API const SectionTypes& getSectionTypes() const;
-
-    /** @sa brion::Morphology::readApicals */
-    BRAIN_API const Vector2is& getApicals() const;
 
     /** Return the list of ids for the given section types. */
     BRAIN_API uint32_ts getSectionIDs(const SectionTypes& types) const;
