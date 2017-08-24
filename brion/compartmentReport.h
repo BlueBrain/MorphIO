@@ -157,6 +157,7 @@ public:
      *
      * The result will be empty if the window is invalid or falls outside the
      * report window.
+     *
      * @param start close left side of the time interval
      * @param end open right side of time interval
      * @return a future with the frames overlapped by the time window

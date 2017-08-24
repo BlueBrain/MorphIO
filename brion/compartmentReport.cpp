@@ -43,7 +43,6 @@ public:
     }
 
     const std::unique_ptr<CompartmentReportPlugin> plugin;
-    lunchbox::ThreadPool threadPool;
 };
 }
 
@@ -138,7 +137,7 @@ std::future<floatsPtr> CompartmentReport::loadFrame(
 
         return _impl->plugin->loadFrame(timestamp);
     };
-    return _impl->threadPool.post(task);
+    return lunchbox::ThreadPool::getInstance().post(task);
 }
 
 std::future<Frames> CompartmentReport::loadFrames(const double start,
@@ -149,7 +148,7 @@ std::future<Frames> CompartmentReport::loadFrames(const double start,
             return Frames();
         return _impl->plugin->loadFrames(start, end);
     };
-    return _impl->threadPool.post(task);
+    return lunchbox::ThreadPool::getInstance().post(task);
 }
 
 size_t CompartmentReport::getNeuronSize(const uint32_t gid) const
@@ -165,7 +164,7 @@ size_t CompartmentReport::getNeuronSize(const uint32_t gid) const
 std::future<floatsPtr> CompartmentReport::loadNeuron(const uint32_t gid) const
 {
     auto task = [gid, this] { return _impl->plugin->loadNeuron(gid); };
-    return _impl->threadPool.post(task);
+    return lunchbox::ThreadPool::getInstance().post(task);
 }
 
 void CompartmentReport::setBufferSize(const size_t size)

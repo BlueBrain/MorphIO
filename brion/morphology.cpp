@@ -29,12 +29,6 @@ namespace brion
 {
 namespace
 {
-lunchbox::ThreadPool& _getWorkers()
-{
-    static lunchbox::ThreadPool workers;
-    return workers;
-}
-
 /**
  * "Plugin" for copied and deserialized morphologies.
  *
@@ -73,7 +67,7 @@ public:
     explicit Impl(const MorphologyInitData& initData)
         : plugin(MorphologyPluginFactory::getInstance().create(initData))
     {
-        loadFuture = _getWorkers().post([&] {
+        loadFuture = lunchbox::ThreadPool::getInstance().post([&] {
             plugin->load();
             if (plugin->getPoints().empty())
                 LBTHROW(std::runtime_error(

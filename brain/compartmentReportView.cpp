@@ -96,7 +96,7 @@ std::future<brion::Frame> CompartmentReportView::load(double timestamp)
         return brion::Frame{0, brion::floatsPtr()};
     };
 
-    return _impl->readerImpl->threadPool.post(loadFrameTask);
+    return lunchbox::ThreadPool::getInstance().post(loadFrameTask);
 }
 
 std::future<brion::Frames> CompartmentReportView::load(double start, double end)
@@ -155,7 +155,7 @@ std::future<brion::Frames> CompartmentReportView::load(double start, double end,
         return frames;
     };
 
-    return _impl->readerImpl->threadPool.post(task);
+    return lunchbox::ThreadPool::getInstance().post(task);
 }
 
 std::future<brion::Frames> CompartmentReportView::loadAll()

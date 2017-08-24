@@ -104,8 +104,8 @@ BOOST_AUTO_TEST_CASE(test_parallel_acess_of_morphology)
         const auto points = morphology.getPoints();
         const auto sections = morphology.getSections();
         const auto types = morphology.getSectionTypes();
-        BOOST_CHECK(!points.empty());
-        BOOST_CHECK(!sections.empty());
-        BOOST_CHECK(!types.empty());
+        TS_BOOST_CHECK(!points.empty());
+        TS_BOOST_CHECK(!sections.empty());
+        TS_BOOST_CHECK(!types.empty());
     }
 }

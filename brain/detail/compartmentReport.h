@@ -52,7 +52,6 @@ struct CompartmentReportReader
     const brion::URI uri;
     brion::GIDSet gids;
     CompartmentReportMetaData metaData;
-    lunchbox::ThreadPool threadPool;
 };
 
 struct CompartmentReportView
