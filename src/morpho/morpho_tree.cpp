@@ -68,8 +68,9 @@ neuron_node_3d::~neuron_node_3d() {}
 //
 
 struct neuron_section::neuron_section_internal {
+    inline neuron_section_internal() {}
     inline neuron_section_internal(std::vector<point>&& p,
-                                  std::vector<double>&& r)
+                                   std::vector<double>&& r)
         : points(std::move(p)), radius(std::move(r)) {
         if (points.size() < 1) {
             throw std::invalid_argument(
@@ -85,9 +86,15 @@ struct neuron_section::neuron_section_internal {
     std::vector<double> radius;
 };
 
+neuron_section::neuron_section()
+    : neuron_node_3d(neuron_struct_type::unknown),
+      _dptr(new neuron_section_internal()) {
+    add_type_capability(morpho_node_type::neuron_section_type);
+}
+
 neuron_section::neuron_section(neuron_struct_type neuron_type,
-                             std::vector<point>&& points,
-                             std::vector<double>&& radius)
+                               std::vector<point>&& points,
+                               std::vector<double>&& radius)
     : neuron_node_3d(neuron_type),
       _dptr(new neuron_section_internal(std::move(points), std::move(radius))) {
 
@@ -113,8 +120,11 @@ const std::vector<double>& neuron_section::get_radius() const {
     return _dptr->radius;
 }
 
-cone neuron_section::get_segment(std::size_t n) const {
+std::vector<point>& neuron_section::get_points() { return _dptr->points; }
 
+std::vector<double>& neuron_section::get_radius() { return _dptr->radius; }
+
+cone neuron_section::get_segment(std::size_t n) const {
     if (n >= get_number_points()) {
         throw std::out_of_range(
             hadoken::format::scat("segment ", n, " is out of bound"));
@@ -281,6 +291,10 @@ struct neuron_soma::neuron_soma_intern {
     _morpho_soma_type soma_type;
 };
 
+neuron_soma::neuron_soma() : neuron_node_3d(neuron_struct_type::soma) {
+    add_type_capability(morpho_node_type::neuron_soma_type);
+}
+
 neuron_soma::neuron_soma(std::vector<point>&& points)
     : neuron_node_3d(neuron_struct_type::soma),
       _dptr(new neuron_soma_intern(std::move(points))) {
@@ -293,6 +307,16 @@ neuron_soma::neuron_soma(const point& p, double radius)
       _dptr(new neuron_soma_intern(p, radius)) {
 
     add_type_capability(morpho_node_type::neuron_soma_type);
+}
+
+void neuron_soma::set_line_loop(std::vector<point>&& line_loop) {
+    _dptr = std::unique_ptr<neuron_soma_intern>(
+        new neuron_soma_intern(std::move(line_loop)));
+}
+
+void neuron_soma::set_sphere(const point& center, double radius) {
+    _dptr = std::unique_ptr<neuron_soma_intern>(
+        new neuron_soma_intern(center, radius));
 }
 
 neuron_soma::~neuron_soma() {}
@@ -465,6 +489,19 @@ std::vector<morpho_node const*> morpho_tree::get_all_nodes() const {
         res.push_back(node.get());
     }
     return res;
+}
+
+const const_morpho_nodes_t morpho_tree::get_nodes() const {
+    const_morpho_nodes_t eax;
+    eax.reserve(_dptr->nodes.size());
+    for (auto& node : _dptr->nodes) {
+        eax.push_back(node);
+    }
+    return eax;
+}
+
+const std::vector<int>& morpho_tree::get_parents() const {
+    return _dptr->parents;
 }
 
 morpho_tree& morpho_tree::operator=(morpho_tree&& other) {

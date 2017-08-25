@@ -20,6 +20,15 @@ include "datastructs.pxi"
 # ======================================================================================================================
 # Python bindings to namespace morpho
 # ======================================================================================================================
+cdef class SerializationFormat:
+    cdef morpho.serialization_format _format;
+    def __cinit__(self, unsigned char value):
+        self._format = <morpho.serialization_format> value
+
+    BINARY = SerializationFormat(<unsigned char> morpho.BINARY)
+    PORTABLE_BINARY = SerializationFormat(<unsigned char> morpho.PORTABLE_BINARY)
+    JSON = SerializationFormat(<unsigned char> morpho.JSON)
+    XML = SerializationFormat(<unsigned char> morpho.XML)
 
 cdef class CELL_TYPE(_Enum):
     NEURON = morpho.NEURON
@@ -290,6 +299,9 @@ cdef class MorphoTree(_py__base):
 
         self._sharedPtr.reset(self.ptr())
 
+    def serialize(self, SerializationFormat format):
+        return morpho.serialize(deref(self.ptr()), format._format)
+
     @property
     def bounding_box(self, ):
         return _Box.from_value(self.ptr().get_bounding_box())
@@ -297,6 +309,9 @@ cdef class MorphoTree(_py__base):
     @property
     def tree_size(self, ):
         return self.ptr().get_tree_size()
+
+    def __len__(self, ):
+        return self.tree_size
 
     def swap(self, MorphoTree other):
         """Python side swap only swaps pointers"""
@@ -346,6 +361,10 @@ cdef class MorphoTree(_py__base):
         cdef MorphoTree obj = MorphoTree()
         obj.ptr().swap(<morpho.morpho_tree&>ref)
         return obj
+
+    @staticmethod
+    def from_bytes(const std.string &bytes, SerializationFormat format):
+        return MorphoTree.from_value(morpho.deserialize(bytes, format._format))
 
     @staticmethod
     cdef list vectorPtr2list(std.vector[morpho.morpho_tree*] vec):

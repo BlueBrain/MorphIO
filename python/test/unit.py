@@ -1,15 +1,30 @@
 from __future__ import absolute_import
+
+import json
+import os
 import unittest
-from morphotool.morphotool import *
+
 import numpy as np
 from numpy import testing as nptest
-import os
+
+from morphotool import MorphologyDB
+from morphotool.morphotool import *
 
 _CUR_DIR = os.path.dirname(__file__)
 _H5V1_MORPHO_TEST_FILE = os.path.join(_CUR_DIR, "dend-C090905B_axon-sm110125a1-3_idA.h5")
 
 
 class TestMorphoTree(unittest.TestCase):
+
+    def test_serialization(self):
+        fmt = SerializationFormat.JSON
+        db = MorphologyDB(os.path.dirname(__file__))
+        tree = db["C010306C"]
+        assert len(tree) > 0
+        data_bytes = tree.serialize(fmt)
+        data = json.loads(data_bytes)  # JSON is valid
+        reloaded_tree = MorphoTree.from_bytes(data_bytes, fmt)
+        assert len(tree) == len(reloaded_tree)
 
     def test_mtree(self):
         tree = MorphoTree()
