@@ -61,4 +61,4 @@ add_subdirectory(deps/hadoken EXCLUDE_FROM_ALL)
 add_subdirectory(deps/highfive EXCLUDE_FROM_ALL)
 add_subdirectory(tests/unit)
 add_subdirectory(python)
-
+add_subdirectory(doc)
