@@ -1,7 +1,7 @@
 # Nix development environment
 #
-# nix-build -I "BPPpkgs=https://github.com/BlueBrain/bbp-nixpkgs/archive/master.tar.gz" default.nix
-# nix-shell -I "BPPpkgs=https://github.com/BlueBrain/bbp-nixpkgs/archive/master.tar.gz"  default.nix
+# nix-build -I "BPPpkgs=https://goo.gl/wTvE5t" default.nix
+# nix-shell -I "BPPpkgs=https://goo.gl/wTvE5t"  default.nix
 #
 with import <BBPpkgs> {};
 {
