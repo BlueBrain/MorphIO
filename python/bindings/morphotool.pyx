@@ -24,7 +24,7 @@ cdef class SerializationFormat(_OrdEnum):
     cdef morpho.serialization_format get_obj(self):
         return <morpho.serialization_format> self.ord
 
-    # Instantiation inside class definition. This is not alowed in Python
+    # Instantiation inside class definition. This is not allowed in Python
     BINARY = SerializationFormat(<unsigned char> morpho_serialization_format.BINARY, "BINARY")
     PORTABLE_BINARY = SerializationFormat(<unsigned char> morpho_serialization_format.PORTABLE_BINARY, "PORTABLE_BINARY")
     JSON = SerializationFormat(<unsigned char> morpho_serialization_format.JSON, "JSON")
