@@ -18,7 +18,7 @@ class TestMorphoTree(unittest.TestCase):
 
     def test_serialization(self):
         fmt = SerializationFormat.JSON
-        db = MorphologyDB(os.path.dirname(__file__))
+        db = MorphologyDB(_CUR_DIR)
         tree = db["C010306C"]
         assert len(tree) > 0
         data_bytes = tree.serialize(fmt)
