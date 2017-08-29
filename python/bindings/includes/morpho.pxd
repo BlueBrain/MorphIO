@@ -11,6 +11,7 @@ cimport std
 cimport morpho_h5_v1
 cimport boost_numeric_ublas
 cimport hadoken_geometry
+from statics.morpho_serialization_format cimport serialization_format
 
 
 # ======================================================================================================================
@@ -113,13 +114,13 @@ cdef extern from "morpho/morpho_spatial.hpp" namespace "morpho":
         bool is_within(point)
 
 
-
 # ======================================================================================================================
 cdef extern from "morpho/morpho_tree.hpp" namespace "morpho::cell_family":
 # ----------------------------------------------------------------------------------------------------------------------
     cdef enum cell_family "morpho::cell_family":
         NEURON
         GLIA
+
 
 # ======================================================================================================================
 cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
@@ -173,7 +174,6 @@ cdef extern from "morpho/morpho_tree.hpp" namespace "morpho":
         #box get_bounding_box()
         std.vector[point] get_line_loop()
 
-
     ###### Cybinding for class morpho_tree ######
     cdef cppclass morpho_tree:
         morpho_tree()
@@ -200,9 +200,7 @@ cdef extern from "morpho/morpho_tree_algorithm.hpp" namespace "morpho":
     neuron_soma* find_neuron_soma(const morpho_tree&)
 
 
-
 # Specialize std::move (only way of using it in cython)
-# -----------------------------------------------------
 cdef extern from "<utility>" namespace "std":
     cdef std.vector[point] move_PointVector "std::move" (std.vector[point])
 
@@ -212,16 +210,6 @@ cdef extern from "<utility>" namespace "std":
 
 # ======================================================================================================================
 cdef extern from "morpho/morpho_serialization.hpp" namespace "morpho":
-    # ----------------------------------------------------------------------------------------------------------------------
-    cdef cppclass serialization_format "morpho::serialization_format":
-        pass
-
-cdef extern from "morpho/morpho_serialization.hpp" namespace "morpho::serialization_format":
-    cdef serialization_format BINARY
-    cdef serialization_format PORTABLE_BINARY
-    cdef serialization_format JSON
-    cdef serialization_format XML
-
-cdef extern from "morpho/morpho_serialization.hpp" namespace "morpho":
+# ----------------------------------------------------------------------------------------------------------------------
     cdef std.string serialize(const morpho_tree&, const serialization_format&)
     cdef morpho_tree deserialize(const std.string&, const serialization_format&)

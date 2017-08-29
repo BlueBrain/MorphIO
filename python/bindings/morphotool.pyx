@@ -13,26 +13,29 @@ cimport statics.morpho_morpho_node_type as morpho_morpho_node_type
 cimport statics.morpho_neuron_struct_type as morpho_neuron_struct_type
 cimport morpho_h5_v1
 cimport statics.morpho_h5_v1_morpho_reader as morpho_h5_v1_morpho_reader
-
+cimport statics.morpho_serialization_format as morpho_serialization_format
 include "datastructs.pxi"
 
 
 # ======================================================================================================================
 # Python bindings to namespace morpho
 # ======================================================================================================================
-cdef class SerializationFormat:
-    cdef morpho.serialization_format _format;
-    def __cinit__(self, unsigned char value):
-        self._format = <morpho.serialization_format> value
+cdef class SerializationFormat(_OrdEnum):
+    cdef morpho.serialization_format get_obj(self):
+        return <morpho.serialization_format> self.ord
 
-    BINARY = SerializationFormat(<unsigned char> morpho.BINARY)
-    PORTABLE_BINARY = SerializationFormat(<unsigned char> morpho.PORTABLE_BINARY)
-    JSON = SerializationFormat(<unsigned char> morpho.JSON)
-    XML = SerializationFormat(<unsigned char> morpho.XML)
+    # Instantiation inside class definition. This is not allowed in Python
+    BINARY = SerializationFormat(<unsigned char> morpho_serialization_format.BINARY, "BINARY")
+    PORTABLE_BINARY = SerializationFormat(<unsigned char> morpho_serialization_format.PORTABLE_BINARY, "PORTABLE_BINARY")
+    JSON = SerializationFormat(<unsigned char> morpho_serialization_format.JSON, "JSON")
+    XML = SerializationFormat(<unsigned char> morpho_serialization_format.XML, "XML")
 
+
+# ----------------------------------------------------------------------------------------------------------------------
 cdef class CELL_TYPE(_Enum):
     NEURON = morpho.NEURON
     GLIA   = morpho.GLIA
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 cdef class MORPHO_NODE_TYPE(_Enum):
@@ -300,7 +303,7 @@ cdef class MorphoTree(_py__base):
         self._sharedPtr.reset(self.ptr())
 
     def serialize(self, SerializationFormat format):
-        return morpho.serialize(deref(self.ptr()), format._format)
+        return morpho.serialize(deref(self.ptr()), format.get_obj())
 
     @property
     def bounding_box(self, ):
@@ -363,8 +366,8 @@ cdef class MorphoTree(_py__base):
         return obj
 
     @staticmethod
-    def from_bytes(const std.string &bytes, SerializationFormat format):
-        return MorphoTree.from_value(morpho.deserialize(bytes, format._format))
+    def from_bytes(const std.string &data, SerializationFormat format):
+        return MorphoTree.from_value(morpho.deserialize(data, format.get_obj()))
 
     @staticmethod
     cdef list vectorPtr2list(std.vector[morpho.morpho_tree*] vec):

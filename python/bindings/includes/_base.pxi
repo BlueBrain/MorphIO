@@ -119,3 +119,19 @@ cdef class _EnumItem:
         if operation == OPERATOR.EQUAL:
             return isinstance(other, (int, self.enumcls)) and int(self) == int(other)
         raise TypeError("Operation not supported by enums")
+
+
+# --------------------------------------------------------
+cdef class _OrdEnum:
+    cdef readonly unsigned char ord
+    cdef readonly str name
+
+    def __cinit__(self, unsigned char value, str name):
+        self.ord = value
+        self.name = name
+
+    def __int__(self):
+        return self.ord
+
+    def __repr__(self):
+        return "<SerializationFormat.%s>" % (self.name,)

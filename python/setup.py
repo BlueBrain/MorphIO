@@ -2,16 +2,16 @@
 import sys
 from setuptools import setup, Extension
 
-morphotool_ext = Extension('morphotool.morphotool',
-    libraries = ['morpho'],
-    sources = ['morphotool/morphotool.cpp'],
+morphotool_ext = Extension(
+    'morphotool.morphotool',
+    libraries=['morpho'],
+    sources=['morphotool/morphotool.cpp'],
     extra_compile_args=['-std=c++11', '-Wno-unused-local-typedefs'],
     include_dirs=[]
 )
 
 setup_opts = dict(
     name         = 'morphotool',
-    version      = '@PYTHON_PACKAGE_VERSION@',
     author       = 'EPFL - Blue Brain Project',
     author_email = 'bbp-ou-hpc@groupes.epfl.ch',
     url          = '',
@@ -20,7 +20,11 @@ setup_opts = dict(
     platforms    = ['Mac OS X', 'Linux'],
     license      = 'GNU General Public License Version 3.0',
     packages     = ["morphotool"],
-    ext_modules  = [morphotool_ext]
+    ext_modules  = [morphotool_ext],
+
+    use_scm_version={'root': '..', 'relative_to': __file__},
+    install_requires=['numpy'],
+    setup_requires=['setuptools_scm']
 )
 
 
