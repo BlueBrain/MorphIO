@@ -2,8 +2,8 @@
 # Requirements
 #
 find_package(PythonInterpLibs QUIET)
-find_package(Cython 0.25.0 QUIET)
-find_package(NumPy)
+find_package(Cython 0.25.0)
+find_package(NumPy QUIET)
 
 if(NOT BUILD_PYTHON_MODULE)
   return()
@@ -47,7 +47,7 @@ add_custom_command(
         PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}
         ${PYTHON_EXECUTABLE} setup.py 
         build
-          --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp1 
+          --build-base=${CMAKE_CURRENT_BINARY_DIR}/debug.build
         build_ext
           "-I${lib_include_dirs}"
           -L${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io
@@ -95,11 +95,11 @@ add_custom_target(
 add_custom_command(
     OUTPUT ${_bdist_flag}
     COMMAND
-        ${PYTHON_EXECUTABLE} setup.py build
-        --build-base=${CMAKE_CURRENT_BINARY_DIR}/tmp2 build_ext
-        "-I${lib_include_dirs}" -L${CMAKE_BINARY_DIR}/src
-        "-lhdf5"
-        bdist_wheel --dist-dir ${CMAKE_BINARY_DIR}/dist > /dev/null
+        ${PYTHON_EXECUTABLE} setup.py 
+         build --build-base=${CMAKE_CURRENT_BINARY_DIR}/bdist_wheel.build 
+         build_ext -I${lib_include_dirs} -L${CMAKE_BINARY_DIR}/src -lhdf5
+         bdist_wheel --dist-dir ${CMAKE_BINARY_DIR}/dist 
+         > /dev/null
     COMMAND
         touch ${_bdist_flag}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -122,15 +122,17 @@ add_custom_command(OUTPUT ${cybindings_cpp} DEPENDS cybindings)
 
 
 # Install Python package linking to the lib at install destination
-install(CODE "\
-     execute_process(COMMAND python setup.py \
-        build_ext \
-          -I${lib_include_dirs} \
-          -L${LIB_INSTALL_DIR} \
-          -R${LIB_INSTALL_DIR} \
-          -lmorpho_io \
-        install \
-          --prefix=${PYTHON_INSTALL_PREFIX} \
+install(CODE "
+     execute_process(COMMAND python setup.py
+        build
+          --build-base=${CMAKE_CURRENT_BINARY_DIR}/install.build
+        build_ext
+          -I${lib_include_dirs}
+          -L${LIB_INSTALL_DIR}
+          -R${LIB_INSTALL_DIR}
+          -lmorpho_io
+        install
+          --prefix=${PYTHON_INSTALL_PREFIX}
           --old-and-unmanageable # Install wherever
      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
      
