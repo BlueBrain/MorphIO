@@ -55,10 +55,15 @@ if(CLANG_FORMAT_PRECOMMIT)
     add_subdirectory(deps/git-cmake-format)
 endif()
 
+
 ## Components
+set(UNIT_TESTS OFF CACHE BOOL "Dont run highfive tests")
+set(HADOKEN_UNIT_TESTS OFF CACHE BOOL "Dont run hadoken tests")
+
 add_subdirectory(src)
 add_subdirectory(deps/hadoken EXCLUDE_FROM_ALL)
 add_subdirectory(deps/highfive EXCLUDE_FROM_ALL)
 add_subdirectory(tests/unit)
 add_subdirectory(python)
 add_subdirectory(doc)
+
