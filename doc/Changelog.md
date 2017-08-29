@@ -3,6 +3,8 @@ Changelog {#Changelog}
 
 # git master
 
+* [173](https://github.com/BlueBrain/Brion/pull/173):
+  Removed the dependency on HDF5++ and use HighFive instead.
 * [172](https://github.com/BlueBrain/Brion/pull/172):
   - zeroeq::Server/Client based morphology loader.
   - New brion::Morphology read API and removed write API (see doc/feature/morphologyRead.md)

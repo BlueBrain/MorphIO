@@ -22,7 +22,6 @@
 
 #include "../detail/lockHDF5.h"
 #include "../detail/morphologyHDF5.h"
-#include "../detail/silenceHDF5.h"
 #include "../detail/utilsHDF5.h"
 
 #include <brion/version.h>
@@ -31,7 +30,9 @@
 #include <lunchbox/pluginRegisterer.h>
 #include <lunchbox/scopedMutex.h>
 
-#include <H5Cpp.h>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5File.hpp>
+#include <highfive/util.hpp>
 
 namespace brion
 {
@@ -43,320 +44,351 @@ lunchbox::PluginRegisterer<MorphologyHDF5> registerer;
 
 struct Loader
 {
-    MorphologyPlugin& morphology;
-    MorphologyInitData& initData;
-
-    H5::H5File file;
-
-    H5::DataSet pointDS;
-    hsize_t pointsDims[2];
-
-    H5::DataSet sectionsDS;
-    hsize_t sectionsDims[2];
-
-    std::string stage;
-
     Loader(MorphologyPlugin& m)
-        : morphology(m)
-        , initData(m.getInitData())
-        , stage("repaired")
+        : _morphology(m)
+        , _initData(m.getInitData())
+        , _stage("repaired")
     {
         lunchbox::ScopedWrite mutex(detail::hdf5Lock());
-        detail::SilenceHDF5 silence;
+        const std::string path = _initData.getURI().getPath();
 
-        initData.version = MORPHOLOGY_VERSION_H5_1;
-        const std::string path = initData.getURI().getPath();
         try
         {
-            file.openFile(path, H5F_ACC_RDONLY);
+            HighFive::SilenceHDF5 silence;
+            _file.reset(new HighFive::File(path, HighFive::File::ReadOnly));
         }
-        catch (const H5::Exception& exc)
+        catch (const HighFive::FileException& exc)
         {
-            LBTHROW(std::runtime_error("Could not open morphology file " +
-                                       path + ": " + exc.getDetailMsg()));
+            LBTHROW(std::runtime_error(_write
+                                           ? "Could not create morphology file "
+                                           : "Could not open morphology file " +
+                                                 path + ": " + exc.what()));
         }
-
-        if (!readV11Metadata() && !readV2Metadata())
-        {
-            try
-            {
-                resolveV1();
-                initData.version = MORPHOLOGY_VERSION_H5_1;
-            }
-            catch (...)
-            {
-                LBTHROW(std::runtime_error("Unknown morphology file format"));
-            }
-        }
-        selectRepairStage();
-        readPoints();
-        readSections();
-        readSectionTypes();
-        readPerimeters();
+        _checkVersion(path);
+        _selectRepairStage();
+        _readPoints();
+        _readSections();
+        _readSectionTypes();
+        _readPerimeters();
     }
 
     ~Loader()
     {
         lunchbox::ScopedWrite mutex(detail::hdf5Lock());
-
-        if (pointDS.getId())
-            pointDS.close();
-
-        if (sectionsDS.getId())
-            sectionsDS.close();
-
-        if (file.getId())
-            file.close();
+        _points.reset();
+        _sections.reset();
+        _file.reset();
     }
 
-    bool readV11Metadata()
+private:
+    MorphologyPlugin& _morphology;
+    MorphologyInitData& _initData;
+
+    std::unique_ptr<HighFive::File> _file;
+
+    std::unique_ptr<HighFive::DataSet> _points;
+    std::vector<size_t> _pointsDims;
+
+    std::unique_ptr<HighFive::DataSet> _sections;
+    std::vector<size_t> _sectionsDims;
+
+    std::string _stage;
+    bool _write;
+
+    void _checkVersion(const std::string& source)
     {
+        if (_readV11Metadata())
+            return;
+
+        if (_readV2Metadata())
+            return;
+
         try
         {
-            const H5::Group& metadata = file.openGroup(_g_metadata);
-            const H5::Attribute& attr = metadata.openAttribute(_a_version);
-
-            uint32_t version[2];
-            attr.read(H5::PredType::STD_U32LE, &version[0]);
-            if (version[0] != 1 || version[1] != 1)
-                return false;
-
-            initData.version = MORPHOLOGY_VERSION_H5_1_1;
-
-            const H5::Attribute& familyAttr = metadata.openAttribute(_a_family);
-            H5::EnumType familyEnum = metadata.openEnumType(_e_family);
-
-            familyAttr.read(familyEnum, &initData.family);
-
-            resolveV1();
-            return true;
+            _resolveV1();
+            _initData.version = MORPHOLOGY_VERSION_H5_1;
+            return;
         }
-        catch (const H5::Exception&)
+        catch (...)
         {
-            return false;
+            LBTHROW(
+                std::runtime_error("Unknown morphology file format for "
+                                   "file " +
+                                   source));
         }
     }
 
-    bool readV2Metadata()
+    void _selectRepairStage()
     {
-        try
+        if (_initData.version != MORPHOLOGY_VERSION_H5_2)
+            return;
+
+        for (const auto& stage : {"repaired", "unraveled", "raw"})
         {
-            file.openGroup(_g_root);
-            initData.version = MORPHOLOGY_VERSION_H5_2;
-            return true;
+            try
+            {
+                HighFive::SilenceHDF5 silence;
+                _file->getDataSet("/" + _g_root + "/" + stage + "/" +
+                                  _d_points);
+                _stage = stage;
+                break;
+            }
+            catch (const HighFive::DataSetException&)
+            {
+            }
         }
-        catch (const H5::Exception&)
-        {
-            return false;
-        }
+        _stage = "repaired";
     }
 
-    void resolveV1()
+    void _resolveV1()
     {
-        pointDS = file.openDataSet("/" + _d_points);
-        const H5::DataSpace pointsSpace = pointDS.getSpace();
-        if (pointsSpace.getSimpleExtentNdims() != 2 ||
-            pointsSpace.getSimpleExtentDims(pointsDims) < 0 ||
-            pointsDims[1] != _pointColumns)
+        HighFive::SilenceHDF5 silence;
+        _points.reset(
+            new HighFive::DataSet(_file->getDataSet("/" + _d_points)));
+        auto dataspace = _points->getSpace();
+        _pointsDims = dataspace.getDimensions();
+
+        if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns)
         {
             LBTHROW(std::runtime_error("Opening morphology file '" +
-                                       file.getFileName() +
+                                       _file->getName() +
                                        "': bad number of dimensions in"
                                        " 'points' dataspace"));
         }
 
-        sectionsDS = file.openDataSet(_d_structure);
-        const H5::DataSpace sectionsSpace = sectionsDS.getSpace();
-        if (sectionsSpace.getSimpleExtentNdims() != 2 ||
-            sectionsSpace.getSimpleExtentDims(sectionsDims) < 0 ||
-            sectionsDims[1] != _structureV1Columns)
+        _sections.reset(new HighFive::DataSet(_file->getDataSet(_d_structure)));
+        dataspace = _sections->getSpace();
+        _sectionsDims = dataspace.getDimensions();
+        if (_sectionsDims.size() != 2 ||
+            _sectionsDims[1] != _structureV1Columns)
         {
             LBTHROW(std::runtime_error("Opening morphology file '" +
-                                       file.getFileName() +
+                                       _file->getName() +
                                        "': bad number of dimensions in"
                                        " 'structure' dataspace"));
         }
     }
 
-    void selectRepairStage()
+    bool _readV11Metadata()
     {
-        if (initData.version != MORPHOLOGY_VERSION_H5_2)
-            return;
-
-        Strings stages{"repaired", "unraveled", "raw"};
-        for (const auto& candidate : stages)
+        try
         {
-            try
-            {
-                file.openDataSet("/" + _g_root + "/" + candidate + "/" +
-                                 _d_points);
-                stage = candidate;
-                break;
-            }
-            catch (const H5::Exception&)
-            {
-            }
+            HighFive::SilenceHDF5 silence;
+            const auto metadata = _file->getGroup(_g_metadata);
+            const auto attr = metadata.getAttribute(_a_version);
+
+            uint32_t version[2];
+            attr.read(version);
+            if (version[0] != 1 || version[1] != 1)
+                return false;
+
+            _initData.version = MORPHOLOGY_VERSION_H5_1_1;
+
+            const auto familyAttr = metadata.getAttribute(_a_family);
+            uint32_t family;
+            familyAttr.read(family);
+            _initData.family = (CellFamily)family;
         }
-        stage = "repaired";
+        catch (const HighFive::GroupException&)
+        {
+            return false;
+        }
+        catch (const HighFive::Exception& e)
+        {
+            // All other exceptions are not expected because if the metadata
+            // group exits it must contain at least the version, and for
+            // version 1.1 it must contain the family.
+            LBTHROW(std::runtime_error(
+                std::string("Error reading morphology metadata: ") + e.what()));
+        }
+
+        _resolveV1();
+        return true;
     }
 
-    void readPoints()
+    bool _readV2Metadata()
     {
-        auto& points = morphology.getPoints();
-
-        if (initData.version == MORPHOLOGY_VERSION_H5_2)
+        try
         {
-            H5::DataSet dataset;
-            try
-            {
-                dataset = file.openDataSet("/" + _g_root + "/" + stage + "/" +
-                                           _d_points);
-            }
-            catch (...)
-            {
-                LBERROR << "Could not open points dataset for morphology file "
-                        << file.getFileName() << " repair stage " << stage
-                        << std::endl;
-                return;
-            }
+            HighFive::SilenceHDF5 silence;
+            const auto root = _file->getGroup(_g_root);
+            const auto attr = root.getAttribute(_a_version);
+            attr.read(_initData.version);
+            if (_initData.version == MORPHOLOGY_VERSION_H5_2)
+                return true;
+        }
+        catch (const HighFive::Exception&)
+        {
+        }
 
-            hsize_t dims[2];
-            const H5::DataSpace& dspace = dataset.getSpace();
-            if (dspace.getSimpleExtentNdims() != 2 ||
-                dspace.getSimpleExtentDims(dims) < 0 ||
-                dims[1] != _pointColumns)
-            {
-                LBTHROW(std::runtime_error("Reading morphology file '" +
-                                           file.getFileName() +
-                                           "': bad number of dimensions in"
-                                           " 'points' dataspace"));
-            }
+        try
+        {
+            HighFive::SilenceHDF5 silence;
+            _file->getGroup(_g_root);
+            _initData.version = MORPHOLOGY_VERSION_H5_2;
+            return true;
+        }
+        catch (const HighFive::Exception&)
+        {
+            return false;
+        }
+    }
 
+    HighFive::DataSet _getStructureDataSet(size_t nSections)
+    {
+        try
+        {
+            HighFive::SilenceHDF5 silence;
+            return _file->getDataSet(_d_structure);
+        }
+        catch (const HighFive::DataSetException&)
+        {
+            return _file->createDataSet<int>(_d_structure, HighFive::DataSpace(
+                                                               {nSections, 3}));
+        }
+    }
+
+    void _readPoints()
+    {
+        auto& points = _morphology.getPoints();
+
+        if (_initData.version == MORPHOLOGY_VERSION_H5_2)
+        {
+            auto dataset = [this]() {
+                try
+                {
+                    return _file->getDataSet("/" + _g_root + "/" + _stage +
+                                             "/" + _d_points);
+                }
+                catch (HighFive::DataSetException&)
+                {
+                    LBTHROW(std::runtime_error(
+                        "Could not open points dataset for morphology file " +
+                        _file->getName() + " repair stage " + _stage));
+                }
+            }();
+
+            const auto dims = dataset.getSpace().getDimensions();
+            if (dims.size() != 2 || dims[1] != _pointColumns)
+            {
+                LBTHROW(std::runtime_error(
+                    "Reading morphology file '" + _file->getName() +
+                    "': bad number of dimensions in 'points' dataspace"));
+            }
             points.resize(dims[0]);
-            dataset.read(points.data(), H5::PredType::NATIVE_FLOAT);
+            dataset.read(points);
             return;
         }
 
-        points.resize(pointsDims[0]);
-        pointDS.read(points.data(), H5::PredType::NATIVE_FLOAT);
+        points.resize(_pointsDims[0]);
+        _points->read(points);
     }
 
-    void readSections()
+    void _readSections()
     {
-        auto& sections = morphology.getSections();
+        auto& sections = _morphology.getSections();
 
-        if (initData.version == MORPHOLOGY_VERSION_H5_2)
+        if (_initData.version == MORPHOLOGY_VERSION_H5_2)
         {
             // fixes BBPSDK-295 by restoring old BBPSDK 0.13 implementation
-            const std::string stage_(stage == "unraveled" ? "raw" : stage);
-            H5::DataSet dataset;
-            try
-            {
-                dataset = file.openDataSet("/" + _g_root + "/" + _g_structure +
-                                           "/" + stage_);
-            }
-            catch (...)
-            {
-                LBERROR
-                    << "Could not open sections dataset for morphology file "
-                    << file.getFileName() << " repair stage " << stage_
-                    << std::endl;
-                return;
-            }
+            auto dataset = [this]() {
+                try
+                {
+                    return _file->getDataSet("/" + _g_root + "/" +
+                                             _g_structure + "/" + _stage);
+                }
+                catch (HighFive::DataSetException&)
+                {
+                    LBTHROW(std::runtime_error(
+                        "Could not open sections dataset for morphology file " +
+                        _file->getName() + " repair stage " + _stage));
+                }
+            }();
 
-            hsize_t dims[2];
-            const H5::DataSpace& dspace = dataset.getSpace();
-            if (dspace.getSimpleExtentNdims() != 2 ||
-                dspace.getSimpleExtentDims(dims) < 0 ||
-                dims[1] != _structureV2Columns)
+            const auto dims = dataset.getSpace().getDimensions();
+            if (dims.size() != 2 || dims[1] != _structureV2Columns)
             {
-                LBTHROW(std::runtime_error("Reading morphology file '" +
-                                           file.getFileName() +
-                                           "': bad number of dimensions in"
-                                           " 'structure' dataspace"));
+                LBTHROW(std::runtime_error(
+                    "Reading morphology file '" + _file->getName() +
+                    "': bad number of dimensions in 'structure' dataspace"));
             }
 
             sections.resize(dims[0]);
-            dataset.read(sections.data(), H5::PredType::NATIVE_INT);
+            dataset.read(sections);
             return;
         }
 
-        const hsize_t readCount[2] = {sectionsDims[0], 1};
-        const hsize_t readOffset[2] = {0, 1};
-        H5::DataSpace dspace = sectionsDS.getSpace();
-        dspace.selectHyperslab(H5S_SELECT_XOR, readCount, readOffset);
-
-        sections.resize(sectionsDims[0]);
-        const hsize_t mdim[2] = {sectionsDims[0], 2};
-        const H5::DataSpace mspace(2, mdim);
-        sectionsDS.read(sections.data(), H5::PredType::NATIVE_INT, mspace,
-                        dspace);
+        auto selection =
+            _sections->select({0, 0}, {_sectionsDims[0], 2}, {1, 2});
+        sections.resize(_sectionsDims[0]);
+        selection.read(sections);
     }
 
-    void readSectionTypes()
+    void _readSectionTypes()
     {
-        auto& types = morphology.getSectionTypes();
+        auto& types = _morphology.getSectionTypes();
 
-        if (initData.version == MORPHOLOGY_VERSION_H5_2)
+        if (_initData.version == MORPHOLOGY_VERSION_H5_2)
         {
-            const H5::DataSet& dataset = file.openDataSet(
-                "/" + _g_root + "/" + _g_structure + "/" + _d_type);
+            auto dataset = [this]() {
+                try
+                {
+                    return _file->getDataSet("/" + _g_root + "/" +
+                                             _g_structure + "/" + _d_type);
+                }
+                catch (HighFive::DataSetException&)
+                {
+                    LBTHROW(
+                        std::runtime_error("Could not open section type "
+                                           "dataset for morphology file " +
+                                           _file->getName()));
+                }
+            }();
 
-            hsize_t dims[2];
-            const H5::DataSpace& dspace = dataset.getSpace();
-            if (dspace.getSimpleExtentNdims() != 2 ||
-                dspace.getSimpleExtentDims(dims) < 0 || dims[1] != 1)
+            const auto dims = dataset.getSpace().getDimensions();
+            if (dims.size() != 2 || dims[1] != 1)
             {
-                LBTHROW(std::runtime_error("Reading morphology file '" +
-                                           file.getFileName() +
-                                           "': bad number of dimensions in"
-                                           " 'sectiontype' dataspace"));
+                LBTHROW(std::runtime_error(
+                    "Reading morphology file '" + _file->getName() +
+                    "': bad number of dimensions in 'sectiontype' dataspace"));
             }
 
             types.resize(dims[0]);
-            dataset.read(types.data(), H5::PredType::NATIVE_INT);
+            dataset.read(types);
             return;
         }
 
-        const hsize_t readCount[2] = {sectionsDims[0], 1};
-        const hsize_t readOffset[2] = {0, 1};
-        H5::DataSpace dspace = sectionsDS.getSpace();
-        dspace.selectHyperslab(H5S_SELECT_SET, readCount, readOffset);
-
-        types.resize(sectionsDims[0]);
-        const hsize_t mdim = sectionsDims[0];
-        const H5::DataSpace mspace(1, &mdim);
-        sectionsDS.read(types.data(), H5::PredType::NATIVE_INT, mspace, dspace);
+        auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
+        types.resize(_sectionsDims[0]);
+        selection.read(types);
     }
 
-    void readPerimeters()
+    void _readPerimeters()
     {
-        auto& perimeters = morphology.getPerimeters();
-
-        if (initData.version != MORPHOLOGY_VERSION_H5_1_1)
+        if (_initData.version != MORPHOLOGY_VERSION_H5_1_1)
             return;
 
         try
         {
-            H5::DataSet dataset = file.openDataSet(_d_perimeters);
+            HighFive::SilenceHDF5 silence;
+            HighFive::DataSet dataset = _file->getDataSet(_d_perimeters);
 
-            hsize_t dims;
-            const H5::DataSpace& dspace = dataset.getSpace();
-            if (dspace.getSimpleExtentNdims() != 1 ||
-                dspace.getSimpleExtentDims(&dims) < 0)
+            auto dims = dataset.getSpace().getDimensions();
+            if (dims.size() != 1)
             {
                 LBTHROW(std::runtime_error("Reading morphology file '" +
-                                           file.getFileName() +
+                                           _file->getName() +
                                            "': bad number of dimensions in"
                                            " 'perimeters' dataspace"));
             }
 
-            perimeters.resize(dims);
-            dataset.read(perimeters.data(), H5::PredType::NATIVE_FLOAT);
+            auto& perimeters = _morphology.getPerimeters();
+            perimeters.resize(dims[0]);
+            dataset.read(perimeters);
         }
         catch (...)
         {
-            if (initData.family == FAMILY_GLIA)
+            if (_initData.family == FAMILY_GLIA)
                 LBTHROW(
                     std::runtime_error("No empty perimeters allowed for glia "
                                        "morphology"));
@@ -372,7 +404,7 @@ MorphologyHDF5::MorphologyHDF5(const MorphologyInitData& initData)
 
 void MorphologyHDF5::load()
 {
-    Loader loader(*this);
+    Loader(*this);
 }
 
 MorphologyHDF5::~MorphologyHDF5()

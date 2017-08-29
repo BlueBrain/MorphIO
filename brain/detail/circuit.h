@@ -24,7 +24,6 @@
 #include <brion/blueConfig.h>
 #include <brion/circuit.h>
 #include <brion/detail/lockHDF5.h>
-#include <brion/detail/silenceHDF5.h>
 #include <brion/morphology.h>
 #include <brion/synapse.h>
 #include <brion/synapseSummary.h>
@@ -36,6 +35,7 @@
 #include <lunchbox/scopedMutex.h>
 
 #ifdef BRAIN_USE_MVD3
+#include <highfive/util.hpp>
 #include <mvd/mvd3.hpp>
 #include <mvd/mvd_generic.hpp>
 #endif
@@ -581,7 +581,7 @@ struct MVD3 : public Circuit::Impl
         const ::MVD3::Range& range = getRange(gids);
         try
         {
-            brion::detail::SilenceHDF5 silence;
+            HighFive::SilenceHDF5 silence;
             lunchbox::ScopedWrite mutex(brion::detail::hdf5Lock());
             const ::MVD3::Positions& positions = _circuit.getPositions(range);
             assign(range, gids, positions, results, toVector3f);
@@ -600,7 +600,7 @@ struct MVD3 : public Circuit::Impl
         const ::MVD3::Range& range = getRange(gids);
         try
         {
-            brion::detail::SilenceHDF5 silence;
+            HighFive::SilenceHDF5 silence;
             lunchbox::ScopedWrite mutex(brion::detail::hdf5Lock());
             const size_ts& mtypes = _circuit.getIndexMtypes(range);
             assign(range, gids, mtypes, results, nop);
@@ -624,7 +624,7 @@ struct MVD3 : public Circuit::Impl
         const ::MVD3::Range& range = getRange(gids);
         try
         {
-            brion::detail::SilenceHDF5 silence;
+            HighFive::SilenceHDF5 silence;
             lunchbox::ScopedWrite mutex(brion::detail::hdf5Lock());
             const size_ts& etypes = _circuit.getIndexEtypes(range);
             assign(range, gids, etypes, results, nop);
@@ -648,7 +648,7 @@ struct MVD3 : public Circuit::Impl
         const ::MVD3::Range& range = getRange(gids);
         try
         {
-            brion::detail::SilenceHDF5 silence;
+            HighFive::SilenceHDF5 silence;
             lunchbox::ScopedWrite mutex(brion::detail::hdf5Lock());
             const ::MVD3::Rotations& rotations = _circuit.getRotations(range);
             assign(range, gids, rotations, results, toQuaternion);
@@ -667,7 +667,7 @@ struct MVD3 : public Circuit::Impl
         const ::MVD3::Range& range = getRange(gids);
         try
         {
-            brion::detail::SilenceHDF5 silence;
+            HighFive::SilenceHDF5 silence;
             lunchbox::ScopedWrite mutex(brion::detail::hdf5Lock());
             const Strings& morphos = _circuit.getMorphologies(range);
             assign(range, gids, morphos, results, toString);

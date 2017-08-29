@@ -22,8 +22,11 @@
 
 #include "compartmentReportCommon.h"
 
-#include <H5Cpp.h>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5File.hpp>
+
 #include <boost/filesystem/path.hpp>
+
 #include <unordered_map>
 
 namespace brion
@@ -59,9 +62,8 @@ public:
     bool flush() final;
 
 private:
-    typedef std::unordered_map<uint32_t, H5::H5File> Files;
-    typedef std::unordered_map<uint32_t, H5::DataSet> Datasets;
-    typedef std::unordered_map<uint32_t, H5::DataSpace> Dataspaces;
+    typedef std::unordered_map<uint32_t, HighFive::File> Files;
+    typedef std::unordered_map<uint32_t, HighFive::DataSet> Datasets;
 
     double _startTime;
     double _endTime;
@@ -76,21 +78,22 @@ private:
     boost::filesystem::path _path;
     std::string _reportName;
     Files _files;
-    H5::H5File _file;
+    std::unique_ptr<HighFive::File> _file;
     Datasets _datas;
-    Dataspaces _fspaces;
-    Dataspaces _mspaces;
 
     bool _loadFrame(size_t timestamp, float* buffer) const final;
 
     void _openFile(const uint32_t cellID);
-    H5::DataSet _openDataset(const H5::H5File& file, const uint32_t cellID);
+    HighFive::DataSet _openDataset(const HighFive::File& file,
+                                   const uint32_t cellID);
 
-    H5::DataSet _createDataset(const uint32_t gid, const size_t compCount);
-    H5::DataSet& _getDataset(const uint32_t gid);
+    HighFive::DataSet _createDataset(const uint32_t gid,
+                                     const size_t compCount);
+    HighFive::DataSet& _getDataset(const uint32_t gid);
+    void _readMetaData(const HighFive::File& file);
     void _createMetaData();
-    void _createMappingAttributes(H5::DataSet& dataset);
-    void _createDataAttributes(H5::DataSet& dataset);
+    void _createMappingAttributes(HighFive::DataSet& dataset);
+    void _createDataAttributes(HighFive::DataSet& dataset);
 };
 }
 }

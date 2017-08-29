@@ -1,5 +1,6 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
+ *                          Juan Hernando <juan.hernando@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -21,9 +22,11 @@
 #define BRION_DETAIL_MESHHDF5
 
 #include "mesh.h"
-#include "silenceHDF5.h"
+#include "utilsHDF5.h"
 
-#include <H5Cpp.h>
+#include <highfive/H5File.hpp>
+#include <highfive/util.hpp>
+
 #include <boost/lexical_cast.hpp>
 #include <lunchbox/debug.h>
 
@@ -63,10 +66,10 @@ public:
     {
         try
         {
-            SilenceHDF5 silence;
-            _file.openDataSet("/membrane/mesh/vertices");
+            HighFive::SilenceHDF5 silence;
+            _file.getDataSet("/membrane/mesh/vertices");
         }
-        catch (...)
+        catch (HighFive::DataSetException)
         {
             LBTHROW(std::runtime_error(source + " not a valid mesh file"));
         }
@@ -75,100 +78,93 @@ public:
     MeshHDF5(const std::string& source, const bool overwrite,
              const MeshVersion version)
         : Mesh(source, version)
-        , _file()
+        , _file([source, overwrite] {
+            try
+            {
+                HighFive::SilenceHDF5 silence;
+                return HighFive::File(source,
+                                      overwrite ? H5F_ACC_TRUNC : H5F_ACC_EXCL);
+            }
+            catch (const HighFive::FileException& exc)
+            {
+                LBTHROW(std::runtime_error("Could not create mesh file " +
+                                           source + ": " + exc.what()));
+            }
+        }())
     {
-        try
-        {
-            SilenceHDF5 silence;
-            _file =
-                H5::H5File(source, overwrite ? H5F_ACC_TRUNC : H5F_ACC_EXCL);
-        }
-        catch (const H5::Exception& exc)
-        {
-            LBTHROW(std::runtime_error("Could not create mesh file " + source +
-                                       ": " + exc.getDetailMsg()));
-        }
     }
 
     virtual size_t getNumVertices() const
     {
-        const H5::DataSet& dataset =
-            _file.openDataSet("/membrane/mesh/vertices");
-        return _numElements(dataset);
+        return _numElements(_file.getDataSet("/membrane/mesh/vertices"));
     }
 
     virtual Vector3fsPtr readVertices() const
     {
-        const H5::DataSet& dataset =
-            _file.openDataSet("/membrane/mesh/vertices");
+        const auto dataset = _file.getDataSet("/membrane/mesh/vertices");
         Vector3fsPtr buffer(new Vector3fs);
         buffer->resize(_numElements(dataset));
-        dataset.read(buffer->data(), H5::PredType::IEEE_F32LE);
+        dataset.read(*buffer);
         return buffer;
     }
 
     virtual uint16_tsPtr readVertexSections() const
     {
-        const H5::DataSet& dataset =
-            _file.openDataSet("/membrane/mesh/mappings/vertex/section_ids");
+        const auto dataset =
+            _file.getDataSet("/membrane/mesh/mappings/vertex/section_ids");
         uint16_tsPtr buffer(new uint16_ts);
         buffer->resize(_numElements(dataset));
-        dataset.read(buffer->data(), H5::PredType::STD_U32LE);
+        dataset.read(*buffer);
         return buffer;
     }
 
     virtual floatsPtr readVertexDistances() const
     {
-        const H5::DataSet& dataset = _file.openDataSet(
+        const auto dataset = _file.getDataSet(
             "/membrane/mesh/mappings/vertex/relative_positions");
         floatsPtr buffer(new floats);
         buffer->resize(_numElements(dataset));
-        dataset.read(buffer->data(), H5::PredType::IEEE_F32LE);
+        dataset.read(*buffer);
         return buffer;
     }
 
     virtual size_t getNumTriangles() const
     {
-        const H5::DataSet& dataset =
-            _file.openDataSet("/membrane/mesh/triangles/soup");
-        return _numElements(dataset);
+        return _numElements(_file.getDataSet("/membrane/mesh/triangles/soup"));
     }
 
     virtual uint32_tsPtr readTriangles() const
     {
-        const H5::DataSet& dataset =
-            _file.openDataSet("/membrane/mesh/triangles/soup");
+        const auto dataset = _file.getDataSet("/membrane/mesh/triangles/soup");
         uint32_tsPtr buffer(new uint32_ts);
         buffer->resize(_numElements(dataset) * 3);
-        dataset.read(buffer->data(), H5::PredType::STD_U32LE);
+        dataset.read(*buffer);
         return buffer;
     }
 
     virtual uint16_tsPtr readTriangleSections() const
     {
-        const H5::DataSet& dataset =
-            _file.openDataSet("/membrane/mesh/mappings/triangle/section_ids");
+        const auto dataset =
+            _file.getDataSet("/membrane/mesh/mappings/triangle/section_ids");
         uint16_tsPtr buffer(new uint16_ts);
         buffer->resize(_numElements(dataset));
-        dataset.read(buffer->data(), H5::PredType::STD_U32LE);
+        dataset.read(*buffer);
         return buffer;
     }
 
     virtual floatsPtr readTriangleDistances() const
     {
-        const H5::DataSet& dataset = _file.openDataSet(
+        const auto dataset = _file.getDataSet(
             "/membrane/mesh/mappings/triangle/relative_positions");
         floatsPtr buffer(new floats);
         buffer->resize(_numElements(dataset));
-        dataset.read(buffer->data(), H5::PredType::IEEE_F32LE);
+        dataset.read(*buffer);
         return buffer;
     }
 
     virtual size_t getTriStripLength() const
     {
-        const H5::DataSet& dataset =
-            _file.openDataSet("/membrane/mesh/triangles/strip");
-        return _numElements(dataset);
+        return _numElements(_file.getDataSet("/membrane/mesh/triangles/strip"));
     }
 
     virtual uint32_tsPtr readTriStrip() const
@@ -176,51 +172,49 @@ public:
         uint32_tsPtr buffer(new uint32_ts);
         try
         {
-            const H5::DataSet& dataset =
-                _file.openDataSet("/membrane/mesh/triangles/strip");
+            const auto& dataset =
+                _file.getDataSet("/membrane/mesh/triangles/strip");
             buffer->resize(_numElements(dataset));
-            dataset.read(buffer->data(), H5::PredType::STD_U32LE);
+            dataset.read(*buffer);
         }
         catch (...)
         {
-            LBINFO << "No tristrip in " << _file.getFileName() << std::endl;
+            LBINFO << "No tristrip in " << _file.getName() << std::endl;
         }
-
         return buffer;
     }
 
     virtual size_t getNumNormals() const
     {
-        const H5::DataSet& dataset =
-            _file.openDataSet("/membrane/mesh/normals");
-        return _numElements(dataset);
+        return _numElements(_file.getDataSet("/membrane/mesh/normals"));
     }
 
     virtual Vector3fsPtr readNormals() const
     {
-        const H5::DataSet& dataset =
-            _file.openDataSet("/membrane/mesh/normals");
+        const auto dataset = _file.getDataSet("/membrane/mesh/normals");
         Vector3fsPtr buffer(new Vector3fs);
         buffer->resize(_numElements(dataset));
-        dataset.read(buffer->data(), H5::PredType::IEEE_F32LE);
+        dataset.read(*buffer);
         return buffer;
     }
 
     virtual size_t getNumStructures(const MeshStructure type) const
     {
         // TODO: consider /structures group
-        const H5::Group& group = _getStructureMappingGroup(type);
-        return group.getNumObjs();
+        const auto& group = _getStructureMappingGroup(type);
+        return group.getNumberObjects();
     }
 
     virtual Vector3fsPtr readStructureVertices(const MeshStructure type,
                                                const size_t index) const
     {
-        // TODO: consider /structures group
-        const H5::DataSet& dataset = _getStructureMapping(type, index);
+        (void)type;
+        (void)index;
+        return Vector3fsPtr();
+        const auto& dataset = _getStructureMapping(type, index);
         Vector3fsPtr buffer(new Vector3fs);
         buffer->resize(_numElements(dataset));
-        dataset.read(buffer->data(), H5::PredType::IEEE_F32LE);
+        dataset.read(*buffer);
         return buffer;
     }
 
@@ -228,10 +222,10 @@ public:
                                                 const size_t index) const
     {
         // TODO: consider /structures group
-        const H5::DataSet& dataset = _getStructureMapping(type, index);
+        const auto dataset = _getStructureMapping(type, index);
         uint32_tsPtr buffer(new uint32_ts);
         buffer->resize(_numElements(dataset));
-        dataset.read(buffer->data(), H5::PredType::STD_U32LE);
+        dataset.read(*buffer);
         return buffer;
     }
 
@@ -239,10 +233,10 @@ public:
                                                const size_t index) const
     {
         // TODO: consider /structures group
-        const H5::DataSet& dataset = _getStructureMapping(type, index);
+        const auto dataset = _getStructureMapping(type, index);
         uint32_tsPtr buffer(new uint32_ts);
         buffer->resize(_numElements(dataset));
-        dataset.read(buffer->data(), H5::PredType::STD_U32LE);
+        dataset.read(*buffer);
         return buffer;
     }
 
@@ -305,27 +299,25 @@ public:
 
     virtual void flush() { LBUNIMPLEMENTED; }
 private:
-    hsize_t _numElements(const H5::DataSet& dataset) const
+    hsize_t _numElements(const HighFive::DataSet& dataset) const
     {
-        hsize_t dims[2];
-        dataset.getSpace().getSimpleExtentDims(dims);
-        return dims[0];
+        return dataset.getSpace().getDimensions()[0];
     }
 
-    H5::Group _getStructureMappingGroup(const MeshStructure type) const
+    HighFive::Group _getStructureMappingGroup(const MeshStructure type) const
     {
-        return _file.openGroup("/membrane/mesh/mappings/structure/" +
-                               boost::lexical_cast<std::string>(type));
+        return _file.getGroup("/membrane/mesh/mappings/structure/" +
+                              boost::lexical_cast<std::string>(type));
     }
 
-    H5::DataSet _getStructureMapping(const MeshStructure type,
-                                     const size_t index) const
+    HighFive::DataSet _getStructureMapping(const MeshStructure type,
+                                           const size_t index) const
     {
-        const H5::Group& group = _getStructureMappingGroup(type);
-        return _file.openDataSet(group.getObjnameByIdx(index));
+        const auto& group = _getStructureMappingGroup(type);
+        return _file.getDataSet(group.getObjectName(index));
     }
 
-    H5::H5File _file;
+    HighFive::File _file;
 };
 }
 }

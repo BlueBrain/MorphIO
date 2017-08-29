@@ -2,6 +2,7 @@
 /* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          bbp-open-source@googlegroups.com
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
+ *                          Juan Hernando <juan.hernando@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -21,19 +22,19 @@
 
 #include "synapse.h"
 #include "detail/lockHDF5.h"
-#include "detail/silenceHDF5.h"
 
-#include <bitset>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5File.hpp>
+#include <highfive/util.hpp>
 
 #include <boost/filesystem.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 
-#include <H5Cpp.h>
-
 #include <lunchbox/log.h>
 #include <lunchbox/scopedMutex.h>
 
+#include <bitset>
 #include <fstream>
 #include <unordered_map>
 
@@ -45,43 +46,37 @@ namespace
 {
 struct Dataset
 {
-    H5::DataSet dataset;
-    H5::DataSpace dataspace;
-    hsize_t dims[2];
+    std::unique_ptr<HighFive::DataSet> dataset;
+    std::pair<size_t, size_t> dims;
 };
 
-bool _openDataset(const H5::H5File& file, const std::string& name,
+bool _openDataset(const HighFive::File& file, const std::string& name,
                   Dataset& dataset)
 {
     try
     {
-        SilenceHDF5 silence;
-        dataset.dataset = file.openDataSet(name);
+        HighFive::SilenceHDF5 silence;
+        dataset.dataset.reset(new HighFive::DataSet(file.getDataSet(name)));
     }
-    catch (const H5::Exception&)
+    catch (const HighFive::DataSetException&)
     {
         LBVERB << "Could not find synapse dataset for " << name << ": "
                << std::endl;
         return false;
     }
 
-    dataset.dataspace = dataset.dataset.getSpace();
-    if (dataset.dataspace.getSimpleExtentNdims() != 2)
+    auto dims = dataset.dataset->getSpace().getDimensions();
+
+    if (dims.size() != 2)
     {
         LBERROR << "Synapse dataset is not 2 dimensional" << std::endl;
         return false;
     }
-
-    if (dataset.dataspace.getSimpleExtentDims(dataset.dims) < 0)
-    {
-        LBERROR << "Synapse dataset dimensions could not be retrieved"
-                << std::endl;
-        return false;
-    }
+    dataset.dims = std::make_pair(dims[0], dims[1]);
 
     return true;
 }
-};
+}
 namespace fs = boost::filesystem;
 
 /** Access a single synapse file (nrn*.h5 or nrn*.h5.<int> */
@@ -94,22 +89,22 @@ public:
 
         try
         {
-            SilenceHDF5 silence;
-            _file.openFile(source, H5F_ACC_RDONLY);
+            HighFive::SilenceHDF5 silence;
+            _file.reset(new HighFive::File(source, H5F_ACC_RDONLY));
         }
-        catch (const H5::Exception& exc)
+        catch (const HighFive::FileException& exc)
         {
             LBTHROW(std::runtime_error("Could not open synapse file " + source +
-                                       ": " + exc.getDetailMsg()));
+                                       ": " + exc.what()));
         }
 
         Dataset dataset;
-        const std::string& datasetName = _file.getObjnameByIdx(0);
-        if (!detail::_openDataset(_file, datasetName, dataset))
+        const std::string& datasetName = _file->getObjectName(0);
+        if (!detail::_openDataset(*_file, datasetName, dataset))
             LBTHROW(std::runtime_error("Cannot open dataset " + datasetName +
                                        " in synapse file " + source));
 
-        _numAttributes = dataset.dims[1];
+        _numAttributes = dataset.dims.second;
         if (_numAttributes != SYNAPSE_ALL &&
             _numAttributes != SYNAPSE_POSITION_ALL &&
             _numAttributes != SYNAPSE_OLD_POSITION_ALL &&
@@ -122,7 +117,7 @@ public:
     ~SynapseFile()
     {
         lunchbox::ScopedWrite mutex(detail::hdf5Lock());
-        _file.close();
+        _file.reset();
     }
 
     template <size_t N>
@@ -137,24 +132,17 @@ public:
         if (!_openDataset(gid, dataset))
             return SynapseMatrix();
 
-        dataset.dataspace.selectNone();
+        std::vector<size_t> columns;
+        columns.reserve(SYNAPSE_ALL);
         for (size_t i = 0; i < bits.size(); ++i)
         {
             if (bits.test(i))
-            {
-                const hsize_t readCounts[2] = {dataset.dims[0], 1};
-                const hsize_t readOffsets[2] = {0, i};
-                dataset.dataspace.selectHyperslab(H5S_SELECT_OR, readCounts,
-                                                  readOffsets);
-            }
+                columns.push_back(i);
         }
+        const auto selection = dataset.dataset->select(columns);
 
-        SynapseMatrix values(boost::extents[dataset.dims[0]][bits.count()]);
-        const hsize_t targetSizes[2] = {dataset.dims[0], bits.count()};
-        H5::DataSpace targetspace(2, targetSizes);
-
-        dataset.dataset.read(values.data(), H5::PredType::NATIVE_FLOAT,
-                             targetspace, dataset.dataspace);
+        SynapseMatrix values(boost::extents[dataset.dims.first][bits.count()]);
+        selection.read(values);
         return values;
     }
 
@@ -162,14 +150,13 @@ public:
     size_t getNumSynapses(const GIDSet& gids) const
     {
         lunchbox::ScopedWrite mutex(detail::hdf5Lock());
-
         size_t numSynapses = 0;
         for (const uint32_t gid : gids)
         {
             Dataset dataset;
             if (!_openDataset(gid, dataset))
                 continue;
-            numSynapses += dataset.dims[0];
+            numSynapses += dataset.dims.first;
         }
         return numSynapses;
     }
@@ -178,7 +165,7 @@ public:
     {
         std::stringstream name;
         name << "a" << gid;
-        return detail::_openDataset(_file, name.str(), dataset);
+        return detail::_openDataset(*_file, name.str(), dataset);
     }
 
     SynapseMatrix read(const uint32_t gid, const uint32_t attributes) const
@@ -195,7 +182,7 @@ public:
             // nrn_extra
             return read<1>(gid, 1);
         default:
-            LBERROR << "Synapse file " << _file.getFileName()
+            LBERROR << "Synapse file " << _file->getName()
                     << " has unknown number of attributes: " << _numAttributes
                     << std::endl;
             return SynapseMatrix();
@@ -203,7 +190,7 @@ public:
     }
 
 private:
-    H5::H5File _file;
+    std::unique_ptr<HighFive::File> _file;
     size_t _numAttributes;
 };
 
@@ -212,7 +199,7 @@ class Synapse : public boost::noncopyable
 {
 public:
     explicit Synapse(const std::string& source)
-        : _file(0)
+        : _file(nullptr)
         , _gid(0)
     {
         try
@@ -274,22 +261,22 @@ public:
         assert(!_fileNames.empty());
 
         const std::string& filename = _fileNames.front();
-        H5::H5File file;
+
         try
         {
-            SilenceHDF5 silence;
-            file.openFile(filename, H5F_ACC_RDONLY);
+            HighFive::SilenceHDF5 silence;
+            HighFive::File file(filename, H5F_ACC_RDONLY);
+            Dataset dataset;
+            if (!_openDataset(file, file.getObjectName(0), dataset))
+                LBTHROW(std::runtime_error(
+                    "Cannot open dataset in synapse file " + filename));
+            return dataset.dims.second;
         }
-        catch (const H5::Exception& exc)
+        catch (const HighFive::FileException& exc)
         {
             LBTHROW(std::runtime_error("Could not open synapse file " +
-                                       filename + ": " + exc.getDetailMsg()));
+                                       filename + ": " + exc.what()));
         }
-        Dataset dataset;
-        if (!_openDataset(file, file.getObjnameByIdx(0), dataset))
-            LBTHROW(std::runtime_error("Cannot open dataset in synapse file " +
-                                       filename));
-        return dataset.dims[1];
     }
 
 private:
@@ -390,24 +377,23 @@ private:
         // to HDF5
 
         lunchbox::ScopedWrite mutex(detail::hdf5Lock());
-        SilenceHDF5 silence;
+        HighFive::SilenceHDF5 silence;
 
         // this trial-and-error is the 'fastest' path found
         for (const std::string& candidate : _fileNames)
         {
             try
             {
-                H5::H5File file;
-                file.openFile(candidate, H5F_ACC_RDONLY);
+                HighFive::File file(candidate, H5F_ACC_RDONLY);
 
                 std::stringstream name;
                 name << "a" << gid;
 
-                file.openDataSet(name.str());
+                file.getDataSet(name.str());
                 _fileMap[gid] = candidate;
                 return candidate;
             }
-            catch (const H5::Exception&)
+            catch (const HighFive::DataSetException&)
             {
             }
         }

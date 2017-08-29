@@ -19,12 +19,14 @@
 
 #include "compartmentReportHDF5.h"
 #include "../detail/lockHDF5.h"
-#include "../detail/silenceHDF5.h"
 #include "../detail/utilsHDF5.h"
 #include <brion/version.h>
 
 #include <boost/filesystem.hpp>
 #include <boost/scoped_array.hpp>
+
+#include <highfive/util.hpp>
+
 #include <lunchbox/debug.h>
 #include <lunchbox/log.h>
 #include <lunchbox/pluginRegisterer.h>
@@ -120,24 +122,25 @@ CompartmentReportHDF5::CompartmentReportHDF5(
 
     {
         lunchbox::ScopedWrite mutex(detail::hdf5Lock());
-
+        HighFive::SilenceHDF5 silence;
         namespace fs = boost::filesystem;
 
         if (accessMode & MODE_WRITE)
         {
-            if ((accessMode & MODE_OVERWRITE) != MODE_OVERWRITE &&
-                fs::exists(_path))
+            const bool exists = fs::exists(_path);
+            if (exists && (accessMode & MODE_OVERWRITE) != MODE_OVERWRITE)
             {
                 LBTHROW(std::runtime_error("Cannot overwrite existing file " +
                                            _path.string()));
             }
+            const auto writeFlag =
+                exists ? HighFive::File::Truncate : HighFive::File::Excl;
+            _file.reset(new HighFive::File(_path.string(),
+                                           HighFive::File::Create | writeFlag));
 
-            _file = H5::H5File(_path.string(), H5F_ACC_TRUNC);
             _reportName = fs::basename(_path);
             return;
         }
-
-        H5::H5File file;
 
         // assume one file per cell
         if (fs::is_directory(_path))
@@ -145,51 +148,16 @@ CompartmentReportHDF5::CompartmentReportHDF5(
             fs::directory_iterator it(_path);
             if (it == fs::directory_iterator())
                 LBTHROW(std::runtime_error("No files in " + _path.string()));
-            file = H5::H5File(it->path().string(), H5F_ACC_RDONLY);
-            if (!file.getId())
-                LBTHROW(std::runtime_error("File not found: " +
-                                           it->path().string()));
+            HighFive::File file(it->path().string(), HighFive::File::ReadOnly);
+            _readMetaData(file);
         }
         // assume one file for all cells
         else
         {
             _reportName = fs::basename(_path);
-            _file = H5::H5File(_path.string(), H5F_ACC_RDONLY);
-            if (!_file.getId())
-                LBTHROW(
-                    std::runtime_error("File not found: " + _path.string()));
-            file = _file;
-        }
-
-        if (!file.getNumObjs())
-            LBTHROW(std::runtime_error("File is empty: " + file.getFileName()));
-
-        try
-        {
-            detail::SilenceHDF5 silence;
-            const H5std_string& datasetName = file.getObjnameByIdx(0);
-            const H5::Group& reportGroup = file.openGroup(datasetName);
-            _reportName = reportGroup.getObjnameByIdx(0);
-            std::stringstream tmp;
-            tmp << datasetName.substr(1);
-            uint32_t gid;
-            tmp >> gid;
-
-            const H5::DataSet& dataset = _openDataset(file, gid);
-            dataset.openAttribute(dataAttributes[1])
-                .read(H5::PredType::NATIVE_DOUBLE, &_startTime);
-            dataset.openAttribute(dataAttributes[2])
-                .read(H5::PredType::NATIVE_DOUBLE, &_endTime);
-            dataset.openAttribute(dataAttributes[3])
-                .read(H5::PredType::NATIVE_DOUBLE, &_timestep);
-            _dunit = "mV";
-            _tunit = "ms";
-        }
-        catch (...)
-        {
-            LBTHROW(std::runtime_error(_path.string() +
-                                       " not a valid H5"
-                                       " compartment report file"));
+            _file.reset(
+                new HighFive::File(_path.string(), HighFive::File::ReadOnly));
+            _readMetaData(*_file);
         }
     }
     _cacheNeuronCompartmentCounts(initData.getGids());
@@ -198,9 +166,9 @@ CompartmentReportHDF5::CompartmentReportHDF5(
 CompartmentReportHDF5::~CompartmentReportHDF5()
 {
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
-
-    if (_file.getId())
-        _file.close();
+    _file.reset();
+    _files.clear();
+    _datas.clear();
 }
 
 bool CompartmentReportHDF5::handles(const CompartmentReportInitData& initData)
@@ -245,29 +213,21 @@ bool CompartmentReportHDF5::_loadFrame(const size_t frameNumber,
 {
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
-    // The offset for the first comparment of the cell being processed
-    hsize_t firstCompartmentOffset = 0;
-
-    for (GIDSetCIter cellID = _gids.begin(); cellID != _gids.end(); ++cellID)
+    size_t cellIndex = 0;
+    size_t destOffset = 0;
+    for (auto cellID : _gids)
     {
-        const H5::DataSet& dataset = _datas.find(*cellID)->second;
+        const auto& dataset = _datas.find(cellID)->second;
+        const size_t compartments = getNumCompartments(cellIndex);
+        const auto& selection =
+            dataset.select({frameNumber, 0}, {1, compartments});
 
-        const H5::DataSpace& space = _fspaces.find(*cellID)->second;
-        const H5::DataSpace& targetSpace = _mspaces.find(*cellID)->second;
+        // Deceiving HighFive into believing this is a two dimensional buffer
+        float* ptr = buffer + destOffset;
+        selection.read(ptr);
 
-        hsize_t sourceSizes[2];
-        space.getSimpleExtentDims(sourceSizes);
-        const hsize_t readCounts[2] = {1, sourceSizes[1]};
-
-        const hsize_t readOffsets[2] = {frameNumber, 0};
-        space.selectHyperslab(H5S_SELECT_SET, readCounts, readOffsets);
-
-        const hsize_t targetOffsets[2] = {0, firstCompartmentOffset};
-        targetSpace.selectHyperslab(H5S_SELECT_SET, readCounts, targetOffsets);
-
-        dataset.read(buffer, H5::PredType::NATIVE_FLOAT, targetSpace, space);
-
-        firstCompartmentOffset += sourceSizes[1];
+        ++cellIndex;
+        destOffset += compartments;
     }
     return true;
 }
@@ -279,17 +239,15 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
     _gids = gids;
 
     _datas.clear();
-    _fspaces.clear();
-    _mspaces.clear();
 
     if (_gids.empty())
     {
-        if (!_file.getId())
+        if (!_file)
             return;
 
-        for (hsize_t i = 0; i < _file.getNumObjs(); ++i)
+        for (hsize_t i = 0; i < _file->getNumberObjects(); ++i)
         {
-            const H5std_string& datasetName = _file.getObjnameByIdx(i);
+            const std::string& datasetName = _file->getObjectName(i);
             std::stringstream tmp;
             tmp << datasetName.substr(1);
             uint32_t gid;
@@ -302,33 +260,33 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
 
     size_t nextCompartmentIndex = 0;
     size_t cellIndex = 0;
-    for (GIDSetCIter cellID = _gids.begin(); cellID != _gids.end();
-         ++cellID, ++cellIndex)
+    for (auto cellID : _gids)
     {
-        _openFile(*cellID);
+        _openFile(cellID);
 
-        const H5::H5File& file =
-            _file.getId() ? _file : _files.find(*cellID)->second;
+        const HighFive::File& file =
+            _file ? *_file : _files.find(cellID)->second;
 
         std::stringstream cellName;
-        cellName << "a" << *cellID;
+        cellName << "a" << cellID;
         const std::string datasetName =
             "/" + cellName.str() + "/" + _reportName + "/" + mappingDatasetName;
-        H5::DataSet dataset;
-        H5E_BEGIN_TRY
-        dataset = file.openDataSet(datasetName);
-        H5E_END_TRY
-        if (!dataset.getId())
-        {
-            LBTHROW(
-                std::runtime_error("ReportReaderHDF5: "
-                                   "Dataset " +
-                                   datasetName + " not found "
-                                                 "in file: " +
-                                   file.getFileName()));
-        }
+        HighFive::DataSet dataset = [file, datasetName]() {
+            try
+            {
+                return file.getDataSet(datasetName);
+            }
+            catch (HighFive::DataSetException&)
+            {
+                LBTHROW(std::runtime_error("CompartmentReportHDF5: Dataset " +
+                                           datasetName + " not found "
+                                                         "in file: " +
+                                           file.getName()));
+            }
+        }();
 
-        if (dataset.getSpace().getSimpleExtentNdims() != 2)
+        auto dims = dataset.getSpace().getDimensions();
+        if (dims.size() != 2)
         {
             LBTHROW(
                 std::runtime_error("Compartment_Report_HDF5_File_Reader: "
@@ -336,11 +294,9 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
                                    datasetName));
         }
 
-        hsize_t dims[2];
-        dataset.getSpace().getSimpleExtentDims(dims);
-
         boost::scoped_array<float> buffer(new float[dims[1]]);
-        dataset.read(buffer.get(), H5::PredType::NATIVE_FLOAT);
+        float* ptr = buffer.get(); // HighFive requires an l-value for read
+        dataset.read(ptr);
 
         // Getting the last section id;
         size_t largestSectionID = 0;
@@ -365,6 +321,8 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
                 offsets[section] = nextCompartmentIndex;
             }
         }
+
+        ++cellIndex;
     }
 
     _comps = nextCompartmentIndex;
@@ -387,17 +345,11 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
         }
     }
 
-    for (GIDSetCIter cellID = _gids.begin(); cellID != _gids.end();
-         ++cellID, ++cellIndex)
+    for (auto cellID : _gids)
     {
-        const H5::H5File& file =
-            _file.getId() ? _file : _files.find(*cellID)->second;
-        const H5::DataSet& dataset = _openDataset(file, *cellID);
-        _datas[*cellID] = dataset;
-        _fspaces[*cellID] = dataset.getSpace();
-        hsize_t targetSizes[2] = {1, getFrameSize()};
-        H5::DataSpace targetSpace(2, targetSizes);
-        _mspaces[*cellID] = targetSpace;
+        const auto& file = _file ? *_file : _files.find(cellID)->second;
+        auto dataset = _openDataset(file, cellID);
+        _datas.emplace(std::make_pair(cellID, std::move(dataset)));
     }
 }
 
@@ -437,22 +389,26 @@ bool CompartmentReportHDF5::writeCompartments(const uint32_t gid,
             std::accumulate(counts.begin(), counts.end(), 0);
         LBASSERT(!counts.empty());
         LBASSERTINFO(compCount > 0, "No compartments for GID " << gid);
-        H5::DataSet dataset = _createDataset(gid, compCount);
+        HighFive::DataSet dataset = _createDataset(gid, compCount);
 
         const size_t sections = counts.size();
         LBASSERT(sections > 0);
-        dataset.openAttribute(1).write(H5::PredType::NATIVE_INT, &sections);
+        dataset.getAttribute(mappingAttributes[1]).write(sections);
 
-        boost::scoped_array<float> mapping(new float[compCount]);
+        boost::multi_array<float, 2> mapping(boost::extents[1][compCount]);
         size_t i = 0;
         for (size_t j = 0; j < counts.size(); ++j)
             for (size_t k = 0; k < counts[j]; ++k)
-                mapping[i++] = j;
+                mapping[0][i++] = j;
 
-        dataset.write(mapping.get(), H5::PredType::NATIVE_FLOAT);
+        dataset.write(mapping);
         return true;
     }
-    CATCH_HDF5ERRORS
+    catch (const HighFive::Exception& e)
+    {
+        LBERROR << "CompartmentReportHDF5: error writing mapping: " << e.what()
+                << std::endl;
+    }
     return false;
 }
 
@@ -464,41 +420,34 @@ bool CompartmentReportHDF5::writeFrame(const uint32_t gid, const float* values,
 
     try
     {
-        H5::DataSet& dataset = _getDataset(gid);
-        const H5::DataSpace& dataFspace = dataset.getSpace();
-
+        auto& dataset = _getDataset(gid);
+        auto dims = dataset.getSpace().getDimensions();
         const size_t frameNumber = _getFrameNumber(timestamp);
-
-        hsize_t dims[2];
-        dataFspace.getSimpleExtentDims(dims);
-
-        // get the correct slab
-        const hsize_t dataDim[2] = {1, dims[1]};
-        const hsize_t dataOffset[2] = {frameNumber, 0};
-        dataFspace.selectHyperslab(H5S_SELECT_SET, dataDim, dataOffset);
-
-        // define mspace
-        H5::DataSpace dataMspace(1, &dataDim[1]);
-
-        // Write data to the dataset
-        dataset.write(values, H5::PredType::NATIVE_FLOAT, dataMspace,
-                      dataFspace);
+        auto selection = dataset.select({frameNumber, 0}, {1, dims[1]});
+        // HighFive is not handling const correctly
+        selection.write(const_cast<float*>(values));
         return true;
     }
-    CATCH_HDF5ERRORS
+    catch (const HighFive::Exception& e)
+    {
+        LBERROR << "CompartmentReportHDF5: error writing frame: " << e.what()
+                << std::endl;
+    }
     return false;
 }
 
 bool CompartmentReportHDF5::flush()
 {
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
-    _file.flush(H5F_SCOPE_GLOBAL);
+    if (_file)
+        _file->flush();
     return true;
 }
 
 void CompartmentReportHDF5::_openFile(const uint32_t cellID)
 {
-    if (_file.getId())
+    if (_file)
+        // All cells are in a single file
         return;
 
     assert(_files.find(cellID) == _files.end());
@@ -507,37 +456,44 @@ void CompartmentReportHDF5::_openFile(const uint32_t cellID)
     cellName << "a" << cellID;
     const boost::filesystem::path filename = _path / (cellName.str() + ".h5");
 
-    H5::H5File file(filename.string().c_str(), H5F_ACC_RDONLY);
-    if (!file.getId())
+    try
     {
-        LBTHROW(std::runtime_error("ReportReaderHDF5: error opening file:" +
-                                   filename.string()));
+        HighFive::SilenceHDF5 silence;
+        _files.emplace(
+            std::make_pair(cellID, HighFive::File(filename.string().c_str(),
+                                                  H5F_ACC_RDONLY)));
     }
-    _files[cellID] = file;
+    catch (const HighFive::FileException&)
+    {
+        LBTHROW(std::runtime_error(
+            "CompartmentReportHDF5: error opening file:" + filename.string()));
+    }
 }
 
-H5::DataSet CompartmentReportHDF5::_openDataset(const H5::H5File& file,
-                                                const uint32_t cellID)
+HighFive::DataSet CompartmentReportHDF5::_openDataset(
+    const HighFive::File& file, const uint32_t cellID)
 {
     std::stringstream cellName;
     cellName << "a" << cellID;
     const std::string datasetName =
         "/" + cellName.str() + "/" + _reportName + "/" + dataDatasetName;
-    H5::DataSet dataset;
-    H5E_BEGIN_TRY
-    dataset = file.openDataSet(datasetName);
-    H5E_END_TRY
-    if (!dataset.getId())
-    {
-        LBTHROW(std::runtime_error("ReportReaderHDF5: Dataset " + datasetName +
-                                   " not found in file: " +
-                                   file.getFileName()));
-    }
+    HighFive::DataSet dataset = [file, datasetName]() {
+        try
+        {
+            return file.getDataSet(datasetName);
+        }
+        catch (const HighFive::DataSetException&)
+        {
+            LBTHROW(std::runtime_error("CompartmentReportHDF5: Dataset " +
+                                       datasetName + " not found in file: " +
+                                       file.getName()));
+        }
+    }();
 
-    if (dataset.getSpace().getSimpleExtentNdims() != 2)
+    if (dataset.getSpace().getNumberDimensions() != 2)
     {
         LBTHROW(
-            std::runtime_error("Compartment_Report_HDF5_File_Reader: "
+            std::runtime_error("CompartmentReportHDF5: "
                                "Error, not 2 dimensional array on " +
                                datasetName));
     }
@@ -545,8 +501,8 @@ H5::DataSet CompartmentReportHDF5::_openDataset(const H5::H5File& file,
     return dataset;
 }
 
-H5::DataSet CompartmentReportHDF5::_createDataset(const uint32_t gid,
-                                                  const size_t compCount)
+HighFive::DataSet CompartmentReportHDF5::_createDataset(const uint32_t gid,
+                                                        const size_t compCount)
 {
     LBASSERT(compCount > 0);
     LBASSERT(!_reportName.empty());
@@ -554,29 +510,22 @@ H5::DataSet CompartmentReportHDF5::_createDataset(const uint32_t gid,
     std::ostringstream neuronName;
     neuronName << "a" << gid;
 
-    H5::Group neuronGroup = _file.createGroup(neuronName.str().c_str());
-    H5::Group reportGroup = neuronGroup.createGroup(_reportName);
+    HighFive::Group neuronGroup = _file->createGroup(neuronName.str().c_str());
+    HighFive::Group reportGroup = neuronGroup.createGroup(_reportName);
 
-    const int dims = 2;
     const double step = getTimestep();
     // Adding step / 2 to the window to avoid off by 1 errors during truncation
     // after the division.
     const size_t numSteps = (getEndTime() - getStartTime() + step * 0.5) / step;
-    const hsize_t mappingDim[dims] = {1, compCount};
-    const hsize_t dataDim[dims] = {numSteps, compCount};
     LBASSERT(numSteps > 0);
 
-    H5::DataSpace mappingDataspace(dims, mappingDim);
-    H5::DataSpace dataDataspace(dims, dataDim);
+    HighFive::DataSet mappingDataset =
+        reportGroup.createDataSet<float>(mappingDatasetName,
+                                         HighFive::DataSpace({1, compCount}));
+    HighFive::DataSet dataDataset = reportGroup.createDataSet<float>(
+        dataDatasetName, HighFive::DataSpace({numSteps, compCount}));
 
-    H5::DataSet mappingDataset =
-        reportGroup.createDataSet(mappingDatasetName,
-                                  H5::PredType::NATIVE_FLOAT, mappingDataspace);
-    H5::DataSet dataDataset =
-        reportGroup.createDataSet(dataDatasetName, H5::PredType::NATIVE_FLOAT,
-                                  dataDataspace);
-
-    _datas[gid] = dataDataset;
+    _datas.emplace(std::make_pair(gid, std::move(dataDataset)));
 
     _createMappingAttributes(mappingDataset);
     _createDataAttributes(dataDataset);
@@ -584,7 +533,7 @@ H5::DataSet CompartmentReportHDF5::_createDataset(const uint32_t gid,
     return mappingDataset;
 }
 
-H5::DataSet& CompartmentReportHDF5::_getDataset(const uint32_t gid)
+HighFive::DataSet& CompartmentReportHDF5::_getDataset(const uint32_t gid)
 {
     Datasets::iterator it = _datas.find(gid);
     if (it == _datas.end())
@@ -592,9 +541,42 @@ H5::DataSet& CompartmentReportHDF5::_getDataset(const uint32_t gid)
     return it->second;
 }
 
+void CompartmentReportHDF5::_readMetaData(const HighFive::File& file)
+{
+    if (!file.getNumberObjects())
+    {
+        std::runtime_error exc("File is empty: " + file.getName());
+        LBTHROW(exc);
+    }
+
+    try
+    {
+        HighFive::SilenceHDF5 silence;
+        const std::string& datasetName = file.getObjectName(0);
+        const auto& reportGroup = file.getGroup(datasetName);
+        _reportName = reportGroup.getObjectName(0);
+        std::stringstream tmp;
+        tmp << datasetName.substr(1);
+        uint32_t gid;
+        tmp >> gid;
+
+        auto dataset = _openDataset(*_file, gid);
+        dataset.getAttribute(dataAttributes[1]).read(_startTime);
+        dataset.getAttribute(dataAttributes[2]).read(_endTime);
+        dataset.getAttribute(dataAttributes[3]).read(_timestep);
+        _dunit = "mV";
+        _tunit = "ms";
+    }
+    catch (const HighFive::Exception&)
+    {
+        LBTHROW(std::runtime_error(_path.string() +
+                                   " not a valid H5 compartment report file"));
+    }
+}
+
 void CompartmentReportHDF5::_createMetaData()
 {
-    H5::Group root = _file.openGroup("/");
+    auto root = _file->getGroup("/");
 
     detail::addStringAttribute(root, "creator", "Brion");
     detail::addStringAttribute(root, "software_version", BRION_REV_STRING);
@@ -612,46 +594,33 @@ void CompartmentReportHDF5::_createMetaData()
     detail::addStringAttribute(root, "creation_time", creationTimeName);
 }
 
-void CompartmentReportHDF5::_createMappingAttributes(H5::DataSet& dataset)
+void CompartmentReportHDF5::_createMappingAttributes(HighFive::DataSet& dataset)
 {
     const std::string type = "compartment";
     detail::addStringAttribute(dataset, mappingAttributes[0], type);
-    dataset.createAttribute(mappingAttributes[1], H5::PredType::NATIVE_INT,
-                            H5S_SCALAR);
-    dataset.createAttribute(mappingAttributes[2], H5::PredType::NATIVE_INT,
-                            H5S_SCALAR);
-    dataset.createAttribute(mappingAttributes[3], H5::PredType::NATIVE_INT,
-                            H5S_SCALAR);
-    dataset.createAttribute(mappingAttributes[4], H5::PredType::NATIVE_INT,
-                            H5S_SCALAR);
-    dataset.createAttribute(mappingAttributes[5], H5::PredType::NATIVE_INT,
-                            H5S_SCALAR);
+    for (int i = 1; i < 6; ++i)
+        dataset.createAttribute<int>(mappingAttributes[i],
+                                     HighFive::DataSpace(
+                                         std::vector<size_t>({1})));
 }
 
-void CompartmentReportHDF5::_createDataAttributes(H5::DataSet& dataset)
+void CompartmentReportHDF5::_createDataAttributes(HighFive::DataSet& dataset)
 {
-    const int rank = 0;
-    const double startTime = getStartTime();
-    const double endTime = getEndTime();
-    const double timestep = getTimestep();
+    HighFive::DataSpace scalar(std::vector<size_t>({1}));
 
-    H5::Attribute rankAttr =
-        dataset.createAttribute(dataAttributes[0], H5::PredType::NATIVE_INT,
-                                H5S_SCALAR);
-    H5::Attribute tstartAttr =
-        dataset.createAttribute(dataAttributes[1], H5::PredType::NATIVE_DOUBLE,
-                                H5S_SCALAR);
-    H5::Attribute tstopAttr =
-        dataset.createAttribute(dataAttributes[2], H5::PredType::NATIVE_DOUBLE,
-                                H5S_SCALAR);
-    H5::Attribute dtAttr =
-        dataset.createAttribute(dataAttributes[3], H5::PredType::NATIVE_DOUBLE,
-                                H5S_SCALAR);
+    auto attribute =
+        dataset.createAttribute<int32_t>(dataAttributes[0], scalar);
+    attribute.write(0); // rank
 
-    rankAttr.write(H5::PredType::NATIVE_INT, &rank);
-    tstartAttr.write(H5::PredType::NATIVE_DOUBLE, &startTime);
-    tstopAttr.write(H5::PredType::NATIVE_DOUBLE, &endTime);
-    dtAttr.write(H5::PredType::NATIVE_DOUBLE, &timestep);
+    attribute = dataset.createAttribute<double>(dataAttributes[1], scalar);
+    attribute.write(getStartTime());
+
+    attribute = dataset.createAttribute<double>(dataAttributes[2], scalar);
+    attribute.write(getEndTime());
+
+    attribute = dataset.createAttribute<double>(dataAttributes[3], scalar);
+    attribute.write(getTimestep());
+
     detail::addStringAttribute(dataset, dataAttributes[4], _dunit);
     detail::addStringAttribute(dataset, dataAttributes[5], _tunit);
 }

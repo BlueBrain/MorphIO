@@ -1,5 +1,7 @@
-/* Copyright (c) 2013-2015, EPFL/Blue Brain Project
+/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
+ *                          Juan Hernando <juan.hernando@epfl.ch>
+ *
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -20,13 +22,18 @@
 #include "synapseSummary.h"
 
 #include "detail/lockHDF5.h"
-#include "detail/silenceHDF5.h"
 
-#include <H5Cpp.h>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5File.hpp>
+#include <highfive/util.hpp>
+
 #include <boost/lexical_cast.hpp>
+
 #include <lunchbox/debug.h>
 #include <lunchbox/log.h>
 #include <lunchbox/scopedMutex.h>
+
+#include <memory>
 
 namespace brion
 {
@@ -43,8 +50,9 @@ public:
 
         try
         {
-            SilenceHDF5 silence;
-            _file.openFile(source, H5F_ACC_RDONLY, H5P_DEFAULT);
+            HighFive::SilenceHDF5 silence;
+            _file.reset(
+                new HighFive::File(source, H5F_ACC_RDONLY, H5P_DEFAULT));
         }
         catch (...)
         {
@@ -55,8 +63,8 @@ public:
 
         try
         {
-            SilenceHDF5 silence;
-            const std::string& datasetName = _file.getObjnameByIdx(0);
+            HighFive::SilenceHDF5 silence;
+            const std::string& datasetName = _file->getObjectName(0);
             const uint32_t gid =
                 boost::lexical_cast<uint32_t>(datasetName.substr(1));
             if (!_loadDataset(gid))
@@ -73,8 +81,8 @@ public:
     {
         lunchbox::ScopedWrite mutex(detail::hdf5Lock());
 
-        if (_file.getId())
-            _file.close();
+        if (_file)
+            _file.reset();
     }
 
     SynapseSummaryMatrix read(const uint32_t gid)
@@ -85,19 +93,14 @@ public:
             return SynapseSummaryMatrix();
 
         SynapseSummaryMatrix values(boost::extents[_dims[0]][_dims[1]]);
-        const hsize_t targetSizes[2] = {_dims[0], _dims[1]};
-        H5::DataSpace targetspace(2, targetSizes);
-
-        _dataset.read(values.data(), H5::PredType::NATIVE_UINT32, targetspace);
-
+        _dataset->read(values);
         return values;
     }
 
 private:
-    H5::H5File _file;
-    mutable H5::DataSet _dataset;
-    mutable H5::DataSpace _dataspace;
-    mutable hsize_t _dims[2];
+    std::unique_ptr<HighFive::File> _file;
+    mutable std::unique_ptr<HighFive::DataSet> _dataset;
+    mutable std::vector<size_t> _dims;
 
     bool _loadDataset(const uint32_t gid) const
     {
@@ -106,38 +109,32 @@ private:
 
         try
         {
-            SilenceHDF5 silence;
-            _dataset = _file.openDataSet(name.str());
+            HighFive::SilenceHDF5 silence;
+            _dataset.reset(
+                new HighFive::DataSet(_file->getDataSet(name.str())));
         }
-        catch (const H5::Exception&)
+        catch (const HighFive::DataSetException&)
         {
             LBVERB << "Could not find synapse summary dataset for "
                    << name.str() << ": " << std::endl;
             return false;
         }
 
-        _dataspace = _dataset.getSpace();
-        if (_dataspace.getSimpleExtentNdims() != 2)
+        auto dataspace = _dataset->getSpace();
+        _dims = dataspace.getDimensions();
+
+        if (_dims.size() != 2)
         {
             LBERROR << "Synapse summary dataset is not 2 dimensional"
                     << std::endl;
             return false;
         }
-
-        if (_dataspace.getSimpleExtentDims(_dims) < 0)
-        {
-            LBERROR << "Synapse summary dataset dimensions could not be "
-                    << "retrieved" << std::endl;
-            return false;
-        }
-
         if (_dims[1] != NUMATTRIBUTES)
         {
             LBERROR << "Synapse summary dataset does not have " << NUMATTRIBUTES
                     << " attributes" << std::endl;
             return false;
         }
-
         if (_dims[0] == 0)
         {
             LBINFO << "No synapse summary for GID " << gid << std::endl;

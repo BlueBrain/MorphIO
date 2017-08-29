@@ -5,7 +5,6 @@
 
 #include <brion/brion.h>
 #include <brion/detail/morphologyHDF5.h>
-#include <brion/detail/silenceHDF5.h>
 #include <brion/detail/utilsHDF5.h>
 
 #include <lunchbox/clock.h>
@@ -17,6 +16,21 @@
 #include <boost/foreach.hpp>
 #include <boost/program_options.hpp>
 
+#include <H5Tpublic.h>
+#include <highfive/H5Attribute.hpp>
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5File.hpp>
+#include <highfive/H5Group.hpp>
+
+namespace HighFive
+{
+class UserType : public DataType
+{
+public:
+    UserType(hid_t hid) { _hid = hid; }
+};
+}
+
 namespace po = boost::program_options;
 using boost::lexical_cast;
 void writeMorphology(const brion::Morphology& in, const std::string& output);
@@ -27,29 +41,33 @@ int main(int argc, char* argv[])
                                     lunchbox::term::getSize().first);
 
     // clang-format off
-    options.add_options()
-        ( "help,h", "Produce help message" )
-        ( "version,v", "Show program name/version banner and exit" )
-        ( "input,i", po::value< std::string >(), "Input morphology" )
-        ( "output,o", po::value< std::string >(), "Output H5 V1.1 morphology" )
-    ;
+    options.add_options()("help,h", "Produce help message")(
+        "version,v", "Show program name/version banner and exit");
+
+    po::options_description hidden;
+    hidden.add_options()
+        ("input,i", po::value<std::string>()->required(), "Input morphology")
+        ("output,o", po::value<std::string>()->required(),
+         "Output H5 V1.1 morphology");
     // clang-format on
+
+    po::options_description allOptions;
+    allOptions.add(hidden).add(options);
+
+    po::positional_options_description positional;
+    positional.add("input", 1);
+    positional.add("output", 2);
+
     po::variables_map vm;
 
-    try
-    {
-        po::store(po::parse_command_line(argc, argv, options), vm);
-        po::notify(vm);
-    }
-    catch (...)
-    {
-        std::cout << "Unknown arguments provided\n\n";
-        std::cout << options << std::endl;
-        return EXIT_FAILURE;
-    }
+    auto parser = po::command_line_parser(argc, argv);
+    po::store(parser.options(allOptions).positional(positional).run(), vm);
 
-    if (vm.count("help"))
+    if (vm.count("help") || vm.count("input") == 0 || vm.count("output") == 0)
     {
+        std::cout << "Usage: " << lunchbox::getFilename(std::string(argv[0]))
+                  << " input output" << std::endl
+                  << std::endl;
         std::cout << options << std::endl;
         return EXIT_SUCCESS;
     }
@@ -61,9 +79,14 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
 
-    if (vm.count("input") != 1 || vm.count("output") != 1)
+    try
     {
-        std::cout << options << std::endl;
+        po::notify(vm);
+    }
+    catch (const po::error& e)
+    {
+        std::cerr << "Command line parse error: " << e.what() << std::endl
+                  << options << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -86,27 +109,26 @@ int main(int argc, char* argv[])
 
 namespace
 {
-void _writeMetadata(H5::H5File& file, const brion::CellFamily& family)
+void _writeMetadata(HighFive::File& file, const brion::CellFamily& family)
 {
-    // metadata
-    H5::Group metadata = file.createGroup(_g_metadata);
+    // metadata for v 1.1
+    auto metadata = file.createGroup(_g_metadata);
 
-    H5::EnumType familyEnum(H5::PredType::STD_U32LE);
-    uint32_t enumValue = brion::FAMILY_NEURON;
-    familyEnum.insert("NEURON", &enumValue);
+    // HighFive doesn't provide an API for enums
+    auto familyEnum = HighFive::UserType(H5Tenum_create(H5T_NATIVE_INT));
+    auto enumValue = brion::FAMILY_NEURON;
+    H5Tenum_insert(familyEnum.getId(), "NEURON", &enumValue);
     enumValue = brion::FAMILY_GLIA;
-    familyEnum.insert("GLIA", &enumValue);
-    familyEnum.commit(metadata, _e_family);
+    H5Tenum_insert(familyEnum.getId(), "GLIA", &enumValue);
 
-    const hsize_t dim = 1;
-    H5::DataSpace familyDS(1, &dim);
-    H5::Attribute familyAttr =
-        metadata.createAttribute(_a_family, familyEnum, familyDS);
-    familyAttr.write(familyEnum, &family);
+    auto familyAttr =
+        metadata.createAttribute(_a_family,
+                                 HighFive::DataSpace(std::vector<size_t>({1})),
+                                 familyEnum);
+    H5Awrite(familyAttr.getId(), familyEnum.getId(), &family);
 
     const std::string creator = "Brion";
     brion::detail::addStringAttribute(metadata, _a_creator, creator);
-
     brion::detail::addStringAttribute(metadata, _a_software_version,
                                       BRION_VERSION_STRING);
 
@@ -123,92 +145,57 @@ void _writeMetadata(H5::H5File& file, const brion::CellFamily& family)
                                                 1); // ctime_r ends with \n
     brion::detail::addStringAttribute(metadata, _a_creation_time,
                                       creation_time);
-    hsize_t dims = 2;
-    H5::DataSpace versionDS(1, &dims);
-    H5::Attribute versionAttr =
-        metadata.createAttribute(_a_version, H5::PredType::STD_U32LE,
-                                 versionDS);
-    const uint32_t version[2] = {1, 1};
-    versionAttr.write(H5::PredType::STD_U32LE, &version[0]);
+
+    auto version = metadata.createAttribute<uint32_t>(
+        _a_version, HighFive::DataSpace(std::vector<size_t>({2})));
+    version.write(std::vector<uint32_t>{1, 1});
 }
 
-void _writePoints(H5::H5File& file, const brion::Vector4fs& points)
+template <typename T>
+void _writePoints(HighFive::NodeTraits<T>& group,
+                  const brion::Vector4fs& points)
 {
-    hsize_t dim[2] = {points.size(), 4};
-    H5::DataSpace pointsDS(2, dim);
-
-    H5::FloatType pointsDT(H5::PredType::NATIVE_DOUBLE);
-    pointsDT.setOrder(H5T_ORDER_LE);
-
-    H5::DataSet dataset = file.createDataSet(_d_points, pointsDT, pointsDS);
-    dataset.write(points.data(), H5::PredType::NATIVE_FLOAT);
+    auto dspace = HighFive::DataSpace({points.size(), 4});
+    // I've confirmed that other tools in the moprhology toolchain write
+    // doubles here (for no good reason).
+    auto dataset = group.template createDataSet<double>(_d_points, dspace);
+    dataset.write(points);
 }
 
-H5::DataSet _getStructureDataSet(H5::H5File& file, const size_t nSections)
+void _writeStructure(HighFive::File& file, const brion::Vector2is& sections,
+                     const brion::SectionTypes& types)
 {
-    H5::DataSet dataset;
-    try
-    {
-        brion::detail::SilenceHDF5 silence;
-        return file.openDataSet(_d_structure);
-    }
-    catch (const H5::Exception&)
-    {
-        hsize_t dim[2] = {nSections, 3};
-        H5::DataSpace structureDS(2, dim);
-        H5::FloatType structureDT(H5::PredType::NATIVE_INT);
-        structureDT.setOrder(H5T_ORDER_LE);
-        return file.createDataSet(_d_structure, structureDT, structureDS);
-    }
+    assert(sections.size() == types.size());
+    auto dataset =
+        file.createDataSet<int>(_d_structure,
+                                HighFive::DataSpace({sections.size(), 3}));
+
+    auto slab = dataset.select({0, 0}, {sections.size(), 2}, {1, 2});
+    slab.write(sections);
+
+    slab = dataset.select({0, 1}, {types.size(), 1});
+    slab.write(types);
 }
 
-void _writeSections(H5::H5File& file, const brion::Vector2is& sections)
-{
-    H5::DataSet dataset = _getStructureDataSet(file, sections.size());
-    const H5::DataSpace& dspace = dataset.getSpace();
-    const hsize_t count[2] = {sections.size(), 1};
-    const hsize_t offset[2] = {0, 1};
-    dspace.selectHyperslab(H5S_SELECT_XOR, count, offset);
-
-    const hsize_t mdim[2] = {sections.size(), 2};
-    const H5::DataSpace mspace(2, mdim);
-    dataset.write(sections.data(), H5::PredType::NATIVE_INT, mspace, dspace);
-}
-
-void _writeSectionTypes(H5::H5File& file, const brion::SectionTypes& types)
-{
-    H5::DataSet dataset = _getStructureDataSet(file, types.size());
-    const H5::DataSpace& dspace = dataset.getSpace();
-    const hsize_t count[2] = {types.size(), 1};
-    const hsize_t offset[2] = {0, 1};
-    dspace.selectHyperslab(H5S_SELECT_SET, count, offset);
-
-    const hsize_t mdim = types.size();
-    const H5::DataSpace mspace(1, &mdim);
-    dataset.write(types.data(), H5::PredType::NATIVE_INT, mspace, dspace);
-}
-
-void _writePerimeters(H5::H5File& file, const brion::floats& perimeters)
+void _writePerimeters(HighFive::File& file, const brion::floats& perimeters)
 {
     if (perimeters.empty())
         return;
 
-    const hsize_t dim = perimeters.size();
-    H5::DataSpace perimeterDS(1, &dim);
-
-    H5::DataSet dataset =
-        file.createDataSet(_d_perimeters, H5::PredType::NATIVE_FLOAT,
-                           perimeterDS);
-    dataset.write(perimeters.data(), H5::PredType::NATIVE_FLOAT);
+    const auto dspace =
+        HighFive::DataSpace(std::vector<size_t>({perimeters.size()}));
+    auto dataset = file.createDataSet<float>(_d_perimeters, dspace);
+    dataset.write(perimeters);
 }
 }
 
 void writeMorphology(const brion::Morphology& in, const std::string& output)
 {
-    H5::H5File file(output, H5F_ACC_TRUNC);
+    HighFive::File file(output,
+                        HighFive::File::Create | HighFive::File::Truncate);
+
     _writeMetadata(file, in.getCellFamily());
     _writePoints(file, in.getPoints());
-    _writeSections(file, in.getSections());
-    _writeSectionTypes(file, in.getSectionTypes());
+    _writeStructure(file, in.getSections(), in.getSectionTypes());
     _writePerimeters(file, in.getPerimeters());
 }

@@ -33,9 +33,8 @@ set(BRIONPLUGINS_SOURCES
 )
 
 set(BRIONPLUGINS_LINK_LIBRARIES
-  PRIVATE Lunchbox Keyv Servus vmmlib ${HDF5_LIBRARIES}
-          ${Boost_FILESYSTEM_LIBRARIES} ${Boost_REGEX_LIBRARIES}
-          ${CMAKE_THREADS_LIB_INIT}
+  PRIVATE Lunchbox Keyv Servus vmmlib HighFive ${Boost_FILESYSTEM_LIBRARIES}
+          ${Boost_REGEX_LIBRARIES} ${CMAKE_THREADS_LIB_INIT}
 )
 
 if(TARGET ZeroEQ)

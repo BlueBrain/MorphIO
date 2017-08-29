@@ -401,6 +401,38 @@ BOOST_AUTO_TEST_CASE(test_read_soma_hdf5)
     testReadSoma("local/simulations/may17_2011/Control/voltage.h5");
 }
 
+BOOST_AUTO_TEST_CASE(test_write_hdf5)
+{
+    struct Fixture
+    {
+        Fixture()
+            : temp(createUniquePath())
+            , h5(temp.string() + ".h5")
+        {
+        }
+
+        ~Fixture() { boost::filesystem::remove(lexical_cast<std::string>(h5)); }
+        boost::filesystem::path temp;
+        const brion::URI h5;
+    } fixture;
+
+    brion::CompartmentReport report(fixture.h5, brion::MODE_WRITE);
+    BOOST_CHECK_NO_THROW(
+        report.writeHeader(1, 9, 0.1, "N parsec", "light years"));
+    BOOST_CHECK(report.writeCompartments(0, {1, 2, 3}));
+    BOOST_CHECK(report.writeCompartments(1, {3, 2, 1}));
+    for (int i = 0; i != 80; ++i)
+    {
+        float t = i * 0.1;
+        BOOST_CHECK(
+            report.writeFrame(0, {1 + t, 2 + t, 2 + t, 3 + t, 3 + t, 3 + t},
+                              (i + 0.5) * 0.1 + 1 /* must be double */));
+        BOOST_CHECK(
+            report.writeFrame(1, {3 + t, 3 + t, 3 + t, 2 + t, 2 + t, 1 + t},
+                              (i + 0.5) * 0.1 + 1 /* must be double */));
+    }
+}
+
 void testReadAllCompartments(const char* relativePath)
 {
     boost::filesystem::path path(BBP_TESTDATA);

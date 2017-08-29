@@ -62,7 +62,6 @@ BOOST_AUTO_TEST_CASE(test_read)
     brion::SynapseSummary synapseSummary(path.string());
 
     const brion::SynapseSummaryMatrix& data = synapseSummary.read(1);
-    std::cout << data << std::endl;
     BOOST_CHECK_EQUAL(data.shape()[0], 27); // 27 synapses for GID 1
     BOOST_CHECK_EQUAL(data.shape()[1], 3);  //  3 attributes
     BOOST_CHECK_EQUAL(data[0][0], 2);
