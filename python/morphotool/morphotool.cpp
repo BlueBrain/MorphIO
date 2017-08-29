@@ -1633,7 +1633,7 @@ struct __pyx_obj_10morphotool__Mat_Index {
  * # Python bindings to namespace morpho
  * # ======================================================================================================================
  * cdef class SerializationFormat(_OrdEnum):             # <<<<<<<<<<<<<<
- *     cdef morpho.serialization_format get_format(self):
+ *     cdef morpho.serialization_format get_obj(self):
  *         return <morpho.serialization_format> self.ord
  */
 struct __pyx_obj_10morphotool_SerializationFormat {
@@ -2221,12 +2221,12 @@ static struct __pyx_vtabstruct_10morphotool__Mat_Index *__pyx_vtabptr_10morphoto
  * # Python bindings to namespace morpho
  * # ======================================================================================================================
  * cdef class SerializationFormat(_OrdEnum):             # <<<<<<<<<<<<<<
- *     cdef morpho.serialization_format get_format(self):
+ *     cdef morpho.serialization_format get_obj(self):
  *         return <morpho.serialization_format> self.ord
  */
 
 struct __pyx_vtabstruct_10morphotool_SerializationFormat {
-  morpho::serialization_format (*get_format)(struct __pyx_obj_10morphotool_SerializationFormat *);
+  morpho::serialization_format (*get_obj)(struct __pyx_obj_10morphotool_SerializationFormat *);
 };
 static struct __pyx_vtabstruct_10morphotool_SerializationFormat *__pyx_vtabptr_10morphotool_SerializationFormat;
 
@@ -3374,7 +3374,7 @@ static morpho::mat_index *__pyx_f_10morphotool_10_Mat_Index_ptr(struct __pyx_obj
 static struct __pyx_obj_10morphotool__Mat_Index *__pyx_f_10morphotool_10_Mat_Index_from_ptr(morpho::mat_index *__pyx_v_ptr, struct __pyx_opt_args_10morphotool_10_Mat_Index_from_ptr *__pyx_optional_args); /* proto*/
 static struct __pyx_obj_10morphotool__Mat_Index *__pyx_f_10morphotool_10_Mat_Index_from_ref(morpho::mat_index const &__pyx_v_ref); /* proto*/
 static struct __pyx_obj_10morphotool__Mat_Index *__pyx_f_10morphotool_10_Mat_Index_from_value(morpho::mat_index const &__pyx_v_ref); /* proto*/
-static morpho::serialization_format __pyx_f_10morphotool_19SerializationFormat_get_format(struct __pyx_obj_10morphotool_SerializationFormat *__pyx_v_self); /* proto*/
+static morpho::serialization_format __pyx_f_10morphotool_19SerializationFormat_get_obj(struct __pyx_obj_10morphotool_SerializationFormat *__pyx_v_self); /* proto*/
 static morpho::morpho_node *__pyx_f_10morphotool_10MorphoNode_ptr0(struct __pyx_obj_10morphotool_MorphoNode *__pyx_v_self); /* proto*/
 static struct __pyx_obj_10morphotool_MorphoNode *__pyx_f_10morphotool_10MorphoNode_from_ptr_index(morpho::morpho_node const *__pyx_v_ptr, int __pyx_v_index, struct __pyx_opt_args_10morphotool_10MorphoNode_from_ptr_index *__pyx_optional_args); /* proto*/
 static struct __pyx_obj_10morphotool_MorphoNode *__pyx_f_10morphotool_10MorphoNode_from_ref(morpho::morpho_node const &__pyx_v_ref); /* proto*/
@@ -3706,6 +3706,7 @@ static const char __pyx_k_JSON[] = "JSON";
 static const char __pyx_k_args[] = "args";
 static const char __pyx_k_axon[] = "axon";
 static const char __pyx_k_base[] = "base";
+static const char __pyx_k_data[] = "data";
 static const char __pyx_k_dict[] = "__dict__";
 static const char __pyx_k_file[] = "file";
 static const char __pyx_k_id_2[] = "id";
@@ -3725,7 +3726,6 @@ static const char __pyx_k_ASCII[] = "ASCII";
 static const char __pyx_k_Point[] = "<_Point";
 static const char __pyx_k_Types[] = "Types";
 static const char __pyx_k_ascii[] = "ascii";
-static const char __pyx_k_bytes[] = "bytes";
 static const char __pyx_k_class[] = "__class__";
 static const char __pyx_k_close[] = "close";
 static const char __pyx_k_error[] = "error";
@@ -3948,7 +3948,6 @@ static PyObject *__pyx_n_s_args;
 static PyObject *__pyx_n_s_ascii;
 static PyObject *__pyx_n_s_axon;
 static PyObject *__pyx_n_s_base;
-static PyObject *__pyx_n_s_bytes;
 static PyObject *__pyx_n_s_c;
 static PyObject *__pyx_n_u_c;
 static PyObject *__pyx_n_s_center;
@@ -3957,6 +3956,7 @@ static PyObject *__pyx_n_s_close;
 static PyObject *__pyx_kp_s_contiguous_and_direct;
 static PyObject *__pyx_kp_s_contiguous_and_indirect;
 static PyObject *__pyx_n_s_copyright;
+static PyObject *__pyx_n_s_data;
 static PyObject *__pyx_n_s_dentrite_apical;
 static PyObject *__pyx_n_s_dentrite_basal;
 static PyObject *__pyx_n_s_dict;
@@ -4158,7 +4158,7 @@ static PyObject *__pyx_pf_10morphotool_10MorphoTree_12get_node(struct __pyx_obj_
 static PyObject *__pyx_pf_10morphotool_10MorphoTree_14get_parent(struct __pyx_obj_10morphotool_MorphoTree *__pyx_v_self, int __pyx_v_id_); /* proto */
 static PyObject *__pyx_pf_10morphotool_10MorphoTree_16get_children(struct __pyx_obj_10morphotool_MorphoTree *__pyx_v_self, int __pyx_v_id_); /* proto */
 static PyObject *__pyx_pf_10morphotool_10MorphoTree_9all_nodes___get__(struct __pyx_obj_10morphotool_MorphoTree *__pyx_v_self); /* proto */
-static PyObject *__pyx_pf_10morphotool_10MorphoTree_18from_bytes(std::string __pyx_v_bytes, struct __pyx_obj_10morphotool_SerializationFormat *__pyx_v_format); /* proto */
+static PyObject *__pyx_pf_10morphotool_10MorphoTree_18from_bytes(std::string __pyx_v_data, struct __pyx_obj_10morphotool_SerializationFormat *__pyx_v_format); /* proto */
 static PyObject *__pyx_pf_10morphotool_10MorphoTree_20transform(struct __pyx_obj_10morphotool_MorphoTree *__pyx_v_self, PyObject *__pyx_v_operations); /* proto */
 static PyObject *__pyx_pf_10morphotool_10MorphoTree_22find_soma(struct __pyx_obj_10morphotool_MorphoTree *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_10morphotool_10MorphoTree_9cell_type___get__(struct __pyx_obj_10morphotool_MorphoTree *__pyx_v_self); /* proto */
@@ -11719,22 +11719,22 @@ static struct __pyx_obj_10morphotool__Mat_Index *__pyx_f_10morphotool_10_Mat_Ind
 /* "morphotool.pyx":24
  * # ======================================================================================================================
  * cdef class SerializationFormat(_OrdEnum):
- *     cdef morpho.serialization_format get_format(self):             # <<<<<<<<<<<<<<
+ *     cdef morpho.serialization_format get_obj(self):             # <<<<<<<<<<<<<<
  *         return <morpho.serialization_format> self.ord
  * 
  */
 
-static morpho::serialization_format __pyx_f_10morphotool_19SerializationFormat_get_format(struct __pyx_obj_10morphotool_SerializationFormat *__pyx_v_self) {
+static morpho::serialization_format __pyx_f_10morphotool_19SerializationFormat_get_obj(struct __pyx_obj_10morphotool_SerializationFormat *__pyx_v_self) {
   morpho::serialization_format __pyx_r;
   __Pyx_RefNannyDeclarations
-  __Pyx_RefNannySetupContext("get_format", 0);
+  __Pyx_RefNannySetupContext("get_obj", 0);
 
   /* "morphotool.pyx":25
  * cdef class SerializationFormat(_OrdEnum):
- *     cdef morpho.serialization_format get_format(self):
+ *     cdef morpho.serialization_format get_obj(self):
  *         return <morpho.serialization_format> self.ord             # <<<<<<<<<<<<<<
  * 
- *     # Instantiation inside class definition. This is not alowed in Python
+ *     # Instantiation inside class definition. This is not allowed in Python
  */
   __pyx_r = ((morpho::serialization_format)__pyx_v_self->__pyx_base.ord);
   goto __pyx_L0;
@@ -11742,7 +11742,7 @@ static morpho::serialization_format __pyx_f_10morphotool_19SerializationFormat_g
   /* "morphotool.pyx":24
  * # ======================================================================================================================
  * cdef class SerializationFormat(_OrdEnum):
- *     cdef morpho.serialization_format get_format(self):             # <<<<<<<<<<<<<<
+ *     cdef morpho.serialization_format get_obj(self):             # <<<<<<<<<<<<<<
  *         return <morpho.serialization_format> self.ord
  * 
  */
@@ -15153,7 +15153,7 @@ static int __pyx_pf_10morphotool_10MorphoTree___init__(struct __pyx_obj_10morpho
  *         self._sharedPtr.reset(self.ptr())
  * 
  *     def serialize(self, SerializationFormat format):             # <<<<<<<<<<<<<<
- *         return morpho.serialize(deref(self.ptr()), format.get_format())
+ *         return morpho.serialize(deref(self.ptr()), format.get_obj())
  * 
  */
 
@@ -15184,12 +15184,12 @@ static PyObject *__pyx_pf_10morphotool_10MorphoTree_2serialize(struct __pyx_obj_
   /* "morphotool.pyx":306
  * 
  *     def serialize(self, SerializationFormat format):
- *         return morpho.serialize(deref(self.ptr()), format.get_format())             # <<<<<<<<<<<<<<
+ *         return morpho.serialize(deref(self.ptr()), format.get_obj())             # <<<<<<<<<<<<<<
  * 
  *     @property
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(morpho::serialize((*((struct __pyx_vtabstruct_10morphotool_MorphoTree *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)), ((struct __pyx_vtabstruct_10morphotool_SerializationFormat *)__pyx_v_format->__pyx_vtab)->get_format(__pyx_v_format))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 306, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert_PyBytes_string_to_py_std__in_string(morpho::serialize((*((struct __pyx_vtabstruct_10morphotool_MorphoTree *)__pyx_v_self->__pyx_base.__pyx_vtab)->ptr(__pyx_v_self)), ((struct __pyx_vtabstruct_10morphotool_SerializationFormat *)__pyx_v_format->__pyx_vtab)->get_obj(__pyx_v_format))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 306, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -15199,7 +15199,7 @@ static PyObject *__pyx_pf_10morphotool_10MorphoTree_2serialize(struct __pyx_obj_
  *         self._sharedPtr.reset(self.ptr())
  * 
  *     def serialize(self, SerializationFormat format):             # <<<<<<<<<<<<<<
- *         return morpho.serialize(deref(self.ptr()), format.get_format())
+ *         return morpho.serialize(deref(self.ptr()), format.get_obj())
  * 
  */
 
@@ -16300,8 +16300,8 @@ static struct __pyx_obj_10morphotool_MorphoTree *__pyx_f_10morphotool_10MorphoTr
 /* "morphotool.pyx":369
  * 
  *     @staticmethod
- *     def from_bytes(const std.string &bytes, SerializationFormat format):             # <<<<<<<<<<<<<<
- *         return MorphoTree.from_value(morpho.deserialize(bytes, format.get_format()))
+ *     def from_bytes(const std.string &data, SerializationFormat format):             # <<<<<<<<<<<<<<
+ *         return MorphoTree.from_value(morpho.deserialize(data, format.get_obj()))
  * 
  */
 
@@ -16309,13 +16309,13 @@ static struct __pyx_obj_10morphotool_MorphoTree *__pyx_f_10morphotool_10MorphoTr
 static PyObject *__pyx_pw_10morphotool_10MorphoTree_19from_bytes(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
 static PyMethodDef __pyx_mdef_10morphotool_10MorphoTree_19from_bytes = {"from_bytes", (PyCFunction)__pyx_pw_10morphotool_10MorphoTree_19from_bytes, METH_VARARGS|METH_KEYWORDS, 0};
 static PyObject *__pyx_pw_10morphotool_10MorphoTree_19from_bytes(CYTHON_UNUSED PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
-  std::string __pyx_v_bytes;
+  std::string __pyx_v_data;
   struct __pyx_obj_10morphotool_SerializationFormat *__pyx_v_format = 0;
   PyObject *__pyx_r = 0;
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("from_bytes (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_bytes,&__pyx_n_s_format,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_data,&__pyx_n_s_format,0};
     PyObject* values[2] = {0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -16329,7 +16329,7 @@ static PyObject *__pyx_pw_10morphotool_10MorphoTree_19from_bytes(CYTHON_UNUSED P
       kw_args = PyDict_Size(__pyx_kwds);
       switch (pos_args) {
         case  0:
-        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_bytes)) != 0)) kw_args--;
+        if (likely((values[0] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_data)) != 0)) kw_args--;
         else goto __pyx_L5_argtuple_error;
         case  1:
         if (likely((values[1] = PyDict_GetItem(__pyx_kwds, __pyx_n_s_format)) != 0)) kw_args--;
@@ -16346,7 +16346,7 @@ static PyObject *__pyx_pw_10morphotool_10MorphoTree_19from_bytes(CYTHON_UNUSED P
       values[0] = PyTuple_GET_ITEM(__pyx_args, 0);
       values[1] = PyTuple_GET_ITEM(__pyx_args, 1);
     }
-    __pyx_v_bytes = __pyx_convert_string_from_py_std__in_string(values[0]); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 369, __pyx_L3_error)
+    __pyx_v_data = __pyx_convert_string_from_py_std__in_string(values[0]); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 369, __pyx_L3_error)
     __pyx_v_format = ((struct __pyx_obj_10morphotool_SerializationFormat *)values[1]);
   }
   goto __pyx_L4_argument_unpacking_done;
@@ -16358,7 +16358,7 @@ static PyObject *__pyx_pw_10morphotool_10MorphoTree_19from_bytes(CYTHON_UNUSED P
   return NULL;
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_format), __pyx_ptype_10morphotool_SerializationFormat, 1, "format", 0))) __PYX_ERR(0, 369, __pyx_L1_error)
-  __pyx_r = __pyx_pf_10morphotool_10MorphoTree_18from_bytes(__pyx_v_bytes, __pyx_v_format);
+  __pyx_r = __pyx_pf_10morphotool_10MorphoTree_18from_bytes(__pyx_v_data, __pyx_v_format);
 
   /* function exit code */
   goto __pyx_L0;
@@ -16369,7 +16369,7 @@ static PyObject *__pyx_pw_10morphotool_10MorphoTree_19from_bytes(CYTHON_UNUSED P
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_10morphotool_10MorphoTree_18from_bytes(std::string __pyx_v_bytes, struct __pyx_obj_10morphotool_SerializationFormat *__pyx_v_format) {
+static PyObject *__pyx_pf_10morphotool_10MorphoTree_18from_bytes(std::string __pyx_v_data, struct __pyx_obj_10morphotool_SerializationFormat *__pyx_v_format) {
   PyObject *__pyx_r = NULL;
   __Pyx_RefNannyDeclarations
   PyObject *__pyx_t_1 = NULL;
@@ -16377,13 +16377,13 @@ static PyObject *__pyx_pf_10morphotool_10MorphoTree_18from_bytes(std::string __p
 
   /* "morphotool.pyx":370
  *     @staticmethod
- *     def from_bytes(const std.string &bytes, SerializationFormat format):
- *         return MorphoTree.from_value(morpho.deserialize(bytes, format.get_format()))             # <<<<<<<<<<<<<<
+ *     def from_bytes(const std.string &data, SerializationFormat format):
+ *         return MorphoTree.from_value(morpho.deserialize(data, format.get_obj()))             # <<<<<<<<<<<<<<
  * 
  *     @staticmethod
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = ((PyObject *)__pyx_f_10morphotool_10MorphoTree_from_value(morpho::deserialize(__pyx_v_bytes, ((struct __pyx_vtabstruct_10morphotool_SerializationFormat *)__pyx_v_format->__pyx_vtab)->get_format(__pyx_v_format)))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
+  __pyx_t_1 = ((PyObject *)__pyx_f_10morphotool_10MorphoTree_from_value(morpho::deserialize(__pyx_v_data, ((struct __pyx_vtabstruct_10morphotool_SerializationFormat *)__pyx_v_format->__pyx_vtab)->get_obj(__pyx_v_format)))); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 370, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -16392,8 +16392,8 @@ static PyObject *__pyx_pf_10morphotool_10MorphoTree_18from_bytes(std::string __p
   /* "morphotool.pyx":369
  * 
  *     @staticmethod
- *     def from_bytes(const std.string &bytes, SerializationFormat format):             # <<<<<<<<<<<<<<
- *         return MorphoTree.from_value(morpho.deserialize(bytes, format.get_format()))
+ *     def from_bytes(const std.string &data, SerializationFormat format):             # <<<<<<<<<<<<<<
+ *         return MorphoTree.from_value(morpho.deserialize(data, format.get_obj()))
  * 
  */
 
@@ -39609,7 +39609,6 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_ascii, __pyx_k_ascii, sizeof(__pyx_k_ascii), 0, 0, 1, 1},
   {&__pyx_n_s_axon, __pyx_k_axon, sizeof(__pyx_k_axon), 0, 0, 1, 1},
   {&__pyx_n_s_base, __pyx_k_base, sizeof(__pyx_k_base), 0, 0, 1, 1},
-  {&__pyx_n_s_bytes, __pyx_k_bytes, sizeof(__pyx_k_bytes), 0, 0, 1, 1},
   {&__pyx_n_s_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 0, 1, 1},
   {&__pyx_n_u_c, __pyx_k_c, sizeof(__pyx_k_c), 0, 1, 0, 1},
   {&__pyx_n_s_center, __pyx_k_center, sizeof(__pyx_k_center), 0, 0, 1, 1},
@@ -39618,6 +39617,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_contiguous_and_direct, __pyx_k_contiguous_and_direct, sizeof(__pyx_k_contiguous_and_direct), 0, 0, 1, 0},
   {&__pyx_kp_s_contiguous_and_indirect, __pyx_k_contiguous_and_indirect, sizeof(__pyx_k_contiguous_and_indirect), 0, 0, 1, 0},
   {&__pyx_n_s_copyright, __pyx_k_copyright, sizeof(__pyx_k_copyright), 0, 0, 1, 1},
+  {&__pyx_n_s_data, __pyx_k_data, sizeof(__pyx_k_data), 0, 0, 1, 1},
   {&__pyx_n_s_dentrite_apical, __pyx_k_dentrite_apical, sizeof(__pyx_k_dentrite_apical), 0, 0, 1, 1},
   {&__pyx_n_s_dentrite_basal, __pyx_k_dentrite_basal, sizeof(__pyx_k_dentrite_basal), 0, 0, 1, 1},
   {&__pyx_n_s_dict, __pyx_k_dict, sizeof(__pyx_k_dict), 0, 0, 1, 1},
@@ -40073,11 +40073,11 @@ static int __Pyx_InitCachedConstants(void) {
   /* "morphotool.pyx":369
  * 
  *     @staticmethod
- *     def from_bytes(const std.string &bytes, SerializationFormat format):             # <<<<<<<<<<<<<<
- *         return MorphoTree.from_value(morpho.deserialize(bytes, format.get_format()))
+ *     def from_bytes(const std.string &data, SerializationFormat format):             # <<<<<<<<<<<<<<
+ *         return MorphoTree.from_value(morpho.deserialize(data, format.get_obj()))
  * 
  */
-  __pyx_tuple__32 = PyTuple_Pack(2, __pyx_n_s_bytes, __pyx_n_s_format); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 369, __pyx_L1_error)
+  __pyx_tuple__32 = PyTuple_Pack(2, __pyx_n_s_data, __pyx_n_s_format); if (unlikely(!__pyx_tuple__32)) __PYX_ERR(0, 369, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__32);
   __Pyx_GIVEREF(__pyx_tuple__32);
   __pyx_codeobj__33 = (PyObject*)__Pyx_PyCode_New(2, 0, 2, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__32, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_media_psf_Home_dev_morpho_tool, __pyx_n_s_from_bytes, 369, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__33)) __PYX_ERR(0, 369, __pyx_L1_error)
@@ -40460,7 +40460,7 @@ PyMODINIT_FUNC PyInit_morphotool(void)
   if (PyObject_SetAttrString(__pyx_m, "_Mat_Index", (PyObject *)&__pyx_type_10morphotool__Mat_Index) < 0) __PYX_ERR(2, 383, __pyx_L1_error)
   __pyx_ptype_10morphotool__Mat_Index = &__pyx_type_10morphotool__Mat_Index;
   __pyx_vtabptr_10morphotool_SerializationFormat = &__pyx_vtable_10morphotool_SerializationFormat;
-  __pyx_vtable_10morphotool_SerializationFormat.get_format = (morpho::serialization_format (*)(struct __pyx_obj_10morphotool_SerializationFormat *))__pyx_f_10morphotool_19SerializationFormat_get_format;
+  __pyx_vtable_10morphotool_SerializationFormat.get_obj = (morpho::serialization_format (*)(struct __pyx_obj_10morphotool_SerializationFormat *))__pyx_f_10morphotool_19SerializationFormat_get_obj;
   __pyx_type_10morphotool_SerializationFormat.tp_base = __pyx_ptype_10morphotool__OrdEnum;
   if (PyType_Ready(&__pyx_type_10morphotool_SerializationFormat) < 0) __PYX_ERR(0, 23, __pyx_L1_error)
   __pyx_type_10morphotool_SerializationFormat.tp_print = 0;
@@ -40923,7 +40923,7 @@ PyMODINIT_FUNC PyInit_morphotool(void)
 
   /* "morphotool.pyx":28
  * 
- *     # Instantiation inside class definition. This is not alowed in Python
+ *     # Instantiation inside class definition. This is not allowed in Python
  *     BINARY = SerializationFormat(<unsigned char> morpho_serialization_format.BINARY, "BINARY")             # <<<<<<<<<<<<<<
  *     PORTABLE_BINARY = SerializationFormat(<unsigned char> morpho_serialization_format.PORTABLE_BINARY, "PORTABLE_BINARY")
  *     JSON = SerializationFormat(<unsigned char> morpho_serialization_format.JSON, "JSON")
@@ -40946,7 +40946,7 @@ PyMODINIT_FUNC PyInit_morphotool(void)
   PyType_Modified(__pyx_ptype_10morphotool_SerializationFormat);
 
   /* "morphotool.pyx":29
- *     # Instantiation inside class definition. This is not alowed in Python
+ *     # Instantiation inside class definition. This is not allowed in Python
  *     BINARY = SerializationFormat(<unsigned char> morpho_serialization_format.BINARY, "BINARY")
  *     PORTABLE_BINARY = SerializationFormat(<unsigned char> morpho_serialization_format.PORTABLE_BINARY, "PORTABLE_BINARY")             # <<<<<<<<<<<<<<
  *     JSON = SerializationFormat(<unsigned char> morpho_serialization_format.JSON, "JSON")
@@ -41193,8 +41193,8 @@ PyMODINIT_FUNC PyInit_morphotool(void)
   /* "morphotool.pyx":369
  * 
  *     @staticmethod
- *     def from_bytes(const std.string &bytes, SerializationFormat format):             # <<<<<<<<<<<<<<
- *         return MorphoTree.from_value(morpho.deserialize(bytes, format.get_format()))
+ *     def from_bytes(const std.string &data, SerializationFormat format):             # <<<<<<<<<<<<<<
+ *         return MorphoTree.from_value(morpho.deserialize(data, format.get_obj()))
  * 
  */
   __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_10morphotool_10MorphoTree_19from_bytes, NULL, __pyx_n_s_morphotool); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
@@ -41204,8 +41204,8 @@ PyMODINIT_FUNC PyInit_morphotool(void)
  *         return obj
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
- *     def from_bytes(const std.string &bytes, SerializationFormat format):
- *         return MorphoTree.from_value(morpho.deserialize(bytes, format.get_format()))
+ *     def from_bytes(const std.string &data, SerializationFormat format):
+ *         return MorphoTree.from_value(morpho.deserialize(data, format.get_obj()))
  */
   __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 368, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
@@ -41222,8 +41222,8 @@ PyMODINIT_FUNC PyInit_morphotool(void)
   /* "morphotool.pyx":369
  * 
  *     @staticmethod
- *     def from_bytes(const std.string &bytes, SerializationFormat format):             # <<<<<<<<<<<<<<
- *         return MorphoTree.from_value(morpho.deserialize(bytes, format.get_format()))
+ *     def from_bytes(const std.string &data, SerializationFormat format):             # <<<<<<<<<<<<<<
+ *         return MorphoTree.from_value(morpho.deserialize(data, format.get_obj()))
  * 
  */
   __pyx_t_1 = __Pyx_GetNameInClass((PyObject *)__pyx_ptype_10morphotool_MorphoTree, __pyx_n_s_from_bytes); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 369, __pyx_L1_error)
@@ -41233,8 +41233,8 @@ PyMODINIT_FUNC PyInit_morphotool(void)
  *         return obj
  * 
  *     @staticmethod             # <<<<<<<<<<<<<<
- *     def from_bytes(const std.string &bytes, SerializationFormat format):
- *         return MorphoTree.from_value(morpho.deserialize(bytes, format.get_format()))
+ *     def from_bytes(const std.string &data, SerializationFormat format):
+ *         return MorphoTree.from_value(morpho.deserialize(data, format.get_obj()))
  */
   __pyx_t_2 = PyTuple_New(1); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 368, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);

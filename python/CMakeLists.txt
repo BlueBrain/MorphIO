@@ -59,8 +59,10 @@ add_custom_command(
         touch ${_pymod_flag}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS
-        ${CYBINDINGS_CPP}
+        ${cybindings_cpp}
         morpho
+    COMMENT 
+        "Building Python module..."
 )
 
 #
@@ -101,7 +103,7 @@ add_custom_command(
     COMMAND
         touch ${_bdist_flag}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${CYBINDINGS_CPP} morphostatic
+    DEPENDS ${cybindings_cpp} morphostatic
     COMMENT "Building Python Wheel..."
 )
 endif()

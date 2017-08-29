@@ -22,7 +22,12 @@ class TestMorphoTree(unittest.TestCase):
         tree = db["C010306C"]
         assert len(tree) > 0
         data_bytes = tree.serialize(fmt)
-        data = json.loads(data_bytes)  # JSON is valid
+
+        # JSON is valid
+        data_str = data_bytes if isinstance(data_bytes, str) \
+            else data_bytes.decode("utf-8")
+        data = json.loads(data_str)
+
         reloaded_tree = MorphoTree.from_bytes(data_bytes, fmt)
         assert len(tree) == len(reloaded_tree)
 

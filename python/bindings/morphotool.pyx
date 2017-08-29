@@ -366,8 +366,8 @@ cdef class MorphoTree(_py__base):
         return obj
 
     @staticmethod
-    def from_bytes(const std.string &bytes, SerializationFormat format):
-        return MorphoTree.from_value(morpho.deserialize(bytes, format.get_obj()))
+    def from_bytes(const std.string &data, SerializationFormat format):
+        return MorphoTree.from_value(morpho.deserialize(data, format.get_obj()))
 
     @staticmethod
     cdef list vectorPtr2list(std.vector[morpho.morpho_tree*] vec):
