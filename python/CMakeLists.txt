@@ -52,7 +52,6 @@ add_custom_command(
           "-I${lib_include_dirs}"
           -L${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io
           -R${CMAKE_BINARY_DIR}/src/morpho:${CMAKE_BINARY_DIR}/src/io
-          -lmorpho_io 
         install 
           --install-lib=${CMAKE_CURRENT_BINARY_DIR}
     COMMAND
@@ -95,10 +94,10 @@ add_custom_target(
 add_custom_command(
     OUTPUT ${_bdist_flag}
     COMMAND
-        ${PYTHON_EXECUTABLE} setup.py 
-         build --build-base=${CMAKE_CURRENT_BINARY_DIR}/bdist_wheel.build 
+        ${PYTHON_EXECUTABLE} setup.py
+         build --build-base=${CMAKE_CURRENT_BINARY_DIR}/bdist_wheel.build
          build_ext -I${lib_include_dirs} -L${CMAKE_BINARY_DIR}/src -lhdf5
-         bdist_wheel --dist-dir ${CMAKE_BINARY_DIR}/dist 
+         bdist_wheel --dist-dir ${CMAKE_BINARY_DIR}/dist
          > /dev/null
     COMMAND
         touch ${_bdist_flag}
@@ -130,7 +129,6 @@ install(CODE "
           -I${lib_include_dirs}
           -L${LIB_INSTALL_DIR}
           -R${LIB_INSTALL_DIR}
-          -lmorpho_io
         install
           --prefix=${PYTHON_INSTALL_PREFIX}
           --old-and-unmanageable # Install wherever
