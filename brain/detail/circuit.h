@@ -35,7 +35,7 @@
 #include <lunchbox/scopedMutex.h>
 
 #ifdef BRAIN_USE_MVD3
-#include <highfive/util.hpp>
+#include <highfive/H5Utility.hpp>
 #include <mvd/mvd3.hpp>
 #include <mvd/mvd_generic.hpp>
 #endif

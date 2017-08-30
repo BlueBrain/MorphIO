@@ -25,7 +25,7 @@
 #include "utilsHDF5.h"
 
 #include <highfive/H5File.hpp>
-#include <highfive/util.hpp>
+#include <highfive/H5Utility.hpp>
 
 #include <boost/lexical_cast.hpp>
 #include <lunchbox/debug.h>

@@ -25,7 +25,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/scoped_array.hpp>
 
-#include <highfive/util.hpp>
+#include <highfive/H5Utility.hpp>
 
 #include <lunchbox/debug.h>
 #include <lunchbox/log.h>

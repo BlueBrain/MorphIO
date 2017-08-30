@@ -25,7 +25,7 @@
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <highfive/util.hpp>
+#include <highfive/H5Utility.hpp>
 
 #include <boost/lexical_cast.hpp>
 
