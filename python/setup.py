@@ -4,7 +4,7 @@ from setuptools import setup, Extension
 
 morphotool_ext = Extension(
     'morphotool.morphotool',
-    libraries=['morpho'],
+    libraries=['morpho_io'],
     sources=['morphotool/morphotool.cpp'],
     extra_compile_args=['-std=c++11', '-Wno-unused-local-typedefs'],
     include_dirs=[]
