@@ -17,8 +17,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <lunchbox/debug.h>
-
 namespace brion
 {
 namespace

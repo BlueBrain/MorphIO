@@ -24,7 +24,6 @@
 #include <brion/morphology.h>     // Needed by doxygen
 #include <brion/pluginInitData.h> // base class
 #include <brion/types.h>
-#include <lunchbox/debug.h>
 #include <servus/serializable.h> // base class
 
 namespace brion
@@ -44,8 +43,8 @@ public:
         , family(f)
     {
         if (f == FAMILY_GLIA && v != MORPHOLOGY_VERSION_H5_1_1)
-            LBTHROW(
-                std::runtime_error("Glia cells only support HDF5 version 1.1"));
+            throw std::runtime_error(
+                "Glia cells only support HDF5 version 1.1");
     }
 
     MorphologyInitData(const URI& uri, const MorphologyVersion v,
@@ -111,29 +110,22 @@ public:
     /** @internal */
     InitDataT& getInitData() { return _data; }
     const InitDataT& getInitData() const { return _data; }
-
     /** @copydoc brion::Morphology::getCellFamily */
     CellFamily getCellFamily() const { return _data.family; }
-
     /** @internal */
     MorphologyVersion getVersion() const { return _data.version; }
-
     /** @copydoc brion::Morphology::getPoints */
     Vector4fs& getPoints() { return _points; }
     const Vector4fs& getPoints() const { return _points; }
-
     /** @copydoc brion::Morphology::getSections */
     Vector2is& getSections() { return _sections; }
     const Vector2is& getSections() const { return _sections; }
-
     /** @copydoc brion::Morphology::getSectionTypes */
     SectionTypes& getSectionTypes() { return _sectionTypes; }
     const SectionTypes& getSectionTypes() const { return _sectionTypes; }
-
     /** @copydoc brion::Morphology::getPerimeters */
     floats& getPerimeters() { return _perimeters; }
     const floats& getPerimeters() const { return _perimeters; }
-
 protected:
     InitDataT _data;
     Vector4fs _points;
