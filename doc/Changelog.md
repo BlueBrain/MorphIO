@@ -3,7 +3,18 @@ Changelog {#Changelog}
 
 # git master
 
-* [173](https://github.com/BlueBrain/Brion/pull/173):
+* [180](https://github.com/BlueBrain/Brion/pull/180):
+  Bugfixes in compartment reports:
+  - The report converter was messing up the order of the data when writing to
+    .h5 from an out-of-order binary.
+  - Timestamps reported were wrong for reports not starting at 0.
+  - Read time and data unit attributes from H5 reports is they exist.
+  - Do not assume the first section is always present post-processing the
+    mapping in H5 reports.
+  - Avoid crashing when calling getNumCompartments from Python with and out of
+    bounds index.
+  - Corrections in compartmentReport comparison code.
+* [176](https://github.com/BlueBrain/Brion/pull/176):
   Removed the dependency on HDF5++ and use HighFive instead.
 * [172](https://github.com/BlueBrain/Brion/pull/172):
   - zeroeq::Server/Client based morphology loader.

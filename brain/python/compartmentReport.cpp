@@ -55,6 +55,11 @@ public:
 
     size_t getNumCompartments(const size_t index) const
     {
+        if (index >= view->getMapping().getOffsets().size())
+        {
+            PyErr_SetString(PyExc_IndexError, "Cell index out of bounds");
+            throw bp::error_already_set();
+        }
         return view->getMapping().getNumCompartments(index);
     }
 

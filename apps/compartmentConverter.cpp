@@ -273,10 +273,23 @@ int main(const int argc, char** argv)
         clock.reset();
         for (const uint32_t gid : gids)
         {
-            const float* cellValues = &values[offsets[index][0]];
             const size_t size =
                 std::accumulate(counts[index].begin(), counts[index].end(), 0);
-            if (!to.writeFrame(gid, cellValues, size, t))
+
+            // Sections IDs must appear sorted for writing as the API doesn't
+            // allow to write an out of order mapping. This is a requirement
+            // from the h5 file format in particular.
+            std::unique_ptr<float[]> cellValues(
+                new float[in.getNumCompartments(index)]);
+            float* out = cellValues.get();
+            for (size_t j = 0; j < offsets[index].size(); ++j)
+            {
+                const size_t compartments = counts[index][j];
+                const size_t offset = offsets[index][j];
+                memcpy(out, &values[offset], sizeof(float) * compartments);
+                out += compartments;
+            }
+            if (!to.writeFrame(gid, cellValues.get(), size, t))
                 return EXIT_FAILURE;
             ++index;
             continue;
@@ -318,28 +331,28 @@ int main(const int argc, char** argv)
         REQUIRE_EQUAL(offsets1.size(), offsets2.size());
         REQUIRE_EQUAL(counts1.size(), counts2.size());
 
-        for (size_t i = 0; i < offsets1.size(); ++i)
-        {
-            requireEqualCollections(offsets1[i], offsets2[i]);
-
-            for (size_t j = 0; j < offsets1[i].size(); ++j)
-                REQUIRE(offsets1[i][j] < in.getFrameSize() ||
-                        offsets1[i][j] == std::numeric_limits<uint64_t>::max());
-        }
-
         for (size_t frameIndex = 0; frameIndex < nFrames; ++frameIndex)
         {
             // Making the timestamp fall in the middle of the frame
             const double t = start + frameIndex * step + step * 0.5;
-            brion::floatsPtr frame1 = in.loadFrame(t).get();
-            brion::floatsPtr frame2 = result.loadFrame(t).get();
+            auto frame1 = in.loadFrame(t).get();
+            auto frame2 = result.loadFrame(t).get();
 
             REQUIRE(frame1);
             REQUIRE(frame2);
 
-            for (size_t i = 0; i < in.getFrameSize(); ++i)
-                REQUIRE_EQUAL((*frame1)[i], (*frame2)[i]);
-
+            for (size_t i = 0; i < offsets1.size(); ++i)
+            {
+                REQUIRE_EQUAL(offsets1[i].size(), offsets2[i].size());
+                REQUIRE_EQUAL(counts1[i].size(), counts2[i].size());
+                for (size_t j = 0; j < offsets1[i].size(); ++j)
+                {
+                    size_t o1 = offsets1[i][j];
+                    size_t o2 = offsets2[i][j];
+                    for (size_t k = 0; k < counts[i][j]; ++k, ++o1, ++o2)
+                        REQUIRE_EQUAL((*frame1)[o1], (*frame2)[o2]);
+                }
+            }
             ++progress;
         }
     }

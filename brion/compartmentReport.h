@@ -236,6 +236,7 @@ public:
      *
      * This should only be called after all the required mapping has been saved
      * before.
+     * Values must be ordered by section and compartment.
      *
      * @param gid the GID of the cell
      * @param values the values per compartment to save
@@ -249,7 +250,8 @@ public:
     }
 
     // clang-format off
-    /** @overload brion::CompartmentReport::writeFrame(uint32_t gid, const floats& values, double timestamp) */
+    /** @overload brion::CompartmentReport::writeFrame(uint32_t gid, const
+     * floats& values, double timestamp) */
     BRION_API bool writeFrame(uint32_t gid, const float* values, size_t size,
                               double timestamp);
     // clang-format on

@@ -114,7 +114,7 @@ Frames CompartmentReportCommon::loadFrames(double start, double end) const
 
     frames.timeStamps.reset(new std::vector<double>);
     for (size_t i = 0; i < count; ++i)
-        frames.timeStamps->push_back((i + startFrame) * timestep);
+        frames.timeStamps->push_back(startTime + (i + startFrame) * timestep);
 
     const auto frameSize = getFrameSize();
     frames.data.reset(new floats(frameSize * count));

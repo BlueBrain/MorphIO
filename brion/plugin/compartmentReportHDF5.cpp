@@ -81,15 +81,22 @@ uint16_t calcCompartmentCounts(SectionOffsets::const_iterator cell,
     {
         // We reached the end of the neuron without finding a section with valid
         // offset. We need to search for the first offset of the next neuron (if
-        // any). For simplicity we assume that first section (soma) always has a
-        // defined offset.
+        // any). We cannot assume that the first section always has a defined
+        // offset because that's not the case for the "synapse" reports.
         while (++cell != mapping.end() && cell->empty())
         {
         }
 
         if (cell != mapping.end())
         {
-            lastIndex = *cell->begin();
+            for (auto i : *cell)
+            {
+                if (i != LB_UNDEFINED_UINT64)
+                {
+                    lastIndex = i;
+                    break;
+                }
+            }
             LBASSERT(lastIndex != LB_UNDEFINED_UINT64);
         }
         else
@@ -564,8 +571,22 @@ void CompartmentReportHDF5::_readMetaData(const HighFive::File& file)
         dataset.getAttribute(dataAttributes[1]).read(_startTime);
         dataset.getAttribute(dataAttributes[2]).read(_endTime);
         dataset.getAttribute(dataAttributes[3]).read(_timestep);
-        _dunit = "mV";
-        _tunit = "ms";
+        try
+        {
+            dataset.getAttribute(dataAttributes[4]).read(_dunit);
+        }
+        catch (const HighFive::AttributeException&)
+        {
+            _dunit = "mV";
+        }
+        try
+        {
+            dataset.getAttribute(dataAttributes[5]).read(_tunit);
+        }
+        catch (const HighFive::AttributeException&)
+        {
+            _tunit = "ms";
+        }
     }
     catch (const HighFive::Exception&)
     {
