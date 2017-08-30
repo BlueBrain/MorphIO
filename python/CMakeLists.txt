@@ -59,7 +59,7 @@ add_custom_command(
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS
         ${cybindings_cpp}
-        morpho
+        morpho_io
     COMMENT 
         "Building Python module..."
 )
