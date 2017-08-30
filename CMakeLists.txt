@@ -57,7 +57,7 @@ endif()
 
 
 ## Components
-set(UNIT_TESTS OFF CACHE BOOL "Dont run highfive tests")
+set(HIGHFIVE_UNIT_TESTS OFF CACHE BOOL "Dont run highfive tests")
 set(HADOKEN_UNIT_TESTS OFF CACHE BOOL "Dont run hadoken tests")
 
 add_subdirectory(src)
