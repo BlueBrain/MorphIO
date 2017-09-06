@@ -214,8 +214,7 @@ public:
      *        a minimum.
      * @throw std::logic_error if one of the preconditions is not fulfilled.
      * @note Until the completion of this operation, the internal state of the
-     * SpikeReport
-     * may change.
+     * SpikeReport may change.
      * @version 2.0
      */
     BRION_API std::future<Spikes> read(float min);
@@ -235,8 +234,7 @@ public:
      *                r.getCurrentTime() >= max
      * @throw std::runtime_error if the precondition does not hold.
      * @note Until the completion of this operation, the internal state of the
-     * SpikeReport
-     * may change.
+     * SpikeReport may change.
      * @sa seek()
      * @version 2.0
      */

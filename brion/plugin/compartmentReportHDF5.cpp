@@ -302,8 +302,7 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
         }
 
         boost::scoped_array<float> buffer(new float[dims[1]]);
-        float* ptr = buffer.get(); // HighFive requires an l-value for read
-        dataset.read(ptr);
+        dataset.read(buffer.get());
 
         // Getting the last section id;
         size_t largestSectionID = 0;

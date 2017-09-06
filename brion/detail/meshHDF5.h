@@ -138,7 +138,7 @@ public:
         const auto dataset = _file.getDataSet("/membrane/mesh/triangles/soup");
         uint32_tsPtr buffer(new uint32_ts);
         buffer->resize(_numElements(dataset) * 3);
-        dataset.read(*buffer);
+        dataset.read(buffer->data());
         return buffer;
     }
 

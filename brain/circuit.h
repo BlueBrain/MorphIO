@@ -134,7 +134,8 @@ public:
     BRAIN_API Matrix4fs getTransforms(const GIDSet& gids) const;
 
     /** @return \if pybind A Nx4 numpy array with the \else The \endif
-     *          local to world rotation of the given cells.
+     *          local to world rotation of the given cells \if pybind as
+     *          xyzw quaternions \endif
      */
     BRAIN_API Quaternionfs getRotations(const GIDSet& gids) const;
 
