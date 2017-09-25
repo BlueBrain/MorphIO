@@ -5,6 +5,7 @@ add_custom_command(
 	OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/index.html
 	COMMAND
 	${PANDOC_EXECUTABLE} -s -S
+	--self-contained
 	-c ${CMAKE_CURRENT_SOURCE_DIR}/github-pandoc.css
 	${CMAKE_CURRENT_SOURCE_DIR}/README.md
 	-o ${CMAKE_CURRENT_BINARY_DIR}/index.html
