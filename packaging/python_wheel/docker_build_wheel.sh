@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-PYTHON_VERSIONS="cp27-cp27mu cp35-cp35m cp36-cp36m"
+PYTHON_VERSIONS="cp27-cp27mu cp27-cp27m cp35-cp35m cp36-cp36m"
 NUMPY_VERSION=1.12.0
 PACKAGING_DIR=/io/packaging/python_wheel/
 WHEELHOUSE=/io/packaging/python_wheel/wheelhouse/
