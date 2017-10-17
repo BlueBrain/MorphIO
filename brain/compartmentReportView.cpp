@@ -87,16 +87,16 @@ std::future<brion::Frame> CompartmentReportView::load(double timestamp)
     timestamp = _snapTimestamp(timestamp, start, timestep);
 
     auto report = _impl->report;
+    auto future = report->loadFrame(timestamp);
 
-    auto loadFrameTask = [timestamp, report] {
-
-        auto data = report->loadFrame(timestamp).get();
-        if (data)
-            return brion::Frame{timestamp, data};
-        return brion::Frame{0, brion::floatsPtr()};
-    };
-
-    return lunchbox::ThreadPool::getInstance().post(loadFrameTask);
+    return std::async(std::launch::deferred,
+                      [timestamp](decltype(future)&& f) {
+                          auto data = f.get();
+                          if (data)
+                              return brion::Frame{timestamp, data};
+                          return brion::Frame{0, brion::floatsPtr()};
+                      },
+                      std::move(future));
 }
 
 std::future<brion::Frames> CompartmentReportView::load(double start, double end)

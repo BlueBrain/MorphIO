@@ -6,9 +6,16 @@
 
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
 
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-filesystem-dev, libboost-regex-dev,
-  libboost-serialization-dev, libboost-system-dev, libboost-test-dev,
-  libhdf5-serial-dev, ${LUNCHBOX_DEB_DEV_DEPENDENCY},
-  ${VMMLIB_DEB_DEV_DEPENDENCY}")
+set(BRION_PACKAGE_DEB_DEPENDS libboost-filesystem-dev libboost-regex-dev
+  libboost-serialization-dev libboost-system-dev libboost-test-dev
+  libhdf5-serial-dev)
+if(USE_PYTHON3)
+  set(PYTHON_SUFFIX 3)
+endif()
+
+if(TARGET brain_python)
+  list(APPEND CPACK_DEBIAN_PACKAGE_DEPENDS libboost-python-dev
+    python${PYTHON_SUFFIX}-numpy)
+endif()
 
 include(CommonCPack)
