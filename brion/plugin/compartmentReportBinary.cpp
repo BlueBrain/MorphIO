@@ -29,6 +29,8 @@
 
 #include <map>
 
+#include <cstdio>
+
 #if defined __linux__ || defined __APPLE__
 #define HAS_AIO
 #endif
@@ -232,10 +234,10 @@ lunchbox::PluginRegisterer<CompartmentReportBinary> registerer;
 
 CompartmentReportBinary::CompartmentReportBinary(
     const CompartmentReportInitData& initData)
-    : _startTime(0)
+    : _path(initData.getURI().getPath())
+    , _startTime(0)
     , _endTime(0)
     , _timestep(0)
-    , _file()
     , _header()
     , _subNumCompartments(0)
     , _subtarget(false)
@@ -254,14 +256,20 @@ CompartmentReportBinary::CompartmentReportBinary(
         LBTHROW(std::runtime_error(
             "Writing of binary compartments not implemented"));
 
+    if (_ioAPI == IOapi::posix_aio)
+    {
 #ifdef HAS_AIO
-    int flags = O_RDONLY;
-    _fileDescriptor = open(initData.getURI().getPath().c_str(), flags);
-    if (_fileDescriptor < 0)
-        throw std::runtime_error("Failed to open " +
-                                 initData.getURI().getPath());
+        _fileDescriptor = open(_path.c_str(), O_RDONLY);
+        if (_fileDescriptor < 0)
+            throw std::runtime_error("Failed to open " + _path);
+        _fileHandle = fdopen(_fileDescriptor, "r");
+        _remapFile(HEADER_LENGTH);
 #endif
-    _file.map(initData.getURI().getPath());
+    }
+    else
+    {
+        _file.open(_path);
+    }
 
     if (!_parseHeader())
         LBTHROW(std::runtime_error("Parsing header failed"));
@@ -274,7 +282,11 @@ CompartmentReportBinary::CompartmentReportBinary(
 
 CompartmentReportBinary::~CompartmentReportBinary()
 {
-    close(_fileDescriptor);
+    if (_ioAPI == IOapi::posix_aio)
+    {
+        close(_fileDescriptor);
+    }
+    _file.close();
 }
 
 bool CompartmentReportBinary::handles(const CompartmentReportInitData& initData)
@@ -295,6 +307,14 @@ std::string CompartmentReportBinary::getDescription()
 {
     return "Blue Brain binary compartment reports:"
            "  [file://]/path/to/report.(bin|rep|bbp)";
+}
+
+bool CompartmentReportBinary::_remapFile(const size_t size)
+{
+    if (_file.is_open())
+        _file.close();
+    _file.open(_path, size);
+    return _file.is_open();
 }
 
 const GIDSet& CompartmentReportBinary::getGIDs() const
@@ -345,13 +365,12 @@ bool CompartmentReportBinary::_loadFrames(const size_t startFrame,
 bool CompartmentReportBinary::_loadFrameMemMap(const size_t frameNumber,
                                                float* buffer) const
 {
-    const uint8_t* ptr = _file.getAddress<const uint8_t>();
+    const uint8_t* ptr = reinterpret_cast<const uint8_t*>(_file.data());
     if (!ptr)
         return false;
 
     const size_t frameOffset =
-        _header.dataBlockOffset +
-        _header.numCompartments * sizeof(float) * frameNumber;
+        _dataOffset + _header.numCompartments * sizeof(float) * frameNumber;
 
     if (!_subtarget)
     {
@@ -399,8 +418,7 @@ void CompartmentReportBinary::_loadFramesAIO(const size_t frameNumber,
                                              float* buffer) const
 {
     const size_t originalFrameSize = _header.numCompartments * sizeof(float);
-    size_t frameOffset =
-        _header.dataBlockOffset + originalFrameSize * frameNumber;
+    size_t frameOffset = _dataOffset + originalFrameSize * frameNumber;
     float* targetFrame = buffer;
     std::vector<AIOReadData> readData;
     readData.reserve(count * (_subtarget ? _gids.size() : 1));
@@ -458,12 +476,12 @@ void CompartmentReportBinary::_loadFramesAIO(const size_t, const size_t,
 
 floatsPtr CompartmentReportBinary::loadNeuron(const uint32_t gid) const
 {
-    const uint8_t* const bytePtr = _file.getAddress<const uint8_t>();
+    const uint8_t* const bytePtr =
+        reinterpret_cast<const uint8_t*>(_file.data());
     if (!bytePtr || _perSectionOffsets[_subtarget].empty())
         return floatsPtr();
 
     const size_t index = getIndex(gid);
-    const float* const ptr = (const float*)(bytePtr + _header.dataBlockOffset);
 
     const size_t frameSize = _header.numCompartments;
     const size_t nFrames = (_endTime - _startTime) / _timestep;
@@ -482,9 +500,27 @@ floatsPtr CompartmentReportBinary::loadNeuron(const uint32_t gid) const
             const uint16_t numCompartments = compCounts[index][j];
             const uint64_t sourceOffset = offsets[index][j];
 
-            ::memcpy(buffer->data() + dstOffset,
-                     ptr + frameOffset + sourceOffset,
-                     numCompartments * sizeof(float));
+            if (numCompartments)
+            {
+                const size_t nBytes = numCompartments * sizeof(float);
+                void* dest = buffer->data() + dstOffset;
+                const size_t srcOffset =
+                    _dataOffset + (frameOffset + sourceOffset) * sizeof(float);
+
+                if (_ioAPI == IOapi::mmap)
+                {
+                    ::memcpy(dest, bytePtr + srcOffset, nBytes);
+                }
+                else
+                {
+                    std::fseek(_fileHandle, srcOffset, SEEK_SET);
+                    if (std::fread(dest, 1, nBytes, _fileHandle) != nBytes)
+                    {
+                        throw std::runtime_error("Failed to read data");
+                    }
+                }
+            }
+
             dstOffset += numCompartments;
         }
     }
@@ -582,7 +618,7 @@ bool CompartmentReportBinary::flush()
 
 bool CompartmentReportBinary::_parseHeader()
 {
-    const uint8_t* ptr = _file.getAddress<const uint8_t>();
+    const uint8_t* ptr = reinterpret_cast<const uint8_t*>(_file.data());
     if (!ptr)
         return false;
 
@@ -631,20 +667,26 @@ bool CompartmentReportBinary::_parseHeader()
 
 bool CompartmentReportBinary::_parseMapping()
 {
-    const uint8_t* ptr = _file.getAddress<const uint8_t>();
+    const uint8_t* ptr = reinterpret_cast<const uint8_t*>(_file.data());
     if (!ptr)
         return false;
 
     size_t offset = _header.headerSize;
 
     // Prefetching the mapping data
-    uint64_t dataOffset = get<uint64_t>(ptr, DATA_INFO + offset);
+    _dataOffset = get<uint64_t>(ptr, DATA_INFO + offset);
     if (_header.byteswap)
-        lunchbox::byteswap(dataOffset);
-    _header.dataBlockOffset = dataOffset;
+        lunchbox::byteswap(_dataOffset);
 
-    std::unique_ptr<uint8_t[]> buffer(new uint8_t[_header.dataBlockOffset]);
-    std::copy(ptr, ptr + dataOffset, buffer.get());
+    if (_ioAPI == IOapi::posix_aio)
+    {
+        if (!_remapFile(_dataOffset))
+            return false;
+        ptr = reinterpret_cast<const uint8_t*>(_file.data());
+    }
+
+    std::unique_ptr<uint8_t[]> buffer(new uint8_t[_dataOffset]);
+    std::copy(ptr, ptr + _dataOffset, buffer.get());
     ptr = buffer.get();
 
     // According to Garik Suess, all compartments of a cell in a frame are next
@@ -668,7 +710,7 @@ bool CompartmentReportBinary::_parseMapping()
         cell.extraMappingOffset =
             get<uint64_t>(ptr, EXTRA_MAPPING_INFO + offset);
         cell.dataOffset = get<uint64_t>(ptr, DATA_INFO + offset);
-        if (cell.dataOffset < dataOffset)
+        if (cell.dataOffset < _dataOffset)
         {
             LBERROR << "Bad offset in report mapping" << std::endl;
             return false;
@@ -682,8 +724,6 @@ bool CompartmentReportBinary::_parseMapping()
         totalCompartments += cell.numCompartments;
         _originalGIDs.insert(cell.gid);
     }
-
-    _header.dataBlockOffset = cells[0].dataOffset;
 
     std::sort(cells.begin(), cells.end());
     SectionOffsets& offsetMapping = _perSectionOffsets[0];
@@ -727,7 +767,7 @@ bool CompartmentReportBinary::_parseMapping()
             if (current != previous)
             {
                 const uint64_t frameIndex =
-                    j + ((info.dataOffset - dataOffset) / _mappingItemSize);
+                    j + ((info.dataOffset - _dataOffset) / _mappingItemSize);
 
                 sectionsMapping.push_back(
                     std::make_pair(current, std::make_pair(frameIndex, 0)));

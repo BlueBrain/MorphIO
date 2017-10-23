@@ -7,8 +7,8 @@
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/README.md")
 
 set(BRION_PACKAGE_DEB_DEPENDS libboost-filesystem-dev libboost-regex-dev
-  libboost-serialization-dev libboost-system-dev libboost-test-dev
-  libhdf5-serial-dev)
+  libboost-serialization-dev libboost-iostreams-dev libboost-system-dev
+  libboost-test-dev libhdf5-serial-dev)
 if(USE_PYTHON3)
   set(PYTHON_SUFFIX 3)
 endif()

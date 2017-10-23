@@ -23,7 +23,8 @@
 #include "compartmentReportCommon.h"
 
 #include <lunchbox/bitOperation.h>
-#include <lunchbox/memoryMap.h>
+
+#include <boost/iostreams/device/mapped_file.hpp>
 
 namespace brion
 {
@@ -47,8 +48,6 @@ struct HeaderInfo
     std::string extraMappingName;
     std::string reportName;
 
-    // cppcheck-suppress unusedStructMember
-    uint64_t dataBlockOffset;
     // cppcheck-suppress unusedStructMember
     bool byteswap;
 };
@@ -95,6 +94,10 @@ private:
     bool _loadFrameMemMap(size_t frameNumber, float* buffer) const;
     void _loadFramesAIO(size_t frameNumber, size_t count, float* buffer) const;
 
+    bool _remapFile(size_t size);
+
+private:
+    const std::string _path;
     double _startTime;
     double _endTime;
     double _timestep;
@@ -103,11 +106,12 @@ private:
 
     GIDSet _gids;
 
-    const std::string _path;
-    lunchbox::MemoryMap _file;
+    boost::iostreams::mapped_file_source _file;
     int _fileDescriptor;
+    FILE* _fileHandle;
 
     HeaderInfo _header;
+    uint64_t _dataOffset = 0;
 
     SectionOffsets _perSectionOffsets[2];
     CompartmentCounts _perSectionCounts[2];
