@@ -77,13 +77,11 @@ private:
     size_t _comps;
     boost::filesystem::path _path;
     std::string _reportName;
-    Files _files;
     std::unique_ptr<HighFive::File> _file;
     Datasets _datas;
 
     bool _loadFrame(size_t timestamp, float* buffer) const final;
 
-    void _openFile(const uint32_t cellID);
     HighFive::DataSet _openDataset(const HighFive::File& file,
                                    const uint32_t cellID);
 

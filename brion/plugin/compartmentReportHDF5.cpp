@@ -149,23 +149,10 @@ CompartmentReportHDF5::CompartmentReportHDF5(
             return;
         }
 
-        // assume one file per cell
-        if (fs::is_directory(_path))
-        {
-            fs::directory_iterator it(_path);
-            if (it == fs::directory_iterator())
-                LBTHROW(std::runtime_error("No files in " + _path.string()));
-            HighFive::File file(it->path().string(), HighFive::File::ReadOnly);
-            _readMetaData(file);
-        }
-        // assume one file for all cells
-        else
-        {
-            _reportName = fs::basename(_path);
-            _file.reset(
-                new HighFive::File(_path.string(), HighFive::File::ReadOnly));
-            _readMetaData(*_file);
-        }
+        _reportName = fs::basename(_path);
+        _file.reset(
+            new HighFive::File(_path.string(), HighFive::File::ReadOnly));
+        _readMetaData(*_file);
     }
     _cacheNeuronCompartmentCounts(initData.getGids());
 }
@@ -174,7 +161,6 @@ CompartmentReportHDF5::~CompartmentReportHDF5()
 {
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
     _file.reset();
-    _files.clear();
     _datas.clear();
 }
 
@@ -249,9 +235,6 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
 
     if (_gids.empty())
     {
-        if (!_file)
-            return;
-
         for (hsize_t i = 0; i < _file->getNumberObjects(); ++i)
         {
             const std::string& datasetName = _file->getObjectName(i);
@@ -269,26 +252,19 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
     size_t cellIndex = 0;
     for (auto cellID : _gids)
     {
-        _openFile(cellID);
-
-        const HighFive::File& file =
-            _file ? *_file : _files.find(cellID)->second;
-
         std::stringstream cellName;
         cellName << "a" << cellID;
         const std::string datasetName =
             "/" + cellName.str() + "/" + _reportName + "/" + mappingDatasetName;
-        HighFive::DataSet dataset = [file, datasetName]() {
+        HighFive::DataSet dataset = [this, datasetName]() {
             try
             {
-                return file.getDataSet(datasetName);
+                return _file->getDataSet(datasetName);
             }
             catch (HighFive::DataSetException&)
             {
                 LBTHROW(std::runtime_error("CompartmentReportHDF5: Dataset " +
-                                           datasetName + " not found "
-                                                         "in file: " +
-                                           file.getName()));
+                                           datasetName + " not found"));
             }
         }();
 
@@ -353,8 +329,7 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
 
     for (auto cellID : _gids)
     {
-        const auto& file = _file ? *_file : _files.find(cellID)->second;
-        auto dataset = _openDataset(file, cellID);
+        auto dataset = _openDataset(*_file, cellID);
         _datas.emplace(std::make_pair(cellID, std::move(dataset)));
     }
 }
@@ -445,35 +420,8 @@ bool CompartmentReportHDF5::writeFrame(const uint32_t gid, const float* values,
 bool CompartmentReportHDF5::flush()
 {
     lunchbox::ScopedWrite mutex(detail::hdf5Lock());
-    if (_file)
-        _file->flush();
+    _file->flush();
     return true;
-}
-
-void CompartmentReportHDF5::_openFile(const uint32_t cellID)
-{
-    if (_file)
-        // All cells are in a single file
-        return;
-
-    assert(_files.find(cellID) == _files.end());
-
-    std::stringstream cellName;
-    cellName << "a" << cellID;
-    const boost::filesystem::path filename = _path / (cellName.str() + ".h5");
-
-    try
-    {
-        HighFive::SilenceHDF5 silence;
-        _files.emplace(
-            std::make_pair(cellID, HighFive::File(filename.string().c_str(),
-                                                  H5F_ACC_RDONLY)));
-    }
-    catch (const HighFive::FileException&)
-    {
-        LBTHROW(std::runtime_error(
-            "CompartmentReportHDF5: error opening file:" + filename.string()));
-    }
 }
 
 HighFive::DataSet CompartmentReportHDF5::_openDataset(
