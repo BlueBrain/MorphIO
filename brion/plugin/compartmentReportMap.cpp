@@ -95,7 +95,7 @@ CompartmentReportMap::CompartmentReportMap(
     }
 
     if (accessMode & MODE_READ)
-        _cacheNeuronCompartmentCounts(initData.getGids());
+        _cacheNeuronCompartmentCounts(initData.getGIDs());
 }
 
 CompartmentReportMap::~CompartmentReportMap()

@@ -55,14 +55,8 @@ struct CompartmentReportMetaData
     /** The  data unit of the report */
     std::string dataUnit;
 
-    /** The cell count of the report */
-    size_t cellCount;
-
     /** The total frame count in the report */
     size_t frameCount;
-
-    /** The total compartment count in the report */
-    size_t compartmentCount;
 };
 
 /**
@@ -96,9 +90,6 @@ public:
      * - *time_step* (Numeric) : The sampling time interval of the report
      * - *time_unit* (String) : The  time unit of the report
      * - *data_unit* (String) : The  data unit of the report
-     * - *cell_count* (Numeric) : The cell count of the report
-     * - *compartment_count* (Numeric) : The total compartment count in the
-     * report
      * - *frame_count* (Numeric) : The total frame count in the report
     */
     dict getMetaData() const;
@@ -106,6 +97,11 @@ public:
 
     /** @return the GIDs of the report */
     BRAIN_API const brion::GIDSet& getGIDs() const;
+
+    /** @return the number of cells in the report.
+      * @version 3.0
+      */
+    BRAIN_API size_t getCellCount() const;
 
     /**
      * Create a view of a subset of neurons. An empty gid

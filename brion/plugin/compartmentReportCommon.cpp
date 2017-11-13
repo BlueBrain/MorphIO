@@ -30,15 +30,12 @@ CompartmentReportCommon::CompartmentReportCommon()
 
 void CompartmentReportCommon::_cacheNeuronCompartmentCounts(const GIDSet& gids)
 {
-    if (gids.empty() || gids != getGIDs() || _neuronCompartments.empty())
-    {
-        updateMapping(gids);
-        const CompartmentCounts& counts = getCompartmentCounts();
-        _neuronCompartments.resize(counts.size());
-        for (size_t i = 0; i < counts.size(); ++i)
-            _neuronCompartments[i] =
-                std::accumulate(counts[i].begin(), counts[i].end(), 0);
-    }
+    updateMapping(gids);
+    const CompartmentCounts& counts = getCompartmentCounts();
+    _neuronCompartments.resize(counts.size());
+    for (size_t i = 0; i < counts.size(); ++i)
+        _neuronCompartments[i] =
+            std::accumulate(counts[i].begin(), counts[i].end(), 0);
 }
 
 size_t CompartmentReportCommon::getNumCompartments(const size_t index) const

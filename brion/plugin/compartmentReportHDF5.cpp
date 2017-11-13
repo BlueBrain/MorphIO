@@ -154,7 +154,9 @@ CompartmentReportHDF5::CompartmentReportHDF5(
             new HighFive::File(_path.string(), HighFive::File::ReadOnly));
         _readMetaData(*_file);
     }
-    _cacheNeuronCompartmentCounts(initData.getGids());
+
+    if (initData.initMapping)
+        _cacheNeuronCompartmentCounts(initData.getGIDs());
 }
 
 CompartmentReportHDF5::~CompartmentReportHDF5()
@@ -181,8 +183,17 @@ std::string CompartmentReportHDF5::getDescription()
            "  [file://]/path/to/report.(h5|hdf5)";
 }
 
+size_t CompartmentReportHDF5::getCellCount() const
+{
+    if (_gids.empty())
+        return _file->getNumberObjects();
+    return _gids.size();
+}
+
 const GIDSet& CompartmentReportHDF5::getGIDs() const
 {
+    if (_gids.empty())
+        _readGIDs();
     return _gids;
 }
 
@@ -208,7 +219,7 @@ bool CompartmentReportHDF5::_loadFrame(const size_t frameNumber,
 
     size_t cellIndex = 0;
     size_t destOffset = 0;
-    for (auto cellID : _gids)
+    for (auto cellID : getGIDs())
     {
         const auto& dataset = _datas.find(cellID)->second;
         const size_t compartments = getNumCompartments(cellIndex);
@@ -234,17 +245,7 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
     _datas.clear();
 
     if (_gids.empty())
-    {
-        for (hsize_t i = 0; i < _file->getNumberObjects(); ++i)
-        {
-            const std::string& datasetName = _file->getObjectName(i);
-            std::stringstream tmp;
-            tmp << datasetName.substr(1);
-            uint32_t gid;
-            tmp >> gid;
-            _gids.insert(gid);
-        }
-    }
+        _readGIDs();
 
     _offsets.resize(_gids.size());
 
@@ -272,7 +273,7 @@ void CompartmentReportHDF5::updateMapping(const GIDSet& gids)
         if (dims.size() != 2)
         {
             LBTHROW(
-                std::runtime_error("Compartment_Report_HDF5_File_Reader: "
+                std::runtime_error("CompartmentReportHDF5: "
                                    "Error, not 2 dimensional array on " +
                                    datasetName));
         }
@@ -497,12 +498,6 @@ HighFive::DataSet& CompartmentReportHDF5::_getDataset(const uint32_t gid)
 
 void CompartmentReportHDF5::_readMetaData(const HighFive::File& file)
 {
-    if (!file.getNumberObjects())
-    {
-        std::runtime_error exc("File is empty: " + file.getName());
-        LBTHROW(exc);
-    }
-
     try
     {
         HighFive::SilenceHDF5 silence;
@@ -540,6 +535,27 @@ void CompartmentReportHDF5::_readMetaData(const HighFive::File& file)
         LBTHROW(std::runtime_error(_path.string() +
                                    " not a valid H5 compartment report file"));
     }
+}
+
+void CompartmentReportHDF5::_readGIDs() const
+{
+    auto callback = [this](const char* name) {
+        if (name[1] != '\0')
+            _gids.insert(std::stoi(&name[1]));
+    };
+    auto wrapper = [](int, const char* name, const H5L_info_t*, void* data) {
+        (*(static_cast<decltype(callback)*>(data)))(name);
+        return 0;
+    };
+    // Asking iterate in alpha numerical order implies that if there're no
+    // index, it will have to be created. I also tried H5_INDEX_CRT_ORDER, but
+    // that causes an error.
+    // In any case the performance seems faster that using H5Gget_objname_by_idx
+    // which most probably has quadratic complexity.
+    // Why there's not way to simply iterate the links in the order they
+    // appear in the file?
+    H5Literate(_file->getId(), H5_INDEX_NAME, H5_ITER_NATIVE, nullptr, wrapper,
+               &callback);
 }
 
 void CompartmentReportHDF5::_createMetaData()

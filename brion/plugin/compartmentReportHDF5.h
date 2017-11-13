@@ -47,6 +47,7 @@ public:
     double getTimestep() const final { return _timestep; }
     const std::string& getDataUnit() const final { return _dunit; }
     const std::string& getTimeUnit() const final { return _tunit; }
+    size_t getCellCount() const final;
     const GIDSet& getGIDs() const final;
     const SectionOffsets& getOffsets() const final;
     const CompartmentCounts& getCompartmentCounts() const final;
@@ -71,7 +72,7 @@ private:
     std::string _dunit;
     std::string _tunit;
 
-    GIDSet _gids;
+    mutable GIDSet _gids;
     SectionOffsets _offsets;
     CompartmentCounts _counts;
     size_t _comps;
@@ -89,6 +90,7 @@ private:
                                      const size_t compCount);
     HighFive::DataSet& _getDataset(const uint32_t gid);
     void _readMetaData(const HighFive::File& file);
+    void _readGIDs() const;
     void _createMetaData();
     void _createMappingAttributes(HighFive::DataSet& dataset);
     void _createDataAttributes(HighFive::DataSet& dataset);

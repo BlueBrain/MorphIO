@@ -263,7 +263,9 @@ CompartmentReportBinary::CompartmentReportBinary(
         if (_fileDescriptor < 0)
             throw std::runtime_error("Failed to open " + _path);
         _fileHandle = fdopen(_fileDescriptor, "r");
-        _remapFile(HEADER_LENGTH);
+        // We need to parse the header, plus the data offset for the first
+        // cell to know where the mapping ends.
+        _remapFile(HEADER_LENGTH + DATA_INFO + sizeof(int32_t));
 #endif
     }
     else
@@ -274,10 +276,22 @@ CompartmentReportBinary::CompartmentReportBinary(
     if (!_parseHeader())
         LBTHROW(std::runtime_error("Parsing header failed"));
 
-    if (!_parseMapping())
-        LBTHROW(std::runtime_error("Parsing mapping failed"));
+    // Remapping the file until the end of the cell mapping if necessary.
+    if (_ioAPI == IOapi::posix_aio)
+    {
+        if (!_remapFile(_dataOffset))
+            LBTHROW(std::runtime_error("Failed to memory map file"));
+    }
 
-    _cacheNeuronCompartmentCounts(initData.getGids());
+    if (initData.initMapping)
+    {
+        if (!_parseMapping())
+            LBTHROW(std::runtime_error("Parsing mapping failed"));
+
+        _cacheNeuronCompartmentCounts(initData.getGIDs());
+    }
+    else
+        _parseGIDs();
 }
 
 CompartmentReportBinary::~CompartmentReportBinary()
@@ -317,8 +331,17 @@ bool CompartmentReportBinary::_remapFile(const size_t size)
     return _file.is_open();
 }
 
+size_t CompartmentReportBinary::getCellCount() const
+{
+    if (_gids.empty())
+        return _header.numCells;
+    return _gids.size();
+}
+
 const GIDSet& CompartmentReportBinary::getGIDs() const
 {
+    if (_gids.empty())
+        return _originalGIDs;
     return _gids;
 }
 
@@ -537,6 +560,9 @@ floatsPtr CompartmentReportBinary::loadNeuron(const uint32_t gid) const
 
 void CompartmentReportBinary::updateMapping(const GIDSet& gids)
 {
+    if (_perSectionOffsets[0].empty() && !_parseMapping())
+        LBTHROW(std::runtime_error("Parsing mapping failed"));
+
     _gids = gids.empty() ? _originalGIDs : gids;
     _subtarget = (_gids != _originalGIDs);
 
@@ -662,29 +688,32 @@ bool CompartmentReportBinary::_parseHeader()
     if (_tunit.empty())
         _tunit = "ms";
 
+    // After parsing the header we figure out the end of the mapping by reading
+    // the data offset of the first cell.
+    // This is needed for remapping the file before reading the GIDs.
+    _dataOffset = get<uint64_t>(ptr, DATA_INFO + _header.headerSize);
+    if (_header.byteswap)
+        lunchbox::byteswap(_dataOffset);
+
     return true;
+}
+
+void CompartmentReportBinary::_parseGIDs()
+{
+    const uint8_t* ptr = reinterpret_cast<const uint8_t*>(_file.data());
+    ptr += _header.headerSize + NUMBER_OF_CELL;
+    for (int32_t i = 0; i < _header.numCells; ++i)
+    {
+        auto gid = get<int32_t>(ptr, i * SIZE_CELL_INFO_LENGTH);
+        lunchbox::byteswap(gid);
+        _originalGIDs.insert(gid);
+    }
 }
 
 bool CompartmentReportBinary::_parseMapping()
 {
     const uint8_t* ptr = reinterpret_cast<const uint8_t*>(_file.data());
-    if (!ptr)
-        return false;
-
     size_t offset = _header.headerSize;
-
-    // Prefetching the mapping data
-    _dataOffset = get<uint64_t>(ptr, DATA_INFO + offset);
-    if (_header.byteswap)
-        lunchbox::byteswap(_dataOffset);
-
-    if (_ioAPI == IOapi::posix_aio)
-    {
-        if (!_remapFile(_dataOffset))
-            return false;
-        ptr = reinterpret_cast<const uint8_t*>(_file.data());
-    }
-
     std::unique_ptr<uint8_t[]> buffer(new uint8_t[_dataOffset]);
     std::copy(ptr, ptr + _dataOffset, buffer.get());
     ptr = buffer.get();

@@ -34,24 +34,22 @@ struct CompartmentReportReader
 {
     CompartmentReportReader(const brion::URI& uri_)
         : uri(uri_)
+        , report{uri}
     {
-        const brion::CompartmentReport report{uri, brion::MODE_READ};
-
-        gids = report.getGIDs();
-
         metaData.startTime = report.getStartTime();
         metaData.endTime = report.getEndTime();
         metaData.timeStep = report.getTimestep();
         metaData.timeUnit = report.getTimeUnit();
         metaData.dataUnit = report.getDataUnit();
-        metaData.cellCount = gids.size();
-        metaData.compartmentCount = report.getFrameSize();
         metaData.frameCount = report.getFrameCount();
     }
 
     const brion::URI uri;
-    brion::GIDSet gids;
     CompartmentReportMetaData metaData;
+    const brion::CompartmentReport report;
+
+    const brion::GIDSet& getGIDs() const { return report.getGIDs(); }
+    size_t getCellCount() const { return report.getCellCount(); }
 };
 
 struct CompartmentReportView

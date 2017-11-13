@@ -39,9 +39,8 @@ class TestMetaData(unittest.TestCase):
         assert(metadata['start_time'] == 0.0)
         assert(metadata['end_time'] == 10.0)
         assert(numpy.isclose(metadata['time_step'], 0.1))
-        assert(metadata['compartment_count'] == 20360)
         assert(metadata['frame_count'] == 100)
-        assert(metadata['cell_count'] == 35)
+        assert(self.report.cell_count == 35)
 
 
 class TestReader(unittest.TestCase):
@@ -55,9 +54,8 @@ class TestReader(unittest.TestCase):
         assert(metadata['start_time'] == 0.0)
         assert(metadata['end_time'] == 10.0)
         assert(numpy.isclose(metadata['time_step'], 0.1))
-        assert(metadata['compartment_count'] == 600)
         assert(metadata['frame_count'] == 100)
-        assert(metadata['cell_count'] == 600)
+        assert(self.report.cell_count == 600)
 
     def test_gids(self):
         assert((self.report.gids == numpy.arange(1, 601, 1)).all())
@@ -73,6 +71,7 @@ class TestReader(unittest.TestCase):
         assert(mapping.index.tolist() == [(1, 0), (2, 0), (3, 0)])
         assert(mapping.offsets == [[0], [1], [2]])
         assert(mapping.compartment_counts() ==  [[1], [1], [1]])
+        assert(mapping.frame_size == 3)
 
     def test_frames(self):
 

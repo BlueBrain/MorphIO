@@ -66,6 +66,7 @@ public:
     double getTimestep() const final { return _timestep; }
     const std::string& getDataUnit() const final { return _dunit; }
     const std::string& getTimeUnit() const final { return _tunit; }
+    size_t getCellCount() const final;
     const GIDSet& getGIDs() const final;
     const SectionOffsets& getOffsets() const final;
     const CompartmentCounts& getCompartmentCounts() const final;
@@ -84,7 +85,7 @@ public:
 
 private:
     bool _parseHeader();
-
+    void _parseGIDs();
     bool _parseMapping();
 
     bool _loadFrame(size_t frameNumber, float* buffer) const final;

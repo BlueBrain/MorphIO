@@ -43,18 +43,36 @@ public:
      *        here.
      * @param accessMode the brion::AccessMode bitmask
      * @param gids the neurons of interest in READ_MODE
-     * @version 1.4
+     * @version 3.0
      */
-    explicit CompartmentReportInitData(const URI& uri,
-                                       const int accessMode = MODE_READ,
-                                       const GIDSet& gids = GIDSet())
+    CompartmentReportInitData(const URI& uri, const int accessMode,
+                              const GIDSet& gids = GIDSet())
         : PluginInitData(uri, accessMode)
+        , initMapping(true)
         , _gids(gids)
     {
     }
 
+    /** Create a CompartmentReportInitData object given a URI, read access mode
+     *  and no mapping requested at report construction.
+     *
+     * @param uri URI to compartment report. The report type is deduced from
+     *        here.
+     * @version 3.0
+     */
+    explicit CompartmentReportInitData(const URI& uri)
+        : PluginInitData(uri, MODE_READ)
+        , initMapping(false)
+    {
+    }
+
+    /** Hint to the implementation to make the data mapping available at
+        construction or not.
+        @version 3.0 */
+    const bool initMapping;
+
     /** @return Returns the gids. @version 1.4 */
-    const GIDSet& getGids() const { return _gids; }
+    const GIDSet& getGIDs() const { return _gids; }
 private:
     const GIDSet _gids;
 };
@@ -108,6 +126,8 @@ public:
     /** @copydoc brion::CompartmentReport::getTimeUnit */
     virtual const std::string& getTimeUnit() const = 0;
 
+    /** @copydoc brion::CompartmentReport::getCellCount */
+    virtual size_t getCellCount() const { return getGIDs().size(); }
     /** @copydoc brion::CompartmentReport::getGIDs */
     virtual const GIDSet& getGIDs() const = 0;
 
@@ -157,7 +177,8 @@ public:
     virtual bool writeCompartments(uint32_t gid, const uint16_ts& counts) = 0;
 
     // clang-format off
-    /** @copydoc brion::CompartmentReport::writeFrame(uint32_t gid, const float* values, size_t size, double timestamp) */
+    /** @copydoc brion::CompartmentReport::writeFrame(uint32_t gid, const float*
+     * values, size_t size, double timestamp) */
     virtual bool writeFrame(uint32_t gid, const float* values, size_t size,
                             double timestamp) = 0;
     // clang-format on

@@ -61,6 +61,9 @@ public:
     BRION_API CompartmentReport(const URI& uri, int mode,
                                 const GIDSet& gids = GIDSet());
 
+    /** @internal */
+    BRION_API CompartmentReport(const URI& uri);
+
     /** @return the descriptions of all loaded report backends. @version 1.0 */
     BRION_API static std::string getDescriptions();
 
@@ -77,6 +80,12 @@ public:
      * @version 1.0
      */
     BRION_API void updateMapping(const GIDSet& gids);
+
+    /** @return the number of considered cells. Maybe much faster than
+     * getGIDs().size()
+     * @version 3.0
+     */
+    BRION_API size_t getCellCount() const;
 
     /** @return the current considered GIDs. @version 1.0 */
     BRION_API const GIDSet& getGIDs() const;

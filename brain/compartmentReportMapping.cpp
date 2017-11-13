@@ -49,4 +49,9 @@ size_t CompartmentReportMapping::getNumCompartments(size_t index) const
 {
     return _viewImpl->report->getNumCompartments(index);
 }
+
+size_t CompartmentReportMapping::getFrameSize() const
+{
+    return _viewImpl->report->getFrameSize();
+}
 }

@@ -82,6 +82,11 @@ public:
      */
     BRAIN_API size_t getNumCompartments(size_t index) const;
 
+    /** @return The total number of compartments in a frame.
+     * @version 3.0
+     */
+    BRAIN_API size_t getFrameSize() const;
+
 private:
     CompartmentReportMapping() = delete;
     CompartmentReportMapping(const CompartmentReportMapping&) = delete;

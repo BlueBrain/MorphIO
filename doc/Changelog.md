@@ -3,6 +3,14 @@ Changelog {#Changelog}
 
 # git master
 
+* [191](https://github.com/BlueBrain/Brion/pull/191):
+  - Optimizations in brain::CompartmentReport opening, only the metadata is
+    read.
+  - Removed compartmentCount and cellCount from brain::CompartmentReportMetadata
+    because they can't be figured out efficiently in all report types.
+  - New function getFrameSize added to CompartmentReportMapping to replace
+    compartmentCount.
+  - New function getCellCount added to CompartmentReport to replace cellCount.
 * [180](https://github.com/BlueBrain/Brion/pull/180):
   Bugfixes in compartment reports:
   - The report converter was messing up the order of the data when writing to

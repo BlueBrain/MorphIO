@@ -53,6 +53,11 @@ CompartmentReport::CompartmentReport(const URI& uri, const int mode,
 {
 }
 
+CompartmentReport::CompartmentReport(const URI& uri)
+    : _impl(new detail::CompartmentReport(CompartmentReportInitData(uri)))
+{
+}
+
 CompartmentReport::~CompartmentReport()
 {
     delete _impl;
@@ -61,6 +66,11 @@ CompartmentReport::~CompartmentReport()
 std::string CompartmentReport::getDescriptions()
 {
     return CompartmentPluginFactory::getInstance().getDescriptions();
+}
+
+size_t CompartmentReport::getCellCount() const
+{
+    return _impl->plugin->getCellCount();
 }
 
 const GIDSet& CompartmentReport::getGIDs() const

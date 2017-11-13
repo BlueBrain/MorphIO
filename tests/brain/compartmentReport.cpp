@@ -118,6 +118,11 @@ inline void testReadSoma(const char* relativePath)
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
     BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
     BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1, TIMESTEP_PRECISION);
+    BOOST_CHECK_EQUAL(report.getMetaData().frameCount, 100);
+
+    BOOST_CHECK_EQUAL(report.getCellCount(), 600);
+
+    BOOST_CHECK_EQUAL(view.getMapping().getFrameSize(), 1);
 
     auto timestamp = report.getMetaData().startTime;
     auto frame = view.load(timestamp).get();
@@ -153,6 +158,11 @@ inline void testReadAllComps(const char* relativePath)
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
     BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
     BOOST_CHECK_CLOSE(report.getMetaData().timeStep, 0.1, TIMESTEP_PRECISION);
+    BOOST_CHECK_EQUAL(report.getMetaData().frameCount, 100);
+
+    BOOST_CHECK_EQUAL(report.getCellCount(), 35);
+
+    BOOST_CHECK_EQUAL(view.getMapping().getFrameSize(), 20360);
 
     auto frame = view.load(.8f).get();
     BOOST_CHECK(frame.data);

@@ -80,6 +80,26 @@ BOOST_AUTO_TEST_CASE(test_invalid_mapping)
                       std::runtime_error);
 }
 
+BOOST_AUTO_TEST_CASE(test_open_binary_no_mapping)
+{
+    boost::filesystem::path path(BBP_TESTDATA);
+    path /= "local/simulations/may17_2011/Control/voltage.bbp";
+    brion::CompartmentReport report(brion::URI(path.string()));
+    // Cell metadata is still accessible
+    BOOST_CHECK_EQUAL(report.getCellCount(), 600);
+    BOOST_CHECK_EQUAL(report.getGIDs().size(), 600);
+}
+
+BOOST_AUTO_TEST_CASE(test_open_hdf5_no_mapping)
+{
+    boost::filesystem::path path(BBP_TESTDATA);
+    path /= "local/simulations/may17_2011/Control/voltage.h5";
+    brion::CompartmentReport report(brion::URI(path.string()));
+    // Cell metadata is still accessible
+    BOOST_CHECK_EQUAL(report.getCellCount(), 600);
+    BOOST_CHECK_EQUAL(report.getGIDs().size(), 600);
+}
+
 namespace
 {
 boost::filesystem::path createUniquePath()
@@ -162,6 +182,7 @@ void test_compare(const brion::URI& uri1, const brion::URI& uri2)
     BOOST_CHECK_EQUAL(report1.getEndTime(), report2.getEndTime());
     BOOST_CHECK_EQUAL(report1.getTimestep(), report2.getTimestep());
     BOOST_CHECK_EQUAL(report1.getFrameSize(), report2.getFrameSize());
+    BOOST_CHECK_EQUAL(report1.getCellCount(), report2.getCellCount());
     BOOST_CHECK_EQUAL_COLLECTIONS(report1.getGIDs().begin(),
                                   report1.getGIDs().end(),
                                   report2.getGIDs().begin(),
@@ -368,6 +389,7 @@ void testReadSoma(const char* relativePath)
     BOOST_CHECK_EQUAL(report.getEndTime(), 10.);
     BOOST_CHECK_EQUAL(report.getTimestep(), 0.1);
     BOOST_CHECK_EQUAL(report.getFrameSize(), 1);
+    BOOST_CHECK_EQUAL(report.getCellCount(), 1);
 
     const auto& offsets = report.getOffsets();
     for (size_t i = 0; i != offsets.size(); ++i)
@@ -443,6 +465,7 @@ void testReadAllCompartments(const char* relativePath)
     BOOST_CHECK_EQUAL(report.getStartTime(), 0.);
     BOOST_CHECK_EQUAL(report.getEndTime(), 10.);
     BOOST_CHECK_EQUAL(report.getTimestep(), 0.1);
+    BOOST_CHECK_EQUAL(report.getCellCount(), 35);
     BOOST_CHECK_EQUAL(report.getFrameSize(), 20360);
 
     const auto& offsets = report.getOffsets();
@@ -507,6 +530,7 @@ void testReadSubtarget(const char* relativePath)
     BOOST_CHECK_EQUAL(report.getStartTime(), 0.);
     BOOST_CHECK_EQUAL(report.getEndTime(), 10.);
     BOOST_CHECK_EQUAL(report.getTimestep(), 0.1);
+    BOOST_CHECK_EQUAL(report.getCellCount(), 2);
     BOOST_CHECK_EQUAL(report.getFrameSize(), 938);
 
     brion::floatsPtr frame = report.loadFrame(report.getStartTime()).get();
