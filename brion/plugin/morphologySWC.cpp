@@ -211,7 +211,7 @@ void MorphologySWC::_readSamples(RawSWCInfo& info)
 
         char* data;
         const unsigned int id = strtol(line.data(), &data, 10);
-        if (*data != ' ')
+        if (*data != ' ' && *data != '\t')
         {
             LBTHROW(std::runtime_error(
                 "Reading swc morphology file: " + info.filename +
@@ -283,9 +283,9 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
         {
             if (sample.parent == int(currentSample))
             {
-                LBTHROW(std::runtime_error(
-                    "Reading swc morphology file: " + info.filename +
-                    ", found a sample point to itself"));
+                LBTHROW(std::runtime_error("Reading swc morphology file: " +
+                                           info.filename +
+                                           ", found a sample point to itself"));
             }
             Sample* parent = &samples[sample.parent];
             if (!parent->valid)
@@ -353,9 +353,9 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
                 if (info.roots.size() &&
                     samples[info.roots[0]].type == SWC_SECTION_SOMA)
                 {
-                    LBTHROW(std::runtime_error(
-                        "Reading swc morphology file: " + info.filename +
-                        ", found two soma sections"));
+                    LBTHROW(std::runtime_error("Reading swc morphology file: " +
+                                               info.filename +
+                                               ", found two soma sections"));
                 }
                 info.roots.insert(info.roots.begin(), currentSample);
                 hasSoma = true;
@@ -412,7 +412,7 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
     // detect all first order sections (some may connect to the soma point
     // or ring and some may not).
     _points.reserve(info.totalValidSamples + info.numSections -
-                     info.roots.size());
+                    info.roots.size());
     _sections.reserve(info.numSections);
     _sectionTypes.reserve(info.numSections);
     Samples& samples = info.samples;
