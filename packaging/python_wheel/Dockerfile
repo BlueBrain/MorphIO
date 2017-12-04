@@ -30,7 +30,7 @@ RUN rm -rf hdf5-1.8.17.tar.bz2 hdf5-1.8.17
 ############
 
 RUN curl -OL https://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz && tar xfz boost_1_59_0.tar.gz
-RUN cd boost_1_59_0 && ./bootstrap.sh --with-libraries=date_time,iostreams,filesystem,program_options,regex,serialization,system,test && ./b2 -j2 -q cxxflags=-fPIC cflags=-fPIC threading=multi link=static --build-type=minimal install
+RUN cd boost_1_59_0 && ./bootstrap.sh --with-libraries=date_time,iostreams,filesystem,program_options,regex,serialization,system,test && ./b2 -s NO_BZIP2=1 -j2 -q cxxflags=-fPIC cflags=-fPIC threading=multi link=static --build-type=minimal install
 RUN cd boost_1_59_0 && ./b2 --clean
 RUN rm -rf boost_1_59_0.tar.gz # don't delete build folder, needed to build boost.python for different python versions on-the-fly
 
