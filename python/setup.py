@@ -24,7 +24,6 @@ setup_opts = dict(
 
     use_scm_version={'root': '..', 'relative_to': __file__},
     install_requires=['numpy'],
-    setup_requires=['setuptools_scm']
 )
 
 
