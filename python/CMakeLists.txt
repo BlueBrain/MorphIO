@@ -40,11 +40,14 @@ add_custom_target(
     pymorphotool ALL 
     DEPENDS ${_pymod_flag}
 )
+
+set(GLOBAL_PYTHON_PATH "$ENV{PYTHONPATH}")
+
 add_custom_command(
     OUTPUT ${_pymod_flag}
     COMMAND
         # Uses setup.py to compile extension and link
-        PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}
+	PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${GLOBAL_PYTHON_PATH}
         ${PYTHON_EXECUTABLE} setup.py 
         build
           --build-base=${CMAKE_CURRENT_BINARY_DIR}/debug.build
