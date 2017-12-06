@@ -705,7 +705,8 @@ void CompartmentReportBinary::_parseGIDs()
     for (int32_t i = 0; i < _header.numCells; ++i)
     {
         auto gid = get<int32_t>(ptr, i * SIZE_CELL_INFO_LENGTH);
-        lunchbox::byteswap(gid);
+        if (_header.byteswap)
+            lunchbox::byteswap(gid);
         _originalGIDs.insert(gid);
     }
 }
