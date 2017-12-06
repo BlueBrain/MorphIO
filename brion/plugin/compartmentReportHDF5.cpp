@@ -543,7 +543,8 @@ void CompartmentReportHDF5::_readGIDs() const
         if (name[1] != '\0')
             _gids.insert(std::stoi(&name[1]));
     };
-    auto wrapper = [](int, const char* name, const H5L_info_t*, void* data) {
+    auto wrapper = [](hid_t, const char* name, const H5L_info_t*,
+                      void* data) -> herr_t {
         (*(static_cast<decltype(callback)*>(data)))(name);
         return 0;
     };
