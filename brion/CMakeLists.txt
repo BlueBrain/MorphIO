@@ -5,45 +5,24 @@
 #
 
 set(BRION_PUBLIC_HEADERS
-  blueConfig.h
-  circuit.h
-  compartmentReport.h
-  compartmentReportPlugin.h
   enums.h
-  mesh.h
   morphology.h
   morphologyPlugin.h
   morphologyPlugin.ipp
   pluginInitData.h
-  spikeReport.h
-  spikeReportPlugin.h
-  synapseSummary.h
-  synapse.h
-  target.h
   types.h
   )
 
 set(BRION_HEADERS
   constants.h
-  detail/mesh.h
-  detail/meshBinary.h
   detail/lockHDF5.h
-  detail/meshHDF5.h
   detail/morphologyHDF5.h
   detail/skipWhiteSpace.h
   detail/utilsHDF5.h
   )
 
 set(BRION_SOURCES
-  blueConfig.cpp
-  circuit.cpp
-  compartmentReport.cpp
-  mesh.cpp
   morphology.cpp
-  spikeReport.cpp
-  synapseSummary.cpp
-  synapse.cpp
-  target.cpp
   )
 
 if(MSVC)
