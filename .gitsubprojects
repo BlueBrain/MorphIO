@@ -1,4 +1,0 @@
-# -*- mode: cmake -*-
-git_subproject(Lunchbox https://github.com/Eyescale/Lunchbox.git 11e4fea)
-git_subproject(vmmlib https://github.com/Eyescale/vmmlib.git f4b3706)
-git_subproject(HighFive https://github.com/BlueBrain/HighFive.git db194b5)

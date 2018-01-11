@@ -3,4 +3,4 @@
 	url = https://github.com/BlueBrain/HighFive.git
 [submodule "3rdparty/vmmlib"]
 	path = 3rdparty/vmmlib
-	url = https://github.com/VMML/vmmlib
+    url = https://github.com/Eyescale/vmmlib.git
