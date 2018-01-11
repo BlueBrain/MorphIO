@@ -22,7 +22,6 @@
 
 #include <brion/api.h>
 #include <brion/types.h>
-#include <servus/serializable.h> // return value
 #include <vmmlib/vector.hpp>     // return value
 
 namespace brion
@@ -102,9 +101,6 @@ public:
 
     /** @internal */
     const MorphologyInitData& getInitData() const;
-
-    servus::Serializable::Data toBinary() const; //!< @internal
-                                                 //@}
 
 private:
     class Impl;

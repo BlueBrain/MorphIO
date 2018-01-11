@@ -65,6 +65,7 @@ bool _deserializeArray(std::vector<T>& dst, const uint8_t*& src,
 }
 }
 
+/*
 servus::Serializable::Data inline MorphologyPlugin::_toBinary() const
 {
     servus::Serializable::Data data;
@@ -89,7 +90,9 @@ servus::Serializable::Data inline MorphologyPlugin::_toBinary() const
     _serializeArray(ptr, _perimeters);
     return data;
 }
+*/
 
+/*
 bool inline MorphologyPlugin::_fromBinary(const void* data, const size_t size)
 {
     const uint8_t* ptr = reinterpret_cast<const uint8_t*>(data);
@@ -117,4 +120,5 @@ bool inline MorphologyPlugin::_fromBinary(const void* data, const size_t size)
     _perimeters.clear();
     return false;
 }
+*/
 }

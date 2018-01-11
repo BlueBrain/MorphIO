@@ -21,9 +21,10 @@
 
 #include "morphologyPlugin.h"
 
-#include <lunchbox/plugin.h>
-#include <lunchbox/pluginFactory.h>
-#include <lunchbox/threadPool.h>
+/* todo: compile */
+#include <iostream>
+#define LBTHROW 
+#define LBERROR std::cout
 
 namespace brion
 {
@@ -50,9 +51,12 @@ public:
     BinaryMorphology(const void* data, size_t size)
         : MorphologyPlugin(MorphologyInitData({}))
     {
-        if (!fromBinary(data, size))
-            LBTHROW(std::runtime_error(
-                "Failed to construct morphology from binary data"));
+      /*
+        if (!fromBinary(data, size)){
+          LBTHROW(std::runtime_error(
+                  "Failed to construct morphology from binary data"));
+        }
+        */
     }
 
     void load() final { /*NOP*/}
@@ -62,11 +66,11 @@ public:
 class Morphology::Impl
 {
 public:
-    typedef lunchbox::PluginFactory<MorphologyPlugin> MorphologyPluginFactory;
+    //typedef lunchbox::PluginFactory<MorphologyPlugin> MorphologyPluginFactory;
 
     explicit Impl(const MorphologyInitData& initData)
-        : plugin(MorphologyPluginFactory::getInstance().create(initData))
     {
+      /*
         loadFuture = lunchbox::ThreadPool::getInstance().post([&] {
             plugin->load();
             if (plugin->getPoints().empty())
@@ -74,6 +78,7 @@ public:
                     "Failed to load morphology " +
                     std::to_string(plugin->getInitData().getURI())));
         });
+        */
     }
 
     Impl(const Morphology& from)
@@ -104,16 +109,18 @@ public:
 
     void finishLoad() const
     {
+      /*
         std::lock_guard<std::mutex> lock(futureMutex);
         if (!loadFuture.valid())
             return;
 
         loadFuture.get();
+        */
     }
 
     std::unique_ptr<MorphologyPlugin> plugin;
-    mutable std::future<void> loadFuture; // fulfilled by worker thread pool
-    mutable std::mutex futureMutex;
+    //mutable std::future<void> loadFuture; // fulfilled by worker thread pool
+    //mutable std::mutex futureMutex;
 };
 
 Morphology::Morphology(const URI& source)
@@ -211,9 +218,4 @@ const MorphologyInitData& Morphology::getInitData() const
     return _impl->plugin->getInitData();
 }
 
-servus::Serializable::Data Morphology::toBinary() const
-{
-    _impl->finishLoad();
-    return _impl->plugin->toBinary();
-}
 }

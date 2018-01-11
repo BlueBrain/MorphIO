@@ -62,36 +62,6 @@ inline std::ostream& operator<<(std::ostream& os, const MorphologyVersion v)
     }
 }
 
-/** The supported attributes of a neuron. */
-enum NeuronAttributes
-{
-    NEURON_MORPHOLOGY_NAME = 1 << 0,
-    NEURON_MORPHOLOGY_ORIGIN = 1 << 1,
-    NEURON_COLUMN_GID = 1 << 2,
-    NEURON_MINICOLUMN_GID = 1 << 3,
-    NEURON_LAYER = 1 << 4,
-    NEURON_MTYPE = 1 << 5,
-    NEURON_ETYPE = 1 << 6,
-    NEURON_POSITION_X = 1 << 7,
-    NEURON_POSITION_Y = 1 << 8,
-    NEURON_POSITION_Z = 1 << 9,
-    NEURON_ROTATION = 1 << 10,
-    NEURON_METYPE = 1 << 11,
-    NEURON_ALL = 12,
-
-    NEURON_ALL_ATTRIBUTES = (1 << NEURON_ALL) - 1
-};
-
-/** The supported classifications for a neuron. */
-enum NeuronClass
-{
-    NEURONCLASS_MTYPE = 0,            //!< L2PC, L5CSPC, ...
-    NEURONCLASS_MORPHOLOGY_CLASS = 1, //!< PYR, INT
-    NEURONCLASS_FUNCTION_CLASS = 2,   //!< EXC, INH
-    NEURONCLASS_ETYPE,                //!< cAD, dAL, ...
-    NEURONCLASS_INVALID
-};
-
 /** Classification of neuron substructures. */
 enum SectionType
 {

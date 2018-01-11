@@ -24,9 +24,17 @@
 
 #include <fstream>
 #include <list>
+/*
 #include <lunchbox/debug.h>
 #include <lunchbox/log.h>
 #include <lunchbox/pluginRegisterer.h>
+*/
+
+//TODO: compile
+#include <iostream>
+#define LBTHROW 
+#define LBERROR std::cout
+#define LBWARN std::cout
 
 namespace brion
 {
@@ -88,7 +96,7 @@ struct Sample
 };
 typedef std::vector<Sample> Samples;
 
-lunchbox::PluginRegisterer<MorphologySWC> registerer;
+//lunchbox::PluginRegisterer<MorphologySWC> registerer;
 
 void _correctSampleType(Sample& sample, const Samples& samples)
 {
@@ -160,7 +168,8 @@ void MorphologySWC::load()
     // This code takes that possibility into account.
 
     RawSWCInfo info;
-    info.filename = _data.getURI().getPath();
+    //TODO: compile
+    //info.filename = _data.getURI().getPath();
 
     _readSamples(info);
     _buildSampleTree(info);
@@ -171,11 +180,15 @@ void MorphologySWC::load()
 
 bool MorphologySWC::handles(const MorphologyInitData& initData)
 {
-    const std::string& scheme = initData.getURI().getScheme();
+    //TODO: compile
+    //const std::string& scheme = initData.getURI().getScheme();
+    const std::string scheme;
     if (scheme != "file" && !scheme.empty())
         return false;
 
-    const std::string path = initData.getURI().getPath();
+    //TODO: compile
+    //const std::string path = initData.getURI().getPath();
+    const std::string path;
     const size_t pos = path.find_last_of(".");
     if (pos == std::string::npos)
         return false;

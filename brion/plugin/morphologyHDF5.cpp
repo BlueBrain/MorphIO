@@ -27,8 +27,6 @@
 #include <brion/version.h>
 
 #include <lunchbox/debug.h>
-#include <lunchbox/pluginRegisterer.h>
-#include <lunchbox/scopedMutex.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
@@ -40,7 +38,6 @@ namespace plugin
 {
 namespace
 {
-lunchbox::PluginRegisterer<MorphologyHDF5> registerer;
 
 struct Loader
 {
@@ -49,7 +46,6 @@ struct Loader
         , _initData(m.getInitData())
         , _stage("repaired")
     {
-        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
         const std::string path = _initData.getURI().getPath();
 
         try
@@ -74,7 +70,6 @@ struct Loader
 
     ~Loader()
     {
-        lunchbox::ScopedWrite mutex(detail::hdf5Lock());
         _points.reset();
         _sections.reset();
         _file.reset();

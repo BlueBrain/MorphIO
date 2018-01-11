@@ -22,9 +22,7 @@
 
 #include <brion/api.h>
 #include <brion/morphology.h>     // Needed by doxygen
-#include <brion/pluginInitData.h> // base class
 #include <brion/types.h>
-#include <servus/serializable.h> // base class
 
 namespace brion
 {
@@ -32,13 +30,13 @@ namespace brion
  * Basic plugin init data for MorphologyPlugin.
  * @version 1.4
  */
-class MorphologyInitData : public PluginInitData
+class MorphologyInitData
 {
 public:
     explicit MorphologyInitData(
         const URI& uri, const MorphologyVersion v = MORPHOLOGY_VERSION_H5_1_1,
         const CellFamily f = FAMILY_NEURON)
-        : PluginInitData(uri, MODE_READ)
+        : uri(uri)
         , version(v)
         , family(f)
     {
@@ -49,14 +47,14 @@ public:
 
     MorphologyInitData(const URI& uri, const MorphologyVersion v,
                        const unsigned int accessMode)
-        : PluginInitData(uri, accessMode)
+        : uri(uri)
         , version(v)
         , family(FAMILY_NEURON)
     {
     }
 
     MorphologyInitData(const URI& uri, const CellFamily f)
-        : PluginInitData(uri, MODE_WRITE)
+        : uri(uri)
         , version(MORPHOLOGY_VERSION_H5_1_1)
         , family(f)
     {
@@ -64,6 +62,7 @@ public:
 
     MorphologyVersion version;
     CellFamily family;
+    URI uri;
 };
 
 /**
@@ -87,7 +86,7 @@ public:
  *
  * @version 1.4
  */
-class MorphologyPlugin : public servus::Serializable
+class MorphologyPlugin
 {
 public:
     /** @internal Needed by the PluginRegisterer. */
@@ -133,13 +132,15 @@ protected:
     SectionTypes _sectionTypes;
     floats _perimeters;
 
+    /*
     // Serializable API
     std::string getTypeName() const final { return "brion::MorphologyPlugin"; }
     bool _fromBinary(const void* data, const size_t size) final;
-    servus::Serializable::Data _toBinary() const final;
+    */
 };
 }
 
+/*
 namespace std
 {
 inline string to_string(const brion::MorphologyInitData& data)
@@ -147,5 +148,6 @@ inline string to_string(const brion::MorphologyInitData& data)
     return to_string(data.getURI());
 }
 }
+*/
 
 #include "morphologyPlugin.ipp" // inline impl to allow header-only usage
