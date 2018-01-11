@@ -1,6 +1,3 @@
-[submodule "CMake/common"]
-	path = CMake/common
-	url = https://github.com/Eyescale/CMake
-[submodule "Pydoxine"]
-	path = Pydoxine
-	url = https://github.com/BlueBrain/Pydoxine
+[submodule "3rdparty/HighFive"]
+	path = 3rdparty/HighFive
+	url = https://github.com/BlueBrain/HighFive.git
