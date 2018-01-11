@@ -45,4 +45,4 @@ include_directories(brion
 )
 
 add_subdirectory(plugin)
-
+add_subdirectory(python)
