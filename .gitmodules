@@ -1,3 +1,6 @@
 [submodule "3rdparty/HighFive"]
 	path = 3rdparty/HighFive
 	url = https://github.com/BlueBrain/HighFive.git
+[submodule "3rdparty/vmmlib"]
+	path = 3rdparty/vmmlib
+	url = https://github.com/VMML/vmmlib

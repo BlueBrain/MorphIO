@@ -29,6 +29,5 @@
 
 # Custom
 .tags
-vmmlib/
 build/
 .*.swp
