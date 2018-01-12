@@ -1,14 +1,47 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <pybind11/numpy.h>
+
 #include <brion/enums.h>
 #include <brion/morphology.h>
 
-
 namespace py = pybind11;
+namespace pybind11 { namespace detail {
+        template <> struct type_caster<vmml::Vector4f>
+        {
+        public:
+   PYBIND11_TYPE_CASTER(vmml::Vector4f, _("Vector4f"));
 
+    // Conversion part 1 (Python -> C++)
+    bool load(py::handle src, bool convert)
+    {
+        if (!convert && !py::array_t<float>::check_(src))
+            return false;
+
+        auto buf = py::array_t<float, py::array::c_style | py::array::forcecast>::ensure(src);
+        if (!buf)
+            return false;
+
+        auto dims = buf.ndim();
+        if (dims != 1 )
+            return false;
+
+        value = vmml::Vector4f(buf.data());
+
+        return true;
+    }
+
+    //Conversion part 2 (C++ -> Python)
+    static py::handle cast(const vmml::Vector4f& src, py::return_value_policy policy, py::handle parent)
+    {
+        py::array a(4, src.array);
+        return a.release();
+    }
+        };
+    }} // namespace pybind11::detail
 
 PYBIND11_MODULE(python_brion, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
-
 
     py::class_<brion::Morphology>(m, "Morphology")
         .def(py::init<const brion::URI&>())
