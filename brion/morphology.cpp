@@ -75,7 +75,6 @@ class Morphology::Impl
 public:
     explicit Impl(const URI& uri)
     {
-
       const size_t pos = uri.find_last_of(".");
       assert(pos != std::string::npos);
       if (uri.substr(pos) == ".h5") {

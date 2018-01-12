@@ -158,6 +158,7 @@ struct MorphologySWC::RawSWCInfo
 MorphologySWC::MorphologySWC(const MorphologyInitData& initData)
     : MorphologyPlugin(initData)
 {
+    load();
 }
 
 void MorphologySWC::load()
@@ -170,8 +171,7 @@ void MorphologySWC::load()
     // This code takes that possibility into account.
 
     RawSWCInfo info;
-    //TODO: compile
-    //info.filename = _data.getURI().getPath();
+    info.filename = _data.uri;
 
     _readSamples(info);
     _buildSampleTree(info);

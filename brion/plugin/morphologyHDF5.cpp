@@ -50,9 +50,7 @@ struct Loader
         , _initData(m.getInitData())
         , _stage("repaired")
     {
-        //TODO: compile
-        //const std::string path = _initData.getURI().getPath();
-        const std::string path;
+        const std::string path = _initData.uri;
 
         try
         {
@@ -401,6 +399,7 @@ private:
 MorphologyHDF5::MorphologyHDF5(const MorphologyInitData& initData)
     : MorphologyPlugin(initData)
 {
+    load();
 }
 
 void MorphologyHDF5::load()
