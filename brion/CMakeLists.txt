@@ -23,19 +23,15 @@ set(BRION_SOURCES
   morphology.cpp
   )
 
-#set(_plugin_lib BrionPlugins)
-#
-#set(BRION_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
-
 set(BRION_LINK_LIBRARIES
   PUBLIC vmmlib ${HDF5_C_LIBRARIES}
-  PRIVATE HighFive ${_plugin_lib} ${Boost_FILESYSTEM_LIBRARIES}
-          ${Boost_REGEX_LIBRARIES} ${CMAKE_THREADS_LIB_INIT}
+  PRIVATE HighFive
 )
 
-#common_library(Brion)
+FILE(GLOB_RECURSE BRION_SOURCES ${CMAKE_SOURCE_DIR}/brion/*.cpp)
 
 add_library(brion
+    SHARED
     ${BRION_PUBLIC_HEADERS} ${BRION_HEADERS} ${BRION_SOURCES}
     )
 target_link_libraries(brion ${BRION_LINK_LIBRARIES})
@@ -44,6 +40,3 @@ include_directories(brion
     ${HDF5_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}
 )
-
-add_subdirectory(plugin)
-add_subdirectory(python)

@@ -412,6 +412,7 @@ MorphologyHDF5::~MorphologyHDF5()
 {
 }
 
+/*
 bool MorphologyHDF5::handles(const MorphologyInitData& initData)
 {
     //TODO: compile
@@ -435,5 +436,6 @@ std::string MorphologyHDF5::getDescription()
     return "Blue Brain hdf5 morphologies:\n"
            "  [file://]/path/to/morphology.h5";
 }
+*/
 }
 }

@@ -22,10 +22,11 @@
 
 #include <brion/enums.h>
 
-#include <boost/multi_array.hpp>
 #include <map>
+#include <memory>
 #include <set>
 #include <string>
+#include <vector>
 
 #pragma warning(push)
 #pragma warning(disable : 4996)
@@ -79,50 +80,12 @@ typedef std::shared_ptr<Vector4ds> Vector4dsPtr;
 using MorphologyPtr = std::shared_ptr<Morphology>;
 using ConstMorphologyPtr = std::shared_ptr<const Morphology>;
 
-/** Data matrix storing NeuronAttributes for each neuron. */
-typedef boost::multi_array<std::string, 2> NeuronMatrix;
-
-/** Data matrix storing SynapseAttributes for each neuron. */
-typedef boost::multi_array<float, 2> SynapseMatrix;
-
-/** Data matrix storing GID, numEfferent, numAfferent for each neuron. */
-typedef boost::multi_array<uint32_t, 2> SynapseSummaryMatrix;
-
-/** A spike */
-typedef std::pair<float, uint32_t> Spike;
-typedef std::vector<Spike> Spikes;
-
-/** A list of Spikes events per cell gid, indexed by spikes times. */
-typedef std::multimap<float, uint32_t> SpikeMap;
-
-struct Frame
-{
-    double timestamp;
-    floatsPtr data;
-};
-
-struct Frames
-{
-    doublesPtr timeStamps;
-    /** The data of multiple compartment frames in a flat array. The number
-        of frames equals timeStamp->size(). All frames have the same size,
-        this size and the mapping of values to entities is defined in the
-        report mapping. */
-    floatsPtr data;
-};
-
-/** A value for undefined timestamps */
-
-const float UNDEFINED_TIMESTAMP BRION_UNUSED =
-    std::numeric_limits<float>::max();
-const float RESTING_VOLTAGE BRION_UNUSED = -67.; //!< Resting voltage in mV
-/** Lowest voltage after hyperpolarisation */
-const float MINIMUM_VOLTAGE BRION_UNUSED = -80.;
-
 typedef std::vector<std::string> Strings;
 
 }
 
+//TODO: compile
+#if 0
 // if you have a type T in namespace N, the operator << for T needs to be in
 // namespace N too
 namespace boost
@@ -149,5 +112,6 @@ inline std::ostream& operator<<(std::ostream& os, const std::pair<T, U>& pair)
     return os << "[ " << pair.first << ", " << pair.second << " ]";
 }
 }
+#endif 
 
 #endif

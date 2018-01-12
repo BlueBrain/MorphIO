@@ -24,6 +24,8 @@
 #include <brion/types.h>
 #include <vmmlib/vector.hpp>     // return value
 
+#include <memory>  //std::unique_ptr
+
 namespace brion
 {
 /** Read access a Morphology file.

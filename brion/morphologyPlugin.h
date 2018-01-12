@@ -24,6 +24,8 @@
 #include <brion/morphology.h>     // Needed by doxygen
 #include <brion/types.h>
 
+#include <string>
+
 namespace brion
 {
 /**
@@ -89,13 +91,7 @@ public:
 class MorphologyPlugin
 {
 public:
-    /** @internal Needed by the PluginRegisterer. */
-    using InterfaceT = MorphologyPlugin;
-
-    /** @internal Needed by the PluginRegisterer. */
-    using InitDataT = MorphologyInitData;
-
-    MorphologyPlugin(const InitDataT& data)
+    MorphologyPlugin(const MorphologyInitData& data)
         : _data(data)
     {
     }
@@ -107,10 +103,12 @@ public:
     virtual void load() = 0;
 
     /** @internal */
-    InitDataT& getInitData() { return _data; }
-    const InitDataT& getInitData() const { return _data; }
+    MorphologyInitData& getInitData() { return _data; }
+    const MorphologyInitData& getInitData() const { return _data; }
+
     /** @copydoc brion::Morphology::getCellFamily */
     CellFamily getCellFamily() const { return _data.family; }
+
     /** @internal */
     MorphologyVersion getVersion() const { return _data.version; }
     /** @copydoc brion::Morphology::getPoints */
@@ -126,7 +124,7 @@ public:
     floats& getPerimeters() { return _perimeters; }
     const floats& getPerimeters() const { return _perimeters; }
 protected:
-    InitDataT _data;
+    MorphologyInitData _data;
     Vector4fs _points;
     Vector2is _sections;
     SectionTypes _sectionTypes;
@@ -140,7 +138,8 @@ protected:
 };
 }
 
-/*
+// TODO: compile
+#if 0
 namespace std
 {
 inline string to_string(const brion::MorphologyInitData& data)
@@ -148,6 +147,7 @@ inline string to_string(const brion::MorphologyInitData& data)
     return to_string(data.getURI());
 }
 }
-*/
+
 
 #include "morphologyPlugin.ipp" // inline impl to allow header-only usage
+#endif

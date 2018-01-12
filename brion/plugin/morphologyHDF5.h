@@ -35,9 +35,12 @@ public:
 
     ~MorphologyHDF5();
 
+//TODO: compile
+#if 0
     /** Check if this plugin can handle the given uri. */
     static bool handles(const MorphologyInitData& initData);
     static std::string getDescription();
+#endif
 
 private:
     void load() final;

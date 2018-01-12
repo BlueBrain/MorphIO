@@ -22,8 +22,10 @@
 
 #include "../detail/skipWhiteSpace.h"
 
+#include <cassert>
 #include <fstream>
 #include <list>
+#include <sstream>
 /*
 #include <lunchbox/debug.h>
 #include <lunchbox/log.h>
