@@ -4,3 +4,6 @@
 [submodule "3rdparty/vmmlib"]
 	path = 3rdparty/vmmlib
     url = https://github.com/Eyescale/vmmlib.git
+[submodule "3rdparty/pybind11"]
+	path = 3rdparty/pybind11
+	url = https://github.com/pybind/pybind11.git
