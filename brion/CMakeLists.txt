@@ -28,8 +28,8 @@ set(BRION_SOURCES
 #set(BRION_PUBLIC_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
 
 set(BRION_LINK_LIBRARIES
-  PUBLIC Servus vmmlib
-  PRIVATE Lunchbox HighFive ${_plugin_lib} ${Boost_FILESYSTEM_LIBRARIES}
+  PUBLIC vmmlib ${HDF5_C_LIBRARIES}
+  PRIVATE HighFive ${_plugin_lib} ${Boost_FILESYSTEM_LIBRARIES}
           ${Boost_REGEX_LIBRARIES} ${CMAKE_THREADS_LIB_INIT}
 )
 
@@ -41,6 +41,7 @@ add_library(brion
 target_link_libraries(brion ${BRION_LINK_LIBRARIES})
 
 include_directories(brion
+    ${HDF5_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}
 )
 

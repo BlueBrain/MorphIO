@@ -26,7 +26,11 @@
 
 #include <brion/version.h>
 
-#include <lunchbox/debug.h>
+//TODO: compile
+#include <iostream>
+#define LBTHROW 
+#define LBERROR std::cout
+#define LBWARN std::cout
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
@@ -46,7 +50,9 @@ struct Loader
         , _initData(m.getInitData())
         , _stage("repaired")
     {
-        const std::string path = _initData.getURI().getPath();
+        //TODO: compile
+        //const std::string path = _initData.getURI().getPath();
+        const std::string path;
 
         try
         {
@@ -408,11 +414,15 @@ MorphologyHDF5::~MorphologyHDF5()
 
 bool MorphologyHDF5::handles(const MorphologyInitData& initData)
 {
-    const std::string& scheme = initData.getURI().getScheme();
+    //TODO: compile
+    //const std::string& scheme = initData.getURI().getScheme();
+    const std::string scheme;
     if (scheme != "file" && !scheme.empty())
         return false;
 
-    const std::string& path = initData.getURI().getPath();
+    //TODO: compile
+    //const std::string& path = initData.getURI().getPath();
+    const std::string path;
     const size_t pos = path.find_last_of(".");
     if (pos == std::string::npos)
         return false;

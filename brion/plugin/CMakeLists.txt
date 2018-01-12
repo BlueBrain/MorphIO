@@ -10,8 +10,8 @@
 #)
 #
 set(BRIONPLUGINS_SOURCES
-    #morphologyHDF5.cpp
-  morphologySWC.cpp
+    morphologyHDF5.cpp
+    morphologySWC.cpp
 )
 #
 #set(BRIONPLUGINS_LINK_LIBRARIES

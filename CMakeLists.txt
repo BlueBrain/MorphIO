@@ -29,6 +29,7 @@ add_subdirectory(3rdparty)
 find_package(Boost REQUIRED COMPONENTS
   date_time filesystem iostreams program_options regex system unit_test_framework)
 #find_package(HighFive REQUIRED)
+find_package(HDF5 QUIET REQUIRED)
 
 #common_find_package(Lunchbox REQUIRED)
 #common_find_package(Boost COMPONENTS python${USE_BOOST_PYTHON_VERSION})
