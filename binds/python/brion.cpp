@@ -6,39 +6,76 @@
 #include <brion/morphology.h>
 
 namespace py = pybind11;
-namespace pybind11 { namespace detail {
-        template <> struct type_caster<vmml::Vector4f>
-        {
-        public:
-   PYBIND11_TYPE_CASTER(vmml::Vector4f, _("Vector4f"));
+
+/** Loading/Casting of vmmlib::vector into numpy arrays **/
+namespace pybind11 {
+namespace detail {
+template <size_t M, typename T> struct type_caster<vmml::vector<M,T>>
+{
+public:
+    typedef vmml::vector<M,T> type;
+    PYBIND11_TYPE_CASTER(type, _("vmml::vector<M,T>"));
+
 
     // Conversion part 1 (Python -> C++)
     bool load(py::handle src, bool convert)
-    {
-        if (!convert && !py::array_t<float>::check_(src))
-            return false;
+        {
+            if (!convert && !py::array_t<T>::check_(src))
+                return false;
 
-        auto buf = py::array_t<float, py::array::c_style | py::array::forcecast>::ensure(src);
-        if (!buf)
-            return false;
+            auto buf = py::array_t<T, py::array::c_style | py::array::forcecast>::ensure(src);
+            if (!buf)
+                return false;
 
-        auto dims = buf.ndim();
-        if (dims != 1 )
-            return false;
+            value = vmml::vector<M,T>(buf.data());
 
-        value = vmml::Vector4f(buf.data());
-
-        return true;
-    }
+            return true;
+        }
 
     //Conversion part 2 (C++ -> Python)
-    static py::handle cast(const vmml::Vector4f& src, py::return_value_policy policy, py::handle parent)
-    {
-        py::array a(4, src.array);
-        return a.release();
-    }
-        };
-    }} // namespace pybind11::detail
+    static py::handle cast(const vmml::vector<M,T>& src, py::return_value_policy policy, py::handle parent)
+        {
+            py::array a(M, src.array);
+            return a.release();
+        }
+};
+
+
+// template <size_t M, typename T> struct type_caster<std::vector<vmml::vector<M,T>>>
+// {
+// public:
+//     typedef std::vector<vmml::vector<M,T>> type;
+//     PYBIND11_TYPE_CASTER(type, _("std::vector<vmml::vector<M,T>>"));
+
+//     // Conversion part 1 (Python -> C++)
+//     bool load(py::handle src, bool convert)
+//         {
+//             if (!convert && !py::array_t<T>::check_(src))
+//                 return false;
+
+//             auto buf = py::array_t<T, py::array::c_style | py::array::forcecast>::ensure(src);
+//             if (!buf)
+//                 return false;
+
+//             auto dims = buf.ndim();
+//             if (dims != 2 )
+//                 return false;
+
+//             std::vector<size_t> shape(2);
+//             value = vmml::vector<M,T>(buf.data());
+
+//             return true;
+//         }
+
+//     //Conversion part 2 (C++ -> Python)
+//     static py::handle cast(const vmml::vector<M,T>& src, py::return_value_policy policy, py::handle parent)
+//         {
+//             py::array a(M, src.array);
+//             return a.release();
+//         }
+// };
+}} // namespace pybind11::detail
+
 
 PYBIND11_MODULE(python_brion, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
