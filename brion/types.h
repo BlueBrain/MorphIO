@@ -21,6 +21,7 @@
 #define BRION_TYPES
 
 #include <brion/enums.h>
+#include <brion/exceptions.h>
 
 #include <map>
 #include <memory>

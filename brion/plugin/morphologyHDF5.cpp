@@ -56,7 +56,7 @@ struct Loader
         }
         catch (const HighFive::FileException& exc)
         {
-            LBTHROW(std::runtime_error(_write
+            LBTHROW(brion::RawDataError(_write
                                            ? "Could not create morphology file "
                                            : "Could not open morphology file " +
                                                  path + ": " + exc.what()));
@@ -108,7 +108,7 @@ private:
         catch (...)
         {
             LBTHROW(
-                std::runtime_error("Unknown morphology file format for "
+                brion::RawDataError("Unknown morphology file format for "
                                    "file " +
                                    source));
         }
@@ -146,7 +146,7 @@ private:
 
         if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns)
         {
-            LBTHROW(std::runtime_error("Opening morphology file '" +
+            LBTHROW(brion::RawDataError("Opening morphology file '" +
                                        _file->getName() +
                                        "': bad number of dimensions in"
                                        " 'points' dataspace"));
@@ -158,7 +158,7 @@ private:
         if (_sectionsDims.size() != 2 ||
             _sectionsDims[1] != _structureV1Columns)
         {
-            LBTHROW(std::runtime_error("Opening morphology file '" +
+            LBTHROW(brion::RawDataError("Opening morphology file '" +
                                        _file->getName() +
                                        "': bad number of dimensions in"
                                        " 'structure' dataspace"));
@@ -194,7 +194,7 @@ private:
             // All other exceptions are not expected because if the metadata
             // group exits it must contain at least the version, and for
             // version 1.1 it must contain the family.
-            LBTHROW(std::runtime_error(
+            LBTHROW(brion::RawDataError(
                 std::string("Error reading morphology metadata: ") + e.what()));
         }
 

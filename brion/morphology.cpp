@@ -84,7 +84,7 @@ public:
             new plugin::MorphologySWC(MorphologyInitData(uri)));
       }
       else {
-        assert(false && "unhandled file type");
+          LBTHROW(UnknownFileType("unhandled file type"));
       }
     }
 

@@ -166,4 +166,12 @@ PYBIND11_MODULE(python_brion, m) {
         .value("MODE_READWRITE", brion::enums::AccessMode::MODE_READWRITE)
         .value("MODE_READOVERWRITE", brion::enums::AccessMode::MODE_READOVERWRITE)
         .export_values();
+
+    auto base = py::register_exception<brion::Error&>(m, "Error");
+    auto raw = py::register_exception<brion::RawDataError&>(m, "RawDataError", base.ptr());
+    py::register_exception<brion::UnknownFileType&>(m, "UnknownFileType", base.ptr());
+    py::register_exception<brion::SomaError&>(m, "SomaError", base.ptr());
+    py::register_exception<brion::IDSequenceError&>(m, "IDSequenceError", raw.ptr());
+    py::register_exception<brion::MultipleTrees&>(m, "MultipleTrees", raw.ptr());
+    py::register_exception<brion::MissingParentError&>(m, "MissingParentError", raw.ptr());
 }

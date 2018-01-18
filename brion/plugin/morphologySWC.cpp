@@ -204,7 +204,7 @@ void MorphologySWC::_readSamples(RawSWCInfo& info)
 {
     std::ifstream file(info.filename.c_str());
     if (file.fail())
-        LBTHROW(std::runtime_error("Error opening morphology file: " +
+        LBTHROW(brion::RawDataError("Error opening morphology file: " +
                                    info.filename));
 
     Samples& samples = info.samples;
@@ -225,16 +225,17 @@ void MorphologySWC::_readSamples(RawSWCInfo& info)
         const unsigned int id = strtol(line.data(), &data, 10);
         if (*data != ' ' && *data != '\t')
         {
-            LBTHROW(std::runtime_error(
+            LBTHROW(brion::RawDataError(
                 "Reading swc morphology file: " + info.filename +
                 ", parse error at line " + std::to_string(lineNumber)));
         }
         samples.resize(std::max(samples.size(), size_t(id + 1)));
         if (samples[id].valid)
         {
-            LBWARN << "Reading swc morphology file: " << info.filename
-                   << ", repeated sample id " << id << " at line "
-                   << std::to_string(lineNumber) << std::endl;
+            LBTHROW(brion::IDSequenceError(
+                        "Reading swc morphology file: " + info.filename
+                        + ", repeated sample id " + std::to_string(id) + " at line "
+                        + std::to_string(lineNumber)));
         }
         else
         {
@@ -242,7 +243,7 @@ void MorphologySWC::_readSamples(RawSWCInfo& info)
             ++totalSamples;
             if (!samples[id].valid)
             {
-                LBTHROW(std::runtime_error(
+                LBTHROW(brion::IDSequenceError(
                     "Reading swc morphology file: " + info.filename +
                     ", parse error at line " + std::to_string(lineNumber)));
             }
@@ -269,8 +270,8 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
         visited.push_back(!sample.valid);
 
     if (samples.empty())
-        LBTHROW(std::runtime_error("Reading swc morphology file: " +
-                                   info.filename + ", no soma section found"));
+        LBTHROW(brion::SomaError("Reading swc morphology file: " +
+                                 info.filename + ", no soma section found"));
 
     size_t currentSample = samples.size() - 1;
     size_t currentEndPoint = samples.size() - 1;
@@ -295,7 +296,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
         {
             if (sample.parent == int(currentSample))
             {
-                LBTHROW(std::runtime_error("Reading swc morphology file: " +
+                LBTHROW(brion::IDSequenceError("Reading swc morphology file: " +
                                            info.filename +
                                            ", found a sample point to itself"));
             }
@@ -306,7 +307,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
                 msg << "Reading swc morphology file: " << info.filename
                     << ", broken tree (missing sample  " << sample.parent << ")"
                     << std::endl;
-                LBTHROW(std::runtime_error(msg.str()));
+                LBTHROW(brion::MissingParentError(msg.str()));
             }
 
             if (parent->type == SWC_SECTION_SOMA)
@@ -338,7 +339,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
             {
                 if (sample.type == SWC_SECTION_SOMA)
                 {
-                    LBTHROW(std::runtime_error(
+                    LBTHROW(brion::SomaError(
                         "Reading swc morphology file: " + info.filename +
                         ", found soma sample with neurite parent"));
                 }
@@ -365,7 +366,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
                 if (info.roots.size() &&
                     samples[info.roots[0]].type == SWC_SECTION_SOMA)
                 {
-                    LBTHROW(std::runtime_error("Reading swc morphology file: " +
+                    LBTHROW(brion::SomaError("Reading swc morphology file: " +
                                                info.filename +
                                                ", found two soma sections"));
                 }
@@ -408,8 +409,8 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
         }
     }
     if (!hasSoma)
-        LBTHROW(std::runtime_error("Reading swc morphology file: " +
-                                   info.filename + ", no soma section found"));
+        LBTHROW(brion::SomaError("Reading swc morphology file: " +
+                                 info.filename + ", no soma section found"));
 }
 
 void MorphologySWC::_buildStructure(RawSWCInfo& info)
@@ -442,19 +443,30 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
         if (sample->parent != SWC_UNDEFINED_PARENT)
         {
             const Sample* parent = &samples[sample->parent];
-            // If the parent sections is the soma, we connect this section
-            // to the soma only if the soma is described with more than
-            // one sample (that is, sections are not connected to point somas).
-            if (parent->type != SWC_SECTION_SOMA || parent->nextID != -1 ||
-                parent->parent != -1)
+
+            // Special case when parent is a single point soma:
+            // Parent is replaced by a new point at the intersection between the circle
+            // defined by the single point soma and the soma center to current point line
+            if (parent->type == SWC_SECTION_SOMA && parent->nextID == -1 && parent->parent == -1)
             {
+                const Vector4f& soma = parent->point;
+                const Vector4f& current_point = sample->point;
+                const Vector4f& radial_vector = current_point - soma;
+                float distance = radial_vector.get_sub_vector<3, 0>().length();
+                float soma_radius = soma[3]/ 2.;
+                float extrapolation_factor = std::min((float)1., soma_radius / distance);
+                Vector4f new_point = soma + extrapolation_factor * radial_vector;
+                new_point[3] = current_point[3];
+                if(!new_point.equals(current_point, 1e-6))
+                    _points.push_back(new_point);
+            } else {
                 _points.push_back(parent->point);
             }
         }
 
         // Iterate while we stay on the same section and push points
         // to the point vector.
-        while (sample && sample->siblingID == -1 &&
+        while (sample && (sample->siblingID == -1 || sample->type == SWC_SECTION_SOMA) &&
                // We also cut into sections when the sample type changes.
                // There are degenerated cases where this is absolutely
                // needed (e.g. a morphology with only one first order
@@ -462,7 +474,14 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
                sample->type == SWCSectionType(_sectionTypes.back()))
         {
             _points.push_back(sample->point);
-            sample = sample->nextID == -1 ? 0 : &samples[sample->nextID];
+
+            if(sample->nextID != -1)
+                sample = &samples[sample->nextID];
+            // Special case of 3 point soma: sibling is part of the same "section"
+            else if(sample->type == SWC_SECTION_SOMA && sample->siblingID != -1)
+                sample = &samples[sample->siblingID];
+            else
+                sample = 0;
         }
 
         // Finished iterating a section
