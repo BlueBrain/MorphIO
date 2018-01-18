@@ -27,8 +27,6 @@
 #include <cassert>
 /* todo: compile */
 #include <iostream>
-#define LBTHROW 
-#define LBERROR std::cout
 
 namespace brion
 {

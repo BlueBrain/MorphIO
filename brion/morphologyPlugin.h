@@ -62,6 +62,8 @@ public:
     {
     }
 
+    URI getURI(){ return URI(uri); }
+
     MorphologyVersion version;
     CellFamily family;
     URI uri;

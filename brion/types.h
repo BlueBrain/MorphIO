@@ -39,6 +39,11 @@
 #define BRION_UNUSED
 #endif
 
+// TODO: bcoste fix me
+#define LBTHROW throw
+#define LBERROR std::cerr
+#define LBWARN std::cerr
+
 /** @namespace brion Blue Brain File IO classes */
 namespace brion
 {
@@ -53,6 +58,7 @@ using vmml::Vector3f;
 using vmml::Vector4f;
 using vmml::Vector3d;
 using vmml::Vector4d;
+using vmml::Matrix4f;
 
 typedef std::vector<size_t> size_ts;
 typedef std::vector<int32_t> int32_ts;
@@ -112,6 +118,6 @@ inline std::ostream& operator<<(std::ostream& os, const std::pair<T, U>& pair)
     return os << "[ " << pair.first << ", " << pair.second << " ]";
 }
 }
-#endif 
+#endif
 
 #endif

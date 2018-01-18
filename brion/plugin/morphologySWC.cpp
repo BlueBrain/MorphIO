@@ -34,9 +34,6 @@
 
 //TODO: compile
 #include <iostream>
-#define LBTHROW 
-#define LBERROR std::cout
-#define LBWARN std::cout
 
 namespace brion
 {

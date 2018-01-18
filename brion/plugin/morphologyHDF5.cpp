@@ -28,9 +28,6 @@
 
 //TODO: compile
 #include <iostream>
-#define LBTHROW 
-#define LBERROR std::cout
-#define LBWARN std::cout
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
@@ -130,7 +127,7 @@ private:
                 _file->getDataSet("/" + _g_root + "/" + stage + "/" +
                                   _d_points);
                 _stage = stage;
-                break;
+                return;
             }
             catch (const HighFive::DataSetException&)
             {

@@ -2,8 +2,13 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
+#include <brain/morphology.h>
+#include <brain/section.h>
+#include <brain/soma.h>
+
 #include <brion/enums.h>
 #include <brion/morphology.h>
+
 
 namespace py = pybind11;
 
@@ -80,7 +85,8 @@ public:
 PYBIND11_MODULE(python_brion, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
-    py::class_<brion::Morphology>(m, "Morphology")
+
+    py::class_<brion::Morphology>(m, "BrionMorphology")
         .def(py::init<const brion::URI&>())
         .def("getCellFamily", &brion::Morphology::getCellFamily)
         .def("getPoints", (brion::Vector4fs& (brion::Morphology::*)())&brion::Morphology::getPoints)
@@ -89,7 +95,46 @@ PYBIND11_MODULE(python_brion, m) {
         .def("getPerimeters", (brion::floats& (brion::Morphology::*)())&brion::Morphology::getPerimeters)
         .def("getVersion", &brion::Morphology::getVersion);
 
-    py::enum_<brion::enums::SectionType>(m, "SectionType")
+    // .def(py::init<const brion::URI&, const brion::Matrix4f&>());
+    py::class_<brain::Morphology>(m, "Morphology")
+        .def(py::init<const brion::URI&>())
+        .def("getPoints", (brion::Vector4fs& (brain::Morphology::*)())&brain::Morphology::getPoints)
+        .def("getSectionTypes", (brain::SectionTypes& (brain::Morphology::*)())&brain::Morphology::getSectionTypes)
+        .def("getSectionIDs", (brain::uint32_ts (brain::Morphology::*)())&brain::Morphology::getSectionIDs)
+        .def("getSections", (const brain::Vector2is& (brain::Morphology::*)() const)&brain::Morphology::getSections)
+        .def("getSections", (brain::Sections (brain::Morphology::*)(brain::SectionType) const)&brain::Morphology::getSections)
+        .def("getSections", (brain::Sections (brain::Morphology::*)(const brain::SectionTypes&) const)&brain::Morphology::getSections)
+        .def("getSection", (brain::Section& (brain::Morphology::*)(const brain::uint32_ts&))&brain::Morphology::getSection)
+        .def("getRootSections", &brain::Morphology::getRootSections)
+        .def("getSoma", (brain::Soma (brain::Morphology::*)())&brain::Morphology::getSoma);
+        // .def("getTransformation", (brion::Matrix4f& (brain::Morphology::*)()&brain::Morphology::getTransformation));
+
+    py::class_<brain::Soma>(m, "Soma")
+        .def(py::init<const brain::Soma&>())
+        .def("getProfilePoints", &brain::Soma::getProfilePoints)
+        .def("getMeanRadius", &brain::Soma::getMeanRadius)
+        .def("getCentroid", &brain::Soma::getCentroid)
+        .def("getChildren", &brain::Soma::getChildren);
+
+    py::class_<brain::Section>(m, "Section")
+        .def("getID", &brain::Section::getID)
+        .def("getType", &brain::Section::getType)
+        .def("hasParent", &brain::Section::hasParent)
+        .def("getParent", &brain::Section::getParent)
+        .def("getSamples", (brain::Vector4fs (brain::Section::*)() const) &brain::Section::getSamples)
+        .def("getChildren", &brain::Section::getChildren);
+
+    py::enum_<brain::SectionType>(m, "SectionType")
+        .value("soma", brain::SectionType::soma)
+        .value("axon", brain::SectionType::axon)
+        .value("basal_dendrite", brain::SectionType::dendrite)
+        .value("apical_dendrite", brain::SectionType::apicalDendrite)
+        // .value("basal_dendrite", brain::SectionType::basalDendrite)
+        .value("undefined", brain::SectionType::undefined)
+        .value("all", brain::SectionType::all)
+        .export_values();
+
+    py::enum_<brion::enums::SectionType>(m, "BrionSectionType")
         .value("SECTION_UNDEFINED", brion::enums::SectionType::SECTION_UNDEFINED)
         .value("SECTION_SOMA", brion::enums::SectionType::SECTION_SOMA)
         .value("SECTION_AXON", brion::enums::SectionType::SECTION_AXON)
