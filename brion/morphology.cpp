@@ -17,6 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <unistd.h>
+
 #include "morphology.h"
 
 #include "morphologyPlugin.h"
@@ -75,6 +77,11 @@ public:
     {
       const size_t pos = uri.find_last_of(".");
       assert(pos != std::string::npos);
+      if(access( uri.c_str(), F_OK ) == -1)
+      {
+          LBTHROW(RawDataError("File: "+uri+" does not exist."));
+      }
+
       if (uri.substr(pos) == ".h5") {
         plugin = std::unique_ptr<MorphologyPlugin>(
             new plugin::MorphologyHDF5(MorphologyInitData(uri)));
