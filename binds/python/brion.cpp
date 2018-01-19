@@ -106,7 +106,8 @@ PYBIND11_MODULE(python_brion, m) {
         .def("getSections", (brain::Sections (brain::Morphology::*)(const brain::SectionTypes&) const)&brain::Morphology::getSections)
         .def("getSection", (brain::Section& (brain::Morphology::*)(const brain::uint32_ts&))&brain::Morphology::getSection)
         .def("getRootSections", &brain::Morphology::getRootSections)
-        .def("getSoma", (brain::Soma (brain::Morphology::*)())&brain::Morphology::getSoma);
+        .def("getSoma", (brain::Soma (brain::Morphology::*)())&brain::Morphology::getSoma)
+        .def("getVersion", &brain::Morphology::getVersion);
         // .def("getTransformation", (brion::Matrix4f& (brain::Morphology::*)()&brain::Morphology::getTransformation));
 
     py::class_<brain::Soma>(m, "Soma")

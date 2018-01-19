@@ -5,7 +5,7 @@
 #
 
 set(BRION_PUBLIC_HEADERS
-  exception.h
+  exceptions.h
   enums.h
   morphology.h
   morphologyPlugin.h
