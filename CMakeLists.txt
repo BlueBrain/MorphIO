@@ -15,7 +15,7 @@ add_subdirectory(3rdparty)
 
 find_package(HDF5 REQUIRED)
 
-add_subdirectory(brion)
+add_subdirectory(minimorph)
 add_subdirectory(morphio)
 
 add_subdirectory(binds/python)

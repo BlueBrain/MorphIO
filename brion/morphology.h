@@ -20,13 +20,13 @@
 #ifndef BRION_MORPHOLOGY
 #define BRION_MORPHOLOGY
 
-#include <brion/api.h>
-#include <brion/types.h>
+#include <minimorph/api.h>
+#include <minimorph/types.h>
 #include <vmmlib/vector.hpp>     // return value
 
 #include <memory>  //std::unique_ptr
 
-namespace brion
+namespace minimorph
 {
 /** Read access a Morphology file.
  *

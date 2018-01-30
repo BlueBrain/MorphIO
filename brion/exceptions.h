@@ -1,4 +1,4 @@
-namespace brion
+namespace minimorph
 {
 class Error: protected std::exception
 {

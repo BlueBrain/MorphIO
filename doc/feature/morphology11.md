@@ -11,7 +11,7 @@ be backward compatible to version 1, hence version 1.1.
 * Support for glia cells according to
   [specification](https://bbpcode.epfl.ch/code/#/c/22473/20/source/h5v1.rst):
   * new 'cell_family' HDF5 enum which has the one of the values NEURON or GLIA
-  * new glia cell values for brion::SectionType: 'glia process', 'glia endfoot'
+  * new glia cell values for minimorph::SectionType: 'glia process', 'glia endfoot'
   * new 'perimeters' dataset
 * New metadata dataset containing provenance and versioning information:
   * 'creator': The software used to create the morphology.
@@ -47,13 +47,13 @@ None
     };
 
     class Morphology
-        // Default parameter brion::MorphologyRepairStage for all functions to
-        // brion::MORPHOLOGY_UNDEFINED. Needed only for V2 and throws there if
-        // brion::MORPHOLOGY_UNDEFINED.
+        // Default parameter minimorph::MorphologyRepairStage for all functions to
+        // minimorph::MORPHOLOGY_UNDEFINED. Needed only for V2 and throws there if
+        // minimorph::MORPHOLOGY_UNDEFINED.
 
 ### New
 
-    /** The cell family represented by brion::Morphology. */
+    /** The cell family represented by minimorph::Morphology. */
     CellFamily
     {
         FAMILY_NEURON = 0,
@@ -72,7 +72,7 @@ None
         Morphology( const std::string& file, CellFamily family );
 
         /** @return the cell family of that morphology. */
-        CellFamily brion::getCellFamily() const;
+        CellFamily minimorph::getCellFamily() const;
 
         /**
          * @return perimeters of the cross sections for each point of the
@@ -105,23 +105,23 @@ None
 
 ## Examples
 
-    brion::Morphology glia( "glia.h5", brion::FAMILY_GLIA );
+    minimorph::Morphology glia( "glia.h5", minimorph::FAMILY_GLIA );
     glia.writePoints( points );
     glia.writeSections( sections );
     glia.writeSectionTypes( types );
     glia.writePerimeters( perimeters );
 
-    const brion::Morphology gliaRead( "glia.h5" );
-    BOOST_CHECK_EQUAL( gliaRead.getCellFamily(), brion::FAMILY_GLIA );
+    const minimorph::Morphology gliaRead( "glia.h5" );
+    BOOST_CHECK_EQUAL( gliaRead.getCellFamily(), minimorph::FAMILY_GLIA );
 
-    brion::Morphology neuron( "neuron.h5", brion::FAMILY_NEURON );
+    minimorph::Morphology neuron( "neuron.h5", minimorph::FAMILY_NEURON );
     neuron.writePoints( points );
     neuron.writeSections( sections );
     neuron.writeSectionTypes( types );
     neuron.writePerimeters( perimeters );
 
-    const brion::Morphology neuronRead( "neuron.h5" );
-    BOOST_CHECK_EQUAL( neuronRead.getCellFamily(), brion::FAMILY_NEURON );
+    const minimorph::Morphology neuronRead( "neuron.h5" );
+    BOOST_CHECK_EQUAL( neuronRead.getCellFamily(), minimorph::FAMILY_NEURON );
 
 ## Issues
 

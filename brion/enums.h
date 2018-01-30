@@ -17,14 +17,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-/** @file brion/enums.h Enumerations used in Brion. */
+/** @file minimorph/enums.h Enumerations used in Brion. */
 
 #ifndef BRION_ENUMS
 #define BRION_ENUMS
 
 #include <ostream>
 
-namespace brion
+namespace minimorph
 {
 namespace enums
 {
@@ -38,7 +38,7 @@ enum MorphologyVersion
     MORPHOLOGY_VERSION_UNDEFINED
 };
 
-/** The cell family represented by brion::Morphology. */
+/** The cell family represented by minimorph::Morphology. */
 enum CellFamily
 {
     FAMILY_NEURON = 0,

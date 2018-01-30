@@ -51,19 +51,19 @@ struct data_converter<vmml::vector<M, T>>
 }
 
 template <>
-inline AtomicType<brion::SectionType>::AtomicType()
+inline AtomicType<minimorph::SectionType>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
 
 template <>
-inline AtomicType<brion::MorphologyVersion>::AtomicType()
+inline AtomicType<minimorph::MorphologyVersion>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
 }
 
-namespace brion
+namespace minimorph
 {
 namespace detail
 {

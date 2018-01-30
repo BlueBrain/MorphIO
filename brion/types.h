@@ -20,8 +20,8 @@
 #ifndef BRION_TYPES
 #define BRION_TYPES
 
-#include <brion/enums.h>
-#include <brion/exceptions.h>
+#include <minimorph/enums.h>
+#include <minimorph/exceptions.h>
 
 #include <map>
 #include <memory>
@@ -45,8 +45,8 @@
 #define LBERROR std::cerr
 #define LBWARN std::cerr
 
-/** @namespace brion Blue Brain File IO classes */
-namespace brion
+/** @namespace minimorph Blue Brain File IO classes */
+namespace minimorph
 {
 typedef std::string URI;
 

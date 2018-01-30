@@ -22,7 +22,7 @@
 
 #include <mutex>
 
-namespace brion
+namespace minimorph
 {
 namespace detail
 {

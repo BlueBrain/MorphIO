@@ -19,7 +19,7 @@
  */
 
 #include <BBP/TestDatasets.h>
-#include <brion/brion.h>
+#include <minimorph/minimorph.h>
 #include <lunchbox/scopedMutex.h>
 #include <lunchbox/spinLock.h>
 
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_synapse)
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn.h5";
 
 #pragma omp parallel
-    TS_BOOST_CHECK_NO_THROW(brion::Synapse(path.string()));
+    TS_BOOST_CHECK_NO_THROW(minimorph::Synapse(path.string()));
 }
 
 BOOST_AUTO_TEST_CASE(test_parallel_access_of_synapse)
@@ -60,15 +60,15 @@ BOOST_AUTO_TEST_CASE(test_parallel_access_of_synapse)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn.h5";
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(1);
     gids.insert(2);
 
-    const brion::Synapse synapse(path.string());
+    const minimorph::Synapse synapse(path.string());
 #pragma omp parallel
     {
-        const brion::SynapseMatrix& data =
-            synapse.read(1, brion::SYNAPSE_ALL_ATTRIBUTES);
+        const minimorph::SynapseMatrix& data =
+            synapse.read(1, minimorph::SYNAPSE_ALL_ATTRIBUTES);
         TS_BOOST_CHECK(!data.empty());
         const size_t numSynapses = synapse.getNumSynapses(gids);
         TS_BOOST_CHECK_GT(numSynapses, 0);
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_synapse_summary)
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn_summary.h5";
 
 #pragma omp parallel
-    TS_BOOST_CHECK_NO_THROW(brion::SynapseSummary(path.string()));
+    TS_BOOST_CHECK_NO_THROW(minimorph::SynapseSummary(path.string()));
 }
 
 BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_morphology)
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_morphology)
     path /= "circuitBuilding_1000neurons/morphologies/h5/C040426.h5";
 
 #pragma omp parallel
-    TS_BOOST_CHECK_NO_THROW(brion::Morphology{brion::URI(path.string())});
+    TS_BOOST_CHECK_NO_THROW(minimorph::Morphology{minimorph::URI(path.string())});
 }
 
 BOOST_AUTO_TEST_CASE(test_parallel_acess_of_morphology)
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(test_parallel_acess_of_morphology)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "circuitBuilding_1000neurons/morphologies/h5/C040426.h5";
 
-    const brion::Morphology morphology{brion::URI(path.string())};
+    const minimorph::Morphology morphology{minimorph::URI(path.string())};
 #pragma omp parallel
     {
         const auto points = morphology.getPoints();

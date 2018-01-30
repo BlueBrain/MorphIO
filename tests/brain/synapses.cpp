@@ -26,7 +26,7 @@
 
 BOOST_AUTO_TEST_CASE(projection)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     const morphio::Synapses& syn1 =
         circuit.getProjectedSynapses(circuit.getGIDs("Layer1"),
                                      circuit.getGIDs("Layer2"));
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(projection)
 
 BOOST_AUTO_TEST_CASE(projection_stream)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     morphio::SynapsesStream stream =
         circuit.getProjectedSynapses(circuit.getGIDs("Layer2"),
                                      circuit.getGIDs("Layer5"),
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(projection_stream)
 
 BOOST_AUTO_TEST_CASE(afferent_synapses)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     const morphio::Synapses& synapses =
         circuit.getAfferentSynapses(circuit.getGIDs("Layer1"),
                                     morphio::SynapsePrefetch::all);
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(afferent_synapses)
 
 BOOST_AUTO_TEST_CASE(bad_external_afferent_synapses)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_CIRCUITCONFIG));
     const morphio::Synapses& bad =
         circuit.getExternalAfferentSynapses({1}, "Unexistent");
     BOOST_CHECK_THROW(bad.size(), std::runtime_error);
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(bad_external_afferent_synapses)
 
 BOOST_AUTO_TEST_CASE(external_afferent_synapses)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_CIRCUITCONFIG));
 
     const std::string label("Thalamocortical_fake_input");
     const morphio::Synapses& synapses =
@@ -120,9 +120,9 @@ BOOST_AUTO_TEST_CASE(external_afferent_synapses)
 
 BOOST_AUTO_TEST_CASE(efferent_synapses)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     const morphio::Synapses& synapses =
-        circuit.getEfferentSynapses(brion::GIDSet{10},
+        circuit.getEfferentSynapses(minimorph::GIDSet{10},
                                     morphio::SynapsePrefetch::all);
     BOOST_CHECK(!synapses.empty());
     BOOST_CHECK_EQUAL(synapses.size(), 74);
@@ -135,9 +135,9 @@ BOOST_AUTO_TEST_CASE(efferent_synapses)
 
 BOOST_AUTO_TEST_CASE(retrograde_projection)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brion::GIDSet& preNeurons = circuit.getGIDs("Layer1");
-    const brion::GIDSet postNeuron = {1};
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
+    const minimorph::GIDSet& preNeurons = circuit.getGIDs("Layer1");
+    const minimorph::GIDSet postNeuron = {1};
     const morphio::Synapses& synapses =
         circuit.getProjectedSynapses(preNeurons, postNeuron,
                                      morphio::SynapsePrefetch::all);
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(retrograde_projection)
 
 BOOST_AUTO_TEST_CASE(lazy_loading_afferent)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     const morphio::Synapses& synapses =
         circuit.getAfferentSynapses(circuit.getGIDs("Layer1"),
                                     morphio::SynapsePrefetch::all);
@@ -168,7 +168,7 @@ BOOST_AUTO_TEST_CASE(lazy_loading_afferent)
 
 BOOST_AUTO_TEST_CASE(lazy_loading_external_afferent_synapses)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_CIRCUITCONFIG));
 
     const std::string label("Thalamocortical_fake_input");
     const morphio::Synapses& synapses =
@@ -187,7 +187,7 @@ BOOST_AUTO_TEST_CASE(lazy_loading_external_afferent_synapses)
 
 BOOST_AUTO_TEST_CASE(lazy_loading_efferent)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     const morphio::Synapses& synapses =
         circuit.getEfferentSynapses(circuit.getGIDs("Layer1"),
                                     morphio::SynapsePrefetch::all);
@@ -207,7 +207,7 @@ BOOST_AUTO_TEST_CASE(lazy_loading_efferent)
 
 BOOST_AUTO_TEST_CASE(lazy_loading_pathway)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     const morphio::Synapses& synapses =
         circuit.getProjectedSynapses(circuit.getGIDs("Layer2"),
                                      circuit.getGIDs("Layer4"),
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(lazy_loading_pathway)
 
 BOOST_AUTO_TEST_CASE(copy)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     const morphio::Synapses& synapses =
         circuit.getAfferentSynapses(circuit.getGIDs("Layer1"));
 
@@ -249,7 +249,7 @@ BOOST_AUTO_TEST_CASE(copy)
 
 BOOST_AUTO_TEST_CASE(full_copy)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     const morphio::Synapses& synapses =
         circuit.getAfferentSynapses(circuit.getGIDs("Layer1"),
                                     morphio::SynapsePrefetch::all);
@@ -265,9 +265,9 @@ BOOST_AUTO_TEST_CASE(full_copy)
 
 BOOST_AUTO_TEST_CASE(check_all_synapse_attributes)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     const morphio::Synapses& synapses =
-        circuit.getAfferentSynapses(brion::GIDSet{1},
+        circuit.getAfferentSynapses(minimorph::GIDSet{1},
                                     morphio::SynapsePrefetch::all);
     BOOST_CHECK_EQUAL(synapses.size(), 77);
 
@@ -280,24 +280,24 @@ BOOST_AUTO_TEST_CASE(check_all_synapse_attributes)
     BOOST_CHECK_EQUAL(synapse.getFacilitation(), 29);
     BOOST_CHECK_THROW(synapse.getGID(), std::runtime_error);
     BOOST_CHECK_EQUAL(synapse.getPostsynapticCenterPosition(),
-                      brion::Vector3f(3.799289703f, 1947.041748047f,
+                      minimorph::Vector3f(3.799289703f, 1947.041748047f,
                                       9.237932205f));
     BOOST_CHECK_EQUAL(synapse.getPostsynapticDistance(), 0.924134851f);
     BOOST_CHECK_EQUAL(synapse.getPostsynapticGID(), 1);
     BOOST_CHECK_EQUAL(synapse.getPostsynapticSectionID(), 70);
     BOOST_CHECK_EQUAL(synapse.getPostsynapticSegmentID(), 13);
     BOOST_CHECK_EQUAL(synapse.getPostsynapticSurfacePosition(),
-                      brion::Vector3f(3.603360415f, 1947.145141602f,
+                      minimorph::Vector3f(3.603360415f, 1947.145141602f,
                                       9.205502510f));
     BOOST_CHECK_EQUAL(synapse.getPresynapticCenterPosition(),
-                      brion::Vector3f(3.611587524f, 1947.084228516f,
+                      minimorph::Vector3f(3.611587524f, 1947.084228516f,
                                       9.198493958f));
     BOOST_CHECK_EQUAL(synapse.getPresynapticDistance(), 2.911511898f);
     BOOST_CHECK_EQUAL(synapse.getPresynapticGID(), 10);
     BOOST_CHECK_EQUAL(synapse.getPresynapticSectionID(), 2);
     BOOST_CHECK_EQUAL(synapse.getPresynapticSegmentID(), 15);
     BOOST_CHECK_EQUAL(synapse.getPresynapticSurfacePosition(),
-                      brion::Vector3f(3.792815685f, 1947.050537109f,
+                      minimorph::Vector3f(3.792815685f, 1947.050537109f,
                                       9.214178085f));
     BOOST_CHECK_EQUAL(synapse.getUtilization(), 0.362769693f);
 }
