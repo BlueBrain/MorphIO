@@ -20,29 +20,29 @@ import setup
 
 import os
 import numpy
-import brain
+import morphio
 
 import unittest
 
 class TestSpikeReportReader(unittest.TestCase):
 
     def setUp(self):
-        self.filename = brain.test.root_data_path + \
+        self.filename = morphio.test.root_data_path + \
                         "/local/simulations/may17_2011/Control/out.spikes"
 
     def test_creation_bad(self):
-        self.assertRaises(RuntimeError, lambda: brain.SpikeReportReader("foo"))
+        self.assertRaises(RuntimeError, lambda: morphio.SpikeReportReader("foo"))
 
     def test_creation(self):
-        reader = brain.SpikeReportReader(self.filename)
+        reader = morphio.SpikeReportReader(self.filename)
 
     def test_get_spikes_bad(self):
-        reader = brain.SpikeReportReader(self.filename)
+        reader = morphio.SpikeReportReader(self.filename)
         self.assertRaises(RuntimeError, lambda: reader.get_spikes(0, 0))
         self.assertRaises(RuntimeError, lambda: reader.get_spikes(0, -1))
 
     def test_get_spikes(self):
-        reader = brain.SpikeReportReader(self.filename)
+        reader = morphio.SpikeReportReader(self.filename)
         spikes = reader.get_spikes(-10, 0)
         assert(len(spikes) == 0)
 
@@ -56,13 +56,13 @@ class TestSpikeReportReader(unittest.TestCase):
 
     def test_get_spikes_filtered(self):
         gids = {1, 10, 100}
-        reader = brain.SpikeReportReader(self.filename, gids)
+        reader = morphio.SpikeReportReader(self.filename, gids)
         spikes = reader.get_spikes(0, float("inf"))
         for time, gid in spikes:
             assert(gid in gids)
 
     def test_properties(self):
-        reader = brain.SpikeReportReader(self.filename)
+        reader = morphio.SpikeReportReader(self.filename)
         # assertAlmostEqual fails due to a float <-> double conversion error
         assert(round(reader.end_time - 9.975, 6) == 0)
 

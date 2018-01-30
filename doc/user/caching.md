@@ -12,10 +12,10 @@ variables:
 
 ## Cached data support
 
-* Morphologies from brain::Circuit::loadMorphologies()
+* Morphologies from morphio::Circuit::loadMorphologies()
   * each morphology is hashed by its canonical filepath if COORDINATES_LOCAL
   * each morphology is hashed by its canonical filepath plus canonical circuit
     filepath and GID if COORDINATES_GLOBAL
-* Synapse position from brain::Circuit::get<type>Synapses()
+* Synapse position from morphio::Circuit::get<type>Synapses()
   * all synapse positions per neuron are hashed by its canonical filepath of the
     nrn file plus if afferent/efferent plus the GID of the neuron.

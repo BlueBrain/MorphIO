@@ -18,7 +18,7 @@
  */
 
 #include <BBP/TestDatasets.h>
-#include <brain/brain.h>
+#include <morphio/morphio.h>
 #include <brion/brion.h>
 
 #define BOOST_TEST_MODULE Circuit
@@ -137,16 +137,16 @@ BOOST_AUTO_TEST_CASE(test_types)
     BOOST_CHECK_EQUAL(etypes[7], "cST");
 }
 
-BOOST_AUTO_TEST_CASE(brain_circuit_constructor)
+BOOST_AUTO_TEST_CASE(morphio_circuit_constructor)
 {
-    brain::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
-    brain::Circuit circuit2((brion::BlueConfig(bbp::test::getBlueconfig())));
-    BOOST_CHECK_THROW(brain::Circuit(brion::URI("pluto")), std::runtime_error);
+    morphio::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
+    morphio::Circuit circuit2((brion::BlueConfig(bbp::test::getBlueconfig())));
+    BOOST_CHECK_THROW(morphio::Circuit(brion::URI("pluto")), std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(brain_circuit_target)
+BOOST_AUTO_TEST_CASE(morphio_circuit_target)
 {
-    const brain::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
+    const morphio::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
     const brion::BlueConfig config(bbp::test::getBlueconfig());
 
     brion::GIDSet first = circuit.getGIDs();
@@ -168,18 +168,18 @@ BOOST_AUTO_TEST_CASE(brain_circuit_target)
                       std::runtime_error);
 }
 
-BOOST_AUTO_TEST_CASE(brain_circuit_positions)
+BOOST_AUTO_TEST_CASE(morphio_circuit_positions)
 {
-    const brain::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
+    const morphio::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
 
     brion::GIDSet gids;
     gids.insert(1);
     gids.insert(2);
-    // This call also tests brain::Circuit::getMorphologyURIs
-    const brain::Vector3fs positions = circuit.getPositions(gids);
+    // This call also tests morphio::Circuit::getMorphologyURIs
+    const morphio::Vector3fs positions = circuit.getPositions(gids);
     BOOST_CHECK_EQUAL(positions.size(), gids.size());
 
-    typedef brain::Vector3f V3;
+    typedef morphio::Vector3f V3;
     BOOST_CHECK_SMALL(
         (positions[0] - V3(54.410675, 1427.669280, 124.882234)).length(),
         0.000001f);
@@ -190,18 +190,18 @@ BOOST_AUTO_TEST_CASE(brain_circuit_positions)
 
 namespace
 {
-void _checkMorphology(const brain::neuron::Morphology& morphology,
+void _checkMorphology(const morphio::neuron::Morphology& morphology,
                       const std::string& other)
 {
     const brion::Morphology reference(brion::URI(
         BBP_TESTDATA + ("/local/morphologies/01.07.08/h5/" + other)));
     BOOST_CHECK(morphology.getPoints() == reference.getPoints());
 }
-void _checkMorphology(const brain::neuron::Morphology& morphology,
+void _checkMorphology(const morphio::neuron::Morphology& morphology,
                       const std::string& other,
-                      const brain::Matrix4f& transform)
+                      const morphio::Matrix4f& transform)
 {
-    const brain::neuron::Morphology reference(
+    const morphio::neuron::Morphology reference(
         brion::URI(BBP_TESTDATA + ("/local/morphologies/01.07.08/h5/" + other)),
         transform);
     const auto& p = morphology.getPoints();
@@ -216,13 +216,13 @@ void _checkMorphology(const brain::neuron::Morphology& morphology,
 
 BOOST_AUTO_TEST_CASE(test_gid_out_of_range)
 {
-    typedef boost::shared_ptr<const brain::Circuit> CircuitPtr;
+    typedef boost::shared_ptr<const morphio::Circuit> CircuitPtr;
     std::vector<CircuitPtr> circuits;
     circuits.push_back(
-        CircuitPtr(new brain::Circuit(brion::URI(BBP_TEST_BLUECONFIG))));
+        CircuitPtr(new morphio::Circuit(brion::URI(BBP_TEST_BLUECONFIG))));
 #ifdef BRAIN_USE_MVD3
     circuits.push_back(
-        CircuitPtr(new brain::Circuit(brion::URI(BBP_TEST_BLUECONFIG3))));
+        CircuitPtr(new morphio::Circuit(brion::URI(BBP_TEST_BLUECONFIG3))));
 #endif
 
     brion::GIDSet gids;
@@ -236,21 +236,21 @@ BOOST_AUTO_TEST_CASE(test_gid_out_of_range)
                           std::runtime_error);
         BOOST_CHECK_THROW(circuit->getRotations(gids), std::runtime_error);
         BOOST_CHECK_THROW(
-            circuit->loadMorphologies(gids, brain::Circuit::Coordinates::local),
+            circuit->loadMorphologies(gids, morphio::Circuit::Coordinates::local),
             std::runtime_error);
     }
 }
 
 BOOST_AUTO_TEST_CASE(load_local_morphologies)
 {
-    const brain::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
+    const morphio::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
 
     brion::GIDSet gids;
     for (uint32_t gid = 1; gid < 500; gid += 75)
         gids.insert(gid);
-    // This call also tests brain::Circuit::getMorphologyURIs
-    const brain::neuron::Morphologies morphologies =
-        circuit.loadMorphologies(gids, brain::Circuit::Coordinates::local);
+    // This call also tests morphio::Circuit::getMorphologyURIs
+    const morphio::neuron::Morphologies morphologies =
+        circuit.loadMorphologies(gids, morphio::Circuit::Coordinates::local);
     BOOST_CHECK_EQUAL(morphologies.size(), gids.size());
 
     // Checking the first morphology
@@ -261,8 +261,8 @@ BOOST_AUTO_TEST_CASE(load_local_morphologies)
     gids.insert(2);
     gids.insert(4);
     gids.insert(6);
-    const brain::neuron::Morphologies repeated =
-        circuit.loadMorphologies(gids, brain::Circuit::Coordinates::local);
+    const morphio::neuron::Morphologies repeated =
+        circuit.loadMorphologies(gids, morphio::Circuit::Coordinates::local);
 
     BOOST_CHECK_EQUAL(repeated.size(), gids.size());
     BOOST_CHECK_EQUAL(repeated[0].get(), repeated[2].get());
@@ -271,19 +271,19 @@ BOOST_AUTO_TEST_CASE(load_local_morphologies)
 
 BOOST_AUTO_TEST_CASE(load_global_morphologies)
 {
-    const brain::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
+    const morphio::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
 
     brion::GIDSet gids;
     for (uint32_t gid = 1; gid < 500; gid += 75)
         gids.insert(gid);
-    const brain::neuron::Morphologies morphologies =
-        circuit.loadMorphologies(gids, brain::Circuit::Coordinates::global);
+    const morphio::neuron::Morphologies morphologies =
+        circuit.loadMorphologies(gids, morphio::Circuit::Coordinates::global);
     BOOST_CHECK_EQUAL(morphologies.size(), gids.size());
 
     // Checking the first morphology
-    brain::Matrix4f matrix;
+    morphio::Matrix4f matrix;
     matrix.rotate_y(-75.992327 * M_PI / 180.0f);
-    matrix.setTranslation(brain::Vector3f(54.410675, 1427.669280, 124.882234));
+    matrix.setTranslation(morphio::Vector3f(54.410675, 1427.669280, 124.882234));
 
     _checkMorphology(*morphologies[0], "R-C010306G.h5", matrix);
 }
@@ -293,12 +293,12 @@ BOOST_AUTO_TEST_CASE(load_global_morphologies)
 BOOST_AUTO_TEST_CASE(all_mvd3)
 {
     brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
-    brain::Circuit circuit(config);
+    morphio::Circuit circuit(config);
     const size_t numNeurons = circuit.getNumNeurons();
     BOOST_CHECK_EQUAL(circuit.getGIDs().size(), numNeurons);
 
-    brain::Vector3fs positions = circuit.getPositions(circuit.getGIDs());
-    brain::Matrix4fs transforms = circuit.getTransforms(circuit.getGIDs());
+    morphio::Vector3fs positions = circuit.getPositions(circuit.getGIDs());
+    morphio::Matrix4fs transforms = circuit.getTransforms(circuit.getGIDs());
     BOOST_CHECK_EQUAL(positions.size(), numNeurons);
     BOOST_CHECK_EQUAL(transforms.size(), numNeurons);
 
@@ -314,19 +314,19 @@ BOOST_AUTO_TEST_CASE(all_mvd3)
                       0.000001f);
 
     BOOST_CHECK(transforms[20].equals(
-        brain::Matrix4f(brain::Quaternionf(0, 0.923706, 0, 0.383102),
-                        brain::Vector3f(30.12771, 1794.125911, 19.860587)),
+        morphio::Matrix4f(morphio::Quaternionf(0, 0.923706, 0, 0.383102),
+                        morphio::Vector3f(30.12771, 1794.125911, 19.860587)),
         0.00001f));
     BOOST_CHECK(transforms[100].equals(
-        brain::Matrix4f(brain::Quaternionf(0, -0.992667, 0, 0.120884),
-                        brain::Vector3f(48.757924, 1824.458993, 15.302584)),
+        morphio::Matrix4f(morphio::Quaternionf(0, -0.992667, 0, 0.120884),
+                        morphio::Vector3f(48.757924, 1824.458993, 15.302584)),
         0.00001f));
 }
 
 BOOST_AUTO_TEST_CASE(partial_mvd3)
 {
     brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
-    brain::Circuit circuit(config);
+    morphio::Circuit circuit(config);
 
     brion::GIDSet gids;
     gids.insert(6);
@@ -334,8 +334,8 @@ BOOST_AUTO_TEST_CASE(partial_mvd3)
     gids.insert(101);
     gids.insert(501);
 
-    const brain::Vector3fs& positions = circuit.getPositions(gids);
-    const brain::Matrix4fs& transforms = circuit.getTransforms(gids);
+    const morphio::Vector3fs& positions = circuit.getPositions(gids);
+    const morphio::Matrix4fs& transforms = circuit.getTransforms(gids);
     BOOST_CHECK_EQUAL(positions.size(), 4);
     BOOST_CHECK_EQUAL(transforms.size(), 4);
 
@@ -351,25 +351,25 @@ BOOST_AUTO_TEST_CASE(partial_mvd3)
                       0.000001f);
 
     BOOST_CHECK(transforms[1].equals(
-        brain::Matrix4f(brain::Quaternionf(0, 0.923706, 0, 0.383102),
-                        brain::Vector3f(30.12771, 1794.125911, 19.860587)),
+        morphio::Matrix4f(morphio::Quaternionf(0, 0.923706, 0, 0.383102),
+                        morphio::Vector3f(30.12771, 1794.125911, 19.860587)),
         0.00001f));
     BOOST_CHECK(transforms[2].equals(
-        brain::Matrix4f(brain::Quaternionf(0, -0.992667, 0, 0.120884),
-                        brain::Vector3f(48.757924, 1824.458993, 15.302584)),
+        morphio::Matrix4f(morphio::Quaternionf(0, -0.992667, 0, 0.120884),
+                        morphio::Vector3f(48.757924, 1824.458993, 15.302584)),
         0.00001f));
 }
 
 BOOST_AUTO_TEST_CASE(morphology_names_mvd3)
 {
     brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
-    brain::Circuit circuit(config);
+    morphio::Circuit circuit(config);
 
     brion::GIDSet gids;
     gids.insert(21);
     gids.insert(501);
 
-    const brain::URIs& names = circuit.getMorphologyURIs(gids);
+    const morphio::URIs& names = circuit.getMorphologyURIs(gids);
     BOOST_REQUIRE_EQUAL(names.size(), 2);
     BOOST_CHECK(boost::algorithm::ends_with(
         std::to_string(names[0]),
@@ -382,26 +382,26 @@ BOOST_AUTO_TEST_CASE(morphology_names_mvd3)
 BOOST_AUTO_TEST_CASE(compare_mvd2_mvd3)
 {
     brion::BlueConfig config2(BBP_TEST_BLUECONFIG);
-    brain::Circuit circuit2(config2);
+    morphio::Circuit circuit2(config2);
 
     brion::BlueConfig config3(BBP_TEST_BLUECONFIG3);
-    brain::Circuit circuit3(config3);
+    morphio::Circuit circuit3(config3);
 
     brion::GIDSet gids;
     gids.insert(21);
     gids.insert(501);
 
-    const brain::size_ts& mtypes2 = circuit2.getMorphologyTypes(gids);
-    const brain::size_ts& etypes2 = circuit2.getElectrophysiologyTypes(gids);
-    const brain::Strings& allMTypes2 = circuit2.getMorphologyTypeNames();
-    const brain::Strings& allETypes2 = circuit2.getElectrophysiologyTypeNames();
-    const brain::URIs& names2 = circuit2.getMorphologyURIs(gids);
+    const morphio::size_ts& mtypes2 = circuit2.getMorphologyTypes(gids);
+    const morphio::size_ts& etypes2 = circuit2.getElectrophysiologyTypes(gids);
+    const morphio::Strings& allMTypes2 = circuit2.getMorphologyTypeNames();
+    const morphio::Strings& allETypes2 = circuit2.getElectrophysiologyTypeNames();
+    const morphio::URIs& names2 = circuit2.getMorphologyURIs(gids);
 
-    const brain::size_ts& mtypes3 = circuit3.getMorphologyTypes(gids);
-    const brain::size_ts& etypes3 = circuit3.getElectrophysiologyTypes(gids);
-    const brain::Strings& allMTypes3 = circuit3.getMorphologyTypeNames();
-    const brain::Strings& allETypes3 = circuit3.getElectrophysiologyTypeNames();
-    const brain::URIs& names3 = circuit3.getMorphologyURIs(gids);
+    const morphio::size_ts& mtypes3 = circuit3.getMorphologyTypes(gids);
+    const morphio::size_ts& etypes3 = circuit3.getElectrophysiologyTypes(gids);
+    const morphio::Strings& allMTypes3 = circuit3.getMorphologyTypeNames();
+    const morphio::Strings& allETypes3 = circuit3.getElectrophysiologyTypeNames();
+    const morphio::URIs& names3 = circuit3.getMorphologyURIs(gids);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(mtypes2.begin(), mtypes2.end(),
                                   mtypes3.begin(), mtypes3.end());
@@ -415,18 +415,18 @@ BOOST_AUTO_TEST_CASE(compare_mvd2_mvd3)
                                   names3.end());
 }
 
-BOOST_AUTO_TEST_CASE(brain_circuit_random_gids)
+BOOST_AUTO_TEST_CASE(morphio_circuit_random_gids)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brain::GIDSet& gids = circuit.getRandomGIDs(0.1f);
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::GIDSet& gids = circuit.getRandomGIDs(0.1f);
     BOOST_CHECK_EQUAL(gids.size(), 100);
 
-    const brain::GIDSet& gids2 = circuit.getRandomGIDs(0.1f);
+    const morphio::GIDSet& gids2 = circuit.getRandomGIDs(0.1f);
     BOOST_CHECK_EQUAL(gids2.size(), 100);
 
     bool notEqual = true;
-    brain::GIDSet::const_iterator it1 = gids.begin();
-    brain::GIDSet::const_iterator it2 = gids2.begin();
+    morphio::GIDSet::const_iterator it1 = gids.begin();
+    morphio::GIDSet::const_iterator it2 = gids2.begin();
     for (; it1 != gids.end(); ++it1, ++it2)
     {
         if (*it1 != *it2)
@@ -437,7 +437,7 @@ BOOST_AUTO_TEST_CASE(brain_circuit_random_gids)
     }
     BOOST_CHECK(notEqual);
 
-    const brain::GIDSet& gids3 = circuit.getRandomGIDs(0.5f, "Layer1");
+    const morphio::GIDSet& gids3 = circuit.getRandomGIDs(0.5f, "Layer1");
     BOOST_CHECK_EQUAL(gids3.size(), 10);
 
     BOOST_CHECK_THROW(circuit.getRandomGIDs(-5.f), std::runtime_error);

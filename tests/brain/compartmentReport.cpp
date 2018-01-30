@@ -20,11 +20,11 @@
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  */
 
-#define BOOST_TEST_MODULE brain::CompartmentReportReader
+#define BOOST_TEST_MODULE morphio::CompartmentReportReader
 
 #include <BBP/TestDatasets.h>
-#include <brain/compartmentReport.h>
-#include <brain/compartmentReportMapping.h>
+#include <morphio/compartmentReport.h>
+#include <morphio/compartmentReportMapping.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>
@@ -33,19 +33,19 @@
 
 BOOST_AUTO_TEST_CASE(invalid_open)
 {
-    BOOST_CHECK_THROW(brain::CompartmentReport(brion::URI("/bla")),
+    BOOST_CHECK_THROW(morphio::CompartmentReport(brion::URI("/bla")),
                       std::runtime_error);
-    BOOST_CHECK_THROW(brain::CompartmentReport(brion::URI("bla")),
+    BOOST_CHECK_THROW(morphio::CompartmentReport(brion::URI("bla")),
                       std::runtime_error);
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/README";
-    BOOST_CHECK_THROW(brain::CompartmentReport(brion::URI(path.string())),
+    BOOST_CHECK_THROW(morphio::CompartmentReport(brion::URI(path.string())),
                       std::runtime_error);
 
     path = BBP_TESTDATA;
     path /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
-    BOOST_CHECK_THROW(brain::CompartmentReport(brion::URI(path.string())),
+    BOOST_CHECK_THROW(morphio::CompartmentReport(brion::URI(path.string())),
                       std::runtime_error);
 }
 
@@ -53,14 +53,14 @@ BOOST_AUTO_TEST_CASE(open_binary)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/simulations/may17_2011/Control/voltage.bbp";
-    BOOST_CHECK_NO_THROW(brain::CompartmentReport(brion::URI(path.string())));
+    BOOST_CHECK_NO_THROW(morphio::CompartmentReport(brion::URI(path.string())));
 }
 
 BOOST_AUTO_TEST_CASE(open_hdf5)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/simulations/may17_2011/Control/voltage.h5";
-    BOOST_CHECK_NO_THROW(brain::CompartmentReport(brion::URI(path.string())));
+    BOOST_CHECK_NO_THROW(morphio::CompartmentReport(brion::URI(path.string())));
 }
 
 BOOST_AUTO_TEST_CASE(invalid_mapping)
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(invalid_mapping)
     brion::GIDSet gids;
     gids.insert(123456789);
 
-    brain::CompartmentReport reader(brion::URI(path.string()));
+    morphio::CompartmentReport reader(brion::URI(path.string()));
 
     BOOST_CHECK_THROW(reader.createView(gids), std::runtime_error);
 }
@@ -82,7 +82,7 @@ void testBounds(const char* relativePath)
 
     brion::GIDSet gids;
     gids.insert(1);
-    brain::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
     auto frame = view.load(report.getMetaData().startTime).get();
@@ -112,7 +112,7 @@ inline void testReadSoma(const char* relativePath)
 
     brion::GIDSet gids;
     gids.insert(1);
-    brain::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
@@ -152,7 +152,7 @@ inline void testReadAllComps(const char* relativePath)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= relativePath;
 
-    brain::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(brion::GIDSet());
 
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
@@ -190,7 +190,7 @@ void testRead(const char* relativePath)
     gids.insert(394);
     gids.insert(400);
 
-    brain::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
     const brion::SectionOffsets& offsets = view.getMapping().getOffsets();
@@ -225,7 +225,7 @@ void testReadRange(const char* relativePath)
     gids.insert(394);
     gids.insert(400);
 
-    brain::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
     const double start = report.getMetaData().startTime;
@@ -256,7 +256,7 @@ void testReadStep(const char* relativePath)
     gids.insert(394);
     gids.insert(400);
 
-    brain::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
     const double start = report.getMetaData().startTime;
@@ -294,7 +294,7 @@ void testReadAll(const char* relativePath)
     gids.insert(394);
     gids.insert(400);
 
-    brain::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
     const brion::SectionOffsets& offsets = view.getMapping().getOffsets();
@@ -329,7 +329,7 @@ void testIndices(const char* relativePath)
 
     brion::GIDSet gids{400};
 
-    brain::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(brion::URI(path.string()));
     auto view = report.createView(gids);
 
     BOOST_CHECK_EQUAL(view.getMapping().getIndex().size(), 309);

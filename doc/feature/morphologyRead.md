@@ -4,7 +4,7 @@ Modification of the brion::Morphology read API {#morphologyRead}
 ## Motivation
 
 The current read API is incorrect. It does return a shared_ptr to mutable data,
-but is marked const. For example, the brain::Morphology takes a const
+but is marked const. For example, the morphio::Morphology takes a const
 brion::Morphology&, but the given object is modified in case of SWC with global
 transformation.
 
@@ -39,6 +39,6 @@ synchronized in all getFoo() calls. This forces that the brion::Morphology has
 state and data, and we should remove the write API at the same time. It has the
 disadvantage of loading all data deferred from the ctor, which requires out of
 core loading (or batching) for large amounts of morphologies. Client code using
-the brain API already has this constraint. While this seems to be more complex,
+the morphio API already has this constraint. While this seems to be more complex,
 actual plugin implementations become simpler since all of the threading and
 synchronization will be done in the plugin base class.

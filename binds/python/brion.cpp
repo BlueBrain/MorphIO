@@ -2,9 +2,9 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
-#include <brain/morphology.h>
-#include <brain/section.h>
-#include <brain/soma.h>
+#include <morphio/morphology.h>
+#include <morphio/section.h>
+#include <morphio/soma.h>
 
 #include <brion/enums.h>
 #include <brion/morphology.h>
@@ -96,43 +96,43 @@ PYBIND11_MODULE(python_brion, m) {
         .def("getVersion", &brion::Morphology::getVersion);
 
     // .def(py::init<const brion::URI&, const brion::Matrix4f&>());
-    py::class_<brain::Morphology>(m, "Morphology")
+    py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const brion::URI&>())
-        .def("getPoints", (brion::Vector4fs& (brain::Morphology::*)())&brain::Morphology::getPoints)
-        .def("getSectionTypes", (brain::SectionTypes& (brain::Morphology::*)())&brain::Morphology::getSectionTypes)
-        .def("getSectionIDs", (brain::uint32_ts (brain::Morphology::*)())&brain::Morphology::getSectionIDs)
-        .def("getSections", (const brain::Vector2is& (brain::Morphology::*)() const)&brain::Morphology::getSections)
-        .def("getSections", (brain::Sections (brain::Morphology::*)(brain::SectionType) const)&brain::Morphology::getSections)
-        .def("getSections", (brain::Sections (brain::Morphology::*)(const brain::SectionTypes&) const)&brain::Morphology::getSections)
-        .def("getSection", (brain::Section& (brain::Morphology::*)(const brain::uint32_ts&))&brain::Morphology::getSection)
-        .def("getRootSections", &brain::Morphology::getRootSections)
-        .def("getSoma", (brain::Soma (brain::Morphology::*)())&brain::Morphology::getSoma)
-        .def("getVersion", &brain::Morphology::getVersion);
-        // .def("getTransformation", (brion::Matrix4f& (brain::Morphology::*)()&brain::Morphology::getTransformation));
+        .def("getPoints", (brion::Vector4fs& (morphio::Morphology::*)())&morphio::Morphology::getPoints)
+        .def("getSectionTypes", (morphio::SectionTypes& (morphio::Morphology::*)())&morphio::Morphology::getSectionTypes)
+        .def("getSectionIDs", (morphio::uint32_ts (morphio::Morphology::*)())&morphio::Morphology::getSectionIDs)
+        .def("getSections", (const morphio::Vector2is& (morphio::Morphology::*)() const)&morphio::Morphology::getSections)
+        .def("getSections", (morphio::Sections (morphio::Morphology::*)(morphio::SectionType) const)&morphio::Morphology::getSections)
+        .def("getSections", (morphio::Sections (morphio::Morphology::*)(const morphio::SectionTypes&) const)&morphio::Morphology::getSections)
+        .def("getSection", (morphio::Section& (morphio::Morphology::*)(const morphio::uint32_ts&))&morphio::Morphology::getSection)
+        .def("getRootSections", &morphio::Morphology::getRootSections)
+        .def("getSoma", (morphio::Soma (morphio::Morphology::*)())&morphio::Morphology::getSoma)
+        .def("getVersion", &morphio::Morphology::getVersion);
+        // .def("getTransformation", (brion::Matrix4f& (morphio::Morphology::*)()&morphio::Morphology::getTransformation));
 
-    py::class_<brain::Soma>(m, "Soma")
-        .def(py::init<const brain::Soma&>())
-        .def("getProfilePoints", &brain::Soma::getProfilePoints)
-        .def("getMeanRadius", &brain::Soma::getMeanRadius)
-        .def("getCentroid", &brain::Soma::getCentroid)
-        .def("getChildren", &brain::Soma::getChildren);
+    py::class_<morphio::Soma>(m, "Soma")
+        .def(py::init<const morphio::Soma&>())
+        .def("getProfilePoints", &morphio::Soma::getProfilePoints)
+        .def("getMeanRadius", &morphio::Soma::getMeanRadius)
+        .def("getCentroid", &morphio::Soma::getCentroid)
+        .def("getChildren", &morphio::Soma::getChildren);
 
-    py::class_<brain::Section>(m, "Section")
-        .def("getID", &brain::Section::getID)
-        .def("getType", &brain::Section::getType)
-        .def("hasParent", &brain::Section::hasParent)
-        .def("getParent", &brain::Section::getParent)
-        .def("getSamples", (brain::Vector4fs (brain::Section::*)() const) &brain::Section::getSamples)
-        .def("getChildren", &brain::Section::getChildren);
+    py::class_<morphio::Section>(m, "Section")
+        .def("getID", &morphio::Section::getID)
+        .def("getType", &morphio::Section::getType)
+        .def("hasParent", &morphio::Section::hasParent)
+        .def("getParent", &morphio::Section::getParent)
+        .def("getSamples", (morphio::Vector4fs (morphio::Section::*)() const) &morphio::Section::getSamples)
+        .def("getChildren", &morphio::Section::getChildren);
 
-    py::enum_<brain::SectionType>(m, "SectionType")
-        .value("soma", brain::SectionType::soma)
-        .value("axon", brain::SectionType::axon)
-        .value("basal_dendrite", brain::SectionType::dendrite)
-        .value("apical_dendrite", brain::SectionType::apicalDendrite)
-        // .value("basal_dendrite", brain::SectionType::basalDendrite)
-        .value("undefined", brain::SectionType::undefined)
-        .value("all", brain::SectionType::all)
+    py::enum_<morphio::SectionType>(m, "SectionType")
+        .value("soma", morphio::SectionType::soma)
+        .value("axon", morphio::SectionType::axon)
+        .value("basal_dendrite", morphio::SectionType::dendrite)
+        .value("apical_dendrite", morphio::SectionType::apicalDendrite)
+        // .value("basal_dendrite", morphio::SectionType::basalDendrite)
+        .value("undefined", morphio::SectionType::undefined)
+        .value("all", morphio::SectionType::all)
         .export_values();
 
     py::enum_<brion::enums::SectionType>(m, "BrionSectionType")

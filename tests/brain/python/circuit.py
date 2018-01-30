@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import setup
-import brain
+import morphio
 import numpy
 
 import unittest
@@ -25,14 +25,14 @@ import unittest
 class TestCircuitOpen(unittest.TestCase):
 
     def test_bad_open(self):
-        self.assertRaises(RuntimeError, lambda: brain.Circuit("foo"))
+        self.assertRaises(RuntimeError, lambda: morphio.Circuit("foo"))
 
     def test_open(self):
-        circuit = brain.Circuit(brain.test.circuit_config)
+        circuit = morphio.Circuit(morphio.test.circuit_config)
 
 class TestCircuit(unittest.TestCase):
     def setUp(self):
-        self.circuit = brain.Circuit(brain.test.circuit_config)
+        self.circuit = morphio.Circuit(morphio.test.circuit_config)
 
     def test_gids(self):
         assert(self.circuit.num_neurons() == 1000)
@@ -60,12 +60,12 @@ class TestCircuit(unittest.TestCase):
                              list({997, 123, 1}), *args))
             return a, b
 
-        a, b = get(brain.Circuit.morphology_types)
+        a, b = get(morphio.Circuit.morphology_types)
         assert(a == b)
-        a, b = get(brain.Circuit.morphology_uris)
+        a, b = get(morphio.Circuit.morphology_uris)
         assert(a == b)
-        a, b = get(brain.Circuit.load_morphologies,
-                   brain.Circuit.Coordinates.local)
+        a, b = get(morphio.Circuit.load_morphologies,
+                   morphio.Circuit.Coordinates.local)
         assert(len(a) == len(b))
         for i, j in zip(a, b):
             assert(numpy.all(i.points() == j.points()))
@@ -87,9 +87,9 @@ class TestCircuit(unittest.TestCase):
 
     def test_load_morphology(self):
         morphologies = self.circuit.load_morphologies(
-            [1, 100, 1000], brain.Circuit.Coordinates.local)
+            [1, 100, 1000], morphio.Circuit.Coordinates.local)
         morphologies = self.circuit.load_morphologies(
-            [1, 100, 1000], brain.Circuit.Coordinates.global_)
+            [1, 100, 1000], morphio.Circuit.Coordinates.global_)
 
     def test_metypes(self):
         count = self.circuit.num_neurons()
@@ -127,9 +127,7 @@ class TestCircuit(unittest.TestCase):
         self.assertRaises(RuntimeError, lambda: self.circuit.positions([0]))
         self.assertRaises(RuntimeError,
                           lambda: self.circuit.load_morphologies(
-                              [100000], brain.Circuit.Coordinates.local))
+                              [100000], morphio.Circuit.Coordinates.local))
 
 if __name__ == '__main__':
     unittest.main()
-
-

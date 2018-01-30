@@ -17,9 +17,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import setup
-import brain
+import morphio
 import numpy
-from brain.neuron import Morphology
+from morphio.neuron import Morphology
 
 import unittest
 
@@ -54,7 +54,7 @@ class TestConstructors(unittest.TestCase):
 
 class TestCircuitFunctions(unittest.TestCase):
     def setUp(self):
-        self.circuit = brain.Circuit(brain.test.circuit_config)
+        self.circuit = morphio.Circuit(morphio.test.circuit_config)
 
     def test_uris(self):
         uris = self.circuit.morphology_uris([1, 2, 3])
@@ -90,7 +90,7 @@ class TestMorphologyFunctions(unittest.TestCase):
         assert(section_types.shape == (13,))
 
     def test_section(self):
-        Type = brain.neuron.SectionType
+        Type = morphio.neuron.SectionType
         neurites = [Type.axon, Type.dendrite, Type.apical_dendrite]
 
         ids = self.morphology.section_ids([Type.soma])
@@ -149,7 +149,7 @@ class TestSectionFunctions(unittest.TestCase):
 
     def test_simple_data(self):
         assert(self.section.id() == 1)
-        assert(self.section.type() == brain.neuron.SectionType.axon)
+        assert(self.section.type() == morphio.neuron.SectionType.axon)
         assert(numpy.isclose(self.section.children()[0].distance_to_soma(),
                              self.section.length()))
 

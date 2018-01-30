@@ -51,11 +51,11 @@ and writing files which store the Blue Brain data model.
 
 The higher level library is called Brain and it provides:
 
-* brain::Circuit to facilitate loading information about cells, morphologies (in
+* morphio::Circuit to facilitate loading information about cells, morphologies (in
   local and global circuit coordinates) and synapses.
-* brain::neuron::Morphology with higher level functions to deal with
+* morphio::neuron::Morphology with higher level functions to deal with
   morphologies.
-* brain::Synapses and brain::Synapse for array and object access to synapses.
+* morphio::Synapses and morphio::Synapse for array and object access to synapses.
 
 ## Building
 

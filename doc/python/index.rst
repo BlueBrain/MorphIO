@@ -9,14 +9,14 @@ Brain Python API documentation
 This is the reference documention of the Brain Python API. For a quick
 introduction on the capabilities of this API check the :ref:`python_tutorial`.
 
-brain namespace
+morphio namespace
 ~~~~~~~~~~~~~~~
-.. automodule:: brain._brain
+.. automodule:: morphio._morphio
    :members:
    :undoc-members:
 
-brain.neuron namespace
+morphio.neuron namespace
 ~~~~~~~~~~~~~~~~~~~~~~
-.. automodule:: brain._brain._neuron
+.. automodule:: morphio._morphio._neuron
    :members:
    :undoc-members:

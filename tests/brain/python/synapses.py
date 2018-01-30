@@ -17,20 +17,20 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import setup
-import brain
+import morphio
 
 import unittest
 
 class TestCircuitFunctions(unittest.TestCase):
     def setUp(self):
-        self.circuit = brain.Circuit(brain.test.circuit_config)
+        self.circuit = morphio.Circuit(morphio.test.circuit_config)
 
     def test_afferent(self):
         gids = [340, 350]
         synapses = self.circuit.afferent_synapses(gids)
         assert(len(synapses) == 312)
         synapses = self.circuit.afferent_synapses(gids,
-                                                  brain.SynapsePrefetch.all)
+                                                  morphio.SynapsePrefetch.all)
         assert(len(synapses) == 312)
 
     def test_efferent(self):
@@ -38,7 +38,7 @@ class TestCircuitFunctions(unittest.TestCase):
         synapses = self.circuit.efferent_synapses(gids)
         assert(len(synapses) == 331)
         synapses = self.circuit.efferent_synapses(gids,
-                                                  brain.SynapsePrefetch.all)
+                                                  morphio.SynapsePrefetch.all)
         assert(len(synapses) == 331)
 
     def test_projection(self):
@@ -47,13 +47,13 @@ class TestCircuitFunctions(unittest.TestCase):
         synapses = self.circuit.projected_synapses(pre, post)
         print(len(synapses) == 1888)
         synapses = self.circuit.projected_synapses(pre, post,
-                                                   brain.SynapsePrefetch.all)
+                                                   morphio.SynapsePrefetch.all)
         assert(len(synapses) == 1888)
 
 class TestSynapsesAccessors(unittest.TestCase):
 
     def setUp(self):
-        self.circuit = brain.Circuit(brain.test.circuit_config)
+        self.circuit = morphio.Circuit(morphio.test.circuit_config)
         self.synapses = self.circuit.afferent_synapses([320])
 
     def test_iterator(self):
@@ -71,7 +71,7 @@ class TestSynapsesAccessors(unittest.TestCase):
 
 class TestSynapseArrays(unittest.TestCase):
     def setUp(self):
-        self.circuit = brain.Circuit(brain.test.circuit_config)
+        self.circuit = morphio.Circuit(morphio.test.circuit_config)
         self.synapses = self.circuit.afferent_synapses([320])
 
     def test_arrays(self):
@@ -98,7 +98,7 @@ class TestSynapseArrays(unittest.TestCase):
 class TestSynapse(unittest.TestCase):
 
     def setUp(self):
-        self.circuit = brain.Circuit(brain.test.circuit_config)
+        self.circuit = morphio.Circuit(morphio.test.circuit_config)
         self.synapses = self.circuit.afferent_synapses([320])
         self.synapse = self.synapses[0]
 
@@ -130,7 +130,7 @@ class TestSynapse(unittest.TestCase):
 class TestMemoryManagement(unittest.TestCase):
 
     def test_synapses(self):
-        circuit = brain.Circuit(brain.test.circuit_config)
+        circuit = morphio.Circuit(morphio.test.circuit_config)
         synapses = circuit.afferent_synapses([320])
         del circuit
         delays = synapses.delays()
@@ -138,7 +138,7 @@ class TestMemoryManagement(unittest.TestCase):
             assert(delay < 10)
 
     def test_synapse(self):
-        circuit = brain.Circuit(brain.test.circuit_config)
+        circuit = morphio.Circuit(morphio.test.circuit_config)
         synapses = circuit.afferent_synapses([320])
         del circuit
         synapses = [s for s in synapses]
@@ -147,5 +147,3 @@ class TestMemoryManagement(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
-

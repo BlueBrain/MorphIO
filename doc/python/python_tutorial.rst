@@ -30,7 +30,7 @@ possibilities depending on the Python version you want to use:
 
 .. code:: python
 
-    import brain
+    import morphio
     import numpy
 
 Circuits
@@ -45,8 +45,8 @@ with the path to the CircuitConfig:
     config = "/gpfs/bbp.cscs.ch/project/proj1/circuits/SomatosensoryCxS1-v5.r0/O1/merged_circuit/CircuitConfig"
     # If the circuit above is not accessible this is another alternative:
     #config = "/gpfs/bbp.cscs.ch/release/l2/2012.07.23/circuit/O1/merged_circuit/CircuitConfig"
-    
-    circuit = brain.Circuit(config)
+
+    circuit = morphio.Circuit(config)
 
 The most basic information we can obtain from a circuit is: \* GID sets
 from target names \* Neuron positions \* Morphological and
@@ -95,7 +95,7 @@ mvd2 or mvd3 circuit files.
     # The indices are used to get the actual names from a separate array.
     names = circuit.morphology_type_names()
     print(names[mtypes[0]])
-    
+
     etypes = circuit.electrophysiology_types(gids)
     names = circuit.electrophysiology_type_names() # typenames
     print(names[etypes[0]])
@@ -159,7 +159,7 @@ mvd2 or mvd3 circuit files.
     <ipython-input-8-6c40e1ced9bb> in <module>()
           1 # Invalid GID lists will throw ValueError or RuntimeError
     ----> 2 circuit.positions([1, 1, 2])
-    
+
 
     ValueError: Repeated GID found
 
@@ -177,7 +177,7 @@ mvd2 or mvd3 circuit files.
 
     <ipython-input-9-9863689e7678> in <module>()
     ----> 1 circuit.positions([0])
-    
+
 
     RuntimeError: Cell GID out of range: 0
 
@@ -195,7 +195,7 @@ mvd2 or mvd3 circuit files.
 
     <ipython-input-10-749cb12fdeb5> in <module>()
     ----> 1 circuit.positions([1000000])
-    
+
 
     RuntimeError: Cell GID out of range: 1000000
 
@@ -239,7 +239,7 @@ only in part of the synpase attributes.
 .. code:: python
 
     # add local coordinates relative to pre and post
-    
+
     # The rest will be loaded on demand
     %time x = synapses.post_center_x_positions()
     # The position and model attributes are cached separately.
@@ -305,8 +305,8 @@ explicitly states which ones are desired).
     # Let's load a morphology directly from a file.
     # Instead of providing a hardcoded file path we will get it from the circuit
     uri = circuit.morphology_uris({1000})[0]
-    morphology = brain.neuron.Morphology(uri)
-    
+    morphology = morphio.neuron.Morphology(uri)
+
     # Loading from the circuit is done using GIDs.
     # When morphologies are shared and local coordinates are requested the underlaying objects are also shared in memory.
     morphologies = circuit.load_morphologies({1000}, circuit.Coordinates.local)
@@ -360,9 +360,9 @@ Some functions also provide access to the low raw data arrays.
 
     # Sections can be retrieved by ID or type.
     # By type
-    axon = morphology.sections({brain.neuron.SectionType.axon})
+    axon = morphology.sections({morphio.neuron.SectionType.axon})
     # By id. The conversion is needed because id takes an integer, but not a numpy.uint32
-    axon = [morphology.section(int(id)) for id in morphology.section_ids({brain.neuron.SectionType.axon})]
+    axon = [morphology.section(int(id)) for id in morphology.section_ids({morphio.neuron.SectionType.axon})]
 .. code:: python
 
     # The soma cannot be converted to a section
@@ -378,7 +378,7 @@ Some functions also provide access to the low raw data arrays.
     <ipython-input-19-d5d9f3cc3afc> in <module>()
           1 # The soma cannot be converted to a section
     ----> 2 morphology.section(0) # throws
-    
+
 
     RuntimeError: The soma cannot be accessed as a Section
 
@@ -390,15 +390,15 @@ Some functions also provide access to the low raw data arrays.
     # Both may return None for first order and terminal sections respectively
     print("Children:", [s.id() for s in section.children()])
     print("Parent:", section.parent())
-    
+
     # To retrieve the sample locations and diameters the method is samples.
     print(section.samples())
-    
+
     # This method can take a list of relative position to obtain linearly interpolated sample positions.
     print(section.samples([0, 0.5, 1.0]))
-    
+
     # add convenience function for section, segment and position along segment
-        
+
     # Distances to soma can be queries in a similar way
     d = section.sample_distances_to_soma()
     print(section.length(), d[-1] - d[0])
@@ -448,7 +448,7 @@ synapses inside a time window:
 .. code:: python
 
     # Loading small simulations from ASCII doesn't take a lot of time.
-    %time reader = brain.SpikeReportReader('/gpfs/bbp.cscs.ch/project/proj3/simulations/vizCa2p0_1x7/out.dat')
+    %time reader = morphio.SpikeReportReader('/gpfs/bbp.cscs.ch/project/proj3/simulations/vizCa2p0_1x7/out.dat')
 
 .. parsed-literal::
 
@@ -458,10 +458,10 @@ synapses inside a time window:
 
 .. code:: python
 
-    # For bigger ones it's better to convert the data to binary first. 
+    # For bigger ones it's better to convert the data to binary first.
     # This is a 74 million cell report from a NEST simulation that has been converted to binary.
     # The conversion step took around one hour and the resulting file is 2.6 GB.
-    %time reader = brain.SpikeReportReader('/gpfs/bbp.cscs.ch/project/proj3/resources/simulations/till_viztm659/till.spikes')
+    %time reader = morphio.SpikeReportReader('/gpfs/bbp.cscs.ch/project/proj3/resources/simulations/till_viztm659/till.spikes')
 
 .. parsed-literal::
 
@@ -471,7 +471,7 @@ synapses inside a time window:
 
 .. code:: python
 
-    # The actual time interval of the report cannot be known by the reader. Instead, it provides the 
+    # The actual time interval of the report cannot be known by the reader. Instead, it provides the
     # time of the first and last spike.
     print (reader.getStartTime(), reader.getEndTime())
 

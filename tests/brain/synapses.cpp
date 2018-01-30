@@ -18,7 +18,7 @@
  */
 
 #include <BBP/TestDatasets.h>
-#include <brain/brain.h>
+#include <morphio/morphio.h>
 #include <vmmlib/vmmlib.hpp>
 
 #define BOOST_TEST_MODULE Synapses
@@ -26,11 +26,11 @@
 
 BOOST_AUTO_TEST_CASE(projection)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brain::Synapses& syn1 =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Synapses& syn1 =
         circuit.getProjectedSynapses(circuit.getGIDs("Layer1"),
                                      circuit.getGIDs("Layer2"));
-    const brain::Synapses& syn2 =
+    const morphio::Synapses& syn2 =
         circuit.getProjectedSynapses(circuit.getGIDs("Layer2"),
                                      circuit.getGIDs("Layer1"));
     BOOST_CHECK_NE(syn1.size(), syn2.size());
@@ -44,20 +44,20 @@ BOOST_AUTO_TEST_CASE(projection)
 
 BOOST_AUTO_TEST_CASE(projection_stream)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    brain::SynapsesStream stream =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    morphio::SynapsesStream stream =
         circuit.getProjectedSynapses(circuit.getGIDs("Layer2"),
                                      circuit.getGIDs("Layer5"),
-                                     brain::SynapsePrefetch::positions);
+                                     morphio::SynapsePrefetch::positions);
     const size_t remaining = 130;
     BOOST_CHECK_EQUAL(stream.getRemaining(), remaining);
-    std::future<brain::Synapses> future = stream.read();
+    std::future<morphio::Synapses> future = stream.read();
     size_t i = 1;
     size_t totalSize = 0;
     vmml::AABBf bbox;
     while (!stream.eos())
     {
-        const brain::Synapses synapses = future.get();
+        const morphio::Synapses synapses = future.get();
         future = stream.read(); // fetch next
 
         ++i;
@@ -80,10 +80,10 @@ BOOST_AUTO_TEST_CASE(projection_stream)
 
 BOOST_AUTO_TEST_CASE(afferent_synapses)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brain::Synapses& synapses =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Synapses& synapses =
         circuit.getAfferentSynapses(circuit.getGIDs("Layer1"),
-                                    brain::SynapsePrefetch::all);
+                                    morphio::SynapsePrefetch::all);
     BOOST_CHECK(!synapses.empty());
     BOOST_CHECK_EQUAL(synapses.size(), 1172);
     BOOST_CHECK_EQUAL(synapses[0].getPresynapticGID(), 10);
@@ -95,20 +95,20 @@ BOOST_AUTO_TEST_CASE(afferent_synapses)
 
 BOOST_AUTO_TEST_CASE(bad_external_afferent_synapses)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
-    const brain::Synapses& bad =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
+    const morphio::Synapses& bad =
         circuit.getExternalAfferentSynapses({1}, "Unexistent");
     BOOST_CHECK_THROW(bad.size(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(external_afferent_synapses)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
 
     const std::string label("Thalamocortical_fake_input");
-    const brain::Synapses& synapses =
+    const morphio::Synapses& synapses =
         circuit.getExternalAfferentSynapses(circuit.getGIDs("Layer1"), label,
-                                            brain::SynapsePrefetch::all);
+                                            morphio::SynapsePrefetch::all);
     BOOST_CHECK_EQUAL(synapses.size(), 1172);
     BOOST_CHECK_EQUAL(synapses[0].getPresynapticGID(), 10);
     BOOST_CHECK_CLOSE(synapses[1].getPostsynapticDistance(), 1.34995711f,
@@ -120,10 +120,10 @@ BOOST_AUTO_TEST_CASE(external_afferent_synapses)
 
 BOOST_AUTO_TEST_CASE(efferent_synapses)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brain::Synapses& synapses =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Synapses& synapses =
         circuit.getEfferentSynapses(brion::GIDSet{10},
-                                    brain::SynapsePrefetch::all);
+                                    morphio::SynapsePrefetch::all);
     BOOST_CHECK(!synapses.empty());
     BOOST_CHECK_EQUAL(synapses.size(), 74);
     BOOST_CHECK_EQUAL(synapses[0].getPostsynapticGID(), 1);
@@ -135,12 +135,12 @@ BOOST_AUTO_TEST_CASE(efferent_synapses)
 
 BOOST_AUTO_TEST_CASE(retrograde_projection)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
     const brion::GIDSet& preNeurons = circuit.getGIDs("Layer1");
     const brion::GIDSet postNeuron = {1};
-    const brain::Synapses& synapses =
+    const morphio::Synapses& synapses =
         circuit.getProjectedSynapses(preNeurons, postNeuron,
-                                     brain::SynapsePrefetch::all);
+                                     morphio::SynapsePrefetch::all);
     BOOST_CHECK(!synapses.empty());
     BOOST_CHECK_EQUAL(synapses.size(), 5);
     for (const auto& synapse : synapses)
@@ -149,11 +149,11 @@ BOOST_AUTO_TEST_CASE(retrograde_projection)
 
 BOOST_AUTO_TEST_CASE(lazy_loading_afferent)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brain::Synapses& synapses =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Synapses& synapses =
         circuit.getAfferentSynapses(circuit.getGIDs("Layer1"),
-                                    brain::SynapsePrefetch::all);
-    const brain::Synapses& synapsesLazy =
+                                    morphio::SynapsePrefetch::all);
+    const morphio::Synapses& synapsesLazy =
         circuit.getAfferentSynapses(circuit.getGIDs("Layer1"));
     BOOST_CHECK_EQUAL(synapses.size(), synapsesLazy.size());
     BOOST_CHECK_EQUAL(synapses[0].getPresynapticGID(),
@@ -168,13 +168,13 @@ BOOST_AUTO_TEST_CASE(lazy_loading_afferent)
 
 BOOST_AUTO_TEST_CASE(lazy_loading_external_afferent_synapses)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_CIRCUITCONFIG));
 
     const std::string label("Thalamocortical_fake_input");
-    const brain::Synapses& synapses =
+    const morphio::Synapses& synapses =
         circuit.getExternalAfferentSynapses(circuit.getGIDs("Layer1"), label,
-                                            brain::SynapsePrefetch::all);
-    const brain::Synapses& synapsesLazy =
+                                            morphio::SynapsePrefetch::all);
+    const morphio::Synapses& synapsesLazy =
         circuit.getExternalAfferentSynapses(circuit.getGIDs("Layer1"), label);
     BOOST_CHECK_EQUAL(synapses.size(), synapsesLazy.size());
     for (auto s1 = synapses.begin(), s2 = synapsesLazy.begin();
@@ -187,11 +187,11 @@ BOOST_AUTO_TEST_CASE(lazy_loading_external_afferent_synapses)
 
 BOOST_AUTO_TEST_CASE(lazy_loading_efferent)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brain::Synapses& synapses =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Synapses& synapses =
         circuit.getEfferentSynapses(circuit.getGIDs("Layer1"),
-                                    brain::SynapsePrefetch::all);
-    const brain::Synapses& synapsesLazy =
+                                    morphio::SynapsePrefetch::all);
+    const morphio::Synapses& synapsesLazy =
         circuit.getEfferentSynapses(circuit.getGIDs("Layer1"));
 
     BOOST_CHECK_EQUAL(synapses.size(), synapsesLazy.size());
@@ -207,12 +207,12 @@ BOOST_AUTO_TEST_CASE(lazy_loading_efferent)
 
 BOOST_AUTO_TEST_CASE(lazy_loading_pathway)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brain::Synapses& synapses =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Synapses& synapses =
         circuit.getProjectedSynapses(circuit.getGIDs("Layer2"),
                                      circuit.getGIDs("Layer4"),
-                                     brain::SynapsePrefetch::all);
-    const brain::Synapses& synapsesLazy =
+                                     morphio::SynapsePrefetch::all);
+    const morphio::Synapses& synapsesLazy =
         circuit.getProjectedSynapses(circuit.getGIDs("Layer2"),
                                      circuit.getGIDs("Layer4"));
 
@@ -229,18 +229,18 @@ BOOST_AUTO_TEST_CASE(lazy_loading_pathway)
 
 BOOST_AUTO_TEST_CASE(copy)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brain::Synapses& synapses =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Synapses& synapses =
         circuit.getAfferentSynapses(circuit.getGIDs("Layer1"));
 
-    const brain::Synapses synapsesCopy = synapses;
+    const morphio::Synapses synapsesCopy = synapses;
 
     BOOST_CHECK_EQUAL(synapses.size(), synapsesCopy.size());
     BOOST_CHECK_EQUAL(synapses[0].getPresynapticGID(),
                       synapsesCopy[0].getPresynapticGID());
 
-    const brain::Synapse synapse = synapses[1];
-    const brain::Synapse synapseCopy = synapse;
+    const morphio::Synapse synapse = synapses[1];
+    const morphio::Synapse synapseCopy = synapse;
     BOOST_CHECK_EQUAL(synapse.getPresynapticGID(),
                       synapseCopy.getPresynapticGID());
 
@@ -249,12 +249,12 @@ BOOST_AUTO_TEST_CASE(copy)
 
 BOOST_AUTO_TEST_CASE(full_copy)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brain::Synapses& synapses =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Synapses& synapses =
         circuit.getAfferentSynapses(circuit.getGIDs("Layer1"),
-                                    brain::SynapsePrefetch::all);
+                                    morphio::SynapsePrefetch::all);
 
-    const brain::Synapses synapsesCopy = synapses;
+    const morphio::Synapses synapsesCopy = synapses;
 
     BOOST_CHECK_EQUAL(synapses.size(), synapsesCopy.size());
     BOOST_CHECK_EQUAL(synapses[0].getPostsynapticSurfacePosition(),
@@ -265,13 +265,13 @@ BOOST_AUTO_TEST_CASE(full_copy)
 
 BOOST_AUTO_TEST_CASE(check_all_synapse_attributes)
 {
-    const brain::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
-    const brain::Synapses& synapses =
+    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Synapses& synapses =
         circuit.getAfferentSynapses(brion::GIDSet{1},
-                                    brain::SynapsePrefetch::all);
+                                    morphio::SynapsePrefetch::all);
     BOOST_CHECK_EQUAL(synapses.size(), 77);
 
-    const brain::Synapse& synapse = synapses[0];
+    const morphio::Synapse& synapse = synapses[0];
     BOOST_CHECK_EQUAL(synapse.getConductance(), 0.572888553f);
     BOOST_CHECK_EQUAL(synapse.getDecay(), 10.208410263f);
     BOOST_CHECK_EQUAL(synapse.getDelay(), 0.583546519f);

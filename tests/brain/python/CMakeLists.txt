@@ -5,10 +5,10 @@
 #
 # Change this number when adding tests to force a CMake run: 2
 
-if(NOT TARGET BBPTestData OR NOT TARGET brain_python)
+if(NOT TARGET BBPTestData OR NOT TARGET morphio_python)
   return()
 endif()
 
-set(PYTHON_TEST_DEPENDENCIES brain_python)
+set(PYTHON_TEST_DEPENDENCIES morphio_python)
 include(CommonPythonCTest)
 configure_file(setup.py.in ${PYTHON_TEST_OUTPUT_PATH}/setup.py)

@@ -17,9 +17,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <brain/brain.h>
-#include <brain/spikeReportReader.h>
-#include <brain/spikeReportWriter.h>
+#include <morphio/morphio.h>
+#include <morphio/spikeReportReader.h>
+#include <morphio/spikeReportWriter.h>
 
 #include <BBP/TestDatasets.h>
 
@@ -80,12 +80,12 @@ std::ostream& operator<<(std::ostream& os, const brion::Spike& spike)
 
 BOOST_AUTO_TEST_CASE(test_invalid_report)
 {
-    BOOST_CHECK_THROW(brain::SpikeReportReader report0(brion::URI("./bla")),
+    BOOST_CHECK_THROW(morphio::SpikeReportReader report0(brion::URI("./bla")),
                       std::runtime_error);
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/README";
-    BOOST_CHECK_THROW(brain::SpikeReportReader(brion::URI(path.string())),
+    BOOST_CHECK_THROW(morphio::SpikeReportReader(brion::URI(path.string())),
                       std::runtime_error);
 }
 
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(test_simple_load_static)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(brion::URI(path.string()));
 }
 
 BOOST_AUTO_TEST_CASE(test_simple_read_bluron)
@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(test_simple_read_bluron)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(brion::URI(path.string()));
     const brion::Spikes& spikes =
         reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE(test_simple_read_nest)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= NEST_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(brion::URI(path.string()));
     const brion::Spikes& spikes =
         reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
@@ -138,8 +138,8 @@ BOOST_AUTO_TEST_CASE(test_simple_read_filtered)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    brain::GIDSet gids{1, 10, 100};
-    brain::SpikeReportReader reader(brion::URI(path.string()), gids);
+    morphio::GIDSet gids{1, 10, 100};
+    morphio::SpikeReportReader reader(brion::URI(path.string()), gids);
     const auto spikes = reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
     BOOST_REQUIRE(!spikes.empty());
     for (auto spike : spikes)
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(test_closed_window)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
-    brain::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(brion::URI(path.string()));
     BOOST_CHECK_THROW(reader.getSpikes(2.5f, 2.5f), std::logic_error);
 }
 
@@ -158,7 +158,7 @@ BOOST_AUTO_TEST_CASE(test_out_of_window)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
-    brain::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(brion::URI(path.string()));
     const brion::Spikes& spikes =
         reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
@@ -172,7 +172,7 @@ BOOST_AUTO_TEST_CASE(test_moving_window)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= NEST_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(brion::URI(path.string()));
 
     float start = 0;
     while (!reader.hasEnded())
@@ -203,17 +203,17 @@ BOOST_AUTO_TEST_CASE(TestSpikes_nest_spikes_read_write)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(brion::URI(path.string()));
     const brion::Spikes& readSpikes =
         reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
     TmpFile file(".gdf");
 
-    brain::SpikeReportWriter writer(brion::URI(file.name));
+    morphio::SpikeReportWriter writer(brion::URI(file.name));
     writer.writeSpikes(readSpikes);
     writer.close();
 
-    brain::SpikeReportReader reReader(brion::URI(file.name));
+    morphio::SpikeReportReader reReader(brion::URI(file.name));
     const brion::Spikes& reReadSpikes =
         reReader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
@@ -226,17 +226,17 @@ BOOST_AUTO_TEST_CASE(TestSpikes_bluron_spikes_read_write)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    brain::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(brion::URI(path.string()));
     const brion::Spikes& readSpikes =
         reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
     TmpFile file(".dat");
 
-    brain::SpikeReportWriter writer(brion::URI(file.name));
+    morphio::SpikeReportWriter writer(brion::URI(file.name));
     writer.writeSpikes(readSpikes);
     writer.close();
 
-    brain::SpikeReportReader reReader(brion::URI(file.name));
+    morphio::SpikeReportReader reReader(brion::URI(file.name));
     const brion::Spikes& reReadSpikes =
         reReader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
 
