@@ -23,7 +23,7 @@
 
 #include "../morphologyPlugin.h"
 
-namespace brion
+namespace minimorph
 {
 namespace plugin
 {

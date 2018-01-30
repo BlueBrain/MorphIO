@@ -29,15 +29,15 @@ set(BRION_LINK_LIBRARIES
   PRIVATE HighFive
 )
 
-FILE(GLOB_RECURSE BRION_SOURCES ${CMAKE_SOURCE_DIR}/brion/*.cpp)
+FILE(GLOB_RECURSE BRION_SOURCES ${CMAKE_SOURCE_DIR}/minimorph/*.cpp)
 
-add_library(brion
+add_library(minimorph
     SHARED
     ${BRION_PUBLIC_HEADERS} ${BRION_HEADERS} ${BRION_SOURCES}
     )
-target_link_libraries(brion ${BRION_LINK_LIBRARIES})
+target_link_libraries(minimorph ${BRION_LINK_LIBRARIES})
 
-include_directories(brion
+include_directories(minimorph
     ${HDF5_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}
 )

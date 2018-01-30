@@ -72,7 +72,7 @@ struct TmpFile
 
 namespace std
 {
-std::ostream& operator<<(std::ostream& os, const brion::Spike& spike)
+std::ostream& operator<<(std::ostream& os, const minimorph::Spike& spike)
 {
     return os << spike.first << ", " << spike.second;
 }
@@ -80,12 +80,12 @@ std::ostream& operator<<(std::ostream& os, const brion::Spike& spike)
 
 BOOST_AUTO_TEST_CASE(test_invalid_report)
 {
-    BOOST_CHECK_THROW(morphio::SpikeReportReader report0(brion::URI("./bla")),
+    BOOST_CHECK_THROW(morphio::SpikeReportReader report0(minimorph::URI("./bla")),
                       std::runtime_error);
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/README";
-    BOOST_CHECK_THROW(morphio::SpikeReportReader(brion::URI(path.string())),
+    BOOST_CHECK_THROW(morphio::SpikeReportReader(minimorph::URI(path.string())),
                       std::runtime_error);
 }
 
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(test_simple_load_static)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    morphio::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(minimorph::URI(path.string()));
 }
 
 BOOST_AUTO_TEST_CASE(test_simple_read_bluron)
@@ -102,9 +102,9 @@ BOOST_AUTO_TEST_CASE(test_simple_read_bluron)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    morphio::SpikeReportReader reader(brion::URI(path.string()));
-    const brion::Spikes& spikes =
-        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
+    morphio::SpikeReportReader reader(minimorph::URI(path.string()));
+    const minimorph::Spikes& spikes =
+        reader.getSpikes(0, minimorph::UNDEFINED_TIMESTAMP);
 
     BOOST_REQUIRE_EQUAL(spikes.size(), BLURON_SPIKES_COUNT);
 
@@ -120,9 +120,9 @@ BOOST_AUTO_TEST_CASE(test_simple_read_nest)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= NEST_SPIKE_REPORT_FILE;
 
-    morphio::SpikeReportReader reader(brion::URI(path.string()));
-    const brion::Spikes& spikes =
-        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
+    morphio::SpikeReportReader reader(minimorph::URI(path.string()));
+    const minimorph::Spikes& spikes =
+        reader.getSpikes(0, minimorph::UNDEFINED_TIMESTAMP);
 
     BOOST_REQUIRE_EQUAL(spikes.size(), NEST_SPIKES_COUNT);
 
@@ -139,8 +139,8 @@ BOOST_AUTO_TEST_CASE(test_simple_read_filtered)
     path /= BLURON_SPIKE_REPORT_FILE;
 
     morphio::GIDSet gids{1, 10, 100};
-    morphio::SpikeReportReader reader(brion::URI(path.string()), gids);
-    const auto spikes = reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
+    morphio::SpikeReportReader reader(minimorph::URI(path.string()), gids);
+    const auto spikes = reader.getSpikes(0, minimorph::UNDEFINED_TIMESTAMP);
     BOOST_REQUIRE(!spikes.empty());
     for (auto spike : spikes)
         BOOST_CHECK(gids.find(spike.second) != gids.end());
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE(test_closed_window)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
-    morphio::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(minimorph::URI(path.string()));
     BOOST_CHECK_THROW(reader.getSpikes(2.5f, 2.5f), std::logic_error);
 }
 
@@ -158,9 +158,9 @@ BOOST_AUTO_TEST_CASE(test_out_of_window)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
-    morphio::SpikeReportReader reader(brion::URI(path.string()));
-    const brion::Spikes& spikes =
-        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
+    morphio::SpikeReportReader reader(minimorph::URI(path.string()));
+    const minimorph::Spikes& spikes =
+        reader.getSpikes(0, minimorph::UNDEFINED_TIMESTAMP);
 
     const float start = spikes.back().first + 1;
 
@@ -172,12 +172,12 @@ BOOST_AUTO_TEST_CASE(test_moving_window)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= NEST_SPIKE_REPORT_FILE;
 
-    morphio::SpikeReportReader reader(brion::URI(path.string()));
+    morphio::SpikeReportReader reader(minimorph::URI(path.string()));
 
     float start = 0;
     while (!reader.hasEnded())
     {
-        const brion::Spikes& spikes = reader.getSpikes(start, start + 1);
+        const minimorph::Spikes& spikes = reader.getSpikes(start, start + 1);
         if (!spikes.empty())
         {
             BOOST_CHECK(spikes.begin()->first >= start);
@@ -186,8 +186,8 @@ BOOST_AUTO_TEST_CASE(test_moving_window)
         start += 1;
     }
 
-    const brion::Spikes& spikes =
-        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
+    const minimorph::Spikes& spikes =
+        reader.getSpikes(0, minimorph::UNDEFINED_TIMESTAMP);
 
     BOOST_REQUIRE_EQUAL(spikes.size(), NEST_SPIKES_COUNT);
 
@@ -203,19 +203,19 @@ BOOST_AUTO_TEST_CASE(TestSpikes_nest_spikes_read_write)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    morphio::SpikeReportReader reader(brion::URI(path.string()));
-    const brion::Spikes& readSpikes =
-        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
+    morphio::SpikeReportReader reader(minimorph::URI(path.string()));
+    const minimorph::Spikes& readSpikes =
+        reader.getSpikes(0, minimorph::UNDEFINED_TIMESTAMP);
 
     TmpFile file(".gdf");
 
-    morphio::SpikeReportWriter writer(brion::URI(file.name));
+    morphio::SpikeReportWriter writer(minimorph::URI(file.name));
     writer.writeSpikes(readSpikes);
     writer.close();
 
-    morphio::SpikeReportReader reReader(brion::URI(file.name));
-    const brion::Spikes& reReadSpikes =
-        reReader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
+    morphio::SpikeReportReader reReader(minimorph::URI(file.name));
+    const minimorph::Spikes& reReadSpikes =
+        reReader.getSpikes(0, minimorph::UNDEFINED_TIMESTAMP);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(readSpikes.begin(), readSpikes.end(),
                                   reReadSpikes.begin(), reReadSpikes.end());
@@ -226,19 +226,19 @@ BOOST_AUTO_TEST_CASE(TestSpikes_bluron_spikes_read_write)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= BLURON_SPIKE_REPORT_FILE;
 
-    morphio::SpikeReportReader reader(brion::URI(path.string()));
-    const brion::Spikes& readSpikes =
-        reader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
+    morphio::SpikeReportReader reader(minimorph::URI(path.string()));
+    const minimorph::Spikes& readSpikes =
+        reader.getSpikes(0, minimorph::UNDEFINED_TIMESTAMP);
 
     TmpFile file(".dat");
 
-    morphio::SpikeReportWriter writer(brion::URI(file.name));
+    morphio::SpikeReportWriter writer(minimorph::URI(file.name));
     writer.writeSpikes(readSpikes);
     writer.close();
 
-    morphio::SpikeReportReader reReader(brion::URI(file.name));
-    const brion::Spikes& reReadSpikes =
-        reReader.getSpikes(0, brion::UNDEFINED_TIMESTAMP);
+    morphio::SpikeReportReader reReader(minimorph::URI(file.name));
+    const minimorph::Spikes& reReadSpikes =
+        reReader.getSpikes(0, minimorph::UNDEFINED_TIMESTAMP);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(readSpikes.begin(), readSpikes.end(),
                                   reReadSpikes.begin(), reReadSpikes.end());

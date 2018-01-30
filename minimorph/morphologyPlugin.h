@@ -20,13 +20,13 @@
 
 #pragma once
 
-#include <brion/api.h>
-#include <brion/morphology.h>     // Needed by doxygen
-#include <brion/types.h>
+#include <minimorph/api.h>
+#include <minimorph/morphology.h>     // Needed by doxygen
+#include <minimorph/types.h>
 
 #include <string>
 
-namespace brion
+namespace minimorph
 {
 /**
  * Basic plugin init data for MorphologyPlugin.
@@ -108,21 +108,21 @@ public:
     MorphologyInitData& getInitData() { return _data; }
     const MorphologyInitData& getInitData() const { return _data; }
 
-    /** @copydoc brion::Morphology::getCellFamily */
+    /** @copydoc minimorph::Morphology::getCellFamily */
     CellFamily getCellFamily() const { return _data.family; }
 
     /** @internal */
     MorphologyVersion getVersion() const { return _data.version; }
-    /** @copydoc brion::Morphology::getPoints */
+    /** @copydoc minimorph::Morphology::getPoints */
     Vector4fs& getPoints() { return _points; }
     const Vector4fs& getPoints() const { return _points; }
-    /** @copydoc brion::Morphology::getSections */
+    /** @copydoc minimorph::Morphology::getSections */
     Vector2is& getSections() { return _sections; }
     const Vector2is& getSections() const { return _sections; }
-    /** @copydoc brion::Morphology::getSectionTypes */
+    /** @copydoc minimorph::Morphology::getSectionTypes */
     SectionTypes& getSectionTypes() { return _sectionTypes; }
     const SectionTypes& getSectionTypes() const { return _sectionTypes; }
-    /** @copydoc brion::Morphology::getPerimeters */
+    /** @copydoc minimorph::Morphology::getPerimeters */
     floats& getPerimeters() { return _perimeters; }
     const floats& getPerimeters() const { return _perimeters; }
 protected:
@@ -134,7 +134,7 @@ protected:
 
     /*
     // Serializable API
-    std::string getTypeName() const final { return "brion::MorphologyPlugin"; }
+    std::string getTypeName() const final { return "minimorph::MorphologyPlugin"; }
     bool _fromBinary(const void* data, const size_t size) final;
     */
 };
@@ -144,7 +144,7 @@ protected:
 #if 0
 namespace std
 {
-inline string to_string(const brion::MorphologyInitData& data)
+inline string to_string(const minimorph::MorphologyInitData& data)
 {
     return to_string(data.getURI());
 }

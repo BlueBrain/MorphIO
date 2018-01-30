@@ -33,19 +33,19 @@
 
 BOOST_AUTO_TEST_CASE(invalid_open)
 {
-    BOOST_CHECK_THROW(morphio::CompartmentReport(brion::URI("/bla")),
+    BOOST_CHECK_THROW(morphio::CompartmentReport(minimorph::URI("/bla")),
                       std::runtime_error);
-    BOOST_CHECK_THROW(morphio::CompartmentReport(brion::URI("bla")),
+    BOOST_CHECK_THROW(morphio::CompartmentReport(minimorph::URI("bla")),
                       std::runtime_error);
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/README";
-    BOOST_CHECK_THROW(morphio::CompartmentReport(brion::URI(path.string())),
+    BOOST_CHECK_THROW(morphio::CompartmentReport(minimorph::URI(path.string())),
                       std::runtime_error);
 
     path = BBP_TESTDATA;
     path /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
-    BOOST_CHECK_THROW(morphio::CompartmentReport(brion::URI(path.string())),
+    BOOST_CHECK_THROW(morphio::CompartmentReport(minimorph::URI(path.string())),
                       std::runtime_error);
 }
 
@@ -53,24 +53,24 @@ BOOST_AUTO_TEST_CASE(open_binary)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/simulations/may17_2011/Control/voltage.bbp";
-    BOOST_CHECK_NO_THROW(morphio::CompartmentReport(brion::URI(path.string())));
+    BOOST_CHECK_NO_THROW(morphio::CompartmentReport(minimorph::URI(path.string())));
 }
 
 BOOST_AUTO_TEST_CASE(open_hdf5)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/simulations/may17_2011/Control/voltage.h5";
-    BOOST_CHECK_NO_THROW(morphio::CompartmentReport(brion::URI(path.string())));
+    BOOST_CHECK_NO_THROW(morphio::CompartmentReport(minimorph::URI(path.string())));
 }
 
 BOOST_AUTO_TEST_CASE(invalid_mapping)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/simulations/may17_2011/Control/voltage.bbp";
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(123456789);
 
-    morphio::CompartmentReport reader(brion::URI(path.string()));
+    morphio::CompartmentReport reader(minimorph::URI(path.string()));
 
     BOOST_CHECK_THROW(reader.createView(gids), std::runtime_error);
 }
@@ -80,9 +80,9 @@ void testBounds(const char* relativePath)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= relativePath;
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(1);
-    morphio::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(minimorph::URI(path.string()));
     auto view = report.createView(gids);
 
     auto frame = view.load(report.getMetaData().startTime).get();
@@ -110,9 +110,9 @@ inline void testReadSoma(const char* relativePath)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= relativePath;
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(1);
-    morphio::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(minimorph::URI(path.string()));
     auto view = report.createView(gids);
 
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
@@ -152,8 +152,8 @@ inline void testReadAllComps(const char* relativePath)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= relativePath;
 
-    morphio::CompartmentReport report(brion::URI(path.string()));
-    auto view = report.createView(brion::GIDSet());
+    morphio::CompartmentReport report(minimorph::URI(path.string()));
+    auto view = report.createView(minimorph::GIDSet());
 
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
     BOOST_CHECK_EQUAL(report.getMetaData().endTime, 10.);
@@ -186,14 +186,14 @@ void testRead(const char* relativePath)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= relativePath;
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(394);
     gids.insert(400);
 
-    morphio::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(minimorph::URI(path.string()));
     auto view = report.createView(gids);
 
-    const brion::SectionOffsets& offsets = view.getMapping().getOffsets();
+    const minimorph::SectionOffsets& offsets = view.getMapping().getOffsets();
     BOOST_CHECK_EQUAL(offsets.size(), 2);
 
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
@@ -221,11 +221,11 @@ void testReadRange(const char* relativePath)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= relativePath;
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(394);
     gids.insert(400);
 
-    morphio::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(minimorph::URI(path.string()));
     auto view = report.createView(gids);
 
     const double start = report.getMetaData().startTime;
@@ -252,11 +252,11 @@ void testReadStep(const char* relativePath)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= relativePath;
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(394);
     gids.insert(400);
 
-    morphio::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(minimorph::URI(path.string()));
     auto view = report.createView(gids);
 
     const double start = report.getMetaData().startTime;
@@ -290,14 +290,14 @@ void testReadAll(const char* relativePath)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= relativePath;
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(394);
     gids.insert(400);
 
-    morphio::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(minimorph::URI(path.string()));
     auto view = report.createView(gids);
 
-    const brion::SectionOffsets& offsets = view.getMapping().getOffsets();
+    const minimorph::SectionOffsets& offsets = view.getMapping().getOffsets();
     BOOST_CHECK_EQUAL(offsets.size(), 2);
 
     BOOST_CHECK_EQUAL(report.getMetaData().startTime, 0.);
@@ -327,9 +327,9 @@ void testIndices(const char* relativePath)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= relativePath;
 
-    brion::GIDSet gids{400};
+    minimorph::GIDSet gids{400};
 
-    morphio::CompartmentReport report(brion::URI(path.string()));
+    morphio::CompartmentReport report(minimorph::URI(path.string()));
     auto view = report.createView(gids);
 
     BOOST_CHECK_EQUAL(view.getMapping().getIndex().size(), 309);

@@ -22,7 +22,7 @@
 
 #include <iostream>
 
-namespace brion
+namespace minimorph
 {
 namespace detail
 {

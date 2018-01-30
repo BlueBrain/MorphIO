@@ -35,7 +35,7 @@
 //TODO: compile
 #include <iostream>
 
-namespace brion
+namespace minimorph
 {
 namespace plugin
 {
@@ -204,7 +204,7 @@ void MorphologySWC::_readSamples(RawSWCInfo& info)
 {
     std::ifstream file(info.filename.c_str());
     if (file.fail())
-        LBTHROW(brion::RawDataError("Error opening morphology file: " +
+        LBTHROW(minimorph::RawDataError("Error opening morphology file: " +
                                    info.filename));
 
     Samples& samples = info.samples;
@@ -225,14 +225,14 @@ void MorphologySWC::_readSamples(RawSWCInfo& info)
         const unsigned int id = strtol(line.data(), &data, 10);
         if (*data != ' ' && *data != '\t')
         {
-            LBTHROW(brion::RawDataError(
+            LBTHROW(minimorph::RawDataError(
                 "Reading swc morphology file: " + info.filename +
                 ", parse error at line " + std::to_string(lineNumber)));
         }
         samples.resize(std::max(samples.size(), size_t(id + 1)));
         if (samples[id].valid)
         {
-            LBTHROW(brion::IDSequenceError(
+            LBTHROW(minimorph::IDSequenceError(
                         "Reading swc morphology file: " + info.filename
                         + ", repeated sample id " + std::to_string(id) + " at line "
                         + std::to_string(lineNumber)));
@@ -243,7 +243,7 @@ void MorphologySWC::_readSamples(RawSWCInfo& info)
             ++totalSamples;
             if (!samples[id].valid)
             {
-                LBTHROW(brion::IDSequenceError(
+                LBTHROW(minimorph::IDSequenceError(
                     "Reading swc morphology file: " + info.filename +
                     ", parse error at line " + std::to_string(lineNumber)));
             }
@@ -270,7 +270,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
         visited.push_back(!sample.valid);
 
     if (samples.empty())
-        LBTHROW(brion::SomaError("Reading swc morphology file: " +
+        LBTHROW(minimorph::SomaError("Reading swc morphology file: " +
                                  info.filename + ", no soma section found"));
 
     size_t currentSample = samples.size() - 1;
@@ -296,7 +296,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
         {
             if (sample.parent == int(currentSample))
             {
-                LBTHROW(brion::IDSequenceError("Reading swc morphology file: " +
+                LBTHROW(minimorph::IDSequenceError("Reading swc morphology file: " +
                                            info.filename +
                                            ", found a sample point to itself"));
             }
@@ -307,7 +307,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
                 msg << "Reading swc morphology file: " << info.filename
                     << ", broken tree (missing sample  " << sample.parent << ")"
                     << std::endl;
-                LBTHROW(brion::MissingParentError(msg.str()));
+                LBTHROW(minimorph::MissingParentError(msg.str()));
             }
 
             if (parent->type == SWC_SECTION_SOMA)
@@ -339,7 +339,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
             {
                 if (sample.type == SWC_SECTION_SOMA)
                 {
-                    LBTHROW(brion::SomaError(
+                    LBTHROW(minimorph::SomaError(
                         "Reading swc morphology file: " + info.filename +
                         ", found soma sample with neurite parent"));
                 }
@@ -366,7 +366,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
                 if (info.roots.size() &&
                     samples[info.roots[0]].type == SWC_SECTION_SOMA)
                 {
-                    LBTHROW(brion::SomaError("Reading swc morphology file: " +
+                    LBTHROW(minimorph::SomaError("Reading swc morphology file: " +
                                                info.filename +
                                                ", found two soma sections"));
                 }
@@ -409,7 +409,7 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
         }
     }
     if (!hasSoma)
-        LBTHROW(brion::SomaError("Reading swc morphology file: " +
+        LBTHROW(minimorph::SomaError("Reading swc morphology file: " +
                                  info.filename + ", no soma section found"));
 }
 

@@ -24,7 +24,7 @@
 #include "../detail/morphologyHDF5.h"
 #include "../detail/utilsHDF5.h"
 
-#include <brion/version.h>
+#include <minimorph/version.h>
 
 //TODO: compile
 #include <iostream>
@@ -33,7 +33,7 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5Utility.hpp>
 
-namespace brion
+namespace minimorph
 {
 namespace plugin
 {
@@ -56,7 +56,7 @@ struct Loader
         }
         catch (const HighFive::FileException& exc)
         {
-            LBTHROW(brion::RawDataError(_write
+            LBTHROW(minimorph::RawDataError(_write
                                            ? "Could not create morphology file "
                                            : "Could not open morphology file " +
                                                  path + ": " + exc.what()));
@@ -108,7 +108,7 @@ private:
         catch (...)
         {
             LBTHROW(
-                brion::RawDataError("Unknown morphology file format for "
+                minimorph::RawDataError("Unknown morphology file format for "
                                    "file " +
                                    source));
         }
@@ -146,7 +146,7 @@ private:
 
         if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns)
         {
-            LBTHROW(brion::RawDataError("Opening morphology file '" +
+            LBTHROW(minimorph::RawDataError("Opening morphology file '" +
                                        _file->getName() +
                                        "': bad number of dimensions in"
                                        " 'points' dataspace"));
@@ -158,7 +158,7 @@ private:
         if (_sectionsDims.size() != 2 ||
             _sectionsDims[1] != _structureV1Columns)
         {
-            LBTHROW(brion::RawDataError("Opening morphology file '" +
+            LBTHROW(minimorph::RawDataError("Opening morphology file '" +
                                        _file->getName() +
                                        "': bad number of dimensions in"
                                        " 'structure' dataspace"));
@@ -194,7 +194,7 @@ private:
             // All other exceptions are not expected because if the metadata
             // group exits it must contain at least the version, and for
             // version 1.1 it must contain the family.
-            LBTHROW(brion::RawDataError(
+            LBTHROW(minimorph::RawDataError(
                 std::string("Error reading morphology metadata: ") + e.what()));
         }
 

@@ -6,8 +6,8 @@
 #include <morphio/section.h>
 #include <morphio/soma.h>
 
-#include <brion/enums.h>
-#include <brion/morphology.h>
+#include <minimorph/enums.h>
+#include <minimorph/morphology.h>
 
 
 namespace py = pybind11;
@@ -82,23 +82,23 @@ public:
 }} // namespace pybind11::detail
 
 
-PYBIND11_MODULE(python_brion, m) {
+PYBIND11_MODULE(python_minimorph, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
 
-    py::class_<brion::Morphology>(m, "BrionMorphology")
-        .def(py::init<const brion::URI&>())
-        .def("getCellFamily", &brion::Morphology::getCellFamily)
-        .def("getPoints", (brion::Vector4fs& (brion::Morphology::*)())&brion::Morphology::getPoints)
-        .def("getSections", (brion::Vector2is& (brion::Morphology::*)())&brion::Morphology::getSections)
-        .def("getSectionTypes", (brion::SectionTypes& (brion::Morphology::*)())&brion::Morphology::getSectionTypes)
-        .def("getPerimeters", (brion::floats& (brion::Morphology::*)())&brion::Morphology::getPerimeters)
-        .def("getVersion", &brion::Morphology::getVersion);
+    py::class_<minimorph::Morphology>(m, "BrionMorphology")
+        .def(py::init<const minimorph::URI&>())
+        .def("getCellFamily", &minimorph::Morphology::getCellFamily)
+        .def("getPoints", (minimorph::Vector4fs& (minimorph::Morphology::*)())&minimorph::Morphology::getPoints)
+        .def("getSections", (minimorph::Vector2is& (minimorph::Morphology::*)())&minimorph::Morphology::getSections)
+        .def("getSectionTypes", (minimorph::SectionTypes& (minimorph::Morphology::*)())&minimorph::Morphology::getSectionTypes)
+        .def("getPerimeters", (minimorph::floats& (minimorph::Morphology::*)())&minimorph::Morphology::getPerimeters)
+        .def("getVersion", &minimorph::Morphology::getVersion);
 
-    // .def(py::init<const brion::URI&, const brion::Matrix4f&>());
+    // .def(py::init<const minimorph::URI&, const minimorph::Matrix4f&>());
     py::class_<morphio::Morphology>(m, "Morphology")
-        .def(py::init<const brion::URI&>())
-        .def("getPoints", (brion::Vector4fs& (morphio::Morphology::*)())&morphio::Morphology::getPoints)
+        .def(py::init<const minimorph::URI&>())
+        .def("getPoints", (minimorph::Vector4fs& (morphio::Morphology::*)())&morphio::Morphology::getPoints)
         .def("getSectionTypes", (morphio::SectionTypes& (morphio::Morphology::*)())&morphio::Morphology::getSectionTypes)
         .def("getSectionIDs", (morphio::uint32_ts (morphio::Morphology::*)())&morphio::Morphology::getSectionIDs)
         .def("getSections", (const morphio::Vector2is& (morphio::Morphology::*)() const)&morphio::Morphology::getSections)
@@ -108,7 +108,7 @@ PYBIND11_MODULE(python_brion, m) {
         .def("getRootSections", &morphio::Morphology::getRootSections)
         .def("getSoma", (morphio::Soma (morphio::Morphology::*)())&morphio::Morphology::getSoma)
         .def("getVersion", &morphio::Morphology::getVersion);
-        // .def("getTransformation", (brion::Matrix4f& (morphio::Morphology::*)()&morphio::Morphology::getTransformation));
+        // .def("getTransformation", (minimorph::Matrix4f& (morphio::Morphology::*)()&morphio::Morphology::getTransformation));
 
     py::class_<morphio::Soma>(m, "Soma")
         .def(py::init<const morphio::Soma&>())
@@ -135,44 +135,44 @@ PYBIND11_MODULE(python_brion, m) {
         .value("all", morphio::SectionType::all)
         .export_values();
 
-    py::enum_<brion::enums::SectionType>(m, "BrionSectionType")
-        .value("SECTION_UNDEFINED", brion::enums::SectionType::SECTION_UNDEFINED)
-        .value("SECTION_SOMA", brion::enums::SectionType::SECTION_SOMA)
-        .value("SECTION_AXON", brion::enums::SectionType::SECTION_AXON)
-        .value("SECTION_DENDRITE", brion::enums::SectionType::SECTION_DENDRITE)
-        .value("SECTION_APICAL_DENDRITE", brion::enums::SectionType::SECTION_APICAL_DENDRITE)
-        .value("SECTION_GLIA_PROCESS", brion::enums::SectionType::SECTION_GLIA_PROCESS)
-        .value("SECTION_GLIA_ENDFOOT", brion::enums::SectionType::SECTION_GLIA_ENDFOOT)
+    py::enum_<minimorph::enums::SectionType>(m, "BrionSectionType")
+        .value("SECTION_UNDEFINED", minimorph::enums::SectionType::SECTION_UNDEFINED)
+        .value("SECTION_SOMA", minimorph::enums::SectionType::SECTION_SOMA)
+        .value("SECTION_AXON", minimorph::enums::SectionType::SECTION_AXON)
+        .value("SECTION_DENDRITE", minimorph::enums::SectionType::SECTION_DENDRITE)
+        .value("SECTION_APICAL_DENDRITE", minimorph::enums::SectionType::SECTION_APICAL_DENDRITE)
+        .value("SECTION_GLIA_PROCESS", minimorph::enums::SectionType::SECTION_GLIA_PROCESS)
+        .value("SECTION_GLIA_ENDFOOT", minimorph::enums::SectionType::SECTION_GLIA_ENDFOOT)
         .export_values();
 
 
-    py::enum_<brion::enums::MorphologyVersion>(m, "MorphologyVersion")
-        .value("MORPHOLOGY_VERSION_H5_1", brion::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
-        .value("MORPHOLOGY_VERSION_H5_2", brion::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_2)
-        .value("MORPHOLOGY_VERSION_H5_1_1", brion::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_1)
-        .value("MORPHOLOGY_VERSION_SWC_1", brion::enums::MorphologyVersion::MORPHOLOGY_VERSION_SWC_1)
-        .value("MORPHOLOGY_VERSION_UNDEFINED", brion::enums::MorphologyVersion::MORPHOLOGY_VERSION_UNDEFINED)
+    py::enum_<minimorph::enums::MorphologyVersion>(m, "MorphologyVersion")
+        .value("MORPHOLOGY_VERSION_H5_1", minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
+        .value("MORPHOLOGY_VERSION_H5_2", minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_2)
+        .value("MORPHOLOGY_VERSION_H5_1_1", minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_1)
+        .value("MORPHOLOGY_VERSION_SWC_1", minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_SWC_1)
+        .value("MORPHOLOGY_VERSION_UNDEFINED", minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_UNDEFINED)
         .export_values();
 
-    py::enum_<brion::enums::CellFamily>(m, "CellFamily")
-        .value("FAMILY_NEURON", brion::enums::CellFamily::FAMILY_NEURON)
-        .value("FAMILY_GLIA", brion::enums::CellFamily::FAMILY_GLIA)
+    py::enum_<minimorph::enums::CellFamily>(m, "CellFamily")
+        .value("FAMILY_NEURON", minimorph::enums::CellFamily::FAMILY_NEURON)
+        .value("FAMILY_GLIA", minimorph::enums::CellFamily::FAMILY_GLIA)
         .export_values();
 
 
-    py::enum_<brion::enums::AccessMode>(m, "AccessMode")
-        .value("MODE_READ", brion::enums::AccessMode::MODE_READ)
-        .value("MODE_WRITE", brion::enums::AccessMode::MODE_WRITE)
-        .value("MODE_OVERWRITE", brion::enums::AccessMode::MODE_OVERWRITE)
-        .value("MODE_READWRITE", brion::enums::AccessMode::MODE_READWRITE)
-        .value("MODE_READOVERWRITE", brion::enums::AccessMode::MODE_READOVERWRITE)
+    py::enum_<minimorph::enums::AccessMode>(m, "AccessMode")
+        .value("MODE_READ", minimorph::enums::AccessMode::MODE_READ)
+        .value("MODE_WRITE", minimorph::enums::AccessMode::MODE_WRITE)
+        .value("MODE_OVERWRITE", minimorph::enums::AccessMode::MODE_OVERWRITE)
+        .value("MODE_READWRITE", minimorph::enums::AccessMode::MODE_READWRITE)
+        .value("MODE_READOVERWRITE", minimorph::enums::AccessMode::MODE_READOVERWRITE)
         .export_values();
 
-    auto base = py::register_exception<brion::Error&>(m, "Error");
-    auto raw = py::register_exception<brion::RawDataError&>(m, "RawDataError", base.ptr());
-    py::register_exception<brion::UnknownFileType&>(m, "UnknownFileType", base.ptr());
-    py::register_exception<brion::SomaError&>(m, "SomaError", base.ptr());
-    py::register_exception<brion::IDSequenceError&>(m, "IDSequenceError", raw.ptr());
-    py::register_exception<brion::MultipleTrees&>(m, "MultipleTrees", raw.ptr());
-    py::register_exception<brion::MissingParentError&>(m, "MissingParentError", raw.ptr());
+    auto base = py::register_exception<minimorph::Error&>(m, "Error");
+    auto raw = py::register_exception<minimorph::RawDataError&>(m, "RawDataError", base.ptr());
+    py::register_exception<minimorph::UnknownFileType&>(m, "UnknownFileType", base.ptr());
+    py::register_exception<minimorph::SomaError&>(m, "SomaError", base.ptr());
+    py::register_exception<minimorph::IDSequenceError&>(m, "IDSequenceError", raw.ptr());
+    py::register_exception<minimorph::MultipleTrees&>(m, "MultipleTrees", raw.ptr());
+    py::register_exception<minimorph::MissingParentError&>(m, "MissingParentError", raw.ptr());
 }

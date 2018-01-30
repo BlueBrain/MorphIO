@@ -30,7 +30,7 @@
 /* todo: compile */
 #include <iostream>
 
-namespace brion
+namespace minimorph
 {
 //TODO: compile
 #if 0

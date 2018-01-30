@@ -19,7 +19,7 @@
 
 #include <BBP/TestDatasets.h>
 #include <morphio/morphio.h>
-#include <brion/brion.h>
+#include <minimorph/minimorph.h>
 
 #define BOOST_TEST_MODULE Circuit
 #include <boost/algorithm/string.hpp>
@@ -29,7 +29,7 @@
 
 namespace
 {
-std::string getValue(const brion::NeuronMatrix& data, const size_t idx,
+std::string getValue(const minimorph::NeuronMatrix& data, const size_t idx,
                      const uint32_t attr)
 {
     return data[idx][lunchbox::getIndexOfLastBit(attr)];
@@ -38,16 +38,16 @@ std::string getValue(const brion::NeuronMatrix& data, const size_t idx,
 
 BOOST_AUTO_TEST_CASE(test_invalid_open)
 {
-    BOOST_CHECK_THROW(brion::Circuit("/bla"), std::runtime_error);
-    BOOST_CHECK_THROW(brion::Circuit("bla"), std::runtime_error);
+    BOOST_CHECK_THROW(minimorph::Circuit("/bla"), std::runtime_error);
+    BOOST_CHECK_THROW(minimorph::Circuit("bla"), std::runtime_error);
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/README";
-    BOOST_CHECK_THROW(brion::Circuit(path.string()), std::runtime_error);
+    BOOST_CHECK_THROW(minimorph::Circuit(path.string()), std::runtime_error);
 
     path = BBP_TESTDATA;
     path /= "local/simulations/may17_2011/Control/voltage.h5";
-    BOOST_CHECK_THROW(brion::Circuit(path.string()), std::runtime_error);
+    BOOST_CHECK_THROW(minimorph::Circuit(path.string()), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(test_all_attributes)
@@ -55,19 +55,19 @@ BOOST_AUTO_TEST_CASE(test_all_attributes)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/circuits/circuit.mvd2";
 
-    brion::Circuit circuit(path.string());
+    minimorph::Circuit circuit(path.string());
     BOOST_CHECK_EQUAL(circuit.getNumNeurons(), 10);
 
-    const brion::NeuronMatrix& data =
-        circuit.get(brion::GIDSet(), brion::NEURON_ALL_ATTRIBUTES);
+    const minimorph::NeuronMatrix& data =
+        circuit.get(minimorph::GIDSet(), minimorph::NEURON_ALL_ATTRIBUTES);
 
     BOOST_CHECK_EQUAL(data.shape()[0], 10); // 10 neurons
-    BOOST_CHECK_EQUAL(data.shape()[1], brion::NEURON_ALL);
-    BOOST_CHECK_EQUAL(getValue(data, 0, brion::NEURON_MORPHOLOGY_NAME),
+    BOOST_CHECK_EQUAL(data.shape()[1], minimorph::NEURON_ALL);
+    BOOST_CHECK_EQUAL(getValue(data, 0, minimorph::NEURON_MORPHOLOGY_NAME),
                       "R-BJM141005C2_B_cor");
-    BOOST_CHECK_EQUAL(getValue(data, 1, brion::NEURON_COLUMN_GID), "0");
-    BOOST_CHECK_EQUAL(getValue(data, 6, brion::NEURON_MTYPE), "17");
-    BOOST_CHECK_EQUAL(getValue(data, 7, brion::NEURON_POSITION_Y),
+    BOOST_CHECK_EQUAL(getValue(data, 1, minimorph::NEURON_COLUMN_GID), "0");
+    BOOST_CHECK_EQUAL(getValue(data, 6, minimorph::NEURON_MTYPE), "17");
+    BOOST_CHECK_EQUAL(getValue(data, 7, minimorph::NEURON_POSITION_Y),
                       "399.305168");
 }
 
@@ -76,14 +76,14 @@ BOOST_AUTO_TEST_CASE(test_some_attributes)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/circuits/circuit.mvd2";
 
-    brion::Circuit circuit(path.string());
+    minimorph::Circuit circuit(path.string());
     BOOST_CHECK_EQUAL(circuit.getNumNeurons(), 10);
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(4);
     gids.insert(6);
-    const brion::NeuronMatrix& data =
-        circuit.get(gids, brion::NEURON_ETYPE | brion::NEURON_MORPHOLOGY_NAME);
+    const minimorph::NeuronMatrix& data =
+        circuit.get(gids, minimorph::NEURON_ETYPE | minimorph::NEURON_MORPHOLOGY_NAME);
 
     BOOST_CHECK_EQUAL(data.shape()[0], 2); // 2 neurons
     BOOST_CHECK_EQUAL(data.shape()[1], 2); // 2 attributes
@@ -98,10 +98,10 @@ BOOST_AUTO_TEST_CASE(test_types)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/circuits/18.10.10_600cell/circuit.mvd2";
 
-    brion::Circuit circuit(path.string());
+    minimorph::Circuit circuit(path.string());
     BOOST_CHECK_EQUAL(circuit.getNumNeurons(), 600);
 
-    const brion::Strings& mtypes = circuit.getTypes(brion::NEURONCLASS_MTYPE);
+    const minimorph::Strings& mtypes = circuit.getTypes(minimorph::NEURONCLASS_MTYPE);
     BOOST_CHECK_EQUAL(mtypes.size(), 22);
     BOOST_CHECK_EQUAL(mtypes[0], "AHC");
     BOOST_CHECK_EQUAL(mtypes[1], "NGC");
@@ -109,23 +109,23 @@ BOOST_AUTO_TEST_CASE(test_types)
     BOOST_CHECK_EQUAL(mtypes[15], "L4SP");
     BOOST_CHECK_EQUAL(mtypes[21], "L6FFPC");
 
-    const brion::Strings& mclasses =
-        circuit.getTypes(brion::NEURONCLASS_MORPHOLOGY_CLASS);
+    const minimorph::Strings& mclasses =
+        circuit.getTypes(minimorph::NEURONCLASS_MORPHOLOGY_CLASS);
     BOOST_CHECK_EQUAL(mclasses.size(), 22);
     BOOST_CHECK_EQUAL(mclasses[0], "INT");
     BOOST_CHECK_EQUAL(mclasses[1], "INT");
     BOOST_CHECK_EQUAL(mclasses[4], "PYR");
     BOOST_CHECK_EQUAL(mclasses[21], "PYR");
 
-    const brion::Strings& fclasses =
-        circuit.getTypes(brion::NEURONCLASS_FUNCTION_CLASS);
+    const minimorph::Strings& fclasses =
+        circuit.getTypes(minimorph::NEURONCLASS_FUNCTION_CLASS);
     BOOST_CHECK_EQUAL(fclasses.size(), 22);
     BOOST_CHECK_EQUAL(fclasses[0], "INH");
     BOOST_CHECK_EQUAL(fclasses[1], "INH");
     BOOST_CHECK_EQUAL(fclasses[4], "EXC");
     BOOST_CHECK_EQUAL(fclasses[21], "EXC");
 
-    const brion::Strings& etypes = circuit.getTypes(brion::NEURONCLASS_ETYPE);
+    const minimorph::Strings& etypes = circuit.getTypes(minimorph::NEURONCLASS_ETYPE);
     BOOST_CHECK_EQUAL(etypes.size(), 8);
     BOOST_CHECK_EQUAL(etypes[0], "cADint");
     BOOST_CHECK_EQUAL(etypes[1], "cFS");
@@ -139,18 +139,18 @@ BOOST_AUTO_TEST_CASE(test_types)
 
 BOOST_AUTO_TEST_CASE(morphio_circuit_constructor)
 {
-    morphio::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
-    morphio::Circuit circuit2((brion::BlueConfig(bbp::test::getBlueconfig())));
-    BOOST_CHECK_THROW(morphio::Circuit(brion::URI("pluto")), std::runtime_error);
+    morphio::Circuit circuit((minimorph::URI(bbp::test::getBlueconfig())));
+    morphio::Circuit circuit2((minimorph::BlueConfig(bbp::test::getBlueconfig())));
+    BOOST_CHECK_THROW(morphio::Circuit(minimorph::URI("pluto")), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(morphio_circuit_target)
 {
-    const morphio::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
-    const brion::BlueConfig config(bbp::test::getBlueconfig());
+    const morphio::Circuit circuit((minimorph::URI(bbp::test::getBlueconfig())));
+    const minimorph::BlueConfig config(bbp::test::getBlueconfig());
 
-    brion::GIDSet first = circuit.getGIDs();
-    brion::GIDSet second = config.parseTarget("Column");
+    minimorph::GIDSet first = circuit.getGIDs();
+    minimorph::GIDSet second = config.parseTarget("Column");
     BOOST_CHECK_EQUAL_COLLECTIONS(first.begin(), first.end(), second.begin(),
                                   second.end());
 
@@ -170,9 +170,9 @@ BOOST_AUTO_TEST_CASE(morphio_circuit_target)
 
 BOOST_AUTO_TEST_CASE(morphio_circuit_positions)
 {
-    const morphio::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
+    const morphio::Circuit circuit((minimorph::URI(bbp::test::getBlueconfig())));
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(1);
     gids.insert(2);
     // This call also tests morphio::Circuit::getMorphologyURIs
@@ -193,7 +193,7 @@ namespace
 void _checkMorphology(const morphio::neuron::Morphology& morphology,
                       const std::string& other)
 {
-    const brion::Morphology reference(brion::URI(
+    const minimorph::Morphology reference(minimorph::URI(
         BBP_TESTDATA + ("/local/morphologies/01.07.08/h5/" + other)));
     BOOST_CHECK(morphology.getPoints() == reference.getPoints());
 }
@@ -202,7 +202,7 @@ void _checkMorphology(const morphio::neuron::Morphology& morphology,
                       const morphio::Matrix4f& transform)
 {
     const morphio::neuron::Morphology reference(
-        brion::URI(BBP_TESTDATA + ("/local/morphologies/01.07.08/h5/" + other)),
+        minimorph::URI(BBP_TESTDATA + ("/local/morphologies/01.07.08/h5/" + other)),
         transform);
     const auto& p = morphology.getPoints();
     const auto& q = reference.getPoints();
@@ -219,13 +219,13 @@ BOOST_AUTO_TEST_CASE(test_gid_out_of_range)
     typedef boost::shared_ptr<const morphio::Circuit> CircuitPtr;
     std::vector<CircuitPtr> circuits;
     circuits.push_back(
-        CircuitPtr(new morphio::Circuit(brion::URI(BBP_TEST_BLUECONFIG))));
+        CircuitPtr(new morphio::Circuit(minimorph::URI(BBP_TEST_BLUECONFIG))));
 #ifdef BRAIN_USE_MVD3
     circuits.push_back(
-        CircuitPtr(new morphio::Circuit(brion::URI(BBP_TEST_BLUECONFIG3))));
+        CircuitPtr(new morphio::Circuit(minimorph::URI(BBP_TEST_BLUECONFIG3))));
 #endif
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(10000000);
     for (const CircuitPtr& circuit : circuits)
     {
@@ -243,9 +243,9 @@ BOOST_AUTO_TEST_CASE(test_gid_out_of_range)
 
 BOOST_AUTO_TEST_CASE(load_local_morphologies)
 {
-    const morphio::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
+    const morphio::Circuit circuit((minimorph::URI(bbp::test::getBlueconfig())));
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     for (uint32_t gid = 1; gid < 500; gid += 75)
         gids.insert(gid);
     // This call also tests morphio::Circuit::getMorphologyURIs
@@ -271,9 +271,9 @@ BOOST_AUTO_TEST_CASE(load_local_morphologies)
 
 BOOST_AUTO_TEST_CASE(load_global_morphologies)
 {
-    const morphio::Circuit circuit((brion::URI(bbp::test::getBlueconfig())));
+    const morphio::Circuit circuit((minimorph::URI(bbp::test::getBlueconfig())));
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     for (uint32_t gid = 1; gid < 500; gid += 75)
         gids.insert(gid);
     const morphio::neuron::Morphologies morphologies =
@@ -292,7 +292,7 @@ BOOST_AUTO_TEST_CASE(load_global_morphologies)
 
 BOOST_AUTO_TEST_CASE(all_mvd3)
 {
-    brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
+    minimorph::BlueConfig config(BBP_TEST_BLUECONFIG3);
     morphio::Circuit circuit(config);
     const size_t numNeurons = circuit.getNumNeurons();
     BOOST_CHECK_EQUAL(circuit.getGIDs().size(), numNeurons);
@@ -302,12 +302,12 @@ BOOST_AUTO_TEST_CASE(all_mvd3)
     BOOST_CHECK_EQUAL(positions.size(), numNeurons);
     BOOST_CHECK_EQUAL(transforms.size(), numNeurons);
 
-    BOOST_CHECK_SMALL((positions[20] - brion::Vector3f(30.1277100000,
+    BOOST_CHECK_SMALL((positions[20] - minimorph::Vector3f(30.1277100000,
                                                        1794.1259110000,
                                                        19.8605870000))
                           .length(),
                       0.000001f);
-    BOOST_CHECK_SMALL((positions[100] - brion::Vector3f(48.7579240000,
+    BOOST_CHECK_SMALL((positions[100] - minimorph::Vector3f(48.7579240000,
                                                         1824.4589930000,
                                                         15.3025840000))
                           .length(),
@@ -325,10 +325,10 @@ BOOST_AUTO_TEST_CASE(all_mvd3)
 
 BOOST_AUTO_TEST_CASE(partial_mvd3)
 {
-    brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
+    minimorph::BlueConfig config(BBP_TEST_BLUECONFIG3);
     morphio::Circuit circuit(config);
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(6);
     gids.insert(21);
     gids.insert(101);
@@ -339,12 +339,12 @@ BOOST_AUTO_TEST_CASE(partial_mvd3)
     BOOST_CHECK_EQUAL(positions.size(), 4);
     BOOST_CHECK_EQUAL(transforms.size(), 4);
 
-    BOOST_CHECK_SMALL((positions[1] - brion::Vector3f(30.1277100000,
+    BOOST_CHECK_SMALL((positions[1] - minimorph::Vector3f(30.1277100000,
                                                       1794.1259110000,
                                                       19.8605870000))
                           .length(),
                       0.000001f);
-    BOOST_CHECK_SMALL((positions[2] - brion::Vector3f(48.7579240000,
+    BOOST_CHECK_SMALL((positions[2] - minimorph::Vector3f(48.7579240000,
                                                       1824.4589930000,
                                                       15.3025840000))
                           .length(),
@@ -362,10 +362,10 @@ BOOST_AUTO_TEST_CASE(partial_mvd3)
 
 BOOST_AUTO_TEST_CASE(morphology_names_mvd3)
 {
-    brion::BlueConfig config(BBP_TEST_BLUECONFIG3);
+    minimorph::BlueConfig config(BBP_TEST_BLUECONFIG3);
     morphio::Circuit circuit(config);
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(21);
     gids.insert(501);
 
@@ -381,13 +381,13 @@ BOOST_AUTO_TEST_CASE(morphology_names_mvd3)
 
 BOOST_AUTO_TEST_CASE(compare_mvd2_mvd3)
 {
-    brion::BlueConfig config2(BBP_TEST_BLUECONFIG);
+    minimorph::BlueConfig config2(BBP_TEST_BLUECONFIG);
     morphio::Circuit circuit2(config2);
 
-    brion::BlueConfig config3(BBP_TEST_BLUECONFIG3);
+    minimorph::BlueConfig config3(BBP_TEST_BLUECONFIG3);
     morphio::Circuit circuit3(config3);
 
-    brion::GIDSet gids;
+    minimorph::GIDSet gids;
     gids.insert(21);
     gids.insert(501);
 
@@ -417,7 +417,7 @@ BOOST_AUTO_TEST_CASE(compare_mvd2_mvd3)
 
 BOOST_AUTO_TEST_CASE(morphio_circuit_random_gids)
 {
-    const morphio::Circuit circuit(brion::URI(BBP_TEST_BLUECONFIG3));
+    const morphio::Circuit circuit(minimorph::URI(BBP_TEST_BLUECONFIG3));
     const morphio::GIDSet& gids = circuit.getRandomGIDs(0.1f);
     BOOST_CHECK_EQUAL(gids.size(), 100);
 

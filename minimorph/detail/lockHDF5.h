@@ -1,6 +1,5 @@
 /* Copyright (c) 2013-2017, EPFL/Blue Brain Project
  *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
- *                          Juan Hernando <jhernando@fi.upm.es>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -18,33 +17,23 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_PLUGIN_MORPHOLOGYHDF5
-#define BRION_PLUGIN_MORPHOLOGYHDF5
+#ifndef BRION_DETAIL_LOCKHDF5
+#define BRION_DETAIL_LOCKHDF5
 
-#include "../morphologyPlugin.h"
+#include <mutex>
 
-namespace brion
+namespace minimorph
 {
-namespace plugin
+namespace detail
 {
-class MorphologyHDF5 : public MorphologyPlugin
+// Every access to hdf5 must be serialized if HDF5 does not take care of it
+// which needs a thread-safe built of the library.
+// http://www.hdfgroup.org/hdf5-quest.html#gconc
+inline std::mutex* hdf5Lock()
 {
-public:
-    /** Create a new parser for an H5 morphology */
-    explicit MorphologyHDF5(const MorphologyInitData& initData);
-
-    ~MorphologyHDF5();
-
-//TODO: compile
-#if 0
-    /** Check if this plugin can handle the given uri. */
-    static bool handles(const MorphologyInitData& initData);
-    static std::string getDescription();
-#endif
-
-private:
-    void load() final;
-};
+    static std::mutex _hdf5Lock;
+    return &_hdf5Lock;
+}
 }
 }
 
