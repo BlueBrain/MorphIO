@@ -136,7 +136,6 @@ public:
     BRAIN_API const Matrix4f& getTransformation() const;
 
     BRAIN_API brion::MorphologyVersion getVersion() const;
-
 private:
     Morphology(const void* data, const size_t size);
     /* servus::Serializable::Data toBinary() const; */
