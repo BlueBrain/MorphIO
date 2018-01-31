@@ -23,7 +23,7 @@
 
 #include "morphology.h"
 
-#include <brion/morphology.h>
+#include <minimorph/morphology.h>
 #include <vmmlib/matrix.hpp> // member
 
 namespace morphio
@@ -33,7 +33,7 @@ typedef std::pair<size_t, size_t> SectionRange;
 class Morphology::Impl
 {
 public:
-    const brion::ConstMorphologyPtr data;
+    const minimorph::ConstMorphologyPtr data;
 
     const Matrix4f transformation;
 
@@ -41,8 +41,8 @@ public:
 
     explicit Impl(const URI& source);
     Impl(const URI& source, const Matrix4f& transform);
-    explicit Impl(brion::ConstMorphologyPtr morphology);
-    Impl(brion::MorphologyPtr morphology, const Matrix4f& transform);
+    explicit Impl(minimorph::ConstMorphologyPtr morphology);
+    Impl(minimorph::MorphologyPtr morphology, const Matrix4f& transform);
     Impl(const void* data, const size_t size);
 
     SectionRange getSectionRange(const uint32_t sectionID) const;
@@ -75,7 +75,7 @@ private:
 
     std::vector<uint32_ts> _sectionChildren;
 
-    void _transform(brion::MorphologyPtr morphology);
+    void _transform(minimorph::MorphologyPtr morphology);
     void _extractInformation();
     float _computeSectionLength(const uint32_t sectionID) const;
     floats _computeAccumulatedLengths(const SectionRange& range) const;

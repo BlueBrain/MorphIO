@@ -29,7 +29,7 @@
 namespace morphio
 {
 /**
- * Wrapper around brion::Morphology with higher level functions.
+ * Wrapper around minimorph::Morphology with higher level functions.
  *
  * This class provides methods to facilitate some queries about morphologies
  * in the context of circuits.
@@ -68,35 +68,35 @@ public:
     BRAIN_API Morphology(const URI& source, const Matrix4f& transform);
 
     /**
-     * Create a morphology from a brion::Morphology and load all the data.
+     * Create a morphology from a minimorph::Morphology and load all the data.
      *
-     * @param morphology the brion::Morphology to load from.
+     * @param morphology the minimorph::Morphology to load from.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
-    BRAIN_API explicit Morphology(brion::ConstMorphologyPtr morphology);
+    BRAIN_API explicit Morphology(minimorph::ConstMorphologyPtr morphology);
 
     /**
-     * Create a morphology from a brion::Morphology, load all the data
+     * Create a morphology from a minimorph::Morphology, load all the data
      * and transform the points. The given morphology is modified.
      *
-     * @param morphology the brion::Morphology to load from.
+     * @param morphology the minimorph::Morphology to load from.
      * @param transform the transformation matrix to apply to the points.
      *        Radii will not be affected by this transformation.
      * @throw runtime_error if an inconsistency is detected in the input file.
      */
-    BRAIN_API Morphology(brion::MorphologyPtr morphology,
+    BRAIN_API Morphology(minimorph::MorphologyPtr morphology,
                          const Matrix4f& transform);
 
     BRAIN_API ~Morphology();
 
-    /** @sa brion::Morphology::readPoints */
+    /** @sa minimorph::Morphology::readPoints */
     BRAIN_API const Vector4fs& getPoints() const;
 
-    /** @sa brion::Morphology::readSections */
+    /** @sa minimorph::Morphology::readSections */
     BRAIN_API const Vector2is& getSections() const;
 
-    /** @sa brion::Morphology::readSectionTypes
-        This type is not morphio::SectionTypes because brion::SectionType
+    /** @sa minimorph::Morphology::readSectionTypes
+        This type is not morphio::SectionTypes because minimorph::SectionType
         is not convertible to morphio::SectionType. */
     BRAIN_API const SectionTypes& getSectionTypes() const;
 
@@ -135,7 +135,7 @@ public:
      */
     BRAIN_API const Matrix4f& getTransformation() const;
 
-    BRAIN_API brion::MorphologyVersion getVersion() const;
+    BRAIN_API minimorph::MorphologyVersion getVersion() const;
 private:
     Morphology(const void* data, const size_t size);
     /* servus::Serializable::Data toBinary() const; */

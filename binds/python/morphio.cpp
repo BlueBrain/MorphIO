@@ -82,7 +82,7 @@ public:
 }} // namespace pybind11::detail
 
 
-PYBIND11_MODULE(python_minimorph, m) {
+PYBIND11_MODULE(python_morphio, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
 

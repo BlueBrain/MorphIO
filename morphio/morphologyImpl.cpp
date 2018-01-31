@@ -21,35 +21,35 @@
 #include "morphologyImpl.h"
 #include "section.h"
 
-#include <brion/morphology.h>
-#include <brion/morphologyPlugin.h>
+#include <minimorph/morphology.h>
+#include <minimorph/morphologyPlugin.h>
 
 #include <bitset>
 
 namespace morphio
 {
 Morphology::Impl::Impl(const void* ptr, const size_t size)
-    : Impl(brion::ConstMorphologyPtr(new brion::Morphology(ptr, size)))
+    : Impl(minimorph::ConstMorphologyPtr(new minimorph::Morphology(ptr, size)))
 {
 }
 
 Morphology::Impl::Impl(const URI& source)
-    : Impl(brion::ConstMorphologyPtr(new brion::Morphology(source)))
+    : Impl(minimorph::ConstMorphologyPtr(new minimorph::Morphology(source)))
 {
 }
 
 Morphology::Impl::Impl(const URI& source, const Matrix4f& transform)
-    : Impl(brion::MorphologyPtr(new brion::Morphology(source)), transform)
+    : Impl(minimorph::MorphologyPtr(new minimorph::Morphology(source)), transform)
 {
 }
 
-Morphology::Impl::Impl(brion::ConstMorphologyPtr morphology)
+Morphology::Impl::Impl(minimorph::ConstMorphologyPtr morphology)
     : data(morphology)
 {
     _extractInformation();
 }
 
-Morphology::Impl::Impl(brion::MorphologyPtr morphology,
+Morphology::Impl::Impl(minimorph::MorphologyPtr morphology,
                        const Matrix4f& transform)
     : data(morphology)
     , transformation(transform)
@@ -99,7 +99,7 @@ uint32_ts Morphology::Impl::getSectionIDs(const SectionTypes& requestedTypes,
 //     float& length = _sectionLengths[sectionID];
 //     const auto& types = data->getSectionTypes();
 
-//     if (length == 0 && types[sectionID] != brion::enums::SECTION_SOMA)
+//     if (length == 0 && types[sectionID] != minimorph::enums::SECTION_SOMA)
 //         length = _computeSectionLength(sectionID);
 //     return length;
 // }
@@ -123,7 +123,7 @@ Vector4fs Morphology::Impl::getSectionSamples(const uint32_t sectionID,
     const auto& types = data->getSectionTypes();
 
     // If the section is the soma return directly the soma position.
-    if (types[sectionID] == brion::enums::SECTION_SOMA)
+    if (types[sectionID] == minimorph::enums::SECTION_SOMA)
         // This code shouldn't be reached.
         LBTHROW(std::runtime_error("Invalid method called on soma section"));
 
@@ -185,7 +185,7 @@ Vector4fs Morphology::Impl::getSectionSamples(const uint32_t sectionID,
 //         const auto& sections = data->getSections();
 //         const auto& types = data->getSectionTypes();
 //         const int32_t parent = sections[sectionID][1];
-//         if (parent == -1 || types[parent] == brion::enums::SECTION_SOMA)
+//         if (parent == -1 || types[parent] == minimorph::enums::SECTION_SOMA)
 //             return 0;
 //         // For the other cases it doesn't matter to have concurrent updates
 //         // because they will yield the same result (and it's probably
@@ -215,7 +215,7 @@ const uint32_ts& Morphology::Impl::getChildren(const uint32_t sectionID) const
     return _sectionChildren[sectionID];
 }
 
-void Morphology::Impl::_transform(brion::MorphologyPtr morphology)
+void Morphology::Impl::_transform(minimorph::MorphologyPtr morphology)
 {
     auto& points = morphology->getPoints();
 #pragma omp parallel for

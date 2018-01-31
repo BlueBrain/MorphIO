@@ -20,7 +20,7 @@
 #ifndef BRAIN_NEURON_TYPES
 #define BRAIN_NEURON_TYPES
 
-#include <brion/types.h>
+#include <minimorph/types.h>
 #include <memory>
 #include <vector>
 
@@ -33,13 +33,13 @@ class Soma;
 
 enum class SectionType
 {
-    soma = brion::enums::SECTION_SOMA,
-        axon = brion::enums::SECTION_AXON,
-        dendrite = brion::enums::SECTION_DENDRITE,
-        basalDendrite = brion::enums::SECTION_BASAL_DENDRITE,
-        apicalDendrite = brion::enums::SECTION_APICAL_DENDRITE,
-        undefined = brion::enums::SECTION_UNDEFINED,
-        all = brion::enums::SECTION_ALL
+    soma = minimorph::enums::SECTION_SOMA,
+        axon = minimorph::enums::SECTION_AXON,
+        dendrite = minimorph::enums::SECTION_DENDRITE,
+        basalDendrite = minimorph::enums::SECTION_BASAL_DENDRITE,
+        apicalDendrite = minimorph::enums::SECTION_APICAL_DENDRITE,
+        undefined = minimorph::enums::SECTION_UNDEFINED,
+        all = minimorph::enums::SECTION_ALL
         };
 
 typedef std::shared_ptr<Morphology> MorphologyPtr;
@@ -55,21 +55,21 @@ using vmml::Vector2i;
 using vmml::Vector3f;
 using vmml::Vector4f;
 
-using brion::Strings;
-using brion::URI;
-using brion::Vector2is;
-using brion::Vector3fs;
-using brion::Vector4fs;
-using brion::floats;
-using brion::uint32_ts;
-using brion::size_ts;
+using minimorph::Strings;
+using minimorph::URI;
+using minimorph::Vector2is;
+using minimorph::Vector3fs;
+using minimorph::Vector4fs;
+using minimorph::floats;
+using minimorph::uint32_ts;
+using minimorph::size_ts;
 
 // Brion exceptions
-using brion::RawDataError;
-using brion::SomaError;
-using brion::IDSequenceError;
-using brion::MultipleTrees;
-using brion::MissingParentError;
+using minimorph::RawDataError;
+using minimorph::SomaError;
+using minimorph::IDSequenceError;
+using minimorph::MultipleTrees;
+using minimorph::MissingParentError;
 
 typedef std::vector<Matrix4f> Matrix4fs;
 typedef std::vector<Quaternionf> Quaternionfs;

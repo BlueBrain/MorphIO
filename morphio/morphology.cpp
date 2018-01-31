@@ -23,7 +23,7 @@
 
 #include "morphologyImpl.h"
 
-#include <brion/morphology.h>
+#include <minimorph/morphology.h>
 
 // #include <lunchbox/log.h>
 
@@ -50,7 +50,7 @@ Morphology::Morphology(const URI& source, const Matrix4f& transform)
 // {
 // }
 
-Morphology::Morphology(brion::MorphologyPtr morphology,
+Morphology::Morphology(minimorph::MorphologyPtr morphology,
                        const Matrix4f& transform)
     : _impl(new Impl(morphology, transform))
 {
@@ -61,7 +61,7 @@ Morphology::Morphology(const URI& source)
 {
 }
 
-Morphology::Morphology(brion::ConstMorphologyPtr morphology)
+Morphology::Morphology(minimorph::ConstMorphologyPtr morphology)
     : _impl(new Impl(morphology))
 {
 }
@@ -80,7 +80,7 @@ const Vector2is& Morphology::getSections() const
     return _impl->data->getSections();
 }
 
-brion::MorphologyVersion Morphology::getVersion() const
+minimorph::MorphologyVersion Morphology::getVersion() const
 {
     return _impl->data->getVersion();
 }
@@ -122,7 +122,7 @@ Section Morphology::getSection(const uint32_t& id) const
         LBTHROW(std::runtime_error(std::string("Section ID ") +
                                    std::to_string(id) + " out of range"));
 
-    if (types[id] == brion::enums::SECTION_SOMA)
+    if (types[id] == minimorph::enums::SECTION_SOMA)
         LBTHROW(std::runtime_error("The soma cannot be accessed as a Section"));
 
     return Section(id, _impl);

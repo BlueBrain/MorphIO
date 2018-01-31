@@ -8,7 +8,7 @@
 #ifndef BRAIN_API_H
 #define BRAIN_API_H
 
-#include <brion/defines.h>
+#include <minimorph/defines.h>
 
 #if defined(_MSC_VER) || defined(__declspec)
 #  define BRAIN_DLLEXPORT __declspec(dllexport)
