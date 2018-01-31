@@ -4,7 +4,7 @@
 # This file is part of Brion <https://github.com/BlueBrain/Brion>
 #
 cmake_minimum_required(VERSION 3.2)
-project(morphio VERSION 3.0.0)
+project(MorphIO VERSION 3.0.0)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
