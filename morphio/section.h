@@ -95,21 +95,21 @@ public:
      */
     BRAIN_API Vector4fs getSamples(const floats& points) const;
 
-    /**
-     * Return the absolute distance from the start of the section to the soma.
-     */
-    BRAIN_API float getDistanceToSoma() const;
+    /* /\** */
+    /*  * Return the absolute distance from the start of the section to the soma. */
+    /*  *\/ */
+    /* BRAIN_API float getDistanceToSoma() const; */
 
-    /**
-     * Return the absolute distances to the soma in microns for all sample
-     * positions.
-     *
-     * @return A list of distances. For a section consisting
-     *         of n segments, this list will have n + 1 values. The section
-     *         length is equal to the difference between the first and last
-     *         values of the list.
-     */
-    BRAIN_API floats getSampleDistancesToSoma() const;
+    /* /\** */
+    /*  * Return the absolute distances to the soma in microns for all sample */
+    /*  * positions. */
+    /*  * */
+    /*  * @return A list of distances. For a section consisting */
+    /*  *         of n segments, this list will have n + 1 values. The section */
+    /*  *         length is equal to the difference between the first and last */
+    /*  *         values of the list. */
+    /*  *\/ */
+    /* BRAIN_API floats getSampleDistancesToSoma() const; */
 
     /** Return true if this section has a parent section, false otherwise. */
     BRAIN_API bool hasParent() const;

@@ -43,7 +43,9 @@ public:
     Impl(const URI& source, const Matrix4f& transform);
     explicit Impl(minimorph::ConstMorphologyPtr morphology);
     Impl(minimorph::MorphologyPtr morphology, const Matrix4f& transform);
+#if 0
     Impl(const void* data, const size_t size);
+#endif
 
     SectionRange getSectionRange(const uint32_t sectionID) const;
 
@@ -58,9 +60,9 @@ public:
     Vector4fs getSectionSamples(const uint32_t sectionID,
                                 const floats& samplePoints) const;
 
-    float getDistanceToSoma(const uint32_t sectionID) const;
+    /* float getDistanceToSoma(const uint32_t sectionID) const; */
 
-    floats getSampleDistancesToSoma(const uint32_t sectionID) const;
+    /* floats getSampleDistancesToSoma(const uint32_t sectionID) const; */
 
     const uint32_ts& getChildren(const uint32_t sectionID) const;
 

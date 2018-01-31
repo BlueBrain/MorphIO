@@ -39,8 +39,10 @@ public:
     /** Close morphology file. @version 1.0 */
     BRION_API ~Morphology();
 
+#if 0
     BRION_API Morphology(const void* data, size_t size);
     BRION_API Morphology(const Morphology&);
+#endif
     BRION_API Morphology& operator=(const Morphology&);
     BRION_API Morphology(Morphology&&);
     BRION_API Morphology& operator=(Morphology&&);

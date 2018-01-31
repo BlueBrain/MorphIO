@@ -5,7 +5,7 @@ set(MORPHIO_SOURCES
     soma.cpp
     )
 
-add_library(morphio
+add_library(morphio SHARED
     ${MORPHIO_SOURCES}
     )
 
@@ -20,6 +20,7 @@ target_link_libraries(morphio
     PRIVATE
     HighFive
     vmmlib
+    minimorph
     )
 
 target_include_directories(morphio

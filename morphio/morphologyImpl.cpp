@@ -28,10 +28,12 @@
 
 namespace morphio
 {
+#if 0
 Morphology::Impl::Impl(const void* ptr, const size_t size)
     : Impl(minimorph::ConstMorphologyPtr(new minimorph::Morphology(ptr, size)))
 {
 }
+#endif
 
 Morphology::Impl::Impl(const URI& source)
     : Impl(minimorph::ConstMorphologyPtr(new minimorph::Morphology(source)))

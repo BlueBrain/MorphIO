@@ -29,10 +29,12 @@
 
 namespace morphio
 {
+#if 0
 Morphology::Morphology(const void* data, const size_t size)
     : _impl(new Impl(data, size))
 {
 }
+#endif
 
 Morphology::Morphology(const URI& source, const Matrix4f& transform)
     : _impl(new Impl(source, transform))

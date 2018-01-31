@@ -1,8 +1,10 @@
 set(MINIMORPH_SOURCES
     morphology.cpp
+    plugin/morphologyHDF5.cpp
+    plugin/morphologySWC.cpp
     )
 
-add_library(minimorph
+add_library(minimorph SHARED
     ${MINIMORPH_SOURCES}
     )
 

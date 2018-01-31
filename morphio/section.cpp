@@ -84,15 +84,15 @@ Vector4fs Section::getSamples(const floats& points) const
     return _morphology->getSectionSamples(_id, points);
 }
 
-float Section::getDistanceToSoma() const
-{
-    return _morphology->getDistanceToSoma(_id);
-}
+// float Section::getDistanceToSoma() const
+// {
+//     return _morphology->getDistanceToSoma(_id);
+// }
 
-floats Section::getSampleDistancesToSoma() const
-{
-    return _morphology->getSampleDistancesToSoma(_id);
-}
+// floats Section::getSampleDistancesToSoma() const
+// {
+//     return _morphology->getSampleDistancesToSoma(_id);
+// }
 
 bool Section::hasParent() const
 {
