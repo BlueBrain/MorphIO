@@ -5,7 +5,7 @@ set(MORPHIO_SOURCES
     soma.cpp
     )
 
-add_library(morphio SHARED
+add_library(morphio
     ${MORPHIO_SOURCES}
     )
 

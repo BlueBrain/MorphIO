@@ -4,7 +4,7 @@ set(MINIMORPH_SOURCES
     plugin/morphologySWC.cpp
     )
 
-add_library(minimorph SHARED
+add_library(minimorph
     ${MINIMORPH_SOURCES}
     )
 
