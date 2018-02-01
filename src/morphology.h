@@ -20,8 +20,8 @@
 #ifndef BRION_MORPHOLOGY
 #define BRION_MORPHOLOGY
 
-#include <minimorph/api.h>
-#include <minimorph/types.h>
+#include "api.h"
+#include <types.h>
 #include <vmmlib/vector.hpp>     // return value
 
 #include <memory>  //std::unique_ptr

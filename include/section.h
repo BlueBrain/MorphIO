@@ -20,10 +20,10 @@
 #ifndef BRAIN_NEURON_SECTION
 #define BRAIN_NEURON_SECTION
 
-#include <morphio/api.h>
-#include <morphio/types.h>
+#include <api.h>
+#include <types.h>
 
-#include <morphio/morphology.h>
+#include <morphology.h>
 
 namespace morphio
 {

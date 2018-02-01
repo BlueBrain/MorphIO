@@ -21,8 +21,8 @@
 #include "morphologyImpl.h"
 #include "section.h"
 
-#include <minimorph/morphology.h>
-#include <minimorph/morphologyPlugin.h>
+#include "morphology.h"
+#include "morphologyPlugin.h"
 
 #include <bitset>
 

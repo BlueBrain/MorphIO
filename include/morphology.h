@@ -20,8 +20,8 @@
 #ifndef BRAIN_NEURON_MORPHOLOGY
 #define BRAIN_NEURON_MORPHOLOGY
 
-#include <morphio/api.h>
-#include <morphio/types.h>
+#include <api.h>
+#include <types.h>
 
 /* #include <boost/noncopyable.hpp> */
 /* #include <servus/serializable.h> */

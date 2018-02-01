@@ -20,9 +20,9 @@
 
 #pragma once
 
-#include <minimorph/api.h>
-#include <minimorph/morphology.h>     // Needed by doxygen
-#include <minimorph/types.h>
+#include <api.h>
+#include <morphology.h>     // Needed by doxygen
+#include <types.h>
 
 #include <string>
 

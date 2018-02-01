@@ -18,7 +18,7 @@
  */
 
 #include <BBP/TestDatasets.h>
-#include <morphio/morphio.h>
+#include "morphio.h"
 #include <vmmlib/vmmlib.hpp>
 
 #define BOOST_TEST_MODULE Synapses

@@ -18,8 +18,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <morphio/morphio.h>
-#include <minimorph/minimorph.h>
+#include "morphio.h"
+#include <minimorph.h>
 #include <tests/paths.h>
 
 #define BOOST_TEST_MODULE MorphologyBrain

@@ -18,11 +18,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <minimorph/minimorph.h>
+#include <minimorph.h>
 #include <tests/paths.h>
 
 #ifdef BRION_USE_ZEROEQ
-#include <minimorph/constants.h>
+#include <constants.h>
 #include <zeroeq/server.h>
 #include <zeroeq/uri.h>
 #endif

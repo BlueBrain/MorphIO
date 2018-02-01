@@ -42,7 +42,7 @@ and writing files which store the Blue Brain data model.
   * BBP binary meshes (minimorph::Mesh)
   * BBP H5 morphologies (minimorph::Morphology)
   * Spike reports (minimorph::SpikeReport)
-* Basic [data types](@ref minimorph/types.h) to work with the loaded data using
+* Basic [data types](@ref types.h) to work with the loaded data using
   [Boost](http://www.boost.org/doc/libs),
   [Lunchbox](http://eyescale.github.io/Lunchbox-1.14/index.html),
   [vmmlib](http://eyescale.github.io/vmmlib-1.12/index.html).

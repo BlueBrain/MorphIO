@@ -23,7 +23,7 @@
 
 #include "morphology.h"
 
-#include <minimorph/morphology.h>
+#include <morphology.h>
 #include <vmmlib/matrix.hpp> // member
 
 namespace morphio

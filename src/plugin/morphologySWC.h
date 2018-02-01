@@ -1,6 +1,6 @@
 /* Copyright (c) 2013-2017, EPFL/Blue Brain Project
- *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *                          Juan Hernando <jhernando@fi.upm.es>
+ *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -18,34 +18,34 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_PLUGIN_MORPHOLOGYHDF5
-#define BRION_PLUGIN_MORPHOLOGYHDF5
+#ifndef BRION_PLUGIN_MORPHOLOGYSWC
+#define BRION_PLUGIN_MORPHOLOGYSWC
 
 #include "../morphologyPlugin.h"
+#include <vmmlib/vector.hpp>
 
 namespace minimorph
 {
 namespace plugin
 {
-class MorphologyHDF5 : public MorphologyPlugin
+class MorphologySWC : public MorphologyPlugin
 {
 public:
-    /** Create a new parser for an H5 morphology */
-    explicit MorphologyHDF5(const MorphologyInitData& initData);
+    explicit MorphologySWC(const MorphologyInitData& initData);
 
-    ~MorphologyHDF5();
-
-//TODO: compile
-#if 0
     /** Check if this plugin can handle the given uri. */
     static bool handles(const MorphologyInitData& initData);
     static std::string getDescription();
-#endif
 
 private:
+    // Plugin API
     void load() final;
+
+    struct RawSWCInfo;
+    void _readSamples(RawSWCInfo& info);
+    void _buildSampleTree(RawSWCInfo& info);
+    void _buildStructure(RawSWCInfo& info);
 };
 }
 }
-
 #endif

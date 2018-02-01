@@ -23,8 +23,8 @@
 #define BOOST_TEST_MODULE morphio::CompartmentReportReader
 
 #include <BBP/TestDatasets.h>
-#include <morphio/compartmentReport.h>
-#include <morphio/compartmentReportMapping.h>
+#include <compartmentReport.h>
+#include <compartmentReportMapping.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/test/unit_test.hpp>

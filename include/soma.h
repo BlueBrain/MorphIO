@@ -21,10 +21,10 @@
 #ifndef BRAIN_NEURON_SOMA
 #define BRAIN_NEURON_SOMA
 
-#include <morphio/api.h>
-#include <morphio/types.h>
+#include <api.h>
+#include <types.h>
 
-#include <morphio/morphology.h>
+#include <morphology.h>
 
 namespace morphio
 {

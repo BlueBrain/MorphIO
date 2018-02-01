@@ -24,4 +24,4 @@ endif()
 
 include(CommonCTest)
 
-add_subdirectory(morphio/python)
+add_subdirectory(python)

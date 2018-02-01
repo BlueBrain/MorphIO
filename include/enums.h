@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-/** @file minimorph/enums.h Enumerations used in Brion. */
+/** @file enums.h Enumerations used in Brion. */
 
 #ifndef BRION_ENUMS
 #define BRION_ENUMS

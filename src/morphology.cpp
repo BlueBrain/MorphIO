@@ -18,12 +18,12 @@
  */
 
 #include "morphology.h"
-#include <morphio/section.h>
+#include <section.h>
 #include "soma.h"
 
 #include "morphologyImpl.h"
 
-#include <minimorph/morphology.h>
+#include <morphology.h>
 
 // #include <lunchbox/log.h>
 

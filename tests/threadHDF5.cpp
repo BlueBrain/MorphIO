@@ -19,13 +19,15 @@
  */
 
 #include <BBP/TestDatasets.h>
-#include <minimorph/minimorph.h>
 #include <lunchbox/scopedMutex.h>
 #include <lunchbox/spinLock.h>
 
 #define BOOST_TEST_MODULE ThreadHDF5
 #include <boost/filesystem/path.hpp>
 #include <boost/test/unit_test.hpp>
+
+#include "minimorph.h"
+
 
 // Some helper macros to make Boost::Test thread safe
 // http://thread.gmane.org/gmane.comp.lib.boost.devel/123662/focus=123678

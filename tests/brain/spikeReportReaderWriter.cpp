@@ -17,9 +17,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <morphio/morphio.h>
-#include <morphio/spikeReportReader.h>
-#include <morphio/spikeReportWriter.h>
+#include "morphio.h"
+#include <spikeReportReader.h>
+#include <spikeReportWriter.h>
 
 #include <BBP/TestDatasets.h>
 

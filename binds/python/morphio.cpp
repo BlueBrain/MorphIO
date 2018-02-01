@@ -2,12 +2,13 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 
-#include <morphio/morphology.h>
-#include <morphio/section.h>
-#include <morphio/soma.h>
+#include <morphology.h>
+#include <section.h>
+#include <soma.h>
 
-#include <minimorph/enums.h>
-#include <minimorph/morphology.h>
+#include <enums.h>
+#include <morphology.h>
+#include <vmmlib/vector.hpp>
 
 
 namespace py = pybind11;
@@ -86,16 +87,6 @@ PYBIND11_MODULE(python_morphio, m) {
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
 
-    py::class_<minimorph::Morphology>(m, "BrionMorphology")
-        .def(py::init<const minimorph::URI&>())
-        .def("getCellFamily", &minimorph::Morphology::getCellFamily)
-        .def("getPoints", (minimorph::Vector4fs& (minimorph::Morphology::*)())&minimorph::Morphology::getPoints)
-        .def("getSections", (minimorph::Vector2is& (minimorph::Morphology::*)())&minimorph::Morphology::getSections)
-        .def("getSectionTypes", (minimorph::SectionTypes& (minimorph::Morphology::*)())&minimorph::Morphology::getSectionTypes)
-        .def("getPerimeters", (minimorph::floats& (minimorph::Morphology::*)())&minimorph::Morphology::getPerimeters)
-        .def("getVersion", &minimorph::Morphology::getVersion);
-
-    // .def(py::init<const minimorph::URI&, const minimorph::Matrix4f&>());
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const minimorph::URI&>())
         .def("getPoints", (minimorph::Vector4fs& (morphio::Morphology::*)())&morphio::Morphology::getPoints)

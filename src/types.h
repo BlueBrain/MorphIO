@@ -20,8 +20,8 @@
 #ifndef BRION_TYPES
 #define BRION_TYPES
 
-#include <minimorph/enums.h>
-#include <minimorph/exceptions.h>
+#include <enums.h>
+#include <exceptions.h>
 
 #include <map>
 #include <memory>

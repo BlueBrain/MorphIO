@@ -18,8 +18,8 @@
  */
 
 #include <BBP/TestDatasets.h>
-#include <morphio/morphio.h>
-#include <minimorph/minimorph.h>
+#include "morphio.h"
+#include <minimorph.h>
 
 #define BOOST_TEST_MODULE Circuit
 #include <boost/algorithm/string.hpp>
