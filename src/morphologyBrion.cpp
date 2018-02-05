@@ -153,12 +153,12 @@ CellFamily Morphology::getCellFamily() const
     return _impl->plugin->getCellFamily();
 }
 
-Vector4fs& Morphology::getPoints()
+Points& Morphology::getPoints()
 {
     return _impl->plugin->getPoints();
 }
 
-const Vector4fs& Morphology::getPoints() const
+const Points& Morphology::getPoints() const
 {
     return _impl->plugin->getPoints();
 }

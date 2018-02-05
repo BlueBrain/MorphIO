@@ -24,7 +24,6 @@
 #include "morphology.h"
 
 #include <morphology.h>
-#include <vmmlib/matrix.hpp> // member
 
 namespace morphio
 {
@@ -55,9 +54,9 @@ public:
     // TODO: bcoste fix me
     /* float getSectionLength(const uint32_t sectionID) const; */
 
-    Vector4fs getSectionSamples(const uint32_t sectionID) const;
+    Points getSectionSamples(const uint32_t sectionID) const;
 
-    Vector4fs getSectionSamples(const uint32_t sectionID,
+    Points getSectionSamples(const uint32_t sectionID,
                                 const floats& samplePoints) const;
 
     /* float getDistanceToSoma(const uint32_t sectionID) const; */

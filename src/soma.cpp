@@ -25,11 +25,11 @@ namespace morphio
 {
 namespace
 {
-Vector3f _computeCentroid(const Vector4fs& points)
+Point _computeCentroid(const Points& points)
 {
-    Vector3f centroid;
-    for (const Vector4f& point : points)
-        centroid += point.get_sub_vector<3, 0>();
+    Point centroid;
+    for (const Point& point : points)
+        centroid += point;
     centroid /= float(points.size());
     return centroid;
 }
@@ -53,22 +53,22 @@ Soma& Soma::operator=(const Soma& soma)
     return *this;
 }
 
-Vector4fs Soma::getProfilePoints() const
+Points Soma::getProfilePoints() const
 {
     return _morphology->getSectionSamples(_morphology->somaSection);
 }
 
 float Soma::getMeanRadius() const
 {
-    const Vector4fs points = getProfilePoints();
-    const Vector3f centroid = _computeCentroid(points);
+    const Points points = getProfilePoints();
+    const Point centroid = _computeCentroid(points);
     float radius = 0;
-    for (const Vector4f point : points)
-        radius += (point.get_sub_vector<3, 0>() - centroid).length();
+    for (const Point point : points)
+        radius += (point - centroid).length();
     return radius /= float(points.size());
 }
 
-Vector3f Soma::getCentroid() const
+Point Soma::getCentroid() const
 {
     return _computeCentroid(getProfilePoints());
 }

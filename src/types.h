@@ -28,11 +28,9 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <stdint.h>
 
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#include <vmmlib/types.hpp>
-#pragma warning(pop)
+#include "vector_types.h"
 
 #ifdef __GNUC__
 #define BRION_UNUSED __attribute__((unused))
@@ -54,12 +52,6 @@ using namespace enums;
 class Morphology;
 class MorphologyInitData;
 
-using vmml::Vector2i;
-using vmml::Vector3f;
-using vmml::Vector4f;
-using vmml::Vector3d;
-using vmml::Vector4d;
-using vmml::Matrix4f;
 
 typedef std::vector<size_t> size_ts;
 typedef std::vector<int32_t> int32_ts;

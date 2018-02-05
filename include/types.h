@@ -17,8 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_TYPES
-#define BRION_TYPES
+#ifndef BRAIN_TYPES
+#define BRAIN_TYPES
 
 #include "enums.h"
 #include "exceptions.h"
@@ -29,10 +29,8 @@
 #include <string>
 #include <vector>
 
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#include <vmmlib/types.hpp>
-#pragma warning(pop)
+
+#include "../src/types.h"
 
 #ifdef __GNUC__
 #define BRION_UNUSED __attribute__((unused))
@@ -41,6 +39,7 @@
 #endif
 
 // TODO: bcoste fix me
+#include <iostream>
 #define LBTHROW throw
 #define LBERROR std::cerr
 #define LBWARN std::cerr
@@ -54,12 +53,13 @@ using namespace enums;
 class Morphology;
 class MorphologyInitData;
 
-using vmml::Vector2i;
-using vmml::Vector3f;
-using vmml::Vector4f;
-using vmml::Vector3d;
-using vmml::Vector4d;
-using vmml::Matrix4f;
+using minimorph::Vector2i;
+using minimorph::Vector3d;
+using minimorph::Vector3f;
+using minimorph::Vector4d;
+using minimorph::Vector4f;
+using minimorph::Matrix4f;
+
 
 typedef std::vector<size_t> size_ts;
 typedef std::vector<int32_t> int32_ts;
@@ -117,11 +117,13 @@ typedef std::vector<Section> Sections;
 typedef std::vector<SectionType> SectionTypes;
 
 
-using vmml::Matrix4f;
-using vmml::Quaternionf;
-using vmml::Vector2i;
-using vmml::Vector3f;
-using vmml::Vector4f;
+using minimorph::Point;
+using minimorph::Points;
+
+using minimorph::Matrix4f;
+using minimorph::Vector2i;
+using minimorph::Vector3f;
+using minimorph::Vector4f;
 
 using minimorph::Strings;
 using minimorph::URI;
@@ -139,8 +141,9 @@ using minimorph::IDSequenceError;
 using minimorph::MultipleTrees;
 using minimorph::MissingParentError;
 
+
 typedef std::vector<Matrix4f> Matrix4fs;
-typedef std::vector<Quaternionf> Quaternionfs;
+
 
 
 /**

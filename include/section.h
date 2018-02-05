@@ -80,7 +80,7 @@ public:
      * @return A list of point positions with diameter. For a section consisting
      *         of n segments, this list will have n + 1 points.
      */
-    BRAIN_API Vector4fs getSamples() const;
+    BRAIN_API Points getSamples() const;
 
     /**
      * Return a list of points sampling this section at discrete locations.
@@ -93,7 +93,7 @@ public:
      *        section. Values will be clampled to [0, 1] before sampling.
      * @return The section sampled at the given relative positions.
      */
-    BRAIN_API Vector4fs getSamples(const floats& points) const;
+    BRAIN_API Points getSamples(const floats& points) const;
 
     /* /\** */
     /*  * Return the absolute distance from the start of the section to the soma. */

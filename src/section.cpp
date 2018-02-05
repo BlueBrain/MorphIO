@@ -74,12 +74,12 @@ SectionType Section::getType() const
 //     return _morphology->getSectionLength(_id);
 // }
 
-Vector4fs Section::getSamples() const
+Points Section::getSamples() const
 {
     return _morphology->getSectionSamples(_id);
 }
 
-Vector4fs Section::getSamples(const floats& points) const
+Points Section::getSamples(const floats& points) const
 {
     return _morphology->getSectionSamples(_id, points);
 }

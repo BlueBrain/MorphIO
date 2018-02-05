@@ -22,7 +22,6 @@
 #define BRION_PLUGIN_MORPHOLOGYHDF5
 
 #include "../morphologyPlugin.h"
-#include <vmmlib/vector.hpp>
 
 namespace minimorph
 {

@@ -46,7 +46,7 @@ Morphology::Impl::Impl(const URI& source, const Matrix4f& transform)
 }
 
 Morphology::Impl::Impl(minimorph::ConstMorphologyPtr morphology)
-    : data(morphology)
+    : data(morphology), transformation(Matrix4f())
 {
     _extractInformation();
 }
@@ -106,19 +106,19 @@ uint32_ts Morphology::Impl::getSectionIDs(const SectionTypes& requestedTypes,
 //     return length;
 // }
 
-Vector4fs Morphology::Impl::getSectionSamples(const uint32_t sectionID) const
+Points Morphology::Impl::getSectionSamples(const uint32_t sectionID) const
 {
     const SectionRange range = getSectionRange(sectionID);
     const auto& points = data->getPoints();
 
-    Vector4fs result;
+    Points result;
     result.reserve(range.second - range.first);
     result.insert(result.end(), points.begin() + range.first,
                   points.begin() + range.second);
     return result;
 }
 
-Vector4fs Morphology::Impl::getSectionSamples(const uint32_t sectionID,
+Points Morphology::Impl::getSectionSamples(const uint32_t sectionID,
                                               const floats& samplePoints) const
 {
     const SectionRange range = getSectionRange(sectionID);
@@ -132,9 +132,9 @@ Vector4fs Morphology::Impl::getSectionSamples(const uint32_t sectionID,
     // Dealing with the degenerate case of single point sections.
     const auto& points = data->getPoints();
     if (range.first + 1 == range.second)
-        return Vector4fs(samplePoints.size(), points[range.first]);
+        return Points(samplePoints.size(), points[range.first]);
 
-    Vector4fs result;
+    Points result;
     result.reserve(samplePoints.size());
 
     const floats accumLengths = _computeAccumulatedLengths(range);
@@ -165,7 +165,7 @@ Vector4fs Morphology::Impl::getSectionSamples(const uint32_t sectionID,
         // Interpolating the cross section at point.
         const float alpha = (length - accumLengths[index]) /
                             (accumLengths[index + 1] - accumLengths[index]);
-        const Vector4f sample =
+        const Point sample =
             points[start + 1] * alpha + points[start] * (1 - alpha);
         result.push_back(sample);
     }
@@ -219,14 +219,12 @@ const uint32_ts& Morphology::Impl::getChildren(const uint32_t sectionID) const
 
 void Morphology::Impl::_transform(minimorph::MorphologyPtr morphology)
 {
-    auto& points = morphology->getPoints();
-#pragma omp parallel for
-    for (size_t i = 0; i < points.size(); ++i)
-    {
-        auto& p = points[i];
-        const Vector3f& pp = transformation * p.get_sub_vector<3, 0>();
-        p.set_sub_vector<3, 0>(pp);
-    }
+//     auto& points = morphology->getPoints();
+// #pragma omp parallel for
+//     for (size_t i = 0; i < points.size(); ++i)
+//     {
+//         points[i] = transformation * points[i];
+//     }
 }
 
 void Morphology::Impl::_extractInformation()
@@ -265,9 +263,9 @@ float Morphology::Impl::_computeSectionLength(const uint32_t sectionID) const
     float length = 0;
     for (size_t i = range.first; i != range.second - 1; ++i)
     {
-        const Vector4f& start = points[i];
-        const Vector4f& end = points[i + 1];
-        const Vector3f& diff = (end - start).get_sub_vector<3, 0>();
+        const Point& start = points[i];
+        const Point& end = points[i + 1];
+        const Vector3f& diff = end - start;
         length += diff.length();
     }
     return length;
@@ -282,9 +280,9 @@ floats Morphology::Impl::_computeAccumulatedLengths(
     result.push_back(0);
     for (size_t i = range.first; i != range.second - 1; ++i)
     {
-        const Vector4f& start = points[i];
-        const Vector4f& end = points[i + 1];
-        const Vector3f& diff = (end - start).get_sub_vector<3, 0>();
+        const Point& start = points[i];
+        const Point& end = points[i + 1];
+        const Vector3f& diff = (end - start);
         result.push_back(result.back() + diff.length());
     }
     return result;

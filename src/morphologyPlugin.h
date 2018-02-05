@@ -114,8 +114,8 @@ public:
     /** @internal */
     MorphologyVersion getVersion() const { return _data.version; }
     /** @copydoc minimorph::Morphology::getPoints */
-    Vector4fs& getPoints() { return _points; }
-    const Vector4fs& getPoints() const { return _points; }
+    Points& getPoints() { return _points; }
+    const Points& getPoints() const { return _points; }
     /** @copydoc minimorph::Morphology::getSections */
     Vector2is& getSections() { return _sections; }
     const Vector2is& getSections() const { return _sections; }
@@ -127,7 +127,8 @@ public:
     const floats& getPerimeters() const { return _perimeters; }
 protected:
     MorphologyInitData _data;
-    Vector4fs _points;
+    Points _points;
+    floats _diameters;
     Vector2is _sections;
     SectionTypes _sectionTypes;
     floats _perimeters;

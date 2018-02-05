@@ -22,7 +22,6 @@
 
 #include "api.h"
 #include <types.h>
-#include <vmmlib/vector.hpp>     // return value
 
 #include <memory>  //std::unique_ptr
 
@@ -70,8 +69,8 @@ public:
      * @return x,y,z coords + diameter of all points of the morphology
      * @version 3.0
      */
-    BRION_API Vector4fs& getPoints();
-    BRION_API const Vector4fs& getPoints() const;
+    BRION_API Points& getPoints();
+    BRION_API const Points& getPoints() const;
 
     /** Get sections of morphology, representing section start index and index
      *  of the parent section.

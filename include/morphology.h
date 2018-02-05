@@ -90,7 +90,7 @@ public:
     BRAIN_API ~Morphology();
 
     /** @sa minimorph::Morphology::readPoints */
-    BRAIN_API const Vector4fs& getPoints() const;
+    BRAIN_API const Points& getPoints() const;
 
     /** @sa minimorph::Morphology::readSections */
     BRAIN_API const Vector2is& getSections() const;

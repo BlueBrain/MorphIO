@@ -8,7 +8,6 @@
 
 #include <enums.h>
 #include <morphology.h>
-#include <vmmlib/vector.hpp>
 
 
 namespace py = pybind11;
@@ -16,35 +15,35 @@ namespace py = pybind11;
 /** Loading/Casting of vmmlib::vector into numpy arrays **/
 namespace pybind11 {
 namespace detail {
-template <size_t M, typename T> struct type_caster<vmml::vector<M,T>>
-{
-public:
-    typedef vmml::vector<M,T> type;
-    PYBIND11_TYPE_CASTER(type, _("vmml::vector<M,T>"));
+// template <size_t M, typename T> struct type_caster<vmml::vector<M,T>>
+// {
+// public:
+//     typedef vmml::vector<M,T> type;
+//     PYBIND11_TYPE_CASTER(type, _("vmml::vector<M,T>"));
 
 
-    // Conversion part 1 (Python -> C++)
-    bool load(py::handle src, bool convert)
-        {
-            if (!convert && !py::array_t<T>::check_(src))
-                return false;
+//     // Conversion part 1 (Python -> C++)
+//     bool load(py::handle src, bool convert)
+//         {
+//             if (!convert && !py::array_t<T>::check_(src))
+//                 return false;
 
-            auto buf = py::array_t<T, py::array::c_style | py::array::forcecast>::ensure(src);
-            if (!buf)
-                return false;
+//             auto buf = py::array_t<T, py::array::c_style | py::array::forcecast>::ensure(src);
+//             if (!buf)
+//                 return false;
 
-            value = vmml::vector<M,T>(buf.data());
+//             value = vmml::vector<M,T>(buf.data());
 
-            return true;
-        }
+//             return true;
+//         }
 
-    //Conversion part 2 (C++ -> Python)
-    static py::handle cast(const vmml::vector<M,T>& src, py::return_value_policy policy, py::handle parent)
-        {
-            py::array a(M, src.array);
-            return a.release();
-        }
-};
+//     //Conversion part 2 (C++ -> Python)
+//     static py::handle cast(const vmml::vector<M,T>& src, py::return_value_policy policy, py::handle parent)
+//         {
+//             py::array a(M, src.array);
+//             return a.release();
+//         }
+// };
 
 
 // template <size_t M, typename T> struct type_caster<std::vector<vmml::vector<M,T>>>
@@ -113,7 +112,7 @@ PYBIND11_MODULE(python_morphio, m) {
         .def("getType", &morphio::Section::getType)
         .def("hasParent", &morphio::Section::hasParent)
         .def("getParent", &morphio::Section::getParent)
-        .def("getSamples", (morphio::Vector4fs (morphio::Section::*)() const) &morphio::Section::getSamples)
+        .def("getSamples", (morphio::Points (morphio::Section::*)() const) &morphio::Section::getSamples)
         .def("getChildren", &morphio::Section::getChildren);
 
     py::enum_<morphio::SectionType>(m, "SectionType")

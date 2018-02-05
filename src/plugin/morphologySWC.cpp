@@ -26,6 +26,7 @@
 #include <fstream>
 #include <list>
 #include <sstream>
+
 /*
 #include <lunchbox/debug.h>
 #include <lunchbox/log.h>
@@ -56,6 +57,14 @@ enum SWCSectionType
     SWC_SECTION_CUSTOM = 7
 };
 
+template <typename TPoint> bool setPoint(const char* line, SWCSectionType &type, TPoint &point, float &radius, int &parent);
+
+template <> bool setPoint(const char* line, SWCSectionType &type, Point &point, float &radius, int &parent){
+
+    return sscanf(line, "%20d%20f%20f%20f%20f%20d", (int*)&type, &point.x,
+               &point.y, &point.z, &radius, &parent) == 6;
+}
+
 struct Sample
 {
     Sample()
@@ -74,18 +83,17 @@ struct Sample
         , parentSection(-1)
     {
         float radius;
-        valid =
-            sscanf(line, "%20d%20f%20f%20f%20f%20d", (int*)&type, &point.x(),
-                   &point.y(), &point.z(), &radius, &parent) == 6;
-        point.w() = radius * 2; // The point array stores diameters.
+        valid = setPoint(line, type, point, radius, parent);
+        diameter = radius * 2; // The point array stores diameters.
 
         if (type >= SWC_SECTION_CUSTOM)
             valid = false; // Unknown section type, custom samples are also
                            // Regarded as unknown.
     }
 
+    float diameter;
     bool valid;
-    Vector4f point; // x, y, z and diameter
+    Point point; // x, y, z and diameter
     SWCSectionType type;
     int parent;
     int nextID;
@@ -444,24 +452,24 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
         {
             const Sample* parent = &samples[sample->parent];
 
-            // Special case when parent is a single point soma:
-            // Parent is replaced by a new point at the intersection between the circle
-            // defined by the single point soma and the soma center to current point line
-            if (parent->type == SWC_SECTION_SOMA && parent->nextID == -1 && parent->parent == -1)
-            {
-                const Vector4f& soma = parent->point;
-                const Vector4f& current_point = sample->point;
-                const Vector4f& radial_vector = current_point - soma;
-                float distance = radial_vector.get_sub_vector<3, 0>().length();
-                float soma_radius = soma[3]/ 2.;
-                float extrapolation_factor = std::min((float)1., soma_radius / distance);
-                Vector4f new_point = soma + extrapolation_factor * radial_vector;
-                new_point[3] = current_point[3];
-                if(!new_point.equals(current_point, 1e-6))
-                    _points.push_back(new_point);
-            } else {
-                _points.push_back(parent->point);
-            }
+            // // Special case when parent is a single point soma:
+            // // Parent is replaced by a new point at the intersection between the circle
+            // // defined by the single point soma and the soma center to current point line
+            // if (parent->type == SWC_SECTION_SOMA && parent->nextID == -1 && parent->parent == -1)
+            // {
+            //     const Vector4f& soma = parent->point;
+            //     const Vector4f& current_point = sample->point;
+            //     const Vector4f& radial_vector = current_point - soma;
+            //     float distance = radial_vector.get_sub_vector<3, 0>().length();
+            //     float soma_radius = soma[3]/ 2.;
+            //     float extrapolation_factor = std::min((float)1., soma_radius / distance);
+            //     Vector4f new_point = soma + extrapolation_factor * radial_vector;
+            //     new_point[3] = current_point[3];
+            //     if(!new_point.equals(current_point, 1e-6))
+            //         _points.push_back(new_point);
+            // } else {
+            //     _points.push_back(parent->point);
+            // }
         }
 
         // Iterate while we stay on the same section and push points
@@ -474,6 +482,7 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
                sample->type == SWCSectionType(_sectionTypes.back()))
         {
             _points.push_back(sample->point);
+            _diameters.push_back(sample->diameter);
 
             if(sample->nextID != -1)
                 sample = &samples[sample->nextID];

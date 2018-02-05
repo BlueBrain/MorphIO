@@ -22,7 +22,8 @@
 #define BRION_PLUGIN_MORPHOLOGYSWC
 
 #include "../morphologyPlugin.h"
-#include <vmmlib/vector.hpp>
+#include "../types.h"
+/* #include "../vector_types.h" */
 
 namespace minimorph
 {

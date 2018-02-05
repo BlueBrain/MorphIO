@@ -72,7 +72,7 @@ Morphology::~Morphology()
 {
 }
 
-const Vector4fs& Morphology::getPoints() const
+const Points& Morphology::getPoints() const
 {
     return _impl->data->getPoints();
 }

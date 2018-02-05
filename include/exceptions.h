@@ -1,3 +1,5 @@
+#pragma once
+
 namespace minimorph
 {
 class Error: protected std::exception
@@ -8,6 +10,8 @@ protected:
 public:
 Error(const std::string& _msg): msg(_msg) {}
     virtual const char* what() {return msg.c_str();}
+
+~Error() throw() {}
 };
 
 class RawDataError: public Error {
