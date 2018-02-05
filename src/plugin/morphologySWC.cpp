@@ -61,8 +61,8 @@ template <typename TPoint> bool setPoint(const char* line, SWCSectionType &type,
 
 template <> bool setPoint(const char* line, SWCSectionType &type, Point &point, float &radius, int &parent){
 
-    return sscanf(line, "%20d%20f%20f%20f%20f%20d", (int*)&type, &point.x,
-               &point.y, &point.z, &radius, &parent) == 6;
+    return sscanf(line, "%20d%20f%20f%20f%20f%20d", (int*)&type, &point[0],
+               &point[1], &point[2], &radius, &parent) == 6;
 }
 
 struct Sample
@@ -442,8 +442,7 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
     sectionQueue.pop_front();
     while (sample)
     {
-        _sections.push_back(
-            Vector2i(int(_points.size()), sample->parentSection));
+        _sections.push_back({int(_points.size()), sample->parentSection});
         _sectionTypes.push_back(SectionType(sample->type));
 
         // Pushing first point of the section using the parent sample

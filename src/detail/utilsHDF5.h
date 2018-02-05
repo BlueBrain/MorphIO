@@ -26,30 +26,6 @@
 #include <types.h>
 namespace HighFive
 {
-namespace details
-{
-template <size_t M, typename T>
-struct array_dims<std::vector<glm::vec<M, T>>>
-{
-    static const size_t value = 2;
-    typedef T type;
-};
-
-template <size_t M, typename T>
-struct type_of_array<std::vector<glm::vec<M, T>>>
-{
-    typedef T type;
-};
-
-template <size_t M, typename T>
-struct data_converter<glm::vec<M, T>>
-{
-    static T* transform_read(std::vector<glm::vec<M, T>>& vector)
-    {
-        return (T*)vector.data();
-    }
-};
-}
 
 template <>
 inline AtomicType<minimorph::SectionType>::AtomicType()
@@ -64,13 +40,13 @@ template <>
 }
 
 template <>
-    inline AtomicType<glm::vec2>::AtomicType()
+    inline AtomicType<minimorph::Vector2i>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
 
 template <>
-    inline AtomicType<glm::vec3>::AtomicType()
+    inline AtomicType<minimorph::Point>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }

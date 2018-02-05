@@ -6,6 +6,7 @@ set(MORPHIO_SOURCES
     morphologyImpl.cpp
     section.cpp
     soma.cpp
+    vector_utils
     )
 
 add_library(morphio
@@ -22,12 +23,10 @@ set_target_properties(morphio
 target_link_libraries(morphio
     PRIVATE
     HighFive
-    glm
     )
 
 target_include_directories(morphio
     PUBLIC
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../include
-    ../3rdparty/glm
     )

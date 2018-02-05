@@ -103,7 +103,7 @@ PYBIND11_MODULE(python_morphio, m) {
     py::class_<morphio::Soma>(m, "Soma")
         .def(py::init<const morphio::Soma&>())
         .def("getProfilePoints", &morphio::Soma::getProfilePoints)
-        .def("getMeanRadius", &morphio::Soma::getMeanRadius)
+        // .def("getMeanRadius", &morphio::Soma::getMeanRadius)
         .def("getCentroid", &morphio::Soma::getCentroid)
         .def("getChildren", &morphio::Soma::getChildren);
 

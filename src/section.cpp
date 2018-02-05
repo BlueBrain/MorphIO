@@ -79,10 +79,10 @@ Points Section::getSamples() const
     return _morphology->getSectionSamples(_id);
 }
 
-Points Section::getSamples(const floats& points) const
-{
-    return _morphology->getSectionSamples(_id, points);
-}
+// Points Section::getSamples(const floats& points) const
+// {
+//     return _morphology->getSectionSamples(_id, points);
+// }
 
 // float Section::getDistanceToSoma() const
 // {

@@ -93,7 +93,7 @@ public:
      *        section. Values will be clampled to [0, 1] before sampling.
      * @return The section sampled at the given relative positions.
      */
-    BRAIN_API Points getSamples(const floats& points) const;
+    /* BRAIN_API Points getSamples(const floats& points) const; */
 
     /* /\** */
     /*  * Return the absolute distance from the start of the section to the soma. */

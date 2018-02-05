@@ -56,8 +56,8 @@ public:
 
     Points getSectionSamples(const uint32_t sectionID) const;
 
-    Points getSectionSamples(const uint32_t sectionID,
-                                const floats& samplePoints) const;
+    /* Points getSectionSamples(const uint32_t sectionID, */
+    /*                             const floats& samplePoints) const; */
 
     /* float getDistanceToSoma(const uint32_t sectionID) const; */
 
@@ -78,8 +78,8 @@ private:
 
     void _transform(minimorph::MorphologyPtr morphology);
     void _extractInformation();
-    float _computeSectionLength(const uint32_t sectionID) const;
-    floats _computeAccumulatedLengths(const SectionRange& range) const;
+    /* float _computeSectionLength(const uint32_t sectionID) const; */
+    /* floats _computeAccumulatedLengths(const SectionRange& range) const; */
 };
 }
 #endif

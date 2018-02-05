@@ -118,60 +118,61 @@ Points Morphology::Impl::getSectionSamples(const uint32_t sectionID) const
     return result;
 }
 
-Points Morphology::Impl::getSectionSamples(const uint32_t sectionID,
-                                              const floats& samplePoints) const
-{
-    const SectionRange range = getSectionRange(sectionID);
-    const auto& types = data->getSectionTypes();
 
-    // If the section is the soma return directly the soma position.
-    if (types[sectionID] == minimorph::enums::SECTION_SOMA)
-        // This code shouldn't be reached.
-        LBTHROW(std::runtime_error("Invalid method called on soma section"));
+// Points Morphology::Impl::getSectionSamples(const uint32_t sectionID,
+//                                               const floats& samplePoints) const
+// {
+//     const SectionRange range = getSectionRange(sectionID);
+//     const auto& types = data->getSectionTypes();
 
-    // Dealing with the degenerate case of single point sections.
-    const auto& points = data->getPoints();
-    if (range.first + 1 == range.second)
-        return Points(samplePoints.size(), points[range.first]);
+//     // If the section is the soma return directly the soma position.
+//     if (types[sectionID] == minimorph::enums::SECTION_SOMA)
+//         // This code shouldn't be reached.
+//         LBTHROW(std::runtime_error("Invalid method called on soma section"));
 
-    Points result;
-    result.reserve(samplePoints.size());
+//     // Dealing with the degenerate case of single point sections.
+//     const auto& points = data->getPoints();
+//     if (range.first + 1 == range.second)
+//         return Points(samplePoints.size(), points[range.first]);
 
-    const floats accumLengths = _computeAccumulatedLengths(range);
-    const float totalLength = accumLengths.back();
+//     Points result;
+//     result.reserve(samplePoints.size());
 
-    for (const float point : samplePoints)
-    {
-        // Finding the segment index for the requested sampling position.
-        const float length = std::max(0.f, std::min(1.f, point)) * totalLength;
-        size_t index = 0;
-        for (; accumLengths[index + 1] < length &&
-               index < accumLengths.size() - 1;
-             ++index)
-            ;
+//     const floats accumLengths = _computeAccumulatedLengths(range);
+//     const float totalLength = accumLengths.back();
 
-        // If the first point of the section is repeated and we are
-        // interpolating
-        // at 0 length - accumLengths[0] and accumLengths[1] - accumLengths[0]
-        // will be both 0. To avoid the 0/0 operation we check for
-        // length == accumLengths[index].
-        const size_t start = range.first + index;
-        if (length == accumLengths[index])
-        {
-            result.push_back(points[start]);
-            continue;
-        }
+//     for (const float point : samplePoints)
+//     {
+//         // Finding the segment index for the requested sampling position.
+//         const float length = std::max(0.f, std::min(1.f, point)) * totalLength;
+//         size_t index = 0;
+//         for (; accumLengths[index + 1] < length &&
+//                index < accumLengths.size() - 1;
+//              ++index)
+//             ;
 
-        // Interpolating the cross section at point.
-        const float alpha = (length - accumLengths[index]) /
-                            (accumLengths[index + 1] - accumLengths[index]);
-        const Point sample =
-            points[start + 1] * alpha + points[start] * (1 - alpha);
-        result.push_back(sample);
-    }
+//         // If the first point of the section is repeated and we are
+//         // interpolating
+//         // at 0 length - accumLengths[0] and accumLengths[1] - accumLengths[0]
+//         // will be both 0. To avoid the 0/0 operation we check for
+//         // length == accumLengths[index].
+//         const size_t start = range.first + index;
+//         if (length == accumLengths[index])
+//         {
+//             result.push_back(points[start]);
+//             continue;
+//         }
 
-    return result;
-}
+//         // Interpolating the cross section at point.
+//         const float alpha = (length - accumLengths[index]) /
+//                             (accumLengths[index + 1] - accumLengths[index]);
+//         const Point sample =
+//             points[start + 1] * alpha + points[start] * (1 - alpha);
+//         result.push_back(sample);
+//     }
+
+//     return result;
+// }
 
 // float Morphology::Impl::getDistanceToSoma(const uint32_t sectionID) const
 // {
@@ -256,35 +257,35 @@ void Morphology::Impl::_extractInformation()
     somaSection = ids[0];
 }
 
-float Morphology::Impl::_computeSectionLength(const uint32_t sectionID) const
-{
-    const auto& points = data->getPoints();
-    const SectionRange range = getSectionRange(sectionID);
-    float length = 0;
-    for (size_t i = range.first; i != range.second - 1; ++i)
-    {
-        const Point& start = points[i];
-        const Point& end = points[i + 1];
-        const Vector3f& diff = end - start;
-        length += diff.length();
-    }
-    return length;
-}
+// float Morphology::Impl::_computeSectionLength(const uint32_t sectionID) const
+// {
+//     const auto& points = data->getPoints();
+//     const SectionRange range = getSectionRange(sectionID);
+//     float length = 0;
+//     for (size_t i = range.first; i != range.second - 1; ++i)
+//     {
+//         const Point& start = points[i];
+//         const Point& end = points[i + 1];
+//         const Point& diff = end - start;
+//         length += diff.length();
+//     }
+//     return length;
+// }
 
-floats Morphology::Impl::_computeAccumulatedLengths(
-    const SectionRange& range) const
-{
-    const auto& points = data->getPoints();
-    floats result;
-    result.reserve(range.second - range.first);
-    result.push_back(0);
-    for (size_t i = range.first; i != range.second - 1; ++i)
-    {
-        const Point& start = points[i];
-        const Point& end = points[i + 1];
-        const Vector3f& diff = (end - start);
-        result.push_back(result.back() + diff.length());
-    }
-    return result;
-}
+// floats Morphology::Impl::_computeAccumulatedLengths(
+//     const SectionRange& range) const
+// {
+//     const auto& points = data->getPoints();
+//     floats result;
+//     result.reserve(range.second - range.first);
+//     result.push_back(0);
+//     for (size_t i = range.first; i != range.second - 1; ++i)
+//     {
+//         const Point& start = points[i];
+//         const Point& end = points[i + 1];
+//         const Point& diff = (end - start);
+//         result.push_back(result.back() + diff.length());
+//     }
+//     return result;
+// }
 }

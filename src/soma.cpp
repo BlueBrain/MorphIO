@@ -58,15 +58,15 @@ Points Soma::getProfilePoints() const
     return _morphology->getSectionSamples(_morphology->somaSection);
 }
 
-float Soma::getMeanRadius() const
-{
-    const Points points = getProfilePoints();
-    const Point centroid = _computeCentroid(points);
-    float radius = 0;
-    for (const Point point : points)
-        radius += (point - centroid).length();
-    return radius /= float(points.size());
-}
+// float Soma::getMeanRadius() const
+// {
+//     const Points points = getProfilePoints();
+//     const Point centroid = _computeCentroid(points);
+//     float radius = 0;
+//     for (const Point point : points)
+//         radius += (point - centroid).length();
+//     return radius /= float(points.size());
+// }
 
 Point Soma::getCentroid() const
 {

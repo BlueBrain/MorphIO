@@ -62,7 +62,7 @@ public:
     BRAIN_API Points getProfilePoints() const;
 
     /** Return the mean distance between the profile points and the centroid. */
-    BRAIN_API float getMeanRadius() const;
+    /* BRAIN_API float getMeanRadius() const; */
 
     /** Return the average of the profile points. */
     BRAIN_API Point getCentroid() const;
