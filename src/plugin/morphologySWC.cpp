@@ -432,18 +432,18 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
     // The size reservation is an upper estimate because it's not easy to
     // detect all first order sections (some may connect to the soma point
     // or ring and some may not).
-    _points.reserve(info.totalValidSamples + info.numSections -
+    _properties.get<PointProperty>().reserve(info.totalValidSamples + info.numSections -
                     info.roots.size());
-    _sections.reserve(info.numSections);
-    _sectionTypes.reserve(info.numSections);
+    _properties.get<SectionProperty>().reserve(info.numSections);
+    _properties.get<SectionTypeProperty>().reserve(info.numSections);
     Samples& samples = info.samples;
 
     Sample* sample = &samples[sectionQueue.front()];
     sectionQueue.pop_front();
     while (sample)
     {
-        _sections.push_back({int(_points.size()), sample->parentSection});
-        _sectionTypes.push_back(SectionType(sample->type));
+        _properties.get<SectionProperty>().push_back({int(_properties.get<PointProperty>().size()), sample->parentSection});
+        _properties.get<SectionTypeProperty>().push_back(SectionType(sample->type));
 
         // Pushing first point of the section using the parent sample
         // if necessary
@@ -465,9 +465,9 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
             //     Vector4f new_point = soma + extrapolation_factor * radial_vector;
             //     new_point[3] = current_point[3];
             //     if(!new_point.equals(current_point, 1e-6))
-            //         _points.push_back(new_point);
+            //         _properties.get<PointProperty>().push_back(new_point);
             // } else {
-            //     _points.push_back(parent->point);
+            //     _properties.get<PointProperty>().push_back(parent->point);
             // }
         }
 
@@ -478,10 +478,10 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
                // There are degenerated cases where this is absolutely
                // needed (e.g. a morphology with only one first order
                // section a point soma).
-               sample->type == SWCSectionType(_sectionTypes.back()))
+               sample->type == SWCSectionType(_properties.get<SectionTypeProperty>().back()))
         {
-            _points.push_back(sample->point);
-            _diameters.push_back(sample->diameter);
+            _properties.get<PointProperty>().push_back(sample->point);
+            _properties.get<DiameterProperty>().push_back(sample->diameter);
 
             if(sample->nextID != -1)
                 sample = &samples[sample->nextID];
@@ -499,7 +499,7 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
             // the sibling (if any) to the sectionQeueue and continuing
             // traversing the current section
             assert(sample->siblingID != -1 ||
-                   sample->type != SWCSectionType(_sectionTypes.back()));
+                   sample->type != SWCSectionType(_properties.get<SectionTypeProperty>().back()));
 
             // Assigning the parent section to the current sample, this
             // will be stored in the section array at the beginning of

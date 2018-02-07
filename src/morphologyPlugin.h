@@ -115,20 +115,18 @@ public:
 
     /** @internal */
     MorphologyVersion getVersion() const { return _data.version; }
-    /** @copydoc minimorph::Morphology::getPoints */
 
-    template <typename Property> std::vector<typename Property::Type> get(){
+    template <typename Property> std::vector<typename Property::Type>& get(){
         return _properties.get<Property>();
     }
 
-    Vector2is& getSections() { return _sections; }
-    const Vector2is& getSections() const { return _sections; }
-    /** @copydoc minimorph::Morphology::getSectionTypes */
+    template <typename Property> const std::vector<typename Property::Type>& get() const {
+        return _properties.get<Property>();
+    }
 
 protected:
     MorphologyInitData _data;
     Properties _properties;
-    Vector2is _sections;
 
     /*
     // Serializable API
@@ -136,10 +134,6 @@ protected:
     bool _fromBinary(const void* data, const size_t size) final;
     */
 };
-
-template std::vector<typename PointProperty::Type> MorphologyPlugin::get<PointProperty>();
-template std::vector<typename PerimeterProperty::Type> MorphologyPlugin::get<PerimeterProperty>();
-template std::vector<typename SectionTypeProperty::Type> MorphologyPlugin::get<SectionTypeProperty>();
 
 }
 

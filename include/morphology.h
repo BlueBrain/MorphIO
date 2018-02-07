@@ -67,22 +67,10 @@ public:
     /** @return the cell family of that morphology. @version 1.8 */
     BRAIN_API CellFamily getCellFamily() const;
 
-    /** Get sections of morphology, representing section start index and index
-     *  of the parent section.
-     *
-     * @return First point and parent indices of all the sections of the
-     *         morphology.
-     * @version 3.0
-     */
-    BRAIN_API Vector2is& getSections();
-    BRAIN_API const Vector2is& getSections() const;
 
 
     BRAIN_API template <typename Property> std::vector<typename Property::Type>& get();
     BRAIN_API template <typename Property> const std::vector<typename Property::Type>& get() const;
-
-
-
     /** @internal */
     BRAIN_API MorphologyVersion getVersion() const;
 
@@ -93,6 +81,8 @@ private:
     class Impl;
     std::unique_ptr<Impl> _impl;
 };
+
+
 
 }
 #endif

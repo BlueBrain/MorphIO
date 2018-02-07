@@ -282,7 +282,7 @@ private:
 
     void _readSections()
     {
-        auto& sections = _morphology.getSections();
+        auto& sections = _morphology.get<SectionProperty>();
 
         if (_initData.version == MORPHOLOGY_VERSION_H5_2)
         {
@@ -322,7 +322,7 @@ private:
 
     void _readSectionTypes()
     {
-        auto& types = _morphology.getSectionTypes();
+        auto& types = _morphology.get<SectionTypeProperty>();
 
         if (_initData.version == MORPHOLOGY_VERSION_H5_2)
         {
@@ -378,7 +378,7 @@ private:
                                            " 'perimeters' dataspace"));
             }
 
-            auto& perimeters = _morphology.getPerimeters();
+            auto& perimeters = _morphology.get<PerimeterProperty>();
             perimeters.resize(dims[0]);
             dataset.read(perimeters);
         }

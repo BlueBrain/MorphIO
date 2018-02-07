@@ -161,16 +161,6 @@ template <typename Property> const std::vector<typename Property::Type>& Morphol
     return _impl->plugin->get<Property>();
 }
 
-Vector2is& Morphology::getSections()
-{
-    return _impl->plugin->getSections();
-}
-
-const Vector2is& Morphology::getSections() const
-{
-    return _impl->plugin->getSections();
-}
-
 MorphologyVersion Morphology::getVersion() const
 {
     return _impl->plugin->getVersion();
@@ -180,5 +170,8 @@ const MorphologyInitData& Morphology::getInitData() const
 {
     return _impl->plugin->getInitData();
 }
+
+template std::vector<typename PointProperty::Type>& Morphology::get<PointProperty>();
+template const std::vector<typename PointProperty::Type>& Morphology::get<PointProperty>() const;
 
 }
