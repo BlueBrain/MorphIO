@@ -19,8 +19,8 @@
 
 /** @file enums.h Enumerations used in Brion. */
 
-#ifndef BRION_ENUMS
-#define BRION_ENUMS
+#ifndef BRAIN_ENUMS
+#define BRAIN_ENUMS
 
 #include <ostream>
 

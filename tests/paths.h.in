@@ -18,11 +18,11 @@
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  */
 
-#ifndef BRION_TEST_PATHS
-#define BRION_TEST_PATHS
+#ifndef BRAIN_TEST_PATHS
+#define BRAIN_TEST_PATHS
 
 #include <BBP/TestDatasets.h>
 
-static char const *const BRION_TESTDATA = "${CMAKE_CURRENT_SOURCE_DIR}/data";
+static char const *const BRAIN_TESTDATA = "${CMAKE_CURRENT_SOURCE_DIR}/data";
 
 #endif

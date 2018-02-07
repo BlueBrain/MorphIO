@@ -5,29 +5,29 @@
  * Defines export visibility macros for library Brion.
  */
 
-#ifndef BRION_API_H
-#define BRION_API_H
+#ifndef BRAIN_API_H
+#define BRAIN_API_H
 
 #if defined(_MSC_VER) || defined(__declspec)
-#  define BRION_DLLEXPORT __declspec(dllexport)
-#  define BRION_DLLIMPORT __declspec(dllimport)
+#  define BRAIN_DLLEXPORT __declspec(dllexport)
+#  define BRAIN_DLLIMPORT __declspec(dllimport)
 #else // _MSC_VER
-#  define BRION_DLLEXPORT
-#  define BRION_DLLIMPORT
+#  define BRAIN_DLLEXPORT
+#  define BRAIN_DLLIMPORT
 #endif // _MSC_VER
 
-#if defined(BRION_STATIC)
-#  define BRION_API
-#elif defined(BRION_SHARED)
-#  define BRION_API BRION_DLLEXPORT
+#if defined(BRAIN_STATIC)
+#  define BRAIN_API
+#elif defined(BRAIN_SHARED)
+#  define BRAIN_API BRAIN_DLLEXPORT
 #else
-#  define BRION_API BRION_DLLIMPORT
+#  define BRAIN_API BRAIN_DLLIMPORT
 #endif
 
-#if defined(BRION_SHARED_INL)
-#  define BRION_INL BRION_DLLEXPORT
+#if defined(BRAIN_SHARED_INL)
+#  define BRAIN_INL BRAIN_DLLEXPORT
 #else
-#  define BRION_INL BRION_DLLIMPORT
+#  define BRAIN_INL BRAIN_DLLIMPORT
 #endif
 
 #endif

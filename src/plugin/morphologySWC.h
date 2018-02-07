@@ -18,11 +18,11 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_PLUGIN_MORPHOLOGYSWC
-#define BRION_PLUGIN_MORPHOLOGYSWC
+#ifndef BRAIN_PLUGIN_MORPHOLOGYSWC
+#define BRAIN_PLUGIN_MORPHOLOGYSWC
 
 #include "../morphologyPlugin.h"
-#include "../types.h"
+#include <types.h>
 /* #include "../vector_types.h" */
 
 namespace minimorph

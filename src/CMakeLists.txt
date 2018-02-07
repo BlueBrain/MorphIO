@@ -1,11 +1,8 @@
 set(MORPHIO_SOURCES
-    morphologyBrion.cpp
+    morphology.cpp
     plugin/morphologyHDF5.cpp
     plugin/morphologySWC.cpp
     morphology.cpp
-    morphologyImpl.cpp
-    section.cpp
-    soma.cpp
     vector_utils
     )
 

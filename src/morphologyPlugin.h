@@ -26,6 +26,8 @@
 
 #include <string>
 
+#include <properties.hpp>
+
 namespace minimorph
 {
 /**
@@ -114,24 +116,19 @@ public:
     /** @internal */
     MorphologyVersion getVersion() const { return _data.version; }
     /** @copydoc minimorph::Morphology::getPoints */
-    Points& getPoints() { return _points; }
-    const Points& getPoints() const { return _points; }
-    /** @copydoc minimorph::Morphology::getSections */
+
+    template <typename Property> std::vector<typename Property::Type> get(){
+        return _properties.get<Property>();
+    }
+
     Vector2is& getSections() { return _sections; }
     const Vector2is& getSections() const { return _sections; }
     /** @copydoc minimorph::Morphology::getSectionTypes */
-    SectionTypes& getSectionTypes() { return _sectionTypes; }
-    const SectionTypes& getSectionTypes() const { return _sectionTypes; }
-    /** @copydoc minimorph::Morphology::getPerimeters */
-    floats& getPerimeters() { return _perimeters; }
-    const floats& getPerimeters() const { return _perimeters; }
+
 protected:
     MorphologyInitData _data;
-    Points _points;
-    floats _diameters;
+    Properties _properties;
     Vector2is _sections;
-    SectionTypes _sectionTypes;
-    floats _perimeters;
 
     /*
     // Serializable API
@@ -139,6 +136,11 @@ protected:
     bool _fromBinary(const void* data, const size_t size) final;
     */
 };
+
+template std::vector<typename PointProperty::Type> MorphologyPlugin::get<PointProperty>();
+template std::vector<typename PerimeterProperty::Type> MorphologyPlugin::get<PerimeterProperty>();
+template std::vector<typename SectionTypeProperty::Type> MorphologyPlugin::get<SectionTypeProperty>();
+
 }
 
 // TODO: compile

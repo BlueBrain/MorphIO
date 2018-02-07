@@ -17,8 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_DETAIL_UTILSHDF5
-#define BRION_DETAIL_UTILSHDF5
+#ifndef BRAIN_DETAIL_UTILSHDF5
+#define BRAIN_DETAIL_UTILSHDF5
 
 #include <highfive/H5Attribute.hpp>
 #include <highfive/H5DataType.hpp>

@@ -21,7 +21,7 @@
 #include <minimorph.h>
 #include <tests/paths.h>
 
-#ifdef BRION_USE_ZEROEQ
+#ifdef BRAIN_USE_ZEROEQ
 #include <constants.h>
 #include <zeroeq/server.h>
 #include <zeroeq/uri.h>
@@ -178,7 +178,7 @@ BOOST_AUTO_TEST_CASE(move_morphology)
     _checkH5V2(morphology);
 }
 
-#ifdef BRION_USE_ZEROEQ
+#ifdef BRAIN_USE_ZEROEQ
 BOOST_AUTO_TEST_CASE(zeroeq_read)
 {
     zeroeq::Server server(zeroeq::NULL_SESSION);
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE(swc_invalid_open)
         std::runtime_error);
     try
     {
-        boost::filesystem::path path(BRION_TESTDATA);
+        boost::filesystem::path path(BRAIN_TESTDATA);
         path /= "swc/bad_syntax.swc";
         minimorph::Morphology(minimorph::URI(path.string())).getPoints();
         BOOST_CHECK(false);
@@ -317,7 +317,7 @@ void checkCloseArraysUptoN(const std::vector<T>& array, const size_t length,
 
 BOOST_AUTO_TEST_CASE(swc_soma)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/soma.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
@@ -328,7 +328,7 @@ BOOST_AUTO_TEST_CASE(swc_soma)
 
 BOOST_AUTO_TEST_CASE(swc_soma_ring)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/soma_ring.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
@@ -340,7 +340,7 @@ BOOST_AUTO_TEST_CASE(swc_soma_ring)
 
 BOOST_AUTO_TEST_CASE(swc_no_soma)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/no_soma.swc";
 
     BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
@@ -349,7 +349,7 @@ BOOST_AUTO_TEST_CASE(swc_no_soma)
 
 BOOST_AUTO_TEST_CASE(swc_two_somas)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/two_somas.swc";
 
     BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
@@ -358,7 +358,7 @@ BOOST_AUTO_TEST_CASE(swc_two_somas)
 
 BOOST_AUTO_TEST_CASE(swc_single_section)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/single_section.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
@@ -371,7 +371,7 @@ BOOST_AUTO_TEST_CASE(swc_single_section)
 
 BOOST_AUTO_TEST_CASE(swc_single_section_unordered)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/single_section_unordered.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
@@ -384,7 +384,7 @@ BOOST_AUTO_TEST_CASE(swc_single_section_unordered)
 
 BOOST_AUTO_TEST_CASE(swc_single_section_missing_segment)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/single_section_missing_segment.swc";
 
     BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
@@ -393,7 +393,7 @@ BOOST_AUTO_TEST_CASE(swc_single_section_missing_segment)
 
 BOOST_AUTO_TEST_CASE(swc_section_type_changes)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/section_type_changes.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
@@ -409,7 +409,7 @@ BOOST_AUTO_TEST_CASE(swc_section_type_changes)
 
 BOOST_AUTO_TEST_CASE(swc_first_order_sections)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/first_order_sections.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
@@ -426,7 +426,7 @@ BOOST_AUTO_TEST_CASE(swc_first_order_sections)
 
 BOOST_AUTO_TEST_CASE(swc_first_order_sections_from_arbitrary_points)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/first_order_sections_ring.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
@@ -446,7 +446,7 @@ BOOST_AUTO_TEST_CASE(swc_first_order_sections_from_arbitrary_points)
 
 BOOST_AUTO_TEST_CASE(swc_bifurcation)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/bifurcations.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
@@ -463,7 +463,7 @@ BOOST_AUTO_TEST_CASE(swc_bifurcation)
 
 BOOST_AUTO_TEST_CASE(swc_end_points)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/end_points.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
@@ -477,7 +477,7 @@ BOOST_AUTO_TEST_CASE(swc_end_points)
 
 BOOST_AUTO_TEST_CASE(swc_fork_points)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/fork_points.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
@@ -491,7 +491,7 @@ BOOST_AUTO_TEST_CASE(swc_fork_points)
 
 BOOST_AUTO_TEST_CASE(swc_neuron)
 {
-    boost::filesystem::path path(BRION_TESTDATA);
+    boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/Neuron.swc";
 
     const minimorph::Morphology neuron{minimorph::URI(path.string())};

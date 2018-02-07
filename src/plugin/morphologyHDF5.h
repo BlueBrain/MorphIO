@@ -18,8 +18,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_PLUGIN_MORPHOLOGYHDF5
-#define BRION_PLUGIN_MORPHOLOGYHDF5
+#ifndef BRAIN_PLUGIN_MORPHOLOGYHDF5
+#define BRAIN_PLUGIN_MORPHOLOGYHDF5
 
 #include "../morphologyPlugin.h"
 

@@ -17,8 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRION_DETAIL_LOCKHDF5
-#define BRION_DETAIL_LOCKHDF5
+#ifndef BRAIN_DETAIL_LOCKHDF5
+#define BRAIN_DETAIL_LOCKHDF5
 
 #include <mutex>
 

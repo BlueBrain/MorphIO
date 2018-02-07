@@ -246,7 +246,7 @@ private:
 
     void _readPoints()
     {
-        auto& points = _morphology.getPoints();
+        auto& points = _morphology.get<PointProperty>();
 
         if (_initData.version == MORPHOLOGY_VERSION_H5_2)
         {

@@ -21,7 +21,6 @@
 
 #include "morphology.h"
 
-#include "morphologyImpl.h"
 #include "morphologyPlugin.h"
 
 #include "plugin/morphologyHDF5.h"
@@ -71,43 +70,50 @@ public:
 }
 #endif
 
-Morphology::Impl::Impl(const URI& uri)
+class Morphology::Impl
 {
-    const size_t pos = uri.find_last_of(".");
-    assert(pos != std::string::npos);
-    if(access( uri.c_str(), F_OK ) == -1)
+public:
+    explicit Impl(const URI& uri)
     {
-        LBTHROW(RawDataError("File: "+uri+" does not exist."));
-    }
+      const size_t pos = uri.find_last_of(".");
+      assert(pos != std::string::npos);
+      if(access( uri.c_str(), F_OK ) == -1)
+      {
+          LBTHROW(RawDataError("File: "+uri+" does not exist."));
+      }
 
-    if (uri.substr(pos) == ".h5") {
+      if (uri.substr(pos) == ".h5") {
         plugin = std::unique_ptr<MorphologyPlugin>(
             new plugin::MorphologyHDF5(MorphologyInitData(uri)));
-    }
-    else if (uri.substr(pos) == ".swc") {
+      }
+      else if (uri.substr(pos) == ".swc") {
         plugin = std::unique_ptr<MorphologyPlugin>(
             new plugin::MorphologySWC(MorphologyInitData(uri)));
+      }
+      else {
+          LBTHROW(UnknownFileType("unhandled file type"));
+      }
     }
-    else {
-        LBTHROW(UnknownFileType("unhandled file type"));
-    }
-}
 
 #if 0
-Morphology::Impl::Impl(const Morphology& from)
+    Impl(const Morphology& from)
         : plugin(new BinaryMorphology(from))
     {
     }
 
-Morphology::Impl::Impl(const void* data, size_t size)
+    Impl(const void* data, size_t size)
         : plugin(new BinaryMorphology(data, size))
     {
     }
 #endif
 
-Morphology::Impl::~Impl()
+    ~Impl()
     {
     }
+
+    //TODO: Do we really need a PIMPL to hold the plugin?
+    std::unique_ptr<MorphologyPlugin> plugin;
+};
 
 Morphology::Morphology(const URI& source)
     : _impl(new Impl(source))
@@ -147,8 +153,22 @@ CellFamily Morphology::getCellFamily() const
     return _impl->plugin->getCellFamily();
 }
 
-template <typename Property> std::vector<typename Property::Type> Morphology::get() {
+template <typename Property> std::vector<typename Property::Type>& Morphology::get(){
     return _impl->plugin->get<Property>();
+}
+
+template <typename Property> const std::vector<typename Property::Type>& Morphology::get() const{
+    return _impl->plugin->get<Property>();
+}
+
+Vector2is& Morphology::getSections()
+{
+    return _impl->plugin->getSections();
+}
+
+const Vector2is& Morphology::getSections() const
+{
+    return _impl->plugin->getSections();
 }
 
 MorphologyVersion Morphology::getVersion() const
@@ -160,7 +180,5 @@ const MorphologyInitData& Morphology::getInitData() const
 {
     return _impl->plugin->getInitData();
 }
-
-
 
 }

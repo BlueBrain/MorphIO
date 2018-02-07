@@ -88,7 +88,7 @@ minimorph::uint32_ts getSectionIDs(const morphio::neuron::Sections& sections)
     return result;
 }
 
-const minimorph::URI TEST_MORPHOLOGY_URI(std::string("file://") + BRION_TESTDATA +
+const minimorph::URI TEST_MORPHOLOGY_URI(std::string("file://") + BRAIN_TESTDATA +
                                      "/h5/test_neuron.h5");
 
 void checkEqualMorphologies(const morphio::neuron::Morphology& first,
