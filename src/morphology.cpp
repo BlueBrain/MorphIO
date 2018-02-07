@@ -1,5 +1,5 @@
 /* Copyright (c) 2013-2017, EPFL/Blue Brain Project
- *                          Juan Hernando <jhernando@fi.upm.es>
+ *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -17,137 +17,150 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+#include <unistd.h>
+
 #include "morphology.h"
-#include <section.h>
-#include "soma.h"
 
 #include "morphologyImpl.h"
+#include "morphologyPlugin.h"
 
-#include <morphology.h>
+#include "plugin/morphologyHDF5.h"
+#include "plugin/morphologySWC.h"
 
-// #include <lunchbox/log.h>
+#include <cassert>
+/* todo: compile */
+#include <iostream>
 
-namespace morphio
+namespace minimorph
 {
+//TODO: compile
 #if 0
-Morphology::Morphology(const void* data, const size_t size)
-    : _impl(new Impl(data, size))
+namespace
 {
+/**
+ * "Plugin" for copied and deserialized morphologies.
+ *
+ * Does not actually load any data, but holds the data gathered from the copy or
+ * deserialization.
+ */
+class BinaryMorphology : public MorphologyPlugin
+{
+public:
+    BinaryMorphology(const Morphology& from)
+        : MorphologyPlugin(from.getInitData())
+    {
+        _points = from.getPoints();
+        _sections = from.getSections();
+        _sectionTypes = from.getSectionTypes();
+        _perimeters = from.getPerimeters();
+    }
+
+    BinaryMorphology(const void* data, size_t size)
+        : MorphologyPlugin(MorphologyInitData({}))
+    {
+      /*
+        if (!fromBinary(data, size)){
+          LBTHROW(std::runtime_error(
+                  "Failed to construct morphology from binary data"));
+        }
+        */
+    }
+
+    void load() final { /*NOP*/}
+};
 }
 #endif
 
-Morphology::Morphology(const URI& source, const Matrix4f& transform)
-    : _impl(new Impl(source, transform))
+Morphology::Impl::Impl(const URI& uri)
 {
+    const size_t pos = uri.find_last_of(".");
+    assert(pos != std::string::npos);
+    if(access( uri.c_str(), F_OK ) == -1)
+    {
+        LBTHROW(RawDataError("File: "+uri+" does not exist."));
+    }
+
+    if (uri.substr(pos) == ".h5") {
+        plugin = std::unique_ptr<MorphologyPlugin>(
+            new plugin::MorphologyHDF5(MorphologyInitData(uri)));
+    }
+    else if (uri.substr(pos) == ".swc") {
+        plugin = std::unique_ptr<MorphologyPlugin>(
+            new plugin::MorphologySWC(MorphologyInitData(uri)));
+    }
+    else {
+        LBTHROW(UnknownFileType("unhandled file type"));
+    }
 }
 
-// Morphology::Morphology(const Morphology& from,
-//                        const Matrix4f& transform)
-//     : _impl(new Impl(from._impl->data, transform))
-// {
-// }
+#if 0
+Morphology::Impl::Impl(const Morphology& from)
+        : plugin(new BinaryMorphology(from))
+    {
+    }
 
-// Morphology::Morphology(const Morphology& from)
-//     : _impl(new Impl(from._impl->data))
-// {
-// }
+Morphology::Impl::Impl(const void* data, size_t size)
+        : plugin(new BinaryMorphology(data, size))
+    {
+    }
+#endif
 
-Morphology::Morphology(minimorph::MorphologyPtr morphology,
-                       const Matrix4f& transform)
-    : _impl(new Impl(morphology, transform))
-{
-}
+Morphology::Impl::~Impl()
+    {
+    }
 
 Morphology::Morphology(const URI& source)
     : _impl(new Impl(source))
 {
 }
 
-Morphology::Morphology(minimorph::ConstMorphologyPtr morphology)
-    : _impl(new Impl(morphology))
+#if 0
+Morphology::Morphology(const void* data, size_t size)
+    : _impl(new Impl(data, size))
 {
 }
+
+Morphology::Morphology(const Morphology& from)
+    : _impl(new Impl(from))
+{
+}
+#endif
+
+/*
+Morphology& Morphology::operator=(const Morphology& from)
+{
+    if (this != &from)
+        _impl.reset(new Impl(from));
+    return *this;
+}
+*/
+
+Morphology::Morphology(Morphology&&) = default;
+Morphology& Morphology::operator=(Morphology&&) = default;
 
 Morphology::~Morphology()
 {
 }
 
-const Points& Morphology::getPoints() const
+CellFamily Morphology::getCellFamily() const
 {
-    return _impl->data->getPoints();
+    return _impl->plugin->getCellFamily();
 }
 
-const Vector2is& Morphology::getSections() const
-{
-    return _impl->data->getSections();
+template <typename Property> std::vector<typename Property::Type> Morphology::get() {
+    return _impl->plugin->get<Property>();
 }
 
-minimorph::MorphologyVersion Morphology::getVersion() const
+MorphologyVersion Morphology::getVersion() const
 {
-    return _impl->data->getVersion();
+    return _impl->plugin->getVersion();
 }
 
-const SectionTypes& Morphology::getSectionTypes() const
+const MorphologyInitData& Morphology::getInitData() const
 {
-    return reinterpret_cast<const SectionTypes&>(
-        _impl->data->getSectionTypes());
+    return _impl->plugin->getInitData();
 }
 
-uint32_ts Morphology::getSectionIDs(const SectionTypes& types) const
-{
-    return _impl->getSectionIDs(types, false);
-}
 
-Sections Morphology::getSections(const SectionType type) const
-{
-    const SectionTypes types(1, type);
-    const uint32_ts ids = _impl->getSectionIDs(types, true);
-    Sections result;
-    for (const uint32_t id : ids)
-        result.push_back(Section(id, _impl));
-    return result;
-}
 
-Sections Morphology::getSections(const SectionTypes& types) const
-{
-    const uint32_ts ids = _impl->getSectionIDs(types, true);
-    Sections result;
-    for (const uint32_t id : ids)
-        result.push_back(Section(id, _impl));
-    return result;
-}
-
-Section Morphology::getSection(const uint32_t& id) const
-{
-    auto& types = _impl->data->getSectionTypes();
-    if (getSections().size() <= id || types.size() <= id)
-        LBTHROW(std::runtime_error(std::string("Section ID ") +
-                                   std::to_string(id) + " out of range"));
-
-    if (types[id] == minimorph::enums::SECTION_SOMA)
-        LBTHROW(std::runtime_error("The soma cannot be accessed as a Section"));
-
-    return Section(id, _impl);
-}
-
-Soma Morphology::getSoma() const
-{
-    return Soma(_impl);
-}
-
-Sections Morphology::getRootSections() const
-{
-    return getSoma().getChildren();
-}
-
-const Matrix4f& Morphology::getTransformation() const
-{
-    return _impl->transformation;
-}
-
-// TODO: fix me
-// servus::Serializable::Data Morphology::toBinary() const
-// {
-//     return _impl->data->toBinary();
-// }
 }

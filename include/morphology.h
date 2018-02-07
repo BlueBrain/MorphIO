@@ -1,5 +1,5 @@
 /* Copyright (c) 2013-2017, EPFL/Blue Brain Project
- *                          Juan Hernando <jhernando@fi.upm.es>
+ *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
  *
  * This file is part of Brion <https://github.com/BlueBrain/Brion>
  *
@@ -17,130 +17,81 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef BRAIN_NEURON_MORPHOLOGY
-#define BRAIN_NEURON_MORPHOLOGY
+#ifndef BRION_MORPHOLOGY
+#define BRION_MORPHOLOGY
 
-#include <api.h>
+#include "api.h"
 #include <types.h>
 
-/* #include <boost/noncopyable.hpp> */
-/* #include <servus/serializable.h> */
+#include <memory>  //std::unique_ptr
 
-namespace morphio
+
+namespace minimorph
 {
-/**
- * Wrapper around minimorph::Morphology with higher level functions.
+/** Read access a Morphology file.
  *
- * This class provides methods to facilitate some queries about morphologies
- * in the context of circuits.
- * Morphologies can be loaded with a transformation applied to its points,
- * which is useful for operating in global circuit coordinates.
- * The transformation is applied at construction so it cannot be modified or
- * reverted.
- *
- * Access to the raw data fields is still provided by getter functions.
- *
- * @version unstable
+ * Following RAII, this class is ready to use after the creation and will ensure
+ * release of resources upon destruction.
  */
-class Morphology // : public boost::noncopyable // TODO: fix me
+
+
+// struct IDProperty {
+//     static const auto value = 0;
+// };
+
+struct PointProperty {
+    typedef std::array<float, 3> Type;
+};
+
+
+class Morphology
 {
 public:
-    class Impl;                            //!< @internal
-    using ImplPtr = std::shared_ptr<Impl>; //!< @internal
+    /** Close morphology file. @version 1.0 */
+    BRION_API ~Morphology();
 
-    /**
-     * Create a morphology from a URI and load all the data.
+#if 0
+    BRION_API Morphology(const void* data, size_t size);
+    BRION_API Morphology(const Morphology&);
+#endif
+    BRION_API Morphology& operator=(const Morphology&);
+    BRION_API Morphology(Morphology&&);
+    BRION_API Morphology& operator=(Morphology&&);
+
+    /** @name Read API */
+    //@{
+    /** Open the given source to a morphology file and parse it.
      *
-     * @param source URI of the morphology data source.
-     * @throw runtime_error if an inconsistency is detected in the input file.
-     */
-    BRAIN_API explicit Morphology(const URI& source);
-
-    /**
-     * Create a morphology from a URI, load all the data and transform
-     * the points.
+     * The actual data loading happens in a background thread and is lazily
+     * finalised in any get method. It is therefore faster to construct a set
+     * of morphologies and then read their data over a serial construct-and-read
+     * approach.
      *
-     * @param source URI of the morphology data source.
-     * @param transform the transformation matrix to apply to the points.
-     *        Radii will not be affected by this transformation.
-     * @throw runtime_error if an inconsistency is detected in the input file.
+     * @param source URI to load the morphology
+     * @throw std::runtime_error if file is not a valid morphology file
+     * @version 3.0
      */
-    BRAIN_API Morphology(const URI& source, const Matrix4f& transform);
+    BRION_API explicit Morphology(const URI& source);
 
-    /**
-     * Create a morphology from a minimorph::Morphology and load all the data.
-     *
-     * @param morphology the minimorph::Morphology to load from.
-     * @throw runtime_error if an inconsistency is detected in the input file.
-     */
-    BRAIN_API explicit Morphology(minimorph::ConstMorphologyPtr morphology);
+    /** @return the cell family of that morphology. @version 1.8 */
+    BRION_API CellFamily getCellFamily() const;
 
-    /**
-     * Create a morphology from a minimorph::Morphology, load all the data
-     * and transform the points. The given morphology is modified.
-     *
-     * @param morphology the minimorph::Morphology to load from.
-     * @param transform the transformation matrix to apply to the points.
-     *        Radii will not be affected by this transformation.
-     * @throw runtime_error if an inconsistency is detected in the input file.
-     */
-    BRAIN_API Morphology(minimorph::MorphologyPtr morphology,
-                         const Matrix4f& transform);
+    template <typename Property> std::vector<typename Property::Type> get();
 
-    BRAIN_API ~Morphology();
 
-    /** @sa minimorph::Morphology::readPoints */
-    BRAIN_API const Points& getPoints() const;
 
-    /** @sa minimorph::Morphology::readSections */
-    BRAIN_API const Vector2is& getSections() const;
+    /** @internal */
+    BRION_API MorphologyVersion getVersion() const;
 
-    /** @sa minimorph::Morphology::readSectionTypes
-        This type is not morphio::SectionTypes because minimorph::SectionType
-        is not convertible to morphio::SectionType. */
-    BRAIN_API const SectionTypes& getSectionTypes() const;
+    /** @internal */
+    const MorphologyInitData& getInitData() const;
+    class Impl;
 
-    /** Return the list of ids for the given section types. */
-    BRAIN_API uint32_ts getSectionIDs(const SectionTypes& types) const;
-
-    /**
-     * Return the sections which have the given section type.
-     * If type is SectionType::Soma an empty list is returned.
-     */
-    BRAIN_API Sections getSections(SectionType type) const;
-
-    /**
-     * Return the sections which have any of the given section types.
-     * No sections are returned for the type SectionType::Soma.
-     */
-    BRAIN_API Sections getSections(const SectionTypes& types) const;
-
-    /**
-     * Return the Section with the given id.
-     *
-     * @throw runtime_error if the id is out of range or the given id refers to
-     * a soma section.
-     */
-    BRAIN_API Section getSection(const uint32_t& id) const;
-
-    /** Return the object with the information about the neuron soma */
-    BRAIN_API Soma getSoma() const;
-
-    /** Return the first order sections starting from the soma */
-    BRAIN_API Sections getRootSections() const;
-
-    /** Return \if pybind a 4x4 numpy array with \endif
-     *  the transformation that was passed to the constructor or the
-     *  identity matrix is no transformation was given.
-     */
-    BRAIN_API const Matrix4f& getTransformation() const;
-
-    BRAIN_API minimorph::MorphologyVersion getVersion() const;
 private:
-    Morphology(const void* data, const size_t size);
-    /* servus::Serializable::Data toBinary() const; */
-
-    ImplPtr _impl;
+    std::unique_ptr<Impl> _impl;
 };
+
+
+template <> std::vector<typename PointProperty::Type> Morphology::get<PointProperty>();
 }
 #endif
