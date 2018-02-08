@@ -2,18 +2,24 @@
 
 namespace minimorph
 {
-template <> std::vector<typename SectionProperty::Type>& Properties::get<SectionProperty>() { return _sections;}
-template <> const std::vector<typename SectionProperty::Type>& Properties::get<SectionProperty>() const { return _sections;}
+namespace Property
+{
+template <> Section::Type& Properties::get<Section>() { return _sections;}
+template <> const Section::Type& Properties::get<Section>() const { return _sections;}
 
-template <> std::vector<typename PointProperty::Type>& Properties::get<PointProperty>() { return _points;}
-template <> const std::vector<typename PointProperty::Type>& Properties::get<PointProperty>() const { return _points;}
+template <> Point::Type& Properties::get<Point>() { return _points;}
+template <> const Point::Type& Properties::get<Point>() const { return _points;}
 
-template <> const std::vector<typename SectionTypeProperty::Type>& Properties::get<SectionTypeProperty>() const { return _sectionTypes;}
-template <> std::vector<typename SectionTypeProperty::Type>& Properties::get<SectionTypeProperty>() { return _sectionTypes;}
+template <> const SectionType::Type& Properties::get<SectionType>() const { return _sectionTypes;}
+template <> SectionType::Type& Properties::get<SectionType>() { return _sectionTypes;}
 
-template <> std::vector<typename PerimeterProperty::Type>& Properties::get<PerimeterProperty>() { return _perimeters;}
-template <> const std::vector<typename PerimeterProperty::Type>& Properties::get<PerimeterProperty>() const { return _perimeters;}
+template <> Perimeter::Type& Properties::get<Perimeter>() { return _perimeters;}
+template <> const Perimeter::Type& Properties::get<Perimeter>() const { return _perimeters;}
 
-template <> const std::vector<typename DiameterProperty::Type>& Properties::get<DiameterProperty>() const { return _diameters;}
-template <> std::vector<typename DiameterProperty::Type>& Properties::get<DiameterProperty>() { return _diameters;}
+template <> const Diameter::Type& Properties::get<Diameter>() const { return _diameters;}
+template <> Diameter::Type& Properties::get<Diameter>() { return _diameters;}
+
+template <> const Children::Type& Properties::get<Children>() const { return _children;}
+template <> Children::Type& Properties::get<Children>() { return _children;}
+}
 }

@@ -2,31 +2,20 @@
 
 namespace minimorph
 {
-class Error: protected std::exception
-{
-protected:
-    std::string msg;
 
+class RawDataError: public std::runtime_error {
 public:
-Error(const std::string& _msg): msg(_msg) {}
-    virtual const char* what() {return msg.c_str();}
-
-~Error() throw() {}
+RawDataError(const std::string& _msg) : std::runtime_error(_msg) {}
 };
 
-class RawDataError: public Error {
+class UnknownFileType : public std::runtime_error {
 public:
-RawDataError(const std::string& _msg) : Error(_msg) {}
+UnknownFileType(const std::string& _msg) : std::runtime_error(_msg) {}
 };
 
-class UnknownFileType : public Error {
+class SomaError: public std::runtime_error {
 public:
-UnknownFileType(const std::string& _msg) : Error(_msg) {}
-};
-
-class SomaError: public Error {
-public:
-SomaError(const std::string& _msg) : Error(_msg) {}
+SomaError(const std::string& _msg) : std::runtime_error(_msg) {}
 };
 
 class IDSequenceError: public RawDataError {

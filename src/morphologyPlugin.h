@@ -100,7 +100,23 @@ public:
     {
     }
 
+
+    void extractInformation()
+    {
+        const auto& sections = _properties.get<Property::Section>();
+        auto& children = _properties.get<Property::Children>();
+
+        for (size_t i = 0; i < sections.size(); ++i)
+        {
+            const int32_t parent = sections[i][1];
+            if (parent != -1)
+                children[parent].push_back(i);
+        }
+    }
+
+
     virtual ~MorphologyPlugin() {}
+
     /** Load all data of the morphology.
      *  Needs to be thread-safe wrt other instances. May throw std::exception.
      */
@@ -116,17 +132,10 @@ public:
     /** @internal */
     MorphologyVersion getVersion() const { return _data.version; }
 
-    template <typename Property> std::vector<typename Property::Type>& get(){
-        return _properties.get<Property>();
-    }
-
-    template <typename Property> const std::vector<typename Property::Type>& get() const {
-        return _properties.get<Property>();
-    }
-
+    const Property::Properties getProperties() const { return _properties; }
 protected:
     MorphologyInitData _data;
-    Properties _properties;
+    Property::Properties _properties;
 
     /*
     // Serializable API

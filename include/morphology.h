@@ -26,7 +26,6 @@
 #include <memory>  //std::unique_ptr
 
 #include <properties.hpp>
-
 namespace minimorph
 {
 
@@ -38,16 +37,15 @@ namespace minimorph
 class Morphology
 {
 public:
+    using PropertiesPtr = std::shared_ptr<Property::Properties>;
+
     /** Close morphology file. @version 1.0 */
     BRAIN_API ~Morphology();
 
-#if 0
-    BRAIN_API Morphology(const void* data, size_t size);
-    BRAIN_API Morphology(const Morphology&);
-#endif
     BRAIN_API Morphology& operator=(const Morphology&);
     BRAIN_API Morphology(Morphology&&);
     BRAIN_API Morphology& operator=(Morphology&&);
+
 
     /** @name Read API */
     //@{
@@ -66,23 +64,17 @@ public:
 
     /** @return the cell family of that morphology. @version 1.8 */
     BRAIN_API CellFamily getCellFamily() const;
+    Sections getSections();
 
-
-
-    BRAIN_API template <typename Property> std::vector<typename Property::Type>& get();
-    BRAIN_API template <typename Property> const std::vector<typename Property::Type>& get() const;
+    BRAIN_API template <typename Property> typename Property::Type& get();
+    BRAIN_API template <typename Property> const typename Property::Type& get() const;
     /** @internal */
     BRAIN_API MorphologyVersion getVersion() const;
 
-    /** @internal */
-    const MorphologyInitData& getInitData() const;
-
 private:
-    class Impl;
-    std::unique_ptr<Impl> _impl;
+    PropertiesPtr load_data(const URI& uri);
+    PropertiesPtr _properties;
 };
-
-
 
 }
 #endif

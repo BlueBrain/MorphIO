@@ -5,38 +5,43 @@
 namespace minimorph
 {
 
-struct SectionProperty {
-    typedef Vector2i Type;
+namespace Property
+{
+struct Section{
+    typedef std::vector<Vector2i> Type;
 };
 
-struct PointProperty {
-    typedef Point Type;
+struct Point{
+    typedef std::vector<minimorph::Point> Type;
 };
 
-struct SectionTypeProperty {
-    typedef SectionType Type;
+struct SectionType{
+    typedef std::vector<minimorph::SectionType> Type;
 };
 
-struct PerimeterProperty {
-    typedef float Type;
+struct Perimeter{
+    typedef std::vector<float> Type;
 };
 
-struct DiameterProperty {
-    typedef float Type;
+struct Diameter {
+    typedef std::vector<float> Type;
+};
+
+struct Children {
+    typedef std::map<uint32_t, uint32_ts> Type;
 };
 
 struct Properties {
-    std::vector<PointProperty::Type> _points;
-    std::vector<SectionTypeProperty::Type> _sectionTypes;
-    std::vector<PerimeterProperty::Type> _perimeters;
-    std::vector<DiameterProperty::Type> _diameters;
-    std::vector<SectionProperty::Type> _sections;
+    Point::Type _points;
+    SectionType::Type _sectionTypes;
+    Perimeter::Type _perimeters;
+    Diameter::Type _diameters;
+    Section::Type _sections;
+    Children::Type _children;
 
-    template <typename T> std::vector<typename T::Type>& get();
-    template <typename T> const std::vector<typename T::Type>& get() const ;
-
-
+    template <typename T> typename T::Type& get();
+    template <typename T> const typename T::Type& get() const;
 };
 
-
+}
 }

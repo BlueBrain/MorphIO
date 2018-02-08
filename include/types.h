@@ -28,7 +28,11 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <stack>
+#include <queue>
+
 #include <stdint.h>
+
 
 #include "vector_types.h"
 
@@ -39,8 +43,9 @@
 #endif
 
 // TODO: bcoste fix me
-#define LBTHROW throw
-#define LBERROR std::cerr
+#include<iostream>
+#define LBTHROW(x) (throw x)
+#define LBERROR(x) (std::cerr << x << std::endl)
 #define LBWARN std::cerr
 
 /** @namespace minimorph Blue Brain File IO classes */
@@ -51,6 +56,11 @@ typedef std::string URI;
 using namespace enums;
 class Morphology;
 class MorphologyInitData;
+class Section;
+template <typename T> class Iterator;
+
+typedef Iterator<std::stack<Section>> depth_iterator;
+typedef Iterator<std::queue<Section>> breadth_iterator;
 
 
 typedef std::vector<size_t> size_ts;
@@ -66,6 +76,7 @@ typedef std::vector<Vector4f> Vector4fs;
 typedef std::vector<Vector3d> Vector3ds;
 typedef std::vector<Vector4d> Vector4ds;
 typedef std::vector<SectionType> SectionTypes;
+typedef std::vector<Section> Sections;
 
 typedef std::shared_ptr<int32_ts> int32_tsPtr;
 typedef std::shared_ptr<uint16_ts> uint16_tsPtr;

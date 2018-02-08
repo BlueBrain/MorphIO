@@ -21,125 +21,22 @@
 
 #include "morphology.h"
 
-#include "morphologyPlugin.h"
+/* todo: compile */
+#include <cassert>
+#include <iostream>
+
 
 #include "plugin/morphologyHDF5.h"
 #include "plugin/morphologySWC.h"
-
-#include <cassert>
-/* todo: compile */
-#include <iostream>
+#include <section.h>
 
 namespace minimorph
 {
-//TODO: compile
-#if 0
-namespace
-{
-/**
- * "Plugin" for copied and deserialized morphologies.
- *
- * Does not actually load any data, but holds the data gathered from the copy or
- * deserialization.
- */
-class BinaryMorphology : public MorphologyPlugin
-{
-public:
-    BinaryMorphology(const Morphology& from)
-        : MorphologyPlugin(from.getInitData())
-    {
-        _points = from.getPoints();
-        _sections = from.getSections();
-        _sectionTypes = from.getSectionTypes();
-        _perimeters = from.getPerimeters();
-    }
-
-    BinaryMorphology(const void* data, size_t size)
-        : MorphologyPlugin(MorphologyInitData({}))
-    {
-      /*
-        if (!fromBinary(data, size)){
-          LBTHROW(std::runtime_error(
-                  "Failed to construct morphology from binary data"));
-        }
-        */
-    }
-
-    void load() final { /*NOP*/}
-};
-}
-#endif
-
-class Morphology::Impl
-{
-public:
-    explicit Impl(const URI& uri)
-    {
-      const size_t pos = uri.find_last_of(".");
-      assert(pos != std::string::npos);
-      if(access( uri.c_str(), F_OK ) == -1)
-      {
-          LBTHROW(RawDataError("File: "+uri+" does not exist."));
-      }
-
-      if (uri.substr(pos) == ".h5") {
-        plugin = std::unique_ptr<MorphologyPlugin>(
-            new plugin::MorphologyHDF5(MorphologyInitData(uri)));
-      }
-      else if (uri.substr(pos) == ".swc") {
-        plugin = std::unique_ptr<MorphologyPlugin>(
-            new plugin::MorphologySWC(MorphologyInitData(uri)));
-      }
-      else {
-          LBTHROW(UnknownFileType("unhandled file type"));
-      }
-    }
-
-#if 0
-    Impl(const Morphology& from)
-        : plugin(new BinaryMorphology(from))
-    {
-    }
-
-    Impl(const void* data, size_t size)
-        : plugin(new BinaryMorphology(data, size))
-    {
-    }
-#endif
-
-    ~Impl()
-    {
-    }
-
-    //TODO: Do we really need a PIMPL to hold the plugin?
-    std::unique_ptr<MorphologyPlugin> plugin;
-};
 
 Morphology::Morphology(const URI& source)
-    : _impl(new Impl(source))
 {
+    _properties = load_data(source);
 }
-
-#if 0
-Morphology::Morphology(const void* data, size_t size)
-    : _impl(new Impl(data, size))
-{
-}
-
-Morphology::Morphology(const Morphology& from)
-    : _impl(new Impl(from))
-{
-}
-#endif
-
-/*
-Morphology& Morphology::operator=(const Morphology& from)
-{
-    if (this != &from)
-        _impl.reset(new Impl(from));
-    return *this;
-}
-*/
 
 Morphology::Morphology(Morphology&&) = default;
 Morphology& Morphology::operator=(Morphology&&) = default;
@@ -148,30 +45,63 @@ Morphology::~Morphology()
 {
 }
 
-CellFamily Morphology::getCellFamily() const
+
+Morphology::PropertiesPtr Morphology::load_data(const URI& uri)
 {
-    return _impl->plugin->getCellFamily();
+    const size_t pos = uri.find_last_of(".");
+    assert(pos != std::string::npos);
+    if(access( uri.c_str(), F_OK ) == -1)
+    {
+        LBTHROW(RawDataError("File: "+uri+" does not exist."));
+    }
+
+    std::unique_ptr<MorphologyPlugin> plugin;
+    if (uri.substr(pos) == ".h5") {
+        plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologyHDF5(MorphologyInitData(uri)));
+    }
+    else if (uri.substr(pos) == ".swc") {
+        plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologySWC(MorphologyInitData(uri)));
+    }
+    else {
+        LBTHROW(UnknownFileType("unhandled file type"));
+    }
+    plugin -> extractInformation();
+
+    return std::make_shared<Property::Properties>(plugin -> getProperties());
 }
 
-template <typename Property> std::vector<typename Property::Type>& Morphology::get(){
-    return _impl->plugin->get<Property>();
+
+Sections Morphology::getSections(){
+    Sections sections;
+    for(int i = 0; i<_properties->get<minimorph::Property::Section>().size(); ++i){
+        sections.push_back(Section(i, _properties));
+    }
+    return sections;
 }
 
-template <typename Property> const std::vector<typename Property::Type>& Morphology::get() const{
-    return _impl->plugin->get<Property>();
+
+template <typename Property> typename Property::Type& Morphology::get(){
+    return _properties->get<Property>();
 }
 
-MorphologyVersion Morphology::getVersion() const
-{
-    return _impl->plugin->getVersion();
+template <typename Property> const typename Property::Type& Morphology::get() const{
+    return _properties->get<Property>();
 }
 
-const MorphologyInitData& Morphology::getInitData() const
-{
-    return _impl->plugin->getInitData();
-}
+// Template method instantiations
 
-template std::vector<typename PointProperty::Type>& Morphology::get<PointProperty>();
-template const std::vector<typename PointProperty::Type>& Morphology::get<PointProperty>() const;
+template Property::Point::Type& Morphology::get<Property::Point>();
+template const Property::Point::Type& Morphology::get<Property::Point>() const;
 
+template Property::Diameter::Type& Morphology::get<Property::Diameter>();
+template const Property::Diameter::Type& Morphology::get<Property::Diameter>() const;
+
+template Property::Perimeter::Type& Morphology::get<Property::Perimeter>();
+template const Property::Perimeter::Type& Morphology::get<Property::Perimeter>() const;
+
+template Property::SectionType::Type& Morphology::get<Property::SectionType>();
+template const Property::SectionType::Type& Morphology::get<Property::SectionType>() const;
+
+template Property::Section::Type& Morphology::get<Property::Section>();
+template const Property::Section::Type& Morphology::get<Property::Section>() const;
 }

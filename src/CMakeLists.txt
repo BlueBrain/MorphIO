@@ -4,6 +4,7 @@ set(MORPHIO_SOURCES
     plugin/morphologySWC.cpp
     properties.cpp
     morphology.cpp
+    section.cpp
     vector_utils
     )
 
@@ -13,7 +14,7 @@ add_library(morphio
 
 set_target_properties(morphio
     PROPERTIES
-    CXX_STANDARD 14
+    CXX_STANDARD 17
     CXX_STANDARD_REQUIRED YES
     CXX_EXTENSIONS NO
     )

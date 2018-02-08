@@ -22,6 +22,9 @@
 #define BRAIN_PLUGIN_MORPHOLOGYHDF5
 
 #include "../morphologyPlugin.h"
+#include <highfive/H5DataSet.hpp>
+#include <highfive/H5File.hpp>
+#include <highfive/H5Utility.hpp>
 
 namespace minimorph
 {
@@ -44,6 +47,28 @@ public:
 
 private:
     void load() final;
+    void _checkVersion(const std::string& source);
+    void _selectRepairStage();
+    void _resolveV1();
+    bool _readV11Metadata();
+    bool _readV2Metadata();
+    HighFive::DataSet _getStructureDataSet(size_t nSections);
+    void _readPoints();
+    void _readSections();
+    void _readSectionTypes();
+    void _readPerimeters();
+
+
+    std::unique_ptr<HighFive::File> _file;
+
+    std::unique_ptr<HighFive::DataSet> _points;
+    std::vector<size_t> _pointsDims;
+
+    std::unique_ptr<HighFive::DataSet> _sections;
+    std::vector<size_t> _sectionsDims;
+
+    std::string _stage;
+    bool _write;
 };
 }
 }
