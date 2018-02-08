@@ -112,6 +112,8 @@ public:
             if (parent != -1)
                 children[parent].push_back(i);
         }
+
+        _properties.get<Property::CellFamily>() = _data.family;
     }
 
 
@@ -125,9 +127,6 @@ public:
     /** @internal */
     MorphologyInitData& getInitData() { return _data; }
     const MorphologyInitData& getInitData() const { return _data; }
-
-    /** @copydoc minimorph::Morphology::getCellFamily */
-    CellFamily getCellFamily() const { return _data.family; }
 
     /** @internal */
     MorphologyVersion getVersion() const { return _data.version; }

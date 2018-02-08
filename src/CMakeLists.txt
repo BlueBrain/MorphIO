@@ -3,7 +3,9 @@ set(MORPHIO_SOURCES
     plugin/morphologyHDF5.cpp
     plugin/morphologySWC.cpp
     properties.cpp
+    iterators.cpp
     morphology.cpp
+    soma.cpp
     section.cpp
     vector_utils
     )

@@ -21,12 +21,11 @@
 #ifndef BRAIN_NEURON_SOMA
 #define BRAIN_NEURON_SOMA
 
-#include <api.h>
 #include <types.h>
 
 #include <morphology.h>
 
-namespace morphio
+namespace minimorph
 {
 /**
  * A class to represent a neuron soma.
@@ -35,46 +34,36 @@ namespace morphio
  * neuron.
  *
  * Typically the soma is described as the poly-line of the projection
- * of the soma onto a plane, where the plane normal points is the vertical
+ * of the soma onto a plane, where the plane normal points in the vertical
  * direction in the local coordinate system of the morphology. In other cases
  * the poly-line is not projected onto a plane, but is an approximation of
- * the contour of the soma as seen in an orthogonal projection down the
+ * the countour of the soma as seen in an orhogonal projection down the
  * vertical axis (this is basically the same as before, but the vertical
  * coordinate is not 0 for all the points).
  * This class can also be used for both descriptions as well as somas simply
  * approximated as spheres.
  *
  * The coordinates system used by a soma will be in the same as the
- * morphio::Morphology from where it comes.
+ * brain::Morphology from where it comes.
  *
  * @version unstable
  */
 class Soma
 {
 public:
-    BRAIN_API Soma(const Soma& soma);
+    BRAIN_API Soma(PropertiesPtr);
 
-    BRAIN_API Soma& operator=(const Soma& soma);
+    BRAIN_API template <typename Property> const typename Property::Type get() const;
 
-    /** Return the x,y,z and radius of the points of the soma
-     * profile \if pybind as a 4xN numpy array\endif.
-     */
-    BRAIN_API Points getProfilePoints() const;
+    BRAIN_API Point getSomaCenter();
 
-    /** Return the mean distance between the profile points and the centroid. */
-    /* BRAIN_API float getMeanRadius() const; */
+    SectionType getType();
 
-    /** Return the average of the profile points. */
-    BRAIN_API Point getCentroid() const;
-
-    /** Return the first order sections starting from the soma. */
-    BRAIN_API Sections getChildren() const;
 
 private:
-    BRAIN_API explicit Soma(Morphology::ImplPtr morphology);
-    friend class Morphology;
+    PropertiesPtr _properties;
+    SectionRange _range;
 
-    Morphology::ImplPtr _morphology;
 };
 }
 #endif

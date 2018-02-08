@@ -1,22 +1,22 @@
 
 /* Copyright (c) 2013-2017, EPFL/Blue Brain Project
-*                          Juan Hernando <jhernando@fi.upm.es>
-*
-* This file is part of Brion <https://github.com/BlueBrain/Brion>
-*
-* This library is free software; you can redistribute it and/or modify it under
-* the terms of the GNU Lesser General Public License version 3.0 as published
-* by the Free Software Foundation.
-*
-* This library is distributed in the hope that it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-* FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
-* details.
-*
-* You should have received a copy of the GNU Lesser General Public License
-* along with this library; if not, write to the Free Software Foundation, Inc.,
-* 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
+ *                          Juan Hernando <jhernando@fi.upm.es>
+ *
+ * This file is part of Brion <https://github.com/BlueBrain/Brion>
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License version 3.0 as published
+ * by the Free Software Foundation.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this library; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 
 #include "section.h"
 
@@ -27,64 +27,63 @@ namespace minimorph
 
 
 
-Section::Section(const uint32_t id, Morphology::PropertiesPtr properties)
-: _id(id)
-, _properties(properties)
+Section::Section(const uint32_t id, PropertiesPtr properties)
+    : _id(id)
+    , _properties(properties)
 {
+    const auto& points = properties->get<Property::Point>();
+    const auto& sections = properties->get<Property::Section>();
+    if(id >= sections.size())
+        LBTHROW(RawDataError("Requested section ID (" + std::to_string(id) + \
+                             ") is out of array bounds (array size = " + \
+                             std::to_string(sections.size()) + ")"));
 
-const auto& points = properties->get<Property::Point>();
-const auto& sections = properties->get<Property::Section>();
-if(id >= sections.size())
-    LBTHROW(RawDataError("Requested section ID (" + std::to_string(id) + \
-                            ") is out of array bounds (array size = " + \
-                            std::to_string(sections.size()) + ")"));
+    const size_t start = sections[id][0];
+    const size_t end = id == sections.size() - 1
+        ? points.size()
+        : sections[id + 1][0];
+    _range = std::make_pair(start, end);
 
-const size_t start = sections[id][0];
-const size_t end = id == sections.size() - 1
-    ? points.size()
-    : sections[id + 1][0];
-_range = std::make_pair(start, end);
-
-if (_range.second <= _range.first)
-    LBWARN << "Dereferencing broken properties section " << _id << std:: endl
-            << "Section range: " << _range.first << " -> " << _range.second
-            << std::endl;
+    if (_range.second <= _range.first)
+        LBWARN << "Dereferencing broken properties section " << _id << std:: endl
+               << "Section range: " << _range.first << " -> " << _range.second
+               << std::endl;
 }
 
 Section::Section(const Section& section)
-: _id(section._id)
-, _range(section._range)
-, _properties(section._properties)
+    : _id(section._id)
+    , _range(section._range)
+    , _properties(section._properties)
 {
 }
 
 Section& Section::operator=(const Section& section)
 {
-if (&section == this)
+    if (&section == this)
+        return *this;
+    _id = section._id;
+    _range = section._range;
+    _properties = section._properties;
     return *this;
-_id = section._id;
-_range = section._range;
-_properties = section._properties;
-return *this;
 }
 
 bool Section::operator==(const Section& other) const
 {
-return other._id == _id && other._properties == _properties;
+    return other._id == _id && other._properties == _properties;
 }
 
 bool Section::operator!=(const Section& other) const
 {
-return !(*this == other);
+    return !(*this == other);
 }
 uint32_t Section::getID() const
 {
-return _id;
+    return _id;
 }
 
 SectionType Section::getType() const
 {
-return _properties->get<Property::SectionType>()[_id];
+    return _properties->get<Property::SectionType>()[_id];
 }
 
 
@@ -98,11 +97,11 @@ template <typename TProperty> const typename TProperty::Type Section::get()
     return result;
 }
 
-std::unique_ptr<Section> Section::getParent() const
+std::shared_ptr<Section> Section::getParent() const
 {
-const int32_t parent = _properties->get<Property::Section>()[_id][1];
+    const int32_t parent = _properties->get<Property::Section>()[_id][1];
 // return (parent > -1) ? std::experimental::optional<Section>(Section(parent, _properties)) : std::experimental::nullopt;
-return (parent > -1) ? std::make_unique<Section>(Section(parent, _properties)) : nullptr;
+    return (parent > -1) ? std::make_shared<Section>(Section(parent, _properties)) : nullptr;
 }
 
 Sections Section::getChildren() const
@@ -115,24 +114,32 @@ Sections Section::getChildren() const
     return result;
 }
 
+
+
 depth_iterator Section::depth_begin() {
-    return Iterator<std::stack<Section> >(*this);
+    return depth_iterator(*this);
 }
 
 depth_iterator Section::depth_end() {
-    return Iterator<std::stack<Section> >();
+    return depth_iterator();
 }
 
 breadth_iterator Section::breadth_begin() {
-    return Iterator<std::queue<Section> >(*this);
+    return breadth_iterator(*this);
 }
 
 breadth_iterator Section::breadth_end() {
-    return Iterator<std::queue<Section> >();
+    return breadth_iterator();
 }
 
-template <> Section Iterator<std::stack<Section>>::operator*() const { return container.top();}
-template <> Section Iterator<std::queue<Section>>::operator*() const { return container.front();}
+upstream_iterator Section::upstream_begin() {
+    return upstream_iterator(*this);
+}
+
+upstream_iterator Section::upstream_end() {
+    return upstream_iterator();
+}
+
 
 std::ostream& operator<<(std::ostream& os, const Section& section){
     os << section.getID();
@@ -140,10 +147,10 @@ std::ostream& operator<<(std::ostream& os, const Section& section){
 }
 
 
-template  const Property::Point::Type Section::get<Property::Point>() ;
-template  const Property::Diameter::Type Section::get<Property::Diameter>() ;
-template  const Property::Perimeter::Type Section::get<Property::Perimeter>() ;
-template  const Property::SectionType::Type Section::get<Property::SectionType>() ;
-template  const Property::Section::Type Section::get<Property::Section>() ;
+template const Property::Point::Type Section::get<Property::Point>() ;
+template const Property::Diameter::Type Section::get<Property::Diameter>();
+template const Property::Perimeter::Type Section::get<Property::Perimeter>();
+template const Property::SectionType::Type Section::get<Property::SectionType>();
+template const Property::Section::Type Section::get<Property::Section>();
 
 }

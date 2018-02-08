@@ -57,10 +57,22 @@ using namespace enums;
 class Morphology;
 class MorphologyInitData;
 class Section;
+class Soma;
+
+namespace Property {
+struct Properties;
+}
+
+
 template <typename T> class Iterator;
+
+typedef std::shared_ptr<Property::Properties> PropertiesPtr;
+
+typedef std::pair<size_t, size_t> SectionRange;
 
 typedef Iterator<std::stack<Section>> depth_iterator;
 typedef Iterator<std::queue<Section>> breadth_iterator;
+typedef Iterator<std::shared_ptr<Section>> upstream_iterator;
 
 
 typedef std::vector<size_t> size_ts;

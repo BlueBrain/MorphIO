@@ -1,6 +1,7 @@
 #pragma once
 
 #include <types.h>
+#include <soma.h>
 
 namespace minimorph
 {
@@ -31,6 +32,10 @@ struct Children {
     typedef std::map<uint32_t, uint32_ts> Type;
 };
 
+struct CellFamily {
+    typedef minimorph::CellFamily Type;
+};
+
 struct Properties {
     Point::Type _points;
     SectionType::Type _sectionTypes;
@@ -38,6 +43,7 @@ struct Properties {
     Diameter::Type _diameters;
     Section::Type _sections;
     Children::Type _children;
+    CellFamily::Type _cellFamily;
 
     template <typename T> typename T::Type& get();
     template <typename T> const typename T::Type& get() const;

@@ -3,7 +3,10 @@
 #include <stack>
 #include <queue>
 
+#include <types.h>
 namespace minimorph {
+
+
 
 /**
 An iterator class to iterate through sections;
@@ -13,19 +16,12 @@ template <typename T> class Iterator {
     T container;
     Iterator() {}
 public:
-    explicit Iterator(const Section& section) { container.push(section); }
-    // Iterator operator++(int) {Iterator retval = *this; ++(*this); return retval;}
-    bool operator==(Iterator other) const {return container == other.container;}
-    bool operator!=(Iterator other) const {return !(*this == other);}
+    explicit Iterator(const Section& section);
+    bool operator==(Iterator other) const;
+    bool operator!=(Iterator other) const;
     Section operator*() const;
-
-    Iterator& operator++(){
-        const auto& section = *(*this);
-        container.pop();
-        for(const auto& child: section.getChildren())
-            container.push(child);
-        return *this;
-    }
+    Iterator& operator++();
+    Iterator operator++(int);
 
 };
 }

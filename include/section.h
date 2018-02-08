@@ -31,7 +31,6 @@
 
 namespace minimorph
 {
-typedef std::pair<size_t, size_t> SectionRange;
 
 
 
@@ -81,7 +80,7 @@ public:
      * @throw runtime_error is the section doesn't have a parent.
      * \endif
      */
-    std::unique_ptr<Section> getParent() const;
+    std::shared_ptr<Section> getParent() const;
         // BRAIN_API std::experimental::optional<Section> getParent() const;
 
     /**
@@ -102,14 +101,20 @@ public:
     BRAIN_API breadth_iterator breadth_begin();
     BRAIN_API breadth_iterator breadth_end();
 
+    /**
+       Upstream first search iterator
+    **/
+    BRAIN_API upstream_iterator upstream_begin();
+    BRAIN_API upstream_iterator upstream_end();
+
 private:
-    BRAIN_API Section(uint32_t id, Morphology::PropertiesPtr morphology);
+    BRAIN_API Section(uint32_t id, PropertiesPtr morphology);
     friend class Morphology;
     friend class Soma;
 
     uint32_t _id;
     SectionRange _range;
-    Morphology::PropertiesPtr _properties;
+    PropertiesPtr _properties;
 };
 
 

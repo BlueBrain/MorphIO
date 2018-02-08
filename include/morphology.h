@@ -26,6 +26,8 @@
 #include <memory>  //std::unique_ptr
 
 #include <properties.hpp>
+#include <soma.h>
+
 namespace minimorph
 {
 
@@ -37,7 +39,6 @@ namespace minimorph
 class Morphology
 {
 public:
-    using PropertiesPtr = std::shared_ptr<Property::Properties>;
 
     /** Close morphology file. @version 1.0 */
     BRAIN_API ~Morphology();
@@ -62,17 +63,26 @@ public:
      */
     BRAIN_API explicit Morphology(const URI& source);
 
-    /** @return the cell family of that morphology. @version 1.8 */
-    BRAIN_API CellFamily getCellFamily() const;
+    Soma getSoma() const;
+
     Sections getSections();
+
+    /**
+     * Return the Section with the given id.
+     *
+     * @throw runtime_error if the id is out of range or the given id refers to
+     * a soma section.
+     */
+    BRAIN_API Section getSection(const uint32_t& id) const;
+
 
     BRAIN_API template <typename Property> typename Property::Type& get();
     BRAIN_API template <typename Property> const typename Property::Type& get() const;
+
     /** @internal */
     BRAIN_API MorphologyVersion getVersion() const;
 
 private:
-    PropertiesPtr load_data(const URI& uri);
     PropertiesPtr _properties;
 };
 

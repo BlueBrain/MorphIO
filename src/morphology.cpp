@@ -35,7 +35,26 @@ namespace minimorph
 
 Morphology::Morphology(const URI& source)
 {
-    _properties = load_data(source);
+    const size_t pos = source.find_last_of(".");
+    assert(pos != std::string::npos);
+    if(access( source.c_str(), F_OK ) == -1)
+    {
+        LBTHROW(RawDataError("File: "+source+" does not exist."));
+    }
+
+    std::unique_ptr<MorphologyPlugin> plugin;
+    if (source.substr(pos) == ".h5") {
+        plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologyHDF5(MorphologyInitData(source)));
+    }
+    else if (source.substr(pos) == ".swc") {
+        plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologySWC(MorphologyInitData(source)));
+    }
+    else {
+        LBTHROW(UnknownFileType("unhandled file type"));
+    }
+    plugin -> extractInformation();
+
+    _properties = std::make_shared<Property::Properties>(plugin -> getProperties());
 }
 
 Morphology::Morphology(Morphology&&) = default;
@@ -45,36 +64,18 @@ Morphology::~Morphology()
 {
 }
 
-
-Morphology::PropertiesPtr Morphology::load_data(const URI& uri)
-{
-    const size_t pos = uri.find_last_of(".");
-    assert(pos != std::string::npos);
-    if(access( uri.c_str(), F_OK ) == -1)
-    {
-        LBTHROW(RawDataError("File: "+uri+" does not exist."));
-    }
-
-    std::unique_ptr<MorphologyPlugin> plugin;
-    if (uri.substr(pos) == ".h5") {
-        plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologyHDF5(MorphologyInitData(uri)));
-    }
-    else if (uri.substr(pos) == ".swc") {
-        plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologySWC(MorphologyInitData(uri)));
-    }
-    else {
-        LBTHROW(UnknownFileType("unhandled file type"));
-    }
-    plugin -> extractInformation();
-
-    return std::make_shared<Property::Properties>(plugin -> getProperties());
+Soma Morphology::getSoma() const {
+    return Soma(_properties);
 }
 
+Section Morphology::getSection(const uint32_t& id) const {
+    return Section(id, _properties);
+}
 
 Sections Morphology::getSections(){
     Sections sections;
     for(int i = 0; i<_properties->get<minimorph::Property::Section>().size(); ++i){
-        sections.push_back(Section(i, _properties));
+        sections.push_back(getSection(i));
     }
     return sections;
 }
@@ -104,4 +105,7 @@ template const Property::SectionType::Type& Morphology::get<Property::SectionTyp
 
 template Property::Section::Type& Morphology::get<Property::Section>();
 template const Property::Section::Type& Morphology::get<Property::Section>() const;
+
+template Property::CellFamily::Type& Morphology::get<Property::CellFamily>();
+template const Property::CellFamily::Type& Morphology::get<Property::CellFamily>() const;
 }
