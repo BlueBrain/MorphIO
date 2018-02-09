@@ -1,7 +1,6 @@
 #pragma once
 
 #include <types.h>
-#include <soma.h>
 
 namespace minimorph
 {

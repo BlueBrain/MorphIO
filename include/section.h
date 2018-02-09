@@ -31,10 +31,6 @@
 
 namespace minimorph
 {
-
-
-
-
 /**
  * A class to represent a morphological section.
  *
@@ -68,10 +64,9 @@ public:
     BRAIN_API uint32_t getID() const;
 
     /** Return the morphological type of this section (dendrite, axon, ...). */
-    BRAIN_API SectionType getType() const;
+    BRAIN_API const SectionType getType() const;
 
 
-    template <typename Property> const typename Property::Type get();
 
     /**
      * Return the parent section of this section \if pybind or None if doesn't
@@ -107,8 +102,17 @@ public:
     BRAIN_API upstream_iterator upstream_begin();
     BRAIN_API upstream_iterator upstream_end();
 
+
+    const Points getPoints() const;
+    const floats getDiameters() const;
+    const floats getPerimeters() const;
+    const SectionTypes getSectionTypes() const;
+
+
 private:
     BRAIN_API Section(uint32_t id, PropertiesPtr morphology);
+    template <typename Property> const typename Property::Type get() const;
+
     friend class Morphology;
     friend class Soma;
 
@@ -119,7 +123,6 @@ private:
 
 
 std::ostream& operator<<(std::ostream& os, const Section& section);
-
 
 }
 #endif

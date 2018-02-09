@@ -75,15 +75,20 @@ public:
      */
     BRAIN_API Section getSection(const uint32_t& id) const;
 
-
-    BRAIN_API template <typename Property> typename Property::Type& get();
-    BRAIN_API template <typename Property> const typename Property::Type& get() const;
+    const Points getPoints() const;
+    const floats getDiameters() const;
+    const floats getPerimeters() const;
+    const SectionTypes getSectionTypes() const;
+    const CellFamily getCellFamily() const;
 
     /** @internal */
     BRAIN_API MorphologyVersion getVersion() const;
 
 private:
     PropertiesPtr _properties;
+
+    template <typename Property> typename Property::Type& get();
+    template <typename Property> const typename Property::Type& get() const;
 };
 
 }

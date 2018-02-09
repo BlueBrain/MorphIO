@@ -53,14 +53,18 @@ class Soma
 public:
     BRAIN_API Soma(PropertiesPtr);
 
-    BRAIN_API template <typename Property> const typename Property::Type get() const;
 
     BRAIN_API Point getSomaCenter();
 
     SectionType getType();
 
+    Points getPoints(){ return get<Property::Point>(); }
+
+    floats getDiameter(){ return get<Property::Diameter>(); }
 
 private:
+    template <typename Property> const typename Property::Type get() const;
+
     PropertiesPtr _properties;
     SectionRange _range;
 

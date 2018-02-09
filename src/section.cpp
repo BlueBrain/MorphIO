@@ -81,13 +81,13 @@ uint32_t Section::getID() const
     return _id;
 }
 
-SectionType Section::getType() const
+const SectionType Section::getType() const
 {
-    return _properties->get<Property::SectionType>()[_id];
+    return get<Property::SectionType>()[_id];
 }
 
 
-template <typename TProperty> const typename TProperty::Type Section::get()
+template <typename TProperty> const typename TProperty::Type Section::get() const
 {
     const auto& data = _properties->get<TProperty>();
     typename TProperty::Type result;
@@ -146,11 +146,8 @@ std::ostream& operator<<(std::ostream& os, const Section& section){
     return os;
 }
 
-
-template const Property::Point::Type Section::get<Property::Point>() ;
-template const Property::Diameter::Type Section::get<Property::Diameter>();
-template const Property::Perimeter::Type Section::get<Property::Perimeter>();
-template const Property::SectionType::Type Section::get<Property::SectionType>();
-template const Property::Section::Type Section::get<Property::Section>();
+const Points Section::getPoints() const { return get<Property::Point>(); }
+const floats Section::getDiameters() const { return get<Property::Diameter>(); }
+const floats Section::getPerimeters() const { return get<Property::Perimeter>(); }
 
 }

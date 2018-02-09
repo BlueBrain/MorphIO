@@ -89,23 +89,12 @@ template <typename Property> const typename Property::Type& Morphology::get() co
     return _properties->get<Property>();
 }
 
-// Template method instantiations
+const Points Morphology::getPoints() const { return get<Property::Point>(); }
+const floats Morphology::getDiameters() const { return get<Property::Diameter>(); }
+const floats Morphology::getPerimeters() const { return get<Property::Perimeter>(); }
+const SectionTypes Morphology::getSectionTypes() const { return get<Property::SectionType>(); }
+const CellFamily Morphology::getCellFamily() const { return get<Property::CellFamily>(); }
 
-template Property::Point::Type& Morphology::get<Property::Point>();
-template const Property::Point::Type& Morphology::get<Property::Point>() const;
 
-template Property::Diameter::Type& Morphology::get<Property::Diameter>();
-template const Property::Diameter::Type& Morphology::get<Property::Diameter>() const;
 
-template Property::Perimeter::Type& Morphology::get<Property::Perimeter>();
-template const Property::Perimeter::Type& Morphology::get<Property::Perimeter>() const;
-
-template Property::SectionType::Type& Morphology::get<Property::SectionType>();
-template const Property::SectionType::Type& Morphology::get<Property::SectionType>() const;
-
-template Property::Section::Type& Morphology::get<Property::Section>();
-template const Property::Section::Type& Morphology::get<Property::Section>() const;
-
-template Property::CellFamily::Type& Morphology::get<Property::CellFamily>();
-template const Property::CellFamily::Type& Morphology::get<Property::CellFamily>() const;
 }
