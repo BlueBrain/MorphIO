@@ -1,4 +1,4 @@
-#include <properties.hpp>
+#include <minimorph/properties.h>
 
 namespace minimorph
 {
@@ -24,8 +24,5 @@ template <> Children::Type& Properties::get<Children>() { return _children;}
 
 template <> const CellFamily::Type& Properties::get<CellFamily>() const { return _cellFamily;}
 template <> CellFamily::Type& Properties::get<CellFamily>() { return _cellFamily;}
-
-// template <> const Soma::Type& Properties::get<Soma>() const { return _soma;}
-// template <> Soma::Type& Properties::get<Soma>() { return _soma;}
 }
 }

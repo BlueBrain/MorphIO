@@ -3,7 +3,7 @@
 #include <stack>
 #include <queue>
 
-#include <types.h>
+#include <minimorph/types.h>
 namespace minimorph {
 
 

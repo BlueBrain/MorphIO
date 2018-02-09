@@ -2,8 +2,8 @@
 #include <vector>
 #include <array>
 
-#include "morphology.h"
-#include "section.h"
+#include "minimorph/morphology.h"
+#include "minimorph/section.h"
 
 using namespace std;
 

@@ -2,11 +2,10 @@
 
 /**
  * @file include/api.h
- * Defines export visibility macros for library Brion.
+ * Defines export visibility macros for library Brain.
  */
 
-#ifndef BRAIN_API_H
-#define BRAIN_API_H
+#pragma once
 
 #if defined(_MSC_VER) || defined(__declspec)
 #  define BRAIN_DLLEXPORT __declspec(dllexport)
@@ -28,6 +27,4 @@
 #  define BRAIN_INL BRAIN_DLLEXPORT
 #else
 #  define BRAIN_INL BRAIN_DLLIMPORT
-#endif
-
 #endif

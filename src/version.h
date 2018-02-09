@@ -5,11 +5,11 @@
  * Defines version macros and class for library Brion.
  */
 
-#ifndef BRAIN_VERSION_H
-#define BRAIN_VERSION_H
+#pragma once
 
-#include "api.h"
 #include <string>
+
+#include <minimorph/api.h>
 
 namespace minimorph
 {
@@ -134,5 +134,3 @@ public:
 };
 
 }
-
-#endif

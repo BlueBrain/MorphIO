@@ -23,7 +23,7 @@
 #include <highfive/H5Attribute.hpp>
 #include <highfive/H5DataType.hpp>
 
-#include <types.h>
+#include <minimorph/types.h>
 namespace HighFive
 {
 
