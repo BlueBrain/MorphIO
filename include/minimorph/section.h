@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gsl/span>
+
 #include <minimorph/api.h>
 #include <minimorph/types.h>
 #include <minimorph/morphology.h>
@@ -81,15 +83,15 @@ public:
     BRAIN_API upstream_iterator upstream_end();
 
 
-    const Points getPoints() const;
-    const floats getDiameters() const;
-    const floats getPerimeters() const;
-    const SectionTypes getSectionTypes() const;
+    const gsl::span<const Point> getPoints() const;
+    const gsl::span<const float> getDiameters() const;
+    const gsl::span<const float> getPerimeters() const;
+    const gsl::span<const SectionType> getSectionTypes() const;
 
 
 private:
     BRAIN_API Section(uint32_t id, PropertiesPtr morphology);
-    template <typename Property> const typename Property::Type get() const;
+    template <typename Property> const gsl::span<const typename Property::Type> get() const;
 
     friend class Morphology;
     friend class Soma;

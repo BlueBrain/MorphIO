@@ -10,3 +10,7 @@ target_link_libraries(HighFive INTERFACE
 add_subdirectory(pybind11)
 target_include_directories(pybind11 INTERFACE
     pybind11)
+
+add_subdirectory(GSL)
+target_include_directories(GSL INTERFACE
+    GSL)

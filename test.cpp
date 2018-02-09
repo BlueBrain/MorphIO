@@ -8,9 +8,8 @@
 using namespace std;
 
 // To be compiled and run with:
-// g++ -std=c++1z -I ./include -I 3rdparty/glm/ -I 3rdparty/HighFive -L build/src/ test.cpp -o main  -lmorphio -Wl,-rpath,/usr/lib/x86_64-linux-gnu/hdf5/serial /usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so && LD_LIBRARY_PATH=./build/src ./main
+// g++ -std=c++1z -I ./include -I 3rdparty/glm/ -I 3rdparty/HighFive _I 3rdparty/GSL/include -L build/src/ test.cpp -o main  -lmorphio -Wl,-rpath,/usr/lib/x86_64-linux-gnu/hdf5/serial /usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so && LD_LIBRARY_PATH=./build/src ./main
 
-using namespace minimorph::Property;
 int main(){
     minimorph::Morphology morphology("neuron.swc");
     auto family = morphology.getCellFamily();

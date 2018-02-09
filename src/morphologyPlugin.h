@@ -83,7 +83,7 @@ public:
     void extractInformation()
     {
         const auto& sections = _properties.get<Property::Section>();
-        auto& children = _properties.get<Property::Children>();
+        auto& children = _properties._children;
 
         for (size_t i = 0; i < sections.size(); ++i)
         {
@@ -92,7 +92,7 @@ public:
                 children[parent].push_back(i);
         }
 
-        _properties.get<Property::CellFamily>() = _data.family;
+        _properties._cellFamily = _data.family;
     }
 
 

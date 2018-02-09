@@ -8,44 +8,40 @@ namespace minimorph
 namespace Property
 {
 struct Section{
-    typedef std::vector<Vector2i> Type;
+    typedef Vector2i Type;
 };
 
 struct Point{
-    typedef std::vector<minimorph::Point> Type;
+    typedef minimorph::Point Type;
 };
 
 struct SectionType{
-    typedef std::vector<minimorph::SectionType> Type;
+    typedef minimorph::SectionType Type;
 };
 
 struct Perimeter{
-    typedef std::vector<float> Type;
+    typedef float Type;
 };
 
 struct Diameter {
-    typedef std::vector<float> Type;
-};
-
-struct Children {
-    typedef std::map<uint32_t, uint32_ts> Type;
-};
-
-struct CellFamily {
-    typedef minimorph::CellFamily Type;
+    typedef float Type;
 };
 
 struct Properties {
-    Point::Type _points;
-    SectionType::Type _sectionTypes;
-    Perimeter::Type _perimeters;
-    Diameter::Type _diameters;
-    Section::Type _sections;
-    Children::Type _children;
-    CellFamily::Type _cellFamily;
+    std::vector<Section::Type> _sections;
+    std::vector<Point::Type> _points;
+    std::vector<SectionType::Type> _sectionTypes;
+    std::vector<Perimeter::Type> _perimeters;
+    std::vector<Diameter::Type> _diameters;
 
-    template <typename T> typename T::Type& get();
-    template <typename T> const typename T::Type& get() const;
+    template <typename T> std::vector<typename T::Type>& get();
+    template <typename T> const std::vector<typename T::Type>& get() const;
+
+    std::map<uint32_t, uint32_ts> _children;
+    minimorph::CellFamily _cellFamily;
+
+    const minimorph::CellFamily& getCellFamily() { return _cellFamily; }
+    const std::map<uint32_t, uint32_ts>& getChildren() { return _children; }
 };
 
 }

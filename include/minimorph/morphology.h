@@ -6,7 +6,6 @@
 #include <minimorph/types.h>
 #include <minimorph/properties.h>
 #include <minimorph/soma.h>
-
 namespace minimorph
 {
 
@@ -42,9 +41,8 @@ public:
      */
     BRAIN_API explicit Morphology(const URI& source);
 
-    Soma getSoma() const;
-
-    Sections getSections();
+    BRAIN_API const Soma getSoma() const;
+    BRAIN_API const Sections getSections();
 
     /**
      * Return the Section with the given id.
@@ -52,13 +50,13 @@ public:
      * @throw runtime_error if the id is out of range or the given id refers to
      * a soma section.
      */
-    BRAIN_API Section getSection(const uint32_t& id) const;
+    BRAIN_API const Section getSection(const uint32_t& id) const;
 
-    const Points getPoints() const;
-    const floats getDiameters() const;
-    const floats getPerimeters() const;
-    const SectionTypes getSectionTypes() const;
-    const CellFamily getCellFamily() const;
+    BRAIN_API const Points getPoints() const;
+    BRAIN_API const floats getDiameters() const;
+    BRAIN_API const floats getPerimeters() const;
+    BRAIN_API const SectionTypes getSectionTypes() const;
+    BRAIN_API const CellFamily getCellFamily() const;
 
     /** @internal */
     BRAIN_API MorphologyVersion getVersion() const;
@@ -66,8 +64,7 @@ public:
 private:
     PropertiesPtr _properties;
 
-    template <typename Property> typename Property::Type& get();
-    template <typename Property> const typename Property::Type& get() const;
+    template <typename Property> const std::vector<typename Property::Type>& get() const;
 };
 
 }

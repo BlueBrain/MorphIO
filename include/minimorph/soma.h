@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gsl/span>
+
 #include <minimorph/types.h>
 #include <minimorph/morphology.h>
 
@@ -36,12 +38,12 @@ public:
 
     SectionType getType();
 
-    Points getPoints(){ return get<Property::Point>(); }
+    const gsl::span<const Point> getPoints(){ return get<Property::Point>(); }
 
-    floats getDiameter(){ return get<Property::Diameter>(); }
+    const gsl::span<const float> getDiameter(){ return get<Property::Diameter>(); }
 
 private:
-    template <typename Property> const typename Property::Type get() const;
+    template <typename Property> const gsl::span<const typename Property::Type> get() const;
 
     PropertiesPtr _properties;
     SectionRange _range;

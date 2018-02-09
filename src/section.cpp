@@ -64,34 +64,32 @@ const SectionType Section::getType() const
 }
 
 
-template <typename TProperty> const typename TProperty::Type Section::get() const
+template <typename TProperty> const gsl::span<const typename TProperty::Type> Section::get() const
 {
-    const auto& data = _properties->get<TProperty>();
-    typename TProperty::Type result;
-    result.reserve(_range.second - _range.first);
-    result.insert(result.end(), data.begin() + _range.first,
-                  data.begin() + _range.second);
-    return result;
+    auto ptr_start = _properties->get<TProperty>().data() + _range.first;
+    return gsl::span<const typename TProperty::Type>(ptr_start, _range.second);
 }
 
 std::shared_ptr<Section> Section::getParent() const
 {
     const int32_t parent = _properties->get<Property::Section>()[_id][1];
-// return (parent > -1) ? std::experimental::optional<Section>(Section(parent, _properties)) : std::experimental::nullopt;
     return (parent > -1) ? std::make_shared<Section>(Section(parent, _properties)) : nullptr;
 }
 
 Sections Section::getChildren() const
 {
-    const uint32_ts& children = _properties->get<Property::Children>()[_id];
     Sections result;
-    result.reserve(children.size());
-    for (const uint32_t id : children)
-        result.push_back(Section(id, _properties));
-    return result;
+    try {
+        const uint32_ts& children = _properties->getChildren().at(_id);
+        result.reserve(children.size());
+        for (const uint32_t id : children)
+            result.push_back(Section(id, _properties));
+        return result;
+    }
+    catch (const std::out_of_range& oor) {
+        return result;
+    }
 }
-
-
 
 depth_iterator Section::depth_begin() {
     return depth_iterator(*this);
@@ -123,8 +121,8 @@ std::ostream& operator<<(std::ostream& os, const Section& section){
     return os;
 }
 
-const Points Section::getPoints() const { return get<Property::Point>(); }
-const floats Section::getDiameters() const { return get<Property::Diameter>(); }
-const floats Section::getPerimeters() const { return get<Property::Perimeter>(); }
+const gsl::span<const Point> Section::getPoints() const { return get<Property::Point>(); }
+const gsl::span<const float> Section::getDiameters() const { return get<Property::Diameter>(); }
+const gsl::span<const float> Section::getPerimeters() const { return get<Property::Perimeter>(); }
 
 }

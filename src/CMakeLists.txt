@@ -24,6 +24,7 @@ set_target_properties(morphio
 target_link_libraries(morphio
     PRIVATE
     HighFive
+    GSL
     )
 
 target_include_directories(morphio

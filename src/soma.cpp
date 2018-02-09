@@ -29,14 +29,10 @@ SectionType Soma::getType(){
     return get<Property::SectionType>()[0];
 }
 
-template <typename TProperty> const typename TProperty::Type Soma::get() const
+template <typename TProperty> const gsl::span<const typename TProperty::Type> Soma::get() const
 {
-    const auto& data = _properties->get<TProperty>();
-    typename TProperty::Type result;
-    result.reserve(_range.second - _range.first);
-    result.insert(result.end(), data.begin() + _range.first,
-                  data.begin() + _range.second);
-    return result;
+    auto ptr_start = _properties->get<TProperty>().data() + _range.first;
+    return gsl::span<const typename TProperty::Type>(ptr_start, _range.second);
 }
 
 Point Soma::getSomaCenter()
@@ -53,6 +49,6 @@ Point Soma::getSomaCenter()
     return Point({x/size, y/size, z/size});
 }
 
-template const Property::Point::Type Soma::get<Property::Point>() const;
-template const Property::Diameter::Type Soma::get<Property::Diameter>() const;
+template const gsl::span<const Property::Point::Type> Soma::get<Property::Point>() const;
+template const gsl::span<const Property::Diameter::Type> Soma::get<Property::Diameter>() const;
 }

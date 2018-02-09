@@ -40,15 +40,15 @@ Morphology::~Morphology()
 {
 }
 
-Soma Morphology::getSoma() const {
+const Soma Morphology::getSoma() const {
     return Soma(_properties);
 }
 
-Section Morphology::getSection(const uint32_t& id) const {
+const Section Morphology::getSection(const uint32_t& id) const {
     return Section(id, _properties);
 }
 
-Sections Morphology::getSections(){
+const Sections Morphology::getSections(){
     Sections sections;
     for(int i = 0; i<_properties->get<minimorph::Property::Section>().size(); ++i){
         sections.push_back(getSection(i));
@@ -56,12 +56,7 @@ Sections Morphology::getSections(){
     return sections;
 }
 
-
-template <typename Property> typename Property::Type& Morphology::get(){
-    return _properties->get<Property>();
-}
-
-template <typename Property> const typename Property::Type& Morphology::get() const{
+template <typename Property> const std::vector<typename Property::Type>& Morphology::get() const{
     return _properties->get<Property>();
 }
 
@@ -69,5 +64,6 @@ const Points Morphology::getPoints() const { return get<Property::Point>(); }
 const floats Morphology::getDiameters() const { return get<Property::Diameter>(); }
 const floats Morphology::getPerimeters() const { return get<Property::Perimeter>(); }
 const SectionTypes Morphology::getSectionTypes() const { return get<Property::SectionType>(); }
-const CellFamily Morphology::getCellFamily() const { return get<Property::CellFamily>(); }
+
+const CellFamily Morphology::getCellFamily() const { return _properties->getCellFamily(); }
 }
