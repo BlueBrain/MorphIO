@@ -60,8 +60,14 @@ int main(){
         }
     }
 
-    // std::cout << "After deletion" << std::endl;
-    // for(auto section: a.getRootSections())
-    //     std::cout << "section->getID(): " << section->getID() << std::endl;
+    std::cout << "Traversal" << std::endl;
+
+    auto firstNeurite = *(a.getRootSections().begin());
+    a.traverse([](minimorph::builder::Morphology* morph, minimorph::builder::Section* sec)
+               {std::cout << "hello from: " << sec->getID() << std::endl;},
+               firstNeurite
+        );
+
+
     std::cout << "End" << std::endl;
 }
