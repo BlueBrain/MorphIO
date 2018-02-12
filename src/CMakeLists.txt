@@ -8,6 +8,7 @@ set(MORPHIO_SOURCES
     soma.cpp
     section.cpp
     vector_utils
+    sectionBuilder.cpp
     )
 
 add_library(morphio

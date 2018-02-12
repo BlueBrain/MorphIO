@@ -2,8 +2,9 @@
 #include <vector>
 #include <array>
 
-#include "minimorph/morphology.h"
-#include "minimorph/section.h"
+#include <minimorph/morphology.h>
+#include <minimorph/section.h>
+#include <minimorph/sectionBuilder.h>
 
 using namespace std;
 
@@ -29,9 +30,9 @@ int main(){
 
     std::cout << "upstream" << std::endl;
     section = morphology.getSection(21);
-    for(auto it = section.upstream_begin(); it != section.upstream_end(); ++it){
-        std::cout << "section.getID(): " << (*it).getID() << std::endl;
-    }
+    // for(auto it = section.upstream_begin(); it != section.upstream_end(); ++it){
+    //     std::cout << "section.getID(): " << (*it).getID() << std::endl;
+    // }
 
     auto soma = morphology.getSoma();
 
@@ -42,4 +43,25 @@ int main(){
     std::cout << center[0] << ", " << center[1] << ", " << center[2] << std::endl;
 
     std::cout << "soma.getType(): " << soma.getType() << std::endl;
+
+    std::cout << "Root sections: " << std::endl;
+    for(auto section: soma.getRootSections())
+        std::cout << section.getID() << std::endl;
+
+    std::cout << "Root sections from morphology: " << std::endl;
+    for(auto section: morphology.getRootSections())
+        std::cout << section.getID() << std::endl;
+
+    minimorph::builder::Morphology a(morphology);
+    for(auto section: a.getRootSections()){
+        std::cout << "Section" << std::endl;
+        for(auto &child: section->getChildren()){
+            std::cout << "child->getID(): " << child->getID() << std::endl;
+        }
+    }
+
+    // std::cout << "After deletion" << std::endl;
+    // for(auto section: a.getRootSections())
+    //     std::cout << "section->getID(): " << section->getID() << std::endl;
+    std::cout << "End" << std::endl;
 }

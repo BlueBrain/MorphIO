@@ -42,6 +42,11 @@ namespace Property {
 struct Properties;
 }
 
+namespace builder {
+    class Section;
+    class Soma;
+    class Morphology;
+}
 
 template <typename T> class Iterator;
 
