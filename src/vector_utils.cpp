@@ -1,4 +1,4 @@
-#include "minimorph/vector_types.h"
+#include <minimorph/vector_types.h>
 
 std::array<float, 3> operator*(const std::array<float, 3> &from, float factor)
 {

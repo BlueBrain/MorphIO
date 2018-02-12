@@ -6,6 +6,7 @@
 #include <minimorph/types.h>
 #include <minimorph/properties.h>
 #include <minimorph/soma.h>
+
 namespace minimorph
 {
 
@@ -42,7 +43,8 @@ public:
     BRAIN_API explicit Morphology(const URI& source);
 
     BRAIN_API const Soma getSoma() const;
-    BRAIN_API const Sections getSections();
+    BRAIN_API const Sections getRootSections() const;
+    BRAIN_API const Sections getSections() const;
 
     /**
      * Return the Section with the given id.
@@ -57,9 +59,7 @@ public:
     BRAIN_API const floats getPerimeters() const;
     BRAIN_API const SectionTypes getSectionTypes() const;
     BRAIN_API const CellFamily getCellFamily() const;
-
-    /** @internal */
-    BRAIN_API MorphologyVersion getVersion() const;
+    BRAIN_API const MorphologyVersion getVersion() const;
 
 private:
     PropertiesPtr _properties;

@@ -33,4 +33,10 @@ public:
 MissingParentError(const std::string& _msg) : RawDataError(_msg) {}
 };
 
+class SectionBuilderError: public RawDataError {
+public:
+SectionBuilderError(const std::string& _msg) : RawDataError(_msg) {}
+};
+
+
 }

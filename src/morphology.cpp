@@ -48,7 +48,11 @@ const Section Morphology::getSection(const uint32_t& id) const {
     return Section(id, _properties);
 }
 
-const Sections Morphology::getSections(){
+const Sections Morphology::getRootSections() const {
+    return getSoma().getRootSections();
+}
+
+const Sections Morphology::getSections() const {
     Sections sections;
     for(int i = 0; i<_properties->get<minimorph::Property::Section>().size(); ++i){
         sections.push_back(getSection(i));
@@ -64,6 +68,6 @@ const Points Morphology::getPoints() const { return get<Property::Point>(); }
 const floats Morphology::getDiameters() const { return get<Property::Diameter>(); }
 const floats Morphology::getPerimeters() const { return get<Property::Perimeter>(); }
 const SectionTypes Morphology::getSectionTypes() const { return get<Property::SectionType>(); }
-
 const CellFamily Morphology::getCellFamily() const { return _properties->getCellFamily(); }
+const MorphologyVersion Morphology::getVersion() const { return _properties->getVersion(); }
 }

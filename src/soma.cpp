@@ -1,4 +1,5 @@
-#include "minimorph/soma.h"
+#include <minimorph/soma.h>
+#include <minimorph/section.h>
 
 namespace minimorph
 {
@@ -25,7 +26,22 @@ Soma::Soma(PropertiesPtr properties)
                << std::endl;
 }
 
-SectionType Soma::getType(){
+const Sections Soma::getRootSections() const
+{
+    Sections result;
+    try {
+        const uint32_ts& children = _properties->getChildren().at(0);
+        result.reserve(children.size());
+        for (const uint32_t id : children)
+            result.push_back(Section(id, _properties));
+        return result;
+    }
+    catch (const std::out_of_range& oor) {
+        return result;
+    }
+}
+
+const SectionType Soma::getType(){
     return get<Property::SectionType>()[0];
 }
 
@@ -35,7 +51,7 @@ template <typename TProperty> const gsl::span<const typename TProperty::Type> So
     return gsl::span<const typename TProperty::Type>(ptr_start, _range.second);
 }
 
-Point Soma::getSomaCenter()
+const Point Soma::getSomaCenter()
 {
     auto points = get<Property::Point>();
     float x = 0, y = 0, z = 0;

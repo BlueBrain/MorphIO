@@ -27,21 +27,37 @@ struct Diameter {
     typedef float Type;
 };
 
-struct Properties {
-    std::vector<Section::Type> _sections;
+struct PointLevel {
     std::vector<Point::Type> _points;
-    std::vector<SectionType::Type> _sectionTypes;
     std::vector<Perimeter::Type> _perimeters;
     std::vector<Diameter::Type> _diameters;
+
+    PointLevel() {}
+    PointLevel(const PointLevel& data, SectionRange range);
+};
+
+struct SectionLevel {
+    std::vector<Section::Type> _sections;
+    std::vector<SectionType::Type> _sectionTypes;
+    std::map<uint32_t, uint32_ts> _children;
+};
+
+struct CellLevel {
+    minimorph::CellFamily _cellFamily;
+    MorphologyVersion _version;
+};
+
+struct Properties {
+    PointLevel _pointLevel;
+    SectionLevel _sectionLevel;
+    CellLevel _cellLevel;
 
     template <typename T> std::vector<typename T::Type>& get();
     template <typename T> const std::vector<typename T::Type>& get() const;
 
-    std::map<uint32_t, uint32_ts> _children;
-    minimorph::CellFamily _cellFamily;
-
-    const minimorph::CellFamily& getCellFamily() { return _cellFamily; }
-    const std::map<uint32_t, uint32_ts>& getChildren() { return _children; }
+    const minimorph::MorphologyVersion& getVersion() { return _cellLevel._version; }
+    const minimorph::CellFamily& getCellFamily() { return _cellLevel._cellFamily; }
+    const std::map<uint32_t, uint32_ts>& getChildren() { return _sectionLevel._children; }
 };
 
 }

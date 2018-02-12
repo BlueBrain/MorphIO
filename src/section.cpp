@@ -1,5 +1,5 @@
-#include "minimorph/section.h"
-#include "minimorph/morphology.h"
+#include <minimorph/section.h>
+#include <minimorph/morphology.h>
 
 namespace minimorph
 {
@@ -34,7 +34,7 @@ Section::Section(const Section& section)
 {
 }
 
-Section& Section::operator=(const Section& section)
+const Section& Section::operator=(const Section& section)
 {
     if (&section == this)
         return *this;
@@ -53,7 +53,7 @@ bool Section::operator!=(const Section& other) const
 {
     return !(*this == other);
 }
-uint32_t Section::getID() const
+const uint32_t Section::getID() const
 {
     return _id;
 }
@@ -76,7 +76,7 @@ std::shared_ptr<Section> Section::getParent() const
     return (parent > -1) ? std::make_shared<Section>(Section(parent, _properties)) : nullptr;
 }
 
-Sections Section::getChildren() const
+const Sections Section::getChildren() const
 {
     Sections result;
     try {
@@ -124,5 +124,4 @@ std::ostream& operator<<(std::ostream& os, const Section& section){
 const gsl::span<const Point> Section::getPoints() const { return get<Property::Point>(); }
 const gsl::span<const float> Section::getDiameters() const { return get<Property::Diameter>(); }
 const gsl::span<const float> Section::getPerimeters() const { return get<Property::Perimeter>(); }
-
 }

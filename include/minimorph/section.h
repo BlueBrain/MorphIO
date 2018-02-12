@@ -35,18 +35,10 @@ class Section
 public:
     BRAIN_API Section(const Section& section);
 
-    BRAIN_API Section& operator=(const Section& section);
+    BRAIN_API const Section& operator=(const Section& section);
 
     BRAIN_API bool operator==(const Section& section) const;
     BRAIN_API bool operator!=(const Section& section) const;
-
-    /** Return the ID of this section. */
-    BRAIN_API uint32_t getID() const;
-
-    /** Return the morphological type of this section (dendrite, axon, ...). */
-    BRAIN_API const SectionType getType() const;
-
-
 
     /**
      * Return the parent section of this section \if pybind or None if doesn't
@@ -55,14 +47,13 @@ public:
      * @throw runtime_error is the section doesn't have a parent.
      * \endif
      */
-    std::shared_ptr<Section> getParent() const;
-        // BRAIN_API std::experimental::optional<Section> getParent() const;
+    BRAIN_API std::shared_ptr<Section> getParent() const;
 
     /**
      * Return a vector with all the direct children of this section.
      * The container will be empty for terminal sections.
      */
-    BRAIN_API Sections getChildren() const;
+    BRAIN_API const Sections getChildren() const;
 
     /**
        Depth first search iterator
@@ -83,25 +74,29 @@ public:
     BRAIN_API upstream_iterator upstream_end();
 
 
-    const gsl::span<const Point> getPoints() const;
-    const gsl::span<const float> getDiameters() const;
-    const gsl::span<const float> getPerimeters() const;
-    const gsl::span<const SectionType> getSectionTypes() const;
+    BRAIN_API const gsl::span<const Point> getPoints() const;
+    BRAIN_API const gsl::span<const float> getDiameters() const;
+    BRAIN_API const gsl::span<const float> getPerimeters() const;
+
+    /** Return the morphological type of this section (dendrite, axon, ...). */
+    BRAIN_API const SectionType getType() const;
+
+    /** Return the ID of this section. */
+    BRAIN_API const uint32_t getID() const;
 
 
 private:
-    BRAIN_API Section(uint32_t id, PropertiesPtr morphology);
+    Section(uint32_t id, PropertiesPtr morphology);
     template <typename Property> const gsl::span<const typename Property::Type> get() const;
 
     friend class Morphology;
     friend class Soma;
+    friend class builder::Section;
 
     uint32_t _id;
     SectionRange _range;
     PropertiesPtr _properties;
 };
 
-
 std::ostream& operator<<(std::ostream& os, const Section& section);
-
 }
