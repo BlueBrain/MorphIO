@@ -40,22 +40,22 @@ Morphology::~Morphology()
 {
 }
 
-const Soma Morphology::getSoma() const {
+const Soma Morphology::soma() const {
     return Soma(_properties);
 }
 
-const Section Morphology::getSection(const uint32_t& id) const {
+const Section Morphology::section(const uint32_t& id) const {
     return Section(id, _properties);
 }
 
-const Sections Morphology::getRootSections() const {
-    return getSoma().getRootSections();
+const std::vector<Section> Morphology::rootSections() const {
+    return soma().rootSections();
 }
 
-const Sections Morphology::getSections() const {
-    Sections sections;
+const std::vector<Section> Morphology::sections() const {
+    std::vector<Section> sections;
     for(int i = 0; i<_properties->get<minimorph::Property::Section>().size(); ++i){
-        sections.push_back(getSection(i));
+        sections.push_back(section(i));
     }
     return sections;
 }
@@ -64,10 +64,10 @@ template <typename Property> const std::vector<typename Property::Type>& Morphol
     return _properties->get<Property>();
 }
 
-const Points Morphology::getPoints() const { return get<Property::Point>(); }
-const floats Morphology::getDiameters() const { return get<Property::Diameter>(); }
-const floats Morphology::getPerimeters() const { return get<Property::Perimeter>(); }
-const SectionTypes Morphology::getSectionTypes() const { return get<Property::SectionType>(); }
-const CellFamily Morphology::getCellFamily() const { return _properties->getCellFamily(); }
-const MorphologyVersion Morphology::getVersion() const { return _properties->getVersion(); }
+const Points& Morphology::points() const { return get<Property::Point>(); }
+const std::vector<float>& Morphology::diameters() const { return get<Property::Diameter>(); }
+const std::vector<float>& Morphology::perimeters() const { return get<Property::Perimeter>(); }
+const std::vector<SectionType>& Morphology::sectionTypes() const { return get<Property::SectionType>(); }
+const CellFamily& Morphology::cellFamily() const { return _properties->cellFamily(); }
+const MorphologyVersion& Morphology::version() const { return _properties->version(); }
 }

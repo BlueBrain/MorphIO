@@ -21,7 +21,7 @@ template <typename T> Iterator<T>& Iterator<T>::operator++()
 {
     const auto& section = *(*this);
     container.pop();
-    for(const auto& child: section.getChildren())
+    for(const auto& child: section.children())
         container.push(child);
     return *this;
 }
@@ -40,7 +40,7 @@ template <> upstream_iterator::Iterator(const Section& section) { container = st
 template <> Section upstream_iterator::operator*() const { return *container;}
 template <> upstream_iterator& upstream_iterator::operator++(){
     const auto& section = *(*this);
-    container = section.getParent();
+    container = section.parent();
     return *this;
 }
 

@@ -53,14 +53,15 @@ bool Section::operator!=(const Section& other) const
 {
     return !(*this == other);
 }
-const uint32_t Section::getID() const
+const uint32_t Section::id() const
 {
     return _id;
 }
 
-const SectionType Section::getType() const
+const SectionType Section::type() const
 {
-    return get<Property::SectionType>()[_id];
+    auto val = _properties->get<Property::SectionType>()[_id];
+    return val;
 }
 
 
@@ -70,17 +71,17 @@ template <typename TProperty> const gsl::span<const typename TProperty::Type> Se
     return gsl::span<const typename TProperty::Type>(ptr_start, _range.second);
 }
 
-std::shared_ptr<Section> Section::getParent() const
+std::shared_ptr<Section> Section::parent() const
 {
     const int32_t parent = _properties->get<Property::Section>()[_id][1];
     return (parent > -1) ? std::make_shared<Section>(Section(parent, _properties)) : nullptr;
 }
 
-const Sections Section::getChildren() const
+const std::vector<Section> Section::children() const
 {
-    Sections result;
+    std::vector<Section> result;
     try {
-        const uint32_ts& children = _properties->getChildren().at(_id);
+        const std::vector<uint32_t>& children = _properties->children().at(_id);
         result.reserve(children.size());
         for (const uint32_t id : children)
             result.push_back(Section(id, _properties));
@@ -91,37 +92,36 @@ const Sections Section::getChildren() const
     }
 }
 
-depth_iterator Section::depth_begin() {
+depth_iterator Section::depth_begin() const {
     return depth_iterator(*this);
 }
 
-depth_iterator Section::depth_end() {
+depth_iterator Section::depth_end() const {
     return depth_iterator();
 }
 
-breadth_iterator Section::breadth_begin() {
+breadth_iterator Section::breadth_begin() const {
     return breadth_iterator(*this);
 }
 
-breadth_iterator Section::breadth_end() {
+breadth_iterator Section::breadth_end() const {
     return breadth_iterator();
 }
 
-upstream_iterator Section::upstream_begin() {
+upstream_iterator Section::upstream_begin() const {
     return upstream_iterator(*this);
 }
 
-upstream_iterator Section::upstream_end() {
+upstream_iterator Section::upstream_end() const {
     return upstream_iterator();
 }
 
-
 std::ostream& operator<<(std::ostream& os, const Section& section){
-    os << section.getID();
+    os << section.id();
     return os;
 }
 
-const gsl::span<const Point> Section::getPoints() const { return get<Property::Point>(); }
-const gsl::span<const float> Section::getDiameters() const { return get<Property::Diameter>(); }
-const gsl::span<const float> Section::getPerimeters() const { return get<Property::Perimeter>(); }
+const gsl::span<const Point> Section::points() const { return get<Property::Point>(); }
+const gsl::span<const float> Section::diameters() const { return get<Property::Diameter>(); }
+const gsl::span<const float> Section::perimeters() const { return get<Property::Perimeter>(); }
 }

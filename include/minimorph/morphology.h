@@ -42,9 +42,9 @@ public:
      */
     BRAIN_API explicit Morphology(const URI& source);
 
-    BRAIN_API const Soma getSoma() const;
-    BRAIN_API const Sections getRootSections() const;
-    BRAIN_API const Sections getSections() const;
+    BRAIN_API const Soma soma() const;
+    BRAIN_API const std::vector<Section> rootSections() const;
+    BRAIN_API const std::vector<Section> sections() const;
 
     /**
      * Return the Section with the given id.
@@ -52,14 +52,14 @@ public:
      * @throw runtime_error if the id is out of range or the given id refers to
      * a soma section.
      */
-    BRAIN_API const Section getSection(const uint32_t& id) const;
+    BRAIN_API const Section section(const uint32_t& id) const;
 
-    BRAIN_API const Points getPoints() const;
-    BRAIN_API const floats getDiameters() const;
-    BRAIN_API const floats getPerimeters() const;
-    BRAIN_API const SectionTypes getSectionTypes() const;
-    BRAIN_API const CellFamily getCellFamily() const;
-    BRAIN_API const MorphologyVersion getVersion() const;
+    BRAIN_API const Points& points() const;
+    BRAIN_API const std::vector<float>& diameters() const;
+    BRAIN_API const std::vector<float>& perimeters() const;
+    BRAIN_API const std::vector<SectionType>& sectionTypes() const;
+    BRAIN_API const CellFamily& cellFamily() const;
+    BRAIN_API const MorphologyVersion& version() const;
 
 private:
     PropertiesPtr _properties;

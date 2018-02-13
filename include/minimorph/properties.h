@@ -39,7 +39,7 @@ struct PointLevel {
 struct SectionLevel {
     std::vector<Section::Type> _sections;
     std::vector<SectionType::Type> _sectionTypes;
-    std::map<uint32_t, uint32_ts> _children;
+    std::map<uint32_t, std::vector<uint32_t>> _children;
 };
 
 struct CellLevel {
@@ -55,9 +55,9 @@ struct Properties {
     template <typename T> std::vector<typename T::Type>& get();
     template <typename T> const std::vector<typename T::Type>& get() const;
 
-    const minimorph::MorphologyVersion& getVersion() { return _cellLevel._version; }
-    const minimorph::CellFamily& getCellFamily() { return _cellLevel._cellFamily; }
-    const std::map<uint32_t, uint32_ts>& getChildren() { return _sectionLevel._children; }
+    const minimorph::MorphologyVersion& version() { return _cellLevel._version; }
+    const minimorph::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
+    const std::map<uint32_t, std::vector<uint32_t>>& children() { return _sectionLevel._children; }
 };
 
 }

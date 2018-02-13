@@ -13,61 +13,71 @@ using namespace std;
 
 int main(){
     minimorph::Morphology morphology("neuron.swc");
-    auto family = morphology.getCellFamily();
+    for(auto type: morphology.sectionTypes())
+        std::cout << "type: " << type << std::endl;
+
+    auto family = morphology.cellFamily();
     std::cout << "family: " << family << std::endl;
-    auto sections = morphology.getSections();
+    auto sections = morphology.sections();
     std::cout << "sections.size(): " << sections.size() << std::endl;
     auto section = sections[3];
     std::cout << "depth" << std::endl;
     for(auto it = section.depth_begin(); it != section.depth_end(); ++it){
-        std::cout << "section.getID(): " << (*it).getID() << std::endl;
+        std::cout << "section.id(): " << (*it).id() << std::endl;
     }
 
     std::cout << "breadth" << std::endl;
     for(auto it = section.breadth_begin(); it != section.breadth_end(); ++it){
-        std::cout << "section.getID(): " << (*it).getID() << std::endl;
+        std::cout << "section.type(): " << (*it).type() << std::endl;
     }
 
     std::cout << "upstream" << std::endl;
-    section = morphology.getSection(21);
-    // for(auto it = section.upstream_begin(); it != section.upstream_end(); ++it){
-    //     std::cout << "section.getID(): " << (*it).getID() << std::endl;
-    // }
+    section = morphology.section(3);
+    for(auto it = section.upstream_begin(); it != section.upstream_end(); ++it){
+        std::cout << "section.id(): " << (*it).id() << std::endl;
+    }
 
-    auto soma = morphology.getSoma();
+    auto soma = morphology.soma();
 
-    for(auto point: soma.getPoints())
+    for(auto point: soma.points())
         std::cout << point[0] << ", " << point[1] << ", " << point[2] << std::endl;
 
-    auto center = soma.getSomaCenter();
+    auto center = soma.somaCenter();
     std::cout << center[0] << ", " << center[1] << ", " << center[2] << std::endl;
 
-    std::cout << "soma.getType(): " << soma.getType() << std::endl;
+    std::cout << "soma.type(): " << soma.type() << std::endl;
 
     std::cout << "Root sections: " << std::endl;
-    for(auto section: soma.getRootSections())
-        std::cout << section.getID() << std::endl;
+    for(auto section: soma.rootSections())
+        std::cout << section.id() << std::endl;
 
     std::cout << "Root sections from morphology: " << std::endl;
-    for(auto section: morphology.getRootSections())
-        std::cout << section.getID() << std::endl;
+    for(auto section: morphology.rootSections())
+        std::cout << section.id() << std::endl;
 
     minimorph::builder::Morphology a(morphology);
-    for(auto section: a.getRootSections()){
+    for(auto section: a.rootSections()){
         std::cout << "Section" << std::endl;
-        for(auto &child: section->getChildren()){
-            std::cout << "child->getID(): " << child->getID() << std::endl;
+        for(auto &child: section->children()){
+            std::cout << "child->id(): " << child->id() << std::endl;
         }
     }
 
     std::cout << "Traversal" << std::endl;
-
-    auto firstNeurite = *(a.getRootSections().begin());
+    auto firstNeurite = *(a.rootSections().begin());
     a.traverse([](minimorph::builder::Morphology* morph, minimorph::builder::Section* sec)
-               {std::cout << "hello from: " << sec->getID() << std::endl;},
+               {std::cout << "hello from: " << sec->type() << std::endl;},
                firstNeurite
         );
 
+    std::cout << "H5 Writer" << std::endl;
+    minimorph::builder::writer::h5(a);
+
+    std::cout << "SWC writer" << std::endl;
+    minimorph::builder::writer::swc(a);
+
+    std::cout << "Asc writer" << std::endl;
+    minimorph::builder::writer::asc(a);
 
     std::cout << "End" << std::endl;
 }

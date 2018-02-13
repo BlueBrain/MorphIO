@@ -16,7 +16,7 @@ template <typename T> class Iterator {
     T container;
     Iterator() {}
 public:
-    explicit Iterator(const Section& section);
+    Iterator(const Section& section);
     bool operator==(Iterator other) const;
     bool operator!=(Iterator other) const;
     Section operator*() const;

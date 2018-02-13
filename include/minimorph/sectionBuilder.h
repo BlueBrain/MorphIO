@@ -28,6 +28,9 @@ class Soma
 {
 public:
     Soma(const minimorph::Soma &soma);
+    SectionType& type(){ return _somaType; }
+    std::vector<Point>& points(){ return _pointProperties._points;}
+    std::vector<float> diameters(){ return _pointProperties._diameters;}
 
 private:
     Property::PointLevel _pointProperties;
@@ -37,17 +40,17 @@ private:
 class Section
 {
 public:
-    const Section* const getParent();
-    const std::set<Section*>& getChildren();
-    const uint32_t getID() const { return _id; }
-    const SectionType getType() const { return _sectionType; }
-
-    std::vector<Point>& getPoints(){ return _pointProperties._points;}
-    std::vector<float> getDiameters(){ return _pointProperties._diameters;}
-    std::vector<float> getPerimeters(){ return _pointProperties._perimeters;}
+    Section* const parent();
+    const std::set<Section*>& children();
+    const uint32_t id() const { return _id; }
+    SectionType& type() { return _sectionType; }
+    std::vector<Point>& points(){ return _pointProperties._points;}
+    std::vector<float> diameters(){ return _pointProperties._diameters;}
+    std::vector<float> perimeters(){ return _pointProperties._perimeters;}
 
 private:
-    void traverse(Morphology* morphology, void (*fun)(Morphology* morphology, Section* section));
+    void traverse(Morphology* morphology,
+                  std::function<void(Morphology* morphology, Section* section)>);
     Section(Morphology*, int id, SectionType type, const Property::PointLevel&);
     Section(Morphology* morphology, const minimorph::Section &section, bool recursive = true);
     ~Section(){}
@@ -64,14 +67,16 @@ class Morphology
 {
 public:
     Morphology(const minimorph::Morphology& morphology);
-    const std::set<Section*>& getRootSections() {
-        return _rootSections;
-    }
+    virtual ~Morphology();
+    const std::set<Section*>& rootSections();
 
+    Soma& soma();
     void deleteSection(Section*, bool recursive = true);
     uint32_t appendSection(Section* parent, const minimorph::Section&, bool recursive=true);
     uint32_t appendSection(Section* parent, SectionType, const Property::PointLevel&);
-    void traverse(void (*fun)(Morphology* morphology, Section* section), Section* rootSection = nullptr);
+    void traverse(std::function<void(Morphology* morphology, Section* section)>,
+                  Section* rootSection = nullptr);
+
 private:
     friend class Section;
 
@@ -81,5 +86,13 @@ private:
     std::map<uint32_t, Section*> _sections;
     uint32_t _counter;
 };
+
+namespace writer
+{
+void h5(Morphology& morphology);
+void swc(Morphology& morphology);
+void asc(Morphology& morphology);
+}
+
 }
 }

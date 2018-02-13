@@ -47,42 +47,42 @@ public:
      * @throw runtime_error is the section doesn't have a parent.
      * \endif
      */
-    BRAIN_API std::shared_ptr<Section> getParent() const;
+    BRAIN_API std::shared_ptr<Section> parent() const;
 
     /**
      * Return a vector with all the direct children of this section.
      * The container will be empty for terminal sections.
      */
-    BRAIN_API const Sections getChildren() const;
+    BRAIN_API const std::vector<Section> children() const;
 
     /**
        Depth first search iterator
     **/
-    BRAIN_API depth_iterator depth_begin();
-    BRAIN_API depth_iterator depth_end();
+    BRAIN_API depth_iterator depth_begin() const;
+    BRAIN_API depth_iterator depth_end() const;
 
     /**
        Breadth first search iterator
     **/
-    BRAIN_API breadth_iterator breadth_begin();
-    BRAIN_API breadth_iterator breadth_end();
+    BRAIN_API breadth_iterator breadth_begin() const;
+    BRAIN_API breadth_iterator breadth_end() const;
 
     /**
        Upstream first search iterator
     **/
-    BRAIN_API upstream_iterator upstream_begin();
-    BRAIN_API upstream_iterator upstream_end();
+    BRAIN_API upstream_iterator upstream_begin() const;
+    BRAIN_API upstream_iterator upstream_end() const;
 
 
-    BRAIN_API const gsl::span<const Point> getPoints() const;
-    BRAIN_API const gsl::span<const float> getDiameters() const;
-    BRAIN_API const gsl::span<const float> getPerimeters() const;
+    BRAIN_API const gsl::span<const Point> points() const;
+    BRAIN_API const gsl::span<const float> diameters() const;
+    BRAIN_API const gsl::span<const float> perimeters() const;
 
     /** Return the morphological type of this section (dendrite, axon, ...). */
-    BRAIN_API const SectionType getType() const;
+    BRAIN_API const SectionType type() const;
 
     /** Return the ID of this section. */
-    BRAIN_API const uint32_t getID() const;
+    BRAIN_API const uint32_t id() const;
 
 
 private:

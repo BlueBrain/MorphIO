@@ -26,11 +26,11 @@ Soma::Soma(PropertiesPtr properties)
                << std::endl;
 }
 
-const Sections Soma::getRootSections() const
+const std::vector<Section> Soma::rootSections() const
 {
-    Sections result;
+    std::vector<Section> result;
     try {
-        const uint32_ts& children = _properties->getChildren().at(0);
+        const std::vector<uint32_t>& children = _properties->children().at(0);
         result.reserve(children.size());
         for (const uint32_t id : children)
             result.push_back(Section(id, _properties));
@@ -41,7 +41,7 @@ const Sections Soma::getRootSections() const
     }
 }
 
-const SectionType Soma::getType(){
+const SectionType Soma::type() const {
     return get<Property::SectionType>()[0];
 }
 
@@ -51,7 +51,7 @@ template <typename TProperty> const gsl::span<const typename TProperty::Type> So
     return gsl::span<const typename TProperty::Type>(ptr_start, _range.second);
 }
 
-const Point Soma::getSomaCenter()
+const Point Soma::somaCenter() const
 {
     auto points = get<Property::Point>();
     float x = 0, y = 0, z = 0;
