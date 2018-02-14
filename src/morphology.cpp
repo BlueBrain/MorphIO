@@ -2,11 +2,16 @@
 #include <cassert>
 #include <iostream>
 
+#include <fstream>
+#include <streambuf>
+
 #include <minimorph/morphology.h>
 #include <minimorph/section.h>
 
 #include "plugin/morphologyHDF5.h"
 #include "plugin/morphologySWC.h"
+
+#include "plugin/parse_ll.cpp"
 
 namespace minimorph
 {
@@ -24,6 +29,17 @@ Morphology::Morphology(const URI& source)
     }
     else if (source.substr(pos) == ".swc") {
         plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologySWC(MorphologyInitData(source)));
+    }
+    else if (source.substr(pos) == ".asc") {
+        std::cout << "hello" << std::endl;
+        plugin::NeurolucidaParser parser;
+        std::ifstream ifs(source);
+        std::string input((std::istreambuf_iterator<char>(ifs)),
+                          (std::istreambuf_iterator<char>()));
+
+        parser.parse(input);
+
+        return;
     }
     else {
         LBTHROW(UnknownFileType("unhandled file type"));

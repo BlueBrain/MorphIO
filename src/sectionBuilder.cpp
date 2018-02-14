@@ -21,12 +21,26 @@ uint32_t Morphology::appendSection(Section* parent, const minimorph::Section& se
     Section *node = new Section(this, section, recursive);
     parent->_children.insert(node);
     node->_parent = parent;
+    return node->id();
 }
 
 uint32_t Morphology::appendSection(Section* parent, SectionType type, const Property::PointLevel &pointProperties){
     Section *section = new Section(this, _counter, type, pointProperties);
     parent->_children.insert(section);
     section->_parent = parent;
+    return section->id();
+}
+
+uint32_t Morphology::createNeurite(const minimorph::Section& section, bool recursive){
+    Section *node = new Section(this, section, recursive);
+    _rootSections.insert(node);
+    return node->id();
+}
+
+uint32_t Morphology::createNeurite(SectionType type, const Property::PointLevel &pointProperties){
+    Section *section = new Section(this, _counter, type, pointProperties);
+    _rootSections.insert(section);
+    return section->id();
 }
 
 void Morphology::_register(Section* section){

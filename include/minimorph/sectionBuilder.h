@@ -27,6 +27,10 @@ namespace builder
 class Soma
 {
 public:
+    Soma() : _somaType(SECTION_UNDEFINED) {}
+    Soma(Property::PointLevel pointProperties, SectionType somaType) :
+        _somaType(somaType), _pointProperties(pointProperties) {}
+
     Soma(const minimorph::Soma &soma);
     SectionType& type(){ return _somaType; }
     std::vector<Point>& points(){ return _pointProperties._points;}
@@ -66,14 +70,18 @@ private:
 class Morphology
 {
 public:
+    Morphology() : _soma(Soma()), _counter(0) {}
     Morphology(const minimorph::Morphology& morphology);
     virtual ~Morphology();
     const std::set<Section*>& rootSections();
 
+    std::map<uint32_t, Section*>& sections() { return _sections; }
     Soma& soma();
     void deleteSection(Section*, bool recursive = true);
     uint32_t appendSection(Section* parent, const minimorph::Section&, bool recursive=true);
     uint32_t appendSection(Section* parent, SectionType, const Property::PointLevel&);
+    uint32_t createNeurite(const minimorph::Section&, bool recursive=true);
+    uint32_t createNeurite(SectionType, const Property::PointLevel&);
     void traverse(std::function<void(Morphology* morphology, Section* section)>,
                   Section* rootSection = nullptr);
 

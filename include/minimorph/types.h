@@ -42,6 +42,9 @@ namespace Property {
 struct Properties;
 }
 
+namespace detail {
+    class NeurolucidaParser;
+}
 namespace builder {
     class Section;
     class Soma;
