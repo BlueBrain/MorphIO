@@ -11,6 +11,9 @@ namespace minimorph
 namespace plugin
 {
 
+namespace asc
+{
+
 enum class Token
 {
     EOF_,
@@ -297,5 +300,6 @@ public:
     }
 };
 
-} // end namespace plugin
+} // namespace asc
+} // namespace plugin
 } // namespace minimorph

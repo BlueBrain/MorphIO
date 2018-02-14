@@ -8,20 +8,13 @@
 #include <list>
 #include <sstream>
 
-/*
-#include <lunchbox/debug.h>
-#include <lunchbox/log.h>
-#include <lunchbox/pluginRegisterer.h>
-*/
-
-//TODO: compile
 #include <iostream>
 
 namespace minimorph
 {
 namespace plugin
 {
-namespace
+namespace swc
 {
 // It's not clear if -1 is the only way of identifying a root section.
 const int SWC_UNDEFINED_PARENT = -1;
@@ -115,9 +108,9 @@ void _correctSampleType(Sample& sample, const Samples& samples)
 
     sample.type = type;
 }
-}
 
-struct MorphologySWC::RawSWCInfo
+
+struct RawSWCInfo
 {
     RawSWCInfo()
         : totalValidSamples(0)
@@ -141,55 +134,8 @@ struct MorphologySWC::RawSWCInfo
     size_t numSections;
 };
 
-MorphologySWC::MorphologySWC(const MorphologyInitData& initData)
-    : MorphologyPlugin(initData)
-{
-    load();
-}
 
-void MorphologySWC::load()
-{
-    // Parsing SWC according to this specification:
-    // http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
-    // Sample numbers may not be contiguous and parent samples can appear
-    // later than child ones. Both things shouldn't happen, but the "spec"
-    // doesn't enforce it, only gives recommendations.
-    // This code takes that possibility into account.
-
-    RawSWCInfo info;
-    info.filename = _data.uri;
-
-    _readSamples(info);
-    _buildSampleTree(info);
-    _buildStructure(info);
-    _data.family = FAMILY_NEURON;
-    _data.version = MORPHOLOGY_VERSION_SWC_1;
-}
-
-bool MorphologySWC::handles(const MorphologyInitData& initData)
-{
-    //TODO: compile
-    //const std::string& scheme = initData.getURI().getScheme();
-    const std::string scheme;
-    if (scheme != "file" && !scheme.empty())
-        return false;
-
-    //TODO: compile
-    //const std::string path = initData.getURI().getPath();
-    const std::string path;
-    const size_t pos = path.find_last_of(".");
-    if (pos == std::string::npos)
-        return false;
-    return path.substr(pos) == ".swc";
-}
-
-std::string MorphologySWC::getDescription()
-{
-    return "SWC morphologies:\n"
-           "  [file://]/path/to/morphology.swc";
-}
-
-void MorphologySWC::_readSamples(RawSWCInfo& info)
+void _readSamples(RawSWCInfo& info)
 {
     std::ifstream file(info.filename.c_str());
     if (file.fail())
@@ -243,7 +189,7 @@ void MorphologySWC::_readSamples(RawSWCInfo& info)
     info.totalValidSamples = totalSamples;
 }
 
-void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
+void _buildSampleTree(RawSWCInfo& info)
 {
     // To connect the samples in a descending tree the easiest thing is to
     // start with the last sample (assumed to be and end-point as no other
@@ -402,8 +348,12 @@ void MorphologySWC::_buildSampleTree(RawSWCInfo& info)
                                  info.filename + ", no soma section found"));
 }
 
-void MorphologySWC::_buildStructure(RawSWCInfo& info)
+Property::Properties _buildStructure(RawSWCInfo& info)
 {
+    Property::Properties _properties;
+    _properties._cellLevel._cellFamily = FAMILY_NEURON;
+    _properties._cellLevel._version = MORPHOLOGY_VERSION_SWC_1;
+
     std::list<size_t> sectionQueue(info.roots.begin(), info.roots.end());
 
     int section = 0;
@@ -511,6 +461,26 @@ void MorphologySWC::_buildStructure(RawSWCInfo& info)
         }
         ++section;
     }
+    return _properties;
 }
+
+Property::Properties load(const URI& uri)
+{
+    // Parsing SWC according to this specification:
+    // http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
+    // Sample numbers may not be contiguous and parent samples can appear
+    // later than child ones. Both things shouldn't happen, but the "spec"
+    // doesn't enforce it, only gives recommendations.
+    // This code takes that possibility into account.
+
+    RawSWCInfo info;
+    info.filename = uri;
+    _readSamples(info);
+    _buildSampleTree(info);
+    Property::Properties properties = _buildStructure(info);
+    return properties;
 }
-}
+
+} // namespace swc
+} // namespace plugin
+} // namespace minimorph

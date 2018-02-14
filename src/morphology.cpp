@@ -10,36 +10,10 @@
 
 #include "plugin/morphologyHDF5.h"
 #include "plugin/morphologySWC.h"
-
-#include "plugin/parse_ll.cpp"
+#include "plugin/morphologyASC.h"
 
 namespace minimorph
 {
-
-namespace plugin
-{
-class MorphologyASC : public MorphologyPlugin
-{
-public:
-    explicit MorphologyASC(const MorphologyInitData& initData)
-        : MorphologyPlugin(initData)
-        {
-            load();
-        }
-
-private:
-    void load() final {
-        std::cout << "hello" << std::endl;
-        plugin::NeurolucidaParser parser;
-        std::ifstream ifs(_data.uri);
-        std::string input((std::istreambuf_iterator<char>(ifs)),
-                          (std::istreambuf_iterator<char>()));
-
-        _properties = parser.parse(input);
-        _data.family = FAMILY_NEURON;
-    }
-};
-}
 
 Morphology::Morphology(const URI& source)
 {
@@ -48,27 +22,28 @@ Morphology::Morphology(const URI& source)
     if(access( source.c_str(), F_OK ) == -1)
         LBTHROW(RawDataError("File: "+source+" does not exist."));
 
-    std::unique_ptr<MorphologyPlugin> plugin;
     if (source.substr(pos) == ".h5") {
-        plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologyHDF5(MorphologyInitData(source)));
+        _properties = std::make_shared<Property::Properties>(plugin::h5::load(source));
     }
     else if (source.substr(pos) == ".swc") {
-        plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologySWC(MorphologyInitData(source)));
+        _properties = std::make_shared<Property::Properties>(plugin::swc::load(source));
     }
     else if (source.substr(pos) == ".asc") {
-        plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologyASC(MorphologyInitData(source)));
+        _properties = std::make_shared<Property::Properties>(plugin::asc::load(source));
     }
     else {
         LBTHROW(UnknownFileType("unhandled file type"));
     }
-    plugin -> extractInformation();
 
-    _properties = std::make_shared<Property::Properties>(plugin -> getProperties());
-}
+    const auto& sections = _properties->get<Property::Section>();
+    auto& children = _properties->_sectionLevel._children;
 
-Morphology::Morphology(const builder::Morphology& morphology)
-{
-
+    for (size_t i = 0; i < sections.size(); ++i)
+    {
+        const int32_t parent = sections[i][1];
+        if (parent != -1)
+            children[parent].push_back(i);
+    }
 }
 
 Morphology::Morphology(Morphology&&) = default;
@@ -108,4 +83,5 @@ const std::vector<float>& Morphology::perimeters() const { return get<Property::
 const std::vector<SectionType>& Morphology::sectionTypes() const { return get<Property::SectionType>(); }
 const CellFamily& Morphology::cellFamily() const { return _properties->cellFamily(); }
 const MorphologyVersion& Morphology::version() const { return _properties->version(); }
-}
+
+} // namespace minimorph

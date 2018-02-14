@@ -1,5 +1,9 @@
+#include <fstream>
+
 #include <minimorph/types.h>
 #include <minimorph/sectionBuilder.h>
+
+#include "morphologyASC.h"
 
 #include "lex.cpp"
 
@@ -9,8 +13,9 @@ namespace minimorph
 namespace plugin
 {
 
-namespace detail
+namespace asc
 {
+
 bool is_eof(Token type)
 {
     return type == Token::EOF_;
@@ -68,8 +73,6 @@ std::tuple<Point, float> parse_point(NeurolucidaLexer& lex)
     return std::tuple<Point, float>{{x, y, z}, r};
 }
 
-} // namespace detail
-
 class NeurolucidaParser
 {
 public:
@@ -117,12 +120,12 @@ private:
             const Token id = static_cast<Token>(lex_.current()->id);
             const size_t peek_id = lex_.peek()->id;
 
-            if (detail::is_eof(id))
+            if (is_eof(id))
             {
                 throw std::runtime_error(
                     "Hit end of of file while consuming a neurite");
             }
-            else if (detail::is_end_of_section(id))
+            else if (is_end_of_section(id))
             {
                 if (!points.empty())
                 {
@@ -148,7 +151,7 @@ private:
                 }
                 return true;
             }
-            else if (detail::is_end_of_branch(id))
+            else if (is_end_of_branch(id))
             {
                 lex_.consume();
             }
@@ -163,7 +166,7 @@ private:
             }
             else if (id == Token::LPAREN)
             {
-                if (detail::skip_sexp(peek_id))
+                if (skip_sexp(peek_id))
                 {
                     // skip words/strings/markers
                     lex_.consume_until_balanced_paren();
@@ -172,7 +175,7 @@ private:
                 {
                     Point point;
                     float radius;
-                    std::tie(point, radius) = detail::parse_point(lex_);
+                    std::tie(point, radius) = parse_point(lex_);
                     points.push_back(point);
                     diameters.push_back(radius);
                 }
@@ -223,7 +226,7 @@ private:
         while (!lex_.ended())
         {
             const Token peek_id = static_cast<Token>(lex_.peek()->id);
-            if (detail::is_neurite_type(peek_id))
+            if (is_neurite_type(peek_id))
             {
                 lex_.consume(); // Advance to NeuriteType
                 std::cout << "Neurite: " << lex_.current()->str() << "\n";
@@ -246,6 +249,20 @@ private:
     minimorph::builder::Morphology nb_;
 };
 
-} // end namespace plugin
+
+Property::Properties load(const URI& uri) {
+    NeurolucidaParser parser;
+    std::ifstream ifs(uri);
+    std::string input((std::istreambuf_iterator<char>(ifs)),
+                      (std::istreambuf_iterator<char>()));
+
+    Property::Properties _properties = parser.parse(input);
+    _properties._cellLevel._cellFamily = FAMILY_NEURON;
+    return _properties;
+}
+
+} // namespace asc
+
+} // namespace plugin
 
 } // namespace minimorph

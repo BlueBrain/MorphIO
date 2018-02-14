@@ -225,19 +225,19 @@ void _write_asc_points(const Points& points, const std::vector<float>& diameters
 
 void _write_asc_section(Section *section, int indentLevel){
     std::string indent(indentLevel, ' ');
-    std::cout << indent << "(" << std::endl;
     _write_asc_points(section->points(), section->diameters(), indentLevel);
 
     if(!section->children().empty()){
+        std::cout << indent << "(" << std::endl;
         auto it = section->children().begin();
         _write_asc_section((*it++), indentLevel+2);
         for(; it != section->children().end(); ++it){
             std::cout << indent << "|" << std::endl;
             _write_asc_section((*it), indentLevel+2);
         }
+        std::cout << indent << ")" << std::endl;
     }
 
-    std::cout << indent << ")" << std::endl;
 }
 void asc(Morphology& morphology) {
     std::map<minimorph::SectionType, std::string> header;

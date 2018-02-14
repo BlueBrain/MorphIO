@@ -1,34 +1,17 @@
-
-#ifndef BRAIN_PLUGIN_MORPHOLOGYSWC
-#define BRAIN_PLUGIN_MORPHOLOGYSWC
+#pragma once
 
 #include <minimorph/types.h>
-
-#include "../morphologyPlugin.h"
-/* #include "../vector_types.h" */
+#include <minimorph/properties.h>
 
 namespace minimorph
 {
 namespace plugin
 {
-class MorphologySWC : public MorphologyPlugin
+namespace swc
 {
-public:
-    explicit MorphologySWC(const MorphologyInitData& initData);
+    Property::Properties load(const URI& uri);
+} // namespace swc
 
-    /** Check if this plugin can handle the given uri. */
-    static bool handles(const MorphologyInitData& initData);
-    static std::string getDescription();
+} // namespace plugin
 
-private:
-    // Plugin API
-    void load() final;
-
-    struct RawSWCInfo;
-    void _readSamples(RawSWCInfo& info);
-    void _buildSampleTree(RawSWCInfo& info);
-    void _buildStructure(RawSWCInfo& info);
-};
-}
-}
-#endif
+} // namespace minimorph

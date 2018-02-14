@@ -2,6 +2,7 @@ set(MORPHIO_SOURCES
     morphology.cpp
     plugin/morphologyHDF5.cpp
     plugin/morphologySWC.cpp
+    plugin/morphologyASC.cpp
     properties.cpp
     iterators.cpp
     morphology.cpp
@@ -9,8 +10,6 @@ set(MORPHIO_SOURCES
     section.cpp
     vector_utils
     sectionBuilder.cpp
-    # lex.cpp
-    # parse_ll.cpp
     )
 
 add_library(morphio
