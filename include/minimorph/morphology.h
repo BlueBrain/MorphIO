@@ -22,6 +22,7 @@ public:
     /** Close morphology file. @version 1.0 */
     BRAIN_API ~Morphology();
 
+    BRAIN_API Morphology(const builder::Morphology&);
     BRAIN_API Morphology& operator=(const Morphology&);
     BRAIN_API Morphology(Morphology&&);
     BRAIN_API Morphology& operator=(Morphology&&);

@@ -88,6 +88,7 @@ public:
         for (size_t i = 0; i < sections.size(); ++i)
         {
             const int32_t parent = sections[i][1];
+            std::cout << sections[i][0] << ' ' << sections[i][1] << std::endl;
             if (parent != -1)
                 children[parent].push_back(i);
         }

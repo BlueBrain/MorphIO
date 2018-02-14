@@ -47,6 +47,8 @@ struct CellLevel {
     MorphologyVersion _version;
 };
 
+
+// The lowest level data blob
 struct Properties {
     PointLevel _pointLevel;
     SectionLevel _sectionLevel;

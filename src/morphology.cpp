@@ -16,6 +16,31 @@
 namespace minimorph
 {
 
+namespace plugin
+{
+class MorphologyASC : public MorphologyPlugin
+{
+public:
+    explicit MorphologyASC(const MorphologyInitData& initData)
+        : MorphologyPlugin(initData)
+        {
+            load();
+        }
+
+private:
+    void load() final {
+        std::cout << "hello" << std::endl;
+        plugin::NeurolucidaParser parser;
+        std::ifstream ifs(_data.uri);
+        std::string input((std::istreambuf_iterator<char>(ifs)),
+                          (std::istreambuf_iterator<char>()));
+
+        _properties = parser.parse(input);
+        _data.family = FAMILY_NEURON;
+    }
+};
+}
+
 Morphology::Morphology(const URI& source)
 {
     const size_t pos = source.find_last_of(".");
@@ -31,15 +56,7 @@ Morphology::Morphology(const URI& source)
         plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologySWC(MorphologyInitData(source)));
     }
     else if (source.substr(pos) == ".asc") {
-        std::cout << "hello" << std::endl;
-        plugin::NeurolucidaParser parser;
-        std::ifstream ifs(source);
-        std::string input((std::istreambuf_iterator<char>(ifs)),
-                          (std::istreambuf_iterator<char>()));
-
-        parser.parse(input);
-
-        return;
+        plugin = std::unique_ptr<MorphologyPlugin>(new plugin::MorphologyASC(MorphologyInitData(source)));
     }
     else {
         LBTHROW(UnknownFileType("unhandled file type"));
@@ -47,6 +64,11 @@ Morphology::Morphology(const URI& source)
     plugin -> extractInformation();
 
     _properties = std::make_shared<Property::Properties>(plugin -> getProperties());
+}
+
+Morphology::Morphology(const builder::Morphology& morphology)
+{
+
 }
 
 Morphology::Morphology(Morphology&&) = default;

@@ -37,6 +37,7 @@ public:
     std::vector<float> diameters(){ return _pointProperties._diameters;}
 
 private:
+    friend class Morphology;
     Property::PointLevel _pointProperties;
     SectionType _somaType;
 };
@@ -85,6 +86,8 @@ public:
     void traverse(std::function<void(Morphology* morphology, Section* section)>,
                   Section* rootSection = nullptr);
 
+    Property::Properties buildReadOnly();
+
 private:
     friend class Section;
 
@@ -97,9 +100,9 @@ private:
 
 namespace writer
 {
-void h5(Morphology& morphology);
 void swc(Morphology& morphology);
 void asc(Morphology& morphology);
+void h5(Morphology& morphology);
 }
 
 }

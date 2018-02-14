@@ -138,31 +138,51 @@ void Section::traverse(Morphology* morphology,
     }
 }
 
-namespace writer
+template <typename T> void _appendVector(std::vector<T>& to, const std::vector<T>& from)
 {
-void h5(Morphology& morphology)
+    to.insert(to.end(), from.begin(), from.end());
+}
+
+void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from)
+{
+    _appendVector(to._points, from._points);
+    _appendVector(to._diameters, from._diameters);
+    _appendVector(to._perimeters, from._perimeters);
+}
+
+
+Property::Properties Morphology::buildReadOnly()
 {
     using std::setw;
     int i = 0;
 
     int start = 0;
-    int sectionIdOnDisk = 0;
+    int sectionIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
-    auto writeSection = [&start, &sectionIdOnDisk, &newIds](Morphology* morphology, Section* section) {
-        std::cout
-        << setw(6) << sectionIdOnDisk << ' '
-        << setw(6) << (section->parent() ? newIds[section->parent()->id()] : -1) << ' '
-        << setw(6) << start << ' '
-        << setw(6) << section->type() << std::endl;
-
+    Property::Properties properties;
+    auto writeSection = [&start, &properties, &sectionIdOnDisk, &newIds](Morphology* morpho, Section* section) {
+        int parentOnDisk = (section->parent() ? newIds[section->parent()->id()] : 0);
+        properties._sectionLevel._sections.push_back({start, parentOnDisk});
+        properties._sectionLevel._sectionTypes.push_back(section->type());
+        _appendProperties(properties._pointLevel, section->_pointProperties);
         newIds[section->id()] = sectionIdOnDisk++;
         start += section->points().size();
     };
 
-    morphology.traverse(writeSection);
 
+    _appendProperties(properties._pointLevel, soma()._pointProperties);
+    properties._sectionLevel._sections.push_back({0, -1});
+    properties._sectionLevel._sectionTypes.push_back(SECTION_SOMA);
 
+    start += soma().points().size();
+    traverse(writeSection);
+    return properties;
 }
+
+namespace writer
+{
+
+
 
 void swc(Morphology& morphology) {
     int sectionIdOnDisk = 1;
@@ -183,7 +203,7 @@ void swc(Morphology& morphology) {
             if(i>0)
                 std::cout << sectionIdOnDisk-1 << std::endl;
             else
-                std::cout << (section->parent() ? newIds[section->parent()->id()] : -1) << std::endl;
+                std::cout << (section->parent() ? newIds[section->parent()->id()] : 0) << std::endl;
             ++sectionIdOnDisk;
         }
         newIds[section->id()] = sectionIdOnDisk-1;
@@ -235,6 +255,38 @@ void asc(Morphology& morphology) {
         _write_asc_section(root, 2);
         std::cout << ")\n\n";
     }
+}
+
+void h5(Morphology& morphology)
+{
+    using std::setw;
+    int i = 0;
+
+    int start = 0;
+    int sectionIdOnDisk = 1;
+    std::map<uint32_t, int32_t> newIds;
+    Property::Properties properties;
+    auto writeSection = [&start, &properties, &sectionIdOnDisk, &newIds](Morphology* morpho, Section* section) {
+        int parentOnDisk = (section->parent() ? newIds[section->parent()->id()] : 0);
+        std::cout
+        << setw(6) << sectionIdOnDisk << ' '
+        << setw(6) << parentOnDisk << ' '
+        << setw(6) << start << ' '
+        << setw(6) << section->type() << std::endl;
+        newIds[section->id()] = sectionIdOnDisk++;
+        start += section->points().size();
+    };
+
+    // Hard-coding soma line. Not so swag
+    // Will we have morphology without soma ?
+    std::cout
+        << setw(6) << 0 << ' '
+        << setw(6) << -1 << ' '
+        << setw(6) << start << ' '
+        << setw(6) << SECTION_SOMA << std::endl;
+
+    start += morphology.soma().points().size();
+    morphology.traverse(writeSection);
 }
 } // end namespace writer
 } // end namespace builder
