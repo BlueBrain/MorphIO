@@ -7,6 +7,7 @@
 
 #include <minimorph/morphology.h>
 #include <minimorph/section.h>
+#include <minimorph/soma.h>
 
 #include "plugin/morphologyHDF5.h"
 #include "plugin/morphologySWC.h"
@@ -61,8 +62,19 @@ const Section Morphology::section(const uint32_t& id) const {
     return Section(id, _properties);
 }
 
-const std::vector<Section> Morphology::rootSections() const {
-    return soma().rootSections();
+const std::vector<Section> Morphology::rootSections() const
+{
+    std::vector<Section> result;
+    try {
+        const std::vector<uint32_t>& children = _properties->children().at(0);
+        result.reserve(children.size());
+        for (const uint32_t id : children)
+            result.push_back(section(id));
+        return result;
+    }
+    catch (const std::out_of_range& oor) {
+        return result;
+    }
 }
 
 const std::vector<Section> Morphology::sections() const {

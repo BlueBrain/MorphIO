@@ -5,7 +5,6 @@
 #include <minimorph/api.h>
 #include <minimorph/types.h>
 #include <minimorph/properties.h>
-#include <minimorph/soma.h>
 
 namespace minimorph
 {

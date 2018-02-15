@@ -14,7 +14,7 @@ An iterator class to iterate through sections;
 template <typename T> class Iterator {
     friend class Section;
     T container;
-    Iterator() {}
+    Iterator();
 public:
     Iterator(const Section& section);
     bool operator==(Iterator other) const;

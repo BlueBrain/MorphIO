@@ -8,7 +8,6 @@
 #include <minimorph/properties.h>
 #include <minimorph/iterators.h>
 
-
 namespace minimorph
 {
 /**
@@ -40,6 +39,8 @@ public:
     BRAIN_API bool operator==(const Section& section) const;
     BRAIN_API bool operator!=(const Section& section) const;
 
+    bool isRoot() const;
+
     /**
      * Return the parent section of this section \if pybind or None if doesn't
      * have any.\else.
@@ -47,7 +48,7 @@ public:
      * @throw runtime_error is the section doesn't have a parent.
      * \endif
      */
-    BRAIN_API std::shared_ptr<Section> parent() const;
+    BRAIN_API Section parent() const;
 
     /**
      * Return a vector with all the direct children of this section.
@@ -89,9 +90,8 @@ private:
     Section(uint32_t id, PropertiesPtr morphology);
     template <typename Property> const gsl::span<const typename Property::Type> get() const;
 
-    friend class Morphology;
-    friend class Soma;
     friend class builder::Section;
+    friend const Section Morphology::section(const uint32_t&) const;
 
     uint32_t _id;
     SectionRange _range;

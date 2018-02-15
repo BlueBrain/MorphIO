@@ -3,6 +3,7 @@
 #include <array>
 
 #include <minimorph/morphology.h>
+#include <minimorph/soma.h>
 #include <minimorph/section.h>
 #include <minimorph/sectionBuilder.h>
 
@@ -46,10 +47,6 @@ int main(){
     std::cout << center[0] << ", " << center[1] << ", " << center[2] << std::endl;
 
     std::cout << "soma.type(): " << soma.type() << std::endl;
-
-    std::cout << "Root sections: " << std::endl;
-    for(auto section: soma.rootSections())
-        std::cout << section.id() << std::endl;
 
     std::cout << "Root sections from morphology: " << std::endl;
     for(auto section: morphology.rootSections())

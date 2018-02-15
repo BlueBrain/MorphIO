@@ -26,21 +26,6 @@ Soma::Soma(PropertiesPtr properties)
                << std::endl;
 }
 
-const std::vector<Section> Soma::rootSections() const
-{
-    std::vector<Section> result;
-    try {
-        const std::vector<uint32_t>& children = _properties->children().at(0);
-        result.reserve(children.size());
-        for (const uint32_t id : children)
-            result.push_back(Section(id, _properties));
-        return result;
-    }
-    catch (const std::out_of_range& oor) {
-        return result;
-    }
-}
-
 const SectionType Soma::type() const {
     return get<Property::SectionType>()[0];
 }

@@ -71,10 +71,17 @@ template <typename TProperty> const gsl::span<const typename TProperty::Type> Se
     return gsl::span<const typename TProperty::Type>(ptr_start, _range.second);
 }
 
-std::shared_ptr<Section> Section::parent() const
+bool Section::isRoot() const {
+    return _properties->get<Property::Section>()[_id][1] == -1;
+}
+
+Section Section::parent() const
 {
+    if(isRoot())
+        LBTHROW("Cannot call Section::parent() on a root node (section id=" + std::to_string(_id) + ").");
+
     const int32_t parent = _properties->get<Property::Section>()[_id][1];
-    return (parent > -1) ? std::make_shared<Section>(Section(parent, _properties)) : nullptr;
+    return Section(parent, _properties);
 }
 
 const std::vector<Section> Section::children() const

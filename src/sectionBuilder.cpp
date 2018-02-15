@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 
+#include <minimorph/soma.h>
 #include <minimorph/sectionBuilder.h>
 
 namespace minimorph
