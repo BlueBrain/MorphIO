@@ -34,6 +34,4 @@ target_include_directories(morphio
     PUBLIC
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../include
-    ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/lexertl14
-    ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/GSL/include
     )
