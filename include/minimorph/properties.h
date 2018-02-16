@@ -43,6 +43,7 @@ struct SectionLevel {
 };
 
 struct CellLevel {
+    minimorph::SomaType _somaType;
     minimorph::CellFamily _cellFamily;
     MorphologyVersion _version;
 };
@@ -59,6 +60,7 @@ struct Properties {
 
     const minimorph::MorphologyVersion& version() { return _cellLevel._version; }
     const minimorph::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
+    const minimorph::SomaType& somaType() { return _cellLevel._somaType; }
     const std::map<uint32_t, std::vector<uint32_t>>& children() { return _sectionLevel._children; }
 };
 

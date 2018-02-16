@@ -1,6 +1,6 @@
-# pybind11_add_module(python_morphio morphio.cpp)
+pybind11_add_module(python_minimorph minimorph.cpp)
 
-# target_link_libraries(python_morphio
-#     PRIVATE
-#     morphio
-#     )
+target_link_libraries(python_minimorph
+    PRIVATE
+    morphio
+    )

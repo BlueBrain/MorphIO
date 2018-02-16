@@ -90,14 +90,14 @@ public:
     }
 
 private:
-    bool parse_neurite_branch(int32_t parent_id, SectionType section_type)
+    bool parse_neurite_branch(int32_t parent_id, Token token)
     {
         lex_.consume(Token::LPAREN, "New branch should start with LPAREN");
 
         bool ret = true;
         while (true)
         {
-            ret &= parse_neurite_section(parent_id, section_type);
+            ret &= parse_neurite_section(parent_id, token);
             if (lex_.ended() || (lex_.current()->id != +Token::PIPE
                                  && lex_.current()->id != +Token::LPAREN))
             {
@@ -109,7 +109,36 @@ private:
         return ret;
     }
 
-    bool parse_neurite_section(int32_t parent_id, SectionType section_type)
+    int32_t _create_soma_or_section(Token token, int32_t parent_id,
+                                    std::vector<Point> &points, std::vector<float> &diameters)
+    {
+        int32_t return_id;
+        minimorph::Property::PointLevel properties;
+        properties._points = points;
+        properties._diameters = diameters;
+        if(token == Token::CELLBODY){
+            const auto& somaType = nb_.soma().type();
+            if(somaType != SOMA_UNDEFINED)
+                throw SectionBuilderError("A soma is already defined (its soma "
+                                          "type is: "+std::to_string(somaType) + ")");
+            nb_.soma() = builder::Soma(properties, SOMA_THREE_POINTS);
+            return_id = -1;
+        } else {
+            SectionType section_type = TokenSectionTypeMap.at(token);
+            if(parent_id == -1)
+                return_id = nb_.createNeurite(section_type,
+                                               properties);
+            else
+                return_id = nb_.appendSection(nb_.sections()[parent_id],
+                                               section_type,
+                                               properties);
+        }
+        points.clear();
+        diameters.clear();
+        return return_id;
+    }
+
+    bool parse_neurite_section(int32_t parent_id, Token token)
     {
         Points points;
         std::vector<float> diameters;
@@ -128,27 +157,7 @@ private:
             else if (is_end_of_section(id))
             {
                 if (!points.empty())
-                {
-                    minimorph::Property::PointLevel properties;
-                    properties._points = points;
-                    properties._diameters = diameters;
-                    std::cout << "section_type: " << section_type << std::endl;
-                    if(section_type == SECTION_SOMA){
-                        assert(nb_.soma().type() == SECTION_UNDEFINED &&
-                               "found two soma sections");
-                        nb_.soma() = builder::Soma(properties, SECTION_SOMA);
-                    } else {
-                        if(parent_id == -1)
-                            section_id = nb_.createNeurite(section_type,
-                                                           properties);
-                        else
-                            section_id = nb_.appendSection(nb_.sections()[parent_id],
-                                                           section_type,
-                                                           properties);
-                    }
-                    points.clear();
-                    diameters.clear();
-                }
+                    _create_soma_or_section(token, parent_id, points, diameters);
                 return true;
             }
             else if (is_end_of_branch(id))
@@ -183,26 +192,9 @@ private:
                 {
                     if (!points.empty())
                     {
-                        minimorph::Property::PointLevel properties;
-                        properties._points = points;
-                        properties._diameters = diameters;
-                        if(section_type == SECTION_SOMA){
-                            assert(nb_.soma().type() == SECTION_UNDEFINED &&
-                                   "found two soma sections");
-                            nb_.soma() = builder::Soma(properties, SECTION_SOMA);
-                        } else {
-                            if(parent_id == -1)
-                                section_id = nb_.createNeurite(section_type,
-                                                               properties);
-                            else
-                                section_id = nb_.appendSection(nb_.sections()[parent_id],
-                                                               section_type,
-                                                               properties);
-                        }
-                        points.clear();
-                        diameters.clear();
+                        section_id = _create_soma_or_section(token, parent_id, points, diameters);
                     }
-                    parse_neurite_branch(section_id, section_type);
+                    parse_neurite_branch(section_id, token);
                 }
                 else
                 {
@@ -231,11 +223,10 @@ private:
                 lex_.consume(); // Advance to NeuriteType
                 std::cout << "Neurite: " << lex_.current()->str() << "\n";
                 const Token current_id = static_cast<Token>(lex_.current()->id);
-                SectionType section_type = TokenSectionTypeMap.at(current_id);
 
                 lex_.consume();
                 lex_.consume(Token::RPAREN, "New Neurite should end in RPAREN");
-                parse_neurite_section(-1, section_type);
+                parse_neurite_section(-1, current_id);
             }
 
             if (!lex_.ended())

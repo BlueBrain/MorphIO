@@ -173,7 +173,9 @@ Property::Properties Morphology::buildReadOnly()
 
     _appendProperties(properties._pointLevel, soma()._pointProperties);
     properties._sectionLevel._sections.push_back({0, -1});
-    properties._sectionLevel._sectionTypes.push_back(SECTION_SOMA);
+
+    properties._sectionLevel._sectionTypes.push_back(SECTION_UNDEFINED);
+    properties._cellLevel._somaType = soma().type();
 
     start += soma().points().size();
     traverse(writeSection);
@@ -197,9 +199,7 @@ void swc(Morphology& morphology) {
             std::cout
             << sectionIdOnDisk << ' '
             << section->type() << ' '
-            << points[i][0] << ' '
-            << points[i][1] << ' '
-            << points[i][2] << ' '
+            << points[i][0] << ' ' << points[i][1] << ' ' << points[i][2] << ' '
             << diameters[i] / 2. << ' ';
             if(i>0)
                 std::cout << sectionIdOnDisk-1 << std::endl;
@@ -238,16 +238,15 @@ void _write_asc_section(Section *section, int indentLevel){
         }
         std::cout << indent << ")" << std::endl;
     }
-
 }
+
 void asc(Morphology& morphology) {
     std::map<minimorph::SectionType, std::string> header;
-    header[SECTION_SOMA] = "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
     header[SECTION_DENDRITE] = "( (Color Red)\n  (Dendrite)\n";
 
     auto &soma = morphology.soma();
-    std::cout << header[soma.type()];
+    std::cout << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
     _write_asc_points(soma.points(), soma.diameters(), 2);
     std::cout << ")\n\n";
 
@@ -289,6 +288,7 @@ void h5(Morphology& morphology)
     start += morphology.soma().points().size();
     morphology.traverse(writeSection);
 }
+
 } // end namespace writer
 } // end namespace builder
 } // end namespace minimorph

@@ -27,19 +27,19 @@ namespace builder
 class Soma
 {
 public:
-    Soma() : _somaType(SECTION_UNDEFINED) {}
-    Soma(Property::PointLevel pointProperties, SectionType somaType) :
+    Soma() : _somaType(SOMA_UNDEFINED) {}
+    Soma(Property::PointLevel pointProperties, SomaType somaType) :
         _somaType(somaType), _pointProperties(pointProperties) {}
 
     Soma(const minimorph::Soma &soma);
-    SectionType& type(){ return _somaType; }
+    SomaType& type(){ return _somaType; }
     std::vector<Point>& points(){ return _pointProperties._points;}
     std::vector<float> diameters(){ return _pointProperties._diameters;}
 
 private:
     friend class Morphology;
     Property::PointLevel _pointProperties;
-    SectionType _somaType;
+    SomaType _somaType;
 };
 
 class Section

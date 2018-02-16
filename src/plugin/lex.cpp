@@ -52,8 +52,7 @@ enum class Token
 const std::map <Token, SectionType> TokenSectionTypeMap {
     { Token::AXON, SECTION_AXON },
     { Token::APICAL, SECTION_APICAL_DENDRITE },
-    { Token::DENDRITE, SECTION_DENDRITE },
-    { Token::CELLBODY, SECTION_SOMA }
+    { Token::DENDRITE, SECTION_DENDRITE }
 };
 
 constexpr bool operator==(int lhs, Token type)

@@ -2,20 +2,27 @@
 
 namespace minimorph
 {
-
-class RawDataError: public std::runtime_error {
+/**
+   Base class of all minimorph errors
+ **/
+class MinimorphError: public std::runtime_error {
 public:
-RawDataError(const std::string& _msg) : std::runtime_error(_msg) {}
+    MinimorphError(const std::string& _msg) : std::runtime_error(_msg) {}
 };
 
-class UnknownFileType : public std::runtime_error {
+class RawDataError: public MinimorphError {
 public:
-UnknownFileType(const std::string& _msg) : std::runtime_error(_msg) {}
+    RawDataError(const std::string& _msg) : MinimorphError(_msg) {}
 };
 
-class SomaError: public std::runtime_error {
+class UnknownFileType : public MinimorphError {
 public:
-SomaError(const std::string& _msg) : std::runtime_error(_msg) {}
+UnknownFileType(const std::string& _msg) : MinimorphError(_msg) {}
+};
+
+class SomaError: public MinimorphError {
+public:
+SomaError(const std::string& _msg) : MinimorphError(_msg) {}
 };
 
 class IDSequenceError: public RawDataError {
