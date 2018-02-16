@@ -37,7 +37,7 @@ public:
     {
         return get<Property::Point>();
     }
-    BRAIN_API const gsl::span<const float> diameter() const
+    BRAIN_API const gsl::span<const float> diameters() const
     {
         return get<Property::Diameter>();
     }
