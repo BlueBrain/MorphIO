@@ -1,6 +1,6 @@
-#include <minimorph/properties.h>
+#include <morphio/properties.h>
 
-namespace minimorph
+namespace morphio
 {
 namespace Property
 {

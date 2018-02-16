@@ -4,7 +4,7 @@
 #include <iostream>
 #include <vector>
 
-namespace minimorph
+namespace morphio
 {
 typedef std::array<int, 2> Vector2i;
 typedef std::array<double, 3> Vector3d;

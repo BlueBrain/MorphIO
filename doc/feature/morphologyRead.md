@@ -1,11 +1,11 @@
-Modification of the minimorph::Morphology read API {#morphologyRead}
+Modification of the morphio::Morphology read API {#morphologyRead}
 ============
 
 ## Motivation
 
 The current read API is incorrect. It does return a shared_ptr to mutable data,
 but is marked const. For example, the morphio::Morphology takes a const
-minimorph::Morphology&, but the given object is modified in case of SWC with global
+morphio::Morphology&, but the given object is modified in case of SWC with global
 transformation.
 
 ## API variants:
@@ -35,7 +35,7 @@ Option 4 adds the future complexity (with shared state between readFoo/readBar)
 on top of Option 2.
 
 Option 5 parses always the data in the ctor using a future and thread pool
-synchronized in all getFoo() calls. This forces that the minimorph::Morphology has
+synchronized in all getFoo() calls. This forces that the morphio::Morphology has
 state and data, and we should remove the write API at the same time. It has the
 disadvantage of loading all data deferred from the ctor, which requires out of
 core loading (or batching) for large amounts of morphologies. Client code using

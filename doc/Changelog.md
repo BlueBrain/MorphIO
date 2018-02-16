@@ -26,7 +26,7 @@ Changelog {#Changelog}
   Removed the dependency on HDF5++ and use HighFive instead.
 * [172](https://github.com/BlueBrain/Brion/pull/172):
   - zeroeq::Server/Client based morphology loader.
-  - New minimorph::Morphology read API and removed write API (see doc/feature/morphologyRead.md)
+  - New morphio::Morphology read API and removed write API (see doc/feature/morphologyRead.md)
   - Removed apical point API
   - morphologyConverter can only write H5 V1.1 morphologies
 * [171](https://github.com/BlueBrain/Brion/pull/171):
@@ -44,7 +44,7 @@ Changelog {#Changelog}
 * [154](https://github.com/BlueBrain/Brion/pull/154):
   - Improved help and command line inverface for spikeConverter and
     compartmentConverter.
-  - Timestamps in minimorph::CompartmentReport changed from float to double.
+  - Timestamps in morphio::CompartmentReport changed from float to double.
   - New implementation of binary compartment report reader using POSIX AIO.
 * [153](https://github.com/BlueBrain/Brion/pull/153):
   Updated Python wrapping of SpikeReportWriter to handle nympy arrays of spikes
@@ -56,7 +56,7 @@ Changelog {#Changelog}
 * [150](https://github.com/BlueBrain/Brion/pull/150):
   - Added a new method in brain::Circuit to obtain synapses for afferent
     projections from outside the circuit (e.g. thalamocortical projections).
-  - Support for Projections sections in minimorph::BlueConfig
+  - Support for Projections sections in morphio::BlueConfig
 * [141](https://github.com/BlueBrain/Brion/pull/141):
   Fixed documentation to specify that morphology section samples report
   diameters and not radii.
@@ -130,17 +130,17 @@ Changelog {#Changelog}
   Remove deprecated enums and functions:
   - `CompartmentReport( const std::string&, const GIDSet& )` and
     `CompartmentReport( const std::string&,
-    const minimorph::CompartmentReportFormat, const bool )` constructors; use
-    minimorph::CompartmentReport::CompartmentReport( const minimorph::URI&, int, const minimorph::GIDSet& )
+    const morphio::CompartmentReportFormat, const bool )` constructors; use
+    morphio::CompartmentReport::CompartmentReport( const morphio::URI&, int, const morphio::GIDSet& )
     instead
-  - `enum CompartmentReportFormat`; use minimorph::BlueConfig::getReportSource()
+  - `enum CompartmentReportFormat`; use morphio::BlueConfig::getReportSource()
     instead
 * [71](https://github.com/BlueBrain/Brion/pull/71):
   Transparent caching of Synapse loading. See
   [Lunchbox#263](https://github.com/Eyescale/Lunchbox/pull/263) for
   configuration.
 * [69](https://github.com/BlueBrain/Brion/pull/69):
-  Speedup brain::Circuit::getGIDs(), add minimorph::BlueConfig::getTargetSources()
+  Speedup brain::Circuit::getGIDs(), add morphio::BlueConfig::getTargetSources()
 * [63](https://github.com/BlueBrain/Brion/pull/63):
   Moved old BBPSDK/Monsteer spike report to Brain (pending refactoring)
 
@@ -179,7 +179,7 @@ Changelog {#Changelog}
 * [31](https://github.com/BlueBrain/Brion/pull/31):
   Fix crash while reading more than `ulimit -Sn` (1024 default) NEST gdf files
 * [29](https://github.com/BlueBrain/Brion/pull/29):
-  New member functions in minimorph::BlueConfig to provide a semantic API.
+  New member functions in morphio::BlueConfig to provide a semantic API.
 * [28](https://github.com/BlueBrain/Brion/pull/28):
   SpikeReport continues parsing files that have broken lines
 
@@ -192,9 +192,9 @@ Changelog {#Changelog}
 * [22](https://github.com/BlueBrain/Brion/pull/22):
   SpikeReport DSO plugins in the LD_LIBRARY_PATH are loaded automatically.
 * [12](https://github.com/BlueBrain/Brion/pull/12):
-  Extended minimorph::Synapse to also support non-merged synapse files
+  Extended morphio::Synapse to also support non-merged synapse files
 * [12](https://github.com/BlueBrain/Brion/pull/12):
-  Add minimorph::Target::parse() to resolve a given target name
+  Add morphio::Target::parse() to resolve a given target name
 * [9](https://github.com/BlueBrain/Brion/issues/9):
   Extend SWC parser to support fork and end points and undefined section points.
   The Brion::SectionType enum has not been extended to include end and fork
@@ -206,9 +206,9 @@ Changelog {#Changelog}
 * Add RESTING_VOLTAGE constant.
 * Add support for binary spike reports.
 * Add support for spike writer plugin.
-* Add async IO support in minimorph::CompartmentReportMap.
-* minimorph::CompartmentReportBinary::updateMapping() more robust.
-* minimorph::SpikeReport API extended to support stream-based reports. A reference
+* Add async IO support in morphio::CompartmentReportMap.
+* morphio::CompartmentReportBinary::updateMapping() more robust.
+* morphio::SpikeReport API extended to support stream-based reports. A reference
   implementation of a stream-based spike report plugin is also provided.
 * Ensure thread-safety with non-threadsafe HDF5 library.
 * Morphology class implementation changed to support the Lunchbox plugin
@@ -230,7 +230,7 @@ Changelog {#Changelog}
 * New spike report reader plugin for NEST spike reports. The plugin can
   parse multiple report file using shell wildcards (*, ?) in the
   filepath provided.
-* New constructor for minimorph::CompartmentReport accepting an URI and the desired
+* New constructor for morphio::CompartmentReport accepting an URI and the desired
   access mode deprecates the old read and write constructors.
 * New compartment report based on key-value stores supported by
   Lunchbox::PersistentMap.

@@ -29,19 +29,19 @@ This is the core library provided by Brion. It includes classes for reading
 and writing files which store the Blue Brain data model.
 
 * Fast and low-overhead read access to:
-  * Blue configs (minimorph::BlueConfig)
-  * Circuit description (minimorph::Circuit)
-  * H5 Synapses data (minimorph::SynapseSummary, minimorph::Synapse)
-  * Target (minimorph::Target)
-  * BBP binary meshes (minimorph::Mesh)
-  * BBP H5 morphologies and SWC morphologies (minimorph::Morphology)
-  * Compartment reports (minimorph::CompartmentReport)
-  * Spike reports (minimorph::SpikeReport)
+  * Blue configs (morphio::BlueConfig)
+  * Circuit description (morphio::Circuit)
+  * H5 Synapses data (morphio::SynapseSummary, morphio::Synapse)
+  * Target (morphio::Target)
+  * BBP binary meshes (morphio::Mesh)
+  * BBP H5 morphologies and SWC morphologies (morphio::Morphology)
+  * Compartment reports (morphio::CompartmentReport)
+  * Spike reports (morphio::SpikeReport)
 * Fast and low-overhead write access to:
-  * Compartment reports (minimorph::CompartmentReport)
-  * BBP binary meshes (minimorph::Mesh)
-  * BBP H5 morphologies (minimorph::Morphology)
-  * Spike reports (minimorph::SpikeReport)
+  * Compartment reports (morphio::CompartmentReport)
+  * BBP binary meshes (morphio::Mesh)
+  * BBP H5 morphologies (morphio::Morphology)
+  * Spike reports (morphio::SpikeReport)
 * Basic [data types](@ref types.h) to work with the loaded data using
   [Boost](http://www.boost.org/doc/libs),
   [Lunchbox](http://eyescale.github.io/Lunchbox-1.14/index.html),

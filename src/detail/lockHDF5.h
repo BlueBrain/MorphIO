@@ -4,7 +4,7 @@
 
 #include <mutex>
 
-namespace minimorph
+namespace morphio
 {
 namespace detail
 {

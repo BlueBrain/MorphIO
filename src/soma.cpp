@@ -1,7 +1,7 @@
-#include <minimorph/section.h>
-#include <minimorph/soma.h>
+#include <morphio/section.h>
+#include <morphio/soma.h>
 
-namespace minimorph
+namespace morphio
 {
 Soma::Soma(PropertiesPtr properties)
     : _properties(properties)

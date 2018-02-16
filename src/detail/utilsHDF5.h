@@ -23,35 +23,35 @@
 #include <highfive/H5Attribute.hpp>
 #include <highfive/H5DataType.hpp>
 
-#include <minimorph/types.h>
+#include <morphio/types.h>
 namespace HighFive
 {
 template <>
-inline AtomicType<minimorph::SectionType>::AtomicType()
+inline AtomicType<morphio::SectionType>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
 
 template <>
-inline AtomicType<minimorph::MorphologyVersion>::AtomicType()
+inline AtomicType<morphio::MorphologyVersion>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
 
 template <>
-inline AtomicType<minimorph::Vector2i>::AtomicType()
+inline AtomicType<morphio::Vector2i>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
 
 template <>
-inline AtomicType<minimorph::Point>::AtomicType()
+inline AtomicType<morphio::Point>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
 }
 
-namespace minimorph
+namespace morphio
 {
 namespace detail
 {

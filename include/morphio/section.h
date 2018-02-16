@@ -2,13 +2,13 @@
 
 #include <gsl/span>
 
-#include <minimorph/api.h>
-#include <minimorph/iterators.h>
-#include <minimorph/morphology.h>
-#include <minimorph/properties.h>
-#include <minimorph/types.h>
+#include <morphio/api.h>
+#include <morphio/iterators.h>
+#include <morphio/morphology.h>
+#include <morphio/properties.h>
+#include <morphio/types.h>
 
-namespace minimorph
+namespace morphio
 {
 /**
  * A class to represent a morphological section.
@@ -22,7 +22,7 @@ namespace minimorph
  * special meaning for it.
  *
  * Sections cannot be directly created, but are returned by several
- * minimorph::Morphology and minimorph::Section methods.
+ * morphio::Morphology and morphio::Section methods.
  *
  * This is a lightweight object with STL container style thread safety.
  * It is also safe to use a section after the morphology from where it comes

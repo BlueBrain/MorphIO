@@ -18,7 +18,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include <minimorph.h>
+#include <morphio.h>
 #include <tests/paths.h>
 
 #ifdef BRAIN_USE_ZEROEQ
@@ -35,18 +35,18 @@
 #include <cstdarg>
 
 // typedef for brevity
-typedef minimorph::Vector4f V4f;
-typedef minimorph::Vector2i V2i;
+typedef morphio::Vector4f V4f;
+typedef morphio::Vector2i V2i;
 
 namespace
 {
 // Ellipsis promotes enums to ints, so we need to use int.
 #pragma clang diagnostic ignored "-Wnon-pod-varargs"
-const int UNDEFINED = minimorph::SECTION_UNDEFINED;
-const int SOMA = minimorph::SECTION_SOMA;
-const int AXON = minimorph::SECTION_AXON;
-const int DENDRITE = minimorph::SECTION_DENDRITE;
-const int APICAL_DENDRITE = minimorph::SECTION_APICAL_DENDRITE;
+const int UNDEFINED = morphio::SECTION_UNDEFINED;
+const int SOMA = morphio::SECTION_SOMA;
+const int AXON = morphio::SECTION_AXON;
+const int DENDRITE = morphio::SECTION_DENDRITE;
+const int APICAL_DENDRITE = morphio::SECTION_APICAL_DENDRITE;
 }
 
 template <typename T>
@@ -60,15 +60,15 @@ void checkCloseArrays(const std::vector<T>& array1,
 
 BOOST_AUTO_TEST_CASE(invalid_open)
 {
-    BOOST_CHECK_THROW(minimorph::Morphology(minimorph::URI("/bla")).getPoints(),
+    BOOST_CHECK_THROW(morphio::Morphology(morphio::URI("/bla")).getPoints(),
                       std::runtime_error);
-    BOOST_CHECK_THROW(minimorph::Morphology(minimorph::URI("bla")).getPoints(),
+    BOOST_CHECK_THROW(morphio::Morphology(morphio::URI("bla")).getPoints(),
                       std::runtime_error);
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/README";
     BOOST_CHECK_THROW(
-        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        morphio::Morphology{morphio::URI(path.string())}.getPoints(),
         std::runtime_error);
 }
 
@@ -77,7 +77,7 @@ BOOST_AUTO_TEST_CASE(h5_invalid_open)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/simulations/may17_2011/Control/voltage.h5";
     BOOST_CHECK_THROW(
-        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        morphio::Morphology{morphio::URI(path.string())}.getPoints(),
         std::runtime_error);
 }
 
@@ -86,8 +86,8 @@ BOOST_AUTO_TEST_CASE(h5_read_v1)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
 
-    const minimorph::Morphology morphology{minimorph::URI(path.string())};
-    BOOST_CHECK_EQUAL(morphology.getCellFamily(), minimorph::FAMILY_NEURON);
+    const morphio::Morphology morphology{morphio::URI(path.string())};
+    BOOST_CHECK_EQUAL(morphology.getCellFamily(), morphio::FAMILY_NEURON);
 
     const auto points = morphology.getPoints();
     BOOST_CHECK_EQUAL(points.size(), 3272);
@@ -113,9 +113,9 @@ BOOST_AUTO_TEST_CASE(h5_read_v1)
 
 namespace
 {
-void _checkH5V2(const minimorph::Morphology& morphology)
+void _checkH5V2(const morphio::Morphology& morphology)
 {
-    BOOST_CHECK_EQUAL(morphology.getCellFamily(), minimorph::FAMILY_NEURON);
+    BOOST_CHECK_EQUAL(morphology.getCellFamily(), morphio::FAMILY_NEURON);
 
     auto& points = morphology.getPoints();
     BOOST_CHECK_EQUAL(points.size(), 1499);
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE(h5_read_v2)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/morphologies/14.07.10_repaired/v2/C010398B-P2.h5";
 
-    const minimorph::Morphology morphology{minimorph::URI(path.string())};
+    const morphio::Morphology morphology{morphio::URI(path.string())};
     _checkH5V2(morphology);
 }
 
@@ -154,12 +154,12 @@ BOOST_AUTO_TEST_CASE(copy_morphology)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/morphologies/14.07.10_repaired/v2/C010398B-P2.h5";
 
-    const minimorph::Morphology morphology{minimorph::URI(path.string())};
-    const minimorph::Morphology copy(morphology);
+    const morphio::Morphology morphology{morphio::URI(path.string())};
+    const morphio::Morphology copy(morphology);
 
     boost::filesystem::path v1(BBP_TESTDATA);
     v1 /= "local/morphologies/01.07.08/h5/R-C010306G.h5";
-    minimorph::Morphology assign{minimorph::URI(v1.string())};
+    morphio::Morphology assign{morphio::URI(v1.string())};
     assign = copy;
 
     _checkH5V2(morphology);
@@ -172,8 +172,8 @@ BOOST_AUTO_TEST_CASE(move_morphology)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/morphologies/14.07.10_repaired/v2/C010398B-P2.h5";
 
-    minimorph::Morphology morphology{minimorph::URI(path.string())};
-    const minimorph::Morphology move(std::move(morphology));
+    morphio::Morphology morphology{morphio::URI(path.string())};
+    const morphio::Morphology move(std::move(morphology));
     _checkH5V2(move);
 
     morphology = std::move(move);
@@ -184,14 +184,14 @@ BOOST_AUTO_TEST_CASE(move_morphology)
 BOOST_AUTO_TEST_CASE(zeroeq_read)
 {
     zeroeq::Server server(zeroeq::NULL_SESSION);
-    server.handle(minimorph::ZEROEQ_GET_MORPHOLOGY, [](const void* data,
+    server.handle(morphio::ZEROEQ_GET_MORPHOLOGY, [](const void* data,
                                                        const size_t size) {
         if (!data || !size)
             return zeroeq::ReplyData();
 
         const std::string path((const char*)data, size);
-        const minimorph::Morphology morphology{minimorph::URI(path)};
-        return zeroeq::ReplyData(minimorph::ZEROEQ_GET_MORPHOLOGY,
+        const morphio::Morphology morphology{morphio::URI(path)};
+        return zeroeq::ReplyData(morphio::ZEROEQ_GET_MORPHOLOGY,
                                  morphology.toBinary().clone());
     });
     std::thread thread([&] { server.receive(); });
@@ -199,11 +199,11 @@ BOOST_AUTO_TEST_CASE(zeroeq_read)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/morphologies/14.07.10_repaired/v2/C010398B-P2.h5";
 
-    const minimorph::URI uri{
+    const morphio::URI uri{
         std::string("zeroeq://") + server.getURI().getHost() + ":" +
         std::to_string(int(server.getURI().getPort())) + path.string()};
 
-    minimorph::Morphology morphology(uri);
+    morphio::Morphology morphology(uri);
     thread.join();
 
     _checkH5V2(morphology);
@@ -213,13 +213,13 @@ BOOST_AUTO_TEST_CASE(zeroeq_read)
 BOOST_AUTO_TEST_CASE(swc_invalid_open)
 {
     BOOST_CHECK_THROW(
-        minimorph::Morphology(minimorph::URI("not_found.swc")).getPoints(),
+        morphio::Morphology(morphio::URI("not_found.swc")).getPoints(),
         std::runtime_error);
     try
     {
         boost::filesystem::path path(BRAIN_TESTDATA);
         path /= "swc/bad_syntax.swc";
-        minimorph::Morphology(minimorph::URI(path.string())).getPoints();
+        morphio::Morphology(morphio::URI(path.string())).getPoints();
         BOOST_CHECK(false);
     }
     catch (std::runtime_error& error)
@@ -239,9 +239,9 @@ std::ostream& operator<<(std::ostream& out, std::vector<T>& list)
 }
 
 std::ostream& operator<<(std::ostream& out,
-                         std::vector<minimorph::SectionType>& list)
+                         std::vector<morphio::SectionType>& list)
 {
-    for (minimorph::SectionType i : list)
+    for (morphio::SectionType i : list)
         out << (int)i << ' ';
     out << std::endl;
     return out;
@@ -254,7 +254,7 @@ struct VaArgsType
 };
 
 template <>
-struct VaArgsType<minimorph::SectionType>
+struct VaArgsType<morphio::SectionType>
 {
     typedef int type;
 };
@@ -322,7 +322,7 @@ BOOST_AUTO_TEST_CASE(swc_soma)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/soma.swc";
 
-    const minimorph::Morphology source{minimorph::URI(path.string())};
+    const morphio::Morphology source{morphio::URI(path.string())};
     checkEqualArrays(source.getPoints(), 1, V4f(0, 0, 0, 20));
     checkEqualArrays(source.getSections(), 1, V2i(0, -1));
     checkEqualArrays(source.getSectionTypes(), 1, SOMA);
@@ -333,7 +333,7 @@ BOOST_AUTO_TEST_CASE(swc_soma_ring)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/soma_ring.swc";
 
-    const minimorph::Morphology source{minimorph::URI(path.string())};
+    const morphio::Morphology source{morphio::URI(path.string())};
     checkEqualArrays(source.getPoints(), 5, V4f(0, 0, 0, 20), V4f(0, 0, 1, 20),
                      V4f(0, 1, 0, 20), V4f(0, 1, 1, 20), V4f(1, 0, 0, 20));
     checkEqualArrays(source.getSections(), 1, V2i(0, -1));
@@ -346,7 +346,7 @@ BOOST_AUTO_TEST_CASE(swc_no_soma)
     path /= "swc/no_soma.swc";
 
     BOOST_CHECK_THROW(
-        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        morphio::Morphology{morphio::URI(path.string())}.getPoints(),
         std::runtime_error);
 }
 
@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_CASE(swc_two_somas)
     path /= "swc/two_somas.swc";
 
     BOOST_CHECK_THROW(
-        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        morphio::Morphology{morphio::URI(path.string())}.getPoints(),
         std::runtime_error);
 }
 
@@ -365,7 +365,7 @@ BOOST_AUTO_TEST_CASE(swc_single_section)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/single_section.swc";
 
-    const minimorph::Morphology source{minimorph::URI(path.string())};
+    const morphio::Morphology source{morphio::URI(path.string())};
 
     checkEqualArrays(source.getPoints(), 5, V4f(0, 0, 0, 20), V4f(0, 0, 1, 4),
                      V4f(0, 0, 2, 4), V4f(0, 0, 3, 4), V4f(0, 0, 4, 4));
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE(swc_single_section_unordered)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/single_section_unordered.swc";
 
-    const minimorph::Morphology source{minimorph::URI(path.string())};
+    const morphio::Morphology source{morphio::URI(path.string())};
 
     checkEqualArrays(source.getPoints(), 5, V4f(0, 0, 0, 20), V4f(0, 0, 1, 4),
                      V4f(0, 0, 2, 4), V4f(0, 0, 3, 4), V4f(0, 0, 4, 4));
@@ -392,7 +392,7 @@ BOOST_AUTO_TEST_CASE(swc_single_section_missing_segment)
     path /= "swc/single_section_missing_segment.swc";
 
     BOOST_CHECK_THROW(
-        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        morphio::Morphology{morphio::URI(path.string())}.getPoints(),
         std::runtime_error);
 }
 
@@ -401,7 +401,7 @@ BOOST_AUTO_TEST_CASE(swc_section_type_changes)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/section_type_changes.swc";
 
-    const minimorph::Morphology source{minimorph::URI(path.string())};
+    const morphio::Morphology source{morphio::URI(path.string())};
 
     checkEqualArrays(source.getPoints(), 7, V4f(0, 0, 0, 20), V4f(0, 0, 1, 4),
                      V4f(0, 0, 2, 4), V4f(0, 0, 2, 4), V4f(0, 0, 3, 4),
@@ -417,7 +417,7 @@ BOOST_AUTO_TEST_CASE(swc_first_order_sections)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/first_order_sections.swc";
 
-    const minimorph::Morphology source{minimorph::URI(path.string())};
+    const morphio::Morphology source{morphio::URI(path.string())};
 
     checkEqualArrays(source.getSections(), 4, V2i(0, -1), V2i(1, 0), V2i(2, 0),
                      V2i(3, 0));
@@ -434,7 +434,7 @@ BOOST_AUTO_TEST_CASE(swc_first_order_sections_from_arbitrary_points)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/first_order_sections_ring.swc";
 
-    const minimorph::Morphology source{minimorph::URI(path.string())};
+    const morphio::Morphology source{morphio::URI(path.string())};
 
     checkEqualArrays(source.getSections(), 4, V2i(0, -1), V2i(5, 0), V2i(8, 0),
                      V2i(11, 0));
@@ -454,7 +454,7 @@ BOOST_AUTO_TEST_CASE(swc_bifurcation)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/bifurcations.swc";
 
-    const minimorph::Morphology source{minimorph::URI(path.string())};
+    const morphio::Morphology source{morphio::URI(path.string())};
 
     checkEqualArrays(source.getPoints(), 9, V4f(0, 0, 0, 20), V4f(0, 0, 2, 4),
                      V4f(0, 0, 3, 4), V4f(0, 0, 3, 4), V4f(0, 0, 4, 4),
@@ -471,7 +471,7 @@ BOOST_AUTO_TEST_CASE(swc_end_points)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/end_points.swc";
 
-    const minimorph::Morphology source{minimorph::URI(path.string())};
+    const morphio::Morphology source{morphio::URI(path.string())};
 
     checkEqualArrays(source.getSections(), 6, V2i(0, -1), V2i(1, 0), V2i(2, 0),
                      V2i(3, 0), V2i(4, 3), V2i(6, 3));
@@ -485,7 +485,7 @@ BOOST_AUTO_TEST_CASE(swc_fork_points)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/fork_points.swc";
 
-    const minimorph::Morphology source{minimorph::URI(path.string())};
+    const morphio::Morphology source{morphio::URI(path.string())};
 
     checkEqualArrays(source.getSections(), 6, V2i(0, -1), V2i(1, 0), V2i(2, 0),
                      V2i(3, 0), V2i(4, 3), V2i(6, 3));
@@ -499,8 +499,8 @@ BOOST_AUTO_TEST_CASE(swc_neuron)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/Neuron.swc";
 
-    const minimorph::Morphology neuron{minimorph::URI(path.string())};
+    const morphio::Morphology neuron{morphio::URI(path.string())};
     BOOST_CHECK_EQUAL(neuron.getPoints().size(), 933);
-    BOOST_CHECK_EQUAL(neuron.getCellFamily(), minimorph::FAMILY_NEURON);
+    BOOST_CHECK_EQUAL(neuron.getCellFamily(), morphio::FAMILY_NEURON);
     BOOST_CHECK(neuron.getPerimeters().empty());
 }

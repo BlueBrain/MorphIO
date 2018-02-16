@@ -1,7 +1,7 @@
-#include <minimorph/morphology.h>
-#include <minimorph/section.h>
+#include <morphio/morphology.h>
+#include <morphio/section.h>
 
-namespace minimorph
+namespace morphio
 {
 Section::Section(const uint32_t id, PropertiesPtr properties)
     : _id(id)

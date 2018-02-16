@@ -10,14 +10,14 @@
 
 #include <gsl/span>
 
-#include <minimorph/api.h>
-#include <minimorph/exceptions.h>
-#include <minimorph/iterators.h>
-#include <minimorph/properties.h>
-#include <minimorph/section.h>
-#include <minimorph/types.h>
+#include <morphio/api.h>
+#include <morphio/exceptions.h>
+#include <morphio/iterators.h>
+#include <morphio/properties.h>
+#include <morphio/section.h>
+#include <morphio/types.h>
 
-namespace minimorph
+namespace morphio
 {
 namespace builder
 {
@@ -34,7 +34,7 @@ public:
     {
     }
 
-    Soma(const minimorph::Soma& soma);
+    Soma(const morphio::Soma& soma);
     SomaType& type() { return _somaType; }
     std::vector<Point>& points() { return _pointProperties._points; }
     std::vector<float> diameters() { return _pointProperties._diameters; }
@@ -59,7 +59,7 @@ private:
         Morphology* morphology,
         std::function<void(Morphology* morphology, Section* section)>);
     Section(Morphology*, int id, SectionType type, const Property::PointLevel&);
-    Section(Morphology* morphology, const minimorph::Section& section,
+    Section(Morphology* morphology, const morphio::Section& section,
             bool recursive = true);
     ~Section() {}
     friend class Morphology;
@@ -78,18 +78,18 @@ public:
         , _counter(0)
     {
     }
-    Morphology(const minimorph::Morphology& morphology);
+    Morphology(const morphio::Morphology& morphology);
     virtual ~Morphology();
     const std::set<Section*>& rootSections();
 
     std::map<uint32_t, Section*>& sections() { return _sections; }
     Soma& soma();
     void deleteSection(Section*, bool recursive = true);
-    uint32_t appendSection(Section* parent, const minimorph::Section&,
+    uint32_t appendSection(Section* parent, const morphio::Section&,
                            bool recursive = true);
     uint32_t appendSection(Section* parent, SectionType,
                            const Property::PointLevel&);
-    uint32_t createNeurite(const minimorph::Section&, bool recursive = true);
+    uint32_t createNeurite(const morphio::Section&, bool recursive = true);
     uint32_t createNeurite(SectionType, const Property::PointLevel&);
     void traverse(std::function<void(Morphology* morphology, Section* section)>,
                   Section* rootSection = nullptr);

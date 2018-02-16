@@ -26,7 +26,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include "minimorph.h"
+#include "morphio.h"
 
 // Some helper macros to make Boost::Test thread safe
 // http://thread.gmane.org/gmane.comp.lib.boost.devel/123662/focus=123678
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_synapse)
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn.h5";
 
 #pragma omp parallel
-    TS_BOOST_CHECK_NO_THROW(minimorph::Synapse(path.string()));
+    TS_BOOST_CHECK_NO_THROW(morphio::Synapse(path.string()));
 }
 
 BOOST_AUTO_TEST_CASE(test_parallel_access_of_synapse)
@@ -61,15 +61,15 @@ BOOST_AUTO_TEST_CASE(test_parallel_access_of_synapse)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn.h5";
 
-    minimorph::GIDSet gids;
+    morphio::GIDSet gids;
     gids.insert(1);
     gids.insert(2);
 
-    const minimorph::Synapse synapse(path.string());
+    const morphio::Synapse synapse(path.string());
 #pragma omp parallel
     {
-        const minimorph::SynapseMatrix& data =
-            synapse.read(1, minimorph::SYNAPSE_ALL_ATTRIBUTES);
+        const morphio::SynapseMatrix& data =
+            synapse.read(1, morphio::SYNAPSE_ALL_ATTRIBUTES);
         TS_BOOST_CHECK(!data.empty());
         const size_t numSynapses = synapse.getNumSynapses(gids);
         TS_BOOST_CHECK_GT(numSynapses, 0);
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_synapse_summary)
     path /= "circuitBuilding_1000neurons/Functionalizer_output/nrn_summary.h5";
 
 #pragma omp parallel
-    TS_BOOST_CHECK_NO_THROW(minimorph::SynapseSummary(path.string()));
+    TS_BOOST_CHECK_NO_THROW(morphio::SynapseSummary(path.string()));
 }
 
 BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_morphology)
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_morphology)
 
 #pragma omp parallel
     TS_BOOST_CHECK_NO_THROW(
-        minimorph::Morphology{minimorph::URI(path.string())});
+        morphio::Morphology{morphio::URI(path.string())});
 }
 
 BOOST_AUTO_TEST_CASE(test_parallel_acess_of_morphology)
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(test_parallel_acess_of_morphology)
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "circuitBuilding_1000neurons/morphologies/h5/C040426.h5";
 
-    const minimorph::Morphology morphology{minimorph::URI(path.string())};
+    const morphio::Morphology morphology{morphio::URI(path.string())};
 #pragma omp parallel
     {
         const auto points = morphology.getPoints();

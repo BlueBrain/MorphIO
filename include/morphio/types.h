@@ -10,9 +10,9 @@
 
 #include <stdint.h>
 
-#include <minimorph/enums.h>
-#include <minimorph/exceptions.h>
-#include <minimorph/vector_types.h>
+#include <morphio/enums.h>
+#include <morphio/exceptions.h>
+#include <morphio/vector_types.h>
 
 #ifdef __GNUC__
 #define BRAIN_UNUSED __attribute__((unused))
@@ -26,8 +26,8 @@
 #define LBERROR(x) (std::cerr << x << std::endl)
 #define LBWARN std::cerr
 
-/** @namespace minimorph Blue Brain File IO classes */
-namespace minimorph
+/** @namespace morphio Blue Brain File IO classes */
+namespace morphio
 {
 typedef std::string URI;
 

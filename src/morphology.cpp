@@ -5,15 +5,15 @@
 #include <fstream>
 #include <streambuf>
 
-#include <minimorph/morphology.h>
-#include <minimorph/section.h>
-#include <minimorph/soma.h>
+#include <morphio/morphology.h>
+#include <morphio/section.h>
+#include <morphio/soma.h>
 
 #include "plugin/morphologyASC.h"
 #include "plugin/morphologyHDF5.h"
 #include "plugin/morphologySWC.h"
 
-namespace minimorph
+namespace morphio
 {
 Morphology::Morphology(const URI& source)
 {
@@ -90,7 +90,7 @@ const std::vector<Section> Morphology::rootSections() const
 const std::vector<Section> Morphology::sections() const
 {
     std::vector<Section> sections;
-    for (int i = 0; i < _properties->get<minimorph::Property::Section>().size();
+    for (int i = 0; i < _properties->get<morphio::Property::Section>().size();
          ++i)
     {
         sections.push_back(section(i));
@@ -129,4 +129,4 @@ const MorphologyVersion& Morphology::version() const
     return _properties->version();
 }
 
-} // namespace minimorph
+} // namespace morphio

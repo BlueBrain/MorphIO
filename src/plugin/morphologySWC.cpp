@@ -10,7 +10,7 @@
 
 #include <iostream>
 
-namespace minimorph
+namespace morphio
 {
 namespace plugin
 {
@@ -141,7 +141,7 @@ void _readSamples(RawSWCInfo& info)
 {
     std::ifstream file(info.filename.c_str());
     if (file.fail())
-        LBTHROW(minimorph::RawDataError("Error opening morphology file: " +
+        LBTHROW(morphio::RawDataError("Error opening morphology file: " +
                                         info.filename));
 
     Samples& samples = info.samples;
@@ -162,14 +162,14 @@ void _readSamples(RawSWCInfo& info)
         const unsigned int id = strtol(line.data(), &data, 10);
         if (*data != ' ' && *data != '\t')
         {
-            LBTHROW(minimorph::RawDataError(
+            LBTHROW(morphio::RawDataError(
                 "Reading swc morphology file: " + info.filename +
                 ", parse error at line " + std::to_string(lineNumber)));
         }
         samples.resize(std::max(samples.size(), size_t(id + 1)));
         if (samples[id].valid)
         {
-            LBTHROW(minimorph::IDSequenceError(
+            LBTHROW(morphio::IDSequenceError(
                 "Reading swc morphology file: " + info.filename +
                 ", repeated sample id " + std::to_string(id) + " at line " +
                 std::to_string(lineNumber)));
@@ -180,7 +180,7 @@ void _readSamples(RawSWCInfo& info)
             ++totalSamples;
             if (!samples[id].valid)
             {
-                LBTHROW(minimorph::IDSequenceError(
+                LBTHROW(morphio::IDSequenceError(
                     "Reading swc morphology file: " + info.filename +
                     ", parse error at line " + std::to_string(lineNumber)));
             }
@@ -207,7 +207,7 @@ void _buildSampleTree(RawSWCInfo& info)
         visited.push_back(!sample.valid);
 
     if (samples.empty())
-        LBTHROW(minimorph::SomaError("Reading swc morphology file: " +
+        LBTHROW(morphio::SomaError("Reading swc morphology file: " +
                                      info.filename +
                                      ", no soma section found"));
 
@@ -234,7 +234,7 @@ void _buildSampleTree(RawSWCInfo& info)
         {
             if (sample.parent == int(currentSample))
             {
-                LBTHROW(minimorph::IDSequenceError(
+                LBTHROW(morphio::IDSequenceError(
                     "Reading swc morphology file: " + info.filename +
                     ", found a sample point to itself"));
             }
@@ -245,7 +245,7 @@ void _buildSampleTree(RawSWCInfo& info)
                 msg << "Reading swc morphology file: " << info.filename
                     << ", broken tree (missing sample  " << sample.parent << ")"
                     << std::endl;
-                LBTHROW(minimorph::MissingParentError(msg.str()));
+                LBTHROW(morphio::MissingParentError(msg.str()));
             }
 
             if (parent->type == SWC_SECTION_SOMA)
@@ -277,7 +277,7 @@ void _buildSampleTree(RawSWCInfo& info)
             {
                 if (sample.type == SWC_SECTION_SOMA)
                 {
-                    LBTHROW(minimorph::SomaError(
+                    LBTHROW(morphio::SomaError(
                         "Reading swc morphology file: " + info.filename +
                         ", found soma sample with neurite parent"));
                 }
@@ -304,7 +304,7 @@ void _buildSampleTree(RawSWCInfo& info)
                 if (info.roots.size() &&
                     samples[info.roots[0]].type == SWC_SECTION_SOMA)
                 {
-                    LBTHROW(minimorph::SomaError(
+                    LBTHROW(morphio::SomaError(
                         "Reading swc morphology file: " + info.filename +
                         ", found two soma sections"));
                 }
@@ -347,7 +347,7 @@ void _buildSampleTree(RawSWCInfo& info)
         }
     }
     if (!hasSoma)
-        LBTHROW(minimorph::SomaError("Reading swc morphology file: " +
+        LBTHROW(morphio::SomaError("Reading swc morphology file: " +
                                      info.filename +
                                      ", no soma section found"));
 }
@@ -503,4 +503,4 @@ Property::Properties load(const URI& uri)
 
 } // namespace swc
 } // namespace plugin
-} // namespace minimorph
+} // namespace morphio

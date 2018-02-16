@@ -2,10 +2,10 @@
 #include <iostream>
 #include <vector>
 
-#include <minimorph/morphology.h>
-#include <minimorph/section.h>
-#include <minimorph/sectionBuilder.h>
-#include <minimorph/soma.h>
+#include <morphio/morphology.h>
+#include <morphio/section.h>
+#include <morphio/sectionBuilder.h>
+#include <morphio/soma.h>
 
 using namespace std;
 
@@ -18,7 +18,7 @@ using namespace std;
 
 int main()
 {
-    minimorph::Morphology morphology("neuron.asc");
+    morphio::Morphology morphology("neuron.asc");
     for (auto type : morphology.sectionTypes())
         std::cout << "type: " << type << std::endl;
 
@@ -62,7 +62,7 @@ int main()
     for (auto section : morphology.rootSections())
         std::cout << section.id() << std::endl;
 
-    minimorph::builder::Morphology a(morphology);
+    morphio::builder::Morphology a(morphology);
     for (auto section : a.rootSections())
     {
         std::cout << "Section" << std::endl;
@@ -75,8 +75,8 @@ int main()
     std::cout << "Traversal" << std::endl;
     auto firstNeurite = *(a.rootSections().begin());
     a.traverse(
-        [](minimorph::builder::Morphology* morph,
-           minimorph::builder::Section* sec) {
+        [](morphio::builder::Morphology* morph,
+           morphio::builder::Section* sec) {
             std::cout << "hello from: " << sec->type() << std::endl;
             for (auto center : sec->points())
                 std::cout << center[0] << ", " << center[1] << ", " << center[2]
@@ -86,13 +86,13 @@ int main()
         firstNeurite);
 
     std::cout << "H5 Writer" << std::endl;
-    minimorph::builder::writer::h5(a);
+    morphio::builder::writer::h5(a);
 
     std::cout << "SWC writer" << std::endl;
-    minimorph::builder::writer::swc(a);
+    morphio::builder::writer::swc(a);
 
     std::cout << "Asc writer" << std::endl;
-    minimorph::builder::writer::asc(a);
+    morphio::builder::writer::asc(a);
 
     std::cout << "End" << std::endl;
 }

@@ -2,10 +2,10 @@
 
 #include <gsl/span>
 
-#include <minimorph/morphology.h>
-#include <minimorph/types.h>
+#include <morphio/morphology.h>
+#include <morphio/types.h>
 
-namespace minimorph
+namespace morphio
 {
 /**
  * A class to represent a neuron soma.

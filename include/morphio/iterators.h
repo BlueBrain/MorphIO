@@ -3,8 +3,8 @@
 #include <queue>
 #include <stack>
 
-#include <minimorph/types.h>
-namespace minimorph
+#include <morphio/types.h>
+namespace morphio
 {
 /**
 An iterator class to iterate through sections;

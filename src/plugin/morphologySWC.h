@@ -1,9 +1,9 @@
 #pragma once
 
-#include <minimorph/properties.h>
-#include <minimorph/types.h>
+#include <morphio/properties.h>
+#include <morphio/types.h>
 
-namespace minimorph
+namespace morphio
 {
 namespace plugin
 {
@@ -14,4 +14,4 @@ Property::Properties load(const URI& uri);
 
 } // namespace plugin
 
-} // namespace minimorph
+} // namespace morphio

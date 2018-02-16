@@ -2,11 +2,11 @@
 
 #include <memory> //std::unique_ptr
 
-#include <minimorph/api.h>
-#include <minimorph/properties.h>
-#include <minimorph/types.h>
+#include <morphio/api.h>
+#include <morphio/properties.h>
+#include <morphio/types.h>
 
-namespace minimorph
+namespace morphio
 {
 /** Read access a Morphology file.
  *

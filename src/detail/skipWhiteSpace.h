@@ -22,7 +22,7 @@
 
 #include <iostream>
 
-namespace minimorph
+namespace morphio
 {
 namespace detail
 {

@@ -1,28 +1,28 @@
 #pragma once
 
-namespace minimorph
+namespace morphio
 {
 /**
-   Base class of all minimorph errors
+   Base class of all morphio errors
  **/
-class MinimorphError: public std::runtime_error {
+class MorphioError: public std::runtime_error {
 public:
-    MinimorphError(const std::string& _msg) : std::runtime_error(_msg) {}
+    MorphioError(const std::string& _msg) : std::runtime_error(_msg) {}
 };
 
-class RawDataError: public MinimorphError {
+class RawDataError: public MorphioError {
 public:
-    RawDataError(const std::string& _msg) : MinimorphError(_msg) {}
+    RawDataError(const std::string& _msg) : MorphioError(_msg) {}
 };
 
-class UnknownFileType : public MinimorphError {
+class UnknownFileType : public MorphioError {
 public:
-UnknownFileType(const std::string& _msg) : MinimorphError(_msg) {}
+UnknownFileType(const std::string& _msg) : MorphioError(_msg) {}
 };
 
-class SomaError: public MinimorphError {
+class SomaError: public MorphioError {
 public:
-SomaError(const std::string& _msg) : MinimorphError(_msg) {}
+SomaError(const std::string& _msg) : MorphioError(_msg) {}
 };
 
 class IDSequenceError : public RawDataError

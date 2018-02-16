@@ -1,13 +1,13 @@
 #pragma once
 
-#include <minimorph/properties.h>
-#include <minimorph/types.h>
+#include <morphio/properties.h>
+#include <morphio/types.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5Utility.hpp>
 
-namespace minimorph
+namespace morphio
 {
 namespace plugin
 {

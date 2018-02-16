@@ -3,14 +3,14 @@
 #include <sstream>
 #include <string>
 
-#include <minimorph/sectionBuilder.h>
-#include <minimorph/soma.h>
+#include <morphio/sectionBuilder.h>
+#include <morphio/soma.h>
 
-namespace minimorph
+namespace morphio
 {
 namespace builder
 {
-Morphology::Morphology(const minimorph::Morphology& morphology)
+Morphology::Morphology(const morphio::Morphology& morphology)
     : _counter(0)
     , _soma(morphology.soma())
 {
@@ -19,7 +19,7 @@ Morphology::Morphology(const minimorph::Morphology& morphology)
 }
 
 uint32_t Morphology::appendSection(Section* parent,
-                                   const minimorph::Section& section,
+                                   const morphio::Section& section,
                                    bool recursive)
 {
     Section* node = new Section(this, section, recursive);
@@ -37,7 +37,7 @@ uint32_t Morphology::appendSection(Section* parent, SectionType type,
     return section->id();
 }
 
-uint32_t Morphology::createNeurite(const minimorph::Section& section,
+uint32_t Morphology::createNeurite(const morphio::Section& section,
                                    bool recursive)
 {
     Section* node = new Section(this, section, recursive);
@@ -83,7 +83,7 @@ Morphology::~Morphology()
         deleteSection(root, true);
 }
 
-Soma::Soma(const minimorph::Soma& soma)
+Soma::Soma(const morphio::Soma& soma)
 {
     _somaType = soma.type();
     _pointProperties =
@@ -100,7 +100,7 @@ Section::Section(Morphology* morphology, int id, SectionType type,
     morphology->_register(this);
 }
 
-Section::Section(Morphology* morphology, const minimorph::Section& section,
+Section::Section(Morphology* morphology, const morphio::Section& section,
                  bool recursive)
     : Section(morphology, section.id(), section.type(),
               Property::PointLevel(section._properties->_pointLevel,
@@ -280,7 +280,7 @@ void _write_asc_section(Section* section, int indentLevel)
 }
 void asc(Morphology& morphology)
 {
-    std::map<minimorph::SectionType, std::string> header;
+    std::map<morphio::SectionType, std::string> header;
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
     header[SECTION_DENDRITE] = "( (Color Red)\n  (Dendrite)\n";
 
@@ -328,4 +328,4 @@ void h5(Morphology& morphology)
 
 } // end namespace writer
 } // end namespace builder
-} // end namespace minimorph
+} // end namespace morphio

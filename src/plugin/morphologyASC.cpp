@@ -1,13 +1,13 @@
 #include <fstream>
 
-#include <minimorph/sectionBuilder.h>
-#include <minimorph/types.h>
+#include <morphio/sectionBuilder.h>
+#include <morphio/types.h>
 
 #include "morphologyASC.h"
 
 #include "lex.cpp"
 
-namespace minimorph
+namespace morphio
 {
 namespace plugin
 {
@@ -110,7 +110,7 @@ private:
                                     std::vector<Point> &points, std::vector<float> &diameters)
     {
         int32_t return_id;
-        minimorph::Property::PointLevel properties;
+        morphio::Property::PointLevel properties;
         properties._points = points;
         properties._diameters = diameters;
         if(token == Token::CELLBODY){
@@ -235,7 +235,7 @@ private:
     }
 
     NeurolucidaLexer lex_;
-    minimorph::builder::Morphology nb_;
+    morphio::builder::Morphology nb_;
 };
 
 Property::Properties load(const URI& uri)
@@ -254,4 +254,4 @@ Property::Properties load(const URI& uri)
 
 } // namespace plugin
 
-} // namespace minimorph
+} // namespace morphio

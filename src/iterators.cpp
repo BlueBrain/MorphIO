@@ -1,7 +1,7 @@
-#include <minimorph/iterators.h>
-#include <minimorph/section.h>
+#include <morphio/iterators.h>
+#include <morphio/section.h>
 
-namespace minimorph
+namespace morphio
 {
 class Section;
 

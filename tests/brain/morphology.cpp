@@ -19,7 +19,7 @@
  */
 
 #include "morphio.h"
-#include <minimorph.h>
+#include <morphio.h>
 #include <tests/paths.h>
 
 #define BOOST_TEST_MODULE MorphologyBrain
@@ -27,8 +27,8 @@
 #include <cstdarg>
 
 // typedef for brevity
-typedef minimorph::Vector4f V4f;
-typedef minimorph::Vector3f V3f;
+typedef morphio::Vector4f V4f;
+typedef morphio::Vector3f V3f;
 
 namespace
 {
@@ -39,7 +39,7 @@ struct VaArgsType
 };
 
 template <>
-struct VaArgsType<minimorph::SectionType>
+struct VaArgsType<morphio::SectionType>
 {
     typedef int type;
 };
@@ -80,32 +80,32 @@ void checkCloseArraysUpToGiven(const std::vector<T>& array,
                      given);
 }
 
-minimorph::uint32_ts getSectionIDs(const morphio::neuron::Sections& sections)
+morphio::uint32_ts getSectionIDs(const morphio::neuron::Sections& sections)
 {
-    minimorph::uint32_ts result;
+    morphio::uint32_ts result;
     for (const morphio::neuron::Section& section : sections)
         result.push_back(section.getID());
     return result;
 }
 
-const minimorph::URI TEST_MORPHOLOGY_URI(std::string("file://") +
+const morphio::URI TEST_MORPHOLOGY_URI(std::string("file://") +
                                          BRAIN_TESTDATA + "/h5/test_neuron.h5");
 
 void checkEqualMorphologies(const morphio::neuron::Morphology& first,
-                            const minimorph::Morphology& second)
+                            const morphio::Morphology& second)
 {
     BOOST_CHECK(second.getPoints() == first.getPoints());
     BOOST_CHECK(second.getSections() == first.getSections());
     BOOST_CHECK(second.getSectionTypes() ==
-                reinterpret_cast<const minimorph::SectionTypes&>(
+                reinterpret_cast<const morphio::SectionTypes&>(
                     first.getSectionTypes()));
 }
 } // namespace
 
 BOOST_AUTO_TEST_CASE(v2_morphology_constructors)
 {
-    minimorph::ConstMorphologyPtr raw(
-        new minimorph::Morphology(TEST_MORPHOLOGY_URI));
+    morphio::ConstMorphologyPtr raw(
+        new morphio::Morphology(TEST_MORPHOLOGY_URI));
 
     const morphio::neuron::Morphology morphology1(TEST_MORPHOLOGY_URI);
     BOOST_CHECK_EQUAL(morphology1.getTransformation(), morphio::Matrix4f());
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(v2_morphology_constructors)
     const morphio::neuron::Morphology morphology2(raw);
     checkEqualMorphologies(morphology2, *raw);
 
-    BOOST_CHECK_THROW(morphio::neuron::Morphology(minimorph::URI("/mars")),
+    BOOST_CHECK_THROW(morphio::neuron::Morphology(morphio::URI("/mars")),
                       std::runtime_error);
 }
 
@@ -168,12 +168,12 @@ BOOST_AUTO_TEST_CASE(get_section_samples)
 {
     morphio::neuron::Morphology morphology(TEST_MORPHOLOGY_URI);
 
-    minimorph::Vector4fs points;
+    morphio::Vector4fs points;
     for (size_t i = 0; i != 11; ++i)
     {
         float i2 = i * i;
         points.push_back(
-            minimorph::Vector4f(0, -i2 / 20.0, i2 / 20.0, 0.5 + i2 / 1000.0));
+            morphio::Vector4f(0, -i2 / 20.0, i2 / 20.0, 0.5 + i2 / 1000.0));
     }
     checkCloseArrays(morphology.getSection(1).getSamples(), points);
 
@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE(get_section_samples)
     {
         float i2 = i * i;
         points.push_back(
-            minimorph::Vector4f(i2 / 20.0, 0, i2 / 20.0, 0.5 + i2 / 1000.0));
+            morphio::Vector4f(i2 / 20.0, 0, i2 / 20.0, 0.5 + i2 / 1000.0));
     }
     checkCloseArrays(morphology.getSection(4).getSamples(), points);
 
@@ -191,7 +191,7 @@ BOOST_AUTO_TEST_CASE(get_section_samples)
     {
         float i2 = i * i;
         points.push_back(
-            minimorph::Vector4f(-i2 / 20.0, 0, i2 / 20.0, 0.5 + i2 / 1000.0));
+            morphio::Vector4f(-i2 / 20.0, 0, i2 / 20.0, 0.5 + i2 / 1000.0));
     }
     checkCloseArrays(morphology.getSection(7).getSamples(), points);
 
@@ -200,7 +200,7 @@ BOOST_AUTO_TEST_CASE(get_section_samples)
     {
         float i2 = i * i;
         points.push_back(
-            minimorph::Vector4f(0, i2 / 20.0, i2 / 20.0, 0.5 + i2 / 1000.0));
+            morphio::Vector4f(0, i2 / 20.0, i2 / 20.0, 0.5 + i2 / 1000.0));
     }
     checkCloseArrays(morphology.getSection(10).getSamples(), points);
 }
@@ -226,7 +226,7 @@ BOOST_AUTO_TEST_CASE(get_section_distances_to_soma)
             morphology.getSection(section + 1).getDistanceToSoma(), length,
             1e-5);
 
-        minimorph::floats reference;
+        morphio::floats reference;
         for (size_t j = 0; j != 11; ++j)
         {
             const float p = j * j / 20.0;
@@ -262,7 +262,7 @@ BOOST_AUTO_TEST_CASE(get_section_samples_by_positions)
 {
     morphio::neuron::Morphology morphology(TEST_MORPHOLOGY_URI);
 
-    minimorph::floats points;
+    morphio::floats points;
     for (float p = 0.0; p <= 1.0; p += 0.2)
         points.push_back(p);
 

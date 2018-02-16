@@ -1,11 +1,11 @@
-#include <minimorph/types.h>
+#include <morphio/types.h>
 
 #include <lexertl/debug.hpp>
 #include <lexertl/generator.hpp>
 #include <lexertl/iterator.hpp>
 #include <lexertl/lookup.hpp>
 
-namespace minimorph
+namespace morphio
 {
 namespace plugin
 {
@@ -297,4 +297,4 @@ public:
 
 } // namespace asc
 } // namespace plugin
-} // namespace minimorph
+} // namespace morphio

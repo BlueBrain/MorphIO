@@ -3,7 +3,7 @@
 
 #include <ostream>
 
-namespace minimorph
+namespace morphio
 {
 namespace enums
 {
@@ -17,7 +17,7 @@ enum MorphologyVersion
     MORPHOLOGY_VERSION_UNDEFINED
 };
 
-/** The cell family represented by minimorph::Morphology. */
+/** The cell family represented by morphio::Morphology. */
 enum CellFamily
 {
     FAMILY_NEURON = 0,

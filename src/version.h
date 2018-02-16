@@ -9,9 +9,9 @@
 
 #include <string>
 
-#include <minimorph/api.h>
+#include <morphio/api.h>
 
-namespace minimorph
+namespace morphio
 {
 /** The current major version. */
 #define BRAIN_VERSION_MAJOR 1

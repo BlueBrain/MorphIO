@@ -29,7 +29,7 @@
 // TODO: compile
 #include <iostream>
 
-namespace minimorph
+namespace morphio
 {
 namespace plugin
 {
@@ -51,7 +51,7 @@ Property::Properties MorphologyHDF5::load(const URI& uri)
     }
     catch (const HighFive::FileException& exc)
     {
-        LBTHROW(minimorph::RawDataError(
+        LBTHROW(morphio::RawDataError(
             _write
                 ? "Could not create morphology file "
                 : "Could not open morphology file " + uri + ": " + exc.what()));
@@ -90,7 +90,7 @@ void MorphologyHDF5::_checkVersion(const std::string& source)
     catch (...)
     {
         LBTHROW(
-            minimorph::RawDataError("Unknown morphology file format for "
+            morphio::RawDataError("Unknown morphology file format for "
                                     "file " +
                                     source));
     }
@@ -126,7 +126,7 @@ void MorphologyHDF5::_resolveV1()
 
     if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns)
     {
-        LBTHROW(minimorph::RawDataError("Opening morphology file '" +
+        LBTHROW(morphio::RawDataError("Opening morphology file '" +
                                         _file->getName() +
                                         "': bad number of dimensions in"
                                         " 'points' dataspace"));
@@ -137,7 +137,7 @@ void MorphologyHDF5::_resolveV1()
     _sectionsDims = dataspace.getDimensions();
     if (_sectionsDims.size() != 2 || _sectionsDims[1] != _structureV1Columns)
     {
-        LBTHROW(minimorph::RawDataError("Opening morphology file '" +
+        LBTHROW(morphio::RawDataError("Opening morphology file '" +
                                         _file->getName() +
                                         "': bad number of dimensions in"
                                         " 'structure' dataspace"));
@@ -173,7 +173,7 @@ bool MorphologyHDF5::_readV11Metadata()
         // All other exceptions are not expected because if the metadata
         // group exits it must contain at least the version, and for
         // version 1.1 it must contain the family.
-        LBTHROW(minimorph::RawDataError(
+        LBTHROW(morphio::RawDataError(
             std::string("Error reading morphology metadata: ") + e.what()));
     }
 
@@ -371,4 +371,4 @@ void MorphologyHDF5::_readPerimeters()
 
 } // namespace h5
 } // namespace plugin
-} // namespace minimorph
+} // namespace morphio

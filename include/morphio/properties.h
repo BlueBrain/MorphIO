@@ -1,8 +1,8 @@
 #pragma once
 
-#include <minimorph/types.h>
+#include <morphio/types.h>
 
-namespace minimorph
+namespace morphio
 {
 namespace Property
 {
@@ -13,12 +13,12 @@ struct Section
 
 struct Point
 {
-    typedef minimorph::Point Type;
+    typedef morphio::Point Type;
 };
 
 struct SectionType
 {
-    typedef minimorph::SectionType Type;
+    typedef morphio::SectionType Type;
 };
 
 struct Perimeter
@@ -50,8 +50,8 @@ struct SectionLevel
 
 struct CellLevel
 {
-    minimorph::SomaType _somaType;
-    minimorph::CellFamily _cellFamily;
+    morphio::SomaType _somaType;
+    morphio::CellFamily _cellFamily;
     MorphologyVersion _version;
 };
 
@@ -67,12 +67,12 @@ struct Properties
     template <typename T>
     const std::vector<typename T::Type>& get() const;
 
-    const minimorph::MorphologyVersion& version()
+    const morphio::MorphologyVersion& version()
     {
         return _cellLevel._version;
     }
-    const minimorph::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
-    const minimorph::SomaType& somaType() {
+    const morphio::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
+    const morphio::SomaType& somaType() {
         return _cellLevel._somaType;
     }
     const std::map<uint32_t, std::vector<uint32_t>>& children()
