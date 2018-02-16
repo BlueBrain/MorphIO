@@ -1,6 +1,5 @@
 find_package(HDF5 REQUIRED)
 add_library(HighFive INTERFACE)
-
 target_include_directories(HighFive INTERFACE
     HighFive/include/
     ${HDF5_INCLUDE_DIRS})
@@ -14,3 +13,7 @@ target_include_directories(pybind11 INTERFACE
 add_subdirectory(GSL)
 target_include_directories(GSL INTERFACE
     GSL)
+
+add_library(lexertl14 INTERFACE)
+target_include_directories(lexertl14 INTERFACE
+    lexertl14)

@@ -27,6 +27,7 @@ target_link_libraries(morphio
     PRIVATE
     HighFive
     GSL
+    lexertl14
     )
 
 target_include_directories(morphio
