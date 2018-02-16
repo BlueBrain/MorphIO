@@ -1,7 +1,7 @@
 #pragma once
 
-#include <minimorph/types.h>
 #include <minimorph/properties.h>
+#include <minimorph/types.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
@@ -32,7 +32,6 @@ private:
     void _readSections();
     void _readSectionTypes();
     void _readPerimeters();
-
 
     std::unique_ptr<HighFive::File> _file;
 

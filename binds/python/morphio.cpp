@@ -1,6 +1,6 @@
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <pybind11/numpy.h>
 
 #include <morphology.h>
 #include <section.h>
@@ -9,18 +9,18 @@
 #include <enums.h>
 #include <morphology.h>
 
-
 namespace py = pybind11;
 
 /** Loading/Casting of vmmlib::vector into numpy arrays **/
-namespace pybind11 {
-namespace detail {
+namespace pybind11
+{
+namespace detail
+{
 // template <size_t M, typename T> struct type_caster<vmml::vector<M,T>>
 // {
 // public:
 //     typedef vmml::vector<M,T> type;
 //     PYBIND11_TYPE_CASTER(type, _("vmml::vector<M,T>"));
-
 
 //     // Conversion part 1 (Python -> C++)
 //     bool load(py::handle src, bool convert)
@@ -28,7 +28,8 @@ namespace detail {
 //             if (!convert && !py::array_t<T>::check_(src))
 //                 return false;
 
-//             auto buf = py::array_t<T, py::array::c_style | py::array::forcecast>::ensure(src);
+//             auto buf = py::array_t<T, py::array::c_style |
+//             py::array::forcecast>::ensure(src);
 //             if (!buf)
 //                 return false;
 
@@ -38,15 +39,16 @@ namespace detail {
 //         }
 
 //     //Conversion part 2 (C++ -> Python)
-//     static py::handle cast(const vmml::vector<M,T>& src, py::return_value_policy policy, py::handle parent)
+//     static py::handle cast(const vmml::vector<M,T>& src,
+//     py::return_value_policy policy, py::handle parent)
 //         {
 //             py::array a(M, src.array);
 //             return a.release();
 //         }
 // };
 
-
-// template <size_t M, typename T> struct type_caster<std::vector<vmml::vector<M,T>>>
+// template <size_t M, typename T> struct
+// type_caster<std::vector<vmml::vector<M,T>>>
 // {
 // public:
 //     typedef std::vector<vmml::vector<M,T>> type;
@@ -58,7 +60,8 @@ namespace detail {
 //             if (!convert && !py::array_t<T>::check_(src))
 //                 return false;
 
-//             auto buf = py::array_t<T, py::array::c_style | py::array::forcecast>::ensure(src);
+//             auto buf = py::array_t<T, py::array::c_style |
+//             py::array::forcecast>::ensure(src);
 //             if (!buf)
 //                 return false;
 
@@ -73,32 +76,51 @@ namespace detail {
 //         }
 
 //     //Conversion part 2 (C++ -> Python)
-//     static py::handle cast(const vmml::vector<M,T>& src, py::return_value_policy policy, py::handle parent)
+//     static py::handle cast(const vmml::vector<M,T>& src,
+//     py::return_value_policy policy, py::handle parent)
 //         {
 //             py::array a(M, src.array);
 //             return a.release();
 //         }
 // };
-}} // namespace pybind11::detail
+}
+} // namespace pybind11::detail
 
-
-PYBIND11_MODULE(python_morphio, m) {
+PYBIND11_MODULE(python_morphio, m)
+{
     m.doc() = "pybind11 example plugin"; // optional module docstring
-
 
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const minimorph::URI&>())
-        .def("getPoints", (minimorph::Vector4fs& (morphio::Morphology::*)())&morphio::Morphology::getPoints)
-        .def("getSectionTypes", (morphio::std::vector<SectionType>& (morphio::Morphology::*)())&morphio::Morphology::getSectionTypes)
-        .def("getSectionIDs", (morphio::std::vector<uint32_t> (morphio::Morphology::*)())&morphio::Morphology::getSectionIDs)
-        .def("getSections", (const morphio::Vector2is& (morphio::Morphology::*)() const)&morphio::Morphology::getSections)
-        .def("getSections", (morphio::std::vector<Section> (morphio::Morphology::*)(morphio::SectionType) const)&morphio::Morphology::getSections)
-        .def("getSections", (morphio::std::vector<Section> (morphio::Morphology::*)(const morphio::std::vector<SectionType>&) const)&morphio::Morphology::getSections)
-        .def("getSection", (morphio::Section& (morphio::Morphology::*)(const morphio::std::vector<uint32_t>&))&morphio::Morphology::getSection)
+        .def("getPoints", (minimorph::Vector4fs & (morphio::Morphology::*)()) &
+                              morphio::Morphology::getPoints)
+        .def("getSectionTypes",
+             (morphio::std::vector<SectionType> & (morphio::Morphology::*)()) &
+                 morphio::Morphology::getSectionTypes)
+        .def("getSectionIDs",
+             (morphio::std::vector<uint32_t> (morphio::Morphology::*)()) &
+                 morphio::Morphology::getSectionIDs)
+        .def("getSections",
+             (const morphio::Vector2is& (morphio::Morphology::*)() const) &
+                 morphio::Morphology::getSections)
+        .def("getSections",
+             (morphio::std::vector<Section> (morphio::Morphology::*)(
+                 morphio::SectionType) const) &
+                 morphio::Morphology::getSections)
+        .def("getSections",
+             (morphio::std::vector<Section> (morphio::Morphology::*)(
+                 const morphio::std::vector<SectionType>&) const) &
+                 morphio::Morphology::getSections)
+        .def("getSection",
+             (morphio::Section &
+              (morphio::Morphology::*)(const morphio::std::vector<uint32_t>&)) &
+                 morphio::Morphology::getSection)
         .def("getRootSections", &morphio::Morphology::getRootSections)
-        .def("getSoma", (morphio::Soma (morphio::Morphology::*)())&morphio::Morphology::getSoma)
+        .def("getSoma", (morphio::Soma (morphio::Morphology::*)()) &
+                            morphio::Morphology::getSoma)
         .def("getVersion", &morphio::Morphology::getVersion);
-        // .def("getTransformation", (minimorph::Matrix4f& (morphio::Morphology::*)()&morphio::Morphology::getTransformation));
+    // .def("getTransformation", (minimorph::Matrix4f&
+    // (morphio::Morphology::*)()&morphio::Morphology::getTransformation));
 
     py::class_<morphio::Soma>(m, "Soma")
         .def(py::init<const morphio::Soma&>())
@@ -112,7 +134,8 @@ PYBIND11_MODULE(python_morphio, m) {
         .def("getType", &morphio::Section::getType)
         .def("hasParent", &morphio::Section::hasParent)
         .def("getParent", &morphio::Section::getParent)
-        .def("getSamples", (morphio::Points (morphio::Section::*)() const) &morphio::Section::getSamples)
+        .def("getSamples", (morphio::Points (morphio::Section::*)() const) &
+                               morphio::Section::getSamples)
         .def("getChildren", &morphio::Section::getChildren);
 
     py::enum_<morphio::SectionType>(m, "SectionType")
@@ -126,22 +149,32 @@ PYBIND11_MODULE(python_morphio, m) {
         .export_values();
 
     py::enum_<minimorph::enums::SectionType>(m, "BrionSectionType")
-        .value("SECTION_UNDEFINED", minimorph::enums::SectionType::SECTION_UNDEFINED)
+        .value("SECTION_UNDEFINED",
+               minimorph::enums::SectionType::SECTION_UNDEFINED)
         .value("SECTION_SOMA", minimorph::enums::SectionType::SECTION_SOMA)
         .value("SECTION_AXON", minimorph::enums::SectionType::SECTION_AXON)
-        .value("SECTION_DENDRITE", minimorph::enums::SectionType::SECTION_DENDRITE)
-        .value("SECTION_APICAL_DENDRITE", minimorph::enums::SectionType::SECTION_APICAL_DENDRITE)
-        .value("SECTION_GLIA_PROCESS", minimorph::enums::SectionType::SECTION_GLIA_PROCESS)
-        .value("SECTION_GLIA_ENDFOOT", minimorph::enums::SectionType::SECTION_GLIA_ENDFOOT)
+        .value("SECTION_DENDRITE",
+               minimorph::enums::SectionType::SECTION_DENDRITE)
+        .value("SECTION_APICAL_DENDRITE",
+               minimorph::enums::SectionType::SECTION_APICAL_DENDRITE)
+        .value("SECTION_GLIA_PROCESS",
+               minimorph::enums::SectionType::SECTION_GLIA_PROCESS)
+        .value("SECTION_GLIA_ENDFOOT",
+               minimorph::enums::SectionType::SECTION_GLIA_ENDFOOT)
         .export_values();
 
-
     py::enum_<minimorph::enums::MorphologyVersion>(m, "MorphologyVersion")
-        .value("MORPHOLOGY_VERSION_H5_1", minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
-        .value("MORPHOLOGY_VERSION_H5_2", minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_2)
-        .value("MORPHOLOGY_VERSION_H5_1_1", minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_1)
-        .value("MORPHOLOGY_VERSION_SWC_1", minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_SWC_1)
-        .value("MORPHOLOGY_VERSION_UNDEFINED", minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_UNDEFINED)
+        .value("MORPHOLOGY_VERSION_H5_1",
+               minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
+        .value("MORPHOLOGY_VERSION_H5_2",
+               minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_2)
+        .value("MORPHOLOGY_VERSION_H5_1_1",
+               minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_1)
+        .value("MORPHOLOGY_VERSION_SWC_1",
+               minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_SWC_1)
+        .value(
+            "MORPHOLOGY_VERSION_UNDEFINED",
+            minimorph::enums::MorphologyVersion::MORPHOLOGY_VERSION_UNDEFINED)
         .export_values();
 
     py::enum_<minimorph::enums::CellFamily>(m, "CellFamily")
@@ -149,20 +182,27 @@ PYBIND11_MODULE(python_morphio, m) {
         .value("FAMILY_GLIA", minimorph::enums::CellFamily::FAMILY_GLIA)
         .export_values();
 
-
     py::enum_<minimorph::enums::AccessMode>(m, "AccessMode")
         .value("MODE_READ", minimorph::enums::AccessMode::MODE_READ)
         .value("MODE_WRITE", minimorph::enums::AccessMode::MODE_WRITE)
         .value("MODE_OVERWRITE", minimorph::enums::AccessMode::MODE_OVERWRITE)
         .value("MODE_READWRITE", minimorph::enums::AccessMode::MODE_READWRITE)
-        .value("MODE_READOVERWRITE", minimorph::enums::AccessMode::MODE_READOVERWRITE)
+        .value("MODE_READOVERWRITE",
+               minimorph::enums::AccessMode::MODE_READOVERWRITE)
         .export_values();
 
     auto base = py::register_exception<minimorph::Error&>(m, "Error");
-    auto raw = py::register_exception<minimorph::RawDataError&>(m, "RawDataError", base.ptr());
-    py::register_exception<minimorph::UnknownFileType&>(m, "UnknownFileType", base.ptr());
+    auto raw =
+        py::register_exception<minimorph::RawDataError&>(m, "RawDataError",
+                                                         base.ptr());
+    py::register_exception<minimorph::UnknownFileType&>(m, "UnknownFileType",
+                                                        base.ptr());
     py::register_exception<minimorph::SomaError&>(m, "SomaError", base.ptr());
-    py::register_exception<minimorph::IDSequenceError&>(m, "IDSequenceError", raw.ptr());
-    py::register_exception<minimorph::MultipleTrees&>(m, "MultipleTrees", raw.ptr());
-    py::register_exception<minimorph::MissingParentError&>(m, "MissingParentError", raw.ptr());
+    py::register_exception<minimorph::IDSequenceError&>(m, "IDSequenceError",
+                                                        raw.ptr());
+    py::register_exception<minimorph::MultipleTrees&>(m, "MultipleTrees",
+                                                      raw.ptr());
+    py::register_exception<minimorph::MissingParentError&>(m,
+                                                           "MissingParentError",
+                                                           raw.ptr());
 }

@@ -1,6 +1,6 @@
-#include <unistd.h>
 #include <cassert>
 #include <iostream>
+#include <unistd.h>
 
 #include <fstream>
 #include <streambuf>
@@ -9,30 +9,36 @@
 #include <minimorph/section.h>
 #include <minimorph/soma.h>
 
+#include "plugin/morphologyASC.h"
 #include "plugin/morphologyHDF5.h"
 #include "plugin/morphologySWC.h"
-#include "plugin/morphologyASC.h"
 
 namespace minimorph
 {
-
 Morphology::Morphology(const URI& source)
 {
     const size_t pos = source.find_last_of(".");
     assert(pos != std::string::npos);
-    if(access( source.c_str(), F_OK ) == -1)
-        LBTHROW(RawDataError("File: "+source+" does not exist."));
+    if (access(source.c_str(), F_OK) == -1)
+        LBTHROW(RawDataError("File: " + source + " does not exist."));
 
-    if (source.substr(pos) == ".h5") {
-        _properties = std::make_shared<Property::Properties>(plugin::h5::load(source));
+    if (source.substr(pos) == ".h5")
+    {
+        _properties =
+            std::make_shared<Property::Properties>(plugin::h5::load(source));
     }
-    else if (source.substr(pos) == ".swc") {
-        _properties = std::make_shared<Property::Properties>(plugin::swc::load(source));
+    else if (source.substr(pos) == ".swc")
+    {
+        _properties =
+            std::make_shared<Property::Properties>(plugin::swc::load(source));
     }
-    else if (source.substr(pos) == ".asc") {
-        _properties = std::make_shared<Property::Properties>(plugin::asc::load(source));
+    else if (source.substr(pos) == ".asc")
+    {
+        _properties =
+            std::make_shared<Property::Properties>(plugin::asc::load(source));
     }
-    else {
+    else
+    {
         LBTHROW(UnknownFileType("unhandled file type"));
     }
 
@@ -54,46 +60,73 @@ Morphology::~Morphology()
 {
 }
 
-const Soma Morphology::soma() const {
+const Soma Morphology::soma() const
+{
     return Soma(_properties);
 }
 
-const Section Morphology::section(const uint32_t& id) const {
+const Section Morphology::section(const uint32_t& id) const
+{
     return Section(id, _properties);
 }
 
 const std::vector<Section> Morphology::rootSections() const
 {
     std::vector<Section> result;
-    try {
+    try
+    {
         const std::vector<uint32_t>& children = _properties->children().at(0);
         result.reserve(children.size());
         for (const uint32_t id : children)
             result.push_back(section(id));
         return result;
     }
-    catch (const std::out_of_range& oor) {
+    catch (const std::out_of_range& oor)
+    {
         return result;
     }
 }
 
-const std::vector<Section> Morphology::sections() const {
+const std::vector<Section> Morphology::sections() const
+{
     std::vector<Section> sections;
-    for(int i = 0; i<_properties->get<minimorph::Property::Section>().size(); ++i){
+    for (int i = 0; i < _properties->get<minimorph::Property::Section>().size();
+         ++i)
+    {
         sections.push_back(section(i));
     }
     return sections;
 }
 
-template <typename Property> const std::vector<typename Property::Type>& Morphology::get() const{
+template <typename Property>
+const std::vector<typename Property::Type>& Morphology::get() const
+{
     return _properties->get<Property>();
 }
 
-const Points& Morphology::points() const { return get<Property::Point>(); }
-const std::vector<float>& Morphology::diameters() const { return get<Property::Diameter>(); }
-const std::vector<float>& Morphology::perimeters() const { return get<Property::Perimeter>(); }
-const std::vector<SectionType>& Morphology::sectionTypes() const { return get<Property::SectionType>(); }
-const CellFamily& Morphology::cellFamily() const { return _properties->cellFamily(); }
-const MorphologyVersion& Morphology::version() const { return _properties->version(); }
+const Points& Morphology::points() const
+{
+    return get<Property::Point>();
+}
+const std::vector<float>& Morphology::diameters() const
+{
+    return get<Property::Diameter>();
+}
+const std::vector<float>& Morphology::perimeters() const
+{
+    return get<Property::Perimeter>();
+}
+const std::vector<SectionType>& Morphology::sectionTypes() const
+{
+    return get<Property::SectionType>();
+}
+const CellFamily& Morphology::cellFamily() const
+{
+    return _properties->cellFamily();
+}
+const MorphologyVersion& Morphology::version() const
+{
+    return _properties->version();
+}
 
 } // namespace minimorph

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+GIT_DIR=$(git rev-parse --show-toplevel)
+cd $GIT_DIR
+
+git ls-files |                                        \
+        egrep '\.(h|c|cpp|hpp)$' |                    \
+        xargs clang-format -output-replacements-xml | \
+        grep "<replacement " > /dev/null
+
+if [ $? -ne 1 ]; then
+    echo "Commit did not match clang-format"
+    exit 1
+fi

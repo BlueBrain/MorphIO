@@ -3,10 +3,10 @@
 #include <gsl/span>
 
 #include <minimorph/api.h>
-#include <minimorph/types.h>
+#include <minimorph/iterators.h>
 #include <minimorph/morphology.h>
 #include <minimorph/properties.h>
-#include <minimorph/iterators.h>
+#include <minimorph/types.h>
 
 namespace minimorph
 {
@@ -74,7 +74,6 @@ public:
     BRAIN_API upstream_iterator upstream_begin() const;
     BRAIN_API upstream_iterator upstream_end() const;
 
-
     BRAIN_API const gsl::span<const Point> points() const;
     BRAIN_API const gsl::span<const float> diameters() const;
     BRAIN_API const gsl::span<const float> perimeters() const;
@@ -85,10 +84,10 @@ public:
     /** Return the ID of this section. */
     BRAIN_API const uint32_t id() const;
 
-
 private:
     Section(uint32_t id, PropertiesPtr morphology);
-    template <typename Property> const gsl::span<const typename Property::Type> get() const;
+    template <typename Property>
+    const gsl::span<const typename Property::Type> get() const;
 
     friend class builder::Section;
     friend const Section Morphology::section(const uint32_t&) const;

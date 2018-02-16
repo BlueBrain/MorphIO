@@ -2,8 +2,8 @@
 
 #include <gsl/span>
 
-#include <minimorph/types.h>
 #include <minimorph/morphology.h>
+#include <minimorph/types.h>
 
 namespace minimorph
 {
@@ -31,20 +31,25 @@ namespace minimorph
 class Soma
 {
 public:
-
     BRAIN_API const Point somaCenter() const;
     BRAIN_API const SectionType type() const;
-    BRAIN_API const gsl::span<const Point> points() const { return get<Property::Point>(); }
-    BRAIN_API const gsl::span<const float> diameter() const { return get<Property::Diameter>(); }
+    BRAIN_API const gsl::span<const Point> points() const
+    {
+        return get<Property::Point>();
+    }
+    BRAIN_API const gsl::span<const float> diameter() const
+    {
+        return get<Property::Diameter>();
+    }
 
 private:
     Soma(PropertiesPtr);
-    template <typename Property> const gsl::span<const typename Property::Type> get() const;
+    template <typename Property>
+    const gsl::span<const typename Property::Type> get() const;
     friend const Soma Morphology::soma() const;
     friend class builder::Soma;
 
     PropertiesPtr _properties;
     SectionRange _range;
-
 };
 }

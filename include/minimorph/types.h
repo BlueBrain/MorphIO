@@ -2,18 +2,17 @@
 
 #include <map>
 #include <memory>
+#include <queue>
 #include <set>
+#include <stack>
 #include <string>
 #include <vector>
-#include <stack>
-#include <queue>
 
 #include <stdint.h>
 
-#include <minimorph/vector_types.h>
 #include <minimorph/enums.h>
 #include <minimorph/exceptions.h>
-
+#include <minimorph/vector_types.h>
 
 #ifdef __GNUC__
 #define BRAIN_UNUSED __attribute__((unused))
@@ -22,7 +21,7 @@
 #endif
 
 // TODO: bcoste fix me
-#include<iostream>
+#include <iostream>
 #define LBTHROW(x) (throw x)
 #define LBERROR(x) (std::cerr << x << std::endl)
 #define LBWARN std::cerr
@@ -38,20 +37,24 @@ class MorphologyInitData;
 class Section;
 class Soma;
 
-namespace Property {
+namespace Property
+{
 struct Properties;
 }
 
-namespace detail {
-    class NeurolucidaParser;
+namespace detail
+{
+class NeurolucidaParser;
 }
-namespace builder {
-    class Section;
-    class Soma;
-    class Morphology;
+namespace builder
+{
+class Section;
+class Soma;
+class Morphology;
 }
 
-template <typename T> class Iterator;
+template <typename T>
+class Iterator;
 typedef std::pair<size_t, size_t> SectionRange;
 
 typedef Iterator<std::stack<Section>> depth_iterator;
@@ -63,7 +66,7 @@ using MorphologyPtr = std::shared_ptr<Morphology>;
 using ConstMorphologyPtr = std::shared_ptr<const Morphology>;
 }
 
-//TODO: compile
+// TODO: compile
 #if 0
 // if you have a type T in namespace N, the operator << for T needs to be in
 // namespace N too

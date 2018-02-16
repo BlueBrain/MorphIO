@@ -88,23 +88,24 @@ minimorph::uint32_ts getSectionIDs(const morphio::neuron::Sections& sections)
     return result;
 }
 
-const minimorph::URI TEST_MORPHOLOGY_URI(std::string("file://") + BRAIN_TESTDATA +
-                                     "/h5/test_neuron.h5");
+const minimorph::URI TEST_MORPHOLOGY_URI(std::string("file://") +
+                                         BRAIN_TESTDATA + "/h5/test_neuron.h5");
 
 void checkEqualMorphologies(const morphio::neuron::Morphology& first,
                             const minimorph::Morphology& second)
 {
     BOOST_CHECK(second.getPoints() == first.getPoints());
     BOOST_CHECK(second.getSections() == first.getSections());
-    BOOST_CHECK(
-        second.getSectionTypes() ==
-        reinterpret_cast<const minimorph::SectionTypes&>(first.getSectionTypes()));
+    BOOST_CHECK(second.getSectionTypes() ==
+                reinterpret_cast<const minimorph::SectionTypes&>(
+                    first.getSectionTypes()));
 }
 } // namespace
 
 BOOST_AUTO_TEST_CASE(v2_morphology_constructors)
 {
-    minimorph::ConstMorphologyPtr raw(new minimorph::Morphology(TEST_MORPHOLOGY_URI));
+    minimorph::ConstMorphologyPtr raw(
+        new minimorph::Morphology(TEST_MORPHOLOGY_URI));
 
     const morphio::neuron::Morphology morphology1(TEST_MORPHOLOGY_URI);
     BOOST_CHECK_EQUAL(morphology1.getTransformation(), morphio::Matrix4f());

@@ -28,7 +28,6 @@
 
 #include "minimorph.h"
 
-
 // Some helper macros to make Boost::Test thread safe
 // http://thread.gmane.org/gmane.comp.lib.boost.devel/123662/focus=123678
 lunchbox::SpinLock testLock;
@@ -92,7 +91,8 @@ BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_morphology)
     path /= "circuitBuilding_1000neurons/morphologies/h5/C040426.h5";
 
 #pragma omp parallel
-    TS_BOOST_CHECK_NO_THROW(minimorph::Morphology{minimorph::URI(path.string())});
+    TS_BOOST_CHECK_NO_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())});
 }
 
 BOOST_AUTO_TEST_CASE(test_parallel_acess_of_morphology)

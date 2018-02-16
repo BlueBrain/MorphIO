@@ -3,39 +3,41 @@
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
-#include <ostream>
 #include <memory>
+#include <ostream>
 
 #include <functional>
 
 #include <gsl/span>
 
 #include <minimorph/api.h>
-#include <minimorph/types.h>
-#include <minimorph/section.h>
-#include <minimorph/properties.h>
 #include <minimorph/exceptions.h>
 #include <minimorph/iterators.h>
-
+#include <minimorph/properties.h>
+#include <minimorph/section.h>
+#include <minimorph/types.h>
 
 namespace minimorph
 {
-
 namespace builder
 {
-
 class Soma
 {
 public:
-    Soma() : _somaType(SECTION_UNDEFINED) {}
-    Soma(Property::PointLevel pointProperties, SectionType somaType) :
-        _somaType(somaType), _pointProperties(pointProperties) {}
+    Soma()
+        : _somaType(SECTION_UNDEFINED)
+    {
+    }
+    Soma(Property::PointLevel pointProperties, SectionType somaType)
+        : _somaType(somaType)
+        , _pointProperties(pointProperties)
+    {
+    }
 
-    Soma(const minimorph::Soma &soma);
-    SectionType& type(){ return _somaType; }
-    std::vector<Point>& points(){ return _pointProperties._points;}
-    std::vector<float> diameters(){ return _pointProperties._diameters;}
-
+    Soma(const minimorph::Soma& soma);
+    SectionType& type() { return _somaType; }
+    std::vector<Point>& points() { return _pointProperties._points; }
+    std::vector<float> diameters() { return _pointProperties._diameters; }
 private:
     friend class Morphology;
     Property::PointLevel _pointProperties;
@@ -49,17 +51,17 @@ public:
     const std::set<Section*>& children();
     const uint32_t id() const { return _id; }
     SectionType& type() { return _sectionType; }
-    std::vector<Point>& points(){ return _pointProperties._points;}
-    std::vector<float> diameters(){ return _pointProperties._diameters;}
-    std::vector<float> perimeters(){ return _pointProperties._perimeters;}
-
+    std::vector<Point>& points() { return _pointProperties._points; }
+    std::vector<float> diameters() { return _pointProperties._diameters; }
+    std::vector<float> perimeters() { return _pointProperties._perimeters; }
 private:
-    void traverse(Morphology* morphology,
-                  std::function<void(Morphology* morphology, Section* section)>);
+    void traverse(
+        Morphology* morphology,
+        std::function<void(Morphology* morphology, Section* section)>);
     Section(Morphology*, int id, SectionType type, const Property::PointLevel&);
-    Section(Morphology* morphology, const minimorph::Section &section, bool recursive = true);
-    ~Section(){}
-
+    Section(Morphology* morphology, const minimorph::Section& section,
+            bool recursive = true);
+    ~Section() {}
     friend class Morphology;
     Property::PointLevel _pointProperties;
     SectionType _sectionType;
@@ -71,7 +73,11 @@ private:
 class Morphology
 {
 public:
-    Morphology() : _soma(Soma()), _counter(0) {}
+    Morphology()
+        : _soma(Soma())
+        , _counter(0)
+    {
+    }
     Morphology(const minimorph::Morphology& morphology);
     virtual ~Morphology();
     const std::set<Section*>& rootSections();
@@ -79,9 +85,11 @@ public:
     std::map<uint32_t, Section*>& sections() { return _sections; }
     Soma& soma();
     void deleteSection(Section*, bool recursive = true);
-    uint32_t appendSection(Section* parent, const minimorph::Section&, bool recursive=true);
-    uint32_t appendSection(Section* parent, SectionType, const Property::PointLevel&);
-    uint32_t createNeurite(const minimorph::Section&, bool recursive=true);
+    uint32_t appendSection(Section* parent, const minimorph::Section&,
+                           bool recursive = true);
+    uint32_t appendSection(Section* parent, SectionType,
+                           const Property::PointLevel&);
+    uint32_t createNeurite(const minimorph::Section&, bool recursive = true);
     uint32_t createNeurite(SectionType, const Property::PointLevel&);
     void traverse(std::function<void(Morphology* morphology, Section* section)>,
                   Section* rootSection = nullptr);
@@ -104,6 +112,5 @@ void swc(Morphology& morphology);
 void asc(Morphology& morphology);
 void h5(Morphology& morphology);
 }
-
 }
 }

@@ -26,7 +26,6 @@
 #include <minimorph/types.h>
 namespace HighFive
 {
-
 template <>
 inline AtomicType<minimorph::SectionType>::AtomicType()
 {
@@ -34,19 +33,19 @@ inline AtomicType<minimorph::SectionType>::AtomicType()
 }
 
 template <>
-    inline AtomicType<minimorph::MorphologyVersion>::AtomicType()
+inline AtomicType<minimorph::MorphologyVersion>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
 
 template <>
-    inline AtomicType<minimorph::Vector2i>::AtomicType()
+inline AtomicType<minimorph::Vector2i>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
 
 template <>
-    inline AtomicType<minimorph::Point>::AtomicType()
+inline AtomicType<minimorph::Point>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
@@ -69,6 +68,5 @@ inline void addStringAttribute(HighFive::AnnotateTraits<T>& object,
 }
 }
 }
-
 
 #endif

@@ -1,28 +1,26 @@
-#include <minimorph/section.h>
 #include <minimorph/morphology.h>
+#include <minimorph/section.h>
 
 namespace minimorph
 {
-
 Section::Section(const uint32_t id, PropertiesPtr properties)
     : _id(id)
     , _properties(properties)
 {
     const auto& points = properties->get<Property::Point>();
     const auto& sections = properties->get<Property::Section>();
-    if(id >= sections.size())
-        LBTHROW(RawDataError("Requested section ID (" + std::to_string(id) + \
-                             ") is out of array bounds (array size = " + \
+    if (id >= sections.size())
+        LBTHROW(RawDataError("Requested section ID (" + std::to_string(id) +
+                             ") is out of array bounds (array size = " +
                              std::to_string(sections.size()) + ")"));
 
     const size_t start = sections[id][0];
-    const size_t end = id == sections.size() - 1
-        ? points.size()
-        : sections[id + 1][0];
+    const size_t end =
+        id == sections.size() - 1 ? points.size() : sections[id + 1][0];
     _range = std::make_pair(start, end);
 
     if (_range.second <= _range.first)
-        LBWARN << "Dereferencing broken properties section " << _id << std:: endl
+        LBWARN << "Dereferencing broken properties section " << _id << std::endl
                << "Section range: " << _range.first << " -> " << _range.second
                << std::endl;
 }
@@ -64,21 +62,23 @@ const SectionType Section::type() const
     return val;
 }
 
-
-template <typename TProperty> const gsl::span<const typename TProperty::Type> Section::get() const
+template <typename TProperty>
+const gsl::span<const typename TProperty::Type> Section::get() const
 {
     auto ptr_start = _properties->get<TProperty>().data() + _range.first;
     return gsl::span<const typename TProperty::Type>(ptr_start, _range.second);
 }
 
-bool Section::isRoot() const {
+bool Section::isRoot() const
+{
     return _properties->get<Property::Section>()[_id][1] == -1;
 }
 
 Section Section::parent() const
 {
-    if(isRoot())
-        LBTHROW("Cannot call Section::parent() on a root node (section id=" + std::to_string(_id) + ").");
+    if (isRoot())
+        LBTHROW("Cannot call Section::parent() on a root node (section id=" +
+                std::to_string(_id) + ").");
 
     const int32_t parent = _properties->get<Property::Section>()[_id][1];
     return Section(parent, _properties);
@@ -87,48 +87,66 @@ Section Section::parent() const
 const std::vector<Section> Section::children() const
 {
     std::vector<Section> result;
-    try {
+    try
+    {
         const std::vector<uint32_t>& children = _properties->children().at(_id);
         result.reserve(children.size());
         for (const uint32_t id : children)
             result.push_back(Section(id, _properties));
         return result;
     }
-    catch (const std::out_of_range& oor) {
+    catch (const std::out_of_range& oor)
+    {
         return result;
     }
 }
 
-depth_iterator Section::depth_begin() const {
+depth_iterator Section::depth_begin() const
+{
     return depth_iterator(*this);
 }
 
-depth_iterator Section::depth_end() const {
+depth_iterator Section::depth_end() const
+{
     return depth_iterator();
 }
 
-breadth_iterator Section::breadth_begin() const {
+breadth_iterator Section::breadth_begin() const
+{
     return breadth_iterator(*this);
 }
 
-breadth_iterator Section::breadth_end() const {
+breadth_iterator Section::breadth_end() const
+{
     return breadth_iterator();
 }
 
-upstream_iterator Section::upstream_begin() const {
+upstream_iterator Section::upstream_begin() const
+{
     return upstream_iterator(*this);
 }
 
-upstream_iterator Section::upstream_end() const {
+upstream_iterator Section::upstream_end() const
+{
     return upstream_iterator();
 }
 
-std::ostream& operator<<(std::ostream& os, const Section& section){
+std::ostream& operator<<(std::ostream& os, const Section& section)
+{
     os << section.id();
     return os;
 }
 
-const gsl::span<const Point> Section::points() const { return get<Property::Point>(); }
-const gsl::span<const float> Section::diameters() const { return get<Property::Diameter>(); }
-const gsl::span<const float> Section::perimeters() const { return get<Property::Perimeter>(); }
+const gsl::span<const Point> Section::points() const
+{
+    return get<Property::Point>();
+}
+const gsl::span<const float> Section::diameters() const
+{
+    return get<Property::Diameter>();
+}
+const gsl::span<const float> Section::perimeters() const
+{
+    return get<Property::Perimeter>();
+}
 }

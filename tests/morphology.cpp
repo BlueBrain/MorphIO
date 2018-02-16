@@ -67,16 +67,18 @@ BOOST_AUTO_TEST_CASE(invalid_open)
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/README";
-    BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(h5_invalid_open)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/simulations/may17_2011/Control/voltage.h5";
-    BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(h5_read_v1)
@@ -182,24 +184,24 @@ BOOST_AUTO_TEST_CASE(move_morphology)
 BOOST_AUTO_TEST_CASE(zeroeq_read)
 {
     zeroeq::Server server(zeroeq::NULL_SESSION);
-    server.handle(minimorph::ZEROEQ_GET_MORPHOLOGY,
-                  [](const void* data, const size_t size) {
-                      if (!data || !size)
-                          return zeroeq::ReplyData();
+    server.handle(minimorph::ZEROEQ_GET_MORPHOLOGY, [](const void* data,
+                                                       const size_t size) {
+        if (!data || !size)
+            return zeroeq::ReplyData();
 
-                      const std::string path((const char*)data, size);
-                      const minimorph::Morphology morphology{minimorph::URI(path)};
-                      return zeroeq::ReplyData(minimorph::ZEROEQ_GET_MORPHOLOGY,
-                                               morphology.toBinary().clone());
-                  });
+        const std::string path((const char*)data, size);
+        const minimorph::Morphology morphology{minimorph::URI(path)};
+        return zeroeq::ReplyData(minimorph::ZEROEQ_GET_MORPHOLOGY,
+                                 morphology.toBinary().clone());
+    });
     std::thread thread([&] { server.receive(); });
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/morphologies/14.07.10_repaired/v2/C010398B-P2.h5";
 
-    const minimorph::URI uri{std::string("zeroeq://") + server.getURI().getHost() +
-                         ":" + std::to_string(int(server.getURI().getPort())) +
-                         path.string()};
+    const minimorph::URI uri{
+        std::string("zeroeq://") + server.getURI().getHost() + ":" +
+        std::to_string(int(server.getURI().getPort())) + path.string()};
 
     minimorph::Morphology morphology(uri);
     thread.join();
@@ -343,8 +345,9 @@ BOOST_AUTO_TEST_CASE(swc_no_soma)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/no_soma.swc";
 
-    BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(swc_two_somas)
@@ -352,8 +355,9 @@ BOOST_AUTO_TEST_CASE(swc_two_somas)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/two_somas.swc";
 
-    BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(swc_single_section)
@@ -387,8 +391,9 @@ BOOST_AUTO_TEST_CASE(swc_single_section_missing_segment)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/single_section_missing_segment.swc";
 
-    BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(swc_section_type_changes)
