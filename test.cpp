@@ -49,10 +49,12 @@ int main()
     auto soma = morphology.soma();
 
     for (auto point : soma.points())
-        std::cout << point[0] << ", " << point[1] << ", " << point[2] << std::endl;
+        std::cout << point[0] << ", " << point[1] << ", " << point[2]
+                  << std::endl;
 
     auto center = soma.somaCenter();
-    std::cout << center[0] << ", " << center[1] << ", " << center[2] << std::endl;
+    std::cout << center[0] << ", " << center[1] << ", " << center[2]
+              << std::endl;
 
     std::cout << "soma.type(): " << soma.type() << std::endl;
 
@@ -73,10 +75,12 @@ int main()
     std::cout << "Traversal" << std::endl;
     auto firstNeurite = *(a.rootSections().begin());
     a.traverse(
-        [](minimorph::builder::Morphology* morph, minimorph::builder::Section* sec) {
+        [](minimorph::builder::Morphology* morph,
+           minimorph::builder::Section* sec) {
             std::cout << "hello from: " << sec->type() << std::endl;
             for (auto center : sec->points())
-                std::cout << center[0] << ", " << center[1] << ", " << center[2] << std::endl;
+                std::cout << center[0] << ", " << center[1] << ", " << center[2]
+                          << std::endl;
 
         },
         firstNeurite);

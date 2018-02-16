@@ -18,7 +18,10 @@ typedef std::vector<Point> Points;
 }
 
 std::array<float, 3> operator*(const std::array<float, 3> &from, float factor);
-std::array<float, 3> operator+(const std::array<float, 3> &left, const std::array<float, 3> &right);
-std::array<float, 3> operator-(const std::array<float, 3> &left, const std::array<float, 3> &right);
-std::array<float, 3> operator+=(std::array<float, 3> &left, const std::array<float, 3> &right);
+std::array<float, 3> operator+(const std::array<float, 3> &left,
+                               const std::array<float, 3> &right);
+std::array<float, 3> operator-(const std::array<float, 3> &left,
+                               const std::array<float, 3> &right);
+std::array<float, 3> operator+=(std::array<float, 3> &left,
+                                const std::array<float, 3> &right);
 std::array<float, 3> operator/=(std::array<float, 3> &left, float factor);

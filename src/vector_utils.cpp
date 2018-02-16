@@ -8,7 +8,8 @@ std::array<float, 3> operator*(const std::array<float, 3> &from, float factor)
     return ret;
 }
 
-std::array<float, 3> operator+(const std::array<float, 3> &left, const std::array<float, 3> &right)
+std::array<float, 3> operator+(const std::array<float, 3> &left,
+                               const std::array<float, 3> &right)
 {
     std::array<float, 3> ret;
     for (int i = 0; i < 3; ++i)
@@ -16,7 +17,8 @@ std::array<float, 3> operator+(const std::array<float, 3> &left, const std::arra
     return ret;
 }
 
-std::array<float, 3> operator-(const std::array<float, 3> &left, const std::array<float, 3> &right)
+std::array<float, 3> operator-(const std::array<float, 3> &left,
+                               const std::array<float, 3> &right)
 {
     std::array<float, 3> ret;
     for (int i = 0; i < 3; ++i)
@@ -24,7 +26,8 @@ std::array<float, 3> operator-(const std::array<float, 3> &left, const std::arra
     return ret;
 }
 
-std::array<float, 3> operator+=(std::array<float, 3> &left, const std::array<float, 3> &right)
+std::array<float, 3> operator+=(std::array<float, 3> &left,
+                                const std::array<float, 3> &right)
 {
     for (int i = 0; i < 3; ++i)
         left[i] += right[i];

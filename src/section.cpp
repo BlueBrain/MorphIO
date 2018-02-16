@@ -15,12 +15,14 @@ Section::Section(const uint32_t id, PropertiesPtr properties)
                              std::to_string(sections.size()) + ")"));
 
     const size_t start = sections[id][0];
-    const size_t end = id == sections.size() - 1 ? points.size() : sections[id + 1][0];
+    const size_t end =
+        id == sections.size() - 1 ? points.size() : sections[id + 1][0];
     _range = std::make_pair(start, end);
 
     if (_range.second <= _range.first)
         LBWARN << "Dereferencing broken properties section " << _id << std::endl
-               << "Section range: " << _range.first << " -> " << _range.second << std::endl;
+               << "Section range: " << _range.first << " -> " << _range.second
+               << std::endl;
 }
 
 Section::Section(const Section& section)
@@ -75,8 +77,8 @@ bool Section::isRoot() const
 Section Section::parent() const
 {
     if (isRoot())
-        LBTHROW("Cannot call Section::parent() on a root node (section id=" + std::to_string(_id) +
-                ").");
+        LBTHROW("Cannot call Section::parent() on a root node (section id=" +
+                std::to_string(_id) + ").");
 
     const int32_t parent = _properties->get<Property::Section>()[_id][1];
     return Section(parent, _properties);

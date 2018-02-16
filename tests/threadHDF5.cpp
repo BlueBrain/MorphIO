@@ -68,7 +68,8 @@ BOOST_AUTO_TEST_CASE(test_parallel_access_of_synapse)
     const minimorph::Synapse synapse(path.string());
 #pragma omp parallel
     {
-        const minimorph::SynapseMatrix& data = synapse.read(1, minimorph::SYNAPSE_ALL_ATTRIBUTES);
+        const minimorph::SynapseMatrix& data =
+            synapse.read(1, minimorph::SYNAPSE_ALL_ATTRIBUTES);
         TS_BOOST_CHECK(!data.empty());
         const size_t numSynapses = synapse.getNumSynapses(gids);
         TS_BOOST_CHECK_GT(numSynapses, 0);
@@ -90,7 +91,8 @@ BOOST_AUTO_TEST_CASE(test_parallel_open_of_same_morphology)
     path /= "circuitBuilding_1000neurons/morphologies/h5/C040426.h5";
 
 #pragma omp parallel
-    TS_BOOST_CHECK_NO_THROW(minimorph::Morphology{minimorph::URI(path.string())});
+    TS_BOOST_CHECK_NO_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())});
 }
 
 BOOST_AUTO_TEST_CASE(test_parallel_acess_of_morphology)

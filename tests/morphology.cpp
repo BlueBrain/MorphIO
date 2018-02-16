@@ -50,7 +50,8 @@ const int APICAL_DENDRITE = minimorph::SECTION_APICAL_DENDRITE;
 }
 
 template <typename T>
-void checkCloseArrays(const std::vector<T>& array1, const std::vector<T>& array2)
+void checkCloseArrays(const std::vector<T>& array1,
+                      const std::vector<T>& array2)
 {
     BOOST_CHECK_EQUAL(array1.size(), array2.size());
     for (size_t i = 0; i != std::min(array1.size(), array2.size()); ++i)
@@ -61,20 +62,23 @@ BOOST_AUTO_TEST_CASE(invalid_open)
 {
     BOOST_CHECK_THROW(minimorph::Morphology(minimorph::URI("/bla")).getPoints(),
                       std::runtime_error);
-    BOOST_CHECK_THROW(minimorph::Morphology(minimorph::URI("bla")).getPoints(), std::runtime_error);
+    BOOST_CHECK_THROW(minimorph::Morphology(minimorph::URI("bla")).getPoints(),
+                      std::runtime_error);
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/README";
-    BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(h5_invalid_open)
 {
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/simulations/may17_2011/Control/voltage.h5";
-    BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(h5_read_v1)
@@ -180,21 +184,24 @@ BOOST_AUTO_TEST_CASE(move_morphology)
 BOOST_AUTO_TEST_CASE(zeroeq_read)
 {
     zeroeq::Server server(zeroeq::NULL_SESSION);
-    server.handle(minimorph::ZEROEQ_GET_MORPHOLOGY, [](const void* data, const size_t size) {
+    server.handle(minimorph::ZEROEQ_GET_MORPHOLOGY, [](const void* data,
+                                                       const size_t size) {
         if (!data || !size)
             return zeroeq::ReplyData();
 
         const std::string path((const char*)data, size);
         const minimorph::Morphology morphology{minimorph::URI(path)};
-        return zeroeq::ReplyData(minimorph::ZEROEQ_GET_MORPHOLOGY, morphology.toBinary().clone());
+        return zeroeq::ReplyData(minimorph::ZEROEQ_GET_MORPHOLOGY,
+                                 morphology.toBinary().clone());
     });
     std::thread thread([&] { server.receive(); });
 
     boost::filesystem::path path(BBP_TESTDATA);
     path /= "local/morphologies/14.07.10_repaired/v2/C010398B-P2.h5";
 
-    const minimorph::URI uri{std::string("zeroeq://") + server.getURI().getHost() + ":" +
-                             std::to_string(int(server.getURI().getPort())) + path.string()};
+    const minimorph::URI uri{
+        std::string("zeroeq://") + server.getURI().getHost() + ":" +
+        std::to_string(int(server.getURI().getPort())) + path.string()};
 
     minimorph::Morphology morphology(uri);
     thread.join();
@@ -205,8 +212,9 @@ BOOST_AUTO_TEST_CASE(zeroeq_read)
 
 BOOST_AUTO_TEST_CASE(swc_invalid_open)
 {
-    BOOST_CHECK_THROW(minimorph::Morphology(minimorph::URI("not_found.swc")).getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology(minimorph::URI("not_found.swc")).getPoints(),
+        std::runtime_error);
     try
     {
         boost::filesystem::path path(BRAIN_TESTDATA);
@@ -216,7 +224,8 @@ BOOST_AUTO_TEST_CASE(swc_invalid_open)
     }
     catch (std::runtime_error& error)
     {
-        BOOST_CHECK(std::string(error.what()).find("line 6") != std::string::npos);
+        BOOST_CHECK(std::string(error.what()).find("line 6") !=
+                    std::string::npos);
     }
 }
 
@@ -229,7 +238,8 @@ std::ostream& operator<<(std::ostream& out, std::vector<T>& list)
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, std::vector<minimorph::SectionType>& list)
+std::ostream& operator<<(std::ostream& out,
+                         std::vector<minimorph::SectionType>& list)
 {
     for (minimorph::SectionType i : list)
         out << (int)i << ' ';
@@ -260,11 +270,13 @@ void checkEqualArrays(const std::vector<T>& array, const size_t length, ...)
         ref.push_back((T)va_arg(args, typename VaArgsType<T>::type));
     va_end(args);
 
-    BOOST_CHECK_EQUAL_COLLECTIONS(array.begin(), array.end(), ref.begin(), ref.end());
+    BOOST_CHECK_EQUAL_COLLECTIONS(array.begin(), array.end(), ref.begin(),
+                                  ref.end());
 }
 
 template <typename T>
-void _checkCloseArrays(const std::vector<T>& array, const size_t length, va_list args)
+void _checkCloseArrays(const std::vector<T>& array, const size_t length,
+                       va_list args)
 {
     for (size_t i = 0; i != length; ++i)
     {
@@ -295,7 +307,8 @@ void checkCloseArrays(const std::vector<vmml::vector<M, T>>& array1,
 }
 
 template <typename T>
-void checkCloseArraysUptoN(const std::vector<T>& array, const size_t length, ...)
+void checkCloseArraysUptoN(const std::vector<T>& array, const size_t length,
+                           ...)
 {
     BOOST_CHECK(array.size() >= length);
     va_list args;
@@ -321,8 +334,8 @@ BOOST_AUTO_TEST_CASE(swc_soma_ring)
     path /= "swc/soma_ring.swc";
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
-    checkEqualArrays(source.getPoints(), 5, V4f(0, 0, 0, 20), V4f(0, 0, 1, 20), V4f(0, 1, 0, 20),
-                     V4f(0, 1, 1, 20), V4f(1, 0, 0, 20));
+    checkEqualArrays(source.getPoints(), 5, V4f(0, 0, 0, 20), V4f(0, 0, 1, 20),
+                     V4f(0, 1, 0, 20), V4f(0, 1, 1, 20), V4f(1, 0, 0, 20));
     checkEqualArrays(source.getSections(), 1, V2i(0, -1));
     checkEqualArrays(source.getSectionTypes(), 1, SOMA);
 }
@@ -332,8 +345,9 @@ BOOST_AUTO_TEST_CASE(swc_no_soma)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/no_soma.swc";
 
-    BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(swc_two_somas)
@@ -341,8 +355,9 @@ BOOST_AUTO_TEST_CASE(swc_two_somas)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/two_somas.swc";
 
-    BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(swc_single_section)
@@ -352,8 +367,8 @@ BOOST_AUTO_TEST_CASE(swc_single_section)
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
 
-    checkEqualArrays(source.getPoints(), 5, V4f(0, 0, 0, 20), V4f(0, 0, 1, 4), V4f(0, 0, 2, 4),
-                     V4f(0, 0, 3, 4), V4f(0, 0, 4, 4));
+    checkEqualArrays(source.getPoints(), 5, V4f(0, 0, 0, 20), V4f(0, 0, 1, 4),
+                     V4f(0, 0, 2, 4), V4f(0, 0, 3, 4), V4f(0, 0, 4, 4));
     checkEqualArrays(source.getSections(), 2, V2i(0, -1), V2i(1, 0));
     checkEqualArrays(source.getSectionTypes(), 2, SOMA, AXON);
 }
@@ -365,8 +380,8 @@ BOOST_AUTO_TEST_CASE(swc_single_section_unordered)
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
 
-    checkEqualArrays(source.getPoints(), 5, V4f(0, 0, 0, 20), V4f(0, 0, 1, 4), V4f(0, 0, 2, 4),
-                     V4f(0, 0, 3, 4), V4f(0, 0, 4, 4));
+    checkEqualArrays(source.getPoints(), 5, V4f(0, 0, 0, 20), V4f(0, 0, 1, 4),
+                     V4f(0, 0, 2, 4), V4f(0, 0, 3, 4), V4f(0, 0, 4, 4));
     checkEqualArrays(source.getSections(), 2, V2i(0, -1), V2i(1, 0));
     checkEqualArrays(source.getSectionTypes(), 2, SOMA, AXON);
 }
@@ -376,8 +391,9 @@ BOOST_AUTO_TEST_CASE(swc_single_section_missing_segment)
     boost::filesystem::path path(BRAIN_TESTDATA);
     path /= "swc/single_section_missing_segment.swc";
 
-    BOOST_CHECK_THROW(minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
-                      std::runtime_error);
+    BOOST_CHECK_THROW(
+        minimorph::Morphology{minimorph::URI(path.string())}.getPoints(),
+        std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(swc_section_type_changes)
@@ -387,10 +403,13 @@ BOOST_AUTO_TEST_CASE(swc_section_type_changes)
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
 
-    checkEqualArrays(source.getPoints(), 7, V4f(0, 0, 0, 20), V4f(0, 0, 1, 4), V4f(0, 0, 2, 4),
-                     V4f(0, 0, 2, 4), V4f(0, 0, 3, 4), V4f(0, 0, 3, 4), V4f(0, 0, 4, 4));
-    checkEqualArrays(source.getSections(), 4, V2i(0, -1), V2i(1, 0), V2i(3, 1), V2i(5, 2));
-    checkEqualArrays(source.getSectionTypes(), 4, SOMA, AXON, DENDRITE, APICAL_DENDRITE);
+    checkEqualArrays(source.getPoints(), 7, V4f(0, 0, 0, 20), V4f(0, 0, 1, 4),
+                     V4f(0, 0, 2, 4), V4f(0, 0, 2, 4), V4f(0, 0, 3, 4),
+                     V4f(0, 0, 3, 4), V4f(0, 0, 4, 4));
+    checkEqualArrays(source.getSections(), 4, V2i(0, -1), V2i(1, 0), V2i(3, 1),
+                     V2i(5, 2));
+    checkEqualArrays(source.getSectionTypes(), 4, SOMA, AXON, DENDRITE,
+                     APICAL_DENDRITE);
 }
 
 BOOST_AUTO_TEST_CASE(swc_first_order_sections)
@@ -400,12 +419,14 @@ BOOST_AUTO_TEST_CASE(swc_first_order_sections)
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
 
-    checkEqualArrays(source.getSections(), 4, V2i(0, -1), V2i(1, 0), V2i(2, 0), V2i(3, 0));
+    checkEqualArrays(source.getSections(), 4, V2i(0, -1), V2i(1, 0), V2i(2, 0),
+                     V2i(3, 0));
     // The tree construction algorithm reverses the order of the sections
     // compared to how they appear in the file
-    checkEqualArrays(source.getPoints(), 4, V4f(0, 0, 0, 20), V4f(0, 0, 3, 4), V4f(0, 0, 2, 4),
-                     V4f(0, 0, 1, 4));
-    checkEqualArrays(source.getSectionTypes(), 4, SOMA, APICAL_DENDRITE, DENDRITE, AXON);
+    checkEqualArrays(source.getPoints(), 4, V4f(0, 0, 0, 20), V4f(0, 0, 3, 4),
+                     V4f(0, 0, 2, 4), V4f(0, 0, 1, 4));
+    checkEqualArrays(source.getSectionTypes(), 4, SOMA, APICAL_DENDRITE,
+                     DENDRITE, AXON);
 }
 
 BOOST_AUTO_TEST_CASE(swc_first_order_sections_from_arbitrary_points)
@@ -415,14 +436,17 @@ BOOST_AUTO_TEST_CASE(swc_first_order_sections_from_arbitrary_points)
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
 
-    checkEqualArrays(source.getSections(), 4, V2i(0, -1), V2i(5, 0), V2i(8, 0), V2i(11, 0));
+    checkEqualArrays(source.getSections(), 4, V2i(0, -1), V2i(5, 0), V2i(8, 0),
+                     V2i(11, 0));
     // The tree construction algorithm reverses the order of the sections
     // compared to how they appear in the file
-    checkEqualArrays(source.getPoints(), 14, V4f(0, 0, 1, 0), V4f(0, 0, 2, 0), V4f(0, 0, 3, 0),
-                     V4f(0, 0, 4, 0), V4f(0, 0, 5, 0), V4f(0, 0, 4, 0), V4f(3, 1, 10, 1),
-                     V4f(3, 2, 11, 1), V4f(0, 0, 3, 0), V4f(2, 1, 8, 1), V4f(2, 2, 9, 1),
+    checkEqualArrays(source.getPoints(), 14, V4f(0, 0, 1, 0), V4f(0, 0, 2, 0),
+                     V4f(0, 0, 3, 0), V4f(0, 0, 4, 0), V4f(0, 0, 5, 0),
+                     V4f(0, 0, 4, 0), V4f(3, 1, 10, 1), V4f(3, 2, 11, 1),
+                     V4f(0, 0, 3, 0), V4f(2, 1, 8, 1), V4f(2, 2, 9, 1),
                      V4f(0, 0, 2, 0), V4f(1, 1, 6, 1), V4f(1, 2, 7, 1));
-    checkEqualArrays(source.getSectionTypes(), 4, SOMA, APICAL_DENDRITE, DENDRITE, AXON);
+    checkEqualArrays(source.getSectionTypes(), 4, SOMA, APICAL_DENDRITE,
+                     DENDRITE, AXON);
 }
 
 BOOST_AUTO_TEST_CASE(swc_bifurcation)
@@ -432,11 +456,14 @@ BOOST_AUTO_TEST_CASE(swc_bifurcation)
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
 
-    checkEqualArrays(source.getPoints(), 9, V4f(0, 0, 0, 20), V4f(0, 0, 2, 4), V4f(0, 0, 3, 4),
-                     V4f(0, 0, 3, 4), V4f(0, 0, 4, 4), V4f(0, 0, 5, 4), V4f(0, 0, 3, 4),
-                     V4f(0, 0, 6, 4), V4f(0, 0, 7, 4));
-    checkEqualArrays(source.getSections(), 4, V2i(0, -1), V2i(1, 0), V2i(3, 1), V2i(6, 1));
-    checkEqualArrays(source.getSectionTypes(), 4, SOMA, DENDRITE, APICAL_DENDRITE, APICAL_DENDRITE);
+    checkEqualArrays(source.getPoints(), 9, V4f(0, 0, 0, 20), V4f(0, 0, 2, 4),
+                     V4f(0, 0, 3, 4), V4f(0, 0, 3, 4), V4f(0, 0, 4, 4),
+                     V4f(0, 0, 5, 4), V4f(0, 0, 3, 4), V4f(0, 0, 6, 4),
+                     V4f(0, 0, 7, 4));
+    checkEqualArrays(source.getSections(), 4, V2i(0, -1), V2i(1, 0), V2i(3, 1),
+                     V2i(6, 1));
+    checkEqualArrays(source.getSectionTypes(), 4, SOMA, DENDRITE,
+                     APICAL_DENDRITE, APICAL_DENDRITE);
 }
 
 BOOST_AUTO_TEST_CASE(swc_end_points)
@@ -446,10 +473,11 @@ BOOST_AUTO_TEST_CASE(swc_end_points)
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
 
-    checkEqualArrays(source.getSections(), 6, V2i(0, -1), V2i(1, 0), V2i(2, 0), V2i(3, 0),
-                     V2i(4, 3), V2i(6, 3));
+    checkEqualArrays(source.getSections(), 6, V2i(0, -1), V2i(1, 0), V2i(2, 0),
+                     V2i(3, 0), V2i(4, 3), V2i(6, 3));
 
-    checkEqualArrays(source.getSectionTypes(), 6, SOMA, UNDEFINED, UNDEFINED, AXON, AXON, AXON);
+    checkEqualArrays(source.getSectionTypes(), 6, SOMA, UNDEFINED, UNDEFINED,
+                     AXON, AXON, AXON);
 }
 
 BOOST_AUTO_TEST_CASE(swc_fork_points)
@@ -459,10 +487,11 @@ BOOST_AUTO_TEST_CASE(swc_fork_points)
 
     const minimorph::Morphology source{minimorph::URI(path.string())};
 
-    checkEqualArrays(source.getSections(), 6, V2i(0, -1), V2i(1, 0), V2i(2, 0), V2i(3, 0),
-                     V2i(4, 3), V2i(6, 3));
+    checkEqualArrays(source.getSections(), 6, V2i(0, -1), V2i(1, 0), V2i(2, 0),
+                     V2i(3, 0), V2i(4, 3), V2i(6, 3));
 
-    checkEqualArrays(source.getSectionTypes(), 6, SOMA, UNDEFINED, UNDEFINED, AXON, AXON, AXON);
+    checkEqualArrays(source.getSectionTypes(), 6, SOMA, UNDEFINED, UNDEFINED,
+                     AXON, AXON, AXON);
 }
 
 BOOST_AUTO_TEST_CASE(swc_neuron)
