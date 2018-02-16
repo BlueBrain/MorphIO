@@ -4,30 +4,35 @@
 
 namespace minimorph
 {
-
 namespace Property
 {
-struct Section{
+struct Section
+{
     typedef Vector2i Type;
 };
 
-struct Point{
+struct Point
+{
     typedef minimorph::Point Type;
 };
 
-struct SectionType{
+struct SectionType
+{
     typedef minimorph::SectionType Type;
 };
 
-struct Perimeter{
+struct Perimeter
+{
     typedef float Type;
 };
 
-struct Diameter {
+struct Diameter
+{
     typedef float Type;
 };
 
-struct PointLevel {
+struct PointLevel
+{
     std::vector<Point::Type> _points;
     std::vector<Perimeter::Type> _perimeters;
     std::vector<Diameter::Type> _diameters;
@@ -36,33 +41,44 @@ struct PointLevel {
     PointLevel(const PointLevel& data, SectionRange range);
 };
 
-struct SectionLevel {
+struct SectionLevel
+{
     std::vector<Section::Type> _sections;
     std::vector<SectionType::Type> _sectionTypes;
     std::map<uint32_t, std::vector<uint32_t>> _children;
 };
 
-struct CellLevel {
+struct CellLevel
+{
     minimorph::SomaType _somaType;
     minimorph::CellFamily _cellFamily;
     MorphologyVersion _version;
 };
 
-
 // The lowest level data blob
-struct Properties {
+struct Properties
+{
     PointLevel _pointLevel;
     SectionLevel _sectionLevel;
     CellLevel _cellLevel;
 
-    template <typename T> std::vector<typename T::Type>& get();
-    template <typename T> const std::vector<typename T::Type>& get() const;
+    template <typename T>
+    std::vector<typename T::Type>& get();
+    template <typename T>
+    const std::vector<typename T::Type>& get() const;
 
-    const minimorph::MorphologyVersion& version() { return _cellLevel._version; }
+    const minimorph::MorphologyVersion& version()
+    {
+        return _cellLevel._version;
+    }
     const minimorph::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
-    const minimorph::SomaType& somaType() { return _cellLevel._somaType; }
-    const std::map<uint32_t, std::vector<uint32_t>>& children() { return _sectionLevel._children; }
+    const minimorph::SomaType& somaType() {
+        return _cellLevel._somaType;
+    }
+    const std::map<uint32_t, std::vector<uint32_t>>& children()
+    {
+        return _sectionLevel._children;
+    }
 };
-
 }
 }

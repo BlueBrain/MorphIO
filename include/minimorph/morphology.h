@@ -1,14 +1,13 @@
 #pragma once
 
-#include <memory>  //std::unique_ptr
+#include <memory> //std::unique_ptr
 
 #include <minimorph/api.h>
-#include <minimorph/types.h>
 #include <minimorph/properties.h>
+#include <minimorph/types.h>
 
 namespace minimorph
 {
-
 /** Read access a Morphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
@@ -17,7 +16,6 @@ namespace minimorph
 class Morphology
 {
 public:
-
     /** Close morphology file. @version 1.0 */
     BRAIN_API ~Morphology();
 
@@ -25,7 +23,6 @@ public:
     BRAIN_API Morphology& operator=(const Morphology&);
     BRAIN_API Morphology(Morphology&&);
     BRAIN_API Morphology& operator=(Morphology&&);
-
 
     /** @name Read API */
     //@{
@@ -64,7 +61,7 @@ public:
 private:
     PropertiesPtr _properties;
 
-    template <typename Property> const std::vector<typename Property::Type>& get() const;
+    template <typename Property>
+    const std::vector<typename Property::Type>& get() const;
 };
-
 }

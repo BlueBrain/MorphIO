@@ -25,25 +25,39 @@ public:
 SomaError(const std::string& _msg) : MinimorphError(_msg) {}
 };
 
-class IDSequenceError: public RawDataError {
+class IDSequenceError : public RawDataError
+{
 public:
-IDSequenceError(const std::string& _msg) : RawDataError(_msg) {}
+    IDSequenceError(const std::string& _msg)
+        : RawDataError(_msg)
+    {
+    }
 };
 
-class MultipleTrees: public RawDataError {
+class MultipleTrees : public RawDataError
+{
 public:
-MultipleTrees(const std::string& _msg) : RawDataError(_msg) {}
+    MultipleTrees(const std::string& _msg)
+        : RawDataError(_msg)
+    {
+    }
 };
 
-class MissingParentError: public RawDataError {
+class MissingParentError : public RawDataError
+{
 public:
-MissingParentError(const std::string& _msg) : RawDataError(_msg) {}
+    MissingParentError(const std::string& _msg)
+        : RawDataError(_msg)
+    {
+    }
 };
 
-class SectionBuilderError: public RawDataError {
+class SectionBuilderError : public RawDataError
+{
 public:
-SectionBuilderError(const std::string& _msg) : RawDataError(_msg) {}
+    SectionBuilderError(const std::string& _msg)
+        : RawDataError(_msg)
+    {
+    }
 };
-
-
 }

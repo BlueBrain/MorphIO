@@ -1,7 +1,7 @@
 #include <fstream>
 
-#include <minimorph/types.h>
 #include <minimorph/sectionBuilder.h>
+#include <minimorph/types.h>
 
 #include "morphologyASC.h"
 
@@ -9,13 +9,10 @@
 
 namespace minimorph
 {
-
 namespace plugin
 {
-
 namespace asc
 {
-
 bool is_eof(Token type)
 {
     return type == Token::EOF_;
@@ -23,15 +20,15 @@ bool is_eof(Token type)
 
 bool is_end_of_branch(Token type)
 {
-    return (type == Token::GENERATED || type == Token::HIGH
-            || type == Token::INCOMPLETE || type == Token::LOW
-            || type == Token::NORMAL || type == Token::MIDPOINT);
+    return (type == Token::GENERATED || type == Token::HIGH ||
+            type == Token::INCOMPLETE || type == Token::LOW ||
+            type == Token::NORMAL || type == Token::MIDPOINT);
 }
 
 bool is_neurite_type(Token id)
 {
-    return (id == Token::AXON || id == Token::APICAL || id == Token::DENDRITE
-            || id == Token::CELLBODY);
+    return (id == Token::AXON || id == Token::APICAL || id == Token::DENDRITE ||
+            id == Token::CELLBODY);
 }
 
 bool is_end_of_section(Token id)
@@ -41,10 +38,10 @@ bool is_end_of_section(Token id)
 
 bool skip_sexp(size_t id)
 {
-    return (id == +Token::WORD || id == +Token::STRING || id == +Token::COLOR
-            || id == +Token::GENERATED || id == +Token::HIGH
-            || id == +Token::INCOMPLETE || id == +Token::LOW
-            || id == +Token::NORMAL);
+    return (id == +Token::WORD || id == +Token::STRING || id == +Token::COLOR ||
+            id == +Token::GENERATED || id == +Token::HIGH ||
+            id == +Token::INCOMPLETE || id == +Token::LOW ||
+            id == +Token::NORMAL);
 }
 
 std::tuple<Point, float> parse_point(NeurolucidaLexer& lex)
@@ -76,7 +73,7 @@ std::tuple<Point, float> parse_point(NeurolucidaLexer& lex)
 class NeurolucidaParser
 {
 public:
-    NeurolucidaParser() {};
+    NeurolucidaParser(){};
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
@@ -98,8 +95,8 @@ private:
         while (true)
         {
             ret &= parse_neurite_section(parent_id, token);
-            if (lex_.ended() || (lex_.current()->id != +Token::PIPE
-                                 && lex_.current()->id != +Token::LPAREN))
+            if (lex_.ended() || (lex_.current()->id != +Token::PIPE &&
+                                 lex_.current()->id != +Token::LPAREN))
             {
                 break;
             }
@@ -167,7 +164,8 @@ private:
             else if (id == Token::LSPINE)
             {
                 // skip spines
-                while (!lex_.ended() && static_cast<Token>(lex_.current()->id) != Token::RSPINE)
+                while (!lex_.ended() &&
+                       static_cast<Token>(lex_.current()->id) != Token::RSPINE)
                 {
                     lex_.consume();
                 }
@@ -240,8 +238,8 @@ private:
     minimorph::builder::Morphology nb_;
 };
 
-
-Property::Properties load(const URI& uri) {
+Property::Properties load(const URI& uri)
+{
     NeurolucidaParser parser;
     std::ifstream ifs(uri);
     std::string input((std::istreambuf_iterator<char>(ifs)),

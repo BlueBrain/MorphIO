@@ -13,52 +13,54 @@
 
 namespace minimorph
 {
-    /** The current major version. */
-#   define BRAIN_VERSION_MAJOR 1
+/** The current major version. */
+#define BRAIN_VERSION_MAJOR 1
 
-    /** The current minor version. */
-#   define BRAIN_VERSION_MINOR 8
+/** The current minor version. */
+#define BRAIN_VERSION_MINOR 8
 
-    /** The current patch level. */
-#   define BRAIN_VERSION_PATCH 0
+/** The current patch level. */
+#define BRAIN_VERSION_PATCH 0
 
-    /** The current SCM revision. */
-#   define BRAIN_VERSION_REVISION 0xba9ba9e
+/** The current SCM revision. */
+#define BRAIN_VERSION_REVISION 0xba9ba9e
 
-    /** The current binary interface. */
-#   define BRAIN_VERSION_ABI 6ull
+/** The current binary interface. */
+#define BRAIN_VERSION_ABI 6ull
 
-    /** The current major.minor.version as a string. */
-#   define BRAIN_VERSION_STRING \
-    "1.8.0"
+/** The current major.minor.version as a string. */
+#define BRAIN_VERSION_STRING "1.8.0"
 
-    /** The current major.minor.version.revision as a string. */
-#   define BRAIN_REV_STRING \
-    "1.8.0.0xba9ba9e"
+/** The current major.minor.version.revision as a string. */
+#define BRAIN_REV_STRING "1.8.0.0xba9ba9e"
 
 /** True if the current version is newer than the given one. */
-#   define BRAIN_VERSION_GT( MAJOR, MINOR, PATCH )       \
-    ( (BRAIN_VERSION_MAJOR>MAJOR) ||                     \
-      (BRAIN_VERSION_MAJOR==MAJOR && (BRAIN_VERSION_MINOR>MINOR || \
-          (BRAIN_VERSION_MINOR==MINOR && BRAIN_VERSION_PATCH>PATCH))))
+#define BRAIN_VERSION_GT(MAJOR, MINOR, PATCH) \
+    ((BRAIN_VERSION_MAJOR > MAJOR) ||         \
+     (BRAIN_VERSION_MAJOR == MAJOR &&         \
+      (BRAIN_VERSION_MINOR > MINOR ||         \
+       (BRAIN_VERSION_MINOR == MINOR && BRAIN_VERSION_PATCH > PATCH))))
 
 /** True if the current version is equal or newer to the given. */
-#   define BRAIN_VERSION_GE( MAJOR, MINOR, PATCH )       \
-    ( (BRAIN_VERSION_MAJOR>MAJOR) ||                     \
-      (BRAIN_VERSION_MAJOR==MAJOR && (BRAIN_VERSION_MINOR>MINOR || \
-          (BRAIN_VERSION_MINOR==MINOR && BRAIN_VERSION_PATCH>=PATCH))))
+#define BRAIN_VERSION_GE(MAJOR, MINOR, PATCH) \
+    ((BRAIN_VERSION_MAJOR > MAJOR) ||         \
+     (BRAIN_VERSION_MAJOR == MAJOR &&         \
+      (BRAIN_VERSION_MINOR > MINOR ||         \
+       (BRAIN_VERSION_MINOR == MINOR && BRAIN_VERSION_PATCH >= PATCH))))
 
 /** True if the current version is older than the given one. */
-#   define BRAIN_VERSION_LT( MAJOR, MINOR, PATCH )       \
-    ( (BRAIN_VERSION_MAJOR<MAJOR) ||                     \
-      (BRAIN_VERSION_MAJOR==MAJOR && (BRAIN_VERSION_MINOR<MINOR || \
-          (BRAIN_VERSION_MINOR==MINOR && BRAIN_VERSION_PATCH<PATCH))))
+#define BRAIN_VERSION_LT(MAJOR, MINOR, PATCH) \
+    ((BRAIN_VERSION_MAJOR < MAJOR) ||         \
+     (BRAIN_VERSION_MAJOR == MAJOR &&         \
+      (BRAIN_VERSION_MINOR < MINOR ||         \
+       (BRAIN_VERSION_MINOR == MINOR && BRAIN_VERSION_PATCH < PATCH))))
 
 /** True if the current version is older or equal to the given. */
-#   define BRAIN_VERSION_LE( MAJOR, MINOR, PATCH )       \
-    ( (BRAIN_VERSION_MAJOR<MAJOR) ||                     \
-      (BRAIN_VERSION_MAJOR==MAJOR && (BRAIN_VERSION_MINOR<MINOR || \
-        (BRAIN_VERSION_MINOR==MINOR && BRAIN_VERSION_PATCH<=PATCH))))
+#define BRAIN_VERSION_LE(MAJOR, MINOR, PATCH) \
+    ((BRAIN_VERSION_MAJOR < MAJOR) ||         \
+     (BRAIN_VERSION_MAJOR == MAJOR &&         \
+      (BRAIN_VERSION_MINOR < MINOR ||         \
+       (BRAIN_VERSION_MINOR == MINOR && BRAIN_VERSION_PATCH <= PATCH))))
 
 /** Information about the current Brion version. */
 class BRAIN_API Version
@@ -82,7 +84,8 @@ public:
     /** @return the current binary interface version of Brion. */
     static int getABI();
 
-    /** @return the current Brion version plus the git SHA hash (MM.mm.pp.rev). */
+    /** @return the current Brion version plus the git SHA hash (MM.mm.pp.rev).
+     */
     static std::string getRevString();
 
     /**
@@ -95,8 +98,8 @@ public:
      */
     static bool check()
     {
-        return getMajor()==BRAIN_VERSION_MAJOR &&
-               getMinor()==BRAIN_VERSION_MINOR;
+        return getMajor() == BRAIN_VERSION_MAJOR &&
+               getMinor() == BRAIN_VERSION_MINOR;
     }
 
     /** @return JSON schema describing this object. */
@@ -132,5 +135,4 @@ public:
                )";
     }
 };
-
 }
