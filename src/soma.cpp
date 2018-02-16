@@ -15,14 +15,12 @@ Soma::Soma(PropertiesPtr properties)
                              std::to_string(sections.size()) + ")"));
 
     const size_t start = sections[id][0];
-    const size_t end =
-        id == sections.size() - 1 ? points.size() : sections[id + 1][0];
+    const size_t end = id == sections.size() - 1 ? points.size() : sections[id + 1][0];
     _range = std::make_pair(start, end);
 
     if (_range.second <= _range.first)
         LBWARN << "Dereferencing broken soma "
-               << "Section range: " << _range.first << " -> " << _range.second
-               << std::endl;
+               << "Section range: " << _range.first << " -> " << _range.second << std::endl;
 }
 
 const SomaType Soma::type() const
@@ -51,8 +49,6 @@ const Point Soma::somaCenter() const
     return Point({x / size, y / size, z / size});
 }
 
-template const gsl::span<const Property::Point::Type>
-    Soma::get<Property::Point>() const;
-template const gsl::span<const Property::Diameter::Type>
-    Soma::get<Property::Diameter>() const;
+template const gsl::span<const Property::Point::Type> Soma::get<Property::Point>() const;
+template const gsl::span<const Property::Diameter::Type> Soma::get<Property::Diameter>() const;
 }

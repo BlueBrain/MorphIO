@@ -5,13 +5,12 @@ namespace minimorph
 namespace Property
 {
 template <typename T>
-std::vector<typename T::Type> copySpan(
-    const std::vector<typename T::Type>& data, SectionRange range)
+std::vector<typename T::Type> copySpan(const std::vector<typename T::Type>& data,
+                                       SectionRange range)
 {
     if (data.empty())
         return std::vector<typename T::Type>();
-    return std::vector<typename T::Type>(data.begin() + range.first,
-                                         data.begin() + range.second);
+    return std::vector<typename T::Type>(data.begin() + range.first, data.begin() + range.second);
 }
 
 PointLevel::PointLevel(const PointLevel& data, SectionRange range)

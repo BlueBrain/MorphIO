@@ -57,13 +57,11 @@ namespace detail
 {
 /** Add a string attribute to the given H5 object. */
 template <typename T>
-inline void addStringAttribute(HighFive::AnnotateTraits<T>& object,
-                               const std::string& name,
+inline void addStringAttribute(HighFive::AnnotateTraits<T>& object, const std::string& name,
                                const std::string& value)
 {
     auto dataspace = HighFive::DataSpace::From(value);
-    auto attr = object.createAttribute(name, dataspace,
-                                       HighFive::AtomicType<std::string>());
+    auto attr = object.createAttribute(name, dataspace, HighFive::AtomicType<std::string>());
     attr.write(value);
 }
 }

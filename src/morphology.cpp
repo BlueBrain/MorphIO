@@ -24,18 +24,15 @@ Morphology::Morphology(const URI& source)
 
     if (source.substr(pos) == ".h5")
     {
-        _properties =
-            std::make_shared<Property::Properties>(plugin::h5::load(source));
+        _properties = std::make_shared<Property::Properties>(plugin::h5::load(source));
     }
     else if (source.substr(pos) == ".swc")
     {
-        _properties =
-            std::make_shared<Property::Properties>(plugin::swc::load(source));
+        _properties = std::make_shared<Property::Properties>(plugin::swc::load(source));
     }
     else if (source.substr(pos) == ".asc")
     {
-        _properties =
-            std::make_shared<Property::Properties>(plugin::asc::load(source));
+        _properties = std::make_shared<Property::Properties>(plugin::asc::load(source));
     }
     else
     {
@@ -90,8 +87,7 @@ const std::vector<Section> Morphology::rootSections() const
 const std::vector<Section> Morphology::sections() const
 {
     std::vector<Section> sections;
-    for (int i = 0; i < _properties->get<minimorph::Property::Section>().size();
-         ++i)
+    for (int i = 0; i < _properties->get<minimorph::Property::Section>().size(); ++i)
     {
         sections.push_back(section(i));
     }

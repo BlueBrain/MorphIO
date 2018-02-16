@@ -46,10 +46,10 @@ enum class Token
     MIDPOINT,
 };
 
-const std::map<Token, SectionType> TokenSectionTypeMap{
-    {Token::AXON, SECTION_AXON},
-    {Token::APICAL, SECTION_APICAL_DENDRITE},
-    {Token::DENDRITE, SECTION_DENDRITE}};
+const std::map<Token, SectionType> TokenSectionTypeMap{{Token::AXON, SECTION_AXON},
+                                                       {Token::APICAL, SECTION_APICAL_DENDRITE},
+                                                       {Token::DENDRITE, SECTION_DENDRITE},
+                                                       {Token::CELLBODY, SECTION_SOMA}};
 
 constexpr bool operator==(int lhs, Token type)
 {
@@ -248,18 +248,17 @@ public:
 
     void state() const
     {
-        std::cout << "Id: " << Token(current_->id) << ", Token: '"
-                  << current_->str() << "' line: " << current_line_num_
-                  << " Next Id: " << Token(next_->id) << ", Token: '"
-                  << next_->str() << "' line: " << next_line_num_ << std::endl;
+        std::cout << "Id: " << Token(current_->id) << ", Token: '" << current_->str()
+                  << "' line: " << current_line_num_ << " Next Id: " << Token(next_->id)
+                  << ", Token: '" << next_->str() << "' line: " << next_line_num_ << std::endl;
     }
 
     void expect(Token t, const char* msg) const
     {
         if (current()->id != +t)
         {
-            std::cout << "Expected: " << t << " but got " << current()->id
-                      << ' ' << msg << std::endl;
+            std::cout << "Expected: " << t << " but got " << current()->id << ' ' << msg
+                      << std::endl;
             throw std::runtime_error("Unexpected token");
         }
     }
@@ -267,8 +266,7 @@ public:
     // advance iterator until sexp is consumed, including final paren
     void consume_until_balanced_paren()
     {
-        expect(Token::LPAREN,
-               "consume_until_balanced_paren should start in LPAREN");
+        expect(Token::LPAREN, "consume_until_balanced_paren should start in LPAREN");
         size_t opening_count = 1;
         while (opening_count != 0)
         {
@@ -286,12 +284,10 @@ public:
             }
             if (ended())
             {
-                throw std::runtime_error(
-                    "Hit end of file before balanced parens");
+                throw std::runtime_error("Hit end of file before balanced parens");
             }
         }
-        consume(Token::RPAREN,
-                "consume_until_balanced_paren should end in RPAREN");
+        consume(Token::RPAREN, "consume_until_balanced_paren should end in RPAREN");
     }
 };
 

@@ -16,6 +16,7 @@ BreakBeforeBinaryOperators: false
 BreakBeforeBraces: Allman # brace on new line
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: true
+ColumnLimit: 100
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
 ContinuationIndentWidth: 4

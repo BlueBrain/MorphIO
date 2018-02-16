@@ -55,12 +55,10 @@ public:
     std::vector<float> diameters() { return _pointProperties._diameters; }
     std::vector<float> perimeters() { return _pointProperties._perimeters; }
 private:
-    void traverse(
-        Morphology* morphology,
-        std::function<void(Morphology* morphology, Section* section)>);
+    void traverse(Morphology* morphology,
+                  std::function<void(Morphology* morphology, Section* section)>);
     Section(Morphology*, int id, SectionType type, const Property::PointLevel&);
-    Section(Morphology* morphology, const minimorph::Section& section,
-            bool recursive = true);
+    Section(Morphology* morphology, const minimorph::Section& section, bool recursive = true);
     ~Section() {}
     friend class Morphology;
     Property::PointLevel _pointProperties;
@@ -85,10 +83,8 @@ public:
     std::map<uint32_t, Section*>& sections() { return _sections; }
     Soma& soma();
     void deleteSection(Section*, bool recursive = true);
-    uint32_t appendSection(Section* parent, const minimorph::Section&,
-                           bool recursive = true);
-    uint32_t appendSection(Section* parent, SectionType,
-                           const Property::PointLevel&);
+    uint32_t appendSection(Section* parent, const minimorph::Section&, bool recursive = true);
+    uint32_t appendSection(Section* parent, SectionType, const Property::PointLevel&);
     uint32_t createNeurite(const minimorph::Section&, bool recursive = true);
     uint32_t createNeurite(SectionType, const Property::PointLevel&);
     void traverse(std::function<void(Morphology* morphology, Section* section)>,

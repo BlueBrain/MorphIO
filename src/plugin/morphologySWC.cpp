@@ -32,15 +32,13 @@ enum SWCSectionType
 };
 
 template <typename TPoint>
-bool setPoint(const char* line, SWCSectionType& type, TPoint& point,
-              float& radius, int& parent);
+bool setPoint(const char* line, SWCSectionType& type, TPoint& point, float& radius, int& parent);
 
 template <>
-bool setPoint(const char* line, SWCSectionType& type, Point& point,
-              float& radius, int& parent)
+bool setPoint(const char* line, SWCSectionType& type, Point& point, float& radius, int& parent)
 {
-    return sscanf(line, "%20d%20f%20f%20f%20f%20d", (int*)&type, &point[0],
-                  &point[1], &point[2], &radius, &parent) == 6;
+    return sscanf(line, "%20d%20f%20f%20f%20f%20d", (int*)&type, &point[0], &point[1], &point[2],
+                  &radius, &parent) == 6;
 }
 
 struct Sample
@@ -141,8 +139,7 @@ void _readSamples(RawSWCInfo& info)
 {
     std::ifstream file(info.filename.c_str());
     if (file.fail())
-        LBTHROW(minimorph::RawDataError("Error opening morphology file: " +
-                                        info.filename));
+        LBTHROW(minimorph::RawDataError("Error opening morphology file: " + info.filename));
 
     Samples& samples = info.samples;
 
@@ -162,17 +159,15 @@ void _readSamples(RawSWCInfo& info)
         const unsigned int id = strtol(line.data(), &data, 10);
         if (*data != ' ' && *data != '\t')
         {
-            LBTHROW(minimorph::RawDataError(
-                "Reading swc morphology file: " + info.filename +
-                ", parse error at line " + std::to_string(lineNumber)));
+            LBTHROW(minimorph::RawDataError("Reading swc morphology file: " + info.filename +
+                                            ", parse error at line " + std::to_string(lineNumber)));
         }
         samples.resize(std::max(samples.size(), size_t(id + 1)));
         if (samples[id].valid)
         {
-            LBTHROW(minimorph::IDSequenceError(
-                "Reading swc morphology file: " + info.filename +
-                ", repeated sample id " + std::to_string(id) + " at line " +
-                std::to_string(lineNumber)));
+            LBTHROW(minimorph::IDSequenceError("Reading swc morphology file: " + info.filename +
+                                               ", repeated sample id " + std::to_string(id) +
+                                               " at line " + std::to_string(lineNumber)));
         }
         else
         {
@@ -180,9 +175,9 @@ void _readSamples(RawSWCInfo& info)
             ++totalSamples;
             if (!samples[id].valid)
             {
-                LBTHROW(minimorph::IDSequenceError(
-                    "Reading swc morphology file: " + info.filename +
-                    ", parse error at line " + std::to_string(lineNumber)));
+                LBTHROW(minimorph::IDSequenceError("Reading swc morphology file: " + info.filename +
+                                                   ", parse error at line " +
+                                                   std::to_string(lineNumber)));
             }
         }
 
@@ -207,8 +202,7 @@ void _buildSampleTree(RawSWCInfo& info)
         visited.push_back(!sample.valid);
 
     if (samples.empty())
-        LBTHROW(minimorph::SomaError("Reading swc morphology file: " +
-                                     info.filename +
+        LBTHROW(minimorph::SomaError("Reading swc morphology file: " + info.filename +
                                      ", no soma section found"));
 
     size_t currentSample = samples.size() - 1;
@@ -234,17 +228,15 @@ void _buildSampleTree(RawSWCInfo& info)
         {
             if (sample.parent == int(currentSample))
             {
-                LBTHROW(minimorph::IDSequenceError(
-                    "Reading swc morphology file: " + info.filename +
-                    ", found a sample point to itself"));
+                LBTHROW(minimorph::IDSequenceError("Reading swc morphology file: " + info.filename +
+                                                   ", found a sample point to itself"));
             }
             Sample* parent = &samples[sample.parent];
             if (!parent->valid)
             {
                 std::stringstream msg;
                 msg << "Reading swc morphology file: " << info.filename
-                    << ", broken tree (missing sample  " << sample.parent << ")"
-                    << std::endl;
+                    << ", broken tree (missing sample  " << sample.parent << ")" << std::endl;
                 LBTHROW(minimorph::MissingParentError(msg.str()));
             }
 
@@ -257,9 +249,8 @@ void _buildSampleTree(RawSWCInfo& info)
                 {
                     if (parent->nextID != -1)
                     {
-                        LBWARN
-                            << "Reading swc morphology file: " << info.filename
-                            << ", found bifurcation in soma section";
+                        LBWARN << "Reading swc morphology file: " << info.filename
+                               << ", found bifurcation in soma section";
                         sample.siblingID = parent->nextID;
                     }
                     // Linking the parent to this sample.
@@ -277,9 +268,8 @@ void _buildSampleTree(RawSWCInfo& info)
             {
                 if (sample.type == SWC_SECTION_SOMA)
                 {
-                    LBTHROW(minimorph::SomaError(
-                        "Reading swc morphology file: " + info.filename +
-                        ", found soma sample with neurite parent"));
+                    LBTHROW(minimorph::SomaError("Reading swc morphology file: " + info.filename +
+                                                 ", found soma sample with neurite parent"));
                 }
                 if (parent->nextID != -1)
                 {
@@ -301,12 +291,10 @@ void _buildSampleTree(RawSWCInfo& info)
             {
                 // Only one soma section is permitted. If a previous
                 // one is detected, then throw.
-                if (info.roots.size() &&
-                    samples[info.roots[0]].type == SWC_SECTION_SOMA)
+                if (info.roots.size() && samples[info.roots[0]].type == SWC_SECTION_SOMA)
                 {
-                    LBTHROW(minimorph::SomaError(
-                        "Reading swc morphology file: " + info.filename +
-                        ", found two soma sections"));
+                    LBTHROW(minimorph::SomaError("Reading swc morphology file: " + info.filename +
+                                                 ", found two soma sections"));
                 }
                 info.roots.insert(info.roots.begin(), currentSample);
                 hasSoma = true;
@@ -320,8 +308,7 @@ void _buildSampleTree(RawSWCInfo& info)
                 // If the sample type is fork or end point, we convert it
                 // into undefined because we don't really know which is the
                 // type of the section.
-                if (sample.type == SWC_SECTION_FORK_POINT ||
-                    sample.type == SWC_SECTION_END_POINT)
+                if (sample.type == SWC_SECTION_FORK_POINT || sample.type == SWC_SECTION_END_POINT)
                 {
                     sample.type = SWC_SECTION_UNDEFINED;
                 }
@@ -347,8 +334,7 @@ void _buildSampleTree(RawSWCInfo& info)
         }
     }
     if (!hasSoma)
-        LBTHROW(minimorph::SomaError("Reading swc morphology file: " +
-                                     info.filename +
+        LBTHROW(minimorph::SomaError("Reading swc morphology file: " + info.filename +
                                      ", no soma section found"));
 }
 
@@ -367,8 +353,8 @@ Property::Properties _buildStructure(RawSWCInfo& info)
     // The size reservation is an upper estimate because it's not easy to
     // detect all first order sections (some may connect to the soma point
     // or ring and some may not).
-    _properties.get<Property::Point>().reserve(
-        info.totalValidSamples + info.numSections - info.roots.size());
+    _properties.get<Property::Point>().reserve(info.totalValidSamples + info.numSections -
+                                               info.roots.size());
     _properties.get<Property::Section>().reserve(info.numSections);
     _properties.get<Property::SectionType>().reserve(info.numSections);
     Samples& samples = info.samples;
@@ -378,10 +364,8 @@ Property::Properties _buildStructure(RawSWCInfo& info)
     while (sample)
     {
         _properties.get<Property::Section>().push_back(
-            {int(_properties.get<Property::Point>().size()),
-             sample->parentSection});
-        _properties.get<Property::SectionType>().push_back(
-            SectionType(sample->type));
+            {int(_properties.get<Property::Point>().size()), sample->parentSection});
+        _properties.get<Property::SectionType>().push_back(SectionType(sample->type));
 
         // Pushing first point of the section using the parent sample
         // if necessary
@@ -417,15 +401,12 @@ Property::Properties _buildStructure(RawSWCInfo& info)
 
         // Iterate while we stay on the same section and push points
         // to the point vector.
-        while (
-            sample &&
-            (sample->siblingID == -1 || sample->type == SWC_SECTION_SOMA) &&
-            // We also cut into sections when the sample type changes.
-            // There are degenerated cases where this is absolutely
-            // needed (e.g. a morphology with only one first order
-            // section a point soma).
-            sample->type ==
-                SWCSectionType(_properties.get<Property::SectionType>().back()))
+        while (sample && (sample->siblingID == -1 || sample->type == SWC_SECTION_SOMA) &&
+               // We also cut into sections when the sample type changes.
+               // There are degenerated cases where this is absolutely
+               // needed (e.g. a morphology with only one first order
+               // section a point soma).
+               sample->type == SWCSectionType(_properties.get<Property::SectionType>().back()))
         {
             _properties.get<Property::Point>().push_back(sample->point);
             _properties.get<Property::Diameter>().push_back(sample->diameter);
@@ -434,8 +415,7 @@ Property::Properties _buildStructure(RawSWCInfo& info)
                 sample = &samples[sample->nextID];
             // Special case of 3 point soma: sibling is part of the same
             // "section"
-            else if (sample->type == SWC_SECTION_SOMA &&
-                     sample->siblingID != -1)
+            else if (sample->type == SWC_SECTION_SOMA && sample->siblingID != -1)
                 sample = &samples[sample->siblingID];
             else
                 sample = 0;
@@ -448,9 +428,7 @@ Property::Properties _buildStructure(RawSWCInfo& info)
             // the sibling (if any) to the sectionQeueue and continuing
             // traversing the current section
             assert(sample->siblingID != -1 ||
-                   sample->type !=
-                       SWCSectionType(
-                           _properties.get<Property::SectionType>().back()));
+                   sample->type != SWCSectionType(_properties.get<Property::SectionType>().back()));
 
             // Assigning the parent section to the current sample, this
             // will be stored in the section array at the beginning of
