@@ -98,8 +98,7 @@ public:
      */
     static bool check()
     {
-        return getMajor() == BRAIN_VERSION_MAJOR &&
-               getMinor() == BRAIN_VERSION_MINOR;
+        return getMajor() == BRAIN_VERSION_MAJOR && getMinor() == BRAIN_VERSION_MINOR;
     }
 
     /** @return JSON schema describing this object. */

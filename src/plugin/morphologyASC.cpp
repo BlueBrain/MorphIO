@@ -20,9 +20,8 @@ bool is_eof(Token type)
 
 bool is_end_of_branch(Token type)
 {
-    return (type == Token::GENERATED || type == Token::HIGH ||
-            type == Token::INCOMPLETE || type == Token::LOW ||
-            type == Token::NORMAL || type == Token::MIDPOINT);
+    return (type == Token::GENERATED || type == Token::HIGH || type == Token::INCOMPLETE ||
+            type == Token::LOW || type == Token::NORMAL || type == Token::MIDPOINT);
 }
 
 bool is_neurite_type(Token id)
@@ -39,9 +38,8 @@ bool is_end_of_section(Token id)
 bool skip_sexp(size_t id)
 {
     return (id == +Token::WORD || id == +Token::STRING || id == +Token::COLOR ||
-            id == +Token::GENERATED || id == +Token::HIGH ||
-            id == +Token::INCOMPLETE || id == +Token::LOW ||
-            id == +Token::NORMAL);
+            id == +Token::GENERATED || id == +Token::HIGH || id == +Token::INCOMPLETE ||
+            id == +Token::LOW || id == +Token::NORMAL);
 }
 
 std::tuple<Point, float> parse_point(NeurolucidaLexer& lex)
@@ -95,8 +93,8 @@ private:
         while (true)
         {
             ret &= parse_neurite_section(parent_id, section_type);
-            if (lex_.ended() || (lex_.current()->id != +Token::PIPE &&
-                                 lex_.current()->id != +Token::LPAREN))
+            if (lex_.ended() ||
+                (lex_.current()->id != +Token::PIPE && lex_.current()->id != +Token::LPAREN))
             {
                 break;
             }
@@ -119,8 +117,7 @@ private:
 
             if (is_eof(id))
             {
-                throw std::runtime_error(
-                    "Hit end of of file while consuming a neurite");
+                throw std::runtime_error("Hit end of of file while consuming a neurite");
             }
             else if (is_end_of_section(id))
             {
@@ -132,19 +129,16 @@ private:
                     std::cout << "section_type: " << section_type << std::endl;
                     if (section_type == SECTION_SOMA)
                     {
-                        assert(nb_.soma().type() == SECTION_UNDEFINED &&
-                               "found two soma sections");
+                        assert(nb_.soma().type() == SECTION_UNDEFINED && "found two soma sections");
                         nb_.soma() = builder::Soma(properties, SECTION_SOMA);
                     }
                     else
                     {
                         if (parent_id == -1)
-                            section_id =
-                                nb_.createNeurite(section_type, properties);
+                            section_id = nb_.createNeurite(section_type, properties);
                         else
-                            section_id =
-                                nb_.appendSection(nb_.sections()[parent_id],
-                                                  section_type, properties);
+                            section_id = nb_.appendSection(nb_.sections()[parent_id], section_type,
+                                                           properties);
                     }
                     points.clear();
                     diameters.clear();
@@ -158,8 +152,7 @@ private:
             else if (id == Token::LSPINE)
             {
                 // skip spines
-                while (!lex_.ended() &&
-                       static_cast<Token>(lex_.current()->id) != Token::RSPINE)
+                while (!lex_.ended() && static_cast<Token>(lex_.current()->id) != Token::RSPINE)
                 {
                     lex_.consume();
                 }
@@ -191,18 +184,15 @@ private:
                         {
                             assert(nb_.soma().type() == SECTION_UNDEFINED &&
                                    "found two soma sections");
-                            nb_.soma() =
-                                builder::Soma(properties, SECTION_SOMA);
+                            nb_.soma() = builder::Soma(properties, SECTION_SOMA);
                         }
                         else
                         {
                             if (parent_id == -1)
-                                section_id =
-                                    nb_.createNeurite(section_type, properties);
+                                section_id = nb_.createNeurite(section_type, properties);
                             else
-                                section_id =
-                                    nb_.appendSection(nb_.sections()[parent_id],
-                                                      section_type, properties);
+                                section_id = nb_.appendSection(nb_.sections()[parent_id],
+                                                               section_type, properties);
                         }
                         points.clear();
                         diameters.clear();
@@ -211,14 +201,13 @@ private:
                 }
                 else
                 {
-                    throw std::runtime_error(
-                        "Unknown token after LPAREN in neurite parse");
+                    throw std::runtime_error("Unknown token after LPAREN in neurite parse");
                 }
             }
             else
             {
-                std::cout << "Default: Id: " << id << ", Token: '"
-                          << lex_.current()->str() << "'\n";
+                std::cout << "Default: Id: " << id << ", Token: '" << lex_.current()->str()
+                          << "'\n";
                 throw std::runtime_error("Unknown token in neurite parse");
             }
         }
@@ -258,8 +247,7 @@ Property::Properties load(const URI& uri)
 {
     NeurolucidaParser parser;
     std::ifstream ifs(uri);
-    std::string input((std::istreambuf_iterator<char>(ifs)),
-                      (std::istreambuf_iterator<char>()));
+    std::string input((std::istreambuf_iterator<char>(ifs)), (std::istreambuf_iterator<char>()));
 
     Property::Properties _properties = parser.parse(input);
     _properties._cellLevel._cellFamily = FAMILY_NEURON;

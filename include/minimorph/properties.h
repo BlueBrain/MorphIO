@@ -66,15 +66,9 @@ struct Properties
     template <typename T>
     const std::vector<typename T::Type>& get() const;
 
-    const minimorph::MorphologyVersion& version()
-    {
-        return _cellLevel._version;
-    }
+    const minimorph::MorphologyVersion& version() { return _cellLevel._version; }
     const minimorph::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
-    const std::map<uint32_t, std::vector<uint32_t>>& children()
-    {
-        return _sectionLevel._children;
-    }
+    const std::map<uint32_t, std::vector<uint32_t>>& children() { return _sectionLevel._children; }
 };
 }
 }

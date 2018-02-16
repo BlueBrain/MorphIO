@@ -51,10 +51,9 @@ Property::Properties MorphologyHDF5::load(const URI& uri)
     }
     catch (const HighFive::FileException& exc)
     {
-        LBTHROW(minimorph::RawDataError(
-            _write
-                ? "Could not create morphology file "
-                : "Could not open morphology file " + uri + ": " + exc.what()));
+        LBTHROW(minimorph::RawDataError(_write ? "Could not create morphology file "
+                                               : "Could not open morphology file " + uri + ": " +
+                                                     exc.what()));
     }
     _checkVersion(uri);
     _selectRepairStage();
@@ -126,8 +125,7 @@ void MorphologyHDF5::_resolveV1()
 
     if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns)
     {
-        LBTHROW(minimorph::RawDataError("Opening morphology file '" +
-                                        _file->getName() +
+        LBTHROW(minimorph::RawDataError("Opening morphology file '" + _file->getName() +
                                         "': bad number of dimensions in"
                                         " 'points' dataspace"));
     }
@@ -137,8 +135,7 @@ void MorphologyHDF5::_resolveV1()
     _sectionsDims = dataspace.getDimensions();
     if (_sectionsDims.size() != 2 || _sectionsDims[1] != _structureV1Columns)
     {
-        LBTHROW(minimorph::RawDataError("Opening morphology file '" +
-                                        _file->getName() +
+        LBTHROW(minimorph::RawDataError("Opening morphology file '" + _file->getName() +
                                         "': bad number of dimensions in"
                                         " 'structure' dataspace"));
     }
@@ -173,8 +170,8 @@ bool MorphologyHDF5::_readV11Metadata()
         // All other exceptions are not expected because if the metadata
         // group exits it must contain at least the version, and for
         // version 1.1 it must contain the family.
-        LBTHROW(minimorph::RawDataError(
-            std::string("Error reading morphology metadata: ") + e.what()));
+        LBTHROW(
+            minimorph::RawDataError(std::string("Error reading morphology metadata: ") + e.what()));
     }
 
     _resolveV1();
@@ -218,8 +215,7 @@ HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections)
     }
     catch (const HighFive::DataSetException&)
     {
-        return _file->createDataSet<int>(_d_structure,
-                                         HighFive::DataSpace({nSections, 3}));
+        return _file->createDataSet<int>(_d_structure, HighFive::DataSpace({nSections, 3}));
     }
 }
 
@@ -232,23 +228,20 @@ void MorphologyHDF5::_readPoints()
         auto dataset = [this]() {
             try
             {
-                return _file->getDataSet("/" + _g_root + "/" + _stage + "/" +
-                                         _d_points);
+                return _file->getDataSet("/" + _g_root + "/" + _stage + "/" + _d_points);
             }
             catch (HighFive::DataSetException&)
             {
-                LBTHROW(std::runtime_error(
-                    "Could not open points dataset for morphology file " +
-                    _file->getName() + " repair stage " + _stage));
+                LBTHROW(std::runtime_error("Could not open points dataset for morphology file " +
+                                           _file->getName() + " repair stage " + _stage));
             }
         }();
 
         const auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 2 || dims[1] != _pointColumns)
         {
-            LBTHROW(std::runtime_error(
-                "Reading morphology file '" + _file->getName() +
-                "': bad number of dimensions in 'points' dataspace"));
+            LBTHROW(std::runtime_error("Reading morphology file '" + _file->getName() +
+                                       "': bad number of dimensions in 'points' dataspace"));
         }
         points.resize(dims[0]);
         dataset.read(points);
@@ -269,23 +262,20 @@ void MorphologyHDF5::_readSections()
         auto dataset = [this]() {
             try
             {
-                return _file->getDataSet("/" + _g_root + "/" + _g_structure +
-                                         "/" + _stage);
+                return _file->getDataSet("/" + _g_root + "/" + _g_structure + "/" + _stage);
             }
             catch (HighFive::DataSetException&)
             {
-                LBTHROW(std::runtime_error(
-                    "Could not open sections dataset for morphology file " +
-                    _file->getName() + " repair stage " + _stage));
+                LBTHROW(std::runtime_error("Could not open sections dataset for morphology file " +
+                                           _file->getName() + " repair stage " + _stage));
             }
         }();
 
         const auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 2 || dims[1] != _structureV2Columns)
         {
-            LBTHROW(std::runtime_error(
-                "Reading morphology file '" + _file->getName() +
-                "': bad number of dimensions in 'structure' dataspace"));
+            LBTHROW(std::runtime_error("Reading morphology file '" + _file->getName() +
+                                       "': bad number of dimensions in 'structure' dataspace"));
         }
 
         sections.resize(dims[0]);
@@ -307,8 +297,7 @@ void MorphologyHDF5::_readSectionTypes()
         auto dataset = [this]() {
             try
             {
-                return _file->getDataSet("/" + _g_root + "/" + _g_structure +
-                                         "/" + _d_type);
+                return _file->getDataSet("/" + _g_root + "/" + _g_structure + "/" + _d_type);
             }
             catch (HighFive::DataSetException&)
             {
@@ -322,9 +311,8 @@ void MorphologyHDF5::_readSectionTypes()
         const auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 2 || dims[1] != 1)
         {
-            LBTHROW(std::runtime_error(
-                "Reading morphology file '" + _file->getName() +
-                "': bad number of dimensions in 'sectiontype' dataspace"));
+            LBTHROW(std::runtime_error("Reading morphology file '" + _file->getName() +
+                                       "': bad number of dimensions in 'sectiontype' dataspace"));
         }
 
         types.resize(dims[0]);
@@ -350,8 +338,7 @@ void MorphologyHDF5::_readPerimeters()
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 1)
         {
-            LBTHROW(std::runtime_error("Reading morphology file '" +
-                                       _file->getName() +
+            LBTHROW(std::runtime_error("Reading morphology file '" + _file->getName() +
                                        "': bad number of dimensions in"
                                        " 'perimeters' dataspace"));
         }

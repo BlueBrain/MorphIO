@@ -33,15 +33,8 @@ class Soma
 public:
     BRAIN_API const Point somaCenter() const;
     BRAIN_API const SectionType type() const;
-    BRAIN_API const gsl::span<const Point> points() const
-    {
-        return get<Property::Point>();
-    }
-    BRAIN_API const gsl::span<const float> diameter() const
-    {
-        return get<Property::Diameter>();
-    }
-
+    BRAIN_API const gsl::span<const Point> points() const { return get<Property::Point>(); }
+    BRAIN_API const gsl::span<const float> diameter() const { return get<Property::Diameter>(); }
 private:
     Soma(PropertiesPtr);
     template <typename Property>
