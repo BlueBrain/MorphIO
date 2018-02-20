@@ -31,18 +31,6 @@ enum SWCSectionType
     SWC_SECTION_CUSTOM = 7
 };
 
-template <typename TPoint>
-bool setPoint(const char* line, SWCSectionType& type, TPoint& point,
-              float& radius, int& parent);
-
-template <>
-bool setPoint(const char* line, SWCSectionType& type, Point& point,
-              float& radius, int& parent)
-{
-    return sscanf(line, "%20d%20f%20f%20f%20f%20d", (int*)&type, &point[0],
-                  &point[1], &point[2], &radius, &parent) == 6;
-}
-
 struct Sample
 {
     Sample()
@@ -61,7 +49,9 @@ struct Sample
         , parentSection(-1)
     {
         float radius;
-        valid = setPoint(line, type, point, radius, parent);
+        valid = sscanf(line, "%20d%20f%20f%20f%20f%20d", (int*)&type, &point[0],
+                       &point[1], &point[2], &radius, &parent) == 6;
+
         diameter = radius * 2; // The point array stores diameters.
 
         if (type >= SWC_SECTION_CUSTOM)

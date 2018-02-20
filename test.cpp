@@ -18,7 +18,7 @@ using namespace std;
 
 int main()
 {
-    morphio::Morphology morphology("neuron.asc");
+    morphio::Morphology morphology("neuron.h5");
     for (auto type : morphology.sectionTypes())
         std::cout << "type: " << type << std::endl;
 

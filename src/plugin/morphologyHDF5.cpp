@@ -257,6 +257,11 @@ void MorphologyHDF5::_readPoints()
 
     points.resize(_pointsDims[0]);
     _points->read(points);
+    // for(auto point: points){
+    //     std::cout << "points[0]: " << point[0] << std::endl;
+    //     std::cout << "points[1]: " << point[1] << std::endl;
+    //     std::cout << "points[2]: " << point[2] << std::endl;
+    // }
 }
 
 void MorphologyHDF5::_readSections()

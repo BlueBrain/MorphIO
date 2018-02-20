@@ -66,7 +66,7 @@ template <typename TProperty>
 const gsl::span<const typename TProperty::Type> Section::get() const
 {
     auto ptr_start = _properties->get<TProperty>().data() + _range.first;
-    return gsl::span<const typename TProperty::Type>(ptr_start, _range.second);
+    return gsl::span<const typename TProperty::Type>(ptr_start, _range.second - _range.first);
 }
 
 bool Section::isRoot() const

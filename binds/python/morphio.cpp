@@ -11,97 +11,46 @@
 
 namespace py = pybind11;
 
-/** Loading/Casting of vmmlib::vector into numpy arrays **/
-namespace pybind11 {
-namespace detail {
-// template <size_t M, typename T> struct type_caster<vmml::vector<M,T>>
-// {
-// public:
-//     typedef vmml::vector<M,T> type;
-//     PYBIND11_TYPE_CASTER(type, _("vmml::vector<M,T>"));
+
+py::array_t<float> span_array_to_ndarray(const gsl::span<const std::array<float, 3> > &span)
+{
+    const auto buffer_info = py::buffer_info(
+        // Cast from (const void*) to (void*) for function signature matching
+        (void*)span.data(),                            /* Pointer to buffer */
+        sizeof(float),                          /* Size of one scalar */
+        py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
+        2,                                      /* Number of dimensions */
+
+        // Forced cast to prevent error:
+        // template argument deduction/substitution failed */
+        { (int) span.size(), 3 }, /* buffer dimentions */
+        { sizeof(float) * 3,                  /* Strides (in bytes) for each index */
+                sizeof(float) }
+        );
+    return py::array(buffer_info);
+}
 
 
-//     // Conversion part 1 (Python -> C++)
-//     bool load(py::handle src, bool convert)
-//         {
-//             if (!convert && !py::array_t<T>::check_(src))
-//                 return false;
+py::array_t<float> span_to_ndarray(const gsl::span<const float>& span)
+{
+    const auto buffer_info = py::buffer_info(
+        // Cast from (const void*) to (void*) for function signature matching
+        (void*)span.data(),                            /* Pointer to buffer */
+        sizeof(float),                          /* Size of one scalar */
+        py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
+        1,                                      /* Number of dimensions */
 
-//             auto buf = py::array_t<T, py::array::c_style | py::array::forcecast>::ensure(src);
-//             if (!buf)
-//                 return false;
-
-//             value = vmml::vector<M,T>(buf.data());
-
-//             return true;
-//         }
-
-//     //Conversion part 2 (C++ -> Python)
-//     static py::handle cast(const vmml::vector<M,T>& src, py::return_value_policy policy, py::handle parent)
-//         {
-//             py::array a(M, src.array);
-//             return a.release();
-//         }
-// };
-
-
-// template <size_t M, typename T> struct type_caster<std::vector<vmml::vector<M,T>>>
-// {
-// public:
-//     typedef std::vector<vmml::vector<M,T>> type;
-//     PYBIND11_TYPE_CASTER(type, _("std::vector<vmml::vector<M,T>>"));
-
-//     // Conversion part 1 (Python -> C++)
-//     bool load(py::handle src, bool convert)
-//         {
-//             if (!convert && !py::array_t<T>::check_(src))
-//                 return false;
-
-//             auto buf = py::array_t<T, py::array::c_style | py::array::forcecast>::ensure(src);
-//             if (!buf)
-//                 return false;
-
-//             auto dims = buf.ndim();
-//             if (dims != 2 )
-//                 return false;
-
-//             std::vector<size_t> shape(2);
-//             value = vmml::vector<M,T>(buf.data());
-
-//             return true;
-//         }
-
-//     //Conversion part 2 (C++ -> Python)
-//     static py::handle cast(const vmml::vector<M,T>& src, py::return_value_policy policy, py::handle parent)
-//         {
-//             py::array a(M, src.array);
-//             return a.release();
-//         }
-// };
-}} // namespace pybind11::detail
-
+        // Forced cast to prevent error:
+        // template argument deduction/substitution failed */
+        {(int) span.size()}, /* buffer dimentions */
+        {sizeof(float)} );      /* Strides (in bytes) for each index */
+    return py::array(buffer_info);
+}
 
 
 PYBIND11_MODULE(python_morphio, m) {
 
     m.doc() = "pybind11 example plugin"; // optional module docstring
-
-    py::class_<gsl::span<std::array<float, 3>>>(m, "spans", py::buffer_protocol())
-        .def_buffer([](gsl::span<std::array<float, 3>> &span) -> py::buffer_info {
-                return py::buffer_info(
-                    span.data(),                            /* Pointer to buffer */
-                    sizeof(float),                          /* Size of one scalar */
-                    py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
-                    2,                                      /* Number of dimensions */
-
-                    // Forced cast to prevent error:
-                    // template argument deduction/substitution failed */
-                    { (int) span.size(), 3 }, /* buffer dimentions */
-                    { sizeof(float) * 3,                  /* Strides (in bytes) for each index */
-                            sizeof(float) }
-                    );
-            });
-
 
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const morphio::URI&>())
@@ -117,8 +66,8 @@ PYBIND11_MODULE(python_morphio, m) {
     py::class_<morphio::Soma>(m, "Soma")
         .def(py::init<const morphio::Soma&>())
         .def("somaCenter", &morphio::Soma::somaCenter)
-        .def("points", &morphio::Soma::points)
-        .def("diameters", &morphio::Soma::diameters)
+        .def("points", [](morphio::Soma* soma){ return span_array_to_ndarray(soma->points()); })
+        .def("diameters", [](morphio::Soma* soma){ return span_to_ndarray(soma->diameters()); })
         .def("type", &morphio::Soma::type);
 
     py::class_<morphio::Section>(m, "Section")
@@ -126,21 +75,21 @@ PYBIND11_MODULE(python_morphio, m) {
         .def("type", &morphio::Section::type)
         .def("isRoot", &morphio::Section::isRoot)
         .def("parent", &morphio::Section::parent)
-        .def("points", &morphio::Section::points)
-        .def("diameters", &morphio::Section::diameters)
-        .def("perimeters", &morphio::Section::perimeters)
+        .def("children", &morphio::Section::children)
+        .def("points", [](morphio::Section* section){ return span_array_to_ndarray(section->points()); })
+        .def("diameters", [](morphio::Section* section){ return span_to_ndarray(section->diameters()); })
+        .def("perimeters", [](morphio::Section* section){ return span_to_ndarray(section->perimeters()); })
         .def("id", &morphio::Section::id);
 
     py::enum_<morphio::enums::SectionType>(m, "SectionType")
-        .value("SECTION_UNDEFINED", morphio::enums::SectionType::SECTION_UNDEFINED)
-        .value("SECTION_SOMA", morphio::enums::SectionType::SECTION_SOMA)
-        .value("SECTION_AXON", morphio::enums::SectionType::SECTION_AXON)
-        .value("SECTION_DENDRITE", morphio::enums::SectionType::SECTION_DENDRITE)
-        .value("SECTION_APICAL_DENDRITE", morphio::enums::SectionType::SECTION_APICAL_DENDRITE)
-        .value("SECTION_GLIA_PROCESS", morphio::enums::SectionType::SECTION_GLIA_PROCESS)
-        .value("SECTION_GLIA_ENDFOOT", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
+        .value("undefined", morphio::enums::SectionType::SECTION_UNDEFINED)
+        .value("soma", morphio::enums::SectionType::SECTION_SOMA)
+        .value("axon", morphio::enums::SectionType::SECTION_AXON)
+        .value("basal_dendrite", morphio::enums::SectionType::SECTION_DENDRITE)
+        .value("apical_dendrite", morphio::enums::SectionType::SECTION_APICAL_DENDRITE)
+        // .value("glia_process", morphio::enums::SectionType::SECTION_GLIA_PROCESS)
+        // .value("glia_endfoot", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
         .export_values();
-
 
     py::enum_<morphio::enums::MorphologyVersion>(m, "MorphologyVersion")
         .value("MORPHOLOGY_VERSION_H5_1", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
