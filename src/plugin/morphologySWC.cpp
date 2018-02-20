@@ -378,32 +378,16 @@ Property::Properties _buildStructure(RawSWCInfo& info)
         if (sample->parent != SWC_UNDEFINED_PARENT)
         {
             const Sample* parent = &samples[sample->parent];
-
-            // // Special case when parent is a single point soma:
-            // // Parent is replaced by a new point at the intersection between
-            // the circle
-            // // defined by the single point soma and the soma center to
-            // current point line
-            // if (parent->type == SWC_SECTION_SOMA && parent->nextID == -1 &&
-            // parent->parent == -1)
-            // {
-            //     const Vector4f& soma = parent->point;
-            //     const Vector4f& current_point = sample->point;
-            //     const Vector4f& radial_vector = current_point - soma;
-            //     float distance = radial_vector.get_sub_vector<3,
-            //     0>().length();
-            //     float soma_radius = soma[3]/ 2.;
-            //     float extrapolation_factor = std::min((float)1., soma_radius
-            //     / distance);
-            //     Vector4f new_point = soma + extrapolation_factor *
-            //     radial_vector;
-            //     new_point[3] = current_point[3];
-            //     if(!new_point.equals(current_point, 1e-6))
-            //         _properties.get<Property::Point>().push_back(new_point);
-            // } else {
-            //     _properties.get<Property::Point>().push_back(parent->point);
-            // }
+            // If the parent sections is the soma, we connect this section
+            // to the soma only if the soma is described with more than
+            // one sample (that is, sections are not connected to point somas).
+            if (parent->type != SWC_SECTION_SOMA)
+            {
+                _properties.get<Property::Point>().push_back(parent->point);
+                _properties.get<Property::Diameter>().push_back(parent->diameter);
+            }
         }
+
 
         // Iterate while we stay on the same section and push points
         // to the point vector.
