@@ -3,7 +3,7 @@
 
 namespace morphio
 {
-Section::Section(const uint32_t id, PropertiesPtr properties)
+Section::Section(const uint32_t id, std::shared_ptr<Property::Properties> properties)
     : _id(id)
     , _properties(properties)
 {

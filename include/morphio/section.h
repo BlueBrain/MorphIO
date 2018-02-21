@@ -84,7 +84,7 @@ public:
     const uint32_t id() const;
 
 private:
-    Section(uint32_t id, PropertiesPtr morphology);
+    Section(uint32_t id, std::shared_ptr<Property::Properties> morphology);
     template <typename Property>
     const gsl::span<const typename Property::Type> get() const;
 
@@ -93,7 +93,7 @@ private:
 
     uint32_t _id;
     SectionRange _range;
-    PropertiesPtr _properties;
+    std::shared_ptr<Property::Properties> _properties;
 };
 
 std::ostream& operator<<(std::ostream& os, const Section& section);

@@ -42,13 +42,13 @@ public:
     }
 
 private:
-    Soma(PropertiesPtr);
+    Soma(std::shared_ptr<Property::Properties>);
     template <typename Property>
     const gsl::span<const typename Property::Type> get() const;
     friend const Soma Morphology::soma() const;
     friend class builder::Soma;
 
-    PropertiesPtr _properties;
+    std::shared_ptr<Property::Properties> _properties;
     SectionRange _range;
 };
 }

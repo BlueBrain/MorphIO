@@ -58,7 +58,7 @@ public:
     const MorphologyVersion& version() const;
 
 private:
-    PropertiesPtr _properties;
+    std::shared_ptr<Property::Properties> _properties;
 
     template <typename Property>
     const std::vector<typename Property::Type>& get() const;

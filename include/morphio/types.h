@@ -60,10 +60,6 @@ typedef std::pair<size_t, size_t> SectionRange;
 typedef Iterator<std::stack<Section>> depth_iterator;
 typedef Iterator<std::queue<Section>> breadth_iterator;
 typedef Iterator<std::vector<Section>> upstream_iterator;
-
-using PropertiesPtr = std::shared_ptr<Property::Properties>;
-using MorphologyPtr = std::shared_ptr<Morphology>;
-using ConstMorphologyPtr = std::shared_ptr<const Morphology>;
 }
 
 // TODO: compile

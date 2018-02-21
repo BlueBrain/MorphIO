@@ -3,7 +3,7 @@
 
 namespace morphio
 {
-Soma::Soma(PropertiesPtr properties)
+Soma::Soma(std::shared_ptr<Property::Properties> properties)
     : _properties(properties)
 {
     uint32_t id = 0;
