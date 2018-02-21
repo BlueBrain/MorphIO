@@ -13,6 +13,7 @@
 #include <morphio/enums.h>
 #include <morphio/exceptions.h>
 #include <morphio/vector_types.h>
+#include <gsl/span>
 
 #ifdef __GNUC__
 #define BRAIN_UNUSED __attribute__((unused))
@@ -60,6 +61,8 @@ typedef std::pair<size_t, size_t> SectionRange;
 typedef Iterator<std::stack<Section>> depth_iterator;
 typedef Iterator<std::queue<Section>> breadth_iterator;
 typedef Iterator<std::vector<Section>> upstream_iterator;
+
+template <typename T> using range = gsl::span<T>;
 }
 
 // TODO: compile

@@ -26,10 +26,10 @@ Soma::Soma(std::shared_ptr<Property::Properties> properties)
 }
 
 template <typename TProperty>
-const gsl::span<const typename TProperty::Type> Soma::get() const
+const range<const typename TProperty::Type> Soma::get() const
 {
     auto ptr_start = _properties->get<TProperty>().data() + _range.first;
-    return gsl::span<const typename TProperty::Type>(ptr_start, _range.second);
+    return range<const typename TProperty::Type>(ptr_start, _range.second);
 }
 
 const Point Soma::somaCenter() const
@@ -46,8 +46,8 @@ const Point Soma::somaCenter() const
     return Point({x / size, y / size, z / size});
 }
 
-template const gsl::span<const Property::Point::Type>
+template const range<const Property::Point::Type>
     Soma::get<Property::Point>() const;
-template const gsl::span<const Property::Diameter::Type>
+template const range<const Property::Diameter::Type>
     Soma::get<Property::Diameter>() const;
 }

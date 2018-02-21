@@ -8,7 +8,6 @@
 
 #include <functional>
 
-#include <gsl/span>
 
 #include <morphio/exceptions.h>
 #include <morphio/iterators.h>

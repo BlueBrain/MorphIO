@@ -1,6 +1,5 @@
 #pragma once
 
-#include <gsl/span>
 
 #include <morphio/morphology.h>
 #include <morphio/types.h>
@@ -32,11 +31,11 @@ class Soma
 {
 public:
     const Point somaCenter() const;
-    const gsl::span<const Point> points() const
+    const range<const Point> points() const
     {
         return get<Property::Point>();
     }
-    const gsl::span<const float> diameters() const
+    const range<const float> diameters() const
     {
         return get<Property::Diameter>();
     }
@@ -44,7 +43,7 @@ public:
 private:
     Soma(std::shared_ptr<Property::Properties>);
     template <typename Property>
-    const gsl::span<const typename Property::Type> get() const;
+    const range<const typename Property::Type> get() const;
     friend const Soma Morphology::soma() const;
     friend class builder::Soma;
 

@@ -12,7 +12,7 @@
 namespace py = pybind11;
 
 
-py::array_t<float> span_array_to_ndarray(const gsl::span<const std::array<float, 3> > &span)
+py::array_t<float> span_array_to_ndarray(const morphio::range<const std::array<float, 3> > &span)
 {
     const auto buffer_info = py::buffer_info(
         // Cast from (const void*) to (void*) for function signature matching
@@ -31,7 +31,7 @@ py::array_t<float> span_array_to_ndarray(const gsl::span<const std::array<float,
 }
 
 
-py::array_t<float> span_to_ndarray(const gsl::span<const float>& span)
+py::array_t<float> span_to_ndarray(const morphio::range<const float>& span)
 {
     const auto buffer_info = py::buffer_info(
         // Cast from (const void*) to (void*) for function signature matching

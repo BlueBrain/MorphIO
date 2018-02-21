@@ -63,10 +63,10 @@ const SectionType Section::type() const
 }
 
 template <typename TProperty>
-const gsl::span<const typename TProperty::Type> Section::get() const
+const range<const typename TProperty::Type> Section::get() const
 {
     auto ptr_start = _properties->get<TProperty>().data() + _range.first;
-    return gsl::span<const typename TProperty::Type>(ptr_start, _range.second - _range.first);
+    return range<const typename TProperty::Type>(ptr_start, _range.second - _range.first);
 }
 
 bool Section::isRoot() const
@@ -137,15 +137,15 @@ std::ostream& operator<<(std::ostream& os, const Section& section)
     return os;
 }
 
-const gsl::span<const Point> Section::points() const
+const range<const Point> Section::points() const
 {
     return get<Property::Point>();
 }
-const gsl::span<const float> Section::diameters() const
+const range<const float> Section::diameters() const
 {
     return get<Property::Diameter>();
 }
-const gsl::span<const float> Section::perimeters() const
+const range<const float> Section::perimeters() const
 {
     return get<Property::Perimeter>();
 }

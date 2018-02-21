@@ -1,6 +1,5 @@
 #pragma once
 
-#include <gsl/span>
 
 #include <morphio/iterators.h>
 #include <morphio/morphology.h>
@@ -73,9 +72,9 @@ public:
     upstream_iterator upstream_begin() const;
     upstream_iterator upstream_end() const;
 
-    const gsl::span<const Point> points() const;
-    const gsl::span<const float> diameters() const;
-    const gsl::span<const float> perimeters() const;
+    const range<const Point> points() const;
+    const range<const float> diameters() const;
+    const range<const float> perimeters() const;
 
     /** Return the morphological type of this section (dendrite, axon, ...). */
     const SectionType type() const;
@@ -86,7 +85,7 @@ public:
 private:
     Section(uint32_t id, std::shared_ptr<Property::Properties> morphology);
     template <typename Property>
-    const gsl::span<const typename Property::Type> get() const;
+    const range<const typename Property::Type> get() const;
 
     friend class builder::Section;
     friend const Section Morphology::section(const uint32_t&) const;
