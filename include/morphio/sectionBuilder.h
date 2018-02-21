@@ -10,7 +10,6 @@
 
 #include <gsl/span>
 
-#include <morphio/api.h>
 #include <morphio/exceptions.h>
 #include <morphio/iterators.h>
 #include <morphio/properties.h>

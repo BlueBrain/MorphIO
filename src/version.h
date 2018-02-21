@@ -9,7 +9,6 @@
 
 #include <string>
 
-#include <morphio/api.h>
 
 namespace morphio
 {
@@ -63,7 +62,7 @@ namespace morphio
        (BRAIN_VERSION_MINOR == MINOR && BRAIN_VERSION_PATCH <= PATCH))))
 
 /** Information about the current Brion version. */
-class BRAIN_API Version
+class Version
 {
 public:
     /** @return the current major version of Brion. */

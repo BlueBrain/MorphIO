@@ -2,7 +2,6 @@
 
 #include <memory> //std::unique_ptr
 
-#include <morphio/api.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
 
@@ -17,12 +16,12 @@ class Morphology
 {
 public:
     /** Close morphology file. @version 1.0 */
-    BRAIN_API ~Morphology();
+    ~Morphology();
 
-    BRAIN_API Morphology(const builder::Morphology&);
-    BRAIN_API Morphology& operator=(const Morphology&);
-    BRAIN_API Morphology(Morphology&&);
-    BRAIN_API Morphology& operator=(Morphology&&);
+    Morphology(const builder::Morphology&);
+    Morphology& operator=(const Morphology&);
+    Morphology(Morphology&&);
+    Morphology& operator=(Morphology&&);
 
     /** @name Read API */
     //@{
@@ -37,11 +36,11 @@ public:
      * @throw std::runtime_error if file is not a valid morphology file
      * @version 3.0
      */
-    BRAIN_API explicit Morphology(const URI& source);
+    explicit Morphology(const URI& source);
 
-    BRAIN_API const Soma soma() const;
-    BRAIN_API const std::vector<Section> rootSections() const;
-    BRAIN_API const std::vector<Section> sections() const;
+    const Soma soma() const;
+    const std::vector<Section> rootSections() const;
+    const std::vector<Section> sections() const;
 
     /**
      * Return the Section with the given id.
@@ -49,14 +48,14 @@ public:
      * @throw runtime_error if the id is out of range or the given id refers to
      * a soma section.
      */
-    BRAIN_API const Section section(const uint32_t& id) const;
+    const Section section(const uint32_t& id) const;
 
-    BRAIN_API const Points& points() const;
-    BRAIN_API const std::vector<float>& diameters() const;
-    BRAIN_API const std::vector<float>& perimeters() const;
-    BRAIN_API const std::vector<SectionType>& sectionTypes() const;
-    BRAIN_API const CellFamily& cellFamily() const;
-    BRAIN_API const MorphologyVersion& version() const;
+    const Points& points() const;
+    const std::vector<float>& diameters() const;
+    const std::vector<float>& perimeters() const;
+    const std::vector<SectionType>& sectionTypes() const;
+    const CellFamily& cellFamily() const;
+    const MorphologyVersion& version() const;
 
 private:
     PropertiesPtr _properties;

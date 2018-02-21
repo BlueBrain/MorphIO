@@ -31,12 +31,12 @@ namespace morphio
 class Soma
 {
 public:
-    BRAIN_API const Point somaCenter() const;
-    BRAIN_API const gsl::span<const Point> points() const
+    const Point somaCenter() const;
+    const gsl::span<const Point> points() const
     {
         return get<Property::Point>();
     }
-    BRAIN_API const gsl::span<const float> diameters() const
+    const gsl::span<const float> diameters() const
     {
         return get<Property::Diameter>();
     }

@@ -2,7 +2,6 @@
 
 #include <gsl/span>
 
-#include <morphio/api.h>
 #include <morphio/iterators.h>
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
@@ -32,12 +31,12 @@ namespace morphio
 class Section
 {
 public:
-    BRAIN_API Section(const Section& section);
+    Section(const Section& section);
 
-    BRAIN_API const Section& operator=(const Section& section);
+    const Section& operator=(const Section& section);
 
-    BRAIN_API bool operator==(const Section& section) const;
-    BRAIN_API bool operator!=(const Section& section) const;
+    bool operator==(const Section& section) const;
+    bool operator!=(const Section& section) const;
 
     bool isRoot() const;
 
@@ -48,41 +47,41 @@ public:
      * @throw runtime_error is the section doesn't have a parent.
      * \endif
      */
-    BRAIN_API Section parent() const;
+    Section parent() const;
 
     /**
      * Return a vector with all the direct children of this section.
      * The container will be empty for terminal sections.
      */
-    BRAIN_API const std::vector<Section> children() const;
+    const std::vector<Section> children() const;
 
     /**
        Depth first search iterator
     **/
-    BRAIN_API depth_iterator depth_begin() const;
-    BRAIN_API depth_iterator depth_end() const;
+    depth_iterator depth_begin() const;
+    depth_iterator depth_end() const;
 
     /**
        Breadth first search iterator
     **/
-    BRAIN_API breadth_iterator breadth_begin() const;
-    BRAIN_API breadth_iterator breadth_end() const;
+    breadth_iterator breadth_begin() const;
+    breadth_iterator breadth_end() const;
 
     /**
        Upstream first search iterator
     **/
-    BRAIN_API upstream_iterator upstream_begin() const;
-    BRAIN_API upstream_iterator upstream_end() const;
+    upstream_iterator upstream_begin() const;
+    upstream_iterator upstream_end() const;
 
-    BRAIN_API const gsl::span<const Point> points() const;
-    BRAIN_API const gsl::span<const float> diameters() const;
-    BRAIN_API const gsl::span<const float> perimeters() const;
+    const gsl::span<const Point> points() const;
+    const gsl::span<const float> diameters() const;
+    const gsl::span<const float> perimeters() const;
 
     /** Return the morphological type of this section (dendrite, axon, ...). */
-    BRAIN_API const SectionType type() const;
+    const SectionType type() const;
 
     /** Return the ID of this section. */
-    BRAIN_API const uint32_t id() const;
+    const uint32_t id() const;
 
 private:
     Section(uint32_t id, PropertiesPtr morphology);
