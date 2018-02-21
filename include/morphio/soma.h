@@ -32,7 +32,6 @@ class Soma
 {
 public:
     BRAIN_API const Point somaCenter() const;
-    BRAIN_API const SomaType type() const;
     BRAIN_API const gsl::span<const Point> points() const
     {
         return get<Property::Point>();

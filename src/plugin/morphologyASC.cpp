@@ -114,11 +114,9 @@ private:
         properties._points = points;
         properties._diameters = diameters;
         if(token == Token::CELLBODY){
-            const auto& somaType = nb_.soma().type();
-            if(somaType != SOMA_UNDEFINED)
-                throw SectionBuilderError("A soma is already defined (its soma "
-                                          "type is: "+std::to_string(somaType) + ")");
-            nb_.soma() = builder::Soma(properties, SOMA_THREE_POINTS);
+            if(nb_.soma().points().size() != 0)
+                throw SectionBuilderError("A soma is already defined");
+            nb_.soma() = builder::Soma(properties);
             return_id = -1;
         } else {
             SectionType section_type = TokenSectionTypeMap.at(token);

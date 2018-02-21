@@ -42,13 +42,6 @@ inline std::ostream& operator<<(std::ostream& os, const MorphologyVersion v)
 }
 
 /** Classification of neuron substructures. */
-enum SomaType
-{
-    SOMA_UNDEFINED = 0,
-    SOMA_THREE_POINTS = 1
-};
-
-/** Classification of neuron substructures. */
 enum SectionType
 {
     SECTION_UNDEFINED = 0,

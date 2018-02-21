@@ -67,8 +67,7 @@ PYBIND11_MODULE(python_morphio, m) {
         .def(py::init<const morphio::Soma&>())
         .def("somaCenter", &morphio::Soma::somaCenter)
         .def("points", [](morphio::Soma* soma){ return span_array_to_ndarray(soma->points()); })
-        .def("diameters", [](morphio::Soma* soma){ return span_to_ndarray(soma->diameters()); })
-        .def("type", &morphio::Soma::type);
+        .def("diameters", [](morphio::Soma* soma){ return span_to_ndarray(soma->diameters()); });
 
     py::class_<morphio::Section>(m, "Section")
         .def("parent", &morphio::Section::parent)

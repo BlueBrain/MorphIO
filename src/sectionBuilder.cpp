@@ -85,7 +85,6 @@ Morphology::~Morphology()
 
 Soma::Soma(const morphio::Soma& soma)
 {
-    _somaType = soma.type();
     _pointProperties =
         Property::PointLevel(soma._properties->_pointLevel, soma._range);
 }
@@ -210,7 +209,6 @@ Property::Properties Morphology::buildReadOnly()
     properties._sectionLevel._sections.push_back({0, -1});
 
     properties._sectionLevel._sectionTypes.push_back(SECTION_UNDEFINED);
-    properties._cellLevel._somaType = soma().type();
 
     start += soma().points().size();
     traverse(writeSection);

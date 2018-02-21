@@ -56,8 +56,6 @@ int main()
     std::cout << center[0] << ", " << center[1] << ", " << center[2]
               << std::endl;
 
-    std::cout << "soma.type(): " << soma.type() << std::endl;
-
     std::cout << "Root sections from morphology: " << std::endl;
     for (auto section : morphology.rootSections())
         std::cout << section.id() << std::endl;

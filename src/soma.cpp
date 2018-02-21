@@ -25,11 +25,6 @@ Soma::Soma(PropertiesPtr properties)
                << std::endl;
 }
 
-const SomaType Soma::type() const
-{
-    return _properties->somaType();
-}
-
 template <typename TProperty>
 const gsl::span<const typename TProperty::Type> Soma::get() const
 {

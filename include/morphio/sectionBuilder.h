@@ -24,24 +24,20 @@ namespace builder
 class Soma
 {
 public:
-    Soma() :
-        _somaType(SOMA_UNDEFINED)
+    Soma()
     {
     }
-    Soma(Property::PointLevel pointProperties, SomaType somaType)
-        : _somaType(somaType)
-        , _pointProperties(pointProperties)
+    Soma(Property::PointLevel pointProperties):
+        _pointProperties(pointProperties)
     {
     }
 
     Soma(const morphio::Soma& soma);
-    SomaType& type() { return _somaType; }
     std::vector<Point>& points() { return _pointProperties._points; }
     std::vector<float> diameters() { return _pointProperties._diameters; }
 private:
     friend class Morphology;
     Property::PointLevel _pointProperties;
-    SomaType _somaType;
 };
 
 class Section
