@@ -9,6 +9,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 add_subdirectory(3rdparty)
 add_subdirectory(src)
+
 add_subdirectory(binds/python)
 
 #add_subdirectory(tests)

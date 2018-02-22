@@ -1,4 +1,4 @@
-set(MORPHIOCPP_SOURCES
+set(MORPHIO_SOURCES
   morphology.cpp
   plugin/morphologyHDF5.cpp
   plugin/morphologySWC.cpp
@@ -12,30 +12,32 @@ set(MORPHIOCPP_SOURCES
   sectionBuilder.cpp
   )
 
+# by default, -fPIC is only used of the dynamic library build
+# This forces the flag also for the static lib
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-add_library(morphiocpp
-    STATIC
-    ${MORPHIOCPP_SOURCES}
+
+# Building object files only once. They will be used for the shared and static library
+add_library(morphio_obj OBJECT ${MORPHIO_SOURCES})
+
+target_include_directories(morphio_obj
+  PUBLIC
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../include
+   $<TARGET_PROPERTY:GSL,INTERFACE_INCLUDE_DIRECTORIES>
+   $<TARGET_PROPERTY:HighFive,INTERFACE_INCLUDE_DIRECTORIES>
+   $<TARGET_PROPERTY:lexertl14,INTERFACE_INCLUDE_DIRECTORIES>
   )
 
-set_target_properties(morphiocpp
+set_target_properties(morphio_obj
   PROPERTIES
   CXX_STANDARD 17
   CXX_STANDARD_REQUIRED YES
   CXX_EXTENSIONS NO
   )
 
-target_link_libraries(morphiocpp
-  PUBLIC
-  GSL
+add_library(morphio_static STATIC $<TARGET_OBJECTS:morphio_obj>)
+add_library(morphio_shared SHARED $<TARGET_OBJECTS:morphio_obj>)
 
-  PRIVATE
-  HighFive
-  lexertl14
-  )
 
-target_include_directories(morphiocpp
-  PUBLIC
-  ${CMAKE_SOURCE_DIR}
-  ${CMAKE_CURRENT_SOURCE_DIR}/../include
-  )
+target_link_libraries(morphio_static PUBLIC GSL PRIVATE HighFive lexertl14)
+target_link_libraries(morphio_shared PUBLIC GSL PRIVATE HighFive lexertl14)
