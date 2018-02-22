@@ -12,8 +12,10 @@ set(MORPHIOCPP_SOURCES
   sectionBuilder.cpp
   )
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 add_library(morphiocpp
-  ${MORPHIOCPP_SOURCES}
+    STATIC
+    ${MORPHIOCPP_SOURCES}
   )
 
 set_target_properties(morphiocpp
