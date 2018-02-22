@@ -1,6 +1,5 @@
-pybind11_add_module(python_morphio morphio.cpp)
+pybind11_add_module(morphio morphio.cpp)
 
-target_link_libraries(python_morphio
+target_link_libraries(morphio
     PRIVATE
-    morphio
-    GSL)
+    morphiocpp)

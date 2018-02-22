@@ -48,7 +48,7 @@ py::array_t<float> span_to_ndarray(const morphio::range<const float>& span)
 }
 
 
-PYBIND11_MODULE(python_morphio, m) {
+PYBIND11_MODULE(morphio, m) {
 
     m.doc() = "pybind11 example plugin"; // optional module docstring
 

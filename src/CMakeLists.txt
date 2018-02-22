@@ -1,37 +1,39 @@
-set(MORPHIO_SOURCES
-    morphology.cpp
-    plugin/morphologyHDF5.cpp
-    plugin/morphologySWC.cpp
-    plugin/morphologyASC.cpp
-    properties.cpp
-    iterators.cpp
-    morphology.cpp
-    soma.cpp
-    section.cpp
-    vector_utils
-    sectionBuilder.cpp
-    )
+set(MORPHIOCPP_SOURCES
+  morphology.cpp
+  plugin/morphologyHDF5.cpp
+  plugin/morphologySWC.cpp
+  plugin/morphologyASC.cpp
+  properties.cpp
+  iterators.cpp
+  morphology.cpp
+  soma.cpp
+  section.cpp
+  vector_utils
+  sectionBuilder.cpp
+  )
 
-add_library(morphio
-    ${MORPHIO_SOURCES}
-    )
+add_library(morphiocpp
+  ${MORPHIOCPP_SOURCES}
+  )
 
-set_target_properties(morphio
-    PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED YES
-    CXX_EXTENSIONS NO
-    )
+set_target_properties(morphiocpp
+  PROPERTIES
+  CXX_STANDARD 17
+  CXX_STANDARD_REQUIRED YES
+  CXX_EXTENSIONS NO
+  )
 
-target_link_libraries(morphio
-    PRIVATE
-    HighFive
-    GSL
-    lexertl14
-    )
+target_link_libraries(morphiocpp
+  PUBLIC
+  GSL
 
-target_include_directories(morphio
-    PUBLIC
-    ${CMAKE_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include
-    )
+  PRIVATE
+  HighFive
+  lexertl14
+  )
+
+target_include_directories(morphiocpp
+  PUBLIC
+  ${CMAKE_SOURCE_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/../include
+  )
