@@ -52,6 +52,11 @@ PYBIND11_MODULE(morphio, m) {
 
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
+
+    m.def("load_cell", [](const morphio::URI& uri){
+            return morphio::Morphology(uri);
+        });
+
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const morphio::URI&>())
         .def("points", &morphio::Morphology::points)

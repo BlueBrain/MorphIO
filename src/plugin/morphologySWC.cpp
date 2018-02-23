@@ -69,11 +69,11 @@ struct Sample
     int parentSection; // Only meaningful for the first sample of each
                        // section
 };
-typedef std::vector<Sample> Samples;
+typedef std::vector<Sample> std::vector<Sample>;
 
 // lunchbox::PluginRegisterer<MorphologySWC> registerer;
 
-void _correctSampleType(Sample& sample, const Samples& samples)
+void _correctSampleType(Sample& sample, const std::vector<Sample& samples)
 {
     SWCSectionType type = sample.type;
     // Fork and end point sample types don't make much sense for Brion.
@@ -115,7 +115,7 @@ struct RawSWCInfo
 
     // This is the raw sample array. It will have gaps for those ids that
     // are missing in the input file.
-    Samples samples;
+    std::vector<Sample samples;
     size_t totalValidSamples;
 
     // Depending on the input file there might be one or more samples with
@@ -134,7 +134,7 @@ void _readSamples(RawSWCInfo& info)
         LBTHROW(morphio::RawDataError("Error opening morphology file: " +
                                         info.filename));
 
-    Samples& samples = info.samples;
+    std::vector<Sample& samples = info.samples;
 
     size_t lineNumber = 0;
     file >> detail::SkipWhiteSpace(lineNumber);
@@ -192,7 +192,7 @@ void _buildSampleTree(RawSWCInfo& info)
     // there. If at any moment a sample which has already been visited is
     // hit, the loop goes back to search the next end point.
     std::vector<bool> visited;
-    Samples& samples = info.samples;
+    std::vector<Sample& samples = info.samples;
     for (Sample& sample : samples)
         visited.push_back(!sample.valid);
 
@@ -361,7 +361,7 @@ Property::Properties _buildStructure(RawSWCInfo& info)
         info.totalValidSamples + info.numSections - info.roots.size());
     _properties.get<Property::Section>().reserve(info.numSections);
     _properties.get<Property::SectionType>().reserve(info.numSections);
-    Samples& samples = info.samples;
+    std::vector<Sample& samples = info.samples;
 
     Sample* sample = &samples[sectionQueue.front()];
     sectionQueue.pop_front();
