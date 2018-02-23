@@ -59,31 +59,31 @@ PYBIND11_MODULE(morphio, m) {
 
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const morphio::URI&>())
-        .def("points", &morphio::Morphology::points)
-        .def("sectionTypes", &morphio::Morphology::sectionTypes)
-        .def("section", &morphio::Morphology::section)
-        .def("sections", &morphio::Morphology::sections)
-        .def("rootSections", &morphio::Morphology::rootSections)
-        .def("soma", &morphio::Morphology::soma)
-        .def("cellFamily", &morphio::Morphology::cellFamily)
-        .def("version", &morphio::Morphology::version);
+        .def_property_readonly("points", &morphio::Morphology::points)
+        .def_property_readonly("sectionTypes", &morphio::Morphology::sectionTypes)
+        .def_property_readonly("section", &morphio::Morphology::section)
+        .def_property_readonly("sections", &morphio::Morphology::sections)
+        .def_property_readonly("rootSections", &morphio::Morphology::rootSections)
+        .def_property_readonly("soma", &morphio::Morphology::soma)
+        .def_property_readonly("cellFamily", &morphio::Morphology::cellFamily)
+        .def_property_readonly("version", &morphio::Morphology::version);
 
     py::class_<morphio::Soma>(m, "Soma")
         .def(py::init<const morphio::Soma&>())
-        .def("somaCenter", &morphio::Soma::somaCenter)
-        .def("points", [](morphio::Soma* soma){ return span_array_to_ndarray(soma->points()); })
-        .def("diameters", [](morphio::Soma* soma){ return span_to_ndarray(soma->diameters()); });
+        .def_property_readonly("somaCenter", &morphio::Soma::somaCenter)
+        .def_property_readonly("points", [](morphio::Soma* soma){ return span_array_to_ndarray(soma->points()); })
+        .def_property_readonly("diameters", [](morphio::Soma* soma){ return span_to_ndarray(soma->diameters()); });
 
     py::class_<morphio::Section>(m, "Section")
-        .def("parent", &morphio::Section::parent)
-        .def("type", &morphio::Section::type)
-        .def("isRoot", &morphio::Section::isRoot)
-        .def("parent", &morphio::Section::parent)
-        .def("children", &morphio::Section::children)
-        .def("points", [](morphio::Section* section){ return span_array_to_ndarray(section->points()); })
-        .def("diameters", [](morphio::Section* section){ return span_to_ndarray(section->diameters()); })
-        .def("perimeters", [](morphio::Section* section){ return span_to_ndarray(section->perimeters()); })
-        .def("id", &morphio::Section::id);
+        .def_property_readonly("parent", &morphio::Section::parent)
+        .def_property_readonly("type", &morphio::Section::type)
+        .def_property_readonly("isRoot", &morphio::Section::isRoot)
+        .def_property_readonly("parent", &morphio::Section::parent)
+        .def_property_readonly("children", &morphio::Section::children)
+        .def_property_readonly("points", [](morphio::Section* section){ return span_array_to_ndarray(section->points()); })
+        .def_property_readonly("diameters", [](morphio::Section* section){ return span_to_ndarray(section->diameters()); })
+        .def_property_readonly("perimeters", [](morphio::Section* section){ return span_to_ndarray(section->perimeters()); })
+        .def_property_readonly("id", &morphio::Section::id);
 
     py::enum_<morphio::enums::SectionType>(m, "SectionType")
         .value("undefined", morphio::enums::SectionType::SECTION_UNDEFINED)
