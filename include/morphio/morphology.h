@@ -18,7 +18,7 @@ public:
     /** Close morphology file. @version 1.0 */
     ~Morphology();
 
-    Morphology(const builder::Morphology&);
+    Morphology(const mut::Morphology&);
     Morphology& operator=(const Morphology&);
     Morphology(Morphology&&);
     Morphology& operator=(Morphology&&);

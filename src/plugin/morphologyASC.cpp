@@ -1,6 +1,6 @@
 #include <fstream>
 
-#include <morphio/sectionBuilder.h>
+#include <morphio/mut/morphology.h>
 #include <morphio/types.h>
 
 #include "morphologyASC.h"
@@ -114,19 +114,15 @@ private:
         properties._points = points;
         properties._diameters = diameters;
         if(token == Token::CELLBODY){
-            if(nb_.soma().points().size() != 0)
+            if(nb_.soma()->points().size() != 0)
                 throw SectionBuilderError("A soma is already defined");
-            nb_.soma() = builder::Soma(properties);
+            nb_.soma() = std::make_shared<mut::Soma>(mut::Soma(properties));
             return_id = -1;
         } else {
             SectionType section_type = TokenSectionTypeMap.at(token);
-            if(parent_id == -1)
-                return_id = nb_.createNeurite(section_type,
-                                               properties);
-            else
-                return_id = nb_.appendSection(nb_.sections()[parent_id],
-                                               section_type,
-                                               properties);
+            return_id = nb_.appendSection(parent_id,
+                                          section_type,
+                                          properties);
         }
         points.clear();
         diameters.clear();
@@ -233,7 +229,7 @@ private:
     }
 
     NeurolucidaLexer lex_;
-    morphio::builder::Morphology nb_;
+    morphio::mut::Morphology nb_;
 };
 
 Property::Properties load(const URI& uri)

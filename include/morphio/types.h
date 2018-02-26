@@ -47,7 +47,7 @@ namespace detail
 {
 class NeurolucidaParser;
 }
-namespace builder
+namespace mut
 {
 class Section;
 class Soma;

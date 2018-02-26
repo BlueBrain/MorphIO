@@ -9,7 +9,9 @@ set(MORPHIO_SOURCES
   soma.cpp
   section.cpp
   vector_utils
-  sectionBuilder.cpp
+  mut/section.cpp
+  mut/soma.cpp
+  mut/morphology.cpp
   )
 
 # by default, -fPIC is only used of the dynamic library build
@@ -37,7 +39,7 @@ set_target_properties(morphio_obj
 
 add_library(morphio_static STATIC $<TARGET_OBJECTS:morphio_obj>)
 add_library(morphio_shared SHARED $<TARGET_OBJECTS:morphio_obj>)
-
+set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio")
 
 target_link_libraries(morphio_static PUBLIC GSL PRIVATE HighFive lexertl14)
 target_link_libraries(morphio_shared PUBLIC GSL PRIVATE HighFive lexertl14)

@@ -3,57 +3,68 @@
 #include <sstream>
 #include <string>
 
-#include <morphio/sectionBuilder.h>
+#include <morphio/mut/morphology.h>
+#include <morphio/mut/section.h>
 #include <morphio/soma.h>
 
 namespace morphio
 {
-namespace builder
+namespace mut
 {
 Morphology::Morphology(const morphio::Morphology& morphology)
     : _counter(0)
-    , _soma(morphology.soma())
+    , _soma(std::make_shared<Soma>(morphology.soma()))
 {
-    for (const auto& rootSection : morphology.rootSections())
-        _rootSections.insert(new Section(this, rootSection));
+
+    for (const morphio::Section& root : morphology.rootSections())
+    {
+        uint32_t id = _register(std::shared_ptr<Section>(new Section(root),
+                                                          friendDtorForSharedPtr));
+        _rootSections.insert(id);
+    }
 }
 
-uint32_t Morphology::appendSection(Section* parent,
+uint32_t Morphology::appendSection(uint32_t parentId,
                                    const morphio::Section& section,
                                    bool recursive)
 {
-    Section* node = new Section(this, section, recursive);
-    parent->_children.insert(node);
-    node->_parent = parent;
-    return node->id();
+    uint32_t id = _register(std::shared_ptr<Section>(new Section(section),
+                                                     friendDtorForSharedPtr));
+    if(parentId == -1)
+        _rootSections.insert(id);
+    else {
+        _parent[id] = parentId;
+        _children[parentId].insert(id);
+    }
+
+    if (recursive)
+    {
+        for (const auto& child : section.children()){
+            appendSection(id, child, true);
+        }
+
+    }
+
+    return id;
 }
 
-uint32_t Morphology::appendSection(Section* parent, SectionType type,
+uint32_t Morphology::appendSection(uint32_t parentId, SectionType type,
                                    const Property::PointLevel& pointProperties)
 {
-    Section* section = new Section(this, _counter, type, pointProperties);
-    parent->_children.insert(section);
-    section->_parent = parent;
-    return section->id();
+    uint32_t id = _register(std::shared_ptr<Section>(new Section(_counter, type, pointProperties),
+                                                     friendDtorForSharedPtr));
+    if(parentId == -1)
+        _rootSections.insert(id);
+    else {
+        _parent[id] = parentId;
+        _children[parentId].insert(id);
+    }
+    return id;
 }
 
-uint32_t Morphology::createNeurite(const morphio::Section& section,
-                                   bool recursive)
-{
-    Section* node = new Section(this, section, recursive);
-    _rootSections.insert(node);
-    return node->id();
-}
+void friendDtorForSharedPtr(Section* section){ delete section; }
 
-uint32_t Morphology::createNeurite(SectionType type,
-                                   const Property::PointLevel& pointProperties)
-{
-    Section* section = new Section(this, _counter, type, pointProperties);
-    _rootSections.insert(section);
-    return section->id();
-}
-
-void Morphology::_register(Section* section)
+uint32_t Morphology::_register(std::shared_ptr<Section> section)
 {
     _counter = std::max(_counter, section->id() + 1);
     if (_sections[section->id()])
@@ -64,15 +75,16 @@ void Morphology::_register(Section* section)
            << std::endl;
         LBTHROW(ss.str());
     }
-    _sections[section->id()] = section;
+    _sections[section->id()] = std::shared_ptr<Section>(section);
+    return section->id();
 }
 
-Soma& Morphology::soma()
+std::shared_ptr<Soma> Morphology::soma()
 {
     return _soma;
 }
 
-const std::set<Section*>& Morphology::rootSections()
+const std::set<uint32_t>& Morphology::rootSections()
 {
     return _rootSections;
 }
@@ -83,91 +95,41 @@ Morphology::~Morphology()
         deleteSection(root, true);
 }
 
-Soma::Soma(const morphio::Soma& soma)
-{
-    _pointProperties =
-        Property::PointLevel(soma._properties->_pointLevel, soma._range);
+std::map<uint32_t, std::shared_ptr<Section>>& Morphology::sections() {
+    return _sections;
 }
 
-Section::Section(Morphology* morphology, int id, SectionType type,
-                 const Property::PointLevel& pointProperties)
-    : _pointProperties(pointProperties)
-    , _id(id)
-    , _sectionType(type)
-    , _parent(nullptr)
-{
-    morphology->_register(this);
-}
+void Morphology::deleteSection(uint32_t id, bool recursive)
 
-Section::Section(Morphology* morphology, const morphio::Section& section,
-                 bool recursive)
-    : Section(morphology, section.id(), section.type(),
-              Property::PointLevel(section._properties->_pointLevel,
-                                   section._range))
 {
-    if (recursive)
-    {
-        for (const auto& child : section.children())
-            morphology->appendSection(this, child, true);
-    }
-}
-
-Section* const Section::parent()
-{
-    return _parent;
-}
-
-const std::set<Section*>& Section::children()
-{
-    return _children;
-}
-
-void Morphology::deleteSection(Section* section, bool recursive)
-{
-    _sections.erase(section->id());
-    _rootSections.erase(section);
-    for (auto child : section->_children)
+    _rootSections.erase(id);
+    for (auto child : _children[id])
     {
         if (recursive)
             deleteSection(child, recursive);
         else
         {
-            if (section->_parent)
-                section->_parent->_children.insert(child);
-            child->_parent = section->_parent;
+            // Re-link children to their "grand-parent"
+            _parent[child] = _parent[id];
+            _children[_parent[id]].insert(child);
+            if (_parent[id] == -1)
+                _rootSections.insert(child);
         }
     }
-    delete section;
+    _children.erase(id);
+    _parent.erase(id);
+    _sections.erase(id);
 }
 
 void Morphology::traverse(
-    std::function<void(Morphology* morphology, Section* section)> fun,
-    Section* rootSection)
+    std::function<void(Morphology& morphology, uint32_t section)> fun,
+    uint32_t startSection)
 {
     auto& sections =
-        rootSection ? std::set<Section*>{rootSection} : rootSections();
+        startSection ? std::set<uint32_t>{startSection} : rootSections();
     for (auto root : sections)
     {
-        root->traverse(this, fun);
-    }
-}
-
-void Section::traverse(
-    Morphology* morphology,
-    std::function<void(Morphology* morphology, Section* section)> fun)
-{
-    // depth first traversal
-    std::vector<Section*> stack;
-    stack.push_back(this);
-    while (!stack.empty())
-    {
-        Section* parent = stack.back();
-        stack.pop_back();
-        fun(morphology, parent);
-        for (auto child : parent->children())
-        {
-            stack.push_back(child);
-        }
+        _sections[root]->traverse(*this, fun);
     }
 }
 
@@ -190,27 +152,27 @@ Property::Properties Morphology::buildReadOnly()
     using std::setw;
     int i = 0;
 
-    int start = 0;
     int sectionIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
     Property::Properties properties;
-    auto writeSection = [&start, &properties, &sectionIdOnDisk,
-                         &newIds](Morphology* morpho, Section* section) {
+    auto writeSection = [&properties, &sectionIdOnDisk, &newIds]
+        (Morphology& morpho, uint32_t sectionId) {
+        auto section = morpho.section(sectionId);
         int parentOnDisk =
-            (section->parent() ? newIds[section->parent()->id()] : 0);
+        (morpho.parent(sectionId) != -1 ? newIds[morpho.parent(sectionId)] : 1);
+
+        int start = properties._pointLevel._points.size();
         properties._sectionLevel._sections.push_back({start, parentOnDisk});
         properties._sectionLevel._sectionTypes.push_back(section->type());
         _appendProperties(properties._pointLevel, section->_pointProperties);
-        newIds[section->id()] = sectionIdOnDisk++;
-        start += section->points().size();
+        newIds[sectionId] = sectionIdOnDisk++;
     };
 
-    _appendProperties(properties._pointLevel, soma()._pointProperties);
+    _appendProperties(properties._pointLevel, soma()->_pointProperties);
     properties._sectionLevel._sections.push_back({0, -1});
 
     properties._sectionLevel._sectionTypes.push_back(SECTION_UNDEFINED);
 
-    start += soma().points().size();
     traverse(writeSection);
     return properties;
 }
@@ -222,7 +184,8 @@ void swc(Morphology& morphology)
     int sectionIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
     auto writeSection =
-        [&sectionIdOnDisk, &newIds](Morphology* morphology, Section* section) {
+        [&sectionIdOnDisk, &newIds](Morphology& morphology, uint32_t sectionId) {
+        auto section = morphology.section(sectionId);
             const auto& points = section->points();
             const auto& diameters = section->diameters();
 
@@ -234,11 +197,11 @@ void swc(Morphology& morphology)
                           << points[i][2] << ' ' << diameters[i] / 2. << ' ';
                 if (i > 0)
                     std::cout << sectionIdOnDisk - 1 << std::endl;
-                else
-                    std::cout
-                        << (section->parent() ? newIds[section->parent()->id()]
-                                              : 0)
-                        << std::endl;
+                else {
+                    uint32_t parentId = morphology.parent(sectionId);
+                    std::cout << (parentId == -1 ? newIds[parentId] : 1) << std::endl;
+                }
+
                 ++sectionIdOnDisk;
             }
             newIds[section->id()] = sectionIdOnDisk - 1;
@@ -258,20 +221,21 @@ void _write_asc_points(const Points& points,
     }
 }
 
-void _write_asc_section(Section* section, int indentLevel)
+void _write_asc_section(Morphology& morpho, uint32_t id, int indentLevel)
 {
     std::string indent(indentLevel, ' ');
+    auto section = morpho.section(id);
     _write_asc_points(section->points(), section->diameters(), indentLevel);
 
-    if (!section->children().empty())
+    if (!morpho.children(id).empty())
     {
         std::cout << indent << "(" << std::endl;
-        auto it = section->children().begin();
-        _write_asc_section((*it++), indentLevel + 2);
-        for (; it != section->children().end(); ++it)
+        auto it = morpho.children(id).begin();
+        _write_asc_section(morpho, (*it++), indentLevel + 2);
+        for (; it != morpho.children(id).end(); ++it)
         {
             std::cout << indent << "|" << std::endl;
-            _write_asc_section((*it), indentLevel + 2);
+            _write_asc_section(morpho, (*it), indentLevel + 2);
         }
         std::cout << indent << ")" << std::endl;
     }
@@ -282,15 +246,15 @@ void asc(Morphology& morphology)
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
     header[SECTION_DENDRITE] = "( (Color Red)\n  (Dendrite)\n";
 
-    auto &soma = morphology.soma();
+    const auto soma = morphology.soma();
     std::cout << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
-    _write_asc_points(soma.points(), soma.diameters(), 2);
+    _write_asc_points(soma->points(), soma->diameters(), 2);
     std::cout << ")\n\n";
 
-    for (auto& root : morphology.rootSections())
+    for (auto& id : morphology.rootSections())
     {
-        std::cout << header[root->type()];
-        _write_asc_section(root, 2);
+        std::cout << header[morphology.section(id)->type()];
+        _write_asc_section(morphology, id, 2);
         std::cout << ")\n\n";
     }
 }
@@ -305,9 +269,10 @@ void h5(Morphology& morphology)
     std::map<uint32_t, int32_t> newIds;
     Property::Properties properties;
     auto writeSection = [&start, &properties, &sectionIdOnDisk,
-                         &newIds](Morphology* morpho, Section* section) {
-        int parentOnDisk =
-            (section->parent() ? newIds[section->parent()->id()] : 0);
+                         &newIds](Morphology& morpho, uint32_t sectionId) {
+        uint32_t parentId = morpho.parent(sectionId);
+        int parentOnDisk = (parentId != -1 ? newIds[parentId] : 1);
+        auto section = morpho.section(sectionId);
         std::cout << setw(6) << sectionIdOnDisk << ' ' << setw(6)
                   << parentOnDisk << ' ' << setw(6) << start << ' ' << setw(6)
                   << section->type() << std::endl;
@@ -320,10 +285,10 @@ void h5(Morphology& morphology)
     std::cout << setw(6) << 0 << ' ' << setw(6) << -1 << ' ' << setw(6) << start
               << ' ' << setw(6) << SECTION_SOMA << std::endl;
 
-    start += morphology.soma().points().size();
+    start += morphology.soma()->points().size();
     morphology.traverse(writeSection);
 }
 
 } // end namespace writer
-} // end namespace builder
+} // end namespace mut
 } // end namespace morphio

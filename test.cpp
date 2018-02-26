@@ -4,8 +4,9 @@
 
 #include <morphio/morphology.h>
 #include <morphio/section.h>
-#include <morphio/sectionBuilder.h>
 #include <morphio/soma.h>
+
+#include <morphio/mut/morphology.h>
 
 using namespace std;
 
@@ -60,21 +61,21 @@ int main()
     for (auto section : morphology.rootSections())
         std::cout << section.id() << std::endl;
 
-    morphio::builder::Morphology a(morphology);
+    morphio::mut::Morphology a(morphology);
     for (auto section : a.rootSections())
     {
         std::cout << "Section" << std::endl;
-        for (auto& child : section->children())
+        for (auto& child : section.children())
         {
-            std::cout << "child->id(): " << child->id() << std::endl;
+            std::cout << "child->id(): " << child << std::endl;
         }
     }
 
     std::cout << "Traversal" << std::endl;
     auto firstNeurite = *(a.rootSections().begin());
     a.traverse(
-        [](morphio::builder::Morphology* morph,
-           morphio::builder::Section* sec) {
+        [](morphio::mut::Morphology* morph,
+           morphio::mut::Section* sec) {
             std::cout << "hello from: " << sec->type() << std::endl;
             for (auto center : sec->points())
                 std::cout << center[0] << ", " << center[1] << ", " << center[2]
@@ -84,13 +85,13 @@ int main()
         firstNeurite);
 
     std::cout << "H5 Writer" << std::endl;
-    morphio::builder::writer::h5(a);
+    morphio::mut::writer::h5(a);
 
     std::cout << "SWC writer" << std::endl;
-    morphio::builder::writer::swc(a);
+    morphio::mut::writer::swc(a);
 
     std::cout << "Asc writer" << std::endl;
-    morphio::builder::writer::asc(a);
+    morphio::mut::writer::asc(a);
 
     std::cout << "End" << std::endl;
 }

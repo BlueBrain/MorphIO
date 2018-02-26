@@ -87,7 +87,7 @@ private:
     template <typename Property>
     const range<const typename Property::Type> get() const;
 
-    friend class builder::Section;
+    friend class mut::Section;
     friend const Section Morphology::section(const uint32_t&) const;
 
     uint32_t _id;

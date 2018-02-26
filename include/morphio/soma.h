@@ -45,7 +45,7 @@ private:
     template <typename Property>
     const range<const typename Property::Type> get() const;
     friend const Soma Morphology::soma() const;
-    friend class builder::Soma;
+    friend class mut::Soma;
 
     std::shared_ptr<Property::Properties> _properties;
     SectionRange _range;
