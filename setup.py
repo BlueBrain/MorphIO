@@ -57,13 +57,18 @@ class CMakeBuild(build_ext):
             build_args += ['--', '-j2']
 
         env = os.environ.copy()
-        env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(
+        env['CXXFLAGS'] = '{} -static-libstdc++ -DVERSION_INFO=\\"{}\\"'.format(
             env.get('CXXFLAGS', ''),
             self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
+        print('un')
+        proc=subprocess.Popen("echo $CXX", shell=True, stdout=subprocess.PIPE)
+        print(proc.communicate())
+        print('un zero')
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args,
                               cwd=self.build_temp, env=env)
+        print('deux')
         subprocess.check_call(['cmake', '--build', '.'] + build_args,
                               cwd=self.build_temp)
 

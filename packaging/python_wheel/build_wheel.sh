@@ -11,5 +11,8 @@ docker run --rm \
     -e PIPPROXY="$PIPPROXY" \
     -e UID=$UID \
     -v $BASE:/io:Z \
-    bbpdocker.epfl.ch/morphio_wheel \
+    morphio_wheel \
     /bin/bash /io/packaging/python_wheel/docker_build_wheel.sh
+
+
+#bbpdocker.epfl.ch/morphio_wheel \
