@@ -93,6 +93,7 @@ const std::vector<Section> Section::children() const
         result.reserve(children.size());
         for (const uint32_t id : children)
             result.push_back(Section(id, _properties));
+
         return result;
     }
     catch (const std::out_of_range& oor)
@@ -131,12 +132,6 @@ upstream_iterator Section::upstream_end() const
     return upstream_iterator();
 }
 
-std::ostream& operator<<(std::ostream& os, const Section& section)
-{
-    os << section.id();
-    return os;
-}
-
 const range<const Point> Section::points() const
 {
     return get<Property::Point>();
@@ -149,4 +144,22 @@ const range<const float> Section::perimeters() const
 {
     return get<Property::Perimeter>();
 }
+
+} // namespace morphio
+
+
+// operator<< must be defined in the global namespace to be usable there
+std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point> points)
+{
+    for(auto point: points)
+        os <<  point[0] << ' ' << point[1] << ' ' << point[2] << std::endl;
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const morphio::Section& section)
+{
+    os << "id: " << section.id() << std::endl;;
+
+    os << section.points();
+    return os;
 }

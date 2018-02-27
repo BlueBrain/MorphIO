@@ -84,8 +84,7 @@ public:
 
 private:
     Section(uint32_t id, std::shared_ptr<Property::Properties> morphology);
-    template <typename Property>
-    const range<const typename Property::Type> get() const;
+    template <typename Property> const range<const typename Property::Type> get() const;
 
     friend class mut::Section;
     friend const Section Morphology::section(const uint32_t&) const;
@@ -95,5 +94,8 @@ private:
     std::shared_ptr<Property::Properties> _properties;
 };
 
-std::ostream& operator<<(std::ostream& os, const Section& section);
+
 }
+
+std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
+std::ostream& operator<<(std::ostream& os, morphio::range<const morphio::Point> points);

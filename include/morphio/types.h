@@ -63,34 +63,5 @@ typedef Iterator<std::queue<Section>> breadth_iterator;
 typedef Iterator<std::vector<Section>> upstream_iterator;
 
 template <typename T> using range = gsl::span<T>;
-}
 
-// TODO: compile
-#if 0
-// if you have a type T in namespace N, the operator << for T needs to be in
-// namespace N too
-namespace boost
-{
-template <typename T>
-inline std::ostream& operator<<(std::ostream& os,
-                                const boost::multi_array<T, 2>& data)
-{
-    for (size_t i = 0; i < data.shape()[0]; ++i)
-    {
-        for (size_t j = 0; j < data.shape()[1]; ++j)
-            os << data[i][j] << " ";
-        os << std::endl;
-    }
-    return os;
-}
-}
-
-namespace std
-{
-template <class T, class U>
-inline std::ostream& operator<<(std::ostream& os, const std::pair<T, U>& pair)
-{
-    return os << "[ " << pair.first << ", " << pair.second << " ]";
-}
-}
-#endif
+} // namespace morphio
