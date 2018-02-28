@@ -1,3 +1,9 @@
+# Python wheels
+*.whl
+
+morphio.egg-info/
+
+
 # Compiled Object files
 *.slo
 *.lo
