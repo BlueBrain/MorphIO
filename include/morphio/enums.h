@@ -51,6 +51,20 @@ enum SectionType
     SECTION_APICAL_DENDRITE = 4, //!< apical dendrite (far from soma)
     SECTION_GLIA_PROCESS = 2,    // TODO: nasty overload there
     SECTION_GLIA_ENDFOOT = 3,
+
+    // All section types equal or above this number are custom types according to
+    // neuromorpho.org standard
+    SECTION_CUSTOM_START = 5,
+
+    // CNIC defined types
+    // It defines too extra types SWC_SECTION_FORK_POINT and SWC_SECTION_END_POINT
+    // Consequently the custom types start at a higher number
+    // See here:
+    // http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
+    SWC_SECTION_FORK_POINT = 5,
+    SWC_SECTION_END_POINT = 6,
+    SECTION_CNIC_CUSTOM_START = 7,
+
     SECTION_ALL = 32
 };
 
