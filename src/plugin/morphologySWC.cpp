@@ -1,14 +1,14 @@
-
-#include "morphologySWC.h"
-
-#include "../detail/skipWhiteSpace.h"
-
 #include <cassert>
 #include <fstream>
 #include <list>
 #include <sstream>
 
 #include <iostream>
+
+#include <morphio/properties.h>
+#include "morphologySWC.h"
+#include <morphio/mut/morphology.h>
+#include <morphio/mut/soma.h>
 
 namespace morphio
 {
@@ -19,42 +19,24 @@ namespace swc
 // It's not clear if -1 is the only way of identifying a root section.
 const int SWC_UNDEFINED_PARENT = -1;
 
-enum SWCSectionType
-{
-    SWC_SECTION_UNDEFINED = 0,
-    SWC_SECTION_SOMA = 1,
-    SWC_SECTION_AXON = 2,
-    SWC_SECTION_DENDRITE = 3,
-    SWC_SECTION_APICAL_DENDRITE = 4,
-    SWC_SECTION_FORK_POINT = 5,
-    SWC_SECTION_END_POINT = 6,
-    SWC_SECTION_CUSTOM = 7
-};
-
 struct Sample
 {
     Sample()
         : valid(false)
-        , type(SWC_SECTION_UNDEFINED)
-        , parent(-1)
-        , nextID(-1)
-        , siblingID(-1)
-        , parentSection(-1)
+        , type(SECTION_UNDEFINED)
+        , parentId(-1)
     {
     }
 
     explicit Sample(const char* line)
-        : nextID(-1)
-        , siblingID(-1)
-        , parentSection(-1)
     {
         float radius;
-        valid = sscanf(line, "%20d%20f%20f%20f%20f%20d", (int*)&type, &point[0],
-                       &point[1], &point[2], &radius, &parent) == 6;
+        valid = sscanf(line, "%20d%20d%20f%20f%20f%20f%20d", (int*)&id, (int*)&type, &point[0],
+                       &point[1], &point[2], &radius, &parentId) == 7;
 
         diameter = radius * 2; // The point array stores diameters.
 
-        if (type >= SWC_SECTION_CUSTOM)
+        if (type >= SECTION_CUSTOM_START)
             valid = false; // Unknown section type, custom samples are also
                            // Regarded as unknown.
     }
@@ -62,416 +44,119 @@ struct Sample
     float diameter;
     bool valid;
     Point point; // x, y, z and diameter
-    SWCSectionType type;
-    int parent;
-    int nextID;
-    int siblingID;
-    int parentSection; // Only meaningful for the first sample of each
-                       // section
+    SectionType type;
+    int parentId;
+    int id;
 };
 
-// lunchbox::PluginRegisterer<MorphologySWC> registerer;
 
-void _correctSampleType(Sample& sample, const std::vector<Sample>& samples)
-{
-    SWCSectionType type = sample.type;
-    // Fork and end point sample types don't make much sense for Brion.
-    // The sample type will be corrected to be that of the parent section.
-    // If the parent is the soma or doesn't exist, the final type will be
-    // undefined. If the parent is also a fork point, the traversal will
-    // continue.
-    int parentID = sample.parent;
-    while (type == SWC_SECTION_FORK_POINT || type == SWC_SECTION_END_POINT)
-    {
-        if (parentID == SWC_UNDEFINED_PARENT)
-        {
-            sample.type = SWC_SECTION_UNDEFINED;
-            return;
-        }
-
-        type = samples[parentID].type;
-        parentID = samples[parentID].parent;
-
-        if (type == SWC_SECTION_SOMA || type == SWC_SECTION_UNDEFINED)
-        {
-            sample.type = SWC_SECTION_UNDEFINED;
-            return;
-        }
-    }
-
-    sample.type = type;
+std::string errorMsg(const std::string& filename,
+                     const std::string& line,
+                     int lineNumber,
+                     std::string additionalMessage = ""){
+    return "Error reading swc morphology file: " + filename +
+        "\nParse error at line: " + std::to_string(lineNumber) +
+        "\nParsed line was:" + line + "\n\n" +
+        additionalMessage;
 }
 
-struct RawSWCInfo
+std::map<uint32_t, Sample> _readSamples(const URI& uri)
 {
-    RawSWCInfo()
-        : totalValidSamples(0)
-        , numSections(0)
-    {
-    }
-
-    std::string filename;
-
-    // This is the raw sample array. It will have gaps for those ids that
-    // are missing in the input file.
-    std::vector<Sample> samples;
-    size_t totalValidSamples;
-
-    // Depending on the input file there might be one or more samples with
-    // no parent. This structure is used to be able to do a depth first
-    // traversal from the soma. The first root is the soma and only one
-    // root sample is allowed to be of type soma.
-    std::vector<size_t> roots;
-
-    size_t numSections;
-};
-
-void _readSamples(RawSWCInfo& info)
-{
-    std::ifstream file(info.filename.c_str());
+    std::ifstream file(uri.c_str());
     if (file.fail())
         LBTHROW(morphio::RawDataError("Error opening morphology file: " +
-                                        info.filename));
+                                        uri));
 
-    std::vector<Sample>& samples = info.samples;
+    std::map<uint32_t, Sample> samples;
 
     size_t lineNumber = 0;
-    file >> detail::SkipWhiteSpace(lineNumber);
     std::string line;
-    size_t totalSamples = 0;
     while (!std::getline(file, line).fail())
     {
         ++lineNumber;
-        // Fix #4: Subsequent non-empty lines each represent a single neuron
-        // sample point with seven data items.
         if (line[0] == '#' || line.empty())
             continue;
 
-        char* data;
-        const unsigned int id = strtol(line.data(), &data, 10);
-        if (*data != ' ' && *data != '\t')
+        const auto &sample = Sample(line.data());
+        if (!sample.valid)
         {
-            LBTHROW(morphio::RawDataError(
-                "Reading swc morphology file: " + info.filename +
-                ", parse error at line " + std::to_string(lineNumber)));
+            LBTHROW(morphio::RawDataError(errorMsg(uri, line, lineNumber)));
         }
-        samples.resize(std::max(samples.size(), size_t(id + 1)));
-        if (samples[id].valid)
-        {
-            LBTHROW(morphio::IDSequenceError(
-                "Reading swc morphology file: " + info.filename +
-                ", repeated sample id " + std::to_string(id) + " at line " +
-                std::to_string(lineNumber)));
-        }
-        else
-        {
-            samples[id] = Sample(data);
-            ++totalSamples;
-            if (!samples[id].valid)
-            {
-                LBTHROW(morphio::IDSequenceError(
-                    "Reading swc morphology file: " + info.filename +
-                    ", parse error at line " + std::to_string(lineNumber)));
-            }
-        }
-
-        file >> detail::SkipWhiteSpace(lineNumber);
+        samples[sample.id] = sample;
     }
-    info.totalValidSamples = totalSamples;
+    return samples;
 }
 
-void _buildSampleTree(RawSWCInfo& info)
+std::ostream& operator<<(std::ostream& os, const morphio::Point& point)
 {
-    // To connect the samples in a descending tree the easiest thing is to
-    // start with the last sample (assumed to be and end-point as no other
-    // can have it as parent without making a loop) and traverse the
-    // morphology tree backwards until we find a sample with no
-    // parent. Then, the next sample in the input vector which hasn't
-    // still been processed is searched and the traversal continues from
-    // there. If at any moment a sample which has already been visited is
-    // hit, the loop goes back to search the next end point.
-    std::vector<bool> visited;
-    std::vector<Sample>& samples = info.samples;
-    for (Sample& sample : samples)
-        visited.push_back(!sample.valid);
-
-    if (samples.empty())
-        LBTHROW(morphio::SomaError("Reading swc morphology file: " +
-                                     info.filename +
-                                     ", no soma section found"));
-
-    size_t currentSample = samples.size() - 1;
-    size_t currentEndPoint = samples.size() - 1;
-    size_t samplesLeft = info.totalValidSamples;
-    assert(!visited[currentSample]); // It's impossible that the last
-                                     // sample array is not valid
-
-    bool hasSoma = false;
-
-    while (samplesLeft--)
-    {
-        Sample& sample = samples[currentSample];
-        visited[currentSample] = true;
-
-        _correctSampleType(sample, samples);
-
-        // Moving to the parent if not visited yet, otherwise searching
-        // for the next end point.
-        const bool root = sample.parent == SWC_UNDEFINED_PARENT;
-
-        if (!root)
-        {
-            if (sample.parent == int(currentSample))
-            {
-                LBTHROW(morphio::IDSequenceError(
-                    "Reading swc morphology file: " + info.filename +
-                    ", found a sample point to itself"));
-            }
-            Sample* parent = &samples[sample.parent];
-            if (!parent->valid)
-            {
-                std::stringstream msg;
-                msg << "Reading swc morphology file: " << info.filename
-                    << ", broken tree (missing sample  " << sample.parent << ")"
-                    << std::endl;
-                LBTHROW(morphio::MissingParentError(msg.str()));
-            }
-
-            if (parent->type == SWC_SECTION_SOMA)
-            {
-                // When the parent is the soma we have to handle it differently
-                // as we don't want to split a soma ring where neurites
-                // connect to arbitrary soma points in multiple sections.
-                if (sample.type == SWC_SECTION_SOMA)
-                {
-                    if (parent->nextID != -1)
-                    {
-                        LBWARN
-                            << "Reading swc morphology file: " << info.filename
-                            << ", found bifurcation in soma section";
-                        sample.siblingID = parent->nextID;
-                    }
-                    // Linking the parent to this sample.
-                    parent->nextID = int(currentSample);
-                }
-                else
-                {
-                    info.roots.push_back(currentSample);
-                    // Sections whose parent is the soma need their parent
-                    // section to be assigned at this point.
-                    sample.parentSection = 0;
-                }
-            }
-            else
-            {
-                if (sample.type == SWC_SECTION_SOMA)
-                {
-                    LBTHROW(morphio::SomaError(
-                        "Reading swc morphology file: " + info.filename +
-                        ", found soma sample with neurite parent"));
-                }
-                if (parent->nextID != -1)
-                {
-                    // The parent was already connected. Linking this sample
-                    // to its sibling.
-                    sample.siblingID = parent->nextID;
-                    // This also means that a sequence of samples is now split
-                    // in three different sections (a parent and two children).
-                    info.numSections += 2;
-                }
-                // Linking the parent to this sample.
-                parent->nextID = int(currentSample);
-            }
-        }
-        else
-        {
-            ++info.numSections;
-            if (sample.type == SWC_SECTION_SOMA)
-            {
-                // Only one soma section is permitted. If a previous
-                // one is detected, then throw.
-                if (info.roots.size() &&
-                    samples[info.roots[0]].type == SWC_SECTION_SOMA)
-                {
-                    LBTHROW(morphio::SomaError(
-                        "Reading swc morphology file: " + info.filename +
-                        ", found two soma sections"));
-                }
-                info.roots.insert(info.roots.begin(), currentSample);
-                hasSoma = true;
-            }
-            else
-            {
-                info.roots.push_back(currentSample);
-                // Non soma root sections get their parent section
-                // assigned to the soma at this point.
-                sample.parentSection = 0;
-                // If the sample type is fork or end point, we convert it
-                // into undefined because we don't really know which is the
-                // type of the section.
-                if (sample.type == SWC_SECTION_FORK_POINT ||
-                    sample.type == SWC_SECTION_END_POINT)
-                {
-                    sample.type = SWC_SECTION_UNDEFINED;
-                }
-            }
-        }
-
-        if (samplesLeft)
-        {
-            if (root || visited[sample.parent])
-            {
-                // This loop and the external loop guarantee that every
-                // sample after currentEndPoint has been already visited (or
-                // is invalid).
-                while (visited[currentEndPoint])
-                {
-                    assert(currentEndPoint != 0);
-                    --currentEndPoint;
-                }
-                currentSample = currentEndPoint;
-            }
-            else
-                currentSample = sample.parent;
-        }
-    }
-    if (!hasSoma)
-        LBTHROW(morphio::SomaError("Reading swc morphology file: " +
-                                     info.filename +
-                                     ", no soma section found"));
+    os <<  point[0] << ' ' << point[1] << ' ' << point[2];
+    return os;
 }
 
-Property::Properties _buildStructure(RawSWCInfo& info)
-{
-    Property::Properties _properties;
-    _properties._cellLevel._cellFamily = FAMILY_NEURON;
-    _properties._cellLevel._version = MORPHOLOGY_VERSION_SWC_1;
-
-    std::list<size_t> sectionQueue(info.roots.begin(), info.roots.end());
-
-    int section = 0;
-    // All sections except the soma section and the first order sections
-    // repeat the parent point in the point list. This is a "feature" to
-    // stay compatible with the binary layout of the .h5 file format.
-    // The size reservation is an upper estimate because it's not easy to
-    // detect all first order sections (some may connect to the soma point
-    // or ring and some may not).
-    _properties.get<Property::Point>().reserve(
-        info.totalValidSamples + info.numSections - info.roots.size());
-    _properties.get<Property::Section>().reserve(info.numSections);
-    _properties.get<Property::SectionType>().reserve(info.numSections);
-    std::vector<Sample>& samples = info.samples;
-
-    Sample* sample = &samples[sectionQueue.front()];
-    sectionQueue.pop_front();
-    while (sample)
-    {
-        _properties.get<Property::Section>().push_back(
-            {int(_properties.get<Property::Point>().size()),
-             sample->parentSection});
-        _properties.get<Property::SectionType>().push_back(
-            SectionType(sample->type));
-
-        // Pushing first point of the section using the parent sample
-        // if necessary
-        if (sample->parent != SWC_UNDEFINED_PARENT)
-        {
-            const Sample* parent = &samples[sample->parent];
-            // If the parent sections is the soma, we connect this section
-            // to the soma only if the soma is described with more than
-            // one sample (that is, sections are not connected to point somas).
-            if (parent->type != SWC_SECTION_SOMA)
-            {
-                _properties.get<Property::Point>().push_back(parent->point);
-                _properties.get<Property::Diameter>().push_back(parent->diameter);
-            }
-        }
 
 
-        // Iterate while we stay on the same section and push points
-        // to the point vector.
-        while (
-            sample &&
-            (sample->siblingID == -1 || sample->type == SWC_SECTION_SOMA) &&
-            // We also cut into sections when the sample type changes.
-            // There are degenerated cases where this is absolutely
-            // needed (e.g. a morphology with only one first order
-            // section a point soma).
-            sample->type ==
-                SWCSectionType(_properties.get<Property::SectionType>().back()))
-        {
-            _properties.get<Property::Point>().push_back(sample->point);
-            _properties.get<Property::Diameter>().push_back(sample->diameter);
+Property::Properties _buildProperties(const std::map<uint32_t, Sample> &samples){
+    std::map<uint32_t, std::vector<uint32_t>> children;
 
-            if (sample->nextID != -1)
-                sample = &samples[sample->nextID];
-            // Special case of 3 point soma: sibling is part of the same
-            // "section"
-            else if (sample->type == SWC_SECTION_SOMA &&
-                     sample->siblingID != -1)
-                sample = &samples[sample->siblingID];
-            else
-                sample = 0;
-        }
-
-        // Finished iterating a section
-        if (sample)
-        {
-            // We reached a bifurcation or a section type change, pushing
-            // the sibling (if any) to the sectionQeueue and continuing
-            // traversing the current section
-            assert(sample->siblingID != -1 ||
-                   sample->type !=
-                       SWCSectionType(
-                           _properties.get<Property::SectionType>().back()));
-
-            // Assigning the parent section to the current sample, this
-            // will be stored in the section array at the beginning of
-            // the next iteration.
-            sample->parentSection = section;
-
-            // Pushing all siblings into the queue and unlinking them
-            int siblingID = sample->siblingID;
-            sample->siblingID = -1;
-            while (siblingID != -1)
-            {
-                // We do push_front to continue on the same subtree and
-                // do a depth-first traversal.
-                sectionQueue.push_front(siblingID);
-                Sample* sibling = &samples[siblingID];
-                // Assigning the parent section to the sibling
-                sibling->parentSection = section;
-                siblingID = sibling->siblingID;
-                sibling->siblingID = -1;
-            }
-        }
-        else if (!sectionQueue.empty())
-        {
-            // Reached an end point. Starting the next section from
-            // the sectionQueue if not empty
-            sample = &samples[sectionQueue.front()];
-            sectionQueue.pop_front();
-        }
-        ++section;
+    // Dictionnary: SWC Id of the last point of a section to section ID
+    std::map<uint32_t, uint32_t> swcIdToSectionId;
+    int lastSomaPoint = -1;
+    for(auto sample_pair: samples){
+        const auto &sample = sample_pair.second;
+        children[sample.parentId].push_back(sample.id);
+        if(sample.type == SECTION_SOMA)
+            lastSomaPoint = sample.id;
     }
-    return _properties;
+
+    mut::Morphology morph;
+
+    Property::PointLevel properties;
+    int32_t parentSectionId = -1;
+
+    for(auto sample_pair: samples) {
+        const auto &sample = sample_pair.second;
+        // Empty property means the start of a new section
+        if(properties._points.size() == 0 &&
+           sample.parentId != SWC_UNDEFINED_PARENT) // Filter out soma section
+        {
+            bool isRootSection = samples.at(sample.parentId).type == SECTION_SOMA;
+
+            if(!isRootSection)
+            {
+                properties._points.push_back(samples.at(sample.parentId).point);
+                properties._diameters.push_back(samples.at(sample.parentId).diameter);
+                parentSectionId = swcIdToSectionId.at(sample.parentId);
+            } else {
+                parentSectionId = -1;
+            }
+        }
+        properties._points.push_back(sample.point);
+        properties._diameters.push_back(sample.diameter);
+
+        // End of soma or end of section
+        if(sample.id == lastSomaPoint || // End of soma
+           children[sample.id].size() == 0 || // Reached leaf
+           children[sample.id].size() == 2){ // Reached bifurcation
+            if(sample.id == lastSomaPoint){
+                morph.soma() = std::make_shared<mut::Soma>(mut::Soma(properties));
+            } else { // Section ends here
+                swcIdToSectionId[sample.id] = morph.appendSection(parentSectionId,
+                                                                  sample.type,
+                                                                  properties);
+            }
+            properties = Property::PointLevel();
+        }
+    }
+
+    return morph.buildReadOnly();
 }
 
 Property::Properties load(const URI& uri)
 {
     // Parsing SWC according to this specification:
     // http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
-    // Sample numbers may not be contiguous and parent samples can appear
-    // later than child ones. Both things shouldn't happen, but the "spec"
-    // doesn't enforce it, only gives recommendations.
-    // This code takes that possibility into account.
 
-    RawSWCInfo info;
-    info.filename = uri;
-    _readSamples(info);
-    _buildSampleTree(info);
-    Property::Properties properties = _buildStructure(info);
-    return properties;
+    return _buildProperties(_readSamples(uri));
 }
 
 } // namespace swc

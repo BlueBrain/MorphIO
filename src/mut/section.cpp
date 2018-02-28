@@ -32,13 +32,14 @@ void Section::traverse(
     stack.push(_id);
     while (!stack.empty())
     {
-        uint32_t parent = stack.top();
+        uint32_t node_id = stack.top();
         stack.pop();
-        fun(morphology, parent);
+        fun(morphology, node_id);
 
-        for (auto child : morphology.children(parent))
+        auto &parent = morphology.children(node_id);
+        for (auto it = parent.rbegin(); it != parent.rend(); ++it)
         {
-            stack.push(child);
+            stack.push(*it);
         }
     }
 }

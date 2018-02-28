@@ -51,7 +51,7 @@ public:
 
        Note: multiple morphologies can share the same Soma instance
     **/
-    std::shared_ptr<Soma> soma();
+    std::shared_ptr<Soma>& soma();
 
     /**
        Get the shared pointer for the given section identified

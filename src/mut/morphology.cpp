@@ -18,9 +18,7 @@ Morphology::Morphology(const morphio::Morphology& morphology)
 
     for (const morphio::Section& root : morphology.rootSections())
     {
-        uint32_t id = _register(std::shared_ptr<Section>(new Section(root),
-                                                          friendDtorForSharedPtr));
-        _rootSections.insert(id);
+        appendSection(-1, root, true);
     }
 }
 
@@ -79,7 +77,7 @@ uint32_t Morphology::_register(std::shared_ptr<Section> section)
     return section->id();
 }
 
-std::shared_ptr<Soma> Morphology::soma()
+std::shared_ptr<Soma>& Morphology::soma()
 {
     return _soma;
 }
@@ -126,10 +124,10 @@ void Morphology::traverse(
     uint32_t startSection)
 {
     auto& sections =
-        startSection ? std::set<uint32_t>{startSection} : rootSections();
+        startSection != -1 ? std::set<uint32_t>{startSection} : rootSections();
     for (auto root : sections)
     {
-        _sections[root]->traverse(*this, fun);
+        section(root)->traverse(*this, fun);
     }
 }
 
@@ -151,6 +149,7 @@ const Property::Properties Morphology::buildReadOnly()
 {
     using std::setw;
     int i = 0;
+
 
     int sectionIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;

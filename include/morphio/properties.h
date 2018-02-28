@@ -39,6 +39,7 @@ struct PointLevel
     std::vector<Diameter::Type> _diameters;
 
     PointLevel() {}
+    PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
 };
 

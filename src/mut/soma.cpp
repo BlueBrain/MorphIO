@@ -8,6 +8,10 @@ namespace morphio
 namespace mut
 {
 
+Soma::Soma(const Property::PointLevel &pointProperties) : _pointProperties(pointProperties)
+{
+}
+
 Soma::Soma(const morphio::Soma& soma)
 {
     _pointProperties =

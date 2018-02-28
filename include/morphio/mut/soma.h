@@ -9,14 +9,8 @@ namespace mut
 class Soma
 {
 public:
-    Soma()
-        {
-        }
-    Soma(Property::PointLevel pointProperties):
-        _pointProperties(pointProperties)
-        {
-        }
-
+    Soma() {}
+    Soma(const Property::PointLevel &pointProperties);
     Soma(const morphio::Soma& soma);
     std::vector<Point>& points() { return _pointProperties._points; }
     const std::vector<Point>& points() const { return _pointProperties._points; }

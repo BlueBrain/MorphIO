@@ -16,6 +16,13 @@ std::vector<typename T::Type> copySpan(
                                          data.begin() + range.second);
 }
 
+PointLevel::PointLevel(const PointLevel &data) :
+    _points(data._points),
+    _diameters(data._diameters),
+    _perimeters(data._perimeters)
+{
+}
+
 PointLevel::PointLevel(const PointLevel& data, SectionRange range)
 {
     _points = copySpan<Property::Point>(data._points, range);
@@ -82,14 +89,11 @@ const std::vector<Diameter::Type>& Properties::get<Diameter>() const
 std::ostream& operator<<(std::ostream& os, const PointLevel& prop){
     os << "Point level properties:" << std::endl;
     os << "Point Diameter" << (prop._perimeters.size() == prop._points.size() ? " Perimeter" : "") << std::endl;
-    size_t maxRows = 5;
-    for(int i = 0; i<std::min(maxRows, prop._points.size()); ++i){
+    for(int i = 0; i<prop._points.size(); ++i){
         os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i];
         if(prop._perimeters.size() == prop._points.size())
             os << ' ' << prop._perimeters[i];
         os << std::endl;
-        if(prop._points.size() > maxRows)
-            os << "..." << std::endl;
     }
     return os;
 }

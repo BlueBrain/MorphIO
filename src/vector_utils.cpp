@@ -58,6 +58,7 @@ std::string dumpPoints(const std::vector<Point>& points)
     std::string str;
     for(const auto& point: points)
         str += dumpPoint(point) + '\n';
+    return str;
 }
 
 } // namespace morphio
