@@ -1,42 +1,63 @@
+#include <sstream>
+
 #include <morphio/vector_types.h>
 
-std::array<float, 3> operator*(const std::array<float, 3> &from, float factor)
+namespace morphio
 {
-    std::array<float, 3> ret;
+
+Point operator*(const Point &from, float factor)
+{
+    Point ret;
     for (int i = 0; i < 3; ++i)
         ret[i] = from[i] * factor;
     return ret;
 }
 
-std::array<float, 3> operator+(const std::array<float, 3> &left,
-                               const std::array<float, 3> &right)
+Point operator+(const Point &left,
+                               const Point &right)
 {
-    std::array<float, 3> ret;
+    Point ret;
     for (int i = 0; i < 3; ++i)
         ret[i] = left[i] + right[i];
     return ret;
 }
 
-std::array<float, 3> operator-(const std::array<float, 3> &left,
-                               const std::array<float, 3> &right)
+Point operator-(const Point &left,
+                               const Point &right)
 {
-    std::array<float, 3> ret;
+    Point ret;
     for (int i = 0; i < 3; ++i)
         ret[i] = left[i] - right[i];
     return ret;
 }
 
-std::array<float, 3> operator+=(std::array<float, 3> &left,
-                                const std::array<float, 3> &right)
+Point operator+=(Point &left,
+                                const Point &right)
 {
     for (int i = 0; i < 3; ++i)
         left[i] += right[i];
     return left;
 }
 
-std::array<float, 3> operator/=(std::array<float, 3> &left, float factor)
+Point operator/=(Point &left, float factor)
 {
     for (int i = 0; i < 3; ++i)
         left[i] /= factor;
     return left;
 }
+
+std::string dumpPoint(const Point& point)
+{
+    std::stringstream ss;
+    ss << point[0] << " " << point[1] << " " << point[2];
+    return ss.str();
+}
+
+std::string dumpPoints(const std::vector<Point>& points)
+{
+    std::string str;
+    for(const auto& point: points)
+        str += dumpPoint(point) + '\n';
+}
+
+} // namespace morphio

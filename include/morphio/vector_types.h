@@ -15,13 +15,13 @@ typedef std::array<std::array<float, 4>, 4> Matrix4f;
 
 typedef std::array<float, 3> Point;
 typedef std::vector<Point> Points;
-}
 
-std::array<float, 3> operator*(const std::array<float, 3> &from, float factor);
-std::array<float, 3> operator+(const std::array<float, 3> &left,
-                               const std::array<float, 3> &right);
-std::array<float, 3> operator-(const std::array<float, 3> &left,
-                               const std::array<float, 3> &right);
-std::array<float, 3> operator+=(std::array<float, 3> &left,
-                                const std::array<float, 3> &right);
-std::array<float, 3> operator/=(std::array<float, 3> &left, float factor);
+Point operator*(const Point &from, float factor);
+Point operator+(const Point &left, const Point &right);
+Point operator-(const Point &left, const Point &right);
+Point operator+=(Point &left, const Point &right);
+Point operator/=(Point &left, float factor);
+
+std::string dumpPoint(const Point& point);
+std::string dumpPoints(const std::vector<Point>& point);
+}

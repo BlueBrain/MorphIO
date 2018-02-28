@@ -41,9 +41,9 @@ private:
 };
 
 void friendDtorForSharedPtr(Section* section);
+
+std::ostream& operator<<(std::ostream& os, Section&);
+std::ostream& operator<<(std::ostream& os, std::shared_ptr<Section>);
+
 } // namespace mut
 } // namespace morphio
-
-// Must be in global namespace
-std::ostream& operator<<(std::ostream& os, morphio::mut::Section& section);
-std::ostream& operator<<(std::ostream& os, std::shared_ptr<morphio::mut::Section> sectionPtr);

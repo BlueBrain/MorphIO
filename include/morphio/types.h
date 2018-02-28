@@ -64,4 +64,5 @@ typedef Iterator<std::vector<Section>> upstream_iterator;
 
 template <typename T> using range = gsl::span<T>;
 
+std::ostream& operator<<(std::ostream& os, const std::vector<Point>&);
 } // namespace morphio

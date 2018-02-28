@@ -2,6 +2,7 @@
 
 #include <morphio/types.h>
 
+
 namespace morphio
 {
 namespace Property
@@ -76,5 +77,9 @@ struct Properties
         return _sectionLevel._children;
     }
 };
-}
-}
+
+std::ostream& operator<<(std::ostream& os, const Properties& properties);
+std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);
+
+} // namespace Property
+} // namespace morphio

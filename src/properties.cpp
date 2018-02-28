@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include <morphio/properties.h>
 
 namespace morphio
@@ -75,5 +77,29 @@ const std::vector<Diameter::Type>& Properties::get<Diameter>() const
 {
     return _pointLevel._diameters;
 }
+
+
+std::ostream& operator<<(std::ostream& os, const PointLevel& prop){
+    os << "Point level properties:" << std::endl;
+    os << "Point Diameter" << (prop._perimeters.size() == prop._points.size() ? " Perimeter" : "") << std::endl;
+    size_t maxRows = 5;
+    for(int i = 0; i<std::min(maxRows, prop._points.size()); ++i){
+        os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i];
+        if(prop._perimeters.size() == prop._points.size())
+            os << ' ' << prop._perimeters[i];
+        os << std::endl;
+        if(prop._points.size() > maxRows)
+            os << "..." << std::endl;
+    }
+    return os;
 }
+
+std::ostream& operator<<(std::ostream& os, const Properties& properties){
+    os << properties._pointLevel << std::endl;
+    // os << _sectionLevel << std::endl;
+    // os << _cellLevel << std::endl;
+    return os;
 }
+
+} // namespace Property
+} // namespace morphio

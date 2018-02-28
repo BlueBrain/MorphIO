@@ -8,7 +8,7 @@ set(MORPHIO_SOURCES
   morphology.cpp
   soma.cpp
   section.cpp
-  vector_utils
+  vector_utils.cpp
   mut/section.cpp
   mut/soma.cpp
   mut/morphology.cpp

@@ -1,3 +1,5 @@
+#include <stack>
+
 #include <morphio/mut/section.h>
 #include <morphio/mut/morphology.h>
 
@@ -26,19 +28,32 @@ void Section::traverse(
     std::function<void(Morphology& morphology, uint32_t section)> fun)
 {
     // depth first traversal
-    std::vector<uint32_t> stack;
-    stack.push_back(_id);
+    std::stack<uint32_t> stack;
+    stack.push(_id);
     while (!stack.empty())
     {
-        uint32_t parent = stack.back();
-        stack.pop_back();
+        uint32_t parent = stack.top();
+        stack.pop();
         fun(morphology, parent);
 
-        for (auto child : morphology.children(_id))
+        for (auto child : morphology.children(parent))
         {
-            stack.push_back(child);
+            stack.push(child);
         }
     }
 }
+
+std::ostream& operator<<(std::ostream& os, Section& section)
+{
+    os << "id: " << section.id() << std::endl;;
+    os << dumpPoints(section.points());
+    return os;
+}
+
+std::ostream& operator<<(std::ostream& os, std::shared_ptr<Section> sectionPtr){
+    os << *sectionPtr;
+    return os;
+}
+
 } // end namespace mut
 } // end namespace morphio
