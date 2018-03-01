@@ -185,7 +185,10 @@ private:
 Property::Properties load(const URI& uri)
 {
 
-    return SWCBuilder(_readSamples(uri))._buildProperties();
+    auto properties = SWCBuilder(_readSamples(uri))._buildProperties();
+    properties._cellLevel._cellFamily = FAMILY_NEURON;
+    properties._cellLevel._version = MORPHOLOGY_VERSION_SWC_1;
+    return properties;
 }
 
 } // namespace swc

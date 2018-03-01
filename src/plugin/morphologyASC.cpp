@@ -239,13 +239,12 @@ Property::Properties load(const URI& uri)
     std::string input((std::istreambuf_iterator<char>(ifs)),
                       (std::istreambuf_iterator<char>()));
 
-    Property::Properties _properties = parser.parse(input);
-    _properties._cellLevel._cellFamily = FAMILY_NEURON;
-    return _properties;
+    Property::Properties properties = parser.parse(input);
+    properties._cellLevel._cellFamily = FAMILY_NEURON;
+    properties._cellLevel._version = MORPHOLOGY_VERSION_ASC_1;
+    return properties;
 }
 
 } // namespace asc
-
 } // namespace plugin
-
 } // namespace morphio
