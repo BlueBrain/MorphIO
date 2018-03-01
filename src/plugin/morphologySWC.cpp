@@ -21,11 +21,11 @@ const int SWC_UNDEFINED_PARENT = -1;
 
 struct Sample
 {
-    Sample() : valid(false) , type(SECTION_UNDEFINED) , parentId(-1)
+    Sample() : valid(false) , type(SECTION_UNDEFINED) , parentId(-1), lineNumber(-1)
         {
         }
 
-    explicit Sample(const char* line)
+    explicit Sample(const char* line, int lineNumber) : lineNumber(lineNumber), line(line)
         {
             float radius;
             valid = sscanf(line, "%20d%20d%20f%20f%20f%20f%20d", (int*)&id, (int*)&type, &point[0],
@@ -44,6 +44,8 @@ struct Sample
     SectionType type;
     int parentId;
     int id;
+    int lineNumber;
+    std::string line;
 };
 
 
@@ -51,9 +53,8 @@ std::string errorMsg(const std::string& filename,
                      const std::string& line,
                      int lineNumber,
                      std::string additionalMessage = ""){
-    return "Error reading swc morphology file: " + filename +
-        "\nParse error at line: " + std::to_string(lineNumber) +
-        "\nParsed line was:" + line + "\n\n" +
+    return "\n" + filename + ":" + std::to_string(lineNumber) + ":error" +
+        "\nParsed line was:\n" + line + "\n\n" +
         additionalMessage;
 }
 
@@ -74,7 +75,7 @@ const std::map<uint32_t, Sample> _readSamples(const URI& uri)
         if (line[0] == '#' || line.empty())
             continue;
 
-        const auto &sample = Sample(line.data());
+        const auto &sample = Sample(line.data(), lineNumber);
         if (!sample.valid)
         {
             LBTHROW(morphio::RawDataError(errorMsg(uri, line, lineNumber)));
@@ -92,8 +93,9 @@ const std::map<uint32_t, Sample> _readSamples(const URI& uri)
 class SWCBuilder
 {
 public:
-    SWCBuilder(const std::map<uint32_t, Sample>& _samples) : samples(_samples)
+    SWCBuilder(const std::string& uri) : uri(uri)
         {
+            samples = _readSamples(uri);
             lastSomaPoint = -1;
             for(auto sample_pair: samples){
                 const auto &sample = sample_pair.second;
@@ -143,7 +145,16 @@ public:
     **/
     void _processSectionStart(const Sample& sample)
         {
-            bool isRootSection = samples.at(sample.parentId).type == SECTION_SOMA;
+            bool isRootSection;
+            try {
+                isRootSection = samples.at(sample.parentId).type == SECTION_SOMA;
+            } catch (const std::out_of_range& oor) {
+                std::string msg = errorMsg(uri, sample.line, sample.lineNumber,
+                                           "Sample id: " + std::to_string(sample.id) +
+                                           " refers to non-existant parent ID: " +
+                                           std::to_string(sample.parentId));
+                LBTHROW(morphio::MissingParentError(msg));
+            }
 
             if(!isRootSection)
             {
@@ -179,13 +190,14 @@ private:
     Property::PointLevel properties;
     int currentSectionParentId = -1;
     mut::Morphology morph;
+    std::string uri;
 
 };
 
 Property::Properties load(const URI& uri)
 {
 
-    auto properties = SWCBuilder(_readSamples(uri))._buildProperties();
+    auto properties = SWCBuilder(uri)._buildProperties();
     properties._cellLevel._cellFamily = FAMILY_NEURON;
     properties._cellLevel._version = MORPHOLOGY_VERSION_SWC_1;
     return properties;

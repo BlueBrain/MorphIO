@@ -166,7 +166,7 @@ const Property::Properties Morphology::buildReadOnly()
         (Morphology& morpho, uint32_t sectionId) {
         auto section = morpho.section(sectionId);
         int parentOnDisk =
-        (morpho.parent(sectionId) != -1 ? newIds[morpho.parent(sectionId)] : 1);
+        (morpho._parent.count(sectionId) > 0 ? newIds[morpho.parent(sectionId)] : 0);
 
         int start = properties._pointLevel._points.size();
         properties._sectionLevel._sections.push_back({start, parentOnDisk});
@@ -177,7 +177,6 @@ const Property::Properties Morphology::buildReadOnly()
 
     _appendProperties(properties._pointLevel, soma()->_pointProperties);
     properties._sectionLevel._sections.push_back({0, -1});
-
     properties._sectionLevel._sectionTypes.push_back(SECTION_UNDEFINED);
 
     traverse(writeSection);
