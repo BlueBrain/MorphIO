@@ -38,7 +38,7 @@ public:
     /**
        Returns all section ids at the tree root
     **/
-    const std::set<uint32_t>& rootSections();
+    const std::vector<uint32_t>& rootSections();
 
 
     /**
@@ -68,7 +68,7 @@ public:
     /**
        Get children IDs
     **/
-    const std::set<uint32_t> children(uint32_t id);
+    const std::vector<uint32_t> children(uint32_t id);
 
 
     /**
@@ -123,12 +123,12 @@ private:
 
     uint32_t _register(std::shared_ptr<Section>);
     std::shared_ptr<Soma> _soma;
-    std::set<uint32_t> _rootSections;
+    std::vector<uint32_t> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
 
     uint32_t _counter;
     std::map<uint32_t, uint32_t> _parent;
-    std::map<uint32_t, std::set<uint32_t>> _children;
+    std::map<uint32_t, std::vector<uint32_t>> _children;
 };
 
 } // namespace mut

@@ -29,10 +29,10 @@ uint32_t Morphology::appendSection(uint32_t parentId,
     uint32_t id = _register(std::shared_ptr<Section>(new Section(section),
                                                      friendDtorForSharedPtr));
     if(parentId == -1)
-        _rootSections.insert(id);
+        _rootSections.push_back(id);
     else {
         _parent[id] = parentId;
-        _children[parentId].insert(id);
+        _children[parentId].push_back(id);
     }
 
     if (recursive)
@@ -52,10 +52,10 @@ uint32_t Morphology::appendSection(uint32_t parentId, SectionType type,
     uint32_t id = _register(std::shared_ptr<Section>(new Section(_counter, type, pointProperties),
                                                      friendDtorForSharedPtr));
     if(parentId == -1)
-        _rootSections.insert(id);
+        _rootSections.push_back(id);
     else {
         _parent[id] = parentId;
-        _children[parentId].insert(id);
+        _children[parentId].push_back(id);
     }
     return id;
 }
@@ -82,7 +82,7 @@ std::shared_ptr<Soma>& Morphology::soma()
     return _soma;
 }
 
-const std::set<uint32_t>& Morphology::rootSections()
+const std::vector<uint32_t>& Morphology::rootSections()
 {
     return _rootSections;
 }
@@ -97,23 +97,31 @@ const std::map<uint32_t, std::shared_ptr<Section>>& Morphology::sections() const
     return _sections;
 }
 
+void eraseByValue(std::vector<uint32_t> &vec, uint32_t id)
+{
+    vec.erase(std::remove(vec.begin(), vec.end(), id), vec.end());
+}
+
 void Morphology::deleteSection(uint32_t id, bool recursive)
 
 {
-    _rootSections.erase(id);
     for (auto child : _children[id])
     {
         if (recursive)
+        {
             deleteSection(child, recursive);
+        }
         else
         {
             // Re-link children to their "grand-parent"
             _parent[child] = _parent[id];
-            _children[_parent[id]].insert(child);
+            _children[_parent[id]].push_back(child);
             if (_parent[id] == -1)
-                _rootSections.insert(child);
+                _rootSections.push_back(child);
         }
     }
+    eraseByValue(_rootSections, id);
+    eraseByValue(_children[_parent[id]], id);
     _children.erase(id);
     _parent.erase(id);
     _sections.erase(id);
@@ -124,7 +132,7 @@ void Morphology::traverse(
     uint32_t startSection)
 {
     auto& sections =
-        startSection != -1 ? std::set<uint32_t>{startSection} : rootSections();
+        startSection != -1 ? std::vector<uint32_t>{startSection} : rootSections();
     for (auto root : sections)
     {
         section(root)->traverse(*this, fun);
@@ -184,11 +192,11 @@ const uint32_t Morphology::parent(uint32_t id) {
     }
 }
 
-const std::set<uint32_t> Morphology::children(uint32_t id) {
+const std::vector<uint32_t> Morphology::children(uint32_t id) {
     try {
         return _children[id];
     } catch (const std::out_of_range &e) {
-        return std::set<uint32_t>();
+        return std::vector<uint32_t>();
     }
 }
 
