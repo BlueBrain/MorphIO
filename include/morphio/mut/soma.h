@@ -15,8 +15,8 @@ public:
     std::vector<Point>& points() { return _pointProperties._points; }
     const std::vector<Point>& points() const { return _pointProperties._points; }
 
-    std::vector<float> diameters() { return _pointProperties._diameters; }
-    const std::vector<float> diameters() const { return _pointProperties._diameters; }
+    std::vector<float>& diameters() { return _pointProperties._diameters; }
+    const std::vector<float>& diameters() const { return _pointProperties._diameters; }
 
 private:
     friend class Morphology;

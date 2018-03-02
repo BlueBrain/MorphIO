@@ -2,6 +2,7 @@
 #include <fstream>
 #include <list>
 #include <sstream>
+#include <algorithm>
 
 #include <iostream>
 
@@ -9,6 +10,7 @@
 #include "morphologySWC.h"
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/soma.h>
+#include <morphio/mut/section.h>
 
 namespace morphio
 {
@@ -47,7 +49,6 @@ struct Sample
     int lineNumber;
     std::string line;
 };
-
 
 std::string errorMsg(const std::string& filename,
                      const std::string& line,
@@ -93,93 +94,104 @@ const std::map<uint32_t, Sample> _readSamples(const URI& uri)
 class SWCBuilder
 {
 public:
-    SWCBuilder(const std::string& uri) : uri(uri)
-        {
-            samples = _readSamples(uri);
-            lastSomaPoint = -1;
-            for(auto sample_pair: samples){
-                const auto &sample = sample_pair.second;
-                children[sample.parentId].push_back(sample.id);
-                if(sample.type == SECTION_SOMA)
-                    lastSomaPoint = sample.id;
-            }
+    SWCBuilder(const std::string& uri) : uri(uri) {
+        samples = _readSamples(uri);
+        lastSomaPoint = -1;
+        for(auto sample_pair: samples){
+            const auto &sample = sample_pair.second;
+            raiseIfNoParent(sample);
+            children[sample.parentId].push_back(sample.id);
+            if(sample.type == SECTION_SOMA)
+                lastSomaPoint = sample.id;
         }
+    }
 
+    void raiseIfNoParent(const Sample& sample) {
+        if(sample.parentId > -1 && samples.count(sample.parentId) == 0)
+            LBTHROW(morphio::MissingParentError(
+                        errorMsg(uri, sample.line, sample.lineNumber,
+                                 "Sample id: " + std::to_string(sample.id) +
+                                 " refers to non-existant parent ID: " +
+                                 std::to_string(sample.parentId))));
+    }
 
-    bool isSectionStartButSoma(const Sample& sample) {
-        return properties._points.size() == 0 && // Start of a new section
-            sample.parentId != SWC_UNDEFINED_PARENT; // filter out soma section
+    inline bool isSomaStart(const Sample& sample) {
+        return sample.parentId == SWC_UNDEFINED_PARENT;
+    }
+
+    inline bool isRootSection(const Sample& sample) {
+        return samples.at(sample.parentId).type == SECTION_SOMA;
+    }
+
+    bool isSectionStart(const Sample& sample) {
+        return isSomaStart(sample) ||
+            (samples[sample.parentId].type == SECTION_SOMA && // Root neurite section
+             sample.type != SECTION_SOMA ) ||                 // Exclude soma bifurcations
+            isSectionEnd(samples[sample.parentId]); // Standard section
     }
 
     bool isSectionEnd(const Sample& sample) {
-            return sample.id == lastSomaPoint || // End of soma
-                children[sample.id].size() == 0 || // Reached leaf
-                children[sample.id].size() >= 2; // Reached bifurcation
-        }
-
-    void appendSample(const Sample& sample) {
-        properties._points.push_back(sample.point);
-        properties._diameters.push_back(sample.diameter);
+        return sample.id == lastSomaPoint || // End of soma
+            children[sample.id].size() == 0 || // Reached leaf
+            (children[sample.id].size() >= 2 && // Reached neurite bifurcation
+             sample.type != SECTION_SOMA);
     }
 
-    Property::Properties _buildProperties()
-        {
-            for(auto sample_pair: samples) {
-                const auto &sample = sample_pair.second;
+    template <typename T> void appendSample(std::shared_ptr<T> somaOrSection,
+                                            const Sample& sample) {
+        somaOrSection->points().push_back(sample.point);
+        somaOrSection->diameters().push_back(sample.diameter);
+    }
 
-                if(isSectionStartButSoma(sample))
-                    _processSectionStart(sample);
+    void _pushChildren(std::vector<int32_t>& vec, int32_t id) {
+        for(auto childId: children[id]) {
+            vec.push_back(childId);
+            _pushChildren(vec, childId);
+        }
+    }
 
-                appendSample(sample);
 
-                if(isSectionEnd(sample))
-                    _processSectionEnd(sample);
+    Property::Properties _buildProperties() {
+        std::vector<int32_t> depthFirstSamples;
+        _pushChildren(depthFirstSamples, -1);
+        for(const auto id: depthFirstSamples) {
+            const Sample& sample = samples[id];
+            if(isSectionStart(sample))
+                _processSectionStart(sample);
+            else if(sample.type != SECTION_SOMA)
+                swcIdToSectionId[sample.id] = swcIdToSectionId[sample.parentId];
+
+            if(sample.type == SECTION_SOMA)
+                appendSample(morph.soma(), sample);
+            else {
+                appendSample(morph.section(swcIdToSectionId.at(sample.id)), sample);
             }
 
-            return morph.buildReadOnly();
         }
+
+        return morph.buildReadOnly();
+    }
 
     /**
        - Append last point of previous section if current section is not a root section
        - Update the parent ID of the new section
     **/
-    void _processSectionStart(const Sample& sample)
-        {
-            bool isRootSection;
-            try {
-                isRootSection = samples.at(sample.parentId).type == SECTION_SOMA;
-            } catch (const std::out_of_range& oor) {
-                std::string msg = errorMsg(uri, sample.line, sample.lineNumber,
-                                           "Sample id: " + std::to_string(sample.id) +
-                                           " refers to non-existant parent ID: " +
-                                           std::to_string(sample.parentId));
-                LBTHROW(morphio::MissingParentError(msg));
-            }
+    void _processSectionStart(const Sample& sample) {
+        if(isSomaStart(sample)) { // Soma start
+            morph.soma() = std::make_shared<mut::Soma>(mut::Soma());
+        } else {
+            int id = isRootSection(sample) ? -1 : swcIdToSectionId[sample.parentId];
+            swcIdToSectionId[sample.id] = morph.appendSection(
+                id,
+                sample.type,
+                Property::PointLevel());
 
-            if(!isRootSection)
+            if(!isRootSection(sample)) // Duplicating last point of previous section
             {
-                appendSample(samples.at(sample.parentId));
-                currentSectionParentId = swcIdToSectionId.at(sample.parentId);
-            } else {
-                currentSectionParentId = -1;
+                appendSample(morph.section(swcIdToSectionId[sample.id]), samples[sample.parentId]);
             }
         }
-
-/**
-   1) Register in mut::Morphology the Soma/Section with the property object
-   2) Reset the property object
-**/
-    void _processSectionEnd(const Sample& sample)
-        {
-            if(sample.id == lastSomaPoint){
-                morph.soma() = std::make_shared<mut::Soma>(mut::Soma(properties));
-            } else {
-                swcIdToSectionId[sample.id] = morph.appendSection(currentSectionParentId,
-                                                                  sample.type,
-                                                                  properties);
-            }
-            properties = Property::PointLevel();
-        }
+    }
 
 private:
     // Dictionnary: SWC Id of the last point of a section to morphio::mut::Section ID
@@ -187,7 +199,6 @@ private:
     int lastSomaPoint = -1;
     std::map<uint32_t, std::vector<uint32_t>> children;
     std::map<uint32_t, Sample> samples;
-    Property::PointLevel properties;
     int currentSectionParentId = -1;
     mut::Morphology morph;
     std::string uri;

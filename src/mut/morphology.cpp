@@ -164,7 +164,7 @@ const Property::Properties Morphology::buildReadOnly()
     Property::Properties properties;
     auto writeSection = [&properties, &sectionIdOnDisk, &newIds]
         (Morphology& morpho, uint32_t sectionId) {
-        auto section = morpho.section(sectionId);
+        auto &section = morpho.section(sectionId);
         int parentOnDisk =
         (morpho._parent.count(sectionId) > 0 ? newIds[morpho.parent(sectionId)] : 0);
 

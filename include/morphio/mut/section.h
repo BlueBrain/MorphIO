@@ -19,8 +19,8 @@ public:
     const uint32_t id() const { return _id; }
     SectionType& type() { return _sectionType; }
     std::vector<Point>& points() { return _pointProperties._points; }
-    std::vector<float> diameters() { return _pointProperties._diameters; }
-    std::vector<float> perimeters() { return _pointProperties._perimeters; }
+    std::vector<float>& diameters() { return _pointProperties._diameters; }
+    std::vector<float>& perimeters() { return _pointProperties._perimeters; }
 
 private:
     friend class Morphology;

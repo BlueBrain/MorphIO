@@ -77,8 +77,8 @@ const std::vector<Section> Morphology::rootSections() const
     {
         const std::vector<uint32_t>& children = _properties->children().at(0);
         result.reserve(children.size());
-        for (auto it = children.rbegin(); it != children.rend(); ++it)
-            result.push_back(section(*it));
+        for (auto id: children)
+            result.push_back(section(id));
         return result;
     }
     catch (const std::out_of_range& oor)
