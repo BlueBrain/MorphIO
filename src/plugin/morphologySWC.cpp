@@ -3,6 +3,7 @@
 #include <list>
 #include <sstream>
 #include <algorithm>
+#include <regex>
 
 #include <iostream>
 
@@ -18,6 +19,13 @@ namespace plugin
 {
 namespace swc
 {
+
+enum ErrorLevel {
+    INFO,
+    WARNING,
+    ERROR
+};
+
 // It's not clear if -1 is the only way of identifying a root section.
 const int SWC_UNDEFINED_PARENT = -1;
 
@@ -27,7 +35,7 @@ struct Sample
         {
         }
 
-    explicit Sample(const char* line, int lineNumber) : lineNumber(lineNumber), line(line)
+    explicit Sample(const char* line, int lineNumber) : lineNumber(lineNumber)
         {
             float radius;
             valid = sscanf(line, "%20d%20d%20f%20f%20f%20f%20d", (int*)&id, (int*)&type, &point[0],
@@ -47,16 +55,30 @@ struct Sample
     int parentId;
     int id;
     int lineNumber;
-    std::string line;
 };
 
+std::string errorLink(const std::string& filename, int lineNumber, ErrorLevel errorLevel) {
+    std::map<ErrorLevel, int> color{
+        {ErrorLevel::INFO, 34},
+        {ErrorLevel::WARNING, 33},
+        {ErrorLevel::ERROR, 31}};
+
+    std::map<ErrorLevel, std::string> severity{
+        {ErrorLevel::INFO, "info"},
+        {ErrorLevel::WARNING, "warning"},
+        {ErrorLevel::ERROR, "error"}};
+
+
+    std::cout << "errorLevel: " << errorLevel << std::endl;
+    std::cout << "color[errorLevel]: " << color[errorLevel] << std::endl;
+    return "\e[1;" + std::to_string(color[errorLevel]) + "m" + filename + ":" + std::to_string(lineNumber) + ":" + severity[errorLevel] + "\e[0m";
+}
+
 std::string errorMsg(const std::string& filename,
-                     const std::string& line,
                      int lineNumber,
+                     ErrorLevel errorLevel,
                      std::string additionalMessage = ""){
-    return "\n" + filename + ":" + std::to_string(lineNumber) + ":error" +
-        "\nParsed line was:\n" + line + "\n\n" +
-        additionalMessage;
+    return "\n" + errorLink(filename, lineNumber, errorLevel) + additionalMessage;
 }
 
 const std::map<uint32_t, Sample> _readSamples(const URI& uri)
@@ -73,13 +95,14 @@ const std::map<uint32_t, Sample> _readSamples(const URI& uri)
     while (!std::getline(file, line).fail())
     {
         ++lineNumber;
-        if (line[0] == '#' || line.empty())
+        if (std::regex_match (line, std::regex(" *(#.*)?") ) || line.empty())
             continue;
 
         const auto &sample = Sample(line.data(), lineNumber);
         if (!sample.valid)
         {
-            LBTHROW(morphio::RawDataError(errorMsg(uri, line, lineNumber)));
+            LBTHROW(morphio::RawDataError(errorMsg(uri, lineNumber, ErrorLevel::ERROR,
+                                              "\nUnable to parse this line\n")));
         }
         samples[sample.id] = sample;
     }
@@ -99,35 +122,75 @@ public:
         lastSomaPoint = -1;
         for(auto sample_pair: samples){
             const auto &sample = sample_pair.second;
-            raiseIfNoParent(sample);
             children[sample.parentId].push_back(sample.id);
             if(sample.type == SECTION_SOMA)
                 lastSomaPoint = sample.id;
+            raiseIfNoParent(sample);
+            raiseIfDisconnectedNeurite(sample);
         }
+
+        checkSoma();
+    }
+
+    /**
+       Are considered potential somata all sample
+       with parentId == -1 and sample.type == SECTION_SOMA
+     **/
+    std::vector<Sample> _potentialSomata() {
+        std::vector<Sample> somata;
+        for(auto id: children[-1])
+            if(samples[id].type == SECTION_SOMA)
+                somata.push_back(samples[id]);
+        return somata;
+    }
+
+    void raiseIfDisconnectedNeurite(const Sample& sample) {
+        if(sample.parentId == SWC_UNDEFINED_PARENT && sample.type != SECTION_SOMA)
+            LBERROR(errorMsg(uri, sample.lineNumber, ErrorLevel::WARNING,
+                             "\nFound a disconnected neurite.\n"
+                             "Neurites are not supposed to have parentId: -1\n"
+                             "(although this is normal if this neuron has no soma)"));
+    }
+
+    void checkSoma() {
+        auto somata = _potentialSomata();
+
+        if(somata.size() > 1) {
+            std::string links;
+            for(auto soma: somata)
+                links += "\n" + errorMsg(uri, soma.lineNumber, ErrorLevel::ERROR);
+            LBTHROW(morphio::SomaError("\nMultiple somata found:" + links));
+        }
+
+        if(somata.size() == 0)
+            LBERROR(errorMsg(uri, 0, ErrorLevel::WARNING, "\nNo soma found in file"));
     }
 
     void raiseIfNoParent(const Sample& sample) {
         if(sample.parentId > -1 && samples.count(sample.parentId) == 0)
-            LBTHROW(morphio::MissingParentError(
-                        errorMsg(uri, sample.line, sample.lineNumber,
-                                 "Sample id: " + std::to_string(sample.id) +
+                       LBTHROW(morphio::MissingParentError(
+                                   errorMsg(uri, sample.lineNumber, ErrorLevel::ERROR,
+                                 "\nSample id: " + std::to_string(sample.id) +
                                  " refers to non-existant parent ID: " +
                                  std::to_string(sample.parentId))));
     }
 
-    inline bool isSomaStart(const Sample& sample) {
-        return sample.parentId == SWC_UNDEFINED_PARENT;
+    /**
+       A neurite which is not attached to the soma
+    **/
+    inline bool isOrphanNeurite(const Sample& sample) {
+        return (sample.parentId == SWC_UNDEFINED_PARENT && sample.type != SECTION_SOMA);
     }
 
     inline bool isRootSection(const Sample& sample) {
-        return samples.at(sample.parentId).type == SECTION_SOMA;
+        return isOrphanNeurite(sample) ||
+            (samples[sample.parentId].type == SECTION_SOMA &&
+             sample.type != SECTION_SOMA); // Exclude soma bifurcations
     }
 
     bool isSectionStart(const Sample& sample) {
-        return isSomaStart(sample) ||
-            (samples[sample.parentId].type == SECTION_SOMA && // Root neurite section
-             sample.type != SECTION_SOMA ) ||                 // Exclude soma bifurcations
-            isSectionEnd(samples[sample.parentId]); // Standard section
+        return (isRootSection(sample) ||
+                isSectionEnd(samples[sample.parentId])); // Standard section
     }
 
     bool isSectionEnd(const Sample& sample) {
@@ -166,7 +229,6 @@ public:
             else {
                 appendSample(morph.section(swcIdToSectionId.at(sample.id)), sample);
             }
-
         }
 
         return morph.buildReadOnly();
@@ -177,19 +239,15 @@ public:
        - Update the parent ID of the new section
     **/
     void _processSectionStart(const Sample& sample) {
-        if(isSomaStart(sample)) { // Soma start
-            morph.soma() = std::make_shared<mut::Soma>(mut::Soma());
-        } else {
-            int id = isRootSection(sample) ? -1 : swcIdToSectionId[sample.parentId];
-            swcIdToSectionId[sample.id] = morph.appendSection(
-                id,
-                sample.type,
-                Property::PointLevel());
+        int id = isRootSection(sample) ? -1 : swcIdToSectionId[sample.parentId];
+        swcIdToSectionId[sample.id] = morph.appendSection(
+            id,
+            sample.type,
+            Property::PointLevel());
 
-            if(!isRootSection(sample)) // Duplicating last point of previous section
-            {
-                appendSample(morph.section(swcIdToSectionId[sample.id]), samples[sample.parentId]);
-            }
+        if(!isRootSection(sample)) // Duplicating last point of previous section
+        {
+            appendSample(morph.section(swcIdToSectionId[sample.id]), samples[sample.parentId]);
         }
     }
 
@@ -197,7 +255,7 @@ private:
     // Dictionnary: SWC Id of the last point of a section to morphio::mut::Section ID
     std::map<uint32_t, uint32_t> swcIdToSectionId;
     int lastSomaPoint = -1;
-    std::map<uint32_t, std::vector<uint32_t>> children;
+    std::map<int32_t, std::vector<uint32_t>> children;
     std::map<uint32_t, Sample> samples;
     int currentSectionParentId = -1;
     mut::Morphology morph;

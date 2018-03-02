@@ -226,6 +226,7 @@ HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections)
 void MorphologyHDF5::_readPoints()
 {
     auto& points = _properties.get<Property::Point>();
+    auto& diameters = _properties.get<Property::Diameter>();
 
     if (_properties.version() == MORPHOLOGY_VERSION_H5_2)
     {
@@ -250,13 +251,24 @@ void MorphologyHDF5::_readPoints()
                 "Reading morphology file '" + _file->getName() +
                 "': bad number of dimensions in 'points' dataspace"));
         }
-        points.resize(dims[0]);
-        dataset.read(points);
+        std::vector<std::vector<float>> vec(dims[0]);
+        // points.resize(dims[0]);
+        dataset.read(vec);
+        for(auto p: vec) {
+            points.push_back({p[0],p[1],p[2]});
+            diameters.push_back(p[3]);
+        }
         return;
     }
 
-    points.resize(_pointsDims[0]);
-    _points->read(points);
+    std::vector<std::vector<float>> vec;
+    vec.resize(_pointsDims[0]);
+    _points->read(vec);
+    for(auto p: vec)
+        points.push_back({p[0],p[1],p[2]});
+    for(auto p: vec)
+        diameters.push_back(p[3]);
+
     // for(auto point: points){
     //     std::cout << "points[0]: " << point[0] << std::endl;
     //     std::cout << "points[1]: " << point[1] << std::endl;
@@ -293,14 +305,22 @@ void MorphologyHDF5::_readSections()
                 "': bad number of dimensions in 'structure' dataspace"));
         }
 
-        sections.resize(dims[0]);
-        dataset.read(sections);
-        return;
+        std::vector<std::vector<int>> vec;
+        vec.resize(dims[0]);
+        dataset.read(vec);
+        for(auto p: vec)
+            sections.push_back({p[0],p[1]});
     }
 
     auto selection = _sections->select({0, 0}, {_sectionsDims[0], 2}, {1, 2});
-    sections.resize(_sectionsDims[0]);
-    selection.read(sections);
+
+    std::vector<std::vector<int>> vec;
+    vec.resize(_sectionsDims[0]);
+    selection.read(vec);
+
+    for(auto p: vec)
+        sections.push_back({p[0],p[1]});
+
 }
 
 void MorphologyHDF5::_readSectionTypes()
