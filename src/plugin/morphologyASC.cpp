@@ -1,6 +1,7 @@
 #include <fstream>
 
 #include <morphio/mut/morphology.h>
+#include <morphio/mut/section.h>
 #include <morphio/types.h>
 
 #include "morphologyASC.h"
@@ -115,11 +116,12 @@ private:
         properties._diameters = diameters;
         if(token == Token::CELLBODY){
             if(nb_.soma()->points().size() != 0)
-                throw SectionBuilderError("A soma is already defined");
+                throw SomaError("A soma is already defined");
             nb_.soma() = std::make_shared<mut::Soma>(mut::Soma(properties));
             return_id = -1;
         } else {
             SectionType section_type = TokenSectionTypeMap.at(token);
+            insertLastPointParentSection(parent_id, properties);
             return_id = nb_.appendSection(parent_id,
                                           section_type,
                                           properties);
@@ -127,6 +129,41 @@ private:
         points.clear();
         diameters.clear();
         return return_id;
+    }
+
+    /*
+     The idea is that these two structures should represent the same morphologies:
+
+     (3 -8 0 2)     and          (3 -8 0 2)
+     (3 -10 0 2)                 (3 -10 0 2)
+     (                           (
+       (0 -10 0 2)                 (3 -10 0 2)  <-- duplicate parent point
+       (-3 -10 0 2)                (0 -10 0 2)
+       |                           (-3 -10 0 2)
+       (6 -10 0 2)                 |
+       (9 -10 0 2)                 (3 -10 0 2)  <-- duplicate parent point
+     )                             (6 -10 0 2)
+                                   (9 -10 0 2)
+                                 )
+     */
+    void insertLastPointParentSection(int32_t parentId,
+                                      morphio::Property::PointLevel &properties) {
+        if(parentId < 0) // Discard root sections
+            return;
+        auto parent = nb_.section(parentId);
+        auto lastParentPoint = parent->points()[parent->points().size()-1];
+        auto lastParentDiameter = parent->diameters()[parent->diameters().size()-1];
+
+        if(lastParentPoint == properties._points[0]) {
+            // Parent point is already duplicated: do nothing
+            if(lastParentDiameter == properties._diameters[0])
+                return;
+
+            LBTHROW(RawDataError("Parent point is duplicated but have a different radius"));
+        }
+
+        properties._points.insert(properties._points.begin(), lastParentPoint);
+        properties._diameters.insert(properties._diameters.begin(), lastParentDiameter);
     }
 
     bool parse_neurite_section(int32_t parent_id, Token token)
@@ -142,7 +179,7 @@ private:
 
             if (is_eof(id))
             {
-                throw std::runtime_error(
+                throw RawDataError(
                     "Hit end of of file while consuming a neurite");
             }
             else if (is_end_of_section(id))
@@ -190,15 +227,13 @@ private:
                 }
                 else
                 {
-                    throw std::runtime_error(
+                    throw RawDataError(
                         "Unknown token after LPAREN in neurite parse");
                 }
             }
             else
             {
-                std::cout << "Default: Id: " << id << ", Token: '"
-                          << lex_.current()->str() << "'\n";
-                throw std::runtime_error("Unknown token in neurite parse");
+                throw RawDataError("Unknown token in neurite parse");
             }
         }
         return false;
@@ -213,7 +248,6 @@ private:
             if (is_neurite_type(peek_id))
             {
                 lex_.consume(); // Advance to NeuriteType
-                std::cout << "Neurite: " << lex_.current()->str() << "\n";
                 const Token current_id = static_cast<Token>(lex_.current()->id);
 
                 lex_.consume();

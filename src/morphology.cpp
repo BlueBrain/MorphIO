@@ -15,6 +15,45 @@
 
 namespace morphio
 {
+
+enum SomaClasses {
+    SOMA_CONTOUR,
+    SOMA_CYLINDER
+};
+
+std::map<MorphologyVersion, SomaClasses> _SOMA_CONFIG{
+    // after much debate (https://github.com/BlueBrain/NeuroM/issues/597)
+    // and research:
+    //
+    //  Cannon et al., 1998: http://www.sciencedirect.com/science/article/pii/S0165027098000910
+    //    'Each line has the same seven fields: numbered point index, user defined flag denoting the
+    //    specific part of the structure (cell body, dendrite, axon etc.), three-dimensional position
+    //    (x, y and z, in mm), radius (r, in mm), and the parent point index'
+    //
+    //  Ascoli et al., 2001: http://www.jstor.org/stable/3067144
+    //    'In the SWC format, dendritic segments are characterized by an identification number, a
+    //    type (to distinguish basal, apical, proximal, distal and lateral trees), the x, y, z
+    //    positions of the cylinder ending point (in pm with respect to a fixed reference point), a
+    //    radius value (also in pm), and the identification number of the 'parent', i.e. the adjacent
+    //    cylinder in the path to the soma (the parent of the root being the soma itself)."
+    //
+    // that the SWC format uses cylinders to represent the soma.
+};
+
+SomaType getSomaType(uint32_t nSomaPoints) {
+    try {
+        return std::map<uint32_t, SomaType>{
+            {0, SOMA_UNDEFINED},
+            {1, SOMA_SINGLE_POINT},
+            {3, SOMA_THREE_POINTS},
+            {2, SOMA_UNDEFINED}}.at(nSomaPoints);
+    }
+    catch (const std::out_of_range& oor)
+    {
+        return SOMA_SIMPLE_CONTOUR;
+    }
+}
+
 Morphology::Morphology(const URI& source)
 {
     const size_t pos = source.find_last_of(".");
@@ -51,6 +90,8 @@ Morphology::Morphology(const URI& source)
         if (parent != -1)
             children[parent].push_back(i);
     }
+    if(version() != MORPHOLOGY_VERSION_SWC_1)
+        _properties->_cellLevel._somaType = getSomaType(soma().points().size());
 }
 
 Morphology::Morphology(Morphology&&) = default;
@@ -120,10 +161,18 @@ const std::vector<SectionType>& Morphology::sectionTypes() const
 {
     return get<Property::SectionType>();
 }
+
+
 const CellFamily& Morphology::cellFamily() const
 {
     return _properties->cellFamily();
 }
+
+const SomaType& Morphology::somaType() const
+{
+    return _properties->somaType();
+}
+
 const MorphologyVersion& Morphology::version() const
 {
     return _properties->version();

@@ -13,6 +13,8 @@
 #include <morphio/mut/soma.h>
 #include <morphio/mut/section.h>
 
+#include "errorMessages.h"
+
 namespace morphio
 {
 namespace plugin
@@ -20,94 +22,9 @@ namespace plugin
 namespace swc
 {
 
-enum ErrorLevel {
-    INFO,
-    WARNING,
-    ERROR
-};
-
 // It's not clear if -1 is the only way of identifying a root section.
 const int SWC_UNDEFINED_PARENT = -1;
 
-struct Sample
-{
-    Sample() : valid(false) , type(SECTION_UNDEFINED) , parentId(-1), lineNumber(-1)
-        {
-        }
-
-    explicit Sample(const char* line, int lineNumber) : lineNumber(lineNumber)
-        {
-            float radius;
-            valid = sscanf(line, "%20d%20d%20f%20f%20f%20f%20d", (int*)&id, (int*)&type, &point[0],
-                           &point[1], &point[2], &radius, &parentId) == 7;
-
-            diameter = radius * 2; // The point array stores diameters.
-
-            if (type >= SECTION_CUSTOM_START)
-                valid = false; // Unknown section type, custom samples are also
-            // Regarded as unknown.
-        }
-
-    float diameter;
-    bool valid;
-    Point point; // x, y, z and diameter
-    SectionType type;
-    int parentId;
-    int id;
-    int lineNumber;
-};
-
-std::string errorLink(const std::string& filename, int lineNumber, ErrorLevel errorLevel) {
-    std::map<ErrorLevel, int> color{
-        {ErrorLevel::INFO, 34},
-        {ErrorLevel::WARNING, 33},
-        {ErrorLevel::ERROR, 31}};
-
-    std::map<ErrorLevel, std::string> severity{
-        {ErrorLevel::INFO, "info"},
-        {ErrorLevel::WARNING, "warning"},
-        {ErrorLevel::ERROR, "error"}};
-
-
-    std::cout << "errorLevel: " << errorLevel << std::endl;
-    std::cout << "color[errorLevel]: " << color[errorLevel] << std::endl;
-    return "\e[1;" + std::to_string(color[errorLevel]) + "m" + filename + ":" + std::to_string(lineNumber) + ":" + severity[errorLevel] + "\e[0m";
-}
-
-std::string errorMsg(const std::string& filename,
-                     int lineNumber,
-                     ErrorLevel errorLevel,
-                     std::string additionalMessage = ""){
-    return "\n" + errorLink(filename, lineNumber, errorLevel) + additionalMessage;
-}
-
-const std::map<uint32_t, Sample> _readSamples(const URI& uri)
-{
-    std::ifstream file(uri.c_str());
-    if (file.fail())
-        LBTHROW(morphio::RawDataError("Error opening morphology file: " +
-                                      uri));
-
-    std::map<uint32_t, Sample> samples;
-
-    size_t lineNumber = 0;
-    std::string line;
-    while (!std::getline(file, line).fail())
-    {
-        ++lineNumber;
-        if (std::regex_match (line, std::regex(" *(#.*)?") ) || line.empty())
-            continue;
-
-        const auto &sample = Sample(line.data(), lineNumber);
-        if (!sample.valid)
-        {
-            LBTHROW(morphio::RawDataError(errorMsg(uri, lineNumber, ErrorLevel::ERROR,
-                                              "\nUnable to parse this line\n")));
-        }
-        samples[sample.id] = sample;
-    }
-    return samples;
-}
 
 
 /**
@@ -117,20 +34,48 @@ const std::map<uint32_t, Sample> _readSamples(const URI& uri)
 class SWCBuilder
 {
 public:
-    SWCBuilder(const std::string& uri) : uri(uri) {
-        samples = _readSamples(uri);
-        lastSomaPoint = -1;
+    SWCBuilder(const std::string& uri) : uri(uri), err(uri) {
+        _readSamples();
+
         for(auto sample_pair: samples){
             const auto &sample = sample_pair.second;
-            children[sample.parentId].push_back(sample.id);
-            if(sample.type == SECTION_SOMA)
-                lastSomaPoint = sample.id;
-            raiseIfNoParent(sample);
-            raiseIfDisconnectedNeurite(sample);
+            raiseIfNonConform(sample);
         }
 
         checkSoma();
     }
+
+
+    void _readSamples() {
+        std::ifstream file(uri.c_str());
+        if (file.fail())
+            LBTHROW(morphio::RawDataError(err.ERROR_OPENING_FILE()));
+
+        size_t lineNumber = 0;
+        std::string line;
+        while (!std::getline(file, line).fail())
+        {
+            ++lineNumber;
+            if (std::regex_match (line, std::regex(" *(#.*)?") ) || line.empty())
+                continue;
+
+            const auto &sample = Sample(line.data(), lineNumber);
+            if (!sample.valid)
+                LBTHROW(morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber)));
+
+            if(samples.count(sample.id) > 0)
+                LBTHROW(morphio::RawDataError(err.ERROR_REPEATED_ID(samples[sample.id], sample)));
+
+            samples[sample.id] = sample;
+            children[sample.parentId].push_back(sample.id);
+
+            if(sample.type == SECTION_SOMA) {
+                lastSomaPoint = sample.id;
+            }
+        }
+    }
+
+
 
     /**
        Are considered potential somata all sample
@@ -138,41 +83,43 @@ public:
      **/
     std::vector<Sample> _potentialSomata() {
         std::vector<Sample> somata;
-        for(auto id: children[-1])
+        for(auto id: children[-1]) {
             if(samples[id].type == SECTION_SOMA)
                 somata.push_back(samples[id]);
+        }
         return somata;
+    }
+
+    void raiseIfBrokenSoma(const Sample& sample) {
+        if(sample.type != SECTION_SOMA)
+            return;
+
+        // Testing soma bifurcation
+        if(sample.parentId != -1 && children[sample.id].size() > 1)
+            LBTHROW(morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample)));
+
+        if(sample.parentId != -1 && samples[sample.parentId].type != SECTION_SOMA)
+            LBTHROW(morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample)));
     }
 
     void raiseIfDisconnectedNeurite(const Sample& sample) {
         if(sample.parentId == SWC_UNDEFINED_PARENT && sample.type != SECTION_SOMA)
-            LBERROR(errorMsg(uri, sample.lineNumber, ErrorLevel::WARNING,
-                             "\nFound a disconnected neurite.\n"
-                             "Neurites are not supposed to have parentId: -1\n"
-                             "(although this is normal if this neuron has no soma)"));
+            LBERROR(err.WARNING_DISCONNECTED_NEURITE(sample));
     }
 
     void checkSoma() {
         auto somata = _potentialSomata();
 
-        if(somata.size() > 1) {
-            std::string links;
-            for(auto soma: somata)
-                links += "\n" + errorMsg(uri, soma.lineNumber, ErrorLevel::ERROR);
-            LBTHROW(morphio::SomaError("\nMultiple somata found:" + links));
-        }
+        if(somata.size() > 1)
+            LBTHROW(morphio::SomaError(err.ERROR_MULTIPLE_SOMATA(somata)));
 
         if(somata.size() == 0)
-            LBERROR(errorMsg(uri, 0, ErrorLevel::WARNING, "\nNo soma found in file"));
+            LBERROR(err.WARNING_NO_SOMA_FOUND());
     }
 
     void raiseIfNoParent(const Sample& sample) {
         if(sample.parentId > -1 && samples.count(sample.parentId) == 0)
-                       LBTHROW(morphio::MissingParentError(
-                                   errorMsg(uri, sample.lineNumber, ErrorLevel::ERROR,
-                                 "\nSample id: " + std::to_string(sample.id) +
-                                 " refers to non-existant parent ID: " +
-                                 std::to_string(sample.parentId))));
+            LBTHROW(morphio::MissingParentError(err.ERROR_MISSING_PARENT(sample)));
     }
 
     /**
@@ -188,12 +135,12 @@ public:
              sample.type != SECTION_SOMA); // Exclude soma bifurcations
     }
 
-    bool isSectionStart(const Sample& sample) {
+    inline bool isSectionStart(const Sample& sample) {
         return (isRootSection(sample) ||
                 isSectionEnd(samples[sample.parentId])); // Standard section
     }
 
-    bool isSectionEnd(const Sample& sample) {
+    inline bool isSectionEnd(const Sample& sample) {
         return sample.id == lastSomaPoint || // End of soma
             children[sample.id].size() == 0 || // Reached leaf
             (children[sample.id].size() >= 2 && // Reached neurite bifurcation
@@ -213,6 +160,48 @@ public:
         }
     }
 
+    void raiseIfNonConform(const Sample &sample) {
+        raiseIfBrokenSoma(sample);
+        raiseIfNoParent(sample);
+        raiseIfDisconnectedNeurite(sample);
+    }
+
+    SomaType somaType() {
+        switch(morph.soma()->points().size()) {
+        case 0:
+        {
+            return SOMA_UNDEFINED;
+        }
+        case 1:
+        {
+            return SOMA_SINGLE_POINT;
+        }
+
+        // NeuroMorpho format is characterized by a 3 points soma
+        // with a bifurcation at soma root
+        case 3:
+        {
+            uint32_t somaRootId = children[-1][0];
+            auto &somaChildren = children[somaRootId];
+            uint32_t nSomaChildren = std::count_if(
+                somaChildren.begin(), somaChildren.end(),
+                [this](uint32_t id){return this->samples[id].type == SECTION_AXON;});
+
+            if(nSomaChildren == 2) {
+                LBERROR("Using neuromorpho 3-Point soma");
+                //  NeuroMorpho is the main provider of morphologies, but they
+                //  with SWC as their default file format: they convert all
+                //  uploads to SWC.  In the process of conversion, they turn all
+                //  somas into their custom 'Three-point soma representation':
+                //   http://neuromorpho.org/SomaFormat.html
+                return SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
+            }
+            return SOMA_CYLINDERS;
+        }
+        default:
+            return SOMA_CYLINDERS;
+        }
+    }
 
     Property::Properties _buildProperties() {
         std::vector<int32_t> depthFirstSamples;
@@ -231,7 +220,9 @@ public:
             }
         }
 
-        return morph.buildReadOnly();
+        Property::Properties properties = morph.buildReadOnly();
+        properties._cellLevel._somaType = somaType();
+        return properties;
     }
 
     /**
@@ -260,8 +251,12 @@ private:
     int currentSectionParentId = -1;
     mut::Morphology morph;
     std::string uri;
+    ErrorMessages err;
 
 };
+
+
+
 
 Property::Properties load(const URI& uri)
 {

@@ -1,3 +1,4 @@
+#include <cassert>
 #include <array>
 #include <iostream>
 #include <vector>
@@ -10,6 +11,7 @@
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 
+
 using namespace std;
 
 // To be compiled and run with:
@@ -19,25 +21,36 @@ using namespace std;
 // /usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so &&
 // LD_LIBRARY_PATH=./build/src ./main
 
-
+void testChildren(){
+    morphio::Morphology morphology("/home/bcoste/workspace/morphology/neurom/test_data/swc/simple.swc");
+    int nChildren = morphology.sections()[1].children().size();
+    // for(auto id: morphology.sections()[1].children()){
+    //     std::cout << "morphology.section(id).points(): " << morphology.section(id).points() << std::endl;
+    // }
+    std::cout << "nChildren: " << nChildren << std::endl;
+    assert(nChildren == 2 && "Should have 2 children");
+}
 int main()
 {
-    morphio::Morphology morphology("neuron.swc");
-    morphio::mut::Morphology a(morphology);
+    std::string filename("Neuron.h5");
+    morphio::Morphology morphology(filename);
+    // morphio::mut::Morphology a(morphology);
+
+    // testChildren();
 
     // for (auto type : morphology.sectionTypes())
     //     std::cout << "type: " << type << std::endl;
 
-    // auto family = morphology.cellFamily();
-    // std::cout << "family: " << family << std::endl;
-    // auto sections = morphology.sections();
-    // std::cout << "sections.size(): " << sections.size() << std::endl;
-    // auto section = sections[3];
-    // std::cout << "depth" << std::endl;
-    // for (auto it = section.depth_begin(); it != section.depth_end(); ++it)
-    // {
-    //     std::cout << "section.id(): " << (*it).id() << std::endl;
-    // }
+    auto family = morphology.cellFamily();
+    std::cout << "family: " << family << std::endl;
+    auto sections = morphology.sections();
+    std::cout << "sections.size(): " << sections.size() << std::endl;
+    auto section = sections[3];
+    std::cout << "depth" << std::endl;
+    for (auto it = section.depth_begin(); it != section.depth_end(); ++it)
+    {
+        std::cout << "section.id(): " << (*it).id() << std::endl;
+    }
 
     // std::cout << "morphology.rootSections()[1]: " << morphology.rootSections()[1] << std::endl;
     // for(auto sec: morphology.rootSections()[0].children())

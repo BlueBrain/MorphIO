@@ -53,6 +53,7 @@ struct SectionLevel
 struct CellLevel
 {
     morphio::CellFamily _cellFamily;
+    SomaType _somaType;
     MorphologyVersion _version;
 };
 
@@ -73,6 +74,7 @@ struct Properties
         return _cellLevel._version;
     }
     const morphio::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
+    const morphio::SomaType& somaType() { return _cellLevel._somaType; }
     const std::map<uint32_t, std::vector<uint32_t>>& children()
     {
         return _sectionLevel._children;

@@ -297,7 +297,11 @@ void MorphologyHDF5::_readSections()
             }
         }();
 
+        _sections.reset(new HighFive::DataSet(dataset));
+
         const auto dims = dataset.getSpace().getDimensions();
+
+
         if (dims.size() != 2 || dims[1] != _structureV2Columns)
         {
             LBTHROW(std::runtime_error(
@@ -308,9 +312,14 @@ void MorphologyHDF5::_readSections()
         std::vector<std::vector<int>> vec;
         vec.resize(dims[0]);
         dataset.read(vec);
-        for(auto p: vec)
+        for(auto p: vec){
             sections.push_back({p[0],p[1]});
+        }
+
+        return;
+
     }
+
 
     auto selection = _sections->select({0, 0}, {_sectionsDims[0], 2}, {1, 2});
 
@@ -318,8 +327,9 @@ void MorphologyHDF5::_readSections()
     vec.resize(_sectionsDims[0]);
     selection.read(vec);
 
-    for(auto p: vec)
+    for(auto p: vec) {
         sections.push_back({p[0],p[1]});
+    }
 
 }
 

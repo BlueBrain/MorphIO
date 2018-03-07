@@ -66,6 +66,7 @@ PYBIND11_MODULE(morphio, m) {
         .def_property_readonly("rootSections", &morphio::Morphology::rootSections)
         .def_property_readonly("soma", &morphio::Morphology::soma)
         .def_property_readonly("cellFamily", &morphio::Morphology::cellFamily)
+        .def_property_readonly("somaType", &morphio::Morphology::somaType)
         .def_property_readonly("version", &morphio::Morphology::version);
 
     py::class_<morphio::Soma>(m, "Soma")
@@ -116,6 +117,15 @@ PYBIND11_MODULE(morphio, m) {
         .value("MODE_READWRITE", morphio::enums::AccessMode::MODE_READWRITE)
         .value("MODE_READOVERWRITE", morphio::enums::AccessMode::MODE_READOVERWRITE)
         .export_values();
+
+
+    py::enum_<morphio::enums::SomaType>(m, "SomaType")
+        .value("SOMA_UNDEFINED", morphio::enums::SomaType::SOMA_UNDEFINED)
+        .value("SOMA_SINGLE_POINT", morphio::enums::SomaType::SOMA_SINGLE_POINT)
+        .value("SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS", morphio::enums::SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+        .value("SOMA_CYLINDERS", morphio::enums::SomaType::SOMA_CYLINDERS)
+        .value("SOMA_THREE_POINTS", morphio::enums::SomaType::SOMA_THREE_POINTS)
+        .value("SOMA_SIMPLE_CONTOUR", morphio::enums::SomaType::SOMA_SIMPLE_CONTOUR);
 
     auto base = py::register_exception<morphio::MorphioError&>(m, "Error");
     auto raw = py::register_exception<morphio::RawDataError&>(m, "RawDataError", base.ptr());

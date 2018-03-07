@@ -54,6 +54,7 @@ public:
     const std::vector<float>& diameters() const;
     const std::vector<float>& perimeters() const;
     const std::vector<SectionType>& sectionTypes() const;
+    const SomaType& somaType() const;
     const CellFamily& cellFamily() const;
     const MorphologyVersion& version() const;
 
