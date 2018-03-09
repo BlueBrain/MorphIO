@@ -127,7 +127,7 @@ PYBIND11_MODULE(morphio, m) {
         .value("SOMA_THREE_POINTS", morphio::enums::SomaType::SOMA_THREE_POINTS)
         .value("SOMA_SIMPLE_CONTOUR", morphio::enums::SomaType::SOMA_SIMPLE_CONTOUR);
 
-    auto base = py::register_exception<morphio::MorphioError&>(m, "Error");
+    auto base = py::register_exception<morphio::MorphioError&>(m, "MorphioError");
     auto raw = py::register_exception<morphio::RawDataError&>(m, "RawDataError", base.ptr());
     py::register_exception<morphio::UnknownFileType&>(m, "UnknownFileType", base.ptr());
     py::register_exception<morphio::SomaError&>(m, "SomaError", base.ptr());
