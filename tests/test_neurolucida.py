@@ -1,35 +1,18 @@
 import os
-import tempfile
 import morphio
 import numpy as np
 from mock import patch
-from nose.tools import eq_, ok_, assert_raises, assert_equal
-from contextlib import contextmanager
+from nose.tools import eq_, ok_, assert_equal
 
 from numpy.testing import assert_array_equal
 from nose import tools as nt
-from morphio import RawDataError, SomaError
+from morphio import Morphology, RawDataError, SomaError
+
+from utils import tmp_asc_file, _test_asc_exception
 
 _path = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(_path, '../../../test_data')
 NEUROLUCIDA_PATH = os.path.join(DATA_PATH, 'neurolucida')
-
-
-@contextmanager
-def tmp_asc_file(content):
-    with tempfile.NamedTemporaryFile(suffix='.asc', mode='w') as tmp_file:
-        tmp_file.write(content)
-        tmp_file.seek(0)
-        yield tmp_file
-
-
-def _test_exception(content, exception, str1, str2):
-    '''Create tempfile with given content and check that the exception is raised'''
-    with tmp_asc_file(content) as tmp_file:
-        with assert_raises(exception) as obj:
-            morphio.Morphology(tmp_file.name)
-        ok_(str1 in str(obj.exception))
-        ok_(str2 in str(obj.exception))
 
 
 def test_soma():
@@ -41,7 +24,7 @@ def test_soma():
                          (-1 -1 0 2 S3)
                          )''') as tmp_file:
 
-        n = morphio.Morphology(tmp_file.name)
+        n = Morphology(tmp_file.name)
 
         assert_array_equal(n.soma.points,
                            [[1, 1, 0],
@@ -52,7 +35,7 @@ def test_soma():
 
 
 def test_unknown_token():
-    _test_exception('''
+    _test_asc_exception('''
                    ("CellBody"
                    (Color Red)
                    (CellBody)
@@ -60,23 +43,23 @@ def test_unknown_token():
                    (Z 1 0 1 S2) ; <-- Z is a BAD token
                    (-1 -1 0 2 S3)
                    )''',
-                    RawDataError,
-                    "Unexpected token: Z",
-                    ":6:error")
+                        RawDataError,
+                        "Unexpected token: Z",
+                        ":6:error")
 
 
 def test_unfinished_point():
-    _test_exception('''("CellBody"
+    _test_asc_exception('''("CellBody"
                          (Color Red)
                          (CellBody)
                          (1 1''',
-                    RawDataError,
-                    'Error converting: "" to float',
-                    ':4:error')
+                        RawDataError,
+                        'Error converting: "" to float',
+                        ':4:error')
 
 
 def test_multiple_soma():
-    _test_exception('''
+    _test_asc_exception('''
                              ("CellBody"
                              (Color Red)
                              (CellBody)
@@ -90,9 +73,9 @@ def test_multiple_soma():
                              (1 1 0 1 S1)
                              (-1 1 0 1 S2)
                              )''',
-                    SomaError,
-                    'A soma is already defined',
-                    ':14:error')
+                        SomaError,
+                        'A soma is already defined',
+                        ':14:error')
 
 
 def test_single_neurite_no_soma():
@@ -109,7 +92,7 @@ def test_single_neurite_no_soma():
 
                          Generated
                          )  ;  End of tree''') as tmp_file:
-        n = morphio.Morphology(tmp_file.name)
+        n = Morphology(tmp_file.name)
 
         assert_array_equal(n.soma.points, np.empty((0, 3)))
         nt.assert_equal(len(n.rootSections), 1)
@@ -137,7 +120,7 @@ def test_skip_header():
                          (  1.2  3.7   2.0     13)
                          )''') as tmp_file:
 
-        n = morphio.Morphology(tmp_file.name)
+        n = Morphology(tmp_file.name)
         nt.assert_equal(len(n.rootSections), 1)
         assert_array_equal(n.rootSections[0].points,
                            np.array([[1.2, 2.7, 1.0],
@@ -186,7 +169,7 @@ https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.
 would look like'''
 
     with tmp_asc_file(with_duplicate) as tmp_file:
-        n = morphio.Morphology(tmp_file.name)
+        n = Morphology(tmp_file.name)
 
     nt.assert_equal(len(n.rootSections), 1)
 
@@ -210,10 +193,10 @@ would look like'''
 
 def test_read_without_duplicates():
     with tmp_asc_file(with_duplicate) as tmp_file:
-        n_with_duplicate = morphio.Morphology(tmp_file.name)
+        n_with_duplicate = Morphology(tmp_file.name)
 
     with tmp_asc_file(without_duplicate) as tmp_file:
-        n_without_duplicate = morphio.Morphology(tmp_file.name)
+        n_without_duplicate = Morphology(tmp_file.name)
 
     assert_array_equal(n_with_duplicate.rootSections[0].children[0].points,
                        n_without_duplicate.rootSections[0].children[0].points)
@@ -223,7 +206,7 @@ def test_read_without_duplicates():
 
 
 def test_broken_duplicate():
-    with tmp_asc_file('''
+    _test_asc_exception('''
                          ((Dendrite)
                           (3 -4 0 2)
                           (3 -6 0 2)
@@ -239,16 +222,14 @@ def test_broken_duplicate():
                             (9 -10 0 2)
                           )
                           )
-                         ''') as tmp_file:
-
-        with assert_raises(RawDataError) as obj:
-            morphio.Morphology(tmp_file.name)
-
-        ok_("Parent point is duplicated but have a different radius" in str(obj.exception))
+                         ''',
+                        RawDataError,
+                        "Parent point is duplicated but have a different radius",
+                        ":11:error")
 
 
 def test_unfinished_file():
-    _test_exception('''
+    _test_asc_exception('''
                      ((Dendrite)
                       (3 -4 0 2)
                       (3 -6 0 2)
@@ -260,9 +241,9 @@ def test_unfinished_file():
                         (-3 -10 0 2)
                         |
                      ''',
-                    RawDataError,
-                    "Hit end of file while consuming a neurite",
-                    ":12:error")
+                        RawDataError,
+                        "Hit end of file while consuming a neurite",
+                        ":12:error")
 
 
 def test_empty_sibling():
@@ -280,7 +261,7 @@ def test_empty_sibling():
                        )
                       )
                  ''') as tmp_file:
-        n = morphio.Morphology(tmp_file.name)
+        n = Morphology(tmp_file.name)
 
     assert_array_equal(n.rootSections[0].points,
                        np.array([[3, -4, 0],
@@ -311,7 +292,7 @@ def test_single_children():
                       )
                  ''') as tmp_file:
 
-        n = morphio.Morphology(tmp_file.name)
+        n = Morphology(tmp_file.name)
 
         nt.assert_equal(len(n.soma.points), 0)
         nt.assert_equal(len(n.sections[0].points), 0)
@@ -383,7 +364,7 @@ def test_markers():
 )
 ''') as tmp_file:
 
-        n = morphio.Morphology(tmp_file.name)
+        n = Morphology(tmp_file.name)
 
         nt.assert_equal(len(n.rootSections), 1)
 
