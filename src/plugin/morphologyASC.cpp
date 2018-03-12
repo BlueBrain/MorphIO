@@ -45,41 +45,25 @@ bool skip_sexp(size_t id)
             id == +Token::NORMAL);
 }
 
-std::tuple<Point, float> parse_point(NeurolucidaLexer& lex)
-{
-    lex.expect(Token::LPAREN, "Point should start in LPAREN");
 
-    float x = std::stod(lex.consume()->str());
-    float y = std::stod(lex.consume()->str());
-    float z = std::stod(lex.consume()->str());
-    float r = 0;
-
-    if (lex.peek()->id == +Token::NUMBER)
-    {
-        r = std::stod(lex.consume()->str());
-    }
-
-    lex.consume();
-
-    if (lex.current()->id == +Token::WORD)
-    {
-        lex.consume(Token::WORD);
-    }
-
-    lex.consume(Token::RPAREN, "Point should end in RPAREN");
-
-    return std::tuple<Point, float>{{x, y, z}, r};
-}
 
 class NeurolucidaParser
 {
 public:
-    NeurolucidaParser(){};
+    NeurolucidaParser(const std::string& uri) : uri_(uri), lex_(uri), err_(uri)
+    {
+    };
+
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
-    Property::Properties parse(const std::string& input)
+    Property::Properties parse()
     {
+
+        std::ifstream ifs(uri_);
+        std::string input((std::istreambuf_iterator<char>(ifs)),
+                          (std::istreambuf_iterator<char>()));
+
         lex_.start_parse(input);
 
         bool ret = parse_block();
@@ -88,6 +72,33 @@ public:
     }
 
 private:
+
+    std::tuple<Point, float> parse_point(NeurolucidaLexer& lex)
+        {
+            lex.expect(Token::LPAREN, "Point should start in LPAREN");
+            std::array<float, 4> point; // X,Y,Z,R
+            for(auto &p: point) {
+                try {
+                    p = std::stod(lex.consume()->str());
+                } catch (const std::invalid_argument& e) {
+                    throw RawDataError(err_.ERROR_PARSING_POINT(lex.line_num(),
+                                                                lex.current()->str()));
+                }
+            }
+
+
+            lex.consume();
+
+            if (lex.current()->id == +Token::WORD)
+            {
+                lex.consume(Token::WORD);
+            }
+
+            lex.consume(Token::RPAREN, "Point should end in RPAREN");
+
+            return std::tuple<Point, float>{{point[0], point[1], point[2]}, point[3]};
+        }
+
     bool parse_neurite_branch(int32_t parent_id, Token token)
     {
         lex_.consume(Token::LPAREN, "New branch should start with LPAREN");
@@ -116,7 +127,7 @@ private:
         properties._diameters = diameters;
         if(token == Token::CELLBODY){
             if(nb_.soma()->points().size() != 0)
-                throw SomaError("A soma is already defined");
+                throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
             nb_.soma() = std::make_shared<mut::Soma>(mut::Soma(properties));
             return_id = -1;
         } else {
@@ -132,7 +143,7 @@ private:
     }
 
     /*
-     The idea is that these two structures should represent the same morphologies:
+     The idea is that these two structures should represent the same morphology:
 
      (3 -8 0 2)     and          (3 -8 0 2)
      (3 -10 0 2)                 (3 -10 0 2)
@@ -159,7 +170,8 @@ private:
             if(lastParentDiameter == properties._diameters[0])
                 return;
 
-            LBTHROW(RawDataError("Parent point is duplicated but have a different radius"));
+            throw RawDataError(err_.ERROR_BROKEN_DUPLICATE(lex_.line_num()));
+
         }
 
         properties._points.insert(properties._points.begin(), lastParentPoint);
@@ -179,8 +191,7 @@ private:
 
             if (is_eof(id))
             {
-                throw RawDataError(
-                    "Hit end of of file while consuming a neurite");
+                throw RawDataError(err_.ERROR_EOF_IN_NEURITE(lex_.line_num()));
             }
             else if (is_end_of_section(id))
             {
@@ -227,13 +238,13 @@ private:
                 }
                 else
                 {
-                    throw RawDataError(
-                        "Unknown token after LPAREN in neurite parse");
+                    throw RawDataError(err_.ERROR_UNKNOWN_TOKEN(lex_.line_num(),
+                                                                lex_.peek()->str()));
                 }
             }
             else
             {
-                throw RawDataError("Unknown token in neurite parse");
+                throw RawDataError(err_.ERROR_UNKNOWN_TOKEN(lex_.line_num(), lex_.peek()->str()));
             }
         }
         return false;
@@ -264,16 +275,18 @@ private:
 
     NeurolucidaLexer lex_;
     morphio::mut::Morphology nb_;
+
+    std::string uri_;
+    ErrorMessages err_;
+
 };
 
 Property::Properties load(const URI& uri)
 {
-    NeurolucidaParser parser;
-    std::ifstream ifs(uri);
-    std::string input((std::istreambuf_iterator<char>(ifs)),
-                      (std::istreambuf_iterator<char>()));
+    NeurolucidaParser parser(uri);
 
-    Property::Properties properties = parser.parse(input);
+
+    Property::Properties properties = parser.parse();
     properties._cellLevel._cellFamily = FAMILY_NEURON;
     properties._cellLevel._version = MORPHOLOGY_VERSION_ASC_1;
     return properties;

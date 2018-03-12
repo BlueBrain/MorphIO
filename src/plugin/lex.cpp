@@ -4,6 +4,7 @@
 #include <lexertl/generator.hpp>
 #include <lexertl/iterator.hpp>
 #include <lexertl/lookup.hpp>
+#include "errorMessages.h"
 
 namespace morphio
 {
@@ -113,11 +114,14 @@ class NeurolucidaLexer
 
     mutable size_t current_line_num_ = 1;
     mutable size_t next_line_num_ = 1;
+    std::string uri_;
+    ErrorMessages err_;
+
     bool debug_;
 
 public:
-    NeurolucidaLexer(bool debug = false)
-        : debug_(debug)
+    NeurolucidaLexer(const std::string& uri, bool debug = false)
+        : uri_(uri), debug_(debug), err_(uri)
     {
         lexertl::rules rules;
         build_lexer(rules, sm_);
@@ -127,6 +131,10 @@ public:
     {
         current_ = next_ = lexertl::siterator(input.begin(), input.end(), sm_);
         // will set the above, current_ to next_, AND consume whitespace
+        size_t n_skipped = skip_whitespace(current_);
+        current_line_num_ += n_skipped;
+        next_line_num_ += n_skipped;
+
         consume();
     }
 
@@ -258,9 +266,16 @@ public:
     {
         if (current()->id != +t)
         {
-            std::cout << "Expected: " << t << " but got " << current()->id
-                      << ' ' << msg << std::endl;
-            throw std::runtime_error("Unexpected token");
+            std::stringstream expected;
+            expected << t;
+
+            std::stringstream got;
+            got << current()->str();
+
+            throw RawDataError(err_.ERROR_UNEXPECTED_TOKEN(line_num(),
+                                                           expected.str(),
+                                                           got.str(),
+                                                           msg));
         }
     }
 
