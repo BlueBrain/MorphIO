@@ -231,7 +231,7 @@ public:
         const lexertl::siterator end;
         if (ended())
         {
-            throw std::runtime_error("Can't iterate past the end");
+            throw RawDataError(err_.ERROR_EOF_REACHED(line_num()));
         }
 
         lexertl::siterator temp(next_);
@@ -301,8 +301,7 @@ public:
             }
             if (ended())
             {
-                throw std::runtime_error(
-                    "Hit end of file before balanced parens");
+                throw RawDataError(err_.ERROR_EOF_UNBALANCED_PARENS(line_num()));
             }
         }
         consume(Token::RPAREN,
