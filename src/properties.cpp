@@ -16,10 +16,26 @@ std::vector<typename T::Type> copySpan(
                                          data.begin() + range.second);
 }
 
+
+;
+
+PointLevel::PointLevel(std::vector<Point::Type> points,
+                       std::vector<Diameter::Type> diameters,
+                       std::vector<Perimeter::Type> perimeters)
+ : _points(points), _diameters(diameters), _perimeters(perimeters)
+{
+    if(_points.size() != _diameters.size())
+        throw SectionBuilderError("Point vector have size: " + std::to_string(_points.size())
+                                  + " while Diameter vector has size: " + std::to_string(_diameters.size()));
+
+    if(_perimeters.size() > 0 && _points.size() != _perimeters.size())
+        throw SectionBuilderError("Point vector have size: " + std::to_string(_points.size())
+                                  + " while Perimeter vector has size: " + std::to_string(_perimeters.size()));
+
+}
+
 PointLevel::PointLevel(const PointLevel &data) :
-    _points(data._points),
-    _diameters(data._diameters),
-    _perimeters(data._perimeters)
+    PointLevel(data._points, data._diameters, data._perimeters)
 {
 }
 

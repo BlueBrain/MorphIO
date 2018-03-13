@@ -20,7 +20,7 @@ tmp_swc_file = partial(_tmp_file, extension='swc')
 
 def assert_substring(substring, string):
     sep = ['\n' + 80 * '>' + '\n', '\n' + 80 * '<' + '\n']
-    ok_(substring in string, "{}\n not in \n{}".format(substring.join(sep), string.join(sep)))
+    ok_(substring in string, "{}\n NOT IN \n{}".format(substring.join(sep), string.join(sep)))
 
 
 def _test_exception(content, exception, str1, str2, extension):

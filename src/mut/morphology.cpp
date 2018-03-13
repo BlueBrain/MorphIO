@@ -22,7 +22,7 @@ Morphology::Morphology(const morphio::Morphology& morphology)
     }
 }
 
-uint32_t Morphology::appendSection(uint32_t parentId,
+uint32_t Morphology::appendSection(int32_t parentId,
                                    const morphio::Section& section,
                                    bool recursive)
 {
@@ -46,7 +46,7 @@ uint32_t Morphology::appendSection(uint32_t parentId,
     return id;
 }
 
-uint32_t Morphology::appendSection(uint32_t parentId, SectionType type,
+uint32_t Morphology::appendSection(int32_t parentId, SectionType type,
                                    const Property::PointLevel& pointProperties)
 {
     uint32_t id = _register(std::shared_ptr<Section>(new Section(_counter, type, pointProperties),

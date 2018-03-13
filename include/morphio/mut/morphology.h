@@ -93,18 +93,18 @@ public:
     void deleteSection(uint32_t id, bool recursive = true);
 
     /**
-       Append the read-only Section to the given parentId
+       Append the read-only Section to the given parentId (-1 appends to soma)
 
        If recursive == true, all descendent will be appended as well
     **/
-    uint32_t appendSection(uint32_t parentId, const morphio::Section&, bool recursive = true);
+    uint32_t appendSection(int32_t parentId, const morphio::Section&, bool recursive = true);
 
     /**
-       Append the read-only Section to the given parentId
+       Append the read-only Section to the given parentId (-1 appends to soma)
 
        If recursive == true, all descendent will be appended as well
     **/
-    uint32_t appendSection(uint32_t parentId, SectionType, const Property::PointLevel&);
+    uint32_t appendSection(int32_t parentId, SectionType, const Property::PointLevel&);
 
     /**
        Iterate on all sections starting at startSection via a depth-first-search traversal

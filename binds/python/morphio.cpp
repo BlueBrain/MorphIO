@@ -3,11 +3,15 @@
 #include <pybind11/numpy.h>
 
 #include <morphio/types.h>
+#include <morphio/enums.h>
+
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
-#include <morphio/enums.h>
 
+#include <morphio/mut/morphology.h>
+#include <morphio/mut/section.h>
+#include <morphio/mut/soma.h>
 
 namespace py = pybind11;
 
@@ -52,10 +56,6 @@ PYBIND11_MODULE(morphio, m) {
 
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
-
-    m.def("load_cell", [](const morphio::URI& uri){
-            return morphio::Morphology(uri);
-        });
 
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const morphio::URI&>())
@@ -127,11 +127,92 @@ PYBIND11_MODULE(morphio, m) {
         .value("SOMA_THREE_POINTS", morphio::enums::SomaType::SOMA_THREE_POINTS)
         .value("SOMA_SIMPLE_CONTOUR", morphio::enums::SomaType::SOMA_SIMPLE_CONTOUR);
 
+
     auto base = py::register_exception<morphio::MorphioError&>(m, "MorphioError");
+    // base.ptr() signifies "inherits from"
     auto raw = py::register_exception<morphio::RawDataError&>(m, "RawDataError", base.ptr());
     py::register_exception<morphio::UnknownFileType&>(m, "UnknownFileType", base.ptr());
     py::register_exception<morphio::SomaError&>(m, "SomaError", base.ptr());
     py::register_exception<morphio::IDSequenceError&>(m, "IDSequenceError", raw.ptr());
     py::register_exception<morphio::MultipleTrees&>(m, "MultipleTrees", raw.ptr());
     py::register_exception<morphio::MissingParentError&>(m, "MissingParentError", raw.ptr());
+    py::register_exception<morphio::SectionBuilderError&>(m, "SectionBuilderError", raw.ptr());
+
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //       Mutable module
+    ////////////////////////////////////////////////////////////////////////////////
+    py::module mut_module = m.def_submodule("mut");
+    py::class_<morphio::mut::Morphology>(mut_module, "Morphology")
+        .def(py::init<>())
+        .def_property_readonly("sections", &morphio::mut::Morphology::sections)
+        .def_property_readonly("root_sections", &morphio::mut::Morphology::rootSections)
+        .def_property_readonly("soma", &morphio::mut::Morphology::soma)
+        .def("parent", &morphio::mut::Morphology::parent)
+        .def("children", &morphio::mut::Morphology::children)
+        .def("section", &morphio::mut::Morphology::section)
+        .def("build_read_only", &morphio::mut::Morphology::buildReadOnly)
+        .def("deleteSection", &morphio::mut::Morphology::deleteSection)
+        .def("appendSection", (uint32_t (morphio::mut::Morphology::*) (int32_t, morphio::SectionType, const morphio::Property::PointLevel&)) &morphio::mut::Morphology::appendSection)
+        .def("deleteSection", &morphio::mut::Morphology::deleteSection)
+        .def("traverse", &morphio::mut::Morphology::traverse);
+
+
+    // py::nodelete needed because morphio::mut::Section has a private destructor
+    // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
+    py::class_<morphio::mut::Section, std::unique_ptr<morphio::mut::Section, py::nodelete>>(mut_module, "Section")
+        .def_property_readonly("id", &morphio::mut::Section::id)
+        .def_property("type",
+                      // getter
+                      &morphio::mut::Section::type,
+                      // setter
+                      [](morphio::mut::Section* section,
+                         morphio::SectionType _type) {
+                          section -> type() = _type;
+                      })
+        .def_property("points",
+                      &morphio::mut::Section::points,
+                      [](morphio::mut::Section* section,
+                         const std::vector<morphio::Point>& _points) {
+                          section -> points() = _points;
+                      })
+        .def_property("diameters",
+                      &morphio::mut::Section::diameters,
+                      [](morphio::mut::Section* section,
+                         const std::vector<float>& _diameters) {
+                          section -> diameters() = _diameters;
+                      })
+        .def_property("perimeters",
+                      &morphio::mut::Section::perimeters,
+                      [](morphio::mut::Section* section,
+                         const std::vector<float>& _perimeters) {
+                          section -> perimeters() = _perimeters;
+                      });
+
+    // py::nodelete needed because morphio::mut::Soma has a private destructor
+    // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
+    py::class_<morphio::mut::Soma, std::unique_ptr<morphio::mut::Soma, py::nodelete>>(mut_module, "Soma")
+        .def_property("points",
+                      &morphio::mut::Soma::points,
+                      [](morphio::mut::Soma* soma,
+                         const std::vector<morphio::Point>& _points) {
+                          soma -> points() = _points;
+                      })
+        .def_property("diameters",
+                      &morphio::mut::Soma::diameters,
+                      [](morphio::mut::Soma* soma,
+                         const std::vector<float>& _diameters) {
+                          soma -> diameters() = _diameters;
+                      });
+
+
+
+    py::class_<morphio::Property::PointLevel>(m, "PointLevel")
+        .def(py::init<>())
+        .def(py::init<std::vector<morphio::Property::Point::Type>,
+                       std::vector<morphio::Property::Diameter::Type>,
+                       std::vector<morphio::Property::Perimeter::Type>>())
+        .def_readwrite("points", &morphio::Property::PointLevel::_points)
+        .def_readwrite("perimeters", &morphio::Property::PointLevel::_perimeters)
+        .def_readwrite("diameters", &morphio::Property::PointLevel::_diameters);
 }

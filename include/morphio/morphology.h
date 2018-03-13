@@ -40,6 +40,12 @@ public:
 
     const Soma soma() const;
     const std::vector<Section> rootSections() const;
+
+    /**
+     * Return a vector containing all section objects.
+     *
+     * The first section of the vector is the soma section.
+     **/
     const std::vector<Section> sections() const;
 
     /**

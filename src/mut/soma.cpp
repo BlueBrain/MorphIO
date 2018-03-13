@@ -18,7 +18,7 @@ Soma::Soma(const morphio::Soma& soma)
         Property::PointLevel(soma._properties->_pointLevel, soma._range);
 }
 
-std::ostream& operator<<(std::ostream& os, const Soma& soma)
+std::ostream& operator<<(std::ostream& os, Soma& soma)
 {
     os << dumpPoints(soma.points());
     return os;
