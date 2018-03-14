@@ -14,6 +14,7 @@ public:
     Soma(const morphio::Soma& soma);
     std::vector<Point>& points() { return _pointProperties._points; }
     std::vector<float>& diameters() { return _pointProperties._diameters; }
+    Property::PointLevel& properties() { return _pointProperties; }
 
 private:
     friend class Morphology;

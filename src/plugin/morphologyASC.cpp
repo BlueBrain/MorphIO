@@ -128,7 +128,8 @@ private:
         if(token == Token::CELLBODY){
             if(nb_.soma()->points().size() != 0)
                 throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
-            nb_.soma() = std::make_shared<mut::Soma>(mut::Soma(properties));
+            nb_.soma() -> properties() = properties;
+
             return_id = -1;
         } else {
             SectionType section_type = TokenSectionTypeMap.at(token);
