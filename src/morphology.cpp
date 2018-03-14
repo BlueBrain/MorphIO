@@ -9,6 +9,8 @@
 #include <morphio/section.h>
 #include <morphio/soma.h>
 
+#include <morphio/mut/morphology.h>
+
 #include "plugin/morphologyASC.h"
 #include "plugin/morphologyHDF5.h"
 #include "plugin/morphologySWC.h"
@@ -54,6 +56,19 @@ SomaType getSomaType(uint32_t nSomaPoints) {
     }
 }
 
+void buildChildren(std::shared_ptr<Property::Properties> properties)
+{
+    const auto& sections = properties->get<Property::Section>();
+    auto& children = properties->_sectionLevel._children;
+
+    for (size_t i = 0; i < sections.size(); ++i)
+    {
+        const int32_t parent = sections[i][1];
+        if (parent != -1)
+            children[parent].push_back(i);
+    }
+}
+
 Morphology::Morphology(const URI& source)
 {
     const size_t pos = source.find_last_of(".");
@@ -81,17 +96,16 @@ Morphology::Morphology(const URI& source)
         LBTHROW(UnknownFileType("unhandled file type"));
     }
 
-    const auto& sections = _properties->get<Property::Section>();
-    auto& children = _properties->_sectionLevel._children;
+    buildChildren(_properties);
 
-    for (size_t i = 0; i < sections.size(); ++i)
-    {
-        const int32_t parent = sections[i][1];
-        if (parent != -1)
-            children[parent].push_back(i);
-    }
     if(version() != MORPHOLOGY_VERSION_SWC_1)
         _properties->_cellLevel._somaType = getSomaType(soma().points().size());
+}
+
+Morphology::Morphology(const mut::Morphology& morphology)
+{
+    _properties = std::make_shared<Property::Properties>(morphology.buildReadOnly());
+    buildChildren(_properties);
 }
 
 Morphology::Morphology(Morphology&&) = default;

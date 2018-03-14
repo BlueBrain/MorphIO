@@ -285,7 +285,6 @@ Property::Properties load(const URI& uri)
 {
     NeurolucidaParser parser(uri);
 
-
     Property::Properties properties = parser.parse();
     properties._cellLevel._cellFamily = FAMILY_NEURON;
     properties._cellLevel._version = MORPHOLOGY_VERSION_ASC_1;

@@ -6,9 +6,9 @@ namespace mut
 {
 namespace writer
 {
-void swc(Morphology& morphology);
-void asc(Morphology& morphology);
-void h5(Morphology& morphology);
+void swc(const Morphology& morphology);
+void asc(const Morphology& morphology);
+void h5(const Morphology& morphology);
 } // namespace writer
 } // end namespace mut
 } // end namespace morphio

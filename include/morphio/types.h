@@ -52,6 +52,14 @@ namespace mut
 class Section;
 class Soma;
 class Morphology;
+
+template <typename T>
+class Iterator;
+
+typedef Iterator<std::stack<uint32_t>> depth_iterator;
+typedef Iterator<std::queue<uint32_t>> breadth_iterator;
+typedef Iterator<std::vector<uint32_t>> upstream_iterator;
+
 }
 
 template <typename T>

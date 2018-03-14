@@ -22,6 +22,7 @@ public:
     std::vector<float>& diameters() { return _pointProperties._diameters; }
     std::vector<float>& perimeters() { return _pointProperties._perimeters; }
 
+
 private:
     friend class Morphology;
 

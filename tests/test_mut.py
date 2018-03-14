@@ -1,8 +1,11 @@
-from nose.tools import assert_equal, assert_raises
+from numpy.testing import assert_array_equal
+from nose.tools import assert_equal, assert_raises, ok_
 
-from morphio.mut import Morphology
-from morphio import PointLevel, SectionType, SectionBuilderError
-
+from morphio.mut import Morphology, Soma
+from morphio import ostream_redirect, PointLevel, SectionType, SectionBuilderError, Morphology as ImmutableMorphology
+from contextlib import contextmanager
+import sys
+from io import StringIO
 from utils import assert_substring
 
 
@@ -90,3 +93,97 @@ def test_child_section():
                  [2, 3])
     assert_equal(m.section(children[0]).perimeters,
                  [20, 30])
+
+
+@contextmanager
+def captured_output():
+    new_out, new_err = StringIO(), StringIO()
+    old_out, old_err = sys.stdout, sys.stderr
+    try:
+        sys.stdout, sys.stderr = new_out, new_err
+        yield sys.stdout, sys.stderr
+    finally:
+        sys.stdout, sys.stderr = old_out, old_err
+
+
+def test_append_no_duplicate():
+    m = Morphology()
+    section_id = m.appendSection(-1,
+                                 SectionType.axon,
+                                 PointLevel([[1, 2, 3], [4, 5, 6]],
+                                            [2, 2],
+                                            [20, 20]))
+
+    with captured_output() as (out, err):
+        with ostream_redirect():
+            m.appendSection(section_id,
+                            SectionType.axon,
+                            PointLevel([[400, 5, 6], [7, 8, 9]],
+                                       [2, 3],
+                                       [20, 30]))
+
+    exception_str = ("While appending section: 1 to parent: 0\n"
+                     "The section first point should be parent section last point")
+    # Testing the warning
+    assert_substring(exception_str, err.getvalue())
+
+    # Testing the exception
+    with assert_raises(SectionBuilderError) as obj:
+        m.build_read_only()
+    assert_substring(exception_str, str(obj.exception))
+
+
+def test_build_read_only():
+    m = Morphology()
+    m.soma.points = [[-1, -2, -3]]
+    m.soma.diameters = [-4]
+
+    section_id = m.appendSection(-1,
+                                 SectionType.axon,
+                                 PointLevel([[1, 2, 3], [4, 5, 6]],
+                                            [2, 2],
+                                            [20, 20]))
+
+    m.appendSection(section_id,
+                    SectionType.axon,
+                    PointLevel([[4, 5, 6], [7, 8, 9]],
+                               [2, 3],
+                               [20, 30]))
+
+    immutable_morphology = ImmutableMorphology(m)
+    assert_equal(len(immutable_morphology.sections), 3)
+
+    assert_array_equal(immutable_morphology.sections[0].points,
+                       [[-1, - 2, -3]])
+    assert_array_equal(immutable_morphology.sections[0].diameters,
+                       [-4])
+
+    # -1 is a fill value for soma "perimeter" property (which is undefined)
+    assert_array_equal(immutable_morphology.sections[0].perimeters,
+                       [-1])
+
+    assert_array_equal(immutable_morphology.sections[1].points,
+                       [[1, 2, 3], [4, 5, 6]])
+    assert_array_equal(immutable_morphology.sections[1].diameters,
+                       [2, 2])
+    assert_array_equal(immutable_morphology.sections[1].perimeters,
+                       [20, 20])
+
+    assert_equal(len(immutable_morphology.sections[1].children),
+                 1)
+
+    child = immutable_morphology.sections[1].children[0]
+    assert_array_equal(child.points,
+                       [[4, 5, 6], [7, 8, 9]])
+    assert_array_equal(child.diameters,
+                       [2, 3])
+    assert_array_equal(child.perimeters,
+                       [20, 30])
+
+    same_child = immutable_morphology.sections[2]
+    assert_array_equal(same_child.points,
+                       [[4, 5, 6], [7, 8, 9]])
+    assert_array_equal(same_child.diameters,
+                       [2, 3])
+    assert_array_equal(same_child.perimeters,
+                       [20, 30])

@@ -9,6 +9,7 @@ set(MORPHIO_SOURCES
   soma.cpp
   section.cpp
   vector_utils.cpp
+  mut/iterators.cpp
   mut/section.cpp
   mut/soma.cpp
   mut/morphology.cpp
