@@ -4,6 +4,7 @@
 
 #include "morphologySWC.h"
 
+#include <morphio/mut/section.h>
 
 namespace morphio
 {
@@ -145,6 +146,13 @@ public:
                         "Hit end of file before balanced parens");
     }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    //              WRITERS
+    ////////////////////////////////////////////////////////////////////////////////
+
+    std::string ERROR_WRITE_NO_SOMA() const {
+        return "Empty soma";
+    }
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
@@ -161,11 +169,17 @@ public:
                         "(although this is normal if this neuron has no soma)");
     }
 
-    std::string WARNING_WRONG_DUPLICATE(uint32_t id, uint32_t parentId) const {
+    std::string WARNING_WRONG_DUPLICATE(std::shared_ptr<morphio::mut::Section> current,
+                                        std::shared_ptr<morphio::mut::Section> parent) const {
+
         return errorMsg(0, ErrorLevel::WARNING,
-                        "While appending section: "+std::to_string(id) +
-                        " to parent: "+std::to_string(parentId) +
-                        "\nThe section first point should be parent section last point");
+                        "While appending section: "+std::to_string(current->id()) +
+                        " to parent: "+std::to_string(parent->id()) +
+                        "\nThe section first point: (" +
+                        dumpPoint(current->points()[0]) +
+                        ") should be parent section last point: (" +
+                        dumpPoint(parent->points()[parent->points().size()-1])
+                        + ")");
     }
 
 private:

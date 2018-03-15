@@ -10,11 +10,11 @@
 
 
 #include <morphio/exceptions.h>
-#include <morphio/iterators.h>
 #include <morphio/properties.h>
 #include <morphio/section.h>
 #include <morphio/types.h>
 #include <morphio/mut/soma.h>
+#include <morphio/mut/iterators.h>
 
 #include "../../../src/plugin/errorMessages.h"
 
@@ -59,7 +59,7 @@ public:
        Note: multiple morphologies can share the same Soma instance
     **/
     std::shared_ptr<Soma> soma();
-    // const std::shared_ptr<Soma> soma() const;
+    const std::shared_ptr<Soma> soma() const;
 
     /**
        Get the shared pointer for the given section identified
@@ -73,7 +73,7 @@ public:
 
        Root sections return -1
     **/
-    const uint32_t parent(uint32_t id) const;
+    const int32_t parent(uint32_t id) const;
 
     /**
        Get children IDs

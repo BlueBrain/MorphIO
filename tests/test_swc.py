@@ -5,6 +5,7 @@ import numpy as np
 from numpy.testing import assert_array_equal
 
 from nose import tools as nt
+from nose.tools import assert_equal
 from morphio import Morphology, SomaError, RawDataError
 
 
@@ -16,6 +17,40 @@ SWC_SOMA_PATH = os.path.join(SWC_PATH, 'soma')
 from utils import tmp_swc_file, _test_swc_exception
 
 SWC_TEST_FILE = os.path.dirname(os.path.realpath(__file__))
+
+
+def test_read_single_neurite():
+    with tmp_swc_file('''# A simple neuron consisting of a point soma
+                         # and a single branch neurite.
+                         1 1 0 0 0 3.0 -1
+                         2 3 0 0 2 0.5 1
+                         3 3 0 0 3 0.5 2
+                         4 3 0 0 4 0.5 3
+                         5 3 0 0 5 0.5 4''') as tmp_file:
+
+        n = Morphology(tmp_file.name)
+    nt.eq_(len(n.rootSections), 1)
+    nt.eq_(n.rootSections[0].id, 1)
+    assert_array_equal(n.soma.points,
+                       [[0, 0, 0]])
+    nt.eq_(len(n.rootSections), 1)
+    nt.eq_(len(n.sections), 2)
+    assert_array_equal(n.rootSections[0].points,
+                       np.array([[0, 0, 2],
+                                 [0, 0, 3],
+                                 [0, 0, 4],
+                                 [0, 0, 5]]))
+
+
+def test_read_simple():
+    simple = Morphology(os.path.join(SWC_TEST_FILE, 'simple.swc'))
+    # assert_array_equal(simple.points,
+    #                    n.points)
+    assert_equal(len(simple.rootSections), 2)
+    assert_array_equal(simple.rootSections[0].points, [[0, 0, 0], [0, 5, 0]])
+    assert_equal(len(simple.rootSections[0].children), 2)
+    assert_array_equal(simple.rootSections[0].children[0].points, [[0, 5, 0], [-5, 5, 0]])
+    assert_array_equal(simple.rootSections[1].points, [[0, 0, 0], [0, -4, 0]])
 
 
 def test_repeated_id():
@@ -43,29 +78,6 @@ def test_neurite_followed_by_soma():
                         SomaError,
                         'Found a soma point with a neurite as parent',
                         ':7:error')
-
-
-def test_read_single_neurite():
-    with tmp_swc_file('''# A simple neuron consisting of a point soma
-                         # and a single branch neurite.
-                         1 1 0 0 0 3.0 -1
-                         2 3 0 0 2 0.5 1
-                         3 3 0 0 3 0.5 2
-                         4 3 0 0 4 0.5 3
-                         5 3 0 0 5 0.5 4''') as tmp_file:
-
-        n = Morphology(tmp_file.name)
-    nt.eq_(len(n.rootSections), 1)
-    nt.eq_(n.rootSections[0].id, 1)
-    assert_array_equal(n.soma.points,
-                       [[0, 0, 0]])
-    nt.eq_(len(n.rootSections), 1)
-    nt.eq_(len(n.sections), 2)
-    assert_array_equal(n.rootSections[0].points,
-                       np.array([[0, 0, 2],
-                                 [0, 0, 3],
-                                 [0, 0, 4],
-                                 [0, 0, 5]]))
 
 
 def test_read_split_soma():

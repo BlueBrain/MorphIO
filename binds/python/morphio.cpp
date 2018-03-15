@@ -154,15 +154,20 @@ PYBIND11_MODULE(morphio, m) {
         .def_property_readonly("sections", &morphio::mut::Morphology::sections)
         .def_property_readonly("root_sections", &morphio::mut::Morphology::rootSections)
         .def_property_readonly("soma",
-                               // (std::shared_ptr<morphio::mut::Soma>(morphio::mut::Morphology::*)())&morphio::mut::Morphology::soma,
-                               &morphio::mut::Morphology::soma)
+                               (std::shared_ptr<morphio::mut::Soma>(morphio::mut::Morphology::*)())&morphio::mut::Morphology::soma
+                               )
         .def("parent", &morphio::mut::Morphology::parent)
         .def("children", &morphio::mut::Morphology::children)
         .def("section", &morphio::mut::Morphology::section)
         .def("build_read_only", &morphio::mut::Morphology::buildReadOnly)
         .def("deleteSection", &morphio::mut::Morphology::deleteSection)
         .def("appendSection", (uint32_t (morphio::mut::Morphology::*) (int32_t, morphio::SectionType, const morphio::Property::PointLevel&)) &morphio::mut::Morphology::appendSection)
-        .def("deleteSection", &morphio::mut::Morphology::deleteSection);
+        .def("deleteSection", &morphio::mut::Morphology::deleteSection)
+        .def("write_h5", &morphio::mut::Morphology::write_h5)
+        .def("write_swc", &morphio::mut::Morphology::write_swc)
+        .def("write_asc", &morphio::mut::Morphology::write_asc);
+
+
 
         // .def("traverse", &morphio::mut::Morphology::traverse);
 

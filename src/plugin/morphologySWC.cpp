@@ -237,15 +237,18 @@ public:
     **/
     void _processSectionStart(const Sample& sample) {
         int id = isRootSection(sample) ? -1 : swcIdToSectionId[sample.parentId];
-        swcIdToSectionId[sample.id] = morph.appendSection(
-            id,
-            sample.type,
-            Property::PointLevel());
+        Property::PointLevel properties;
 
         if(!isRootSection(sample)) // Duplicating last point of previous section
         {
-            appendSample(morph.section(swcIdToSectionId[sample.id]), samples[sample.parentId]);
+            properties._points.push_back(samples[sample.parentId].point);
+            properties._diameters.push_back(samples[sample.parentId].diameter);
         }
+
+        swcIdToSectionId[sample.id] = morph.appendSection(
+            id,
+            sample.type,
+            properties);
     }
 
 private:

@@ -57,7 +57,16 @@ class SectionBuilderError : public RawDataError
 public:
     SectionBuilderError(const std::string& _msg)
         : RawDataError(_msg)
-    {
-    }
+        {
+        }
+};
+
+class WriterError : public MorphioError
+{
+public:
+    WriterError(const std::string& _msg)
+        : MorphioError(_msg)
+        {
+        }
 };
 }

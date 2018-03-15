@@ -123,7 +123,7 @@ def test_append_no_duplicate():
                                        [20, 30]))
 
     exception_str = ("While appending section: 1 to parent: 0\n"
-                     "The section first point should be parent section last point")
+                     "The section first point: (400 5 6) should be parent section last point: (4 5 6)")
     # Testing the warning
     assert_substring(exception_str, err.getvalue())
 

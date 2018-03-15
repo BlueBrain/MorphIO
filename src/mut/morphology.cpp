@@ -68,7 +68,7 @@ uint32_t Morphology::appendSection(int32_t parentId,
         _rootSections.push_back(id);
     else {
         if(!_checkDuplicatePoint(_sections[parentId], _sections[id]))
-            LBERROR(_err.WARNING_WRONG_DUPLICATE(id, parentId));
+            LBERROR(_err.WARNING_WRONG_DUPLICATE(_sections[id], _sections.at(parentId)));
 
         _parent[id] = parentId;
         _children[parentId].push_back(id);
@@ -95,7 +95,7 @@ uint32_t Morphology::appendSection(int32_t parentId, SectionType type,
         _rootSections.push_back(id);
     else {
         if(!_checkDuplicatePoint(_sections[parentId], _sections[id]))
-            LBERROR(_err.WARNING_WRONG_DUPLICATE(id, parentId));
+            LBERROR(_err.WARNING_WRONG_DUPLICATE(_sections[id], _sections[parentId]));
 
         _parent[id] = parentId;
         _children[parentId].push_back(id);
@@ -125,10 +125,10 @@ std::shared_ptr<Soma> Morphology::soma()
     return _soma;
 }
 
-// const std::shared_ptr<Soma> Morphology::soma() const
-// {
-//     return _soma;
-// }
+const std::shared_ptr<Soma> Morphology::soma() const
+{
+    return _soma;
+}
 
 const std::vector<uint32_t>& Morphology::rootSections() const
 {
@@ -232,7 +232,8 @@ const Property::Properties Morphology::buildReadOnly() const
 
         if(parentId > -1 && // Exclude root sections
            !_checkDuplicatePoint(_sections.at(parentId), _sections.at(sectionId)))
-            LBTHROW(SectionBuilderError(_err.WARNING_WRONG_DUPLICATE(sectionId, parentId)));
+            LBTHROW(SectionBuilderError(_err.WARNING_WRONG_DUPLICATE(_sections.at(sectionId),
+                                                                     _sections.at(parentId))));
 
 
         int start = properties._pointLevel._points.size();
@@ -245,7 +246,7 @@ const Property::Properties Morphology::buildReadOnly() const
     return properties;
 }
 
-const uint32_t Morphology::parent(uint32_t id) const {
+const int32_t Morphology::parent(uint32_t id) const {
     try {
         return _parent.at(id);
     } catch (const std::out_of_range &e) {
@@ -297,15 +298,26 @@ upstream_iterator Morphology::upstream_end() const
 
 
 void Morphology::write_asc(const std::string& filename) {
-    // writer::asc(filename);
+    writer::asc(*this, filename);
 }
 
 void Morphology::write_swc(const std::string& filename) {
-    // writer::swc(filename);
+    writer::swc(*this, filename);
 }
 
 void Morphology::write_h5(const std::string& filename) {
-    // writer::h5(filename);
+    for(auto it = depth_begin(); it != depth_end(); ++it) {
+        int32_t sectionId = *it;
+        int32_t parentId = parent(sectionId);
+        auto &section = _sections.at(sectionId);
+
+        if(parentId > -1 && // Exclude root sections
+           !_checkDuplicatePoint(_sections.at(parentId), _sections.at(sectionId)))
+            LBTHROW(SectionBuilderError(_err.WARNING_WRONG_DUPLICATE(_sections.at(sectionId),
+                                                                     _sections.at(parentId))));
+    }
+
+    writer::h5(*this, filename);
 }
 
 
