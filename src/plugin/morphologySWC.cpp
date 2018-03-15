@@ -73,6 +73,7 @@ public:
                 lastSomaPoint = sample.id;
             }
         }
+        file.close();
     }
 
 

@@ -44,6 +44,8 @@ struct PointLevel
                std::vector<Perimeter::Type> perimeters = std::vector<Perimeter::Type>());
     PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
+    bool operator==(const PointLevel& other) const;
+
 };
 
 struct SectionLevel
@@ -51,6 +53,8 @@ struct SectionLevel
     std::vector<Section::Type> _sections;
     std::vector<SectionType::Type> _sectionTypes;
     std::map<uint32_t, std::vector<uint32_t>> _children;
+
+    bool operator==(const SectionLevel& other) const;
 };
 
 struct CellLevel
@@ -58,7 +62,12 @@ struct CellLevel
     morphio::CellFamily _cellFamily;
     SomaType _somaType;
     MorphologyVersion _version;
+
+    bool operator==(const CellLevel& other) const;
+
 };
+
+
 
 // The lowest level data blob
 struct Properties
@@ -82,6 +91,8 @@ struct Properties
     {
         return _sectionLevel._children;
     }
+    bool operator==(const Properties& other) const;
+
 };
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);

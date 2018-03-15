@@ -2,6 +2,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 #include <pybind11/iostream.h>
+#include <pybind11/operators.h>
 
 #include <morphio/types.h>
 #include <morphio/enums.h>
@@ -63,6 +64,9 @@ PYBIND11_MODULE(morphio, m) {
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const morphio::URI&>())
         .def(py::init<const morphio::mut::Morphology&>())
+        .def("__eq__", [](const morphio::Morphology& a, const morphio::Morphology& b) {
+                return a.operator==(b);
+            }, py::is_operator())
         .def_property_readonly("points", &morphio::Morphology::points)
         .def_property_readonly("sectionTypes", &morphio::Morphology::sectionTypes)
         .def_property_readonly("section", &morphio::Morphology::section)

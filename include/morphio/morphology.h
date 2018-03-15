@@ -23,6 +23,8 @@ public:
     Morphology(Morphology&&);
     Morphology& operator=(Morphology&&);
 
+    bool operator==(const Morphology& other) const;
+
     /** @name Read API */
     //@{
     /** Open the given source to a morphology file and parse it.

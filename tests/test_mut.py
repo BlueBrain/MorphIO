@@ -150,8 +150,14 @@ def test_build_read_only():
                                [2, 3],
                                [20, 30]))
 
+    m.appendSection(section_id,
+                    SectionType.axon,
+                    PointLevel([[4, 5, 6], [10, 11, 12]],
+                               [2, 2],
+                               [20, 20]))
+
     immutable_morphology = ImmutableMorphology(m)
-    assert_equal(len(immutable_morphology.sections), 3)
+    assert_equal(len(immutable_morphology.sections), 4)
 
     assert_array_equal(immutable_morphology.sections[0].points,
                        [[-1, - 2, -3]])
@@ -170,7 +176,7 @@ def test_build_read_only():
                        [20, 20])
 
     assert_equal(len(immutable_morphology.sections[1].children),
-                 1)
+                 2)
 
     child = immutable_morphology.sections[1].children[0]
     assert_array_equal(child.points,

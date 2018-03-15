@@ -146,6 +146,8 @@ public:
                         "Hit end of file before balanced parens");
     }
 
+
+
     ////////////////////////////////////////////////////////////////////////////////
     //              WRITERS
     ////////////////////////////////////////////////////////////////////////////////
@@ -180,6 +182,14 @@ public:
                         ") should be parent section last point: (" +
                         dumpPoint(parent->points()[parent->points().size()-1])
                         + ")");
+    }
+
+
+    const std::string WARNING_ONLY_CHILD(int id) const {
+        return errorMsg(0, ErrorLevel::WARNING,
+                        "Section: " + std::to_string(id) + " has only one child. " +
+                        "Merging the child section.");
+
     }
 
 private:

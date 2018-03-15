@@ -196,3 +196,9 @@ def test_simple_reversed():
     assert_array_equal(n.rootSections[1].children[1].points,
                        [[0, -4, 0],
                         [-5, -4, 0]])
+
+
+def test_equality():
+    filename = os.path.join(SWC_TEST_FILE, 'simple.swc')
+    nt.ok_(not (Morphology(filename) is Morphology(filename)))
+    nt.ok_(Morphology(filename) == Morphology(filename))

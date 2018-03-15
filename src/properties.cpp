@@ -34,6 +34,7 @@ PointLevel::PointLevel(std::vector<Point::Type> points,
 
 }
 
+
 PointLevel::PointLevel(const PointLevel &data) :
     PointLevel(data._points, data._diameters, data._perimeters)
 {
@@ -45,6 +46,65 @@ PointLevel::PointLevel(const PointLevel& data, SectionRange range)
     _diameters = copySpan<Property::Diameter>(data._diameters, range);
     _perimeters = copySpan<Property::Perimeter>(data._perimeters, range);
 }
+
+bool PointLevel::operator==(const PointLevel& other) const {
+    std::cout << "this->_points == other._points: " << (this->_points == other._points) << std::endl;
+    // std::cout << "dumpPoints(this->_points): " << dumpPoints(this->_points) << std::endl;
+    // std::cout << "dumpPoints(other._points): " << dumpPoints(other._points) << std::endl;
+    std::cout << "this->points.size(): " << this->_points.size() << std::endl;
+    std::cout << "other._points.size(): " << other._points.size() << std::endl;
+    for(int i=0;i<this->_points.size();++i){
+        if(this->_points[i] != other._points[i]) {
+            std::cout << dumpPoint(this->_points[i]) << " -> " << dumpPoint(other._points[i]) << std::endl;
+            return false;
+
+        }
+
+
+    }
+    return this == &other ||
+        (this->_points == other._points &&
+         this->_perimeters == other._perimeters &&
+         this->_diameters == other._diameters);
+}
+
+bool SectionLevel::operator==(const SectionLevel& other) const {
+    if(this->_sectionTypes != other._sectionTypes) {
+        std::cout << "this->_sectionTypes.size() : " << this->_sectionTypes.size()  << std::endl;
+        std::cout << "other._sectionTypes.size(): " << other._sectionTypes.size() << std::endl;
+    }
+    return this == &other ||
+        (this->_sections == other._sections &&
+         this->_sectionTypes == other._sectionTypes &&
+         this->_children == other._children);
+}
+
+bool CellLevel::operator==(const CellLevel& other) const {
+    if(this->_cellFamily != other._cellFamily){
+        std::cout << "this->_cellFamily: " << this->_cellFamily << std::endl;
+        std::cout << "other._cellFamily: " << other._cellFamily << std::endl;
+    }
+    // if(this->_somaType != other._somaType) {
+    //     std::cout << "this->somaType: " << this->_somaType << std::endl;
+    //     std::cout << "other._somaType: " << other._somaType << std::endl;
+    // }
+    return this == &other ||
+        (this->_cellFamily == other._cellFamily
+         // this->_somaType == other._somaType
+            );
+}
+
+bool Properties::operator==(const Properties& other) const {
+    std::cout << "this -> _pointLevel == other._pointLevel: " << (this -> _pointLevel == other._pointLevel) << std::endl;
+    std::cout << "this -> _sectionLevel == other._sectionLevel: " << (this -> _sectionLevel == other._sectionLevel) << std::endl;
+    std::cout << "this -> _cellLevel == other._cellLevel: " << (this -> _cellLevel == other._cellLevel) << std::endl;
+    return this == &other ||
+        (this -> _pointLevel == other._pointLevel &&
+         this -> _sectionLevel == other._sectionLevel &&
+         this -> _cellLevel == other._cellLevel);
+}
+
+
 
 template <>
 std::vector<Section::Type>& Properties::get<Section>()

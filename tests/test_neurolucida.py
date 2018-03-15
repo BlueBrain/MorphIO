@@ -11,8 +11,6 @@ from morphio import Morphology, RawDataError, SomaError
 from utils import tmp_asc_file, _test_asc_exception
 
 _path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
-NEUROLUCIDA_PATH = os.path.join(DATA_PATH, 'neurolucida')
 
 
 def test_soma():
@@ -263,15 +261,12 @@ def test_empty_sibling():
                  ''') as tmp_file:
         n = Morphology(tmp_file.name)
 
+    assert_equal(len(n.rootSections), 1)
     assert_array_equal(n.rootSections[0].points,
                        np.array([[3, -4, 0],
                                  [3, -6, 0],
                                  [3, -8, 0],
-                                 [3, -10, 0]],
-                                dtype=np.float32))
-
-    assert_array_equal(n.rootSections[0].children[0].points,
-                       np.array([[3, -10, 0],
+                                 [3, -10, 0],
                                  [0, -10, 0],
                                  [-3, -10, 0]],
                                 dtype=np.float32))
@@ -288,6 +283,11 @@ def test_single_children():
                         (3 -10 0 2)
                         (0 -10 0 2)
                         (-3 -10 0 2)
+                        (
+                          (-5 -5 5 5)
+                          |
+                          (-6 -6 6 6)
+                        )
                        )
                       )
                  ''') as tmp_file:
@@ -296,25 +296,30 @@ def test_single_children():
 
         nt.assert_equal(len(n.soma.points), 0)
         nt.assert_equal(len(n.sections[0].points), 0)
-
+        assert_equal(len(n.rootSections), 1)
         assert_array_equal(n.rootSections[0].points,
                            np.array([[3, -4, 0],
                                      [3, -6, 0],
                                      [3, -8, 0],
                                      [3, -10, 0],
-                                     ],
+                                     [0, -10, 0],
+                                     [-3, -10, 0]],
                                     dtype=np.float32))
 
-        nt.assert_equal(len(n.sections), 3)
+        assert_equal(len(n.rootSections[0].children), 2)
 
-        children = np.array([[3, -10, 0],
-                             [0, -10, 0],
-                             [-3, -10, 0]],
-                            dtype=np.float32)
+        assert_array_equal(n.rootSections[0].children[0].points,
+                           np.array([[-3, -10, 0],
+                                     [-5, -5, 5]]))
 
-        # Checking both ways to access this sections
-        assert_array_equal(n.sections[2].points, children)
-        assert_array_equal(n.rootSections[0].children[0].points, children)
+        assert_array_equal(n.rootSections[0].children[1].points,
+                           np.array([[-3, -10, 0],
+                                     [-6, -6, 6]]))
+
+
+def test_equality_with_simple():
+    ok_(Morphology(os.path.join(_path, 'simple.asc')) ==
+        Morphology(os.path.join(_path, 'simple.swc')))
 
 
 def test_markers():

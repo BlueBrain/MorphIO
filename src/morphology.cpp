@@ -76,17 +76,22 @@ Morphology::Morphology(const URI& source)
     if (access(source.c_str(), F_OK) == -1)
         LBTHROW(RawDataError("File: " + source + " does not exist."));
 
-    if (source.substr(pos) == ".h5")
+    std::string extension;
+
+    for(auto& c : source.substr(pos))
+        extension += std::tolower(c);
+
+    if (extension == ".h5")
     {
         _properties =
             std::make_shared<Property::Properties>(plugin::h5::load(source));
     }
-    else if (source.substr(pos) == ".swc")
+    else if (extension == ".swc")
     {
         _properties =
             std::make_shared<Property::Properties>(plugin::swc::load(source));
     }
-    else if (source.substr(pos) == ".asc")
+    else if (extension == ".asc")
     {
         _properties =
             std::make_shared<Property::Properties>(plugin::asc::load(source));
@@ -114,6 +119,13 @@ Morphology& Morphology::operator=(Morphology&&) = default;
 Morphology::~Morphology()
 {
 }
+
+bool Morphology::operator==(const Morphology& other) const {
+    return this->_properties == other._properties ||
+        (this->_properties && other._properties &&
+         *(this->_properties) == *(other._properties));
+}
+
 
 const Soma Morphology::soma() const
 {

@@ -188,17 +188,20 @@ void Morphology::deleteSection(uint32_t id, bool recursive)
 // }
 
 template <typename T>
-void _appendVector(std::vector<T>& to, const std::vector<T>& from)
+void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset)
 {
-    to.insert(to.end(), from.begin(), from.end());
+    to.insert(to.end(), from.begin() + offset, from.end());
 }
 
 void _appendProperties(Property::PointLevel& to,
-                       const Property::PointLevel& from)
+                       const Property::PointLevel& from,
+                       int offset = 0)
 {
-    _appendVector(to._points, from._points);
-    _appendVector(to._diameters, from._diameters);
-    _appendVector(to._perimeters, from._perimeters);
+    _appendVector(to._points, from._points, offset);
+    _appendVector(to._diameters, from._diameters, offset);
+
+    if(!from._perimeters.empty())
+        _appendVector(to._perimeters, from._perimeters, offset);
 }
 
 const Property::Properties Morphology::buildReadOnly() const
@@ -236,11 +239,25 @@ const Property::Properties Morphology::buildReadOnly() const
                                                                      _sections.at(parentId))));
 
 
-        int start = properties._pointLevel._points.size();
-        properties._sectionLevel._sections.push_back({start, parentOnDisk});
-        properties._sectionLevel._sectionTypes.push_back(section->type());
-        _appendProperties(properties._pointLevel, section->_pointProperties);
-        newIds[sectionId] = sectionIdOnDisk++;
+        bool isUnifurcation = parentId > -1 && children(parentId).size() == 1;
+
+        // This "if" condition ensures that "unifurcations" (ie. successive sections with only 1
+        // child) get merged together into a bigger section
+        if(!isUnifurcation) {
+            int start = properties._pointLevel._points.size();
+            properties._sectionLevel._sections.push_back({start, parentOnDisk});
+            properties._sectionLevel._sectionTypes.push_back(section->type());
+            newIds[sectionId] = sectionIdOnDisk++;
+            _appendProperties(properties._pointLevel, section->_pointProperties);
+        } else {
+            LBERROR(_err.WARNING_ONLY_CHILD(parentId));
+            newIds[sectionId] = newIds[parentId];
+
+            // Skip the duplicate point
+            _appendProperties(properties._pointLevel, section->_pointProperties, 1);
+        }
+
+
     }
 
     return properties;

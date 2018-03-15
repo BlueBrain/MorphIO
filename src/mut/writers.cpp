@@ -1,4 +1,6 @@
 #include <cassert>
+#include <iostream>
+#include <fstream>
 
 #include <morphio/mut/writers.h>
 #include <morphio/mut/morphology.h>
@@ -18,13 +20,30 @@ namespace writer
 {
 void swc(const Morphology& morphology, const std::string& filename)
 {
+    std::ofstream myfile;
+    myfile.open (filename);
+    using std::setw;
+
+    myfile << "# index" << setw(9)
+           << "type" << setw(9)
+           << "X" << setw(12)
+           << "Y" << setw(12)
+           << "Z" << setw(12)
+           << "radius" << setw(13)
+           << "parent\n" << std::endl;
+
+
     int segmentIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
     auto soma = morphology.soma();
+
+    if(morphology.soma()->points().size() < 1)
+        throw WriterError(plugin::ErrorMessages().ERROR_WRITE_NO_SOMA());
+
     for (int i = 0; i < soma->points().size(); ++i){
-        std::cout << segmentIdOnDisk++ << ' ' << SECTION_SOMA << ' '
-                  << soma->points()[i][0] << ' ' << soma->points()[i][1] << ' '
-                  << soma->points()[i][2] << ' ' << soma->diameters()[i] / 2. << ' '
+        myfile << segmentIdOnDisk++ << setw(12) << SECTION_SOMA << setw(12)
+               << soma->points()[i][0] << setw(12) << soma->points()[i][1] << setw(12)
+               << soma->points()[i][2] << setw(12) << soma->diameters()[i] / 2. << setw(12)
                   << (i==0 ? -1 : segmentIdOnDisk-1) << std::endl;
     }
 
@@ -38,14 +57,15 @@ void swc(const Morphology& morphology, const std::string& filename)
         bool isRootSection = morphology.parent(sectionId) < 0;
         for (int i = (isRootSection ? 0 : 1); i < points.size(); ++i)
         {
-            std::cout << segmentIdOnDisk << ' ' << section->type() << ' '
-                      << points[i][0] << ' ' << points[i][1] << ' '
-                      << points[i][2] << ' ' << diameters[i] / 2. << ' ';
-            if (i > 0)
-                std::cout << segmentIdOnDisk - 1 << std::endl;
+            myfile << segmentIdOnDisk << setw(12) << section->type() << setw(12)
+                   << points[i][0] << setw(12) << points[i][1] << setw(12)
+                   << points[i][2] << setw(12) << diameters[i] / 2. << setw(12);
+
+            if (i > (isRootSection ? 0 : 1))
+                myfile << segmentIdOnDisk - 1 << std::endl;
             else {
-                uint32_t parentId = morphology.parent(sectionId);
-                std::cout << (parentId == -1 ? newIds[parentId] : 1) << std::endl;
+                int32_t parentId = morphology.parent(sectionId);
+                myfile << (parentId != -1 ? newIds[parentId] : 1) << std::endl;
             }
 
             ++segmentIdOnDisk;
@@ -53,6 +73,7 @@ void swc(const Morphology& morphology, const std::string& filename)
         newIds[section->id()] = segmentIdOnDisk - 1;
     }
 
+    myfile.close();
 
 }
 
@@ -150,19 +171,6 @@ void h5(const Morphology& morpho, const std::string& filename)
         newIds[section->id()] = sectionIdOnDisk++;
         offset += numberOfPoints;
     }
-
-
-
-    std::cout << "structure" << std::endl;
-
-    for(auto r: raw_structure)
-        std::cout << r[0] << ' ' << r[1] << ' ' << r[2] << std::endl;
-
-    std::cout << "point" << std::endl;
-
-    for(auto r: raw_points)
-        std::cout << r[0] << ' ' << r[1] << ' ' << r[2] << std::endl;
-
 
     std::vector<std::string> comment{" created out by morpho_tool v1"};
 

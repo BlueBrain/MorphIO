@@ -111,6 +111,10 @@ int main()
     // std::cout << "End" << std::endl;
 
     // morphio::mut::Morphology m;
+    // m.soma()->properties() = morphio::Property::PointLevel({{-1,-1,-1}},
+    //                                                        {-4},
+    //                                                        {-5});
+
     // uint32_t id = m.appendSection(-1,
     //                               morphio::SECTION_AXON,
     //                               morphio::Property::PointLevel({{1, 2, 3}, {4, 5, 6}},
@@ -120,11 +124,36 @@ int main()
 
     // m.appendSection(id,
     //                 morphio::SECTION_AXON,
-    //                 morphio::Property::PointLevel({{400, 5, 6}, {7, 8, 9}},
-    //                            {2, 3},
+    //                 morphio::Property::PointLevel({{4, 5, 6}, {7, 8, 9}},
+    //                                               {2, 3},
     //                                               {20, 30}));
 
-    // m.buildReadOnly();
+    // // m.write_asc("yolo.txt");
+    // // m.write_swc("yolo.txt");
+    // m.write_h5("custom.h5");
+
+    // morphio::Morphology b("custom.h5");
+
+    // std::cout << "b.soma().points().size(): " << b.soma().points().size() << std::endl;
+    // std::cout << "b.sections().size(): " << b.sections().size() << std::endl;
+    // std::cout << "b.section(1): " << b.section(1) << std::endl;
+    // std::cout << "b.section(2): " << b.section(2) << std::endl;
+    // std::cout << "m.sections().size(): " << m.sections().size() << std::endl;
+    std::string filename = "/home/bcoste/workspace/morphology/io/tests/MorphologyRepository/Guilherme Testa Silva/GTS070208/GTS070208-P2.asc";
+
+    // filename = "tests/problem.asc";
+
+    morphio::mut::Morphology a(filename);
+    a.write_swc("simple_written.swc");
+
+    morphio::Morphology c(filename);
+    // morphio::Morphology("/home/bcoste/workspace/morphology/neurom/test_data/swc/simple.swc");
+
+
+    bool same_same = (c == morphio::Morphology("simple_written.swc"));
+
+    std::cout << "same_same: " << same_same << std::endl;
+    exit(same_same == true ? 0 : -1);
 
 
 }
