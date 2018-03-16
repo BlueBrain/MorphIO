@@ -48,20 +48,17 @@ PointLevel::PointLevel(const PointLevel& data, SectionRange range)
 }
 
 bool PointLevel::operator==(const PointLevel& other) const {
-    std::cout << "this->_points == other._points: " << (this->_points == other._points) << std::endl;
-    // std::cout << "dumpPoints(this->_points): " << dumpPoints(this->_points) << std::endl;
-    // std::cout << "dumpPoints(other._points): " << dumpPoints(other._points) << std::endl;
-    std::cout << "this->points.size(): " << this->_points.size() << std::endl;
-    std::cout << "other._points.size(): " << other._points.size() << std::endl;
-    for(int i=0;i<this->_points.size();++i){
-        if(this->_points[i] != other._points[i]) {
-            std::cout << dumpPoint(this->_points[i]) << " -> " << dumpPoint(other._points[i]) << std::endl;
-            return false;
-
+    if(this->_points != other._points) {
+        std::cout << "this->points.size(): " << this->_points.size() << std::endl;
+        std::cout << "other._points.size(): " << other._points.size() << std::endl;
+        for(int i=0;i<this->_points.size();++i){
+            if(this->_points[i] != other._points[i]) {
+                std::cout << dumpPoint(this->_points[i]) << " -> " << dumpPoint(other._points[i]) << std::endl;
+                return false;
+            }
         }
-
-
     }
+
     return this == &other ||
         (this->_points == other._points &&
          this->_perimeters == other._perimeters &&
@@ -69,10 +66,17 @@ bool PointLevel::operator==(const PointLevel& other) const {
 }
 
 bool SectionLevel::operator==(const SectionLevel& other) const {
-    if(this->_sectionTypes != other._sectionTypes) {
-        std::cout << "this->_sectionTypes.size() : " << this->_sectionTypes.size()  << std::endl;
-        std::cout << "other._sectionTypes.size(): " << other._sectionTypes.size() << std::endl;
-    }
+    // if(this->_sectionTypes != other._sectionTypes) {
+    //     std::cout << "this->_sectionTypes.size() : " << this->_sectionTypes.size()  << std::endl;
+    //     std::cout << "other._sectionTypes.size(): " << other._sectionTypes.size() << std::endl;
+    // }
+
+    // if(this->_sections != other._sections) {
+    //     std::cout << "this->_sections.size() : " << this->_sections.size()  << std::endl;
+    //     std::cout << "other._sections.size(): " << other._sections.size() << std::endl;
+    //     for(int i=0;i<this->_sections.size();++i)
+    //         std::cout << this->_sections[i][0] << ' ' << this->_sections[i][1] << " -> " << other._sections[i][0] << ' ' << other._sections[i][1] << std::endl;
+    // }
     return this == &other ||
         (this->_sections == other._sections &&
          this->_sectionTypes == other._sectionTypes &&
@@ -80,10 +84,10 @@ bool SectionLevel::operator==(const SectionLevel& other) const {
 }
 
 bool CellLevel::operator==(const CellLevel& other) const {
-    if(this->_cellFamily != other._cellFamily){
-        std::cout << "this->_cellFamily: " << this->_cellFamily << std::endl;
-        std::cout << "other._cellFamily: " << other._cellFamily << std::endl;
-    }
+    // if(this->_cellFamily != other._cellFamily){
+    //     std::cout << "this->_cellFamily: " << this->_cellFamily << std::endl;
+    //     std::cout << "other._cellFamily: " << other._cellFamily << std::endl;
+    // }
     // if(this->_somaType != other._somaType) {
     //     std::cout << "this->somaType: " << this->_somaType << std::endl;
     //     std::cout << "other._somaType: " << other._somaType << std::endl;
@@ -95,9 +99,9 @@ bool CellLevel::operator==(const CellLevel& other) const {
 }
 
 bool Properties::operator==(const Properties& other) const {
-    std::cout << "this -> _pointLevel == other._pointLevel: " << (this -> _pointLevel == other._pointLevel) << std::endl;
-    std::cout << "this -> _sectionLevel == other._sectionLevel: " << (this -> _sectionLevel == other._sectionLevel) << std::endl;
-    std::cout << "this -> _cellLevel == other._cellLevel: " << (this -> _cellLevel == other._cellLevel) << std::endl;
+    // std::cout << "this -> _pointLevel == other._pointLevel: " << (this -> _pointLevel == other._pointLevel) << std::endl;
+    // std::cout << "this -> _sectionLevel == other._sectionLevel: " << (this -> _sectionLevel == other._sectionLevel) << std::endl;
+    // std::cout << "this -> _cellLevel == other._cellLevel: " << (this -> _cellLevel == other._cellLevel) << std::endl;
     return this == &other ||
         (this -> _pointLevel == other._pointLevel &&
          this -> _sectionLevel == other._sectionLevel &&

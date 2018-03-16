@@ -145,12 +145,16 @@ int main()
 
     morphio::mut::Morphology a(filename);
     a.write_swc("simple_written.swc");
+    a.write_h5("simple_written.h5");
+    a.write_asc("simple_written.asc");
 
     morphio::Morphology c(filename);
     // morphio::Morphology("/home/bcoste/workspace/morphology/neurom/test_data/swc/simple.swc");
 
 
-    bool same_same = (c == morphio::Morphology("simple_written.swc"));
+    bool same_same = (c == morphio::Morphology("simple_written.h5")) &&
+        (c == morphio::Morphology("simple_written.swc")) &&
+        (c == morphio::Morphology("simple_written.asc"));
 
     std::cout << "same_same: " << same_same << std::endl;
     exit(same_same == true ? 0 : -1);

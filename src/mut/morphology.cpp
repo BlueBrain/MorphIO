@@ -224,7 +224,7 @@ const Property::Properties Morphology::buildReadOnly() const
         properties._pointLevel._perimeters = std::vector<float>(_soma->_pointProperties._points.size(), -1);
 
     properties._sectionLevel._sections.push_back({0, -1});
-    properties._sectionLevel._sectionTypes.push_back(SECTION_UNDEFINED);
+    properties._sectionLevel._sectionTypes.push_back(SECTION_SOMA);
 
     for(auto it = depth_begin(); it != depth_end(); ++it) {
         int32_t sectionId = *it;

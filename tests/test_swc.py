@@ -6,7 +6,7 @@ from numpy.testing import assert_array_equal
 
 from nose import tools as nt
 from nose.tools import assert_equal
-from morphio import Morphology, SomaError, RawDataError
+from morphio import Morphology, SomaError, RawDataError, SectionType
 
 
 _path = os.path.dirname(os.path.abspath(__file__))
@@ -40,6 +40,8 @@ def test_read_single_neurite():
                                  [0, 0, 3],
                                  [0, 0, 4],
                                  [0, 0, 5]]))
+
+    assert_equal(n.section(0).type, SectionType.soma)
 
 
 def test_read_simple():

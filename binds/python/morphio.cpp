@@ -69,7 +69,7 @@ PYBIND11_MODULE(morphio, m) {
             }, py::is_operator())
         .def_property_readonly("points", &morphio::Morphology::points)
         .def_property_readonly("sectionTypes", &morphio::Morphology::sectionTypes)
-        .def_property_readonly("section", &morphio::Morphology::section)
+        .def("section", &morphio::Morphology::section)
         .def_property_readonly("sections", &morphio::Morphology::sections)
         .def_property_readonly("rootSections", &morphio::Morphology::rootSections)
         .def_property_readonly("soma", &morphio::Morphology::soma)

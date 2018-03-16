@@ -77,22 +77,22 @@ void swc(const Morphology& morphology, const std::string& filename)
 
 }
 
-void _write_asc_points(const Points& points,
+void _write_asc_points(std::ofstream& myfile, const Points& points,
                        const std::vector<float>& diameters, int indentLevel)
 {
     for (int i = 0; i < points.size(); ++i)
     {
-        std::cout << std::string(indentLevel, ' ') << "(" << points[i][0] << ' '
+        myfile << std::string(indentLevel, ' ') << "(" << points[i][0] << ' '
                   << points[i][1] << ' ' << points[i][2] << ' ' << diameters[i]
                   << ')' << std::endl;
     }
 }
 
-void _write_asc_section(const Morphology& morpho, uint32_t id, int indentLevel)
+void _write_asc_section(std::ofstream& myfile, const Morphology& morpho, uint32_t id, int indentLevel)
 {
     std::string indent(indentLevel, ' ');
     auto section = morpho.section(id);
-    _write_asc_points(section->points(), section->diameters(), indentLevel);
+    _write_asc_points(myfile, section->points(), section->diameters(), indentLevel);
 
     if (!morpho.children(id).empty())
     {
@@ -100,30 +100,37 @@ void _write_asc_section(const Morphology& morpho, uint32_t id, int indentLevel)
         size_t nChildren = children.size();
         for (int i = 0; i<nChildren; ++i)
         {
-            std::cout << indent << (i == 0 ? "(" : "|") << std::endl;
-            _write_asc_section(morpho, children[i], indentLevel + 2);
+            myfile << indent << (i == 0 ? "(" : "|") << std::endl;
+            _write_asc_section(myfile, morpho, children[i], indentLevel + 2);
         }
-        std::cout << indent << ")" << std::endl;
+        myfile << indent << ")" << std::endl;
     }
 }
 
 void asc(const Morphology& morphology, const std::string& filename)
 {
+    std::ofstream myfile;
+    myfile.open (filename);
+
     std::map<morphio::SectionType, std::string> header;
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
     header[SECTION_DENDRITE] = "( (Color Red)\n  (Dendrite)\n";
+    header[SECTION_APICAL_DENDRITE] = "( (Color Red)\n  (Apical)\n";
 
     const auto soma = morphology.soma();
-    std::cout << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
-    _write_asc_points(soma->points(), soma->diameters(), 2);
-    std::cout << ")\n\n";
+    myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
+    _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
+    myfile << ")\n\n";
 
     for (auto& id : morphology.rootSections())
     {
-        std::cout << header[morphology.section(id)->type()];
-        _write_asc_section(morphology, id, 2);
-        std::cout << ")\n\n";
+        myfile << header.at(morphology.section(id)->type());
+        _write_asc_section(myfile, morphology, id, 2);
+        myfile << ")\n\n";
     }
+
+    myfile.close();
+
 }
 
 void h5(const Morphology& morpho, const std::string& filename)
@@ -150,7 +157,7 @@ void h5(const Morphology& morpho, const std::string& filename)
 
     for(int i = 0;i<numberOfPoints; ++i)
         raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
-    raw_structure.push_back({0, -1, SECTION_SOMA});
+    raw_structure.push_back({0, SECTION_SOMA, -1});
     int offset = 0;
     offset += morpho.soma()->points().size();
 
@@ -164,7 +171,7 @@ void h5(const Morphology& morpho, const std::string& filename)
         const auto &points = section->points();
         const auto &diameters = section->diameters();
         const std::size_t numberOfPoints = points.size();
-        raw_structure.push_back({offset, parentOnDisk, section->type()});
+        raw_structure.push_back({offset, section->type(), parentOnDisk});
         for(int i = 0;i<numberOfPoints; ++i)
             raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
 
