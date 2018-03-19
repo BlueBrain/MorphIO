@@ -134,9 +134,16 @@ private:
         } else {
             SectionType section_type = TokenSectionTypeMap.at(token);
             insertLastPointParentSection(parent_id, properties);
-            return_id = nb_.appendSection(parent_id,
-                                          section_type,
-                                          properties);
+
+            // Condition to remove single point section that duplicate parent point
+            // See test_single_point_section_duplicate_parent for an example
+            if(parent_id < 0 || properties._points.size() > 1)
+                return_id = nb_.appendSection(parent_id,
+                                              section_type,
+                                              properties);
+            else
+                return_id = parent_id;
+
         }
         points.clear();
         diameters.clear();

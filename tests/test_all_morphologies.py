@@ -60,7 +60,8 @@ def test_all():
             for file in files:
                 yield os.path.join(root, file)
 
-    for i, f in enumerate(filter(_is_good_file, walk('MorphologyRepository'))):
+    # for i, f in enumerate(filter(_is_good_file, walk('MorphologyRepository'))):
+    for i, f in enumerate(not_same_same_list):
         print(i)
         print(f)
         m = MutMorphology(f)
@@ -78,7 +79,7 @@ def test_all():
 
         if not same_same:
             not_same_same.append(f)
-        print(not_same_same)
+    print(not_same_same)
 
 
 not_same_same_list = ['MorphologyRepository/Ani Gupta/C030796A/C030796A-P2.asc',

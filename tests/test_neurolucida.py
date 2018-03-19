@@ -273,6 +273,7 @@ def test_empty_sibling():
 
 
 def test_single_children():
+    '''Single children are merged with their parent'''
     with tmp_asc_file('''
                      ((Dendrite)
                       (3 -4 0 2)
@@ -280,9 +281,9 @@ def test_single_children():
                       (3 -8 0 2)
                       (3 -10 0 2)
                       (
-                        (3 -10 0 2)
-                        (0 -10 0 2)
-                        (-3 -10 0 2)
+                        (3 -10 0 2)  ; merged with parent section
+                        (0 -10 0 2)  ; merged with parent section
+                        (-3 -10 0 2) ; merged with parent section
                         (
                           (-5 -5 5 5)
                           |
@@ -315,6 +316,52 @@ def test_single_children():
         assert_array_equal(n.rootSections[0].children[1].points,
                            np.array([[-3, -10, 0],
                                      [-6, -6, 6]]))
+
+
+def test_single_point_section_duplicate_parent():
+    '''The following neuron represents a malformed tri-furcation. It is (badly) represented
+    as a bifurcation of a bifurcation
+
+    This is a simplification of the problem at:
+    MorphologyRepository/Ani_Gupta/C030796A/C030796A-P2.asc:5915
+    '''
+    with tmp_asc_file('''
+((Color Blue)
+ (Axon)
+    (1 0 0 1)
+    (2 0 0 1)
+    (
+      (2 0 0 1) ; Bifurcation starts here
+      (
+        (4 0 0 1)
+        |
+        (5 0 0 1)
+      )
+      |           ; Bifurcation of the bifurcation
+      (6 0 0 1)
+  )
+ )
+''') as bad_tmp_file:
+        bad = Morphology(bad_tmp_file.name)
+
+    # Correct representation should be
+    with tmp_asc_file('''
+((Color Blue)
+ (Axon)
+    (1 0 0 1)
+    (2 0 0 1)
+    (
+      (4 0 0 1)
+      |
+      (5 0 0 1)
+      |           ; Bifurcation of the bifurcation
+      (6 0 0 1)
+    )
+ )
+''') as good_tmp_file:
+        good = Morphology(good_tmp_file.name)
+
+    ok_(good == bad)
 
 
 def test_equality_with_simple():

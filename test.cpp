@@ -139,9 +139,9 @@ int main()
     // std::cout << "b.section(1): " << b.section(1) << std::endl;
     // std::cout << "b.section(2): " << b.section(2) << std::endl;
     // std::cout << "m.sections().size(): " << m.sections().size() << std::endl;
-    std::string filename = "/home/bcoste/workspace/morphology/io/tests/MorphologyRepository/Guilherme Testa Silva/GTS070208/GTS070208-P2.asc";
 
-    // filename = "tests/problem.asc";
+    std::string filename = "sample.asc";
+
 
     morphio::mut::Morphology a(filename);
     a.write_swc("simple_written.swc");
