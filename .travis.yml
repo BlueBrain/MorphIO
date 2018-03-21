@@ -1,0 +1,24 @@
+dist: trusty
+language: python
+env: COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5
+addons:
+  apt:
+    packages:
+      - libhdf5-dev
+      - g++-5
+    sources: &sources
+      - llvm-toolchain-precise-3.8
+      - ubuntu-toolchain-r-test
+branches:
+  only:
+  - morphio
+python:
+  - 2.7
+  # - 3.5
+  # - 3.6
+cache: pip
+install:
+  - pip install --user .
+  - pip install --user -r tests/requirement_tests.txt
+script:
+  - nosetests
