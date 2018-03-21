@@ -29,7 +29,7 @@ class CMakeBuild(build_ext):
 
         if platform.system() == "Windows":
             cmake_version = LooseVersion(re.search(r'version\s*([\d.]+)',
-                                         out.decode()).group(1))
+                                                   out.decode()).group(1))
             if cmake_version < '3.1.0':
                 raise RuntimeError("CMake >= 3.1.0 is required on Windows")
 
@@ -62,21 +62,18 @@ class CMakeBuild(build_ext):
             self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        print('un')
-        proc=subprocess.Popen("echo $CXX", shell=True, stdout=subprocess.PIPE)
-        print(proc.communicate())
-        print('un zero')
+        proc = subprocess.Popen("echo $CXX", shell=True, stdout=subprocess.PIPE)
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args,
                               cwd=self.build_temp, env=env)
-        print('deux')
         subprocess.check_call(['cmake', '--build', '.'] + build_args,
                               cwd=self.build_temp)
+
 
 setup(
     name='morphio',
     version='1.0.0',
-    author       = 'EPFL - Blue Brain Project',
-    author_email = 'bbp-ou-nse@groupes.epfl.ch',
+    author='EPFL - Blue Brain Project',
+    author_email='bbp-ou-nse@groupes.epfl.ch',
     description='A hybrid Python/C++ test project',
     long_description='',
     ext_modules=[CMakeExtension('morphio')],

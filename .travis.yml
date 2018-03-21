@@ -1,24 +1,50 @@
-dist: trusty
-language: python
-env: COMPILER_NAME=gcc CXX=g++-5 CC=gcc-5
-addons:
-  apt:
-    packages:
-      - libhdf5-dev
-      - g++-5
-    sources: &sources
-      - llvm-toolchain-precise-3.8
-      - ubuntu-toolchain-r-test
-branches:
-  only:
-  - morphio
+matrix:
+  include:
+    # - os: linux
+    #   dist: trusty
+    #   sudo: required
+    - os: osx
+      osx_image: xcode9.2
+
+language: c++
+sudo: required
+services:
+  - docker
 python:
-  - 2.7
-  # - 3.5
+  # - 2.7
+  - 3.5
   # - 3.6
+# addons:
+#   apt:
+#     packages:
+#       - libhdf5-dev
+#       - g++-5
+#     sources: &sources
+#       - llvm-toolchain-precise-3.8
+#       - ubuntu-toolchain-r-test
 cache: pip
+before_install:
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else rm /usr/local/include/c++; brew install hdf5; fi
+  - virtualenv env && source env/bin/activate
 install:
-  - pip install --user .
-  - pip install --user -r tests/requirement_tests.txt
+  # - pip install .
 script:
-  - nosetests
+  # - pip install -r tests/requirement_tests.txt
+  # - nosetests
+  - pip install delocate
+  - ./packaging/python_wheel/docker_build_wheel.sh
+
+# before_deploy:
+  # # Build macos wheel
+  # - pushd . && cd packaging/python_wheel && ./docker_build_wheel.sh && popd
+
+  # # Build Linux wheels with the manylinux docker image
+  # - pushd . && cd packaging/python_wheel && ./build_docker_image.sh && ./build_wheel.sh && popd
+# deploy:
+#   provider: pypi
+#   user: bbp.opensource
+#   password:
+#     secure: N/2AGpTUSOGOxQqYulja5Etj228w1SByVuX+ozPvuPJTm5kJh5fqav8FVtPLziaWAaWxJ6W2nFdWT9AwodwMk3+1NBHMWpOZ3NJnvibz0cvYCkXdNcgXOFGrPSeX3Oo2d74IeT20R44lieZEW62j4488SSaVkwr3p7YgyfVMVGo=
+#   on:
+#     tags: true
+#     branch: master
