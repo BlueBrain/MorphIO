@@ -27,24 +27,25 @@ before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else rm /usr/local/include/c++; brew install hdf5; fi
   - virtualenv env && source env/bin/activate
 install:
-  # - pip install .
+  - pip install .
 script:
-  # - pip install -r tests/requirement_tests.txt
-  # - nosetests
-  - pip install delocate
-  - ./packaging/python_wheel/docker_build_wheel.sh
+  - pip install -r tests/requirement_tests.txt
+  - nosetests
 
 # before_deploy:
-  # # Build macos wheel
-  # - pushd . && cd packaging/python_wheel && ./docker_build_wheel.sh && popd
+  - pip install delocate
+  # Build macos wheel
+  - ./packaging/python_wheel/build_wheel.sh
 
-  # # Build Linux wheels with the manylinux docker image
-  # - pushd . && cd packaging/python_wheel && ./build_docker_image.sh && ./build_wheel.sh && popd
-# deploy:
-#   provider: pypi
-#   user: bbp.opensource
-#   password:
-#     secure: N/2AGpTUSOGOxQqYulja5Etj228w1SByVuX+ozPvuPJTm5kJh5fqav8FVtPLziaWAaWxJ6W2nFdWT9AwodwMk3+1NBHMWpOZ3NJnvibz0cvYCkXdNcgXOFGrPSeX3Oo2d74IeT20R44lieZEW62j4488SSaVkwr3p7YgyfVMVGo=
-#   on:
-#     tags: true
-#     branch: master
+  # Build Linux wheels with the manylinux docker image
+  - packaging/python_wheel/build_docker_image.sh
+  - packaging/python_wheel/build_wheel_in_manylinux1_docker.sh
+
+deploy:
+  provider: pypi
+  user: bbp.opensource
+  password:
+    secure: N/2AGpTUSOGOxQqYulja5Etj228w1SByVuX+ozPvuPJTm5kJh5fqav8FVtPLziaWAaWxJ6W2nFdWT9AwodwMk3+1NBHMWpOZ3NJnvibz0cvYCkXdNcgXOFGrPSeX3Oo2d74IeT20R44lieZEW62j4488SSaVkwr3p7YgyfVMVGo=
+  on:
+    tags: true
+    branch: master

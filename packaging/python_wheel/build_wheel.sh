@@ -1,23 +1,38 @@
 #!/usr/bin/env bash
-BASE=$(git rev-parse --show-toplevel)
+set -e
 
-export PIPPROXY="-i https://bbpteam.epfl.ch/repository/devpi/simple"
-export http_proxy=${HTTP_PROXY-$http_proxy}
-export https_proxy=${HTTPS_PROXY-$https_proxy}
+export MORPHIO_BASE=$(realpath "$( cd "$(dirname "$0")" ; pwd -P )"/../..)
+export WHEELHOUSE=${MORPHIO_BASE}/packaging/python_wheel/wheelhouse/
 
-if [ ! -f $fichier ]; then
-    wget https://github.com/Noctem/pogeo-toolchain/releases/download/v1.3/gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2
-    tar -xjvf gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2
+if [ "$(uname)" == "Darwin" ]; then
+    export PYTHON_VERSIONS="cp27-cp27m"
+    export AUDIT_CMD="delocate-wheel -w $WHEELHOUSE"
+else
+    # in manylinux1 docker image
+    export CXX=${MORPHIO_BASE}/packaging/python_wheel/toolchain/bin/c++
+    export AUDIT_CMD="auditwheel repair -w $WHEELHOUSE"
+    export PYTHON_VERSIONS="cp27-cp27mu cp27-cp27m cp35-cp35m cp36-cp36m"
+    export LD_LIBRARY_PATH=${MORPHIO_BASE}/packaging/python_wheel/toolchain/lib:${LD_LIBRARY_PATH}
 fi
 
-docker run --rm \
-    -e http_proxy=$http_proxy \
-    -e https_proxy=$https_proxy \
-    -e PIPPROXY="$PIPPROXY" \
-    -e UID=$UID \
-    -v $BASE:/io:Z \
-    morphio_wheel \
-    /bin/bash /io/packaging/python_wheel/docker_build_wheel.sh
 
+build_morphio()
+{
+    if [ "$(uname)" == "Darwin" ]; then
+        local PYTHON=$(which python)
+    else
+        # in manylinux1 docker image
+        local PYTHON=/opt/python/$version/bin/python
+    fi
+    cd ${MORPHIO_BASE}
+    rm -rf build dist morphio.egg-info
+    $PYTHON setup.py bdist_wheel
+    ${AUDIT_CMD} ${MORPHIO_BASE}/dist/*${version}*
+    rm -rf build dist
+}
 
-#bbpdocker.epfl.ch/morphio_wheel \
+for version in $PYTHON_VERSIONS; do
+    build_morphio $version
+done
+
+# chown -R $UID.$UID $WHEELHOUSE
