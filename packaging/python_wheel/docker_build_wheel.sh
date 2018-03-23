@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 set -e
 
-MORPHIO_BASE=$(realpath "$( cd "$(dirname "$0")" ; pwd -P )"/../..)
-WHEELHOUSE=${MORPHIO_BASE}/packaging/python_wheel/wheelhouse/
-export LD_LIBRARY_PATH=${MORPHIO_BASE}/packaging/python_wheel/toolchain/lib:${LD_LIBRARY_PATH}
+export MORPHIO_BASE=$(realpath "$( cd "$(dirname "$0")" ; pwd -P )"/../..)
+export WHEELHOUSE=${MORPHIO_BASE}/packaging/python_wheel/wheelhouse/
 
 if [ "$(uname)" == "Darwin" ]; then
-    PYTHON_VERSIONS="cp27-cp27m"
-    AUDIT_CMD=delocate-wheel
+    export PYTHON_VERSIONS="cp27-cp27m"
+    export AUDIT_CMD="delocate-wheel -w $WHEELHOUSE"
 else
     export CXX=${MORPHIO_BASE}/packaging/python_wheel/toolchain/bin/c++
     # export CC=${MORPHIO_BASE}/packaging/python_wheel/toolchain/bin/gcc
-    AUDIT_CMD="auditwheel repair -w $WHEELHOUSE"
-    PYTHON_VERSIONS="cp27-cp27mu cp27-cp27m cp35-cp35m cp36-cp36m"
+    export AUDIT_CMD="auditwheel repair -w $WHEELHOUSE"
+    export PYTHON_VERSIONS="cp27-cp27mu cp27-cp27m cp35-cp35m cp36-cp36m"
+    export LD_LIBRARY_PATH=${MORPHIO_BASE}/packaging/python_wheel/toolchain/lib:${LD_LIBRARY_PATH}
 fi
 
 
@@ -26,7 +26,7 @@ build_morphio()
     fi
     cd ${MORPHIO_BASE}
     rm -rf build dist morphio.egg-info
-    $PYTHON setup.py bdist_wheel --bdist-dir=${MORPHIO_BASE}/dist
+    $PYTHON setup.py bdist_wheel
     ${AUDIT_CMD} ${MORPHIO_BASE}/dist/*${version}*
     # rm -rf build dist
 }
