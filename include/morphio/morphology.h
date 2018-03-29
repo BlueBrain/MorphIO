@@ -35,7 +35,7 @@ public:
         Example:
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit Morphology(const URI& source, unsigned int options);
+    explicit Morphology(const URI& source, unsigned int options = NO_MODIFIER);
     Morphology(const mut::Morphology&);
 
     const Soma soma() const;
@@ -65,6 +65,8 @@ public:
     const MorphologyVersion& version() const;
 
 private:
+    friend class mut::Morphology;
+
     std::shared_ptr<Property::Properties> _properties;
 
     template <typename Property>

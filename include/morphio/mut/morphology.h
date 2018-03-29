@@ -180,6 +180,8 @@ private:
     std::shared_ptr<Soma> _soma;
     std::vector<uint32_t> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
+    std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
+
 
     uint32_t _counter;
     std::map<uint32_t, uint32_t> _parent;

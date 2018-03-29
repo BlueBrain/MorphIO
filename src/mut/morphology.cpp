@@ -26,6 +26,10 @@ Morphology::Morphology(const morphio::Morphology& morphology)
     , _soma(std::make_shared<Soma>(morphology.soma()))
 {
 
+    _cellProperties = std::make_shared<morphio::Property::CellLevel>
+        (morphology._properties->_cellLevel);
+
+
     for (const morphio::Section& root : morphology.rootSections())
     {
         appendSection(-1, root, true);
@@ -80,7 +84,6 @@ uint32_t Morphology::appendSection(int32_t parentId,
         for (const auto& child : section.children()){
             appendSection(id, child, true);
         }
-
     }
 
     return id;
@@ -211,6 +214,9 @@ const Property::Properties Morphology::buildReadOnly() const
     int sectionIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
     Property::Properties properties;
+
+    if(_cellProperties)
+        properties._cellLevel = *_cellProperties;
 
     _appendProperties(properties._pointLevel, _soma->_pointProperties);
 

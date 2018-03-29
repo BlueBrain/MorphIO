@@ -108,10 +108,13 @@ Morphology::Morphology(const URI& source, unsigned int options)
     if(version() != MORPHOLOGY_VERSION_SWC_1)
         _properties->_cellLevel._somaType = getSomaType(soma().points().size());
 
+    // Sad trick because, contrary to SWC and ASC, H5 does not create a mut::Morphology object
+    // on which we can directly call mut::Morphology::applyModifiers
     if(options &&
        version() == MORPHOLOGY_VERSION_H5_1 ||
        version() == MORPHOLOGY_VERSION_H5_1_1 ||
        version() == MORPHOLOGY_VERSION_H5_2) {
+
         mut::Morphology mutable_morph(*this);
         mutable_morph.applyModifiers(options);
         _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
