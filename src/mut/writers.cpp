@@ -118,9 +118,14 @@ void asc(const Morphology& morphology, const std::string& filename)
     header[SECTION_APICAL_DENDRITE] = "( (Color Red)\n  (Apical)\n";
 
     const auto soma = morphology.soma();
-    myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
-    _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
-    myfile << ")\n\n";
+    if(soma->points().size() > 0) {
+        myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
+        _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
+        myfile << ")\n\n";
+    } else {
+        LBERROR(plugin::ErrorMessages().ERROR_WRITE_NO_SOMA());
+    }
+
 
     for (auto& id : morphology.rootSections())
     {

@@ -184,14 +184,30 @@ public:
     std::string WARNING_WRONG_DUPLICATE(std::shared_ptr<morphio::mut::Section> current,
                                         std::shared_ptr<morphio::mut::Section> parent) const {
 
-        return errorMsg(0, ErrorLevel::WARNING,
-                        "While appending section: "+std::to_string(current->id()) +
-                        " to parent: "+std::to_string(parent->id()) +
-                        "\nThe section first point: (" +
-                        dumpPoint(current->points()[0]) +
-                        ") should be parent section last point: (" +
-                        dumpPoint(parent->points()[parent->points().size()-1])
-                        + ")");
+        std::string msg("While appending section: "+std::to_string(current->id()) +
+                        " to parent: "+std::to_string(parent->id()));
+
+        if(parent->points().empty())
+            return errorMsg(0, ErrorLevel::WARNING, msg +
+                            "\nThe parent section is empty.");
+
+        if(current->points().empty())
+            return errorMsg(0, ErrorLevel::WARNING, msg +
+                            "\nThe current section has no points. It should at least contains " +
+                            "parent section last point");
+
+        auto p0 = parent->points()[parent->points().size()-1];
+        auto p1 = current->points()[0];
+        auto d0 = parent->diameters()[parent->diameters().size()-1];
+        auto d1 = current->diameters()[0];
+
+        return errorMsg(0, ErrorLevel::WARNING, msg +
+                        "\nThe section first point " +
+                        "should be parent section last point: " +
+                        "\n        : X Y Z Diameter" +
+                        "\nparent  :["+std::to_string(p0[0]) + ", "+std::to_string(p0[0]) + ", "+std::to_string(p0[0]) + ", "+std::to_string(d0) + "]" +
+                        "\ncurrent :["+std::to_string(p1[0]) + ", "+std::to_string(p1[0]) + ", "+std::to_string(p1[0]) + ", "+std::to_string(d1) + "]\n");
+
     }
 
 
