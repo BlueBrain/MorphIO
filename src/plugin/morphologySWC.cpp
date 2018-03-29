@@ -210,7 +210,7 @@ public:
         }
     }
 
-    Property::Properties _buildProperties() {
+    Property::Properties _buildProperties(unsigned int options) {
         std::vector<int32_t> depthFirstSamples;
         _pushChildren(depthFirstSamples, -1);
         for(const auto id: depthFirstSamples) {
@@ -226,6 +226,8 @@ public:
                 appendSample(morph.section(swcIdToSectionId.at(sample.id)), sample);
             }
         }
+
+        morph.applyModifiers(options);
 
         Property::Properties properties = morph.buildReadOnly();
         properties._cellLevel._somaType = somaType();
@@ -268,10 +270,10 @@ private:
 
 
 
-Property::Properties load(const URI& uri)
+Property::Properties load(const URI& uri, unsigned int options)
 {
 
-    auto properties = SWCBuilder(uri)._buildProperties();
+    auto properties = SWCBuilder(uri)._buildProperties(options);
     properties._cellLevel._cellFamily = FAMILY_NEURON;
     properties._cellLevel._version = MORPHOLOGY_VERSION_SWC_1;
     return properties;

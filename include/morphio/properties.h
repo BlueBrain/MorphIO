@@ -45,7 +45,6 @@ struct PointLevel
     PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
     bool operator==(const PointLevel& other) const;
-
 };
 
 struct SectionLevel

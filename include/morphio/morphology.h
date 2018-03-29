@@ -18,7 +18,7 @@ public:
     /** Close morphology file. @version 1.0 */
     ~Morphology();
 
-    Morphology(const mut::Morphology&);
+
     Morphology& operator=(const Morphology&);
     Morphology(Morphology&&);
     Morphology& operator=(Morphology&&);
@@ -28,17 +28,15 @@ public:
     /** @name Read API */
     //@{
     /** Open the given source to a morphology file and parse it.
-     *
-     * The actual data loading happens in a background thread and is lazily
-     * finalised in any get method. It is therefore faster to construct a set
-     * of morphologies and then read their data over a serial construct-and-read
-     * approach.
-     *
-     * @param source URI to load the morphology
-     * @throw std::runtime_error if file is not a valid morphology file
-     * @version 3.0
+
+        options is the modifier flags to be applied. All flags are defined in their enum:
+        morphio::enum::Option and can be composed.
+
+        Example:
+            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit Morphology(const URI& source);
+    explicit Morphology(const URI& source, unsigned int options);
+    Morphology(const mut::Morphology&);
 
     const Soma soma() const;
     const std::vector<Section> rootSections() const;

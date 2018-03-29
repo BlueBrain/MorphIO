@@ -14,6 +14,7 @@ set(MORPHIO_SOURCES
   mut/soma.cpp
   mut/morphology.cpp
   mut/writers.cpp
+  mut/modifiers.cpp
   )
 
 # by default, -fPIC is only used of the dynamic library build

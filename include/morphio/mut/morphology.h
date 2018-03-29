@@ -31,8 +31,14 @@ public:
 
     /**
        Build a mutable Morphology from an on-disk morphology
+
+       options is the modifier flags to be applied. All flags are defined in their enum:
+       morphio::enum::Option and can be composed.
+
+       Example:
+           Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
     **/
-    Morphology(const morphio::URI& uri);
+    Morphology(const morphio::URI& uri, unsigned int options = NO_MODIFIER);
 
     /**
        Build a mutable Morphology from a read-only morphology
@@ -155,6 +161,8 @@ public:
     **/
     // void traverse(std::function<void(Morphology& morphology, uint32_t sectionId)>,
     //               uint32_t startSection = -1);
+
+    void applyModifiers(unsigned int modifierFlags);
 
 
     void write_h5(const std::string& filename);

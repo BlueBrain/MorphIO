@@ -57,7 +57,7 @@ public:
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
-    Property::Properties parse()
+    morphio::mut::Morphology& parse()
     {
 
         std::ifstream ifs(uri_);
@@ -68,7 +68,8 @@ public:
 
         bool ret = parse_block();
 
-        return nb_.buildReadOnly();
+        return nb_;
+
     }
 
 private:
@@ -289,11 +290,14 @@ private:
 
 };
 
-Property::Properties load(const URI& uri)
+Property::Properties load(const URI& uri, unsigned int options)
 {
     NeurolucidaParser parser(uri);
 
-    Property::Properties properties = parser.parse();
+    morphio::mut::Morphology& nb_ = parser.parse();
+    nb_.applyModifiers(options);
+
+    Property::Properties properties = nb_.buildReadOnly();
     properties._cellLevel._cellFamily = FAMILY_NEURON;
     properties._cellLevel._version = MORPHOLOGY_VERSION_ASC_1;
     return properties;

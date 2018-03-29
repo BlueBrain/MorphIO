@@ -16,8 +16,8 @@ namespace mut
 {
 
 
-Morphology::Morphology(const morphio::URI& uri)
-    : Morphology(morphio::Morphology(uri))
+Morphology::Morphology(const morphio::URI& uri, unsigned int options)
+    : Morphology(morphio::Morphology(uri, options))
 {
 }
 
@@ -313,6 +313,23 @@ upstream_iterator Morphology::upstream_end() const
     return upstream_iterator();
 }
 
+
+void Morphology::applyModifiers(unsigned int modifierFlags) {
+    if(modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS)
+        LBTHROW(SectionBuilderError(
+                    _err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES,
+                                                  TWO_POINTS_SECTIONS)));
+
+    if(modifierFlags & SOMA_SPHERE)
+        modifiers::soma_sphere(*this);
+
+    if(modifierFlags & NO_DUPLICATES)
+        modifiers::no_duplicate_point(*this);
+
+    if(modifierFlags & TWO_POINTS_SECTIONS)
+        modifiers::two_points_sections(*this);
+
+}
 
 void Morphology::write_asc(const std::string& filename) {
     writer::asc(*this, filename);

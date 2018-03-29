@@ -5,6 +5,7 @@
 #include "morphologySWC.h"
 
 #include <morphio/mut/section.h>
+#include <morphio/mut/modifiers.h>
 
 namespace morphio
 {
@@ -96,6 +97,8 @@ public:
     }
 
 
+
+
     ////////////////////////////////////////////////////////////////////////////////
     //             NEUROLUCIDA
     ////////////////////////////////////////////////////////////////////////////////
@@ -144,6 +147,13 @@ public:
     const std::string ERROR_EOF_UNBALANCED_PARENS(int lineNumber) const {
         return errorMsg(lineNumber, ErrorLevel::ERROR,
                         "Hit end of file before balanced parens");
+    }
+
+    const std::string ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
+                                               morphio::Option flag2) const {
+        return errorMsg(0, ErrorLevel::ERROR,
+                        "Modifiers: " + std::to_string(flag1) + " and : " +
+                        std::to_string(flag2) + " are incompatible");
     }
 
 

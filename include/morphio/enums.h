@@ -7,6 +7,17 @@ namespace morphio
 {
 namespace enums
 {
+
+/** The list of modifier flags that can be passed when loading a morphology
+ See morphio::mut::modifiers for more informations **/
+enum Option {
+    NO_MODIFIER =  0x00,
+    TWO_POINTS_SECTIONS    = 0x01,
+    SOMA_SPHERE     = 0x02,
+    NO_DUPLICATES   = 0x04
+};
+
+
 /** The supported versions for morphology files. */
 enum MorphologyVersion
 {

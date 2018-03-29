@@ -37,7 +37,7 @@ struct Sample
     int lineNumber;
 };
 
-Property::Properties load(const URI& uri);
+Property::Properties load(const URI& uri, unsigned int options);
 } // namespace swc
 
 } // namespace plugin

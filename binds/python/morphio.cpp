@@ -229,6 +229,8 @@ PYBIND11_MODULE(morphio, m) {
     py::class_<morphio::Property::PointLevel>(m, "PointLevel")
         .def(py::init<>())
         .def(py::init<std::vector<morphio::Property::Point::Type>,
+             std::vector<morphio::Property::Diameter::Type>>())
+        .def(py::init<std::vector<morphio::Property::Point::Type>,
              std::vector<morphio::Property::Diameter::Type>,
              std::vector<morphio::Property::Perimeter::Type>>())
         .def_readwrite("points", &morphio::Property::PointLevel::_points)

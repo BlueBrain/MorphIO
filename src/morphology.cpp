@@ -69,7 +69,9 @@ void buildChildren(std::shared_ptr<Property::Properties> properties)
     }
 }
 
-Morphology::Morphology(const URI& source)
+
+
+Morphology::Morphology(const URI& source, unsigned int options)
 {
     const size_t pos = source.find_last_of(".");
     assert(pos != std::string::npos);
@@ -84,17 +86,17 @@ Morphology::Morphology(const URI& source)
     if (extension == ".h5")
     {
         _properties =
-            std::make_shared<Property::Properties>(plugin::h5::load(source));
+            std::make_shared<Property::Properties>(plugin::h5::load(source, options));
     }
     else if (extension == ".swc")
     {
         _properties =
-            std::make_shared<Property::Properties>(plugin::swc::load(source));
+            std::make_shared<Property::Properties>(plugin::swc::load(source, options));
     }
     else if (extension == ".asc")
     {
         _properties =
-            std::make_shared<Property::Properties>(plugin::asc::load(source));
+            std::make_shared<Property::Properties>(plugin::asc::load(source, options));
     }
     else
     {
@@ -105,6 +107,15 @@ Morphology::Morphology(const URI& source)
 
     if(version() != MORPHOLOGY_VERSION_SWC_1)
         _properties->_cellLevel._somaType = getSomaType(soma().points().size());
+
+    if(options &&
+       version() == MORPHOLOGY_VERSION_H5_1 ||
+       version() == MORPHOLOGY_VERSION_H5_1_1 ||
+       version() == MORPHOLOGY_VERSION_H5_2) {
+        mut::Morphology mutable_morph(*this);
+        mutable_morph.applyModifiers(options);
+        _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
+    }
 }
 
 Morphology::Morphology(const mut::Morphology& morphology)

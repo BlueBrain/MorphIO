@@ -35,7 +35,7 @@ namespace plugin
 {
 namespace h5
 {
-Property::Properties load(const URI& uri)
+Property::Properties load(const URI& uri, unsigned int options)
 {
     return MorphologyHDF5().load(uri);
 }
