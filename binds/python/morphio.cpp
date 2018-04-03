@@ -95,7 +95,22 @@ PYBIND11_MODULE(morphio, m) {
         .def_property_readonly("points", [](morphio::Section* section){ return span_array_to_ndarray(section->points()); })
         .def_property_readonly("diameters", [](morphio::Section* section){ return span_to_ndarray(section->diameters()); })
         .def_property_readonly("perimeters", [](morphio::Section* section){ return span_to_ndarray(section->perimeters()); })
-        .def_property_readonly("id", &morphio::Section::id);
+        .def_property_readonly("id", &morphio::Section::id)
+        .def_property_readonly("depth_begin", [](morphio::Section* section) {
+                return py::make_iterator(section->depth_begin(), section->depth_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+        .def_property_readonly("breadth_begin", [](morphio::Section* section) {
+                return py::make_iterator(section->breadth_begin(), section->breadth_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+        .def_property_readonly("upstream_begin", [](morphio::Section* section) {
+                return py::make_iterator(section->upstream_begin(), section->upstream_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */);
+
+
+
 
     py::enum_<morphio::enums::SectionType>(m, "SectionType")
         .value("undefined", morphio::enums::SectionType::SECTION_UNDEFINED)
@@ -173,7 +188,21 @@ PYBIND11_MODULE(morphio, m) {
 
         .def("write_h5", &morphio::mut::Morphology::write_h5)
         .def("write_swc", &morphio::mut::Morphology::write_swc)
-        .def("write_asc", &morphio::mut::Morphology::write_asc);
+        .def("write_asc", &morphio::mut::Morphology::write_asc)
+
+        .def("depth_begin", [](morphio::mut::Morphology* morph, uint32_t id) {
+                return py::make_iterator(morph->depth_begin(id), morph->depth_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+        .def("breadth_begin", [](morphio::mut::Morphology* morph, uint32_t id) {
+                return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+        .def("upstream_begin", [](morphio::mut::Morphology* morph, uint32_t id) {
+                return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */);
+
 
 
 
