@@ -57,14 +57,25 @@ but will also provide accessors to the different section.
 
 One important concept is that MorphIO is splitted into a *read-only* part and a *read/write* one.
 
+### Quick summary
+*C++ vs Python*:
+- c++ accessors become python properties
+- style: c++ functions are camel case while python ones are snake case
+
+*Read-only vs read/write*
+- Hierarchical data (such as parent or children) are accessed at the Section level for the *read-only* API and at the Morphology level for the *read/write* one.
+- Hierarchical data accessors return pointer to the concerned section for the *read-only* API, and concerned section IDs for the *read/write* one.
+
 ### Read-only API
 The read-only API aims at providing better performances as its internal data
 representation is contiguous in memory. All accessors return immutable objects and
 the mechanism for accessing individual sections
 is also simpler than in the read/write API.
 
-In this API, the morphology object is in fact where all data are stored. The
-Soma and Section classes are lightweight classes that provide views to the Morphology data.
+Internally, in this API the morphology object is in fact where all data are stored. The
+Soma and Section classes are lightweight classes that provide views on the Morphology data.
+
+Hierarchical properties (children/parent properties) can be retrieved from the Section object itself.
 
 #### C++
 In C++ the API is available right under the `morphio` namespace:
@@ -77,17 +88,24 @@ In C++ the API is available right under the `morphio` namespace:
 #### Python
 In Python the API is available right under the `morphio` module:
 
-```Python
+```python
 from morphio import Morphology, Section, Soma
 ```
 
+For more convenience, all section data are accessed through properties, such as:
+```python
+points = section.points
+diameters = section.diameters
+```
 
 ### Mutable (read/write) API
 The read/write API provide a way to read morphologies, edit them and write them to disk.
 It offers a tree-centric aproach of the morphology: each section object store its own data and can be seen as a node.
-The morphology object simply store the relationship (parent/children) between the different nodes.
+
+The morphology object simply store the hierarchical data (parent/children) between the different nodes. This means that contrary to the read-only API, hierarchical properties must be retrieved through accessors of the Morphology class (and not the Section/Soma ones).
 
 Note: Multiple morphologies can share the same node. This way, cloning a morphology simply means cloning the node relationships but not the data stored in every node.
+
 
 #### C++
 In C++ the API is available under the `morphio/mut` namespace:
@@ -107,16 +125,127 @@ from morphio.mut import Morphology, Section, Soma
 
 ## Usage
 When possible both APIs will try to use the class and function names.
+Here are a examples on how to use the various APIs.
 
-| Immutable C++                      | Immutable Python               | Mutable C++                         | Mutable Python                     |
-|------------------------------------|--------------------------------|-------------------------------------|------------------------------------|
-| #include <morphio/morphology.h>    | from morphio import Morphology | #include <morphio/mut/morphology.h> | from morphio.mut import Morphology |
-|                                    |                                |                                     |                                    |
-| using morphio::Morphology;         |                                | using morphio::mut::Morphology      |                                    |
-| using morphio::Section;            |                                | using morphio::mut::Section;        |                                    |
-| auto m = Morphology("sample.asc"); |                                | auto m = Morphology("sample.asc")   |                                    |
-|                                    |                                |                                     |                                    |
-| auto roots = m.rootSections()      | roots = m.rootSections         | auto roots = m.rootSections()       | roots = m.rootSections             |
-|                                    |                                |                                     |                                    |
-| first\_root = roots[0]             | first\_root = roots[0]         | auto first\_root = roots[0]         | first\_root = roots[0]             |
-|                                    |                                |                                     |                                    |
+### Immutable C++
+
+```cpp
+#include <morphio/morphology.h>
+#include <morphio/section.h>
+
+int main()
+{
+    auto m = morphio::Morphology("sample.asc");
+
+    auto roots = m.rootSections();
+
+    auto first_root = roots[0];
+
+    // iterate on sections starting at first_root
+    for(auto it = first_root.depth_begin(); it != first_root.depth_end(); ++it) {
+        const morphio::Section &section = (*it);
+
+        std::cout << "Section type: " << section.type() << std::endl;
+        std::cout << "Section id: " << section.id() << std::endl;
+        std::cout << "Parent section id: " << section.parent().id() << std::endl;
+        std::cout << "Number of child sections: " << section.children().size() << std::endl;
+        std::cout << "X - Y - Z - Diameter" << std::endl;
+        for(int i = 0; i<section.points().size(); ++i) {
+            std::cout <<
+                section.points()[i][0] << ' ' <<
+                section.points()[i][1] << ' ' <<
+                section.points()[i][2] << ' ' <<
+                section.diameters()[i] << std::endl;
+        }
+
+        std::cout << std::endl;
+    }
+}
+```
+
+
+### Immutable Python
+
+```python
+from morphio import Morphology
+
+m = Morphology("sample.asc")
+
+roots = m.rootSections
+
+first_root = roots[0]
+
+# iterate on sections starting at first_root
+for section in first_root.depth_begin:
+    print("Section type: {}".format(section.type))
+    print("Section id: {}".format(section.id))
+    print("Parent section id: {}".format(section.parent.id))
+    print("Number of child sections: {}".format(len(section.children)))
+    print("X - Y - Z - Diameter")
+
+    for point, diameter in zip(section.points, section.diameters):
+        print('{} - {}'.format(point, diameter))
+```
+
+
+
+### Mutable C++
+
+```cpp
+#include <morphio/mut/morphology.h>
+#include <morphio/mut/section.h>
+
+using morphio::mut::Morphology;
+using morphio::mut::Section;
+
+int main()
+{
+    auto m = Morphology("sample.asc");
+    auto roots = m.rootSections();
+    auto first_root = roots[0];
+
+    // iterate on sections starting at first_root
+    for(auto id_it = m.depth_begin(first_root); id_it != m.depth_end(); ++id_it) {
+        int section_id = *id_it;
+        auto& section = m.section(section_id);
+
+        std::cout << "Section type: " << section->type() << std::endl;
+        std::cout << "Section id: " << section->id() << std::endl;
+        std::cout << "Parent section id: " << m.parent(section_id) << std::endl;
+        std::cout << "Number of child sections: " << m.children(section_id).size() << std::endl;
+        std::cout << "X - Y - Z - Diameter" << std::endl;
+        for(int i = 0; i<section->points().size(); ++i) {
+            std::cout <<
+                section->points()[i][0] << ' ' <<
+                section->points()[i][1] << ' ' <<
+                section->points()[i][2] << ' ' <<
+                section->diameters()[i] << std::endl;
+        }
+
+        std::cout << std::endl;
+    }
+}
+```
+
+
+### Mutable Python
+
+```python
+from morphio.mut import Morphology
+
+m = Morphology("sample.asc")
+roots = m.root_sections
+first_root = roots[0]
+
+# iterate on sections starting at first_root
+for section_id in m.depth_begin(first_root):
+    section = m.section(section_id)
+    print("Section type: {}".format(section.type))
+    print("Section id: {}".format(section.id))
+    print("Parent section id: {}".format(m.parent(section_id)))
+    print("Number of child sections: {}".format(len(m.children(section_id))))
+    print("X - Y - Z - Diameter")
+
+    for point, diameter in zip(section.points, section.diameters):
+        print('{} - {}'.format(point, diameter))
+```
