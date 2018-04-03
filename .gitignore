@@ -3,6 +3,9 @@
 
 morphio.egg-info/
 
+packaging/python_wheel/toolchain/
+
+*.pyc
 
 # Compiled Object files
 *.slo
