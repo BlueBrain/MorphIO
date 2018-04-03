@@ -1,5 +1,31 @@
 # MorphIO [![Build Status](https://travis-ci.com/wizmer/morpho-tool.svg?token=KRP9rHiV52PC6mX3ACXp&branch=master)](https://travis-ci.com/wizmer/morpho-tool)
 
+## Table of content
+
+* [Installation](#installation)
+   * [As a python wheel](#as-a-python-wheel)
+   * [From sources](#from-sources)
+      * [Dependencies](#dependencies)
+         * [Linux](#linux)
+         * [Mac OS](#mac-os)
+      * [Installation instructions](#installation-instructions)
+         * [Install as a c++ library](#install-as-a-c-library)
+         * [Install as a Python package](#install-as-a-python-package)
+* [Introduction](#introduction)
+   * [Quick summary](#quick-summary)
+   * [Read-only API](#read-only-api)
+      * [C++](#c)
+      * [Python](#python)
+   * [Mutable (read/write) API](#mutable-readwrite-api)
+      * [C++](#c-1)
+      * [Python](#python-1)
+* [Converter](#converter)
+* [Usage](#usage)
+   * [Immutable C++](#immutable-c)
+   * [Immutable Python](#immutable-python)
+   * [Mutable C++](#mutable-c)
+   * [Mutable Python](#mutable-python)
+
 ## Installation
 
 ### As a python wheel
@@ -16,12 +42,19 @@ MorphIO requires the following dependencies:
 - libhdf5-dev
 
 ##### Linux
-```sudo apt install cmake libhdf5-dev```
+```shell
+sudo apt install cmake libhdf5-dev
+```
 
-#### Mac OS
-```brew install hdf5 cmake```
+##### Mac OS
 
-#### Install as a c++ library
+```shell
+brew install hdf5 cmake
+```
+
+#### Installation instructions
+
+##### Install as a c++ library
 
 ```shell
 git clone git@github.com:wizmer/morpho-tool.git --recursive
@@ -31,7 +64,7 @@ cmake ..
 make
 ```
 
-#### Install as a Python package
+##### Install as a Python package
 
 ```shell
 pip install git+ssh://git@github.com/wizmer/morpho-tool.git
@@ -122,6 +155,21 @@ In Python the API is available under the `morphio.mut` module:
 from morphio.mut import Morphology, Section, Soma
 ```
 
+## Converter
+MorphIO comes with a file format converter that can go back and forth the following 3 formats:
+- asc
+- swc
+- h5
+
+The converter is compiled as part of the c++ library and will be in the `bin/` folder.
+It can be used as:
+```shell
+./convert inputfile outputfile
+```
+
+Note for BBP users: for more information about the intricacy of the format conversion, visit:
+
+<https://bbpteam.epfl.ch/project/issues/browse/NSETM-458>
 
 ## Usage
 When possible both APIs will try to use the class and function names.
@@ -170,9 +218,7 @@ int main()
 from morphio import Morphology
 
 m = Morphology("sample.asc")
-
 roots = m.rootSections
-
 first_root = roots[0]
 
 # iterate on sections starting at first_root
