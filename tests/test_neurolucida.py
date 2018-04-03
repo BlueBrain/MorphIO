@@ -29,7 +29,7 @@ def test_soma():
                             [-1, 1, 0],
                             [-1, -1, 0]])
 
-        nt.assert_equal(len(n.rootSections), 0)
+        nt.assert_equal(len(n.root_sections), 0)
 
 
 def test_unknown_token():
@@ -93,12 +93,12 @@ def test_single_neurite_no_soma():
         n = Morphology(tmp_file.name)
 
         assert_array_equal(n.soma.points, np.empty((0, 3)))
-        nt.assert_equal(len(n.rootSections), 1)
-        assert_array_equal(n.rootSections[0].points,
+        nt.assert_equal(len(n.root_sections), 1)
+        assert_array_equal(n.root_sections[0].points,
                            np.array([[1.2, 2.7, 1.0],
                                      [1.2, 3.7, 2.0]], dtype=np.float32))
 
-        assert_array_equal(n.rootSections[0].diameters,
+        assert_array_equal(n.root_sections[0].diameters,
                            np.array([13., 13.], dtype=np.float32))
 
 
@@ -119,8 +119,8 @@ def test_skip_header():
                          )''') as tmp_file:
 
         n = Morphology(tmp_file.name)
-        nt.assert_equal(len(n.rootSections), 1)
-        assert_array_equal(n.rootSections[0].points,
+        nt.assert_equal(len(n.root_sections), 1)
+        assert_array_equal(n.root_sections[0].points,
                            np.array([[1.2, 2.7, 1.0],
                                      [1.2, 3.7, 2.0]], dtype=np.float32))
 
@@ -169,21 +169,21 @@ would look like'''
     with tmp_asc_file(with_duplicate) as tmp_file:
         n = Morphology(tmp_file.name)
 
-    nt.assert_equal(len(n.rootSections), 1)
+    nt.assert_equal(len(n.root_sections), 1)
 
-    assert_array_equal(n.rootSections[0].points,
+    assert_array_equal(n.root_sections[0].points,
                        [[3, -4, 0],
                         [3, -6, 0],
                         [3, -8, 0],
                         [3, -10, 0],
                         ])
 
-    assert_array_equal(n.rootSections[0].children[0].points,
+    assert_array_equal(n.root_sections[0].children[0].points,
                        [[3, -10, 0],
                         [0, -10, 0],
                         [-3, -10, 0]])
 
-    assert_array_equal(n.rootSections[0].children[1].points,
+    assert_array_equal(n.root_sections[0].children[1].points,
                        [[3, -10, 0],
                         [6, -10, 0],
                         [9, -10, 0]])
@@ -196,11 +196,11 @@ def test_read_without_duplicates():
     with tmp_asc_file(without_duplicate) as tmp_file:
         n_without_duplicate = Morphology(tmp_file.name)
 
-    assert_array_equal(n_with_duplicate.rootSections[0].children[0].points,
-                       n_without_duplicate.rootSections[0].children[0].points)
+    assert_array_equal(n_with_duplicate.root_sections[0].children[0].points,
+                       n_without_duplicate.root_sections[0].children[0].points)
 
-    assert_array_equal(n_with_duplicate.rootSections[0].points,
-                       n_without_duplicate.rootSections[0].points)
+    assert_array_equal(n_with_duplicate.root_sections[0].points,
+                       n_without_duplicate.root_sections[0].points)
 
 
 def test_broken_duplicate():
@@ -261,8 +261,8 @@ def test_empty_sibling():
                  ''') as tmp_file:
         n = Morphology(tmp_file.name)
 
-    assert_equal(len(n.rootSections), 1)
-    assert_array_equal(n.rootSections[0].points,
+    assert_equal(len(n.root_sections), 1)
+    assert_array_equal(n.root_sections[0].points,
                        np.array([[3, -4, 0],
                                  [3, -6, 0],
                                  [3, -8, 0],
@@ -297,8 +297,8 @@ def test_single_children():
 
         nt.assert_equal(len(n.soma.points), 0)
         nt.assert_equal(len(n.sections[0].points), 0)
-        assert_equal(len(n.rootSections), 1)
-        assert_array_equal(n.rootSections[0].points,
+        assert_equal(len(n.root_sections), 1)
+        assert_array_equal(n.root_sections[0].points,
                            np.array([[3, -4, 0],
                                      [3, -6, 0],
                                      [3, -8, 0],
@@ -307,13 +307,13 @@ def test_single_children():
                                      [-3, -10, 0]],
                                     dtype=np.float32))
 
-        assert_equal(len(n.rootSections[0].children), 2)
+        assert_equal(len(n.root_sections[0].children), 2)
 
-        assert_array_equal(n.rootSections[0].children[0].points,
+        assert_array_equal(n.root_sections[0].children[0].points,
                            np.array([[-3, -10, 0],
                                      [-5, -5, 5]]))
 
-        assert_array_equal(n.rootSections[0].children[1].points,
+        assert_array_equal(n.root_sections[0].children[1].points,
                            np.array([[-3, -10, 0],
                                      [-6, -6, 6]]))
 
@@ -418,33 +418,33 @@ def test_markers():
 
         n = Morphology(tmp_file.name)
 
-        nt.assert_equal(len(n.rootSections), 1)
+        nt.assert_equal(len(n.root_sections), 1)
 
-        assert_array_equal(n.rootSections[0].points,
+        assert_array_equal(n.root_sections[0].points,
                            np.array([[-290.87,  -113.09,   -16.32],
                                      [-290.87,  -113.09,   -16.32],
                                      ],
                                     dtype=np.float32))
 
-        assert_array_equal(n.rootSections[0].children[0].points,
+        assert_array_equal(n.root_sections[0].children[0].points,
                            np.array([[-290.87,  -113.09,   -16.32],
                                      [-277.14,  -119.13,   -18.02],
                                      [-275.54,  -119.99,   -16.67]],
                                     dtype=np.float32))
 
-        assert_array_equal(n.rootSections[0].children[1].points,
+        assert_array_equal(n.root_sections[0].children[1].points,
                            np.array([[-290.87,  -113.09,   -16.32],
                                      [-277.80,  -120.28,   -19.48],
                                      [-276.65,  -121.14,   -20.20]],
                                     dtype=np.float32))
 
-        assert_array_equal(n.rootSections[0].children[1].children[0].points,
+        assert_array_equal(n.root_sections[0].children[1].children[0].points,
                            np.array([[-276.65,  -121.14,   -20.20],
                                      [-267.94,  -128.61,   -22.57],
                                      [-204.90,  -157.63,   -42.45]],
                                     dtype=np.float32))
 
-        assert_array_equal(n.rootSections[0].children[1].children[1].points,
+        assert_array_equal(n.root_sections[0].children[1].children[1].points,
                            np.array([[-276.65,  -121.14,   -20.20],
                                      [-269.77,  -129.47,   -22.57],
                                      [-268.17,  -130.62,   -24.75],

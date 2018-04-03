@@ -29,13 +29,13 @@ def test_read_single_neurite():
                          5 3 0 0 5 0.5 4''') as tmp_file:
 
         n = Morphology(tmp_file.name)
-    nt.eq_(len(n.rootSections), 1)
-    nt.eq_(n.rootSections[0].id, 1)
+    nt.eq_(len(n.root_sections), 1)
+    nt.eq_(n.root_sections[0].id, 1)
     assert_array_equal(n.soma.points,
                        [[0, 0, 0]])
-    nt.eq_(len(n.rootSections), 1)
+    nt.eq_(len(n.root_sections), 1)
     nt.eq_(len(n.sections), 2)
-    assert_array_equal(n.rootSections[0].points,
+    assert_array_equal(n.root_sections[0].points,
                        np.array([[0, 0, 2],
                                  [0, 0, 3],
                                  [0, 0, 4],
@@ -48,11 +48,11 @@ def test_read_simple():
     simple = Morphology(os.path.join(SWC_TEST_FILE, 'simple.swc'))
     # assert_array_equal(simple.points,
     #                    n.points)
-    assert_equal(len(simple.rootSections), 2)
-    assert_array_equal(simple.rootSections[0].points, [[0, 0, 0], [0, 5, 0]])
-    assert_equal(len(simple.rootSections[0].children), 2)
-    assert_array_equal(simple.rootSections[0].children[0].points, [[0, 5, 0], [-5, 5, 0]])
-    assert_array_equal(simple.rootSections[1].points, [[0, 0, 0], [0, -4, 0]])
+    assert_equal(len(simple.root_sections), 2)
+    assert_array_equal(simple.root_sections[0].points, [[0, 0, 0], [0, 5, 0]])
+    assert_equal(len(simple.root_sections[0].children), 2)
+    assert_array_equal(simple.root_sections[0].children[0].points, [[0, 5, 0], [-5, 5, 0]])
+    assert_array_equal(simple.root_sections[1].points, [[0, 0, 0], [0, -4, 0]])
 
 
 def test_repeated_id():
@@ -109,14 +109,14 @@ def test_read_split_soma():
                         [2, 0, 0],
                         [3, 0, 0]])
 
-    nt.assert_equal(len(n.rootSections), 2)
-    assert_array_equal(n.rootSections[0].points,
+    nt.assert_equal(len(n.root_sections), 2)
+    assert_array_equal(n.root_sections[0].points,
                        [[0, 0, 2],
                         [0, 0, 3],
                         [0, 0, 4],
                         [0, 0, 5]])
 
-    assert_array_equal(n.rootSections[1].points,
+    assert_array_equal(n.root_sections[1].points,
                        [[0, 0, 6],
                         [0, 0, 7],
                         [0, 0, 8],
@@ -185,17 +185,17 @@ def test_simple_reversed():
         n = Morphology(tmp_file.name)
     assert_array_equal(n.soma.points,
                        [[0, 0, 0]])
-    nt.assert_equal(len(n.rootSections), 2)
-    assert_array_equal(n.rootSections[0].points,
+    nt.assert_equal(len(n.root_sections), 2)
+    assert_array_equal(n.root_sections[0].points,
                        [[0, 0, 0],
                         [0, 5, 0]])
-    assert_array_equal(n.rootSections[1].points,
+    assert_array_equal(n.root_sections[1].points,
                        [[0, 0, 0],
                         [0, -4, 0]])
-    assert_array_equal(n.rootSections[1].children[0].points,
+    assert_array_equal(n.root_sections[1].children[0].points,
                        [[0, -4, 0],
                         [6, -4, 0]])
-    assert_array_equal(n.rootSections[1].children[1].points,
+    assert_array_equal(n.root_sections[1].children[1].points,
                        [[0, -4, 0],
                         [-5, -4, 0]])
 

@@ -35,7 +35,7 @@ def test_point_level():
 
 def test_empty_neurite():
     m = Morphology()
-    m.appendSection(-1, SectionType.axon, PointLevel())
+    m.append_section(-1, SectionType.axon, PointLevel())
     assert_equal(len(m.root_sections), 1)
     assert_equal(m.section(m.root_sections[0]).type,
                  SectionType.axon)
@@ -43,9 +43,9 @@ def test_empty_neurite():
 
 def test_single_neurite():
     m = Morphology()
-    m.appendSection(-1,
-                    SectionType.axon,
-                    PointLevel([[1, 2, 3]], [2], [20]))
+    m.append_section(-1,
+                     SectionType.axon,
+                     PointLevel([[1, 2, 3]], [2], [20]))
 
     assert_equal(m.section(m.root_sections[0]).points,
                  [[1, 2, 3]])
@@ -73,15 +73,15 @@ def test_single_neurite():
 
 def test_child_section():
     m = Morphology()
-    section_id = m.appendSection(-1,
-                                 SectionType.axon,
-                                 PointLevel([[1, 2, 3]], [2], [20]))
+    section_id = m.append_section(-1,
+                                  SectionType.axon,
+                                  PointLevel([[1, 2, 3]], [2], [20]))
 
-    m.appendSection(section_id,
-                    SectionType.axon,
-                    PointLevel([[1, 2, 3], [4, 5, 6]],
-                               [2, 3],
-                               [20, 30]))
+    m.append_section(section_id,
+                     SectionType.axon,
+                     PointLevel([[1, 2, 3], [4, 5, 6]],
+                                [2, 3],
+                                [20, 30]))
 
     children = m.children(m.root_sections[0])
     assert_equal(len(children),
@@ -108,19 +108,19 @@ def captured_output():
 
 def test_append_no_duplicate():
     m = Morphology()
-    section_id = m.appendSection(-1,
-                                 SectionType.axon,
-                                 PointLevel([[1, 2, 3], [4, 5, 6]],
-                                            [2, 2],
-                                            [20, 20]))
+    section_id = m.append_section(-1,
+                                  SectionType.axon,
+                                  PointLevel([[1, 2, 3], [4, 5, 6]],
+                                             [2, 2],
+                                             [20, 20]))
 
     with captured_output() as (out, err):
         with ostream_redirect():
-            m.appendSection(section_id,
-                            SectionType.axon,
-                            PointLevel([[400, 5, 6], [7, 8, 9]],
-                                       [2, 3],
-                                       [20, 30]))
+            m.append_section(section_id,
+                             SectionType.axon,
+                             PointLevel([[400, 5, 6], [7, 8, 9]],
+                                        [2, 3],
+                                        [20, 30]))
 
     exception_str = ("While appending section: 1 to parent: 0\n"
                      "The section first point should be parent section last point:")
@@ -139,23 +139,23 @@ def test_build_read_only():
     m.soma.points = [[-1, -2, -3]]
     m.soma.diameters = [-4]
 
-    section_id = m.appendSection(-1,
-                                 SectionType.axon,
-                                 PointLevel([[1, 2, 3], [4, 5, 6]],
-                                            [2, 2],
-                                            [20, 20]))
+    section_id = m.append_section(-1,
+                                  SectionType.axon,
+                                  PointLevel([[1, 2, 3], [4, 5, 6]],
+                                             [2, 2],
+                                             [20, 20]))
 
-    m.appendSection(section_id,
-                    SectionType.axon,
-                    PointLevel([[4, 5, 6], [7, 8, 9]],
-                               [2, 3],
-                               [20, 30]))
+    m.append_section(section_id,
+                     SectionType.axon,
+                     PointLevel([[4, 5, 6], [7, 8, 9]],
+                                [2, 3],
+                                [20, 30]))
 
-    m.appendSection(section_id,
-                    SectionType.axon,
-                    PointLevel([[4, 5, 6], [10, 11, 12]],
-                               [2, 2],
-                               [20, 20]))
+    m.append_section(section_id,
+                     SectionType.axon,
+                     PointLevel([[4, 5, 6], [10, 11, 12]],
+                                [2, 2],
+                                [20, 20]))
 
     immutable_morphology = ImmutableMorphology(m)
     assert_equal(len(immutable_morphology.sections), 4)

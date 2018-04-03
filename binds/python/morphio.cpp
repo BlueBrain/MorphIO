@@ -67,26 +67,29 @@ PYBIND11_MODULE(morphio, m) {
         .def("__eq__", [](const morphio::Morphology& a, const morphio::Morphology& b) {
                 return a.operator==(b);
             }, py::is_operator())
+
         .def_property_readonly("points", &morphio::Morphology::points)
-        .def_property_readonly("sectionTypes", &morphio::Morphology::sectionTypes)
+        .def_property_readonly("section_types", &morphio::Morphology::sectionTypes)
         .def("section", &morphio::Morphology::section)
         .def_property_readonly("sections", &morphio::Morphology::sections)
-        .def_property_readonly("rootSections", &morphio::Morphology::rootSections)
+        .def_property_readonly("root_sections", &morphio::Morphology::rootSections)
         .def_property_readonly("soma", &morphio::Morphology::soma)
-        .def_property_readonly("cellFamily", &morphio::Morphology::cellFamily)
-        .def_property_readonly("somaType", &morphio::Morphology::somaType)
+        .def_property_readonly("cell_family", &morphio::Morphology::cellFamily)
+        .def_property_readonly("soma_type", &morphio::Morphology::somaType)
         .def_property_readonly("version", &morphio::Morphology::version);
+
+
 
     py::class_<morphio::Soma>(m, "Soma")
         .def(py::init<const morphio::Soma&>())
-        .def_property_readonly("somaCenter", &morphio::Soma::somaCenter)
+        .def_property_readonly("soma_center", &morphio::Soma::somaCenter)
         .def_property_readonly("points", [](morphio::Soma* soma){ return span_array_to_ndarray(soma->points()); })
         .def_property_readonly("diameters", [](morphio::Soma* soma){ return span_to_ndarray(soma->diameters()); });
 
     py::class_<morphio::Section>(m, "Section")
         .def_property_readonly("parent", &morphio::Section::parent)
         .def_property_readonly("type", &morphio::Section::type)
-        .def_property_readonly("isRoot", &morphio::Section::isRoot)
+        .def_property_readonly("is_root", &morphio::Section::isRoot)
         .def_property_readonly("parent", &morphio::Section::parent)
         .def_property_readonly("children", &morphio::Section::children)
         .def_property_readonly("points", [](morphio::Section* section){ return span_array_to_ndarray(section->points()); })
@@ -164,9 +167,10 @@ PYBIND11_MODULE(morphio, m) {
         .def("children", &morphio::mut::Morphology::children)
         .def("section", &morphio::mut::Morphology::section)
         .def("build_read_only", &morphio::mut::Morphology::buildReadOnly)
-        .def("deleteSection", &morphio::mut::Morphology::deleteSection)
-        .def("appendSection", (uint32_t (morphio::mut::Morphology::*) (int32_t, morphio::SectionType, const morphio::Property::PointLevel&)) &morphio::mut::Morphology::appendSection)
-        .def("deleteSection", &morphio::mut::Morphology::deleteSection)
+        .def("delete_section", &morphio::mut::Morphology::deleteSection)
+        .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, morphio::SectionType, const morphio::Property::PointLevel&)) &morphio::mut::Morphology::appendSection)
+        .def("delete_section", &morphio::mut::Morphology::deleteSection)
+
         .def("write_h5", &morphio::mut::Morphology::write_h5)
         .def("write_swc", &morphio::mut::Morphology::write_swc)
         .def("write_asc", &morphio::mut::Morphology::write_asc);
