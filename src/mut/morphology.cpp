@@ -207,13 +207,18 @@ void _appendProperties(Property::PointLevel& to,
         _appendVector(to._perimeters, from._perimeters, offset);
 }
 
-const Property::Properties Morphology::buildReadOnly() const
+const Property::Properties Morphology::buildReadOnly() const {
+    return buildReadOnly(morphio::plugin::DebugInfo());
+}
+
+const Property::Properties Morphology::buildReadOnly(const morphio::plugin::DebugInfo& debugInfo) const
 {
     using std::setw;
     int i = 0;
     int sectionIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
     Property::Properties properties;
+    morphio::plugin::ErrorMessages err(debugInfo.filename);
 
     if(_cellProperties)
         properties._cellLevel = *_cellProperties;
@@ -241,7 +246,7 @@ const Property::Properties Morphology::buildReadOnly() const
 
         if(parentId > -1 && // Exclude root sections
            !_checkDuplicatePoint(_sections.at(parentId), _sections.at(sectionId)))
-            LBTHROW(SectionBuilderError(_err.WARNING_WRONG_DUPLICATE(_sections.at(sectionId),
+            LBTHROW(SectionBuilderError(err.WARNING_WRONG_DUPLICATE(_sections.at(sectionId),
                                                                      _sections.at(parentId))));
 
 
@@ -256,14 +261,12 @@ const Property::Properties Morphology::buildReadOnly() const
             newIds[sectionId] = sectionIdOnDisk++;
             _appendProperties(properties._pointLevel, section->_pointProperties);
         } else {
-            LBERROR(_err.WARNING_ONLY_CHILD(parentId));
+            LBERROR(err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
             newIds[sectionId] = newIds[parentId];
 
             // Skip the duplicate point
             _appendProperties(properties._pointLevel, section->_pointProperties, 1);
         }
-
-
     }
 
     return properties;

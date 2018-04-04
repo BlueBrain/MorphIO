@@ -120,6 +120,8 @@ class NeurolucidaLexer
     bool debug_;
 
 public:
+    size_t current_section_start_ = 0;
+
     NeurolucidaLexer(const std::string& uri, bool debug = false)
         : uri_(uri), debug_(debug), err_(uri)
     {

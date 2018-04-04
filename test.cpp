@@ -21,9 +21,8 @@ using namespace std;
 
 int main()
 {
-    std::string filename = "simple_written.asc";
-    morphio::mut::Morphology morpho(filename, morphio::SOMA_SPHERE);
+    std::string filename = "broken.asc";
+    morphio::Morphology morpho(filename, morphio::SOMA_SPHERE);
 
-    morpho.write_asc("simplified.asc");
-
+    // morpho.write_asc(filename);
 }

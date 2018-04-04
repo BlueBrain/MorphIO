@@ -50,7 +50,10 @@ bool skip_sexp(size_t id)
 class NeurolucidaParser
 {
 public:
-    NeurolucidaParser(const std::string& uri) : uri_(uri), lex_(uri), err_(uri)
+    NeurolucidaParser(const std::string& uri) : uri_(uri),
+                                                lex_(uri),
+                                                debugInfo_(uri),
+                                                err_(uri)
     {
     };
 
@@ -138,16 +141,20 @@ private:
 
             // Condition to remove single point section that duplicate parent point
             // See test_single_point_section_duplicate_parent for an example
-            if(parent_id < 0 || properties._points.size() > 1)
+            if(parent_id < 0 || properties._points.size() > 1) {
                 return_id = nb_.appendSection(parent_id,
                                               section_type,
                                               properties);
-            else
+                debugInfo_.lineNumbers[return_id] = lex_.current_section_start_;
+            } else {
                 return_id = parent_id;
+            }
+
 
         }
         points.clear();
         diameters.clear();
+        lex_.current_section_start_ = lex_.line_num();
         return return_id;
     }
 
@@ -287,7 +294,8 @@ private:
 
     std::string uri_;
     ErrorMessages err_;
-
+public:
+    DebugInfo debugInfo_;
 };
 
 Property::Properties load(const URI& uri, unsigned int options)
@@ -297,7 +305,7 @@ Property::Properties load(const URI& uri, unsigned int options)
     morphio::mut::Morphology& nb_ = parser.parse();
     nb_.applyModifiers(options);
 
-    Property::Properties properties = nb_.buildReadOnly();
+    Property::Properties properties = nb_.buildReadOnly(parser.debugInfo_);
     properties._cellLevel._cellFamily = FAMILY_NEURON;
     properties._cellLevel._version = MORPHOLOGY_VERSION_ASC_1;
     return properties;

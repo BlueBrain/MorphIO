@@ -19,7 +19,7 @@ Soma::Soma(std::shared_ptr<Property::Properties> properties)
         id == sections.size() - 1 ? points.size() : sections[id + 1][0];
     _range = std::make_pair(start, end);
 
-    if (_range.second <= _range.first)
+    if (_range.second < _range.first)
         LBWARN << "Dereferencing broken soma "
                << "Section range: " << _range.first << " -> " << _range.second
                << std::endl;

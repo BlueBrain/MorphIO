@@ -181,7 +181,7 @@ PYBIND11_MODULE(morphio, m) {
         .def("parent", &morphio::mut::Morphology::parent)
         .def("children", &morphio::mut::Morphology::children)
         .def("section", &morphio::mut::Morphology::section)
-        .def("build_read_only", &morphio::mut::Morphology::buildReadOnly)
+        .def("build_read_only", (const morphio::Property::Properties (morphio::mut::Morphology::*)() const) &morphio::mut::Morphology::buildReadOnly)
         .def("delete_section", &morphio::mut::Morphology::deleteSection)
         .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, morphio::SectionType, const morphio::Property::PointLevel&)) &morphio::mut::Morphology::appendSection)
         .def("delete_section", &morphio::mut::Morphology::deleteSection)

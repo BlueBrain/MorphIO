@@ -18,6 +18,14 @@ enum ErrorLevel {
     ERROR
 };
 
+struct DebugInfo {
+public:
+    DebugInfo(std::string filename = "") : filename(filename) {}
+    std::map<uint32_t, uint32_t> lineNumbers;
+    std::string filename;
+};
+
+
 class ErrorMessages {
 public:
     ErrorMessages(){};
@@ -211,11 +219,17 @@ public:
     }
 
 
-    const std::string WARNING_ONLY_CHILD(int id) const {
-        return errorMsg(0, ErrorLevel::WARNING,
-                        "Section: " + std::to_string(id) + " has only one child. " +
-                        "Merging the child section.");
+    const std::string WARNING_ONLY_CHILD(const DebugInfo& info, int parentId, int childId) const {
+        std::string parentLine, childLine;
+        try {
+            parentLine =  " starting at:\n" + errorLink(info.lineNumbers.at(parentId), ErrorLevel::INFO) + "\n";
+            childLine = " starting at:\n" + errorLink(info.lineNumbers.at(childId), ErrorLevel::WARNING) + "\n";
+        } catch (const std::out_of_range& oor) {}
 
+
+        return "\nSection: " + std::to_string(childId) + childLine + " is the only child of " +
+            "section: " + std::to_string(parentId) + parentLine +
+            "\nIt will be merged with the parent section";
     }
 
 private:

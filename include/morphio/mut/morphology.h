@@ -17,6 +17,7 @@
 #include <morphio/mut/iterators.h>
 
 #include "../../../src/plugin/errorMessages.h"
+#include "../../../src/plugin/morphologyASC.h"
 
 namespace morphio
 {
@@ -173,6 +174,8 @@ public:
 
 private:
     friend class Section;
+    friend Property::Properties morphio::plugin::asc::load(const URI& uri, unsigned int options);
+
 
     morphio::plugin::ErrorMessages _err;
 
@@ -186,6 +189,8 @@ private:
     uint32_t _counter;
     std::map<uint32_t, uint32_t> _parent;
     std::map<uint32_t, std::vector<uint32_t>> _children;
+    const Property::Properties buildReadOnly(const morphio::plugin::DebugInfo& debugInfo) const;
+
 };
 
 } // namespace mut

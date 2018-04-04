@@ -34,7 +34,7 @@ const int SWC_UNDEFINED_PARENT = -1;
 class SWCBuilder
 {
 public:
-    SWCBuilder(const std::string& uri) : uri(uri), err(uri) {
+    SWCBuilder(const std::string& uri) : uri(uri), err(uri), debugInfo(uri) {
         _readSamples();
 
         for(auto sample_pair: samples){
@@ -155,6 +155,7 @@ public:
 
     template <typename T> void appendSample(std::shared_ptr<T> somaOrSection,
                                             const Sample& sample) {
+        debugInfo.lineNumbers[sample.id] = sample.lineNumber;
         somaOrSection->points().push_back(sample.point);
         somaOrSection->diameters().push_back(sample.diameter);
     }
@@ -264,6 +265,7 @@ private:
     mut::Morphology morph;
     std::string uri;
     ErrorMessages err;
+    DebugInfo debugInfo;
 
 };
 
