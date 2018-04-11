@@ -232,7 +232,7 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
         _sections.at(_rootSections.at(0))->_pointProperties._perimeters.size() > 0;
 
     if(isPerimeterUsed)
-        properties._pointLevel._perimeters = std::vector<float>(_soma->_pointProperties._points.size(), -1);
+        properties._pointLevel._perimeters = std::vector<float>(_soma->_pointProperties._points.size(), 0);
 
     properties._sectionLevel._sections.push_back({0, -1});
     properties._sectionLevel._sectionTypes.push_back(SECTION_SOMA);

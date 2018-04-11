@@ -2,6 +2,18 @@
 
 #include <morphio/properties.h>
 
+bool verbose = true;
+
+namespace std
+{
+template <typename T, size_t N> string to_string(const array<T, N>& a){
+    string res("[");
+    for(auto el: a)
+        res += to_string(el) + ", ";
+    return res;
+}
+}
+
 namespace morphio
 {
 namespace Property
@@ -47,65 +59,85 @@ PointLevel::PointLevel(const PointLevel& data, SectionRange range)
     _perimeters = copySpan<Property::Perimeter>(data._perimeters, range);
 }
 
-bool PointLevel::operator==(const PointLevel& other) const {
-    if(this->_points != other._points) {
-        std::cout << "this->points.size(): " << this->_points.size() << std::endl;
-        std::cout << "other._points.size(): " << other._points.size() << std::endl;
-        for(int i=0;i<this->_points.size();++i){
-            if(this->_points[i] != other._points[i]) {
-                std::cout << dumpPoint(this->_points[i]) << " -> " << dumpPoint(other._points[i]) << std::endl;
-                return false;
-            }
-        }
-    }
 
-    return this == &other ||
-        (this->_points == other._points &&
-         this->_perimeters == other._perimeters &&
-         this->_diameters == other._diameters);
+
+template <typename T> bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2, const std::string& name, bool verbose) {
+    if(vec1 == vec2)
+        return true;
+    if(vec1.size() != vec2.size()){
+        LBERROR("Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        return false;
+    }
+    for(int i=0;i<vec1.size();++i){
+        LBERROR(std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+    }
+    return false;
 }
 
-bool SectionLevel::operator==(const SectionLevel& other) const {
-    // if(this->_sectionTypes != other._sectionTypes) {
-    //     std::cout << "this->_sectionTypes.size() : " << this->_sectionTypes.size()  << std::endl;
-    //     std::cout << "other._sectionTypes.size(): " << other._sectionTypes.size() << std::endl;
-    // }
+template <typename T, typename U> bool compare(const std::map<T,U>& vec1, const std::map<T,U>& vec2, const std::string& name, bool verbose) {
+    if(vec1 == vec2)
+        return true;
+    if(vec1.size() != vec2.size()){
+        LBERROR("Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+    }
+    return false;
+}
 
-    // if(this->_sections != other._sections) {
-    //     std::cout << "this->_sections.size() : " << this->_sections.size()  << std::endl;
-    //     std::cout << "other._sections.size(): " << other._sections.size() << std::endl;
-    //     for(int i=0;i<this->_sections.size();++i)
-    //         std::cout << this->_sections[i][0] << ' ' << this->_sections[i][1] << " -> " << other._sections[i][0] << ' ' << other._sections[i][1] << std::endl;
-    // }
+template <typename T> bool compare(const T& el1, const T& el2, const std::string& name, bool verbose) {
+    if(el1 == el2)
+        return true;
+    LBERROR(name + " differs") ;
+    return false;
+}
+
+bool PointLevel::operator==(const PointLevel& other) const {
     return this == &other ||
-        (this->_sections == other._sections &&
-         this->_sectionTypes == other._sectionTypes &&
-         this->_children == other._children);
+        (compare(this->_points, other._points, "_points", verbose) &&
+         compare(this->_diameters, other._diameters, "_diameters", verbose) &&
+         compare(this->_perimeters, other._perimeters, "_perimeters", verbose));
+}
+
+bool PointLevel::operator!=(const PointLevel& other) const {
+    return !(this->operator==(other));
+}
+
+
+bool SectionLevel::operator==(const SectionLevel& other) const {
+    return this == &other ||
+        (compare(this->_sections, other._sections, "_sections", verbose) &&
+         compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) &&
+         compare(this->_children, other._children, "_childre", verbose));
+}
+
+bool SectionLevel::operator!=(const SectionLevel& other) const {
+    return !(this->operator==(other));
 }
 
 bool CellLevel::operator==(const CellLevel& other) const {
-    // if(this->_cellFamily != other._cellFamily){
-    //     std::cout << "this->_cellFamily: " << this->_cellFamily << std::endl;
-    //     std::cout << "other._cellFamily: " << other._cellFamily << std::endl;
-    // }
-    // if(this->_somaType != other._somaType) {
-    //     std::cout << "this->somaType: " << this->_somaType << std::endl;
-    //     std::cout << "other._somaType: " << other._somaType << std::endl;
-    // }
+    if(verbose && this->_cellFamily != other._cellFamily){
+        std::cout << "this->_cellFamily: " << this->_cellFamily << std::endl;
+        std::cout << "other._cellFamily: " << other._cellFamily << std::endl;
+    }
     return this == &other ||
         (this->_cellFamily == other._cellFamily
          // this->_somaType == other._somaType
             );
 }
 
+bool CellLevel::operator!=(const CellLevel& other) const {
+    return !(this->operator==(other));
+}
+
+
 bool Properties::operator==(const Properties& other) const {
-    // std::cout << "this -> _pointLevel == other._pointLevel: " << (this -> _pointLevel == other._pointLevel) << std::endl;
-    // std::cout << "this -> _sectionLevel == other._sectionLevel: " << (this -> _sectionLevel == other._sectionLevel) << std::endl;
-    // std::cout << "this -> _cellLevel == other._cellLevel: " << (this -> _cellLevel == other._cellLevel) << std::endl;
     return this == &other ||
-        (this -> _pointLevel == other._pointLevel &&
-         this -> _sectionLevel == other._sectionLevel &&
-         this -> _cellLevel == other._cellLevel);
+        (compare(this -> _pointLevel, other._pointLevel, "_pointLevel", verbose) &&
+         compare(this -> _sectionLevel, other._sectionLevel, "_sectionLevel", verbose) &&
+         compare(this -> _cellLevel, other._cellLevel, "_cellLevel", verbose));
+}
+
+bool Properties::operator!=(const Properties& other) const {
+    return !this->operator==(other);
 }
 
 

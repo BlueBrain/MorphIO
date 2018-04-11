@@ -174,6 +174,17 @@ public:
         return "Empty soma";
     }
 
+    std::string ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1, int length1,
+                                             const std::string& vec2, int length2) const {
+        std::string msg("Vector length mismatch: \nLength "+ vec1 + ": " +
+                        std::to_string(length1) +
+                        "\nLength "+ vec2 + ": " + std::to_string(length2));
+        if(length1 == 0 || length2 == 0)
+            msg += "\nTip: Did you forget to fill vector: " + (length1 == 0 ? vec1 : vec2) + " ?";
+
+        return msg;
+    }
+
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
     ////////////////////////////////////////////////////////////////////////////////

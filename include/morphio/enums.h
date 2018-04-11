@@ -63,6 +63,28 @@ enum SomaType
     SOMA_SIMPLE_CONTOUR
 };
 
+/** Output stream formatter for MorphologyVersion */
+inline std::ostream& operator<<(std::ostream& os, const SomaType v)
+{
+    switch (v)
+    {
+
+    case SOMA_SINGLE_POINT:
+        return os << "SOMA_SINGLE_POINT";
+    case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS:
+        return os << "SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS";
+    case SOMA_CYLINDERS:
+        return os << "SOMA_CYLINDERS";
+    case SOMA_THREE_POINTS:
+        return os << "SOMA_THREE_POINTS";
+    case SOMA_SIMPLE_CONTOUR:
+        return os << "SOMA_SIMPLE_CONTOUR";
+
+    default:
+    case SOMA_UNDEFINED:
+        return os << "SOMA_UNDEFINED";
+    }
+}
 
 /** Classification of neuron substructures. */
 enum SectionType

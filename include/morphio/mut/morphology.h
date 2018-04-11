@@ -28,7 +28,9 @@ namespace mut
 class Morphology
 {
 public:
-    Morphology() : _soma(std::make_shared<Soma>(Soma())) , _counter(0) {}
+    Morphology() : _soma(std::make_shared<Soma>(Soma())),
+                   _cellProperties(std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())),
+                   _counter(0) {}
 
     /**
        Build a mutable Morphology from an on-disk morphology
@@ -164,6 +166,11 @@ public:
     //               uint32_t startSection = -1);
 
     void applyModifiers(unsigned int modifierFlags);
+
+    SomaType& somaType() { return _cellProperties->_somaType; }
+    CellFamily& cellFamily(){ return _cellProperties->_cellFamily; }
+    MorphologyVersion& version(){ return _cellProperties->_version; }
+
 
 
     void write_h5(const std::string& filename);

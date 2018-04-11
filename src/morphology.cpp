@@ -69,8 +69,6 @@ void buildChildren(std::shared_ptr<Property::Properties> properties)
     }
 }
 
-
-
 Morphology::Morphology(const URI& source, unsigned int options)
 {
     const size_t pos = source.find_last_of(".");
@@ -83,25 +81,17 @@ Morphology::Morphology(const URI& source, unsigned int options)
     for(auto& c : source.substr(pos))
         extension += std::tolower(c);
 
-    if (extension == ".h5")
-    {
-        _properties =
-            std::make_shared<Property::Properties>(plugin::h5::load(source, options));
-    }
-    else if (extension == ".swc")
-    {
-        _properties =
-            std::make_shared<Property::Properties>(plugin::swc::load(source, options));
-    }
-    else if (extension == ".asc")
-    {
-        _properties =
-            std::make_shared<Property::Properties>(plugin::asc::load(source, options));
-    }
-    else
-    {
+    auto loader = [&source, &options, &extension](){
+        if (extension == ".h5")
+            return plugin::h5::load(source, options);
+        if (extension == ".asc")
+            return plugin::asc::load(source, options);
+        if (extension == ".swc")
+            return plugin::swc::load(source, options);
         LBTHROW(UnknownFileType("unhandled file type"));
-    }
+    };
+
+    _properties = std::make_shared<Property::Properties>(loader());
 
     buildChildren(_properties);
 
@@ -111,9 +101,9 @@ Morphology::Morphology(const URI& source, unsigned int options)
     // Sad trick because, contrary to SWC and ASC, H5 does not create a mut::Morphology object
     // on which we can directly call mut::Morphology::applyModifiers
     if(options &&
-       version() == MORPHOLOGY_VERSION_H5_1 ||
-       version() == MORPHOLOGY_VERSION_H5_1_1 ||
-       version() == MORPHOLOGY_VERSION_H5_2) {
+       (version() == MORPHOLOGY_VERSION_H5_1 ||
+        version() == MORPHOLOGY_VERSION_H5_1_1 ||
+        version() == MORPHOLOGY_VERSION_H5_2)) {
 
         mut::Morphology mutable_morph(*this);
         mutable_morph.applyModifiers(options);
@@ -140,6 +130,11 @@ bool Morphology::operator==(const Morphology& other) const {
          *(this->_properties) == *(other._properties));
 }
 
+bool Morphology::operator!=(const Morphology& other) const {
+    return !this->operator==(other);
+}
+
+
 
 const Soma Morphology::soma() const
 {
@@ -158,8 +153,10 @@ const std::vector<Section> Morphology::rootSections() const
     {
         const std::vector<uint32_t>& children = _properties->children().at(0);
         result.reserve(children.size());
-        for (auto id: children)
+        for (auto id: children) {
             result.push_back(section(id));
+        }
+
         return result;
     }
     catch (const std::out_of_range& oor)

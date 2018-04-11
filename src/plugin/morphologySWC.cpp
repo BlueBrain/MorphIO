@@ -193,10 +193,9 @@ public:
             auto &somaChildren = children[somaRootId];
             uint32_t nSomaChildren = std::count_if(
                 somaChildren.begin(), somaChildren.end(),
-                [this](uint32_t id){return this->samples[id].type == SECTION_AXON;});
+                [this](uint32_t id){return this->samples[id].type == SECTION_SOMA;});
 
             if(nSomaChildren == 2) {
-                LBERROR("Using neuromorpho 3-Point soma");
                 //  NeuroMorpho is the main provider of morphologies, but they
                 //  with SWC as their default file format: they convert all
                 //  uploads to SWC.  In the process of conversion, they turn all

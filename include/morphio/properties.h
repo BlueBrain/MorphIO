@@ -45,6 +45,7 @@ struct PointLevel
     PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
     bool operator==(const PointLevel& other) const;
+    bool operator!=(const PointLevel& other) const;
 };
 
 struct SectionLevel
@@ -54,6 +55,7 @@ struct SectionLevel
     std::map<uint32_t, std::vector<uint32_t>> _children;
 
     bool operator==(const SectionLevel& other) const;
+    bool operator!=(const SectionLevel& other) const;
 };
 
 struct CellLevel
@@ -63,7 +65,7 @@ struct CellLevel
     MorphologyVersion _version;
 
     bool operator==(const CellLevel& other) const;
-
+    bool operator!=(const CellLevel& other) const;
 };
 
 
@@ -91,7 +93,7 @@ struct Properties
         return _sectionLevel._children;
     }
     bool operator==(const Properties& other) const;
-
+    bool operator!=(const Properties& other) const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);

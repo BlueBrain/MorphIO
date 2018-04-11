@@ -165,9 +165,9 @@ def test_build_read_only():
     assert_array_equal(immutable_morphology.sections[0].diameters,
                        [-4])
 
-    # -1 is a fill value for soma "perimeter" property (which is undefined)
+    # 0 is a fill value for soma "perimeter" property (which is undefined)
     assert_array_equal(immutable_morphology.sections[0].perimeters,
-                       [-1])
+                       [0])
 
     assert_array_equal(immutable_morphology.sections[1].points,
                        [[1, 2, 3], [4, 5, 6]])

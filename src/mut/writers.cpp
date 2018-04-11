@@ -138,6 +138,20 @@ void asc(const Morphology& morphology, const std::string& filename)
 
 }
 
+template <typename T> HighFive::Attribute write_attribute(HighFive::File& file, const std::string& name, const T& version) {
+    HighFive::Attribute a_version = file.createAttribute<typename T::value_type>(
+        name, HighFive::DataSpace::From(version));
+    a_version.write(version);
+    return a_version;
+}
+
+template <typename T> HighFive::Attribute write_attribute(HighFive::Group& group, const std::string& name, const T& version) {
+    HighFive::Attribute a_version = group.createAttribute<typename T::value_type>(
+        name, HighFive::DataSpace::From(version));
+    a_version.write(version);
+    return a_version;
+}
+
 void h5(const Morphology& morpho, const std::string& filename)
 {
 
@@ -152,19 +166,37 @@ void h5(const Morphology& morpho, const std::string& filename)
 
     std::vector<std::vector<float>> raw_points;
     std::vector<std::vector<int32_t>> raw_structure;
+    std::vector<float> raw_perimeters;
 
     const auto &points = morpho.soma()->points();
     const auto &diameters = morpho.soma()->diameters();
+
     const std::size_t numberOfPoints = points.size();
+    const std::size_t numberOfDiameters = diameters.size();
+
 
     if(numberOfPoints < 1)
         throw WriterError(plugin::ErrorMessages().ERROR_WRITE_NO_SOMA());
+    if(numberOfPoints != numberOfDiameters)
+        throw WriterError(plugin::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+                              "soma points", numberOfPoints,
+                              "soma diameters", numberOfDiameters));
 
-    for(int i = 0;i<numberOfPoints; ++i)
+    bool hasPerimeterData = morpho.rootSections().size() > 0 ?
+        morpho.section(morpho.rootSections()[0])->perimeters().size() > 0 :
+        false;
+
+    for(int i = 0;i<numberOfPoints; ++i) {
         raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
+        if(hasPerimeterData)
+            raw_perimeters.push_back(0);
+    }
+
     raw_structure.push_back({0, SECTION_SOMA, -1});
     int offset = 0;
     offset += morpho.soma()->points().size();
+
+
 
 
     for(auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
@@ -175,28 +207,54 @@ void h5(const Morphology& morpho, const std::string& filename)
         auto section = morpho.section(sectionId);
         const auto &points = section->points();
         const auto &diameters = section->diameters();
+        const auto &perimeters = section->perimeters();
+
         const std::size_t numberOfPoints = points.size();
+        const std::size_t numberOfPerimeters = perimeters.size();
         raw_structure.push_back({offset, section->type(), parentOnDisk});
+
         for(int i = 0;i<numberOfPoints; ++i)
             raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
+
+        if(numberOfPerimeters > 0) {
+
+            if(numberOfPerimeters != numberOfPoints)
+                throw WriterError(plugin::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+                                      "points", numberOfPoints,
+                                      "perimeters", numberOfPerimeters));
+            for(int i = 0;i<numberOfPerimeters; ++i)
+                raw_perimeters.push_back(perimeters[i]);
+        }
 
         newIds[section->id()] = sectionIdOnDisk++;
         offset += numberOfPoints;
     }
 
-    std::vector<std::string> comment{" created out by morpho_tool v1"};
 
     HighFive::DataSet dpoints =
         h5_file.createDataSet<double>("/points", HighFive::DataSpace::From(raw_points));
     HighFive::DataSet dstructures = h5_file.createDataSet<int32_t>(
         "/structure", HighFive::DataSpace::From(raw_structure));
-    HighFive::Attribute acomment = h5_file.createAttribute<std::string>(
-        "comment", HighFive::DataSpace::From(comment));
+    HighFive::DataSet dperimeters = h5_file.createDataSet<float>(
+        "/perimeters", HighFive::DataSpace::From(raw_perimeters));
+
+
+    std::string METADATA = "metadata";
+    HighFive::Group g_metadata = h5_file.createGroup(METADATA);
+
+    std::vector<uint32_t> version{1,1};
+
 
     dpoints.write(raw_points);
     dstructures.write(raw_structure);
-    acomment.write(comment);
+    write_attribute(g_metadata, "version", version);
+    write_attribute(g_metadata, "cell_family", std::vector<uint32_t>{FAMILY_NEURON});
+    write_attribute(h5_file, "comment",
+                    std::vector<std::string>{" created out by morpho_tool v1"});
 
+
+    if(hasPerimeterData)
+        dperimeters.write(raw_perimeters);
 }
 
 } // end namespace writer
