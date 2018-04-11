@@ -21,8 +21,22 @@ using namespace std;
 
 int main()
 {
-    std::string filename = "broken.asc";
-    morphio::Morphology morpho(filename, morphio::SOMA_SPHERE);
+    morphio::mut::Morphology morpho;
+    morpho.soma()->points() = {{0,0,0},
+                               {1,1,1}};
+    morpho.soma()->diameters() = {1,1};
 
-    // morpho.write_asc(filename);
+    morpho.appendSection(-1, morphio::SectionType::SECTION_AXON,
+                         morphio::Property::PointLevel({{2,2,2}, {3,3,3}},
+                                                       {4,4},
+                                                       {5,5}));
+
+
+    morpho.write_h5("test.h5");
+
+
+    morphio::Morphology read("test.h5");
+
+    bool same_same = morphio::Morphology(morpho) != read;
+    std::cout << "same_same: " << same_same << std::endl;
 }

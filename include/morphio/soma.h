@@ -40,6 +40,16 @@ public:
         return get<Property::Diameter>();
     }
 
+    const SomaType type() const
+    {
+        return _properties->_cellLevel._somaType;
+    }
+    const float volume() const;
+    const float surface() const;
+    const float maxDistance() const;
+
+
+
 private:
     Soma(std::shared_ptr<Property::Properties>);
     template <typename Property>

@@ -167,7 +167,7 @@ public:
 
     void applyModifiers(unsigned int modifierFlags);
 
-    SomaType& somaType() { return _cellProperties->_somaType; }
+    SomaType somaType() { return _soma->type(); }
     CellFamily& cellFamily(){ return _cellProperties->_cellFamily; }
     MorphologyVersion& version(){ return _cellProperties->_version; }
 

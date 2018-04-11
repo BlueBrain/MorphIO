@@ -220,9 +220,10 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
     Property::Properties properties;
     morphio::plugin::ErrorMessages err(debugInfo.filename);
 
-    if(_cellProperties)
+    if(_cellProperties) {
         properties._cellLevel = *_cellProperties;
-
+        properties._cellLevel._somaType = _soma->type();
+    }
     _appendProperties(properties._pointLevel, _soma->_pointProperties);
 
     // Need to fill some unused value for the soma perimeter

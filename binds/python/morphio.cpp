@@ -186,6 +186,10 @@ PYBIND11_MODULE(morphio, m) {
         .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, morphio::SectionType, const morphio::Property::PointLevel&)) &morphio::mut::Morphology::appendSection)
         .def("delete_section", &morphio::mut::Morphology::deleteSection)
 
+        .def_property_readonly("cell_family", &morphio::mut::Morphology::cellFamily)
+        .def_property_readonly("soma_type", &morphio::mut::Morphology::somaType)
+        .def_property_readonly("version", &morphio::mut::Morphology::version)
+
         .def("write_h5", &morphio::mut::Morphology::write_h5)
         .def("write_swc", &morphio::mut::Morphology::write_swc)
         .def("write_asc", &morphio::mut::Morphology::write_asc)
@@ -245,12 +249,14 @@ PYBIND11_MODULE(morphio, m) {
     py::class_<morphio::mut::Soma, std::unique_ptr<morphio::mut::Soma, py::nodelete>>(mut_module, "Soma")
         .def(py::init<const morphio::Property::PointLevel&>())
         .def_property("points",
+                      (std::vector<morphio::Point>& (morphio::mut::Soma::*) ())
                       &morphio::mut::Soma::points,
                       [](morphio::mut::Soma* soma,
                          const std::vector<morphio::Point>& _points) {
                           soma -> points() = _points;
                       })
         .def_property("diameters",
+                      (std::vector<float>& (morphio::mut::Soma::*) ())
                       &morphio::mut::Soma::diameters,
                       [](morphio::mut::Soma* soma,
                          const std::vector<float>& _diameters) {

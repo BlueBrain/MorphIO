@@ -1,5 +1,8 @@
+#include <cmath>
+
 #include <morphio/section.h>
 #include <morphio/soma.h>
+
 
 namespace morphio
 {
@@ -46,8 +49,25 @@ const Point Soma::somaCenter() const
     return Point({x / size, y / size, z / size});
 }
 
+const float Soma::volume() const {
+    switch(_properties->_cellLevel._somaType) {
+    case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS:
+    {
+        float radius = diameters()[0] / 2;
+        return 4 * M_PI * radius * radius;
+    }
+
+    default:
+        throw;
+
+    }
+}
+const float Soma::surface() const {};
+const float Soma::maxDistance() const {};
+
 template const range<const Property::Point::Type>
     Soma::get<Property::Point>() const;
 template const range<const Property::Diameter::Type>
     Soma::get<Property::Diameter>() const;
+
 }

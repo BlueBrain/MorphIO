@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-export MORPHIO_BASE=$(realpath "$( cd "$(dirname "$0")" ; pwd -P )"/../..)
+export MORPHIO_BASE=$(readlink -f "$( cd "$(dirname "$0")" ; pwd -P )"/../..)
 export WHEELHOUSE=${MORPHIO_BASE}/packaging/python_wheel/wheelhouse/
 
 if [ "$(uname)" == "Darwin" ]; then
