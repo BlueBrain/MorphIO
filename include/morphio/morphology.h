@@ -76,6 +76,7 @@ public:
     const SomaType& somaType() const;
     const CellFamily& cellFamily() const;
     const MorphologyVersion& version() const;
+    const Mitochondria mitochondria() const;
 
 private:
     friend class mut::Morphology;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <morphio/section_base.h>
+
 #include <morphio/iterators.h>
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
@@ -28,48 +28,50 @@ namespace morphio
  * is a Section referring to it.
  */
 
-class Section : public SectionBase<Section>
+template <typename T>
+class SectionBase
 {
-    typedef Property::Section SectionId;
-    typedef Property::Point PointAttribute;
 public:
-    /**
-       Depth first search iterator
-    **/
-    depth_iterator depth_begin() const;
-    depth_iterator depth_end() const;
+    SectionBase(const SectionBase& section);
+
+    const SectionBase& operator=(const SectionBase& section);
+
+    bool operator==(const SectionBase& section) const;
+    bool operator!=(const SectionBase& section) const;
+
+    bool isRoot() const;
 
     /**
-       Breadth first search iterator
-    **/
-    breadth_iterator breadth_begin() const;
-    breadth_iterator breadth_end() const;
+     * Return the parent section of this section \if pybind or None if doesn't
+     * have any.\else.
+     *
+     * @throw runtime_error is the section doesn't have a parent.
+     * \endif
+     */
+    T parent() const;
 
     /**
-       Upstream first search iterator
-    **/
-    upstream_iterator upstream_begin() const;
-    upstream_iterator upstream_end() const;
+     * Return a vector with all the direct children of this section.
+     * The container will be empty for terminal sections.
+     */
+    const std::vector<T> children() const;
 
-
-    const range<const Point> points() const;
-    const range<const float> diameters() const;
-    const range<const float> perimeters() const;
-
-    /** Return the morphological type of this section (dendrite, axon, ...). */
-    const SectionType type() const;
-    friend class mut::Section;
-    friend const Section Morphology::section(const uint32_t&) const;
-    friend class SectionBase<Section>;
+    /** Return the ID of this section. */
+    const uint32_t id() const;
 
 protected:
-    Section(uint32_t id, std::shared_ptr<Property::Properties> morphology) : SectionBase(id, morphology) {}
-};
+    SectionBase(uint32_t id, std::shared_ptr<Property::Properties> morphology);
+    template <typename Property> const range<const typename Property::Type> get() const;
 
-// explicit instanciation
-template class SectionBase<Section>;
+
+    uint32_t _id;
+    SectionRange _range;
+    std::shared_ptr<Property::Properties> _properties;
+};
 
 } // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
 std::ostream& operator<<(std::ostream& os, morphio::range<const morphio::Point> points);
+
+#include "../../src/section_base.tpp"

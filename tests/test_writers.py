@@ -3,7 +3,7 @@ from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
 
 from morphio.mut import Morphology
-from morphio import SectionType, PointLevel, Morphology as ImmutMorphology
+from morphio import SectionType, PointLevel, MitochondriaPointLevel, Morphology as ImmutMorphology
 
 _path = os.path.dirname(os.path.abspath(__file__))
 
@@ -89,3 +89,23 @@ def test_write_perimeter():
     morpho.write_h5("test_write.h5")
 
     assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.h5"))
+
+
+def test_mitochondria():
+    morpho = Morphology()
+    morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
+    morpho.soma.diameters = [1, 1]
+
+    sectionId = morpho.append_section(
+        -1, SectionType.axon,
+        PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]))
+
+    mito_id = morpho.mitochondria().append_section(
+        -1, MitochondriaPointLevel([0, 0], [0.5, 0.6],
+                                   [10, 20]))
+
+    morpho.mitochondria().append_section(
+        mito_id, MitochondriaPointLevel([0, 0, 0, 0],
+                                        [0.6, 0.7, 0.8, 0.9],
+                                        [20, 30, 40, 50]))
+    morpho.write_h5("test.h5")

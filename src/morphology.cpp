@@ -5,6 +5,7 @@
 #include <fstream>
 #include <streambuf>
 
+#include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
@@ -58,14 +59,30 @@ SomaType getSomaType(uint32_t nSomaPoints) {
 
 void buildChildren(std::shared_ptr<Property::Properties> properties)
 {
-    const auto& sections = properties->get<Property::Section>();
-    auto& children = properties->_sectionLevel._children;
 
-    for (size_t i = 0; i < sections.size(); ++i)
     {
-        const int32_t parent = sections[i][1];
-        if (parent != -1)
+        const auto& sections = properties->get<Property::Section>();
+        auto& children = properties->_sectionLevel._children;
+
+        for (size_t i = 0; i < sections.size(); ++i)
+        {
+            const int32_t parent = sections[i][1];
+            if (parent != -1)
+                children[parent].push_back(i);
+        }
+    }
+
+    {
+        const auto& sections = properties->get<Property::MitoSection>();
+        auto& children = properties->_mitochondriaSectionLevel._children;
+
+        for (size_t i = 0; i < sections.size(); ++i)
+        {
+            const int32_t parent = sections[i][1];
+            std::cout << "parent: " << parent << std::endl;
+            std::cout << "i: " << i << std::endl;
             children[parent].push_back(i);
+        }
     }
 }
 
@@ -139,6 +156,11 @@ bool Morphology::operator!=(const Morphology& other) const {
 const Soma Morphology::soma() const
 {
     return Soma(_properties);
+}
+
+const Mitochondria Morphology::mitochondria() const
+{
+    return Mitochondria(_properties);
 }
 
 const Section Morphology::section(const uint32_t& id) const

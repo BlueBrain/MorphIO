@@ -1,3 +1,4 @@
+#include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 
 namespace morphio

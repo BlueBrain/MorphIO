@@ -18,6 +18,14 @@ namespace morphio
 {
 namespace Property
 {
+
+template <typename T>
+void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset)
+{
+    to.insert(to.end(), from.begin() + offset, from.end());
+}
+
+
 template <typename T>
 std::vector<typename T::Type> copySpan(
     const std::vector<typename T::Type>& data, SectionRange range)
@@ -28,8 +36,22 @@ std::vector<typename T::Type> copySpan(
                                          data.begin() + range.second);
 }
 
+MitochondriaPointLevel::MitochondriaPointLevel(std::vector<MitoNeuriteSectionId::Type> sectionIds,
+                                               std::vector<MitoPathLength::Type> relativePathLengths,
+                                               std::vector<MitoDiameter::Type> diameters)
+    : _sectionIds(sectionIds), _relativePathLengths(relativePathLengths), _diameters(diameters)
+{
+    if(_sectionIds.size() != _relativePathLengths.size())
+        throw SectionBuilderError("While building MitochondriaPointLevel:\n"
+                                  "section IDs vector have size: " + std::to_string(_sectionIds.size())
+                                  + " while relative path length vector has size: " + std::to_string(_relativePathLengths.size()));
 
-;
+    if(_sectionIds.size() != _diameters.size())
+        throw SectionBuilderError("While building MitochondriaPointLevel:\n"
+                                  "section IDs vector have size: " + std::to_string(_sectionIds.size())
+                                  + " while diameter vector has size: " + std::to_string(_diameters.size()));
+
+}
 
 PointLevel::PointLevel(std::vector<Point::Type> points,
                        std::vector<Diameter::Type> diameters,
@@ -147,10 +169,35 @@ std::vector<Section::Type>& Properties::get<Section>()
 {
     return _sectionLevel._sections;
 }
+
 template <>
 const std::vector<Section::Type>& Properties::get<Section>() const
 {
     return _sectionLevel._sections;
+}
+
+template <>
+std::vector<MitoSection::Type>& Properties::get<MitoSection>()
+{
+    return _mitochondriaSectionLevel._sections;
+}
+
+template <>
+const std::vector<MitoSection::Type>& Properties::get<MitoSection>() const
+{
+    return _mitochondriaSectionLevel._sections;
+}
+
+template <>
+std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>()
+{
+    return _mitochondriaPointLevel._sectionIds;
+}
+
+template <>
+const std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>() const
+{
+    return _mitochondriaPointLevel._sectionIds;
 }
 
 template <>
@@ -180,6 +227,7 @@ std::vector<Perimeter::Type>& Properties::get<Perimeter>()
 {
     return _pointLevel._perimeters;
 }
+
 template <>
 const std::vector<Perimeter::Type>& Properties::get<Perimeter>() const
 {
@@ -191,12 +239,36 @@ std::vector<Diameter::Type>& Properties::get<Diameter>()
 {
     return _pointLevel._diameters;
 }
+
 template <>
 const std::vector<Diameter::Type>& Properties::get<Diameter>() const
 {
     return _pointLevel._diameters;
 }
 
+template <>
+std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>()
+{
+    return _mitochondriaPointLevel._diameters;
+}
+
+template <>
+const std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() const
+{
+    return _mitochondriaPointLevel._diameters;
+}
+
+template <>
+std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>()
+{
+    return _mitochondriaPointLevel._relativePathLengths;
+}
+
+template <>
+const std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() const
+{
+    return _mitochondriaPointLevel._relativePathLengths;
+}
 
 std::ostream& operator<<(std::ostream& os, const PointLevel& prop){
     os << "Point level properties:" << std::endl;
@@ -216,6 +288,14 @@ std::ostream& operator<<(std::ostream& os, const Properties& properties){
     // os << _cellLevel << std::endl;
     return os;
 }
+
+template void _appendVector(std::vector<float>&, std::vector<float> const&, int);
+template void _appendVector(std::vector<std::array<float, 3ul>>&,
+                            std::vector<std::array<float, 3ul>> const&,
+                            int);
+template void _appendVector(std::vector<unsigned int>&,
+                            std::vector<unsigned int> const&,
+                            int);
 
 } // namespace Property
 } // namespace morphio

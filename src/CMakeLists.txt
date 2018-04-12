@@ -3,6 +3,9 @@ set(MORPHIO_SOURCES
   plugin/morphologyHDF5.cpp
   plugin/morphologySWC.cpp
   plugin/morphologyASC.cpp
+  mitochondria.cpp
+  mito_section.cpp
+  mito_iterators.cpp
   properties.cpp
   iterators.cpp
   morphology.cpp
@@ -13,6 +16,7 @@ set(MORPHIO_SOURCES
   mut/section.cpp
   mut/soma.cpp
   mut/morphology.cpp
+  mut/mitochondria.cpp
   mut/writers.cpp
   mut/modifiers.cpp
   )

@@ -190,21 +190,16 @@ void Morphology::deleteSection(uint32_t id, bool recursive)
 //     }
 // }
 
-template <typename T>
-void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset)
-{
-    to.insert(to.end(), from.begin() + offset, from.end());
-}
 
 void _appendProperties(Property::PointLevel& to,
                        const Property::PointLevel& from,
                        int offset = 0)
 {
-    _appendVector(to._points, from._points, offset);
-    _appendVector(to._diameters, from._diameters, offset);
+    Property::_appendVector(to._points, from._points, offset);
+    Property::_appendVector(to._diameters, from._diameters, offset);
 
     if(!from._perimeters.empty())
-        _appendVector(to._perimeters, from._perimeters, offset);
+        Property::_appendVector(to._perimeters, from._perimeters, offset);
 }
 
 const Property::Properties Morphology::buildReadOnly() const {

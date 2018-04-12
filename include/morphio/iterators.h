@@ -14,10 +14,10 @@ class Iterator
 {
     friend class Section;
     T container;
-    Iterator();
 
 public:
     Iterator(const Section& section);
+    Iterator();
     bool operator==(Iterator other) const;
     bool operator!=(Iterator other) const;
     Section operator*() const;

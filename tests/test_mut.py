@@ -1,8 +1,9 @@
+import numpy as np
 from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
 
 from morphio.mut import Morphology, Soma
-from morphio import ostream_redirect, PointLevel, SectionType, SectionBuilderError, Morphology as ImmutableMorphology
+from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, SectionBuilderError, Morphology as ImmutableMorphology
 from contextlib import contextmanager
 import sys
 from io import StringIO
@@ -194,3 +195,41 @@ def test_build_read_only():
                        [2, 3])
     assert_array_equal(same_child.perimeters,
                        [20, 30])
+
+
+def test_mitochondria():
+    morpho = Morphology()
+    morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
+    morpho.soma.diameters = [1, 1]
+
+    sectionId = morpho.append_section(
+        -1, SectionType.axon,
+        PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]))
+
+    mito = morpho.mitochondria()
+    first_mito_id = mito.append_section(
+        -1, MitochondriaPointLevel([0, 0], [0.5, 0.6],
+                                   [10, 20]))
+
+    first_child = mito.append_section(first_mito_id,
+                                      MitochondriaPointLevel([3, 4, 4, 5],
+                                                             [0.6, 0.7, 0.8, 0.9],
+                                                             [20, 30, 40, 50]))
+
+    second_mito_id = mito.append_section(-1,
+                                         MitochondriaPointLevel([0, 1, 1, 2],
+                                                                [0.6, 0.7, 0.8, 0.9],
+                                                                [5, 6, 7, 8]))
+
+    assert_equal(mito.parent(first_mito_id), -1)
+    assert_equal(mito.children(first_mito_id), [first_child])
+    assert_equal(mito.parent(first_child), first_mito_id)
+    assert_equal(mito.root_sections, [first_mito_id, second_mito_id])
+
+    assert_array_equal(mito.section(first_child).diameters,
+                       [20, 30, 40, 50])
+    assert_array_equal(mito.section(first_child).neurite_section_ids,
+                       [3, 4, 4, 5])
+
+    assert_array_equal(np.array(mito.section(first_child).path_lengths, dtype=np.float32),
+                       np.array([0.6, 0.7, 0.8, 0.9], dtype=np.float32))

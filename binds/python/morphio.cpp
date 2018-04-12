@@ -7,10 +7,14 @@
 #include <morphio/types.h>
 #include <morphio/enums.h>
 
+#include <morphio/mito_iterators.h>
+#include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
 #include <morphio/section.h>
+#include <morphio/mito_section.h>
 #include <morphio/soma.h>
 
+#include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/soma.h>
@@ -37,19 +41,20 @@ py::array_t<float> span_array_to_ndarray(const morphio::range<const std::array<f
 }
 
 
-py::array_t<float> span_to_ndarray(const morphio::range<const float>& span)
+template <typename T>
+py::array_t<float> span_to_ndarray(const morphio::range<const T>& span)
 {
     const auto buffer_info = py::buffer_info(
         // Cast from (const void*) to (void*) for function signature matching
         (void*)span.data(),                            /* Pointer to buffer */
-        sizeof(float),                          /* Size of one scalar */
-        py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
+        sizeof(T),                          /* Size of one scalar */
+        py::format_descriptor<T>::format(), /* Python struct-style format descriptor */
         1,                                      /* Number of dimensions */
 
         // Forced cast to prevent error:
         // template argument deduction/substitution failed */
         {(int) span.size()}, /* buffer dimentions */
-        {sizeof(float)} );      /* Strides (in bytes) for each index */
+        {sizeof(T)} );      /* Strides (in bytes) for each index */
     return py::array(buffer_info);
 }
 
@@ -73,11 +78,16 @@ PYBIND11_MODULE(morphio, m) {
         .def("section", &morphio::Morphology::section)
         .def_property_readonly("sections", &morphio::Morphology::sections)
         .def_property_readonly("root_sections", &morphio::Morphology::rootSections)
+        .def_property_readonly("mitochondria", &morphio::Morphology::mitochondria)
         .def_property_readonly("soma", &morphio::Morphology::soma)
         .def_property_readonly("cell_family", &morphio::Morphology::cellFamily)
         .def_property_readonly("soma_type", &morphio::Morphology::somaType)
         .def_property_readonly("version", &morphio::Morphology::version);
 
+    py::class_<morphio::Mitochondria>(m, "Mitochondria")
+        .def("section", &morphio::Mitochondria::section)
+        .def_property_readonly("sections", &morphio::Mitochondria::sections)
+        .def_property_readonly("root_sections", &morphio::Mitochondria::rootSections);
 
 
     py::class_<morphio::Soma>(m, "Soma")
@@ -105,6 +115,28 @@ PYBIND11_MODULE(morphio, m) {
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
         .def_property_readonly("upstream_begin", [](morphio::Section* section) {
+                return py::make_iterator(section->upstream_begin(), section->upstream_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */);
+
+    py::class_<morphio::MitoSection>(m, "MitoSection")
+        .def_property_readonly("parent", &morphio::MitoSection::parent)
+        .def_property_readonly("is_root", &morphio::MitoSection::isRoot)
+        .def_property_readonly("parent", &morphio::MitoSection::parent)
+        .def_property_readonly("children", &morphio::MitoSection::children)
+        .def_property_readonly("neurite_section_id", [](morphio::MitoSection* section){ return span_to_ndarray(section->neuriteSectionId()); })
+        .def_property_readonly("diameters", [](morphio::MitoSection* section){ return span_to_ndarray(section->diameters()); })
+        .def_property_readonly("relative_path_lengths", [](morphio::MitoSection* section){ return span_to_ndarray(section->relativePathLengths()); })
+        .def_property_readonly("id", &morphio::MitoSection::id)
+        .def_property_readonly("depth_begin", [](morphio::MitoSection* section) {
+                return py::make_iterator(section->depth_begin(), section->depth_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+        .def_property_readonly("breadth_begin", [](morphio::MitoSection* section) {
+                return py::make_iterator(section->breadth_begin(), section->breadth_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+        .def_property_readonly("upstream_begin", [](morphio::MitoSection* section) {
                 return py::make_iterator(section->upstream_begin(), section->upstream_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */);
@@ -169,6 +201,16 @@ PYBIND11_MODULE(morphio, m) {
     //       Mutable module
     ////////////////////////////////////////////////////////////////////////////////
     py::module mut_module = m.def_submodule("mut");
+
+    py::class_<morphio::mut::Mitochondria>(mut_module, "Mitochondria")
+        .def(py::init<>())
+        .def_property_readonly("root_sections", &morphio::mut::Mitochondria::rootSections)
+        .def("parent", &morphio::mut::Mitochondria::parent)
+        .def("children", &morphio::mut::Mitochondria::children)
+        .def("section", &morphio::mut::Mitochondria::section)
+        .def("append_section", &morphio::mut::Mitochondria::appendSection);
+
+
     py::class_<morphio::mut::Morphology>(mut_module, "Morphology")
         .def(py::init<>())
         .def(py::init<const morphio::URI&>())
@@ -181,6 +223,8 @@ PYBIND11_MODULE(morphio, m) {
         .def("parent", &morphio::mut::Morphology::parent)
         .def("children", &morphio::mut::Morphology::children)
         .def("section", &morphio::mut::Morphology::section)
+        .def("mitochondria", (morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ())
+             &morphio::mut::Morphology::mitochondria, py::return_value_policy::reference)
         .def("build_read_only", (const morphio::Property::Properties (morphio::mut::Morphology::*)() const) &morphio::mut::Morphology::buildReadOnly)
         .def("delete_section", &morphio::mut::Morphology::deleteSection)
         .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, morphio::SectionType, const morphio::Property::PointLevel&)) &morphio::mut::Morphology::appendSection)
@@ -212,6 +256,28 @@ PYBIND11_MODULE(morphio, m) {
 
         // .def("traverse", &morphio::mut::Morphology::traverse);
 
+
+    // py::nodelete needed because morphio::mut::MitoSection has a private destructor
+    // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
+    py::class_<morphio::mut::MitoSection, std::unique_ptr<morphio::mut::MitoSection, py::nodelete>>(mut_module, "MitoSection")
+        .def_property("diameters",
+                      &morphio::mut::MitoSection::diameters,
+                      [](morphio::mut::MitoSection* section,
+                         const std::vector<float>& _diameters) {
+                          section -> diameters() = _diameters;
+                      })
+        .def_property("path_lengths",
+                      &morphio::mut::MitoSection::pathLengths,
+                      [](morphio::mut::MitoSection* section,
+                         const std::vector<float>& _pathLengths) {
+                          section -> pathLengths() = _pathLengths;
+                      })
+        .def_property("neurite_section_ids",
+                      &morphio::mut::MitoSection::neuriteSectionIds,
+                      [](morphio::mut::MitoSection* section,
+                         const std::vector<uint32_t>& _neuriteSectionIds) {
+                          section -> neuriteSectionIds() = _neuriteSectionIds;
+                      });
 
     // py::nodelete needed because morphio::mut::Section has a private destructor
     // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
@@ -265,6 +331,11 @@ PYBIND11_MODULE(morphio, m) {
 
 
 
+    py::class_<morphio::Property::MitochondriaPointLevel>(m, "MitochondriaPointLevel")
+        .def(py::init<>())
+        .def(py::init<std::vector<uint32_t>, std::vector<float>,
+             std::vector<morphio::Property::Diameter::Type>>());
+
     py::class_<morphio::Property::PointLevel>(m, "PointLevel")
         .def(py::init<>())
         .def(py::init<std::vector<morphio::Property::Point::Type>,
@@ -290,4 +361,8 @@ PYBIND11_MODULE(morphio, m) {
         .def_readwrite("point_level", &morphio::Property::Properties::_pointLevel)
         .def_readwrite("section_level", &morphio::Property::Properties::_sectionLevel)
         .def_readwrite("cell_level", &morphio::Property::Properties::_cellLevel);
+
+
+
+
 }

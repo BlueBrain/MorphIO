@@ -7,7 +7,15 @@ namespace morphio
 {
 namespace Property
 {
+template <typename T>
+void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
+
 struct Section
+{
+    typedef Vector2i Type;
+};
+
+struct MitoSection
 {
     typedef Vector2i Type;
 };
@@ -32,6 +40,21 @@ struct Diameter
     typedef float Type;
 };
 
+struct MitoPathLength
+{
+    typedef float Type;
+};
+
+struct MitoDiameter
+{
+    typedef float Type;
+};
+
+struct MitoNeuriteSectionId
+{
+    typedef uint32_t Type;
+};
+
 struct PointLevel
 {
     std::vector<Point::Type> _points;
@@ -46,6 +69,30 @@ struct PointLevel
     PointLevel(const PointLevel& data, SectionRange range);
     bool operator==(const PointLevel& other) const;
     bool operator!=(const PointLevel& other) const;
+};
+
+struct MitochondriaPointLevel
+{
+    std::vector<MitoNeuriteSectionId::Type> _sectionIds;
+    std::vector<MitoPathLength::Type> _relativePathLengths;
+    std::vector<MitoDiameter::Type> _diameters;
+
+    MitochondriaPointLevel(){};
+
+    MitochondriaPointLevel(std::vector<uint32_t> sectionId,
+                           // relative pathlength between the current points
+                           // and the start of the neuronal section
+                           std::vector<MitoPathLength::Type> relativePathLengths,
+                           std::vector<MitoDiameter::Type> diameters);
+};
+
+struct MitochondriaSectionLevel
+{
+    std::vector<Section::Type> _sections;
+    std::map<int32_t, std::vector<uint32_t>> _children;
+
+    bool operator==(const MitochondriaSectionLevel& other) const;
+    bool operator!=(const MitochondriaSectionLevel& other) const;
 };
 
 struct SectionLevel
@@ -77,6 +124,9 @@ struct Properties
     SectionLevel _sectionLevel;
     CellLevel _cellLevel;
 
+    MitochondriaPointLevel _mitochondriaPointLevel;
+    MitochondriaSectionLevel _mitochondriaSectionLevel;
+
     template <typename T>
     std::vector<typename T::Type>& get();
     template <typename T>
@@ -98,6 +148,7 @@ struct Properties
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);
+
 
 } // namespace Property
 } // namespace morphio

@@ -62,6 +62,7 @@ Property::Properties MorphologyHDF5::load(const URI& uri)
     _readSections();
     _readSectionTypes();
     _readPerimeters();
+    _readMitochondria();
 
     return _properties;
 }
@@ -269,11 +270,6 @@ void MorphologyHDF5::_readPoints()
     for(auto p: vec)
         diameters.push_back(p[3]);
 
-    // for(auto point: points){
-    //     std::cout << "points[0]: " << point[0] << std::endl;
-    //     std::cout << "points[1]: " << point[1] << std::endl;
-    //     std::cout << "points[2]: " << point[2] << std::endl;
-    // }
 }
 
 void MorphologyHDF5::_readSections()
@@ -402,6 +398,75 @@ void MorphologyHDF5::_readPerimeters()
                 std::runtime_error("No empty perimeters allowed for glia "
                                    "morphology"));
     }
+}
+
+template <typename T>
+void MorphologyHDF5::_read(const std::string& group,
+                           const std::string& _dataset,
+                           MorphologyVersion version,
+                           int expectedDimension,
+                           T& data)
+{
+
+    if (_properties.version() != version)
+        return;
+    try
+    {
+        const auto mito = _file->getGroup(group);
+
+        HighFive::DataSet dataset = mito.getDataSet(_dataset);
+
+        auto dims = dataset.getSpace().getDimensions();
+        if (dims.size() != expectedDimension)
+        {
+            LBTHROW(std::runtime_error("Reading morphology file '" +
+                                       _file->getName() +
+                                       "': bad number of dimensions in"
+                                       " 'perimeters' dataspace"));
+        }
+
+        data.resize(dims[0]);
+        dataset.read(data);
+    }
+    catch (...)
+    {
+        if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
+            LBTHROW(
+                std::runtime_error("No empty perimeters allowed for glia "
+                                   "morphology"));
+    }
+}
+
+void MorphologyHDF5::_readMitochondria()
+{
+    std::vector<std::vector<float>> points;
+    _read(_g_mitochondria,
+          _d_points,
+          MORPHOLOGY_VERSION_H5_1_1,
+          2,
+          points);
+
+    auto& mitoSectionId = _properties.get<Property::MitoNeuriteSectionId>();
+    auto& pathlength = _properties.get<Property::MitoPathLength>();
+    auto& diameters = _properties.get<Property::MitoDiameter>();
+    for(auto p: points){
+        mitoSectionId.push_back((uint32_t)p[0]);
+        pathlength.push_back(p[1]);
+        diameters.push_back(p[2]);
+    }
+
+
+    std::vector<std::vector<int32_t>> structure;
+    _read(_g_mitochondria,
+          "structure",
+          MORPHOLOGY_VERSION_H5_1_1,
+          2,
+        structure);
+
+
+
+    for(auto& s: structure)
+        _properties.get<Property::MitoSection>().push_back({s[0], s[1]});
 }
 
 } // namespace h5

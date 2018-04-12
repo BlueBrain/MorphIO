@@ -3,6 +3,7 @@
 #include <fstream>
 
 #include <morphio/mut/writers.h>
+#include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 
@@ -18,6 +19,20 @@ namespace mut
 {
 namespace writer
 {
+template <typename T>
+struct base_type
+{
+    using type = T;
+};
+
+/**
+   A structure to get the base type of nested vectors
+ **/
+template <typename T>
+struct base_type<std::vector<T>> : base_type<T>
+{
+};
+
 void swc(const Morphology& morphology, const std::string& filename)
 {
     std::ofstream myfile;
@@ -138,27 +153,84 @@ void asc(const Morphology& morphology, const std::string& filename)
 
 }
 
-template <typename T> HighFive::Attribute write_attribute(HighFive::File& file, const std::string& name, const T& version) {
-    HighFive::Attribute a_version = file.createAttribute<typename T::value_type>(
-        name, HighFive::DataSpace::From(version));
+template <typename T>
+HighFive::Attribute write_attribute(HighFive::File& file,
+                                    const std::string& name, const T& version)
+{
+    HighFive::Attribute a_version =
+        file.createAttribute<typename T::value_type>(name,
+                                                     HighFive::DataSpace::From(
+                                                         version));
     a_version.write(version);
     return a_version;
 }
 
-template <typename T> HighFive::Attribute write_attribute(HighFive::Group& group, const std::string& name, const T& version) {
-    HighFive::Attribute a_version = group.createAttribute<typename T::value_type>(
-        name, HighFive::DataSpace::From(version));
+template <typename T>
+HighFive::Attribute write_attribute(HighFive::Group& group,
+                                    const std::string& name, const T& version)
+{
+    HighFive::Attribute a_version =
+        group.createAttribute<typename T::value_type>(name,
+                                                      HighFive::DataSpace::From(
+                                                          version));
     a_version.write(version);
     return a_version;
+}
+
+template <typename T>
+void write_dataset(HighFive::File& file, const std::string& name, const T& raw)
+{
+    HighFive::DataSet dpoints = file.createDataSet<typename base_type<T>::type>(
+        name, HighFive::DataSpace::From(raw));
+
+    dpoints.write(raw);
+}
+
+template <typename T>
+void write_dataset(HighFive::Group& file, const std::string& name, const T& raw)
+{
+    HighFive::DataSet dpoints = file.createDataSet<typename base_type<T>::type>(
+        name, HighFive::DataSpace::From(raw));
+
+    dpoints.write(raw);
+}
+
+void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria,
+                    const std::string& filename)
+{
+    if(mitochondria.rootSections().empty())
+        return;
+
+    Property::Properties properties;
+    mitochondria._buildMitochondria(properties);
+    auto& p = properties._mitochondriaPointLevel;
+    size_t size = p._diameters.size();
+
+    std::vector<std::vector<float>> points;
+    std::vector<std::vector<int32_t>> structure;
+    for (int i = 0; i < size; ++i)
+    {
+        points.push_back(
+            {(float)p._sectionIds[i], p._relativePathLengths[i], p._diameters[i]});
+    }
+
+    auto& s = properties._mitochondriaSectionLevel;
+    for (int i = 0; i < s._sections.size(); ++i)
+    {
+        structure.push_back({s._sections[i][0], s._sections[i][1]});
+    }
+
+    HighFive::Group g_mitochondria = h5_file.createGroup("mitochondria");
+
+    write_dataset(g_mitochondria, "/mitochondria/points", points);
+    write_dataset(h5_file, "/mitochondria/structure", structure);
 }
 
 void h5(const Morphology& morpho, const std::string& filename)
 {
-
-    HighFive::File h5_file(filename, HighFive::File::ReadWrite | HighFive::File::Create |
-                           HighFive::File::Truncate);
-
-
+    HighFive::File h5_file(filename, HighFive::File::ReadWrite |
+                                         HighFive::File::Create |
+                                         HighFive::File::Truncate);
 
     int sectionIdOnDisk = 1;
     int i = 0;
@@ -230,31 +302,21 @@ void h5(const Morphology& morpho, const std::string& filename)
         offset += numberOfPoints;
     }
 
+    write_dataset(h5_file, "/points", raw_points);
+    write_dataset(h5_file, "/structure", raw_structure);
 
-    HighFive::DataSet dpoints =
-        h5_file.createDataSet<double>("/points", HighFive::DataSpace::From(raw_points));
-    HighFive::DataSet dstructures = h5_file.createDataSet<int32_t>(
-        "/structure", HighFive::DataSpace::From(raw_structure));
-    HighFive::DataSet dperimeters = h5_file.createDataSet<float>(
-        "/perimeters", HighFive::DataSpace::From(raw_perimeters));
+    HighFive::Group g_metadata = h5_file.createGroup("metadata");
 
-
-    std::string METADATA = "metadata";
-    HighFive::Group g_metadata = h5_file.createGroup(METADATA);
-
-    std::vector<uint32_t> version{1,1};
-
-
-    dpoints.write(raw_points);
-    dstructures.write(raw_structure);
-    write_attribute(g_metadata, "version", version);
-    write_attribute(g_metadata, "cell_family", std::vector<uint32_t>{FAMILY_NEURON});
+    write_attribute(g_metadata, "version", std::vector<uint32_t>{1, 1});
+    write_attribute(g_metadata, "cell_family",
+                    std::vector<uint32_t>{FAMILY_NEURON});
     write_attribute(h5_file, "comment",
                     std::vector<std::string>{" created out by morpho_tool v1"});
 
+    if (hasPerimeterData)
+        write_dataset(h5_file, "/perimeters", raw_perimeters);
 
-    if(hasPerimeterData)
-        dperimeters.write(raw_perimeters);
+    mitochondriaH5(h5_file, morpho.mitochondria(), filename);
 }
 
 } // end namespace writer

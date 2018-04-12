@@ -32,6 +32,13 @@ private:
     void _readSections();
     void _readSectionTypes();
     void _readPerimeters();
+    void _readMitochondria();
+    template <typename T>
+    void _read(const std::string& group,
+                               const std::string& _dataset,
+                               MorphologyVersion version,
+                               int expectedDimension,
+                               T& data);
 
     std::unique_ptr<HighFive::File> _file;
 

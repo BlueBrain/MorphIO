@@ -15,6 +15,7 @@ const std::string _a_family("cell_family");
 const std::string _d_perimeters("/perimeters");
 const std::string _a_software_version("software_version");
 const std::string _a_creation_time("creation_time");
+const std::string _g_mitochondria("/mitochondria");
 
 // v1.1 & v2
 const std::string _a_creator("creator");

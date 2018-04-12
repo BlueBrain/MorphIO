@@ -35,7 +35,10 @@ typedef std::string URI;
 using namespace enums;
 class Morphology;
 class MorphologyInitData;
+template <class T> class SectionBase;
 class Section;
+class MitoSection;
+class Mitochondria;
 class Soma;
 
 namespace Property
@@ -64,7 +67,16 @@ typedef Iterator<std::vector<uint32_t>> upstream_iterator;
 
 template <typename T>
 class Iterator;
+
+template <typename T>
+class MitoIterator;
+
+
 typedef std::pair<size_t, size_t> SectionRange;
+
+typedef MitoIterator<std::stack<MitoSection>> mito_depth_iterator;
+typedef MitoIterator<std::queue<MitoSection>> mito_breadth_iterator;
+typedef MitoIterator<std::vector<MitoSection>> mito_upstream_iterator;
 
 typedef Iterator<std::stack<Section>> depth_iterator;
 typedef Iterator<std::queue<Section>> breadth_iterator;

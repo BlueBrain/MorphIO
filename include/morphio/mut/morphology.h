@@ -8,8 +8,8 @@
 
 #include <functional>
 
-
 #include <morphio/exceptions.h>
+#include <morphio/mut/mitochondria.h>
 #include <morphio/properties.h>
 #include <morphio/section.h>
 #include <morphio/types.h>
@@ -165,6 +165,8 @@ public:
     // void traverse(std::function<void(Morphology& morphology, uint32_t sectionId)>,
     //               uint32_t startSection = -1);
 
+    Mitochondria& mitochondria() { return _mitochondria; }
+    const Mitochondria& mitochondria() const { return _mitochondria; }
     void applyModifiers(unsigned int modifierFlags);
 
     SomaType somaType() { return _soma->type(); }
@@ -191,7 +193,7 @@ private:
     std::vector<uint32_t> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
     std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
-
+    Mitochondria _mitochondria;
 
     uint32_t _counter;
     std::map<uint32_t, uint32_t> _parent;
