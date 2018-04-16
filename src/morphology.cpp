@@ -79,8 +79,6 @@ void buildChildren(std::shared_ptr<Property::Properties> properties)
         for (size_t i = 0; i < sections.size(); ++i)
         {
             const int32_t parent = sections[i][1];
-            std::cout << "parent: " << parent << std::endl;
-            std::cout << "i: " << i << std::endl;
             children[parent].push_back(i);
         }
     }
@@ -173,7 +171,7 @@ const std::vector<Section> Morphology::rootSections() const
     std::vector<Section> result;
     try
     {
-        const std::vector<uint32_t>& children = _properties->children().at(0);
+        const std::vector<uint32_t>& children = _properties->children<morphio::Property::Section>().at(0);
         result.reserve(children.size());
         for (auto id: children) {
             result.push_back(section(id));

@@ -96,7 +96,7 @@ def test_mitochondria():
     morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
     morpho.soma.diameters = [1, 1]
 
-    sectionId = morpho.append_section(
+    section_id = morpho.append_section(
         -1, SectionType.axon,
         PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]))
 

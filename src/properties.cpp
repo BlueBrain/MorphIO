@@ -270,6 +270,18 @@ const std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() const
     return _mitochondriaPointLevel._relativePathLengths;
 }
 
+template <>
+const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>()
+{
+    return _sectionLevel._children;
+}
+
+template <>
+const std::map<int32_t, std::vector<uint32_t>>& Properties::children<MitoSection>()
+{
+    return _mitochondriaSectionLevel._children;
+}
+
 std::ostream& operator<<(std::ostream& os, const PointLevel& prop){
     os << "Point level properties:" << std::endl;
     os << "Point Diameter" << (prop._perimeters.size() == prop._points.size() ? " Perimeter" : "") << std::endl;

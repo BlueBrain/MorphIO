@@ -76,17 +76,17 @@ const range<const typename TProperty::Type> SectionBase<T>::get() const
 template <typename T>
 bool SectionBase<T>::isRoot() const
 {
-    return _properties->get<Property::Section>()[_id][1] == -1;
+    return _properties->get<typename T::SectionId>()[_id][1] == -1;
 }
 
 template <typename T>
 T SectionBase<T>::parent() const
 {
     if (isRoot())
-        LBTHROW("Cannot call Section::parent() on a root node (section id=" +
-                std::to_string(_id) + ").");
+        LBTHROW(MissingParentError("Cannot call Section::parent() on a root node (section id=" +
+                                   std::to_string(_id) + ")."));
 
-    const int32_t parent = _properties->get<Property::Section>()[_id][1];
+    const int32_t parent = _properties->get<typename T::SectionId>()[_id][1];
     return T(parent, _properties);
 }
 
@@ -96,7 +96,7 @@ const std::vector<T> SectionBase<T>::children() const
     std::vector<T> result;
     try
     {
-        const std::vector<uint32_t>& children = _properties->children().at(_id);
+        const std::vector<uint32_t>& children = _properties->children<typename T::SectionId>().at(_id);
         result.reserve(children.size());
         for (const uint32_t id : children)
             result.push_back(T(id, _properties));

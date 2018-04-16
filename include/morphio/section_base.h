@@ -8,25 +8,17 @@
 
 namespace morphio
 {
+
 /**
- * A class to represent a morphological section.
- *
- * A Section is an unbranched piece of a morphological skeleton.
- * This class provides functions to query information about the sample points
- * that compose the section and functions to obtain the parent and children
- * sections.
- *
- * The cell soma is also considered a section, but some functions have
- * special meaning for it.
- *
- * Sections cannot be directly created, but are returned by several
- * morphio::Morphology and morphio::Section methods.
- *
- * This is a lightweight object with STL container style thread safety.
- * It is also safe to use a section after the morphology from where it comes
- * has been deallocated. The morphological data will be kept as long as there
- * is a Section referring to it.
- */
+   This CRTP (https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern)
+   defines basic methods that every kind of sections (should them be neuronal or mithochondrial)
+   must define.
+
+   The CRTP is used here so that the methods of the base class can return object of the derived class.
+   Examples:
+       T SectionBase::parent()
+       std::vector<T> SectionBase::children()
+ **/
 
 template <typename T>
 class SectionBase

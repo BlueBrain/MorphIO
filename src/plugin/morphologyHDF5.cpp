@@ -401,7 +401,7 @@ void MorphologyHDF5::_readPerimeters()
 }
 
 template <typename T>
-void MorphologyHDF5::_read(const std::string& group,
+void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& _dataset,
                            MorphologyVersion version,
                            int expectedDimension,
@@ -412,9 +412,9 @@ void MorphologyHDF5::_read(const std::string& group,
         return;
     try
     {
-        const auto mito = _file->getGroup(group);
+        const auto group = _file->getGroup(groupName);
 
-        HighFive::DataSet dataset = mito.getDataSet(_dataset);
+        HighFive::DataSet dataset = group.getDataSet(_dataset);
 
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != expectedDimension)
@@ -439,6 +439,17 @@ void MorphologyHDF5::_read(const std::string& group,
 
 void MorphologyHDF5::_readMitochondria()
 {
+    {
+        HighFive::SilenceHDF5 silence;
+
+        try {
+            const auto group = _file->getGroup(_g_mitochondria);
+        } catch (HighFive::GroupException&)
+        {
+            return;
+        }
+    }
+
     std::vector<std::vector<float>> points;
     _read(_g_mitochondria,
           _d_points,

@@ -99,7 +99,7 @@ struct SectionLevel
 {
     std::vector<Section::Type> _sections;
     std::vector<SectionType::Type> _sectionTypes;
-    std::map<uint32_t, std::vector<uint32_t>> _children;
+    std::map<int32_t, std::vector<uint32_t>> _children;
 
     bool operator==(const SectionLevel& other) const;
     bool operator!=(const SectionLevel& other) const;
@@ -138,13 +138,18 @@ struct Properties
     }
     const morphio::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
     const morphio::SomaType& somaType() { return _cellLevel._somaType; }
-    const std::map<uint32_t, std::vector<uint32_t>>& children()
-    {
-        return _sectionLevel._children;
-    }
+
+
+    template <typename T>
+    const std::map<int32_t, std::vector<uint32_t>>& children();
+
+
     bool operator==(const Properties& other) const;
     bool operator!=(const Properties& other) const;
 };
+
+template <> const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>();
+template <> const std::map<int32_t, std::vector<uint32_t>>& Properties::children<MitoSection>();
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);

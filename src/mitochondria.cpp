@@ -24,7 +24,7 @@ const std::vector<MitoSection> Mitochondria::rootSections() const
     std::vector<MitoSection> result;
     try
     {
-        const std::vector<uint32_t>& children = _properties->_mitochondriaSectionLevel._children.at(-1);
+        const std::vector<uint32_t>& children = _properties->children<morphio::Property::MitoSection>().at(-1);
         result.reserve(children.size());
         for (auto id: children) {
             result.push_back(section(id));
