@@ -71,21 +71,27 @@ public:
     const std::shared_ptr<Soma> soma() const;
 
     /**
-       Get the shared pointer for the given section identified
+     * Return the mitochondria container class
+     **/
+    Mitochondria& mitochondria() { return _mitochondria; }
 
-       Note: multiple morphologies can shared the same shared pointers.
+
+    /**
+       Get the shared pointer for the given section
+
+       Note: multiple morphologies can share the same Section instances.
     **/
     const std::shared_ptr<Section> section(uint32_t id) const;
 
     /**
        Get the parent ID
 
-       Root sections return -1
+       Note: Root sections return -1
     **/
     const int32_t parent(uint32_t id) const;
 
     /**
-       Get children IDs
+       Return a vector of children IDs
     **/
     const std::vector<uint32_t> children(uint32_t id) const;
 
@@ -165,7 +171,6 @@ public:
     // void traverse(std::function<void(Morphology& morphology, uint32_t sectionId)>,
     //               uint32_t startSection = -1);
 
-    Mitochondria& mitochondria() { return _mitochondria; }
     const Mitochondria& mitochondria() const { return _mitochondria; }
     void applyModifiers(unsigned int modifierFlags);
 

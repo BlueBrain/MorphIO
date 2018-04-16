@@ -51,32 +51,71 @@ public:
     explicit Morphology(const URI& source, unsigned int options = NO_MODIFIER);
     Morphology(const mut::Morphology&);
 
+    /**
+     * Return the soma object
+     **/
     const Soma soma() const;
+
+    /**
+     * Return the mitochondria object
+     **/
+    const Mitochondria mitochondria() const;
+
+    /**
+     * Return a vector of all root sections
+     * (sections whose parent ID are -1)
+     **/
     const std::vector<Section> rootSections() const;
 
     /**
      * Return a vector containing all section objects.
      *
-     * The first section of the vector is the soma section.
+     * The first section of the vector is always the soma section.
      **/
     const std::vector<Section> sections() const;
 
     /**
      * Return the Section with the given id.
+     * Reminder: ID = 0 is the soma section
      *
-     * @throw runtime_error if the id is out of range or the given id refers to
-     * a soma section.
+     * @throw RawDataError if the id is out of range
      */
     const Section section(const uint32_t& id) const;
 
+    /**
+     * Return a vector with all points from all sections
+     **/
     const Points& points() const;
+
+    /**
+     * Return a vector with all diameters from all sections
+     **/
     const std::vector<float>& diameters() const;
+
+    /**
+     * Return a vector with all perimeters from all sections
+     **/
     const std::vector<float>& perimeters() const;
+
+    /**
+     * Return a vector with the section type of every section
+     **/
     const std::vector<SectionType>& sectionTypes() const;
+
+    /**
+     * Return the soma type
+     **/
     const SomaType& somaType() const;
+
+    /**
+     * Return the cell family (neuron or glia)
+     **/
     const CellFamily& cellFamily() const;
+
+    /**
+     * Return the version
+     **/
     const MorphologyVersion& version() const;
-    const Mitochondria mitochondria() const;
 
 private:
     friend class mut::Morphology;

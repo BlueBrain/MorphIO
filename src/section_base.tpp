@@ -36,7 +36,6 @@ SectionBase<T>::SectionBase(const SectionBase& section)
 {
 }
 
-
 template <typename T> const SectionBase<T>& SectionBase<T>::operator=(const SectionBase& section)
 {
     if (&section == this)

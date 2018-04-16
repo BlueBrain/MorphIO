@@ -20,7 +20,7 @@
 #include <morphio/mut/soma.h>
 
 namespace py = pybind11;
-
+using namespace py::literals;
 
 py::array_t<float> span_array_to_ndarray(const morphio::range<const std::array<float, 3> > &span)
 {
@@ -73,16 +73,38 @@ PYBIND11_MODULE(morphio, m) {
                 return a.operator==(b);
             }, py::is_operator())
 
-        .def_property_readonly("points", &morphio::Morphology::points)
-        .def_property_readonly("section_types", &morphio::Morphology::sectionTypes)
-        .def("section", &morphio::Morphology::section)
-        .def_property_readonly("sections", &morphio::Morphology::sections)
-        .def_property_readonly("root_sections", &morphio::Morphology::rootSections)
-        .def_property_readonly("mitochondria", &morphio::Morphology::mitochondria)
-        .def_property_readonly("soma", &morphio::Morphology::soma)
-        .def_property_readonly("cell_family", &morphio::Morphology::cellFamily)
-        .def_property_readonly("soma_type", &morphio::Morphology::somaType)
-        .def_property_readonly("version", &morphio::Morphology::version);
+        // Cell sub-parts
+        .def_property_readonly("soma", &morphio::Morphology::soma,
+                               "Return the soma object")
+        .def_property_readonly("mitochondria", &morphio::Morphology::mitochondria,
+                               "Return the soma object")
+        .def_property_readonly("root_sections", &morphio::Morphology::rootSections,
+                               "Return a list of all root sections "
+                               "(sections whose parent ID are -1)")
+        .def_property_readonly("sections", &morphio::Morphology::sections,
+                               "Return a vector containing all section objects. "
+                               "The first section of the vector is the soma section")
+        .def("section", &morphio::Morphology::section,
+             "Return the Section with the given id\n"
+             "Reminder: ID = 0 is the soma section\n\n"
+             "throw RawDataError if the id is out of range",
+            "section_id"_a)
+
+        // Property accessors
+        .def_property_readonly("points", &morphio::Morphology::points,
+                               "Return a list with all points from all sections")
+        .def_property_readonly("diameters", &morphio::Morphology::diameters,
+                               "Return a list with all diameters from all sections")
+        .def_property_readonly("perimeters", &morphio::Morphology::perimeters,
+                               "Return a list with all perimeters from all sections")
+        .def_property_readonly("section_types", &morphio::Morphology::sectionTypes,
+                               "Return a vector with the section type of every section")
+        .def_property_readonly("soma_type", &morphio::Morphology::somaType,
+                               "Return the soma type")
+        .def_property_readonly("cell_family", &morphio::Morphology::cellFamily,
+                               "Return the cell family (neuron or glia)")
+        .def_property_readonly("version", &morphio::Morphology::version,
+                               "Return the version");
 
     py::class_<morphio::Mitochondria>(m, "Mitochondria")
         .def("section", &morphio::Mitochondria::section)
@@ -207,7 +229,9 @@ PYBIND11_MODULE(morphio, m) {
         .def_property_readonly("root_sections", &morphio::mut::Mitochondria::rootSections)
         .def("parent", &morphio::mut::Mitochondria::parent)
         .def("children", &morphio::mut::Mitochondria::children)
-        .def("section", &morphio::mut::Mitochondria::section)
+        .def("section", &morphio::mut::Mitochondria::section,
+             "Get a reference to the given mithochondrial section\n"
+             "Note: multiple mitochondria can shared the same references")
         .def("append_section", &morphio::mut::Mitochondria::appendSection);
 
 
@@ -215,14 +239,27 @@ PYBIND11_MODULE(morphio, m) {
         .def(py::init<>())
         .def(py::init<const morphio::URI&>())
         .def(py::init<const morphio::Morphology&>())
-        .def_property_readonly("sections", &morphio::mut::Morphology::sections)
-        .def_property_readonly("root_sections", &morphio::mut::Morphology::rootSections)
+        .def_property_readonly("sections", &morphio::mut::Morphology::sections,
+                               "Return a list containing IDs of all sections. "
+                               "The first section of the vector is the soma section")
+        .def_property_readonly("root_sections", &morphio::mut::Morphology::rootSections,
+                               "Return a list of all root sections IDs "
+                               "(sections whose parent ID are -1)")
         .def_property_readonly("soma",
-                               (std::shared_ptr<morphio::mut::Soma>(morphio::mut::Morphology::*)())&morphio::mut::Morphology::soma
-                               )
-        .def("parent", &morphio::mut::Morphology::parent)
-        .def("children", &morphio::mut::Morphology::children)
-        .def("section", &morphio::mut::Morphology::section)
+                               (std::shared_ptr<morphio::mut::Soma>(morphio::mut::Morphology::*)())&morphio::mut::Morphology::soma,
+                               "Return a reference to the soma object\n"
+                               "Note: multiple morphologies can share the same Soma instance")
+        .def("parent", &morphio::mut::Morphology::parent,
+             "Get the parent ID\n"
+             "Note: Root sections return -1",
+             "section_id"_a)
+        .def("children", &morphio::mut::Morphology::children,
+             "Return a list of children IDs",
+             "section_id"_a)
+        .def("section", &morphio::mut::Morphology::section,
+             "Return the section with the given id
+             Note: multiple morphologies can share the same Section instances",
+             "section_id"_a)
         .def("mitochondria", (morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ())
              &morphio::mut::Morphology::mitochondria, py::return_value_policy::reference)
         .def("build_read_only", (const morphio::Property::Properties (morphio::mut::Morphology::*)() const) &morphio::mut::Morphology::buildReadOnly)
