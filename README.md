@@ -24,7 +24,12 @@
    * [Immutable C++](#immutable-c)
    * [Immutable Python](#immutable-python)
    * [Mutable C++](#mutable-c)
+      * [Reading morphologies](#reading-morphologies)
+      * [Creating morphologies](#creating-morphologies)
    * [Mutable Python](#mutable-python)
+      * [Reading morphologies](#reading-morphologies-1)
+      * [Creating morphologies](#creating-morphologies-1)
+
 
 ## Installation
 
@@ -237,6 +242,7 @@ for section in first_root.depth_begin:
 
 ### Mutable C++
 
+#### Reading morphologies
 ```cpp
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
@@ -273,8 +279,45 @@ int main()
 }
 ```
 
+#### Creating morphologies
+
+Here is a simple example to create a morphology from scratch and writing it to disk
+
+```C++
+#include <morphio/mut/morphology.h>
+
+int main()
+{
+    morphio::mut::Morphology morpho;
+    morpho.soma()->points() = {{0, 0, 0}, {1, 1, 1}};
+    morpho.soma()->diameters() = {1, 1};
+
+    uint32_t sectionId = morpho.appendSection(
+        -1, // Parent section ID (-1 = soma)
+        morphio::SectionType::SECTION_AXON,
+        morphio::Property::PointLevel(
+            {{2, 2, 2}, {3, 3, 3}}, // x,y,z coordinates of each point
+            {4, 4}, // diameter of each point
+            {5, 5})); // (optional) perimeter of each point
+
+    uint32_t childSectionId = morpho.appendSection(
+        sectionId,
+        morphio::SectionType::SECTION_AXON,
+        morphio::Property::PointLevel(
+            {{3, 3, 3}, {4, 4, 4}},
+            {4, 4},
+            {5, 5}));
+
+    // Writing the file in the 3 formats
+    morpho.write_asc("outfile.asc");
+    morpho.write_swc("outfile.swc");
+    morpho.write_h5("outfile.h5");
+}
+```
 
 ### Mutable Python
+
+#### Reading morphologies
 
 ```python
 from morphio.mut import Morphology
@@ -294,4 +337,37 @@ for section_id in m.depth_begin(first_root):
 
     for point, diameter in zip(section.points, section.diameters):
         print('{} - {}'.format(point, diameter))
+```
+
+#### Creating morphologies
+
+Here is a simple example to create a morphology from scratch and writing it to disk
+
+```python
+from morphio.mut import Morphology
+from morphio import SectionType, PointLevel
+
+morpho = Morphology()
+morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
+morpho.soma.diameters = [1, 1]
+
+section_id = morpho.append_section(
+    -1,  # Parent section ID(-1=soma)
+    SectionType.axon,
+    PointLevel(
+        [[2, 2, 2], [3, 3, 3]],  # x, y, z coordinates of each point
+        [4, 4],  # diameter of each point
+        [5, 5]))  # (optional) perimeter of each point
+
+child_section_id = morpho.append_section(
+    section_id,
+    SectionType.axon,
+    PointLevel(
+        [[3, 3, 3], [4, 4, 4]],
+        [4, 4],
+        [5, 5]))
+
+morpho.write_asc("outfile.asc")
+morpho.write_swc("outfile.swc")
+morpho.write_h5("outfile.h5")
 ```
