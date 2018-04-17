@@ -71,100 +71,158 @@ PYBIND11_MODULE(morphio, m) {
         .def(py::init<const morphio::mut::Morphology&>())
         .def("__eq__", [](const morphio::Morphology& a, const morphio::Morphology& b) {
                 return a.operator==(b);
-            }, py::is_operator())
+            }, py::is_operator(),
+            "Are considered equal, 2 morphologies with the same:\n"
+            "- point vector\n"
+            "- diameter vector\n"
+            "- perimeter vector\n"
+            "- cell family\n"
+            "- section types\n"
+            "- topology (children/parent relationship)\n\n"
+            "Note: the soma types are NOT required to be equal")
 
-        // Cell sub-parts
+        // Cell sub-parts accessors
         .def_property_readonly("soma", &morphio::Morphology::soma,
-                               "Return the soma object")
+                               "Returns the soma object")
         .def_property_readonly("mitochondria", &morphio::Morphology::mitochondria,
-                               "Return the soma object")
+                               "Returns the soma object")
         .def_property_readonly("root_sections", &morphio::Morphology::rootSections,
-                               "Return a list of all root sections "
+                               "Returns a list of all root sections "
                                "(sections whose parent ID are -1)")
         .def_property_readonly("sections", &morphio::Morphology::sections,
-                               "Return a vector containing all section objects. "
-                               "The first section of the vector is the soma section")
+                               "Returns a vector containing all section objects\n\n"
+                               "Note: the first section of the vector is always the soma section")
         .def("section", &morphio::Morphology::section,
-             "Return the Section with the given id\n"
+             "Returns the Section with the given id\n"
              "Reminder: ID = 0 is the soma section\n\n"
              "throw RawDataError if the id is out of range",
             "section_id"_a)
 
         // Property accessors
         .def_property_readonly("points", &morphio::Morphology::points,
-                               "Return a list with all points from all sections")
+                               "Returns a list with all points from all sections")
         .def_property_readonly("diameters", &morphio::Morphology::diameters,
-                               "Return a list with all diameters from all sections")
+                               "Returns a list with all diameters from all sections")
         .def_property_readonly("perimeters", &morphio::Morphology::perimeters,
-                               "Return a list with all perimeters from all sections")
+                               "Returns a list with all perimeters from all sections")
         .def_property_readonly("section_types", &morphio::Morphology::sectionTypes,
-                               "Return a vector with the section type of every section")
+                               "Returns a vector with the section type of every section")
         .def_property_readonly("soma_type", &morphio::Morphology::somaType,
-                               "Return the soma type")
+                               "Returns the soma type")
         .def_property_readonly("cell_family", &morphio::Morphology::cellFamily,
-                               "Return the cell family (neuron or glia)")
+                               "Returns the cell family (neuron or glia)")
         .def_property_readonly("version", &morphio::Morphology::version,
-                               "Return the version");
+                               "Returns the version");
 
-    py::class_<morphio::Mitochondria>(m, "Mitochondria")
-        .def("section", &morphio::Mitochondria::section)
-        .def_property_readonly("sections", &morphio::Mitochondria::sections)
-        .def_property_readonly("root_sections", &morphio::Mitochondria::rootSections);
+    py::class_<morphio::Mitochondria>(
+        m, "Mitochondria",
+        "The entry-point class to access mitochondrial data\n"
+        "By design, it is the equivalent of the Morphology class but at the mitochondrial level\n"
+        "As the Morphology class, it implements a section accessor and a root section accessor\n"
+        "returning views on the Properties object for the queried mitochondrial section")
+        .def("section", &morphio::Mitochondria::section,
+             "Returns the mithochondrial section with the given ID",
+            "section_id"_a)
+        .def_property_readonly("sections", &morphio::Mitochondria::sections,
+            "Returns a list of all mitochondrial sections")
+        .def_property_readonly("root_sections", &morphio::Mitochondria::rootSections,
+            "Returns a list of all root sections (section whose parent ID is -1)");
 
 
     py::class_<morphio::Soma>(m, "Soma")
         .def(py::init<const morphio::Soma&>())
-        .def_property_readonly("soma_center", &morphio::Soma::somaCenter)
-        .def_property_readonly("points", [](morphio::Soma* soma){ return span_array_to_ndarray(soma->points()); })
-        .def_property_readonly("diameters", [](morphio::Soma* soma){ return span_to_ndarray(soma->diameters()); });
+        .def_property_readonly("points", [](morphio::Soma* soma){ return span_array_to_ndarray(soma->points()); },
+                               "Returns the coordinates (x,y,z) of all soma point")
+        .def_property_readonly("diameters", [](morphio::Soma* soma){ return span_to_ndarray(soma->diameters()); },
+                               "Returns the diameters of all soma points")
+        .def_property_readonly("soma_center", &morphio::Soma::somaCenter,
+                               "Returns the center of gravity of the soma points");
+
 
     py::class_<morphio::Section>(m, "Section")
-        .def_property_readonly("parent", &morphio::Section::parent)
-        .def_property_readonly("type", &morphio::Section::type)
-        .def_property_readonly("is_root", &morphio::Section::isRoot)
-        .def_property_readonly("parent", &morphio::Section::parent)
-        .def_property_readonly("children", &morphio::Section::children)
-        .def_property_readonly("points", [](morphio::Section* section){ return span_array_to_ndarray(section->points()); })
-        .def_property_readonly("diameters", [](morphio::Section* section){ return span_to_ndarray(section->diameters()); })
-        .def_property_readonly("perimeters", [](morphio::Section* section){ return span_to_ndarray(section->perimeters()); })
-        .def_property_readonly("id", &morphio::Section::id)
+        // Topology-related member functions
+        .def_property_readonly("parent", &morphio::Section::parent,
+                               "Returns the parent section of this section\n"
+                               "throw MissingParentError is the section doesn't have a parent")
+        .def_property_readonly("is_root", &morphio::Section::isRoot,
+                               "Returns true if this section is a root section (parent ID == -1)")
+        .def_property_readonly("children", &morphio::Section::children,
+                               "Returns a list of children sections")
+
+        // Property-related accessors
+        .def_property_readonly("id", &morphio::Section::id,
+                               "Returns the section ID\n"
+                               "The section ID can be used to query sections via Morphology::section(uint32_t id)")
+        .def_property_readonly("type", &morphio::Section::type,
+                               "Returns the morphological type of this section "
+                               "(dendrite, axon, ...)")
+        .def_property_readonly("points", [](morphio::Section* section){ return span_array_to_ndarray(section->points()); },
+                               "Returns list of section's point coordinates")
+        .def_property_readonly("diameters", [](morphio::Section* section){ return span_to_ndarray(section->diameters()); },
+                               "Returns list of section's point diameters")
+        .def_property_readonly("perimeters", [](morphio::Section* section){ return span_to_ndarray(section->perimeters()); },
+                               "Returns list of section's point perimeters")
+
+        // Iterators
         .def_property_readonly("depth_begin", [](morphio::Section* section) {
                 return py::make_iterator(section->depth_begin(), section->depth_end());
             },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Depth first search iterator")
         .def_property_readonly("breadth_begin", [](morphio::Section* section) {
                 return py::make_iterator(section->breadth_begin(), section->breadth_end());
             },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Breadth first search iterator")
         .def_property_readonly("upstream_begin", [](morphio::Section* section) {
                 return py::make_iterator(section->upstream_begin(), section->upstream_end());
             },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */);
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Upstream iterator");
 
     py::class_<morphio::MitoSection>(m, "MitoSection")
-        .def_property_readonly("parent", &morphio::MitoSection::parent)
-        .def_property_readonly("is_root", &morphio::MitoSection::isRoot)
-        .def_property_readonly("parent", &morphio::MitoSection::parent)
-        .def_property_readonly("children", &morphio::MitoSection::children)
-        .def_property_readonly("neurite_section_id", [](morphio::MitoSection* section){ return span_to_ndarray(section->neuriteSectionId()); })
-        .def_property_readonly("diameters", [](morphio::MitoSection* section){ return span_to_ndarray(section->diameters()); })
-        .def_property_readonly("relative_path_lengths", [](morphio::MitoSection* section){ return span_to_ndarray(section->relativePathLengths()); })
-        .def_property_readonly("id", &morphio::MitoSection::id)
+        // Topology-related member functions
+        .def_property_readonly("parent", &morphio::MitoSection::parent,
+                               "Returns the parent mitochondrial section of this section\n"
+                               "throw MissingParentError is the section doesn't have a parent")
+        .def_property_readonly("is_root", &morphio::MitoSection::isRoot,
+                               "Returns true if this section is a root section (parent ID == -1)")
+        .def_property_readonly("children", &morphio::MitoSection::children,
+                               "Returns a list of children mitochondrial sections")
+
+        // Property-related accesors
+        .def_property_readonly("id", &morphio::MitoSection::id,
+                               "Returns the section ID\n"
+                               "The section ID can be used to query sections via Mitochondria::section(uint32_t id)")
+        .def_property_readonly("neurite_section_id", [](morphio::MitoSection* section){ return span_to_ndarray(section->neuriteSectionId()); },
+                               "Returns list of neuronal section IDs associated to each point "
+                               "of this mitochondrial section")
+        .def_property_readonly("diameters", [](morphio::MitoSection* section){ return span_to_ndarray(section->diameters()); },
+                               "Returns list of section's point diameters")
+        .def_property_readonly("relative_path_lengths", [](morphio::MitoSection* section){ return span_to_ndarray(section->relativePathLengths()); },
+                               "Returns list of relative distances between the start of the "
+                               "neuronal section and each point of the mitochondrial section\n\n"
+                               "Note: - a relative distance of 0 means the mitochondrial point is at the "
+                               "beginning of the neuronal section\n"
+                               "      - a relative distance of 1 means the mitochondrial point is at the "
+                               "end of the neuronal section\n")
+
+        // Iterators
         .def_property_readonly("depth_begin", [](morphio::MitoSection* section) {
                 return py::make_iterator(section->depth_begin(), section->depth_end());
             },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Depth first search iterator")
         .def_property_readonly("breadth_begin", [](morphio::MitoSection* section) {
                 return py::make_iterator(section->breadth_begin(), section->breadth_end());
             },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Breadth first search iterator")
         .def_property_readonly("upstream_begin", [](morphio::MitoSection* section) {
                 return py::make_iterator(section->upstream_begin(), section->upstream_end());
             },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */);
-
-
-
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Upstream search iterator");
 
     py::enum_<morphio::enums::SectionType>(m, "SectionType")
         .value("undefined", morphio::enums::SectionType::SECTION_UNDEFINED)
@@ -224,74 +282,114 @@ PYBIND11_MODULE(morphio, m) {
     ////////////////////////////////////////////////////////////////////////////////
     py::module mut_module = m.def_submodule("mut");
 
-    py::class_<morphio::mut::Mitochondria>(mut_module, "Mitochondria")
-        .def(py::init<>())
-        .def_property_readonly("root_sections", &morphio::mut::Mitochondria::rootSections)
-        .def("parent", &morphio::mut::Mitochondria::parent)
-        .def("children", &morphio::mut::Mitochondria::children)
-        .def("section", &morphio::mut::Mitochondria::section,
-             "Get a reference to the given mithochondrial section\n"
-             "Note: multiple mitochondria can shared the same references")
-        .def("append_section", &morphio::mut::Mitochondria::appendSection);
-
 
     py::class_<morphio::mut::Morphology>(mut_module, "Morphology")
         .def(py::init<>())
         .def(py::init<const morphio::URI&>())
         .def(py::init<const morphio::Morphology&>())
+
+        // Cell sub-part accessors
         .def_property_readonly("sections", &morphio::mut::Morphology::sections,
-                               "Return a list containing IDs of all sections. "
+                               "Returns a list containing IDs of all sections. "
                                "The first section of the vector is the soma section")
         .def_property_readonly("root_sections", &morphio::mut::Morphology::rootSections,
-                               "Return a list of all root sections IDs "
+                               "Returns a list of all root sections IDs "
                                "(sections whose parent ID are -1)")
         .def_property_readonly("soma",
                                (std::shared_ptr<morphio::mut::Soma>(morphio::mut::Morphology::*)())&morphio::mut::Morphology::soma,
-                               "Return a reference to the soma object\n"
+                               "Returns a reference to the soma object\n\n"
                                "Note: multiple morphologies can share the same Soma instance")
+        .def_property_readonly("mitochondria", (morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ())
+                               &morphio::mut::Morphology::mitochondria,
+                               "Returns a reference to the mitochondria container class")
         .def("parent", &morphio::mut::Morphology::parent,
-             "Get the parent ID\n"
+             "Get the parent ID\n\n"
              "Note: Root sections return -1",
              "section_id"_a)
         .def("children", &morphio::mut::Morphology::children,
-             "Return a list of children IDs",
+             "Returns a list of children IDs",
              "section_id"_a)
         .def("section", &morphio::mut::Morphology::section,
-             "Return the section with the given id
-             Note: multiple morphologies can share the same Section instances",
+             "Returns the section with the given id\n\n"
+             "Note: multiple morphologies can share the same Section instances",
              "section_id"_a)
-        .def("mitochondria", (morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ())
-             &morphio::mut::Morphology::mitochondria, py::return_value_policy::reference)
-        .def("build_read_only", (const morphio::Property::Properties (morphio::mut::Morphology::*)() const) &morphio::mut::Morphology::buildReadOnly)
-        .def("delete_section", &morphio::mut::Morphology::deleteSection)
-        .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, morphio::SectionType, const morphio::Property::PointLevel&)) &morphio::mut::Morphology::appendSection)
-        .def("delete_section", &morphio::mut::Morphology::deleteSection)
+        .def("build_read_only", (const morphio::Property::Properties (morphio::mut::Morphology::*)() const) &morphio::mut::Morphology::buildReadOnly,
+             "Returns the data structure used to create read-only morphologies")
+        .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, morphio::SectionType, const morphio::Property::PointLevel&)) &morphio::mut::Morphology::appendSection,
+             "Append a new Section the given parentId (-1 appends to soma)",
+             "parent_id"_a, "section_type"_a, "point_level_properties"_a)
+        .def("delete_section", &morphio::mut::Morphology::deleteSection,
+             "Delete the given section\n"
+             "\n"
+             "Will silently fail if the section id is not part of the tree\n"
+             "\n"
+             "If recursive == true, all descendent sections will be deleted as well\n"
+             "Else, children will be re-attached to their grand-parent",
+             "section_id"_a, "recursive"_a=true)
 
-        .def_property_readonly("cell_family", &morphio::mut::Morphology::cellFamily)
-        .def_property_readonly("soma_type", &morphio::mut::Morphology::somaType)
-        .def_property_readonly("version", &morphio::mut::Morphology::version)
+        .def_property_readonly("cell_family", &morphio::mut::Morphology::cellFamily,
+                               "Returns the cell family (neuron or glia)")
 
-        .def("write_h5", &morphio::mut::Morphology::write_h5)
-        .def("write_swc", &morphio::mut::Morphology::write_swc)
-        .def("write_asc", &morphio::mut::Morphology::write_asc)
+        .def_property_readonly("soma_type", &morphio::mut::Morphology::somaType,
+            "Returns the soma type")
+
+        .def_property_readonly("version", &morphio::mut::Morphology::version,
+            "Returns the version")
+
+        .def("write_h5", &morphio::mut::Morphology::write_h5,
+             "Write file to H5 format", "filename"_a)
+        .def("write_swc", &morphio::mut::Morphology::write_swc,
+             "Write file to SWC format", "filename"_a)
+        .def("write_asc", &morphio::mut::Morphology::write_asc,
+             "Write file to ASC (neurolucida) format", "filename"_a)
 
         .def("depth_begin", [](morphio::mut::Morphology* morph, uint32_t id) {
                 return py::make_iterator(morph->depth_begin(id), morph->depth_end());
             },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Depth first iterator starting at a given section id\n"
+            "\n"
+            "If id == -1, the iteration will be successively performed starting\n"
+            "at each root section",
+            "section_id"_a)
         .def("breadth_begin", [](morphio::mut::Morphology* morph, uint32_t id) {
                 return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
             },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */)
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Breadth first iterator starting at a given section id\n"
+            "\n"
+            "If id == -1, the iteration will be successively performed starting\n"
+            "at each root section",
+            "section_id"_a)
         .def("upstream_begin", [](morphio::mut::Morphology* morph, uint32_t id) {
                 return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
             },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */);
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Upstream iterator starting at a given section id\n"
+            "\n"
+            "If id == -1, the iteration will be successively performed starting\n"
+            "at each root section",
+            "section_id"_a);
 
-
-
-
-        // .def("traverse", &morphio::mut::Morphology::traverse);
+    py::class_<morphio::mut::Mitochondria>(mut_module, "Mitochondria")
+        .def(py::init<>())
+        .def_property_readonly("root_sections", &morphio::mut::Mitochondria::rootSections,
+                               "Returns a list of all root sections IDs "
+                               "(sections whose parent ID are -1)")
+        .def("parent", &morphio::mut::Mitochondria::parent,
+             "Returns the parent mithochondrial section ID",
+             "section_id"_a)
+        .def("children", &morphio::mut::Mitochondria::children,
+            "section_id"_a)
+        .def("section", &morphio::mut::Mitochondria::section,
+             "Get a reference to the given mithochondrial section\n\n"
+             "Note: multiple mitochondria can shared the same references",
+            "section_id"_a)
+        .def("append_section", &morphio::mut::Mitochondria::appendSection,
+             "Append the read-only Section to the given parentId (-1 appends to soma)\n"
+             "\n"
+             "If recursive == true, all descendent will be appended as well",
+             "parent_id"_a, "point_level_properties"_a);
 
 
     // py::nodelete needed because morphio::mut::MitoSection has a private destructor
@@ -302,24 +400,30 @@ PYBIND11_MODULE(morphio, m) {
                       [](morphio::mut::MitoSection* section,
                          const std::vector<float>& _diameters) {
                           section -> diameters() = _diameters;
-                      })
+                      },
+                      "Returns the diameters of all points of this section")
         .def_property("path_lengths",
                       &morphio::mut::MitoSection::pathLengths,
                       [](morphio::mut::MitoSection* section,
                          const std::vector<float>& _pathLengths) {
                           section -> pathLengths() = _pathLengths;
-                      })
+                      },
+                      "Returns the relative distance (between 0 and 1)\n"
+                      "between the start of the neuronal section and each point\n"
+                      "of this mitochondrial section")
         .def_property("neurite_section_ids",
                       &morphio::mut::MitoSection::neuriteSectionIds,
                       [](morphio::mut::MitoSection* section,
                          const std::vector<uint32_t>& _neuriteSectionIds) {
                           section -> neuriteSectionIds() = _neuriteSectionIds;
-                      });
+                      },
+                      "Returns the neurite section Ids of all points of this section");
 
     // py::nodelete needed because morphio::mut::Section has a private destructor
     // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
     py::class_<morphio::mut::Section, std::unique_ptr<morphio::mut::Section, py::nodelete>>(mut_module, "Section")
-        .def_property_readonly("id", &morphio::mut::Section::id)
+        .def_property_readonly("id", &morphio::mut::Section::id,
+                               "Return the section ID")
         .def_property("type",
                       // getter
                       &morphio::mut::Section::type,
@@ -327,25 +431,30 @@ PYBIND11_MODULE(morphio, m) {
                       [](morphio::mut::Section* section,
                          morphio::SectionType _type) {
                           section -> type() = _type;
-                      })
+                      },
+                      "Returns the morphological type of this section "
+                      "(dendrite, axon, ...)")
         .def_property("points",
                       &morphio::mut::Section::points,
                       [](morphio::mut::Section* section,
                          const std::vector<morphio::Point>& _points) {
                           section -> points() = _points;
-                      })
+                      },
+                      "Returns the coordinates (x,y,z) of all points of this section")
         .def_property("diameters",
                       &morphio::mut::Section::diameters,
                       [](morphio::mut::Section* section,
                          const std::vector<float>& _diameters) {
                           section -> diameters() = _diameters;
-                      })
+                      },
+                      "Returns the diameters of all points of this section")
         .def_property("perimeters",
                       &morphio::mut::Section::perimeters,
                       [](morphio::mut::Section* section,
                          const std::vector<float>& _perimeters) {
                           section -> perimeters() = _perimeters;
-                      });
+                      },
+                      "Returns the perimeters of all points of this section");
 
     // py::nodelete needed because morphio::mut::Soma has a private destructor
     // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
@@ -357,16 +466,23 @@ PYBIND11_MODULE(morphio, m) {
                       [](morphio::mut::Soma* soma,
                          const std::vector<morphio::Point>& _points) {
                           soma -> points() = _points;
-                      })
+                      },
+                      "Returns the coordinates (x,y,z) of all soma point")
         .def_property("diameters",
                       (std::vector<float>& (morphio::mut::Soma::*) ())
                       &morphio::mut::Soma::diameters,
                       [](morphio::mut::Soma* soma,
                          const std::vector<float>& _diameters) {
                           soma -> diameters() = _diameters;
-                      });
-
-
+                      },
+                      "Returns the diameters of all soma points")
+        .def_property_readonly("type",
+                               &morphio::mut::Soma::type,
+                               "Returns the soma type")
+        .def_property_readonly("surface",
+                               &morphio::mut::Soma::surface,
+                               "Returns the soma surface\n\n"
+                               "Note: the soma surface computation depends on the soma type");
 
     py::class_<morphio::Property::MitochondriaPointLevel>(m, "MitochondriaPointLevel")
         .def(py::init<>())
@@ -380,26 +496,36 @@ PYBIND11_MODULE(morphio, m) {
         .def(py::init<std::vector<morphio::Property::Point::Type>,
              std::vector<morphio::Property::Diameter::Type>,
              std::vector<morphio::Property::Perimeter::Type>>())
-        .def_readwrite("points", &morphio::Property::PointLevel::_points)
-        .def_readwrite("perimeters", &morphio::Property::PointLevel::_perimeters)
-        .def_readwrite("diameters", &morphio::Property::PointLevel::_diameters);
+        .def_readwrite("points", &morphio::Property::PointLevel::_points,
+                       "Returns the list of point coordinates")
+        .def_readwrite("perimeters", &morphio::Property::PointLevel::_perimeters,
+                       "Returns the list of perimeters")
+        .def_readwrite("diameters", &morphio::Property::PointLevel::_diameters,
+                       "Returns the list of diameters");
 
     py::class_<morphio::Property::SectionLevel>(m, "SectionLevel")
-        .def_readwrite("sections", &morphio::Property::SectionLevel::_sections)
-        .def_readwrite("section_types", &morphio::Property::SectionLevel::_sectionTypes)
-        .def_readwrite("children", &morphio::Property::SectionLevel::_children);
+        .def_readwrite("sections", &morphio::Property::SectionLevel::_sections,
+            "Returns a list of [offset, parent section ID]")
+        .def_readwrite("section_types", &morphio::Property::SectionLevel::_sectionTypes,
+            "Returns the list of section types")
+        .def_readwrite("children", &morphio::Property::SectionLevel::_children,
+            "Returns a dictionary where key is a section ID "
+            "and value is the list of children section IDs");
 
     py::class_<morphio::Property::CellLevel>(m, "CellLevel")
-        .def_readwrite("cell_family", &morphio::Property::CellLevel::_cellFamily)
-        .def_readwrite("soma_type", &morphio::Property::CellLevel::_somaType)
-        .def_readwrite("version", &morphio::Property::CellLevel::_version);
+        .def_readwrite("cell_family", &morphio::Property::CellLevel::_cellFamily,
+            "Returns the cell family (neuron or glia)")
+        .def_readwrite("soma_type", &morphio::Property::CellLevel::_somaType,
+            "Returns the soma type")
+        .def_readwrite("version", &morphio::Property::CellLevel::_version,
+            "Returns the version");
 
     py::class_<morphio::Property::Properties>(m, "Properties")
-        .def_readwrite("point_level", &morphio::Property::Properties::_pointLevel)
-        .def_readwrite("section_level", &morphio::Property::Properties::_sectionLevel)
-        .def_readwrite("cell_level", &morphio::Property::Properties::_cellLevel);
-
-
-
+        .def_readwrite("point_level", &morphio::Property::Properties::_pointLevel,
+                       "Returns the structure that stores information at the point level")
+        .def_readwrite("section_level", &morphio::Property::Properties::_sectionLevel,
+                       "Returns the structure that stores information at the section level")
+        .def_readwrite("cell_level", &morphio::Property::Properties::_cellLevel,
+            "Returns the structure that stores information at the cell level");
 
 }

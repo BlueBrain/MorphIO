@@ -31,20 +31,20 @@ public:
     bool operator==(const SectionBase& section) const;
     bool operator!=(const SectionBase& section) const;
 
+    /**
+     * Return true if this section is a root section (parent ID == -1)
+     **/
     bool isRoot() const;
 
     /**
-     * Return the parent section of this section \if pybind or None if doesn't
-     * have any.\else.
+     * Return the parent section of this section
      *
-     * @throw runtime_error is the section doesn't have a parent.
-     * \endif
+     * @throw MissingParentError is the section doesn't have a parent.
      */
     T parent() const;
 
     /**
-     * Return a vector with all the direct children of this section.
-     * The container will be empty for terminal sections.
+     * Return a list of children sections
      */
     const std::vector<T> children() const;
 

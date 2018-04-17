@@ -14,13 +14,34 @@ public:
         : _mitoPoints(mitoPoints)
     {
     }
+
+    /**
+     * Return the diameters of all points of this section
+     **/
     std::vector<float>& diameters() { return _mitoPoints._diameters; }
+
+    /**
+     * Return the neurite section Ids of all points of this section
+     **/
     std::vector<uint32_t>& neuriteSectionIds() { return _mitoPoints._sectionIds; }
+
+    /**
+     * Return the relative distance (between 0 and 1)
+     * between the start of the neuronal section and each point
+     * of this mitochondrial section
+     **/
     std::vector<float>& pathLengths() { return _mitoPoints._relativePathLengths; }
 
     Property::MitochondriaPointLevel _mitoPoints;
 };
 
+/**
+ * The entry-point class to access mitochondrial data
+ *
+ * By design, it is the equivalent of the Morphology class but at the mitochondrial level.
+ * As the Morphology class, it implements a section accessor and a root section accessor
+ * returning views on the Properties object for the queried mitochondrial section.
+ **/
 class Mitochondria
 {
 public:
@@ -33,8 +54,18 @@ public:
     const std::vector<uint32_t> children(uint32_t id) const;
     const std::shared_ptr<MitoSection> section(uint32_t id) const;
     const std::map<uint32_t, std::shared_ptr<MitoSection>>& sections() const;
+
+    /**
+     * Return the parent mithochondrial section ID
+     **/
     const int32_t parent(uint32_t id) const;
+
+    /**
+     * Return the list of IDs of all mitochondrial root sections
+     * (sections whose parent ID are -1)
+     **/
     const std::vector<uint32_t>& rootSections() const;
+
 
     uint32_t appendSection(int32_t mitoParentId,
                            const Property::MitochondriaPointLevel& points);

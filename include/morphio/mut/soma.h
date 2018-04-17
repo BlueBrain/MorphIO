@@ -12,13 +12,28 @@ public:
     Soma() : _somaType(SOMA_UNDEFINED) {}
     Soma(const Property::PointLevel &pointProperties);
     Soma(const morphio::Soma& soma);
+
+    /**
+       Return the coordinates (x,y,z) of all soma point
+    **/
     std::vector<Point>& points() { return _pointProperties._points; }
     const std::vector<Point>& points() const { return _pointProperties._points; }
 
+    /**
+       Return the diameters of all soma points
+    **/
     std::vector<float>& diameters() { return _pointProperties._diameters; }
     const std::vector<float>& diameters() const { return _pointProperties._diameters; }
 
+    /**
+       Return the soma type
+    **/
     const SomaType type() const { return _somaType; }
+
+    /**
+       Return the soma surface
+       Note: the soma surface computation depends on the soma type
+    **/
     const float surface() const;
 
     Property::PointLevel& properties() { return _pointProperties; }

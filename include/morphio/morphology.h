@@ -15,8 +15,7 @@ namespace morphio
 class Morphology
 {
 public:
-    /** Close morphology file. @version 1.0 */
-    ~Morphology();
+    virtual ~Morphology();
 
 
     Morphology& operator=(const Morphology&);
@@ -33,7 +32,7 @@ public:
                - section types
                - topology (children/parent relationship)
 
-           Note: the soma type is NOT required to be equal
+           Note: the soma types are NOT required to be equal
      **/
     bool operator==(const Morphology& other) const;
     bool operator!=(const Morphology& other) const;

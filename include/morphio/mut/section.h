@@ -14,13 +14,35 @@ namespace mut
 class Section
 {
 public:
-    // uint32_t const parent();
-    // const std::set<uint32_t>& children();
+
+    /**
+     * Return the section ID
+     **/
     const uint32_t id() const { return _id; }
+
+    /**
+     * Return the morphological type of this section (dendrite, axon, ...)
+     **/
     SectionType& type() { return _sectionType; }
+
+    /**
+       Return the coordinates (x,y,z) of all points of this section
+    **/
     std::vector<Point>& points() { return _pointProperties._points; }
+
+    /**
+       Return the diameters of all points of this section
+    **/
     std::vector<float>& diameters() { return _pointProperties._diameters; }
+
+    /**
+       Return the perimeters of all points of this section
+    **/
     std::vector<float>& perimeters() { return _pointProperties._perimeters; }
+
+    /**
+       Return the PointLevel instance that contains this section's data
+    **/
     Property::PointLevel& properties() { return _pointProperties; }
 
 private:

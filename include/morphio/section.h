@@ -52,11 +52,27 @@ public:
     upstream_iterator upstream_end() const;
 
 
+    /**
+     * Return a view (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
+     to this section's point coordinates
+    **/
     const range<const Point> points() const;
+
+    /**
+     * Return a view (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
+     to this section's point diameters
+    **/
     const range<const float> diameters() const;
+
+    /**
+     * Return a view (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
+     to this section's point perimeters
+     **/
     const range<const float> perimeters() const;
 
-    /** Return the morphological type of this section (dendrite, axon, ...). */
+    /**
+     * Return the morphological type of this section (dendrite, axon, ...)
+     */
     const SectionType type() const;
     friend class mut::Section;
     friend const Section Morphology::section(const uint32_t&) const;

@@ -74,6 +74,7 @@ public:
      * Return the mitochondria container class
      **/
     Mitochondria& mitochondria() { return _mitochondria; }
+    const Mitochondria& mitochondria() const { return _mitochondria; }
 
 
     /**
@@ -106,8 +107,7 @@ public:
     /**
        Depth first iterator starting at a given section id
 
-       If id == -1, the iteration will be successively performed starting
-       at each root section
+       If id == -1, the iteration will start at each root section, successively
     **/
     depth_iterator depth_begin(uint32_t id = -1) const;
     depth_iterator depth_end() const;
@@ -155,9 +155,7 @@ public:
     uint32_t appendSection(int32_t parentId, const morphio::Section&, bool recursive = true);
 
     /**
-       Append the read-only Section to the given parentId (-1 appends to soma)
-
-       If recursive == true, all descendent will be appended as well
+       Append a new Section the given parentId (-1 appends to soma)
     **/
     uint32_t appendSection(int32_t parentId, SectionType, const Property::PointLevel&);
 
@@ -171,17 +169,38 @@ public:
     // void traverse(std::function<void(Morphology& morphology, uint32_t sectionId)>,
     //               uint32_t startSection = -1);
 
-    const Mitochondria& mitochondria() const { return _mitochondria; }
     void applyModifiers(unsigned int modifierFlags);
 
+    /**
+     * Return the soma type
+     **/
     SomaType somaType() { return _soma->type(); }
+
+    /**
+     * Return the cell family (neuron or glia)
+     **/
     CellFamily& cellFamily(){ return _cellProperties->_cellFamily; }
+
+    /**
+     * Return the version
+     **/
     MorphologyVersion& version(){ return _cellProperties->_version; }
 
 
 
+    /**
+     * Write file to H5 format
+     **/
     void write_h5(const std::string& filename);
+
+    /**
+     * Write file to ASC (neurolucida) format
+     **/
     void write_asc(const std::string& filename);
+
+    /**
+     * Write file to SWC format
+     **/
     void write_swc(const std::string& filename);
 
 

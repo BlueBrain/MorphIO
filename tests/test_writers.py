@@ -100,11 +100,11 @@ def test_mitochondria():
         -1, SectionType.axon,
         PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]))
 
-    mito_id = morpho.mitochondria().append_section(
+    mito_id = morpho.mitochondria.append_section(
         -1, MitochondriaPointLevel([0, 0], [0.5, 0.6],
                                    [10, 20]))
 
-    morpho.mitochondria().append_section(
+    morpho.mitochondria.append_section(
         mito_id, MitochondriaPointLevel([0, 0, 0, 0],
                                         [0.6, 0.7, 0.8, 0.9],
                                         [20, 30, 40, 50]))

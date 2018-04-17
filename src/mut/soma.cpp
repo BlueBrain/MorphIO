@@ -22,7 +22,6 @@ Soma::Soma(const morphio::Soma& soma) : _somaType(soma.type())
 }
 
 const float Soma::surface() const {
-    std::cout << "type(): " << type() << std::endl;
     switch(type()) {
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS:
     {
@@ -49,8 +48,7 @@ const float Soma::surface() const {
     }
 
     default:
-        throw;
-
+        throw std::runtime_error("Soma::surface is not implemented for this soma type");
     }
 }
 

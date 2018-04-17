@@ -30,21 +30,46 @@ namespace morphio
 class Soma
 {
 public:
+
+    /**
+     * Return the center of gravity of the soma points
+     **/
     const Point somaCenter() const;
+
+    /**
+     * Return the  coordinates (x,y,z) of all soma points
+     **/
     const range<const Point> points() const
     {
         return get<Property::Point>();
     }
+
+    /**
+     * Return the diameters of all soma points
+     **/
     const range<const float> diameters() const
     {
         return get<Property::Diameter>();
     }
 
+    /**
+     * Return the soma type
+     **/
     const SomaType type() const
     {
         return _properties->_cellLevel._somaType;
     }
+
+    /**
+     * Return the soma volume\n"
+     * Note: the soma volume computation depends on the soma type
+     **/
     const float volume() const;
+
+    /**
+     * Return the soma surface\n"
+     * Note: the soma surface computation depends on the soma type
+     **/
     const float surface() const;
     const float maxDistance() const;
 

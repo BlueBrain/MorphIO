@@ -6,15 +6,15 @@ def test_doc_exists():
     cls = morphio.Morphology
 
     classes = [morphio.Morphology,
-               # morphio.mut.Morphology,
-               # morphio.Section,
-               # morphio.mut.Section,
-               # morphio.Soma,
-               # morphio.mut.Soma,
-               # morphio.MitoSection,
-               # morphio.mut.MitoSection,
-               # morphio.Mitochondria,
-               # morphio.mut.Mitochondria
+               morphio.mut.Morphology,
+               morphio.Section,
+               morphio.mut.Section,
+               morphio.Soma,
+               morphio.mut.Soma,
+               morphio.MitoSection,
+               morphio.mut.MitoSection,
+               morphio.Mitochondria,
+               morphio.mut.Mitochondria
                ]
     for cls in classes:
         public_methods = (method for method in dir(cls) if not method[:2] == '__')
