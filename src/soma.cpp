@@ -35,7 +35,7 @@ const range<const typename TProperty::Type> Soma::get() const
     return range<const typename TProperty::Type>(ptr_start, _range.second);
 }
 
-const Point Soma::somaCenter() const
+const Point Soma::center() const
 {
     auto points = get<Property::Point>();
     float x = 0, y = 0, z = 0;

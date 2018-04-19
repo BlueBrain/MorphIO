@@ -34,7 +34,7 @@ public:
     /**
      * Return the center of gravity of the soma points
      **/
-    const Point somaCenter() const;
+    const Point center() const;
 
     /**
      * Return the  coordinates (x,y,z) of all soma points

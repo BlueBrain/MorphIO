@@ -64,6 +64,11 @@ const int32_t Mitochondria::parent(uint32_t id) const {
     }
 }
 
+const bool Mitochondria::isRoot(uint32_t id) const {
+    return parent(id) == -1;
+}
+
+
 const std::shared_ptr<MitoSection> Mitochondria::section(uint32_t id) const
 {
     return _sections.at(id);

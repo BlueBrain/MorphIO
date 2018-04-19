@@ -61,6 +61,12 @@ public:
     const int32_t parent(uint32_t id) const;
 
     /**
+       Return true if section is a root section
+    **/
+    const bool isRoot(uint32_t id) const;
+
+
+    /**
      * Return the list of IDs of all mitochondrial root sections
      * (sections whose parent ID are -1)
      **/

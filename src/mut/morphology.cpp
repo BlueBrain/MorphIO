@@ -276,6 +276,10 @@ const int32_t Morphology::parent(uint32_t id) const {
     }
 }
 
+const bool Morphology::isRoot(uint32_t id) const {
+    return parent(id) == -1;
+}
+
 const std::vector<uint32_t> Morphology::children(uint32_t id) const {
     try {
         return _children.at(id);

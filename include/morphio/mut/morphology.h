@@ -92,6 +92,11 @@ public:
     const int32_t parent(uint32_t id) const;
 
     /**
+       Return true if section is a root section
+    **/
+    const bool isRoot(uint32_t id) const;
+
+    /**
        Return a vector of children IDs
     **/
     const std::vector<uint32_t> children(uint32_t id) const;
