@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 #include <pybind11/numpy.h>
 #include <pybind11/iostream.h>
 #include <pybind11/operators.h>
@@ -22,6 +23,7 @@
 namespace py = pybind11;
 using namespace py::literals;
 
+
 py::array_t<float> span_array_to_ndarray(const morphio::range<const std::array<float, 3> > &span)
 {
     const auto buffer_info = py::buffer_info(
@@ -39,7 +41,6 @@ py::array_t<float> span_array_to_ndarray(const morphio::range<const std::array<f
         );
     return py::array(buffer_info);
 }
-
 
 template <typename T>
 py::array_t<float> span_to_ndarray(const morphio::range<const T>& span)
@@ -59,12 +60,39 @@ py::array_t<float> span_to_ndarray(const morphio::range<const T>& span)
 }
 
 
+morphio::Points array_to_points(py::array_t<float> &buf){
+    morphio::Points points;
+    py::buffer_info info = buf.request();
+    float* ptr = (float*)info.ptr;
+
+    for(int i = 0;i<info.shape[0]; ++i){
+        points.push_back(std::array<float, 3>{ptr[3 * i],
+                    ptr[3 * i + 1],
+                    ptr[3 * i + 2]});
+    }
+    return points;
+}
+
 PYBIND11_MODULE(morphio, m) {
+    py::class_<morphio::Points>(m, "Points", py::buffer_protocol())
+        .def_buffer([](morphio::Points &m) -> py::buffer_info {
+                return py::buffer_info(
+                    m.data(),                               /* Pointer to buffer */
+                    sizeof(float),                          /* Size of one scalar */
+                    py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
+                    2,                                      /* Number of dimensions */
+                    { (int)  m.size(), 3 },                 /* Buffer dimensions */
+                    { sizeof(float) * 3,             /* Strides (in bytes) for each index */
+                            sizeof(float) }
+                    );
+            });
+
 
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
-    http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight=iostream#capturing-standard-output-from-ostream
+http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight=iostream#capturing-standard-output-from-ostream
     py::add_ostream_redirect(m, "ostream_redirect");
+
 
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const morphio::URI&>())
@@ -96,23 +124,64 @@ PYBIND11_MODULE(morphio, m) {
              "Returns the Section with the given id\n"
              "Reminder: ID = 0 is the soma section\n\n"
              "throw RawDataError if the id is out of range",
-            "section_id"_a)
+             "section_id"_a)
 
         // Property accessors
-        .def_property_readonly("points", &morphio::Morphology::points,
-                               "Returns a list with all points from all sections")
-        .def_property_readonly("diameters", &morphio::Morphology::diameters,
-                               "Returns a list with all diameters from all sections")
-        .def_property_readonly("perimeters", &morphio::Morphology::perimeters,
-                               "Returns a list with all perimeters from all sections")
-        .def_property_readonly("section_types", &morphio::Morphology::sectionTypes,
-                               "Returns a vector with the section type of every section")
+        .def_property_readonly("points", [](morphio::Morphology* morpho){
+                return py::array(morpho->points().size(), morpho->points().data());
+            },
+            "Returns a list with all points from all sections")
+        .def_property_readonly("diameters", [](morphio::Morphology* morpho){
+                auto diameters = morpho->diameters();
+                return py::array(diameters.size(), diameters.data());
+            },
+            "Returns a list with all diameters from all sections")
+        .def_property_readonly("perimeters", [](morphio::Morphology* obj){
+                auto data = obj->perimeters();
+                return py::array(data.size(), data.data());
+            },
+            "Returns a list with all perimeters from all sections")
+        .def_property_readonly("section_types", [](morphio::Morphology* obj){
+                auto data = obj->sectionTypes();
+                return py::array(data.size(), data.data());
+            },
+            "Returns a vector with the section type of every section")
         .def_property_readonly("soma_type", &morphio::Morphology::somaType,
                                "Returns the soma type")
         .def_property_readonly("cell_family", &morphio::Morphology::cellFamily,
                                "Returns the cell family (neuron or glia)")
         .def_property_readonly("version", &morphio::Morphology::version,
                                "Returns the version");
+
+    // // Iterators
+    // .def("depth_begin", [](morphio::Morphology* morph, int32_t id) {
+    //         return py::make_iterator(morph->depth_begin(id), morph->depth_end());
+    //     },
+    //     py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+    //     "Depth first iterator starting at a given section id\n"
+    //     "\n"
+    //     "If id == -1, the iteration will be successively performed starting\n"
+    //     "at each root section",
+    //     "section_id"_a=-1)
+    // .def("breadth_begin", [](morphio::Morphology* morph, int32_t id) {
+    //         return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
+    //     },
+    //     py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+    //     "Breadth first iterator starting at a given section id\n"
+    //     "\n"
+    //     "If id == -1, the iteration will be successively performed starting\n"
+    //     "at each root section",
+    //     "section_id"_a=-1)
+    // .def("upstream_begin", [](morphio::Morphology* morph, int32_t id) {
+    //         return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
+    //     },
+    //     py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+    //     "Upstream iterator starting at a given section id\n"
+    //     "\n"
+    //     "If id == -1, the iteration will be successively performed starting\n"
+    //     "at each root section",
+    //     "section_id"_a=-1);
+
 
     py::class_<morphio::Mitochondria>(
         m, "Mitochondria",
@@ -122,11 +191,11 @@ PYBIND11_MODULE(morphio, m) {
         "returning views on the Properties object for the queried mitochondrial section")
         .def("section", &morphio::Mitochondria::section,
              "Returns the mithochondrial section with the given ID",
-            "section_id"_a)
+             "section_id"_a)
         .def_property_readonly("sections", &morphio::Mitochondria::sections,
-            "Returns a list of all mitochondrial sections")
+                               "Returns a list of all mitochondrial sections")
         .def_property_readonly("root_sections", &morphio::Mitochondria::rootSections,
-            "Returns a list of all root sections (section whose parent ID is -1)");
+                               "Returns a list of all root sections (section whose parent ID is -1)");
 
 
     py::class_<morphio::Soma>(m, "Soma")
@@ -135,8 +204,10 @@ PYBIND11_MODULE(morphio, m) {
                                "Returns the coordinates (x,y,z) of all soma point")
         .def_property_readonly("diameters", [](morphio::Soma* soma){ return span_to_ndarray(soma->diameters()); },
                                "Returns the diameters of all soma points")
-        .def_property_readonly("soma_center", &morphio::Soma::somaCenter,
-                               "Returns the center of gravity of the soma points");
+        .def_property_readonly("center", [](morphio::Soma* soma){
+                return py::array(3, soma->center().data());
+            },
+            "Returns the center of gravity of the soma points");
 
 
     py::class_<morphio::Section>(m, "Section")
@@ -282,7 +353,6 @@ PYBIND11_MODULE(morphio, m) {
     ////////////////////////////////////////////////////////////////////////////////
     py::module mut_module = m.def_submodule("mut");
 
-
     py::class_<morphio::mut::Morphology>(mut_module, "Morphology")
         .def(py::init<>())
         .def(py::init<const morphio::URI&>())
@@ -302,6 +372,8 @@ PYBIND11_MODULE(morphio, m) {
         .def_property_readonly("mitochondria", (morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ())
                                &morphio::mut::Morphology::mitochondria,
                                "Returns a reference to the mitochondria container class")
+        .def("is_root", &morphio::mut::Morphology::isRoot,
+             "Return True if section is a root section", "section_id"_a)
         .def("parent", &morphio::mut::Morphology::parent,
              "Get the parent ID\n\n"
              "Note: Root sections return -1",
@@ -331,10 +403,10 @@ PYBIND11_MODULE(morphio, m) {
                                "Returns the cell family (neuron or glia)")
 
         .def_property_readonly("soma_type", &morphio::mut::Morphology::somaType,
-            "Returns the soma type")
+                               "Returns the soma type")
 
         .def_property_readonly("version", &morphio::mut::Morphology::version,
-            "Returns the version")
+                               "Returns the version")
 
         .def("write_h5", &morphio::mut::Morphology::write_h5,
              "Write file to H5 format", "filename"_a)
@@ -343,7 +415,7 @@ PYBIND11_MODULE(morphio, m) {
         .def("write_asc", &morphio::mut::Morphology::write_asc,
              "Write file to ASC (neurolucida) format", "filename"_a)
 
-        .def("depth_begin", [](morphio::mut::Morphology* morph, uint32_t id) {
+        .def("depth_begin", [](morphio::mut::Morphology* morph, int32_t id) {
                 return py::make_iterator(morph->depth_begin(id), morph->depth_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -351,8 +423,8 @@ PYBIND11_MODULE(morphio, m) {
             "\n"
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
-            "section_id"_a)
-        .def("breadth_begin", [](morphio::mut::Morphology* morph, uint32_t id) {
+            "section_id"_a=-1)
+        .def("breadth_begin", [](morphio::mut::Morphology* morph, int32_t id) {
                 return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -360,8 +432,8 @@ PYBIND11_MODULE(morphio, m) {
             "\n"
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
-            "section_id"_a)
-        .def("upstream_begin", [](morphio::mut::Morphology* morph, uint32_t id) {
+            "section_id"_a=-1)
+        .def("upstream_begin", [](morphio::mut::Morphology* morph, int32_t id) {
                 return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -369,22 +441,24 @@ PYBIND11_MODULE(morphio, m) {
             "\n"
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
-            "section_id"_a);
+            "section_id"_a=-1);
 
     py::class_<morphio::mut::Mitochondria>(mut_module, "Mitochondria")
         .def(py::init<>())
         .def_property_readonly("root_sections", &morphio::mut::Mitochondria::rootSections,
                                "Returns a list of all root sections IDs "
                                "(sections whose parent ID are -1)")
+        .def("is_root", &morphio::mut::Mitochondria::isRoot,
+             "Return True if section is a root section", "section_id"_a)
         .def("parent", &morphio::mut::Mitochondria::parent,
              "Returns the parent mithochondrial section ID",
              "section_id"_a)
         .def("children", &morphio::mut::Mitochondria::children,
-            "section_id"_a)
+             "section_id"_a)
         .def("section", &morphio::mut::Mitochondria::section,
              "Get a reference to the given mithochondrial section\n\n"
              "Note: multiple mitochondria can shared the same references",
-            "section_id"_a)
+             "section_id"_a)
         .def("append_section", &morphio::mut::Mitochondria::appendSection,
              "Append the read-only Section to the given parentId (-1 appends to soma)\n"
              "\n"
@@ -425,9 +499,7 @@ PYBIND11_MODULE(morphio, m) {
         .def_property_readonly("id", &morphio::mut::Section::id,
                                "Return the section ID")
         .def_property("type",
-                      // getter
                       &morphio::mut::Section::type,
-                      // setter
                       [](morphio::mut::Section* section,
                          morphio::SectionType _type) {
                           section -> type() = _type;
@@ -437,22 +509,22 @@ PYBIND11_MODULE(morphio, m) {
         .def_property("points",
                       &morphio::mut::Section::points,
                       [](morphio::mut::Section* section,
-                         const std::vector<morphio::Point>& _points) {
-                          section -> points() = _points;
+                         py::array_t<float> _points) {
+                          section -> points() = array_to_points(_points);
                       },
                       "Returns the coordinates (x,y,z) of all points of this section")
         .def_property("diameters",
                       &morphio::mut::Section::diameters,
                       [](morphio::mut::Section* section,
-                         const std::vector<float>& _diameters) {
-                          section -> diameters() = _diameters;
+                         py::array_t<float> _diameters) {
+                          section -> diameters() = _diameters.cast<std::vector<float>>();
                       },
                       "Returns the diameters of all points of this section")
         .def_property("perimeters",
                       &morphio::mut::Section::perimeters,
                       [](morphio::mut::Section* section,
-                         const std::vector<float>& _perimeters) {
-                          section -> perimeters() = _perimeters;
+                         py::array_t<float> _perimeters) {
+                          section -> perimeters() = _perimeters.cast<std::vector<float>>();
                       },
                       "Returns the perimeters of all points of this section");
 
@@ -461,19 +533,19 @@ PYBIND11_MODULE(morphio, m) {
     py::class_<morphio::mut::Soma, std::unique_ptr<morphio::mut::Soma, py::nodelete>>(mut_module, "Soma")
         .def(py::init<const morphio::Property::PointLevel&>())
         .def_property("points",
-                      (std::vector<morphio::Point>& (morphio::mut::Soma::*) ())
+                      (morphio::Points& (morphio::mut::Soma::*) ())
                       &morphio::mut::Soma::points,
                       [](morphio::mut::Soma* soma,
-                         const std::vector<morphio::Point>& _points) {
-                          soma -> points() = _points;
+                         py::array_t<float> _points) {
+                          soma -> points() = array_to_points(_points);
                       },
                       "Returns the coordinates (x,y,z) of all soma point")
         .def_property("diameters",
                       (std::vector<float>& (morphio::mut::Soma::*) ())
                       &morphio::mut::Soma::diameters,
                       [](morphio::mut::Soma* soma,
-                         const std::vector<float>& _diameters) {
-                          soma -> diameters() = _diameters;
+                         py::array_t<float> _diameters) {
+                          soma -> diameters() = _diameters.cast<std::vector<float>>();
                       },
                       "Returns the diameters of all soma points")
         .def_property_readonly("type",
@@ -484,48 +556,60 @@ PYBIND11_MODULE(morphio, m) {
                                "Returns the soma surface\n\n"
                                "Note: the soma surface computation depends on the soma type");
 
-    py::class_<morphio::Property::MitochondriaPointLevel>(m, "MitochondriaPointLevel")
-        .def(py::init<>())
-        .def(py::init<std::vector<uint32_t>, std::vector<float>,
-             std::vector<morphio::Property::Diameter::Type>>());
 
-    py::class_<morphio::Property::PointLevel>(m, "PointLevel")
+
+    py::class_<morphio::Property::Properties>(m, "Properties",
+                                              "The higher level container structure is Property::Properties"
+        )
+        .def_readwrite("point_level", &morphio::Property::Properties::_pointLevel,
+                       "Returns the structure that stores information at the point level")
+        .def_readwrite("section_level", &morphio::Property::Properties::_sectionLevel,
+                       "Returns the structure that stores information at the section level")
+        .def_readwrite("cell_level", &morphio::Property::Properties::_cellLevel,
+                       "Returns the structure that stores information at the cell level");
+
+
+    py::class_<morphio::Property::PointLevel>(m, "PointLevel",
+                                              "Container class for information available at the point level (point coordinate, diameter, perimeter)")
         .def(py::init<>())
         .def(py::init<std::vector<morphio::Property::Point::Type>,
-             std::vector<morphio::Property::Diameter::Type>>())
+             std::vector<morphio::Property::Diameter::Type>>(),
+             "points"_a, "diameters"_a)
         .def(py::init<std::vector<morphio::Property::Point::Type>,
              std::vector<morphio::Property::Diameter::Type>,
-             std::vector<morphio::Property::Perimeter::Type>>())
-        .def_readwrite("points", &morphio::Property::PointLevel::_points,
+             std::vector<morphio::Property::Perimeter::Type>>(),
+             "points"_a, "diameters"_a, "perimeters"_a)
+        .def_readwrite("points",
+                       &morphio::Property::PointLevel::_points,
                        "Returns the list of point coordinates")
         .def_readwrite("perimeters", &morphio::Property::PointLevel::_perimeters,
                        "Returns the list of perimeters")
         .def_readwrite("diameters", &morphio::Property::PointLevel::_diameters,
                        "Returns the list of diameters");
 
-    py::class_<morphio::Property::SectionLevel>(m, "SectionLevel")
+    py::class_<morphio::Property::SectionLevel>(m, "SectionLevel",
+                                                "Container class for information available at the section level (section type, parent section)")
         .def_readwrite("sections", &morphio::Property::SectionLevel::_sections,
-            "Returns a list of [offset, parent section ID]")
+                       "Returns a list of [offset, parent section ID]")
         .def_readwrite("section_types", &morphio::Property::SectionLevel::_sectionTypes,
-            "Returns the list of section types")
+                       "Returns the list of section types")
         .def_readwrite("children", &morphio::Property::SectionLevel::_children,
-            "Returns a dictionary where key is a section ID "
-            "and value is the list of children section IDs");
+                       "Returns a dictionary where key is a section ID "
+                       "and value is the list of children section IDs");
 
-    py::class_<morphio::Property::CellLevel>(m, "CellLevel")
+    py::class_<morphio::Property::CellLevel>(m, "CellLevel",
+                                             "Container class for information available at the cell level (cell type, file version, soma type)")
         .def_readwrite("cell_family", &morphio::Property::CellLevel::_cellFamily,
-            "Returns the cell family (neuron or glia)")
+                       "Returns the cell family (neuron or glia)")
         .def_readwrite("soma_type", &morphio::Property::CellLevel::_somaType,
-            "Returns the soma type")
+                       "Returns the soma type")
         .def_readwrite("version", &morphio::Property::CellLevel::_version,
-            "Returns the version");
+                       "Returns the version");
 
-    py::class_<morphio::Property::Properties>(m, "Properties")
-        .def_readwrite("point_level", &morphio::Property::Properties::_pointLevel,
-                       "Returns the structure that stores information at the point level")
-        .def_readwrite("section_level", &morphio::Property::Properties::_sectionLevel,
-                       "Returns the structure that stores information at the section level")
-        .def_readwrite("cell_level", &morphio::Property::Properties::_cellLevel,
-            "Returns the structure that stores information at the cell level");
-
+    py::class_<morphio::Property::MitochondriaPointLevel>(m, "MitochondriaPointLevel",
+                                                          "Container class for the information available at the mitochondrial point level (enclosing neuronal section, relative distance to start of neuronal section, diameter)")
+        .def(py::init<>())
+        .def(py::init<std::vector<uint32_t>, std::vector<float>,
+             std::vector<morphio::Property::Diameter::Type>>(),
+             "neuronal_section_ids"_a, "distances_to_section_start"_a, "diameters"_a);
 }

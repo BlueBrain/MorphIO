@@ -1,3 +1,17 @@
+/**
+   The property namespace is the core of MorphIO as it is where all the
+   internal data are stored.
+
+   The higher level container structure is Property::Properties.
+
+   It contains low-lever structure that stores information at various levels:
+       - PointLevel: information that is available at the point level (point coordinate, diameter, perimeter)
+       - SectionLevel: information that is available at the section level (section type, parent section)
+       - CellLevel: information that is available at the cell level (cell type, file version, soma type)
+       - MitochondriaPointLevel: information that is available at the mitochondrial point level
+         (enclosing neuronal section, relative distance to start of neuronal section, diameter)
+       - MitochondriaSectionLevel: information that is available at the mitochondrial section level (parent section)
+ **/
 #pragma once
 
 #include <morphio/types.h>
