@@ -161,6 +161,10 @@ const Mitochondria Morphology::mitochondria() const
     return Mitochondria(_properties);
 }
 
+const std::vector<Property::Annotation> Morphology::annotations() const {
+    return _properties->_annotations;
+}
+
 const Section Morphology::section(const uint32_t& id) const
 {
     return Section(id, _properties);

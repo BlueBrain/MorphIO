@@ -210,6 +210,10 @@ public:
 
 
 
+    void addAnnotation(const morphio::Property::Annotation& annotation) {
+        _annotations.push_back(annotation);
+    }
+
 private:
     friend class Section;
     friend Property::Properties morphio::plugin::asc::load(const URI& uri, unsigned int options);
@@ -222,6 +226,7 @@ private:
     std::vector<uint32_t> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
     std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
+    std::vector<morphio::Property::Annotation> _annotations;
     Mitochondria _mitochondria;
 
     uint32_t _counter;

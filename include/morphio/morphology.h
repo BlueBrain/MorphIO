@@ -61,6 +61,11 @@ public:
     const Mitochondria mitochondria() const;
 
     /**
+     * Return the annotation object
+     **/
+    const std::vector<Property::Annotation> annotations() const;
+
+    /**
      * Return a vector of all root sections
      * (sections whose parent ID are -1)
      **/

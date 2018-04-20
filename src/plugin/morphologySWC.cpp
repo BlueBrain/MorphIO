@@ -155,7 +155,7 @@ public:
 
     template <typename T> void appendSample(std::shared_ptr<T> somaOrSection,
                                             const Sample& sample) {
-        debugInfo.lineNumbers[sample.id] = sample.lineNumber;
+        debugInfo.setLineNumber(sample.id, sample.lineNumber);
         somaOrSection->points().push_back(sample.point);
         somaOrSection->diameters().push_back(sample.diameter);
     }

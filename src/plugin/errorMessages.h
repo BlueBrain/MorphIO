@@ -20,9 +20,23 @@ enum ErrorLevel {
 
 struct DebugInfo {
 public:
-    DebugInfo(std::string filename = "") : filename(filename) {}
-    std::map<uint32_t, uint32_t> lineNumbers;
-    std::string filename;
+    DebugInfo(std::string filename = "") : _filename(filename) {}
+
+    void setLineNumber(uint32_t sectionId, uint32_t line) {
+        _lineNumbers[sectionId] = line;
+    }
+
+    const int32_t getLineNumber(uint32_t sectionId) const {
+        try {
+            return _lineNumbers.at(sectionId);
+        } catch (const std::out_of_range& oor) {
+            return -1;
+        }
+    }
+    std::string _filename;
+
+private:
+    std::map<uint32_t, uint32_t> _lineNumbers;
 };
 
 
@@ -113,11 +127,6 @@ public:
     const std::string ERROR_SOMA_ALREADY_DEFINED(int lineNumber) const {
         return errorMsg(lineNumber, ErrorLevel::ERROR,
                         "A soma is already defined");
-    }
-
-    const std::string ERROR_BROKEN_DUPLICATE(int lineNumber) const {
-        return errorMsg(lineNumber, ErrorLevel::ERROR,
-                        "Parent point is duplicated but have a different radius");
     }
 
 
@@ -231,15 +240,16 @@ public:
 
 
     const std::string WARNING_ONLY_CHILD(const DebugInfo& info, int parentId, int childId) const {
-        std::string parentLine, childLine;
-        try {
-            parentLine =  " starting at:\n" + errorLink(info.lineNumbers.at(parentId), ErrorLevel::INFO) + "\n";
-            childLine = " starting at:\n" + errorLink(info.lineNumbers.at(childId), ErrorLevel::WARNING) + "\n";
-        } catch (const std::out_of_range& oor) {}
+        int parentLine = info.getLineNumber(parentId);
+        int childLine =  info.getLineNumber(childId);
+        std::string parentMsg, childMsg;
+        if(parentLine > -1 && childLine > -1) {
+            parentMsg =  " starting at:\n" + errorLink(parentLine, ErrorLevel::INFO) + "\n";
+            childMsg = " starting at:\n" + errorLink(childLine, ErrorLevel::WARNING) + "\n";
+        }
 
-
-        return "\nSection: " + std::to_string(childId) + childLine + " is the only child of " +
-            "section: " + std::to_string(parentId) + parentLine +
+        return "\nSection: " + std::to_string(childId) + childMsg + " is the only child of " +
+            "section: " + std::to_string(parentId) + parentMsg +
             "\nIt will be merged with the parent section";
     }
 

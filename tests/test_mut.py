@@ -115,24 +115,11 @@ def test_append_no_duplicate():
                                              [2, 2],
                                              [20, 20]))
 
-    with captured_output() as (out, err):
-        with ostream_redirect():
-            m.append_section(section_id,
-                             SectionType.axon,
-                             PointLevel([[400, 5, 6], [7, 8, 9]],
-                                        [2, 3],
-                                        [20, 30]))
-
-    exception_str = ("While appending section: 1 to parent: 0\n"
-                     "The section first point should be parent section last point:")
-
-    # Testing the warning
-    assert_substring(exception_str, err.getvalue())
-
-    # Testing the exception
-    with assert_raises(SectionBuilderError) as obj:
-        m.build_read_only()
-    assert_substring(exception_str, str(obj.exception))
+    m.append_section(section_id,
+                     SectionType.axon,
+                     PointLevel([[400, 5, 6], [7, 8, 9]],
+                                [2, 3],
+                                [20, 30]))
 
 
 def test_build_read_only():

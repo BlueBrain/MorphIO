@@ -125,6 +125,7 @@ private:
     int32_t _create_soma_or_section(Token token, int32_t parent_id,
                                     std::vector<Point> &points, std::vector<float> &diameters)
     {
+        lex_.current_section_start_ = lex_.line_num();
         int32_t return_id;
         morphio::Property::PointLevel properties;
         properties._points = points;
@@ -141,24 +142,26 @@ private:
 
             // Condition to remove single point section that duplicate parent point
             // See test_single_point_section_duplicate_parent for an example
-            if(parent_id < 0 || properties._points.size() > 1) {
+            if(parent_id > -1 && properties._points.size() == 1) {
+                return_id = parent_id;
+            } else {
                 return_id = nb_.appendSection(parent_id,
                                               section_type,
                                               properties);
-                debugInfo_.lineNumbers[return_id] = lex_.current_section_start_;
-            } else {
-                return_id = parent_id;
+                debugInfo_.setLineNumber(return_id, lex_.current_section_start_);
             }
-
 
         }
         points.clear();
         diameters.clear();
-        lex_.current_section_start_ = lex_.line_num();
+
         return return_id;
     }
 
     /*
+      Add the last point of parent section to the beginning of this section
+      if not already present.
+
      The idea is that these two structures should represent the same morphology:
 
      (3 -8 0 2)     and          (3 -8 0 2)
@@ -181,14 +184,8 @@ private:
         auto lastParentPoint = parent->points()[parent->points().size()-1];
         auto lastParentDiameter = parent->diameters()[parent->diameters().size()-1];
 
-        if(lastParentPoint == properties._points[0]) {
-            // Parent point is already duplicated: do nothing
-            if(lastParentDiameter == properties._diameters[0])
-                return;
-
-            throw RawDataError(err_.ERROR_BROKEN_DUPLICATE(lex_.line_num()));
-
-        }
+        if(lastParentPoint == properties._points[0])
+            return;
 
         properties._points.insert(properties._points.begin(), lastParentPoint);
         properties._diameters.insert(properties._diameters.begin(), lastParentDiameter);

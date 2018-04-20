@@ -203,29 +203,6 @@ def test_read_without_duplicates():
                        n_without_duplicate.root_sections[0].points)
 
 
-def test_broken_duplicate():
-    _test_asc_exception('''
-                         ((Dendrite)
-                          (3 -4 0 2)
-                          (3 -6 0 2)
-                          (3 -8 0 2)
-                          (3 -10 0 2)
-                          (
-                            (3 -10 0 40) ; <-- duplicate with different radii
-                            (0 -10 0 2)
-                            (-3 -10 0 2)
-                            |
-                            (3 -10 0 2) ; <-- good duplicate
-                            (6 -10 0 2)
-                            (9 -10 0 2)
-                          )
-                          )
-                         ''',
-                        RawDataError,
-                        "Parent point is duplicated but have a different radius",
-                        ":11:error")
-
-
 def test_unfinished_file():
     _test_asc_exception('''
                      ((Dendrite)

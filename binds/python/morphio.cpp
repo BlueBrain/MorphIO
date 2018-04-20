@@ -114,6 +114,8 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
                                "Returns the soma object")
         .def_property_readonly("mitochondria", &morphio::Morphology::mitochondria,
                                "Returns the soma object")
+        .def_property_readonly("annotations", &morphio::Morphology::annotations,
+                               "Returns a list of annotations")
         .def_property_readonly("root_sections", &morphio::Morphology::rootSections,
                                "Returns a list of all root sections "
                                "(sections whose parent ID are -1)")
@@ -294,6 +296,10 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Upstream search iterator");
+
+    py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
+        .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
+            "Indicates that a section has only one child");
 
     py::enum_<morphio::enums::SectionType>(m, "SectionType")
         .value("undefined", morphio::enums::SectionType::SECTION_UNDEFINED)
@@ -605,6 +611,17 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
                        "Returns the soma type")
         .def_readwrite("version", &morphio::Property::CellLevel::_version,
                        "Returns the version");
+
+    py::class_<morphio::Property::Annotation>(m, "Annotation",
+                                             "Container class for information about anomalies detected while parsing the file (no soma, section with a single child...)")
+        .def_readwrite("type", &morphio::Property::Annotation::_type,
+                       "Returns the type")
+        .def_readwrite("section_id", &morphio::Property::Annotation::_sectionId,
+                       "Returns the sectionId")
+        .def_readwrite("line_number", &morphio::Property::Annotation::_lineNumber,
+                       "Returns the lineNumber")
+        .def_readwrite("details", &morphio::Property::Annotation::_details,
+                       "Returns the details");
 
     py::class_<morphio::Property::MitochondriaPointLevel>(m, "MitochondriaPointLevel",
                                                           "Container class for the information available at the mitochondrial point level (enclosing neuronal section, relative distance to start of neuronal section, diameter)")

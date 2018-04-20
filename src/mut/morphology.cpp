@@ -48,17 +48,20 @@ bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
     if(parent->points()[parent->points().size()-1] != current->points()[0])
         return false;
 
-    if(parent->diameters()[parent->diameters().size()-1] != current->diameters()[0])
-        return false;
+    // TODO: I dont know if it is OK for the diameter and the perimeter to not
+    // be duplicated
 
-    // As perimeter is optional, it must either be defined for parent and current
-    // or not be defined at all
-    if(parent->perimeters().empty() != current->perimeters().empty())
-        return false;
+    // if(parent->diameters()[parent->diameters().size()-1] != current->diameters()[0])
+    //     return false;
 
-    if(!parent->perimeters().empty() &&
-       parent->perimeters()[parent->perimeters().size()-1] != current->perimeters()[0])
-        return false;
+    // // As perimeter is optional, it must either be defined for parent and current
+    // // or not be defined at all
+    // if(parent->perimeters().empty() != current->perimeters().empty())
+    //     return false;
+
+    // if(!parent->perimeters().empty() &&
+    //    parent->perimeters()[parent->perimeters().size()-1] != current->perimeters()[0])
+    //     return false;
 
     return true;
 }
@@ -213,7 +216,7 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
     int sectionIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
     Property::Properties properties;
-    morphio::plugin::ErrorMessages err(debugInfo.filename);
+    morphio::plugin::ErrorMessages err(debugInfo._filename);
 
     if(_cellProperties) {
         properties._cellLevel = *_cellProperties;
@@ -242,9 +245,8 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
 
         if(parentId > -1 && // Exclude root sections
            !_checkDuplicatePoint(_sections.at(parentId), _sections.at(sectionId)))
-            LBTHROW(SectionBuilderError(err.WARNING_WRONG_DUPLICATE(_sections.at(sectionId),
-                                                                     _sections.at(parentId))));
-
+            LBERROR(err.WARNING_WRONG_DUPLICATE(_sections.at(sectionId),
+                                                _sections.at(parentId)));
 
         bool isUnifurcation = parentId > -1 && children(parentId).size() == 1;
 
@@ -257,7 +259,12 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
             newIds[sectionId] = sectionIdOnDisk++;
             _appendProperties(properties._pointLevel, section->_pointProperties);
         } else {
-            LBERROR(err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
+            std::string errorMsg = err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId);
+            LBERROR(errorMsg);
+            properties._annotations.push_back(Property::Annotation(SINGLE_CHILD,
+                                                                   parentId,
+                                                                   errorMsg,
+                                                                   debugInfo.getLineNumber(sectionId)));
             newIds[sectionId] = newIds[parentId];
 
             // Skip the duplicate point

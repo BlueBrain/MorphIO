@@ -119,11 +119,20 @@ struct SectionLevel
     bool operator!=(const SectionLevel& other) const;
 };
 
+struct Annotation {
+    Annotation(AnnotationType type, uint32_t sectionId, std::string details, int32_t lineNumber);
+    AnnotationType _type;
+    uint32_t _sectionId;
+    int32_t _lineNumber;
+    std::string _details;
+};
+
 struct CellLevel
 {
     morphio::CellFamily _cellFamily;
     SomaType _somaType;
     MorphologyVersion _version;
+    std::vector<Annotation> annotation;
 
     bool operator==(const CellLevel& other) const;
     bool operator!=(const CellLevel& other) const;
@@ -140,6 +149,8 @@ struct Properties
 
     MitochondriaPointLevel _mitochondriaPointLevel;
     MitochondriaSectionLevel _mitochondriaSectionLevel;
+
+    std::vector<Annotation> _annotations;
 
     template <typename T>
     std::vector<typename T::Type>& get();

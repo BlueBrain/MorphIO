@@ -29,6 +29,11 @@ enum MorphologyVersion
     MORPHOLOGY_VERSION_UNDEFINED
 };
 
+enum AnnotationType
+{
+    SINGLE_CHILD,
+};
+
 /** The cell family represented by morphio::Morphology. */
 enum CellFamily
 {

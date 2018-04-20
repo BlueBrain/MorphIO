@@ -146,9 +146,18 @@ bool CellLevel::operator==(const CellLevel& other) const {
             );
 }
 
+
 bool CellLevel::operator!=(const CellLevel& other) const {
     return !(this->operator==(other));
 }
+
+Annotation::Annotation(AnnotationType type,
+                       uint32_t sectionId,
+                       std::string details,
+                       int32_t lineNumber) :
+    _type(type), _sectionId(sectionId), _lineNumber(lineNumber), _details(details)
+{
+};
 
 
 bool Properties::operator==(const Properties& other) const {
