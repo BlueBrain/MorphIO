@@ -24,8 +24,6 @@
 #include "../detail/morphologyHDF5.h"
 #include "../detail/utilsHDF5.h"
 
-#include "../version.h"
-
 // TODO: compile
 #include <iostream>
 
