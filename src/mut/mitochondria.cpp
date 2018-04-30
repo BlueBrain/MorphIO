@@ -8,8 +8,7 @@ namespace mut
 uint32_t Mitochondria::appendSection(
     int32_t mitoParentId, const Property::MitochondriaPointLevel& points)
 {
-    uint32_t mitoId = ++_mitochondriaSectionCounter;
-
+    uint32_t mitoId = _mitochondriaSectionCounter;
     _parent[mitoId] = mitoParentId;
 
     if (mitoParentId == -1)
@@ -26,6 +25,7 @@ uint32_t Mitochondria::appendSection(
     }
 
     _sections[mitoId] = std::shared_ptr<MitoSection>(new MitoSection(points));
+    ++_mitochondriaSectionCounter;
     return mitoId;
 }
 

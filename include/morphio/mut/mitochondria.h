@@ -45,9 +45,7 @@ public:
 class Mitochondria
 {
 public:
-    Mitochondria()
-        : _mitochondriaCounter(-1)
-        , _mitochondriaSectionCounter(-1)
+    Mitochondria() :_mitochondriaSectionCounter(0)
     {
     }
 
@@ -86,8 +84,7 @@ private:
     std::vector<uint32_t> _rootSections;
     std::map<uint32_t, std::shared_ptr<MitoSection>> _sections;
 
-    int32_t _mitochondriaCounter;
-    int32_t _mitochondriaSectionCounter;
+    uint32_t _mitochondriaSectionCounter;
 };
 }
 }

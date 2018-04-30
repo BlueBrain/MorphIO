@@ -120,9 +120,11 @@ struct SectionLevel
 };
 
 struct Annotation {
-    Annotation(AnnotationType type, uint32_t sectionId, std::string details, int32_t lineNumber);
+    Annotation(AnnotationType type, uint32_t sectionId, PointLevel points,
+               std::string details, int32_t lineNumber);
     AnnotationType _type;
     uint32_t _sectionId;
+    PointLevel _points;
     int32_t _lineNumber;
     std::string _details;
 };

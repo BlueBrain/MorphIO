@@ -263,6 +263,7 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
             LBERROR(errorMsg);
             properties._annotations.push_back(Property::Annotation(SINGLE_CHILD,
                                                                    parentId,
+                                                                   section->_pointProperties,
                                                                    errorMsg,
                                                                    debugInfo.getLineNumber(sectionId)));
             newIds[sectionId] = newIds[parentId];

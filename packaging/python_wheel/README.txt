@@ -1,3 +1,7 @@
+TLDR:
+  build_wheel_in_manylinux1_docker.sh should be run from the root folder
+  to create linux wheels
+
 Overview
 ********
 

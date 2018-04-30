@@ -615,13 +615,28 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
     py::class_<morphio::Property::Annotation>(m, "Annotation",
                                              "Container class for information about anomalies detected while parsing the file (no soma, section with a single child...)")
         .def_readwrite("type", &morphio::Property::Annotation::_type,
-                       "Returns the type")
+                               "Returns the type")
         .def_readwrite("section_id", &morphio::Property::Annotation::_sectionId,
                        "Returns the sectionId")
         .def_readwrite("line_number", &morphio::Property::Annotation::_lineNumber,
                        "Returns the lineNumber")
         .def_readwrite("details", &morphio::Property::Annotation::_details,
-                       "Returns the details");
+                               "Returns the details")
+        .def_property_readonly("points",
+                       [](morphio::Property::Annotation* a) {
+                           return a->_points._points;
+                       },
+                       "Returns the list of coordinates of annotated points")
+        .def_property_readonly("diameters", [](morphio::Property::Annotation* a) {
+                return a->_points._diameters;
+            },
+            "Returns the list of diameters of annotated points")
+        .def_property_readonly("perimeters",
+                               [](morphio::Property::Annotation* a) {
+                                   return a->_points._perimeters;
+                               },
+                               "Returns the list of perimeters of annotated points");
+
 
     py::class_<morphio::Property::MitochondriaPointLevel>(m, "MitochondriaPointLevel",
                                                           "Container class for the information available at the mitochondrial point level (enclosing neuronal section, relative distance to start of neuronal section, diameter)")

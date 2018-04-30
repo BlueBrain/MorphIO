@@ -153,9 +153,11 @@ bool CellLevel::operator!=(const CellLevel& other) const {
 
 Annotation::Annotation(AnnotationType type,
                        uint32_t sectionId,
+                       PointLevel points,
                        std::string details,
                        int32_t lineNumber) :
-    _type(type), _sectionId(sectionId), _lineNumber(lineNumber), _details(details)
+    _type(type), _sectionId(sectionId), _points(points),
+    _lineNumber(lineNumber), _details(details)
 {
 };
 
