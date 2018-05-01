@@ -8,6 +8,7 @@
 
 #include <functional>
 
+#include <morphio/errorMessages.h>
 #include <morphio/exceptions.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/properties.h>
@@ -16,14 +17,11 @@
 #include <morphio/mut/soma.h>
 #include <morphio/mut/iterators.h>
 
-#include "../../../src/plugin/errorMessages.h"
-#include "../../../src/plugin/morphologyASC.h"
 
 namespace morphio
 {
 namespace mut
 {
-
 
 class Morphology
 {
@@ -214,10 +212,10 @@ public:
         _annotations.push_back(annotation);
     }
 
+    const Property::Properties buildReadOnly(const morphio::plugin::DebugInfo& debugInfo) const;
+
 private:
     friend class Section;
-    friend Property::Properties morphio::plugin::asc::load(const URI& uri, unsigned int options);
-
 
     morphio::plugin::ErrorMessages _err;
 
@@ -232,7 +230,6 @@ private:
     uint32_t _counter;
     std::map<uint32_t, uint32_t> _parent;
     std::map<uint32_t, std::vector<uint32_t>> _children;
-    const Property::Properties buildReadOnly(const morphio::plugin::DebugInfo& debugInfo) const;
 
 };
 

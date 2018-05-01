@@ -8,12 +8,13 @@
 #include <iostream>
 
 #include <morphio/properties.h>
+#include <morphio/errorMessages.h>
 #include "morphologySWC.h"
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/soma.h>
 #include <morphio/mut/section.h>
 
-#include "errorMessages.h"
+
 
 namespace morphio
 {

@@ -2,12 +2,12 @@
 #include <iostream>
 #include <fstream>
 
+#include <morphio/errorMessages.h>
 #include <morphio/mut/writers.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 
-#include "../plugin/errorMessages.h"
 
 #include <highfive/H5File.hpp>
 #include <highfive/H5DataSet.hpp>

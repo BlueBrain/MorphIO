@@ -78,6 +78,5 @@ setup(
     long_description='',
     ext_modules=[CMakeExtension('morphio')],
     cmdclass=dict(build_ext=CMakeBuild),
-    test_suite='tests',
     zip_safe=False,
 )

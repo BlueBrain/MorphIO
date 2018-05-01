@@ -50,6 +50,12 @@ namespace detail
 {
 class NeurolucidaParser;
 }
+
+namespace plugin
+{
+    class DebugInfo;
+    class ErrorMessages;
+}
 namespace mut
 {
 class Section;

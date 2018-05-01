@@ -66,4 +66,4 @@ protected:
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
 std::ostream& operator<<(std::ostream& os, morphio::range<const morphio::Point> points);
 
-#include "../../src/section_base.tpp"
+#include "section_base.tpp"
