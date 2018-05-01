@@ -4,6 +4,7 @@ set(MORPHIO_SOURCES
   plugin/morphologySWC.cpp
   plugin/morphologyASC.cpp
   mitochondria.cpp
+  errorMessages.cpp
   mito_section.cpp
   mito_iterators.cpp
   properties.cpp

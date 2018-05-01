@@ -1,10 +1,10 @@
 #include <morphio/types.h>
+#include <morphio/errorMessages.h>
 
 #include <lexertl/debug.hpp>
 #include <lexertl/generator.hpp>
 #include <lexertl/iterator.hpp>
 #include <lexertl/lookup.hpp>
-#include "errorMessages.h"
 
 namespace morphio
 {

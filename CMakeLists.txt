@@ -15,8 +15,6 @@ add_subdirectory(apps)
 #add_subdirectory(tests)
 #include(CPackConfig)
 
-set(CMAKE_INSTALL_PREFIX /tmp)
-
 install(
     DIRECTORY include/morphio
     DESTINATION include
