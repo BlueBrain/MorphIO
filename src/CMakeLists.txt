@@ -50,3 +50,9 @@ set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio")
 
 target_link_libraries(morphio_static PUBLIC GSL PRIVATE HighFive lexertl14)
 target_link_libraries(morphio_shared PUBLIC GSL PRIVATE HighFive lexertl14)
+
+install(
+  # DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  TARGETS morphio_shared
+  DESTINATION lib
+  )
