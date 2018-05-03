@@ -79,6 +79,5 @@ setup(
     install_requires='numpy>=1.8.0',
     ext_modules=[CMakeExtension('morphio')],
     cmdclass=dict(build_ext=CMakeBuild),
-    test_suite='tests',
     zip_safe=False,
 )

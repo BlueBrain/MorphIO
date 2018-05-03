@@ -12,7 +12,6 @@ add_subdirectory(src)
 add_subdirectory(binds/python)
 add_subdirectory(apps)
 
-
 install(
     DIRECTORY include/morphio
     DESTINATION include
