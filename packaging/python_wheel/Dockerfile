@@ -1,4 +1,4 @@
-FROM quay.io/pypa/manylinux1_x86_64
+FROM quay.io/pypa/manylinux1_x86_64:2478ba64a9951d7d31bd76c16c9ad747922e3a5abe3b82ca9a23efce86d7a19d
 RUN yum install -y zlib-devel bzip2-devel flex
 
 ############
@@ -24,21 +24,12 @@ RUN cd hdf5-1.8.17 && ./configure CFLAGS=-fPIC CXXFLAGS=-fPIC --prefix=/usr/loca
 RUN cd hdf5-1.8.17 && ar x /usr/lib64/libz.a && ar r /usr/local/lib/libhdf5.a *.o
 RUN rm -rf hdf5-1.8.17.tar.bz2 hdf5-1.8.17
 
-
 ############
-# Boost
+# GCC 7.1
+# Taken from this discussion about a recent GCC in manylinux.
+# https://github.com/pypa/manylinux/issues/118#issuecomment-317238069
+#
+# In case this URL disappears. There is a copy of the tarball here:
+# /nfs4/bbp.epfl.ch/user/bcoste/public/gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2
 ############
-
-# RUN curl -OL https://downloads.sourceforge.net/project/boost/boost/1.59.0/boost_1_59_0.tar.gz && tar xfz boost_1_59_0.tar.gz
-# RUN cd boost_1_59_0 && ./bootstrap.sh --with-libraries=date_time,iostreams,filesystem,program_options,regex,serialization,system,test && ./b2 -s NO_BZIP2=1 -j2 -q cxxflags=-fPIC cflags=-fPIC threading=multi link=static --build-type=minimal install
-# RUN cd boost_1_59_0 && ./b2 --clean
-# RUN rm -rf boost_1_59_0.tar.gz # don't delete build folder, needed to build boost.python for different python versions on-the-fly
-
-############
-# Doxygen
-############
-
-# # Needed for docstrings generation and system doxygen is too old
-# # after 1.8.6, we can't use anymore system flex, see https://stackoverflow.com/questions/20844635
-# RUN wget --no-check-certificate https://github.com/doxygen/doxygen/archive/Release_1_8_5.tar.gz && tar xfz Release_1_8_5 && cd doxygen-Release_1_8_5 && ./configure && make -j2 && make install
-# RUN rm -rf Release_1_8_5 doxygen-Release_1_8_5
+RUN curl -OL https://github.com/Noctem/pogeo-toolchain/releases/download/v1.3/gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2 && tar -xjvf gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2

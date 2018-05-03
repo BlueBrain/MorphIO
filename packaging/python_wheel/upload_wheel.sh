@@ -2,7 +2,7 @@
 BASE=$(git rev-parse --show-toplevel)
 
 if [ "$RELEASE" == "true" ]; then
-    CHANNEL=release
+    CHANNEL=dev
 else
     CHANNEL=dev
 fi
@@ -10,6 +10,9 @@ fi
 for wheel in `ls $BASE/packaging/python_wheel/wheelhouse/morphio*.whl`; do
     upload2repo -t python -r $CHANNEL -f $wheel
 done
+
+git status
+ls
 
 # cleanup afterwards
 docker run --rm \

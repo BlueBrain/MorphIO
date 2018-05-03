@@ -10,7 +10,7 @@ add_subdirectory(3rdparty)
 add_subdirectory(src)
 
 add_subdirectory(binds/python)
-add_subdirectory(apps)
+# add_subdirectory(apps)
 
 install(
     DIRECTORY include/morphio

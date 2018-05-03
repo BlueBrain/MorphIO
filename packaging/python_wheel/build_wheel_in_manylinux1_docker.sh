@@ -10,6 +10,7 @@ if [ ! -f $fichier ]; then
     tar -xjvf gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2
 fi
 
+docker images
 docker run --rm \
     -e http_proxy=$http_proxy \
     -e https_proxy=$https_proxy \
