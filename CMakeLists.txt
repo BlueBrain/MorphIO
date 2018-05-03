@@ -12,8 +12,6 @@ add_subdirectory(src)
 add_subdirectory(binds/python)
 add_subdirectory(apps)
 
-#add_subdirectory(tests)
-#include(CPackConfig)
 
 install(
     DIRECTORY include/morphio

@@ -48,17 +48,17 @@ def test_single_neurite():
                      SectionType.axon,
                      PointLevel([[1, 2, 3]], [2], [20]))
 
-    assert_equal(m.section(m.root_sections[0]).points,
-                 [[1, 2, 3]])
+    assert_array_equal(m.section(m.root_sections[0]).points,
+                       [[1, 2, 3]])
     assert_equal(m.section(m.root_sections[0]).diameters,
                  [2])
     assert_equal(m.section(m.root_sections[0]).perimeters,
                  [20])
 
     m.section(m.root_sections[0]).points = [[10, 20, 30]]
-    assert_equal(m.section(m.root_sections[0]).points,
-                 [[10, 20, 30]],
-                 'Points array should have been mutated')
+    assert_array_equal(m.section(m.root_sections[0]).points,
+                       [[10, 20, 30]],
+                       'Points array should have been mutated')
 
     m.section(m.root_sections[0]).diameters = [7]
 
@@ -88,12 +88,12 @@ def test_child_section():
     assert_equal(len(children),
                  1)
 
-    assert_equal(m.section(children[0]).points,
-                 [[1, 2, 3], [4, 5, 6]])
-    assert_equal(m.section(children[0]).diameters,
-                 [2, 3])
-    assert_equal(m.section(children[0]).perimeters,
-                 [20, 30])
+    assert_array_equal(m.section(children[0]).points,
+                       [[1, 2, 3], [4, 5, 6]])
+    assert_array_equal(m.section(children[0]).diameters,
+                       [2, 3])
+    assert_array_equal(m.section(children[0]).perimeters,
+                       [20, 30])
 
 
 @contextmanager

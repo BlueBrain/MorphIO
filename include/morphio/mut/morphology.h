@@ -58,7 +58,7 @@ public:
     /**
        Returns the dictionary id -> Section for this tree
     **/
-    const std::map<uint32_t, std::shared_ptr<Section>>& sections() const;
+    const std::map<uint32_t, std::shared_ptr<Section>> sections() const;
 
     /**
        Returns a shared pointer on the Soma

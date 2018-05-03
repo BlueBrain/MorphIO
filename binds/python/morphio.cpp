@@ -122,6 +122,7 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
         .def_property_readonly("sections", &morphio::Morphology::sections,
                                "Returns a vector containing all section objects\n\n"
                                "Note: the first section of the vector is always the soma section")
+
         .def("section", &morphio::Morphology::section,
              "Returns the Section with the given id\n"
              "Reminder: ID = 0 is the soma section\n\n"
@@ -513,21 +514,30 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
                       "Returns the morphological type of this section "
                       "(dendrite, axon, ...)")
         .def_property("points",
-                      &morphio::mut::Section::points,
+                      [](morphio::mut::Section* section){
+                          return py::array(section->points().size(),
+                                           section->points().data());
+                      },
                       [](morphio::mut::Section* section,
                          py::array_t<float> _points) {
                           section -> points() = array_to_points(_points);
                       },
                       "Returns the coordinates (x,y,z) of all points of this section")
         .def_property("diameters",
-                      &morphio::mut::Section::diameters,
+                      [](morphio::mut::Section* section){
+                          return py::array(section->diameters().size(),
+                                           section->diameters().data());
+                      },
                       [](morphio::mut::Section* section,
                          py::array_t<float> _diameters) {
                           section -> diameters() = _diameters.cast<std::vector<float>>();
                       },
                       "Returns the diameters of all points of this section")
         .def_property("perimeters",
-                      &morphio::mut::Section::perimeters,
+                      [](morphio::mut::Section* section){
+                          return py::array(section->perimeters().size(),
+                                           section->perimeters().data());
+                      },
                       [](morphio::mut::Section* section,
                          py::array_t<float> _perimeters) {
                           section -> perimeters() = _perimeters.cast<std::vector<float>>();
@@ -539,16 +549,20 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
     py::class_<morphio::mut::Soma, std::unique_ptr<morphio::mut::Soma, py::nodelete>>(mut_module, "Soma")
         .def(py::init<const morphio::Property::PointLevel&>())
         .def_property("points",
-                      (morphio::Points& (morphio::mut::Soma::*) ())
-                      &morphio::mut::Soma::points,
+                      [](morphio::mut::Soma* soma){
+                          return py::array(soma->points().size(),
+                                           soma->points().data());
+                      },
                       [](morphio::mut::Soma* soma,
                          py::array_t<float> _points) {
                           soma -> points() = array_to_points(_points);
                       },
                       "Returns the coordinates (x,y,z) of all soma point")
         .def_property("diameters",
-                      (std::vector<float>& (morphio::mut::Soma::*) ())
-                      &morphio::mut::Soma::diameters,
+                      [](morphio::mut::Soma* soma){
+                          return py::array(soma->diameters().size(),
+                                           soma->diameters().data());
+                      },
                       [](morphio::mut::Soma* soma,
                          py::array_t<float> _diameters) {
                           soma -> diameters() = _diameters.cast<std::vector<float>>();

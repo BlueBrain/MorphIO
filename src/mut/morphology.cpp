@@ -147,7 +147,7 @@ Morphology::~Morphology()
         deleteSection(root, true);
 }
 
-const std::map<uint32_t, std::shared_ptr<Section>>& Morphology::sections() const {
+const std::map<uint32_t, std::shared_ptr<Section>> Morphology::sections() const {
     return _sections;
 }
 

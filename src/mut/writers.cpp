@@ -40,12 +40,12 @@ void swc(const Morphology& morphology, const std::string& filename)
     using std::setw;
 
     myfile << "# index" << setw(9)
-           << "type" << setw(9)
-           << "X" << setw(12)
-           << "Y" << setw(12)
-           << "Z" << setw(12)
+           << "type" << setw(10)
+           << "X" << setw(13)
+           << "Y" << setw(13)
+           << "Z" << setw(13)
            << "radius" << setw(13)
-           << "parent\n" << std::endl;
+           << "parent" << std::endl;
 
 
     int segmentIdOnDisk = 1;
@@ -56,9 +56,11 @@ void swc(const Morphology& morphology, const std::string& filename)
         throw WriterError(plugin::ErrorMessages().ERROR_WRITE_NO_SOMA());
 
     for (int i = 0; i < soma->points().size(); ++i){
-        myfile << segmentIdOnDisk++ << setw(12) << SECTION_SOMA << setw(12)
-               << soma->points()[i][0] << setw(12) << soma->points()[i][1] << setw(12)
-               << soma->points()[i][2] << setw(12) << soma->diameters()[i] / 2. << setw(12)
+        myfile << segmentIdOnDisk++ << setw(12) << SECTION_SOMA
+               << ' ' << setw(12) << soma->points()[i][0]
+               << ' ' << setw(12) << soma->points()[i][1]
+               << ' ' << setw(12) << soma->points()[i][2]
+               << ' ' << setw(12) << soma->diameters()[i] / 2. << setw(12)
                   << (i==0 ? -1 : segmentIdOnDisk-1) << std::endl;
     }
 
@@ -72,9 +74,11 @@ void swc(const Morphology& morphology, const std::string& filename)
         bool isRootSection = morphology.parent(sectionId) < 0;
         for (int i = (isRootSection ? 0 : 1); i < points.size(); ++i)
         {
-            myfile << segmentIdOnDisk << setw(12) << section->type() << setw(12)
-                   << points[i][0] << setw(12) << points[i][1] << setw(12)
-                   << points[i][2] << setw(12) << diameters[i] / 2. << setw(12);
+            myfile << segmentIdOnDisk << setw(12) << section->type()
+                   << ' ' << setw(12) << points[i][0]
+                   << ' ' << setw(12) << points[i][1]
+                   << ' ' << setw(12) << points[i][2]
+                   << ' ' << setw(12) << diameters[i] / 2. << setw(12);
 
             if (i > (isRootSection ? 0 : 1))
                 myfile << segmentIdOnDisk - 1 << std::endl;
