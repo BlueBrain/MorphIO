@@ -1,7 +1,6 @@
 import os
 import morphio
 import numpy as np
-from mock import patch
 from nose.tools import eq_, ok_, assert_equal
 
 from numpy.testing import assert_array_equal
