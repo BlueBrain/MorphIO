@@ -36,6 +36,9 @@ Morphology::Morphology(const morphio::Morphology& morphology)
     }
 }
 
+/**
+   Return false if there is no duplicate point
+ **/
 bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
                           std::shared_ptr<Section> current) {
     // Weird edge case where parent is empty: skipping it
@@ -348,15 +351,36 @@ void Morphology::applyModifiers(unsigned int modifierFlags) {
 
 }
 
-void Morphology::write_asc(const std::string& filename) {
+
+void Morphology::write(const std::string& filename) {
+    const size_t pos = filename.find_last_of(".");
+    assert(pos != std::string::npos);
+
+    std::string extension;
+
+    for(auto& c : filename.substr(pos))
+        extension += std::tolower(c);
+
+    if (extension == ".h5")
+        writer::h5(*this, filename);
+    else if (extension == ".asc")
+        writer::asc(*this, filename);
+    else if (extension == ".swc")
+        writer::swc(*this, filename);
+    else
+        LBTHROW(UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename)));
+
+}
+
+void Morphology::_write_asc(const std::string& filename) {
     writer::asc(*this, filename);
 }
 
-void Morphology::write_swc(const std::string& filename) {
+void Morphology::_write_swc(const std::string& filename) {
     writer::swc(*this, filename);
 }
 
-void Morphology::write_h5(const std::string& filename) {
+void Morphology::_write_h5(const std::string& filename) {
     for(auto it = depth_begin(); it != depth_end(); ++it) {
         int32_t sectionId = *it;
         int32_t parentId = parent(sectionId);

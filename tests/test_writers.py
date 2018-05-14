@@ -8,6 +8,14 @@ from morphio import SectionType, PointLevel, MitochondriaPointLevel, Morphology 
 _path = os.path.dirname(os.path.abspath(__file__))
 
 
+def test_write_soma_basic():
+    morpho = Morphology()
+    morpho.soma.points = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    morpho.soma.diameters = [2, 3, 3]
+
+    morpho.write("test_write.swc")
+
+
 def test_write_basic():
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0]]
@@ -49,9 +57,9 @@ def test_write_basic():
                                              [-5, -4, 0]],
                                             [2, 4]))
 
-    morpho.write_asc("test_write.asc")
-    morpho.write_swc("test_write.swc")
-    morpho.write_h5("test_write.h5")
+    morpho.write("test_write.asc")
+    morpho.write("test_write.swc")
+    morpho.write("test_write.h5")
 
     assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.asc"))
     assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.swc"))
@@ -86,7 +94,7 @@ def test_write_perimeter():
                                      [2, 3],
                                      [6, 8]))
 
-    morpho.write_h5("test_write.h5")
+    morpho.write("test_write.h5")
 
     assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.h5"))
 
@@ -108,4 +116,4 @@ def test_mitochondria():
         mito_id, MitochondriaPointLevel([0, 0, 0, 0],
                                         [0.6, 0.7, 0.8, 0.9],
                                         [20, 30, 40, 50]))
-    morpho.write_h5("test.h5")
+    morpho.write("test.h5")

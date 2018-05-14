@@ -189,30 +189,33 @@ public:
      **/
     MorphologyVersion& version(){ return _cellProperties->_version; }
 
-
-
     /**
-     * Write file to H5 format
+     * Write file to H5, SWC, ASC format depending on filename extension
      **/
-    void write_h5(const std::string& filename);
-
-    /**
-     * Write file to ASC (neurolucida) format
-     **/
-    void write_asc(const std::string& filename);
-
-    /**
-     * Write file to SWC format
-     **/
-    void write_swc(const std::string& filename);
-
-
+    void write(const std::string& filename);
 
     void addAnnotation(const morphio::Property::Annotation& annotation) {
         _annotations.push_back(annotation);
     }
 
     const Property::Properties buildReadOnly(const morphio::plugin::DebugInfo& debugInfo) const;
+
+protected:
+    /**
+     * Write file to H5 format
+     **/
+    virtual void _write_h5(const std::string& filename);
+
+    /**
+     * Write file to ASC (neurolucida) format
+     **/
+    virtual void _write_asc(const std::string& filename);
+
+    /**
+     * Write file to SWC format
+     **/
+    virtual void _write_swc(const std::string& filename);
+
 
 private:
     friend class Section;

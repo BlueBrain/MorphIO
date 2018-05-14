@@ -415,12 +415,8 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
         .def_property_readonly("version", &morphio::mut::Morphology::version,
                                "Returns the version")
 
-        .def("write_h5", &morphio::mut::Morphology::write_h5,
-             "Write file to H5 format", "filename"_a)
-        .def("write_swc", &morphio::mut::Morphology::write_swc,
-             "Write file to SWC format", "filename"_a)
-        .def("write_asc", &morphio::mut::Morphology::write_asc,
-             "Write file to ASC (neurolucida) format", "filename"_a)
+        .def("write", &morphio::mut::Morphology::write,
+             "Write file to H5, SWC, ASC format depending on filename extension", "filename"_a)
 
         .def("depth_begin", [](morphio::mut::Morphology* morph, int32_t id) {
                 return py::make_iterator(morph->depth_begin(id), morph->depth_end());

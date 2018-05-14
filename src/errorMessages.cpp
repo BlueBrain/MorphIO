@@ -121,8 +121,14 @@ const std::string ErrorMessages::ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
 //              WRITERS
 ////////////////////////////////////////////////////////////////////////////////
 
+const std::string ErrorMessages::ERROR_WRONG_EXTENSION(const std::string filename) const {
+    return "Filename: " + filename +
+        " must have one of the following extensions: swc, asc or h5";
+};
+
+
 std::string ErrorMessages::ERROR_WRITE_NO_SOMA() const {
-    return "Empty soma";
+    return "Cannot write file without a soma";
 }
 
 std::string ErrorMessages::ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1, int length1,
