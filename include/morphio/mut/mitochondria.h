@@ -54,6 +54,34 @@ public:
     const std::map<uint32_t, std::shared_ptr<MitoSection>>& sections() const;
 
     /**
+       Depth first iterator starting at a given section id
+
+       If id == -1, the iteration will start at each root section, successively
+    **/
+    mito_depth_iterator depth_begin(uint32_t id = -1) const;
+    mito_depth_iterator depth_end() const;
+
+    /**
+       Breadth first iterator
+
+       If id == -1, the iteration will be successively performed starting
+       at each root section
+    **/
+    mito_breadth_iterator breadth_begin(uint32_t id = -1) const;
+    mito_breadth_iterator breadth_end() const;
+
+    /**
+       Upstream first iterator
+
+       If id == -1, the iteration will be successively performed starting
+       at each root section
+    **/
+    mito_upstream_iterator upstream_begin(uint32_t id = -1) const;
+    mito_upstream_iterator upstream_end() const;
+
+
+
+    /**
      * Return the parent mithochondrial section ID
      **/
     const int32_t parent(uint32_t id) const;

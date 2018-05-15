@@ -15,6 +15,7 @@
 #include <morphio/mito_section.h>
 #include <morphio/soma.h>
 
+#include <morphio/mut/mito_iterators.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
@@ -451,6 +452,9 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
         .def_property_readonly("root_sections", &morphio::mut::Mitochondria::rootSections,
                                "Returns a list of all root sections IDs "
                                "(sections whose parent ID are -1)")
+        .def_property_readonly("sections", &morphio::mut::Mitochondria::sections,
+                               "Return a dict where key is the mitochondrial section ID"
+                               " and value is the mithochondrial section")
         .def("is_root", &morphio::mut::Mitochondria::isRoot,
              "Return True if section is a root section", "section_id"_a)
         .def("parent", &morphio::mut::Mitochondria::parent,
@@ -466,7 +470,36 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
              "Append the read-only Section to the given parentId (-1 appends to soma)\n"
              "\n"
              "If recursive == true, all descendent will be appended as well",
-             "parent_id"_a, "point_level_properties"_a);
+             "parent_id"_a, "point_level_properties"_a)
+
+        .def("depth_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
+                return py::make_iterator(morph->depth_begin(id), morph->depth_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Depth first iterator starting at a given section id\n"
+            "\n"
+            "If id == -1, the iteration will be successively performed starting\n"
+            "at each root section",
+            "section_id"_a=-1)
+        .def("breadth_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
+                return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Breadth first iterator starting at a given section id\n"
+            "\n"
+            "If id == -1, the iteration will be successively performed starting\n"
+            "at each root section",
+            "section_id"_a=-1)
+        .def("upstream_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
+                return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Upstream iterator starting at a given section id\n"
+            "\n"
+            "If id == -1, the iteration will be successively performed starting\n"
+            "at each root section",
+            "section_id"_a=-1);
+
 
 
     // py::nodelete needed because morphio::mut::MitoSection has a private destructor
@@ -479,7 +512,7 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
                           section -> diameters() = _diameters;
                       },
                       "Returns the diameters of all points of this section")
-        .def_property("path_lengths",
+        .def_property("relative_path_lengths",
                       &morphio::mut::MitoSection::pathLengths,
                       [](morphio::mut::MitoSection* section,
                          const std::vector<float>& _pathLengths) {

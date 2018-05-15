@@ -218,5 +218,5 @@ def test_mitochondria():
     assert_array_equal(mito.section(first_child).neurite_section_ids,
                        [3, 4, 4, 5])
 
-    assert_array_equal(np.array(mito.section(first_child).path_lengths, dtype=np.float32),
+    assert_array_equal(np.array(mito.section(first_child).relative_path_lengths, dtype=np.float32),
                        np.array([0.6, 0.7, 0.8, 0.9], dtype=np.float32))

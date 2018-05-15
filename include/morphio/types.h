@@ -61,21 +61,28 @@ namespace mut
 class Section;
 class Soma;
 class Morphology;
+class Mitochondria;
+
+template <typename T>
+class MitoIterator;
 
 template <typename T>
 class Iterator;
+
+typedef MitoIterator<std::stack<uint32_t>> mito_depth_iterator;
+typedef MitoIterator<std::queue<uint32_t>> mito_breadth_iterator;
+typedef MitoIterator<std::vector<uint32_t>> mito_upstream_iterator;
 
 typedef Iterator<std::stack<uint32_t>> depth_iterator;
 typedef Iterator<std::queue<uint32_t>> breadth_iterator;
 typedef Iterator<std::vector<uint32_t>> upstream_iterator;
-
 }
 
 template <typename T>
-class Iterator;
+class MitoIterator;
 
 template <typename T>
-class MitoIterator;
+class Iterator;
 
 
 typedef std::pair<size_t, size_t> SectionRange;

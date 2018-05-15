@@ -384,9 +384,14 @@ similar to neuronal section and end up with a similar API. The morphology object
 of each mitochondrion.
 - section(id): returns a given mitochondrial section
 - append_section: creates a new mitochondrial section
-
+_ depth_begin: a depth first iterator
+_ breadth_begin: a breadth first iterator
+_ upstream_begin: an upstream iterator
 
 ```python
+from morphio.mut import Morphology
+from morphio import MitochondriaPointLevel, PointLevel, SectionType
+
 morpho = Morphology()
 
 # A neuronal section that will store mitochondria
@@ -395,7 +400,7 @@ section_id = morpho.append_section(
     PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]))
 
 # Creating a new mitochondrion
-mito_id = morpho.mitochondria().append_section(
+mito_id = morpho.mitochondria.append_section(
     -1,
     MitochondriaPointLevel([section_id, section_id], # section id hosting the mitochondria point
                            [0.5, 0.6], # relative distance between the start of the section and the point
@@ -403,10 +408,19 @@ mito_id = morpho.mitochondria().append_section(
                            ))
 
 # Appending a new mitochondrial section to the previous one
-morpho.mitochondria().append_section(
+morpho.mitochondria.append_section(
     mito_id, MitochondriaPointLevel([0, 0, 0, 0],
                                     [0.6, 0.7, 0.8, 0.9],
                                     [20, 30, 40, 50]))
+
+# Iteration works the same as iteration on neuronal sections
+first_root = morpho.mitochondria.root_sections[0]
+for section_id in morpho.mitochondria.depth_begin(first_root):
+    section = morpho.mitochondria.section(section_id)
+    print('relative_path_length - diameter')
+    for relative_path_length, diameter in zip(section.diameters,
+                                              section.relative_path_lengths):
+        print("{} - {}".format(relative_path_length, diameter))
 ```
 
 Reading mithochondria from H5 files:

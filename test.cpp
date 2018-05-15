@@ -11,6 +11,7 @@
 
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
+#include <morphio/mut/mito_iterators.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 
@@ -27,32 +28,34 @@ using namespace std;
 
 int main()
 {
-    // morphio::mut::Morphology morpho;
-    // morpho.soma()->points() = {{0, 0, 0}, {1, 1, 1}};
-    // morpho.soma()->diameters() = {1, 1};
+    morphio::mut::Morphology morpho;
+    morpho.soma()->points() = {{0, 0, 0}, {1, 1, 1}};
+    morpho.soma()->diameters() = {1, 1};
 
-    // uint32_t sectionId = morpho.appendSection(
-    //     -1, morphio::SectionType::SECTION_AXON,
-    //     morphio::Property::PointLevel({{2, 2, 2}, {3, 3, 3}}, {4, 4}, {5, 5}));
+    auto mito = morpho.mitochondria();
 
-    // uint32_t id = morpho.mitochondria().appendSection(
-    //     -1, morphio::Property::MitochondriaPointLevel({0, 0}, {0.5, 0.6},
-    //                                                   {10, 20}));
+    uint32_t sectionId = morpho.appendSection(
+        -1, morphio::SectionType::SECTION_AXON,
+        morphio::Property::PointLevel({{2, 2, 2}, {3, 3, 3}}, {4, 4}, {5, 5}));
 
-    // morpho.mitochondria().appendSection(
-    //     id, morphio::Property::MitochondriaPointLevel({0, 0, 0, 0},
-    //                                                   {0.6, 0.7, 0.8, 0.9},
-    //                                                   {20, 30, 40, 50}));
-    // morpho.write_h5("test.h5");
+    uint32_t id = mito.appendSection(
+        -1, morphio::Property::MitochondriaPointLevel({0, 0}, {0.5, 0.6},
+                                                      {10, 20}));
 
-    morphio::Morphology m("test.h5");
+    mito.appendSection(
+        id, morphio::Property::MitochondriaPointLevel({0, 0, 0, 0},
+                                                      {0.6, 0.7, 0.8, 0.9},
+                                                      {20, 30, 40, 50}));
 
-    std::cout << "m.mitochondria().rootSections().size(): " << m.mitochondria().rootSections().size() << std::endl;
-    // for(auto s: m.mitochondria().section(0).diameters())
-    //     std::cout << "s: " << s << std::endl;
-    // std::cout << "second" << std::endl;
 
-    // for(auto s: m.mitochondria().section(1).diameters())
-    //     std::cout << "s: " << s << std::endl;
+    auto roots = mito.rootSections();
+    auto first_root = roots[0];
 
+    for(auto id_it = mito.depth_begin(first_root); id_it != mito.depth_end(); ++id_it) {
+        int section_id = *id_it;
+        auto& section = mito.section(section_id);
+        for(int i = 0; i<section->diameters().size(); ++i) {
+            std::cout << "section->diameters()[i]: " << section->diameters()[i] << std::endl;
+        }
+    }
 }
