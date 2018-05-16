@@ -31,6 +31,11 @@ public:
     const SomaType type() const { return _somaType; }
 
     /**
+     * Return the center of gravity of the soma points
+     **/
+    const Point center() const;
+
+    /**
        Return the soma surface
        Note: the soma surface computation depends on the soma type
     **/

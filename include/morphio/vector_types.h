@@ -22,6 +22,9 @@ Point operator-(const Point &left, const Point &right);
 Point operator+=(Point &left, const Point &right);
 Point operator/=(Point &left, float factor);
 
+template <typename T> const Point centerOfGravity(const T& points);
+
 std::string dumpPoint(const Point& point);
 std::string dumpPoints(const std::vector<Point>& point);
+
 }

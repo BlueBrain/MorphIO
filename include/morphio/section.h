@@ -33,6 +33,12 @@ class Section : public SectionBase<Section>
     typedef Property::Section SectionId;
     typedef Property::Point PointAttribute;
 public:
+
+    /**
+       Euclidian distance between first and last point of the section
+    **/
+    const float length() const;
+
     /**
        Depth first search iterator
     **/

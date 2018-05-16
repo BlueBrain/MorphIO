@@ -1,6 +1,8 @@
 #include <sstream>
 
 #include <morphio/vector_types.h>
+#include <gsl/span>
+
 
 namespace morphio
 {
@@ -60,5 +62,21 @@ std::string dumpPoints(const std::vector<Point>& points)
         str += dumpPoint(point) + '\n';
     return str;
 }
+
+template <typename T>
+const Point centerOfGravity(const T& points)
+{
+    float x = 0, y = 0, z = 0;
+    float size = float(points.size());
+    for (const Point& point : points)
+    {
+        x += point[0];
+        y += point[1];
+        z += point[2];
+    }
+    return Point({x / size, y / size, z / size});
+}
+template const Point centerOfGravity(const gsl::span<const Point>& points);
+template const Point centerOfGravity(const std::vector<Point>& points);
 
 } // namespace morphio

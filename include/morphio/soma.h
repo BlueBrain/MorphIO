@@ -32,11 +32,6 @@ class Soma
 public:
 
     /**
-     * Return the center of gravity of the soma points
-     **/
-    const Point center() const;
-
-    /**
      * Return the  coordinates (x,y,z) of all soma points
      **/
     const range<const Point> points() const
@@ -59,6 +54,11 @@ public:
     {
         return _properties->_cellLevel._somaType;
     }
+
+    /**
+     * Return the center of gravity of the soma points
+     **/
+    const Point center() const;
 
     /**
      * Return the soma volume\n"

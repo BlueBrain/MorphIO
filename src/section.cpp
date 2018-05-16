@@ -1,12 +1,27 @@
 #include <morphio/morphology.h>
 #include <morphio/section.h>
+#include <math.h>
 
 namespace morphio
 {
+
+
 const SectionType Section::type() const
 {
     auto val = _properties->get<Property::SectionType>()[_id];
     return val;
+}
+
+const float Section::length() const
+{
+    auto points = this->points();
+    int last = points.size() - 1;
+    if (last < 1)
+        return 0;
+
+    return sqrt((points[0][0] - points[last][0]) * (points[0][0] - points[last][0]) +
+                (points[0][1] - points[last][1]) * (points[0][1] - points[last][1]) +
+                (points[0][2] - points[last][2]) * (points[0][2] - points[last][2]));
 }
 
 depth_iterator Section::depth_begin() const

@@ -2,6 +2,7 @@
 
 #include <morphio/section.h>
 #include <morphio/soma.h>
+#include <morphio/vector_types.h>
 
 
 namespace morphio
@@ -38,15 +39,7 @@ const range<const typename TProperty::Type> Soma::get() const
 const Point Soma::center() const
 {
     auto points = get<Property::Point>();
-    float x = 0, y = 0, z = 0;
-    float size = float(points.size());
-    for (const Point& point : points)
-    {
-        x += point[0];
-        y += point[1];
-        z += point[2];
-    }
-    return Point({x / size, y / size, z / size});
+    return centerOfGravity(points);
 }
 
 const float Soma::volume() const {

@@ -21,6 +21,11 @@ Soma::Soma(const morphio::Soma& soma) : _somaType(soma.type())
         Property::PointLevel(soma._properties->_pointLevel, soma._range);
 }
 
+const Point Soma::center() const
+{
+    return centerOfGravity(points());
+}
+
 const float Soma::surface() const {
     switch(type()) {
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS:

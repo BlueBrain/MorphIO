@@ -603,7 +603,12 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
         .def_property_readonly("surface",
                                &morphio::mut::Soma::surface,
                                "Returns the soma surface\n\n"
-                               "Note: the soma surface computation depends on the soma type");
+                               "Note: the soma surface computation depends on the soma type")
+        .def_property_readonly("center", [](morphio::mut::Soma* soma){
+                return py::array(3, soma->center().data());
+            },
+            "Returns the center of gravity of the soma points");
+
 
 
 
