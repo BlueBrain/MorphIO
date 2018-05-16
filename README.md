@@ -37,7 +37,8 @@
 ### As a python wheel
 The python binding can directly be installed using pip:
 ```shell
-pip install morphio
+
+pip install --index-url  https://bbpteam.epfl.ch/repository/devpi/bbprelman/dev/+simple/ morphio
 ```
 
 ### From sources
