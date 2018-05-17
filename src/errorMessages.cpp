@@ -116,6 +116,14 @@ const std::string ErrorMessages::ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
 }
 
 
+const std::string ErrorMessages::ERROR_UNSPECIFIED_SECTION_TYPE() const {
+    return "\n\nThe value of argument 'type' is set to 'SectionType::SECTION_UNDEFINED' "
+        "in the function call 'mut::Morphology::appendSection (C++) / mut.morphology.append_section (python)'.\n"
+        "This is only allowed for non-root sections as this indicates the type of the parent "
+        "section should be used.\n\n"
+        "Hint: SECTION_UNDEFINED is the default value of parameter 'type'. You may have "
+        "forgotten to specify this parameter and it picked the default value ?";
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //              WRITERS

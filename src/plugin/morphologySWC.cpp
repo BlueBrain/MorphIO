@@ -251,8 +251,8 @@ public:
 
         swcIdToSectionId[sample.id] = morph.appendSection(
             id,
-            sample.type,
-            properties);
+            properties,
+            sample.type);
     }
 
 private:

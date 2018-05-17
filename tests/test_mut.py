@@ -36,17 +36,34 @@ def test_point_level():
 
 def test_empty_neurite():
     m = Morphology()
-    m.append_section(-1, SectionType.axon, PointLevel())
+    m.append_section(-1, PointLevel(), SectionType.axon)
     assert_equal(len(m.root_sections), 1)
     assert_equal(m.section(m.root_sections[0]).type,
                  SectionType.axon)
 
 
+def test_unspecified_section_type():
+    good_error_msg = """The value of argument 'type' is set to 'SectionType::SECTION_UNDEFINED' in the function call 'mut::Morphology::appendSection (C++) / mut.morphology.append_section (python)'.
+This is only allowed for non-root sections as this indicates the type of the parent section should be used.
+
+Hint: SECTION_UNDEFINED is the default value of parameter 'type'. You may have forgotten to specify this parameter and it picked the default value ?"""
+
+    with assert_raises(SectionBuilderError) as obj:
+        Morphology().append_section(-1, PointLevel())
+        assert_substring(good_error_msg,
+                         str(obj.exception))
+
+    with assert_raises(SectionBuilderError) as obj:
+        Morphology().append_section(-1, PointLevel(), SectionType.undefined)
+        assert_substring(good_error_msg,
+                         str(obj.exception))
+
+
 def test_single_neurite():
     m = Morphology()
     m.append_section(-1,
-                     SectionType.axon,
-                     PointLevel([[1, 2, 3]], [2], [20]))
+                     PointLevel([[1, 2, 3]], [2], [20]),
+                     SectionType.axon)
 
     assert_array_equal(m.section(m.root_sections[0]).points,
                        [[1, 2, 3]])
@@ -75,11 +92,10 @@ def test_single_neurite():
 def test_child_section():
     m = Morphology()
     section_id = m.append_section(-1,
-                                  SectionType.axon,
-                                  PointLevel([[1, 2, 3]], [2], [20]))
+                                  PointLevel([[1, 2, 3]], [2], [20]),
+                                  SectionType.axon)
 
     m.append_section(section_id,
-                     SectionType.axon,
                      PointLevel([[1, 2, 3], [4, 5, 6]],
                                 [2, 3],
                                 [20, 30]))
@@ -110,13 +126,12 @@ def captured_output():
 def test_append_no_duplicate():
     m = Morphology()
     section_id = m.append_section(-1,
-                                  SectionType.axon,
                                   PointLevel([[1, 2, 3], [4, 5, 6]],
                                              [2, 2],
-                                             [20, 20]))
+                                             [20, 20]),
+                                  SectionType.axon)
 
     m.append_section(section_id,
-                     SectionType.axon,
                      PointLevel([[400, 5, 6], [7, 8, 9]],
                                 [2, 3],
                                 [20, 30]))
@@ -128,19 +143,17 @@ def test_build_read_only():
     m.soma.diameters = [-4]
 
     section_id = m.append_section(-1,
-                                  SectionType.axon,
                                   PointLevel([[1, 2, 3], [4, 5, 6]],
                                              [2, 2],
-                                             [20, 20]))
+                                             [20, 20]),
+                                  SectionType.axon)
 
     m.append_section(section_id,
-                     SectionType.axon,
                      PointLevel([[4, 5, 6], [7, 8, 9]],
                                 [2, 3],
                                 [20, 30]))
 
     m.append_section(section_id,
-                     SectionType.axon,
                      PointLevel([[4, 5, 6], [10, 11, 12]],
                                 [2, 2],
                                 [20, 20]))
@@ -190,8 +203,9 @@ def test_mitochondria():
     morpho.soma.diameters = [1, 1]
 
     sectionId = morpho.append_section(
-        -1, SectionType.axon,
-        PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]))
+        -1,
+        PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
+        SectionType.axon)
 
     mito = morpho.mitochondria
     first_mito_id = mito.append_section(

@@ -159,8 +159,13 @@ public:
 
     /**
        Append a new Section the given parentId (-1 appends to soma)
+
+       If sectionType is omitted or set to SECTION_UNDEFINED,
+       the type of the parent section will be used
+       (Root sections can't have sectionType ommited)
     **/
-    uint32_t appendSection(int32_t parentId, SectionType, const Property::PointLevel&);
+    uint32_t appendSection(int32_t parentId, const Property::PointLevel&,
+                           SectionType sectionType = SectionType::SECTION_UNDEFINED);
 
     /**
        Iterate on all sections starting at startSection via a depth-first-search traversal

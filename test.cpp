@@ -35,8 +35,8 @@ int main()
     auto mito = morpho.mitochondria();
 
     uint32_t sectionId = morpho.appendSection(
-        -1, morphio::SectionType::SECTION_AXON,
-        morphio::Property::PointLevel({{2, 2, 2}, {3, 3, 3}}, {4, 4}, {5, 5}));
+        -1, morphio::Property::PointLevel({{2, 2, 2}, {3, 3, 3}}, {4, 4}, {5, 5}),
+        morphio::SectionType::SECTION_AXON);
 
     uint32_t id = mito.appendSection(
         -1, morphio::Property::MitochondriaPointLevel({0, 0}, {0.5, 0.6},

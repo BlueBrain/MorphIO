@@ -148,6 +148,8 @@ public:
     //              WRITERS
     ////////////////////////////////////////////////////////////////////////////////
 
+    const std::string ERROR_UNSPECIFIED_SECTION_TYPE() const;
+
     const std::string ERROR_WRONG_EXTENSION(const std::string filename) const;
 
     std::string ERROR_WRITE_NO_SOMA() const;

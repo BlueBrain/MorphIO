@@ -395,9 +395,12 @@ http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight
              "section_id"_a)
         .def("build_read_only", (const morphio::Property::Properties (morphio::mut::Morphology::*)() const) &morphio::mut::Morphology::buildReadOnly,
              "Returns the data structure used to create read-only morphologies")
-        .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, morphio::SectionType, const morphio::Property::PointLevel&)) &morphio::mut::Morphology::appendSection,
-             "Append a new Section the given parentId (-1 appends to soma)",
-             "parent_id"_a, "section_type"_a, "point_level_properties"_a)
+        .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, const morphio::Property::PointLevel&, morphio::SectionType)) &morphio::mut::Morphology::appendSection,
+             "Append a new Section the given parentId (-1 appends to soma)"
+             " If section_type is omitted or set to 'undefined'"
+             " the type of the parent section will be used"
+             " (Root sections can't have sectionType ommited)",
+             "parent_id"_a, "point_level_properties"_a, "section_type"_a=morphio::SectionType::SECTION_UNDEFINED)
         .def("delete_section", &morphio::mut::Morphology::deleteSection,
              "Delete the given section\n"
              "\n"

@@ -95,14 +95,25 @@ uint32_t Morphology::appendSection(int32_t parentId,
     return id;
 }
 
-uint32_t Morphology::appendSection(int32_t parentId, SectionType type,
-                                   const Property::PointLevel& pointProperties)
+uint32_t Morphology::appendSection(int32_t parentId,
+                                   const Property::PointLevel& pointProperties,
+                                   SectionType type)
 {
+    if(type == SectionType::SECTION_UNDEFINED) {
+        if(parentId == -1)
+            LBTHROW(SectionBuilderError(_err.ERROR_UNSPECIFIED_SECTION_TYPE()));
+        else
+            type = _sections[parentId] -> type();
+    }
+
     uint32_t id = _register(std::shared_ptr<Section>(new Section(_counter, type, pointProperties),
                                                      friendDtorForSharedPtr));
-    if(parentId == -1)
+
+
+
+        if(parentId == -1) {
         _rootSections.push_back(id);
-    else {
+    } else {
         if(!_checkDuplicatePoint(_sections[parentId], _sections[id]))
             LBERROR(_err.WARNING_WRONG_DUPLICATE(_sections[id], _sections[parentId]));
 

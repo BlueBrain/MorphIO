@@ -146,8 +146,8 @@ private:
                 return_id = parent_id;
             } else {
                 return_id = nb_.appendSection(parent_id,
-                                              section_type,
-                                              properties);
+                                              properties,
+                                              section_type);
                 debugInfo_.setLineNumber(return_id, lex_.current_section_start_);
             }
 
