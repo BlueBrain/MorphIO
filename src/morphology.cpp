@@ -87,9 +87,12 @@ void buildChildren(std::shared_ptr<Property::Properties> properties)
 Morphology::Morphology(const URI& source, unsigned int options)
 {
     const size_t pos = source.find_last_of(".");
-    assert(pos != std::string::npos);
+    if(pos == std::string::npos)
+        LBTHROW(UnknownFileType("File has no extension"));
+
     if (access(source.c_str(), F_OK) == -1)
         LBTHROW(RawDataError("File: " + source + " does not exist."));
+
 
     std::string extension;
 
