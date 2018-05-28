@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -o xtrace
 BASE=$(git rev-parse --show-toplevel)
 
 docker build --no-cache -t morphio_wheel \

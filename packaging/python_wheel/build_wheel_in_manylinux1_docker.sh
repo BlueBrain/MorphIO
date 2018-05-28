@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -o xtrace
 BASE=$(git rev-parse --show-toplevel)
 
 export PIPPROXY="-i https://bbpteam.epfl.ch/repository/devpi/simple"

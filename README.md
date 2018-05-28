@@ -179,8 +179,8 @@ Note for BBP users: for more information about the intricacy of the format conve
 <https://bbpteam.epfl.ch/project/issues/browse/NSETM-458>
 
 ## Usage
-When possible both APIs will try to use the class and function names.
-Here are a examples on how to use the various APIs.
+When possible both APIs will try to use the same class and function names.
+Here are examples of how to use the various APIs.
 
 ### Immutable C++
 

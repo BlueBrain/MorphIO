@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -o xtrace
 BASE=$(git rev-parse --show-toplevel)
 
 if [ "$RELEASE" == "true" ]; then
@@ -10,9 +11,6 @@ fi
 for wheel in `ls $BASE/packaging/python_wheel/wheelhouse/morphio*.whl`; do
     upload2repo -t python -r $CHANNEL -f $wheel
 done
-
-git status
-ls
 
 # cleanup afterwards
 docker run --rm \
