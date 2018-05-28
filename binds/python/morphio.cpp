@@ -108,6 +108,8 @@ PYBIND11_MODULE(morphio, m) {
             "- section types\n"
             "- topology (children/parent relationship)\n\n"
             "Note: the soma types are NOT required to be equal")
+        .def(py::self != py::self)
+
 
         // Cell sub-parts accessors
         .def_property_readonly("soma", &morphio::Morphology::soma,

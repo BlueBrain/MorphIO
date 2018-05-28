@@ -33,6 +33,18 @@ struct base_type<std::vector<T>> : base_type<T>
 {
 };
 
+void writeLine(std::ofstream& myfile, int id, int parentId, SectionType type, const Point& point, float diameter){
+    using std::setw;
+
+    myfile << std::to_string(id)
+           << setw(12) << std::to_string(type)
+           << " " << setw(12) << std::to_string(point[0])
+           << " " << setw(12) << std::to_string(point[1])
+           << " " << setw(12) << std::to_string(point[2])
+           << " " << setw(12) << std::to_string(diameter / 2.)
+           << setw(12) << std::to_string(parentId) << std::endl;
+}
+
 void swc(const Morphology& morphology, const std::string& filename)
 {
     std::ofstream myfile;
@@ -55,17 +67,20 @@ void swc(const Morphology& morphology, const std::string& filename)
     if(!morphology.mitochondria().rootSections().empty())
         LBERROR(plugin::ErrorMessages().MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
+    const auto& points = soma->points();
+    const auto& diameters = soma->diameters();
 
-    if(soma->points().size() < 1)
+    if(points.size() < 1)
         throw WriterError(plugin::ErrorMessages().ERROR_WRITE_NO_SOMA());
 
-    for (int i = 0; i < soma->points().size(); ++i){
-        myfile << segmentIdOnDisk++ << setw(12) << SECTION_SOMA
-               << ' ' << setw(12) << soma->points()[i][0]
-               << ' ' << setw(12) << soma->points()[i][1]
-               << ' ' << setw(12) << soma->points()[i][2]
-               << ' ' << setw(12) << soma->diameters()[i] / 2. << setw(12)
-                  << (i==0 ? -1 : segmentIdOnDisk-1) << std::endl;
+    for (int i = 0; i < points.size(); ++i){
+        writeLine(myfile,
+                  segmentIdOnDisk,
+                  i==0 ? -1 : segmentIdOnDisk-1,
+                  SECTION_SOMA,
+                  points[i],
+                  diameters[i]);
+        ++segmentIdOnDisk;
     }
 
     for(auto it = morphology.depth_begin(); it != morphology.depth_end(); ++it) {
@@ -78,18 +93,20 @@ void swc(const Morphology& morphology, const std::string& filename)
         bool isRootSection = morphology.parent(sectionId) < 0;
         for (int i = (isRootSection ? 0 : 1); i < points.size(); ++i)
         {
-            myfile << segmentIdOnDisk << setw(12) << section->type()
-                   << ' ' << setw(12) << points[i][0]
-                   << ' ' << setw(12) << points[i][1]
-                   << ' ' << setw(12) << points[i][2]
-                   << ' ' << setw(12) << diameters[i] / 2. << setw(12);
-
+            int parentIdOnDisk;
             if (i > (isRootSection ? 0 : 1))
-                myfile << segmentIdOnDisk - 1 << std::endl;
+                parentIdOnDisk = segmentIdOnDisk - 1;
             else {
                 int32_t parentId = morphology.parent(sectionId);
-                myfile << (parentId != -1 ? newIds[parentId] : 1) << std::endl;
+                parentIdOnDisk = (parentId != -1 ? newIds[parentId] : 1);
             }
+
+            writeLine(myfile,
+                      segmentIdOnDisk,
+                      parentIdOnDisk,
+                      section->type(),
+                      points[i],
+                      diameters[i]);
 
             ++segmentIdOnDisk;
         }
@@ -97,7 +114,6 @@ void swc(const Morphology& morphology, const std::string& filename)
     }
 
     myfile.close();
-
 }
 
 void _write_asc_points(std::ofstream& myfile, const Points& points,
@@ -105,9 +121,11 @@ void _write_asc_points(std::ofstream& myfile, const Points& points,
 {
     for (int i = 0; i < points.size(); ++i)
     {
-        myfile << std::string(indentLevel, ' ') << "(" << points[i][0] << ' '
-                  << points[i][1] << ' ' << points[i][2] << ' ' << diameters[i]
-                  << ')' << std::endl;
+        myfile << std::string(indentLevel, ' ')
+               << "(" << std::to_string(points[i][0]) << ' '
+               << std::to_string(points[i][1]) << ' '
+               << std::to_string(points[i][2]) << ' '
+               << std::to_string(diameters[i]) << ')' << std::endl;
     }
 }
 
