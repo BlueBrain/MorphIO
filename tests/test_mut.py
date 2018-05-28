@@ -111,6 +111,11 @@ def test_child_section():
     assert_array_equal(m.section(children[0]).perimeters,
                        [20, 30])
 
+    m.section(children[0]).points = [[7, 8, 9], [10, 11, 12]]
+
+    assert_array_equal(m.section(children[0]).points,
+                       [[7, 8, 9], [10, 11, 12]])
+
 
 @contextmanager
 def captured_output():
