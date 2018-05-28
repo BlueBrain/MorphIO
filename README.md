@@ -311,9 +311,9 @@ int main()
             {5, 5}));
 
     // Writing the file in the 3 formats
-    morpho.write_asc("outfile.asc");
-    morpho.write_swc("outfile.swc");
-    morpho.write_h5("outfile.h5");
+    morpho.write("outfile.asc");
+    morpho.write("outfile.swc");
+    morpho.write("outfile.h5");
 }
 ```
 
@@ -369,9 +369,9 @@ child_section_id = morpho.append_section(
         [4, 4],
         [5, 5]))
 
-morpho.write_asc("outfile.asc")
-morpho.write_swc("outfile.swc")
-morpho.write_h5("outfile.h5")
+morpho.write("outfile.asc")
+morpho.write("outfile.swc")
+morpho.write("outfile.h5")
 ```
 
 ### Mitochondria
