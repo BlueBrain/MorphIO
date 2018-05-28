@@ -115,6 +115,8 @@ public:
 
     const std::string ERROR_SELF_PARENT(const Sample& sample) const;
 
+    const std::string ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std::string&) const;
+
 
     ////////////////////////////////////////////////////////////////////////////////
     //             NEUROLUCIDA

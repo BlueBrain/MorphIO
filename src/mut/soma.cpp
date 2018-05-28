@@ -4,6 +4,7 @@
 #include <morphio/soma.h>
 
 #include <morphio/section.h>
+#include <morphio/shared_utils.tpp>
 
 namespace morphio
 {
@@ -27,34 +28,10 @@ const Point Soma::center() const
 }
 
 const float Soma::surface() const {
-    switch(type()) {
-    case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS:
-    {
-        float radius = diameters()[0] / 2;
-        return 4 * M_PI * radius * radius;
-    }
-    case SOMA_SIMPLE_CONTOUR:
-    {
-        std::vector<Point> polygone;
-        polygone = points();
-
-        polygone.push_back(polygone[0]);
-
-        float area = 0;
-
-        for(int i = 1;i<polygone.size(); ++i){
-            float x_i = polygone[i][0];
-            float y_i = polygone[i][1];
-            float x_prev_i = polygone[i-1][0];
-            float y_prev_i = polygone[i-1][1];
-            area += 0.5 * (x_prev_i * y_i - x_i * y_prev_i);
-        }
-        return area;
-    }
-
-    default:
-        throw std::runtime_error("Soma::surface is not implemented for this soma type");
-    }
+    return _somaSurface<std::vector<float>,
+                        std::vector<Point>>(type(),
+                        diameters(),
+                        points());
 }
 
 std::ostream& operator<<(std::ostream& os, Soma& soma)

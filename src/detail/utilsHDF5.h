@@ -39,7 +39,7 @@ inline AtomicType<morphio::MorphologyVersion>::AtomicType()
 }
 
 template <>
-inline AtomicType<morphio::Vector2i>::AtomicType()
+inline AtomicType<std::array<int, 2>>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }

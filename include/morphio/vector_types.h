@@ -6,17 +6,10 @@
 
 namespace morphio
 {
-typedef std::array<int, 2> Vector2i;
-typedef std::array<double, 3> Vector3d;
-typedef std::array<float, 3> Vector3f;
-typedef std::array<double, 4> Vector4d;
-typedef std::array<float, 4> Vector4f;
-typedef std::array<std::array<float, 4>, 4> Matrix4f;
-
 typedef std::array<float, 3> Point;
 typedef std::vector<Point> Points;
 
-Point operator*(const Point &from, float factor);
+
 Point operator+(const Point &left, const Point &right);
 Point operator-(const Point &left, const Point &right);
 Point operator+=(Point &left, const Point &right);
@@ -27,4 +20,37 @@ template <typename T> const Point centerOfGravity(const T& points);
 std::string dumpPoint(const Point& point);
 std::string dumpPoints(const std::vector<Point>& point);
 
+
+/**
+   Euclidian distance between two points
+**/
+float distance(const Point &left, const Point &right);
+
+template <typename T>
+Point operator*(const Point &from, T factor)
+{
+    Point ret;
+    for (int i = 0; i < 3; ++i)
+        ret[i] = from[i] * factor;
+    return ret;
 }
+
+template <typename T>
+Point operator*(T factor, const Point &from)
+{
+    return from * factor;
+}
+
+template <typename T>
+Point operator/(const Point &from, T factor)
+{
+    return from * (1/(float)factor);
+}
+
+
+std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
+std::ostream& operator<<(std::ostream& os, const std::vector<morphio::Point>& points);
+
+}
+std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
+std::ostream& operator<<(std::ostream& os, const std::vector<morphio::Point>& points);

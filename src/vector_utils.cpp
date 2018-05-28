@@ -2,18 +2,11 @@
 
 #include <morphio/vector_types.h>
 #include <gsl/span>
-
+#include <math.h>
 
 namespace morphio
 {
 
-Point operator*(const Point &from, float factor)
-{
-    Point ret;
-    for (int i = 0; i < 3; ++i)
-        ret[i] = from[i] * factor;
-    return ret;
-}
 
 Point operator+(const Point &left,
                                const Point &right)
@@ -48,6 +41,16 @@ Point operator/=(Point &left, float factor)
     return left;
 }
 
+/**
+   Euclidian distance between two points
+**/
+float distance(const Point &left, const Point &right)
+{
+    return sqrt((left[0] - right[0]) * (left[0] - right[0]) +
+                (left[1] - right[1]) * (left[1] - right[1]) +
+                (left[2] - right[2]) * (left[2] - right[2]));
+}
+
 std::string dumpPoint(const Point& point)
 {
     std::stringstream ss;
@@ -78,5 +81,33 @@ const Point centerOfGravity(const T& points)
 }
 template const Point centerOfGravity(const gsl::span<const Point>& points);
 template const Point centerOfGravity(const std::vector<Point>& points);
+template <> Point operator*(const Point &from, int factor);
+template <> Point operator*(const Point &from, float factor);
+template <> Point operator*(int factor, const Point &from);
+template <> Point operator*(float factor, const Point &from);
+template <> Point operator/(const Point &from, int factor);
+template <> Point operator/(const Point &from, float factor);
+
+std::ostream& operator<<(std::ostream& os, const std::vector<morphio::Point>& points)
+{
+    os << morphio::dumpPoints(points);
+    return os;
+}
+std::ostream& operator<<(std::ostream& os, const morphio::Point& point)
+{
+    os << morphio::dumpPoint(point);
+    return os;
+}
 
 } // namespace morphio
+
+std::ostream& operator<<(std::ostream& os, const std::vector<morphio::Point>& points)
+{
+    os << morphio::dumpPoints(points);
+    return os;
+}
+std::ostream& operator<<(std::ostream& os, const morphio::Point& point)
+{
+    os << morphio::dumpPoint(point);
+    return os;
+}

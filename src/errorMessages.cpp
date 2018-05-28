@@ -60,6 +60,9 @@ const std::string ErrorMessages::ERROR_SELF_PARENT(const Sample& sample) const {
                     "Parent ID can not be itself");
 }
 
+const std::string ErrorMessages::ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std::string &method) const {
+    return "Cannot call: " + method + " on soma of type UNDEFINED";
+}
 
 
 

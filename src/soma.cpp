@@ -3,6 +3,7 @@
 #include <morphio/section.h>
 #include <morphio/soma.h>
 #include <morphio/vector_types.h>
+#include <morphio/shared_utils.tpp>
 
 
 namespace morphio
@@ -55,7 +56,12 @@ const float Soma::volume() const {
 
     }
 }
-const float Soma::surface() const {};
+
+const float Soma::surface() const {
+    return _somaSurface<morphio::range<const float>,
+                 morphio::range<const Point>>(type(), diameters(), points());
+}
+
 const float Soma::maxDistance() const {};
 
 template const range<const Property::Point::Type>

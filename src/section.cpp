@@ -1,6 +1,6 @@
 #include <morphio/morphology.h>
 #include <morphio/section.h>
-#include <math.h>
+#include <morphio/vector_types.h>
 
 namespace morphio
 {
@@ -19,9 +19,7 @@ const float Section::length() const
     if (last < 1)
         return 0;
 
-    return sqrt((points[0][0] - points[last][0]) * (points[0][0] - points[last][0]) +
-                (points[0][1] - points[last][1]) * (points[0][1] - points[last][1]) +
-                (points[0][2] - points[last][2]) * (points[0][2] - points[last][2]));
+    return distance(points[0], points[last]);
 }
 
 depth_iterator Section::depth_begin() const

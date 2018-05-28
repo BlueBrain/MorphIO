@@ -26,12 +26,14 @@ void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
 
 struct Section
 {
-    typedef Vector2i Type;
+    // (offset, parent index)
+    typedef std::array<int, 2> Type;
 };
 
 struct MitoSection
 {
-    typedef Vector2i Type;
+    // (offset, parent index)
+    typedef std::array<int, 2> Type;
 };
 
 struct Point
