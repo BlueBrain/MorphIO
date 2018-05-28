@@ -376,7 +376,7 @@ morpho.write_h5("outfile.h5")
 
 ### Mitochondria
 
-It is also possible to read and write mitochondria from/to the h5 files.
+It is also possible to read and write mitochondria from/to the h5 files (*SWC and ASC are not supported*).
 As mitochondria can be represented as trees, one can define the concept of *mitochondrial section*
 similar to neuronal section and end up with a similar API. The morphology object has a
 *mitochondria* handle method that exposes the basic methods:

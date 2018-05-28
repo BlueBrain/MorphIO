@@ -1,9 +1,13 @@
-from contextlib import contextmanager
+'''Module providing utility functions for the tests'''
+import sys
 import tempfile
+from contextlib import contextmanager
+from functools import partial
+from io import StringIO
+
+from nose.tools import assert_raises, ok_
 
 from morphio import Morphology
-from nose.tools import ok_, assert_raises
-from functools import partial
 
 
 @contextmanager
@@ -34,3 +38,21 @@ def _test_exception(content, exception, str1, str2, extension):
 
 _test_asc_exception = partial(_test_exception, extension='asc')
 _test_swc_exception = partial(_test_exception, extension='swc')
+
+
+@contextmanager
+def captured_output():
+    '''Capture the python streams
+
+    To be used as:
+    with captured_output() as (out, err):
+        print('hello world')
+    assert_equal(out.getvalue().strip(), 'hello world')
+    '''
+    new_out, new_err = StringIO(), StringIO()
+    old_out, old_err = sys.stdout, sys.stderr
+    try:
+        sys.stdout, sys.stderr = new_out, new_err
+        yield sys.stdout, sys.stderr
+    finally:
+        sys.stdout, sys.stderr = old_out, old_err

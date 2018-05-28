@@ -52,7 +52,11 @@ void swc(const Morphology& morphology, const std::string& filename)
     std::map<uint32_t, int32_t> newIds;
     auto soma = morphology.soma();
 
-    if(morphology.soma()->points().size() < 1)
+    if(!morphology.mitochondria().rootSections().empty())
+        LBERROR(plugin::ErrorMessages().MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+
+
+    if(soma->points().size() < 1)
         throw WriterError(plugin::ErrorMessages().ERROR_WRITE_NO_SOMA());
 
     for (int i = 0; i < soma->points().size(); ++i){
@@ -130,6 +134,10 @@ void asc(const Morphology& morphology, const std::string& filename)
 {
     std::ofstream myfile;
     myfile.open (filename);
+
+    if(!morphology.mitochondria().rootSections().empty())
+        LBERROR(plugin::ErrorMessages().MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+
 
     std::map<morphio::SectionType, std::string> header;
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";

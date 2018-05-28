@@ -91,9 +91,8 @@ PYBIND11_MODULE(morphio, m) {
 
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
-http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight=iostream#capturing-standard-output-from-ostream
+  // http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight=iostream#capturing-standard-output-from-ostream
     py::add_ostream_redirect(m, "ostream_redirect");
-
 
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const morphio::URI&>())

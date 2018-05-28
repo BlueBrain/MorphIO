@@ -157,6 +157,11 @@ public:
     std::string ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1, int length1,
                                              const std::string& vec2, int length2) const;
 
+    std::string MITOCHONDRIA_WRITE_NOT_SUPPORTED() {
+        return errorMsg(0, ErrorLevel::WARNING, "This cell has mitochondria, they cannot be saved in "
+                        " ASC or SWC format. Please use H5 if you want to save them.");
+    }
+
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
     ////////////////////////////////////////////////////////////////////////////////

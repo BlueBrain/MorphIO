@@ -1,9 +1,11 @@
 import os
-from numpy.testing import assert_array_equal
-from nose.tools import assert_equal, assert_raises, ok_
+
+from nose.tools import assert_equal, ok_
 
 from morphio.mut import Morphology
-from morphio import SectionType, PointLevel, MitochondriaPointLevel, Morphology as ImmutMorphology
+from morphio import SectionType, PointLevel, MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect
+
+from utils import captured_output
 
 _path = os.path.dirname(os.path.abspath(__file__))
 
@@ -111,3 +113,15 @@ def test_mitochondria():
                                         [0.6, 0.7, 0.8, 0.9],
                                         [20, 30, 40, 50]))
     morpho.write("test.h5")
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            morpho.write("test.swc")
+            assert_equal(err.getvalue().strip(),
+                         "This cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            morpho.write("test.asc")
+            assert_equal(err.getvalue().strip(),
+                         "This cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
