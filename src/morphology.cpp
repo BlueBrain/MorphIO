@@ -106,7 +106,7 @@ Morphology::Morphology(const URI& source, unsigned int options)
             return plugin::asc::load(source, options);
         if (extension == ".swc")
             return plugin::swc::load(source, options);
-        LBTHROW(UnknownFileType("unhandled file type"));
+        LBTHROW(UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported"));
     };
 
     _properties = std::make_shared<Property::Properties>(loader());
