@@ -1,4 +1,4 @@
-FROM quay.io/pypa/manylinux1_x86_64:2478ba64a9951d7d31bd76c16c9ad747922e3a5abe3b82ca9a23efce86d7a19d
+FROM quay.io/pypa/manylinux1_x86_64
 RUN yum install -y zlib-devel bzip2-devel flex
 
 ############
