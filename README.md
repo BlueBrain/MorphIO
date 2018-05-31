@@ -64,8 +64,8 @@ brew install hdf5 cmake
 ##### Install as a c++ library
 
 ```shell
-git clone git@github.com:wizmer/morpho-tool.git --recursive
-cd morpho-tool
+git clone git@github.com:bluebrain/morphio.git --recursive
+cd morphio
 mkdir build && cd build
 cmake ..
 make
