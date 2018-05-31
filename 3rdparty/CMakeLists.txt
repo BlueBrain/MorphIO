@@ -14,6 +14,8 @@ add_subdirectory(GSL)
 target_include_directories(GSL INTERFACE
     GSL)
 
+add_subdirectory(eigen)
+
 add_library(lexertl14 INTERFACE)
 target_include_directories(lexertl14 INTERFACE
     lexertl14)

@@ -10,3 +10,6 @@
 [submodule "3rdparty/lexertl14"]
 	path = 3rdparty/lexertl14
 	url = https://github.com/BenHanson/lexertl14
+[submodule "3rdparty/eigen"]
+	path = 3rdparty/eigen
+	url = https://github.com/libigl/eigen.git
