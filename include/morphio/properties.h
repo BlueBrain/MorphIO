@@ -94,6 +94,8 @@ struct MitochondriaPointLevel
     std::vector<MitoDiameter::Type> _diameters;
 
     MitochondriaPointLevel(){};
+    MitochondriaPointLevel(const MitochondriaPointLevel& data, SectionRange range);
+
 
     MitochondriaPointLevel(std::vector<uint32_t> sectionId,
                            // relative pathlength between the current points

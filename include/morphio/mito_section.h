@@ -60,6 +60,8 @@ protected:
     MitoSection(uint32_t id, std::shared_ptr<Property::Properties> morphology) : SectionBase(id, morphology) {}
     friend const MitoSection Mitochondria::section(const uint32_t&) const;
     friend class SectionBase<MitoSection>;
+    friend class mut::MitoSection;
+
 
 };
 } // namespace morphio

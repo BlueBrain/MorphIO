@@ -117,6 +117,7 @@ public:
 
     const std::string ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std::string&) const;
 
+    const std::string ERROR_MISSING_MITO_PARENT(int mitoParentId) const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //             NEUROLUCIDA

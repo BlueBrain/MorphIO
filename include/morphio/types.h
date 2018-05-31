@@ -59,6 +59,7 @@ namespace plugin
 namespace mut
 {
 class Section;
+class MitoSection;
 class Soma;
 class Morphology;
 class Mitochondria;

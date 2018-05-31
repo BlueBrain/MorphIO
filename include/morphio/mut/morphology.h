@@ -155,7 +155,7 @@ public:
 
        If recursive == true, all descendent will be appended as well
     **/
-    uint32_t appendSection(int32_t parentId, const morphio::Section&, bool recursive = true);
+    uint32_t appendSection(int32_t parentId, const morphio::Section&, bool recursive = false);
 
     /**
        Append a new Section the given parentId (-1 appends to soma)

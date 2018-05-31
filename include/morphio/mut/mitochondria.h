@@ -2,6 +2,7 @@
 
 #include <morphio/properties.h>
 #include <morphio/types.h>
+#include <morphio/mito_section.h>
 
 namespace morphio
 {
@@ -12,8 +13,14 @@ class MitoSection
 public:
     MitoSection(const Property::MitochondriaPointLevel& mitoPoints)
         : _mitoPoints(mitoPoints)
-    {
-    }
+        {
+        }
+
+    MitoSection(const morphio::MitoSection& section)
+        : MitoSection(Property::MitochondriaPointLevel(section._properties->_mitochondriaPointLevel,
+                                                       section._range))
+        {
+        }
 
     /**
      * Return the diameters of all points of this section
@@ -99,8 +106,20 @@ public:
     const std::vector<uint32_t>& rootSections() const;
 
 
+    /**
+       Append a new MitoSection the given parentId (-1 create a new mitochondrion)
+    **/
     uint32_t appendSection(int32_t mitoParentId,
                            const Property::MitochondriaPointLevel& points);
+
+    /**
+       Append the read-only MitoSection to the given parentId (-1 creates a new mitochondrion)
+
+       If recursive == true, all descendent mito sections will be appended as well
+    **/
+    uint32_t appendSection(int32_t mitoParentId, const morphio::MitoSection& section,
+        bool recursive = false);
+
 
     const std::shared_ptr<MitoSection> mitoSection(uint32_t id) const;
 

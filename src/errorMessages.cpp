@@ -65,6 +65,12 @@ const std::string ErrorMessages::ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std:
 }
 
 
+const std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(int mitoParentId) const {
+    return "While trying to append new mitochondria section.\n"
+        "Mitochondrial parent section: " + std::to_string(mitoParentId) + " does not exist.";
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //             NEUROLUCIDA

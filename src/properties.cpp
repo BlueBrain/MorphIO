@@ -36,6 +36,15 @@ std::vector<typename T::Type> copySpan(
                                          data.begin() + range.second);
 }
 
+
+MitochondriaPointLevel::MitochondriaPointLevel(const MitochondriaPointLevel& data,
+                                               SectionRange range)
+{
+    _sectionIds = copySpan<Property::MitoNeuriteSectionId>(data._sectionIds, range);
+    _relativePathLengths = copySpan<Property::MitoPathLength>(data._relativePathLengths, range);
+    _diameters = copySpan<Property::MitoDiameter>(data._diameters, range);
+}
+
 MitochondriaPointLevel::MitochondriaPointLevel(std::vector<MitoNeuriteSectionId::Type> sectionIds,
                                                std::vector<MitoPathLength::Type> relativePathLengths,
                                                std::vector<MitoDiameter::Type> diameters)

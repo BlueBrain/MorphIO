@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 
+#include <morphio/mitochondria.h>
+#include <morphio/mito_section.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/iterators.h>
@@ -33,6 +35,11 @@ Morphology::Morphology(const morphio::Morphology& morphology)
     for (const morphio::Section& root : morphology.rootSections())
     {
         appendSection(-1, root, true);
+    }
+
+    for (const morphio::MitoSection& root : morphology.mitochondria().rootSections())
+    {
+        mitochondria().appendSection(-1, root, true);
     }
 }
 
@@ -68,6 +75,7 @@ bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
 
     return true;
 }
+
 uint32_t Morphology::appendSection(int32_t parentId,
                                    const morphio::Section& section,
                                    bool recursive)

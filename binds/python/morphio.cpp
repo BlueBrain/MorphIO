@@ -471,9 +471,7 @@ PYBIND11_MODULE(morphio, m) {
              "Note: multiple mitochondria can shared the same references",
              "section_id"_a)
         .def("append_section", &morphio::mut::Mitochondria::appendSection,
-             "Append the read-only Section to the given parentId (-1 appends to soma)\n"
-             "\n"
-             "If recursive == true, all descendent will be appended as well",
+             "Append a new MitoSection the given parentId (-1 create a new mitochondrion)",
              "parent_id"_a, "point_level_properties"_a)
 
         .def("depth_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
