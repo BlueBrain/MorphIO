@@ -74,7 +74,7 @@ make
 ##### Install as a Python package
 
 ```shell
-pip install git+ssh://git@github.com/wizmer/morpho-tool.git
+pip install git+ssh://git@github.com/bluebrain/morphio.git
 ```
 
 ## Introduction
