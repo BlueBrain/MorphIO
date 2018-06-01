@@ -105,7 +105,7 @@ const std::shared_ptr<MitoSection> Mitochondria::section(uint32_t id) const
     return _sections.at(id);
 }
 
-const std::map<uint32_t, std::shared_ptr<MitoSection>>& Mitochondria::sections() const {
+const std::map<uint32_t, std::shared_ptr<MitoSection>> Mitochondria::sections() const {
     return _sections;
 }
 

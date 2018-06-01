@@ -236,6 +236,18 @@ def test_mitochondria_read():
     assert_equal(len(mito.children(mito.root_sections[1])), 0)
 
 
+def test_sections_are_not_dereferenced():
+    '''There used to be a bug where if you would call:
+    mitochondria.sections, that would dereference all section pointers
+    if mitochondria.sections was not kept in a variable'''
+    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+
+    # This lines used to cause a bug
+    morpho.mitochondria.sections  # pylint: disable=pointless-statement
+
+    ok_(all(section is not None for section in morpho.mitochondria.sections.values()))
+
+
 def test_mitochondria():
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0], [1, 1, 1]]

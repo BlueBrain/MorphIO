@@ -65,7 +65,7 @@ public:
 
     const std::vector<uint32_t> children(uint32_t id) const;
     const std::shared_ptr<MitoSection> section(uint32_t id) const;
-    const std::map<uint32_t, std::shared_ptr<MitoSection>>& sections() const;
+    const std::map<uint32_t, std::shared_ptr<MitoSection>> sections() const;
 
     /**
        Depth first iterator starting at a given section id
