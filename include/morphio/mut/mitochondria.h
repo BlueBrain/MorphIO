@@ -11,16 +11,22 @@ namespace mut
 class MitoSection
 {
 public:
-    MitoSection(const Property::MitochondriaPointLevel& mitoPoints)
-        : _mitoPoints(mitoPoints)
+    MitoSection(int id, const Property::MitochondriaPointLevel& mitoPoints)
+        : _id(id), _mitoPoints(mitoPoints)
         {
         }
 
-    MitoSection(const morphio::MitoSection& section)
-        : MitoSection(Property::MitochondriaPointLevel(section._properties->_mitochondriaPointLevel,
+    MitoSection(int id, const morphio::MitoSection& section)
+        : MitoSection(id,
+                      Property::MitochondriaPointLevel(section._properties->_mitochondriaPointLevel,
                                                        section._range))
         {
         }
+
+    /**
+     * Return the diameters of all points of this section
+     **/
+    const uint32_t id() { return _id; }
 
     /**
      * Return the diameters of all points of this section
@@ -40,6 +46,7 @@ public:
     std::vector<float>& pathLengths() { return _mitoPoints._relativePathLengths; }
 
     Property::MitochondriaPointLevel _mitoPoints;
+    uint32_t _id;
 };
 
 /**

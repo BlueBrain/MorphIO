@@ -34,7 +34,7 @@ public:
     /**
      * Returns list of neuronal section IDs associated to each point
      **/
-    const range<const uint32_t> neuriteSectionId() const;
+    const range<const uint32_t> neuriteSectionIds() const;
 
     /**
      * Returns list of section's point diameters

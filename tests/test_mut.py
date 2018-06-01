@@ -202,6 +202,40 @@ def test_build_read_only():
                        [20, 30])
 
 
+import os
+_path = os.path.dirname(os.path.abspath(__file__))
+
+
+def test_mitochondria_read():
+    '''Read a H5 file with a mitochondria'''
+    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    mito = morpho.mitochondria
+    assert_equal(len(mito.root_sections), 2)
+
+    mitochondria = [mito.section(root_id) for root_id in mito.root_sections]
+
+    assert_array_equal(mitochondria[0].diameters,
+                       [10, 20])
+    assert_array_equal(mitochondria[0].relative_path_lengths,
+                       np.array([0.5, 0.6], dtype=np.float32))
+    assert_array_equal(mitochondria[0].neurite_section_ids,
+                       np.array([0., 0.], dtype=np.float32))
+
+    assert_equal(len(mito.children(mito.root_sections[0])), 1)
+
+    assert_equal(mito.parent(mito.children(0)[0]),
+                 mitochondria[0].id)
+
+    assert_array_equal(mitochondria[1].diameters,
+                       [5, 6, 7, 8])
+    assert_array_equal(mitochondria[1].relative_path_lengths,
+                       np.array([0.6, 0.7, 0.8, 0.9], dtype=np.float32))
+    assert_array_equal(mitochondria[1].neurite_section_ids,
+                       np.array([0, 1, 1, 2], dtype=np.float32))
+
+    assert_equal(len(mito.children(mito.root_sections[1])), 0)
+
+
 def test_mitochondria():
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0], [1, 1, 1]]

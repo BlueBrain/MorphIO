@@ -1,5 +1,6 @@
 import os
-
+import numpy as np
+from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, ok_
 
 from morphio.mut import Morphology
@@ -104,9 +105,13 @@ def test_mitochondria():
         -1, PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
         SectionType.axon,)
 
+    neuronal_section_ids = [0, 0]
+    relative_pathlengths = np.array([0.5, 0.6], dtype=np.float32)
+    diameters = [10, 20]
     mito_id = morpho.mitochondria.append_section(
-        -1, MitochondriaPointLevel([0, 0], [0.5, 0.6],
-                                   [10, 20]))
+        -1, MitochondriaPointLevel(neuronal_section_ids,
+                                   relative_pathlengths,
+                                   diameters))
 
     morpho.mitochondria.append_section(
         mito_id, MitochondriaPointLevel([0, 0, 0, 0],
@@ -125,3 +130,22 @@ def test_mitochondria():
             morpho.write("test.asc")
             assert_equal(err.getvalue().strip(),
                          "This cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
+
+    mito = ImmutMorphology('test.h5').mitochondria
+    assert_array_equal(mito.root_sections[0].diameters,
+                       diameters)
+    assert_array_equal(mito.root_sections[0].neurite_section_ids,
+                       neuronal_section_ids)
+    assert_array_equal(mito.root_sections[0].relative_path_lengths,
+                       relative_pathlengths)
+
+    assert_equal(len(mito.root_sections), 1)
+    print("mito.root_sections.diameters: {}".format(mito.root_sections[0].diameters))
+
+    mito = Morphology('test.h5').mitochondria
+    assert_equal(mito.root_sections, [0])
+    assert_array_equal(mito.section(0).diameters,
+                       diameters)
+
+    assert_array_equal(mito.section(0).neurite_section_ids,
+                       neuronal_section_ids)

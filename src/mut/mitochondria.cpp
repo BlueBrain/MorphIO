@@ -10,8 +10,8 @@ uint32_t Mitochondria::appendSection(
     int32_t mitoParentId, const morphio::MitoSection& section,
     bool recursive)
 {
-    uint32_t mitoId = _mitochondriaSectionCounter;
-    _sections[mitoId] = std::shared_ptr<MitoSection>(new MitoSection(section));
+    uint32_t mitoId = _mitochondriaSectionCounter++;
+    _sections[mitoId] = std::shared_ptr<MitoSection>(new MitoSection(mitoId, section));
 
     if(mitoParentId == -1)
         _rootSections.push_back(mitoId);
@@ -55,7 +55,7 @@ uint32_t Mitochondria::appendSection(
         LBTHROW(morphio::plugin::ErrorMessages().ERROR_MISSING_MITO_PARENT(mitoParentId));
     }
 
-    _sections[mitoId] = std::shared_ptr<MitoSection>(new MitoSection(points));
+    _sections[mitoId] = std::shared_ptr<MitoSection>(new MitoSection(mitoId, points));
     ++_mitochondriaSectionCounter;
     return mitoId;
 }

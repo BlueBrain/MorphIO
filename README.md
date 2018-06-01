@@ -431,7 +431,7 @@ Reading mithochondria from H5 files:
 
     for mitochondrial_section in morpho.mitochondria.root_sections:
         print('{neurite_id}, {relative_path_lengths}, {diameters}'.format(
-            neurite_id=mitochondrial_section.neurite_section_id,
+            neurite_id=mitochondrial_section.neurite_section_ids,
             relative_path_lengths=mitochondrial_section.relative_path_lengths,
             diameters=mitochondrial_section.diameters))
 

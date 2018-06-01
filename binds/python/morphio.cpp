@@ -270,7 +270,7 @@ PYBIND11_MODULE(morphio, m) {
         .def_property_readonly("id", &morphio::MitoSection::id,
                                "Returns the section ID\n"
                                "The section ID can be used to query sections via Mitochondria::section(uint32_t id)")
-        .def_property_readonly("neurite_section_id", [](morphio::MitoSection* section){ return span_to_ndarray(section->neuriteSectionId()); },
+        .def_property_readonly("neurite_section_ids", [](morphio::MitoSection* section){ return span_to_ndarray(section->neuriteSectionIds()); },
                                "Returns list of neuronal section IDs associated to each point "
                                "of this mitochondrial section")
         .def_property_readonly("diameters", [](morphio::MitoSection* section){ return span_to_ndarray(section->diameters()); },
@@ -470,7 +470,7 @@ PYBIND11_MODULE(morphio, m) {
              "Get a reference to the given mithochondrial section\n\n"
              "Note: multiple mitochondria can shared the same references",
              "section_id"_a)
-        .def("append_section", &morphio::mut::Mitochondria::appendSection,
+        .def("append_section", (uint32_t (morphio::mut::Mitochondria::*) (int32_t, const morphio::Property::MitochondriaPointLevel&)) &morphio::mut::Mitochondria::appendSection,
              "Append a new MitoSection the given parentId (-1 create a new mitochondrion)",
              "parent_id"_a, "point_level_properties"_a)
 
@@ -507,6 +507,8 @@ PYBIND11_MODULE(morphio, m) {
     // py::nodelete needed because morphio::mut::MitoSection has a private destructor
     // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
     py::class_<morphio::mut::MitoSection, std::unique_ptr<morphio::mut::MitoSection, py::nodelete>>(mut_module, "MitoSection")
+        .def_property_readonly("id", &morphio::mut::MitoSection::id,
+                               "Return the section ID")
         .def_property("diameters",
                       &morphio::mut::MitoSection::diameters,
                       [](morphio::mut::MitoSection* section,

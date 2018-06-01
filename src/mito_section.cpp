@@ -36,7 +36,7 @@ mito_upstream_iterator MitoSection::upstream_end() const
     return mito_upstream_iterator();
 }
 
-const range<const uint32_t> MitoSection::neuriteSectionId() const
+const range<const uint32_t> MitoSection::neuriteSectionIds() const
 {
     return get<Property::MitoNeuriteSectionId>();
 }
