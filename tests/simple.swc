@@ -17,6 +17,9 @@
 #           (0, -4)
 #
 # all radii are 1, except for end points, which are 0
+#
+# This is the same file as simple.asc
+
 
  1 1  0  0 0 1. -1
  2 3  0  0 0 1.  1

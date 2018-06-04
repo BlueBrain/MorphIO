@@ -151,11 +151,22 @@ public:
     void deleteSection(uint32_t id, bool recursive = true);
 
     /**
-       Append the read-only Section to the given parentId (-1 appends to soma)
+       Append the existing Section to the given parentId (-1 appends to soma)
 
        If recursive == true, all descendent will be appended as well
     **/
-    uint32_t appendSection(int32_t parentId, const morphio::Section&, bool recursive = false);
+    uint32_t appendSection(int32_t parentId, const morphio::Section&,
+                           bool recursive = false);
+
+    /**
+       Append the existing Section to the given parentId (-1 appends to soma)
+
+       If a mut::morphio::Morphology is passed, all descendent of section in this
+       morphology will be appended as well
+    **/
+    uint32_t appendSection(int32_t parentId, std::shared_ptr<Section> section,
+                           const Morphology& morphology = Morphology());
+
 
     /**
        Append a new Section the given parentId (-1 appends to soma)

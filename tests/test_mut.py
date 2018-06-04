@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
@@ -8,6 +9,8 @@ from contextlib import contextmanager
 import sys
 from io import StringIO
 from utils import assert_substring
+
+_path = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_point_level():
@@ -246,6 +249,18 @@ def test_sections_are_not_dereferenced():
     morpho.mitochondria.sections  # pylint: disable=pointless-statement
 
     ok_(all(section is not None for section in morpho.mitochondria.sections.values()))
+
+
+def test_append_mutable_section():
+    morpho = Morphology()
+    source = Morphology(os.path.join(_path, "simple.swc"))
+    second_children_first_root = source.children(source.root_sections[0])[1]
+
+    morpho.append_section(-1, source.section(second_children_first_root))
+    assert_equal(len(morpho.root_sections), 1)
+
+    assert_array_equal(morpho.section(morpho.root_sections[0]).points,
+                       source.section(second_children_first_root).points)
 
 
 def test_mitochondria():

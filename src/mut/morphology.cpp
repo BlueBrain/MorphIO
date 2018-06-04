@@ -104,6 +104,29 @@ uint32_t Morphology::appendSection(int32_t parentId,
 }
 
 uint32_t Morphology::appendSection(int32_t parentId,
+                                   std::shared_ptr<Section> section,
+                                   const Morphology& morphology)
+{
+    uint32_t id = _register(section);
+    if(parentId == -1)
+        _rootSections.push_back(id);
+    else {
+        if(!_checkDuplicatePoint(_sections[parentId], _sections[id]))
+            LBERROR(_err.WARNING_WRONG_DUPLICATE(_sections[id], _sections.at(parentId)));
+
+        _parent[id] = parentId;
+        _children[parentId].push_back(id);
+
+    }
+
+    for (const auto& child : morphology.children(id)){
+        appendSection(id, morphology.section(child), morphology);
+    }
+
+    return id;
+}
+
+uint32_t Morphology::appendSection(int32_t parentId,
                                    const Property::PointLevel& pointProperties,
                                    SectionType type)
 {
@@ -135,14 +158,14 @@ void friendDtorForSharedPtr(Section* section){ delete section; }
 
 uint32_t Morphology::_register(std::shared_ptr<Section> section)
 {
-    _counter = std::max(_counter, section->id() + 1);
-    if (_sections[section->id()])
+    _counter = std::max(_counter, section->id()) + 1;
+    if (_sections.count(section->id()))
     {
         std::stringstream ss;
-        ss << "Cannot register section (" << section->id()
+        ss << "Cannot register section (" << std::to_string(section->id())
            << "). The morphology has already a section with the same ID."
            << std::endl;
-        LBTHROW(ss.str());
+        LBTHROW(SectionBuilderError(ss.str()));
     }
     _sections[section->id()] = std::shared_ptr<Section>(section);
     return section->id();
@@ -201,6 +224,7 @@ void Morphology::deleteSection(uint32_t id, bool recursive)
     _children.erase(id);
     _parent.erase(id);
     _sections.erase(id);
+
 }
 
 // void Morphology::traverse(

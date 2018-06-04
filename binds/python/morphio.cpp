@@ -362,7 +362,7 @@ PYBIND11_MODULE(morphio, m) {
     ////////////////////////////////////////////////////////////////////////////////
     py::module mut_module = m.def_submodule("mut");
 
-    py::class_<morphio::mut::Morphology>(mut_module, "Morphology")
+    auto mutable_morphology = py::class_<morphio::mut::Morphology>(mut_module, "Morphology")
         .def(py::init<>())
         .def(py::init<const morphio::URI&>())
         .def(py::init<const morphio::Morphology&>())
@@ -402,6 +402,11 @@ PYBIND11_MODULE(morphio, m) {
              " the type of the parent section will be used"
              " (Root sections can't have sectionType ommited)",
              "parent_id"_a, "point_level_properties"_a, "section_type"_a=morphio::SectionType::SECTION_UNDEFINED)
+        .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, const morphio::Section&, bool)) &morphio::mut::Morphology::appendSection,
+             "Append the existing immutable Section to the given parentId (-1 appends to soma) "
+             "If recursive == true, all descendent will be appended as well",
+             "parent_id"_a, "immutable_section"_a, "recursive"_a=false)
+
         .def("delete_section", &morphio::mut::Morphology::deleteSection,
              "Delete the given section\n"
              "\n"
@@ -450,6 +455,12 @@ PYBIND11_MODULE(morphio, m) {
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
             "section_id"_a=-1);
+
+    mutable_morphology.def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, std::shared_ptr<morphio::mut::Section>, const morphio::mut::Morphology&)) &morphio::mut::Morphology::appendSection,
+             "Append the existing mutable Section to the given parentId (-1 appends to soma) "
+             "If a mut::morphio::Morphology is passed, all descendent of section in this "
+             "morphology will be appended as well"
+             "parent_id"_a, "mutable_section"_a, "morphology"_a=morphio::mut::Morphology());
 
     py::class_<morphio::mut::Mitochondria>(mut_module, "Mitochondria")
         .def(py::init<>())
