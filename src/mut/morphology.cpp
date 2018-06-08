@@ -204,27 +204,35 @@ void eraseByValue(std::vector<uint32_t> &vec, uint32_t id)
 void Morphology::deleteSection(uint32_t id, bool recursive)
 
 {
-    for (auto child : _children[id])
-    {
-        if (recursive)
-        {
-            deleteSection(child, recursive);
+    if (recursive) {
+        // The deletion must start by the furthest leaves, otherwise you may cut the
+        // topology and forget to remove some sections
+        std::vector<int> ids;
+        for(auto it = breadth_begin(id); it != breadth_end(); ++it) {
+            ids.push_back(*it);
         }
-        else
-        {
-            // Re-link children to their "grand-parent"
-            _parent[child] = _parent[id];
-            _children[_parent[id]].push_back(child);
-            if (_parent[id] == -1)
-                _rootSections.push_back(child);
+
+        for(auto it = ids.rbegin(); it != ids.rend(); ++it) {
+            auto child = *it;
+            {
+                deleteSection(child, false);
+            }
+        }
+    } else {
+        for (auto child : _children[id]) {
+        // Re-link children to their "grand-parent"
+        _parent[child] = _parent[id];
+        _children[_parent[id]].push_back(child);
+        if (_parent[id] == -1)
+            _rootSections.push_back(child);
         }
     }
+
     eraseByValue(_rootSections, id);
     eraseByValue(_children[_parent[id]], id);
     _children.erase(id);
     _parent.erase(id);
     _sections.erase(id);
-
 }
 
 // void Morphology::traverse(

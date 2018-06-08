@@ -4,13 +4,15 @@ from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
 
 from morphio.mut import Morphology, Soma
-from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, SectionBuilderError, Morphology as ImmutableMorphology
+from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, SectionBuilderError, Morphology as ImmutableMorphology, upstream, depth_first, breadth_first
 from contextlib import contextmanager
 import sys
 from io import StringIO
 from utils import assert_substring
 
 _path = os.path.dirname(os.path.abspath(__file__))
+
+SIMPLE = Morphology(os.path.join(_path, "simple.swc"))
 
 
 def test_point_level():
@@ -253,14 +255,13 @@ def test_sections_are_not_dereferenced():
 
 def test_append_mutable_section():
     morpho = Morphology()
-    source = Morphology(os.path.join(_path, "simple.swc"))
-    second_children_first_root = source.children(source.root_sections[0])[1]
+    second_children_first_root = SIMPLE.children(SIMPLE.root_sections[0])[1]
 
-    morpho.append_section(-1, source.section(second_children_first_root))
+    morpho.append_section(-1, SIMPLE.section(second_children_first_root))
     assert_equal(len(morpho.root_sections), 1)
 
     assert_array_equal(morpho.section(morpho.root_sections[0]).points,
-                       source.section(second_children_first_root).points)
+                       SIMPLE.section(second_children_first_root).points)
 
 
 def test_mitochondria():
@@ -300,3 +301,12 @@ def test_mitochondria():
 
     assert_array_equal(np.array(mito.section(first_child).relative_path_lengths, dtype=np.float32),
                        np.array([0.6, 0.7, 0.8, 0.9], dtype=np.float32))
+
+
+def test_iterators():
+    assert_array_equal(list(SIMPLE.iter(6, upstream)),
+                       [6, 4])
+    assert_array_equal(list(SIMPLE.iter(1, depth_first)),
+                       [1, 2, 3])
+    assert_array_equal(list(SIMPLE.iter(1, breadth_first)),
+                       [1, 3, 2])

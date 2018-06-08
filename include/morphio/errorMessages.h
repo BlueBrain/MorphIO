@@ -155,7 +155,7 @@ public:
 
     const std::string ERROR_WRONG_EXTENSION(const std::string filename) const;
 
-    std::string ERROR_WRITE_NO_SOMA() const;
+    std::string WARNING_WRITE_NO_SOMA() const;
 
     std::string ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1, int length1,
                                              const std::string& vec2, int length2) const;

@@ -75,6 +75,69 @@ morphio::Points array_to_points(py::array_t<float> &buf){
 }
 
 PYBIND11_MODULE(morphio, m) {
+    py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
+        .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
+            "Indicates that a section has only one child");
+
+    py::enum_<morphio::enums::IterType>(m, "IterType")
+        .value("depth_first", morphio::enums::IterType::DEPTH_FIRST)
+        .value("breadth_first", morphio::enums::IterType::BREADTH_FIRST)
+        .value("upstream", morphio::enums::IterType::UPSTREAM)
+        .export_values();
+
+    py::enum_<morphio::enums::SectionType>(m, "SectionType")
+        .value("undefined", morphio::enums::SectionType::SECTION_UNDEFINED)
+        .value("soma", morphio::enums::SectionType::SECTION_SOMA)
+        .value("axon", morphio::enums::SectionType::SECTION_AXON)
+        .value("basal_dendrite", morphio::enums::SectionType::SECTION_DENDRITE)
+        .value("apical_dendrite", morphio::enums::SectionType::SECTION_APICAL_DENDRITE)
+        // .value("glia_process", morphio::enums::SectionType::SECTION_GLIA_PROCESS)
+        // .value("glia_endfoot", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
+        .export_values();
+
+    py::enum_<morphio::enums::MorphologyVersion>(m, "MorphologyVersion")
+        .value("MORPHOLOGY_VERSION_H5_1", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
+        .value("MORPHOLOGY_VERSION_H5_2", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_2)
+        .value("MORPHOLOGY_VERSION_H5_1_1", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_1)
+        .value("MORPHOLOGY_VERSION_SWC_1", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_SWC_1)
+        .value("MORPHOLOGY_VERSION_UNDEFINED", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_UNDEFINED)
+        .export_values();
+
+    py::enum_<morphio::enums::CellFamily>(m, "CellFamily")
+        .value("FAMILY_NEURON", morphio::enums::CellFamily::FAMILY_NEURON)
+        .value("FAMILY_GLIA", morphio::enums::CellFamily::FAMILY_GLIA)
+        .export_values();
+
+
+    py::enum_<morphio::enums::AccessMode>(m, "AccessMode")
+        .value("MODE_READ", morphio::enums::AccessMode::MODE_READ)
+        .value("MODE_WRITE", morphio::enums::AccessMode::MODE_WRITE)
+        .value("MODE_OVERWRITE", morphio::enums::AccessMode::MODE_OVERWRITE)
+        .value("MODE_READWRITE", morphio::enums::AccessMode::MODE_READWRITE)
+        .value("MODE_READOVERWRITE", morphio::enums::AccessMode::MODE_READOVERWRITE)
+        .export_values();
+
+
+    py::enum_<morphio::enums::SomaType>(m, "SomaType")
+        .value("SOMA_UNDEFINED", morphio::enums::SomaType::SOMA_UNDEFINED)
+        .value("SOMA_SINGLE_POINT", morphio::enums::SomaType::SOMA_SINGLE_POINT)
+        .value("SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS", morphio::enums::SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+        .value("SOMA_CYLINDERS", morphio::enums::SomaType::SOMA_CYLINDERS)
+        .value("SOMA_THREE_POINTS", morphio::enums::SomaType::SOMA_THREE_POINTS)
+        .value("SOMA_SIMPLE_CONTOUR", morphio::enums::SomaType::SOMA_SIMPLE_CONTOUR);
+
+
+    auto base = py::register_exception<morphio::MorphioError&>(m, "MorphioError");
+    // base.ptr() signifies "inherits from"
+    auto raw = py::register_exception<morphio::RawDataError&>(m, "RawDataError", base.ptr());
+    py::register_exception<morphio::UnknownFileType&>(m, "UnknownFileType", base.ptr());
+    py::register_exception<morphio::SomaError&>(m, "SomaError", base.ptr());
+    py::register_exception<morphio::IDSequenceError&>(m, "IDSequenceError", raw.ptr());
+    py::register_exception<morphio::MultipleTrees&>(m, "MultipleTrees", raw.ptr());
+    py::register_exception<morphio::MissingParentError&>(m, "MissingParentError", raw.ptr());
+    py::register_exception<morphio::SectionBuilderError&>(m, "SectionBuilderError", raw.ptr());
+
+
     py::class_<morphio::Points>(m, "Points", py::buffer_protocol())
         .def_buffer([](morphio::Points &m) -> py::buffer_info {
                 return py::buffer_info(
@@ -157,35 +220,22 @@ PYBIND11_MODULE(morphio, m) {
                                "Returns the cell family (neuron or glia)")
         .def_property_readonly("version", &morphio::Morphology::version,
                                "Returns the version");
-
-    // // Iterators
-    // .def("depth_begin", [](morphio::Morphology* morph, int32_t id) {
-    //         return py::make_iterator(morph->depth_begin(id), morph->depth_end());
+    // .def("iter", [](morphio::Morphology* morph, morphio::IterType type, int32_t id) {
+    //         switch (type) {
+    //         case morphio::IterType::DEPTH_FIRST:
+    //             return py::make_iterator(morph->depth_begin(id), morph->depth_end());
+    //         case morphio::IterType::BREADTH_FIRST:
+    //             return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
+    //         case morphio::IterType::UPSTREAM:
+    //             return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
+    //         }
     //     },
     //     py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
     //     "Depth first iterator starting at a given section id\n"
     //     "\n"
     //     "If id == -1, the iteration will be successively performed starting\n"
     //     "at each root section",
-    //     "section_id"_a=-1)
-    // .def("breadth_begin", [](morphio::Morphology* morph, int32_t id) {
-    //         return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
-    //     },
-    //     py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-    //     "Breadth first iterator starting at a given section id\n"
-    //     "\n"
-    //     "If id == -1, the iteration will be successively performed starting\n"
-    //     "at each root section",
-    //     "section_id"_a=-1)
-    // .def("upstream_begin", [](morphio::Morphology* morph, int32_t id) {
-    //         return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
-    //     },
-    //     py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-    //     "Upstream iterator starting at a given section id\n"
-    //     "\n"
-    //     "If id == -1, the iteration will be successively performed starting\n"
-    //     "at each root section",
-    //     "section_id"_a=-1);
+    //     "iter_type"_a=morphio::IterType::DEPTH_FIRST, "section_id"_a=-1)
 
 
     py::class_<morphio::Mitochondria>(
@@ -240,21 +290,23 @@ PYBIND11_MODULE(morphio, m) {
                                "Returns list of section's point perimeters")
 
         // Iterators
-        .def_property_readonly("depth_begin", [](morphio::Section* section) {
-                return py::make_iterator(section->depth_begin(), section->depth_end());
+        .def("iter", [](morphio::Section* section, morphio::IterType type) {
+                switch (type) {
+                case morphio::IterType::DEPTH_FIRST:
+                    return py::make_iterator(section->depth_begin(), section->depth_end());
+                case morphio::IterType::BREADTH_FIRST:
+                    return py::make_iterator(section->breadth_begin(), section->breadth_end());
+                case morphio::IterType::UPSTREAM:
+                    return py::make_iterator(section->upstream_begin(), section->upstream_end());
+                }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Depth first search iterator")
-        .def_property_readonly("breadth_begin", [](morphio::Section* section) {
-                return py::make_iterator(section->breadth_begin(), section->breadth_end());
-            },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Breadth first search iterator")
-        .def_property_readonly("upstream_begin", [](morphio::Section* section) {
-                return py::make_iterator(section->upstream_begin(), section->upstream_end());
-            },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Upstream iterator");
+            "Depth first iterator starting at a given section id\n"
+            "\n"
+            "If id == -1, the iteration will be successively performed starting\n"
+            "at each root section",
+            "iter_type"_a=morphio::IterType::DEPTH_FIRST);
+
 
     py::class_<morphio::MitoSection>(m, "MitoSection")
         // Topology-related member functions
@@ -284,77 +336,23 @@ PYBIND11_MODULE(morphio, m) {
                                "end of the neuronal section\n")
 
         // Iterators
-        .def_property_readonly("depth_begin", [](morphio::MitoSection* section) {
-                return py::make_iterator(section->depth_begin(), section->depth_end());
+        .def("iter", [](morphio::MitoSection* section, morphio::IterType type) {
+                switch (type) {
+                case morphio::IterType::DEPTH_FIRST:
+                    return py::make_iterator(section->depth_begin(), section->depth_end());
+                case morphio::IterType::BREADTH_FIRST:
+                    return py::make_iterator(section->breadth_begin(), section->breadth_end());
+                case morphio::IterType::UPSTREAM:
+                    return py::make_iterator(section->upstream_begin(), section->upstream_end());
+                }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Depth first search iterator")
-        .def_property_readonly("breadth_begin", [](morphio::MitoSection* section) {
-                return py::make_iterator(section->breadth_begin(), section->breadth_end());
-            },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Breadth first search iterator")
-        .def_property_readonly("upstream_begin", [](morphio::MitoSection* section) {
-                return py::make_iterator(section->upstream_begin(), section->upstream_end());
-            },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Upstream search iterator");
+            "Depth first iterator starting at a given section id\n"
+            "\n"
+            "If id == -1, the iteration will be successively performed starting\n"
+            "at each root section",
+            "iter_type"_a=morphio::IterType::DEPTH_FIRST);
 
-    py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
-        .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
-            "Indicates that a section has only one child");
-
-    py::enum_<morphio::enums::SectionType>(m, "SectionType")
-        .value("undefined", morphio::enums::SectionType::SECTION_UNDEFINED)
-        .value("soma", morphio::enums::SectionType::SECTION_SOMA)
-        .value("axon", morphio::enums::SectionType::SECTION_AXON)
-        .value("basal_dendrite", morphio::enums::SectionType::SECTION_DENDRITE)
-        .value("apical_dendrite", morphio::enums::SectionType::SECTION_APICAL_DENDRITE)
-        // .value("glia_process", morphio::enums::SectionType::SECTION_GLIA_PROCESS)
-        // .value("glia_endfoot", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
-        .export_values();
-
-    py::enum_<morphio::enums::MorphologyVersion>(m, "MorphologyVersion")
-        .value("MORPHOLOGY_VERSION_H5_1", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
-        .value("MORPHOLOGY_VERSION_H5_2", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_2)
-        .value("MORPHOLOGY_VERSION_H5_1_1", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_1)
-        .value("MORPHOLOGY_VERSION_SWC_1", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_SWC_1)
-        .value("MORPHOLOGY_VERSION_UNDEFINED", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_UNDEFINED)
-        .export_values();
-
-    py::enum_<morphio::enums::CellFamily>(m, "CellFamily")
-        .value("FAMILY_NEURON", morphio::enums::CellFamily::FAMILY_NEURON)
-        .value("FAMILY_GLIA", morphio::enums::CellFamily::FAMILY_GLIA)
-        .export_values();
-
-
-    py::enum_<morphio::enums::AccessMode>(m, "AccessMode")
-        .value("MODE_READ", morphio::enums::AccessMode::MODE_READ)
-        .value("MODE_WRITE", morphio::enums::AccessMode::MODE_WRITE)
-        .value("MODE_OVERWRITE", morphio::enums::AccessMode::MODE_OVERWRITE)
-        .value("MODE_READWRITE", morphio::enums::AccessMode::MODE_READWRITE)
-        .value("MODE_READOVERWRITE", morphio::enums::AccessMode::MODE_READOVERWRITE)
-        .export_values();
-
-
-    py::enum_<morphio::enums::SomaType>(m, "SomaType")
-        .value("SOMA_UNDEFINED", morphio::enums::SomaType::SOMA_UNDEFINED)
-        .value("SOMA_SINGLE_POINT", morphio::enums::SomaType::SOMA_SINGLE_POINT)
-        .value("SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS", morphio::enums::SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-        .value("SOMA_CYLINDERS", morphio::enums::SomaType::SOMA_CYLINDERS)
-        .value("SOMA_THREE_POINTS", morphio::enums::SomaType::SOMA_THREE_POINTS)
-        .value("SOMA_SIMPLE_CONTOUR", morphio::enums::SomaType::SOMA_SIMPLE_CONTOUR);
-
-
-    auto base = py::register_exception<morphio::MorphioError&>(m, "MorphioError");
-    // base.ptr() signifies "inherits from"
-    auto raw = py::register_exception<morphio::RawDataError&>(m, "RawDataError", base.ptr());
-    py::register_exception<morphio::UnknownFileType&>(m, "UnknownFileType", base.ptr());
-    py::register_exception<morphio::SomaError&>(m, "SomaError", base.ptr());
-    py::register_exception<morphio::IDSequenceError&>(m, "IDSequenceError", raw.ptr());
-    py::register_exception<morphio::MultipleTrees&>(m, "MultipleTrees", raw.ptr());
-    py::register_exception<morphio::MissingParentError&>(m, "MissingParentError", raw.ptr());
-    py::register_exception<morphio::SectionBuilderError&>(m, "SectionBuilderError", raw.ptr());
 
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -428,33 +426,24 @@ PYBIND11_MODULE(morphio, m) {
         .def("write", &morphio::mut::Morphology::write,
              "Write file to H5, SWC, ASC format depending on filename extension", "filename"_a)
 
-        .def("depth_begin", [](morphio::mut::Morphology* morph, int32_t id) {
-                return py::make_iterator(morph->depth_begin(id), morph->depth_end());
+        // Iterators
+        .def("iter", [](morphio::mut::Morphology* morph, int id, morphio::IterType type) {
+                switch (type) {
+                case morphio::IterType::DEPTH_FIRST:
+                    return py::make_iterator(morph->depth_begin(id), morph->depth_end());
+                case morphio::IterType::BREADTH_FIRST:
+                    return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
+                case morphio::IterType::UPSTREAM:
+                    return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
+                }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Depth first iterator starting at a given section id\n"
             "\n"
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
-            "section_id"_a=-1)
-        .def("breadth_begin", [](morphio::mut::Morphology* morph, int32_t id) {
-                return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
-            },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Breadth first iterator starting at a given section id\n"
-            "\n"
-            "If id == -1, the iteration will be successively performed starting\n"
-            "at each root section",
-            "section_id"_a=-1)
-        .def("upstream_begin", [](morphio::mut::Morphology* morph, int32_t id) {
-                return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
-            },
-            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Upstream iterator starting at a given section id\n"
-            "\n"
-            "If id == -1, the iteration will be successively performed starting\n"
-            "at each root section",
-            "section_id"_a=-1);
+            "id"_a=-1, "iter_type"_a=morphio::IterType::DEPTH_FIRST);
+
 
     mutable_morphology.def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, std::shared_ptr<morphio::mut::Section>, const morphio::mut::Morphology&)) &morphio::mut::Morphology::appendSection,
              "Append the existing mutable Section to the given parentId (-1 appends to soma) "
@@ -484,7 +473,6 @@ PYBIND11_MODULE(morphio, m) {
         .def("append_section", (uint32_t (morphio::mut::Mitochondria::*) (int32_t, const morphio::Property::MitochondriaPointLevel&)) &morphio::mut::Mitochondria::appendSection,
              "Append a new MitoSection the given parentId (-1 create a new mitochondrion)",
              "parent_id"_a, "point_level_properties"_a)
-
         .def("depth_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
                 return py::make_iterator(morph->depth_begin(id), morph->depth_end());
             },

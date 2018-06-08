@@ -61,7 +61,6 @@ protected:
     friend const MitoSection Mitochondria::section(const uint32_t&) const;
     friend class SectionBase<MitoSection>;
     friend class mut::MitoSection;
-
-
+    const static int rootSectionsParentId = -1;
 };
 } // namespace morphio

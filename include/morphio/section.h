@@ -86,6 +86,10 @@ public:
 
 protected:
     Section(uint32_t id, std::shared_ptr<Property::Properties> morphology) : SectionBase(id, morphology) {}
+protected:
+    const static int rootSectionsParentId = 0;
+
+
 };
 
 // explicit instanciation

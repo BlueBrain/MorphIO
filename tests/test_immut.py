@@ -1,17 +1,43 @@
 import os
 import numpy as np
+from itertools import combinations
 from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
 
-from morphio import Morphology
+from morphio import Morphology, upstream
 
 _path = os.path.dirname(os.path.abspath(__file__))
 
 
+# These 3 cells are identical
+CELLS = {
+    'asc': Morphology(os.path.join(_path, "simple.asc")),
+    'swc': Morphology(os.path.join(_path, "simple.swc")),
+    'h5': Morphology(os.path.join(_path, "h5/v1/simple.h5")),
+}
+
+
 def test_equality():
-    swc = Morphology(os.path.join(_path, "simple.swc"))
-    asc = Morphology(os.path.join(_path, "simple.asc"))
-    ok_(swc == asc)
+    for cell1, cell2 in combinations(['asc', 'swc', 'h5'], 2):
+        ok_(CELLS[cell1] == CELLS[cell2], '{} != {}'.format(cell1, cell2))
+
+
+def test_is_root():
+    for _, cell in CELLS.items():
+        ok_(all(section.is_root for section in cell.root_sections))
+        ok_(all(not child.is_root
+                for section in cell.root_sections
+                for child in section.children))
+
+
+def test_iter():
+    for cell in CELLS.values():
+        assert_array_equal([section.points for section in
+                            cell.root_sections[0].children[0].iter(upstream)],
+                           [[[0.,  5.,  0.],
+                             [-5.,  5.,  0.]],
+                            [[0., 0., 0.],
+                             [0., 5., 0.]]])
 
 
 def test_mitochondria():

@@ -144,10 +144,6 @@ const std::string ErrorMessages::ERROR_WRONG_EXTENSION(const std::string filenam
 };
 
 
-std::string ErrorMessages::ERROR_WRITE_NO_SOMA() const {
-    return "Cannot write file without a soma";
-}
-
 std::string ErrorMessages::ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1, int length1,
                                          const std::string& vec2, int length2) const {
     std::string msg("Vector length mismatch: \nLength "+ vec1 + ": " +
@@ -162,6 +158,10 @@ std::string ErrorMessages::ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1,
 ////////////////////////////////////////////////////////////////////////////////
 //              WARNINGS
 ////////////////////////////////////////////////////////////////////////////////
+std::string ErrorMessages::WARNING_WRITE_NO_SOMA() const {
+    return "Warning: writing file without a soma";
+}
+
 std::string ErrorMessages::WARNING_NO_SOMA_FOUND() const {
     return errorMsg(0, ErrorLevel::WARNING,
                     "No soma found in file");

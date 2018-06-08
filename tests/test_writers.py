@@ -140,7 +140,6 @@ def test_mitochondria():
                        relative_pathlengths)
 
     assert_equal(len(mito.root_sections), 1)
-    print("mito.root_sections.diameters: {}".format(mito.root_sections[0].diameters))
 
     mito = Morphology('test.h5').mitochondria
     assert_equal(mito.root_sections, [0])

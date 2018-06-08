@@ -83,11 +83,11 @@ upstream_iterator::Iterator(const Morphology& morphology, uint32_t sectionId) :
 template <>
 upstream_iterator& upstream_iterator::operator++()
 {
-    // const auto& section = *(*this);
-    // if (section.isRoot())
-    //     container.pop_back();
-    // else
-    //     container[0] = section.parent();
+    const auto& section = *(*this);
+    if (_morphology.isRoot(section))
+        container.pop_back();
+    else
+        container[0] = _morphology.parent(section);
     return *this;
 }
 
