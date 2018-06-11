@@ -12,7 +12,7 @@ if [ ! -f $fichier ]; then
 fi
 
 docker images
-docker run --rm \
+docker run  \
     -e http_proxy=$http_proxy \
     -e https_proxy=$https_proxy \
     -e PIPPROXY="$PIPPROXY" \
