@@ -24,7 +24,7 @@ def test_write_basic():
     morpho.soma.points = [[0, 0, 0]]
     morpho.soma.diameters = [2]
 
-    dendrite = morpho.append_section(-1,
+    dendrite = morpho.append_section(None,
                                      PointLevel([[0, 0, 0],
                                                  [0, 5, 0]],
                                                 [2, 2]),
@@ -40,7 +40,7 @@ def test_write_basic():
                                       [6, 5, 0]],
                                      [2, 3]))
 
-    axon = morpho.append_section(-1,
+    axon = morpho.append_section(None,
                                  PointLevel([[0, 0, 0],
                                              [0, -4, 0]],
                                             [2, 2]),
@@ -72,7 +72,7 @@ def test_write_perimeter():
     morpho.soma.points = [[0, 0, 0]]
     morpho.soma.diameters = [2]
 
-    dendrite = morpho.append_section(-1,
+    dendrite = morpho.append_section(None,
                                      PointLevel([[0, 0, 0],
                                                  [0, 5, 0]],
                                                 [2, 2],
@@ -102,7 +102,7 @@ def test_mitochondria():
     morpho.soma.diameters = [1, 1]
 
     section_id = morpho.append_section(
-        -1, PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
+        None, PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
         SectionType.axon,)
 
     neuronal_section_ids = [0, 0]

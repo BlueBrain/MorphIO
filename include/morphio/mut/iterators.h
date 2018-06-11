@@ -22,10 +22,11 @@ class Iterator
     Iterator();
 
 public:
-    Iterator(const Morphology& morphology, uint32_t rootSectionId = -1);
+    Iterator(const Morphology& morphology, std::shared_ptr<Section> rootSection);
+    Iterator(const Morphology& morphology);
     bool operator==(Iterator other) const;
     bool operator!=(Iterator other) const;
-    uint32_t operator*() const;
+    std::shared_ptr<Section> operator*() const;
     Iterator& operator++();
     Iterator operator++(int);
 };

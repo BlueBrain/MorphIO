@@ -34,7 +34,7 @@ Morphology::Morphology(const morphio::Morphology& morphology)
 
     for (const morphio::Section& root : morphology.rootSections())
     {
-        appendSection(-1, root, true);
+        appendSection(nullptr, root, true);
     }
 
     for (const morphio::MitoSection& root : morphology.mitochondria().rootSections())
@@ -76,60 +76,65 @@ bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
     return true;
 }
 
-uint32_t Morphology::appendSection(int32_t parentId,
+std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> parent,
                                    const morphio::Section& section,
                                    bool recursive)
 {
-    uint32_t id = _register(std::shared_ptr<Section>(new Section(section),
-                                                     friendDtorForSharedPtr));
+    std::shared_ptr<Section> ptr(new Section(section), friendDtorForSharedPtr);
+    int32_t parentId = parent == nullptr ? -1 : parent->id();
+
+    uint32_t id = _register(ptr);
     if(parentId == -1)
-        _rootSections.push_back(id);
+        _rootSections.push_back(ptr);
     else {
         if(!_checkDuplicatePoint(_sections[parentId], _sections[id]))
             LBERROR(_err.WARNING_WRONG_DUPLICATE(_sections[id], _sections.at(parentId)));
 
         _parent[id] = parentId;
-        _children[parentId].push_back(id);
+        _children[parentId].push_back(ptr);
 
     }
 
     if (recursive)
     {
         for (const auto& child : section.children()){
-            appendSection(id, child, true);
+            appendSection(ptr, child, true);
         }
     }
 
-    return id;
+    return ptr;
 }
 
-uint32_t Morphology::appendSection(int32_t parentId,
+std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> parent,
                                    std::shared_ptr<Section> section,
                                    const Morphology& morphology)
 {
     uint32_t id = _register(section);
+    int32_t parentId = parent == nullptr ? -1 : parent->id();
     if(parentId == -1)
-        _rootSections.push_back(id);
+        _rootSections.push_back(section);
     else {
         if(!_checkDuplicatePoint(_sections[parentId], _sections[id]))
             LBERROR(_err.WARNING_WRONG_DUPLICATE(_sections[id], _sections.at(parentId)));
 
         _parent[id] = parentId;
-        _children[parentId].push_back(id);
+        _children[parentId].push_back(section);
 
     }
 
-    for (const auto& child : morphology.children(id)){
-        appendSection(id, morphology.section(child), morphology);
+    for (const auto& child : morphology.children(section)){
+        appendSection(section, child, morphology);
     }
 
-    return id;
+    return section;
 }
 
-uint32_t Morphology::appendSection(int32_t parentId,
-                                   const Property::PointLevel& pointProperties,
-                                   SectionType type)
+std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> parent,
+                                                   const Property::PointLevel& pointProperties,
+                                                   SectionType type)
 {
+    int32_t parentId = parent == nullptr ? -1 : parent->id();
+
     if(type == SectionType::SECTION_UNDEFINED) {
         if(parentId == -1)
             LBTHROW(SectionBuilderError(_err.ERROR_UNSPECIFIED_SECTION_TYPE()));
@@ -137,21 +142,21 @@ uint32_t Morphology::appendSection(int32_t parentId,
             type = _sections[parentId] -> type();
     }
 
-    uint32_t id = _register(std::shared_ptr<Section>(new Section(_counter, type, pointProperties),
-                                                     friendDtorForSharedPtr));
+    std::shared_ptr<Section> ptr(new Section(_counter, type, pointProperties), friendDtorForSharedPtr);
+    uint32_t id = _register(ptr);
 
 
 
         if(parentId == -1) {
-        _rootSections.push_back(id);
+        _rootSections.push_back(ptr);
     } else {
         if(!_checkDuplicatePoint(_sections[parentId], _sections[id]))
             LBERROR(_err.WARNING_WRONG_DUPLICATE(_sections[id], _sections[parentId]));
 
         _parent[id] = parentId;
-        _children[parentId].push_back(id);
+        _children[parentId].push_back(ptr);
     }
-    return id;
+    return ptr;
 }
 
 void friendDtorForSharedPtr(Section* section){ delete section; }
@@ -181,34 +186,41 @@ const std::shared_ptr<Soma> Morphology::soma() const
     return _soma;
 }
 
-const std::vector<uint32_t>& Morphology::rootSections() const
+const std::vector<std::shared_ptr<Section>>& Morphology::rootSections() const
 {
     return _rootSections;
 }
 
 Morphology::~Morphology()
 {
-    for (auto root : _rootSections)
+    auto roots = _rootSections; // Need to iterate on a copy
+    for (auto root : roots) {
         deleteSection(root, true);
+    }
+
 }
 
 const std::map<uint32_t, std::shared_ptr<Section>> Morphology::sections() const {
     return _sections;
 }
 
-void eraseByValue(std::vector<uint32_t> &vec, uint32_t id)
+void eraseByValue(std::vector<std::shared_ptr<Section>> &vec, std::shared_ptr<Section> section)
 {
-    vec.erase(std::remove(vec.begin(), vec.end(), id), vec.end());
+    vec.erase(std::remove(vec.begin(), vec.end(), section), vec.end());
 }
 
-void Morphology::deleteSection(uint32_t id, bool recursive)
+void Morphology::deleteSection(std::shared_ptr<Section> section, bool recursive)
 
 {
+    if(!section)
+        return;
+    int id = section->id();
+
     if (recursive) {
         // The deletion must start by the furthest leaves, otherwise you may cut the
         // topology and forget to remove some sections
-        std::vector<int> ids;
-        for(auto it = breadth_begin(id); it != breadth_end(); ++it) {
+        std::vector<std::shared_ptr<Section>> ids;
+        for(auto it = breadth_begin(section); it != breadth_end(); ++it) {
             ids.push_back(*it);
         }
 
@@ -219,20 +231,21 @@ void Morphology::deleteSection(uint32_t id, bool recursive)
             }
         }
     } else {
-        for (auto child : _children[id]) {
+        for (auto child : children(section)) {
         // Re-link children to their "grand-parent"
-        _parent[child] = _parent[id];
-        _children[_parent[id]].push_back(child);
-        if (_parent[id] == -1)
-            _rootSections.push_back(child);
+            _parent[id] = _parent[id];
+            _children[_parent[id]].push_back(child);
+            if (_parent[id] == -1)
+                _rootSections.push_back(child);
         }
+
+        eraseByValue(_rootSections, section);
+        eraseByValue(_children[_parent[id]], section);
+        _children.erase(id);
+        _parent.erase(id);
+        _sections.erase(id);
     }
 
-    eraseByValue(_rootSections, id);
-    eraseByValue(_children[_parent[id]], id);
-    _children.erase(id);
-    _parent.erase(id);
-    _sections.erase(id);
 }
 
 // void Morphology::traverse(
@@ -279,10 +292,10 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
     _appendProperties(properties._pointLevel, _soma->_pointProperties);
 
     // Need to fill some unused value for the soma perimeter
-    // in order to get the same size for the perimeter final vector than for the point one
+    // in order to get the same size for the 'perimeter' vector than for the 'point' one
     bool isPerimeterUsed = _rootSections.empty() ?
         false :
-        _sections.at(_rootSections.at(0))->_pointProperties._perimeters.size() > 0;
+        _rootSections.at(0)->_pointProperties._perimeters.size() > 0;
 
     if(isPerimeterUsed)
         properties._pointLevel._perimeters = std::vector<float>(_soma->_pointProperties._points.size(), 0);
@@ -291,18 +304,16 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
     properties._sectionLevel._sectionTypes.push_back(SECTION_SOMA);
 
     for(auto it = depth_begin(); it != depth_end(); ++it) {
-        int32_t sectionId = *it;
-        int32_t parentId = parent(sectionId);
-        auto &section = _sections.at(sectionId);
-        int parentOnDisk =
-            (_parent.count(sectionId) > 0 ? newIds[parentId] : 0);
+        std::shared_ptr<Section> section = *it;
+        int parentId = isRoot(section) ? -1 : parent(section)->id();
+        int sectionId = section->id();
+        int parentOnDisk = (isRoot(section) ? 0 : newIds[parentId]);
 
-        if(parentId > -1 && // Exclude root sections
-           !_checkDuplicatePoint(_sections.at(parentId), _sections.at(sectionId)))
-            LBERROR(err.WARNING_WRONG_DUPLICATE(_sections.at(sectionId),
-                                                _sections.at(parentId)));
+        if(!isRoot(section) &&
+           !_checkDuplicatePoint(parent(section), section))
+            LBERROR(err.WARNING_WRONG_DUPLICATE(section, parent(section)));
 
-        bool isUnifurcation = parentId > -1 && children(parentId).size() == 1;
+        bool isUnifurcation = !isRoot(section) && children(parent(section)).size() == 1;
 
         // This "if" condition ensures that "unifurcations" (ie. successive sections with only 1
         // child) get merged together into a bigger section
@@ -330,23 +341,24 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
     return properties;
 }
 
-const int32_t Morphology::parent(uint32_t id) const {
+const std::shared_ptr<Section> Morphology::parent(const std::shared_ptr<Section>& section) const {
+    return _sections.at(_parent.at(section->id()));
+}
+
+const bool Morphology::isRoot(const std::shared_ptr<Section>& section) const {
     try {
-        return _parent.at(id);
+        parent(section);
+        return false;
     } catch (const std::out_of_range &e) {
-        return -1;
+        return true;
     }
 }
 
-const bool Morphology::isRoot(uint32_t id) const {
-    return parent(id) == -1;
-}
-
-const std::vector<uint32_t> Morphology::children(uint32_t id) const {
+const std::vector<std::shared_ptr<Section>> Morphology::children(const std::shared_ptr<Section>& section) const {
     try {
-        return _children.at(id);
+        return _children.at(section->id());
     } catch (const std::out_of_range &e) {
-        return std::vector<uint32_t>();
+        return std::vector<std::shared_ptr<Section>>();
     }
 }
 
@@ -354,9 +366,13 @@ const std::shared_ptr<Section> Morphology::section(uint32_t id) const {
     return _sections.at(id);
 }
 
-depth_iterator Morphology::depth_begin(uint32_t id) const
+depth_iterator Morphology::depth_begin() const
 {
-    return depth_iterator(*this, id);
+    return depth_iterator(*this);
+}
+depth_iterator Morphology::depth_begin(const std::shared_ptr<Section>& section) const
+{
+    return depth_iterator(*this, section);
 }
 
 depth_iterator Morphology::depth_end() const
@@ -364,9 +380,14 @@ depth_iterator Morphology::depth_end() const
     return depth_iterator();
 }
 
-breadth_iterator Morphology::breadth_begin(uint32_t id) const
+breadth_iterator Morphology::breadth_begin() const
 {
-    return breadth_iterator(*this, id);
+    return breadth_iterator(*this);
+}
+
+breadth_iterator Morphology::breadth_begin(const std::shared_ptr<Section>& section) const
+{
+    return breadth_iterator(*this, section);
 }
 
 breadth_iterator Morphology::breadth_end() const
@@ -374,9 +395,9 @@ breadth_iterator Morphology::breadth_end() const
     return breadth_iterator();
 }
 
-upstream_iterator Morphology::upstream_begin(uint32_t id) const
+upstream_iterator Morphology::upstream_begin(const std::shared_ptr<Section>& section) const
 {
-    return upstream_iterator(*this, id);
+    return upstream_iterator(*this, section);
 }
 
 upstream_iterator Morphology::upstream_end() const
@@ -433,14 +454,12 @@ void Morphology::_write_swc(const std::string& filename) {
 
 void Morphology::_write_h5(const std::string& filename) {
     for(auto it = depth_begin(); it != depth_end(); ++it) {
-        int32_t sectionId = *it;
-        int32_t parentId = parent(sectionId);
-        auto &section = _sections.at(sectionId);
+        std::shared_ptr<Section> section = *it;
 
-        if(parentId > -1 && // Exclude root sections
-           !_checkDuplicatePoint(_sections.at(parentId), _sections.at(sectionId)))
-            LBTHROW(SectionBuilderError(_err.WARNING_WRONG_DUPLICATE(_sections.at(sectionId),
-                                                                     _sections.at(parentId))));
+        if(!isRoot(section) &&
+           !_checkDuplicatePoint(parent(section), section))
+            LBTHROW(SectionBuilderError(_err.WARNING_WRONG_DUPLICATE(section,
+                                                                     parent(section))));
     }
 
     writer::h5(*this, filename);

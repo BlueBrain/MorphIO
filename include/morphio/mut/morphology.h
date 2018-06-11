@@ -52,7 +52,7 @@ public:
     /**
        Returns all section ids at the tree root
     **/
-    const std::vector<uint32_t>& rootSections() const;
+    const std::vector<std::shared_ptr<Section>>& rootSections() const;
 
 
     /**
@@ -87,17 +87,17 @@ public:
 
        Note: Root sections return -1
     **/
-    const int32_t parent(uint32_t id) const;
+    const std::shared_ptr<Section> parent(const std::shared_ptr<Section>& section) const;
 
     /**
        Return true if section is a root section
     **/
-    const bool isRoot(uint32_t id) const;
+    const bool isRoot(const std::shared_ptr<Section>& section) const;
 
     /**
        Return a vector of children IDs
     **/
-    const std::vector<uint32_t> children(uint32_t id) const;
+    const std::vector<std::shared_ptr<Section>> children(const std::shared_ptr<Section>& section) const;
 
 
     /**
@@ -112,7 +112,8 @@ public:
 
        If id == -1, the iteration will start at each root section, successively
     **/
-    depth_iterator depth_begin(uint32_t id = -1) const;
+    depth_iterator depth_begin() const;
+    depth_iterator depth_begin(const std::shared_ptr<Section>& section) const;
     depth_iterator depth_end() const;
 
     /**
@@ -121,16 +122,14 @@ public:
        If id == -1, the iteration will be successively performed starting
        at each root section
     **/
-    breadth_iterator breadth_begin(uint32_t id = -1) const;
+    breadth_iterator breadth_begin() const;
+    breadth_iterator breadth_begin(const std::shared_ptr<Section>& section) const;
     breadth_iterator breadth_end() const;
 
     /**
        Upstream first iterator
-
-       If id == -1, the iteration will be successively performed starting
-       at each root section
     **/
-    upstream_iterator upstream_begin(uint32_t id = -1) const;
+    upstream_iterator upstream_begin(const std::shared_ptr<Section>& section) const;
     upstream_iterator upstream_end() const;
 
 
@@ -148,15 +147,16 @@ public:
        If recursive == true, all descendent sections will be deleted as well
        Else, children will be re-attached to their grand-parent
     **/
-    void deleteSection(uint32_t id, bool recursive = true);
+    void deleteSection(std::shared_ptr<Section> section, bool recursive = true);
 
     /**
        Append the existing Section to the given parentId (-1 appends to soma)
 
        If recursive == true, all descendent will be appended as well
     **/
-    uint32_t appendSection(int32_t parentId, const morphio::Section&,
-                           bool recursive = false);
+    std::shared_ptr<Section> appendSection(std::shared_ptr<Section> parent,
+                                           const morphio::Section&,
+                                           bool recursive = false);
 
     /**
        Append the existing Section to the given parentId (-1 appends to soma)
@@ -164,8 +164,9 @@ public:
        If a mut::morphio::Morphology is passed, all descendent of section in this
        morphology will be appended as well
     **/
-    uint32_t appendSection(int32_t parentId, std::shared_ptr<Section> section,
-                           const Morphology& morphology = Morphology());
+    std::shared_ptr<Section> appendSection(std::shared_ptr<Section> parent,
+                                           std::shared_ptr<Section> section,
+                                           const Morphology& morphology = Morphology());
 
 
     /**
@@ -175,8 +176,9 @@ public:
        the type of the parent section will be used
        (Root sections can't have sectionType ommited)
     **/
-    uint32_t appendSection(int32_t parentId, const Property::PointLevel&,
-                           SectionType sectionType = SectionType::SECTION_UNDEFINED);
+    std::shared_ptr<Section> appendSection(std::shared_ptr<Section> parent,
+                                           const Property::PointLevel&,
+                                           SectionType sectionType = SectionType::SECTION_UNDEFINED);
 
     /**
        Iterate on all sections starting at startSection via a depth-first-search traversal
@@ -240,7 +242,7 @@ private:
 
     uint32_t _register(std::shared_ptr<Section>);
     std::shared_ptr<Soma> _soma;
-    std::vector<uint32_t> _rootSections;
+    std::vector<std::shared_ptr<Section>> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
     std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     std::vector<morphio::Property::Annotation> _annotations;
@@ -248,7 +250,7 @@ private:
 
     uint32_t _counter;
     std::map<uint32_t, uint32_t> _parent;
-    std::map<uint32_t, std::vector<uint32_t>> _children;
+    std::map<uint32_t, std::vector<std::shared_ptr<Section>>> _children;
 
 };
 

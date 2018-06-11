@@ -84,21 +84,21 @@ void swc(const Morphology& morphology, const std::string& filename)
     }
 
     for(auto it = morphology.depth_begin(); it != morphology.depth_end(); ++it) {
-        int32_t sectionId = *it;
-        auto section = morphology.section(sectionId);
+        std::shared_ptr<Section> section = *it;
         const auto& points = section->points();
         const auto& diameters = section->diameters();
 
         assert(points.size() > 0 && "Empty section");
-        bool isRootSection = morphology.parent(sectionId) < 0;
-        for (int i = (isRootSection ? 0 : 1); i < points.size(); ++i)
+        bool isRootSection = morphology.isRoot(section);
+
+        for (int i = (isRootSection ? 0 : 1); // skips duplicate point for non-root sections
+             i < points.size(); ++i)
         {
             int parentIdOnDisk;
             if (i > (isRootSection ? 0 : 1))
                 parentIdOnDisk = segmentIdOnDisk - 1;
             else {
-                int32_t parentId = morphology.parent(sectionId);
-                parentIdOnDisk = (parentId != -1 ? newIds[parentId] : 1);
+                parentIdOnDisk = (isRootSection ? 1 : newIds[morphology.parent(section)->id()]);
             }
 
             writeLine(myfile,
@@ -129,15 +129,14 @@ void _write_asc_points(std::ofstream& myfile, const Points& points,
     }
 }
 
-void _write_asc_section(std::ofstream& myfile, const Morphology& morpho, uint32_t id, int indentLevel)
+void _write_asc_section(std::ofstream& myfile, const Morphology& morpho, const std::shared_ptr<Section>& section, int indentLevel)
 {
     std::string indent(indentLevel, ' ');
-    auto section = morpho.section(id);
     _write_asc_points(myfile, section->points(), section->diameters(), indentLevel);
 
-    if (!morpho.children(id).empty())
+    if (!morpho.children(section).empty())
     {
-        auto children = morpho.children(id);
+        auto children = morpho.children(section);
         size_t nChildren = children.size();
         for (int i = 0; i<nChildren; ++i)
         {
@@ -172,10 +171,10 @@ void asc(const Morphology& morphology, const std::string& filename)
     }
 
 
-    for (auto& id : morphology.rootSections())
+    for (auto& section : morphology.rootSections())
     {
-        myfile << header.at(morphology.section(id)->type());
-        _write_asc_section(myfile, morphology, id, 2);
+        myfile << header.at(section->type());
+        _write_asc_section(myfile, morphology, section, 2);
         myfile << ")\n\n";
     }
 
@@ -285,11 +284,14 @@ void h5(const Morphology& morpho, const std::string& filename)
                               "soma diameters", numberOfDiameters));
 
     bool hasPerimeterData = morpho.rootSections().size() > 0 ?
-        morpho.section(morpho.rootSections()[0])->perimeters().size() > 0 :
+        morpho.rootSections()[0]->perimeters().size() > 0 :
         false;
 
     for(int i = 0;i<numberOfPoints; ++i) {
         raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
+
+        // If the morphology has some perimeter data, we need to fill some perimeter dummy
+        // value in the soma range of the data structure to keep the length matching
         if(hasPerimeterData)
             raw_perimeters.push_back(0);
     }
@@ -302,11 +304,9 @@ void h5(const Morphology& morpho, const std::string& filename)
 
 
     for(auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
-        uint32_t sectionId = *it;
-        uint32_t parentId = morpho.parent(sectionId);
-        int parentOnDisk = (parentId != -1 ? newIds[parentId] : 0);
+        std::shared_ptr<Section> section = *it;
+        int parentOnDisk = (morpho.isRoot(section) ? 0 : newIds[morpho.parent(section)->id()]);
 
-        auto section = morpho.section(sectionId);
         const auto &points = section->points();
         const auto &diameters = section->diameters();
         const auto &perimeters = section->perimeters();

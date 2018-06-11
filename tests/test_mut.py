@@ -41,9 +41,9 @@ def test_point_level():
 
 def test_empty_neurite():
     m = Morphology()
-    m.append_section(-1, PointLevel(), SectionType.axon)
+    m.append_section(None, PointLevel(), SectionType.axon)
     assert_equal(len(m.root_sections), 1)
-    assert_equal(m.section(m.root_sections[0]).type,
+    assert_equal(m.root_sections[0].type,
                  SectionType.axon)
 
 
@@ -54,49 +54,49 @@ This is only allowed for non-root sections as this indicates the type of the par
 Hint: SECTION_UNDEFINED is the default value of parameter 'type'. You may have forgotten to specify this parameter and it picked the default value ?"""
 
     with assert_raises(SectionBuilderError) as obj:
-        Morphology().append_section(-1, PointLevel())
+        Morphology().append_section(None, PointLevel())
         assert_substring(good_error_msg,
                          str(obj.exception))
 
     with assert_raises(SectionBuilderError) as obj:
-        Morphology().append_section(-1, PointLevel(), SectionType.undefined)
+        Morphology().append_section(None, PointLevel(), SectionType.undefined)
         assert_substring(good_error_msg,
                          str(obj.exception))
 
 
 def test_single_neurite():
     m = Morphology()
-    m.append_section(-1,
+    m.append_section(None,
                      PointLevel([[1, 2, 3]], [2], [20]),
                      SectionType.axon)
 
-    assert_array_equal(m.section(m.root_sections[0]).points,
+    assert_array_equal(m.root_sections[0].points,
                        [[1, 2, 3]])
-    assert_equal(m.section(m.root_sections[0]).diameters,
+    assert_equal(m.root_sections[0].diameters,
                  [2])
-    assert_equal(m.section(m.root_sections[0]).perimeters,
+    assert_equal(m.root_sections[0].perimeters,
                  [20])
 
-    m.section(m.root_sections[0]).points = [[10, 20, 30]]
-    assert_array_equal(m.section(m.root_sections[0]).points,
+    m.root_sections[0].points = [[10, 20, 30]]
+    assert_array_equal(m.root_sections[0].points,
                        [[10, 20, 30]],
                        'Points array should have been mutated')
 
-    m.section(m.root_sections[0]).diameters = [7]
+    m.root_sections[0].diameters = [7]
 
-    assert_equal(m.section(m.root_sections[0]).diameters,
+    assert_equal(m.root_sections[0].diameters,
                  [7],
                  'Diameter array should have been mutated')
 
-    m.section(m.root_sections[0]).perimeters = [27]
-    assert_equal(m.section(m.root_sections[0]).perimeters,
+    m.root_sections[0].perimeters = [27]
+    assert_equal(m.root_sections[0].perimeters,
                  [27],
                  'Perimeter array should have been mutated')
 
 
 def test_child_section():
     m = Morphology()
-    section_id = m.append_section(-1,
+    section_id = m.append_section(None,
                                   PointLevel([[1, 2, 3]], [2], [20]),
                                   SectionType.axon)
 
@@ -109,16 +109,16 @@ def test_child_section():
     assert_equal(len(children),
                  1)
 
-    assert_array_equal(m.section(children[0]).points,
+    assert_array_equal(children[0].points,
                        [[1, 2, 3], [4, 5, 6]])
-    assert_array_equal(m.section(children[0]).diameters,
+    assert_array_equal(children[0].diameters,
                        [2, 3])
-    assert_array_equal(m.section(children[0]).perimeters,
+    assert_array_equal(children[0].perimeters,
                        [20, 30])
 
-    m.section(children[0]).points = [[7, 8, 9], [10, 11, 12]]
+    children[0].points = [[7, 8, 9], [10, 11, 12]]
 
-    assert_array_equal(m.section(children[0]).points,
+    assert_array_equal(children[0].points,
                        [[7, 8, 9], [10, 11, 12]])
 
 
@@ -135,7 +135,7 @@ def captured_output():
 
 def test_append_no_duplicate():
     m = Morphology()
-    section_id = m.append_section(-1,
+    section_id = m.append_section(None,
                                   PointLevel([[1, 2, 3], [4, 5, 6]],
                                              [2, 2],
                                              [20, 20]),
@@ -152,7 +152,7 @@ def test_build_read_only():
     m.soma.points = [[-1, -2, -3]]
     m.soma.diameters = [-4]
 
-    section_id = m.append_section(-1,
+    section_id = m.append_section(None,
                                   PointLevel([[1, 2, 3], [4, 5, 6]],
                                              [2, 2],
                                              [20, 20]),
@@ -257,11 +257,11 @@ def test_append_mutable_section():
     morpho = Morphology()
     second_children_first_root = SIMPLE.children(SIMPLE.root_sections[0])[1]
 
-    morpho.append_section(-1, SIMPLE.section(second_children_first_root))
+    morpho.append_section(None, second_children_first_root)
     assert_equal(len(morpho.root_sections), 1)
 
-    assert_array_equal(morpho.section(morpho.root_sections[0]).points,
-                       SIMPLE.section(second_children_first_root).points)
+    assert_array_equal(morpho.root_sections[0].points,
+                       second_children_first_root.points)
 
 
 def test_mitochondria():
@@ -270,7 +270,7 @@ def test_mitochondria():
     morpho.soma.diameters = [1, 1]
 
     sectionId = morpho.append_section(
-        -1,
+        None,
         PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
         SectionType.axon)
 
@@ -304,9 +304,9 @@ def test_mitochondria():
 
 
 def test_iterators():
-    assert_array_equal(list(SIMPLE.iter(6, upstream)),
+    assert_array_equal([sec.id for sec in SIMPLE.iter(SIMPLE.section(6), upstream)],
                        [6, 4])
-    assert_array_equal(list(SIMPLE.iter(1, depth_first)),
+    assert_array_equal([sec.id for sec in SIMPLE.iter(SIMPLE.section(1), depth_first)],
                        [1, 2, 3])
-    assert_array_equal(list(SIMPLE.iter(1, breadth_first)),
+    assert_array_equal([sec.id for sec in SIMPLE.iter(SIMPLE.section(1), breadth_first)],
                        [1, 3, 2])

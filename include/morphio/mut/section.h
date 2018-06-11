@@ -45,6 +45,8 @@ public:
     **/
     Property::PointLevel& properties() { return _pointProperties; }
 
+    ~Section() {}
+
 private:
     friend class Morphology;
 
@@ -52,11 +54,8 @@ private:
     // https://stackoverflow.com/questions/8202530/how-can-i-call-a-private-destructor-from-a-shared-ptr
     friend void friendDtorForSharedPtr(Section *);
 
-    void traverse(Morphology& morphology,
-                  std::function<void(Morphology& morphology, uint32_t sectionId)>);
     Section(int id, SectionType type, const Property::PointLevel&);
     Section(const morphio::Section& section);
-    ~Section() {}
 
     Property::PointLevel _pointProperties;
     SectionType _sectionType;

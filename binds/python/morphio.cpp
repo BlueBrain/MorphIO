@@ -371,7 +371,7 @@ PYBIND11_MODULE(morphio, m) {
                                "The first section of the vector is the soma section")
         .def_property_readonly("root_sections", &morphio::mut::Morphology::rootSections,
                                "Returns a list of all root sections IDs "
-                               "(sections whose parent ID are -1)")
+                               "(sections whose parent ID are -1)", py::return_value_policy::reference)
         .def_property_readonly("soma",
                                (std::shared_ptr<morphio::mut::Soma>(morphio::mut::Morphology::*)())&morphio::mut::Morphology::soma,
                                "Returns a reference to the soma object\n\n"
@@ -394,14 +394,14 @@ PYBIND11_MODULE(morphio, m) {
              "section_id"_a)
         .def("build_read_only", (const morphio::Property::Properties (morphio::mut::Morphology::*)() const) &morphio::mut::Morphology::buildReadOnly,
              "Returns the data structure used to create read-only morphologies")
-        .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, const morphio::Property::PointLevel&, morphio::SectionType)) &morphio::mut::Morphology::appendSection,
-             "Append a new Section the given parentId (-1 appends to soma)"
+        .def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*) (std::shared_ptr<morphio::mut::Section>, const morphio::Property::PointLevel&, morphio::SectionType)) &morphio::mut::Morphology::appendSection,
+             "Append a new Section the given parentId (None appends to soma)"
              " If section_type is omitted or set to 'undefined'"
              " the type of the parent section will be used"
              " (Root sections can't have sectionType ommited)",
              "parent_id"_a, "point_level_properties"_a, "section_type"_a=morphio::SectionType::SECTION_UNDEFINED)
-        .def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, const morphio::Section&, bool)) &morphio::mut::Morphology::appendSection,
-             "Append the existing immutable Section to the given parentId (-1 appends to soma) "
+        .def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*) (std::shared_ptr<morphio::mut::Section>, const morphio::Section&, bool)) &morphio::mut::Morphology::appendSection,
+             "Append the existing immutable Section to the given parentId (None appends to soma) "
              "If recursive == true, all descendent will be appended as well",
              "parent_id"_a, "immutable_section"_a, "recursive"_a=false)
 
@@ -427,14 +427,14 @@ PYBIND11_MODULE(morphio, m) {
              "Write file to H5, SWC, ASC format depending on filename extension", "filename"_a)
 
         // Iterators
-        .def("iter", [](morphio::mut::Morphology* morph, int id, morphio::IterType type) {
+        .def("iter", [](morphio::mut::Morphology* morph, std::shared_ptr<morphio::mut::Section> section, morphio::IterType type) {
                 switch (type) {
                 case morphio::IterType::DEPTH_FIRST:
-                    return py::make_iterator(morph->depth_begin(id), morph->depth_end());
+                    return py::make_iterator(morph->depth_begin(section), morph->depth_end());
                 case morphio::IterType::BREADTH_FIRST:
-                    return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
+                    return py::make_iterator(morph->breadth_begin(section), morph->breadth_end());
                 case morphio::IterType::UPSTREAM:
-                    return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
+                    return py::make_iterator(morph->upstream_begin(section), morph->upstream_end());
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -445,8 +445,8 @@ PYBIND11_MODULE(morphio, m) {
             "id"_a=-1, "iter_type"_a=morphio::IterType::DEPTH_FIRST);
 
 
-    mutable_morphology.def("append_section", (uint32_t (morphio::mut::Morphology::*) (int32_t, std::shared_ptr<morphio::mut::Section>, const morphio::mut::Morphology&)) &morphio::mut::Morphology::appendSection,
-             "Append the existing mutable Section to the given parentId (-1 appends to soma) "
+    mutable_morphology.def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*) (std::shared_ptr<morphio::mut::Section>, std::shared_ptr<morphio::mut::Section>, const morphio::mut::Morphology&)) &morphio::mut::Morphology::appendSection,
+             "Append the existing mutable Section to the given parentId (None appends to soma) "
              "If a mut::morphio::Morphology is passed, all descendent of section in this "
              "morphology will be appended as well"
              "parent_id"_a, "mutable_section"_a, "morphology"_a=morphio::mut::Morphology());
@@ -534,7 +534,7 @@ PYBIND11_MODULE(morphio, m) {
 
     // py::nodelete needed because morphio::mut::Section has a private destructor
     // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
-    py::class_<morphio::mut::Section, std::unique_ptr<morphio::mut::Section, py::nodelete>>(mut_module, "Section")
+    py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(mut_module, "Section")
         .def_property_readonly("id", &morphio::mut::Section::id,
                                "Return the section ID")
         .def_property("type",

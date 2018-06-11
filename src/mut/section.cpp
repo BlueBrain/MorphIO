@@ -23,26 +23,6 @@ Section::Section(const morphio::Section& section)
 }
 
 
-void Section::traverse(
-    Morphology& morphology,
-    std::function<void(Morphology& morphology, uint32_t section)> fun)
-{
-    // depth first traversal
-    std::stack<uint32_t> stack;
-    stack.push(_id);
-    while (!stack.empty())
-    {
-        uint32_t node_id = stack.top();
-        stack.pop();
-        fun(morphology, node_id);
-
-        auto &parent = morphology.children(node_id);
-        for (auto it = parent.rbegin(); it != parent.rend(); ++it)
-        {
-            stack.push(*it);
-        }
-    }
-}
 
 std::ostream& operator<<(std::ostream& os, Section& section)
 {

@@ -144,7 +144,8 @@ public:
 
     inline bool isSectionStart(const Sample& sample) {
         return (isRootSection(sample) ||
-                isSectionEnd(samples[sample.parentId])); // Standard section
+                    (sample.parentId > -1 &&
+                     isSectionEnd(samples[sample.parentId]))); // Standard section
     }
 
     inline bool isSectionEnd(const Sample& sample) {
@@ -240,7 +241,6 @@ public:
        - Update the parent ID of the new section
     **/
     void _processSectionStart(const Sample& sample) {
-        int id = isRootSection(sample) ? -1 : swcIdToSectionId[sample.parentId];
         Property::PointLevel properties;
 
         if(!isRootSection(sample)) // Duplicating last point of previous section
@@ -249,10 +249,11 @@ public:
             properties._diameters.push_back(samples[sample.parentId].diameter);
         }
 
-        swcIdToSectionId[sample.id] = morph.appendSection(
-            id,
+        std::shared_ptr<morphio::mut::Section> section = morph.appendSection(
+            isRootSection(sample) ? nullptr : morph.section(swcIdToSectionId[sample.parentId]),
             properties,
             sample.type);
+        swcIdToSectionId[sample.id] = section->id();
     }
 
 private:

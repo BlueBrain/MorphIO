@@ -8,16 +8,19 @@ namespace mut
 class Section;
 
 template <typename T>
-Iterator<T>::Iterator(const Morphology& morphology, uint32_t rootSectionId) :
+Iterator<T>::Iterator(const Morphology& morphology, std::shared_ptr<Section> rootSection) :
     _morphology(morphology)
 {
-    if(rootSectionId != -1)
-        container.push(rootSectionId);
-    else {
-        auto roots = _morphology.rootSections();
-        for(auto it = roots.rbegin(); it != roots.rend(); ++it)
-            container.push(*it);
-    }
+    container.push(rootSection);
+}
+
+template <typename T>
+Iterator<T>::Iterator(const Morphology& morphology) :
+    _morphology(morphology)
+{
+    auto roots = _morphology.rootSections();
+    for(auto it = roots.rbegin(); it != roots.rend(); ++it)
+        container.push(*it);
 }
 
 template <typename T>
@@ -58,26 +61,30 @@ Iterator<T>::Iterator() : _morphology(Morphology())
 
 // Specializations
 template <>
-uint32_t depth_iterator::operator*() const
+std::shared_ptr<Section> depth_iterator::operator*() const
 {
     return container.top();
 }
 template <>
-uint32_t breadth_iterator::operator*() const
+std::shared_ptr<Section> breadth_iterator::operator*() const
 {
     return container.front();
 }
 template <>
-uint32_t upstream_iterator::operator*() const
+std::shared_ptr<Section> upstream_iterator::operator*() const
 {
     return container[0];
 }
 
 template <>
-upstream_iterator::Iterator(const Morphology& morphology, uint32_t sectionId) :
+upstream_iterator::Iterator(const Morphology& morphology) :
+    _morphology(morphology) {} // Unused
+
+template <>
+upstream_iterator::Iterator(const Morphology& morphology, std::shared_ptr<Section> section) :
     _morphology(morphology)
 {
-    container.push_back(sectionId);
+    container.push_back(section);
 }
 
 template <>
@@ -92,9 +99,9 @@ upstream_iterator& upstream_iterator::operator++()
 }
 
 // Instantiations
-template class Iterator<std::stack<uint32_t>>;
-template class Iterator<std::queue<uint32_t>>;
-template class Iterator<std::vector<uint32_t>>;
+template class Iterator<std::stack<std::shared_ptr<Section>>>;
+template class Iterator<std::queue<std::shared_ptr<Section>>>;
+template class Iterator<std::vector<std::shared_ptr<Section>>>;
 
 } // namespace mut
 } // namespace morphio

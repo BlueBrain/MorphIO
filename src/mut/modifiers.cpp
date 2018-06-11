@@ -13,7 +13,7 @@ namespace modifiers
 
 void two_points_sections(morphio::mut::Morphology& morpho) {
     for(auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
-        auto section = morpho.section(*it);
+        std::shared_ptr<Section> section = *it;
         size_t size = section->points().size();
         if(size < 2)
             continue;
@@ -26,7 +26,7 @@ void two_points_sections(morphio::mut::Morphology& morpho) {
 
 void no_duplicate_point(morphio::mut::Morphology& morpho) {
     for(auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
-        auto section = morpho.section(*it);
+        std::shared_ptr<Section> section = *it;
         size_t size = section->points().size();
 
         if(size < 1 || morpho.parent(*it) < 0)
