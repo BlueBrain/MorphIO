@@ -7,7 +7,7 @@ if [ "$(docker images | grep morphio_wheel | wc -l)" != "0" ]; then
 
 else
     echo "docker image morphio_wheel not found, building it..."
-    docker build -t morphio_wheel \
+    docker build -t bbpdocker.epfl.ch/morphio_wheel \
            --build-arg http_proxy=${HTTP_PROXY-$http_proxy} \
            --build-arg https_proxy=${HTTPS_PROXY-$https_proxy} \
            $BASE/packaging/python_wheel | tee build.log

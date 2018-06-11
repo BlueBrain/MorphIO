@@ -45,12 +45,6 @@ rm ${MORPHIO_BASE}/.gitignore
 
 rm -rf ${MORPHIO_BASE}/bin
 
-# cd ${MORPHIO_BASE}
-# pwd
-# rm -rf build dist morphio.egg-info bin
-
 for version in $PYTHON_VERSIONS; do
     build_morphio $version
 done
-
-# chown -R $UID.$UID $WHEELHOUSE
