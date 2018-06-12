@@ -450,7 +450,7 @@ PYBIND11_MODULE(morphio, m) {
         .def(py::init<>())
         .def_property_readonly("root_sections", &morphio::mut::Mitochondria::rootSections,
                                "Returns a list of all root sections IDs "
-                               "(sections whose parent ID are -1)")
+                               "(sections whose parent ID are -1)", py::return_value_policy::reference)
         .def_property_readonly("sections", &morphio::mut::Mitochondria::sections,
                                "Return a dict where key is the mitochondrial section ID"
                                " and value is the mithochondrial section")
@@ -465,11 +465,11 @@ PYBIND11_MODULE(morphio, m) {
              "Get a reference to the given mithochondrial section\n\n"
              "Note: multiple mitochondria can shared the same references",
              "section_id"_a)
-        .def("append_section", (uint32_t (morphio::mut::Mitochondria::*) (int32_t, const morphio::Property::MitochondriaPointLevel&)) &morphio::mut::Mitochondria::appendSection,
-             "Append a new MitoSection the given parentId (-1 create a new mitochondrion)",
+        .def("append_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*) (std::shared_ptr<morphio::mut::MitoSection>, const morphio::Property::MitochondriaPointLevel&)) &morphio::mut::Mitochondria::appendSection,
+             "Append a new MitoSection the given parentId (None create a new mitochondrion)",
              "parent_id"_a, "point_level_properties"_a)
-        .def("depth_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
-                return py::make_iterator(morph->depth_begin(id), morph->depth_end());
+        .def("depth_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection section) {
+                return py::make_iterator(morph->depth_begin(section), morph->depth_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Depth first iterator starting at a given section id\n"
@@ -477,8 +477,8 @@ PYBIND11_MODULE(morphio, m) {
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
             "section_id"_a=-1)
-        .def("breadth_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
-                return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
+        .def("breadth_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection section) {
+                return py::make_iterator(morph->breadth_begin(section), morph->breadth_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Breadth first iterator starting at a given section id\n"
@@ -486,8 +486,8 @@ PYBIND11_MODULE(morphio, m) {
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
             "section_id"_a=-1)
-        .def("upstream_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
-                return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
+        .def("upstream_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection section) {
+                return py::make_iterator(morph->upstream_begin(section), morph->upstream_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Upstream iterator starting at a given section id\n"
@@ -498,6 +498,8 @@ PYBIND11_MODULE(morphio, m) {
 
 
 
+    // py::nodelete needed because morphio::mut::MitoSection has a private destructor
+    // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
     py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(mut_module, "MitoSection")
         .def_property_readonly("id", &morphio::mut::MitoSection::id,
                                "Return the section ID")
