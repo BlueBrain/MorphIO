@@ -220,22 +220,6 @@ PYBIND11_MODULE(morphio, m) {
                                "Returns the cell family (neuron or glia)")
         .def_property_readonly("version", &morphio::Morphology::version,
                                "Returns the version");
-    // .def("iter", [](morphio::Morphology* morph, morphio::IterType type, int32_t id) {
-    //         switch (type) {
-    //         case morphio::IterType::DEPTH_FIRST:
-    //             return py::make_iterator(morph->depth_begin(id), morph->depth_end());
-    //         case morphio::IterType::BREADTH_FIRST:
-    //             return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
-    //         case morphio::IterType::UPSTREAM:
-    //             return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
-    //         }
-    //     },
-    //     py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-    //     "Depth first iterator starting at a given section id\n"
-    //     "\n"
-    //     "If id == -1, the iteration will be successively performed starting\n"
-    //     "at each root section",
-    //     "iter_type"_a=morphio::IterType::DEPTH_FIRST, "section_id"_a=-1)
 
 
     py::class_<morphio::Mitochondria>(

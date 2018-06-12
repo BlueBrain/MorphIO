@@ -229,7 +229,7 @@ roots = m.rootSections
 first_root = roots[0]
 
 # iterate on sections starting at first_root
-for section in first_root.depth_begin:
+for section in first_root.iter():
     print("Section type: {}".format(section.type))
     print("Section id: {}".format(section.id))
     print("Parent section id: {}".format(section.parent.id))
@@ -260,13 +260,13 @@ int main()
 
     // iterate on sections starting at first_root
     for(auto id_it = m.depth_begin(first_root); id_it != m.depth_end(); ++id_it) {
-        int section_id = *id_it;
-        auto& section = m.section(section_id);
+      std::shared_ptr<Section> section = *id_it;
 
         std::cout << "Section type: " << section->type() << std::endl;
         std::cout << "Section id: " << section->id() << std::endl;
-        std::cout << "Parent section id: " << m.parent(section_id) << std::endl;
-        std::cout << "Number of child sections: " << m.children(section_id).size() << std::endl;
+        if(!m.isRoot(section))
+          std::cout << "Parent section id: " << m.parent(section) << std::endl;
+        std::cout << "Number of child sections: " << m.children(section).size() << std::endl;
         std::cout << "X - Y - Z - Diameter" << std::endl;
         for(int i = 0; i<section->points().size(); ++i) {
             std::cout <<
@@ -294,21 +294,21 @@ int main()
     morpho.soma()->points() = {{0, 0, 0}, {1, 1, 1}};
     morpho.soma()->diameters() = {1, 1};
 
-    uint32_t sectionId = morpho.appendSection(
-        -1, // Parent section ID (-1 = soma)
-        morphio::SectionType::SECTION_AXON,
+    std::shared_ptr<morphio::mut::Section> section = morpho.appendSection(
+        nullptr, // Parent section ID (nullptr = soma)
         morphio::Property::PointLevel(
             {{2, 2, 2}, {3, 3, 3}}, // x,y,z coordinates of each point
             {4, 4}, // diameter of each point
-            {5, 5})); // (optional) perimeter of each point
+            {5, 5}),
+        morphio::SectionType::SECTION_AXON); // (optional) perimeter of each point
 
-    uint32_t childSectionId = morpho.appendSection(
-        sectionId,
-        morphio::SectionType::SECTION_AXON,
+    std::shared_ptr<morphio::mut::Section> childSection = morpho.appendSection(
+        section,
         morphio::Property::PointLevel(
             {{3, 3, 3}, {4, 4, 4}},
             {4, 4},
-            {5, 5}));
+            {5, 5}),
+        morphio::SectionType::SECTION_AXON);
 
     // Writing the file in the 3 formats
     morpho.write("outfile.asc");
@@ -329,12 +329,12 @@ roots = m.root_sections
 first_root = roots[0]
 
 # iterate on sections starting at first_root
-for section_id in m.depth_begin(first_root):
-    section = m.section(section_id)
+for section in m.iter(first_root):
     print("Section type: {}".format(section.type))
     print("Section id: {}".format(section.id))
-    print("Parent section id: {}".format(m.parent(section_id)))
-    print("Number of child sections: {}".format(len(m.children(section_id))))
+    if not m.is_root(section):
+        print("Parent section id: {}".format(m.parent(section)))
+    print("Number of child sections: {}".format(len(m.children(section))))
     print("X - Y - Z - Diameter")
 
     for point, diameter in zip(section.points, section.diameters):
@@ -354,20 +354,19 @@ morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
 morpho.soma.diameters = [1, 1]
 
 section_id = morpho.append_section(
-    -1,  # Parent section ID(-1=soma)
-    SectionType.axon,
+    None,  # Parent section ID(None=soma)
     PointLevel(
         [[2, 2, 2], [3, 3, 3]],  # x, y, z coordinates of each point
         [4, 4],  # diameter of each point
-        [5, 5]))  # (optional) perimeter of each point
+        [5, 5]),
+    SectionType.axon)  # (optional) perimeter of each point
 
 child_section_id = morpho.append_section(
     section_id,
-    SectionType.axon,
     PointLevel(
         [[3, 3, 3], [4, 4, 4]],
         [4, 4],
-        [5, 5]))
+        [5, 5])) # section type is omitted -> parent section type will be used
 
 morpho.write("outfile.asc")
 morpho.write("outfile.swc")
@@ -397,13 +396,14 @@ morpho = Morphology()
 
 # A neuronal section that will store mitochondria
 section_id = morpho.append_section(
-    -1, SectionType.axon,
-    PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]))
+    None,
+    PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
+    SectionType.axon)
 
 # Creating a new mitochondrion
 mito_id = morpho.mitochondria.append_section(
     -1,
-    MitochondriaPointLevel([section_id, section_id], # section id hosting the mitochondria point
+    MitochondriaPointLevel([section.id, section.id], # section id hosting the mitochondria point
                            [0.5, 0.6], # relative distance between the start of the section and the point
                            [10, 20] # mitochondria diameters
                            ))
@@ -427,14 +427,15 @@ for section_id in morpho.mitochondria.depth_begin(first_root):
 Reading mithochondria from H5 files:
 
 ```python
-    morpho = Morphology("file_with_mithochondria.h5")
+from morphio import Morphology
 
-    for mitochondrial_section in morpho.mitochondria.root_sections:
-        print('{neurite_id}, {relative_path_lengths}, {diameters}'.format(
-            neurite_id=mitochondrial_section.neurite_section_ids,
-            relative_path_lengths=mitochondrial_section.relative_path_lengths,
-            diameters=mitochondrial_section.diameters))
+morpho = Morphology("file_with_mithochondria.h5")
 
-        print("Number of children: {}".format(len(mitochondrial_section.children)))
+for mitochondrial_section in morpho.mitochondria.root_sections:
+    print('{neurite_id}, {relative_path_lengths}, {diameters}'.format(
+          neurite_id=mitochondrial_section.neurite_section_ids,
+          relative_path_lengths=mitochondrial_section.relative_path_lengths,
+          diameters=mitochondrial_section.diameters))
 
+    print("Number of children: {}".format(len(mitochondrial_section.children)))
 ```
