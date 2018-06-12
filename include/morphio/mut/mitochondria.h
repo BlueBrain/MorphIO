@@ -68,7 +68,7 @@ public:
     {
     }
 
-    const std::vector<uint32_t> children(uint32_t id) const;
+    const std::vector<std::shared_ptr<Section> children(uint32_t id) const;
     const std::shared_ptr<MitoSection> section(uint32_t id) const;
     const std::map<uint32_t, std::shared_ptr<MitoSection>> sections() const;
 
@@ -77,7 +77,8 @@ public:
 
        If id == -1, the iteration will start at each root section, successively
     **/
-    mito_depth_iterator depth_begin(uint32_t id = -1) const;
+    mito_depth_iterator depth_begin() const;
+    mito_depth_iterator depth_begin(const std::shared_ptr<MitoSection>& section) const;
     mito_depth_iterator depth_end() const;
 
     /**
@@ -86,7 +87,8 @@ public:
        If id == -1, the iteration will be successively performed starting
        at each root section
     **/
-    mito_breadth_iterator breadth_begin(uint32_t id = -1) const;
+    mito_breadth_iterotor breadth_begin() const;
+    mito_breadth_iterator breadth_begin(const std::shared_ptr<MitoSection>& section) const;
     mito_breadth_iterator breadth_end() const;
 
     /**
@@ -95,7 +97,8 @@ public:
        If id == -1, the iteration will be successively performed starting
        at each root section
     **/
-    mito_upstream_iterator upstream_begin(uint32_t id = -1) const;
+    mito_upstream_iterotor upstream_begin() const;
+    mito_upstream_iterator upstream_begin(const std::shared_ptr<MitoSection>& section) const;
     mito_upstream_iterator upstream_end() const;
 
 
@@ -103,25 +106,25 @@ public:
     /**
      * Return the parent mithochondrial section ID
      **/
-    int32_t parent(uint32_t id) const;
+    const std::shared_ptr<MitoSection> parent(const std::shared_ptr<MitoSection>& section) const;
 
     /**
        Return true if section is a root section
     **/
-    bool isRoot(uint32_t id) const;
+    bool isRoot(const std::shared_ptr<MitoSection>& section) const;
 
 
     /**
      * Return the list of IDs of all mitochondrial root sections
      * (sections whose parent ID are -1)
      **/
-    const std::vector<uint32_t>& rootSections() const;
+    const std::vector<std::shared_ptr<MitoSection>& rootSections() const;
 
 
     /**
        Append a new MitoSection the given parentId (-1 create a new mitochondrion)
     **/
-    uint32_t appendSection(int32_t mitoParentId,
+    std::shared_ptr<MitoSection> appendSection(std::shared_ptr<MitoSection> mitoParentId,
                            const Property::MitochondriaPointLevel& points);
 
     /**
@@ -140,7 +143,7 @@ public:
 private:
     std::map<uint32_t, std::vector<uint32_t>> _children;
     std::map<uint32_t, uint32_t> _parent;
-    std::vector<uint32_t> _rootSections;
+    std::vector<std::shared_ptr<MitoSection>> _rootSections;
     std::map<uint32_t, std::shared_ptr<MitoSection>> _sections;
 
     uint32_t _mitochondriaSectionCounter;
