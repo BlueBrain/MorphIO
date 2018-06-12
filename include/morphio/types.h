@@ -70,9 +70,9 @@ class MitoIterator;
 template <typename T>
 class Iterator;
 
-typedef MitoIterator<std::stack<uint32_t>> mito_depth_iterator;
-typedef MitoIterator<std::queue<uint32_t>> mito_breadth_iterator;
-typedef MitoIterator<std::vector<uint32_t>> mito_upstream_iterator;
+typedef MitoIterator<std::stack<std::shared_ptr<MitoSection>>> mito_depth_iterator;
+typedef MitoIterator<std::queue<std::shared_ptr<MitoSection>>> mito_breadth_iterator;
+typedef MitoIterator<std::vector<std::shared_ptr<MitoSection>>> mito_upstream_iterator;
 
 typedef Iterator<std::stack<std::shared_ptr<Section>>> depth_iterator;
 typedef Iterator<std::queue<std::queue<std::shared_ptr<Section>>>> breadth_iterator;
