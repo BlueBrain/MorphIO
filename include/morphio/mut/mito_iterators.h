@@ -26,10 +26,11 @@ class MitoIterator
     MitoIterator();
 
 public:
-    MitoIterator(const Mitochondria& mitochondria, int rootSectionId = -1);
+    MitoIterator(const Mitochondria& mitochondria, std::shared_ptr<MitoSection> rootSectionId = nullptr);
+    MitoIterator(const Mitochondria& mitochondria)
     bool operator==(MitoIterator other) const;
     bool operator!=(MitoIterator other) const;
-    uint32_t operator*() const;
+    std::shared_ptr<MitoSection> operator*() const;
     MitoIterator& operator++();
     MitoIterator operator++(int);
 };
