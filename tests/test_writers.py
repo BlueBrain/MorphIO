@@ -6,7 +6,7 @@ from nose.tools import assert_equal, ok_
 from morphio.mut import Morphology
 from morphio import SectionType, PointLevel, MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect
 
-from utils import captured_output
+from utils import captured_output, setup_tempdir
 
 _path = os.path.dirname(os.path.abspath(__file__))
 
@@ -71,15 +71,15 @@ def test_write_merge_only_child():
     '''The root section has only one child
     The child should be merged with its parent section
     Special care must be given for the potential duplicate point
-                                            o
-                                           /
-                                          / son 1
-      root       child    grand-child    /
-    o--------o----------o--------------o<
-                                         \
-                                          \  son 2
-                                           \
-                                            o
+                              o
+                             /
+                            / son 1
+      root       child    /
+    o--------o----------o<
+                          \
+                           \  son 2
+                            \
+                             o
     '''
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0]]
@@ -93,36 +93,32 @@ def test_write_merge_only_child():
     child = morpho.append_section(root,
                                   PointLevel([[0, 5, 0], [0, 6, 0]],
                                              [2, 3]))
-    grand_child = morpho.append_section(child,
-                                        PointLevel([[0, 6, 0], [0, 7, 0]],
-                                                   [2, 3]))
-
-    son1 = morpho.append_section(grand_child,
-                                 PointLevel([[1, 2, 3], [4, 5, 6]],
+    son1 = morpho.append_section(child,
+                                 PointLevel([[0, 6, 0], [0, 7, 0]],
                                             [2, 3]))
 
-    son2 = morpho.append_section(grand_child,
-                                 PointLevel([[7, 8, 9], [10, 11, 12]],
-                                            [2, 3]))
+    son2 = morpho.append_section(child,
+                                 PointLevel([[0, 6, 0], [4, 5, 6]],
+                                            [3, 3]))
 
-    # with setup_tempdir('test_write_merge_only_child') as tmp_folder:
     with setup_tempdir('test_write_merge_only_child') as tmp_folder:
         for extension in ['swc', 'asc', 'h5']:
             filename = os.path.join(tmp_folder, 'test.{}'.format(extension))
             morpho.write(filename)
 
-            print("extension: {}".format(extension))
             read = Morphology(filename)
             root = read.root_sections[0]
             assert_array_equal(root.points,
                                [[0, 0, 0],
                                 [0, 5, 0],
-                                [0, 6, 0],
-                                [0, 7, 0]])
+                                [0, 6, 0]])
             assert_equal(len(read.children(root)), 2)
 
             assert_array_equal(read.children(root)[0].points,
-                               [[1, 2, 3], [4, 5, 6]])
+                               [[0, 6, 0], [0, 7, 0]])
+
+            assert_array_equal(read.children(root)[1].points,
+                               [[0, 6, 0], [4, 5, 6]])
 
 
 def test_write_perimeter():

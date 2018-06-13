@@ -1,4 +1,5 @@
 '''Module providing utility functions for the tests'''
+import shutil
 import sys
 import tempfile
 from contextlib import contextmanager
@@ -8,6 +9,16 @@ from io import StringIO
 from nose.tools import assert_raises, ok_
 
 from morphio import Morphology
+
+
+@contextmanager
+def setup_tempdir(prefix):
+    '''Context manager returning a temporary directory'''
+    temp_dir = tempfile.mkdtemp(prefix=prefix)
+    try:
+        yield temp_dir
+    finally:
+        shutil.rmtree(temp_dir)
 
 
 @contextmanager

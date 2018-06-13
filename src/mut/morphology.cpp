@@ -338,6 +338,7 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
         }
     }
 
+    mitochondria()._buildMitochondria(properties);
     return properties;
 }
 
@@ -423,22 +424,28 @@ void Morphology::applyModifiers(unsigned int modifierFlags) {
 
 }
 
-
 void Morphology::write(const std::string& filename) {
     const size_t pos = filename.find_last_of(".");
     assert(pos != std::string::npos);
 
     std::string extension;
 
+    // going through morphio::Morphology allows us to benefit
+    // from its curation process:
+    // - check for duplicate
+    // - section with only one child
+    morphio::mut::Morphology clean(morphio::Morphology(*this));
+
+
     for(auto& c : filename.substr(pos))
         extension += std::tolower(c);
 
     if (extension == ".h5")
-        writer::h5(*this, filename);
+        writer::h5(clean, filename);
     else if (extension == ".asc")
-        writer::asc(*this, filename);
+        writer::asc(clean, filename);
     else if (extension == ".swc")
-        writer::swc(*this, filename);
+        writer::swc(clean, filename);
     else
         LBTHROW(UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename)));
 

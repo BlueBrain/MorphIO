@@ -300,9 +300,6 @@ void h5(const Morphology& morpho, const std::string& filename)
     int offset = 0;
     offset += morpho.soma()->points().size();
 
-
-
-
     for(auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
         std::shared_ptr<Section> section = *it;
         int parentOnDisk = (morpho.isRoot(section) ? 0 : newIds[morpho.parent(section)->id()]);
