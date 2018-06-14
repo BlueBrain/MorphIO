@@ -15,10 +15,17 @@ Section::Section(int id, SectionType type,
 {
 }
 
-Section::Section(const morphio::Section& section)
-    : Section(section.id(), section.type(),
+Section::Section(int id, const morphio::Section& section)
+    : Section(id, section.type(),
               Property::PointLevel(section._properties->_pointLevel,
                                    section._range))
+{
+}
+
+Section::Section(int id, const Section& section)
+    : _pointProperties(section._pointProperties)
+    , _id(id)
+    , _sectionType(section._sectionType)
 {
 }
 

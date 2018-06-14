@@ -24,7 +24,7 @@ Morphology::Morphology(const morphio::URI& uri, unsigned int options)
 }
 
 Morphology::Morphology(const morphio::Morphology& morphology)
-    : _counter(0)
+    : _counter(1)
     , _soma(std::make_shared<Soma>(morphology.soma()))
 {
 
@@ -80,7 +80,7 @@ std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> pare
                                    const morphio::Section& section,
                                    bool recursive)
 {
-    std::shared_ptr<Section> ptr(new Section(section), friendDtorForSharedPtr);
+    std::shared_ptr<Section> ptr(new Section(_counter, section), friendDtorForSharedPtr);
     int32_t parentId = parent == nullptr ? -1 : parent->id();
 
     uint32_t id = _register(ptr);
@@ -106,9 +106,10 @@ std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> pare
 }
 
 std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> parent,
-                                   std::shared_ptr<Section> section,
+                                                   std::shared_ptr<Section> section,
                                    const Morphology& morphology)
 {
+    std::shared_ptr<Section> original_section = section;
     uint32_t id = _register(section);
     int32_t parentId = parent == nullptr ? -1 : parent->id();
     if(parentId == -1)
@@ -122,7 +123,7 @@ std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> pare
 
     }
 
-    for (const auto& child : morphology.children(section)){
+    for (const auto& child : morphology.children(original_section)){
         appendSection(section, child, morphology);
     }
 
@@ -161,17 +162,17 @@ std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> pare
 
 void friendDtorForSharedPtr(Section* section){ delete section; }
 
-uint32_t Morphology::_register(std::shared_ptr<Section> section)
+uint32_t Morphology::_register(std::shared_ptr<Section>& section)
 {
-    _counter = std::max(_counter, section->id()) + 1;
+    // If a section with the same ID already exists, we copy the node under a new ID
     if (_sections.count(section->id()))
     {
-        std::stringstream ss;
-        ss << "Cannot register section (" << std::to_string(section->id())
-           << "). The morphology has already a section with the same ID."
-           << std::endl;
-        LBTHROW(SectionBuilderError(ss.str()));
+        section = std::shared_ptr<Section>(new Section(_counter, *section),
+                                           friendDtorForSharedPtr);
+
     }
+    _counter = std::max(_counter, section->id()) + 1;
+
     _sections[section->id()] = std::shared_ptr<Section>(section);
     return section->id();
 }
@@ -326,6 +327,7 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
         } else {
             std::string errorMsg = err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId);
             LBERROR(errorMsg);
+
             properties._annotations.push_back(Property::Annotation(SINGLE_CHILD,
                                                                    parentId,
                                                                    section->_pointProperties,

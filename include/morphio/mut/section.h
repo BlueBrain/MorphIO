@@ -55,7 +55,8 @@ private:
     friend void friendDtorForSharedPtr(Section *);
 
     Section(int id, SectionType type, const Property::PointLevel&);
-    Section(const morphio::Section& section);
+    Section(int id, const morphio::Section& section);
+    Section(int id, const Section&);
 
     Property::PointLevel _pointProperties;
     SectionType _sectionType;

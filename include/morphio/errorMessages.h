@@ -9,6 +9,14 @@
 
 namespace morphio
 {
+
+/**
+   Set the maximum number of warnings to be printed on screen
+**/
+void set_maximum_warnings(int n_warnings);
+
+void LBERROR(const std::string& msg);
+
 namespace plugin
 {
 
@@ -38,6 +46,8 @@ public:
 private:
     std::map<uint32_t, uint32_t> _lineNumbers;
 };
+
+
 
 
 struct Sample

@@ -24,7 +24,6 @@
 // TODO: bcoste fix me
 #include <iostream>
 #define LBTHROW(x) (throw x)
-#define LBERROR(x) (std::cerr << x << std::endl)
 #define LBWARN std::cerr
 
 /** @namespace morphio Blue Brain File IO classes */

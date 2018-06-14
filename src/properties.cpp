@@ -1,6 +1,7 @@
 #include <algorithm>
 
 #include <morphio/properties.h>
+#include <morphio/errorMessages.h>
 
 bool verbose = true;
 

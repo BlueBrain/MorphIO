@@ -2,8 +2,34 @@
 
 namespace morphio
 {
+
+static int MORPHIO_MAX_N_WARNINGS = 100;
+
+void set_maximum_warnings(int n_warnings) {
+    MORPHIO_MAX_N_WARNINGS = n_warnings;
+}
+
+void LBERROR(const std::string& msg) {
+    static int error = 0;
+    if(MORPHIO_MAX_N_WARNINGS == 0)
+        return;
+
+    if(MORPHIO_MAX_N_WARNINGS < 0 || error <= MORPHIO_MAX_N_WARNINGS) {
+        std::cerr << msg << std::endl;
+        if(error == MORPHIO_MAX_N_WARNINGS) {
+            std::cerr << "Maximum number of warning reached. Next warnings won't be displayed." << std::endl;
+            std::cerr << "You can change this number by calling:" << std::endl;
+            std::cerr << "\t- C++: set_maximum_warnings(int)" << std::endl;
+            std::cerr << "\t- Python: morphio.set_maximum_warnings(int)" << std::endl;
+            std::cerr << "0 will print no warning. -1 will print them all" << std::endl;
+        }
+        ++error;
+    }
+}
+
 namespace plugin
 {
+
 
 const std::string ErrorMessages::errorMsg(int lineNumber, ErrorLevel errorLevel, std::string msg) const {
         return "\n" +

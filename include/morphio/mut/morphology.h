@@ -28,7 +28,7 @@ class Morphology
 public:
     Morphology() : _soma(std::make_shared<Soma>(Soma())),
                    _cellProperties(std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())),
-                   _counter(0) {}
+                   _counter(1) {}
 
     /**
        Build a mutable Morphology from an on-disk morphology
@@ -150,7 +150,7 @@ public:
     void deleteSection(std::shared_ptr<Section> section, bool recursive = true);
 
     /**
-       Append the existing Section to the given parentId (-1 appends to soma)
+       Append the existing morphio::Section to the given parentId (nullptr appends to soma)
 
        If recursive == true, all descendent will be appended as well
     **/
@@ -159,7 +159,7 @@ public:
                                            bool recursive = false);
 
     /**
-       Append the existing Section to the given parentId (-1 appends to soma)
+       Append the existing Section to the given parentId (nullptr appends to soma)
 
        If a mut::morphio::Morphology is passed, all descendent of section in this
        morphology will be appended as well
@@ -170,7 +170,7 @@ public:
 
 
     /**
-       Append a new Section the given parentId (-1 appends to soma)
+       Append a new Section the given parentId (nullptr appends to soma)
 
        If sectionType is omitted or set to SECTION_UNDEFINED,
        the type of the parent section will be used
@@ -240,7 +240,7 @@ private:
 
     morphio::plugin::ErrorMessages _err;
 
-    uint32_t _register(std::shared_ptr<Section>);
+    uint32_t _register(std::shared_ptr<Section>&);
     std::shared_ptr<Soma> _soma;
     std::vector<std::shared_ptr<Section>> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;

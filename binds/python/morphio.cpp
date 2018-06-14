@@ -14,6 +14,7 @@
 #include <morphio/section.h>
 #include <morphio/mito_section.h>
 #include <morphio/soma.h>
+#include <morphio/errorMessages.h>
 
 #include <morphio/mut/mito_iterators.h>
 #include <morphio/mut/mitochondria.h>
@@ -75,6 +76,9 @@ morphio::Points array_to_points(py::array_t<float> &buf){
 }
 
 PYBIND11_MODULE(morphio, m) {
+
+    m.def("set_maximum_warnings", &morphio::set_maximum_warnings,
+          "Set the maximum number of warnings to be printed on screen");
     py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
         .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
             "Indicates that a section has only one child");
@@ -379,7 +383,7 @@ PYBIND11_MODULE(morphio, m) {
         .def("build_read_only", (const morphio::Property::Properties (morphio::mut::Morphology::*)() const) &morphio::mut::Morphology::buildReadOnly,
              "Returns the data structure used to create read-only morphologies")
         .def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*) (std::shared_ptr<morphio::mut::Section>, const morphio::Property::PointLevel&, morphio::SectionType)) &morphio::mut::Morphology::appendSection,
-             "Append a new Section the given parentId (None appends to soma)"
+             "Append a new Section the given parentId (None appends to soma)\n"
              " If section_type is omitted or set to 'undefined'"
              " the type of the parent section will be used"
              " (Root sections can't have sectionType ommited)",
