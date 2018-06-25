@@ -71,7 +71,6 @@ enum SomaType
     SOMA_SINGLE_POINT,
     SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS,
     SOMA_CYLINDERS,
-    SOMA_THREE_POINTS,
     SOMA_SIMPLE_CONTOUR
 };
 
@@ -87,8 +86,6 @@ inline std::ostream& operator<<(std::ostream& os, const SomaType v)
         return os << "SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS";
     case SOMA_CYLINDERS:
         return os << "SOMA_CYLINDERS";
-    case SOMA_THREE_POINTS:
-        return os << "SOMA_THREE_POINTS";
     case SOMA_SIMPLE_CONTOUR:
         return os << "SOMA_SIMPLE_CONTOUR";
 

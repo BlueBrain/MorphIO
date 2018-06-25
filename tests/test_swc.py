@@ -9,14 +9,9 @@ from nose.tools import assert_equal
 from morphio import Morphology, SomaError, RawDataError, SectionType
 
 
-_path = os.path.dirname(os.path.abspath(__file__))
-DATA_PATH = os.path.join(_path, '../../../test_data')
-SWC_PATH = os.path.join(DATA_PATH, 'swc')
-SWC_SOMA_PATH = os.path.join(SWC_PATH, 'soma')
+_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 from utils import tmp_swc_file, _test_swc_exception
-
-SWC_TEST_FILE = os.path.dirname(os.path.realpath(__file__))
 
 
 def test_read_single_neurite():
@@ -45,7 +40,7 @@ def test_read_single_neurite():
 
 
 def test_read_simple():
-    simple = Morphology(os.path.join(SWC_TEST_FILE, 'simple.swc'))
+    simple = Morphology(os.path.join(_path, 'simple.swc'))
     # assert_array_equal(simple.points,
     #                    n.points)
     assert_equal(len(simple.root_sections), 2)
@@ -150,7 +145,7 @@ def test_weird_indent():
 """) as tmp_file:
         n = Morphology(tmp_file.name)
 
-    simple = Morphology(os.path.join(SWC_TEST_FILE, 'simple.swc'))
+    simple = Morphology(os.path.join(_path, 'simple.swc'))
     assert_array_equal(simple.points,
                        n.points)
 
@@ -201,6 +196,6 @@ def test_simple_reversed():
 
 
 def test_equality():
-    filename = os.path.join(SWC_TEST_FILE, 'simple.swc')
+    filename = os.path.join(_path, 'simple.swc')
     nt.ok_(not (Morphology(filename) is Morphology(filename)))
     nt.ok_(Morphology(filename) == Morphology(filename))

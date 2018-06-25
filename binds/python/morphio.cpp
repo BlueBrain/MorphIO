@@ -100,11 +100,18 @@ PYBIND11_MODULE(morphio, m) {
         .export_values();
 
     py::enum_<morphio::enums::MorphologyVersion>(m, "MorphologyVersion")
-        .value("MORPHOLOGY_VERSION_H5_1", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
-        .value("MORPHOLOGY_VERSION_H5_2", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_2)
-        .value("MORPHOLOGY_VERSION_H5_1_1", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_1)
-        .value("MORPHOLOGY_VERSION_SWC_1", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_SWC_1)
-        .value("MORPHOLOGY_VERSION_UNDEFINED", morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_UNDEFINED)
+        .value("MORPHOLOGY_VERSION_H5_1",
+               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
+        .value("MORPHOLOGY_VERSION_H5_2",
+               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_2)
+        .value("MORPHOLOGY_VERSION_H5_1_1",
+               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_1)
+        .value("MORPHOLOGY_VERSION_SWC_1",
+               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_SWC_1)
+        .value("MORPHOLOGY_VERSION_UNDEFINED",
+               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_UNDEFINED)
+        .value("MORPHOLOGY_VERSION_ASC_1",
+               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_ASC_1)
         .export_values();
 
     py::enum_<morphio::enums::CellFamily>(m, "CellFamily")
@@ -127,7 +134,6 @@ PYBIND11_MODULE(morphio, m) {
         .value("SOMA_SINGLE_POINT", morphio::enums::SomaType::SOMA_SINGLE_POINT)
         .value("SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS", morphio::enums::SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
         .value("SOMA_CYLINDERS", morphio::enums::SomaType::SOMA_CYLINDERS)
-        .value("SOMA_THREE_POINTS", morphio::enums::SomaType::SOMA_THREE_POINTS)
         .value("SOMA_SIMPLE_CONTOUR", morphio::enums::SomaType::SOMA_SIMPLE_CONTOUR);
 
 
@@ -247,11 +253,15 @@ PYBIND11_MODULE(morphio, m) {
                                "Returns the coordinates (x,y,z) of all soma point")
         .def_property_readonly("diameters", [](morphio::Soma* soma){ return span_to_ndarray(soma->diameters()); },
                                "Returns the diameters of all soma points")
-        .def_property_readonly("center", [](morphio::Soma* soma){
-                return py::array(3, soma->center().data());
-            },
-            "Returns the center of gravity of the soma points");
 
+        .def_property_readonly("center", [](morphio::Soma* soma){
+                                             return py::array(3, soma->center().data());
+                                         },
+            "Returns the center of gravity of the soma points")
+
+        .def_property_readonly("surface", &morphio::Soma::surface,
+                               "Returns the soma surface\n\n"
+                               "Note: the soma surface computation depends on the soma type");
 
     py::class_<morphio::Section>(m, "Section")
         // Topology-related member functions
@@ -491,9 +501,7 @@ PYBIND11_MODULE(morphio, m) {
 
 
 
-    // py::nodelete needed because morphio::mut::MitoSection has a private destructor
-    // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
-    py::class_<morphio::mut::MitoSection, std::unique_ptr<morphio::mut::MitoSection, py::nodelete>>(mut_module, "MitoSection")
+    py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(mut_module, "MitoSection")
         .def_property_readonly("id", &morphio::mut::MitoSection::id,
                                "Return the section ID")
         .def_property("diameters",
@@ -520,8 +528,6 @@ PYBIND11_MODULE(morphio, m) {
                       },
                       "Returns the neurite section Ids of all points of this section");
 
-    // py::nodelete needed because morphio::mut::Section has a private destructor
-    // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
     py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(mut_module, "Section")
         .def_property_readonly("id", &morphio::mut::Section::id,
                                "Return the section ID")
@@ -564,9 +570,7 @@ PYBIND11_MODULE(morphio, m) {
                       },
                       "Returns the perimeters of all points of this section");
 
-    // py::nodelete needed because morphio::mut::Soma has a private destructor
-    // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
-    py::class_<morphio::mut::Soma, std::unique_ptr<morphio::mut::Soma, py::nodelete>>(mut_module, "Soma")
+    py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>>(mut_module, "Soma")
         .def(py::init<const morphio::Property::PointLevel&>())
         .def_property("points",
                       [](morphio::mut::Soma* soma){

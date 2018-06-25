@@ -8,7 +8,7 @@ from morphio import SectionType, PointLevel, MitochondriaPointLevel, Morphology 
 
 from utils import captured_output, setup_tempdir
 
-_path = os.path.dirname(os.path.abspath(__file__))
+_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 def test_write_soma_basic():

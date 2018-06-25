@@ -71,7 +71,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='morphio',
-    version='1.0.1',
+    version='1.0.2',
     author='EPFL - Blue Brain Project',
     author_email='bbp-ou-nse@groupes.epfl.ch',
     description='A hybrid Python/C++ test project',

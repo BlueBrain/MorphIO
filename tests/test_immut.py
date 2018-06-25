@@ -6,7 +6,7 @@ from nose.tools import assert_equal, assert_raises, ok_
 
 from morphio import Morphology, upstream
 
-_path = os.path.dirname(os.path.abspath(__file__))
+_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 # These 3 cells are identical

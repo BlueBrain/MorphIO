@@ -9,7 +9,7 @@ from morphio import Morphology, RawDataError, SomaError
 
 from utils import tmp_asc_file, _test_asc_exception
 
-_path = os.path.dirname(os.path.abspath(__file__))
+_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 def test_soma():
@@ -351,6 +351,19 @@ def test_single_point_section_duplicate_parent():
         good = Morphology(good_tmp_file.name)
 
     ok_(good == bad)
+
+
+def test_spine():
+    neuron = Morphology(os.path.join(_path, 'spine.asc'))
+    assert_equal(len(neuron.root_sections), 1)
+    assert_array_equal(neuron.root_sections[0].points,
+                       np.array([[3.22,    -1.15,   150.00],
+                                 [5.84,    -2.17,   150.00],
+                                 [9.34,    -3.81,   150.00],
+                                 [9.99,    -4.00,   150.00],
+                                 [11.38,    -4.62,   150.00],
+                                 [12.55,    -5.16,   150.00],
+                                 [13.75,    -5.96,   150.00]], dtype=np.float32))
 
 
 def test_equality_with_simple():

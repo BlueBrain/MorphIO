@@ -13,9 +13,19 @@ typedef std::vector<Point> Points;
 Point operator+(const Point &left, const Point &right);
 Point operator-(const Point &left, const Point &right);
 Point operator+=(Point &left, const Point &right);
-Point operator/=(Point &left, float factor);
+Point operator-=(Point &left, const Point &right);
+Point operator/=(Point &left, const float factor);
 
+std::vector<Point> operator+(const std::vector<Point>& points, const Point &right);
+std::vector<Point> operator-(const std::vector<Point>& points, const Point &right);
+std::vector<Point> operator+=(std::vector<Point>& points, const Point &right);
+std::vector<Point> operator-=(std::vector<Point>& points, const Point &right);
+
+template <typename T> Point operator*(const Point &from, T factor);
+template <typename T> Point operator*(T factor, const Point &from);
+template <typename T> Point operator/(const Point &from, T factor);
 template <typename T> const Point centerOfGravity(const T& points);
+
 
 std::string dumpPoint(const Point& point);
 std::string dumpPoints(const std::vector<Point>& point);
@@ -25,27 +35,6 @@ std::string dumpPoints(const std::vector<Point>& point);
    Euclidian distance between two points
 **/
 float distance(const Point &left, const Point &right);
-
-template <typename T>
-Point operator*(const Point &from, T factor)
-{
-    Point ret;
-    for (int i = 0; i < 3; ++i)
-        ret[i] = from[i] * factor;
-    return ret;
-}
-
-template <typename T>
-Point operator*(T factor, const Point &from)
-{
-    return from * factor;
-}
-
-template <typename T>
-Point operator/(const Point &from, T factor)
-{
-    return from * (1/(float)factor);
-}
 
 
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);

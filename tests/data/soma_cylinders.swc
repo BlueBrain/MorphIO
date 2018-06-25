@@ -1,0 +1,6 @@
+# A soma composed of three cylinders
+# Cylinders are along X and have a radius of 40
+1 1 0 0 0 40 -1
+2 1 1 0 0 40  1
+3 1 2 0 0 40  2
+4 1 3 0 0 40  3

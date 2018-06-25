@@ -10,6 +10,11 @@ public:
     MorphioError(const std::string& _msg) : std::runtime_error(_msg) {}
 };
 
+class NotImplementedError: public MorphioError {
+public:
+    NotImplementedError(const std::string& _msg) : MorphioError(_msg) {}
+};
+
 class RawDataError: public MorphioError {
 public:
     RawDataError(const std::string& _msg) : MorphioError(_msg) {}

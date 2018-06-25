@@ -3,13 +3,14 @@
 #include <morphio/vector_types.h>
 #include <gsl/span>
 #include <math.h>
+#include <morphio/shared_utils.tpp>
 
 namespace morphio
 {
 
 
 Point operator+(const Point &left,
-                               const Point &right)
+                const Point &right)
 {
     Point ret;
     for (int i = 0; i < 3; ++i)
@@ -27,10 +28,18 @@ Point operator-(const Point &left,
 }
 
 Point operator+=(Point &left,
-                                const Point &right)
+                 const Point &right)
 {
     for (int i = 0; i < 3; ++i)
         left[i] += right[i];
+    return left;
+}
+
+Point operator-=(Point &left,
+                 const Point &right)
+{
+    for (int i = 0; i < 3; ++i)
+        left[i] -= right[i];
     return left;
 }
 
@@ -40,6 +49,33 @@ Point operator/=(Point &left, float factor)
         left[i] /= factor;
     return left;
 }
+
+std::vector<Point> operator+(const std::vector<Point>& points, const Point &right)
+{
+    std::vector<Point> result;
+    for(auto& p: points)
+        result.push_back(p + right);
+    return result;
+}
+std::vector<Point> operator-(const std::vector<Point>& points, const Point &right) {
+    std::vector<Point> result;
+    for(auto& p: points)
+        result.push_back(p - right);
+    return result;
+}
+
+std::vector<Point> operator+=(std::vector<Point>& points, const Point &right) {
+    for(auto& p: points)
+        p += right;
+    return points;
+}
+
+std::vector<Point> operator-=(std::vector<Point>& points, const Point &right) {
+    for(auto& p: points)
+        p -= right;
+    return points;
+}
+
 
 /**
    Euclidian distance between two points
@@ -81,12 +117,37 @@ const Point centerOfGravity(const T& points)
 }
 template const Point centerOfGravity(const gsl::span<const Point>& points);
 template const Point centerOfGravity(const std::vector<Point>& points);
-template <> Point operator*(const Point &from, int factor);
-template <> Point operator*(const Point &from, float factor);
-template <> Point operator*(int factor, const Point &from);
-template <> Point operator*(float factor, const Point &from);
-template <> Point operator/(const Point &from, int factor);
-template <> Point operator/(const Point &from, float factor);
+
+template <typename T>
+Point operator*(const Point &from, T factor)
+{
+    Point ret;
+    for (int i = 0; i < 3; ++i)
+        ret[i] = from[i] * factor;
+    return ret;
+}
+template Point operator*<int>(const Point &from, int factor);
+template Point operator*<float>(const Point &from, float factor);
+
+template <typename T>
+Point operator*(T factor, const Point &from)
+{
+    return from * factor;
+}
+template Point operator*<int>(int factor, const Point &from);
+template Point operator*<float>(float factor, const Point &from);
+
+template <typename T>
+Point operator/(const Point &from, T factor)
+{
+    return from * (1/(float)factor);
+}
+template Point operator/(const Point &from, int factor);
+template Point operator/(const Point &from, float factor);
+
+
+
+
 
 std::ostream& operator<<(std::ostream& os, const std::vector<morphio::Point>& points)
 {

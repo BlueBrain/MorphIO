@@ -10,7 +10,7 @@ import sys
 from io import StringIO
 from utils import assert_substring
 
-_path = os.path.dirname(os.path.abspath(__file__))
+_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 SIMPLE = Morphology(os.path.join(_path, "simple.swc"))
 
@@ -205,10 +205,6 @@ def test_build_read_only():
                        [2, 3])
     assert_array_equal(same_child.perimeters,
                        [20, 30])
-
-
-import os
-_path = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_mitochondria_read():

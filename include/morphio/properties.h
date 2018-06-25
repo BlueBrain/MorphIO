@@ -83,8 +83,8 @@ struct PointLevel
                std::vector<Perimeter::Type> perimeters = std::vector<Perimeter::Type>());
     PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
-    bool operator==(const PointLevel& other) const;
-    bool operator!=(const PointLevel& other) const;
+    // bool operator==(const PointLevel& other) const;
+    // bool operator!=(const PointLevel& other) const;
 };
 
 struct MitochondriaPointLevel
@@ -188,6 +188,7 @@ std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);
 
 template <> std::vector<Point::Type>& Properties::get<Point>();
 template <> std::vector<Section::Type>& Properties::get<Section>();
+template <> const std::vector<Section::Type>& Properties::get<Section>() const;
 
 } // namespace Property
 } // namespace morphio

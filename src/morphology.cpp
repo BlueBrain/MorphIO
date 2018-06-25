@@ -48,7 +48,6 @@ SomaType getSomaType(uint32_t nSomaPoints) {
         return std::map<uint32_t, SomaType>{
             {0, SOMA_UNDEFINED},
             {1, SOMA_SINGLE_POINT},
-            {3, SOMA_THREE_POINTS},
             {2, SOMA_UNDEFINED}}.at(nSomaPoints);
     }
     catch (const std::out_of_range& oor)
@@ -143,9 +142,21 @@ Morphology::~Morphology()
 }
 
 bool Morphology::operator==(const Morphology& other) const {
-    return this->_properties == other._properties ||
-        (this->_properties && other._properties &&
-         *(this->_properties) == *(other._properties));
+    constexpr float epsilon = 1e-5;
+    if(this->_properties == other._properties)
+        return true;
+
+    // std::array<float, 2> soma_surfaces{this->soma().surface(),
+    //                                    other.soma().surface()};
+    // std::cout << "std::abs(soma_surfaces[1] - soma_surfaces[0]): " << std::to_string(std::abs(soma_surfaces[1] - soma_surfaces[0])) << std::endl;
+    // if(std::abs(soma_surfaces[1] - soma_surfaces[0]) > epsilon) {
+    //     LBERROR("Soma surfaces differs: " + std::to_string(soma_surfaces[0]) +
+    //             " VS " + std::to_string(soma_surfaces[1]));
+    //     return false;
+    // }
+
+    return (this->_properties && other._properties &&
+            *(this->_properties) == *(other._properties));
 }
 
 bool Morphology::operator!=(const Morphology& other) const {

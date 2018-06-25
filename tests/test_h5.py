@@ -5,7 +5,7 @@ from nose import tools as nt
 
 from morphio import Morphology, MORPHOLOGY_VERSION_H5_1, MORPHOLOGY_VERSION_H5_2
 
-_path = os.path.dirname(os.path.abspath(__file__))
+_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 H5_PATH = os.path.join(_path, 'h5')
 H5V1_PATH = os.path.join(H5_PATH, 'v1')
 H5V2_PATH = os.path.join(H5_PATH, 'v2')
