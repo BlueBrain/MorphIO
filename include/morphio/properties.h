@@ -186,5 +186,8 @@ std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);
 
 
+template <> std::vector<Point::Type>& Properties::get<Point>();
+template <> std::vector<Section::Type>& Properties::get<Section>();
+
 } // namespace Property
 } // namespace morphio
