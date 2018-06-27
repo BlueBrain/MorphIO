@@ -149,7 +149,7 @@ public:
         rules_.push("\\(", +Token::LPAREN);
         rules_.push("\\)", +Token::RPAREN);
 
-        rules_.push("<\\(", +Token::LSPINE);
+        rules_.push("<[ \t\r]*\\(", +Token::LSPINE);
         rules_.push("\\)>", +Token::RSPINE);
 
         rules_.push(",", +Token::COMMA);

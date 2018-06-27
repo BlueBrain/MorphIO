@@ -294,6 +294,19 @@ def test_single_children():
                                      [-6, -6, 6]]))
 
 
+def test_spine():
+    neuron = Morphology(os.path.join(_path, 'spine.asc'))
+    assert_equal(len(neuron.root_sections), 1)
+    assert_array_equal(neuron.root_sections[0].points,
+                       np.array([[3.22,    -1.15,   150.00],
+                                 [5.84,    -2.17,   150.00],
+                                 [9.34,    -3.81,   150.00],
+                                 [9.99,    -4.00,   150.00],
+                                 [11.38,    -4.62,   150.00],
+                                 [12.55,    -5.16,   150.00],
+                                 [13.75,    -5.96,   150.00]], dtype=np.float32))
+
+
 def test_single_point_section_duplicate_parent():
     '''The following neuron represents a malformed tri-furcation. It is (badly) represented
     as a bifurcation of a bifurcation
