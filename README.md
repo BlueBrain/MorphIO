@@ -29,6 +29,7 @@
    * [Mutable Python](#mutable-python)
       * [Reading morphologies](#reading-morphologies-1)
       * [Creating morphologies](#creating-morphologies-1)
+   * [Mitochondria](#mitochondria)
 
 
 
@@ -438,4 +439,19 @@ for mitochondrial_section in morpho.mitochondria.root_sections:
           diameters=mitochondrial_section.diameters))
 
     print("Number of children: {}".format(len(mitochondrial_section.children)))
+```
+
+### Tips
+#### Maximum number of warnings
+On can control the maximum number of warnings using the command:
+```python
+
+# Will stop displaying warnings after 100 warnings
+morphio.set_maximum_warnings(100)
+
+# Will never stop displaying warnings
+morphio.set_maximum_warnings(-1)
+
+# Warnings won't be displayed
+morphio.set_maximum_warnings(0)
 ```

@@ -5,6 +5,11 @@ namespace morphio
 
 static int MORPHIO_MAX_N_WARNINGS = 100;
 
+/**
+   Controls the maximum number of warning to be printed on screen
+   0 will print no warning
+   -1 will print them all
+**/
 void set_maximum_warnings(int n_warnings) {
     MORPHIO_MAX_N_WARNINGS = n_warnings;
 }

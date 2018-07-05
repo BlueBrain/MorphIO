@@ -78,7 +78,9 @@ morphio::Points array_to_points(py::array_t<float> &buf){
 PYBIND11_MODULE(morphio, m) {
 
     m.def("set_maximum_warnings", &morphio::set_maximum_warnings,
-          "Set the maximum number of warnings to be printed on screen");
+          "Set the maximum number of warnings to be printed on screen\n"
+          "0 will print no warning\n"
+          "-1 will print them all");
     py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
         .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
             "Indicates that a section has only one child");
