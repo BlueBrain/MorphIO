@@ -30,6 +30,7 @@
       * [Reading morphologies](#reading-morphologies-1)
       * [Creating morphologies](#creating-morphologies-1)
    * [Mitochondria](#mitochondria)
+* [Specification](#specification)
 
 
 
@@ -455,3 +456,6 @@ morphio.set_maximum_warnings(-1)
 # Warnings won't be displayed
 morphio.set_maximum_warnings(0)
 ```
+
+# Specification
+See https://github.com/BlueBrain/MorphIO/blob/master/doc/specification.md
