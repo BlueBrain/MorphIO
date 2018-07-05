@@ -13,6 +13,7 @@ set(MORPHIO_SOURCES
   soma.cpp
   section.cpp
   vector_utils.cpp
+  version.cpp
   mut/mito_iterators.cpp
   mut/iterators.cpp
   mut/section.cpp
@@ -21,6 +22,12 @@ set(MORPHIO_SOURCES
   mut/mitochondria.cpp
   mut/writers.cpp
   mut/modifiers.cpp
+  )
+
+file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/../VERSION MORPHIO_VERSION_STRING)
+configure_file (
+  ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp.in
+  ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
   )
 
 # by default, -fPIC is only used of the dynamic library build

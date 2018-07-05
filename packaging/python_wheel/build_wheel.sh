@@ -38,8 +38,6 @@ build_morphio()
     git status
 }
 
-rm ${MORPHIO_BASE}/.gitignore
-
 rm -rf ${MORPHIO_BASE}/bin
 
 for version in $PYTHON_VERSIONS; do

@@ -1,0 +1,7 @@
+#include <string>
+
+#include <morphio/types.h>
+namespace morphio
+{
+  const std::string VERSION("@MORPHIO_VERSION_STRING@");
+}

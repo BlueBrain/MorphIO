@@ -29,6 +29,7 @@
 /** @namespace morphio Blue Brain File IO classes */
 namespace morphio
 {
+extern const std::string VERSION;
 typedef std::string URI;
 
 using namespace enums;

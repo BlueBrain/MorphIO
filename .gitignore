@@ -6,7 +6,7 @@
 *.h5
 
 bin/
-
+src/version.cpp
 morphio.egg-info/
 
 packaging/python_wheel/toolchain/

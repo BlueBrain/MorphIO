@@ -139,6 +139,9 @@ PYBIND11_MODULE(morphio, m) {
         .value("SOMA_SIMPLE_CONTOUR", morphio::enums::SomaType::SOMA_SIMPLE_CONTOUR);
 
 
+
+    m.attr("version") = morphio::VERSION;
+
     auto base = py::register_exception<morphio::MorphioError&>(m, "MorphioError");
     // base.ptr() signifies "inherits from"
     auto raw = py::register_exception<morphio::RawDataError&>(m, "RawDataError", base.ptr());
