@@ -16,8 +16,8 @@ docker run  \
     -e http_proxy=$http_proxy \
     -e https_proxy=$https_proxy \
     -e PIPPROXY="$PIPPROXY" \
-    -e UID=$UID \
     -v $BASE:/io:Z \
+    --user $UID \
     bbpdocker.epfl.ch/morphio_wheel \
     /bin/bash /io/packaging/python_wheel/build_wheel.sh
 

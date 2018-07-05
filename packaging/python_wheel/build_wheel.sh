@@ -32,12 +32,9 @@ build_morphio()
 
     $PYTHON setup.py bdist_wheel
     ls -lrt build/bdist.linux-x86_64/wheel
-    echo "((((((((After build))))))))"
     git status
     ${AUDIT_CMD} ${MORPHIO_BASE}/dist/*${version}*
     rm -rf build dist morphio.egg-info bin
-
-    echo "((((((((After rm))))))))"
     git status
 }
 
