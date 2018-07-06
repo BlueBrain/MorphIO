@@ -22,4 +22,6 @@ docker run  \
     /bin/bash /io/packaging/python_wheel/build_wheel.sh
 
 
-#bbpdocker.epfl.ch/morphio_wheel \
+# Build sdist
+cd /io
+python setup.py sdist

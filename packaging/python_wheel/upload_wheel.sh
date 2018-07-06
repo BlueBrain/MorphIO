@@ -12,8 +12,11 @@ for wheel in `ls $BASE/packaging/python_wheel/wheelhouse/morphio*.whl`; do
     upload2repo -t python -r $CHANNEL -f $wheel
 done
 
+upload2repo -t python -r $CHANNEL -f /io/dist/morphio.*.tar.gz
+
+
 # cleanup afterwards
 docker run --rm \
     -v $BASE:/io:Z \
     bbpdocker.epfl.ch/morphio_wheel \
-    /bin/rm -rf /io/packaging/python_wheel/wheelhouse
+    /bin/rm -rf /io/packaging/python_wheel/wheelhouse /io/dist
