@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 
 #include <morphio/properties.h>
 #include <morphio/errorMessages.h>
