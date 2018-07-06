@@ -62,15 +62,20 @@ class CMakeBuild(build_ext):
             self.distribution.get_version())
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        proc = subprocess.Popen("echo $CXX", shell=True, stdout=subprocess.PIPE)
-        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args,
-                              cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', '--build', '.'] + build_args,
-                              cwd=self.build_temp)
+        try:
+            proc = subprocess.Popen("echo $CXX", shell=True, stdout=subprocess.PIPE)
+            output = subprocess.check_call(['cmake', ext.sourcedir] + cmake_args,
+                                           cwd=self.build_temp, env=env)
+            output = subprocess.check_call(['cmake', '--build', '.'] + build_args,
+                                           cwd=self.build_temp)
+        except subprocess.CalledProcessError as exc:
+            print("Status : FAIL", exc.returncode, exc.output)
+            raise
 
 
 with open('VERSION') as versionf:
     version = versionf.readline().strip()
+
 
 setup(
     name='morphio',
@@ -80,6 +85,7 @@ setup(
     description='A hybrid Python/C++ test project',
     long_description='',
     install_requires=['numpy>=1.14.1'],
+    url='https://github.com/BlueBrain/MorphIO/',
     ext_modules=[CMakeExtension('morphio')],
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,

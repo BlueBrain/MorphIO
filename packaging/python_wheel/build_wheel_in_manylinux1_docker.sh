@@ -22,6 +22,7 @@ docker run  \
     /bin/bash /io/packaging/python_wheel/build_wheel.sh
 
 
-# Build sdist
-cd /io
+pushd .
+cd $BASE
 python setup.py sdist
+popd
