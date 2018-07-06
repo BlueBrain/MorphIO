@@ -140,7 +140,7 @@ template <typename T> bool compare(const morphio::range<T>& vec1, const morphio:
 
     const float epsilon = 1e-6;
     for(int i=0;i<vec1.size();++i){
-        if(std::abs(vec1[i] - vec2[i]) > epsilon) {
+        if(std::fabs(vec1[i] - vec2[i]) > epsilon) {
             LBERROR("Error comparing "+name+", elements differ:");
             LBERROR(std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
             LBERROR(std::to_string(vec2[i] - vec1[i]));
@@ -160,7 +160,7 @@ template <> bool compare(const morphio::range<const morphio::Point>& vec1,
 
     const float epsilon = 1e-6;
     for(int i=0;i<vec1.size();++i){
-        if(std::abs(distance(vec1[i], vec2[i])) > epsilon) {
+        if(std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
             LBERROR("Error comparing "+name+", elements differ:");
             LBERROR(std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
             LBERROR(std::to_string(vec2[i] - vec1[i]));

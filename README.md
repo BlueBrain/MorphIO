@@ -3,14 +3,12 @@
 ## Table of content
 
 * [Installation](#installation)
-   * [As a python wheel](#as-a-python-wheel)
-   * [From sources](#from-sources)
-      * [Dependencies](#dependencies)
-         * [Linux](#linux)
-         * [Mac OS](#mac-os)
-      * [Installation instructions](#installation-instructions)
-         * [Install as a c++ library](#install-as-a-c-library)
-         * [Install as a Python package](#install-as-a-python-package)
+   * [Dependencies](#dependencies)
+      * [Linux](#linux)
+      * [Mac OS](#mac-os)
+   * [Installation instructions](#installation-instructions)
+      * [Install as a c++ library](#install-as-a-c-library)
+      * [Install as a Python package](#install-as-a-python-package)
 * [Introduction](#introduction)
    * [Quick summary](#quick-summary)
    * [Read-only API](#read-only-api)
@@ -36,16 +34,7 @@
 
 ## Installation
 
-### As a python wheel
-The python binding can directly be installed using pip:
-```shell
-
-pip install --index-url  https://bbpteam.epfl.ch/repository/devpi/bbprelman/dev/+simple/ morphio
-```
-
-### From sources
-
-#### Dependencies
+### Dependencies
 MorphIO requires the following dependencies:
 - cmake >= 3.2
 - libhdf5-dev
@@ -61,9 +50,9 @@ sudo apt install cmake libhdf5-dev
 brew install hdf5 cmake
 ```
 
-#### Installation instructions
+### Installation instructions
 
-##### Install as a c++ library
+#### Install as a c++ library
 
 ```shell
 git clone git@github.com:bluebrain/morphio.git --recursive
@@ -73,10 +62,11 @@ cmake ..
 make
 ```
 
-##### Install as a Python package
+#### Install as a Python package
 
+The python binding can directly be installed using pip:
 ```shell
-pip install git+ssh://git@github.com/bluebrain/morphio.git
+pip install --index-url  https://bbpteam.epfl.ch/repository/devpi/bbprelman/dev/+simple/ morphio
 ```
 
 ## Introduction
