@@ -229,8 +229,8 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(std::shared_ptr<morphio::mut:
                     "\nThe section first point " +
                     "should be parent section last point: " +
                     "\n        : X Y Z Diameter" +
-                    "\nparent  :["+std::to_string(p0[0]) + ", "+std::to_string(p0[0]) + ", "+std::to_string(p0[0]) + ", "+std::to_string(d0) + "]" +
-                    "\ncurrent :["+std::to_string(p1[0]) + ", "+std::to_string(p1[0]) + ", "+std::to_string(p1[0]) + ", "+std::to_string(d1) + "]\n");
+                    "\nparent last point :["+std::to_string(p0[0]) + ", "+std::to_string(p0[0]) + ", "+std::to_string(p0[0]) + ", "+std::to_string(d0) + "]" +
+                    "\nchild first point :["+std::to_string(p1[0]) + ", "+std::to_string(p1[0]) + ", "+std::to_string(p1[0]) + ", "+std::to_string(d1) + "]\n");
 
 }
 

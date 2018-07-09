@@ -1,10 +1,10 @@
 import os
 import numpy as np
-from numpy.testing import assert_array_equal
-from nose.tools import assert_equal, ok_
+from numpy.testing import assert_array_equal, assert_equal
+from nose.tools import ok_
 
 from morphio.mut import Morphology
-from morphio import SectionType, PointLevel, MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect
+from morphio import set_maximum_warnings, SectionType, PointLevel, MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect
 
 from utils import captured_output, setup_tempdir
 
@@ -63,8 +63,10 @@ def test_write_basic():
     assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.asc"))
     assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.swc"))
     assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.h5"))
-    assert_equal(ImmutMorphology(morpho), ImmutMorphology(os.path.join(_path, "simple.asc")))
-    ok_(not (ImmutMorphology(morpho) != ImmutMorphology(os.path.join(_path, "simple.asc"))))
+    assert_equal(ImmutMorphology(morpho), ImmutMorphology(
+        os.path.join(_path, "simple.asc")))
+    ok_(not (ImmutMorphology(morpho) != ImmutMorphology(
+        os.path.join(_path, "simple.asc"))))
 
 
 def test_write_merge_only_child():
@@ -103,22 +105,26 @@ def test_write_merge_only_child():
 
     with setup_tempdir('test_write_merge_only_child') as tmp_folder:
         for extension in ['swc', 'asc', 'h5']:
-            filename = os.path.join(tmp_folder, 'test.{}'.format(extension))
-            morpho.write(filename)
+            with captured_output() as (_, err):
+                with ostream_redirect(stdout=True, stderr=True):
+                    filename = os.path.join(tmp_folder, 'test.{}'.format(extension))
+                    morpho.write(filename)
 
-            read = Morphology(filename)
-            root = read.root_sections[0]
-            assert_array_equal(root.points,
-                               [[0, 0, 0],
-                                [0, 5, 0],
-                                [0, 6, 0]])
-            assert_equal(len(read.children(root)), 2)
+                    read = Morphology(filename)
+                    root = read.root_sections[0]
+                    assert_array_equal(root.points,
+                                       [[0, 0, 0],
+                                        [0, 5, 0],
+                                        [0, 6, 0]])
+                    assert_equal(len(read.children(root)), 2)
+                    assert_equal(err.getvalue().strip(),
+                                 'Section: 2 is the only child of section: 1\nIt will be merged with the parent section')
 
-            assert_array_equal(read.children(root)[0].points,
-                               [[0, 6, 0], [0, 7, 0]])
+                    assert_array_equal(read.children(root)[0].points,
+                                       [[0, 6, 0], [0, 7, 0]])
 
-            assert_array_equal(read.children(root)[1].points,
-                               [[0, 6, 0], [4, 5, 6]])
+                    assert_array_equal(read.children(root)[1].points,
+                                       [[0, 6, 0], [4, 5, 6]])
 
 
 def test_write_perimeter():
@@ -147,7 +153,39 @@ def test_write_perimeter():
 
     morpho.write("test_write.h5")
 
-    assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.h5"))
+    assert_array_equal(ImmutMorphology(morpho),
+                       ImmutMorphology("test_write.h5"))
+
+
+def test_write_no_soma():
+    morpho = Morphology()
+    dendrite = morpho.append_section(None,
+                                     PointLevel([[0, 0, 0],
+                                                 [0, 5, 0]],
+                                                [2, 2],
+                                                [5, 6]),
+                                     SectionType.basal_dendrite)
+    dendrite = morpho.append_section(None,
+                                     PointLevel([[0, 1, 0],
+                                                 [0, 7, 0]],
+                                                [2, 2],
+                                                [5, 6]),
+                                     SectionType.basal_dendrite)
+
+    for ext in ['asc', 'h5', 'swc']:
+        with captured_output() as (_, err):
+            with ostream_redirect(stdout=True, stderr=True):
+                outfile = 'tmp.' + ext
+                morpho.write(outfile)
+                assert_equal(err.getvalue().strip(),
+                             'Warning: writing file without a soma')
+
+                read = Morphology(outfile)
+
+        assert_equal(len(read.soma.points), 0)
+        assert_equal(len(read.root_sections), 2)
+        assert_array_equal(read.root_sections[0].points, [[0, 0, 0], [0, 5, 0]])
+        assert_array_equal(read.root_sections[1].points, [[0, 1, 0], [0, 7, 0]])
 
 
 def test_mitochondria():

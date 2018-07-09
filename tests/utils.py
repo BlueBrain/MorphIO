@@ -1,4 +1,5 @@
 '''Module providing utility functions for the tests'''
+import re
 import shutil
 import sys
 import tempfile
@@ -31,6 +32,12 @@ def _tmp_file(content, extension):
 
 tmp_asc_file = partial(_tmp_file, extension='asc')
 tmp_swc_file = partial(_tmp_file, extension='swc')
+
+
+def strip_color_codes(string):
+    '''Strip color codes from the input string'''
+    ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+    return ansi_escape.sub('', string)
 
 
 def assert_substring(substring, string):

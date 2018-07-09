@@ -8,7 +8,7 @@ from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, Sectio
 from contextlib import contextmanager
 import sys
 from io import StringIO
-from utils import assert_substring
+from utils import assert_substring, captured_output
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -122,29 +122,28 @@ def test_child_section():
                        [[7, 8, 9], [10, 11, 12]])
 
 
-@contextmanager
-def captured_output():
-    new_out, new_err = StringIO(), StringIO()
-    old_out, old_err = sys.stdout, sys.stderr
-    try:
-        sys.stdout, sys.stderr = new_out, new_err
-        yield sys.stdout, sys.stderr
-    finally:
-        sys.stdout, sys.stderr = old_out, old_err
-
-
 def test_append_no_duplicate():
     m = Morphology()
+
     section_id = m.append_section(None,
                                   PointLevel([[1, 2, 3], [4, 5, 6]],
                                              [2, 2],
                                              [20, 20]),
                                   SectionType.axon)
 
-    m.append_section(section_id,
-                     PointLevel([[400, 5, 6], [7, 8, 9]],
-                                [2, 3],
-                                [20, 30]))
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+
+            m.append_section(section_id,
+                             PointLevel([[400, 5, 6], [7, 8, 9]],
+                                        [2, 3],
+                                        [20, 30]))
+            assert_equal(err.getvalue().strip(),
+                         'While appending section: 2 to parent: 1\n'
+                         'The section first point should be parent section last point: \n'
+                         '        : X Y Z Diameter\n'
+                         'parent last point :[4.000000, 4.000000, 4.000000, 2.000000]\n'
+                         'child first point :[400.000000, 400.000000, 400.000000, 2.000000]')
 
 
 def test_build_read_only():

@@ -31,14 +31,67 @@ ASC and H5 being the text and binary representation of the same format, they obe
 A H5/ASC file with a soma of 3 points or more will have their soma represented as a soma contour. In ASC format, soma points are characterized by an S-expression starting with the tag "CellBody". MorphIO does *not* support ASC files with *multiple* CellBody tags. [^footnote]
 
 # Sub-cellular structures
+SWC does not support any sub-cellular structures. H5 and ASC support some, please see the following for more details.
 
 ## Spines
-ASC files containing files will be read correctly. *However* spines data are not handled by MorphIO and spine information will be lost when writing to disk.
+SWC and H5 do not support spines. ASC files containing files will be read correctly. *However* spines data are not handled by MorphIO and spine information will be lost when writing to disk.
 
 ## Mitochondria
+SWC and ASC do not support mitochondria.
 Mitochondria can be read and written to disk using the H5 format. See the [README.md](https://github.com/BlueBrain/MorphIO/blob/master/README.md#mitochondria) for more details about the mitochondria API.
 
 ## Custom annotations
 Custom annotations are not supported. [^footnote]
+
+# Soma special cases
+## No somata
+MorphIO supports reading and writing files without a soma. SWC files root sections will have a parent ID of -1.
+
+## Multiple soma
+Are not supported
+
+# Others
+## Section with only one child section
+When a section has a single child section (aka unifurcation), the child section will be merged with its parent when reading or writing the file.
+
+## Duplicate points
+When reading an ASC file, the last point of a section will be added as the first point of the
+child sections if not already present. That means these two representations are equivalent:
+
+```lisp
+( (Dendrite)
+  (3 -4 0 2)
+  (3 -10 0 2)
+  (
+    (0 -10 0 2)
+    (-3 -10 0 2)
+  |
+    (6 -10 0 2)
+    (9 -10 0 2)
+  )
+)
+```
+
+```lisp
+( (Dendrite)
+  (3 -4 0 2)
+  (3 -10 0 2)
+  (
+    (3 -10 0 2) ; <- duplicate
+    (0 -10 0 2)
+    (-3 -10 0 2)
+  |
+    (3 -10 0 2) ; <- duplicate
+    (6 -10 0 2)
+    (9 -10 0 2)
+  )
+)
+```
+Note: As of today, it is **OK** for a duplicated point to have a different radius than the original point.
+
+
+When writing the file the duplicate point is **not** automatically added. However, a warning will be displayed if the first point of a section differs from the last point of the previous section.
+
+
 
 [^footnote] If this feature seems crucial to you, feel free to create an issue on [MorphIO issue tracker](https://github.com/BlueBrain/MorphIO/issues).

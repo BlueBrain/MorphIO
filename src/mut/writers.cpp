@@ -100,7 +100,7 @@ void swc(const Morphology& morphology, const std::string& filename)
             if (i > (isRootSection ? 0 : 1))
                 parentIdOnDisk = segmentIdOnDisk - 1;
             else {
-                parentIdOnDisk = (isRootSection ? 1 : newIds[morphology.parent(section)->id()]);
+                parentIdOnDisk = (isRootSection ? (soma->points().empty() ? -1 : 1) : newIds[morphology.parent(section)->id()]);
             }
 
             writeLine(myfile,
