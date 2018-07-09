@@ -5,9 +5,9 @@ from nose.tools import eq_, ok_, assert_equal
 
 from numpy.testing import assert_array_equal
 from nose import tools as nt
-from morphio import Morphology, RawDataError, SomaError
+from morphio import Morphology, RawDataError, SomaError, ostream_redirect
 
-from utils import tmp_asc_file, _test_asc_exception
+from utils import tmp_asc_file, _test_asc_exception, captured_output, assert_substring
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -221,7 +221,11 @@ def test_unfinished_file():
 
 
 def test_empty_sibling():
-    with tmp_asc_file('''
+    '''The empty sibling will be removed and the single child will be merged
+    with its parent'''
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            with tmp_asc_file('''
                      ((Dendrite)
                       (3 -4 0 2)
                       (3 -6 0 2)
@@ -235,7 +239,11 @@ def test_empty_sibling():
                        )
                       )
                  ''') as tmp_file:
-        n = Morphology(tmp_file.name)
+                n = Morphology(tmp_file.name)
+                assert_substring('is the only child of section: 1 starting at:',
+                                 err.getvalue().strip())
+                assert_substring('It will be merged with the parent section',
+                                 err.getvalue().strip())
 
     assert_equal(len(n.root_sections), 1)
     assert_array_equal(n.root_sections[0].points,
@@ -269,7 +277,13 @@ def test_single_children():
                       )
                  ''') as tmp_file:
 
-        n = Morphology(tmp_file.name)
+        with captured_output() as (_, err):
+            with ostream_redirect(stdout=True, stderr=True):
+                n = Morphology(tmp_file.name)
+                assert_substring('is the only child of section: 1 starting at:',
+                                 err.getvalue().strip())
+                assert_substring('It will be merged with the parent section',
+                                 err.getvalue().strip())
 
         nt.assert_equal(len(n.soma.points), 0)
         nt.assert_equal(len(n.sections[0].points), 0)

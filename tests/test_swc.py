@@ -1,17 +1,16 @@
 import os
 
 import numpy as np
-
+from nose import tools as nt
+from nose.tools import assert_equal, assert_raises
 from numpy.testing import assert_array_equal
 
-from nose import tools as nt
-from nose.tools import assert_equal
-from morphio import Morphology, SomaError, RawDataError, SectionType
-
+from morphio import (Morphology, RawDataError, SectionType, SomaError,
+                     ostream_redirect, set_maximum_warnings)
+from utils import (_test_swc_exception, assert_substring, captured_output,
+                   strip_color_codes, tmp_swc_file)
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-
-from utils import tmp_swc_file, _test_swc_exception
 
 
 def test_read_single_neurite():
@@ -65,16 +64,19 @@ def test_repeated_id():
 
 
 def test_neurite_followed_by_soma():
-    _test_swc_exception('''# An orphan neurite with a soma child
+    # Capturing the output to keep the unit test suite stdout clean
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            _test_swc_exception('''# An orphan neurite with a soma child
                            1 3 0 0 1 0.5 -1
                            2 3 0 0 2 0.5 1
                            3 3 0 0 3 0.5 2
                            4 3 0 0 4 0.5 3
                            5 3 0 0 5 0.5 4
                            6 1 0 0 0 3.0 5 # <-- soma child''',
-                        SomaError,
-                        'Found a soma point with a neurite as parent',
-                        ':7:error')
+                                SomaError,
+                                'Found a soma point with a neurite as parent',
+                                ':7:error')
 
 
 def test_read_split_soma():
@@ -199,3 +201,25 @@ def test_equality():
     filename = os.path.join(_path, 'simple.swc')
     nt.ok_(not (Morphology(filename) is Morphology(filename)))
     nt.ok_(Morphology(filename) == Morphology(filename))
+
+
+def test_multiple_soma():
+    with assert_raises(SomaError) as obj:
+        Morphology(os.path.join(_path, 'multiple_soma.swc'))
+    assert_substring(
+        ''.join(['Multiple somata found: \n\n',
+                 os.path.join(_path, 'multiple_soma.swc:2:error\n\n\n'),
+                 os.path.join(_path, 'multiple_soma.swc:11:error')]),
+        strip_color_codes(str(obj.exception)))
+
+
+def test_disconnected_neurite():
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            n = Morphology(os.path.join(_path, 'disconnected_neurite.swc'))
+            assert_equal(
+                _path + '''/disconnected_neurite.swc:10:warning
+Found a disconnected neurite.
+Neurites are not supposed to have parentId: -1
+(although this is normal if this neuron has no soma)''',
+                strip_color_codes(err.getvalue().strip()))
