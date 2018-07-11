@@ -348,6 +348,30 @@ def test_spine():
 
 
 def test_single_point_section_duplicate_parent():
+    '''Section is made only of the duplicate point'''
+    with tmp_asc_file('''
+                     ((Dendrite)
+                      (3 -4 0 2)
+                      (3 -10 0 2)
+                      (
+                        (3 -10 0 4)  ; duplicate point
+                      )
+                     )''') as tmp_file:
+
+        bad = Morphology(tmp_file.name)
+
+    with tmp_asc_file('''
+                     ((Dendrite)
+                      (3 -4 0 2)
+                      (3 -10 0 2)
+                     )''') as tmp_file:
+
+        good = Morphology(tmp_file.name)
+
+        assert_equal(bad, good)
+
+
+def test_single_point_section_duplicate_parent_complex():
     '''The following neuron represents a malformed tri-furcation. It is (badly) represented
     as a bifurcation of a bifurcation
 
