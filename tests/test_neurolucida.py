@@ -77,18 +77,12 @@ def test_multiple_soma():
 
 def test_single_neurite_no_soma():
     with tmp_asc_file('''
-
-                         ( (Color Yellow)
+                      ( (Color Yellow)
                          (Axon)
                          (Set "axons")
-
-    ;; A commented line and some empty lines
-
-                         (  1.2  2.7   1.0     13)  ;; Some comment
+                         (  1.2  2.7   1.0     13)
                          (  1.2  3.7   2.0     13)
-
-                         Generated
-                         )  ;  End of tree''') as tmp_file:
+                      )''') as tmp_file:
         n = Morphology(tmp_file.name)
 
         assert_array_equal(n.soma.points, np.empty((0, 3)))
@@ -254,6 +248,38 @@ def test_empty_sibling():
                                  [0, -10, 0],
                                  [-3, -10, 0]],
                                 dtype=np.float32))
+
+
+def test_section_single_point():
+    '''Test single point section.
+    The parent section last point will be duplicated
+    '''
+    with tmp_asc_file('''
+                     ((Dendrite)
+                      (3 -4 0 2)
+                      (3 -6 0 2)
+                      (3 -8 0 2)
+                      (3 -10 0 2)
+                      (
+                        (3 -10 2 4)  ; single point section
+                       |
+                        (3 -10 0 2)  ; normal section
+                        (3 -10 1 2)
+                        (3 -10 2 2)
+                      )
+                     )''') as tmp_file:
+
+        n = Morphology(tmp_file.name)
+        nt.assert_equal(len(n.root_sections), 1)
+        nt.assert_equal(len(n.root_sections[0].children), 2)
+        assert_array_equal(n.root_sections[0].children[0].points,
+                           np.array([[3, -10, 0],
+                                     [3, -10, 2]], dtype=np.float32))
+
+        assert_array_equal(n.root_sections[0].children[1].points,
+                           np.array([[3, -10, 0],
+                                     [3, -10, 1],
+                                     [3, -10, 2]], dtype=np.float32))
 
 
 def test_single_children():
