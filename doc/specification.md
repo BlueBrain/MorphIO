@@ -62,48 +62,20 @@ When a section has a single child section (aka unifurcation), the child section 
 
 [Unit test](https://github.com/BlueBrain/MorphIO/blob/a60b52dfe403ef289455ee2221c1b4fce6418978/tests/test_neurolucida.py#L251), [Unit test](https://github.com/BlueBrain/MorphIO/blob/a60b52dfe403ef289455ee2221c1b4fce6418978/tests/test_writers.py#L72)
 
-## Duplicate points
-When reading an ASC file, the last point of a section will be added as the first point of the
-child sections if not already present. That means these two representations are equivalent:
+# Section ordering
+In MorphIO each section is identified by an ID. By default, the section IDs will correspond to the order of section appearance while performing a depth-first traversal on every neurites. The neurite order is the order of appearance in the file.
+Alternatively, the NRN simulator way of ordering section can be used by specifying the flag `morphio::Option::NRN_ID` when opening the file. In the NRN iteration, soma sections are placed first and then neurites are sorted by type: axon -> basal -> apical
 
-```lisp
-( (Dendrite)
-  (3 -4 0 2)
-  (3 -10 0 2)
-  (
-    (0 -10 0 2)
-    (-3 -10 0 2)
-  |
-    (6 -10 0 2)
-    (9 -10 0 2)
-  )
-)
-```
+# Format specific specifications
+- H5:
+[See here](https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html)
+- ASC:
+[See here](https://github.com/BlueBrain/MorphIO/blob/master/doc/specification_neurolucida.md)
+- SWC:
+The file format specification if available on [http://www.neuronland.org](http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html).
+Here we will discuss, what does MorphIO support and does not.
+SWC IDs ordering: there is no special constraint about the IDs as long as the parent ID of each points are defined. IDs don't need to be consecutive nor sorted, and the soma does not need to be the first point.
 
-```lisp
-( (Dendrite)
-  (3 -4 0 2)
-  (3 -10 0 2)
-  (
-    (3 -10 0 2) ; <- duplicate
-    (0 -10 0 2)
-    (-3 -10 0 2)
-  |
-    (3 -10 0 2) ; <- duplicate
-    (6 -10 0 2)
-    (9 -10 0 2)
-  )
-)
-```
-
-[Unit test](https://github.com/BlueBrain/MorphIO/blob/a60b52dfe403ef289455ee2221c1b4fce6418978/tests/test_neurolucida.py#L162), [Unit test](https://github.com/BlueBrain/MorphIO/blob/a60b52dfe403ef289455ee2221c1b4fce6418978/tests/test_writers.py#L191)
-
-Note: As of today, it is **OK** for a duplicated point to have a different radius than the original point.
-
-
-When writing the file the duplicate point is **not** automatically added. However, a warning will be displayed if the first point of a section differs from the last point of the previous section.
-
-[Unit test](https://github.com/BlueBrain/MorphIO/blob/a60b52dfe403ef289455ee2221c1b4fce6418978/tests/test_mut.py#L125)
 
 
 [^footnote] If this feature seems crucial to you, feel free to create an issue on [MorphIO issue tracker](https://github.com/BlueBrain/MorphIO/issues).

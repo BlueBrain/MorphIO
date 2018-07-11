@@ -223,3 +223,23 @@ Found a disconnected neurite.
 Neurites are not supposed to have parentId: -1
 (although this is normal if this neuron has no soma)''',
                 strip_color_codes(err.getvalue().strip()))
+
+
+def test_read_weird_ids():
+    with tmp_swc_file('''1 1 0 0 0 3.0 -1
+                         2 3 0 0 2 0.5 1
+                         3 3 0 0 3 0.5 2
+                         4 3 0 0 4 0.5 3
+                         5 3 0 0 5 0.5 4''') as tmp_file:
+
+        normal = Morphology(tmp_file.name)
+
+    with tmp_swc_file('''10000 3 0 0 5 0.5 100
+                         3 3 0 0 3 0.5 47
+                         10 1 0 0 0 3.0 -1
+                         47 3 0 0 2 0.5 10
+                         100 3 0 0 4 0.5 3
+                         ''') as tmp_file:
+        weird = Morphology(tmp_file.name)
+
+    assert_equal(normal, weird)
