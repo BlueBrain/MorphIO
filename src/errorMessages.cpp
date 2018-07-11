@@ -14,9 +14,22 @@ void set_maximum_warnings(int n_warnings) {
     MORPHIO_MAX_N_WARNINGS = n_warnings;
 }
 
-void LBERROR(const std::string& msg) {
+
+void set_ignored_warning(Warning warning, bool ignore) {
+  if(ignore)
+    plugin::_ignoredWarnings.insert(warning);
+  else
+    plugin::_ignoredWarnings.erase(warning);
+}
+
+void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
+  for(auto warning: warnings)
+    set_ignored_warning(warning, ignore);
+}
+
+void LBERROR(Warning warning, const std::string& msg) {
     static int error = 0;
-    if(MORPHIO_MAX_N_WARNINGS == 0)
+    if(plugin::ErrorMessages::isIgnored(warning) || MORPHIO_MAX_N_WARNINGS == 0)
         return;
 
     if(MORPHIO_MAX_N_WARNINGS < 0 || error <= MORPHIO_MAX_N_WARNINGS) {
@@ -35,6 +48,10 @@ void LBERROR(const std::string& msg) {
 namespace plugin
 {
 
+
+bool ErrorMessages::isIgnored(Warning warning) {
+  return _ignoredWarnings.find(warning) != _ignoredWarnings.end();
+}
 
 const std::string ErrorMessages::errorMsg(int lineNumber, ErrorLevel errorLevel, std::string msg) const {
         return "\n" +
@@ -249,6 +266,11 @@ const std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info, int p
         "\nIt will be merged with the parent section";
 }
 
+
+  std::string ErrorMessages::WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const {
+    return errorMsg(0, ErrorLevel::WARNING, "This cell has mitochondria, they cannot be saved in "
+                    " ASC or SWC format. Please use H5 if you want to save them.");
+  }
 
 
 } // namespace plugin

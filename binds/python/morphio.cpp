@@ -77,10 +77,14 @@ morphio::Points array_to_points(py::array_t<float> &buf){
 
 PYBIND11_MODULE(morphio, m) {
 
-    m.def("set_maximum_warnings", &morphio::set_maximum_warnings,
-          "Set the maximum number of warnings to be printed on screen\n"
-          "0 will print no warning\n"
-          "-1 will print them all");
+  m.def("set_maximum_warnings", &morphio::set_maximum_warnings,
+        "Set the maximum number of warnings to be printed on screen\n"
+        "0 will print no warning\n"
+        "-1 will print them all");
+  m.def("set_ignored_warning", (void (*)(morphio::Warning, bool)) &morphio::set_ignored_warning,
+        "Ignore/Unignore a specific warning message", "warning"_a, "ignore"_a = true);
+  m.def("set_ignored_warning", (void (*)(const std::vector<morphio::Warning>&, bool)) &morphio::set_ignored_warning,
+        "Ignore/Unignore a list of warnings", "warning"_a, "ignore"_a = true);
     py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
         .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
             "Indicates that a section has only one child");
@@ -122,7 +126,14 @@ PYBIND11_MODULE(morphio, m) {
         .export_values();
 
 
-    py::enum_<morphio::enums::AccessMode>(m, "AccessMode")
+    py::enum_<morphio::enums::Warning>(m, "Warning")
+    .value("undefined", morphio::enums::Warning::UNDEFINED)
+    .value("mitochondria_write_not_supported", morphio::enums::Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED)
+    .value("write_no_soma", morphio::enums::Warning::WRITE_NO_SOMA)
+    .value("no_soma_found", morphio::enums::Warning::NO_SOMA_FOUND)
+    .value("only_child", morphio::enums::Warning::ONLY_CHILD);
+
+     py::enum_<morphio::enums::AccessMode>(m, "AccessMode")
         .value("MODE_READ", morphio::enums::AccessMode::MODE_READ)
         .value("MODE_WRITE", morphio::enums::AccessMode::MODE_WRITE)
         .value("MODE_OVERWRITE", morphio::enums::AccessMode::MODE_OVERWRITE)

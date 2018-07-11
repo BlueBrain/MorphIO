@@ -67,13 +67,15 @@ void swc(const Morphology& morphology, const std::string& filename)
     auto soma = morphology.soma();
 
     if(!morphology.mitochondria().rootSections().empty())
-        LBERROR(plugin::ErrorMessages().MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+      LBERROR(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
+              plugin::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     const auto& points = soma->points();
     const auto& diameters = soma->diameters();
 
     if(points.size() < 1)
-        LBERROR(plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
+      LBERROR(Warning::WRITE_NO_SOMA,
+              plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
 
     for (int i = 0; i < points.size(); ++i){
         writeLine(myfile,
@@ -156,7 +158,8 @@ void asc(const Morphology& morphology, const std::string& filename)
     myfile.open (filename);
 
     if(!morphology.mitochondria().rootSections().empty())
-        LBERROR(plugin::ErrorMessages().MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+      LBERROR(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
+              plugin::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
 
     std::map<morphio::SectionType, std::string> header;
@@ -170,7 +173,8 @@ void asc(const Morphology& morphology, const std::string& filename)
         _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
         myfile << ")\n\n";
     } else {
-        LBERROR(plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
+      LBERROR(Warning::WRITE_NO_SOMA,
+              plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
 
@@ -281,7 +285,8 @@ void h5(const Morphology& morpho, const std::string& filename)
 
 
     if(numberOfPoints < 1)
-        LBERROR(plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
+      LBERROR(Warning::WRITE_NO_SOMA,
+              plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
     if(numberOfPoints != numberOfDiameters)
         throw WriterError(plugin::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
                               "soma points", numberOfPoints,

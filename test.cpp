@@ -28,5 +28,5 @@ using namespace std;
 
 int main()
 {
-    return morphio::Morphology("/home/bcoste/workspace/morphology/toolbox/morph_tool/tests/simple.asc") == morphio::Morphology("/home/bcoste/workspace/morphology/toolbox/morph_tool/tests/blah.swc");
+  morphio::Morphology("/home/bcoste/workspace/morphology/toolbox/morph_tool/tests/simple.asc"); 
 }

@@ -14,8 +14,10 @@ namespace morphio
    Set the maximum number of warnings to be printed on screen
 **/
 void set_maximum_warnings(int n_warnings);
+void set_ignored_warning(Warning warning, bool ignore = true);
+void set_ignored_warning(const std::vector<Warning>& warning, bool ignore = true);
 
-void LBERROR(const std::string& msg);
+void LBERROR(Warning warning, const std::string& msg);
 
 namespace plugin
 {
@@ -48,6 +50,7 @@ private:
 };
 
 
+ static std::set<Warning> _ignoredWarnings;
 
 
 struct Sample
@@ -83,6 +86,11 @@ class ErrorMessages {
 public:
     ErrorMessages(){};
     ErrorMessages(const std::string& uri) : _uri(uri) {};
+
+    /**
+       Is the output of the warning ignored
+    **/
+    static bool isIgnored(Warning warning);
 
     const std::string errorLink(int lineNumber, ErrorLevel errorLevel) const {
         std::map<ErrorLevel, std::string> SEVERITY{
@@ -165,29 +173,20 @@ public:
 
     const std::string ERROR_WRONG_EXTENSION(const std::string filename) const;
 
-    std::string WARNING_WRITE_NO_SOMA() const;
-
     std::string ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1, int length1,
                                              const std::string& vec2, int length2) const;
-
-    std::string MITOCHONDRIA_WRITE_NOT_SUPPORTED() {
-        return errorMsg(0, ErrorLevel::WARNING, "This cell has mitochondria, they cannot be saved in "
-                        " ASC or SWC format. Please use H5 if you want to save them.");
-    }
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
     ////////////////////////////////////////////////////////////////////////////////
+
+    std::string WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const;
+    std::string WARNING_WRITE_NO_SOMA() const;
     std::string WARNING_NO_SOMA_FOUND() const;
-
     std::string WARNING_DISCONNECTED_NEURITE(const Sample& sample) const;
-
     std::string WARNING_WRONG_DUPLICATE(std::shared_ptr<morphio::mut::Section> current,
                                         std::shared_ptr<morphio::mut::Section> parent) const;
-
-
     const std::string WARNING_ONLY_CHILD(const DebugInfo& info, int parentId, int childId) const;
-
 private:
     std::string _uri;
 };

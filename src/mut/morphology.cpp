@@ -17,7 +17,7 @@ namespace morphio
 namespace mut
 {
 
-
+using morphio::plugin::ErrorMessages;
 Morphology::Morphology(const morphio::URI& uri, unsigned int options)
     : Morphology(morphio::Morphology(uri, options))
 {
@@ -87,8 +87,9 @@ std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> pare
     if(parentId == -1)
         _rootSections.push_back(ptr);
     else {
-        if(!_checkDuplicatePoint(_sections[parentId], _sections[id]))
-            LBERROR(_err.WARNING_WRONG_DUPLICATE(_sections[id], _sections.at(parentId)));
+      if(!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
+         !_checkDuplicatePoint(_sections[parentId], _sections[id]))
+        LBERROR(Warning::WRONG_DUPLICATE, _err.WARNING_WRONG_DUPLICATE(_sections[id], _sections.at(parentId)));
 
         _parent[id] = parentId;
         _children[parentId].push_back(ptr);
@@ -115,8 +116,9 @@ std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> pare
     if(parentId == -1)
         _rootSections.push_back(section);
     else {
-        if(!_checkDuplicatePoint(_sections[parentId], _sections[id]))
-            LBERROR(_err.WARNING_WRONG_DUPLICATE(_sections[id], _sections.at(parentId)));
+      if(!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
+         !_checkDuplicatePoint(_sections[parentId], _sections[id]))
+        LBERROR(Warning::WRONG_DUPLICATE, _err.WARNING_WRONG_DUPLICATE(_sections[id], _sections.at(parentId)));
 
         _parent[id] = parentId;
         _children[parentId].push_back(section);
@@ -151,8 +153,9 @@ std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> pare
         if(parentId == -1) {
         _rootSections.push_back(ptr);
     } else {
-        if(!_checkDuplicatePoint(_sections[parentId], _sections[id]))
-            LBERROR(_err.WARNING_WRONG_DUPLICATE(_sections[id], _sections[parentId]));
+          if(!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
+             !_checkDuplicatePoint(_sections[parentId], _sections[id]))
+            LBERROR(Warning::WRONG_DUPLICATE, _err.WARNING_WRONG_DUPLICATE(_sections[id], _sections[parentId]));
 
         _parent[id] = parentId;
         _children[parentId].push_back(ptr);
@@ -310,9 +313,10 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
         int sectionId = section->id();
         int parentOnDisk = (isRoot(section) ? 0 : newIds[parentId]);
 
-        if(!isRoot(section) &&
+        if(!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
+           !isRoot(section) &&
            !_checkDuplicatePoint(parent(section), section))
-            LBERROR(err.WARNING_WRONG_DUPLICATE(section, parent(section)));
+          LBERROR(Warning::WRONG_DUPLICATE, err.WARNING_WRONG_DUPLICATE(section, parent(section)));
 
         bool isUnifurcation = !isRoot(section) && children(parent(section)).size() == 1;
 
@@ -326,7 +330,7 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
             _appendProperties(properties._pointLevel, section->_pointProperties);
         } else {
             std::string errorMsg = err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId);
-            LBERROR(errorMsg);
+            LBERROR(Warning::ONLY_CHILD, errorMsg);
 
             properties._annotations.push_back(Property::Annotation(SINGLE_CHILD,
                                                                    parentId,

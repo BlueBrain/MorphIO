@@ -99,14 +99,14 @@ template <typename T> bool compare(const std::vector<T>& vec1, const std::vector
         return true;
 
     if(vec1.size() != vec2.size()){
-        LBERROR("Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
-    LBERROR("Error comparing "+name+", elements differ:");
+    LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
     for(int i=0;i<vec1.size();++i){
         if(vec1[i] != vec2[i]) {
-            LBERROR(std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+            LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
         }
     }
 
@@ -117,15 +117,15 @@ template <typename T> bool compare(const std::vector<T>& vec1, const std::vector
 bool compare_section_structure(const std::vector<Section::Type>& vec1, const std::vector<Section::Type>& vec2, const std::string& name, bool verbose, bool offset) {
 
         if(vec1.size() != vec2.size()){
-            LBERROR("Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+            LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
             return false;
         }
 
         for(int i=1;i<vec1.size();++i){
             if(vec1[i][0] - vec1[1][0] != vec2[i][0] - vec2[1][0] ||
                 vec1[i][1] != vec2[i][1]) {
-                LBERROR("Error comparing "+name+", elements differ:");
-                LBERROR(std::to_string(vec1[i][0] - vec1[1][0]) + ", " + std::to_string(vec1[i][1]) + " <--> " + std::to_string(vec2[i][0] - vec2[1][0]) + ", " + std::to_string(vec2[i][1]));
+                LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
+                LBERROR(Warning::UNDEFINED, std::to_string(vec1[i][0] - vec1[1][0]) + ", " + std::to_string(vec1[i][1]) + " <--> " + std::to_string(vec2[i][0] - vec2[1][0]) + ", " + std::to_string(vec2[i][1]));
                 return false;
             }
         }
@@ -135,16 +135,16 @@ bool compare_section_structure(const std::vector<Section::Type>& vec1, const std
 
 template <typename T> bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2, const std::string& name, bool verbose) {
     if(vec1.size() != vec2.size()){
-        LBERROR("Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     const float epsilon = 1e-6;
     for(int i=0;i<vec1.size();++i){
         if(std::fabs(vec1[i] - vec2[i]) > epsilon) {
-            LBERROR("Error comparing "+name+", elements differ:");
-            LBERROR(std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
-            LBERROR(std::to_string(vec2[i] - vec1[i]));
+            LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
+            LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+            LBERROR(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
             return false;
         }
     }
@@ -155,16 +155,16 @@ template <> bool compare(const morphio::range<const morphio::Point>& vec1,
                          const morphio::range<const morphio::Point>& vec2,
                          const std::string& name, bool verbose) {
     if(vec1.size() != vec2.size()){
-        LBERROR("Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     const float epsilon = 1e-6;
     for(int i=0;i<vec1.size();++i){
         if(std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
-            LBERROR("Error comparing "+name+", elements differ:");
-            LBERROR(std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
-            LBERROR(std::to_string(vec2[i] - vec1[i]));
+            LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
+            LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+            LBERROR(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
             return false;
         }
     }
@@ -176,7 +176,7 @@ template <typename T, typename U> bool compare(const std::map<T,U>& vec1, const 
     if(vec1 == vec2)
         return true;
     if(vec1.size() != vec2.size()){
-        LBERROR("Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
     }
     return false;
 }
@@ -184,7 +184,7 @@ template <typename T, typename U> bool compare(const std::map<T,U>& vec1, const 
 template <typename T> bool compare(const T& el1, const T& el2, const std::string& name, bool verbose) {
     if(el1 == el2)
         return true;
-    LBERROR(name + " differs") ;
+    LBERROR(Warning::UNDEFINED, name + " differs") ;
     return false;
 }
 

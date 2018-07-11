@@ -17,6 +17,21 @@ enum Option {
     NO_DUPLICATES   = 0x04
 };
 
+/**
+   This enum should be kept in sync with the warnings
+   defined in ErrorMessages.
+   It is used to define which warnings are ignored by the user
+**/
+ enum Warning {
+   UNDEFINED,
+   MITOCHONDRIA_WRITE_NOT_SUPPORTED,
+   WRITE_NO_SOMA,
+   NO_SOMA_FOUND,
+   DISCONNECTED_NEURITE,
+   WRONG_DUPLICATE,
+   ONLY_CHILD,
+ };
+
 
 /** The supported versions for morphology files. */
 enum MorphologyVersion

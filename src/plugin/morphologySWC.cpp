@@ -109,9 +109,10 @@ public:
             LBTHROW(morphio::RawDataError(err.ERROR_SELF_PARENT(sample)));
     }
 
-    void raiseIfDisconnectedNeurite(const Sample& sample) {
+    void warnIfDisconnectedNeurite(const Sample& sample) {
         if(sample.parentId == SWC_UNDEFINED_PARENT && sample.type != SECTION_SOMA)
-            LBERROR(err.WARNING_DISCONNECTED_NEURITE(sample));
+          LBERROR(Warning::DISCONNECTED_NEURITE,
+                  err.WARNING_DISCONNECTED_NEURITE(sample));
     }
 
     void checkSoma() {
@@ -121,7 +122,8 @@ public:
             LBTHROW(morphio::SomaError(err.ERROR_MULTIPLE_SOMATA(somata)));
 
         if(somata.size() == 0)
-            LBERROR(err.WARNING_NO_SOMA_FOUND());
+          LBERROR(Warning::NO_SOMA_FOUND,
+                  err.WARNING_NO_SOMA_FOUND());
     }
 
     void raiseIfNoParent(const Sample& sample) {
@@ -173,7 +175,7 @@ public:
         raiseIfSelfParent(sample);
         raiseIfBrokenSoma(sample);
         raiseIfNoParent(sample);
-        raiseIfDisconnectedNeurite(sample);
+        warnIfDisconnectedNeurite(sample);
     }
 
     SomaType somaType() {
