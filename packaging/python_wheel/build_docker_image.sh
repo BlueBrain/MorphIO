@@ -2,10 +2,10 @@
 set -o xtrace
 BASE=$(git rev-parse --show-toplevel)
 
-if [ "$(docker images | grep morphio_wheel | wc -l)" != "0" ]; then
-    echo "Image already exist. Not rebuilding it."
+# if [ "$(docker images | grep morphio_wheel | wc -l)" != "0" ]; then
+#     echo "Image already exist. Not rebuilding it."
 
-else
+# else
     echo "docker image morphio_wheel not found, building it..."
     docker build -t bbpdocker.epfl.ch/morphio_wheel \
            --build-arg http_proxy=${HTTP_PROXY-$http_proxy} \
@@ -14,4 +14,4 @@ else
 
     ID=$(tail -1 build.log | awk '{print $3;}')
     upload2repo -t docker -i $ID -g latest -n morphio_wheel
-fi
+# fi
