@@ -13,7 +13,7 @@
 #include <morphio/enums.h>
 #include <morphio/exceptions.h>
 #include <morphio/vector_types.h>
-#include <gsl/span>
+#include <gsl/gsl>
 
 #ifdef __GNUC__
 #define BRAIN_UNUSED __attribute__((unused))

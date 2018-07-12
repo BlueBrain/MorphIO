@@ -1,7 +1,6 @@
 #include <sstream>
 
 #include <morphio/vector_types.h>
-#include <gsl/span>
 #include <math.h>
 #include <morphio/shared_utils.tpp>
 
@@ -115,7 +114,7 @@ const Point centerOfGravity(const T& points)
     }
     return Point({x / size, y / size, z / size});
 }
-template const Point centerOfGravity(const gsl::span<const Point>& points);
+template const Point centerOfGravity(const range<const Point>& points);
 template const Point centerOfGravity(const std::vector<Point>& points);
 
 template <typename T>
