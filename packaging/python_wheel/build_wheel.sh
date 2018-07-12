@@ -13,7 +13,9 @@ else
     export CXX=/toolchain/bin/c++
     export LD_LIBRARY_PATH=/toolchain/lib:${LD_LIBRARY_PATH}
     export AUDIT_CMD="auditwheel repair -w $WHEELHOUSE"
-    export PYTHON_VERSIONS="cp35-cp35m cp36-cp36m cp27-cp27mu cp27-cp27m"
+    # cp35-cp35m is ignored while https://github.com/pybind/pybind11/issues/314
+    # is not solved
+    export PYTHON_VERSIONS="cp36-cp36m cp27-cp27mu cp27-cp27m"
 fi
 
 rm -rf ${MORPHIO_BASE}/envs/
