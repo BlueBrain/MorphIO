@@ -68,9 +68,9 @@ Alternatively, the NRN simulator way of ordering section can be used by specifyi
 
 # Format specific specifications
 - H5:
-[See here](https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html)
+[See the Human Brain Project page](https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html)
 - ASC:
-[See here](https://github.com/BlueBrain/MorphIO/blob/master/doc/specification_neurolucida.md)
+[doc/specification\_neurolucida.md](https://github.com/BlueBrain/MorphIO/blob/master/doc/specification_neurolucida.md)
 - SWC:
 The file format specification if available on [http://www.neuronland.org](http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html).
 Here we will discuss, what does MorphIO support and does not.
