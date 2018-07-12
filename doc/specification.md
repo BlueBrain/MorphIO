@@ -74,8 +74,16 @@ Alternatively, the NRN simulator way of ordering section can be used by specifyi
 - SWC:
 The file format specification if available on [http://www.neuronland.org](http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html).
 Here we will discuss, what does MorphIO support and does not.
-SWC IDs ordering: there is no special constraint about the IDs as long as the parent ID of each points are defined. IDs don't need to be consecutive nor sorted, and the soma does not need to be the first point.
 
+SWC IDs ordering: there is no special constraint about the IDs as long as the parent ID of each points is defined. IDs don't need to be consecutive nor sorted, and the soma does not need to be the first point.
+
+Soma format is determined according to the number of soma points:
+- one point -> SOMA\_SINGLE\_POINT
+- two points -> SOMA\_UNDEFINED
+- three points:
+    - layout: one soma point with two children -> SOMA\_NEUROMORPHO\_THREE\_POINT\_CYLINDERS
+    - else -> SOMA\_CYLINDERS
+- more than three points -> SOMA\_CYLINDERS
 
 
 [^footnote] If this feature seems crucial to you, feel free to create an issue on [MorphIO issue tracker](https://github.com/BlueBrain/MorphIO/issues).

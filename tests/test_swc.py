@@ -5,10 +5,10 @@ from nose import tools as nt
 from nose.tools import assert_equal, assert_raises
 from numpy.testing import assert_array_equal
 
-from morphio import (Morphology, RawDataError, SectionType, SomaError,
+from morphio import (Morphology, RawDataError, SectionType, SomaError, SomaType,
                      ostream_redirect, set_maximum_warnings)
-from utils import (_test_swc_exception, assert_substring, captured_output,
-                   strip_color_codes, tmp_swc_file)
+from utils import (_test_swc_exception, assert_substring, assert_string_equal, captured_output,
+                   strip_color_codes, tmp_swc_file, strip_all)
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -197,6 +197,84 @@ def test_simple_reversed():
                         [-5, -4, 0]])
 
 
+def test_soma_type():
+    '''The ordering of IDs is not required'''
+    # 1 point soma
+    with tmp_swc_file('''1 1 0 0 0 3.0 -1''') as tmp_file:
+        assert_equal(Morphology(tmp_file.name).soma_type,
+                     SomaType.SOMA_SINGLE_POINT)
+
+    # 2 point soma
+    with tmp_swc_file('''1 1 0 0 0 3.0 -1
+                         2 1 0 0 0 3.0  1''') as tmp_file:
+        assert_equal(Morphology(tmp_file.name).soma_type,
+                     SomaType.SOMA_UNDEFINED)
+
+    # > 3 points soma
+    with tmp_swc_file('''1 1 0 0 0 3.0 -1
+                         2 1 0 0 0 3.0  1
+                         3 1 0 0 0 3.0  2
+                         4 1 0 0 0 3.0  3
+                         5 1 0 0 0 3.0  4''') as tmp_file:
+        assert_equal(Morphology(tmp_file.name).soma_type,
+                     SomaType.SOMA_CYLINDERS)
+
+    # 3 points soma can be of type SOMA_CYLINDERS or SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
+    # depending on the point layout
+
+    # SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS are characterized by
+    # one soma point with 2 children
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+
+            with tmp_swc_file('''1 1 0  0 0 3.0 -1
+                                 2 1 1 -3 0 3.0  1
+                                 3 1 0  0 0 3.0  1 # PID is 1''') as tmp_file:
+                assert_equal(Morphology(tmp_file.name).soma_type,
+                             SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+                assert_string_equal(
+                    err.getvalue(),
+                    '''The soma does not conform the three point soma spec
+                       The only valid neuro-morpho soma is:
+                       1 1 x   y   z r -1
+                       2 1 x (y-r) z r  1
+                       3 1 x (y+r) z r  1
+
+                       Got:
+                       1 1 0 0 0 3 -1
+                       2 1 1.000000 (exp. 0.000000) -3.000000 0.000000 3.000000 1
+                       3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1
+                       ''')
+
+# If this configuration is not respected -> SOMA_CYLINDERS
+    with tmp_swc_file('''1 1 0 0 0 3.0 -1
+                         2 1 0 0 0 3.0  1
+                         3 1 0 0 0 3.0  2 # PID is 2''') as tmp_file:
+        assert_equal(Morphology(tmp_file.name).soma_type,
+                     SomaType.SOMA_CYLINDERS)
+
+
+def test_read_weird_ids():
+    '''The ordering of IDs is not required'''
+    with tmp_swc_file('''1 1 0 0 0 3.0 -1
+                         2 3 0 0 2 0.5 1
+                         3 3 0 0 3 0.5 2
+                         4 3 0 0 4 0.5 3
+                         5 3 0 0 5 0.5 4''') as tmp_file:
+
+        normal = Morphology(tmp_file.name)
+
+    with tmp_swc_file('''10000 3 0 0 5 0.5 100 # neurite 4th point
+                         3 3 0 0 3 0.5 47      # neurite 2nd point
+                         10 1 0 0 0 3.0 -1     # soma
+                         47 3 0 0 2 0.5 10     # neurite 1st point
+                         100 3 0 0 4 0.5 3     # neurite 3rd point
+                         ''') as tmp_file:
+        weird = Morphology(tmp_file.name)
+
+    assert_equal(normal, weird)
+
+
 def test_equality():
     filename = os.path.join(_path, 'simple.swc')
     nt.ok_(not (Morphology(filename) is Morphology(filename)))
@@ -223,23 +301,3 @@ Found a disconnected neurite.
 Neurites are not supposed to have parentId: -1
 (although this is normal if this neuron has no soma)''',
                 strip_color_codes(err.getvalue().strip()))
-
-
-def test_read_weird_ids():
-    with tmp_swc_file('''1 1 0 0 0 3.0 -1
-                         2 3 0 0 2 0.5 1
-                         3 3 0 0 3 0.5 2
-                         4 3 0 0 4 0.5 3
-                         5 3 0 0 5 0.5 4''') as tmp_file:
-
-        normal = Morphology(tmp_file.name)
-
-    with tmp_swc_file('''10000 3 0 0 5 0.5 100
-                         3 3 0 0 3 0.5 47
-                         10 1 0 0 0 3.0 -1
-                         47 3 0 0 2 0.5 10
-                         100 3 0 0 4 0.5 3
-                         ''') as tmp_file:
-        weird = Morphology(tmp_file.name)
-
-    assert_equal(normal, weird)

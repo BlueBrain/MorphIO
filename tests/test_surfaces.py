@@ -1,9 +1,9 @@
 import os
 import numpy as np
 from numpy.testing import assert_array_equal
-from nose.tools import assert_equal, assert_almost_equal
+from nose.tools import assert_equal, assert_almost_equal, assert_raises
 
-from morphio import Morphology as ImmutMorphology
+from morphio import Morphology as ImmutMorphology, SomaError
 from morphio.mut import Morphology
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -53,10 +53,8 @@ def test_contour_surface():
                         2 * np.pi * 40 * 3, places=2)
 
     # SWC single frustum
-    assert_almost_equal(ImmutMorphology(os.path.join(_path, "soma_single_frustum.swc")).soma.surface,
-                        1201.428168331057, places=3)
-    assert_almost_equal(Morphology(os.path.join(_path, "soma_single_frustum.swc")).soma.surface,
-                        1201.428168331057, places=3)
+    with assert_raises(SomaError):
+        _ = Morphology(os.path.join(_path, "soma_single_frustum.swc")).soma.surface
 
     # SWC multiple frustums
     assert_almost_equal(ImmutMorphology(os.path.join(_path, "soma_multiple_frustums.swc")).soma.surface,

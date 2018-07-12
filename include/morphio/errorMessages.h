@@ -187,6 +187,11 @@ public:
     std::string WARNING_WRONG_DUPLICATE(std::shared_ptr<morphio::mut::Section> current,
                                         std::shared_ptr<morphio::mut::Section> parent) const;
     const std::string WARNING_ONLY_CHILD(const DebugInfo& info, int parentId, int childId) const;
+
+    const std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& root,
+                                                         const Sample& child1,
+                                                         const Sample& child2);
+
 private:
     std::string _uri;
 };

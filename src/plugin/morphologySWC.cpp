@@ -178,6 +178,27 @@ public:
         warnIfDisconnectedNeurite(sample);
     }
 
+    void _checkNeuroMorphoSoma(const Sample& root, const std::vector<Sample> &children) {
+        // The only valid neuro-morpho soma is:
+        // 1 1 x   y   z r -1
+        // 2 1 x (y-r) z r  1
+        // 3 1 x (y+r) z r  1
+
+        float x = root.point[0],  y = root.point[1],  z = root.point[2], d = root.diameter, r = root.diameter / 2.;
+        const Sample& child1 = children[0];
+        const Sample& child2 = children[1];
+
+        if(child1.point[0] != x ||
+           child2.point[0] != x ||
+           child1.point[1] != y-r ||
+           child2.point[1] != y+r ||
+           child1.point[2] != z ||
+           child2.point[2] != z ||
+           child1.diameter != d ||
+           child2.diameter != d)
+            err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(root, child1, child2);
+    }
+
     SomaType somaType() {
         switch(morph.soma()->points().size()) {
         case 0:
@@ -188,23 +209,31 @@ public:
         {
             return SOMA_SINGLE_POINT;
         }
-
+        case 2:
+        {
+            return SOMA_UNDEFINED;
+        }
         // NeuroMorpho format is characterized by a 3 points soma
         // with a bifurcation at soma root
         case 3:
         {
             uint32_t somaRootId = children[-1][0];
             auto &somaChildren = children[somaRootId];
-            uint32_t nSomaChildren = std::count_if(
-                somaChildren.begin(), somaChildren.end(),
-                [this](uint32_t id){return this->samples[id].type == SECTION_SOMA;});
 
-            if(nSomaChildren == 2) {
+            std::vector<Sample> children_soma_points;
+            for(auto child: somaChildren) {
+                if(this->samples[child].type == SECTION_SOMA)
+                    children_soma_points.push_back(this->samples[child]);
+            }
+
+            if(somaChildren.size() == 2) {
                 //  NeuroMorpho is the main provider of morphologies, but they
                 //  with SWC as their default file format: they convert all
                 //  uploads to SWC.  In the process of conversion, they turn all
                 //  somas into their custom 'Three-point soma representation':
                 //   http://neuromorpho.org/SomaFormat.html
+                _checkNeuroMorphoSoma(this->samples[somaRootId], children_soma_points);
+
                 return SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
             }
             return SOMA_CYLINDERS;

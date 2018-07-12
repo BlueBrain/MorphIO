@@ -1,4 +1,6 @@
+#include <cmath>
 #include <morphio/errorMessages.h>
+
 
 namespace morphio
 {
@@ -116,6 +118,17 @@ const std::string ErrorMessages::ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std:
 const std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(int mitoParentId) const {
     return "While trying to append new mitochondria section.\n"
         "Mitochondrial parent section: " + std::to_string(mitoParentId) + " does not exist.";
+}
+
+/**
+   Return val1 and highlight it with some color if val1 != val2
+**/
+const std::string _col(float val1, float val2) {
+    bool is_ok = std::fabs(val1 - val2) < 1e-6;
+    if(is_ok)
+        return std::to_string(val1);
+    return  "\e[1;33m" + std::to_string(val1) + " (exp. " + std::to_string(val2) + ")\e[0m";
+
 }
 
 
@@ -264,6 +277,32 @@ const std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info, int p
     return "\nSection: " + std::to_string(childId) + childMsg + " is the only child of " +
         "section: " + std::to_string(parentId) + parentMsg +
         "\nIt will be merged with the parent section";
+}
+
+const std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& root,
+                                                                    const Sample& child1,
+                                                                    const Sample& child2) {
+    float x = root.point[0],  y = root.point[1],  z = root.point[2], d = root.diameter, r = root.diameter / 2.;
+    std::cerr << "The soma does not conform the three point soma spec" << std::endl;
+    std::cerr <<"The only valid neuro-morpho soma is:" << std::endl;
+    std::cerr <<"1 1 x   y   z r -1" << std::endl;
+    std::cerr <<"2 1 x (y-r) z r  1" << std::endl;
+    std::cerr <<"3 1 x (y+r) z r  1\n" << std::endl;
+
+    std::cerr << "Got:" << std::endl;
+    std::cerr << "1 1 " << x << " " << y << " " << z << " " << r << " -1" << std::endl;
+    std::cerr << "2 1 "
+              << _col(child1.point[0], x) << " "
+              << _col(child1.point[1], y-r) << " "
+              << _col(child1.point[2], z) << " "
+              << _col(child1.diameter/2., r) << " 1" << std::endl;
+    std::cerr << "3 1 "
+              << _col(child2.point[0], x) << " "
+              << _col(child2.point[1], y+r) << " "
+              << _col(child2.point[2], z) << " "
+              << _col(child2.diameter/2., r) << " 1" << std::endl;
+
+
 }
 
 
