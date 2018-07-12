@@ -37,13 +37,15 @@ MorphIO requires the following dependencies:
 - cmake >= 3.2
 - libhdf5-dev
 
-Linux:
+Debian:
 ```shell
 sudo apt install cmake libhdf5-dev
 ```
+Red Hat:
+```shell
+sudo yum install cmake3.x86_64 hdf5-devel.x86_64
+```
 Max OS:
-##### Mac OS
-
 ```shell
 brew install hdf5 cmake
 ```

@@ -37,7 +37,8 @@ build_morphio()
     which pip
     pip install --upgrade pip
     pip install cython==0.28
-    $PYTHON setup.py bdist_wheel
+    # $PYTHON setup.py bdist_wheel
+    "${PYBIN}/pip" wheel ${MORPHIO_BASE} -w ${WHEELHOUSE}
     ls -lrt build/bdist.linux-x86_64/wheel
     git status
     ${AUDIT_CMD} ${MORPHIO_BASE}/dist/*${version}*
