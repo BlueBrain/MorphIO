@@ -16,7 +16,7 @@ else
     export PYTHON_VERSIONS="cp35-cp35m cp36-cp36m cp27-cp27mu cp27-cp27m"
 fi
 
-
+rm -rf ${MORPHIO_BASE}/envs/
 build_morphio()
 {
     if [ "$(uname)" == "Darwin" ]; then
@@ -25,17 +25,23 @@ build_morphio()
         # in manylinux1 docker image
         local PYTHON=/opt/python/$version/bin/python
     fi
-    cd ${MORPHIO_BASE}
-    ls -alR build || true
-    rm -rf build dist morphio.egg-info bin
-    ls -alR build || true
 
+    cd ${MORPHIO_BASE}
+    rm -rf build dist morphio.egg-info bin
+
+    env_name=${MORPHIO_BASE}/envs/env-${version}
+    $(dirname $PYTHON)/pyvenv ${env_name}
+    source ${env_name}/bin/activate
+    which pip
+    pip install --upgrade pip
+    pip install cython==0.28
     $PYTHON setup.py bdist_wheel
     ls -lrt build/bdist.linux-x86_64/wheel
     git status
     ${AUDIT_CMD} ${MORPHIO_BASE}/dist/*${version}*
     rm -rf build dist morphio.egg-info bin
     git status
+    deactivate
 }
 
 rm -rf ${MORPHIO_BASE}/bin

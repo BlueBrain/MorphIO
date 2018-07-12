@@ -1,6 +1,7 @@
 FROM quay.io/pypa/manylinux1_x86_64
 RUN yum install -y zlib-devel bzip2-devel flex
 
+
 ############
 # CMake
 ############
@@ -33,3 +34,7 @@ RUN rm -rf hdf5-1.8.17.tar.bz2 hdf5-1.8.17
 # /nfs4/bbp.epfl.ch/user/bcoste/public/gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2
 ############
 RUN curl -OL https://github.com/Noctem/pogeo-toolchain/releases/download/v1.3/gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2 && tar -xjvf gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2
+
+RUN useradd -ms /bin/bash wheel_user
+USER wheel_user
+WORKDIR /home/wheel_user
