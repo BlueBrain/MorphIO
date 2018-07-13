@@ -41,15 +41,14 @@ target_include_directories(morphio_obj
   PUBLIC
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/../include
-   $<TARGET_PROPERTY:GSL,INTERFACE_INCLUDE_DIRECTORIES>
+   $<TARGET_PROPERTY:gsl-lite,INTERFACE_INCLUDE_DIRECTORIES>
    $<TARGET_PROPERTY:HighFive,INTERFACE_INCLUDE_DIRECTORIES>
-   $<TARGET_PROPERTY:lexertl14,INTERFACE_INCLUDE_DIRECTORIES>
-   $<TARGET_PROPERTY:eigen,INTERFACE_INCLUDE_DIRECTORIES>
+   $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
   )
 
 set_target_properties(morphio_obj
   PROPERTIES
-  CXX_STANDARD 14
+  CXX_STANDARD 11
   CXX_STANDARD_REQUIRED YES
   CXX_EXTENSIONS NO
   )
@@ -58,8 +57,8 @@ add_library(morphio_static STATIC $<TARGET_OBJECTS:morphio_obj>)
 add_library(morphio_shared SHARED $<TARGET_OBJECTS:morphio_obj>)
 set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio")
 
-target_link_libraries(morphio_static PUBLIC GSL PRIVATE HighFive lexertl14)
-target_link_libraries(morphio_shared PUBLIC GSL PRIVATE HighFive lexertl14)
+target_link_libraries(morphio_static PUBLIC gsl-lite PRIVATE HighFive lexertl)
+target_link_libraries(morphio_shared PUBLIC gsl-lite PRIVATE HighFive lexertl)
 
 install(
   # DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
