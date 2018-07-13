@@ -11,7 +11,7 @@ target_include_directories(pybind11 INTERFACE
     pybind11)
 
 add_subdirectory(GSL_LITE)
-target_include_directories(GSL_LITE INTERFACE)
+target_include_directories(gsl-lite INTERFACE)
 
 add_library(lexertl INTERFACE)
 target_include_directories(lexertl INTERFACE lexertl)
