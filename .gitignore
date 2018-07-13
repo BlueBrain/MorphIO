@@ -1,10 +1,6 @@
 # Python wheels
 *.whl
 
-*.asc
-*.swc
-*.h5
-
 bin/
 src/version.cpp
 morphio.egg-info/

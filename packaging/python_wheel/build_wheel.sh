@@ -31,20 +31,10 @@ build_morphio()
     cd ${MORPHIO_BASE}
     rm -rf build dist morphio.egg-info bin
 
-    env_name=${MORPHIO_BASE}/envs/env-${version}
-    $(dirname $PYTHON)/pyvenv ${env_name}
-    source ${env_name}/bin/activate
-    which pip
-    pip install --upgrade pip
-    pip install cython==0.28
-    # $PYTHON setup.py bdist_wheel
-    "${PYBIN}/pip" wheel ${MORPHIO_BASE} -w ${WHEELHOUSE}
-    ls -lrt build/bdist.linux-x86_64/wheel
-    git status
+    $PYTHON setup.py bdist_wheel
+    # "${PYBIN}/pip" wheel ${MORPHIO_BASE} -w ${WHEELHOUSE}
     ${AUDIT_CMD} ${MORPHIO_BASE}/dist/*${version}*
     rm -rf build dist morphio.egg-info bin
-    git status
-    deactivate
 }
 
 rm -rf ${MORPHIO_BASE}/bin

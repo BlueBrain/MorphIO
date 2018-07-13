@@ -86,7 +86,7 @@ setup(
     author_email='bbp-ou-nse@groupes.epfl.ch',
     description='A hybrid Python/C++ test project',
     long_description='',
-    install_requires=['numpy>=1.14.1', 'cython>=0.28'],
+    install_requires=['numpy>=1.14.1'],
     url='https://github.com/BlueBrain/MorphIO/',
     ext_modules=[CMakeExtension('morphio')],
     cmdclass=dict(build_ext=CMakeBuild),
