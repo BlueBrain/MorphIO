@@ -33,9 +33,10 @@
 ## Installation
 
 ### Dependencies
-MorphIO requires the following dependencies:
+To build MorphIO from sources, the following dependencies are required:
 - cmake >= 3.2
 - libhdf5-dev
+- A C++11 compiler
 
 Debian:
 ```shell
@@ -48,6 +49,11 @@ sudo yum install cmake3.x86_64 hdf5-devel.x86_64
 Max OS:
 ```shell
 brew install hdf5 cmake
+```
+
+BBP Nix:
+```shell
+module load nix/cmake/3.9.6
 ```
 
 ### Installation instructions

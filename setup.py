@@ -1,15 +1,15 @@
 import os
+import platform
 import re
+import subprocess
 import sys
 import sysconfig
-import platform
-import subprocess
-
 from distutils.version import LooseVersion
-from setuptools import setup, Extension, find_packages
+from shutil import copyfile, copymode
+
+from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext
 from setuptools.command.test import test as TestCommand
-from shutil import copyfile, copymode
 
 
 class CMakeExtension(Extension):
@@ -65,7 +65,8 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         try:
-            proc = subprocess.Popen("echo $CXX", shell=True, stdout=subprocess.PIPE)
+            proc = subprocess.Popen(
+                "echo $CXX", shell=True, stdout=subprocess.PIPE)
             output = subprocess.check_call([cmake, ext.sourcedir] + cmake_args,
                                            cwd=self.build_temp, env=env)
             output = subprocess.check_call([cmake, '--build', '.'] + build_args,
@@ -80,15 +81,22 @@ with open('VERSION') as versionf:
 
 
 setup(
-    name='morphio',
+    name='MorphIO',
     version=version,
-    author='EPFL - Blue Brain Project',
+    author='NSE Team - Blue Brain Project',
     author_email='bbp-ou-nse@groupes.epfl.ch',
-    description='A hybrid Python/C++ test project',
+    description='A neuron morphology IO library',
     long_description='',
     install_requires=['numpy>=1.14.1'],
     url='https://github.com/BlueBrain/MorphIO/',
     ext_modules=[CMakeExtension('morphio')],
     cmdclass=dict(build_ext=CMakeBuild),
+    license="BBP-internal-confidential",
+    keywords=('computational neuroscience',
+              'morphology',
+              'neuron'
+              'neurolucida'
+              'neuromorphology'),
     zip_safe=False,
+    classifiers=[]
 )

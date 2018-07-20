@@ -3,8 +3,12 @@ This page aims at describing what MorphIO supports and does not.
 # Formats:
 MorphIO supports ASC (aka Neurolucida), H5 and SWC extensions
 
-# Soma formats (See also: http://neuromorpho.org/SomaFormat.html):
+# Soma formats:
+
+(For more information, see: [Soma Format](http://neuromorpho.org/SomaFormat.html))
+
 MorphIO recognizes several kinds of soma format. The soma type is determined according to the morphology type and the number of data points:
+
 ## Undefined soma SOMA\_UNDEFINED
 MorphIO can read correctly a file without a soma. The latter will be of type "undefined".
 Additionnaly, a soma made of 2 points will be of type "undefined" as well. Indeed a 2-points soma does not make any sense in any of the other soma formats.
@@ -64,7 +68,13 @@ When a section has a single child section (aka unifurcation), the child section 
 
 # Section ordering
 In MorphIO each section is identified by an ID. By default, the section IDs will correspond to the order of section appearance while performing a depth-first traversal on every neurites. The neurite order is the order of appearance in the file.
-Alternatively, the NRN simulator way of ordering section can be used by specifying the flag `morphio::Option::NRN_ID` when opening the file. In the NRN iteration, soma sections are placed first and then neurites are sorted by type: axon -> basal -> apical
+Alternatively, the NRN simulator way of ordering section can be used by specifying the flag `morphio::Option::NRN_ID` when opening the file.
+In the NRN simulator, the soma which is considered as a section (contrary to MorphIO) is placed first and then neurites are sorted according to their type.
+The final order is the following:
+0. Soma
+1. Axon
+2. Basal
+3. Apical
 
 # Format specific specifications
 - H5:
