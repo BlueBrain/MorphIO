@@ -15,7 +15,7 @@ def test_v1():
     n = Morphology(os.path.join(H5V1_PATH, 'Neuron.h5'))
     nt.assert_equal(n.version, MORPHOLOGY_VERSION_H5_1)
 
-    nt.assert_equal(len(n.sections), 85)
+    nt.assert_equal(len(list(n.iter())), 84)
     nt.assert_equal(len(n.points), 927)
     assert_array_equal(n.points[:10],
                        [[0.0, 0.0, 0.0],
@@ -34,5 +34,5 @@ def test_v2():
     n = Morphology(os.path.join(H5V2_PATH, 'Neuron.h5'))
     nt.assert_equal(n.version, MORPHOLOGY_VERSION_H5_2)
 
-    nt.assert_equal(len(n.sections), 86)
+    nt.assert_equal(len(list(n.iter())), 85)
     nt.assert_equal(len(n.points), 927)

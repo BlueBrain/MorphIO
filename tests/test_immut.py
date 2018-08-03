@@ -4,7 +4,7 @@ from itertools import combinations
 from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
 
-from morphio import Morphology, upstream
+from morphio import Morphology, upstream, IterType
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -31,7 +31,22 @@ def test_is_root():
 
 
 def test_iter():
+    neuron = Morphology(os.path.join(_path, "iterators.asc"))
+    root = neuron.root_sections[0]
+    assert_array_equal([section.id for section in root.iter(IterType.depth_first)],
+                       [1,2,3,4,5,6,7])
+    assert_array_equal([section.id for section in root.iter(IterType.breadth_first)],
+                       [1, 2, 5, 3, 4, 6, 7])
+
+    assert_array_equal([section.id for section in neuron.iter(IterType.breadth_first)],
+                       [1, 2, 5, 3, 4, 6, 7, 8, 9, 10])
+
+
     for cell in CELLS.values():
+        assert_array_equal([section.id for section in cell.iter()],
+                           [1, 2, 3, 4, 5, 6])
+        assert_array_equal([section.id for section in cell.iter(IterType.depth_first)],
+                           [1, 2, 3, 4, 5, 6])
         assert_array_equal([section.points for section in
                             cell.root_sections[0].children[0].iter(upstream)],
                            [[[0.,  5.,  0.],

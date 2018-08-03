@@ -40,7 +40,7 @@ Iterator<T>& Iterator<T>::operator++()
 {
     const auto& section = *(*this);
     container.pop();
-    auto& children = _morphology.children(section);
+    auto& children = section->children();
     for (auto it = children.rbegin(); it != children.rend(); ++it)
         container.push(*it);
     return *this;
@@ -91,10 +91,10 @@ template <>
 upstream_iterator& upstream_iterator::operator++()
 {
     const auto& section = *(*this);
-    if (_morphology.isRoot(section))
+    if (section->isRoot())
         container.pop_back();
     else
-        container[0] = _morphology.parent(section);
+        container[0] = section->parent();
     return *this;
 }
 

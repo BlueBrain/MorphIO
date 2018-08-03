@@ -116,14 +116,14 @@ def test_write_merge_only_child():
                                        [[0, 0, 0],
                                         [0, 5, 0],
                                         [0, 6, 0]])
-                    assert_equal(len(read.children(root)), 2)
+                    assert_equal(len(root.children), 2)
                     assert_equal(err.getvalue().strip(),
                                  'Section: 2 is the only child of section: 1\nIt will be merged with the parent section')
 
-                    assert_array_equal(read.children(root)[0].points,
+                    assert_array_equal(root.children[0].points,
                                        [[0, 6, 0], [0, 7, 0]])
 
-                    assert_array_equal(read.children(root)[1].points,
+                    assert_array_equal(root.children[1].points,
                                        [[0, 6, 0], [4, 5, 6]])
 
 

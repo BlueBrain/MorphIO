@@ -88,9 +88,14 @@ const std::string ErrorMessages::ERROR_MISSING_PARENT(const Sample& sample) cons
                     std::to_string(sample.parentId));
 }
 
-std::string ErrorMessages::ERROR_SOMA_BIFURCATION(const Sample& sample) const {
-    return errorMsg(sample.lineNumber, ErrorLevel::ERROR,
-                    "Found soma bifurcation");
+std::string ErrorMessages::ERROR_SOMA_BIFURCATION(const Sample& sample,
+                                                  const std::vector<Sample>& children) const {
+
+    std::string msg = errorMsg(sample.lineNumber, ErrorLevel::ERROR, "Found soma bifurcation\n");
+    msg += "The following children have been found:";
+    for(auto child: children)
+        msg += errorMsg(child.lineNumber, ErrorLevel::WARNING, "");
+    return msg;
 }
 
 std::string ErrorMessages::ERROR_SOMA_WITH_NEURITE_PARENT(const Sample& sample) const {

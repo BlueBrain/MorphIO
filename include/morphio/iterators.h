@@ -13,11 +13,14 @@ template <typename T>
 class Iterator
 {
     friend class Section;
+    friend class Morphology;
+
     T container;
 
+    Iterator();
 public:
     Iterator(const Section& section);
-    Iterator();
+    Iterator(const Morphology& morphology);
     bool operator==(Iterator other) const;
     bool operator!=(Iterator other) const;
     Section operator*() const;

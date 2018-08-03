@@ -28,5 +28,11 @@ using namespace std;
 
 int main()
 {
-  morphio::Morphology("/home/bcoste/workspace/morphology/toolbox/morph_tool/tests/simple.asc");
+    morphio::Morphology m("/home/bcoste/workspace/morphology/io/tests/data/simple.asc");
+
+    auto roots = m.rootSections();
+
+    auto first_root = roots[0];
+    for(auto it = m.depth_begin(); it!=m.depth_end(); ++it)
+        std::cout << "(*it): " << (*it) << std::endl;
 }

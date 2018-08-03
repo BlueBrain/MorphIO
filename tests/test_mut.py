@@ -96,16 +96,19 @@ def test_single_neurite():
 
 def test_child_section():
     m = Morphology()
-    section_id = m.append_section(None,
+    section = m.append_section(None,
                                   PointLevel([[1, 2, 3]], [2], [20]),
                                   SectionType.axon)
 
-    m.append_section(section_id,
+    ok_(section.is_root)
+
+    m.append_section(section,
                      PointLevel([[1, 2, 3], [4, 5, 6]],
                                 [2, 3],
                                 [20, 30]))
 
-    children = m.children(m.root_sections[0])
+    children = m.root_sections[0].children
+
     assert_equal(len(children),
                  1)
 
@@ -168,28 +171,25 @@ def test_build_read_only():
                                 [20, 20]))
 
     immutable_morphology = ImmutableMorphology(m)
-    assert_equal(len(immutable_morphology.sections), 4)
+    sections = list(immutable_morphology.iter())
+    assert_equal(len(sections), 3)
 
-    assert_array_equal(immutable_morphology.sections[0].points,
+    assert_array_equal(immutable_morphology.soma.points,
                        [[-1, - 2, -3]])
-    assert_array_equal(immutable_morphology.sections[0].diameters,
+    assert_array_equal(immutable_morphology.soma.diameters,
                        [-4])
 
-    # 0 is a fill value for soma "perimeter" property (which is undefined)
-    assert_array_equal(immutable_morphology.sections[0].perimeters,
-                       [0])
-
-    assert_array_equal(immutable_morphology.sections[1].points,
+    assert_array_equal(immutable_morphology.section(1).points,
                        [[1, 2, 3], [4, 5, 6]])
-    assert_array_equal(immutable_morphology.sections[1].diameters,
+    assert_array_equal(immutable_morphology.section(1).diameters,
                        [2, 2])
-    assert_array_equal(immutable_morphology.sections[1].perimeters,
+    assert_array_equal(immutable_morphology.section(1).perimeters,
                        [20, 20])
 
-    assert_equal(len(immutable_morphology.sections[1].children),
+    assert_equal(len(immutable_morphology.section(1).children),
                  2)
 
-    child = immutable_morphology.sections[1].children[0]
+    child = immutable_morphology.section(1).children[0]
     assert_array_equal(child.points,
                        [[4, 5, 6], [7, 8, 9]])
     assert_array_equal(child.diameters,
@@ -197,7 +197,7 @@ def test_build_read_only():
     assert_array_equal(child.perimeters,
                        [20, 30])
 
-    same_child = immutable_morphology.sections[2]
+    same_child = immutable_morphology.section(2)
     assert_array_equal(same_child.points,
                        [[4, 5, 6], [7, 8, 9]])
     assert_array_equal(same_child.diameters,
@@ -250,7 +250,7 @@ def test_sections_are_not_dereferenced():
 
 def test_append_mutable_section():
     morpho = Morphology()
-    second_children_first_root = SIMPLE.children(SIMPLE.root_sections[0])[1]
+    second_children_first_root = SIMPLE.root_sections[0].children[1]
 
     morpho.append_section(None, second_children_first_root)
     assert_equal(len(morpho.root_sections), 1)

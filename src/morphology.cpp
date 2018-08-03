@@ -181,6 +181,10 @@ const std::vector<Property::Annotation> Morphology::annotations() const {
 
 const Section Morphology::section(const uint32_t& id) const
 {
+    if(id == 0)
+        throw RawDataError("Morphology::section(const uint32_t& id) cannot be called with "
+                           "id = 0, use Morphology::soma (python: morphology.soma) "
+                           "to retrieve the soma");
     return Section(id, _properties);
 }
 
@@ -205,8 +209,9 @@ const std::vector<Section> Morphology::rootSections() const
 
 const std::vector<Section> Morphology::sections() const
 {
+    // TODO: Make this more performant when needed
     std::vector<Section> sections;
-    for (int i = 0; i < _properties->get<morphio::Property::Section>().size();
+    for (int i = 1; i < _properties->get<morphio::Property::Section>().size();
          ++i)
     {
         sections.push_back(section(i));
@@ -251,6 +256,26 @@ const SomaType& Morphology::somaType() const
 const MorphologyVersion& Morphology::version() const
 {
     return _properties->version();
+}
+
+depth_iterator Morphology::depth_begin() const
+{
+    return depth_iterator(*this);
+}
+
+depth_iterator Morphology::depth_end() const
+{
+    return depth_iterator();
+}
+
+breadth_iterator Morphology::breadth_begin() const
+{
+    return breadth_iterator(*this);
+}
+
+breadth_iterator Morphology::breadth_end() const
+{
+    return breadth_iterator();
 }
 
 } // namespace morphio

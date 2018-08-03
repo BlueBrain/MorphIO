@@ -125,7 +125,8 @@ public:
 
     const std::string ERROR_MISSING_PARENT(const Sample& sample) const;
 
-    std::string ERROR_SOMA_BIFURCATION(const Sample& sample) const;
+    std::string ERROR_SOMA_BIFURCATION(const Sample& sample,
+                                       const std::vector<Sample>& children) const;
 
     std::string ERROR_SOMA_WITH_NEURITE_PARENT(const Sample& sample) const;
 

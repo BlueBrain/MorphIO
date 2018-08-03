@@ -68,6 +68,7 @@ public:
     /**
      * Return a vector of all root sections
      * (sections whose parent ID are -1)
+     * Note: The soma is NOT considered as a root section
      **/
     const std::vector<Section> rootSections() const;
 
@@ -80,7 +81,6 @@ public:
 
     /**
      * Return the Section with the given id.
-     * Reminder: ID = 0 is the soma section
      *
      * @throw RawDataError if the id is out of range
      */
@@ -105,6 +105,24 @@ public:
      * Return a vector with the section type of every section
      **/
     const std::vector<SectionType>& sectionTypes() const;
+
+    /**
+       Depth first iterator starting at a given section id
+
+       If id == -1, the iteration will start at each root section, successively
+    **/
+    depth_iterator depth_begin() const;
+    depth_iterator depth_end() const;
+
+    /**
+       Breadth first iterator
+
+       If id == -1, the iteration will be successively performed starting
+       at each root section
+    **/
+    breadth_iterator breadth_begin() const;
+    breadth_iterator breadth_end() const;
+
 
     /**
      * Return the soma type

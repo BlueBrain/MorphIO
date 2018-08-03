@@ -312,7 +312,7 @@ def test_single_children():
                                  err.getvalue().strip())
 
         nt.assert_equal(len(n.soma.points), 0)
-        nt.assert_equal(len(n.sections[0].points), 0)
+        nt.assert_equal(len(n.soma.points), 0)
         assert_equal(len(n.root_sections), 1)
         assert_array_equal(n.root_sections[0].points,
                            np.array([[3, -4, 0],

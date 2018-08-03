@@ -28,14 +28,11 @@ def test_read_single_neurite():
     assert_array_equal(n.soma.points,
                        [[0, 0, 0]])
     nt.eq_(len(n.root_sections), 1)
-    nt.eq_(len(n.sections), 2)
     assert_array_equal(n.root_sections[0].points,
                        np.array([[0, 0, 2],
                                  [0, 0, 3],
                                  [0, 0, 4],
                                  [0, 0, 5]]))
-
-    assert_equal(n.section(0).type, SectionType.soma)
 
 
 def test_read_simple():
@@ -119,7 +116,7 @@ def test_read_split_soma():
                         [0, 0, 8],
                         [0, 0, 9]])
 
-    nt.eq_(len(n.sections), 3)
+    nt.eq_(len(list(n.iter())), 2)
 
 
 def test_weird_indent():

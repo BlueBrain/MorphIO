@@ -93,7 +93,7 @@ typedef MitoIterator<std::queue<MitoSection>> mito_breadth_iterator;
 typedef MitoIterator<std::vector<MitoSection>> mito_upstream_iterator;
 
 typedef Iterator<std::stack<Section>> depth_iterator;
-typedef Iterator<std::queue<Section>> breadth_iterator;
+typedef Iterator<std::queue<std::queue<Section>>> breadth_iterator;
 typedef Iterator<std::vector<Section>> upstream_iterator;
 
 template <typename T> using range = gsl::span<T>;

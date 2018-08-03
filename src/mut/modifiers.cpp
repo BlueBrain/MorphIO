@@ -29,7 +29,7 @@ void no_duplicate_point(morphio::mut::Morphology& morpho) {
         std::shared_ptr<Section> section = *it;
         size_t size = section->points().size();
 
-        if(size < 1 || morpho.parent(*it) < 0)
+        if(size < 1 || (*it)->parent() < 0)
             continue;
 
         section->points().erase(section->points().begin());

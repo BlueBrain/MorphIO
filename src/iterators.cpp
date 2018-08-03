@@ -11,6 +11,34 @@ Iterator<T>::Iterator(const Section& section)
     container.push(section);
 }
 
+template <>
+breadth_iterator::Iterator(const Section& section)
+{
+    std::queue<Section> q;
+    q.push(section);
+    container.push(q);
+}
+
+template <typename T>
+Iterator<T>::Iterator(const Morphology& morphology)
+{
+    auto roots = morphology.rootSections();
+    for(auto it = roots.rbegin(); it != roots.rend(); ++it)
+        container.push(*it);
+}
+template <>
+breadth_iterator::Iterator(const Morphology& morphology) {
+    for(auto root: morphology.rootSections()) {
+        std::queue<Section> q;
+        q.push(root);
+        container.push(q);
+    }
+}
+
+template <>
+upstream_iterator::Iterator(const Morphology& morphology) {} // Unused
+
+
 template <typename T>
 bool Iterator<T>::operator==(Iterator other) const
 {
@@ -23,15 +51,6 @@ bool Iterator<T>::operator!=(Iterator other) const
     return !(*this == other);
 }
 
-template <typename T>
-Iterator<T>& Iterator<T>::operator++()
-{
-    const auto& section = *(*this);
-    container.pop();
-    for (const auto& child : section.children())
-        container.push(child);
-    return *this;
-}
 
 template <typename T>
 Iterator<T> Iterator<T>::operator++(int)
@@ -55,7 +74,7 @@ Section depth_iterator::operator*() const
 template <>
 Section breadth_iterator::operator*() const
 {
-    return container.front();
+    return container.front().front();
 }
 template <>
 Section upstream_iterator::operator*() const
@@ -67,6 +86,31 @@ template <>
 upstream_iterator::Iterator(const Section& section)
 {
     container.push_back(section);
+}
+
+template <>
+depth_iterator& depth_iterator::operator++()
+{
+    const auto& section = *(*this);
+    container.pop();
+    auto& children = section.children();
+    for (auto it = children.rbegin(); it != children.rend(); ++it)
+        container.push(*it);
+    return *this;
+}
+
+template <>
+breadth_iterator& breadth_iterator::operator++()
+{
+    const auto& section = *(*this);
+    container.front().pop();
+    auto& children = section.children();
+    for (auto& child: section.children())
+        container.front().push(child);
+    if(container.front().empty())
+        container.pop();
+
+    return *this;
 }
 
 template <>
@@ -82,6 +126,6 @@ upstream_iterator& upstream_iterator::operator++()
 
 // Instantiations
 template class Iterator<std::stack<Section>>;
-template class Iterator<std::queue<Section>>;
+template class Iterator<std::queue<std::queue<Section>>>;
 template class Iterator<std::vector<Section>>;
 }

@@ -6,12 +6,14 @@
 #include <morphio/section.h>
 #include <morphio/types.h>
 
+#include <morphio/mut/iterators.h>
+
 namespace morphio
 {
 namespace mut
 {
 
-class Section
+class Section: public std::enable_shared_from_this<Section>
 {
 public:
 
@@ -45,6 +47,38 @@ public:
     **/
     Property::PointLevel& properties() { return _pointProperties; }
 
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    // Methods that were previously in mut::Morphology
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+
+    /**
+       Get the parent ID
+
+       Note: Root sections return -1
+    **/
+    const std::shared_ptr<Section> parent() const;
+
+    /**
+       Return true if section is a root section
+    **/
+    const bool isRoot() const;
+
+    /**
+       Return a vector of children IDs
+    **/
+    const std::vector<std::shared_ptr<Section>> children() const;
+
+    depth_iterator depth_begin() const;
+    depth_iterator depth_end() const;
+
+    breadth_iterator breadth_begin() const;
+    breadth_iterator breadth_end() const;
+
+    upstream_iterator upstream_begin() const;
+    upstream_iterator upstream_end() const;
+
     ~Section() {}
 
 private:
@@ -54,12 +88,13 @@ private:
     // https://stackoverflow.com/questions/8202530/how-can-i-call-a-private-destructor-from-a-shared-ptr
     friend void friendDtorForSharedPtr(Section *);
 
-    Section(int id, SectionType type, const Property::PointLevel&);
-    Section(int id, const morphio::Section& section);
-    Section(int id, const Section&);
+    Section(Morphology*, int id, SectionType type, const Property::PointLevel&);
+    Section(Morphology*, int id, const morphio::Section& section);
+    Section(Morphology*, int id, const Section&);
 
     Property::PointLevel _pointProperties;
     SectionType _sectionType;
+    const Morphology* _morphology;
     uint32_t _id;
 };
 

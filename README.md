@@ -136,14 +136,6 @@ points = section.points
 diameters = section.diameters
 ```
 
-### Mutable (read/write) API
-The read/write API provide a way to read morphologies, edit them and write them to disk.
-It offers a tree-centric aproach of the morphology: each section object store its own data and can be seen as a node.
-
-The morphology object simply store the hierarchical data (parent/children) between the different nodes. This means that contrary to the read-only API, hierarchical properties must be retrieved through accessors of the Morphology class (and not the Section/Soma ones).
-
-Note: Multiple morphologies can share the same node. This way, cloning a morphology simply means cloning the node relationships but not the data stored in every node.
-
 
 #### C++
 In C++ the API is available under the `morphio/mut` namespace:
@@ -160,27 +152,8 @@ In Python the API is available under the `morphio.mut` module:
 from morphio.mut import Morphology, Section, Soma
 ```
 
-## Converter
-MorphIO comes with a file format converter that can go back and forth the following 3 formats:
-- asc
-- swc
-- h5
 
-The converter is compiled as part of the c++ library and will be in the `bin/` folder.
-It can be used as:
-```shell
-./convert inputfile outputfile
-```
-
-Note for BBP users: for more information about the intricacy of the format conversion, visit:
-
-<https://bbpteam.epfl.ch/project/issues/browse/NSETM-458>
-
-## Usage
-When possible both APIs will try to use the same class and function names.
-Here are examples of how to use the various APIs.
-
-### Immutable C++
+### C++
 
 ```cpp
 #include <morphio/morphology.h>
@@ -216,8 +189,7 @@ int main()
 }
 ```
 
-
-### Immutable Python
+### Python
 
 ```python
 from morphio import Morphology
@@ -240,46 +212,8 @@ for section in first_root.iter():
 
 
 
-### Mutable C++
 
-#### Reading morphologies
-```cpp
-#include <morphio/mut/morphology.h>
-#include <morphio/mut/section.h>
-
-using morphio::mut::Morphology;
-using morphio::mut::Section;
-
-int main()
-{
-    auto m = Morphology("sample.asc");
-    auto roots = m.rootSections();
-    auto first_root = roots[0];
-
-    // iterate on sections starting at first_root
-    for(auto id_it = m.depth_begin(first_root); id_it != m.depth_end(); ++id_it) {
-      std::shared_ptr<Section> section = *id_it;
-
-        std::cout << "Section type: " << section->type() << std::endl;
-        std::cout << "Section id: " << section->id() << std::endl;
-        if(!m.isRoot(section))
-          std::cout << "Parent section id: " << m.parent(section) << std::endl;
-        std::cout << "Number of child sections: " << m.children(section).size() << std::endl;
-        std::cout << "X - Y - Z - Diameter" << std::endl;
-        for(int i = 0; i<section->points().size(); ++i) {
-            std::cout <<
-                section->points()[i][0] << ' ' <<
-                section->points()[i][1] << ' ' <<
-                section->points()[i][2] << ' ' <<
-                section->diameters()[i] << std::endl;
-        }
-
-        std::cout << std::endl;
-    }
-}
-```
-
-#### Creating morphologies
+#### Creating morphologies with the mutable API
 
 Here is a simple example to create a morphology from scratch and writing it to disk
 

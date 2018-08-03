@@ -80,7 +80,7 @@ std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> pare
                                    const morphio::Section& section,
                                    bool recursive)
 {
-    std::shared_ptr<Section> ptr(new Section(_counter, section), friendDtorForSharedPtr);
+    std::shared_ptr<Section> ptr(new Section(this, _counter, section), friendDtorForSharedPtr);
     int32_t parentId = parent == nullptr ? -1 : parent->id();
 
     uint32_t id = _register(ptr);
@@ -125,7 +125,7 @@ std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> pare
 
     }
 
-    for (const auto& child : morphology.children(original_section)){
+    for (const auto& child : original_section->children()){
         appendSection(section, child, morphology);
     }
 
@@ -145,7 +145,8 @@ std::shared_ptr<Section> Morphology::appendSection(std::shared_ptr<Section> pare
             type = _sections[parentId] -> type();
     }
 
-    std::shared_ptr<Section> ptr(new Section(_counter, type, pointProperties), friendDtorForSharedPtr);
+    std::shared_ptr<Section> ptr(new Section(this,
+                                             _counter, type, pointProperties), friendDtorForSharedPtr);
     uint32_t id = _register(ptr);
 
 
@@ -170,7 +171,7 @@ uint32_t Morphology::_register(std::shared_ptr<Section>& section)
     // If a section with the same ID already exists, we copy the node under a new ID
     if (_sections.count(section->id()))
     {
-        section = std::shared_ptr<Section>(new Section(_counter, *section),
+        section = std::shared_ptr<Section>(new Section(this, _counter, *section),
                                            friendDtorForSharedPtr);
 
     }
@@ -235,7 +236,7 @@ void Morphology::deleteSection(std::shared_ptr<Section> section, bool recursive)
             }
         }
     } else {
-        for (auto child : children(section)) {
+        for (auto child : section->children()) {
         // Re-link children to their "grand-parent"
             _parent[id] = _parent[id];
             _children[_parent[id]].push_back(child);
@@ -309,16 +310,16 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
 
     for(auto it = depth_begin(); it != depth_end(); ++it) {
         std::shared_ptr<Section> section = *it;
-        int parentId = isRoot(section) ? -1 : parent(section)->id();
+        int parentId = section->isRoot() ? -1 : section->parent()->id();
         int sectionId = section->id();
-        int parentOnDisk = (isRoot(section) ? 0 : newIds[parentId]);
+        int parentOnDisk = (section->isRoot() ? 0 : newIds[parentId]);
 
         if(!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
-           !isRoot(section) &&
-           !_checkDuplicatePoint(parent(section), section))
-          LBERROR(Warning::WRONG_DUPLICATE, err.WARNING_WRONG_DUPLICATE(section, parent(section)));
+           !section->isRoot() &&
+           !_checkDuplicatePoint(section->parent(), section))
+          LBERROR(Warning::WRONG_DUPLICATE, err.WARNING_WRONG_DUPLICATE(section, section->parent()));
 
-        bool isUnifurcation = !isRoot(section) && children(parent(section)).size() == 1;
+        bool isUnifurcation = !section->isRoot() && section->parent()->children().size() == 1;
 
         // This "if" condition ensures that "unifurcations" (ie. successive sections with only 1
         // child) get merged together into a bigger section
@@ -347,28 +348,6 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
     mitochondria()._buildMitochondria(properties);
     return properties;
 }
-
-const std::shared_ptr<Section> Morphology::parent(const std::shared_ptr<Section>& section) const {
-    return _sections.at(_parent.at(section->id()));
-}
-
-const bool Morphology::isRoot(const std::shared_ptr<Section>& section) const {
-    try {
-        parent(section);
-        return false;
-    } catch (const std::out_of_range &e) {
-        return true;
-    }
-}
-
-const std::vector<std::shared_ptr<Section>> Morphology::children(const std::shared_ptr<Section>& section) const {
-    try {
-        return _children.at(section->id());
-    } catch (const std::out_of_range &e) {
-        return std::vector<std::shared_ptr<Section>>();
-    }
-}
-
 const std::shared_ptr<Section> Morphology::section(uint32_t id) const {
     return _sections.at(id);
 }
@@ -469,10 +448,10 @@ void Morphology::_write_h5(const std::string& filename) {
     for(auto it = depth_begin(); it != depth_end(); ++it) {
         std::shared_ptr<Section> section = *it;
 
-        if(!isRoot(section) &&
-           !_checkDuplicatePoint(parent(section), section))
+        if(!section->isRoot() &&
+           !_checkDuplicatePoint(section->parent(), section))
             LBTHROW(SectionBuilderError(_err.WARNING_WRONG_DUPLICATE(section,
-                                                                     parent(section))));
+                                                                     section->parent())));
     }
 
     writer::h5(*this, filename);

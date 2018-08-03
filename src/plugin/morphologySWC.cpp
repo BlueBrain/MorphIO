@@ -96,9 +96,17 @@ public:
         if(sample.type != SECTION_SOMA)
             return;
 
-        // Testing soma bifurcation
-        if(sample.parentId != -1 && children[sample.id].size() > 1)
-            LBTHROW(morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample)));
+        if(sample.parentId != -1 && children[sample.id].size() > 1) {
+            std::vector<Sample> bifurcations;
+            for(auto id: children[sample.id]) {
+                if(samples[id].type == SECTION_SOMA)
+                    bifurcations.push_back(samples[id]);
+            }
+
+            LBTHROW(morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample, bifurcations)));
+        }
+
+
 
         if(sample.parentId != -1 && samples[sample.parentId].type != SECTION_SOMA)
             LBTHROW(morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample)));

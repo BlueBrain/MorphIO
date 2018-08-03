@@ -32,7 +32,9 @@ Each point describes coordinates and radius of a disk. Each frustums is formed b
 ASC and H5 being the text and binary representation of the same format, they obey to the same specification.
 
 #### [SOMA\_CONTOUR](https://github.com/BlueBrain/MorphIO/blob/a60b52dfe403ef289455ee2221c1b4fce6418978/src/morphology.cpp#L55)
-A H5/ASC file with a soma of 3 points or more will have their soma represented as a soma contour. In ASC format, soma points are characterized by an S-expression starting with the tag "CellBody". MorphIO does *not* support ASC files with *multiple* CellBody tags. [^footnote]
+A H5/ASC file with a soma of 3 points or more will have their soma represented as a soma contour. In ASC format, soma points are characterized by an S-expression starting with the tag "CellBody". Even if it is almost never the case in practice, contours are meant to be in the XY plane.
+
+> :warning: MorphIO does **not** support ASC files with **multiple** CellBody tags. [^footnote]
 
 # Sub-cellular structures
 SWC does not support any sub-cellular structures. H5 and ASC support some, please see the following for more details.

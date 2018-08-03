@@ -82,23 +82,6 @@ public:
     **/
     const std::shared_ptr<Section> section(uint32_t id) const;
 
-    /**
-       Get the parent ID
-
-       Note: Root sections return -1
-    **/
-    const std::shared_ptr<Section> parent(const std::shared_ptr<Section>& section) const;
-
-    /**
-       Return true if section is a root section
-    **/
-    const bool isRoot(const std::shared_ptr<Section>& section) const;
-
-    /**
-       Return a vector of children IDs
-    **/
-    const std::vector<std::shared_ptr<Section>> children(const std::shared_ptr<Section>& section) const;
-
 
     /**
        Return the data structure used to create read-only morphologies

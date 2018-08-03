@@ -22,58 +22,10 @@
 #include <morphio/mut/section.h>
 #include <morphio/mut/soma.h>
 
+#include "bindings_utils.cpp"
+
 namespace py = pybind11;
 using namespace py::literals;
-
-
-py::array_t<float> span_array_to_ndarray(const morphio::range<const std::array<float, 3> > &span)
-{
-    const auto buffer_info = py::buffer_info(
-        // Cast from (const void*) to (void*) for function signature matching
-        (void*)span.data(),                            /* Pointer to buffer */
-        sizeof(float),                          /* Size of one scalar */
-        py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
-        2,                                      /* Number of dimensions */
-
-        // Forced cast to prevent error:
-        // template argument deduction/substitution failed */
-        { (int) span.size(), 3 }, /* buffer dimentions */
-        { sizeof(float) * 3,                  /* Strides (in bytes) for each index */
-                sizeof(float) }
-        );
-    return py::array(buffer_info);
-}
-
-template <typename T>
-py::array_t<float> span_to_ndarray(const morphio::range<const T>& span)
-{
-    const auto buffer_info = py::buffer_info(
-        // Cast from (const void*) to (void*) for function signature matching
-        (void*)span.data(),                            /* Pointer to buffer */
-        sizeof(T),                          /* Size of one scalar */
-        py::format_descriptor<T>::format(), /* Python struct-style format descriptor */
-        1,                                      /* Number of dimensions */
-
-        // Forced cast to prevent error:
-        // template argument deduction/substitution failed */
-        {(int) span.size()}, /* buffer dimentions */
-        {sizeof(T)} );      /* Strides (in bytes) for each index */
-    return py::array(buffer_info);
-}
-
-
-morphio::Points array_to_points(py::array_t<float> &buf){
-    morphio::Points points;
-    py::buffer_info info = buf.request();
-    float* ptr = (float*)info.ptr;
-
-    for(int i = 0;i<info.shape[0]; ++i){
-        points.push_back(std::array<float, 3>{ptr[3 * i],
-                    ptr[3 * i + 1],
-                    ptr[3 * i + 2]});
-    }
-    return points;
-}
 
 PYBIND11_MODULE(morphio, m) {
 
@@ -149,8 +101,6 @@ PYBIND11_MODULE(morphio, m) {
         .value("SOMA_CYLINDERS", morphio::enums::SomaType::SOMA_CYLINDERS)
         .value("SOMA_SIMPLE_CONTOUR", morphio::enums::SomaType::SOMA_SIMPLE_CONTOUR);
 
-
-
     m.attr("version") = morphio::VERSION;
 
     auto base = py::register_exception<morphio::MorphioError&>(m, "MorphioError");
@@ -176,7 +126,6 @@ PYBIND11_MODULE(morphio, m) {
                             sizeof(float) }
                     );
             });
-
 
     m.doc() = "pybind11 example plugin"; // optional module docstring
 
@@ -211,12 +160,14 @@ PYBIND11_MODULE(morphio, m) {
                                "Returns a list of all root sections "
                                "(sections whose parent ID are -1)")
         .def_property_readonly("sections", &morphio::Morphology::sections,
-                               "Returns a vector containing all section objects\n\n"
-                               "Note: the first section of the vector is always the soma section")
+                               "Returns a vector containing all sections objects\n\n"
+                               "Notes:\n"
+            "- Soma is not included\n"
+            "- First section ID is 1 (0 is reserved for the soma)\n"
+            "- To select sections by ID use: Morphology::section(id)")
 
         .def("section", &morphio::Morphology::section,
              "Returns the Section with the given id\n"
-             "Reminder: ID = 0 is the soma section\n\n"
              "throw RawDataError if the id is out of range",
              "section_id"_a)
 
@@ -245,7 +196,24 @@ PYBIND11_MODULE(morphio, m) {
         .def_property_readonly("cell_family", &morphio::Morphology::cellFamily,
                                "Returns the cell family (neuron or glia)")
         .def_property_readonly("version", &morphio::Morphology::version,
-                               "Returns the version");
+                               "Returns the version")
+
+        // Iterators
+        .def("iter", [](morphio::Morphology* morpho, morphio::IterType type) {
+                switch (type) {
+                case morphio::IterType::DEPTH_FIRST:
+                    return py::make_iterator(morpho->depth_begin(), morpho->depth_end());
+                case morphio::IterType::BREADTH_FIRST:
+                    return py::make_iterator(morpho->breadth_begin(), morpho->breadth_end());
+                }
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Section iterator that runs successively on every neurite\n"
+            "iter_type controls the order of iteration on sections of a given neurite. 2 values can be passed:\n"
+            "- morphio.IterType.depth_first (default)\n"
+            "- morphio.IterType.breadth_first (default)\n"
+            "iter_type"_a=morphio::IterType::DEPTH_FIRST);
+
 
 
     py::class_<morphio::Mitochondria>(
@@ -274,6 +242,9 @@ PYBIND11_MODULE(morphio, m) {
                                              return py::array(3, soma->center().data());
                                          },
             "Returns the center of gravity of the soma points")
+        .def_property_readonly("type",
+                               &morphio::Soma::type,
+                               "Returns the soma type")
 
         .def_property_readonly("surface", &morphio::Soma::surface,
                                "Returns the soma surface\n\n"
@@ -393,15 +364,6 @@ PYBIND11_MODULE(morphio, m) {
         .def_property_readonly("mitochondria", (morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ())
                                &morphio::mut::Morphology::mitochondria,
                                "Returns a reference to the mitochondria container class")
-        .def("is_root", &morphio::mut::Morphology::isRoot,
-             "Return True if section is a root section", "section_id"_a)
-        .def("parent", &morphio::mut::Morphology::parent,
-             "Get the parent ID\n\n"
-             "Note: Root sections return -1",
-             "section_id"_a)
-        .def("children", &morphio::mut::Morphology::children,
-             "Returns a list of children IDs",
-             "section_id"_a)
         .def("section", &morphio::mut::Morphology::section,
              "Returns the section with the given id\n\n"
              "Note: multiple morphologies can share the same Section instances",
@@ -584,7 +546,31 @@ PYBIND11_MODULE(morphio, m) {
                          py::array_t<float> _perimeters) {
                           section -> perimeters() = _perimeters.cast<std::vector<float>>();
                       },
-                      "Returns the perimeters of all points of this section");
+                      "Returns the perimeters of all points of this section")
+        .def_property_readonly("is_root", &morphio::mut::Section::isRoot,
+             "Return True if section is a root section")
+        .def_property_readonly("parent", &morphio::mut::Section::parent,
+             "Get the parent ID\n\n"
+             "Note: Root sections return -1")
+        .def_property_readonly("children", &morphio::mut::Section::children,
+             "Returns a list of children IDs")
+        // Iterators
+        .def("iter", [](morphio::mut::Section* section, morphio::IterType type) {
+                         switch (type) {
+                         case morphio::IterType::DEPTH_FIRST:
+                             return py::make_iterator(section->depth_begin(), section->depth_end());
+                         case morphio::IterType::BREADTH_FIRST:
+                             return py::make_iterator(section->breadth_begin(), section->breadth_end());
+                         case morphio::IterType::UPSTREAM:
+                             return py::make_iterator(section->upstream_begin(), section->upstream_end());
+                         }
+                     },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Depth first iterator starting at a given section id\n"
+            "\n"
+            "If id == -1, the iteration will be successively performed starting\n"
+            "at each root section",
+            "iter_type"_a=morphio::IterType::DEPTH_FIRST);
 
     py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>>(mut_module, "Soma")
         .def(py::init<const morphio::Property::PointLevel&>())
