@@ -24,7 +24,7 @@ Morphology::Morphology(const morphio::URI& uri, unsigned int options)
 }
 
 Morphology::Morphology(const morphio::Morphology& morphology)
-    : _counter(1)
+    : _counter(0)
     , _soma(std::make_shared<Soma>(morphology.soma()))
 {
 
@@ -285,7 +285,7 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
 {
     using std::setw;
     int i = 0;
-    int sectionIdOnDisk = 1;
+    int sectionIdOnDisk = 0;
     std::map<uint32_t, int32_t> newIds;
     Property::Properties properties;
     morphio::plugin::ErrorMessages err(debugInfo._filename);
@@ -294,25 +294,13 @@ const Property::Properties Morphology::buildReadOnly(const morphio::plugin::Debu
         properties._cellLevel = *_cellProperties;
         properties._cellLevel._somaType = _soma->type();
     }
-    _appendProperties(properties._pointLevel, _soma->_pointProperties);
-
-    // Need to fill some unused value for the soma perimeter
-    // in order to get the same size for the 'perimeter' vector than for the 'point' one
-    bool isPerimeterUsed = _rootSections.empty() ?
-        false :
-        _rootSections.at(0)->_pointProperties._perimeters.size() > 0;
-
-    if(isPerimeterUsed)
-        properties._pointLevel._perimeters = std::vector<float>(_soma->_pointProperties._points.size(), 0);
-
-    properties._sectionLevel._sections.push_back({0, -1});
-    properties._sectionLevel._sectionTypes.push_back(SECTION_SOMA);
+    _appendProperties(properties._somaLevel, _soma->_pointProperties);
 
     for(auto it = depth_begin(); it != depth_end(); ++it) {
         std::shared_ptr<Section> section = *it;
         int parentId = section->isRoot() ? -1 : section->parent()->id();
         int sectionId = section->id();
-        int parentOnDisk = (section->isRoot() ? 0 : newIds[parentId]);
+        int parentOnDisk = (section->isRoot() ? -1 : newIds[parentId]);
 
         if(!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
            !section->isRoot() &&

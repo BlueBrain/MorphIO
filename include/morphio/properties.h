@@ -123,6 +123,11 @@ struct SectionLevel
     bool operator!=(const SectionLevel& other) const;
 };
 
+struct SomaLevel
+{
+    Section::Type _sections;
+};
+
 struct Annotation {
     Annotation(AnnotationType type, uint32_t sectionId, PointLevel points,
                std::string details, int32_t lineNumber);
@@ -149,15 +154,24 @@ struct CellLevel
 // The lowest level data blob
 struct Properties
 {
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Data stuctures
+    ////////////////////////////////////////////////////////////////////////////////
+
     PointLevel _pointLevel;
     SectionLevel _sectionLevel;
     CellLevel _cellLevel;
+    PointLevel _somaLevel;
 
     MitochondriaPointLevel _mitochondriaPointLevel;
     MitochondriaSectionLevel _mitochondriaSectionLevel;
 
     std::vector<Annotation> _annotations;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    // Functions
+    ////////////////////////////////////////////////////////////////////////////////
     template <typename T>
     std::vector<typename T::Type>& get();
     template <typename T>

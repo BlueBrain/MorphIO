@@ -180,7 +180,7 @@ PYBIND11_MODULE(morphio, m) {
                 auto diameters = morpho->diameters();
                 return py::array(diameters.size(), diameters.data());
             },
-            "Returns a list with all diameters from all sections")
+            "Returns a list with all diameters from all sections (soma points are not included)")
         .def_property_readonly("perimeters", [](morphio::Morphology* obj){
                 auto data = obj->perimeters();
                 return py::array(data.size(), data.data());

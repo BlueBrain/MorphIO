@@ -68,7 +68,6 @@ public:
     /**
      * Return a vector of all root sections
      * (sections whose parent ID are -1)
-     * Note: The soma is NOT considered as a root section
      **/
     const std::vector<Section> rootSections() const;
 
@@ -88,12 +87,14 @@ public:
 
     /**
      * Return a vector with all points from all sections
+     * (soma points are not included)
      **/
     const Points& points() const;
 
     /**
      * Return a vector with all diameters from all sections
-     **/
+     * (soma points are not included)
+    **/
     const std::vector<float>& diameters() const;
 
     /**

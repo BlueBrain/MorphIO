@@ -75,7 +75,7 @@ const range<const typename TProperty::Type> SectionBase<T>::get() const
 template <typename T>
 bool SectionBase<T>::isRoot() const
 {
-    return _properties->get<typename T::SectionId>()[_id][1] == T::rootSectionsParentId;
+    return _properties->get<typename T::SectionId>()[_id][1] == -1;
 }
 
 template <typename T>

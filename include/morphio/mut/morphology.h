@@ -28,7 +28,7 @@ class Morphology
 public:
     Morphology() : _soma(std::make_shared<Soma>(Soma())),
                    _cellProperties(std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())),
-                   _counter(1) {}
+                   _counter(0) {}
 
     /**
        Build a mutable Morphology from an on-disk morphology

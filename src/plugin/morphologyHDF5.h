@@ -28,10 +28,10 @@ private:
     bool _readV11Metadata();
     bool _readV2Metadata();
     HighFive::DataSet _getStructureDataSet(size_t nSections);
-    void _readPoints();
-    void _readSections();
+    void _readPoints(int);
+    int _readSections();
     void _readSectionTypes();
-    void _readPerimeters();
+    void _readPerimeters(int);
     void _readMitochondria();
     template <typename T>
     void _read(const std::string& group,

@@ -66,8 +66,7 @@ void buildChildren(std::shared_ptr<Property::Properties> properties)
         for (size_t i = 0; i < sections.size(); ++i)
         {
             const int32_t parent = sections[i][1];
-            if (parent != -1)
-                children[parent].push_back(i);
+            children[parent].push_back(i);
         }
     }
 
@@ -163,8 +162,6 @@ bool Morphology::operator!=(const Morphology& other) const {
     return !this->operator==(other);
 }
 
-
-
 const Soma Morphology::soma() const
 {
     return Soma(_properties);
@@ -181,10 +178,6 @@ const std::vector<Property::Annotation> Morphology::annotations() const {
 
 const Section Morphology::section(const uint32_t& id) const
 {
-    if(id == 0)
-        throw RawDataError("Morphology::section(const uint32_t& id) cannot be called with "
-                           "id = 0, use Morphology::soma (python: morphology.soma) "
-                           "to retrieve the soma");
     return Section(id, _properties);
 }
 
@@ -193,7 +186,7 @@ const std::vector<Section> Morphology::rootSections() const
     std::vector<Section> result;
     try
     {
-        const std::vector<uint32_t>& children = _properties->children<morphio::Property::Section>().at(0);
+        const std::vector<uint32_t>& children = _properties->children<morphio::Property::Section>().at(-1);
         result.reserve(children.size());
         for (auto id: children) {
             result.push_back(section(id));

@@ -234,7 +234,7 @@ def test_empty_sibling():
                       )
                  ''') as tmp_file:
                 n = Morphology(tmp_file.name)
-                assert_substring('is the only child of section: 1 starting at:',
+                assert_substring('is the only child of section: 0 starting at:',
                                  err.getvalue().strip())
                 assert_substring('It will be merged with the parent section',
                                  err.getvalue().strip())
@@ -306,7 +306,7 @@ def test_single_children():
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
                 n = Morphology(tmp_file.name)
-                assert_substring('is the only child of section: 1 starting at:',
+                assert_substring('is the only child of section: 0 starting at:',
                                  err.getvalue().strip())
                 assert_substring('It will be merged with the parent section',
                                  err.getvalue().strip())

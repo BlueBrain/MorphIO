@@ -97,8 +97,8 @@ def test_single_neurite():
 def test_child_section():
     m = Morphology()
     section = m.append_section(None,
-                                  PointLevel([[1, 2, 3]], [2], [20]),
-                                  SectionType.axon)
+                               PointLevel([[1, 2, 3]], [2], [20]),
+                               SectionType.axon)
 
     ok_(section.is_root)
 
@@ -128,21 +128,22 @@ def test_child_section():
 def test_append_no_duplicate():
     m = Morphology()
 
-    section_id = m.append_section(None,
+    section = m.append_section(None,
                                   PointLevel([[1, 2, 3], [4, 5, 6]],
                                              [2, 2],
                                              [20, 20]),
                                   SectionType.axon)
+    assert_equal(section.id, 0)
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
 
-            m.append_section(section_id,
+            m.append_section(section,
                              PointLevel([[400, 5, 6], [7, 8, 9]],
                                         [2, 3],
                                         [20, 30]))
             assert_equal(err.getvalue().strip(),
-                         'While appending section: 2 to parent: 1\n'
+                         'While appending section: 1 to parent: 0\n'
                          'The section first point should be parent section last point: \n'
                          '        : X Y Z Diameter\n'
                          'parent last point :[4.000000, 4.000000, 4.000000, 2.000000]\n'
@@ -154,23 +155,24 @@ def test_build_read_only():
     m.soma.points = [[-1, -2, -3]]
     m.soma.diameters = [-4]
 
-    section_id = m.append_section(None,
+    section = m.append_section(None,
                                   PointLevel([[1, 2, 3], [4, 5, 6]],
                                              [2, 2],
                                              [20, 20]),
                                   SectionType.axon)
 
-    m.append_section(section_id,
+    m.append_section(section,
                      PointLevel([[4, 5, 6], [7, 8, 9]],
                                 [2, 3],
                                 [20, 30]))
 
-    m.append_section(section_id,
+    m.append_section(section,
                      PointLevel([[4, 5, 6], [10, 11, 12]],
                                 [2, 2],
                                 [20, 20]))
 
     immutable_morphology = ImmutableMorphology(m)
+
     sections = list(immutable_morphology.iter())
     assert_equal(len(sections), 3)
 
@@ -179,17 +181,17 @@ def test_build_read_only():
     assert_array_equal(immutable_morphology.soma.diameters,
                        [-4])
 
-    assert_array_equal(immutable_morphology.section(1).points,
+    assert_array_equal(immutable_morphology.section(0).points,
                        [[1, 2, 3], [4, 5, 6]])
-    assert_array_equal(immutable_morphology.section(1).diameters,
+    assert_array_equal(immutable_morphology.section(0).diameters,
                        [2, 2])
-    assert_array_equal(immutable_morphology.section(1).perimeters,
+    assert_array_equal(immutable_morphology.section(0).perimeters,
                        [20, 20])
 
-    assert_equal(len(immutable_morphology.section(1).children),
+    assert_equal(len(immutable_morphology.section(0).children),
                  2)
 
-    child = immutable_morphology.section(1).children[0]
+    child = immutable_morphology.section(0).children[0]
     assert_array_equal(child.points,
                        [[4, 5, 6], [7, 8, 9]])
     assert_array_equal(child.diameters,
@@ -197,7 +199,7 @@ def test_build_read_only():
     assert_array_equal(child.perimeters,
                        [20, 30])
 
-    same_child = immutable_morphology.section(2)
+    same_child = immutable_morphology.section(1)
     assert_array_equal(same_child.points,
                        [[4, 5, 6], [7, 8, 9]])
     assert_array_equal(same_child.diameters,
@@ -299,9 +301,9 @@ def test_mitochondria():
 
 
 def test_iterators():
-    assert_array_equal([sec.id for sec in SIMPLE.iter(SIMPLE.section(6), upstream)],
-                       [6, 4])
-    assert_array_equal([sec.id for sec in SIMPLE.iter(SIMPLE.section(1), depth_first)],
-                       [1, 2, 3])
-    assert_array_equal([sec.id for sec in SIMPLE.iter(SIMPLE.section(1), breadth_first)],
-                       [1, 3, 2])
+    assert_array_equal([sec.id for sec in SIMPLE.iter(SIMPLE.section(5), upstream)],
+                       [5, 3])
+    assert_array_equal([sec.id for sec in SIMPLE.iter(SIMPLE.section(0), depth_first)],
+                       [0, 1, 2])
+    assert_array_equal([sec.id for sec in SIMPLE.iter(SIMPLE.section(0), breadth_first)],
+                       [0, 2, 1])

@@ -16,17 +16,20 @@ _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 def test_read_single_neurite():
     with tmp_swc_file('''# A simple neuron consisting of a point soma
                          # and a single branch neurite.
-                         1 1 0 0 0 3.0 -1
+                         1 1 0 4 0 3.0 -1
                          2 3 0 0 2 0.5 1
                          3 3 0 0 3 0.5 2
                          4 3 0 0 4 0.5 3
                          5 3 0 0 5 0.5 4''') as tmp_file:
 
         n = Morphology(tmp_file.name)
+
+    assert_array_equal(n.soma.points, [[0, 4, 0]])
+    assert_array_equal(n.soma.diameters, [6.0])
     nt.eq_(len(n.root_sections), 1)
-    nt.eq_(n.root_sections[0].id, 1)
+    nt.eq_(n.root_sections[0].id, 0)
     assert_array_equal(n.soma.points,
-                       [[0, 0, 0]])
+                       [[0, 4, 0]])
     nt.eq_(len(n.root_sections), 1)
     assert_array_equal(n.root_sections[0].points,
                        np.array([[0, 0, 2],
@@ -37,13 +40,17 @@ def test_read_single_neurite():
 
 def test_read_simple():
     simple = Morphology(os.path.join(_path, 'simple.swc'))
-    # assert_array_equal(simple.points,
-    #                    n.points)
     assert_equal(len(simple.root_sections), 2)
+    assert_equal(simple.root_sections[0].id, 0)
+    assert_equal(simple.root_sections[1].id, 3)
+
     assert_array_equal(simple.root_sections[0].points, [[0, 0, 0], [0, 5, 0]])
+
     assert_equal(len(simple.root_sections[0].children), 2)
-    assert_array_equal(simple.root_sections[0].children[0].points, [[0, 5, 0], [-5, 5, 0]])
-    assert_array_equal(simple.root_sections[1].points, [[0, 0, 0], [0, -4, 0]])
+    assert_equal(simple.root_sections[0].children[0].id, 1)
+    assert_equal(simple.root_sections[0].children[1].id, 2)
+    # assert_array_equal(simple.root_sections[0].children[0].points, [[0, 5, 0], [-5, 5, 0]])
+    # assert_array_equal(simple.root_sections[1].points, [[0, 0, 0], [0, -4, 0]])
 
 
 def test_repeated_id():

@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from collections import OrderedDict
 from itertools import combinations
 from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
@@ -10,11 +11,11 @@ _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 # These 3 cells are identical
-CELLS = {
+CELLS = OrderedDict({
     'asc': Morphology(os.path.join(_path, "simple.asc")),
     'swc': Morphology(os.path.join(_path, "simple.swc")),
     'h5': Morphology(os.path.join(_path, "h5/v1/simple.h5")),
-}
+})
 
 
 def test_equality():
@@ -34,19 +35,19 @@ def test_iter():
     neuron = Morphology(os.path.join(_path, "iterators.asc"))
     root = neuron.root_sections[0]
     assert_array_equal([section.id for section in root.iter(IterType.depth_first)],
-                       [1,2,3,4,5,6,7])
+                       [0,1,2,3,4,5,6])
     assert_array_equal([section.id for section in root.iter(IterType.breadth_first)],
-                       [1, 2, 5, 3, 4, 6, 7])
+                       [0, 1, 4, 2, 3, 5, 6])
 
     assert_array_equal([section.id for section in neuron.iter(IterType.breadth_first)],
-                       [1, 2, 5, 3, 4, 6, 7, 8, 9, 10])
+                       [0, 1, 4, 2, 3, 5, 6, 7, 8, 9])
 
 
-    for cell in CELLS.values():
+    for _, cell in CELLS.items():
         assert_array_equal([section.id for section in cell.iter()],
-                           [1, 2, 3, 4, 5, 6])
+                           [0, 1, 2, 3, 4, 5])
         assert_array_equal([section.id for section in cell.iter(IterType.depth_first)],
-                           [1, 2, 3, 4, 5, 6])
+                           [0, 1, 2, 3, 4, 5])
         assert_array_equal([section.points for section in
                             cell.root_sections[0].children[0].iter(upstream)],
                            [[[0.,  5.,  0.],
@@ -59,6 +60,7 @@ def test_mitochondria():
     morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
     mito = morpho.mitochondria
     assert_equal(len(mito.root_sections), 2)
+    assert_equal(mito.root_sections[0].id, 0)
     mito_root = mito.root_sections
 
     assert_array_equal(mito_root[0].diameters,

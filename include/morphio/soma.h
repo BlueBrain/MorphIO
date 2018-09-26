@@ -36,7 +36,7 @@ public:
      **/
     const range<const Point> points() const
     {
-        return get<Property::Point>();
+        return _properties->_somaLevel._points;
     }
 
     /**
@@ -44,7 +44,7 @@ public:
      **/
     const range<const float> diameters() const
     {
-        return get<Property::Diameter>();
+        return _properties->_somaLevel._diameters;
     }
 
     /**
@@ -77,12 +77,13 @@ public:
 
 private:
     Soma(std::shared_ptr<Property::Properties>);
-    template <typename Property>
-    const range<const typename Property::Type> get() const;
-    friend const Soma Morphology::soma() const;
+    // TODO: find out why the following line does not work
+    // when friend class Morphology; is removed
+    // template <typename Property>
+    // friend const morphio::Soma morphio::Morphology::soma() const;
+    friend class Morphology;
     friend class mut::Soma;
 
     std::shared_ptr<Property::Properties> _properties;
-    SectionRange _range;
 };
 }

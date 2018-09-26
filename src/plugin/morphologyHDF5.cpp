@@ -56,10 +56,10 @@ Property::Properties MorphologyHDF5::load(const URI& uri)
     }
     _checkVersion(uri);
     _selectRepairStage();
-    _readPoints();
-    _readSections();
+    int firstSectionOffset = _readSections();
+    _readPoints(firstSectionOffset);
     _readSectionTypes();
-    _readPerimeters();
+    _readPerimeters(firstSectionOffset);
     _readMitochondria();
 
     return _properties;
@@ -126,9 +126,9 @@ void MorphologyHDF5::_resolveV1()
     if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns)
     {
         LBTHROW(morphio::RawDataError("Opening morphology file '" +
-                                        _file->getName() +
-                                        "': bad number of dimensions in"
-                                        " 'points' dataspace"));
+                                      _file->getName() +
+                                      "': bad number of dimensions in"
+                                      " 'points' dataspace"));
     }
 
     _sections.reset(new HighFive::DataSet(_file->getDataSet(_d_structure)));
@@ -137,9 +137,9 @@ void MorphologyHDF5::_resolveV1()
     if (_sectionsDims.size() != 2 || _sectionsDims[1] != _structureV1Columns)
     {
         LBTHROW(morphio::RawDataError("Opening morphology file '" +
-                                        _file->getName() +
-                                        "': bad number of dimensions in"
-                                        " 'structure' dataspace"));
+                                      _file->getName() +
+                                      "': bad number of dimensions in"
+                                      " 'structure' dataspace"));
     }
 }
 
@@ -222,10 +222,13 @@ HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections)
     }
 }
 
-void MorphologyHDF5::_readPoints()
+void MorphologyHDF5::_readPoints(int firstSectionOffset)
 {
     auto& points = _properties.get<Property::Point>();
     auto& diameters = _properties.get<Property::Diameter>();
+
+    auto& somaPoints = _properties._somaLevel._points;
+    auto& somaDiameters = _properties._somaLevel._diameters;
 
     if (_properties.version() == MORPHOLOGY_VERSION_H5_2)
     {
@@ -253,9 +256,15 @@ void MorphologyHDF5::_readPoints()
         std::vector<std::vector<float>> vec(dims[0]);
         // points.resize(dims[0]);
         dataset.read(vec);
-        for(auto p: vec) {
-            points.push_back({p[0],p[1],p[2]});
-            diameters.push_back(p[3]);
+        for(int i = 0; i<vec.size(); ++i) {
+            const auto &p = vec[i];
+            if(i < firstSectionOffset) {
+                somaPoints.push_back({p[0],p[1],p[2]});
+                somaDiameters.push_back(p[3]);
+            } else {
+                points.push_back({p[0],p[1],p[2]});
+                diameters.push_back(p[3]);
+            }
         }
         return;
     }
@@ -263,14 +272,19 @@ void MorphologyHDF5::_readPoints()
     std::vector<std::vector<float>> vec;
     vec.resize(_pointsDims[0]);
     _points->read(vec);
-    for(auto p: vec)
-        points.push_back({p[0],p[1],p[2]});
-    for(auto p: vec)
-        diameters.push_back(p[3]);
-
+    for(int i = 0; i<vec.size(); ++i) {
+        const auto &p = vec[i];
+        if(i < firstSectionOffset) {
+            somaPoints.push_back({p[0],p[1],p[2]});
+            somaDiameters.push_back(p[3]);
+        } else {
+            points.push_back({p[0],p[1],p[2]});
+            diameters.push_back(p[3]);
+        }
+    }
 }
 
-void MorphologyHDF5::_readSections()
+int MorphologyHDF5::_readSections()
 {
     auto& sections = _properties.get<Property::Section>();
 
@@ -304,14 +318,19 @@ void MorphologyHDF5::_readSections()
         }
 
         std::vector<std::vector<int>> vec;
-        vec.resize(dims[0]);
+        vec.resize(dims[0]-1);
         dataset.read(vec);
+        bool skipFirst = true;
+        int firstSectionOffset = vec[1][0];
         for(auto p: vec){
-            sections.push_back({p[0],p[1]});
+            if(skipFirst) {
+                skipFirst = false;
+                continue;
+            }
+            sections.push_back({p[0] - firstSectionOffset, p[1] - 1});
         }
 
-        return;
-
+        return firstSectionOffset;
     }
 
 
@@ -321,10 +340,17 @@ void MorphologyHDF5::_readSections()
     vec.resize(_sectionsDims[0]);
     selection.read(vec);
 
-    for(auto p: vec) {
-        sections.push_back({p[0],p[1]});
+    bool skipFirst = true;
+    int firstSectionOffset = vec[1][0];
+    for(auto p: vec){
+        if(skipFirst) {
+            skipFirst = false;
+            continue;
+        }
+        sections.push_back({p[0] - firstSectionOffset, p[1] - 1});
     }
 
+    return firstSectionOffset;
 }
 
 void MorphologyHDF5::_readSectionTypes()
@@ -364,9 +390,10 @@ void MorphologyHDF5::_readSectionTypes()
     auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
     types.resize(_sectionsDims[0]);
     selection.read(types);
+    types.erase(types.begin()); // remove soma type
 }
 
-void MorphologyHDF5::_readPerimeters()
+void MorphologyHDF5::_readPerimeters(int firstSectionOffset)
 {
     if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1)
         return;
@@ -385,9 +412,12 @@ void MorphologyHDF5::_readPerimeters()
                                        " 'perimeters' dataspace"));
         }
 
-        auto& perimeters = _properties.get<Property::Perimeter>();
+        std::vector<float> perimeters;
         perimeters.resize(dims[0]);
         dataset.read(perimeters);
+        _properties.get<Property::Perimeter>().assign(
+            perimeters.begin() + firstSectionOffset,
+            perimeters.end());
     }
     catch (...)
     {
