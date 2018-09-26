@@ -16,7 +16,8 @@ def test_write_soma_basic():
     morpho.soma.points = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
     morpho.soma.diameters = [2, 3, 3]
 
-    morpho.write("test_write.swc")
+    with setup_tempdir('test_write_soma_basic') as tmp_folder:
+        morpho.write(os.path.join(tmp_folder, "test_write.swc"))
 
 
 def test_write_basic():
@@ -56,17 +57,18 @@ def test_write_basic():
                                              [-5, -4, 0]],
                                             [2, 4]))
 
-    morpho.write("test_write.asc")
-    morpho.write("test_write.swc")
-    morpho.write("test_write.h5")
+    with setup_tempdir('test_write_basic') as tmp_folder:
+        morpho.write(os.path.join(tmp_folder, "test_write.asc"))
+        morpho.write(os.path.join(tmp_folder, "test_write.swc"))
+        morpho.write(os.path.join(tmp_folder, "test_write.h5"))
 
-    assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.asc"))
-    assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.swc"))
-    assert_equal(ImmutMorphology(morpho), ImmutMorphology("test_write.h5"))
-    assert_equal(ImmutMorphology(morpho), ImmutMorphology(
-        os.path.join(_path, "simple.asc")))
-    ok_(not (ImmutMorphology(morpho) != ImmutMorphology(
-        os.path.join(_path, "simple.asc"))))
+        assert_equal(ImmutMorphology(morpho), ImmutMorphology(os.path.join(tmp_folder, "test_write.asc")))
+        assert_equal(ImmutMorphology(morpho), ImmutMorphology(os.path.join(tmp_folder, "test_write.swc")))
+        assert_equal(ImmutMorphology(morpho), ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")))
+        assert_equal(ImmutMorphology(morpho), ImmutMorphology(
+            os.path.join(_path, "simple.asc")))
+        ok_(not (ImmutMorphology(morpho) != ImmutMorphology(
+            os.path.join(_path, "simple.asc"))))
 
 
 def test_write_merge_only_child():
@@ -151,10 +153,11 @@ def test_write_perimeter():
                                      [2, 3],
                                      [6, 8]))
 
-    morpho.write("test_write.h5")
+    with setup_tempdir('test_write_perimeter') as tmp_folder:
+        morpho.write(os.path.join(tmp_folder, "test_write.h5"))
 
-    assert_array_equal(ImmutMorphology(morpho),
-                       ImmutMorphology("test_write.h5"))
+        assert_array_equal(ImmutMorphology(morpho),
+                           ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")))
 
 
 def test_write_no_soma():
@@ -172,20 +175,21 @@ def test_write_no_soma():
                                                 [5, 6]),
                                      SectionType.basal_dendrite)
 
-    for ext in ['asc', 'h5', 'swc']:
-        with captured_output() as (_, err):
-            with ostream_redirect(stdout=True, stderr=True):
-                outfile = 'tmp.' + ext
-                morpho.write(outfile)
-                assert_equal(err.getvalue().strip(),
-                             'Warning: writing file without a soma')
+    with setup_tempdir('test_write_no_soma') as tmp_folder:
+        for ext in ['asc', 'h5', 'swc']:
+            with captured_output() as (_, err):
+                with ostream_redirect(stdout=True, stderr=True):
+                    outfile = os.path.join(tmp_folder, 'tmp.' + ext)
+                    morpho.write(outfile)
+                    assert_equal(err.getvalue().strip(),
+                                 'Warning: writing file without a soma')
 
-                read = Morphology(outfile)
+                    read = Morphology(outfile)
 
-        assert_equal(len(read.soma.points), 0)
-        assert_equal(len(read.root_sections), 2)
-        assert_array_equal(read.root_sections[0].points, [[0, 0, 0], [0, 5, 0]])
-        assert_array_equal(read.root_sections[1].points, [[0, 1, 0], [0, 7, 0]])
+            assert_equal(len(read.soma.points), 0)
+            assert_equal(len(read.root_sections), 2)
+            assert_array_equal(read.root_sections[0].points, [[0, 0, 0], [0, 5, 0]])
+            assert_array_equal(read.root_sections[1].points, [[0, 1, 0], [0, 7, 0]])
 
 
 def test_mitochondria():
@@ -209,34 +213,35 @@ def test_mitochondria():
         mito_id, MitochondriaPointLevel([0, 0, 0, 0],
                                         [0.6, 0.7, 0.8, 0.9],
                                         [20, 30, 40, 50]))
-    morpho.write("test.h5")
+    with setup_tempdir('test_mitochondria') as tmp_folder:
+        morpho.write(os.path.join(tmp_folder, "test.h5"))
 
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            morpho.write("test.swc")
-            assert_equal(err.getvalue().strip(),
-                         "This cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
+        with captured_output() as (_, err):
+            with ostream_redirect(stdout=True, stderr=True):
+                morpho.write(os.path.join(tmp_folder, "test.swc"))
+                assert_equal(err.getvalue().strip(),
+                             "This cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
 
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            morpho.write("test.asc")
-            assert_equal(err.getvalue().strip(),
-                         "This cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
+        with captured_output() as (_, err):
+            with ostream_redirect(stdout=True, stderr=True):
+                morpho.write(os.path.join(tmp_folder, "test.asc"))
+                assert_equal(err.getvalue().strip(),
+                             "This cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
 
-    mito = ImmutMorphology('test.h5').mitochondria
-    assert_array_equal(mito.root_sections[0].diameters,
-                       diameters)
-    assert_array_equal(mito.root_sections[0].neurite_section_ids,
-                       neuronal_section_ids)
-    assert_array_equal(mito.root_sections[0].relative_path_lengths,
-                       relative_pathlengths)
+        mito = ImmutMorphology(os.path.join(tmp_folder, 'test.h5')).mitochondria
+        assert_array_equal(mito.root_sections[0].diameters,
+                           diameters)
+        assert_array_equal(mito.root_sections[0].neurite_section_ids,
+                           neuronal_section_ids)
+        assert_array_equal(mito.root_sections[0].relative_path_lengths,
+                           relative_pathlengths)
 
-    assert_equal(len(mito.root_sections), 1)
+        assert_equal(len(mito.root_sections), 1)
 
-    mito = Morphology('test.h5').mitochondria
-    assert_equal(mito.root_sections, [0])
-    assert_array_equal(mito.section(0).diameters,
-                       diameters)
+        mito = Morphology(os.path.join(tmp_folder, 'test.h5')).mitochondria
+        assert_equal(mito.root_sections, [0])
+        assert_array_equal(mito.section(0).diameters,
+                           diameters)
 
-    assert_array_equal(mito.section(0).neurite_section_ids,
-                       neuronal_section_ids)
+        assert_array_equal(mito.section(0).neurite_section_ids,
+                           neuronal_section_ids)
