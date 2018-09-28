@@ -100,9 +100,31 @@ One important concept is that MorphIO is splitted into a *read-only* part and a 
 - c++ accessors become python properties
 - style: c++ functions are camel case while python ones are snake case
 
-*Read-only vs read/write*
-- Hierarchical data (such as parent or children) are accessed at the Section level for the *read-only* API and at the Morphology level for the *read/write* one.
-- Hierarchical data accessors return pointer to the concerned section for the *read-only* API, and concerned section IDs for the *read/write* one.
+### Include/imports
+
+- C++ mutable
+```C++
+#include <morphio/morphology.h>
+#include <morphio/section.h>
+#include <morphio/soma.h>
+```
+
+- Python mutable
+```python
+from morphio import Morphology, Section, Soma
+```
+
+- C++ immutable
+```C++
+#include <morphio/mut/morphology.h>
+#include <morphio/mut/section.h>
+#include <morphio/mut/soma.h>
+```
+
+- Python immutable
+```python
+from morphio.mut import Morphology, Section, Soma
+```
 
 ### Read-only API
 The read-only API aims at providing better performances as its internal data
@@ -115,20 +137,6 @@ Soma and Section classes are lightweight classes that provide views on the Morph
 
 Hierarchical properties (children/parent properties) can be retrieved from the Section object itself.
 
-#### C++
-In C++ the API is available right under the `morphio` namespace:
-```C++
-#include <morphio/morphology.h>
-#include <morphio/section.h>
-#include <morphio/soma.h>
-```
-
-#### Python
-In Python the API is available right under the `morphio` module:
-
-```python
-from morphio import Morphology, Section, Soma
-```
 
 For more convenience, all section data are accessed through properties, such as:
 ```python
