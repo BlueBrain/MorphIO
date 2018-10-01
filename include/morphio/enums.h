@@ -14,7 +14,8 @@ enum Option {
     NO_MODIFIER =  0x00,
     TWO_POINTS_SECTIONS    = 0x01,
     SOMA_SPHERE     = 0x02,
-    NO_DUPLICATES   = 0x04
+    NO_DUPLICATES   = 0x04,
+    NRN_ORDER   = 0x08
 };
 
 /**

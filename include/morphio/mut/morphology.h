@@ -220,7 +220,7 @@ protected:
 
 private:
     friend class Section;
-
+    friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
     morphio::plugin::ErrorMessages _err;
 
     uint32_t _register(std::shared_ptr<Section>&);

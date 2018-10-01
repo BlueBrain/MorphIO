@@ -395,6 +395,9 @@ void Morphology::applyModifiers(unsigned int modifierFlags) {
     if(modifierFlags & TWO_POINTS_SECTIONS)
         modifiers::two_points_sections(*this);
 
+    if(modifierFlags & NRN_ORDER)
+        modifiers::nrn_order(*this);
+
 }
 
 void Morphology::write(const std::string& filename) {

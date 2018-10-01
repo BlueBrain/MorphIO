@@ -57,6 +57,15 @@ PYBIND11_MODULE(morphio, m) {
         // .value("glia_endfoot", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
         .export_values();
 
+    py::enum_<morphio::enums::Option>(m, "Option", py::arithmetic())
+        .value("no_modifier", morphio::enums::Option::NO_MODIFIER)
+        .value("two_points_sections", morphio::enums::Option::TWO_POINTS_SECTIONS)
+        .value("soma_sphere", morphio::enums::Option::SOMA_SPHERE)
+        .value("no_duplicates", morphio::enums::Option::NO_DUPLICATES)
+        .value("nrn_order", morphio::enums::Option::NRN_ORDER)
+        .export_values();
+
+
     py::enum_<morphio::enums::MorphologyVersion>(m, "MorphologyVersion")
         .value("MORPHOLOGY_VERSION_H5_1",
                morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
@@ -133,7 +142,8 @@ PYBIND11_MODULE(morphio, m) {
     py::add_ostream_redirect(m, "ostream_redirect");
 
     py::class_<morphio::Morphology>(m, "Morphology")
-        .def(py::init<const morphio::URI&>())
+        .def(py::init<const morphio::URI&, unsigned int>(),
+             "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
         .def(py::init<const morphio::mut::Morphology&>())
         .def("__eq__", [](const morphio::Morphology& a, const morphio::Morphology& b) {
                 return a.operator==(b);

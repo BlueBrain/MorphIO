@@ -128,15 +128,10 @@ from morphio.mut import Morphology, Section, Soma
 
 ### Read-only API
 The read-only API aims at providing better performances as its internal data
-representation is contiguous in memory. All accessors return immutable objects and
-the mechanism for accessing individual sections
-is also simpler than in the read/write API.
+representation is contiguous in memory. All accessors return immutable objects.
 
 Internally, in this API the morphology object is in fact where all data are stored. The
 Soma and Section classes are lightweight classes that provide views on the Morphology data.
-
-Hierarchical properties (children/parent properties) can be retrieved from the Section object itself.
-
 
 For more convenience, all section data are accessed through properties, such as:
 ```python
@@ -311,6 +306,35 @@ child_section_id = morpho.append_section(
 morpho.write("outfile.asc")
 morpho.write("outfile.swc")
 morpho.write("outfile.h5")
+```
+### Opening flags
+When opening the file, modifier flags can be passed to alter the morphology representation.
+The following flags are supported:
+
+- morphio::NO\_MODIFIER:
+This is the default flag, it will do nothing.
+- morphio::TWO\_POINTS\_SECTIONS:
+Each section gets reduce to a line made of the first and last point.
+- morphio::SOMA\_SPHERE:
+The soma is reduced to a sphere which is the center of gravity of the real soma.
+- morphio::NO\_DUPLICATES:
+The duplicate point are not present. It means the first point of each section
+is no longer the last point of the parent section.
+- morphio::NRN\_ORDER:
+Neurite are reordered according to the
+[NEURON simulator ordering](https://github.com/neuronsimulator/nrn/blob/2dbf2ebf95f1f8e5a9f0565272c18b1c87b2e54c/share/lib/hoc/import3d/import3d_gui.hoc#L874)
+
+Multiple flags can be passed by using the standard bit flag manipulation (works the same way in C++ and Python):
+C++:
+```C++
+#include <morphio/Morphology.h>
+Morphology("myfile.asc", options=morphio::NO_DUPLICATES|morphio::NRN_ORDER)
+```
+
+Python:
+```python
+from morphio import Morphology, Option
+Morphology("myfile.asc", options=Option.no_duplicates|Option.nrn_order)
 ```
 
 ### Mitochondria

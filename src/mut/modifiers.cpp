@@ -1,5 +1,6 @@
 #include <morphio/mut/modifiers.h>
 #include <morphio/mut/morphology.h>
+#include <algorithm>
 #include <cmath>
 
 
@@ -29,11 +30,12 @@ void no_duplicate_point(morphio::mut::Morphology& morpho) {
         std::shared_ptr<Section> section = *it;
         size_t size = section->points().size();
 
-        if(size < 1 || (*it)->parent() < 0)
+        if(size < 1 || (*it)->isRoot())
             continue;
 
         section->points().erase(section->points().begin());
         section->diameters().erase(section->diameters().begin());
+
         if(!section->perimeters().empty())
             section->perimeters().erase(section->perimeters().begin());
     }
@@ -63,6 +65,14 @@ void soma_sphere(morphio::mut::Morphology& morpho) {
     soma->diameters() = {r};
 }
 
+bool NRN_order_comparator (std::shared_ptr<Section> a, std::shared_ptr<Section> b) {
+    return a -> type() < b -> type();
+}
+
+void nrn_order(morphio::mut::Morphology& morpho) {
+     std::sort (morpho._rootSections.begin(), morpho._rootSections.end(),
+               NRN_order_comparator);
+}
 
 } // namespace modifiers
 
