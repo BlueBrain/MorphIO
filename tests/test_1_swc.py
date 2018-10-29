@@ -228,6 +228,12 @@ def test_soma_type():
 
     # SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS are characterized by
     # one soma point with 2 children
+    with tmp_swc_file('''1 1 0  0 0 3.0 -1
+    2 1 0 -3 0 3.0  1
+    3 1 0  3 0 3.0  1 # PID is 1''') as tmp_file:
+        assert_equal(Morphology(tmp_file.name).soma_type,
+                     SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
 

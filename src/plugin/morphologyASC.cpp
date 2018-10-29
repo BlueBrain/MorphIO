@@ -145,10 +145,11 @@ private:
             if(parent_id > -1 && properties._points.size() == 1) {
                 return_id = parent_id;
             } else {
-                std::shared_ptr<morphio::mut::Section> section = nb_.appendSection(
-                    parent_id > -1 ? nb_.section(parent_id) : nullptr,
-                    properties,
-                    section_type);
+                std::shared_ptr<morphio::mut::Section> section;
+                if(parent_id > -1)
+                    section = nb_.section(parent_id)->appendSection(properties, section_type);
+                else
+                    section = nb_.appendRootSection(properties, section_type);
                 return_id = section -> id();
                 debugInfo_.setLineNumber(return_id, lex_.current_section_start_);
             }

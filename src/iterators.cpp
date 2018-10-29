@@ -26,6 +26,7 @@ Iterator<T>::Iterator(const Morphology& morphology)
     for(auto it = roots.rbegin(); it != roots.rend(); ++it)
         container.push(*it);
 }
+
 template <>
 breadth_iterator::Iterator(const Morphology& morphology) {
     for(auto root: morphology.rootSections()) {

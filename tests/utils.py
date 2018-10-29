@@ -13,13 +13,14 @@ from morphio import Morphology
 
 
 @contextmanager
-def setup_tempdir(prefix):
+def setup_tempdir(prefix, no_cleanup=False):
     '''Context manager returning a temporary directory'''
     temp_dir = tempfile.mkdtemp(prefix=prefix)
     try:
         yield temp_dir
     finally:
-        shutil.rmtree(temp_dir)
+        if not no_cleanup:
+            shutil.rmtree(temp_dir)
 
 
 @contextmanager
@@ -42,7 +43,8 @@ def strip_color_codes(string):
 
 def strip_all(string):
     '''Strip color code and whitespace at the beginning end of each line'''
-    return '\n'.join(strip_color_codes(line).strip() for line in string.split('\n'))
+    lines = (strip_color_codes(line).strip() for line in string.split('\n'))
+    return '\n'.join(filter(None, lines))
 
 
 def assert_substring(substring, string):

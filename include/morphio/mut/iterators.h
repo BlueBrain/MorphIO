@@ -16,14 +16,12 @@ class Iterator
 {
     friend class Morphology;
 
-    const Morphology& _morphology;
-
     T container;
-    Iterator();
 
 public:
-    Iterator(const Morphology& morphology, std::shared_ptr<Section> rootSection);
+    Iterator(std::shared_ptr<Section> rootSection);
     Iterator(const Morphology& morphology);
+    Iterator();
     bool operator==(Iterator other) const;
     bool operator!=(Iterator other) const;
     std::shared_ptr<Section> operator*() const;

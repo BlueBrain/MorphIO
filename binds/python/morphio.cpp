@@ -296,10 +296,12 @@ PYBIND11_MODULE(morphio, m) {
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Depth first iterator starting at a given section id\n"
+            "Section iterator\n"
             "\n"
-            "If id == -1, the iteration will be successively performed starting\n"
-            "at each root section",
+            "iter_type controls the iteration order. 3 values can be passed:\n"
+            "- morphio.IterType.depth_first (default)\n"
+            "- morphio.IterType.breadth_first\n"
+            "- morphio.IterType.upstream\n",
             "iter_type"_a=morphio::IterType::DEPTH_FIRST);
 
 
@@ -374,22 +376,21 @@ PYBIND11_MODULE(morphio, m) {
         .def_property_readonly("mitochondria", (morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ())
                                &morphio::mut::Morphology::mitochondria,
                                "Returns a reference to the mitochondria container class")
+        .def_property_readonly("annotations", &morphio::mut::Morphology::annotations,
+                               "Returns a list of annotations")
         .def("section", &morphio::mut::Morphology::section,
              "Returns the section with the given id\n\n"
              "Note: multiple morphologies can share the same Section instances",
              "section_id"_a)
         .def("build_read_only", (const morphio::Property::Properties (morphio::mut::Morphology::*)() const) &morphio::mut::Morphology::buildReadOnly,
              "Returns the data structure used to create read-only morphologies")
-        .def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*) (std::shared_ptr<morphio::mut::Section>, const morphio::Property::PointLevel&, morphio::SectionType)) &morphio::mut::Morphology::appendSection,
-             "Append a new Section the given parentId (None appends to soma)\n"
-             " If section_type is omitted or set to 'undefined'"
-             " the type of the parent section will be used"
-             " (Root sections can't have sectionType ommited)",
-             "parent_id"_a, "point_level_properties"_a, "section_type"_a=morphio::SectionType::SECTION_UNDEFINED)
-        .def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*) (std::shared_ptr<morphio::mut::Section>, const morphio::Section&, bool)) &morphio::mut::Morphology::appendSection,
-             "Append the existing immutable Section to the given parentId (None appends to soma) "
+        .def("append_root_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*) (const morphio::Property::PointLevel&, morphio::SectionType)) &morphio::mut::Morphology::appendRootSection,
+             "Append a root Section\n",
+             "point_level_properties"_a, "section_type"_a)
+        .def("append_root_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*) (const morphio::Section&, bool)) &morphio::mut::Morphology::appendRootSection,
+             "Append the existing immutable Section as a root section\n"
              "If recursive == true, all descendent will be appended as well",
-             "parent_id"_a, "immutable_section"_a, "recursive"_a=false)
+             "immutable_section"_a, "recursive"_a=false)
 
         .def("delete_section", &morphio::mut::Morphology::deleteSection,
              "Delete the given section\n"
@@ -413,29 +414,28 @@ PYBIND11_MODULE(morphio, m) {
              "Write file to H5, SWC, ASC format depending on filename extension", "filename"_a)
 
         // Iterators
-        .def("iter", [](morphio::mut::Morphology* morph, std::shared_ptr<morphio::mut::Section> section, morphio::IterType type) {
+        .def("iter", [](morphio::mut::Morphology* morph, morphio::IterType type) {
                 switch (type) {
                 case morphio::IterType::DEPTH_FIRST:
-                    return py::make_iterator(morph->depth_begin(section), morph->depth_end());
+                    return py::make_iterator(morph->depth_begin(), morph->depth_end());
                 case morphio::IterType::BREADTH_FIRST:
-                    return py::make_iterator(morph->breadth_begin(section), morph->breadth_end());
-                case morphio::IterType::UPSTREAM:
-                    return py::make_iterator(morph->upstream_begin(section), morph->upstream_end());
+                    return py::make_iterator(morph->breadth_begin(), morph->breadth_end());
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Depth first iterator starting at a given section id\n"
-            "\n"
-            "If id == -1, the iteration will be successively performed starting\n"
-            "at each root section",
-            "id"_a=-1, "iter_type"_a=morphio::IterType::DEPTH_FIRST);
+            "Section iterator that runs successively on every neurite\n"
+            "iter_type controls the order of iteration on sections of a given neurite. 2 values can be passed:\n"
+            "- morphio.IterType.depth_first (default)\n"
+            "- morphio.IterType.breadth_first",
+            "iter_type"_a=morphio::IterType::DEPTH_FIRST);
 
 
-    mutable_morphology.def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*) (std::shared_ptr<morphio::mut::Section>, std::shared_ptr<morphio::mut::Section>, const morphio::mut::Morphology&)) &morphio::mut::Morphology::appendSection,
-             "Append the existing mutable Section to the given parentId (None appends to soma) "
-             "If a mut::morphio::Morphology is passed, all descendent of section in this "
-             "morphology will be appended as well"
-             "parent_id"_a, "mutable_section"_a, "morphology"_a=morphio::mut::Morphology());
+    mutable_morphology.def("append_root_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*)
+                                              (std::shared_ptr<morphio::mut::Section>, bool))
+                           &morphio::mut::Morphology::appendRootSection,
+                           "Append the existing mutable Section as a root section\n"
+                           "If recursive == true, all descendent will be appended as well",
+                           "mutable_section"_a, "recursive"_a=false);
 
     py::class_<morphio::mut::Mitochondria>(mut_module, "Mitochondria")
         .def(py::init<>())
@@ -576,11 +576,33 @@ PYBIND11_MODULE(morphio, m) {
                          }
                      },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Depth first iterator starting at a given section id\n"
+            "Section iterator\n"
             "\n"
-            "If id == -1, the iteration will be successively performed starting\n"
-            "at each root section",
-            "iter_type"_a=morphio::IterType::DEPTH_FIRST);
+            "iter_type controls the iteration order. 3 values can be passed:\n"
+            "- morphio.IterType.depth_first (default)\n"
+            "- morphio.IterType.breadth_first\n"
+            "- morphio.IterType.upstream\n",
+            "iter_type"_a=morphio::IterType::DEPTH_FIRST)
+
+        // Editing
+        .def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Section::*) (const morphio::Section&, bool)) &morphio::mut::Section::appendSection,
+             "Append the existing immutable Section to this section"
+             "If recursive == true, all descendent will be appended as well",
+             "immutable_section"_a, "recursive"_a=false)
+
+        .def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Section::*) (std::shared_ptr<morphio::mut::Section>, bool)) &morphio::mut::Section::appendSection,
+             "Append the existing mutable Section to this section\n"
+             "If recursive == true, all descendent will be appended as well",
+             "mutable_section"_a, "recursive"_a=false)
+
+        .def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Section::*) (const morphio::Property::PointLevel&, morphio::SectionType)) &morphio::mut::Section::appendSection,
+             "Append a new Section to this section\n"
+             " If section_type is omitted or set to 'undefined'"
+             " the type of the parent section will be used"
+             " (Root sections can't have sectionType ommited)",
+             "point_level_properties"_a, "section_type"_a=morphio::SectionType::SECTION_UNDEFINED);
+
+
 
     py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>>(mut_module, "Soma")
         .def(py::init<const morphio::Property::PointLevel&>())

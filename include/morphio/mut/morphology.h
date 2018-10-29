@@ -23,10 +23,13 @@ namespace morphio
 namespace mut
 {
 
+bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
+                          std::shared_ptr<Section> current);
+
 class Morphology
 {
 public:
-    Morphology() : _soma(std::make_shared<Soma>(Soma())),
+    Morphology() : _soma(std::make_shared<Soma>()),
                    _cellProperties(std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())),
                    _counter(0) {}
 
@@ -76,6 +79,12 @@ public:
 
 
     /**
+     * Return the annotation object
+     **/
+    const std::vector<Property::Annotation> annotations() const;
+
+
+    /**
        Get the shared pointer for the given section
 
        Note: multiple morphologies can share the same Section instances.
@@ -96,7 +105,6 @@ public:
        If id == -1, the iteration will start at each root section, successively
     **/
     depth_iterator depth_begin() const;
-    depth_iterator depth_begin(const std::shared_ptr<Section>& section) const;
     depth_iterator depth_end() const;
 
     /**
@@ -106,15 +114,7 @@ public:
        at each root section
     **/
     breadth_iterator breadth_begin() const;
-    breadth_iterator breadth_begin(const std::shared_ptr<Section>& section) const;
     breadth_iterator breadth_end() const;
-
-    /**
-       Upstream first iterator
-    **/
-    upstream_iterator upstream_begin(const std::shared_ptr<Section>& section) const;
-    upstream_iterator upstream_end() const;
-
 
     ////////////////////////////////////////////////////////////////////////////////
     //
@@ -133,35 +133,24 @@ public:
     void deleteSection(std::shared_ptr<Section> section, bool recursive = true);
 
     /**
-       Append the existing morphio::Section to the given parentId (nullptr appends to soma)
+       Append the existing morphio::Section as a root section
 
        If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<Section> appendSection(std::shared_ptr<Section> parent,
-                                           const morphio::Section&,
-                                           bool recursive = false);
+    std::shared_ptr<Section> appendRootSection(const morphio::Section&, bool recursive = false);
 
     /**
-       Append the existing Section to the given parentId (nullptr appends to soma)
+       Append an existing Section as a root section
 
-       If a mut::morphio::Morphology is passed, all descendent of section in this
-       morphology will be appended as well
+       If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<Section> appendSection(std::shared_ptr<Section> parent,
-                                           std::shared_ptr<Section> section,
-                                           const Morphology& morphology = Morphology());
+    std::shared_ptr<Section> appendRootSection(std::shared_ptr<Section> section, bool recursive = false);
 
 
     /**
-       Append a new Section the given parentId (nullptr appends to soma)
-
-       If sectionType is omitted or set to SECTION_UNDEFINED,
-       the type of the parent section will be used
-       (Root sections can't have sectionType ommited)
+       Append a root Section
     **/
-    std::shared_ptr<Section> appendSection(std::shared_ptr<Section> parent,
-                                           const Property::PointLevel&,
-                                           SectionType sectionType = SectionType::SECTION_UNDEFINED);
+    std::shared_ptr<Section> appendRootSection(const Property::PointLevel&, SectionType sectionType);
 
     /**
        Iterate on all sections starting at startSection via a depth-first-search traversal

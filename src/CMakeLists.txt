@@ -41,6 +41,11 @@ target_include_directories(morphio_obj
   PUBLIC
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/../include
+  )
+
+target_include_directories(morphio_obj
+  SYSTEM
+  PUBLIC
    $<TARGET_PROPERTY:gsl-lite,INTERFACE_INCLUDE_DIRECTORIES>
    $<TARGET_PROPERTY:HighFive,INTERFACE_INCLUDE_DIRECTORIES>
    $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
