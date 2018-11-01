@@ -53,7 +53,7 @@ class NeurolucidaParser;
 
 namespace plugin
 {
-    class DebugInfo;
+    struct DebugInfo;
     class ErrorMessages;
 }
 namespace mut

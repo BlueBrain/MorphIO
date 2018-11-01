@@ -77,7 +77,7 @@ void swc(const Morphology& morphology, const std::string& filename)
       LBERROR(Warning::WRITE_NO_SOMA,
               plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
 
-    for (int i = 0; i < points.size(); ++i){
+    for (unsigned int i = 0; i < points.size(); ++i){
         writeLine(myfile,
                   segmentIdOnDisk,
                   i==0 ? -1 : segmentIdOnDisk-1,
@@ -95,7 +95,7 @@ void swc(const Morphology& morphology, const std::string& filename)
         assert(points.size() > 0 && "Empty section");
         bool isRootSection = section->isRoot();
 
-        for (int i = (isRootSection ? 0 : 1); // skips duplicate point for non-root sections
+        for (unsigned int i = (isRootSection ? 0 : 1); // skips duplicate point for non-root sections
              i < points.size(); ++i)
         {
             int parentIdOnDisk;
@@ -124,7 +124,7 @@ void swc(const Morphology& morphology, const std::string& filename)
 void _write_asc_points(std::ofstream& myfile, const Points& points,
                        const std::vector<float>& diameters, int indentLevel)
 {
-    for (int i = 0; i < points.size(); ++i)
+    for (unsigned int i = 0; i < points.size(); ++i)
     {
         myfile << std::string(indentLevel, ' ')
                << "(" << std::to_string(points[i][0]) << ' '
@@ -143,7 +143,7 @@ void _write_asc_section(std::ofstream& myfile, const Morphology& morpho, const s
     {
         auto children = section->children();
         size_t nChildren = children.size();
-        for (int i = 0; i<nChildren; ++i)
+        for (unsigned int i = 0; i<nChildren; ++i)
         {
             myfile << indent << (i == 0 ? "(" : "|") << std::endl;
             _write_asc_section(myfile, morpho, children[i], indentLevel + 2);
@@ -232,8 +232,7 @@ void write_dataset(HighFive::Group& file, const std::string& name, const T& raw)
     dpoints.write(raw);
 }
 
-void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria,
-                    const std::string& filename)
+void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria)
 {
     if(mitochondria.rootSections().empty())
         return;
@@ -245,14 +244,14 @@ void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria,
 
     std::vector<std::vector<float>> points;
     std::vector<std::vector<int32_t>> structure;
-    for (int i = 0; i < size; ++i)
+    for (unsigned int i = 0; i < size; ++i)
     {
         points.push_back(
             {(float)p._sectionIds[i], p._relativePathLengths[i], p._diameters[i]});
     }
 
     auto& s = properties._mitochondriaSectionLevel;
-    for (int i = 0; i < s._sections.size(); ++i)
+    for (unsigned int i = 0; i < s._sections.size(); ++i)
     {
         structure.push_back({s._sections[i][0], s._sections[i][1]});
     }
@@ -270,7 +269,6 @@ void h5(const Morphology& morpho, const std::string& filename)
                                          HighFive::File::Truncate);
 
     int sectionIdOnDisk = 1;
-    int i = 0;
     std::map<uint32_t, int32_t> newIds;
 
     std::vector<std::vector<float>> raw_points;
@@ -296,7 +294,7 @@ void h5(const Morphology& morpho, const std::string& filename)
         morpho.rootSections()[0]->perimeters().size() > 0 :
         false;
 
-    for(int i = 0;i<numberOfPoints; ++i) {
+    for(unsigned int i = 0;i<numberOfPoints; ++i) {
         raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
 
         // If the morphology has some perimeter data, we need to fill some perimeter dummy
@@ -321,7 +319,7 @@ void h5(const Morphology& morpho, const std::string& filename)
         const std::size_t numberOfPerimeters = perimeters.size();
         raw_structure.push_back({offset, section->type(), parentOnDisk});
 
-        for(int i = 0;i<numberOfPoints; ++i)
+        for(unsigned int i = 0;i<numberOfPoints; ++i)
             raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
 
         if(numberOfPerimeters > 0) {
@@ -330,7 +328,7 @@ void h5(const Morphology& morpho, const std::string& filename)
                 throw WriterError(plugin::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
                                       "points", numberOfPoints,
                                       "perimeters", numberOfPerimeters));
-            for(int i = 0;i<numberOfPerimeters; ++i)
+            for(unsigned int i = 0;i<numberOfPerimeters; ++i)
                 raw_perimeters.push_back(perimeters[i]);
         }
 
@@ -351,7 +349,7 @@ void h5(const Morphology& morpho, const std::string& filename)
     if (hasPerimeterData)
         write_dataset(h5_file, "/perimeters", raw_perimeters);
 
-    mitochondriaH5(h5_file, morpho.mitochondria(), filename);
+    mitochondriaH5(h5_file, morpho.mitochondria());
 }
 
 } // end namespace writer

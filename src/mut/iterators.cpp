@@ -92,9 +92,8 @@ std::shared_ptr<Section> upstream_iterator::operator*() const
     return container[0];
 }
 
-template <>
-upstream_iterator::Iterator(const Morphology& morphology)
-{} // unused
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+template <> upstream_iterator::Iterator(const Morphology& morphology) {} // unused
 
 template <>
 upstream_iterator::Iterator(std::shared_ptr<Section> section)
@@ -107,7 +106,6 @@ breadth_iterator& breadth_iterator::operator++()
 {
     const auto& section = *(*this);
     container.front().pop();
-    auto& children = section->children();
     for (auto& child: section->children())
         container.front().push(child);
     if(container.front().empty())

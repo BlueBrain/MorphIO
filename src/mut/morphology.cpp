@@ -79,11 +79,9 @@ bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
 std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& section, bool recursive)
 {
     std::shared_ptr<Section> ptr(new Section(this, _counter, section), friendDtorForSharedPtr);
-    int32_t parentId = -1;
 
-    uint32_t id = _register(ptr);
-    if(parentId == -1)
-        _rootSections.push_back(ptr);
+    _register(ptr);
+    _rootSections.push_back(ptr);
 
     if (recursive)
     {
@@ -99,10 +97,8 @@ std::shared_ptr<Section> Morphology::appendRootSection(std::shared_ptr<Section> 
                                                        bool recursive)
 {
     std::shared_ptr<Section> original_section = section;
-    uint32_t id = _register(section);
-    int32_t parentId = -1;
-    if(parentId == -1)
-        _rootSections.push_back(section);
+    _register(section);
+    _rootSections.push_back(section);
 
     if (recursive) {
         for (const auto& child : original_section->children()){
@@ -115,10 +111,8 @@ std::shared_ptr<Section> Morphology::appendRootSection(std::shared_ptr<Section> 
 std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLevel& pointProperties,
                                                        SectionType type)
 {
-    int32_t parentId = -1;
-
     std::shared_ptr<Section> ptr(new Section(this, _counter, type, pointProperties), friendDtorForSharedPtr);
-    uint32_t id = _register(ptr);
+    _register(ptr);
 
     _rootSections.push_back(ptr);
 
@@ -127,18 +121,20 @@ std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLeve
 
 void friendDtorForSharedPtr(Section* section){ delete section; }
 
-uint32_t Morphology::_register(std::shared_ptr<Section>& section)
+uint32_t Morphology::_register(std::shared_ptr<Section> section)
 {
     // If a section with the same ID already exists, we copy the node under a new ID
     if (_sections.count(section->id()))
     {
+        std::cout << "could it be ?" << std::endl;
+
         section = std::shared_ptr<Section>(new Section(this, _counter, *section),
                                            friendDtorForSharedPtr);
 
     }
     _counter = std::max(_counter, section->id()) + 1;
 
-    _sections[section->id()] = std::shared_ptr<Section>(section);
+    _sections[section->id()] = section;
     return section->id();
 }
 
@@ -204,9 +200,9 @@ void Morphology::deleteSection(std::shared_ptr<Section> section, bool recursive)
     } else {
         for (auto child : section->children()) {
         // Re-link children to their "grand-parent"
-            _parent[id] = _parent[id];
+            _parent[child->id()] = _parent[id];
             _children[_parent[id]].push_back(child);
-            if (_parent[id] == -1)
+            if (section->isRoot())
                 _rootSections.push_back(child);
         }
 
@@ -250,7 +246,6 @@ const Property::Properties Morphology::buildReadOnly() const {
 const Property::Properties Morphology::buildReadOnly(const morphio::plugin::DebugInfo& debugInfo) const
 {
     using std::setw;
-    int i = 0;
     int sectionIdOnDisk = 0;
     std::map<uint32_t, int32_t> newIds;
     Property::Properties properties;

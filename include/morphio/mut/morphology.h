@@ -29,9 +29,10 @@ bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
 class Morphology
 {
 public:
-    Morphology() : _soma(std::make_shared<Soma>()),
-                   _cellProperties(std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())),
-                   _counter(0) {}
+    Morphology() : _counter(0),
+                   _soma(std::make_shared<Soma>()),
+                   _cellProperties(std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel()))
+                    {}
 
     /**
        Build a mutable Morphology from an on-disk morphology
@@ -212,15 +213,16 @@ private:
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
     morphio::plugin::ErrorMessages _err;
 
-    uint32_t _register(std::shared_ptr<Section>&);
+    uint32_t _register(std::shared_ptr<Section>);
+
+    uint32_t _counter;
     std::shared_ptr<Soma> _soma;
+    std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     std::vector<std::shared_ptr<Section>> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
-    std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     std::vector<morphio::Property::Annotation> _annotations;
     Mitochondria _mitochondria;
 
-    uint32_t _counter;
     std::map<uint32_t, uint32_t> _parent;
     std::map<uint32_t, std::vector<std::shared_ptr<Section>>> _children;
 

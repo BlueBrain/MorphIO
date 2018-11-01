@@ -20,7 +20,7 @@ public:
     /**
      * Return the section ID
      **/
-    const uint32_t id() const { return _id; }
+    uint32_t id() const { return _id; }
 
     /**
      * Return the morphological type of this section (dendrite, axon, ...)
@@ -63,7 +63,7 @@ public:
     /**
        Return true if section is a root section
     **/
-    const bool isRoot() const;
+    bool isRoot() const;
 
     /**
        Return a vector of children IDs
@@ -104,10 +104,10 @@ private:
     Section(Morphology*, int id, const morphio::Section& section);
     Section(Morphology*, int id, const Section&);
 
-    Property::PointLevel _pointProperties;
-    SectionType _sectionType;
     Morphology* _morphology;
+    Property::PointLevel _pointProperties;
     uint32_t _id;
+    SectionType _sectionType;
 };
 
 void friendDtorForSharedPtr(Section* section);

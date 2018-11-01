@@ -33,7 +33,7 @@ namespace plugin
 {
 namespace h5
 {
-Property::Properties load(const URI& uri, unsigned int options)
+Property::Properties load(const URI& uri)
 {
     return MorphologyHDF5().load(uri);
 }
@@ -222,7 +222,7 @@ HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections)
     }
 }
 
-void MorphologyHDF5::_readPoints(int firstSectionOffset)
+void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
 {
     auto& points = _properties.get<Property::Point>();
     auto& diameters = _properties.get<Property::Diameter>();
@@ -256,7 +256,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset)
         std::vector<std::vector<float>> vec(dims[0]);
         // points.resize(dims[0]);
         dataset.read(vec);
-        for(int i = 0; i<vec.size(); ++i) {
+        for(unsigned int i = 0; i<vec.size(); ++i) {
             const auto &p = vec[i];
             if(i < firstSectionOffset) {
                 somaPoints.push_back({p[0],p[1],p[2]});
@@ -272,7 +272,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset)
     std::vector<std::vector<float>> vec;
     vec.resize(_pointsDims[0]);
     _points->read(vec);
-    for(int i = 0; i<vec.size(); ++i) {
+    for(unsigned int i = 0; i<vec.size(); ++i) {
         const auto &p = vec[i];
         if(i < firstSectionOffset) {
             somaPoints.push_back({p[0],p[1],p[2]});
@@ -432,7 +432,7 @@ template <typename T>
 void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& _dataset,
                            MorphologyVersion version,
-                           int expectedDimension,
+                           unsigned int expectedDimension,
                            T& data)
 {
 

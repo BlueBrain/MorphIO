@@ -74,8 +74,8 @@ struct MitoNeuriteSectionId
 struct PointLevel
 {
     std::vector<Point::Type> _points;
-    std::vector<Perimeter::Type> _perimeters;
     std::vector<Diameter::Type> _diameters;
+    std::vector<Perimeter::Type> _perimeters;
 
     PointLevel() {}
     PointLevel(std::vector<Point::Type> points,

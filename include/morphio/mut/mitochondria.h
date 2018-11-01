@@ -26,7 +26,7 @@ public:
     /**
      * Return the diameters of all points of this section
      **/
-    const uint32_t id() { return _id; }
+    uint32_t id() { return _id; }
 
     /**
      * Return the diameters of all points of this section
@@ -45,8 +45,13 @@ public:
      **/
     std::vector<float>& pathLengths() { return _mitoPoints._relativePathLengths; }
 
-    Property::MitochondriaPointLevel _mitoPoints;
+
+private:
     uint32_t _id;
+
+public:
+    // TODO: make private
+    Property::MitochondriaPointLevel _mitoPoints;
 };
 
 /**
@@ -98,12 +103,12 @@ public:
     /**
      * Return the parent mithochondrial section ID
      **/
-    const int32_t parent(uint32_t id) const;
+    int32_t parent(uint32_t id) const;
 
     /**
        Return true if section is a root section
     **/
-    const bool isRoot(uint32_t id) const;
+    bool isRoot(uint32_t id) const;
 
 
     /**

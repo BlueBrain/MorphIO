@@ -99,7 +99,7 @@ Morphology::Morphology(const URI& source, unsigned int options)
 
     auto loader = [&source, &options, &extension](){
         if (extension == ".h5")
-            return plugin::h5::load(source, options);
+            return plugin::h5::load(source);
         if (extension == ".asc")
             return plugin::asc::load(source, options);
         if (extension == ".swc")
@@ -141,10 +141,10 @@ Morphology::~Morphology()
 }
 
 bool Morphology::operator==(const Morphology& other) const {
-    constexpr float epsilon = 1e-5;
     if(this->_properties == other._properties)
         return true;
 
+    // constexpr float epsilon = 1e-5;
     // std::array<float, 2> soma_surfaces{this->soma().surface(),
     //                                    other.soma().surface()};
     // std::cout << "std::abs(soma_surfaces[1] - soma_surfaces[0]): " << std::to_string(std::abs(soma_surfaces[1] - soma_surfaces[0])) << std::endl;
@@ -204,7 +204,7 @@ const std::vector<Section> Morphology::sections() const
 {
     // TODO: Make this more performant when needed
     std::vector<Section> sections;
-    for (int i = 1; i < _properties->get<morphio::Property::Section>().size();
+    for (uint i = 1; i < _properties->get<morphio::Property::Section>().size();
          ++i)
     {
         sections.push_back(section(i));

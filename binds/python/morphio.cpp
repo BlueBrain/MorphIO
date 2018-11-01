@@ -215,6 +215,8 @@ PYBIND11_MODULE(morphio, m) {
                     return py::make_iterator(morpho->depth_begin(), morpho->depth_end());
                 case morphio::IterType::BREADTH_FIRST:
                     return py::make_iterator(morpho->breadth_begin(), morpho->breadth_end());
+                default:
+                    LBTHROW(morphio::MorphioError("Only iteration types depth_first and breadth_first are supported"));
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -293,6 +295,8 @@ PYBIND11_MODULE(morphio, m) {
                     return py::make_iterator(section->breadth_begin(), section->breadth_end());
                 case morphio::IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
+                default:
+                    LBTHROW(morphio::MorphioError("Only iteration types depth_first, breadth_first and upstream are supported"));
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -341,6 +345,8 @@ PYBIND11_MODULE(morphio, m) {
                     return py::make_iterator(section->breadth_begin(), section->breadth_end());
                 case morphio::IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
+                default:
+                    LBTHROW(morphio::MorphioError("Only iteration types depth_first, breadth_first and upstream are supported"));
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -420,6 +426,8 @@ PYBIND11_MODULE(morphio, m) {
                     return py::make_iterator(morph->depth_begin(), morph->depth_end());
                 case morphio::IterType::BREADTH_FIRST:
                     return py::make_iterator(morph->breadth_begin(), morph->breadth_end());
+                default:
+                LBTHROW(morphio::MorphioError("Only iteration types depth_first and breadth_first are supported"));
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -573,8 +581,10 @@ PYBIND11_MODULE(morphio, m) {
                              return py::make_iterator(section->breadth_begin(), section->breadth_end());
                          case morphio::IterType::UPSTREAM:
                              return py::make_iterator(section->upstream_begin(), section->upstream_end());
+                         default:
+                             LBTHROW(morphio::MorphioError("Only iteration types depth_first, breadth_first and upstream are supported"));
                          }
-                     },
+            },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Section iterator\n"
             "\n"
@@ -598,8 +608,7 @@ PYBIND11_MODULE(morphio, m) {
         .def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Section::*) (const morphio::Property::PointLevel&, morphio::SectionType)) &morphio::mut::Section::appendSection,
              "Append a new Section to this section\n"
              " If section_type is omitted or set to 'undefined'"
-             " the type of the parent section will be used"
-             " (Root sections can't have sectionType ommited)",
+             " the type of the parent section will be used",
              "point_level_properties"_a, "section_type"_a=morphio::SectionType::SECTION_UNDEFINED);
 
 

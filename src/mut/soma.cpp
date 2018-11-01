@@ -27,7 +27,7 @@ const Point Soma::center() const
     return centerOfGravity(points());
 }
 
-const float Soma::surface() const {
+float Soma::surface() const {
     return _somaSurface<std::vector<float>,
                         std::vector<Point>>(type(),
                         diameters(),

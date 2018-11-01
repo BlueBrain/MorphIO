@@ -9,7 +9,7 @@ namespace mut
 class MitoSection;
 
 template <typename T>
-MitoIterator<T>::MitoIterator(const Mitochondria& mitochondria, uint32_t rootSectionId) :
+MitoIterator<T>::MitoIterator(const Mitochondria& mitochondria, int rootSectionId) :
     _mitochondria(mitochondria)
 {
     if(rootSectionId != -1)
@@ -75,7 +75,7 @@ uint32_t mito_upstream_iterator::operator*() const
 }
 
 template <>
-mito_upstream_iterator::MitoIterator(const Mitochondria& mitochondria, uint32_t sectionId) :
+mito_upstream_iterator::MitoIterator(const Mitochondria& mitochondria, int sectionId) :
     _mitochondria(mitochondria)
 {
     container.push_back(sectionId);

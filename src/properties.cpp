@@ -4,7 +4,7 @@
 #include <morphio/properties.h>
 #include <morphio/errorMessages.h>
 
-bool verbose = true;
+bool verbose = false;
 
 namespace std
 {
@@ -99,14 +99,17 @@ template <typename T> bool compare(const std::vector<T>& vec1, const std::vector
         return true;
 
     if(vec1.size() != vec2.size()){
-        LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        if(verbose)
+            LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
-    LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
-    for(int i=0;i<vec1.size();++i){
-        if(vec1[i] != vec2[i]) {
-            LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+    if(verbose) {
+        LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
+        for(unsigned int i=0;i<vec1.size();++i){
+            if(vec1[i] != vec2[i]) {
+                LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+            }
         }
     }
 
@@ -114,18 +117,21 @@ template <typename T> bool compare(const std::vector<T>& vec1, const std::vector
 }
 
 
-bool compare_section_structure(const std::vector<Section::Type>& vec1, const std::vector<Section::Type>& vec2, const std::string& name, bool verbose, bool offset) {
+bool compare_section_structure(const std::vector<Section::Type>& vec1, const std::vector<Section::Type>& vec2, const std::string& name, bool verbose) {
 
         if(vec1.size() != vec2.size()){
-            LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+            if(verbose)
+                LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
             return false;
         }
 
-        for(int i=1;i<vec1.size();++i){
+        for(unsigned int i=1;i<vec1.size();++i){
             if(vec1[i][0] - vec1[1][0] != vec2[i][0] - vec2[1][0] ||
                 vec1[i][1] != vec2[i][1]) {
-                LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
-                LBERROR(Warning::UNDEFINED, std::to_string(vec1[i][0] - vec1[1][0]) + ", " + std::to_string(vec1[i][1]) + " <--> " + std::to_string(vec2[i][0] - vec2[1][0]) + ", " + std::to_string(vec2[i][1]));
+                if(verbose) {
+                    LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
+                    LBERROR(Warning::UNDEFINED, std::to_string(vec1[i][0] - vec1[1][0]) + ", " + std::to_string(vec1[i][1]) + " <--> " + std::to_string(vec2[i][0] - vec2[1][0]) + ", " + std::to_string(vec2[i][1]));
+                }
                 return false;
             }
         }
@@ -135,12 +141,13 @@ bool compare_section_structure(const std::vector<Section::Type>& vec1, const std
 
 template <typename T> bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2, const std::string& name, bool verbose) {
     if(vec1.size() != vec2.size()){
-        LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        if (verbose)
+            LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     const float epsilon = 1e-6;
-    for(int i=0;i<vec1.size();++i){
+    for(unsigned int i=0;i<vec1.size();++i){
         if(std::fabs(vec1[i] - vec2[i]) > epsilon) {
             LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
             LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
@@ -155,16 +162,19 @@ template <> bool compare(const morphio::range<const morphio::Point>& vec1,
                          const morphio::range<const morphio::Point>& vec2,
                          const std::string& name, bool verbose) {
     if(vec1.size() != vec2.size()){
-        LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        if(verbose)
+            LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     const float epsilon = 1e-6;
-    for(int i=0;i<vec1.size();++i){
+    for(unsigned int i=0;i<vec1.size();++i){
         if(std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
-            LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
-            LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
-            LBERROR(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
+            if(verbose) {
+                LBERROR(Warning::UNDEFINED, "Error comparing "+name+", elements differ:");
+                LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                LBERROR(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
+            }
             return false;
         }
     }
@@ -175,16 +185,21 @@ template <> bool compare(const morphio::range<const morphio::Point>& vec1,
 template <typename T, typename U> bool compare(const std::map<T,U>& vec1, const std::map<T,U>& vec2, const std::string& name, bool verbose) {
     if(vec1 == vec2)
         return true;
-    if(vec1.size() != vec2.size()){
-        LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+    if (verbose) {
+        if(vec1.size() != vec2.size()){
+            LBERROR(Warning::UNDEFINED, "Error comparing "+name+", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
     }
+
     return false;
 }
 
 template <typename T> bool compare(const T& el1, const T& el2, const std::string& name, bool verbose) {
     if(el1 == el2)
         return true;
-    LBERROR(Warning::UNDEFINED, name + " differs") ;
+
+    if (verbose)
+        LBERROR(Warning::UNDEFINED, name + " differs") ;
     return false;
 }
 
@@ -223,6 +238,9 @@ bool compare(const PointLevel& el1, const PointLevel& el2,
         result *= compare(perimeters1, perimeters2, "_perimeters", verbose);
 
     }
+    if(!result && verbose)
+        LBERROR(Warning::UNDEFINED, "Error comparing "+name);
+
 
     return result;
 }
@@ -230,7 +248,7 @@ bool compare(const PointLevel& el1, const PointLevel& el2,
 
 bool SectionLevel::operator==(const SectionLevel& other) const {
     return this == &other ||
-        (compare_section_structure(this->_sections, other._sections, "_sections", verbose, 1) &&
+        (compare_section_structure(this->_sections, other._sections, "_sections", verbose) &&
          compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) &&
          compare(this->_children, other._children, "_children", verbose));
 }
@@ -409,7 +427,7 @@ const std::map<int32_t, std::vector<uint32_t>>& Properties::children<MitoSection
 std::ostream& operator<<(std::ostream& os, const PointLevel& prop){
     os << "Point level properties:" << std::endl;
     os << "Point Diameter" << (prop._perimeters.size() == prop._points.size() ? " Perimeter" : "") << std::endl;
-    for(int i = 0; i<prop._points.size(); ++i){
+    for(unsigned int i = 0; i<prop._points.size(); ++i){
         os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i];
         if(prop._perimeters.size() == prop._points.size())
             os << ' ' << prop._perimeters[i];

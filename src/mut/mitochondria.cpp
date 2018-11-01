@@ -87,7 +87,7 @@ const std::vector<uint32_t>& Mitochondria::rootSections() const
     return _rootSections;
 }
 
-const int32_t Mitochondria::parent(uint32_t id) const {
+int32_t Mitochondria::parent(uint32_t id) const {
     try {
         return _parent.at(id);
     } catch (const std::out_of_range &e) {
@@ -95,7 +95,7 @@ const int32_t Mitochondria::parent(uint32_t id) const {
     }
 }
 
-const bool Mitochondria::isRoot(uint32_t id) const {
+bool Mitochondria::isRoot(uint32_t id) const {
     return parent(id) == -1;
 }
 
@@ -113,7 +113,6 @@ const std::map<uint32_t, std::shared_ptr<MitoSection>> Mitochondria::sections() 
 void Mitochondria::_buildMitochondria(Property::Properties& properties) const
 {
     uint32_t counter = 0;
-    uint32_t sectionIdOnDisk = 0;
     std::map<uint32_t, uint32_t> newIds;
 
     for (uint32_t mitoStart : _rootSections)

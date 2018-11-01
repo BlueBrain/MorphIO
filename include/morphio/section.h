@@ -37,7 +37,7 @@ public:
     /**
        Euclidian distance between first and last point of the section
     **/
-    const float length() const;
+    float length() const;
 
     /**
        Depth first search iterator
@@ -79,7 +79,7 @@ public:
     /**
      * Return the morphological type of this section (dendrite, axon, ...)
      */
-    const SectionType type() const;
+    SectionType type() const;
     friend class mut::Section;
     friend const Section Morphology::section(const uint32_t&) const;
     friend class SectionBase<Section>;

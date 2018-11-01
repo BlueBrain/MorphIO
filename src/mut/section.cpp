@@ -42,7 +42,7 @@ const std::shared_ptr<Section> Section::parent() const {
     return _morphology->_sections.at(_morphology->_parent.at(id()));
 }
 
-const bool Section::isRoot() const {
+bool Section::isRoot() const {
     try {
         parent();
         return false;
@@ -124,7 +124,6 @@ std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> section
     }
 
     return section;
-
 }
 
 
@@ -167,11 +166,14 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
     if(sectionType == SectionType::SECTION_UNDEFINED)
         sectionType = type();
 
-    std::shared_ptr<Section> ptr(new Section(_morphology,
-                                             _morphology -> _counter,
-                                             sectionType,
-                                             pointProperties),
-                                 friendDtorForSharedPtr);
+    Section *p = new Section(_morphology,
+                             _morphology -> _counter,
+                             sectionType,
+                             pointProperties);
+
+    std::shared_ptr<Section> ptr(p, friendDtorForSharedPtr);
+
+
     uint32_t childId = _morphology -> _register(ptr);
 
     if(!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&

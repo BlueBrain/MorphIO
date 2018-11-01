@@ -107,6 +107,11 @@ constexpr std::size_t operator+(Token type)
 
 class NeurolucidaLexer
 {
+private:
+    std::string uri_;
+    bool debug_;
+    ErrorMessages err_;
+
     lexertl::state_machine sm_;
 
     lexertl::siterator current_;
@@ -114,10 +119,6 @@ class NeurolucidaLexer
 
     mutable size_t current_line_num_ = 1;
     mutable size_t next_line_num_ = 1;
-    std::string uri_;
-    ErrorMessages err_;
-
-    bool debug_;
 
 public:
     size_t current_section_start_ = 0;

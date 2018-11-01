@@ -6,13 +6,13 @@ namespace morphio
 {
 
 
-const SectionType Section::type() const
+SectionType Section::type() const
 {
     auto val = _properties->get<Property::SectionType>()[_id];
     return val;
 }
 
-const float Section::length() const
+float Section::length() const
 {
     auto points = this->points();
     int last = points.size() - 1;
