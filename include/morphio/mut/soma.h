@@ -13,6 +13,9 @@ public:
     Soma(const Property::PointLevel &pointProperties);
     Soma(const morphio::Soma& soma);
 
+    ~Soma() {
+    }
+
     /**
        Return the coordinates (x,y,z) of all soma point
     **/

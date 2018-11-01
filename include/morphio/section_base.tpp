@@ -68,7 +68,11 @@ template <typename T>
 template <typename TProperty>
 const range<const typename TProperty::Type> SectionBase<T>::get() const
 {
-    auto ptr_start = _properties->get<TProperty>().data() + _range.first;
+    auto& data = _properties->get<TProperty>();
+    if(data.empty())
+        return range<const typename TProperty::Type>();
+
+    auto ptr_start = data.data() + _range.first;
     return range<const typename TProperty::Type>(ptr_start, _range.second - _range.first);
 }
 

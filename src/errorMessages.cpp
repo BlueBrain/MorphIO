@@ -1,5 +1,7 @@
+#include <sstream>
 #include <cmath>
 #include <morphio/errorMessages.h>
+
 
 
 namespace morphio
@@ -191,15 +193,6 @@ const std::string ErrorMessages::ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
 }
 
 
-const std::string ErrorMessages::ERROR_UNSPECIFIED_SECTION_TYPE() const {
-    return "\n\nThe value of argument 'type' is set to 'SectionType::SECTION_UNDEFINED' "
-        "in the function call 'mut::Morphology::appendSection (C++) / mut.morphology.append_section (python)'.\n"
-        "This is only allowed for non-root sections as this indicates the type of the parent "
-        "section should be used.\n\n"
-        "Hint: SECTION_UNDEFINED is the default value of parameter 'type'. You may have "
-        "forgotten to specify this parameter and it picked the default value ?";
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 //              WRITERS
 ////////////////////////////////////////////////////////////////////////////////
@@ -288,26 +281,26 @@ const std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Samp
                                                                     const Sample& child1,
                                                                     const Sample& child2) {
     float x = root.point[0],  y = root.point[1],  z = root.point[2], d = root.diameter, r = root.diameter / 2.;
-    std::cerr << "The soma does not conform the three point soma spec" << std::endl;
-    std::cerr <<"The only valid neuro-morpho soma is:" << std::endl;
-    std::cerr <<"1 1 x   y   z r -1" << std::endl;
-    std::cerr <<"2 1 x (y-r) z r  1" << std::endl;
-    std::cerr <<"3 1 x (y+r) z r  1\n" << std::endl;
+    std::stringstream ss;
+    ss << "The soma does not conform the three point soma spec" << std::endl;
+    ss <<"The only valid neuro-morpho soma is:" << std::endl;
+    ss <<"1 1 x   y   z r -1" << std::endl;
+    ss <<"2 1 x (y-r) z r  1" << std::endl;
+    ss <<"3 1 x (y+r) z r  1\n" << std::endl;
 
-    std::cerr << "Got:" << std::endl;
-    std::cerr << "1 1 " << x << " " << y << " " << z << " " << r << " -1" << std::endl;
-    std::cerr << "2 1 "
+    ss << "Got:" << std::endl;
+    ss << "1 1 " << x << " " << y << " " << z << " " << r << " -1" << std::endl;
+    ss << "2 1 "
               << _col(child1.point[0], x) << " "
               << _col(child1.point[1], y-r) << " "
               << _col(child1.point[2], z) << " "
               << _col(child1.diameter/2., r) << " 1" << std::endl;
-    std::cerr << "3 1 "
+    ss << "3 1 "
               << _col(child2.point[0], x) << " "
               << _col(child2.point[1], y+r) << " "
               << _col(child2.point[2], z) << " "
               << _col(child2.diameter/2., r) << " 1" << std::endl;
-
-
+    return ss.str();
 }
 
 

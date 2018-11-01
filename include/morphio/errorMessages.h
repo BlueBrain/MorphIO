@@ -170,8 +170,6 @@ public:
     //              WRITERS
     ////////////////////////////////////////////////////////////////////////////////
 
-    const std::string ERROR_UNSPECIFIED_SECTION_TYPE() const;
-
     const std::string ERROR_WRONG_EXTENSION(const std::string filename) const;
 
     std::string ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1, int length1,

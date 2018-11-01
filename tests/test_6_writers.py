@@ -25,35 +25,23 @@ def test_write_basic():
     morpho.soma.points = [[0, 0, 0]]
     morpho.soma.diameters = [2]
 
-    dendrite = morpho.append_section(None,
-                                     PointLevel([[0, 0, 0],
-                                                 [0, 5, 0]],
-                                                [2, 2]),
-                                     SectionType.basal_dendrite)
+    dendrite = morpho.append_root_section(PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
+                                          SectionType.basal_dendrite)
 
-    morpho.append_section(dendrite,
-                          PointLevel([[0, 5, 0],
-                                      [-5, 5, 0]],
-                                     [2, 3]))
+    dendrite.append_section(PointLevel([[0, 5, 0], [-5, 5, 0]], [2, 3]))
+    dendrite.append_section(PointLevel([[0, 5, 0], [6, 5, 0]], [2, 3]))
 
-    morpho.append_section(dendrite,
-                          PointLevel([[0, 5, 0],
-                                      [6, 5, 0]],
-                                     [2, 3]))
-
-    axon = morpho.append_section(None,
+    axon = morpho.append_root_section(
                                  PointLevel([[0, 0, 0],
                                              [0, -4, 0]],
                                             [2, 2]),
                                  SectionType.axon)
 
-    morpho.append_section(axon,
-                          PointLevel([[0, -4, 0],
+    axon.append_section(PointLevel([[0, -4, 0],
                                       [6, -4, 0]],
                                      [2, 4]))
 
-    axon = morpho.append_section(axon,
-                                 PointLevel([[0, -4, 0],
+    axon = axon.append_section(PointLevel([[0, -4, 0],
                                              [-5, -4, 0]],
                                             [2, 4]))
 
@@ -89,21 +77,14 @@ def test_write_merge_only_child():
     morpho.soma.points = [[0, 0, 0]]
     morpho.soma.diameters = [2]
 
-    root = morpho.append_section(None,
+    root = morpho.append_root_section(
                                  PointLevel([[0, 0, 0],
                                              [0, 5, 0]],
                                             [2, 2]),
                                  SectionType.basal_dendrite)
-    child = morpho.append_section(root,
-                                  PointLevel([[0, 5, 0], [0, 6, 0]],
-                                             [2, 3]))
-    son1 = morpho.append_section(child,
-                                 PointLevel([[0, 6, 0], [0, 7, 0]],
-                                            [2, 3]))
-
-    son2 = morpho.append_section(child,
-                                 PointLevel([[0, 6, 0], [4, 5, 6]],
-                                            [3, 3]))
+    child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
+    son1 = child.append_section(PointLevel([[0, 6, 0], [0, 7, 0]], [2, 3]))
+    son2 = child.append_section(PointLevel([[0, 6, 0], [4, 5, 6]], [3, 3]))
 
     with setup_tempdir('test_write_merge_only_child') as tmp_folder:
         for extension in ['swc', 'asc', 'h5']:
@@ -134,20 +115,20 @@ def test_write_perimeter():
     morpho.soma.points = [[0, 0, 0]]
     morpho.soma.diameters = [2]
 
-    dendrite = morpho.append_section(None,
+    dendrite = morpho.append_root_section(
                                      PointLevel([[0, 0, 0],
                                                  [0, 5, 0]],
                                                 [2, 2],
                                                 [5, 6]),
                                      SectionType.basal_dendrite)
 
-    morpho.append_section(dendrite,
+    dendrite.append_section(
                           PointLevel([[0, 5, 0],
                                       [-5, 5, 0]],
                                      [2, 3],
                                      [6, 7]))
 
-    morpho.append_section(dendrite,
+    dendrite.append_section(
                           PointLevel([[0, 5, 0],
                                       [6, 5, 0]],
                                      [2, 3],
@@ -162,13 +143,13 @@ def test_write_perimeter():
 
 def test_write_no_soma():
     morpho = Morphology()
-    dendrite = morpho.append_section(None,
+    dendrite = morpho.append_root_section(
                                      PointLevel([[0, 0, 0],
                                                  [0, 5, 0]],
                                                 [2, 2],
                                                 [5, 6]),
                                      SectionType.basal_dendrite)
-    dendrite = morpho.append_section(None,
+    dendrite = morpho.append_root_section(
                                      PointLevel([[0, 1, 0],
                                                  [0, 7, 0]],
                                                 [2, 2],
@@ -197,8 +178,7 @@ def test_mitochondria():
     morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
     morpho.soma.diameters = [1, 1]
 
-    section_id = morpho.append_section(
-        None, PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
+    section_id = morpho.append_root_section(PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
         SectionType.axon,)
 
     neuronal_section_ids = [0, 0]

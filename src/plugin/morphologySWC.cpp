@@ -203,8 +203,11 @@ public:
            child1.point[2] != z ||
            child2.point[2] != z ||
            child1.diameter != d ||
-           child2.diameter != d)
-            err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(root, child1, child2);
+           child2.diameter != d) {
+            LBERROR(Warning::SOMA_NON_CONFORM,
+                    err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(root, child1, child2));
+        }
+
     }
 
     SomaType somaType() {
@@ -240,7 +243,9 @@ public:
                 //  uploads to SWC.  In the process of conversion, they turn all
                 //  somas into their custom 'Three-point soma representation':
                 //   http://neuromorpho.org/SomaFormat.html
-                _checkNeuroMorphoSoma(this->samples[somaRootId], children_soma_points);
+
+                if(!ErrorMessages::isIgnored(Warning::SOMA_NON_CONFORM))
+                    _checkNeuroMorphoSoma(this->samples[somaRootId], children_soma_points);
 
                 return SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
             }
@@ -282,16 +287,21 @@ public:
     void _processSectionStart(const Sample& sample) {
         Property::PointLevel properties;
 
-        if(!isRootSection(sample)) // Duplicating last point of previous section
+        std::shared_ptr<morphio::mut::Section> section;
+
+        if(isRootSection(sample))
         {
+            section = morph.appendRootSection(properties, sample.type);
+        }
+        else
+        {
+            // Duplicating last point of previous section
             properties._points.push_back(samples[sample.parentId].point);
             properties._diameters.push_back(samples[sample.parentId].diameter);
+
+            section = morph.section(swcIdToSectionId[sample.parentId])->appendSection(properties, sample.type);
         }
 
-        std::shared_ptr<morphio::mut::Section> section = morph.appendSection(
-            isRootSection(sample) ? nullptr : morph.section(swcIdToSectionId[sample.parentId]),
-            properties,
-            sample.type);
         swcIdToSectionId[sample.id] = section->id();
     }
 
@@ -306,7 +316,6 @@ private:
     std::string uri;
     ErrorMessages err;
     DebugInfo debugInfo;
-
 };
 
 

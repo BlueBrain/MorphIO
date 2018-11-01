@@ -229,16 +229,14 @@ int main()
     morpho.soma()->points() = {{0, 0, 0}, {1, 1, 1}};
     morpho.soma()->diameters() = {1, 1};
 
-    std::shared_ptr<morphio::mut::Section> section = morpho.appendSection(
-        nullptr, // Parent section ID (nullptr = soma)
+    std::shared_ptr<morphio::mut::Section> section = morpho.appendRootSection(
         morphio::Property::PointLevel(
             {{2, 2, 2}, {3, 3, 3}}, // x,y,z coordinates of each point
             {4, 4}, // diameter of each point
             {5, 5}),
         morphio::SectionType::SECTION_AXON); // (optional) perimeter of each point
 
-    std::shared_ptr<morphio::mut::Section> childSection = morpho.appendSection(
-        section,
+    std::shared_ptr<morphio::mut::Section> childSection = section.appendSection(
         morphio::Property::PointLevel(
             {{3, 3, 3}, {4, 4, 4}},
             {4, 4},
@@ -288,16 +286,14 @@ morpho = Morphology()
 morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
 morpho.soma.diameters = [1, 1]
 
-section_id = morpho.append_section(
-    None,  # Parent section ID(None=soma)
+section = morpho.append_root_section(
     PointLevel(
         [[2, 2, 2], [3, 3, 3]],  # x, y, z coordinates of each point
         [4, 4],  # diameter of each point
         [5, 5]),
     SectionType.axon)  # (optional) perimeter of each point
 
-child_section_id = morpho.append_section(
-    section_id,
+child_section = section.append_section(
     PointLevel(
         [[3, 3, 3], [4, 4, 4]],
         [4, 4],
@@ -359,8 +355,7 @@ from morphio import MitochondriaPointLevel, PointLevel, SectionType
 morpho = Morphology()
 
 # A neuronal section that will store mitochondria
-section_id = morpho.append_section(
-    None,
+section = morpho.append_root_section(
     PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
     SectionType.axon)
 

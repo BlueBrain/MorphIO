@@ -81,6 +81,18 @@ public:
 
     ~Section() {}
 
+
+
+    std::shared_ptr<Section> appendSection(const morphio::Section&,
+                                           bool recursive = false);
+
+    std::shared_ptr<Section> appendSection(std::shared_ptr<Section> section,
+                                           bool recursive = false);
+
+    std::shared_ptr<Section> appendSection(const Property::PointLevel&,
+                                           SectionType sectionType = SectionType::SECTION_UNDEFINED);
+
+
 private:
     friend class Morphology;
 
@@ -94,7 +106,7 @@ private:
 
     Property::PointLevel _pointProperties;
     SectionType _sectionType;
-    const Morphology* _morphology;
+    Morphology* _morphology;
     uint32_t _id;
 };
 
