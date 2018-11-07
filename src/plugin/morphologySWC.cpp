@@ -273,6 +273,7 @@ public:
             }
         }
 
+        morph.sanitize();
         morph.applyModifiers(options);
 
         Property::Properties properties = morph.buildReadOnly();

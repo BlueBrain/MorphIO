@@ -305,9 +305,10 @@ Property::Properties load(const URI& uri, unsigned int options)
     NeurolucidaParser parser(uri);
 
     morphio::mut::Morphology& nb_ = parser.parse();
+    nb_.sanitize(parser.debugInfo_);
     nb_.applyModifiers(options);
 
-    Property::Properties properties = nb_.buildReadOnly(parser.debugInfo_);
+    Property::Properties properties = nb_.buildReadOnly();
     properties._cellLevel._cellFamily = FAMILY_NEURON;
     properties._cellLevel._version = MORPHOLOGY_VERSION_ASC_1;
     return properties;

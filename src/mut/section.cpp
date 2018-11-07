@@ -104,10 +104,15 @@ std::ostream& operator<<(std::ostream& os, std::shared_ptr<Section> sectionPtr){
 }
 
 
-std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> section, bool recursive)
+std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> original_section,
+                                                bool recursive)
 {
+    std::shared_ptr<Section> ptr(new Section(_morphology,
+                                             _morphology -> _counter,
+                                             *original_section),
+                                 friendDtorForSharedPtr);
     int32_t parentId = id();
-    uint32_t id = _morphology -> _register(section);
+    uint32_t id = _morphology -> _register(ptr);
     auto& _sections = _morphology -> _sections;
 
     if(!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
@@ -115,15 +120,15 @@ std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> section
         LBERROR(Warning::WRONG_DUPLICATE, _morphology -> _err.WARNING_WRONG_DUPLICATE(_sections[id], _sections.at(parentId)));
 
     _morphology -> _parent[id] = parentId;
-    _morphology -> _children[parentId].push_back(section);
+    _morphology -> _children[parentId].push_back(ptr);
 
     if (recursive) {
-        for (const auto& child : section->children()){
-            section -> appendSection(child, true);
+        for (const auto child : original_section->children()){
+            ptr -> appendSection(child, true);
         }
     }
 
-    return section;
+    return ptr;
 }
 
 
@@ -165,6 +170,9 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
     auto& _sections = _morphology -> _sections;
     if(sectionType == SectionType::SECTION_UNDEFINED)
         sectionType = type();
+
+    if (sectionType == SECTION_SOMA)
+        LBTHROW(morphio::SectionBuilderError("Cannot create section with type soma"));
 
     Section *p = new Section(_morphology,
                              _morphology -> _counter,

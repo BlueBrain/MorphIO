@@ -19,68 +19,10 @@
 namespace morphio
 {
 
-enum SomaClasses {
-    SOMA_CONTOUR,
-    SOMA_CYLINDER
-};
 
-std::map<MorphologyVersion, SomaClasses> _SOMA_CONFIG{
-    // after much debate (https://github.com/BlueBrain/NeuroM/issues/597)
-    // and research:
-    //
-    //  Cannon et al., 1998: http://www.sciencedirect.com/science/article/pii/S0165027098000910
-    //    'Each line has the same seven fields: numbered point index, user defined flag denoting the
-    //    specific part of the structure (cell body, dendrite, axon etc.), three-dimensional position
-    //    (x, y and z, in mm), radius (r, in mm), and the parent point index'
-    //
-    //  Ascoli et al., 2001: http://www.jstor.org/stable/3067144
-    //    'In the SWC format, dendritic segments are characterized by an identification number, a
-    //    type (to distinguish basal, apical, proximal, distal and lateral trees), the x, y, z
-    //    positions of the cylinder ending point (in pm with respect to a fixed reference point), a
-    //    radius value (also in pm), and the identification number of the 'parent', i.e. the adjacent
-    //    cylinder in the path to the soma (the parent of the root being the soma itself)."
-    //
-    // that the SWC format uses cylinders to represent the soma.
-};
+void buildChildren(std::shared_ptr<Property::Properties> properties);
+SomaType getSomaType(uint32_t nSomaPoints);
 
-SomaType getSomaType(uint32_t nSomaPoints) {
-    try {
-        return std::map<uint32_t, SomaType>{
-            {0, SOMA_UNDEFINED},
-            {1, SOMA_SINGLE_POINT},
-            {2, SOMA_UNDEFINED}}.at(nSomaPoints);
-    }
-    catch (const std::out_of_range& oor)
-    {
-        return SOMA_SIMPLE_CONTOUR;
-    }
-}
-
-void buildChildren(std::shared_ptr<Property::Properties> properties)
-{
-
-    {
-        const auto& sections = properties->get<Property::Section>();
-        auto& children = properties->_sectionLevel._children;
-
-        for (size_t i = 0; i < sections.size(); ++i)
-        {
-            const int32_t parent = sections[i][1];
-            children[parent].push_back(i);
-        }
-    }
-
-    {
-        const auto& sections = properties->get<Property::MitoSection>();
-        auto& children = properties->_mitochondriaSectionLevel._children;
-
-        for (size_t i = 0; i < sections.size(); ++i)
-        {
-            const int32_t parent = sections[i][1];
-            children[parent].push_back(i);
-        }
-    }
-}
 
 Morphology::Morphology(const URI& source, unsigned int options)
 {
@@ -122,13 +64,15 @@ Morphology::Morphology(const URI& source, unsigned int options)
         version() == MORPHOLOGY_VERSION_H5_2)) {
 
         mut::Morphology mutable_morph(*this);
+        mutable_morph.sanitize();
         mutable_morph.applyModifiers(options);
         _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
     }
 }
 
-Morphology::Morphology(const mut::Morphology& morphology)
+Morphology::Morphology(mut::Morphology morphology)
 {
+    morphology.sanitize();
     _properties = std::make_shared<Property::Properties>(morphology.buildReadOnly());
     buildChildren(_properties);
 }
@@ -270,5 +214,46 @@ breadth_iterator Morphology::breadth_end() const
 {
     return breadth_iterator();
 }
+
+
+SomaType getSomaType(uint32_t nSomaPoints) {
+    try {
+        return std::map<uint32_t, SomaType>{
+            {0, SOMA_UNDEFINED},
+            {1, SOMA_SINGLE_POINT},
+            {2, SOMA_UNDEFINED}}.at(nSomaPoints);
+    }
+    catch (const std::out_of_range& oor)
+    {
+        return SOMA_SIMPLE_CONTOUR;
+    }
+}
+
+void buildChildren(std::shared_ptr<Property::Properties> properties)
+{
+
+    {
+        const auto& sections = properties->get<Property::Section>();
+        auto& children = properties->_sectionLevel._children;
+
+        for (size_t i = 0; i < sections.size(); ++i)
+        {
+            const int32_t parent = sections[i][1];
+            children[parent].push_back(i);
+        }
+    }
+
+    {
+        const auto& sections = properties->get<Property::MitoSection>();
+        auto& children = properties->_mitochondriaSectionLevel._children;
+
+        for (size_t i = 0; i < sections.size(); ++i)
+        {
+            const int32_t parent = sections[i][1];
+            children[parent].push_back(i);
+        }
+    }
+}
+
 
 } // namespace morphio

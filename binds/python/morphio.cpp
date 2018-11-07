@@ -144,7 +144,7 @@ PYBIND11_MODULE(morphio, m) {
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const morphio::URI&, unsigned int>(),
              "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const morphio::mut::Morphology&>())
+        .def(py::init<morphio::mut::Morphology&>())
         .def("__eq__", [](const morphio::Morphology& a, const morphio::Morphology& b) {
                 return a.operator==(b);
             }, py::is_operator(),
@@ -367,6 +367,7 @@ PYBIND11_MODULE(morphio, m) {
         .def(py::init<>())
         .def(py::init<const morphio::URI&>())
         .def(py::init<const morphio::Morphology&>())
+        .def(py::init<const morphio::mut::Morphology&>())
 
         // Cell sub-part accessors
         .def_property_readonly("sections", &morphio::mut::Morphology::sections,

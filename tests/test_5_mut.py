@@ -125,8 +125,28 @@ def test_append_no_duplicate():
                          'While appending section: 1 to parent: 0\n'
                          'The section first point should be parent section last point: \n'
                          '        : X Y Z Diameter\n'
-                         'parent last point :[4.000000, 4.000000, 4.000000, 2.000000]\n'
-                         'child first point :[400.000000, 400.000000, 400.000000, 2.000000]')
+                         'parent last point :[4.000000, 5.000000, 6.000000, 2.000000]\n'
+                         'child first point :[400.000000, 5.000000, 6.000000, 2.000000]')
+
+
+def test_mut_copy_ctor():
+    simple = Morphology(os.path.join(_path, "simple.swc"))
+    assert_equal([sec.id for sec in simple.iter()],
+                 [0, 1, 2, 3, 4, 5])
+    copy = Morphology(simple)
+    section = copy.append_root_section(PointLevel([[1, 2, 3], [4, 5, 6]],
+                                                  [2, 2],
+                                                  [20, 20]),
+                                       SectionType.axon)
+
+    # test that first object has not been mutated
+    assert_equal([sec.id for sec in simple.iter()],
+                 [0, 1, 2, 3, 4, 5])
+
+    assert_equal([sec.id for sec in copy.iter()],
+                 [0, 1, 2, 3, 4, 5, 6])
+
+
 
 
 def test_build_read_only():
@@ -164,8 +184,7 @@ def test_build_read_only():
     assert_array_equal(immutable_morphology.section(0).perimeters,
                        [20, 20])
 
-    assert_equal(len(immutable_morphology.section(0).children),
-                 2)
+    assert_equal(len(immutable_morphology.section(0).children), 2)
 
     child = immutable_morphology.section(0).children[0]
     assert_array_equal(child.points,

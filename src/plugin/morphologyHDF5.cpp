@@ -384,6 +384,7 @@ void MorphologyHDF5::_readSectionTypes()
 
         types.resize(dims[0]);
         dataset.read(types);
+        types.erase(types.begin()); // remove soma type
         return;
     }
 

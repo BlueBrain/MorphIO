@@ -13,6 +13,11 @@ H5V2_PATH = os.path.join(H5_PATH, 'v2')
 
 
 def test_v1():
+    n = Morphology(os.path.join(H5V1_PATH, 'simple.h5'))
+    assert_equal(len(n.root_sections), 2)
+    assert_equal(n.root_sections[0].type, 3)
+    assert_equal(n.root_sections[1].type, 2)
+
     n = Morphology(os.path.join(H5V1_PATH, 'Neuron.h5'))
     assert_equal(n.version, MORPHOLOGY_VERSION_H5_1)
 
@@ -27,8 +32,7 @@ def test_v1():
                                     repeat(SectionType.basal_dendrite, 42),
                                     repeat(SectionType.axon, 21)))
 
-    assert_equal(section_types,
-                 real_section_types)
+    assert_equal(section_types, real_section_types)
     assert_array_equal(n.points[:7],
                        [[0.0, 0.0, 0.0],
                         [0.0, 0.0, 0.10000000149011612],
@@ -43,6 +47,10 @@ def test_v2():
     n = Morphology(os.path.join(H5V2_PATH, 'Neuron.h5'))
     assert_equal(n.version, MORPHOLOGY_VERSION_H5_2)
 
-    assert_equal(len(n.soma.points), 1)
+
+    # This is a bug in the Neuron.h5 file
+    # First neurite should not have a type: soma
+    assert_equal(n.root_sections[0].type, 1)
+    assert_equal(n.root_sections[1].type, 4)
     assert_equal(len(list(n.iter())), 85)
     assert_equal(len(n.points), 926)

@@ -46,9 +46,15 @@ public:
     Morphology(const morphio::URI& uri, unsigned int options = NO_MODIFIER);
 
     /**
+       Build a mutable Morphology from a mutable morphology
+    **/
+    Morphology(const morphio::mut::Morphology& morphology);
+
+    /**
        Build a mutable Morphology from a read-only morphology
     **/
     Morphology(const morphio::Morphology& morphology);
+
 
     virtual ~Morphology();
 
@@ -92,11 +98,6 @@ public:
     **/
     const std::shared_ptr<Section> section(uint32_t id) const;
 
-
-    /**
-       Return the data structure used to create read-only morphologies
-    **/
-    const Property::Properties buildReadOnly() const;
 
 
 
@@ -165,6 +166,7 @@ public:
 
     void applyModifiers(unsigned int modifierFlags);
 
+
     /**
      * Return the soma type
      **/
@@ -189,24 +191,16 @@ public:
         _annotations.push_back(annotation);
     }
 
-    const Property::Properties buildReadOnly(const morphio::plugin::DebugInfo& debugInfo) const;
-
-protected:
     /**
-     * Write file to H5 format
-     **/
-    virtual void _write_h5(const std::string& filename);
+       Return the data structure used to create read-only morphologies
+    **/
+    const Property::Properties buildReadOnly() const;
 
     /**
-     * Write file to ASC (neurolucida) format
+       Check that the neuron is valid, issue warning and fix unifurcations
      **/
-    virtual void _write_asc(const std::string& filename);
-
-    /**
-     * Write file to SWC format
-     **/
-    virtual void _write_swc(const std::string& filename);
-
+    void sanitize();
+    void sanitize(const morphio::plugin::DebugInfo& debugInfo);
 
 private:
     friend class Section;
