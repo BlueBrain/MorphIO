@@ -58,7 +58,7 @@ Morphology::Morphology(const morphio::Morphology& morphology)
 
     for (const morphio::MitoSection& root : morphology.mitochondria().rootSections())
     {
-        mitochondria().appendSection(-1, root, true);
+        mitochondria().appendSection(nullptr, root, true);
     }
 }
 

@@ -16,7 +16,7 @@ public:
         {
         }
 
-    MitoSection(int id, const morphio::MitoSection& section)
+    MitoSection(int id, const morphio::MitoSection section)
         : MitoSection(id,
                       Property::MitochondriaPointLevel(section._properties->_mitochondriaPointLevel,
                                                        section._range))
@@ -68,7 +68,7 @@ public:
     {
     }
 
-    const std::vector<std::shared_ptr<Section> children(uint32_t id) const;
+    const std::vector<std::shared_ptr<MitoSection>> children(std::shared_ptr<MitoSection>) const;
     const std::shared_ptr<MitoSection> section(uint32_t id) const;
     const std::map<uint32_t, std::shared_ptr<MitoSection>> sections() const;
 
@@ -78,7 +78,7 @@ public:
        If id == -1, the iteration will start at each root section, successively
     **/
     mito_depth_iterator depth_begin() const;
-    mito_depth_iterator depth_begin(const std::shared_ptr<MitoSection>& section) const;
+    mito_depth_iterator depth_begin(const std::shared_ptr<MitoSection> section) const;
     mito_depth_iterator depth_end() const;
 
     /**
@@ -87,8 +87,8 @@ public:
        If id == -1, the iteration will be successively performed starting
        at each root section
     **/
-    mito_breadth_iterotor breadth_begin() const;
-    mito_breadth_iterator breadth_begin(const std::shared_ptr<MitoSection>& section) const;
+    mito_breadth_iterator breadth_begin() const;
+    mito_breadth_iterator breadth_begin(const std::shared_ptr<MitoSection> section) const;
     mito_breadth_iterator breadth_end() const;
 
     /**
@@ -97,8 +97,8 @@ public:
        If id == -1, the iteration will be successively performed starting
        at each root section
     **/
-    mito_upstream_iterotor upstream_begin() const;
-    mito_upstream_iterator upstream_begin(const std::shared_ptr<MitoSection>& section) const;
+    mito_upstream_iterator upstream_begin() const;
+    mito_upstream_iterator upstream_begin(const std::shared_ptr<MitoSection> section) const;
     mito_upstream_iterator upstream_end() const;
 
 
@@ -106,19 +106,19 @@ public:
     /**
      * Return the parent mithochondrial section ID
      **/
-    const std::shared_ptr<MitoSection> parent(const std::shared_ptr<MitoSection>& section) const;
+    const std::shared_ptr<MitoSection> parent(const std::shared_ptr<MitoSection> parent) const;
 
     /**
        Return true if section is a root section
     **/
-    bool isRoot(const std::shared_ptr<MitoSection>& section) const;
+    bool isRoot(const std::shared_ptr<MitoSection> section) const;
 
 
     /**
      * Return the list of IDs of all mitochondrial root sections
      * (sections whose parent ID are -1)
      **/
-    const std::vector<std::shared_ptr<MitoSection>& rootSections() const;
+    const std::vector<std::shared_ptr<MitoSection>>& rootSections() const;
 
 
     /**
@@ -132,7 +132,7 @@ public:
 
        If recursive == true, all descendent mito sections will be appended as well
     **/
-    uint32_t appendSection(int32_t mitoParentId, const morphio::MitoSection& section,
+    std::shared_ptr<MitoSection> appendSection(const std::shared_ptr<MitoSection>, const morphio::MitoSection section,
         bool recursive = false);
 
 
@@ -141,7 +141,7 @@ public:
     void _buildMitochondria(Property::Properties& properties) const;
 
 private:
-    std::map<uint32_t, std::vector<uint32_t>> _children;
+    std::map<uint32_t, std::vector<std::shared_ptr<MitoSection>>> _children;
     std::map<uint32_t, uint32_t> _parent;
     std::vector<std::shared_ptr<MitoSection>> _rootSections;
     std::map<uint32_t, std::shared_ptr<MitoSection>> _sections;

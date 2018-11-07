@@ -468,7 +468,7 @@ PYBIND11_MODULE(morphio, m) {
         .def("append_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*) (std::shared_ptr<morphio::mut::MitoSection>, const morphio::Property::MitochondriaPointLevel&)) &morphio::mut::Mitochondria::appendSection,
              "Append a new MitoSection the given parentId (None create a new mitochondrion)",
              "parent_id"_a, "point_level_properties"_a)
-        .def("depth_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection section) {
+        .def("depth_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection> section) {
                 return py::make_iterator(morph->depth_begin(section), morph->depth_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -477,7 +477,7 @@ PYBIND11_MODULE(morphio, m) {
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
             "section_id"_a=-1)
-        .def("breadth_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection section) {
+        .def("breadth_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection> section) {
                 return py::make_iterator(morph->breadth_begin(section), morph->breadth_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -486,7 +486,7 @@ PYBIND11_MODULE(morphio, m) {
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
             "section_id"_a=-1)
-        .def("upstream_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection section) {
+        .def("upstream_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection> section) {
                 return py::make_iterator(morph->upstream_begin(section), morph->upstream_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,

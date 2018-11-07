@@ -82,7 +82,7 @@ mito_upstream_iterator::MitoIterator(const Mitochondria& mitochondria) :
     _mitochondria(mitochondria) {}
 
 template <>
-mito_upstream_iterator::MitoIterator(const Mitochondria& mtiochondria, std::shared_ptr<MitoSection> section) :
+mito_upstream_iterator::MitoIterator(const Mitochondria& mitochondria, std::shared_ptr<MitoSection> section) :
     _mitochondria(mitochondria)
 {
     container.push_back(section);
