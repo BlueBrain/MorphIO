@@ -20,24 +20,26 @@ using namespace std;
 // To be compiled and run with:
 
 // cd /home/bcoste/workspace/morphology/io/build && make && cd .. && rm main; g++ -g -std=c++1z -I ./include -I 3rdparty/glm/ -I 3rdparty/HighFive -I 3rdparty/GSL_LITE/include -L build/src/ test.cpp -o main  -lmorphio -Wl,-rpath,/usr/lib/x86_64-linux-gnu/hdf5/serial /usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so && LD_LIBRARY_PATH=./build/src ./main && pip install . --upgrade
-
-#define go_mut 1
 int main()
 {
-    std::cout << "bla" << std::endl;
-    #ifdef go_mut
     morphio::mut::Morphology m("/home/bcoste/workspace/morphology/io/tests/data/simple.swc");
-    #else
-    morphio::Morphology m("/home/bcoste/workspace/morphology/io/tests/data/simple.swc");
-    #endif
+    morphio::mut::Morphology b(m);
 
-    auto roots = m.rootSections();
+    for(auto it = m.depth_begin(); it != m.depth_end(); ++it)
+        std::cout <<  (*it)->id() << std::endl;
 
-    auto first_root = roots[0];
-    #ifdef go_mut
-    for(auto it = first_root->depth_begin(); it!=first_root->depth_end(); ++it)
-    #else
-    for(auto it = first_root.depth_begin(); it!=first_root.depth_end(); ++it)
-    #endif
-        std::cout << "(*it): " << (*it) << std::endl;
+
+    // m.sanitize();
+
+    // std::cout << "second sanitize" << std::endl;
+    // b.sanitize();
+
+    // std::cout << "m.rootSections()[0]->children()[0]->parent().get(): " << m.rootSections()[0]->children()[0]->parent().get() << std::endl;
+    //     (*it)->points() = {{0,0,0}, {0,0,0}};
+
+    // for(auto it = m.depth_begin(); it != m.depth_end(); ++it)
+    //     std::cout << "dumpPoints((*it)->points()): " << morphio::dumpPoints((*it)->points()) << std::endl;
+
+    // child->appendSection(morphio::Property::PointLevel({{0, 5, 0}, {500,5,5}}, {10, 10}));
+    // m.write("test.swc");
 }

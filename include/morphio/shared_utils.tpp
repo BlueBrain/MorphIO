@@ -5,7 +5,7 @@
 namespace morphio
 {
 template <typename ContainerDiameters, typename ContainerPoints>
-const float _somaSurface(const SomaType type,
+float _somaSurface(const SomaType type,
                          const ContainerDiameters& diameters,
                          const ContainerPoints& points){
     size_t size = points.size();
@@ -29,7 +29,7 @@ const float _somaSurface(const SomaType type,
         // Surface is approximated as the sum of areas of the conical frustums
         // defined by each segments. Does not include the endcaps areas
         float surface = 0;
-        for(int i = 0;i<size-1; ++i){
+        for(unsigned int i = 0;i<size-1; ++i){
             float r0 = diameters[i] * 0.5;
             float r1 = diameters[i+1] * 0.5;
             float h2 = distance(points[i], points[i+1]);
@@ -42,7 +42,7 @@ const float _somaSurface(const SomaType type,
     {
         throw NotImplementedError("Surface is not implemented for SOMA_SIMPLE_CONTOUR");
     }
-    case SOMA_UNDEFINED:
+    default:
     {
         morphio::plugin::ErrorMessages err;
         LBTHROW(SomaError(err.ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA("Soma::surface")));

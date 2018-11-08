@@ -4,6 +4,9 @@
 #include <stack>
 
 #include <morphio/types.h>
+#include <morphio/mut/mitochondria.h>
+
+
 
 namespace morphio
 {
@@ -17,16 +20,17 @@ class MitoIterator
 {
     friend class Mitochondria;
 
-    const Mitochondria& _mitochondria;
+    const Mitochondria _mitochondria;
 
     T container;
     MitoIterator();
 
 public:
-    MitoIterator(const Mitochondria& mitochondria, uint32_t rootSectionId = -1);
+    MitoIterator(const Mitochondria& mitochondria, std::shared_ptr<MitoSection> rootSectionId = nullptr);
+    MitoIterator(const Mitochondria& mitochondria);
     bool operator==(MitoIterator other) const;
     bool operator!=(MitoIterator other) const;
-    uint32_t operator*() const;
+    std::shared_ptr<MitoSection> operator*() const;
     MitoIterator& operator++();
     MitoIterator operator++(int);
 };

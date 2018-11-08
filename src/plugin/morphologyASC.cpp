@@ -69,7 +69,7 @@ public:
 
         lex_.start_parse(input);
 
-        bool ret = parse_block();
+        parse_block();
 
         return nb_;
 
@@ -289,13 +289,15 @@ private:
         return true;
     }
 
-    NeurolucidaLexer lex_;
     morphio::mut::Morphology nb_;
 
     std::string uri_;
-    ErrorMessages err_;
+    NeurolucidaLexer lex_;
 public:
     DebugInfo debugInfo_;
+private:
+    ErrorMessages err_;
+
 };
 
 Property::Properties load(const URI& uri, unsigned int options)
@@ -303,9 +305,10 @@ Property::Properties load(const URI& uri, unsigned int options)
     NeurolucidaParser parser(uri);
 
     morphio::mut::Morphology& nb_ = parser.parse();
+    nb_.sanitize(parser.debugInfo_);
     nb_.applyModifiers(options);
 
-    Property::Properties properties = nb_.buildReadOnly(parser.debugInfo_);
+    Property::Properties properties = nb_.buildReadOnly();
     properties._cellLevel._cellFamily = FAMILY_NEURON;
     properties._cellLevel._version = MORPHOLOGY_VERSION_ASC_1;
     return properties;

@@ -125,8 +125,28 @@ def test_append_no_duplicate():
                          'While appending section: 1 to parent: 0\n'
                          'The section first point should be parent section last point: \n'
                          '        : X Y Z Diameter\n'
-                         'parent last point :[4.000000, 4.000000, 4.000000, 2.000000]\n'
-                         'child first point :[400.000000, 400.000000, 400.000000, 2.000000]')
+                         'parent last point :[4.000000, 5.000000, 6.000000, 2.000000]\n'
+                         'child first point :[400.000000, 5.000000, 6.000000, 2.000000]')
+
+
+def test_mut_copy_ctor():
+    simple = Morphology(os.path.join(_path, "simple.swc"))
+    assert_equal([sec.id for sec in simple.iter()],
+                 [0, 1, 2, 3, 4, 5])
+    copy = Morphology(simple)
+    section = copy.append_root_section(PointLevel([[1, 2, 3], [4, 5, 6]],
+                                                  [2, 2],
+                                                  [20, 20]),
+                                       SectionType.axon)
+
+    # test that first object has not been mutated
+    assert_equal([sec.id for sec in simple.iter()],
+                 [0, 1, 2, 3, 4, 5])
+
+    assert_equal([sec.id for sec in copy.iter()],
+                 [0, 1, 2, 3, 4, 5, 6])
+
+
 
 
 def test_build_read_only():
@@ -164,8 +184,7 @@ def test_build_read_only():
     assert_array_equal(immutable_morphology.section(0).perimeters,
                        [20, 20])
 
-    assert_equal(len(immutable_morphology.section(0).children),
-                 2)
+    assert_equal(len(immutable_morphology.section(0).children), 2)
 
     child = immutable_morphology.section(0).children[0]
     assert_array_equal(child.points,
@@ -190,7 +209,7 @@ def test_mitochondria_read():
     mito = morpho.mitochondria
     assert_equal(len(mito.root_sections), 2)
 
-    mitochondria = [mito.section(root_id) for root_id in mito.root_sections]
+    mitochondria = mito.root_sections
 
     assert_array_equal(mitochondria[0].diameters,
                        [10, 20])
@@ -201,8 +220,10 @@ def test_mitochondria_read():
 
     assert_equal(len(mito.children(mito.root_sections[0])), 1)
 
-    assert_equal(mito.parent(mito.children(0)[0]),
-                 mitochondria[0].id)
+    child = mito.children(mitochondria[0])[0]
+
+    assert_equal(mito.parent(mito.children(mitochondria[0])[0]),
+                 mitochondria[0])
 
     assert_array_equal(mitochondria[1].diameters,
                        [5, 6, 7, 8])
@@ -247,31 +268,30 @@ def test_mitochondria():
         SectionType.axon)
 
     mito = morpho.mitochondria
-    first_mito_id = mito.append_section(
-        -1, MitochondriaPointLevel([0, 0], [0.5, 0.6],
-                                   [10, 20]))
+    first_mito_id = mito.append_root_section(MitochondriaPointLevel([0, 0], [0.5, 0.6],
+                                                                    [10, 20]))
 
-    first_child = mito.append_section(first_mito_id,
+    first_child = first_mito_id.append_section(
                                       MitochondriaPointLevel([3, 4, 4, 5],
                                                              [0.6, 0.7, 0.8, 0.9],
                                                              [20, 30, 40, 50]))
 
-    second_mito_id = mito.append_section(-1,
+    second_mito_id = mito.append_root_section(
                                          MitochondriaPointLevel([0, 1, 1, 2],
                                                                 [0.6, 0.7, 0.8, 0.9],
                                                                 [5, 6, 7, 8]))
 
-    assert_equal(mito.parent(first_mito_id), -1)
+    assert_equal(mito.is_root(first_mito_id), True)
     assert_equal(mito.children(first_mito_id), [first_child])
     assert_equal(mito.parent(first_child), first_mito_id)
     assert_equal(mito.root_sections, [first_mito_id, second_mito_id])
 
-    assert_array_equal(mito.section(first_child).diameters,
+    assert_array_equal(first_child.diameters,
                        [20, 30, 40, 50])
-    assert_array_equal(mito.section(first_child).neurite_section_ids,
+    assert_array_equal(first_child.neurite_section_ids,
                        [3, 4, 4, 5])
 
-    assert_array_equal(np.array(mito.section(first_child).relative_path_lengths, dtype=np.float32),
+    assert_array_equal(np.array(first_child.relative_path_lengths, dtype=np.float32),
                        np.array([0.6, 0.7, 0.8, 0.9], dtype=np.float32))
 
 

@@ -29,9 +29,10 @@ bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
 class Morphology
 {
 public:
-    Morphology() : _soma(std::make_shared<Soma>()),
-                   _cellProperties(std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())),
-                   _counter(0) {}
+    Morphology() : _counter(0),
+                   _soma(std::make_shared<Soma>()),
+                   _cellProperties(std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel()))
+                    {}
 
     /**
        Build a mutable Morphology from an on-disk morphology
@@ -45,9 +46,15 @@ public:
     Morphology(const morphio::URI& uri, unsigned int options = NO_MODIFIER);
 
     /**
+       Build a mutable Morphology from a mutable morphology
+    **/
+    Morphology(const morphio::mut::Morphology& morphology);
+
+    /**
        Build a mutable Morphology from a read-only morphology
     **/
     Morphology(const morphio::Morphology& morphology);
+
 
     virtual ~Morphology();
 
@@ -91,11 +98,6 @@ public:
     **/
     const std::shared_ptr<Section> section(uint32_t id) const;
 
-
-    /**
-       Return the data structure used to create read-only morphologies
-    **/
-    const Property::Properties buildReadOnly() const;
 
 
 
@@ -164,6 +166,7 @@ public:
 
     void applyModifiers(unsigned int modifierFlags);
 
+
     /**
      * Return the soma type
      **/
@@ -188,39 +191,32 @@ public:
         _annotations.push_back(annotation);
     }
 
-    const Property::Properties buildReadOnly(const morphio::plugin::DebugInfo& debugInfo) const;
-
-protected:
     /**
-     * Write file to H5 format
-     **/
-    virtual void _write_h5(const std::string& filename);
+       Return the data structure used to create read-only morphologies
+    **/
+    const Property::Properties buildReadOnly() const;
 
     /**
-     * Write file to ASC (neurolucida) format
+       Check that the neuron is valid, issue warning and fix unifurcations
      **/
-    virtual void _write_asc(const std::string& filename);
-
-    /**
-     * Write file to SWC format
-     **/
-    virtual void _write_swc(const std::string& filename);
-
+    void sanitize();
+    void sanitize(const morphio::plugin::DebugInfo& debugInfo);
 
 private:
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
     morphio::plugin::ErrorMessages _err;
 
-    uint32_t _register(std::shared_ptr<Section>&);
+    uint32_t _register(std::shared_ptr<Section>);
+
+    uint32_t _counter;
     std::shared_ptr<Soma> _soma;
+    std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     std::vector<std::shared_ptr<Section>> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
-    std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     std::vector<morphio::Property::Annotation> _annotations;
     Mitochondria _mitochondria;
 
-    uint32_t _counter;
     std::map<uint32_t, uint32_t> _parent;
     std::map<uint32_t, std::vector<std::shared_ptr<Section>>> _children;
 

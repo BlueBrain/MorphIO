@@ -59,7 +59,7 @@ bool SectionBase<T>::operator!=(const SectionBase& other) const
 }
 
 template <typename T>
-const uint32_t SectionBase<T>::id() const
+uint32_t SectionBase<T>::id() const
 {
     return _id;
 }

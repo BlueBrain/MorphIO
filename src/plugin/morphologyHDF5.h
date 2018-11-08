@@ -13,7 +13,7 @@ namespace plugin
 {
 namespace h5
 {
-Property::Properties load(const URI& uri, unsigned int options);
+Property::Properties load(const URI& uri);
 
 class MorphologyHDF5
 {
@@ -28,17 +28,17 @@ private:
     bool _readV11Metadata();
     bool _readV2Metadata();
     HighFive::DataSet _getStructureDataSet(size_t nSections);
-    void _readPoints(int);
+    void _readPoints(unsigned int);
     int _readSections();
     void _readSectionTypes();
     void _readPerimeters(int);
     void _readMitochondria();
     template <typename T>
     void _read(const std::string& group,
-                               const std::string& _dataset,
-                               MorphologyVersion version,
-                               int expectedDimension,
-                               T& data);
+               const std::string& _dataset,
+               MorphologyVersion version,
+               unsigned int expectedDimension,
+               T& data);
 
     std::unique_ptr<HighFive::File> _file;
 

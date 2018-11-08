@@ -36,7 +36,7 @@ public:
         _lineNumbers[sectionId] = line;
     }
 
-    const int32_t getLineNumber(uint32_t sectionId) const {
+    int32_t getLineNumber(uint32_t sectionId) const {
         try {
             return _lineNumbers.at(sectionId);
         } catch (const std::out_of_range& oor) {

@@ -63,9 +63,9 @@ def test_write_merge_only_child():
     '''The root section has only one child
     The child should be merged with its parent section
     Special care must be given for the potential duplicate point
-                              o
-                             /
-                            / son 1
+                             o
+                            /
+                           / son 1
       root       child    /
     o--------o----------o<
                           \
@@ -93,21 +93,24 @@ def test_write_merge_only_child():
                     filename = os.path.join(tmp_folder, 'test.{}'.format(extension))
                     morpho.write(filename)
 
-                    read = Morphology(filename)
-                    root = read.root_sections[0]
-                    assert_array_equal(root.points,
-                                       [[0, 0, 0],
-                                        [0, 5, 0],
-                                        [0, 6, 0]])
-                    assert_equal(len(root.children), 2)
                     assert_equal(err.getvalue().strip(),
                                  'Section: 1 is the only child of section: 0\nIt will be merged with the parent section')
 
-                    assert_array_equal(root.children[0].points,
-                                       [[0, 6, 0], [0, 7, 0]])
 
-                    assert_array_equal(root.children[1].points,
-                                       [[0, 6, 0], [4, 5, 6]])
+            read = Morphology(filename)
+            root = read.root_sections[0]
+            assert_array_equal(root.points,
+                               [[0, 0, 0],
+                                [0, 5, 0],
+                                [0, 6, 0]])
+            assert_equal(len(root.children), 2)
+
+            assert_array_equal(root.children[0].points,
+                               [[0, 6, 0], [0, 7, 0]])
+
+            assert_array_equal(root.children[1].points,
+                               [[0, 6, 0], [4, 5, 6]])
+
 
 
 def test_write_perimeter():
@@ -184,13 +187,13 @@ def test_mitochondria():
     neuronal_section_ids = [0, 0]
     relative_pathlengths = np.array([0.5, 0.6], dtype=np.float32)
     diameters = [10, 20]
-    mito_id = morpho.mitochondria.append_section(
-        -1, MitochondriaPointLevel(neuronal_section_ids,
+    mito_id = morpho.mitochondria.append_root_section(
+        MitochondriaPointLevel(neuronal_section_ids,
                                    relative_pathlengths,
                                    diameters))
 
-    morpho.mitochondria.append_section(
-        mito_id, MitochondriaPointLevel([0, 0, 0, 0],
+    mito_id.append_section(
+        MitochondriaPointLevel([0, 0, 0, 0],
                                         [0.6, 0.7, 0.8, 0.9],
                                         [20, 30, 40, 50]))
     with setup_tempdir('test_mitochondria') as tmp_folder:
@@ -219,7 +222,8 @@ def test_mitochondria():
         assert_equal(len(mito.root_sections), 1)
 
         mito = Morphology(os.path.join(tmp_folder, 'test.h5')).mitochondria
-        assert_equal(mito.root_sections, [0])
+        assert_equal(len(mito.root_sections), 1)
+        assert_equal(mito.root_sections[0].neurite_section_ids, neuronal_section_ids)
         assert_array_equal(mito.section(0).diameters,
                            diameters)
 

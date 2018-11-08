@@ -1,8 +1,7 @@
 #include <sstream>
 
-#include <morphio/vector_types.h>
+#include <morphio/types.h>
 #include <math.h>
-#include <morphio/shared_utils.tpp>
 
 namespace morphio
 {

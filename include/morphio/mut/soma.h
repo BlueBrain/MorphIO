@@ -31,7 +31,7 @@ public:
     /**
        Return the soma type
     **/
-    const SomaType type() const { return _somaType; }
+    SomaType type() const { return _somaType; }
 
     /**
      * Return the center of gravity of the soma points
@@ -42,7 +42,7 @@ public:
        Return the soma surface
        Note: the soma surface computation depends on the soma type
     **/
-    const float surface() const;
+    float surface() const;
 
     Property::PointLevel& properties() { return _pointProperties; }
 

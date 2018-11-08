@@ -257,8 +257,8 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(std::shared_ptr<morphio::mut:
                     "\nThe section first point " +
                     "should be parent section last point: " +
                     "\n        : X Y Z Diameter" +
-                    "\nparent last point :["+std::to_string(p0[0]) + ", "+std::to_string(p0[0]) + ", "+std::to_string(p0[0]) + ", "+std::to_string(d0) + "]" +
-                    "\nchild first point :["+std::to_string(p1[0]) + ", "+std::to_string(p1[0]) + ", "+std::to_string(p1[0]) + ", "+std::to_string(d1) + "]\n");
+                    "\nparent last point :["+std::to_string(p0[0]) + ", "+std::to_string(p0[1]) + ", "+std::to_string(p0[2]) + ", "+std::to_string(d0) + "]" +
+                    "\nchild first point :["+std::to_string(p1[0]) + ", "+std::to_string(p1[1]) + ", "+std::to_string(p1[2]) + ", "+std::to_string(d1) + "]\n");
 
 }
 
@@ -280,7 +280,7 @@ const std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info, int p
 const std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& root,
                                                                     const Sample& child1,
                                                                     const Sample& child2) {
-    float x = root.point[0],  y = root.point[1],  z = root.point[2], d = root.diameter, r = root.diameter / 2.;
+    float x = root.point[0],  y = root.point[1],  z = root.point[2], r = root.diameter / 2.;
     std::stringstream ss;
     ss << "The soma does not conform the three point soma spec" << std::endl;
     ss <<"The only valid neuro-morpho soma is:" << std::endl;

@@ -52,7 +52,7 @@ public:
     const range<const float> relativePathLengths() const;
 
     /** Return the morphological type of this section (dendrite, axon, ...). */
-    const SectionType type() const;
+    SectionType type() const;
 
 
 

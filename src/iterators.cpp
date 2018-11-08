@@ -36,8 +36,8 @@ breadth_iterator::Iterator(const Morphology& morphology) {
     }
 }
 
-template <>
-upstream_iterator::Iterator(const Morphology& morphology) {} // Unused
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+template <> upstream_iterator::Iterator(const Morphology& morphology) {} // Unused
 
 
 template <typename T>
@@ -105,7 +105,6 @@ breadth_iterator& breadth_iterator::operator++()
 {
     const auto& section = *(*this);
     container.front().pop();
-    auto& children = section.children();
     for (auto& child: section.children())
         container.front().push(child);
     if(container.front().empty())

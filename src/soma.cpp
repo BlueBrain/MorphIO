@@ -18,7 +18,7 @@ const Point Soma::center() const
     return centerOfGravity(_properties->_somaLevel._points);
 }
 
-const float Soma::volume() const {
+float Soma::volume() const {
     switch(_properties->_cellLevel._somaType) {
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS:
     {
@@ -32,12 +32,12 @@ const float Soma::volume() const {
     }
 }
 
-const float Soma::surface() const {
-    return _somaSurface<morphio::range<const float>,
-                 morphio::range<const Point>>(type(), diameters(), points());
+float Soma::surface() const {
+    return _somaSurface<range<const float>,
+                 range<const Point>>(type(), diameters(), points());
 }
 
-const float Soma::maxDistance() const {};
+float Soma::maxDistance() const { return 0; };
 
 
 }

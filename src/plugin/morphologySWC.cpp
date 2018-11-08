@@ -273,6 +273,7 @@ public:
             }
         }
 
+        morph.sanitize();
         morph.applyModifiers(options);
 
         Property::Properties properties = morph.buildReadOnly();
@@ -311,7 +312,6 @@ private:
     int lastSomaPoint = -1;
     std::map<int32_t, std::vector<uint32_t>> children;
     std::map<uint32_t, Sample> samples;
-    int currentSectionParentId = -1;
     mut::Morphology morph;
     std::string uri;
     ErrorMessages err;

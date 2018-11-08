@@ -50,7 +50,7 @@ public:
     /**
      * Return the soma type
      **/
-    const SomaType type() const
+    SomaType type() const
     {
         return _properties->_cellLevel._somaType;
     }
@@ -64,14 +64,14 @@ public:
      * Return the soma volume\n"
      * Note: the soma volume computation depends on the soma type
      **/
-    const float volume() const;
+    float volume() const;
 
     /**
      * Return the soma surface\n"
      * Note: the soma surface computation depends on the soma type
      **/
-    const float surface() const;
-    const float maxDistance() const;
+    float surface() const;
+    float maxDistance() const;
 
 
 

@@ -144,7 +144,7 @@ PYBIND11_MODULE(morphio, m) {
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const morphio::URI&, unsigned int>(),
              "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const morphio::mut::Morphology&>())
+        .def(py::init<morphio::mut::Morphology&>())
         .def("__eq__", [](const morphio::Morphology& a, const morphio::Morphology& b) {
                 return a.operator==(b);
             }, py::is_operator(),
@@ -215,6 +215,8 @@ PYBIND11_MODULE(morphio, m) {
                     return py::make_iterator(morpho->depth_begin(), morpho->depth_end());
                 case morphio::IterType::BREADTH_FIRST:
                     return py::make_iterator(morpho->breadth_begin(), morpho->breadth_end());
+                default:
+                    LBTHROW(morphio::MorphioError("Only iteration types depth_first and breadth_first are supported"));
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -293,6 +295,8 @@ PYBIND11_MODULE(morphio, m) {
                     return py::make_iterator(section->breadth_begin(), section->breadth_end());
                 case morphio::IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
+                default:
+                    LBTHROW(morphio::MorphioError("Only iteration types depth_first, breadth_first and upstream are supported"));
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -341,6 +345,8 @@ PYBIND11_MODULE(morphio, m) {
                     return py::make_iterator(section->breadth_begin(), section->breadth_end());
                 case morphio::IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
+                default:
+                    LBTHROW(morphio::MorphioError("Only iteration types depth_first, breadth_first and upstream are supported"));
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -361,6 +367,7 @@ PYBIND11_MODULE(morphio, m) {
         .def(py::init<>())
         .def(py::init<const morphio::URI&>())
         .def(py::init<const morphio::Morphology&>())
+        .def(py::init<const morphio::mut::Morphology&>())
 
         // Cell sub-part accessors
         .def_property_readonly("sections", &morphio::mut::Morphology::sections,
@@ -420,6 +427,8 @@ PYBIND11_MODULE(morphio, m) {
                     return py::make_iterator(morph->depth_begin(), morph->depth_end());
                 case morphio::IterType::BREADTH_FIRST:
                     return py::make_iterator(morph->breadth_begin(), morph->breadth_end());
+                default:
+                LBTHROW(morphio::MorphioError("Only iteration types depth_first and breadth_first are supported"));
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -441,7 +450,7 @@ PYBIND11_MODULE(morphio, m) {
         .def(py::init<>())
         .def_property_readonly("root_sections", &morphio::mut::Mitochondria::rootSections,
                                "Returns a list of all root sections IDs "
-                               "(sections whose parent ID are -1)")
+                               "(sections whose parent ID are -1)", py::return_value_policy::reference)
         .def_property_readonly("sections", &morphio::mut::Mitochondria::sections,
                                "Return a dict where key is the mitochondrial section ID"
                                " and value is the mithochondrial section")
@@ -456,11 +465,25 @@ PYBIND11_MODULE(morphio, m) {
              "Get a reference to the given mithochondrial section\n\n"
              "Note: multiple mitochondria can shared the same references",
              "section_id"_a)
-        .def("append_section", (uint32_t (morphio::mut::Mitochondria::*) (int32_t, const morphio::Property::MitochondriaPointLevel&)) &morphio::mut::Mitochondria::appendSection,
-             "Append a new MitoSection the given parentId (-1 create a new mitochondrion)",
-             "parent_id"_a, "point_level_properties"_a)
-        .def("depth_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
-                return py::make_iterator(morph->depth_begin(id), morph->depth_end());
+        .def("append_root_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*)
+                                     (const morphio::Property::MitochondriaPointLevel&))
+             &morphio::mut::Mitochondria::appendRootSection,
+             "Append a new root MitoSection",
+             "point_level_properties"_a)
+        .def("append_root_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*)
+                                     (const morphio::MitoSection&, bool recursive))
+             &morphio::mut::Mitochondria::appendRootSection,
+             "Append a new root MitoSection (if recursive == true, all descendent will be appended as well)",
+             "immutable_section"_a, "recursive"_a = true)
+        .def("append_root_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*)
+                                     (const std::shared_ptr<morphio::mut::MitoSection>, bool recursive))
+             &morphio::mut::Mitochondria::appendRootSection,
+             "Append a new root MitoSection (if recursive == true, all descendent will be appended as well)",
+             "section"_a, "recursive"_a = true)
+
+
+        .def("depth_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection> section) {
+                return py::make_iterator(morph->depth_begin(section), morph->depth_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Depth first iterator starting at a given section id\n"
@@ -468,8 +491,8 @@ PYBIND11_MODULE(morphio, m) {
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
             "section_id"_a=-1)
-        .def("breadth_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
-                return py::make_iterator(morph->breadth_begin(id), morph->breadth_end());
+        .def("breadth_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection> section) {
+                return py::make_iterator(morph->breadth_begin(section), morph->breadth_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Breadth first iterator starting at a given section id\n"
@@ -477,8 +500,8 @@ PYBIND11_MODULE(morphio, m) {
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
             "section_id"_a=-1)
-        .def("upstream_begin", [](morphio::mut::Mitochondria* morph, int32_t id) {
-                return py::make_iterator(morph->upstream_begin(id), morph->upstream_end());
+        .def("upstream_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection> section) {
+                return py::make_iterator(morph->upstream_begin(section), morph->upstream_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Upstream iterator starting at a given section id\n"
@@ -489,6 +512,8 @@ PYBIND11_MODULE(morphio, m) {
 
 
 
+    // py::nodelete needed because morphio::mut::MitoSection has a private destructor
+    // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
     py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(mut_module, "MitoSection")
         .def_property_readonly("id", &morphio::mut::MitoSection::id,
                                "Return the section ID")
@@ -514,7 +539,21 @@ PYBIND11_MODULE(morphio, m) {
                          const std::vector<uint32_t>& _neuriteSectionIds) {
                           section -> neuriteSectionIds() = _neuriteSectionIds;
                       },
-                      "Returns the neurite section Ids of all points of this section");
+                      "Returns the neurite section Ids of all points of this section")
+
+        .def("append_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (const morphio::Property::MitochondriaPointLevel&)) &morphio::mut::MitoSection::appendSection,
+             "Append a new MitoSection to this mito section",
+             "point_level_properties"_a)
+
+        .def("append_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (std::shared_ptr<morphio::mut::MitoSection>, bool)) &morphio::mut::MitoSection::appendSection,
+             "Append a copy of the section to this section\n"
+             "If recursive == true, all descendent will be appended as well",
+             "section"_a, "recursive"_a=false)
+
+        .def("append_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (const morphio::MitoSection&, bool)) &morphio::mut::MitoSection::appendSection,
+             "Append the existing immutable MitoSection to this section\n"
+             "If recursive == true, all descendent will be appended as well",
+             "immutable_section"_a, "recursive"_a=false);
 
     py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(mut_module, "Section")
         .def_property_readonly("id", &morphio::mut::Section::id,
@@ -573,8 +612,10 @@ PYBIND11_MODULE(morphio, m) {
                              return py::make_iterator(section->breadth_begin(), section->breadth_end());
                          case morphio::IterType::UPSTREAM:
                              return py::make_iterator(section->upstream_begin(), section->upstream_end());
+                         default:
+                             LBTHROW(morphio::MorphioError("Only iteration types depth_first, breadth_first and upstream are supported"));
                          }
-                     },
+            },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Section iterator\n"
             "\n"
@@ -598,8 +639,7 @@ PYBIND11_MODULE(morphio, m) {
         .def("append_section", (std::shared_ptr<morphio::mut::Section> (morphio::mut::Section::*) (const morphio::Property::PointLevel&, morphio::SectionType)) &morphio::mut::Section::appendSection,
              "Append a new Section to this section\n"
              " If section_type is omitted or set to 'undefined'"
-             " the type of the parent section will be used"
-             " (Root sections can't have sectionType ommited)",
+             " the type of the parent section will be used",
              "point_level_properties"_a, "section_type"_a=morphio::SectionType::SECTION_UNDEFINED);
 
 

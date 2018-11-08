@@ -49,7 +49,7 @@ public:
     const std::vector<T> children() const;
 
     /** Return the ID of this section. */
-    const uint32_t id() const;
+    uint32_t id() const;
 
 protected:
     SectionBase(uint32_t id, std::shared_ptr<Property::Properties> morphology);

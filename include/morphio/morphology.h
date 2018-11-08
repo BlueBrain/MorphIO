@@ -7,6 +7,14 @@
 
 namespace morphio
 {
+
+
+enum SomaClasses {
+    SOMA_CONTOUR,
+    SOMA_CYLINDER
+};
+
+
 /** Read access a Morphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
@@ -16,7 +24,6 @@ class Morphology
 {
 public:
     virtual ~Morphology();
-
 
     Morphology& operator=(const Morphology&);
     Morphology(Morphology&&);
@@ -47,8 +54,8 @@ public:
         Example:
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit Morphology(const URI& source, unsigned int options = NO_MODIFIER);
-    Morphology(const mut::Morphology&);
+    Morphology(const URI& source, unsigned int options = NO_MODIFIER);
+    Morphology(mut::Morphology);
 
     /**
      * Return the soma object
