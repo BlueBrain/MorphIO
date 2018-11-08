@@ -36,10 +36,10 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology)
         appendRootSection(root, true);
     }
 
-    // for (const unsigned int id: morphology.mitochondria().rootSections())
-    // {
-    //     mitochondria().appendSection(-1, morphology.mitochondria().section(id), true);
-    // }
+    for (const std::shared_ptr<MitoSection> root : morphology.mitochondria().rootSections())
+    {
+        mitochondria().appendRootSection(root, true);
+    }
 }
 
 Morphology::Morphology(const morphio::Morphology& morphology)
@@ -58,7 +58,7 @@ Morphology::Morphology(const morphio::Morphology& morphology)
 
     for (const morphio::MitoSection& root : morphology.mitochondria().rootSections())
     {
-        mitochondria().appendSection(nullptr, root, true);
+        mitochondria().appendRootSection(root, true);
     }
 }
 
@@ -98,7 +98,6 @@ bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
 std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& section, bool recursive)
 {
     std::shared_ptr<Section> ptr(new Section(this, _counter, section), friendDtorForSharedPtr);
-
     _register(ptr);
     _rootSections.push_back(ptr);
 
@@ -116,7 +115,6 @@ std::shared_ptr<Section> Morphology::appendRootSection(std::shared_ptr<Section> 
                                                        bool recursive)
 {
     std::shared_ptr<Section> section_copy(new Section(this, _counter, *section), friendDtorForSharedPtr);
-
     _register(section_copy);
     _rootSections.push_back(section_copy);
 
@@ -128,12 +126,13 @@ std::shared_ptr<Section> Morphology::appendRootSection(std::shared_ptr<Section> 
 
     return section_copy;
 }
+
+
 std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLevel& pointProperties,
                                                        SectionType type)
 {
     std::shared_ptr<Section> ptr(new Section(this, _counter, type, pointProperties), friendDtorForSharedPtr);
     _register(ptr);
-
     _rootSections.push_back(ptr);
 
     return ptr;
@@ -268,7 +267,6 @@ void Morphology::sanitize(const morphio::plugin::DebugInfo& debugInfo) {
             LBERROR(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
             bool duplicate = _checkDuplicatePoint(section->parent(), section);
 
-            int offset = duplicate ? 1 : 0;
             morphio::Property::_appendVector(parent->points(),
                                              section->points(),
                                              duplicate ? 1 : 0);

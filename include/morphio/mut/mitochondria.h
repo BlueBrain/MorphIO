@@ -4,56 +4,12 @@
 #include <morphio/types.h>
 #include <morphio/mito_section.h>
 
+#include <morphio/mut/mito_section.h>
+
 namespace morphio
 {
 namespace mut
 {
-class MitoSection
-{
-public:
-    MitoSection(int id, const Property::MitochondriaPointLevel& mitoPoints)
-        : _id(id), _mitoPoints(mitoPoints)
-        {
-        }
-
-    MitoSection(int id, const morphio::MitoSection section)
-        : MitoSection(id,
-                      Property::MitochondriaPointLevel(section._properties->_mitochondriaPointLevel,
-                                                       section._range))
-        {
-        }
-
-    /**
-     * Return the diameters of all points of this section
-     **/
-    uint32_t id() { return _id; }
-
-    /**
-     * Return the diameters of all points of this section
-     **/
-    std::vector<float>& diameters() { return _mitoPoints._diameters; }
-
-    /**
-     * Return the neurite section Ids of all points of this section
-     **/
-    std::vector<uint32_t>& neuriteSectionIds() { return _mitoPoints._sectionIds; }
-
-    /**
-     * Return the relative distance (between 0 and 1)
-     * between the start of the neuronal section and each point
-     * of this mitochondrial section
-     **/
-    std::vector<float>& pathLengths() { return _mitoPoints._relativePathLengths; }
-
-
-private:
-    uint32_t _id;
-
-public:
-    // TODO: make private
-    Property::MitochondriaPointLevel _mitoPoints;
-};
-
 /**
  * The entry-point class to access mitochondrial data
  *
@@ -64,7 +20,7 @@ public:
 class Mitochondria
 {
 public:
-    Mitochondria() :_mitochondriaSectionCounter(0)
+    Mitochondria() :_counter(0)
     {
     }
 
@@ -122,18 +78,19 @@ public:
 
 
     /**
-       Append a new MitoSection the given parentId (-1 create a new mitochondrion)
+       Append a new root MitoSection
     **/
-    std::shared_ptr<MitoSection> appendSection(std::shared_ptr<MitoSection> mitoParentId,
-                           const Property::MitochondriaPointLevel& points);
+    std::shared_ptr<MitoSection> appendRootSection(const Property::MitochondriaPointLevel& points);
 
     /**
-       Append the read-only MitoSection to the given parentId (-1 creates a new mitochondrion)
+       Append a root MitoSection
 
        If recursive == true, all descendent mito sections will be appended as well
     **/
-    std::shared_ptr<MitoSection> appendSection(const std::shared_ptr<MitoSection>, const morphio::MitoSection section,
-        bool recursive = false);
+    std::shared_ptr<MitoSection> appendRootSection(const morphio::MitoSection&,
+                                                   bool recursive = false);
+    std::shared_ptr<MitoSection> appendRootSection(const std::shared_ptr<MitoSection>,
+                                                   bool recursive = false);
 
 
     const std::shared_ptr<MitoSection> mitoSection(uint32_t id) const;
@@ -141,12 +98,15 @@ public:
     void _buildMitochondria(Property::Properties& properties) const;
 
 private:
+    friend class MitoSection;
+
+    uint32_t _register(std::shared_ptr<MitoSection> section);
+
+    uint32_t _counter;
     std::map<uint32_t, std::vector<std::shared_ptr<MitoSection>>> _children;
     std::map<uint32_t, uint32_t> _parent;
     std::vector<std::shared_ptr<MitoSection>> _rootSections;
     std::map<uint32_t, std::shared_ptr<MitoSection>> _sections;
-
-    uint32_t _mitochondriaSectionCounter;
 };
 }
 }

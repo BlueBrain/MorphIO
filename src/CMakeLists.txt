@@ -15,6 +15,7 @@ set(MORPHIO_SOURCES
   vector_utils.cpp
   version.cpp
   mut/mito_iterators.cpp
+  mut/mito_section.cpp
   mut/iterators.cpp
   mut/section.cpp
   mut/soma.cpp

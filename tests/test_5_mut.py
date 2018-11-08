@@ -268,16 +268,15 @@ def test_mitochondria():
         SectionType.axon)
 
     mito = morpho.mitochondria
-    first_mito_id = mito.append_section(
-        None, MitochondriaPointLevel([0, 0], [0.5, 0.6],
-                                   [10, 20]))
+    first_mito_id = mito.append_root_section(MitochondriaPointLevel([0, 0], [0.5, 0.6],
+                                                                    [10, 20]))
 
-    first_child = mito.append_section(first_mito_id,
+    first_child = first_mito_id.append_section(
                                       MitochondriaPointLevel([3, 4, 4, 5],
                                                              [0.6, 0.7, 0.8, 0.9],
                                                              [20, 30, 40, 50]))
 
-    second_mito_id = mito.append_section(None,
+    second_mito_id = mito.append_root_section(
                                          MitochondriaPointLevel([0, 1, 1, 2],
                                                                 [0.6, 0.7, 0.8, 0.9],
                                                                 [5, 6, 7, 8]))

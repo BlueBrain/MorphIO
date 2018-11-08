@@ -465,9 +465,23 @@ PYBIND11_MODULE(morphio, m) {
              "Get a reference to the given mithochondrial section\n\n"
              "Note: multiple mitochondria can shared the same references",
              "section_id"_a)
-        .def("append_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*) (std::shared_ptr<morphio::mut::MitoSection>, const morphio::Property::MitochondriaPointLevel&)) &morphio::mut::Mitochondria::appendSection,
-             "Append a new MitoSection the given parentId (None create a new mitochondrion)",
-             "parent_id"_a, "point_level_properties"_a)
+        .def("append_root_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*)
+                                     (const morphio::Property::MitochondriaPointLevel&))
+             &morphio::mut::Mitochondria::appendRootSection,
+             "Append a new root MitoSection",
+             "point_level_properties"_a)
+        .def("append_root_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*)
+                                     (const morphio::MitoSection&, bool recursive))
+             &morphio::mut::Mitochondria::appendRootSection,
+             "Append a new root MitoSection (if recursive == true, all descendent will be appended as well)",
+             "immutable_section"_a, "recursive"_a = true)
+        .def("append_root_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*)
+                                     (const std::shared_ptr<morphio::mut::MitoSection>, bool recursive))
+             &morphio::mut::Mitochondria::appendRootSection,
+             "Append a new root MitoSection (if recursive == true, all descendent will be appended as well)",
+             "section"_a, "recursive"_a = true)
+
+
         .def("depth_begin", [](morphio::mut::Mitochondria* morph, std::shared_ptr<morphio::mut::MitoSection> section) {
                 return py::make_iterator(morph->depth_begin(section), morph->depth_end());
             },
@@ -525,7 +539,21 @@ PYBIND11_MODULE(morphio, m) {
                          const std::vector<uint32_t>& _neuriteSectionIds) {
                           section -> neuriteSectionIds() = _neuriteSectionIds;
                       },
-                      "Returns the neurite section Ids of all points of this section");
+                      "Returns the neurite section Ids of all points of this section")
+
+        .def("append_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (const morphio::Property::MitochondriaPointLevel&)) &morphio::mut::MitoSection::appendSection,
+             "Append a new MitoSection to this mito section",
+             "point_level_properties"_a)
+
+        .def("append_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (std::shared_ptr<morphio::mut::MitoSection>, bool)) &morphio::mut::MitoSection::appendSection,
+             "Append a copy of the section to this section\n"
+             "If recursive == true, all descendent will be appended as well",
+             "section"_a, "recursive"_a=false)
+
+        .def("append_section", (std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (const morphio::MitoSection&, bool)) &morphio::mut::MitoSection::appendSection,
+             "Append the existing immutable MitoSection to this section\n"
+             "If recursive == true, all descendent will be appended as well",
+             "immutable_section"_a, "recursive"_a=false);
 
     py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(mut_module, "Section")
         .def_property_readonly("id", &morphio::mut::Section::id,
