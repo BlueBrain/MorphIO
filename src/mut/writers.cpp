@@ -17,6 +17,7 @@ namespace morphio
 {
 namespace mut
 {
+
 namespace writer
 {
 template <typename T>

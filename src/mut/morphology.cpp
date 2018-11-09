@@ -380,7 +380,6 @@ void Morphology::write(const std::string& filename) {
         writer::swc(clean, filename);
     else
         LBTHROW(UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename)));
-
 }
 
 
