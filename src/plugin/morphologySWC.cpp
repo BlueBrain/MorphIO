@@ -96,17 +96,22 @@ public:
         if(sample.type != SECTION_SOMA)
             return;
 
-        if(sample.parentId != -1 && children[sample.id].size() > 1) {
-            std::vector<Sample> bifurcations;
+        if(sample.parentId != -1 && children[sample.id].size() > 0) {
+            std::vector<Sample> soma_bifurcations;
+            std::vector<Sample> neurite_wrong_root;
             for(auto id: children[sample.id]) {
                 if(samples[id].type == SECTION_SOMA)
-                    bifurcations.push_back(samples[id]);
+                    soma_bifurcations.push_back(samples[id]);
+                else
+                    neurite_wrong_root.push_back(samples[id]);
             }
 
-            LBTHROW(morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample, bifurcations)));
+            if(soma_bifurcations.size() > 1)
+                LBTHROW(morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample, soma_bifurcations)));
+
+            if(neurite_wrong_root.size() > 0)
+                LBERROR(morphio::WRONG_ROOT_POINT, err.WARNING_WRONG_ROOT_POINT(neurite_wrong_root));
         }
-
-
 
         if(sample.parentId != -1 && samples[sample.parentId].type != SECTION_SOMA)
             LBTHROW(morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample)));

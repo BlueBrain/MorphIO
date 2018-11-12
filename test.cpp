@@ -22,11 +22,18 @@ using namespace std;
 // cd /home/bcoste/workspace/morphology/io/build && make && cd .. && rm main; g++ -g -std=c++1z -I ./include -I 3rdparty/glm/ -I 3rdparty/HighFive -I 3rdparty/GSL_LITE/include -L build/src/ test.cpp -o main  -lmorphio -Wl,-rpath,/usr/lib/x86_64-linux-gnu/hdf5/serial /usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so && LD_LIBRARY_PATH=./build/src ./main && pip install . --upgrade
 int main()
 {
-    morphio::mut::Morphology m("/home/bcoste/workspace/morphology/io/tests/data/simple.swc");
-    morphio::mut::Morphology b(m);
+    using namespace std;
+    clock_t begin = clock();
+    // morphio::Morphology m("/home/bcoste/workspace/morphology/io/tests/data/simple.swc");
+    morphio::Morphology m("/home/bcoste/workspace/morphology/io/tests/data/neurite_wrong_root_point.swc");
+    clock_t end = clock();
+    double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC * 1000.;
+    std::cout << elapsed_secs << " milliseconds" << std::endl;
 
-    for(auto it = m.depth_begin(); it != m.depth_end(); ++it)
-        std::cout <<  (*it)->id() << std::endl;
+    // morphio::mut::Morphology b(m);
+
+    // for(auto it = m.depth_begin(); it != m.depth_end(); ++it)
+    //     std::cout <<  (*it)->id() << std::endl;
 
 
     // m.sanitize();

@@ -233,15 +233,15 @@ void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
     if (_properties.version() == MORPHOLOGY_VERSION_H5_2)
     {
         auto dataset = [this]() {
+            std::string path = "/" + _g_root + "/" + _stage + "/" + _d_points;
             try
             {
-                return _file->getDataSet("/" + _g_root + "/" + _stage + "/" +
-                                         _d_points);
+                return _file->getDataSet(path);
             }
             catch (HighFive::DataSetException&)
             {
                 LBTHROW(std::runtime_error(
-                    "Could not open points dataset for morphology file " +
+                    "Could not open " + path + " dataset for morphology file " +
                     _file->getName() + " repair stage " + _stage));
             }
         }();
@@ -292,16 +292,29 @@ int MorphologyHDF5::_readSections()
     {
         // fixes BBPSDK-295 by restoring old BBPSDK 0.13 implementation
         auto dataset = [this]() {
+            std::string path = "/" + _g_root + "/" + _g_structure + "/" + _stage;
             try
             {
-                return _file->getDataSet("/" + _g_root + "/" + _g_structure +
-                                         "/" + _stage);
+                return _file->getDataSet(path);
             }
             catch (HighFive::DataSetException&)
             {
-                LBTHROW(std::runtime_error(
-                    "Could not open sections dataset for morphology file " +
+                if(_stage == "unraveled") {
+                    std::string raw_path = "/" + _g_root + "/" + _g_structure + "/raw";
+                    try {
+                        return _file->getDataSet(raw_path);
+                    }
+                    catch (HighFive::DataSetException&) {
+                        LBTHROW(std::runtime_error(
+                                    "Could not find unraveled structure neither at " + path + " or " + raw_path + " for dataset for morphology file " +
+                                    _file->getName() + " repair stage " + _stage));
+                    }
+                } else {
+                    LBTHROW(std::runtime_error(
+                    "Could not open " + path + " dataset for morphology file " +
                     _file->getName() + " repair stage " + _stage));
+
+                }
             }
         }();
 
@@ -360,16 +373,16 @@ void MorphologyHDF5::_readSectionTypes()
     if (_properties.version() == MORPHOLOGY_VERSION_H5_2)
     {
         auto dataset = [this]() {
+            std::string path = "/" + _g_root + "/" + _g_structure + "/" + _d_type;
             try
             {
-                return _file->getDataSet("/" + _g_root + "/" + _g_structure +
-                                         "/" + _d_type);
+                return _file->getDataSet(path);
             }
             catch (HighFive::DataSetException&)
             {
                 LBTHROW(
-                    std::runtime_error("Could not open section type "
-                                       "dataset for morphology file " +
+                    std::runtime_error("Could not open " + path +
+                                       " dataset for morphology file " +
                                        _file->getName()));
             }
         }();

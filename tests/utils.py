@@ -9,7 +9,7 @@ from io import StringIO
 
 from nose.tools import assert_raises, ok_
 
-from morphio import Morphology
+from morphio import Morphology, set_ignored_warning
 
 
 @contextmanager
@@ -22,6 +22,14 @@ def setup_tempdir(prefix, no_cleanup=False):
         if not no_cleanup:
             shutil.rmtree(temp_dir)
 
+@contextmanager
+def ignored_warning(warning):
+    '''Context manager during which a warning is ignored'''
+    try:
+        set_ignored_warning(warning, True)
+        yield
+    finally:
+        set_ignored_warning(warning, False)
 
 @contextmanager
 def _tmp_file(content, extension):

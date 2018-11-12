@@ -304,10 +304,19 @@ const std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Samp
 }
 
 
-  std::string ErrorMessages::WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const {
+std::string ErrorMessages::WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const {
     return errorMsg(0, ErrorLevel::WARNING, "This cell has mitochondria, they cannot be saved in "
                     " ASC or SWC format. Please use H5 if you want to save them.");
-  }
+}
+
+std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const {
+
+    std::string msg = "Neurite(s) not connected to first soma point have been found:";
+    for(auto child: children)
+        msg += errorMsg(child.lineNumber, ErrorLevel::WARNING, "");
+    return msg;
+}
+
 
 
 } // namespace plugin

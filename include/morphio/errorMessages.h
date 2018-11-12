@@ -191,6 +191,8 @@ public:
                                                          const Sample& child1,
                                                          const Sample& child2);
 
+    std::string WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const;
+
 private:
     std::string _uri;
 };
