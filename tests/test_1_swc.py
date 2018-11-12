@@ -6,9 +6,9 @@ from nose.tools import assert_equal, assert_raises
 from numpy.testing import assert_array_equal
 
 from morphio import (Morphology, RawDataError, SectionType, SomaError, SomaType,
-                     ostream_redirect, set_maximum_warnings)
+                     ostream_redirect, set_maximum_warnings, set_ignored_warning, Warning)
 from utils import (_test_swc_exception, assert_substring, assert_string_equal, captured_output,
-                   strip_color_codes, tmp_swc_file, strip_all)
+                   strip_color_codes, tmp_swc_file, strip_all, ignored_warning)
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -311,3 +311,22 @@ Found a disconnected neurite.
 Neurites are not supposed to have parentId: -1
 (although this is normal if this neuron has no soma)''',
                 strip_color_codes(err.getvalue().strip()))
+
+def test_neurite_wrong_root_point():
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            n = Morphology(os.path.join(_path, 'neurite_wrong_root_point.swc'))
+            assert_equal(
+            '''Neurite(s) not connected to first soma point have been found:
+{}/neurite_wrong_root_point.swc:5:warning'''.format(_path),
+                strip_color_codes(err.getvalue().strip()))
+    assert_equal(len(n.root_sections), 1)
+    assert_array_equal(n.root_sections[0].points,
+                       [[0,0,0], [0,0,1]])
+
+
+    with ignored_warning(Warning.wrong_root_point):
+        with captured_output() as (_, err):
+            with ostream_redirect(stdout=True, stderr=True):
+                n = Morphology(os.path.join(_path, 'neurite_wrong_root_point.swc'))
+                assert_equal('', err.getvalue().strip())

@@ -72,13 +72,14 @@ void bind_misc(py::module &m) {
 
 
     py::enum_<morphio::enums::Warning>(m, "Warning")
-    .value("undefined", morphio::enums::Warning::UNDEFINED)
-    .value("mitochondria_write_not_supported", morphio::enums::Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED)
-    .value("write_no_soma", morphio::enums::Warning::WRITE_NO_SOMA)
-    .value("no_soma_found", morphio::enums::Warning::NO_SOMA_FOUND)
-    .value("only_child", morphio::enums::Warning::ONLY_CHILD);
+        .value("undefined", morphio::enums::Warning::UNDEFINED)
+        .value("mitochondria_write_not_supported", morphio::enums::Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED)
+        .value("write_no_soma", morphio::enums::Warning::WRITE_NO_SOMA)
+        .value("no_soma_found", morphio::enums::Warning::NO_SOMA_FOUND)
+        .value("wrong_root_point", morphio::enums::Warning::WRONG_ROOT_POINT)
+        .value("only_child", morphio::enums::Warning::ONLY_CHILD);
 
-     py::enum_<morphio::enums::AccessMode>(m, "AccessMode")
+    py::enum_<morphio::enums::AccessMode>(m, "AccessMode")
         .value("MODE_READ", morphio::enums::AccessMode::MODE_READ)
         .value("MODE_WRITE", morphio::enums::AccessMode::MODE_WRITE)
         .value("MODE_OVERWRITE", morphio::enums::AccessMode::MODE_OVERWRITE)
@@ -120,7 +121,7 @@ void bind_misc(py::module &m) {
                     );
             });
 
-        py::class_<morphio::Property::Properties>(m, "Properties",
+    py::class_<morphio::Property::Properties>(m, "Properties",
                                               "The higher level container structure is Property::Properties"
         )
         .def_readwrite("point_level", &morphio::Property::Properties::_pointLevel,
@@ -169,20 +170,20 @@ void bind_misc(py::module &m) {
                        "Returns the version");
 
     py::class_<morphio::Property::Annotation>(m, "Annotation",
-                                             "Container class for information about anomalies detected while parsing the file (no soma, section with a single child...)")
+                                              "Container class for information about anomalies detected while parsing the file (no soma, section with a single child...)")
         .def_readwrite("type", &morphio::Property::Annotation::_type,
-                               "Returns the type")
+                       "Returns the type")
         .def_readwrite("section_id", &morphio::Property::Annotation::_sectionId,
                        "Returns the sectionId")
         .def_readwrite("line_number", &morphio::Property::Annotation::_lineNumber,
                        "Returns the lineNumber")
         .def_readwrite("details", &morphio::Property::Annotation::_details,
-                               "Returns the details")
+                       "Returns the details")
         .def_property_readonly("points",
-                       [](morphio::Property::Annotation* a) {
-                           return a->_points._points;
-                       },
-                       "Returns the list of coordinates of annotated points")
+                               [](morphio::Property::Annotation* a) {
+                                   return a->_points._points;
+                               },
+                               "Returns the list of coordinates of annotated points")
         .def_property_readonly("diameters", [](morphio::Property::Annotation* a) {
                 return a->_points._diameters;
             },
