@@ -310,8 +310,7 @@ std::string ErrorMessages::WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const {
 }
 
 std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const {
-
-    std::string msg = "Neurite(s) not connected to first soma point have been found:";
+    std::string msg = "With a 3 points soma, neurites must be connected to the first soma point:";
     for(auto child: children)
         msg += errorMsg(child.lineNumber, ErrorLevel::WARNING, "");
     return msg;

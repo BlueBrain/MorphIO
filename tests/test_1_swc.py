@@ -313,14 +313,26 @@ Neurites are not supposed to have parentId: -1
                 strip_color_codes(err.getvalue().strip()))
 
 def test_neurite_wrong_root_point():
+    '''Test that for 3 points soma, the neurites are attached to first soma point'''
+
+    # Not 3-points soma --> OK
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            n = Morphology(os.path.join(_path, 'soma_cylinders.swc'))
+            assert_equal('', err.getvalue().strip())
+        assert_equal(len(n.root_sections), 1)
+
+
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             n = Morphology(os.path.join(_path, 'neurite_wrong_root_point.swc'))
             assert_equal(
-            '''Neurite(s) not connected to first soma point have been found:
-{}/neurite_wrong_root_point.swc:5:warning'''.format(_path),
+'''With a 3 points soma, neurites must be connected to the first soma point:
+{}/neurite_wrong_root_point.swc:4:warning
+
+{}/neurite_wrong_root_point.swc:6:warning'''.format(_path, _path),
                 strip_color_codes(err.getvalue().strip()))
-    assert_equal(len(n.root_sections), 1)
+    assert_equal(len(n.root_sections), 2)
     assert_array_equal(n.root_sections[0].points,
                        [[0,0,0], [0,0,1]])
 

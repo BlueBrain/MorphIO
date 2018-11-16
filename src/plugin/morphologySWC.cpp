@@ -98,7 +98,6 @@ public:
 
         if(sample.parentId != -1 && children[sample.id].size() > 0) {
             std::vector<Sample> soma_bifurcations;
-            std::vector<Sample> neurite_wrong_root;
             for(auto id: children[sample.id]) {
                 if(samples[id].type == SECTION_SOMA)
                     soma_bifurcations.push_back(samples[id]);
@@ -108,9 +107,6 @@ public:
 
             if(soma_bifurcations.size() > 1)
                 LBTHROW(morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample, soma_bifurcations)));
-
-            if(neurite_wrong_root.size() > 0)
-                LBERROR(morphio::WRONG_ROOT_POINT, err.WARNING_WRONG_ROOT_POINT(neurite_wrong_root));
         }
 
         if(sample.parentId != -1 && samples[sample.parentId].type != SECTION_SOMA)
@@ -266,17 +262,21 @@ public:
         _pushChildren(depthFirstSamples, -1);
         for(const auto id: depthFirstSamples) {
             const Sample& sample = samples[id];
-            if(isSectionStart(sample))
+            if(isSectionStart(sample)) {
                 _processSectionStart(sample);
-            else if(sample.type != SECTION_SOMA)
+            } else if(sample.type != SECTION_SOMA) {
                 swcIdToSectionId[sample.id] = swcIdToSectionId[sample.parentId];
+            }
 
-            if(sample.type == SECTION_SOMA)
+            if(sample.type == SECTION_SOMA) {
                 appendSample(morph.soma(), sample);
-            else {
+            } else {
                 appendSample(morph.section(swcIdToSectionId.at(sample.id)), sample);
             }
         }
+
+        if(morph.soma()->points().size() == 3 && neurite_wrong_root.size() > 0)
+            LBERROR(morphio::WRONG_ROOT_POINT, err.WARNING_WRONG_ROOT_POINT(neurite_wrong_root));
 
         morph.sanitize();
         morph.applyModifiers(options);
@@ -314,6 +314,10 @@ public:
 private:
     // Dictionnary: SWC Id of the last point of a section to morphio::mut::Section ID
     std::map<uint32_t, uint32_t> swcIdToSectionId;
+
+    // Neurite that do not have parent ID = 1, allowed for soma contour, not 3-pts soma
+    std::vector<Sample> neurite_wrong_root;
+
     int lastSomaPoint = -1;
     std::map<int32_t, std::vector<uint32_t>> children;
     std::map<uint32_t, Sample> samples;
