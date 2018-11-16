@@ -67,6 +67,7 @@ Morphology::Morphology(const URI& source, unsigned int options)
         mutable_morph.sanitize();
         mutable_morph.applyModifiers(options);
         _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
+        buildChildren(_properties);
     }
 }
 
