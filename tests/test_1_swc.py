@@ -322,7 +322,6 @@ def test_neurite_wrong_root_point():
             assert_equal('', err.getvalue().strip())
         assert_equal(len(n.root_sections), 1)
 
-
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             n = Morphology(os.path.join(_path, 'neurite_wrong_root_point.swc'))
@@ -335,7 +334,6 @@ def test_neurite_wrong_root_point():
     assert_equal(len(n.root_sections), 2)
     assert_array_equal(n.root_sections[0].points,
                        [[0,0,0], [0,0,1]])
-
 
     with ignored_warning(Warning.wrong_root_point):
         with captured_output() as (_, err):
