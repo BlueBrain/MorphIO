@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-project(MorphIO VERSION 3.0.0)
+project(MorphIO VERSION 2.0.0)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
