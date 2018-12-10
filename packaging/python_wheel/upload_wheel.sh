@@ -12,7 +12,7 @@ for wheel in `ls $BASE/packaging/python_wheel/wheelhouse/morphio*.whl`; do
     upload2repo -t python -r $CHANNEL -f $wheel
 done
 
-upload2repo -t python -r $CHANNEL -f $BASE/dist/morphio-*.tar.gz
+upload2repo -t python -r $CHANNEL -f $BASE/dist/MorphIO-*.tar.gz
 
 
 # cleanup afterwards
