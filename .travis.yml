@@ -4,16 +4,19 @@ matrix:
     #   dist: trusty
     #   sudo: required
     - os: osx
-      osx_image: xcode9.2
-
+      osx_image: xcode10.1
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/Library/Caches/Homebrew
 language: c++
 sudo: required
 services:
   - docker
 python:
   # - 2.7
-  - 3.5
-  # - 3.6
+  # - 3.5
+  - 3.6
 # addons:
 #   apt:
 #     packages:
@@ -22,24 +25,25 @@ python:
 #     sources: &sources
 #       - llvm-toolchain-precise-3.8
 #       - ubuntu-toolchain-r-test
-cache: pip
 before_install:
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else rm /usr/local/include/c++; brew install hdf5; fi
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
+  - pip install virtualenv
   - virtualenv env && source env/bin/activate
 install:
+  - pip install --upgrade pip
   - pip install .
 script:
   - pip install -r tests/requirement_tests.txt
   - nosetests
 
-# before_deploy:
-  - pip install delocate
-  # Build macos wheel
-  - ./packaging/python_wheel/build_wheel.sh
+# # before_deploy:
+#   - pip install delocate
+#   # Build macos wheel
+#   - ./packaging/python_wheel/build_wheel.sh
 
-  # Build Linux wheels with the manylinux docker image
-  - packaging/python_wheel/build_docker_image.sh
-  - packaging/python_wheel/build_wheel_in_manylinux1_docker.sh
+#   # Build Linux wheels with the manylinux docker image
+#   - ./packaging/python_wheel/build_docker_image.sh
+#   - ./packaging/python_wheel/build_wheel_in_manylinux1_docker.sh
 
 deploy:
   provider: pypi

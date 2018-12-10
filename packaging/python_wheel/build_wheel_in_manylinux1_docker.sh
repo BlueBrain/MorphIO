@@ -6,11 +6,6 @@ export PIPPROXY="-i https://bbpteam.epfl.ch/repository/devpi/simple"
 export http_proxy=${HTTP_PROXY-$http_proxy}
 export https_proxy=${HTTPS_PROXY-$https_proxy}
 
-if [ ! -f $fichier ]; then
-    wget https://github.com/Noctem/pogeo-toolchain/releases/download/v1.3/gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2
-    tar -xjvf gcc-7.1-binutils-2.28-centos5-x86-64.tar.bz2
-fi
-
 docker images
 docker run  \
     -e http_proxy=$http_proxy \

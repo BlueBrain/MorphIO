@@ -9,9 +9,6 @@ if [ "$(uname)" == "Darwin" ]; then
     export PYTHON_VERSIONS="cp27-cp27m"
     export AUDIT_CMD="delocate-wheel -w $WHEELHOUSE"
 else
-    # in manylinux1 docker image
-    export CXX=/toolchain/bin/c++
-    export LD_LIBRARY_PATH=/toolchain/lib:${LD_LIBRARY_PATH}
     export AUDIT_CMD="auditwheel repair -w $WHEELHOUSE"
     # cp35-cp35m is ignored while https://github.com/pybind/pybind11/issues/314
     # is not solved

@@ -53,7 +53,7 @@ brew install hdf5 cmake
 
 BBP Nix:
 ```shell
-module load nix/cmake/3.9.6
+module load nix/cmake/3.9.6 gcc
 ```
 
 ### Installation instructions
