@@ -22,7 +22,6 @@ python:
 #     sources: &sources
 #       - llvm-toolchain-precise-3.8
 #       - ubuntu-toolchain-r-test
-cache: pip
 before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else rm /usr/local/include/c++; brew install hdf5; fi
   - virtualenv env && source env/bin/activate
