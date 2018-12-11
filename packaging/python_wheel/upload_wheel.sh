@@ -16,7 +16,7 @@ upload2repo -t python -r $CHANNEL -f $BASE/dist/MorphIO-*.tar.gz
 
 
 # cleanup afterwards
-docker run --rm \
+docker run \
     -v $BASE:/io:Z \
     bbpdocker.epfl.ch/morphio_wheel \
     /bin/rm -rf /io/packaging/python_wheel/wheelhouse /io/dist
