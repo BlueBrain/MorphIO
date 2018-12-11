@@ -12,8 +12,8 @@ services:
   - docker
 python:
   # - 2.7
-  - 3.5
-  # - 3.6
+  # - 3.5
+  - 3.6
 # addons:
 #   apt:
 #     packages:
