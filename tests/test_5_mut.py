@@ -203,6 +203,11 @@ def test_build_read_only():
                        [20, 30])
 
 
+def test_mutable_immutable_equivalence():
+    morpho = ImmutableMorphology(os.path.join(_path, "simple.swc"))
+    assert_array_equal(morpho.points, morpho.as_mutable().as_immutable().points)
+
+
 def test_mitochondria_read():
     '''Read a H5 file with a mitochondria'''
     morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
