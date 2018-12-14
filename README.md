@@ -53,7 +53,8 @@ brew install hdf5 cmake
 
 BB5
 ```shell
-module load nix/cmake/3.9.6
+source /opt/rh/rh-python36/enable
+module load gcc/5.4.0 nix/cmake/3.9.6
 ```
 
 ### Installation instructions
