@@ -4,7 +4,7 @@ from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
 
 from morphio.mut import Morphology, Soma
-from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, SectionBuilderError, Morphology as ImmutableMorphology, upstream, depth_first, breadth_first
+from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, MorphioError, SectionBuilderError, Morphology as ImmutableMorphology, upstream, depth_first, breadth_first
 from contextlib import contextmanager
 import sys
 from io import StringIO
@@ -323,3 +323,20 @@ def test_iterators():
 
     assert_array_equal([section.id for section in neuron.iter(breadth_first)],
                        [0, 1, 4, 2, 3, 5, 6, 7, 8, 9])
+
+def test_non_C_nparray():
+    m = Morphology(os.path.join(_path, "simple.swc"))
+    section = m.root_sections[0]
+    points = np.array([[1,2,3], [4,5,6]])
+    section.points = points
+    assert_array_equal(section.points, points)
+
+    with assert_raises(MorphioError) as obj:
+        section.points = points.T
+
+    assert_substring("Wrong array shape. Expected: (X, 3), got: (3, 2)",
+                     str(obj.exception))
+
+    non_standard_stride = np.asfortranarray(points)
+    section.points = non_standard_stride
+    assert_array_equal(section.points, points)
