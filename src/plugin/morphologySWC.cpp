@@ -1,11 +1,9 @@
 #include <cassert>
+#include <cctype>
 #include <fstream>
 #include <list>
 #include <sstream>
 #include <algorithm>
-#include <regex>
-
-#include <iostream>
 
 #include <morphio/properties.h>
 #include <morphio/errorMessages.h>
@@ -14,6 +12,22 @@
 #include <morphio/mut/soma.h>
 #include <morphio/mut/section.h>
 
+
+namespace {
+
+bool _ignoreLine(const std::string& line)
+{
+    bool result = true;
+    for (auto c: line) {
+        if (!isspace(c)) {
+            result = (c == '#');
+            break;
+        }
+    }
+    return result;
+}
+
+}  // unnamed namespace
 
 
 namespace morphio
@@ -57,7 +71,8 @@ public:
         while (!std::getline(file, line).fail())
         {
             ++lineNumber;
-            if (std::regex_match (line, std::regex(" *(#.*)?") ) || line.empty())
+
+            if (_ignoreLine(line))
                 continue;
 
             const auto &sample = Sample(line.data(), lineNumber);
