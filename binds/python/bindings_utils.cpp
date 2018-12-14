@@ -40,10 +40,8 @@ py::array_t<float> span_to_ndarray(const morphio::range<const T>& span)
 }
 
 
-morphio::Points array_to_points(py::array_t<float> &buf){
-    morphio::Points points;
-    py::buffer_info info = buf.request();
-    auto &shape = info.shape;
+void _raise_if_wrong_shape(const py::buffer_info& info) {
+    const auto &shape = info.shape;
     if(shape.size() != 2 || info.shape[1] != 3) {
         std::string shape_str;
         for(int i=0; i<shape.size(); ++i){
@@ -53,8 +51,12 @@ morphio::Points array_to_points(py::array_t<float> &buf){
         }
         throw morphio::MorphioError("Wrong array shape. Expected: (X, 3), got: (" + shape_str + ")");
     }
+}
 
-    float* ptr = (float*)info.ptr;
+morphio::Points array_to_points(py::array_t<float> &buf){
+    morphio::Points points;
+    py::buffer_info info = buf.request();
+    _raise_if_wrong_shape(info);
 
     for(int i = 0;i<info.shape[0]; ++i){
         points.push_back(std::array<float, 3>{*buf.data(i, 0), *buf.data(i, 1), *buf.data(i, 2)});

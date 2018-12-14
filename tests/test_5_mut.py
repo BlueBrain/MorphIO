@@ -327,7 +327,7 @@ def test_iterators():
 def test_non_C_nparray():
     m = Morphology(os.path.join(_path, "simple.swc"))
     section = m.root_sections[0]
-    points = np.array([[1,1,1], [2,2,2]])
+    points = np.array([[1,2,3], [4,5,6]])
     section.points = points
     assert_array_equal(section.points, points)
 
@@ -337,7 +337,6 @@ def test_non_C_nparray():
     assert_substring("Wrong array shape. Expected: (X, 3), got: (3, 2)",
                      str(obj.exception))
 
-    non_standard_stride = np.array([[1, 2], [3, 4], [5, 6]]).T
+    non_standard_stride = np.asfortranarray(points)
     section.points = non_standard_stride
-    assert_array_equal(np.array([[1, 3, 5], [2, 4, 6]]),
-                       section.points)
+    assert_array_equal(section.points, points)
