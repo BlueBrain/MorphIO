@@ -51,9 +51,9 @@ Max OS:
 brew install hdf5 cmake
 ```
 
-BBP Nix:
+BB5
 ```shell
-module load nix/cmake/3.9.6 gcc
+module load nix/cmake/3.9.6
 ```
 
 ### Installation instructions
