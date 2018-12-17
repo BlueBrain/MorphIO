@@ -17,14 +17,8 @@ namespace {
 
 bool _ignoreLine(const std::string& line)
 {
-    bool result = true;
-    for (auto c: line) {
-        if (!isspace(c)) {
-            result = (c == '#');
-            break;
-        }
-    }
-    return result;
+  std::size_t pos = line.find_first_not_of("\n\r\t ");
+  return pos == std::string::npos || line[pos] == '#';
 }
 
 }  // unnamed namespace
@@ -72,7 +66,7 @@ public:
         {
             ++lineNumber;
 
-            if (_ignoreLine(line))
+            if (line.empty() || _ignoreLine(line))
                 continue;
 
             const auto &sample = Sample(line.data(), lineNumber);
