@@ -14,9 +14,9 @@ _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 def test_read_single_neurite():
-    with tmp_swc_file('''# A simple neuron consisting of a point soma
-                         # and a single branch neurite.
-                         1 1 0 4 0 3.0 -1
+    '''Test reading a simple neuron consisting of a point soma
+    and a single branch neurite.'''
+    with tmp_swc_file('''1 1 0 4 0 3.0 -1
                          2 3 0 0 2 0.5 1
                          3 3 0 0 3 0.5 2
                          4 3 0 0 4 0.5 3
@@ -28,8 +28,6 @@ def test_read_single_neurite():
     assert_array_equal(n.soma.diameters, [6.0])
     nt.eq_(len(n.root_sections), 1)
     nt.eq_(n.root_sections[0].id, 0)
-    assert_array_equal(n.soma.points,
-                       [[0, 4, 0]])
     nt.eq_(len(n.root_sections), 1)
     assert_array_equal(n.root_sections[0].points,
                        np.array([[0, 0, 2],
@@ -37,6 +35,31 @@ def test_read_single_neurite():
                                  [0, 0, 4],
                                  [0, 0, 5]]))
 
+
+def test_skip_comments():
+    '''Test skipping comments'''
+    with tmp_swc_file(('#a comment\n'
+                       '# a comment\n'
+                       ' # a comment\n'
+                       '  #  a comment\n'
+                       '1 1 0 4 0 3.0 -1\n'
+                       '\t#a tab comment\n'
+                       '\t#\ta tab comment\n'
+                       '\t\t#\t\ta a tab comment\n'
+                       '2 3 0 0 2 0.5 1\n'
+                       '3 3 0 0 3 0.5 2\n'
+                       '4 3 0 0 4 0.5 3\n'
+                       '5 3 0 0 5 0.5 4\n')) as tmp_file:
+        n = Morphology(tmp_file.name)
+    assert_array_equal(n.soma.points, [[0, 4, 0]])
+    assert_array_equal(n.soma.diameters, [6.0])
+
+    nt.eq_(len(n.root_sections), 1)
+    assert_array_equal(n.root_sections[0].points,
+                       np.array([[0, 0, 2],
+                                 [0, 0, 3],
+                                 [0, 0, 4],
+                                 [0, 0, 5]]))
 
 def test_read_simple():
     simple = Morphology(os.path.join(_path, 'simple.swc'))
