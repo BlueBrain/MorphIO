@@ -46,7 +46,10 @@ void writeLine(std::ofstream& myfile, int id, int parentId, SectionType type, co
            << setw(12) << std::to_string(parentId) << std::endl;
 }
 
-const std::string version_footnote = "Created by MorphIO v"+morphio::VERSION;
+std::string version_footnote()
+{
+    return std::string("Created by MorphIO v") + morphio::VERSION;
+}
 
 void swc(const Morphology& morphology, const std::string& filename)
 {
@@ -118,7 +121,7 @@ void swc(const Morphology& morphology, const std::string& filename)
         newIds[section->id()] = segmentIdOnDisk - 1;
     }
 
-    myfile << "\n# " << version_footnote << std::endl;
+    myfile << "\n# " << version_footnote() << std::endl;
     myfile.close();
 }
 
@@ -186,7 +189,7 @@ void asc(const Morphology& morphology, const std::string& filename)
         myfile << ")\n\n";
     }
 
-    myfile << "; " << version_footnote << std::endl;
+    myfile << "; " << version_footnote() << std::endl;
     myfile.close();
 
 }
@@ -345,7 +348,7 @@ void h5(const Morphology& morpho, const std::string& filename)
     write_attribute(g_metadata, "version", std::vector<uint32_t>{1, 1});
     write_attribute(g_metadata, "cell_family",
                     std::vector<uint32_t>{FAMILY_NEURON});
-    write_attribute(h5_file, "comment", std::vector<std::string>{version_footnote});
+    write_attribute(h5_file, "comment", std::vector<std::string>{version_footnote()});
 
     if (hasPerimeterData)
         write_dataset(h5_file, "/perimeters", raw_perimeters);
