@@ -8,7 +8,7 @@ else
     CHANNEL=dev
 fi
 
-for wheel in `ls $BASE/packaging/python_wheel/wheelhouse/morphio*.whl`; do
+for wheel in `ls $BASE/packaging/python_wheel/wheelhouse/MorphIO*.whl`; do
     upload2repo -t python -r $CHANNEL -f $wheel
 done
 
