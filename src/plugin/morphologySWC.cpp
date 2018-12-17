@@ -17,8 +17,8 @@ namespace {
 
 bool _ignoreLine(const std::string& line)
 {
-  std::size_t pos = line.find_first_not_of("\n\r\t ");
-  return pos == std::string::npos || line[pos] == '#';
+    std::size_t pos = line.find_first_not_of("\n\r\t ");
+    return pos == std::string::npos || line[pos] == '#';
 }
 
 }  // unnamed namespace
