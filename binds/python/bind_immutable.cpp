@@ -7,6 +7,7 @@
 
 #include <morphio/types.h>
 #include <morphio/enums.h>
+#include <morphio/mut/morphology.h>
 
 namespace py = pybind11;
 using namespace py::literals;
@@ -32,6 +33,8 @@ void bind_immutable_module(py::module &m) {
             "- topology (children/parent relationship)\n\n"
             "Note: the soma types are NOT required to be equal")
         .def(py::self != py::self)
+
+        .def("as_mutable", [](const morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })
 
 
         // Cell sub-parts accessors

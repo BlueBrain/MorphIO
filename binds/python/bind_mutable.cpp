@@ -54,6 +54,8 @@ void bind_mutable_module(py::module &m) {
              "Else, children will be re-attached to their grand-parent",
              "section_id"_a, "recursive"_a=true)
 
+        .def("as_immutable", [](const morphio::mut::Morphology* morph) { return morphio::Morphology(*morph); })
+
         .def_property_readonly("cell_family", &morphio::mut::Morphology::cellFamily,
                                "Returns the cell family (neuron or glia)")
 
