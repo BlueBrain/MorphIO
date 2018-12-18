@@ -34,7 +34,7 @@ void bind_immutable_module(py::module &m) {
             "Note: the soma types are NOT required to be equal")
         .def(py::self != py::self)
 
-        .def("as_mutable", [](morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })
+        .def("as_mutable", [](const morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })
 
 
         // Cell sub-parts accessors
