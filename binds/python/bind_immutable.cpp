@@ -32,6 +32,9 @@ void bind_immutable_module(py::module &m) {
             "- section types\n"
             "- topology (children/parent relationship)\n\n"
             "Note: the soma types are NOT required to be equal")
+        .def("__ne__", [](const morphio::Morphology& a, const morphio::Morphology& b) {
+                return a.operator!=(b);
+            }, py::is_operator())
         .def(py::self != py::self)
 
         .def("as_mutable", [](const morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })

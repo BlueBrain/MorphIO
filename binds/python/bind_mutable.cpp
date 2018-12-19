@@ -28,6 +28,9 @@ void bind_mutable_module(py::module &m) {
             "- same perimeters\n"
             "- same type\n"
             "Note: the soma types are NOT required to be equal")
+        .def("__ne__", [](const morphio::mut::Morphology& a, const morphio::mut::Morphology& b) {
+                return a.operator!=(b);
+            }, py::is_operator())
 
         // Cell sub-part accessors
         .def_property_readonly("sections", &morphio::mut::Morphology::sections,
