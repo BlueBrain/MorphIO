@@ -26,21 +26,25 @@ public:
      * Return the morphological type of this section (dendrite, axon, ...)
      **/
     SectionType& type() { return _sectionType; }
+    const SectionType& type() const { return _sectionType; }
 
     /**
        Return the coordinates (x,y,z) of all points of this section
     **/
     std::vector<Point>& points() { return _pointProperties._points; }
+    const std::vector<Point>& points() const { return _pointProperties._points; }
 
     /**
        Return the diameters of all points of this section
     **/
     std::vector<float>& diameters() { return _pointProperties._diameters; }
+    const std::vector<float>& diameters() const { return _pointProperties._diameters; }
 
     /**
        Return the perimeters of all points of this section
     **/
     std::vector<float>& perimeters() { return _pointProperties._perimeters; }
+    const std::vector<float>& perimeters() const { return _pointProperties._perimeters; }
 
     /**
        Return the PointLevel instance that contains this section's data
@@ -90,6 +94,16 @@ public:
     std::shared_ptr<Section> appendSection(const Property::PointLevel&,
                                            SectionType sectionType = SectionType::SECTION_UNDEFINED);
 
+    /**
+    Two sections are equal if they have same:
+    - points
+    - diameters
+    - perimeters
+    - type
+    **/
+    bool operator==(const Section& other) const;
+    bool operator!=(const Section& other) const;
+
 private:
     friend class Morphology;
 
@@ -100,6 +114,7 @@ private:
     Section(Morphology*, int id, SectionType type, const Property::PointLevel&);
     Section(Morphology*, int id, const morphio::Section& section);
     Section(Morphology*, int id, const Section&);
+    bool _compare(const Section&, bool) const;
 
     Morphology* _morphology;
     Property::PointLevel _pointProperties;

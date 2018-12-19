@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from numpy.testing import assert_array_equal
-from nose.tools import assert_equal, assert_raises, ok_
+from nose.tools import assert_equal, assert_raises, ok_, assert_not_equal
 
 from morphio.mut import Morphology, Soma
 from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, MorphioError, SectionBuilderError, Morphology as ImmutableMorphology, upstream, depth_first, breadth_first
@@ -298,6 +298,52 @@ def test_mitochondria():
 
     assert_array_equal(np.array(first_child.relative_path_lengths, dtype=np.float32),
                        np.array([0.6, 0.7, 0.8, 0.9], dtype=np.float32))
+
+def test_equality():
+    neuron_ref = Morphology(os.path.join(_path, 'simple2.asc'))
+    a = Morphology(os.path.join(_path, 'simple2.asc'))
+    assert_equal(neuron_ref, a)
+    ok_(not (neuron_ref != a))
+
+    def mundane_section(neuron):
+        '''Not a root section, not a leaf section'''
+        return neuron.root_sections[0].children[0]
+
+    mundane_section(a).type = SectionType.apical_dendrite
+    assert_not_equal(neuron_ref, a)
+    ok_(not (neuron_ref == a))
+
+    a = Morphology(os.path.join(_path, 'simple2.asc'))
+    mundane_section(a).points = [[0,0,0]]
+    assert_not_equal(neuron_ref, a)
+    ok_(not (neuron_ref == a))
+
+    a = Morphology(os.path.join(_path, 'simple2.asc'))
+    mundane_section(a).diameters = [0,0,0]
+    assert_not_equal(neuron_ref, a)
+    ok_(not (neuron_ref == a))
+
+    a = Morphology(os.path.join(_path, 'simple2.asc'))
+    mundane_section(a).perimeters = [0,0,0]
+    assert_not_equal(neuron_ref, a)
+    ok_(not (neuron_ref == a))
+
+    a = Morphology(os.path.join(_path, 'simple2.asc'))
+    a.delete_section(mundane_section(a).children[0])
+    assert_not_equal(neuron_ref, a)
+    ok_(not (neuron_ref == a))
+
+    a = Morphology(os.path.join(_path, 'simple2.asc'))
+    a.delete_section(a.root_sections[0])
+    assert_not_equal(neuron_ref, a)
+    ok_(not (neuron_ref == a))
+
+
+
+
+
+
+
 
 
 def test_iterators():

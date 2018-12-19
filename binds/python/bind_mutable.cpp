@@ -15,6 +15,20 @@ void bind_mutable_module(py::module &m) {
         .def(py::init<const morphio::Morphology&>())
         .def(py::init<const morphio::mut::Morphology&>())
 
+        .def("__eq__", [](const morphio::mut::Morphology& a, const morphio::mut::Morphology& b) {
+                return a.operator==(b);
+            }, py::is_operator(),
+            "Are considered equal, 2 morphologies with the same:\n"
+            "- root sections\n"
+            "- section topology\n"
+            "- cell family\n"
+            "For each section:"
+            "- same points\n"
+            "- same diameters\n"
+            "- same perimeters\n"
+            "- same type\n"
+            "Note: the soma types are NOT required to be equal")
+
         // Cell sub-part accessors
         .def_property_readonly("sections", &morphio::mut::Morphology::sections,
                                "Returns a list containing IDs of all sections. "
@@ -207,6 +221,7 @@ void bind_mutable_module(py::module &m) {
         .def_property_readonly("id", &morphio::mut::Section::id,
                                "Return the section ID")
         .def_property("type",
+                      (const morphio::SectionType& (morphio::mut::Section::*)() const)
                       &morphio::mut::Section::type,
                       [](morphio::mut::Section* section,
                          morphio::SectionType _type) {

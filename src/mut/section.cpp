@@ -196,5 +196,54 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
     return ptr;
 }
 
+bool Section::_compare(const Section& other, bool verbose) const {
+    if(this->type() != other.type()) {
+        if(verbose)
+            std::cout << "Section type differ" << std::endl;
+        return false;
+    }
+
+    if(this->points() != other.points()) {
+        if(verbose)
+            std::cout << "Points differ" << std::endl;
+        return false;
+    }
+
+    if(this->diameters() != other.diameters()) {
+        if(verbose)
+            std::cout << "Diameters differ" << std::endl;
+        return false;
+    }
+
+    if(this->perimeters() != other.perimeters()) {
+        if(verbose)
+            std::cout << "Perimeters differ" << std::endl;
+        return false;
+    }
+
+    if(this->children().size() != other.children().size()) {
+        if(verbose)
+            std::cout << "Different number of children" << std::endl;
+        return false;
+    }
+
+    for(unsigned int i=0; i < this->children().size(); ++i)
+        if(*(this->children()[i]) != *(other.children()[i])) {
+            if(verbose)
+                std::cout << "Sections differ" << std::endl;
+            return false;
+        }
+
+    return true;
+}
+
+bool Section::operator==(const Section& other) const {
+    return _compare(other, false);
+}
+
+bool Section::operator!=(const Section& other) const {
+    return !_compare(other, false);
+}
+
 } // end namespace mut
 } // end namespace morphio

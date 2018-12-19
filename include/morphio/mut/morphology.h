@@ -58,6 +58,20 @@ public:
 
     virtual ~Morphology();
 
+   /**
+   Are considered equal, 2 morphologies with the same:\n
+    - root sections
+    - section topology
+    - cell family
+    For each section:
+    - same points
+    - same diameters
+    - same perimeters
+    - same type
+    Note: the soma types are NOT required to be equal
+    **/
+    bool operator==(const Morphology& other) const;
+    bool operator!=(const Morphology& other) const;
 
     /**
        Returns all section ids at the tree root
@@ -208,6 +222,7 @@ private:
     morphio::plugin::ErrorMessages _err;
 
     uint32_t _register(std::shared_ptr<Section>);
+    bool _compare(const Morphology& other, bool verbose) const;
 
     uint32_t _counter;
     std::shared_ptr<Soma> _soma;
