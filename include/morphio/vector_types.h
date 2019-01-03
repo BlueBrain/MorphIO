@@ -6,8 +6,8 @@
 
 namespace morphio
 {
-typedef std::array<float, 3> Point;
-typedef std::vector<Point> Points;
+using Point = std::array<float, 3>;
+using Points = std::vector<Point>;
 
 Point operator+(const Point& left, const Point& right);
 Point operator-(const Point& left, const Point& right);

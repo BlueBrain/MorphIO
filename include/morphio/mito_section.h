@@ -9,8 +9,8 @@ namespace morphio
 {
 class MitoSection : public SectionBase<MitoSection>
 {
-    typedef Property::MitoSection SectionId;
-    typedef Property::MitoDiameter PointAttribute;
+    using SectionId = Property::MitoSection;
+    using PointAttribute = Property::MitoDiameter;
 
 public:
     /**

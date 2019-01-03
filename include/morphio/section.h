@@ -30,8 +30,8 @@ namespace morphio
 
 class Section : public SectionBase<Section>
 {
-    typedef Property::Section SectionId;
-    typedef Property::Point PointAttribute;
+    using SectionId = Property::Section;
+    using PointAttribute = Property::Point;
 
 public:
     /**

@@ -31,48 +31,48 @@ void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
 struct Section
 {
     // (offset, parent index)
-    typedef std::array<int, 2> Type;
+    using Type = std::array<int, 2>;
 };
 
 struct MitoSection
 {
     // (offset, parent index)
-    typedef std::array<int, 2> Type;
+    using Type = std::array<int, 2>;
 };
 
 struct Point
 {
-    typedef morphio::Point Type;
+    using Type = morphio::Point;
 };
 
 struct SectionType
 {
-    typedef morphio::SectionType Type;
+    using Type = morphio::SectionType;
 };
 
 struct Perimeter
 {
-    typedef float Type;
+    using Type = float;
 };
 
 struct Diameter
 {
-    typedef float Type;
+    using Type = float;
 };
 
 struct MitoPathLength
 {
-    typedef float Type;
+    using Type = float;
 };
 
 struct MitoDiameter
 {
-    typedef float Type;
+    using Type = float;
 };
 
 struct MitoNeuriteSectionId
 {
-    typedef uint32_t Type;
+    using Type = uint32_t;
 };
 
 struct PointLevel

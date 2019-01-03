@@ -30,7 +30,7 @@
 namespace morphio
 {
 extern const std::string VERSION;
-typedef std::string URI;
+using URI = std::string;
 
 using namespace enums;
 class Morphology;
@@ -71,17 +71,17 @@ class MitoIterator;
 template <typename T>
 class Iterator;
 
-typedef MitoIterator<std::stack<std::shared_ptr<MitoSection>>>
-    mito_depth_iterator;
-typedef MitoIterator<std::queue<std::shared_ptr<MitoSection>>>
-    mito_breadth_iterator;
-typedef MitoIterator<std::vector<std::shared_ptr<MitoSection>>>
-    mito_upstream_iterator;
+using mito_depth_iterator =
+    MitoIterator<std::stack<std::shared_ptr<MitoSection>>>;
+using mito_breadth_iterator =
+    MitoIterator<std::queue<std::shared_ptr<MitoSection>>>;
+using mito_upstream_iterator =
+    MitoIterator<std::vector<std::shared_ptr<MitoSection>>>
 
-typedef Iterator<std::stack<std::shared_ptr<Section>>> depth_iterator;
-typedef Iterator<std::queue<std::queue<std::shared_ptr<Section>>>>
-    breadth_iterator;
-typedef Iterator<std::vector<std::shared_ptr<Section>>> upstream_iterator;
+    using depth_iterator = Iterator<std::stack<std::shared_ptr<Section>>>;
+using breadth_iterator
+    Iterator<std::queue<std::queue<std::shared_ptr<Section>>>>;
+using upstream_iterator = Iterator<std::vector<std::shared_ptr<Section>>>;
 } // namespace mut
 
 template <typename T>
@@ -90,15 +90,15 @@ class MitoIterator;
 template <typename T>
 class Iterator;
 
-typedef std::pair<size_t, size_t> SectionRange;
+using SectionRange = std::pair<size_t, size_t>;
 
-typedef MitoIterator<std::stack<MitoSection>> mito_depth_iterator;
-typedef MitoIterator<std::queue<MitoSection>> mito_breadth_iterator;
-typedef MitoIterator<std::vector<MitoSection>> mito_upstream_iterator;
+using mito_depth_iterator = MitoIterator<std::stack<MitoSection>>;
+using mito_breadth_iterator = MitoIterator<std::queue<MitoSection>>;
+using mito_upstream_iterator = MitoIterator<std::vector<MitoSection>>;
 
-typedef Iterator<std::stack<Section>> depth_iterator;
-typedef Iterator<std::queue<std::queue<Section>>> breadth_iterator;
-typedef Iterator<std::vector<Section>> upstream_iterator;
+using depth_iterator = Iterator<std::stack<Section>>;
+using breadth_iterator = Iterator<std::queue<std::queue<Section>>>;
+using upstream_iterator = Iterator<std::vector<Section>>;
 
 template <typename T>
 using range = gsl::span<T>;
