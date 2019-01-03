@@ -1,5 +1,5 @@
-#include <morphio/mitochondria.h>
 #include <morphio/mito_section.h>
+#include <morphio/mitochondria.h>
 
 namespace morphio
 {
@@ -11,8 +11,8 @@ const MitoSection Mitochondria::section(const uint32_t& id) const
 const std::vector<MitoSection> Mitochondria::sections() const
 {
     std::vector<MitoSection> sections;
-    for (unsigned int i = 0; i < _properties->get<morphio::Property::MitoSection>().size();
-         ++i)
+    for (unsigned int i = 0;
+         i < _properties->get<morphio::Property::MitoSection>().size(); ++i)
     {
         sections.push_back(section(i));
     }
@@ -24,10 +24,12 @@ const std::vector<MitoSection> Mitochondria::rootSections() const
     std::vector<MitoSection> result;
     try
     {
-        const std::vector<uint32_t>& children = _properties->children<morphio::Property::MitoSection>().at(-1);
+        const std::vector<uint32_t>& children =
+            _properties->children<morphio::Property::MitoSection>().at(-1);
 
         result.reserve(children.size());
-        for (auto id: children) {
+        for (auto id : children)
+        {
             result.push_back(section(id));
         }
 
@@ -38,6 +40,5 @@ const std::vector<MitoSection> Mitochondria::rootSections() const
         return result;
     }
 }
-
 
 } // namespace morphio

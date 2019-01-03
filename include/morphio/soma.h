@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <morphio/morphology.h>
 #include <morphio/types.h>
 
@@ -30,7 +29,6 @@ namespace morphio
 class Soma
 {
 public:
-
     /**
      * Return the  coordinates (x,y,z) of all soma points
      **/
@@ -50,10 +48,7 @@ public:
     /**
      * Return the soma type
      **/
-    SomaType type() const
-    {
-        return _properties->_cellLevel._somaType;
-    }
+    SomaType type() const { return _properties->_cellLevel._somaType; }
 
     /**
      * Return the center of gravity of the soma points
@@ -73,8 +68,6 @@ public:
     float surface() const;
     float maxDistance() const;
 
-
-
 private:
     Soma(std::shared_ptr<Property::Properties>);
     // TODO: find out why the following line does not work
@@ -86,4 +79,4 @@ private:
 
     std::shared_ptr<Property::Properties> _properties;
 };
-}
+} // namespace morphio

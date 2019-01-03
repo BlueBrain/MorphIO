@@ -4,8 +4,6 @@
 
 namespace morphio
 {
-
-
 SectionType Section::type() const
 {
     auto val = _properties->get<Property::SectionType>()[_id];
@@ -69,19 +67,20 @@ const range<const float> Section::perimeters() const
 
 } // namespace morphio
 
-
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section)
 {
-    os << "id: " << section.id() << std::endl;;
+    os << "id: " << section.id() << std::endl;
+    ;
 
     os << section.points();
     return os;
 }
 
 // operator<< must be defined in the global namespace to be usable there
-std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point> points)
+std::ostream& operator<<(std::ostream& os,
+                         const morphio::range<const morphio::Point> points)
 {
-    for(auto point: points)
-        os <<  point[0] << ' ' << point[1] << ' ' << point[2] << std::endl;
+    for (auto point : points)
+        os << point[0] << ' ' << point[1] << ' ' << point[2] << std::endl;
     return os;
 }

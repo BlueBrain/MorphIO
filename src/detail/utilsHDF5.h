@@ -49,7 +49,7 @@ inline AtomicType<morphio::Point>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
-}
+} // namespace HighFive
 
 namespace morphio
 {
@@ -66,7 +66,7 @@ inline void addStringAttribute(HighFive::AnnotateTraits<T>& object,
                                        HighFive::AtomicType<std::string>());
     attr.write(value);
 }
-}
-}
+} // namespace detail
+} // namespace morphio
 
 #endif

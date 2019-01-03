@@ -49,10 +49,10 @@ Property::Properties MorphologyHDF5::load(const URI& uri)
     }
     catch (const HighFive::FileException& exc)
     {
-        LBTHROW(morphio::RawDataError(
-            _write
-                ? "Could not create morphology file "
-                : "Could not open morphology file " + uri + ": " + exc.what()));
+        LBTHROW(morphio::RawDataError(_write
+                                          ? "Could not create morphology file "
+                                          : "Could not open morphology file " +
+                                                uri + ": " + exc.what()));
     }
     _checkVersion(uri);
     _selectRepairStage();
@@ -90,8 +90,8 @@ void MorphologyHDF5::_checkVersion(const std::string& source)
     {
         LBTHROW(
             morphio::RawDataError("Unknown morphology file format for "
-                                    "file " +
-                                    source));
+                                  "file " +
+                                  source));
     }
 }
 
@@ -256,13 +256,17 @@ void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
         std::vector<std::vector<float>> vec(dims[0]);
         // points.resize(dims[0]);
         dataset.read(vec);
-        for(unsigned int i = 0; i<vec.size(); ++i) {
-            const auto &p = vec[i];
-            if(i < firstSectionOffset) {
-                somaPoints.push_back({p[0],p[1],p[2]});
+        for (unsigned int i = 0; i < vec.size(); ++i)
+        {
+            const auto& p = vec[i];
+            if (i < firstSectionOffset)
+            {
+                somaPoints.push_back({p[0], p[1], p[2]});
                 somaDiameters.push_back(p[3]);
-            } else {
-                points.push_back({p[0],p[1],p[2]});
+            }
+            else
+            {
+                points.push_back({p[0], p[1], p[2]});
                 diameters.push_back(p[3]);
             }
         }
@@ -272,13 +276,17 @@ void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
     std::vector<std::vector<float>> vec;
     vec.resize(_pointsDims[0]);
     _points->read(vec);
-    for(unsigned int i = 0; i<vec.size(); ++i) {
-        const auto &p = vec[i];
-        if(i < firstSectionOffset) {
-            somaPoints.push_back({p[0],p[1],p[2]});
+    for (unsigned int i = 0; i < vec.size(); ++i)
+    {
+        const auto& p = vec[i];
+        if (i < firstSectionOffset)
+        {
+            somaPoints.push_back({p[0], p[1], p[2]});
             somaDiameters.push_back(p[3]);
-        } else {
-            points.push_back({p[0],p[1],p[2]});
+        }
+        else
+        {
+            points.push_back({p[0], p[1], p[2]});
             diameters.push_back(p[3]);
         }
     }
@@ -292,28 +300,37 @@ int MorphologyHDF5::_readSections()
     {
         // fixes BBPSDK-295 by restoring old BBPSDK 0.13 implementation
         auto dataset = [this]() {
-            std::string path = "/" + _g_root + "/" + _g_structure + "/" + _stage;
+            std::string path =
+                "/" + _g_root + "/" + _g_structure + "/" + _stage;
             try
             {
                 return _file->getDataSet(path);
             }
             catch (HighFive::DataSetException&)
             {
-                if(_stage == "unraveled") {
-                    std::string raw_path = "/" + _g_root + "/" + _g_structure + "/raw";
-                    try {
+                if (_stage == "unraveled")
+                {
+                    std::string raw_path =
+                        "/" + _g_root + "/" + _g_structure + "/raw";
+                    try
+                    {
                         return _file->getDataSet(raw_path);
                     }
-                    catch (HighFive::DataSetException&) {
+                    catch (HighFive::DataSetException&)
+                    {
                         LBTHROW(std::runtime_error(
-                                    "Could not find unraveled structure neither at " + path + " or " + raw_path + " for dataset for morphology file " +
-                                    _file->getName() + " repair stage " + _stage));
+                            "Could not find unraveled structure neither at " +
+                            path + " or " + raw_path +
+                            " for dataset for morphology file " +
+                            _file->getName() + " repair stage " + _stage));
                     }
-                } else {
-                    LBTHROW(std::runtime_error(
-                    "Could not open " + path + " dataset for morphology file " +
-                    _file->getName() + " repair stage " + _stage));
-
+                }
+                else
+                {
+                    LBTHROW(std::runtime_error("Could not open " + path +
+                                               " dataset for morphology file " +
+                                               _file->getName() +
+                                               " repair stage " + _stage));
                 }
             }
         }();
@@ -321,7 +338,6 @@ int MorphologyHDF5::_readSections()
         _sections.reset(new HighFive::DataSet(dataset));
 
         const auto dims = dataset.getSpace().getDimensions();
-
 
         if (dims.size() != 2 || dims[1] != _structureV2Columns)
         {
@@ -331,12 +347,14 @@ int MorphologyHDF5::_readSections()
         }
 
         std::vector<std::vector<int>> vec;
-        vec.resize(dims[0]-1);
+        vec.resize(dims[0] - 1);
         dataset.read(vec);
         bool skipFirst = true;
         int firstSectionOffset = vec[1][0];
-        for(auto p: vec){
-            if(skipFirst) {
+        for (auto p : vec)
+        {
+            if (skipFirst)
+            {
                 skipFirst = false;
                 continue;
             }
@@ -346,7 +364,6 @@ int MorphologyHDF5::_readSections()
         return firstSectionOffset;
     }
 
-
     auto selection = _sections->select({0, 0}, {_sectionsDims[0], 2}, {1, 2});
 
     std::vector<std::vector<int>> vec;
@@ -355,8 +372,10 @@ int MorphologyHDF5::_readSections()
 
     bool skipFirst = true;
     int firstSectionOffset = vec[1][0];
-    for(auto p: vec){
-        if(skipFirst) {
+    for (auto p : vec)
+    {
+        if (skipFirst)
+        {
             skipFirst = false;
             continue;
         }
@@ -373,17 +392,17 @@ void MorphologyHDF5::_readSectionTypes()
     if (_properties.version() == MORPHOLOGY_VERSION_H5_2)
     {
         auto dataset = [this]() {
-            std::string path = "/" + _g_root + "/" + _g_structure + "/" + _d_type;
+            std::string path =
+                "/" + _g_root + "/" + _g_structure + "/" + _d_type;
             try
             {
                 return _file->getDataSet(path);
             }
             catch (HighFive::DataSetException&)
             {
-                LBTHROW(
-                    std::runtime_error("Could not open " + path +
-                                       " dataset for morphology file " +
-                                       _file->getName()));
+                LBTHROW(std::runtime_error("Could not open " + path +
+                                           " dataset for morphology file " +
+                                           _file->getName()));
             }
         }();
 
@@ -429,9 +448,9 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset)
         std::vector<float> perimeters;
         perimeters.resize(dims[0]);
         dataset.read(perimeters);
-        _properties.get<Property::Perimeter>().assign(
-            perimeters.begin() + firstSectionOffset,
-            perimeters.end());
+        _properties.get<Property::Perimeter>().assign(perimeters.begin() +
+                                                          firstSectionOffset,
+                                                      perimeters.end());
     }
     catch (...)
     {
@@ -446,10 +465,8 @@ template <typename T>
 void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& _dataset,
                            MorphologyVersion version,
-                           unsigned int expectedDimension,
-                           T& data)
+                           unsigned int expectedDimension, T& data)
 {
-
     if (_properties.version() != version)
         return;
     try
@@ -484,41 +501,34 @@ void MorphologyHDF5::_readMitochondria()
     {
         HighFive::SilenceHDF5 silence;
 
-        try {
+        try
+        {
             const auto group = _file->getGroup(_g_mitochondria);
-        } catch (HighFive::GroupException&)
+        }
+        catch (HighFive::GroupException&)
         {
             return;
         }
     }
 
     std::vector<std::vector<float>> points;
-    _read(_g_mitochondria,
-          _d_points,
-          MORPHOLOGY_VERSION_H5_1_1,
-          2,
-          points);
+    _read(_g_mitochondria, _d_points, MORPHOLOGY_VERSION_H5_1_1, 2, points);
 
     auto& mitoSectionId = _properties.get<Property::MitoNeuriteSectionId>();
     auto& pathlength = _properties.get<Property::MitoPathLength>();
     auto& diameters = _properties.get<Property::MitoDiameter>();
-    for(auto p: points){
+    for (auto p : points)
+    {
         mitoSectionId.push_back((uint32_t)p[0]);
         pathlength.push_back(p[1]);
         diameters.push_back(p[2]);
     }
 
-
     std::vector<std::vector<int32_t>> structure;
-    _read(_g_mitochondria,
-          "structure",
-          MORPHOLOGY_VERSION_H5_1_1,
-          2,
-        structure);
+    _read(_g_mitochondria, "structure", MORPHOLOGY_VERSION_H5_1_1, 2,
+          structure);
 
-
-
-    for(auto& s: structure)
+    for (auto& s : structure)
         _properties.get<Property::MitoSection>().push_back({s[0], s[1]});
 }
 

@@ -34,10 +34,8 @@ private:
     void _readPerimeters(int);
     void _readMitochondria();
     template <typename T>
-    void _read(const std::string& group,
-               const std::string& _dataset,
-               MorphologyVersion version,
-               unsigned int expectedDimension,
+    void _read(const std::string& group, const std::string& _dataset,
+               MorphologyVersion version, unsigned int expectedDimension,
                T& data);
 
     std::unique_ptr<HighFive::File> _file;
@@ -52,6 +50,6 @@ private:
     Property::Properties _properties;
     bool _write;
 };
-}
-}
-}
+} // namespace h5
+} // namespace plugin
+} // namespace morphio

@@ -3,10 +3,8 @@
 #include <queue>
 #include <stack>
 
-#include <morphio/types.h>
 #include <morphio/mut/mitochondria.h>
-
-
+#include <morphio/types.h>
 
 namespace morphio
 {
@@ -26,7 +24,8 @@ class MitoIterator
     MitoIterator();
 
 public:
-    MitoIterator(const Mitochondria& mitochondria, std::shared_ptr<MitoSection> rootSectionId = nullptr);
+    MitoIterator(const Mitochondria& mitochondria,
+                 std::shared_ptr<MitoSection> rootSectionId = nullptr);
     MitoIterator(const Mitochondria& mitochondria);
     bool operator==(MitoIterator other) const;
     bool operator!=(MitoIterator other) const;

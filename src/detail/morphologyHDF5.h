@@ -27,4 +27,4 @@ const size_t _structureV2Columns = 2;
 const std::string _g_root("neuron1");
 const std::string _d_type("sectiontype");
 const std::string _a_apical("apical");
-}
+} // namespace

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <morphio/section_base.h>
-#include <morphio/properties.h>
 #include <morphio/mitochondria.h>
+#include <morphio/properties.h>
+#include <morphio/section_base.h>
 #include <morphio/types.h>
 
 namespace morphio
@@ -11,6 +11,7 @@ class MitoSection : public SectionBase<MitoSection>
 {
     typedef Property::MitoSection SectionId;
     typedef Property::MitoDiameter PointAttribute;
+
 public:
     /**
        Depth first search iterator
@@ -29,7 +30,6 @@ public:
     **/
     mito_upstream_iterator upstream_begin() const;
     mito_upstream_iterator upstream_end() const;
-
 
     /**
      * Returns list of neuronal section IDs associated to each point
@@ -54,10 +54,11 @@ public:
     /** Return the morphological type of this section (dendrite, axon, ...). */
     SectionType type() const;
 
-
-
 protected:
-    MitoSection(uint32_t id, std::shared_ptr<Property::Properties> morphology) : SectionBase(id, morphology) {}
+    MitoSection(uint32_t id, std::shared_ptr<Property::Properties> morphology)
+        : SectionBase(id, morphology)
+    {
+    }
     friend const MitoSection Mitochondria::section(const uint32_t&) const;
     friend class SectionBase<MitoSection>;
     friend class mut::MitoSection;

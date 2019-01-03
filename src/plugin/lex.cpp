@@ -1,5 +1,5 @@
-#include <morphio/types.h>
 #include <morphio/errorMessages.h>
+#include <morphio/types.h>
 
 #include <lexertl/debug.hpp>
 #include <lexertl/generator.hpp>
@@ -124,7 +124,9 @@ public:
     size_t current_section_start_ = 0;
 
     NeurolucidaLexer(const std::string& uri, bool debug = false)
-        : uri_(uri), debug_(debug), err_(uri)
+        : uri_(uri)
+        , debug_(debug)
+        , err_(uri)
     {
         lexertl::rules rules;
         build_lexer(rules, sm_);
@@ -277,8 +279,7 @@ public:
 
             throw RawDataError(err_.ERROR_UNEXPECTED_TOKEN(line_num(),
                                                            expected.str(),
-                                                           got.str(),
-                                                           msg));
+                                                           got.str(), msg));
         }
     }
 
@@ -304,7 +305,8 @@ public:
             }
             if (ended())
             {
-                throw RawDataError(err_.ERROR_EOF_UNBALANCED_PARENS(line_num()));
+                throw RawDataError(
+                    err_.ERROR_EOF_UNBALANCED_PARENS(line_num()));
             }
         }
         consume(Token::RPAREN,

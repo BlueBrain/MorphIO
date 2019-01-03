@@ -24,4 +24,4 @@ public:
     MitoIterator& operator++();
     MitoIterator operator++(int);
 };
-}
+} // namespace morphio

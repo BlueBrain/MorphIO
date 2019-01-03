@@ -9,24 +9,32 @@ namespace mut
 class Soma
 {
 public:
-    Soma() : _somaType(SOMA_UNDEFINED) {}
-    Soma(const Property::PointLevel &pointProperties);
+    Soma()
+        : _somaType(SOMA_UNDEFINED)
+    {
+    }
+    Soma(const Property::PointLevel& pointProperties);
     Soma(const morphio::Soma& soma);
 
-    ~Soma() {
-    }
+    ~Soma() {}
 
     /**
        Return the coordinates (x,y,z) of all soma point
     **/
     std::vector<Point>& points() { return _pointProperties._points; }
-    const std::vector<Point>& points() const { return _pointProperties._points; }
+    const std::vector<Point>& points() const
+    {
+        return _pointProperties._points;
+    }
 
     /**
        Return the diameters of all soma points
     **/
     std::vector<float>& diameters() { return _pointProperties._diameters; }
-    const std::vector<float>& diameters() const { return _pointProperties._diameters; }
+    const std::vector<float>& diameters() const
+    {
+        return _pointProperties._diameters;
+    }
 
     /**
        Return the soma type

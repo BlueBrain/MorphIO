@@ -84,4 +84,4 @@ mito_upstream_iterator& mito_upstream_iterator::operator++()
 template class MitoIterator<std::stack<MitoSection>>;
 template class MitoIterator<std::queue<MitoSection>>;
 template class MitoIterator<std::vector<MitoSection>>;
-}
+} // namespace morphio

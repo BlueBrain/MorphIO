@@ -10,35 +10,36 @@
 
 #include <morphio/errorMessages.h>
 #include <morphio/exceptions.h>
+#include <morphio/mut/iterators.h>
 #include <morphio/mut/mitochondria.h>
+#include <morphio/mut/soma.h>
 #include <morphio/properties.h>
 #include <morphio/section.h>
 #include <morphio/types.h>
-#include <morphio/mut/soma.h>
-#include <morphio/mut/iterators.h>
-
 
 namespace morphio
 {
 namespace mut
 {
-
 bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
                           std::shared_ptr<Section> current);
 
 class Morphology
 {
 public:
-    Morphology() : _counter(0),
-                   _soma(std::make_shared<Soma>()),
-                   _cellProperties(std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel()))
-                    {}
+    Morphology()
+        : _counter(0)
+        , _soma(std::make_shared<Soma>())
+        , _cellProperties(std::make_shared<morphio::Property::CellLevel>(
+              morphio::Property::CellLevel()))
+    {
+    }
 
     /**
        Build a mutable Morphology from an on-disk morphology
 
-       options is the modifier flags to be applied. All flags are defined in their enum:
-       morphio::enum::Option and can be composed.
+       options is the modifier flags to be applied. All flags are defined in
+    their enum: morphio::enum::Option and can be composed.
 
        Example:
            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
@@ -55,21 +56,20 @@ public:
     **/
     Morphology(const morphio::Morphology& morphology);
 
-
     virtual ~Morphology();
 
-   /**
-   Are considered equal, 2 morphologies with the same:\n
-    - root sections
-    - section topology
-    - cell family
-    For each section:
-    - same points
-    - same diameters
-    - same perimeters
-    - same type
-    Note: the soma types are NOT required to be equal
-    **/
+    /**
+    Are considered equal, 2 morphologies with the same:\n
+     - root sections
+     - section topology
+     - cell family
+     For each section:
+     - same points
+     - same diameters
+     - same perimeters
+     - same type
+     Note: the soma types are NOT required to be equal
+     **/
     bool operator==(const Morphology& other) const;
     bool operator!=(const Morphology& other) const;
 
@@ -77,7 +77,6 @@ public:
        Returns all section ids at the tree root
     **/
     const std::vector<std::shared_ptr<Section>>& rootSections() const;
-
 
     /**
        Returns the dictionary id -> Section for this tree
@@ -98,12 +97,10 @@ public:
     Mitochondria& mitochondria() { return _mitochondria; }
     const Mitochondria& mitochondria() const { return _mitochondria; }
 
-
     /**
      * Return the annotation object
      **/
     const std::vector<Property::Annotation> annotations() const;
-
 
     /**
        Get the shared pointer for the given section
@@ -111,9 +108,6 @@ public:
        Note: multiple morphologies can share the same Section instances.
     **/
     const std::shared_ptr<Section> section(uint32_t id) const;
-
-
-
 
     /**
        Depth first iterator starting at a given section id
@@ -153,33 +147,35 @@ public:
 
        If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<Section> appendRootSection(const morphio::Section&, bool recursive = false);
+    std::shared_ptr<Section> appendRootSection(const morphio::Section&,
+                                               bool recursive = false);
 
     /**
        Append an existing Section as a root section
 
        If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<Section> appendRootSection(std::shared_ptr<Section> section, bool recursive = false);
-
+    std::shared_ptr<Section> appendRootSection(std::shared_ptr<Section> section,
+                                               bool recursive = false);
 
     /**
        Append a root Section
     **/
-    std::shared_ptr<Section> appendRootSection(const Property::PointLevel&, SectionType sectionType);
+    std::shared_ptr<Section> appendRootSection(const Property::PointLevel&,
+                                               SectionType sectionType);
 
     /**
-       Iterate on all sections starting at startSection via a depth-first-search traversal
-       and call the callback function fun.
+       Iterate on all sections starting at startSection via a depth-first-search
+    traversal and call the callback function fun.
 
-       startSection specifies the starting section. if startSection == -1, the traversal
-       will done on every neurite.
+       startSection specifies the starting section. if startSection == -1, the
+    traversal will done on every neurite.
     **/
-    // void traverse(std::function<void(Morphology& morphology, uint32_t sectionId)>,
+    // void traverse(std::function<void(Morphology& morphology, uint32_t
+    // sectionId)>,
     //               uint32_t startSection = -1);
 
     void applyModifiers(unsigned int modifierFlags);
-
 
     /**
      * Return the soma type
@@ -189,19 +185,20 @@ public:
     /**
      * Return the cell family (neuron or glia)
      **/
-    CellFamily& cellFamily(){ return _cellProperties->_cellFamily; }
+    CellFamily& cellFamily() { return _cellProperties->_cellFamily; }
 
     /**
      * Return the version
      **/
-    MorphologyVersion& version(){ return _cellProperties->_version; }
+    MorphologyVersion& version() { return _cellProperties->_version; }
 
     /**
      * Write file to H5, SWC, ASC format depending on filename extension
      **/
     void write(const std::string& filename);
 
-    void addAnnotation(const morphio::Property::Annotation& annotation) {
+    void addAnnotation(const morphio::Property::Annotation& annotation)
+    {
         _annotations.push_back(annotation);
     }
 
@@ -234,7 +231,6 @@ private:
 
     std::map<uint32_t, uint32_t> _parent;
     std::map<uint32_t, std::vector<std::shared_ptr<Section>>> _children;
-
 };
 
 } // namespace mut

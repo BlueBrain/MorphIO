@@ -16,7 +16,7 @@ inline std::mutex* hdf5Lock()
     static std::mutex _hdf5Lock;
     return &_hdf5Lock;
 }
-}
-}
+} // namespace detail
+} // namespace morphio
 
 #endif

@@ -23,13 +23,15 @@ template <typename T>
 Iterator<T>::Iterator(const Morphology& morphology)
 {
     auto roots = morphology.rootSections();
-    for(auto it = roots.rbegin(); it != roots.rend(); ++it)
+    for (auto it = roots.rbegin(); it != roots.rend(); ++it)
         container.push(*it);
 }
 
 template <>
-breadth_iterator::Iterator(const Morphology& morphology) {
-    for(auto root: morphology.rootSections()) {
+breadth_iterator::Iterator(const Morphology& morphology)
+{
+    for (auto root : morphology.rootSections())
+    {
         std::queue<Section> q;
         q.push(root);
         container.push(q);
@@ -37,8 +39,10 @@ breadth_iterator::Iterator(const Morphology& morphology) {
 }
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-template <> upstream_iterator::Iterator(const Morphology& morphology) {} // Unused
-
+template <>
+upstream_iterator::Iterator(const Morphology& morphology)
+{
+} // Unused
 
 template <typename T>
 bool Iterator<T>::operator==(Iterator other) const
@@ -51,7 +55,6 @@ bool Iterator<T>::operator!=(Iterator other) const
 {
     return !(*this == other);
 }
-
 
 template <typename T>
 Iterator<T> Iterator<T>::operator++(int)
@@ -105,9 +108,9 @@ breadth_iterator& breadth_iterator::operator++()
 {
     const auto& section = *(*this);
     container.front().pop();
-    for (auto& child: section.children())
+    for (auto& child : section.children())
         container.front().push(child);
-    if(container.front().empty())
+    if (container.front().empty())
         container.pop();
 
     return *this;
@@ -128,4 +131,4 @@ upstream_iterator& upstream_iterator::operator++()
 template class Iterator<std::stack<Section>>;
 template class Iterator<std::queue<std::queue<Section>>>;
 template class Iterator<std::vector<Section>>;
-}
+} // namespace morphio

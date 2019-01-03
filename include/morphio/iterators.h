@@ -18,6 +18,7 @@ class Iterator
     T container;
 
     Iterator();
+
 public:
     Iterator(const Section& section);
     Iterator(const Morphology& morphology);
@@ -27,4 +28,4 @@ public:
     Iterator& operator++();
     Iterator operator++(int);
 };
-}
+} // namespace morphio

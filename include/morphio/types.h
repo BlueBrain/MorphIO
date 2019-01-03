@@ -10,10 +10,10 @@
 
 #include <stdint.h>
 
+#include <gsl/gsl>
 #include <morphio/enums.h>
 #include <morphio/exceptions.h>
 #include <morphio/vector_types.h>
-#include <gsl/gsl>
 
 #ifdef __GNUC__
 #define BRAIN_UNUSED __attribute__((unused))
@@ -35,7 +35,8 @@ typedef std::string URI;
 using namespace enums;
 class Morphology;
 class MorphologyInitData;
-template <class T> class SectionBase;
+template <class T>
+class SectionBase;
 class Section;
 class MitoSection;
 class Mitochondria;
@@ -53,9 +54,9 @@ class NeurolucidaParser;
 
 namespace plugin
 {
-    struct DebugInfo;
-    class ErrorMessages;
-}
+struct DebugInfo;
+class ErrorMessages;
+} // namespace plugin
 namespace mut
 {
 class Section;
@@ -70,21 +71,24 @@ class MitoIterator;
 template <typename T>
 class Iterator;
 
-typedef MitoIterator<std::stack<std::shared_ptr<MitoSection>>> mito_depth_iterator;
-typedef MitoIterator<std::queue<std::shared_ptr<MitoSection>>> mito_breadth_iterator;
-typedef MitoIterator<std::vector<std::shared_ptr<MitoSection>>> mito_upstream_iterator;
+typedef MitoIterator<std::stack<std::shared_ptr<MitoSection>>>
+    mito_depth_iterator;
+typedef MitoIterator<std::queue<std::shared_ptr<MitoSection>>>
+    mito_breadth_iterator;
+typedef MitoIterator<std::vector<std::shared_ptr<MitoSection>>>
+    mito_upstream_iterator;
 
 typedef Iterator<std::stack<std::shared_ptr<Section>>> depth_iterator;
-typedef Iterator<std::queue<std::queue<std::shared_ptr<Section>>>> breadth_iterator;
+typedef Iterator<std::queue<std::queue<std::shared_ptr<Section>>>>
+    breadth_iterator;
 typedef Iterator<std::vector<std::shared_ptr<Section>>> upstream_iterator;
-}
+} // namespace mut
 
 template <typename T>
 class MitoIterator;
 
 template <typename T>
 class Iterator;
-
 
 typedef std::pair<size_t, size_t> SectionRange;
 
@@ -96,7 +100,8 @@ typedef Iterator<std::stack<Section>> depth_iterator;
 typedef Iterator<std::queue<std::queue<Section>>> breadth_iterator;
 typedef Iterator<std::vector<Section>> upstream_iterator;
 
-template <typename T> using range = gsl::span<T>;
+template <typename T>
+using range = gsl::span<T>;
 
 std::ostream& operator<<(std::ostream& os, const std::vector<Point>&);
 } // namespace morphio

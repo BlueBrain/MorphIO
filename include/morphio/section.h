@@ -1,9 +1,9 @@
 #pragma once
 
-#include <morphio/section_base.h>
 #include <morphio/iterators.h>
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
+#include <morphio/section_base.h>
 #include <morphio/types.h>
 
 namespace morphio
@@ -32,8 +32,8 @@ class Section : public SectionBase<Section>
 {
     typedef Property::Section SectionId;
     typedef Property::Point PointAttribute;
-public:
 
+public:
     /**
        Euclidian distance between first and last point of the section
     **/
@@ -57,21 +57,23 @@ public:
     upstream_iterator upstream_begin() const;
     upstream_iterator upstream_end() const;
 
-
     /**
-     * Return a view (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
+     * Return a view
+    (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point coordinates
     **/
     const range<const Point> points() const;
 
     /**
-     * Return a view (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
+     * Return a view
+    (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point diameters
     **/
     const range<const float> diameters() const;
 
     /**
-     * Return a view (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
+     * Return a view
+     (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point perimeters
      **/
     const range<const float> perimeters() const;
@@ -85,7 +87,10 @@ public:
     friend class SectionBase<Section>;
 
 protected:
-    Section(uint32_t id, std::shared_ptr<Property::Properties> morphology) : SectionBase(id, morphology) {}
+    Section(uint32_t id, std::shared_ptr<Property::Properties> morphology)
+        : SectionBase(id, morphology)
+    {
+    }
 };
 
 // explicit instanciation
@@ -94,4 +99,5 @@ template class SectionBase<Section>;
 } // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
-std::ostream& operator<<(std::ostream& os, morphio::range<const morphio::Point> points);
+std::ostream& operator<<(std::ostream& os,
+                         morphio::range<const morphio::Point> points);
