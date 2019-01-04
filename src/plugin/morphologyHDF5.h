@@ -7,12 +7,9 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5Utility.hpp>
 
-namespace morphio
-{
-namespace plugin
-{
-namespace h5
-{
+namespace morphio {
+namespace plugin {
+namespace h5 {
 Property::Properties load(const URI& uri);
 
 class MorphologyHDF5
@@ -35,8 +32,8 @@ private:
     void _readMitochondria();
     template <typename T>
     void _read(const std::string& group, const std::string& _dataset,
-               MorphologyVersion version, unsigned int expectedDimension,
-               T& data);
+        MorphologyVersion version, unsigned int expectedDimension,
+        T& data);
 
     std::unique_ptr<HighFive::File> _file;
 

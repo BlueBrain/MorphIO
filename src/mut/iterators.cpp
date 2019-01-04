@@ -1,10 +1,8 @@
 #include <morphio/mut/iterators.h>
 #include <morphio/mut/morphology.h>
 
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 class Section;
 
 template <typename T>
@@ -32,8 +30,7 @@ Iterator<T>::Iterator(const Morphology& morphology)
 template <>
 breadth_iterator::Iterator(const Morphology& morphology)
 {
-    for (auto root : morphology.rootSections())
-    {
+    for (auto root : morphology.rootSections()) {
         std::queue<std::shared_ptr<Section>> q;
         q.push(root);
         container.push(q);

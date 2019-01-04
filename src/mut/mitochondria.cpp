@@ -2,10 +2,8 @@
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/writers.h>
 
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 void friendDtorForSharedPtrMito(MitoSection* section)
 {
     delete section;
@@ -15,14 +13,12 @@ std::shared_ptr<MitoSection> Mitochondria::appendRootSection(
     const morphio::MitoSection& section, bool recursive)
 {
     std::shared_ptr<MitoSection> ptr(new MitoSection(this, _counter, section),
-                                     friendDtorForSharedPtrMito);
+        friendDtorForSharedPtrMito);
     _register(ptr);
     _rootSections.push_back(ptr);
 
-    if (recursive)
-    {
-        for (const auto& child : section.children())
-        {
+    if (recursive) {
+        for (const auto& child : section.children()) {
             ptr->appendSection(child, true);
         }
     }
@@ -34,15 +30,13 @@ std::shared_ptr<MitoSection> Mitochondria::appendRootSection(
     std::shared_ptr<MitoSection> section, bool recursive)
 {
     std::shared_ptr<MitoSection> section_copy(new MitoSection(this, _counter,
-                                                              *section),
-                                              friendDtorForSharedPtrMito);
+                                                  *section),
+        friendDtorForSharedPtrMito);
     _register(section_copy);
     _rootSections.push_back(section_copy);
 
-    if (recursive)
-    {
-        for (const auto child : section->children())
-        {
+    if (recursive) {
+        for (const auto child : section->children()) {
             section_copy->appendSection(child, true);
         }
     }
@@ -54,8 +48,8 @@ std::shared_ptr<MitoSection> Mitochondria::appendRootSection(
     const Property::MitochondriaPointLevel& pointProperties)
 {
     std::shared_ptr<MitoSection> ptr(new MitoSection(this, _counter,
-                                                     pointProperties),
-                                     friendDtorForSharedPtrMito);
+                                         pointProperties),
+        friendDtorForSharedPtrMito);
     _register(ptr);
     _rootSections.push_back(ptr);
 
@@ -63,24 +57,21 @@ std::shared_ptr<MitoSection> Mitochondria::appendRootSection(
 }
 
 void _appendMitoProperties(Property::MitochondriaPointLevel& to,
-                           const Property::MitochondriaPointLevel& from,
-                           int offset = 0)
+    const Property::MitochondriaPointLevel& from,
+    int offset = 0)
 {
     Property::_appendVector(to._sectionIds, from._sectionIds, offset);
     Property::_appendVector(to._relativePathLengths, from._relativePathLengths,
-                            offset);
+        offset);
     Property::_appendVector(to._diameters, from._diameters, offset);
 }
 
 const std::vector<std::shared_ptr<MitoSection>> Mitochondria::children(
     std::shared_ptr<MitoSection> section) const
 {
-    try
-    {
+    try {
         return _children.at(section->id());
-    }
-    catch (const std::out_of_range& e)
-    {
+    } catch (const std::out_of_range& e) {
         return std::vector<std::shared_ptr<MitoSection>>();
     }
 }
@@ -99,13 +90,10 @@ const std::shared_ptr<MitoSection> Mitochondria::parent(
 
 bool Mitochondria::isRoot(const std::shared_ptr<MitoSection> section) const
 {
-    try
-    {
+    try {
         parent(section);
         return false;
-    }
-    catch (const std::out_of_range& e)
-    {
+    } catch (const std::out_of_range& e) {
         return true;
     }
 }
@@ -126,22 +114,20 @@ void Mitochondria::_buildMitochondria(Property::Properties& properties) const
     uint32_t counter = 0;
     std::map<uint32_t, uint32_t> newIds;
 
-    for (std::shared_ptr<MitoSection> mitoStart : _rootSections)
-    {
+    for (std::shared_ptr<MitoSection> mitoStart : _rootSections) {
         std::queue<std::shared_ptr<MitoSection>> q;
         q.push(mitoStart);
-        while (!q.empty())
-        {
+        while (!q.empty()) {
             std::shared_ptr<MitoSection> section = q.front();
             q.pop();
             bool root = isRoot(section);
             int32_t parentOnDisk = root ? -1 : newIds[parent(section)->id()];
 
             properties._mitochondriaSectionLevel._sections.push_back(
-                {(int)properties._mitochondriaPointLevel._diameters.size(),
-                 parentOnDisk});
+                { (int)properties._mitochondriaPointLevel._diameters.size(),
+                    parentOnDisk });
             _appendMitoProperties(properties._mitochondriaPointLevel,
-                                  section->_mitoPoints);
+                section->_mitoPoints);
 
             newIds[section->id()] = counter++;
 

@@ -5,8 +5,7 @@
 #include <morphio/properties.h>
 #include <morphio/types.h>
 
-namespace morphio
-{
+namespace morphio {
 /**
    This CRTP
  (https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern) defines
@@ -63,6 +62,6 @@ protected:
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
 std::ostream& operator<<(std::ostream& os,
-                         morphio::range<const morphio::Point> points);
+    morphio::range<const morphio::Point> points);
 
 #include "section_base.tpp"

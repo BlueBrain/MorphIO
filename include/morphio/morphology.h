@@ -5,8 +5,7 @@
 #include <morphio/properties.h>
 #include <morphio/types.h>
 
-namespace morphio
-{
+namespace morphio {
 enum SomaClasses
 {
     SOMA_CONTOUR,

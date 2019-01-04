@@ -2,8 +2,7 @@
 #include <morphio/section.h>
 #include <morphio/vector_types.h>
 
-namespace morphio
-{
+namespace morphio {
 SectionType Section::type() const
 {
     auto val = _properties->get<Property::SectionType>()[_id];
@@ -78,7 +77,7 @@ std::ostream& operator<<(std::ostream& os, const morphio::Section& section)
 
 // operator<< must be defined in the global namespace to be usable there
 std::ostream& operator<<(std::ostream& os,
-                         const morphio::range<const morphio::Point> points)
+    const morphio::range<const morphio::Point> points)
 {
     for (auto point : points)
         os << point[0] << ' ' << point[1] << ' ' << point[2] << std::endl;

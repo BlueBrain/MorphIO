@@ -4,8 +4,7 @@
 #include <stack>
 
 #include <morphio/types.h>
-namespace morphio
-{
+namespace morphio {
 /**
 An iterator class to iterate through sections;
  **/

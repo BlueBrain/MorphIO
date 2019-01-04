@@ -5,8 +5,7 @@
 #include <morphio/section_base.h>
 #include <morphio/types.h>
 
-namespace morphio
-{
+namespace morphio {
 class MitoSection : public SectionBase<MitoSection>
 {
     using SectionId = Property::MitoSection;

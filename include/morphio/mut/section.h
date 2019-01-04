@@ -8,10 +8,8 @@
 
 #include <morphio/mut/iterators.h>
 
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 class Section : public std::enable_shared_from_this<Section>
 {
 public:
@@ -93,10 +91,10 @@ public:
     ~Section() {}
 
     std::shared_ptr<Section> appendSection(const morphio::Section&,
-                                           bool recursive = false);
+        bool recursive = false);
 
     std::shared_ptr<Section> appendSection(std::shared_ptr<Section> section,
-                                           bool recursive = false);
+        bool recursive = false);
 
     std::shared_ptr<Section> appendSection(
         const Property::PointLevel&,

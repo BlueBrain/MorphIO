@@ -6,10 +6,8 @@
 #include <morphio/section.h>
 #include <morphio/shared_utils.tpp>
 
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 Soma::Soma(const Property::PointLevel& pointProperties)
     : _somaType(SOMA_UNDEFINED)
     , _pointProperties(pointProperties)
@@ -30,8 +28,8 @@ const Point Soma::center() const
 float Soma::surface() const
 {
     return _somaSurface<std::vector<float>, std::vector<Point>>(type(),
-                                                                diameters(),
-                                                                points());
+        diameters(),
+        points());
 }
 
 std::ostream& operator<<(std::ostream& os, Soma& soma)

@@ -17,12 +17,10 @@
 #include <morphio/section.h>
 #include <morphio/types.h>
 
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
-                          std::shared_ptr<Section> current);
+    std::shared_ptr<Section> current);
 
 class Morphology
 {
@@ -148,7 +146,7 @@ public:
        If recursive == true, all descendent will be appended as well
     **/
     std::shared_ptr<Section> appendRootSection(const morphio::Section&,
-                                               bool recursive = false);
+        bool recursive = false);
 
     /**
        Append an existing Section as a root section
@@ -156,13 +154,13 @@ public:
        If recursive == true, all descendent will be appended as well
     **/
     std::shared_ptr<Section> appendRootSection(std::shared_ptr<Section> section,
-                                               bool recursive = false);
+        bool recursive = false);
 
     /**
        Append a root Section
     **/
     std::shared_ptr<Section> appendRootSection(const Property::PointLevel&,
-                                               SectionType sectionType);
+        SectionType sectionType);
 
     /**
        Iterate on all sections starting at startSection via a depth-first-search

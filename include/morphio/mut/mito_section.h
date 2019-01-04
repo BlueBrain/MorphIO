@@ -4,17 +4,15 @@
 #include <morphio/properties.h>
 #include <morphio/types.h>
 
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 class MitoSection
 {
 public:
     MitoSection(Mitochondria* mitochondria, int id,
-                const Property::MitochondriaPointLevel& pointProperties);
+        const Property::MitochondriaPointLevel& pointProperties);
     MitoSection(Mitochondria* mitochondria, int id,
-                const morphio::MitoSection& section);
+        const morphio::MitoSection& section);
     MitoSection(Mitochondria* mitochondria, int id, const MitoSection& section);
 
     std::shared_ptr<MitoSection> appendSection(

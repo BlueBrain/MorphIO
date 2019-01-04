@@ -24,8 +24,7 @@
 #include <highfive/H5DataType.hpp>
 
 #include <morphio/types.h>
-namespace HighFive
-{
+namespace HighFive {
 template <>
 inline AtomicType<morphio::SectionType>::AtomicType()
 {
@@ -51,19 +50,17 @@ inline AtomicType<morphio::Point>::AtomicType()
 }
 } // namespace HighFive
 
-namespace morphio
-{
-namespace detail
-{
+namespace morphio {
+namespace detail {
 /** Add a string attribute to the given H5 object. */
 template <typename T>
 inline void addStringAttribute(HighFive::AnnotateTraits<T>& object,
-                               const std::string& name,
-                               const std::string& value)
+    const std::string& name,
+    const std::string& value)
 {
     auto dataspace = HighFive::DataSpace::From(value);
     auto attr = object.createAttribute(name, dataspace,
-                                       HighFive::AtomicType<std::string>());
+        HighFive::AtomicType<std::string>());
     attr.write(value);
 }
 } // namespace detail

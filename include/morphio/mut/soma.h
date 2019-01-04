@@ -2,10 +2,8 @@
 
 #include <morphio/properties.h>
 
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 class Soma
 {
 public:

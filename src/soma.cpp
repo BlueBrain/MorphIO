@@ -5,8 +5,7 @@
 #include <morphio/soma.h>
 #include <morphio/vector_types.h>
 
-namespace morphio
-{
+namespace morphio {
 Soma::Soma(std::shared_ptr<Property::Properties> properties)
     : _properties(properties)
 {
@@ -19,10 +18,8 @@ const Point Soma::center() const
 
 float Soma::volume() const
 {
-    switch (_properties->_cellLevel._somaType)
-    {
-    case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS:
-    {
+    switch (_properties->_cellLevel._somaType) {
+    case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: {
         float radius = diameters()[0] / 2;
         return 4 * M_PI * radius * radius;
     }
@@ -35,8 +32,8 @@ float Soma::volume() const
 float Soma::surface() const
 {
     return _somaSurface<range<const float>, range<const Point>>(type(),
-                                                                diameters(),
-                                                                points());
+        diameters(),
+        points());
 }
 
 float Soma::maxDistance() const

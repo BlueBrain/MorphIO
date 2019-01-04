@@ -1,8 +1,7 @@
 #include <morphio/mito_iterators.h>
 #include <morphio/mito_section.h>
 
-namespace morphio
-{
+namespace morphio {
 class MitoSection;
 
 template <typename T>

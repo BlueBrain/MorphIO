@@ -3,8 +3,7 @@
 #include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
 
-namespace morphio
-{
+namespace morphio {
 mito_depth_iterator MitoSection::depth_begin() const
 {
     return mito_depth_iterator(*this);

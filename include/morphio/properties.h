@@ -21,10 +21,8 @@
 
 #include <morphio/types.h>
 
-namespace morphio
-{
-namespace Property
-{
+namespace morphio {
+namespace Property {
 template <typename T>
 void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
 
@@ -83,9 +81,8 @@ struct PointLevel
 
     PointLevel() {}
     PointLevel(std::vector<Point::Type> points,
-               std::vector<Diameter::Type> diameters,
-               std::vector<Perimeter::Type> perimeters =
-                   std::vector<Perimeter::Type>());
+        std::vector<Diameter::Type> diameters,
+        std::vector<Perimeter::Type> perimeters = std::vector<Perimeter::Type>());
     PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
     // bool operator==(const PointLevel& other) const;
@@ -100,7 +97,7 @@ struct MitochondriaPointLevel
 
     MitochondriaPointLevel(){};
     MitochondriaPointLevel(const MitochondriaPointLevel& data,
-                           SectionRange range);
+        SectionRange range);
 
     MitochondriaPointLevel(
         std::vector<uint32_t> sectionId,
@@ -137,7 +134,7 @@ struct SomaLevel
 struct Annotation
 {
     Annotation(AnnotationType type, uint32_t sectionId, PointLevel points,
-               std::string details, int32_t lineNumber);
+        std::string details, int32_t lineNumber);
     AnnotationType _type;
     uint32_t _sectionId;
     PointLevel _points;
@@ -196,7 +193,7 @@ template <>
 const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>();
 template <>
 const std::map<int32_t, std::vector<uint32_t>>&
-    Properties::children<MitoSection>();
+Properties::children<MitoSection>();
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);

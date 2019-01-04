@@ -4,8 +4,7 @@
 #include <iostream>
 #include <vector>
 
-namespace morphio
-{
+namespace morphio {
 using Point = std::array<float, 3>;
 using Points = std::vector<Point>;
 
@@ -16,9 +15,9 @@ Point operator-=(Point& left, const Point& right);
 Point operator/=(Point& left, const float factor);
 
 std::vector<Point> operator+(const std::vector<Point>& points,
-                             const Point& right);
+    const Point& right);
 std::vector<Point> operator-(const std::vector<Point>& points,
-                             const Point& right);
+    const Point& right);
 std::vector<Point> operator+=(std::vector<Point>& points, const Point& right);
 std::vector<Point> operator-=(std::vector<Point>& points, const Point& right);
 
@@ -41,9 +40,9 @@ float distance(const Point& left, const Point& right);
 
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
 std::ostream& operator<<(std::ostream& os,
-                         const std::vector<morphio::Point>& points);
+    const std::vector<morphio::Point>& points);
 
 } // namespace morphio
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
 std::ostream& operator<<(std::ostream& os,
-                         const std::vector<morphio::Point>& points);
+    const std::vector<morphio::Point>& points);

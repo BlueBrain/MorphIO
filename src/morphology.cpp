@@ -16,8 +16,7 @@
 #include "plugin/morphologyHDF5.h"
 #include "plugin/morphologySWC.h"
 
-namespace morphio
-{
+namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
 SomaType getSomaType(uint32_t nSomaPoints);
 
@@ -56,10 +55,7 @@ Morphology::Morphology(const URI& source, unsigned int options)
     // Sad trick because, contrary to SWC and ASC, H5 does not create a
     // mut::Morphology object on which we can directly call
     // mut::Morphology::applyModifiers
-    if (options && (version() == MORPHOLOGY_VERSION_H5_1 ||
-                    version() == MORPHOLOGY_VERSION_H5_1_1 ||
-                    version() == MORPHOLOGY_VERSION_H5_2))
-    {
+    if (options && (version() == MORPHOLOGY_VERSION_H5_1 || version() == MORPHOLOGY_VERSION_H5_1_1 || version() == MORPHOLOGY_VERSION_H5_2)) {
         mut::Morphology mutable_morph(*this);
         mutable_morph.sanitize();
         mutable_morph.applyModifiers(options);
@@ -72,8 +68,7 @@ Morphology::Morphology(const URI& source, unsigned int options)
 Morphology::Morphology(mut::Morphology morphology)
 {
     morphology.sanitize();
-    _properties =
-        std::make_shared<Property::Properties>(morphology.buildReadOnly());
+    _properties = std::make_shared<Property::Properties>(morphology.buildReadOnly());
     buildChildren(_properties);
 }
 
@@ -99,8 +94,7 @@ bool Morphology::operator==(const Morphology& other) const
     //     return false;
     // }
 
-    return (this->_properties && other._properties &&
-            *(this->_properties) == *(other._properties));
+    return (this->_properties && other._properties && *(this->_properties) == *(other._properties));
 }
 
 bool Morphology::operator!=(const Morphology& other) const
@@ -131,20 +125,15 @@ const Section Morphology::section(const uint32_t& id) const
 const std::vector<Section> Morphology::rootSections() const
 {
     std::vector<Section> result;
-    try
-    {
-        const std::vector<uint32_t>& children =
-            _properties->children<morphio::Property::Section>().at(-1);
+    try {
+        const std::vector<uint32_t>& children = _properties->children<morphio::Property::Section>().at(-1);
         result.reserve(children.size());
-        for (auto id : children)
-        {
+        for (auto id : children) {
             result.push_back(section(id));
         }
 
         return result;
-    }
-    catch (const std::out_of_range& oor)
-    {
+    } catch (const std::out_of_range& oor) {
         return result;
     }
 }
@@ -154,8 +143,7 @@ const std::vector<Section> Morphology::sections() const
     // TODO: Make this more performant when needed
     std::vector<Section> sections;
     for (uint i = 1; i < _properties->get<morphio::Property::Section>().size();
-         ++i)
-    {
+         ++i) {
         sections.push_back(section(i));
     }
     return sections;
@@ -221,15 +209,12 @@ breadth_iterator Morphology::breadth_end() const
 
 SomaType getSomaType(uint32_t nSomaPoints)
 {
-    try
-    {
-        return std::map<uint32_t, SomaType>{{0, SOMA_UNDEFINED},
-                                            {1, SOMA_SINGLE_POINT},
-                                            {2, SOMA_UNDEFINED}}
+    try {
+        return std::map<uint32_t, SomaType>{ { 0, SOMA_UNDEFINED },
+            { 1, SOMA_SINGLE_POINT },
+            { 2, SOMA_UNDEFINED } }
             .at(nSomaPoints);
-    }
-    catch (const std::out_of_range& oor)
-    {
+    } catch (const std::out_of_range& oor) {
         return SOMA_SIMPLE_CONTOUR;
     }
 }
@@ -240,8 +225,7 @@ void buildChildren(std::shared_ptr<Property::Properties> properties)
         const auto& sections = properties->get<Property::Section>();
         auto& children = properties->_sectionLevel._children;
 
-        for (size_t i = 0; i < sections.size(); ++i)
-        {
+        for (size_t i = 0; i < sections.size(); ++i) {
             const int32_t parent = sections[i][1];
             children[parent].push_back(i);
         }
@@ -251,8 +235,7 @@ void buildChildren(std::shared_ptr<Property::Properties> properties)
         const auto& sections = properties->get<Property::MitoSection>();
         auto& children = properties->_mitochondriaSectionLevel._children;
 
-        for (size_t i = 0; i < sections.size(); ++i)
-        {
+        for (size_t i = 0; i < sections.size(); ++i) {
             const int32_t parent = sections[i][1];
             children[parent].push_back(i);
         }

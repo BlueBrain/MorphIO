@@ -6,8 +6,7 @@
 #include <morphio/section_base.h>
 #include <morphio/types.h>
 
-namespace morphio
-{
+namespace morphio {
 /**
  * A class to represent a morphological section.
  *
@@ -100,4 +99,4 @@ template class SectionBase<Section>;
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
 std::ostream& operator<<(std::ostream& os,
-                         morphio::range<const morphio::Point> points);
+    morphio::range<const morphio::Point> points);

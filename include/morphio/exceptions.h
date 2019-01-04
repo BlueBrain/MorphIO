@@ -1,7 +1,6 @@
 #pragma once
 
-namespace morphio
-{
+namespace morphio {
 /**
    Base class of all morphio errors
  **/

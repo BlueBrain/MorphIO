@@ -3,8 +3,7 @@
 #include <math.h>
 #include <morphio/types.h>
 
-namespace morphio
-{
+namespace morphio {
 Point operator+(const Point& left, const Point& right)
 {
     Point ret;
@@ -43,7 +42,7 @@ Point operator/=(Point& left, float factor)
 }
 
 std::vector<Point> operator+(const std::vector<Point>& points,
-                             const Point& right)
+    const Point& right)
 {
     std::vector<Point> result;
     for (auto& p : points)
@@ -51,7 +50,7 @@ std::vector<Point> operator+(const std::vector<Point>& points,
     return result;
 }
 std::vector<Point> operator-(const std::vector<Point>& points,
-                             const Point& right)
+    const Point& right)
 {
     std::vector<Point> result;
     for (auto& p : points)
@@ -78,9 +77,7 @@ std::vector<Point> operator-=(std::vector<Point>& points, const Point& right)
 **/
 float distance(const Point& left, const Point& right)
 {
-    return sqrt((left[0] - right[0]) * (left[0] - right[0]) +
-                (left[1] - right[1]) * (left[1] - right[1]) +
-                (left[2] - right[2]) * (left[2] - right[2]));
+    return sqrt((left[0] - right[0]) * (left[0] - right[0]) + (left[1] - right[1]) * (left[1] - right[1]) + (left[2] - right[2]) * (left[2] - right[2]));
 }
 
 std::string dumpPoint(const Point& point)
@@ -103,13 +100,12 @@ const Point centerOfGravity(const T& points)
 {
     float x = 0, y = 0, z = 0;
     float size = float(points.size());
-    for (const Point& point : points)
-    {
+    for (const Point& point : points) {
         x += point[0];
         y += point[1];
         z += point[2];
     }
-    return Point({x / size, y / size, z / size});
+    return Point({ x / size, y / size, z / size });
 }
 template const Point centerOfGravity(const range<const Point>& points);
 template const Point centerOfGravity(const std::vector<Point>& points);
@@ -142,7 +138,7 @@ template Point operator/(const Point& from, int factor);
 template Point operator/(const Point& from, float factor);
 
 std::ostream& operator<<(std::ostream& os,
-                         const std::vector<morphio::Point>& points)
+    const std::vector<morphio::Point>& points)
 {
     os << morphio::dumpPoints(points);
     return os;
@@ -156,7 +152,7 @@ std::ostream& operator<<(std::ostream& os, const morphio::Point& point)
 } // namespace morphio
 
 std::ostream& operator<<(std::ostream& os,
-                         const std::vector<morphio::Point>& points)
+    const std::vector<morphio::Point>& points)
 {
     os << morphio::dumpPoints(points);
     return os;

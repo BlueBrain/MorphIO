@@ -6,12 +6,9 @@
 #include <lexertl/iterator.hpp>
 #include <lexertl/lookup.hpp>
 
-namespace morphio
-{
-namespace plugin
-{
-namespace asc
-{
+namespace morphio {
+namespace plugin {
+namespace asc {
 enum class Token
 {
     EOF_,
@@ -48,9 +45,10 @@ enum class Token
 };
 
 const std::map<Token, SectionType> TokenSectionTypeMap{
-    {Token::AXON, SECTION_AXON},
-    {Token::APICAL, SECTION_APICAL_DENDRITE},
-    {Token::DENDRITE, SECTION_DENDRITE}};
+    { Token::AXON, SECTION_AXON },
+    { Token::APICAL, SECTION_APICAL_DENDRITE },
+    { Token::DENDRITE, SECTION_DENDRITE }
+};
 
 constexpr bool operator==(int lhs, Token type)
 {
@@ -59,8 +57,7 @@ constexpr bool operator==(int lhs, Token type)
 
 inline std::ostream& operator<<(std::ostream& s, const Token& t)
 {
-    switch (t)
-    {
+    switch (t) {
 #define Q(x) #x
 #define T(TOK)       \
     case Token::TOK: \
@@ -180,8 +177,7 @@ public:
 
         lexertl::generator::build(rules_, sm_);
         sm_.minimise();
-        if (debug_)
-        {
+        if (debug_) {
             lexertl::debug::dump(sm_, std::cout);
         }
     }
@@ -193,19 +189,13 @@ public:
     {
         const lexertl::siterator end;
         size_t endlines = 0;
-        while (iter != end)
-        {
-            if (iter->id == +Token::NEWLINE)
-            {
+        while (iter != end) {
+            if (iter->id == +Token::NEWLINE) {
                 ++endlines;
                 ++iter;
-            }
-            else if (iter->id == +Token::WS || iter->id == +Token::COMMENT)
-            {
+            } else if (iter->id == +Token::WS || iter->id == +Token::COMMENT) {
                 ++iter;
-            }
-            else
-            {
+            } else {
                 break;
             }
         }
@@ -220,12 +210,9 @@ public:
 
     const lexertl::siterator consume(Token t, std::string msg = "")
     {
-        if (!msg.empty())
-        {
+        if (!msg.empty()) {
             expect(t, msg.c_str());
-        }
-        else
-        {
+        } else {
             expect(t, "Consume");
         }
         return consume();
@@ -234,8 +221,7 @@ public:
     const lexertl::siterator consume()
     {
         const lexertl::siterator end;
-        if (ended())
-        {
+        if (ended()) {
             throw RawDataError(err_.ERROR_EOF_REACHED(line_num()));
         }
 
@@ -245,14 +231,12 @@ public:
 
         current_line_num_ = next_line_num_;
 
-        if (next_ != end)
-        {
+        if (next_ != end) {
             ++next_;
             next_line_num_ += skip_whitespace(next_);
         }
 
-        if (debug_)
-        {
+        if (debug_) {
             state();
         }
 
@@ -269,8 +253,7 @@ public:
 
     void expect(Token t, const char* msg) const
     {
-        if (current()->id != +t)
-        {
+        if (current()->id != +t) {
             std::stringstream expected;
             expected << t;
 
@@ -278,8 +261,8 @@ public:
             got << current()->str();
 
             throw RawDataError(err_.ERROR_UNEXPECTED_TOKEN(line_num(),
-                                                           expected.str(),
-                                                           got.str(), msg));
+                expected.str(),
+                got.str(), msg));
         }
     }
 
@@ -287,13 +270,11 @@ public:
     void consume_until_balanced_paren()
     {
         expect(Token::LPAREN,
-               "consume_until_balanced_paren should start in LPAREN");
+            "consume_until_balanced_paren should start in LPAREN");
         size_t opening_count = 1;
-        while (opening_count != 0)
-        {
+        while (opening_count != 0) {
             size_t id = consume()->id;
-            switch (id)
-            {
+            switch (id) {
             case +Token::RPAREN:
                 --opening_count;
                 break;
@@ -303,14 +284,13 @@ public:
             default:
                 break;
             }
-            if (ended())
-            {
+            if (ended()) {
                 throw RawDataError(
                     err_.ERROR_EOF_UNBALANCED_PARENS(line_num()));
             }
         }
         consume(Token::RPAREN,
-                "consume_until_balanced_paren should end in RPAREN");
+            "consume_until_balanced_paren should end in RPAREN");
     }
 };
 

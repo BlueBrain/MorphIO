@@ -3,10 +3,8 @@
 
 #include <ostream>
 
-namespace morphio
-{
-namespace enums
-{
+namespace morphio {
+namespace enums {
 /** The list of modifier flags that can be passed when loading a morphology
  See morphio::mut::modifiers for more informations **/
 enum Option
@@ -62,8 +60,7 @@ enum CellFamily
 /** Output stream formatter for MorphologyVersion */
 inline std::ostream& operator<<(std::ostream& os, const MorphologyVersion v)
 {
-    switch (v)
-    {
+    switch (v) {
     case MORPHOLOGY_VERSION_H5_1:
         return os << "h5v1";
     case MORPHOLOGY_VERSION_H5_2:
@@ -95,8 +92,7 @@ enum SomaType
 /** Output stream formatter for MorphologyVersion */
 inline std::ostream& operator<<(std::ostream& os, const SomaType v)
 {
-    switch (v)
-    {
+    switch (v) {
     case SOMA_SINGLE_POINT:
         return os << "SOMA_SINGLE_POINT";
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS:
@@ -118,9 +114,9 @@ enum SectionType
     SECTION_UNDEFINED = 0,
     SECTION_SOMA = 1, //!< neuron cell body
     SECTION_AXON = 2,
-    SECTION_DENDRITE = 3,        //!< general or basal dendrite (near to soma)
+    SECTION_DENDRITE = 3, //!< general or basal dendrite (near to soma)
     SECTION_APICAL_DENDRITE = 4, //!< apical dendrite (far from soma)
-    SECTION_GLIA_PROCESS = 2,    // TODO: nasty overload there
+    SECTION_GLIA_PROCESS = 2, // TODO: nasty overload there
     SECTION_GLIA_ENDFOOT = 3,
 
     // All section types equal or above this number are custom types according

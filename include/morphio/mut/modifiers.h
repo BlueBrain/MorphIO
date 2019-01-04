@@ -2,12 +2,9 @@
 
 #include <morphio/types.h>
 
-namespace morphio
-{
-namespace mut
-{
-namespace modifiers
-{
+namespace morphio {
+namespace mut {
+namespace modifiers {
 /**
    Only the first and last points of each sections are kept
 **/

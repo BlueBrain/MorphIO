@@ -6,10 +6,8 @@
 
 #include <morphio/mut/mito_section.h>
 
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 /**
  * The entry-point class to access mitochondrial data
  *
@@ -93,7 +91,7 @@ public:
     well
     **/
     std::shared_ptr<MitoSection> appendRootSection(const morphio::MitoSection&,
-                                                   bool recursive = false);
+        bool recursive = false);
     std::shared_ptr<MitoSection> appendRootSection(
         const std::shared_ptr<MitoSection>, bool recursive = false);
 

@@ -1,5 +1,4 @@
-namespace
-{
+namespace {
 // v1 & v2
 const std::string _d_points("points");
 const size_t _pointColumns = 4;

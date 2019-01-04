@@ -7,20 +7,18 @@
 #include <morphio/mut/modifiers.h>
 #include <morphio/mut/section.h>
 
-namespace morphio
-{
+namespace morphio {
 /**
    Set the maximum number of warnings to be printed on screen
 **/
 void set_maximum_warnings(int n_warnings);
 void set_ignored_warning(Warning warning, bool ignore = true);
 void set_ignored_warning(const std::vector<Warning>& warning,
-                         bool ignore = true);
+    bool ignore = true);
 
 void LBERROR(Warning warning, const std::string& msg);
 
-namespace plugin
-{
+namespace plugin {
 enum ErrorLevel
 {
     INFO,
@@ -43,12 +41,9 @@ public:
 
     int32_t getLineNumber(uint32_t sectionId) const
     {
-        try
-        {
+        try {
             return _lineNumbers.at(sectionId);
-        }
-        catch (const std::out_of_range& oor)
-        {
+        } catch (const std::out_of_range& oor) {
             return -1;
         }
     }
@@ -74,15 +69,15 @@ struct Sample
         : lineNumber(lineNumber)
     {
         float radius;
-        valid =
-            sscanf(line, "%20d%20d%20f%20f%20f%20f%20d", (int*)&id, (int*)&type,
-                   &point[0], &point[1], &point[2], &radius, &parentId) == 7;
+        valid = sscanf(line, "%20d%20d%20f%20f%20f%20f%20d", (int*)&id, (int*)&type,
+                    &point[0], &point[1], &point[2], &radius, &parentId)
+            == 7;
 
         diameter = radius * 2; // The point array stores diameters.
 
         if (type >= SECTION_CUSTOM_START)
             valid = false; // Unknown section type, custom samples are also
-                           // Regarded as unknown.
+                // Regarded as unknown.
     }
 
     float diameter;
@@ -108,25 +103,25 @@ public:
 
     const std::string errorLink(int lineNumber, ErrorLevel errorLevel) const
     {
-        std::map<ErrorLevel, std::string> SEVERITY{{ErrorLevel::INFO, "info"},
-                                                   {ErrorLevel::WARNING,
-                                                    "warning"},
-                                                   {ErrorLevel::ERROR,
-                                                    "error"}};
+        std::map<ErrorLevel, std::string> SEVERITY{ { ErrorLevel::INFO, "info" },
+            { ErrorLevel::WARNING,
+                "warning" },
+            { ErrorLevel::ERROR,
+                "error" } };
 
         const std::map<ErrorLevel, std::string> COLOR{
-            {ErrorLevel::INFO, "\e[1;34m"},
-            {ErrorLevel::WARNING, "\e[1;33m"},
-            {ErrorLevel::ERROR, "\e[1;31m"}};
+            { ErrorLevel::INFO, "\e[1;34m" },
+            { ErrorLevel::WARNING, "\e[1;33m" },
+            { ErrorLevel::ERROR, "\e[1;31m" }
+        };
 
         const std::string COLOR_END("\e[0m");
 
-        return COLOR.at(errorLevel) + _uri + ":" + std::to_string(lineNumber) +
-               ":" + SEVERITY.at(errorLevel) + COLOR_END;
+        return COLOR.at(errorLevel) + _uri + ":" + std::to_string(lineNumber) + ":" + SEVERITY.at(errorLevel) + COLOR_END;
     }
 
     const std::string errorMsg(int lineNumber, ErrorLevel errorLevel,
-                               std::string msg = "") const;
+        std::string msg = "") const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //              ERRORS
@@ -147,7 +142,7 @@ public:
     std::string ERROR_SOMA_WITH_NEURITE_PARENT(const Sample& sample) const;
 
     const std::string ERROR_REPEATED_ID(const Sample& originalSample,
-                                        const Sample& newSample) const;
+        const Sample& newSample) const;
 
     const std::string ERROR_SELF_PARENT(const Sample& sample) const;
 
@@ -162,15 +157,15 @@ public:
     const std::string ERROR_SOMA_ALREADY_DEFINED(int lineNumber) const;
 
     const std::string ERROR_PARSING_POINT(int lineNumber,
-                                          const std::string& point) const;
+        const std::string& point) const;
 
     const std::string ERROR_UNKNOWN_TOKEN(int lineNumber,
-                                          const std::string& token) const;
+        const std::string& token) const;
 
     const std::string ERROR_UNEXPECTED_TOKEN(int lineNumber,
-                                             const std::string& expected,
-                                             const std::string& got,
-                                             const std::string& msg) const;
+        const std::string& expected,
+        const std::string& got,
+        const std::string& msg) const;
 
     const std::string ERROR_EOF_REACHED(int lineNumber) const;
 
@@ -179,7 +174,7 @@ public:
     const std::string ERROR_EOF_UNBALANCED_PARENS(int lineNumber) const;
 
     const std::string ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
-                                               morphio::Option flag2) const;
+        morphio::Option flag2) const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WRITERS
@@ -188,9 +183,9 @@ public:
     const std::string ERROR_WRONG_EXTENSION(const std::string filename) const;
 
     std::string ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1,
-                                             int length1,
-                                             const std::string& vec2,
-                                             int length2) const;
+        int length1,
+        const std::string& vec2,
+        int length2) const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
@@ -204,7 +199,7 @@ public:
         std::shared_ptr<morphio::mut::Section> current,
         std::shared_ptr<morphio::mut::Section> parent) const;
     const std::string WARNING_ONLY_CHILD(const DebugInfo& info, int parentId,
-                                         int childId) const;
+        int childId) const;
 
     const std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
         const Sample& root, const Sample& child1, const Sample& child2);

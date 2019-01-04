@@ -2,8 +2,7 @@
 
 #include <morphio/types.h>
 
-namespace morphio
-{
+namespace morphio {
 /**
  * The entry-point class to access mitochondrial data
  *

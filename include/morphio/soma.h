@@ -3,8 +3,7 @@
 #include <morphio/morphology.h>
 #include <morphio/types.h>
 
-namespace morphio
-{
+namespace morphio {
 /**
  * A class to represent a neuron soma.
  *
