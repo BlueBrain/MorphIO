@@ -1,4 +1,6 @@
 #include <fstream>
+#include <unordered_map>
+#include <unordered_set>
 
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
@@ -71,11 +73,43 @@ public:
 
         parse_block();
 
+        create_soma();
+
         return nb_;
 
     }
 
+
+    void create_soma() {
+        if(somaStacks.size() == 1) {
+            nb_.soma() -> properties() = somaStacks[0];
+        } else if(somaStacks.size() > 1) {
+            _raiseIfEachStackHasMultipleZ();
+            for (const auto& stack: somaStacks) {
+                morphio::Property::_appendVector(nb_.soma() -> properties()._points, stack._points, 0);
+                morphio::Property::_appendVector(nb_.soma() -> properties()._diameters, stack._diameters, 0);
+            }
+        }
+    }
+
 private:
+
+    void _raiseIfEachStackHasMultipleZ() {
+        for (const auto& stack: somaStacks) {
+            std::unordered_set<float> level;
+            for(const Point& point: stack._points) {
+                level.insert(point[2]);
+            }
+
+            if (level.size() > 1) {
+                std::string msg("Soma stack has multiple Z levels:\n");
+                for (float z: level)
+                    msg += " * " + std::to_string(z) + "\n";
+
+                throw RawDataError(msg);
+            }
+        }
+    }
 
     std::tuple<Point, float> parse_point(NeurolucidaLexer& lex)
         {
@@ -125,16 +159,19 @@ private:
     int32_t _create_soma_or_section(Token token, int32_t parent_id,
                                     std::vector<Point> &points, std::vector<float> &diameters)
     {
-        lex_.current_section_start_ = lex_.line_num();
         int32_t return_id;
         morphio::Property::PointLevel properties;
         properties._points = points;
         properties._diameters = diameters;
         if(token == Token::CELLBODY){
-            if(nb_.soma()->points().size() != 0)
-                throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
-            nb_.soma() -> properties() = properties;
+            float z = points[0][2];
+            if (soma_z_levels.count(z))
+                throw RawDataError(err_.ERROR_MULTIPLE_SOMA_STACKS_WITH_SAME_Z(lex_.current_section_start_,
+                                                                               soma_z_levels[z],
+                                                                               z));
+            soma_z_levels[z] = lex_.current_section_start_;
 
+            somaStacks.push_back(properties);
             return_id = -1;
         } else {
             SectionType section_type = TokenSectionTypeMap.at(token);
@@ -199,6 +236,8 @@ private:
         Points points;
         std::vector<float> diameters;
         uint32_t section_id = nb_.sections().size();
+        lex_.current_section_start_ = lex_.line_num();
+
 
         while (true)
         {
@@ -297,7 +336,8 @@ public:
     DebugInfo debugInfo_;
 private:
     ErrorMessages err_;
-
+    std::vector<morphio::Property::PointLevel> somaStacks;
+    std::unordered_map<float, uint32_t> soma_z_levels;
 };
 
 Property::Properties load(const URI& uri, unsigned int options)

@@ -143,9 +143,15 @@ const std::string _col(float val1, float val2) {
 ////////////////////////////////////////////////////////////////////////////////
 //             NEUROLUCIDA
 ////////////////////////////////////////////////////////////////////////////////
-const std::string ErrorMessages::ERROR_SOMA_ALREADY_DEFINED(int lineNumber) const {
-    return errorMsg(lineNumber, ErrorLevel::ERROR,
-                    "A soma is already defined");
+const std::string ErrorMessages::ERROR_MULTIPLE_SOMA_STACKS_WITH_SAME_Z(int line1, int line2, float z) const {
+    std::string msg = errorMsg(line1, ErrorLevel::ERROR,
+                               "\nThere is already a soma stack for Z == "+std::to_string(z) + " at line:");
+    msg += errorMsg(line2, ErrorLevel::INFO, "");
+    msg += "\nNote: Multiple blocks of type CellBody means the soma is represented as a soma stack.\n"
+        "(More info on soma stacks: https://www.neuron.yale.edu/phpBB/viewtopic.php?t=3833)\n"
+        "In this case, each CellBody block is the soma contour for a given Z position\n"
+        " and each block must have a different Z value";
+    return msg;
 }
 
 

@@ -66,17 +66,24 @@ def assert_string_equal(str1, str2):
         str1.join(sep), str2.join(sep)))
 
 
-def _test_exception(content, exception, str1, str2, extension):
-    '''Create tempfile with given content and check that the exception is raised'''
-    with _tmp_file(content, extension) as tmp_file:
+def _test_swc_exception(content, exception, *messages):
+    '''Create tempfile with given content, check that the exception is raised
+    and that messages are part of the error message'''
+    with _tmp_file(content, 'swc') as tmp_file:
         with assert_raises(exception) as obj:
             Morphology(tmp_file.name)
-        assert_substring(str1, str(obj.exception))
-        assert_substring(str2, str(obj.exception))
+        for msg in messages:
+            assert_substring(msg, str(obj.exception))
 
+def _test_asc_exception(content, exception, *messages):
+    '''Create tempfile with given content, check that the exception is raised
+    and that messages are part of the error message'''
+    with _tmp_file(content, 'asc') as tmp_file:
+        with assert_raises(exception) as obj:
+            Morphology(tmp_file.name)
+        for msg in messages:
+            assert_substring(msg, str(obj.exception))
 
-_test_asc_exception = partial(_test_exception, extension='asc')
-_test_swc_exception = partial(_test_exception, extension='swc')
 
 
 @contextmanager

@@ -141,8 +141,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     //             NEUROLUCIDA
     ////////////////////////////////////////////////////////////////////////////////
-    const std::string ERROR_SOMA_ALREADY_DEFINED(int lineNumber) const;
-
+    const std::string ERROR_MULTIPLE_SOMA_STACKS_WITH_SAME_Z(int line1, int line2, float z) const;
 
     const std::string ERROR_PARSING_POINT(int lineNumber,
                                           const std::string& point) const;
