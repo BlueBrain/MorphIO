@@ -124,8 +124,8 @@ void Mitochondria::_buildMitochondria(Property::Properties& properties) const
             int32_t parentOnDisk = root ? -1 : newIds[parent(section)->id()];
 
             properties._mitochondriaSectionLevel._sections.push_back(
-                { (int)properties._mitochondriaPointLevel._diameters.size(),
-                    parentOnDisk });
+                {(int)properties._mitochondriaPointLevel._diameters.size(),
+                    parentOnDisk});
             _appendMitoProperties(properties._mitochondriaPointLevel,
                 section->_mitoPoints);
 

@@ -84,8 +84,8 @@ private:
 
         lex.consume(Token::RPAREN, "Point should end in RPAREN");
 
-        return std::tuple<Point, float>{ { point[0], point[1], point[2] },
-            point[3] };
+        return std::tuple<Point, float>{{point[0], point[1], point[2]},
+            point[3]};
     }
 
     bool parse_neurite_branch(int32_t parent_id, Token token)

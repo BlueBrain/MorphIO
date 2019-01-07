@@ -54,14 +54,14 @@ MitochondriaPointLevel::MitochondriaPointLevel(
     if (_sectionIds.size() != _relativePathLengths.size())
         throw SectionBuilderError(
             "While building MitochondriaPointLevel:\n"
-            "section IDs vector have size: "
-            + std::to_string(_sectionIds.size()) + " while relative path length vector has size: " + std::to_string(_relativePathLengths.size()));
+            "section IDs vector have size: " +
+            std::to_string(_sectionIds.size()) + " while relative path length vector has size: " + std::to_string(_relativePathLengths.size()));
 
     if (_sectionIds.size() != _diameters.size())
         throw SectionBuilderError(
             "While building MitochondriaPointLevel:\n"
-            "section IDs vector have size: "
-            + std::to_string(_sectionIds.size()) + " while diameter vector has size: " + std::to_string(_diameters.size()));
+            "section IDs vector have size: " +
+            std::to_string(_sectionIds.size()) + " while diameter vector has size: " + std::to_string(_diameters.size()));
 }
 
 PointLevel::PointLevel(std::vector<Point::Type> points,
@@ -306,10 +306,10 @@ bool Properties::operator==(const Properties& other) const
     size_t this_soma_offset = get<Section>().size() > 1 ? get<Section>()[1][0] : 0;
     size_t other_soma_offset = other.get<Section>().size() > 1 ? other.get<Section>()[1][0] : 0;
     return (compare(this->_pointLevel, other._pointLevel, this_soma_offset,
-                other_soma_offset, "_pointLevel", verbose)
-        && compare(this->_sectionLevel, other._sectionLevel, "_sectionLevel",
-               verbose)
-        && compare(this->_cellLevel, other._cellLevel, "_cellLevel", verbose));
+                other_soma_offset, "_pointLevel", verbose) &&
+            compare(this->_sectionLevel, other._sectionLevel, "_sectionLevel",
+                verbose) &&
+            compare(this->_cellLevel, other._cellLevel, "_cellLevel", verbose));
 }
 
 bool Properties::operator!=(const Properties& other) const
@@ -349,7 +349,7 @@ std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>()
 
 template <>
 const std::vector<MitoNeuriteSectionId::Type>&
-Properties::get<MitoNeuriteSectionId>() const
+    Properties::get<MitoNeuriteSectionId>() const
 {
     return _mitochondriaPointLevel._sectionIds;
 }
@@ -432,7 +432,7 @@ const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>()
 
 template <>
 const std::map<int32_t, std::vector<uint32_t>>&
-Properties::children<MitoSection>()
+    Properties::children<MitoSection>()
 {
     return _mitochondriaSectionLevel._children;
 }

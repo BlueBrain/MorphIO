@@ -105,7 +105,7 @@ const Point centerOfGravity(const T& points)
         y += point[1];
         z += point[2];
     }
-    return Point({ x / size, y / size, z / size });
+    return Point({x / size, y / size, z / size});
 }
 template const Point centerOfGravity(const range<const Point>& points);
 template const Point centerOfGravity(const std::vector<Point>& points);

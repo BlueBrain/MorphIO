@@ -70,14 +70,13 @@ struct Sample
     {
         float radius;
         valid = sscanf(line, "%20d%20d%20f%20f%20f%20f%20d", (int*)&id, (int*)&type,
-                    &point[0], &point[1], &point[2], &radius, &parentId)
-            == 7;
+                    &point[0], &point[1], &point[2], &radius, &parentId) == 7;
 
         diameter = radius * 2; // The point array stores diameters.
 
         if (type >= SECTION_CUSTOM_START)
             valid = false; // Unknown section type, custom samples are also
-                // Regarded as unknown.
+                           // Regarded as unknown.
     }
 
     float diameter;
@@ -103,17 +102,16 @@ public:
 
     const std::string errorLink(int lineNumber, ErrorLevel errorLevel) const
     {
-        std::map<ErrorLevel, std::string> SEVERITY{ { ErrorLevel::INFO, "info" },
-            { ErrorLevel::WARNING,
-                "warning" },
-            { ErrorLevel::ERROR,
-                "error" } };
+        std::map<ErrorLevel, std::string> SEVERITY{{ErrorLevel::INFO, "info"},
+            {ErrorLevel::WARNING,
+                "warning"},
+            {ErrorLevel::ERROR,
+                "error"}};
 
         const std::map<ErrorLevel, std::string> COLOR{
-            { ErrorLevel::INFO, "\e[1;34m" },
-            { ErrorLevel::WARNING, "\e[1;33m" },
-            { ErrorLevel::ERROR, "\e[1;31m" }
-        };
+            {ErrorLevel::INFO, "\e[1;34m"},
+            {ErrorLevel::WARNING, "\e[1;33m"},
+            {ErrorLevel::ERROR, "\e[1;31m"}};
 
         const std::string COLOR_END("\e[0m");
 

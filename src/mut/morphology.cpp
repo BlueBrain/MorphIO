@@ -307,7 +307,7 @@ const Property::Properties Morphology::buildReadOnly() const
         int parentOnDisk = (section->isRoot() ? -1 : newIds[parentId]);
 
         int start = properties._pointLevel._points.size();
-        properties._sectionLevel._sections.push_back({ start, parentOnDisk });
+        properties._sectionLevel._sections.push_back({start, parentOnDisk});
         properties._sectionLevel._sectionTypes.push_back(section->type());
         newIds[sectionId] = sectionIdOnDisk++;
         _appendProperties(properties._pointLevel, section->_pointProperties);

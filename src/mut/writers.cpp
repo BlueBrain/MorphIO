@@ -229,13 +229,13 @@ void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria)
     std::vector<std::vector<float>> points;
     std::vector<std::vector<int32_t>> structure;
     for (unsigned int i = 0; i < size; ++i) {
-        points.push_back({ (float)p._sectionIds[i], p._relativePathLengths[i],
-            p._diameters[i] });
+        points.push_back({(float)p._sectionIds[i], p._relativePathLengths[i],
+            p._diameters[i]});
     }
 
     auto& s = properties._mitochondriaSectionLevel;
     for (unsigned int i = 0; i < s._sections.size(); ++i) {
-        structure.push_back({ s._sections[i][0], s._sections[i][1] });
+        structure.push_back({s._sections[i][0], s._sections[i][1]});
     }
 
     HighFive::Group g_mitochondria = h5_file.createGroup("mitochondria");
@@ -270,12 +270,12 @@ void h5(const Morphology& morpho, const std::string& filename)
             numberOfDiameters));
 
     bool hasPerimeterData = morpho.rootSections().size() > 0
-        ? morpho.rootSections()[0]->perimeters().size() > 0
-        : false;
+                                ? morpho.rootSections()[0]->perimeters().size() > 0
+                                : false;
 
     for (unsigned int i = 0; i < numberOfPoints; ++i) {
         raw_points.push_back(
-            { points[i][0], points[i][1], points[i][2], diameters[i] });
+            {points[i][0], points[i][1], points[i][2], diameters[i]});
 
         // If the morphology has some perimeter data, we need to fill some
         // perimeter dummy value in the soma range of the data structure to keep
@@ -284,7 +284,7 @@ void h5(const Morphology& morpho, const std::string& filename)
             raw_perimeters.push_back(0);
     }
 
-    raw_structure.push_back({ 0, SECTION_SOMA, -1 });
+    raw_structure.push_back({0, SECTION_SOMA, -1});
     int offset = 0;
     offset += morpho.soma()->points().size();
 
@@ -298,11 +298,11 @@ void h5(const Morphology& morpho, const std::string& filename)
 
         const std::size_t numberOfPoints = points.size();
         const std::size_t numberOfPerimeters = perimeters.size();
-        raw_structure.push_back({ offset, section->type(), parentOnDisk });
+        raw_structure.push_back({offset, section->type(), parentOnDisk});
 
         for (unsigned int i = 0; i < numberOfPoints; ++i)
             raw_points.push_back(
-                { points[i][0], points[i][1], points[i][2], diameters[i] });
+                {points[i][0], points[i][1], points[i][2], diameters[i]});
 
         if (numberOfPerimeters > 0) {
             if (numberOfPerimeters != numberOfPoints)
@@ -323,11 +323,11 @@ void h5(const Morphology& morpho, const std::string& filename)
 
     HighFive::Group g_metadata = h5_file.createGroup("metadata");
 
-    write_attribute(g_metadata, "version", std::vector<uint32_t>{ 1, 1 });
+    write_attribute(g_metadata, "version", std::vector<uint32_t>{1, 1});
     write_attribute(g_metadata, "cell_family",
-        std::vector<uint32_t>{ FAMILY_NEURON });
+        std::vector<uint32_t>{FAMILY_NEURON});
     write_attribute(h5_file, "comment",
-        std::vector<std::string>{ version_footnote() });
+        std::vector<std::string>{version_footnote()});
 
     if (hasPerimeterData)
         write_dataset(h5_file, "/perimeters", raw_perimeters);

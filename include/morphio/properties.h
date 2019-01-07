@@ -193,7 +193,7 @@ template <>
 const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>();
 template <>
 const std::map<int32_t, std::vector<uint32_t>>&
-Properties::children<MitoSection>();
+    Properties::children<MitoSection>();
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);

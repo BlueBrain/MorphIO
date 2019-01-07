@@ -44,8 +44,8 @@ Property::Properties MorphologyHDF5::load(const URI& uri)
         _file.reset(new HighFive::File(uri, HighFive::File::ReadOnly));
     } catch (const HighFive::FileException& exc) {
         LBTHROW(morphio::RawDataError(_write
-                ? "Could not create morphology file "
-                : "Could not open morphology file " + uri + ": " + exc.what()));
+                                          ? "Could not create morphology file "
+                                          : "Could not open morphology file " + uri + ": " + exc.what()));
     }
     _checkVersion(uri);
     _selectRepairStage();
@@ -80,8 +80,8 @@ void MorphologyHDF5::_checkVersion(const std::string& source)
     } catch (...) {
         LBTHROW(
             morphio::RawDataError("Unknown morphology file format for "
-                                  "file "
-                + source));
+                                  "file " +
+                                  source));
     }
 }
 
@@ -90,7 +90,7 @@ void MorphologyHDF5::_selectRepairStage()
     if (_properties.version() != MORPHOLOGY_VERSION_H5_2)
         return;
 
-    for (const auto& stage : { "repaired", "unraveled", "raw" }) {
+    for (const auto& stage : {"repaired", "unraveled", "raw"}) {
         try {
             HighFive::SilenceHDF5 silence;
             _file->getDataSet("/" + _g_root + "/" + stage + "/" + _d_points);
@@ -184,7 +184,7 @@ HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections)
         return _file->getDataSet(_d_structure);
     } catch (const HighFive::DataSetException&) {
         return _file->createDataSet<int>(_d_structure,
-            HighFive::DataSpace({ nSections, 3 }));
+            HighFive::DataSpace({nSections, 3}));
     }
 }
 
@@ -218,10 +218,10 @@ void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
         for (unsigned int i = 0; i < vec.size(); ++i) {
             const auto& p = vec[i];
             if (i < firstSectionOffset) {
-                somaPoints.push_back({ p[0], p[1], p[2] });
+                somaPoints.push_back({p[0], p[1], p[2]});
                 somaDiameters.push_back(p[3]);
             } else {
-                points.push_back({ p[0], p[1], p[2] });
+                points.push_back({p[0], p[1], p[2]});
                 diameters.push_back(p[3]);
             }
         }
@@ -234,10 +234,10 @@ void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
     for (unsigned int i = 0; i < vec.size(); ++i) {
         const auto& p = vec[i];
         if (i < firstSectionOffset) {
-            somaPoints.push_back({ p[0], p[1], p[2] });
+            somaPoints.push_back({p[0], p[1], p[2]});
             somaDiameters.push_back(p[3]);
         } else {
-            points.push_back({ p[0], p[1], p[2] });
+            points.push_back({p[0], p[1], p[2]});
             diameters.push_back(p[3]);
         }
     }
@@ -287,13 +287,13 @@ int MorphologyHDF5::_readSections()
                 skipFirst = false;
                 continue;
             }
-            sections.push_back({ p[0] - firstSectionOffset, p[1] - 1 });
+            sections.push_back({p[0] - firstSectionOffset, p[1] - 1});
         }
 
         return firstSectionOffset;
     }
 
-    auto selection = _sections->select({ 0, 0 }, { _sectionsDims[0], 2 }, { 1, 2 });
+    auto selection = _sections->select({0, 0}, {_sectionsDims[0], 2}, {1, 2});
 
     std::vector<std::vector<int>> vec;
     vec.resize(_sectionsDims[0]);
@@ -306,7 +306,7 @@ int MorphologyHDF5::_readSections()
             skipFirst = false;
             continue;
         }
-        sections.push_back({ p[0] - firstSectionOffset, p[1] - 1 });
+        sections.push_back({p[0] - firstSectionOffset, p[1] - 1});
     }
 
     return firstSectionOffset;
@@ -338,7 +338,7 @@ void MorphologyHDF5::_readSectionTypes()
         return;
     }
 
-    auto selection = _sections->select({ 0, 1 }, { _sectionsDims[0], 1 });
+    auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
     types.resize(_sectionsDims[0]);
     selection.read(types);
     types.erase(types.begin()); // remove soma type
@@ -430,7 +430,7 @@ void MorphologyHDF5::_readMitochondria()
         structure);
 
     for (auto& s : structure)
-        _properties.get<Property::MitoSection>().push_back({ s[0], s[1] });
+        _properties.get<Property::MitoSection>().push_back({s[0], s[1]});
 }
 
 } // namespace h5

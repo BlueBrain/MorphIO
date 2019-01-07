@@ -116,8 +116,8 @@ const std::string ErrorMessages::ERROR_REPEATED_ID(
     const Sample& originalSample, const Sample& newSample) const
 {
     return errorMsg(newSample.lineNumber, ErrorLevel::WARNING,
-               "Repeated ID: " + std::to_string(originalSample.id))
-        + "\nID already appears here: \n" + errorLink(originalSample.lineNumber, ErrorLevel::INFO);
+               "Repeated ID: " + std::to_string(originalSample.id)) +
+           "\nID already appears here: \n" + errorLink(originalSample.lineNumber, ErrorLevel::INFO);
 }
 
 const std::string ErrorMessages::ERROR_SELF_PARENT(const Sample& sample) const
@@ -136,8 +136,8 @@ const std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(
     int mitoParentId) const
 {
     return "While trying to append new mitochondria section.\n"
-           "Mitochondrial parent section: "
-        + std::to_string(mitoParentId) + " does not exist.";
+           "Mitochondrial parent section: " +
+           std::to_string(mitoParentId) + " does not exist.";
 }
 
 /**
@@ -265,9 +265,10 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
 
     if (current->points().empty())
         return errorMsg(0, ErrorLevel::WARNING,
-            msg + "\nThe current section has no points. It should at "
-                  "least contains "
-                + "parent section last point");
+            msg +
+                "\nThe current section has no points. It should at "
+                "least contains " +
+                "parent section last point");
 
     auto p0 = parent->points()[parent->points().size() - 1];
     auto p1 = current->points()[0];
@@ -328,8 +329,9 @@ std::string ErrorMessages::WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const
 std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(
     const std::vector<Sample>& children) const
 {
-    std::string msg = "With a 3 points soma, neurites must be connected to the first soma "
-                      "point:";
+    std::string msg =
+        "With a 3 points soma, neurites must be connected to the first soma "
+        "point:";
     for (auto child : children)
         msg += errorMsg(child.lineNumber, ErrorLevel::WARNING, "");
     return msg;

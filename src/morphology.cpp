@@ -210,9 +210,9 @@ breadth_iterator Morphology::breadth_end() const
 SomaType getSomaType(uint32_t nSomaPoints)
 {
     try {
-        return std::map<uint32_t, SomaType>{ { 0, SOMA_UNDEFINED },
-            { 1, SOMA_SINGLE_POINT },
-            { 2, SOMA_UNDEFINED } }
+        return std::map<uint32_t, SomaType>{{0, SOMA_UNDEFINED},
+            {1, SOMA_SINGLE_POINT},
+            {2, SOMA_UNDEFINED}}
             .at(nSomaPoints);
     } catch (const std::out_of_range& oor) {
         return SOMA_SIMPLE_CONTOUR;

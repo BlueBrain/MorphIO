@@ -14,8 +14,8 @@ SectionBase<T>::SectionBase(const uint32_t id,
 
     const size_t start = sections[id][0];
     const size_t end = id == sections.size() - 1
-        ? properties->get<typename T::PointAttribute>().size()
-        : sections[id + 1][0];
+                           ? properties->get<typename T::PointAttribute>().size()
+                           : sections[id + 1][0];
 
     _range = std::make_pair(start, end);
 

@@ -171,11 +171,11 @@ public:
 
     inline bool isSectionEnd(const Sample& sample)
     {
-        return sample.id == lastSomaPoint || // End of soma
-            children[sample.id].size() == 0 || // Reached leaf
-            (children[sample.id].size() >= 2 && // Reached neurite
-                // bifurcation
-                sample.type != SECTION_SOMA);
+        return sample.id == lastSomaPoint ||       // End of soma
+               children[sample.id].size() == 0 ||  // Reached leaf
+               (children[sample.id].size() >= 2 && // Reached neurite
+                   // bifurcation
+                   sample.type != SECTION_SOMA);
     }
 
     template <typename T>

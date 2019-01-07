@@ -13,12 +13,12 @@ void two_points_sections(morphio::mut::Morphology& morpho)
         size_t size = section->points().size();
         if (size < 2)
             continue;
-        section->points() = { section->points()[0], section->points()[size - 1] };
-        section->diameters() = { section->diameters()[0],
-            section->diameters()[size - 1] };
+        section->points() = {section->points()[0], section->points()[size - 1]};
+        section->diameters() = {section->diameters()[0],
+            section->diameters()[size - 1]};
         if (!section->perimeters().empty())
-            section->perimeters() = { section->perimeters()[0],
-                section->perimeters()[size - 1] };
+            section->perimeters() = {section->perimeters()[0],
+                section->perimeters()[size - 1]};
     }
 }
 
@@ -58,8 +58,8 @@ void soma_sphere(morphio::mut::Morphology& morpho)
         r += sqrt(pow(point[0] - x, 2) + pow(point[1] - y, 2) + pow(point[2] - z, 2)) / size;
     }
 
-    soma->points() = { { x, y, z } };
-    soma->diameters() = { r };
+    soma->points() = {{x, y, z}};
+    soma->diameters() = {r};
 }
 
 bool NRN_order_comparator(std::shared_ptr<Section> a,
