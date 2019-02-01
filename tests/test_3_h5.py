@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from itertools import chain, repeat
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_array_almost_equal
 from nose.tools import assert_equal
 
 from morphio import Morphology, MORPHOLOGY_VERSION_H5_1, MORPHOLOGY_VERSION_H5_2, SectionType
@@ -54,3 +54,12 @@ def test_v2():
     assert_equal(n.root_sections[1].type, 4)
     assert_equal(len(list(n.iter())), 85)
     assert_equal(len(n.points), 926)
+
+
+def test_duplicate():
+    '''Test that if the neurite starts with a duplicate point, it is removed'''
+    n = Morphology(os.path.join(H5V1_PATH, 'duplicate-first-point.h5'))
+    assert_array_almost_equal(n.root_sections[0].points[:2],
+                              np.array([[ 0.7586341 , -6.33394   ,  0.2727443 ],
+                                        [ 0.44756508, -6.85335   ,  0.04720071]],
+                                       dtype=np.float32))

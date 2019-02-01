@@ -28,7 +28,7 @@ private:
     void _readPoints(unsigned int);
     int _readSections();
     void _readSectionTypes();
-    void _readPerimeters(int);
+    const std::vector<float> _readPerimeters();
     void _readMitochondria();
     template <typename T>
     void _read(const std::string& group, const std::string& _dataset,

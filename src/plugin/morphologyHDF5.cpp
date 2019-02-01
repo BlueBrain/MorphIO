@@ -52,7 +52,6 @@ Property::Properties MorphologyHDF5::load(const URI& uri)
     int firstSectionOffset = _readSections();
     _readPoints(firstSectionOffset);
     _readSectionTypes();
-    _readPerimeters(firstSectionOffset);
     _readMitochondria();
 
     return _properties;
@@ -196,6 +195,8 @@ void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
     auto& somaPoints = _properties._somaLevel._points;
     auto& somaDiameters = _properties._somaLevel._diameters;
 
+    std::vector<std::vector<float>> vec;
+
     if (_properties.version() == MORPHOLOGY_VERSION_H5_2) {
         auto dataset = [this]() {
             std::string path = "/" + _g_root + "/" + _stage + "/" + _d_points;
@@ -212,35 +213,36 @@ void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
             LBTHROW(std::runtime_error(
                 "Reading morphology file '" + _file->getName() + "': bad number of dimensions in 'points' dataspace"));
         }
-        std::vector<std::vector<float>> vec(dims[0]);
-        // points.resize(dims[0]);
+
+        vec.resize(dims[0]);
         dataset.read(vec);
-        for (unsigned int i = 0; i < vec.size(); ++i) {
-            const auto& p = vec[i];
-            if (i < firstSectionOffset) {
-                somaPoints.push_back({p[0], p[1], p[2]});
-                somaDiameters.push_back(p[3]);
-            } else {
-                points.push_back({p[0], p[1], p[2]});
-                diameters.push_back(p[3]);
-            }
-        }
-        return;
+    } else {
+        vec.resize(_pointsDims[0]);
+        _points->read(vec);
     }
 
-    std::vector<std::vector<float>> vec;
-    vec.resize(_pointsDims[0]);
-    _points->read(vec);
-    for (unsigned int i = 0; i < vec.size(); ++i) {
+    for (unsigned int i = 0; i < firstSectionOffset; ++i) {
         const auto& p = vec[i];
-        if (i < firstSectionOffset) {
-            somaPoints.push_back({p[0], p[1], p[2]});
-            somaDiameters.push_back(p[3]);
-        } else {
-            points.push_back({p[0], p[1], p[2]});
-            diameters.push_back(p[3]);
-        }
+        somaPoints.push_back({p[0], p[1], p[2]});
+        somaDiameters.push_back(p[3]);
     }
+
+    bool duplicateFirstPoint = false;
+    for (unsigned int i = firstSectionOffset; i < vec.size(); ++i) {
+        const auto& p = vec[i];
+        if (i == firstSectionOffset && vec.size() > firstSectionOffset + 1 &&
+            vec[firstSectionOffset] == vec[firstSectionOffset + 1]) {
+            duplicateFirstPoint = true;
+            continue;
+        }
+        points.push_back({p[0], p[1], p[2]});
+        diameters.push_back(p[3]);
+    }
+
+    const auto& _perimeters = _readPerimeters();
+    if (!_perimeters.empty())
+        _properties.get<Property::Perimeter>().assign(_perimeters.begin() + firstSectionOffset + int(duplicateFirstPoint),
+            _perimeters.end());
 }
 
 int MorphologyHDF5::_readSections()
@@ -344,10 +346,10 @@ void MorphologyHDF5::_readSectionTypes()
     types.erase(types.begin()); // remove soma type
 }
 
-void MorphologyHDF5::_readPerimeters(int firstSectionOffset)
+const std::vector<float> MorphologyHDF5::_readPerimeters()
 {
     if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1)
-        return;
+        return std::vector<float>();
 
     try {
         HighFive::SilenceHDF5 silence;
@@ -362,13 +364,11 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset)
         std::vector<float> perimeters;
         perimeters.resize(dims[0]);
         dataset.read(perimeters);
-        _properties.get<Property::Perimeter>().assign(perimeters.begin() + firstSectionOffset,
-            perimeters.end());
+        return perimeters;
     } catch (...) {
         if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
-            LBTHROW(
-                std::runtime_error("No empty perimeters allowed for glia "
-                                   "morphology"));
+            LBTHROW(std::runtime_error("No empty perimeters allowed for glia morphology"));
+        return std::vector<float>();
     }
 }
 
