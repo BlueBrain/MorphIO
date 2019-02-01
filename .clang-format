@@ -1,4 +1,4 @@
----
+﻿---
 AccessModifierOffset: -4
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
@@ -11,9 +11,20 @@ AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakBeforeMultilineStrings: true
 AlwaysBreakTemplateDeclarations: true
+BasedOnStyle: WebKit
 BinPackParameters: true
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: false
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: false
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: false
+  BeforeElse: false
+BreakBeforeBraces: Custom
 BreakBeforeBinaryOperators: false
-BreakBeforeBraces: Allman # brace on new line
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
@@ -27,7 +38,7 @@ IndentFunctionDeclarationAfterType: true
 IndentWidth:     4
 KeepEmptyLinesAtTheStartOfBlocks: false
 Language: Cpp
-MaxEmptyLinesToKeep: 1
+MaxEmptyLinesToKeep: 2
 NamespaceIndentation: None
 PenaltyBreakBeforeFirstCallParameter: 100
 PenaltyBreakComment: 60

@@ -5,70 +5,72 @@
    The higher level container structure is Property::Properties.
 
    It contains low-lever structure that stores information at various levels:
-       - PointLevel: information that is available at the point level (point coordinate, diameter, perimeter)
-       - SectionLevel: information that is available at the section level (section type, parent section)
-       - CellLevel: information that is available at the cell level (cell type, file version, soma type)
-       - MitochondriaPointLevel: information that is available at the mitochondrial point level
-         (enclosing neuronal section, relative distance to start of neuronal section, diameter)
-       - MitochondriaSectionLevel: information that is available at the mitochondrial section level (parent section)
+       - PointLevel: information that is available at the point level (point
+ coordinate, diameter, perimeter)
+       - SectionLevel: information that is available at the section level
+ (section type, parent section)
+       - CellLevel: information that is available at the cell level (cell type,
+ file version, soma type)
+       - MitochondriaPointLevel: information that is available at the
+ mitochondrial point level (enclosing neuronal section, relative distance to
+ start of neuronal section, diameter)
+       - MitochondriaSectionLevel: information that is available at the
+ mitochondrial section level (parent section)
  **/
 #pragma once
 
 #include <morphio/types.h>
 
-
-namespace morphio
-{
-namespace Property
-{
+namespace morphio {
+namespace Property {
 template <typename T>
 void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
 
 struct Section
 {
     // (offset, parent index)
-    typedef std::array<int, 2> Type;
+    using Type = std::array<int, 2>;
 };
 
 struct MitoSection
 {
     // (offset, parent index)
-    typedef std::array<int, 2> Type;
+    using Type = std::array<int, 2>;
 };
 
 struct Point
 {
-    typedef morphio::Point Type;
+    using Type = morphio::Point;
 };
 
 struct SectionType
 {
-    typedef morphio::SectionType Type;
+    using Type = morphio::SectionType;
 };
 
 struct Perimeter
 {
-    typedef float Type;
+    using Type = float;
 };
 
 struct Diameter
 {
-    typedef float Type;
+    using Type = float;
 };
 
 struct MitoPathLength
 {
-    typedef float Type;
+    using Type = float;
 };
 
 struct MitoDiameter
 {
-    typedef float Type;
+    using Type = float;
 };
 
 struct MitoNeuriteSectionId
 {
-    typedef uint32_t Type;
+    using Type = uint32_t;
 };
 
 struct PointLevel
@@ -79,8 +81,8 @@ struct PointLevel
 
     PointLevel() {}
     PointLevel(std::vector<Point::Type> points,
-               std::vector<Diameter::Type> diameters,
-               std::vector<Perimeter::Type> perimeters = std::vector<Perimeter::Type>());
+        std::vector<Diameter::Type> diameters,
+        std::vector<Perimeter::Type> perimeters = std::vector<Perimeter::Type>());
     PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
     // bool operator==(const PointLevel& other) const;
@@ -94,14 +96,15 @@ struct MitochondriaPointLevel
     std::vector<MitoDiameter::Type> _diameters;
 
     MitochondriaPointLevel(){};
-    MitochondriaPointLevel(const MitochondriaPointLevel& data, SectionRange range);
+    MitochondriaPointLevel(const MitochondriaPointLevel& data,
+        SectionRange range);
 
-
-    MitochondriaPointLevel(std::vector<uint32_t> sectionId,
-                           // relative pathlength between the current points
-                           // and the start of the neuronal section
-                           std::vector<MitoPathLength::Type> relativePathLengths,
-                           std::vector<MitoDiameter::Type> diameters);
+    MitochondriaPointLevel(
+        std::vector<uint32_t> sectionId,
+        // relative pathlength between the current points
+        // and the start of the neuronal section
+        std::vector<MitoPathLength::Type> relativePathLengths,
+        std::vector<MitoDiameter::Type> diameters);
 };
 
 struct MitochondriaSectionLevel
@@ -128,9 +131,10 @@ struct SomaLevel
     Section::Type _sections;
 };
 
-struct Annotation {
+struct Annotation
+{
     Annotation(AnnotationType type, uint32_t sectionId, PointLevel points,
-               std::string details, int32_t lineNumber);
+        std::string details, int32_t lineNumber);
     AnnotationType _type;
     uint32_t _sectionId;
     PointLevel _points;
@@ -149,12 +153,9 @@ struct CellLevel
     bool operator!=(const CellLevel& other) const;
 };
 
-
-
 // The lowest level data blob
 struct Properties
 {
-
     ////////////////////////////////////////////////////////////////////////////////
     // Data stuctures
     ////////////////////////////////////////////////////////////////////////////////
@@ -177,32 +178,32 @@ struct Properties
     template <typename T>
     const std::vector<typename T::Type>& get() const;
 
-    const morphio::MorphologyVersion& version()
-    {
-        return _cellLevel._version;
-    }
+    const morphio::MorphologyVersion& version() { return _cellLevel._version; }
     const morphio::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
     const morphio::SomaType& somaType() { return _cellLevel._somaType; }
 
-
     template <typename T>
     const std::map<int32_t, std::vector<uint32_t>>& children();
-
 
     bool operator==(const Properties& other) const;
     bool operator!=(const Properties& other) const;
 };
 
-template <> const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>();
-template <> const std::map<int32_t, std::vector<uint32_t>>& Properties::children<MitoSection>();
+template <>
+const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>();
+template <>
+const std::map<int32_t, std::vector<uint32_t>>&
+    Properties::children<MitoSection>();
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);
 
-
-template <> std::vector<Point::Type>& Properties::get<Point>();
-template <> std::vector<Section::Type>& Properties::get<Section>();
-template <> const std::vector<Section::Type>& Properties::get<Section>() const;
+template <>
+std::vector<Point::Type>& Properties::get<Point>();
+template <>
+std::vector<Section::Type>& Properties::get<Section>();
+template <>
+const std::vector<Section::Type>& Properties::get<Section>() const;
 
 } // namespace Property
 } // namespace morphio

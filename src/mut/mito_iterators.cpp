@@ -1,26 +1,24 @@
 #include <morphio/mut/mito_iterators.h>
 #include <morphio/mut/mitochondria.h>
-#include <morphio/mut/mitochondria.h>
 
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 class MitoSection;
 
 template <typename T>
-MitoIterator<T>::MitoIterator(const Mitochondria& mitochondria, std::shared_ptr<MitoSection> rootSection) :
-    _mitochondria(mitochondria)
+MitoIterator<T>::MitoIterator(const Mitochondria& mitochondria,
+    std::shared_ptr<MitoSection> rootSection)
+    : _mitochondria(mitochondria)
 {
     container.push(rootSection);
 }
 
 template <typename T>
-MitoIterator<T>::MitoIterator(const Mitochondria& mitochondria) :
-    _mitochondria(mitochondria)
+MitoIterator<T>::MitoIterator(const Mitochondria& mitochondria)
+    : _mitochondria(mitochondria)
 {
     auto roots = _mitochondria.rootSections();
-    for(auto it = roots.rbegin(); it != roots.rend(); ++it)
+    for (auto it = roots.rbegin(); it != roots.rend(); ++it)
         container.push(*it);
 }
 
@@ -56,7 +54,8 @@ MitoIterator<T> MitoIterator<T>::operator++(int)
 }
 
 template <typename T>
-MitoIterator<T>::MitoIterator() : _mitochondria(Mitochondria())
+MitoIterator<T>::MitoIterator()
+    : _mitochondria(Mitochondria())
 {
 }
 
@@ -78,12 +77,15 @@ std::shared_ptr<MitoSection> mito_upstream_iterator::operator*() const
 }
 
 template <>
-mito_upstream_iterator::MitoIterator(const Mitochondria& mitochondria) :
-    _mitochondria(mitochondria) {}
+mito_upstream_iterator::MitoIterator(const Mitochondria& mitochondria)
+    : _mitochondria(mitochondria)
+{
+}
 
 template <>
-mito_upstream_iterator::MitoIterator(const Mitochondria& mitochondria, std::shared_ptr<MitoSection> section) :
-    _mitochondria(mitochondria)
+mito_upstream_iterator::MitoIterator(const Mitochondria& mitochondria,
+    std::shared_ptr<MitoSection> section)
+    : _mitochondria(mitochondria)
 {
     container.push_back(section);
 }

@@ -4,8 +4,7 @@
 #include <stack>
 
 #include <morphio/types.h>
-namespace morphio
-{
+namespace morphio {
 /**
 An iterator class to iterate through sections;
  **/
@@ -24,4 +23,4 @@ public:
     MitoIterator& operator++();
     MitoIterator operator++(int);
 };
-}
+} // namespace morphio

@@ -6,20 +6,18 @@
 #include <morphio/section.h>
 #include <morphio/shared_utils.tpp>
 
-namespace morphio
-{
-namespace mut
-{
-
-Soma::Soma(const Property::PointLevel &pointProperties) : _somaType(SOMA_UNDEFINED),
-                                                          _pointProperties(pointProperties)
+namespace morphio {
+namespace mut {
+Soma::Soma(const Property::PointLevel& pointProperties)
+    : _somaType(SOMA_UNDEFINED)
+    , _pointProperties(pointProperties)
 {
 }
 
-Soma::Soma(const morphio::Soma& soma) : _somaType(soma.type())
+Soma::Soma(const morphio::Soma& soma)
+    : _somaType(soma.type())
 {
-    _pointProperties =
-        Property::PointLevel(soma._properties->_somaLevel);
+    _pointProperties = Property::PointLevel(soma._properties->_somaLevel);
 }
 
 const Point Soma::center() const
@@ -27,11 +25,11 @@ const Point Soma::center() const
     return centerOfGravity(points());
 }
 
-float Soma::surface() const {
-    return _somaSurface<std::vector<float>,
-                        std::vector<Point>>(type(),
-                        diameters(),
-                        points());
+float Soma::surface() const
+{
+    return _somaSurface<std::vector<float>, std::vector<Point>>(type(),
+        diameters(),
+        points());
 }
 
 std::ostream& operator<<(std::ostream& os, Soma& soma)
@@ -40,7 +38,8 @@ std::ostream& operator<<(std::ostream& os, Soma& soma)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, std::shared_ptr<Soma> somaPtr){
+std::ostream& operator<<(std::ostream& os, std::shared_ptr<Soma> somaPtr)
+{
     os << *somaPtr;
     return os;
 }

@@ -4,10 +4,8 @@
 #include <stack>
 
 #include <morphio/types.h>
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 /**
 An iterator class to iterate through sections;
  **/

@@ -5,15 +5,12 @@
 #include <morphio/properties.h>
 #include <morphio/types.h>
 
-namespace morphio
+namespace morphio {
+enum SomaClasses
 {
-
-
-enum SomaClasses {
     SOMA_CONTOUR,
     SOMA_CYLINDER
 };
-
 
 /** Read access a Morphology file.
  *
@@ -48,8 +45,8 @@ public:
     //@{
     /** Open the given source to a morphology file and parse it.
 
-        options is the modifier flags to be applied. All flags are defined in their enum:
-        morphio::enum::Option and can be composed.
+        options is the modifier flags to be applied. All flags are defined in
+       their enum: morphio::enum::Option and can be composed.
 
         Example:
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
@@ -101,7 +98,7 @@ public:
     /**
      * Return a vector with all diameters from all sections
      * (soma points are not included)
-    **/
+     **/
     const std::vector<float>& diameters() const;
 
     /**
@@ -131,7 +128,6 @@ public:
     breadth_iterator breadth_begin() const;
     breadth_iterator breadth_end() const;
 
-
     /**
      * Return the soma type
      **/
@@ -155,4 +151,4 @@ private:
     template <typename Property>
     const std::vector<typename Property::Type>& get() const;
 };
-}
+} // namespace morphio

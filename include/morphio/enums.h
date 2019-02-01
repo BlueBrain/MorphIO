@@ -3,19 +3,17 @@
 
 #include <ostream>
 
-namespace morphio
-{
-namespace enums
-{
-
+namespace morphio {
+namespace enums {
 /** The list of modifier flags that can be passed when loading a morphology
  See morphio::mut::modifiers for more informations **/
-enum Option {
-    NO_MODIFIER =  0x00,
-    TWO_POINTS_SECTIONS    = 0x01,
-    SOMA_SPHERE     = 0x02,
-    NO_DUPLICATES   = 0x04,
-    NRN_ORDER   = 0x08
+enum Option
+{
+    NO_MODIFIER = 0x00,
+    TWO_POINTS_SECTIONS = 0x01,
+    SOMA_SPHERE = 0x02,
+    NO_DUPLICATES = 0x04,
+    NRN_ORDER = 0x08
 };
 
 /**
@@ -23,18 +21,18 @@ enum Option {
    defined in ErrorMessages.
    It is used to define which warnings are ignored by the user
 **/
- enum Warning {
-   UNDEFINED,
-   MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-   WRITE_NO_SOMA,
-   SOMA_NON_CONFORM,
-   NO_SOMA_FOUND,
-   DISCONNECTED_NEURITE,
-   WRONG_DUPLICATE,
-   WRONG_ROOT_POINT,
-   ONLY_CHILD,
- };
-
+enum Warning
+{
+    UNDEFINED,
+    MITOCHONDRIA_WRITE_NOT_SUPPORTED,
+    WRITE_NO_SOMA,
+    SOMA_NON_CONFORM,
+    NO_SOMA_FOUND,
+    DISCONNECTED_NEURITE,
+    WRONG_DUPLICATE,
+    WRONG_ROOT_POINT,
+    ONLY_CHILD,
+};
 
 /** The supported versions for morphology files. */
 enum MorphologyVersion
@@ -62,8 +60,7 @@ enum CellFamily
 /** Output stream formatter for MorphologyVersion */
 inline std::ostream& operator<<(std::ostream& os, const MorphologyVersion v)
 {
-    switch (v)
-    {
+    switch (v) {
     case MORPHOLOGY_VERSION_H5_1:
         return os << "h5v1";
     case MORPHOLOGY_VERSION_H5_2:
@@ -95,9 +92,7 @@ enum SomaType
 /** Output stream formatter for MorphologyVersion */
 inline std::ostream& operator<<(std::ostream& os, const SomaType v)
 {
-    switch (v)
-    {
-
+    switch (v) {
     case SOMA_SINGLE_POINT:
         return os << "SOMA_SINGLE_POINT";
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS:
@@ -124,14 +119,14 @@ enum SectionType
     SECTION_GLIA_PROCESS = 2,    // TODO: nasty overload there
     SECTION_GLIA_ENDFOOT = 3,
 
-    // All section types equal or above this number are custom types according to
-    // neuromorpho.org standard
+    // All section types equal or above this number are custom types according
+    // to neuromorpho.org standard
     SECTION_CUSTOM_START = 5,
 
     // CNIC defined types
-    // It defines too extra types SWC_SECTION_FORK_POINT and SWC_SECTION_END_POINT
-    // Consequently the custom types start at a higher number
-    // See here:
+    // It defines too extra types SWC_SECTION_FORK_POINT and
+    // SWC_SECTION_END_POINT Consequently the custom types start at a higher
+    // number See here:
     // http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
     SWC_SECTION_FORK_POINT = 5,
     SWC_SECTION_END_POINT = 6,
@@ -152,5 +147,5 @@ enum AccessMode
     MODE_READWRITE = MODE_READ | MODE_WRITE,
     MODE_READOVERWRITE = MODE_READ | MODE_OVERWRITE
 };
-}
-}
+} // namespace enums
+} // namespace morphio

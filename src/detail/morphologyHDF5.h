@@ -1,5 +1,4 @@
-namespace
-{
+namespace {
 // v1 & v2
 const std::string _d_points("points");
 const size_t _pointColumns = 4;
@@ -27,4 +26,4 @@ const size_t _structureV2Columns = 2;
 const std::string _g_root("neuron1");
 const std::string _d_type("sectiontype");
 const std::string _a_apical("apical");
-}
+} // namespace

@@ -4,8 +4,7 @@
 #include <stack>
 
 #include <morphio/types.h>
-namespace morphio
-{
+namespace morphio {
 /**
 An iterator class to iterate through sections;
  **/
@@ -18,6 +17,7 @@ class Iterator
     T container;
 
     Iterator();
+
 public:
     Iterator(const Section& section);
     Iterator(const Morphology& morphology);
@@ -27,4 +27,4 @@ public:
     Iterator& operator++();
     Iterator operator++(int);
 };
-}
+} // namespace morphio

@@ -1,14 +1,24 @@
 #!/bin/bash
 
-GIT_DIR=$(git rev-parse --show-toplevel)
-cd $GIT_DIR
+find src include -iname \*.h -o -iname \*.c -o -iname \*.cpp -o -iname \*.hpp -o -iname \*.tpp\
+    | xargs clang-format -style=file -i -fallback-style=none
 
-git ls-files |                                        \
-        egrep '\.(h|c|cpp|hpp)$' |                    \
-        xargs clang-format -output-replacements-xml | \
-        grep "<replacement " > /dev/null
+git diff > clang_format.patch
 
-if [ $? -ne 1 ]; then
-    echo "Commit did not match clang-format"
-    exit 1
+# Delete if 0 size
+if [ ! -s clang_format.patch ]
+then
+    rm clang_format.patch
+    exit 0
 fi
+
+echo "The code is not formatted according to clang-format"
+echo "Here is the diff:"
+echo cat clang_format.patch
+echo ""
+cat clang_format.patch
+echo ""
+echo "Please run the following command in the root directory:"
+echo "find src include -iname \*.h -o -iname \*.c -o -iname \*.cpp -o -iname \*.hpp -o -iname \*.tpp | xargs clang-format -style=file -i -fallback-style=none"
+
+exit 1

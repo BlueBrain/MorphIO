@@ -1,10 +1,8 @@
 #include <morphio/mut/iterators.h>
 #include <morphio/mut/morphology.h>
 
-namespace morphio
-{
-namespace mut
-{
+namespace morphio {
+namespace mut {
 class Section;
 
 template <typename T>
@@ -25,13 +23,14 @@ template <typename T>
 Iterator<T>::Iterator(const Morphology& morphology)
 {
     auto roots = morphology.rootSections();
-    for(auto it = roots.rbegin(); it != roots.rend(); ++it)
+    for (auto it = roots.rbegin(); it != roots.rend(); ++it)
         container.push(*it);
 }
 
 template <>
-breadth_iterator::Iterator(const Morphology& morphology) {
-    for(auto root: morphology.rootSections()) {
+breadth_iterator::Iterator(const Morphology& morphology)
+{
+    for (auto root : morphology.rootSections()) {
         std::queue<std::shared_ptr<Section>> q;
         q.push(root);
         container.push(q);
@@ -93,7 +92,10 @@ std::shared_ptr<Section> upstream_iterator::operator*() const
 }
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-template <> upstream_iterator::Iterator(const Morphology& morphology) {} // unused
+template <>
+upstream_iterator::Iterator(const Morphology& morphology)
+{
+} // unused
 
 template <>
 upstream_iterator::Iterator(std::shared_ptr<Section> section)
@@ -106,9 +108,9 @@ breadth_iterator& breadth_iterator::operator++()
 {
     const auto& section = *(*this);
     container.front().pop();
-    for (auto& child: section->children())
+    for (auto& child : section->children())
         container.front().push(child);
-    if(container.front().empty())
+    if (container.front().empty())
         container.pop();
 
     return *this;
