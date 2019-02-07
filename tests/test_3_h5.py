@@ -54,3 +54,15 @@ def test_v2():
     assert_equal(n.root_sections[1].type, 4)
     assert_equal(len(list(n.iter())), 85)
     assert_equal(len(n.points), 926)
+
+def test_soma_no_neurite():
+    n = Morphology(os.path.join(H5V1_PATH, 'soma_no_neurites.h5'))
+
+    assert_array_equal(n.soma.points,
+                       [[ 0.,  0.,  0.],
+                        [ 1.,  0.,  0.],
+                        [ 0., 25.,  0.]])
+    assert_array_equal(n.soma.diameters,
+                       [6,6,15])
+
+    assert_equal(len(n.root_sections), 0)

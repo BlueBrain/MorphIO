@@ -215,9 +215,10 @@ void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
         std::vector<std::vector<float>> vec(dims[0]);
         // points.resize(dims[0]);
         dataset.read(vec);
+        bool noNeurites = (firstSectionOffset == -1);
         for (unsigned int i = 0; i < vec.size(); ++i) {
             const auto& p = vec[i];
-            if (i < firstSectionOffset) {
+            if (noNeurites || i < firstSectionOffset) {
                 somaPoints.push_back({p[0], p[1], p[2]});
                 somaDiameters.push_back(p[3]);
             } else {
@@ -231,9 +232,10 @@ void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
     std::vector<std::vector<float>> vec;
     vec.resize(_pointsDims[0]);
     _points->read(vec);
+    bool noNeurites = (firstSectionOffset == -1);
     for (unsigned int i = 0; i < vec.size(); ++i) {
         const auto& p = vec[i];
-        if (i < firstSectionOffset) {
+        if (noNeurites || i < firstSectionOffset) {
             somaPoints.push_back({p[0], p[1], p[2]});
             somaDiameters.push_back(p[3]);
         } else {
@@ -299,8 +301,12 @@ int MorphologyHDF5::_readSections()
     vec.resize(_sectionsDims[0]);
     selection.read(vec);
 
-    bool skipFirst = true;
+    if (vec.size() < 2) // Neuron without any neurites
+        return -1;
+
     int firstSectionOffset = vec[1][0];
+
+    bool skipFirst = true; // Skipping soma section
     for (auto p : vec) {
         if (skipFirst) {
             skipFirst = false;
@@ -346,7 +352,9 @@ void MorphologyHDF5::_readSectionTypes()
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset)
 {
-    if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1)
+    bool noNeurites = (firstSectionOffset == -1);
+
+    if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1 || noNeurites)
         return;
 
     try {
