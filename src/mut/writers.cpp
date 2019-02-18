@@ -47,6 +47,14 @@ std::string version_footnote()
     return std::string("Created by MorphIO v") + morphio::VERSION;
 }
 
+/**
+   Only skip duplicate if it has the same diameter and perimeter
+ **/
+bool _skipDuplicate(const std::shared_ptr<Section> section)
+{
+    return section->diameters()[0] == section->parent()->diameters().back();
+}
+
 void swc(const Morphology& morphology, const std::string& filename)
 {
     std::ofstream myfile;
@@ -87,11 +95,11 @@ void swc(const Morphology& morphology, const std::string& filename)
         assert(points.size() > 0 && "Empty section");
         bool isRootSection = section->isRoot();
 
-        for (unsigned int i = (isRootSection ? 0 : 1); // skips duplicate point
-             // for non-root sections
-             i < points.size(); ++i) {
+        // skips duplicate point for non-root sections
+        unsigned int firstPoint = ((isRootSection || !_skipDuplicate(section)) ? 0 : 1);
+        for (unsigned int i = firstPoint; i < points.size(); ++i) {
             int parentIdOnDisk;
-            if (i > (isRootSection ? 0 : 1))
+            if (i > firstPoint)
                 parentIdOnDisk = segmentIdOnDisk - 1;
             else {
                 parentIdOnDisk = (isRootSection ? (soma->points().empty() ? -1 : 1)

@@ -268,6 +268,11 @@ public:
 
     Property::Properties _buildProperties(unsigned int options)
     {
+        // The process might occasionally creates empty section before
+        // filling them so the warning is ignored
+        bool originalIsIgnored = err.isIgnored(morphio::Warning::APPENDING_EMPTY_SECTION);
+        set_ignored_warning(morphio::Warning::APPENDING_EMPTY_SECTION, true);
+
         std::vector<int32_t> depthFirstSamples;
         _pushChildren(depthFirstSamples, -1);
         for (const auto id : depthFirstSamples) {
@@ -295,6 +300,9 @@ public:
 
         Property::Properties properties = morph.buildReadOnly();
         properties._cellLevel._somaType = somaType();
+
+        set_ignored_warning(morphio::Warning::APPENDING_EMPTY_SECTION, originalIsIgnored);
+
         return properties;
     }
 
@@ -312,10 +320,11 @@ public:
         if (isRootSection(sample)) {
             section = morph.appendRootSection(properties, sample.type);
         } else {
-            // Duplicating last point of previous section
-            properties._points.push_back(samples[sample.parentId].point);
-            properties._diameters.push_back(samples[sample.parentId].diameter);
-
+            // Duplicating last point of previous section if there is not already a duplicate
+            if (sample.point != samples[sample.parentId].point) {
+                properties._points.push_back(samples[sample.parentId].point);
+                properties._diameters.push_back(samples[sample.parentId].diameter);
+            }
             section = morph.section(swcIdToSectionId[sample.parentId])
                           ->appendSection(properties, sample.type);
         }

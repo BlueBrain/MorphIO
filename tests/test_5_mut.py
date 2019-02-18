@@ -41,10 +41,21 @@ def test_point_level():
 
 def test_empty_neurite():
     m = Morphology()
-    m.append_root_section(PointLevel(), SectionType.axon)
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            root = m.append_root_section(PointLevel(), SectionType.axon)
+            assert_equal(err.getvalue().strip(),
+                         'Appending empty section with id: 0')
+
     assert_equal(len(m.root_sections), 1)
     assert_equal(m.root_sections[0].type,
                  SectionType.axon)
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            root.append_section(PointLevel(), SectionType.axon)
+            assert_equal(err.getvalue().strip(),
+                         'Appending empty section with id: 1')
 
 def test_single_neurite():
     m = Morphology()
@@ -145,7 +156,6 @@ def test_mut_copy_ctor():
 
     assert_equal([sec.id for sec in copy.iter()],
                  [0, 1, 2, 3, 4, 5, 6])
-
 
 
 
@@ -337,14 +347,6 @@ def test_equality():
     a.delete_section(a.root_sections[0])
     assert_not_equal(neuron_ref, a)
     ok_(not (neuron_ref == a))
-
-
-
-
-
-
-
-
 
 def test_iterators():
     assert_array_equal([sec.id for sec in SIMPLE.section(5).iter(upstream)],

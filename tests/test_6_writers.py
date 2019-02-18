@@ -229,3 +229,34 @@ def test_mitochondria():
 
         assert_array_equal(mito.section(0).neurite_section_ids,
                            neuronal_section_ids)
+
+def test_duplicate_different_diameter():
+    '''Test that starting a child section with a different diamete
+    work as expected'''
+    morpho = Morphology()
+    morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
+    morpho.soma.diameters = [1, 1]
+
+    section = morpho.append_root_section(PointLevel([[2, 2, 2], [3, 3, 3]],
+                                                       [4, 4]),
+                                         SectionType.axon,)
+
+    section.append_section(PointLevel([[3, 3, 3], [4, 4, 4]], [10, 12]))
+    section.append_section(PointLevel([[3, 3, 3], [5, 5, 5]], [11, 12]))
+
+
+    with setup_tempdir('test_write_duplicate_different_diameter', no_cleanup=True) as tmp_folder:
+        for ext in ['asc', 'h5', 'swc']:
+            with captured_output() as (_, err):
+                with ostream_redirect(stdout=True, stderr=True):
+                    outfile = os.path.join(tmp_folder, 'tmp.' + ext)
+                    morpho.write(outfile)
+
+                    read = Morphology(outfile)
+
+            assert_equal(len(read.root_sections[0].children), 2)
+            child1, child2 = read.root_sections[0].children
+            assert_array_equal(child1.points, [[3, 3, 3], [4, 4, 4]])
+            assert_array_equal(child2.points, [[3, 3, 3], [5, 5, 5]])
+            assert_array_equal(child1.diameters, [10, 12])
+            assert_array_equal(child2.diameters, [11, 12])

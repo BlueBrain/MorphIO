@@ -196,6 +196,7 @@ public:
     std::string WARNING_WRONG_DUPLICATE(
         std::shared_ptr<morphio::mut::Section> current,
         std::shared_ptr<morphio::mut::Section> parent) const;
+    std::string WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morphio::mut::Section>);
     const std::string WARNING_ONLY_CHILD(const DebugInfo& info, int parentId,
         int childId) const;
 

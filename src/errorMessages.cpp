@@ -252,6 +252,11 @@ std::string ErrorMessages::WARNING_DISCONNECTED_NEURITE(
         "(although this is normal if this neuron has no soma)");
 }
 
+std::string ErrorMessages::WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morphio::mut::Section> section)
+{
+    return errorMsg(0, ErrorLevel::WARNING, "Appending empty section with id: " + std::to_string(section->id()));
+}
+
 std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
     std::shared_ptr<morphio::mut::Section> current,
     std::shared_ptr<morphio::mut::Section> parent) const
