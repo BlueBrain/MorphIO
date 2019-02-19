@@ -93,7 +93,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(
 
     bool emptySection = ptr->points().empty();
     if (emptySection)
-        LBERROR(Warning::APPENDING_EMPTY_SECTION, this->_err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+        LBERROR(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
 
     if (recursive) {
         for (const auto& child : section.children()) {
@@ -114,7 +114,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(
 
     bool emptySection = section_copy->points().empty();
     if (emptySection)
-        LBERROR(Warning::APPENDING_EMPTY_SECTION, this->_err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
+        LBERROR(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
 
     if (recursive) {
         for (const auto child : section->children()) {
@@ -136,7 +136,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(
 
     bool emptySection = ptr->points().empty();
     if (emptySection)
-        LBERROR(Warning::APPENDING_EMPTY_SECTION, this->_err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+        LBERROR(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
 
     return ptr;
 }
