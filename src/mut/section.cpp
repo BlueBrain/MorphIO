@@ -100,6 +100,10 @@ std::ostream& operator<<(std::ostream& os, std::shared_ptr<Section> sectionPtr)
     return os;
 }
 
+bool _emptySection(const std::shared_ptr<Section> section)
+{
+    return section->points().empty();
+}
 std::shared_ptr<Section> Section::appendSection(
     std::shared_ptr<Section> original_section, bool recursive)
 {
@@ -110,7 +114,7 @@ std::shared_ptr<Section> Section::appendSection(
     uint32_t childId = _morphology->_register(ptr);
     auto& _sections = _morphology->_sections;
 
-    bool emptySection = _sections[childId]->points().empty();
+    bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
         LBERROR(Warning::APPENDING_EMPTY_SECTION, _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
@@ -141,7 +145,7 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
     uint32_t childId = _morphology->_register(ptr);
     auto& _sections = _morphology->_sections;
 
-    bool emptySection = _sections[childId]->points().empty();
+    bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
         LBERROR(Warning::APPENDING_EMPTY_SECTION, _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
@@ -182,7 +186,7 @@ std::shared_ptr<Section> Section::appendSection(
 
     uint32_t childId = _morphology->_register(ptr);
 
-    bool emptySection = _sections[childId]->points().empty();
+    bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
         LBERROR(Warning::APPENDING_EMPTY_SECTION, _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 

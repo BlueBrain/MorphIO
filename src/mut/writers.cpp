@@ -48,7 +48,7 @@ std::string version_footnote()
 }
 
 /**
-   Only skip duplicate if it has the same diameter and perimeter
+   Only skip duplicate if it has the same diameter
  **/
 bool _skipDuplicate(const std::shared_ptr<Section> section)
 {
