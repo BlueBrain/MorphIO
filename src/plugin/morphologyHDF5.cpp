@@ -251,6 +251,7 @@ int MorphologyHDF5::_readSections()
 
     if (_properties.version() == MORPHOLOGY_VERSION_H5_2) {
         // fixes BBPSDK-295 by restoring old BBPSDK 0.13 implementation
+        HighFive::SilenceHDF5 silence;
         auto dataset = [this]() {
             std::string path = "/" + _g_root + "/" + _g_structure + "/" + _stage;
             try {
