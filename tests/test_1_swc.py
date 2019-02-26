@@ -363,3 +363,40 @@ def test_neurite_wrong_root_point():
             with ostream_redirect(stdout=True, stderr=True):
                 n = Morphology(os.path.join(_path, 'neurite_wrong_root_point.swc'))
                 assert_equal('', err.getvalue().strip())
+
+
+def test_read_duplicate():
+    '''Test reading a simple neuron consisting of a point soma
+    and a single branch neurite.'''
+    with tmp_swc_file('''# A simple neuron with a duplicate point
+                         # at the bifurcation
+                         #
+                         # soma point
+                         1 1 1 0 1 4.0 -1
+                         # root section
+                         2 3 0 0 2 0.5 1
+                         3 3 0 0 3 0.5 2
+                         # first child: real duplicate
+                         4 3 0 0 3 0.5 3
+                         5 3 0 0 7 0.5 4
+                         # second child: duplicate with different diameter
+                         6 3 0 0 3 2.3 3
+                         7 3 0 0 8 3.5 6
+                         # third child: no duplicate
+                         8 3 1 0 0 2.3 3
+                         9 3 1 1 0 3.5 8''') as tmp_file:
+
+        n = Morphology(tmp_file.name)
+
+    nt.eq_(len(n.root_sections), 1)
+    nt.eq_(len(n.root_sections[0].children), 3)
+    child1, child2, child3 = n.root_sections[0].children
+    assert_array_equal(n.root_sections[0].points, np.array([[0, 0, 2], [0, 0, 3]]))
+    assert_array_equal(child1.points, np.array([[0, 0, 3], [0, 0, 7]]))
+    assert_array_equal(child2.points, np.array([[0, 0, 3], [0, 0, 8]]))
+    assert_array_equal(child3.points, np.array([[0, 0, 3],
+                                                [1, 0, 0],
+                                                [1, 1, 0]]))
+    assert_array_equal(child1.diameters, np.array([1, 1]))
+    assert_array_equal(child2.diameters, np.array([4.6, 7], dtype=np.float32))
+    assert_array_equal(child3.diameters, np.array([1, 4.6, 7], dtype=np.float32))

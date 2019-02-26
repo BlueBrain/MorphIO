@@ -69,13 +69,6 @@ bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
     if (parent->points()[parent->points().size() - 1] != current->points()[0])
         return false;
 
-    // TODO: I dont know if it is OK for the diameter and the perimeter to not
-    // be duplicated
-
-    // if(parent->diameters()[parent->diameters().size()-1] !=
-    // current->diameters()[0])
-    //     return false;
-
     // // As perimeter is optional, it must either be defined for parent and
     // current
     // // or not be defined at all
@@ -98,6 +91,10 @@ std::shared_ptr<Section> Morphology::appendRootSection(
     _register(ptr);
     _rootSections.push_back(ptr);
 
+    bool emptySection = ptr->points().empty();
+    if (emptySection)
+        LBERROR(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+
     if (recursive) {
         for (const auto& child : section.children()) {
             ptr->appendSection(child, true);
@@ -114,6 +111,10 @@ std::shared_ptr<Section> Morphology::appendRootSection(
         friendDtorForSharedPtr);
     _register(section_copy);
     _rootSections.push_back(section_copy);
+
+    bool emptySection = section_copy->points().empty();
+    if (emptySection)
+        LBERROR(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
 
     if (recursive) {
         for (const auto child : section->children()) {
@@ -132,6 +133,10 @@ std::shared_ptr<Section> Morphology::appendRootSection(
         friendDtorForSharedPtr);
     _register(ptr);
     _rootSections.push_back(ptr);
+
+    bool emptySection = ptr->points().empty();
+    if (emptySection)
+        LBERROR(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
 
     return ptr;
 }
