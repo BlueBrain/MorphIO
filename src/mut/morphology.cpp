@@ -19,7 +19,7 @@ Morphology::Morphology(const morphio::URI& uri, unsigned int options)
 {
 }
 
-Morphology::Morphology(const morphio::mut::Morphology& morphology)
+Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int options)
     : _counter(0)
     , _soma(std::make_shared<Soma>(*morphology.soma()))
 {
@@ -34,9 +34,11 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology)
         morphology.mitochondria().rootSections()) {
         mitochondria().appendRootSection(root, true);
     }
+
+    applyModifiers(options);
 }
 
-Morphology::Morphology(const morphio::Morphology& morphology)
+Morphology::Morphology(const morphio::Morphology& morphology, unsigned int options)
     : _counter(0)
     , _soma(std::make_shared<Soma>(morphology.soma()))
 {
@@ -51,6 +53,8 @@ Morphology::Morphology(const morphio::Morphology& morphology)
         morphology.mitochondria().rootSections()) {
         mitochondria().appendRootSection(root, true);
     }
+
+    applyModifiers(options);
 }
 
 /**

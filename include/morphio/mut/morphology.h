@@ -47,12 +47,12 @@ public:
     /**
        Build a mutable Morphology from a mutable morphology
     **/
-    Morphology(const morphio::mut::Morphology& morphology);
+    Morphology(const morphio::mut::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
     /**
        Build a mutable Morphology from a read-only morphology
     **/
-    Morphology(const morphio::Morphology& morphology);
+    Morphology(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
     virtual ~Morphology();
 
