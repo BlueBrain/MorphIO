@@ -6,6 +6,7 @@ from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
 
 from morphio import Morphology, upstream, IterType, Option, SectionType, ostream_redirect
+from morphio.mut import Morphology as MutableMorphology
 from utils import captured_output
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -22,6 +23,22 @@ def test_nrn_order():
                  [SectionType.axon,
                   SectionType.basal_dendrite,
                   SectionType.apical_dendrite])
+
+
+    normal = Morphology(os.path.join(_path, 'reversed_NRN_neurite_order.swc'))
+    m = MutableMorphology(normal, options=Option.nrn_order)
+    assert_equal([section.type for section in m.root_sections],
+                 [SectionType.axon,
+                  SectionType.basal_dendrite,
+                  SectionType.apical_dendrite])
+
+    normal = MutableMorphology(os.path.join(_path, 'reversed_NRN_neurite_order.swc'))
+    m = MutableMorphology(normal, options=Option.nrn_order)
+    assert_equal([section.type for section in m.root_sections],
+                 [SectionType.axon,
+                  SectionType.basal_dendrite,
+                  SectionType.apical_dendrite])
+
 
 def test_two_point_section():
     m = Morphology(os.path.join(_path, 'multiple_point_section.asc'), options=Option.two_points_sections)

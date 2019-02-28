@@ -11,9 +11,12 @@ void bind_mutable_module(py::module &m) {
 
     auto mutable_morphology = py::class_<morphio::mut::Morphology>(m, "Morphology")
         .def(py::init<>())
-        .def(py::init<const morphio::URI&>())
-        .def(py::init<const morphio::Morphology&>())
-        .def(py::init<const morphio::mut::Morphology&>())
+        .def(py::init<const morphio::URI&, unsigned int>(),
+             "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
+        .def(py::init<const morphio::Morphology&, unsigned int>(),
+             "morphology"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
+        .def(py::init<const morphio::mut::Morphology&, unsigned int>(),
+             "morphology"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
 
         .def("__eq__", [](const morphio::mut::Morphology& a, const morphio::mut::Morphology& b) {
                 return a.operator==(b);
