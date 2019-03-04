@@ -278,6 +278,9 @@ void Morphology::sanitize(const morphio::plugin::DebugInfo& debugInfo)
                 err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
             bool duplicate = _checkDuplicatePoint(section->parent(), section);
 
+            addAnnotation(morphio::Property::Annotation(morphio::AnnotationType::SINGLE_CHILD, sectionId,
+                section->properties(), "", debugInfo.getLineNumber(parentId)));
+
             morphio::Property::_appendVector(parent->points(),
                 section->points(),
                 duplicate ? 1 : 0);
@@ -323,6 +326,7 @@ const Property::Properties Morphology::buildReadOnly() const
     }
 
     mitochondria()._buildMitochondria(properties);
+    properties._annotations = annotations();
     return properties;
 }
 
