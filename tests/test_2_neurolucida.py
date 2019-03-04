@@ -219,8 +219,7 @@ def test_empty_sibling():
     with its parent'''
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            with tmp_asc_file('''
-                     ((Dendrite)
+            with tmp_asc_file('''((Dendrite)
                       (3 -4 0 2)
                       (3 -6 0 2)
                       (3 -8 0 2)
@@ -248,6 +247,14 @@ def test_empty_sibling():
                                  [0, -10, 0],
                                  [-3, -10, 0]],
                                 dtype=np.float32))
+
+    assert_equal(len(n.annotations), 1)
+    annotation = n.annotations[0]
+    assert_equal(annotation.type, morphio.AnnotationType.single_child)
+    assert_equal(annotation.line_number, 6)
+    assert_array_equal(annotation.points, [[3, -10, 0], [0, -10, 0], [-3, -10, 0]])
+    assert_array_equal(annotation.diameters, [2, 2, 2])
+
 
 
 def test_section_single_point():
