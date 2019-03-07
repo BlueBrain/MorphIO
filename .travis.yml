@@ -1,120 +1,36 @@
-env:
-    global:
-        - REPO_DIR=.
-        # Commit from your-project that you want to build
-        - BUILD_COMMIT=HEAD
-        # pip dependencies to _build_ your project
-        - BUILD_DEPENDS="numpy"
-        # pip dependencies to _test_ your project.  Include any dependencies
-        # that you need, that are also specified in BUILD_DEPENDS, this will be
-        # a separate install.
-        - TEST_DEPENDS="numpy nose"
-        - PLAT=x86_64
-        - UNICODE_WIDTH=32
-        - WHEELHOUSE_UPLOADER_USERNAME=bbp.opensource
-        - DOCKER_IMAGE=bluebrain/morphio_wheel
-        - secure: "N/2AGpTUSOGOxQqYulja5Etj228w1SByVuX+ozPvuPJTm5kJh5fqav8FVtPLziaWAaWxJ6W2nFdWT9AwodwMk3+1NBHMWpOZ3NJnvibz0cvYCkXdNcgXOFGrPSeX3Oo2d74IeT20R44lieZEW62j4488SSaVkwr3p7YgyfVMVGo="
-
-language: python
-# The Travis Python version is unrelated to the version we build and test
-# with.  This is set with the MB_PYTHON_VERSION variable.
-python: 3.5
-dist: trusty
-services: docker
-
 matrix:
-  exclude:
-    # Exclude the default Python 3.5 build
-    - python: 3.5
   include:
-    - os: linux
-      env: MB_PYTHON_VERSION=2.7
     # - os: linux
-    #   env:
-    #     - MB_PYTHON_VERSION=2.7
-    #     - UNICODE_WIDTH=16
-    # - os: linux
-    #   env:
-    #     - MB_PYTHON_VERSION=2.7
-    #     - PLAT=i686
-    # - os: linux
-    #   env:
-    #     - MB_PYTHON_VERSION=2.7
-    #     - PLAT=i686
-    #     - UNICODE_WIDTH=16
-    # - os: linux
-    #   env:
-    #     - MB_PYTHON_VERSION=3.4
-    # - os: linux
-    #   env:
-    #     - MB_PYTHON_VERSION=3.4
-    #     - PLAT=i686
-    # - os: linux
-    #   env:
-    #     - MB_PYTHON_VERSION=3.5
-    # - os: linux
-    #   env:
-    #     - MB_PYTHON_VERSION=3.5
-    #     - PLAT=i686
-    # - os: linux
-    #   env:
-    #     - MB_PYTHON_VERSION=3.6
-    # - os: linux
-    #   env:
-    #     - MB_PYTHON_VERSION=3.6
-    #     - PLAT=i686
-    # - os: osx
-    #   language: generic
-    #   env:
-    #     - MB_PYTHON_VERSION=2.7
-    # - os: osx
-    #   language: generic
-    #   env:
-    #     - MB_PYTHON_VERSION=3.4
-    # - os: osx
-    #   language: generic
-    #   env:
-    #     - MB_PYTHON_VERSION=3.5
-    # - os: osx
-    #   language: generic
-    #   env:
-    #     - MB_PYTHON_VERSION=3.6
-    # - os: osx
-    #   language: generic
-    #   env:
-    #     - MB_PYTHON_VERSION=pypy-5.7
-
+    #   dist: trusty
+    #   sudo: required
+    - os: osx
+      osx_image: xcode10.1
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/Library/Caches/Homebrew
+language: c++
+sudo: required
+python:
+  - 2.7
+  # - 3.5
+  - 3.6
+# addons:
+#   apt:
+#     packages:
+#       - libhdf5-dev
+#       - g++-5
+#     sources: &sources
+#       - llvm-toolchain-precise-3.8
+#       - ubuntu-toolchain-r-test
 before_install:
-    - source multibuild/common_utils.sh
-    - source multibuild/travis_steps.sh
-    - clean_code $REPO_DIR $BUILD_COMMIT
-    - before_install
-
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
+  - pip install virtualenv
+  - virtualenv env && source env/bin/activate
 install:
-    # Maybe get and clean and patch source
-    - build_wheel $REPO_DIR $PLAT
-
+  - pip install --upgrade pip
+  - pip install .
 script:
-    - install_run $PLAT
-
-after_success:
-    # Copy compiled wheels to dist/ where Travis `dpl` tool can find them and
-    # upload to PyPI
-    - mkdir -p dist; cp ${TRAVIS_BUILD_DIR}/wheelhouse/*.whl dist
-    - python setup.py sdist
-
-# Deploy to PyPI on tags. Since the hard work of building wheels is already
-# done, we need to defeat some of Travis' automation.
-# Inspired from:
-# https://github.com/madig/freetype-py/blob/bc944ef10a5648b88b25819e12de9853470f53de/.travis.yml
-deploy:
-  provider: pypi
-  server: https://testpypi.python.org/pypi
-  on:
-    all_branches: true
-    tags: true
-  user: bbp.opensource
-  password:
-    secure: N/2AGpTUSOGOxQqYulja5Etj228w1SByVuX+ozPvuPJTm5kJh5fqav8FVtPLziaWAaWxJ6W2nFdWT9AwodwMk3+1NBHMWpOZ3NJnvibz0cvYCkXdNcgXOFGrPSeX3Oo2d74IeT20R44lieZEW62j4488SSaVkwr3p7YgyfVMVGo=
-  skip_cleanup: true  # Prevent deletion of dist/*.
-  distributions: check  # Dummy argument so dists aren't rebuilt by dpl.
+  - ./scripts/check-clang-format-all
+  - pip install -r tests/requirement_tests.txt
+  - nosetests
