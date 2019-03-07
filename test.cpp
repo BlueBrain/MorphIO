@@ -25,15 +25,16 @@ int main()
     using namespace std;
     clock_t begin = clock();
     // morphio::Morphology m("/home/bcoste/workspace/morphology/io/tests/data/simple.swc");
-    morphio::Morphology m("/home/bcoste/workspace/morphology/io/tests/data/neurite_wrong_root_point.swc");
+    morphio::Morphology m("data/Astrocytes_H5/astrocyte2_v3.h5");
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC * 1000.;
     std::cout << elapsed_secs << " milliseconds" << std::endl;
-
-    // morphio::mut::Morphology b(m);
-
-    // for(auto it = m.depth_begin(); it != m.depth_end(); ++it)
-    //     std::cout <<  (*it)->id() << std::endl;
+    
+    morphio::mut::Morphology b(m);
+    auto roots = m.rootSections();
+    std::cout<<roots.size()<<std::endl;
+    //for(auto it = m.depth_begin(); it != m.depth_end(); ++it)
+    //    std::cout <<  (*it)->id() << std::endl;
 
 
     // m.sanitize();

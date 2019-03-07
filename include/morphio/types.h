@@ -37,6 +37,7 @@ class MorphologyInitData;
 template <class T>
 class SectionBase;
 class Section;
+class VasculatureSection;
 class MitoSection;
 class Mitochondria;
 class Soma;
