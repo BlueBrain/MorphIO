@@ -24,7 +24,3 @@ RUN cd hdf5-1.8.17 && ./configure CFLAGS=-fPIC CXXFLAGS=-fPIC --prefix=/usr/loca
 # the .a file, so currently safe
 RUN cd hdf5-1.8.17 && ar x /usr/lib64/libz.a && ar r /usr/local/lib/libhdf5.a *.o
 RUN rm -rf hdf5-1.8.17.tar.bz2 hdf5-1.8.17
-
-RUN useradd -ms /bin/bash wheel_user
-USER wheel_user
-WORKDIR /home/wheel_user
