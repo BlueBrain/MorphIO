@@ -35,18 +35,20 @@ using URI = std::string;
 
 using namespace enums;
 class Morphology;
-class VasculatureMorphology;
-class MorphologyInitData;
 template <class T>
 class SectionBase;
 class Section;
-class VasculatureSection;
 class MitoSection;
 class Mitochondria;
 class Soma;
 
 namespace Property {
 struct Properties;
+}
+
+namespace vasculature {
+    class VasculatureSection;
+    class VasculatureMorphology;
 }
 
 namespace detail {

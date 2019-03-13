@@ -31,26 +31,28 @@ public:
     Iterator operator++(int);
 };
 
-    class graph_iterator
-    {
-        friend class VasculatureSection;
-        friend class VasculatureMorphology;
-        std::set<VasculatureSection> visited;
 
-        std::stack<VasculatureSection> container;
+class graph_iterator
+{
+    friend class vasculature::VasculatureSection;
+    friend class vasculature::VasculatureMorphology;
+    std::set<vasculature::VasculatureSection> visited;
+
+    std::stack<vasculature::VasculatureSection> container;
 
         graph_iterator();
 
-    public:
-        graph_iterator(const VasculatureSection& vasculatureSection);
-        graph_iterator(const VasculatureMorphology& vasculatureMorphology);
-        bool operator==(graph_iterator other) const;
-        bool operator!=(graph_iterator other) const;
-        VasculatureSection operator*() const;
-        graph_iterator& operator++();
-        graph_iterator operator++(int);
-    };
 
+
+    public:
+    graph_iterator(const vasculature::VasculatureSection& vasculatureSection);
+    graph_iterator(const vasculature::VasculatureMorphology& vasculatureMorphology);
+    bool operator==(graph_iterator other) const;
+    bool operator!=(graph_iterator other) const;
+    vasculature::VasculatureSection operator*() const;
+    graph_iterator& operator++();
+    graph_iterator operator++(int);
+};
 
 // Declare the specializations
 template <>

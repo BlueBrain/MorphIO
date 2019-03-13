@@ -3,8 +3,9 @@
 #include <morphio/vector_types.h>
 
 namespace morphio {
+namespace vasculature {
 VasculatureSection::VasculatureSection(const uint32_t id,
-        std::shared_ptr<VasculatureProperty::Properties> properties)
+        std::shared_ptr<property::Properties> properties)
         : _id(id)
         , _properties(properties)
 {
@@ -99,9 +100,9 @@ const std::vector<VasculatureSection> VasculatureSection::neighbors() const
     return pre;
 }
 
-SectionType VasculatureSection::type() const
+VascularSectionType VasculatureSection::type() const
 {
-    auto val = _properties->get<VasculatureProperty::SectionType>()[_id];
+    auto val = _properties->get<property::SectionType>()[_id];
     return val;
 }
 
@@ -116,12 +117,12 @@ float VasculatureSection::length() const
 
 const range<const Point> VasculatureSection::points() const
 {
-    return get<VasculatureProperty::Point>();
+    return get<property::Point>();
 }
 
 const range<const float> VasculatureSection::diameters() const
 {
-    return get<VasculatureProperty::Diameter>();
+    return get<property::Diameter>();
 }
 
 bool VasculatureSection::operator<(const VasculatureSection& other) const
@@ -141,4 +142,5 @@ graph_iterator VasculatureSection::end() const
     return graph_iterator();
 }
 
+}
 }

@@ -10,13 +10,14 @@
 namespace morphio {
 namespace plugin {
 namespace h5 {
-VasculatureProperty::Properties load_vasc(const URI& uri);
+using namespace morphio::vasculature;
+property::Properties load_vasc(const URI& uri);
 
 class VasculatureMorphologyHDF5
 {
 public:
     virtual ~VasculatureMorphologyHDF5();
-    VasculatureProperty::Properties load(const URI& uri);
+    property::Properties load(const URI& uri);
 
 private:
     void _resolve();
@@ -37,7 +38,7 @@ private:
     std::unique_ptr<HighFive::DataSet> _connectivity;
     std::vector<size_t> _conDims;
 
-    VasculatureProperty::Properties _properties;
+    property::Properties _properties;
     bool _write;
 };
 }

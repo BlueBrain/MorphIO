@@ -3,6 +3,7 @@
 #include <morphio/vascSection.h>
 
 namespace morphio {
+
 class Section;
 class VasculatureSection;
 
@@ -38,12 +39,12 @@ breadth_iterator::Iterator(const Morphology& morphology)
     }
 }
 
-graph_iterator::graph_iterator(const VasculatureSection& vasculatureSection)
+graph_iterator::graph_iterator(const vasculature::VasculatureSection& vasculatureSection)
 {
     container.push(vasculatureSection);
 }
 
-graph_iterator::graph_iterator(const VasculatureMorphology& vasculatureMorphology)
+graph_iterator::graph_iterator(const vasculature::VasculatureMorphology& vasculatureMorphology)
 {
     auto sections = vasculatureMorphology.sections();
     container.push(sections[0]);
@@ -116,7 +117,7 @@ Section upstream_iterator::operator*() const
     return container[0];
 }
 
-VasculatureSection graph_iterator::operator*() const
+vasculature::VasculatureSection graph_iterator::operator*() const
 {
     return container.top();
 }

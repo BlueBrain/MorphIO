@@ -18,7 +18,8 @@ string to_string(const array<T, N>& a)
 }
 
 namespace morphio {
-namespace VasculatureProperty {
+namespace vasculature {
+namespace property {
 template <typename T> // resuse from property ?
 void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset)
 {
@@ -50,8 +51,8 @@ VascPointLevel::VascPointLevel(const VascPointLevel& data)
 
 VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range)
 {
-    _points = copySpan<VasculatureProperty::Point>(data._points, range);
-    _diameters = copySpan<VasculatureProperty::Diameter>(data._diameters, range);
+    _points = copySpan<property::Point>(data._points, range);
+    _diameters = copySpan<property::Diameter>(data._diameters, range);
 }
 
 template <typename T>
@@ -69,7 +70,7 @@ bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
     }
 
     if (verbose_) {
-        LBERROR(Warning::UNDEFINED, 
+        LBERROR(Warning::UNDEFINED,
             "Error comparing " + name + ", elements differ:");
         for (unsigned int i = 0; i < vec1.size(); ++i) {
             if (vec1[i] != vec2[i]) {
@@ -290,5 +291,6 @@ template void _appendVector(std::vector<std::array<float, 3ul>>&,
 template void _appendVector(std::vector<unsigned int>&,
         std::vector<unsigned int> const&, int);
 
+}
 }
 }

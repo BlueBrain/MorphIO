@@ -4,7 +4,9 @@
 
 namespace morphio
 {
-namespace VasculatureProperty
+namespace vasculature
+{
+namespace property
 {
 template <typename T>
 void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
@@ -21,7 +23,7 @@ struct Point
 
 struct SectionType
 {
-    using Type = morphio::SectionType;
+    using Type = morphio::VascularSectionType;
 };
 
 struct Diameter
@@ -102,5 +104,6 @@ template <>
 const std::vector<VascSection::Type>& Properties::get<VascSection>() const;
 template <>
 std::vector<Connection::Type>& Properties::get<Connection>();
+}
 }
 }

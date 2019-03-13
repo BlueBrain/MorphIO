@@ -12,7 +12,10 @@
 #include "plugin/morphologySWC.h"
 
 namespace morphio {
-void buildConnectivity(std::shared_ptr<VasculatureProperty::Properties> properties);
+namespace vasculature
+{
+
+void buildConnectivity(std::shared_ptr<property::Properties> properties);
 
 VasculatureMorphology::VasculatureMorphology(const morphio::URI &source, unsigned int options)
 {
@@ -37,7 +40,7 @@ VasculatureMorphology::VasculatureMorphology(const morphio::URI &source, unsigne
                 "Unhandled file type"));
     };
 
-    _properties = std::make_shared<VasculatureProperty::Properties>(loader());
+    _properties = std::make_shared<property::Properties>(loader());
 
     buildConnectivity(_properties);
 }
@@ -56,7 +59,7 @@ bool VasculatureMorphology::operator==(const VasculatureMorphology& other) const
     //return (this->_properties && other._properties && *(this->_properties) == *(other._properties))
 }
 
-bool VasculatureMorphology::operator!=(const morphio::VasculatureMorphology& other) const
+bool VasculatureMorphology::operator!=(const morphio::vasculature::VasculatureMorphology& other) const
 {
     return !this->operator==(other);
 }
@@ -86,7 +89,7 @@ const std::vector<VasculatureSection> VasculatureMorphology::rootSections() cons
 const std::vector<VasculatureSection> VasculatureMorphology::sections() const
 {
     std::vector<VasculatureSection> sections;
-    for (uint i = 1; i < _properties->get<morphio::VasculatureProperty::VascSection>().size(); ++i) {
+    for (uint i = 1; i < _properties->get<property::VascSection>().size(); ++i) {
         sections.push_back(section(i));
     }
     return sections;
@@ -100,17 +103,17 @@ const std::vector<typename Property::Type>& VasculatureMorphology::get() const
 
 const Points& VasculatureMorphology::points() const
 {
-    return get<VasculatureProperty::Point>();
+    return get<property::Point>();
 }
 
 const std::vector<float>& VasculatureMorphology::diameters() const
 {
-    return get<VasculatureProperty::Diameter>();
+    return get<property::Diameter>();
 }
 
-const std::vector<SectionType>& VasculatureMorphology::sectionTypes() const
+const std::vector<property::SectionType::Type>& VasculatureMorphology::sectionTypes() const
 {
-    return get<VasculatureProperty::SectionType>();
+    return get<property::SectionType>();
 }
 
 graph_iterator VasculatureMorphology::begin() const
@@ -123,11 +126,11 @@ graph_iterator VasculatureMorphology::end() const
     return graph_iterator();
 }
 
-void buildConnectivity(std::shared_ptr<VasculatureProperty::Properties> properties)
+void buildConnectivity(std::shared_ptr<property::Properties> properties)
 {
 
-    const auto& sections = properties->get<VasculatureProperty::VascSection>();
-    const auto& connectivity = properties->get<VasculatureProperty::Connection>();
+    const auto& sections = properties->get<property::VascSection>();
+    const auto& connectivity = properties->get<property::Connection>();
     auto& successors = properties->_sectionLevel._successors;
     auto& predecessors = properties->_sectionLevel._predecessors;
 
@@ -140,4 +143,5 @@ void buildConnectivity(std::shared_ptr<VasculatureProperty::Properties> properti
 
 }
 
+}
 }

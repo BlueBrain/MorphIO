@@ -8,30 +8,31 @@
 
 namespace morphio
 {
-
+namespace vasculature
+{
 class VasculatureSection
 {
-    using SectionId = VasculatureProperty::VascSection;
-    using PointAttribute = VasculatureProperty::Point;
+    using SectionId = property::VascSection;
+    using PointAttribute = property::Point;
 
 public:
-    
+
     VasculatureSection(const VasculatureSection& section);
 
     const VasculatureSection& operator=(const VasculatureSection& section);
 
-    VasculatureSection(uint32_t id, std::shared_ptr<VasculatureProperty::Properties> morphology);
+    VasculatureSection(uint32_t id, std::shared_ptr<property::Properties> morphology);
 
     bool operator==(const VasculatureSection& section) const;
     bool operator!=(const VasculatureSection& section) const;
     bool operator<(const VasculatureSection& other) const;
-    
+
     //bool isRoot() const;
-    
+
     const std::vector<VasculatureSection> predecessors() const;
-    
+
     const std::vector<VasculatureSection> successors() const;
-    
+
     const std::vector<VasculatureSection> neighbors() const;
 
     uint32_t id() const;
@@ -45,7 +46,7 @@ public:
 
     const range<const float> diameters() const;
 
-    SectionType type() const;
+    VascularSectionType type() const;
 
 protected:
 
@@ -55,10 +56,10 @@ protected:
 
     uint32_t _id;
     SectionRange _range;
-    std::shared_ptr<VasculatureProperty::Properties> _properties;
+    std::shared_ptr<property::Properties> _properties;
 };
 
 }
-
-std::ostream& operator<<(std::ostream& os, const morphio::VasculatureSection& section);
+}
+std::ostream& operator<<(std::ostream& os, const morphio::vasculature::VasculatureSection& section);
 std::ostream& operator<<(std::ostream& os, morphio::range<const morphio::Point> points);
