@@ -3,6 +3,7 @@ set(MORPHIO_SOURCES
   plugin/morphologyHDF5.cpp
   plugin/morphologySWC.cpp
   plugin/morphologyASC.cpp
+  plugin/vasc_morphologyHDF5.cpp
   mitochondria.cpp
   errorMessages.cpp
   mito_section.cpp
@@ -12,6 +13,8 @@ set(MORPHIO_SOURCES
   morphology.cpp
   soma.cpp
   section.cpp
+  vascMorphology.cpp
+  vascProperties.cpp
   vector_utils.cpp
   version.cpp
   mut/mito_iterators.cpp
@@ -23,7 +26,7 @@ set(MORPHIO_SOURCES
   mut/mitochondria.cpp
   mut/writers.cpp
   mut/modifiers.cpp
-  )
+  vascSection.cpp)
 
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/../VERSION MORPHIO_VERSION_STRING)
 configure_file (

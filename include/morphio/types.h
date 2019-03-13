@@ -23,6 +23,8 @@
 
 // TODO: bcoste fix me
 #include <iostream>
+//#include "iterators.h"
+
 #define LBTHROW(x) (throw x)
 #define LBWARN std::cerr
 
@@ -33,6 +35,7 @@ using URI = std::string;
 
 using namespace enums;
 class Morphology;
+class VasculatureMorphology;
 class MorphologyInitData;
 template <class T>
 class SectionBase;
@@ -91,6 +94,7 @@ using mito_upstream_iterator = MitoIterator<std::vector<MitoSection>>;
 using depth_iterator = Iterator<std::stack<Section>>;
 using breadth_iterator = Iterator<std::queue<std::queue<Section>>>;
 using upstream_iterator = Iterator<std::vector<Section>>;
+class graph_iterator;
 
 template <typename T>
 using range = gsl::span<T>;

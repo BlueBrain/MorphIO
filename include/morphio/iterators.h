@@ -2,8 +2,11 @@
 
 #include <queue>
 #include <stack>
+#include <set>
 
 #include <morphio/types.h>
+//#include <morphio/section.h>
+//#include <morphio/vascSection.h>
 namespace morphio {
 /**
 An iterator class to iterate through sections;
@@ -27,6 +30,27 @@ public:
     Iterator& operator++();
     Iterator operator++(int);
 };
+
+    class graph_iterator
+    {
+        friend class VasculatureSection;
+        friend class VasculatureMorphology;
+        std::set<VasculatureSection> visited;
+
+        std::stack<VasculatureSection> container;
+
+        graph_iterator();
+
+    public:
+        graph_iterator(const VasculatureSection& vasculatureSection);
+        graph_iterator(const VasculatureMorphology& vasculatureMorphology);
+        bool operator==(graph_iterator other) const;
+        bool operator!=(graph_iterator other) const;
+        VasculatureSection operator*() const;
+        graph_iterator& operator++();
+        graph_iterator operator++(int);
+    };
+
 
 // Declare the specializations
 template <>
@@ -53,5 +77,6 @@ upstream_iterator& upstream_iterator::operator++();
 extern template class Iterator<std::stack<Section>>;
 extern template class Iterator<std::queue<std::queue<Section>>>;
 extern template class Iterator<std::vector<Section>>;
+
 
 } // namespace morphio

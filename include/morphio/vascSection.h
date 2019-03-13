@@ -11,15 +11,22 @@ namespace morphio
 
 class VasculatureSection
 {
-    uint32_t _id;
-    SectionRange _range;
-    std::shared_ptr<Property::Properties> _properties;
+    using SectionId = VasculatureProperty::VascSection;
+    using PointAttribute = VasculatureProperty::Point;
 
 public:
     
     VasculatureSection(const VasculatureSection& section);
+
+    const VasculatureSection& operator=(const VasculatureSection& section);
+
+    VasculatureSection(uint32_t id, std::shared_ptr<VasculatureProperty::Properties> morphology);
+
+    bool operator==(const VasculatureSection& section) const;
+    bool operator!=(const VasculatureSection& section) const;
+    bool operator<(const VasculatureSection& other) const;
     
-    bool isRoot() const;
+    //bool isRoot() const;
     
     const std::vector<VasculatureSection> predecessors() const;
     
@@ -27,24 +34,28 @@ public:
     
     const std::vector<VasculatureSection> neighbors() const;
 
-    const uint32_t id() const;
+    uint32_t id() const;
 
-    const float length() const;
+    float length() const;
 
-    depth_iterator depth_begin() const;
-    depth_iterator depth_end() const;
-    
-    breadth_iterator breadth_begin() const;
-    breadth_iterator breadth_end() const;
-
-    upstream_iterator upstream_begin() const;
-    upstream_iterator upstream_end() const;
+    graph_iterator begin() const;
+    graph_iterator end() const;
 
     const range<const Point> points() const;
 
     const range<const float> diameters() const;
 
-    const SectionType type() const;    
+    SectionType type() const;
+
+protected:
+
+
+    template <typename Property>
+    const range<const typename Property::Type> get() const;
+
+    uint32_t _id;
+    SectionRange _range;
+    std::shared_ptr<VasculatureProperty::Properties> _properties;
 };
 
 }

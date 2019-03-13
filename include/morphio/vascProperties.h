@@ -6,71 +6,101 @@ namespace morphio
 {
 namespace VasculatureProperty
 {
+template <typename T>
+void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
 
-struct Section
+struct VascSection
 {
-    typedef std::array<int, 2> Type;
+    using Type = int;
 };
 
 struct Point
 {
-    typedef morphio::Point Type;
+    using Type = morphio::Point;
 };
 
 struct SectionType
 {
-    typedef morphio::SectionType Type;
-}
+    using Type = morphio::SectionType;
+};
 
 struct Diameter
 {
-    typedef float Type;
-}
+    using Type = float;
+};
 
-struct PointLevel
+struct Connection
+{
+    using Type = std::array<int, 2>;
+};
+
+struct VascPointLevel
 {
     std::vector<Point::Type> _points;
     std::vector<Diameter::Type> _diameters;
 
-    PointLevel() {}
-    PointLevel(std::vector<Point::Type> points,
+    VascPointLevel() {}
+    VascPointLevel(std::vector<Point::Type> points,
                std::vector<Diameter::Type> diameters);
-    PointLevel(const PointLevel& data);
-    PointLevel(const PointLevel& data, SectionRange range);
+    VascPointLevel(const VascPointLevel& data);
+    VascPointLevel(const VascPointLevel& data, SectionRange range);
 };
 
-struct EdgeLevel
+struct VascEdgeLevel
 {
     std::vector<float> leakiness;
-}
+};
 
-struct SectionLevel
+struct VascSectionLevel
 {
-    std::vector<Section::Type> _sections;
+    std::vector<VascSection::Type> _sections;
     std::vector<SectionType::Type> _sectionTypes;
-    std::map<int32_t, std::vector<uint32_t>> _predecessors;
-    std::map<int32_t, std::vector<uint32_t>> _successors;
-
-    bool operator==(const SectionLevel& other) const;
-    bool operator!=(const SectionLevel& other) const;
+    std::map<uint32_t, std::vector<uint32_t>> _predecessors;
+    std::map<uint32_t, std::vector<uint32_t>> _successors;
+    std::map<uint32_t, std::vector<uint32_t>> _neighbors;
+    bool operator==(const VascSectionLevel& other) const;
+    bool operator!=(const VascSectionLevel& other) const;
 };
 
 struct Properties
 {
-    PointLevel _pointLevel;
-    EdgeLevel _edgeLevel;
-    SectionLevel _sectionLevel;
+    VascPointLevel _pointLevel;
+    VascEdgeLevel _edgeLevel;
+    VascSectionLevel _sectionLevel;
+    std::vector<Connection::Type> _connectivity;
 
     template <typename T>
     std::vector<typename T::Type>& get();
     template <typename T>
     const std::vector<typename T::Type>& get() const;
 
-    const std::map<int32_t, std::vector<uint32_t>>& neighbors();
+    template <typename T>
+    const std::map<uint32_t, std::vector<uint32_t>>& neighbors();
+
+    template <typename T>
+    const std::map<uint32_t, std::vector<uint32_t>>& predecessors();
+
+    template <typename T>
+    const std::map<uint32_t, std::vector<uint32_t>>& successors();
 };
 
-std::ostream& operator<<(std::ostream& os, const Properties& properties);
-std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);
+template <>
+const std::map<uint32_t, std::vector<uint32_t>>& Properties::neighbors<VascSection>();
+template <>
+const std::map<uint32_t, std::vector<uint32_t>>& Properties::predecessors<VascSection>();
+template <>
+const std::map<uint32_t, std::vector<uint32_t>>& Properties::successors<VascSection>();
 
+std::ostream& operator<<(std::ostream& os, const Properties& properties);
+std::ostream& operator<<(std::ostream& os, const VascPointLevel& pointLevel);
+
+template <>
+std::vector<Point::Type>& Properties::get<Point>();
+template <>
+std::vector<VascSection::Type>& Properties::get<VascSection>();
+template <>
+const std::vector<VascSection::Type>& Properties::get<VascSection>() const;
+template <>
+std::vector<Connection::Type>& Properties::get<Connection>();
 }
 }

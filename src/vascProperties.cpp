@@ -4,7 +4,7 @@
 #include <morphio/errorMessages.h>
 #include <morphio/vascProperties.h>
 
-bool verbose = false;
+bool verbose_ = false;
 
 namespace std {
 template <typename T, size_t N>
@@ -30,11 +30,11 @@ std::vector<typename T::Type> copySpan(
     const std::vector<typename T::Type>& data, SectionRange range)
 {
     if (data.empty())
-        return std::vector<typename T::Type();
+        return std::vector<typename T::Type>();
     return std::vector<typename T::Type>(data.begin() + range.first, data.begin() + range.second);
 }
 
-PointLevel::PointLevel(std::vector<Point::Type> points,
+VascPointLevel::VascPointLevel(std::vector<Point::Type> points,
     std::vector<Diameter::Type> diameters) :
     _points(points), _diameters(diameters)
 {
@@ -43,12 +43,12 @@ PointLevel::PointLevel(std::vector<Point::Type> points,
             "Point vector have size: " + std::to_string(_points.size()) + "while Diameter vector has size: " + std::to_string(_diameters.size()));
 }
 
-PointLevel::PointLevel(const PointLevel& data)
-    : PointLevel(data._points, data._diameters)
+VascPointLevel::VascPointLevel(const VascPointLevel& data)
+    : VascPointLevel(data._points, data._diameters)
 {
 }
 
-PointLevel::PointLevel(const PointLevel& data, SectionRange range)
+VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range)
 {
     _points = copySpan<VasculatureProperty::Point>(data._points, range);
     _diameters = copySpan<VasculatureProperty::Diameter>(data._diameters, range);
@@ -56,19 +56,19 @@ PointLevel::PointLevel(const PointLevel& data, SectionRange range)
 
 template <typename T>
 bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
-    const std::string& name, bool verbose)
+    const std::string& name, bool verbose_)
 {
     if (vec1==vec2)
         return true;
 
     if (vec1.size() != vec2.size()) {
-        if (verbose)
+        if (verbose_)
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
-    if (verbose) {
+    if (verbose_) {
         LBERROR(Warning::UNDEFINED, 
             "Error comparing " + name + ", elements differ:");
         for (unsigned int i = 0; i < vec1.size(); ++i) {
@@ -80,24 +80,24 @@ bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
     return false;
 }
 
-bool compare_section_structure(const std::vector<VasculatureSection::Type>& vec1,
-    const std::vector<VasculatureSection::Type>& vec2,
-    const std::string& name, bool verbose)
+bool compare_section_structure(const std::vector<VascSection::Type>& vec1,
+    const std::vector<VascSection::Type>& vec2,
+    const std::string& name, bool verbose_)
 {
     if (vec1.size() != vec2.size()) {
-        if (verbose)
+        if (verbose_)
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     for (unsigned int i = 1; i < vec1.size(); ++i) {
-        if (vec1[i][0] - vec1[1][0] != vec2[i][0] - vec2[1][0] || vec1[i][1] != vec2[i][1]) {
-            if (verbose) {
+        if (vec1[i] - vec1[1] != vec2[i] - vec2[1]) {
+            if (verbose_) {
                 LBERROR(Warning::UNDEFINED,
                     "Error comparing " + name + ", elements differ:");
                 LBERROR(Warning::UNDEFINED,
-                    std::to_string(vec1[i][0] - vec1[1][0]) + ", " + std::to_string(vec1[i][1]) + " <--> " + std::to_string(vec2[i][0] - vec2[1][0]) + ", " + std::to_string(vec2[i][1]));
+                    std::to_string(vec1[i] - vec1[1]) + " <--> " + std::to_string(vec2[i] - vec2[1]));
             }
             return false;
         }
@@ -107,10 +107,10 @@ bool compare_section_structure(const std::vector<VasculatureSection::Type>& vec1
 
 template <typename T>
 bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
-    const std::string& name, bool verbose)
+    const std::string& name, bool verbose_)
 {
     if (vec1.size() != vec2.size()) {
-        if (verbose)
+        if (verbose_)
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
@@ -132,19 +132,19 @@ bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
 template <>
 bool compare(const morphio::range<const morphio::Point>& vec1,
     const morphio::range<const morphio::Point>& vec2,
-    const std::string& name, bool verbose)
+    const std::string& name, bool verbose_)
 {
     if (vec1.size() != vec2.size()) {
-        if (verbose)
+        if (verbose_)
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::string(vec2.size()));
+                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     const float epsilon = 1e-6;
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
-            if (verbose) {
+            if (verbose_) {
                 LBERROR(Warning::UNDEFINED,
                     "Error comparing " + name + ", elements differ:");
                 LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
@@ -158,11 +158,11 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
 
 template <typename T, typename U>
 bool compare(const std::map<T, U>& vec1, const std::map<T, U>& vec2,
-    const std::string& name, bool verbose)
+    const std::string& name, bool verbose_)
 {
     if (vec1 == vec2)
         return true;
-    if (verbose) {
+    if (verbose_) {
         if (vec1.size() != vec2.size()) {
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
@@ -172,34 +172,34 @@ bool compare(const std::map<T, U>& vec1, const std::map<T, U>& vec2,
 }
 
 template <typename T>
-bool compare(const T& el1, const T& el2, const std::string& name, bool verbose)
+bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
 {
     if (el1 == el2)
         return true;
 
-    if (verbose)
+    if (verbose_)
         LBERROR(Warning::UNDEFINED, name + " differs");
     return false;
 }
 
-bool SectionLevel::operator==(const SectionLevel& other) const
+bool VascSectionLevel::operator==(const VascSectionLevel& other) const
 {
-    return this == &other || (compare_section_structure(this->sections, other._sections, "_sections", verbose) && compare(this->sectionTypes, other._sectionTypes, "_sectionTypes", verbose) && compare(this->neighbors, other._neighbors,"_neighbors", verbose));
+    return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose_) && compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose_) && compare(this->_neighbors, other._neighbors,"_neighbors", verbose_));
 }
 
-bool SectionLevel::operator!=(const SectionLevel& other) const
+bool VascSectionLevel::operator!=(const VascSectionLevel& other) const
 {
     return !(this->operator==(other));
 }
 
 template <>
-std::vector<VasculatureSection::Type>& Properties::get<VasculatureSection>()
+std::vector<VascSection::Type>& Properties::get<VascSection>()
 {
     return _sectionLevel._sections;
 }
 
 template <>
-const std::vector<VasculatureSection::Type>& Properties::get<VasculatureSection>() const
+const std::vector<VascSection::Type>& Properties::get<VascSection>() const
 {
     return _sectionLevel._sections;
 }
@@ -217,13 +217,19 @@ const std::vector<Point::Type>& Properties::get<Point>() const
 }
 
 template <>
+std::vector<Connection::Type>& Properties::get<Connection>()
+{
+    return _connectivity;
+}
+
+template <>
 std::vector<SectionType::Type>& Properties::get<SectionType>()
 {
     return _sectionLevel._sectionTypes;
 }
 
 template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>() const
+const std::vector<SectionType::Type>& Properties::get<SectionType>() const
 {
     return _sectionLevel._sectionTypes;
 }
@@ -241,12 +247,24 @@ const std::vector<Diameter::Type>& Properties::get<Diameter>() const
 }
 
 template <>
-const std::map<int32_t, std::vector<uint32_t>>& Properties::neighbors<VasculatureSection>()
+const std::map<uint32_t, std::vector<uint32_t>>& Properties::neighbors<VascSection>()
 {
     return _sectionLevel._neighbors;
 }
 
-std::ostream& operator<<(std::ostream& os, const PointLevel& prop)
+template <>
+const std::map<uint32_t, std::vector<uint32_t>>& Properties::predecessors<VascSection>()
+{
+    return _sectionLevel._predecessors;
+}
+
+template <>
+const std::map<uint32_t, std::vector<uint32_t>>& Properties::successors<VascSection>()
+{
+    return _sectionLevel._successors;
+}
+
+std::ostream& operator<<(std::ostream& os, const VascPointLevel& prop)
 {
     os << "Point level properties:" << std::endl;
     os << "Point diameter"
@@ -254,8 +272,6 @@ std::ostream& operator<<(std::ostream& os, const PointLevel& prop)
        << std::endl;
     for (unsigned int i = 0; i < prop._points.size(); ++i) {
         os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i];
-        if (prop._diameters.size() == prop._points.size())
-            os << ' ' << prop._diameters[i];
         os << std::endl;
     }
     return os;
@@ -264,9 +280,15 @@ std::ostream& operator<<(std::ostream& os, const PointLevel& prop)
 std::ostream& operator<<(std::ostream& os, const Properties& properties)
 {
     os << properties._pointLevel << std::endl;
-    os << properties._sectionLevel << std::endl;
+    //os << properties._sectionLevel << std::endl;
     return os;
 }
+
+template void _appendVector(std::vector<float>&, std::vector<float> const&, int);
+template void _appendVector(std::vector<std::array<float, 3ul>>&,
+        std::vector<std::array<float, 3ul>> const&, int);
+template void _appendVector(std::vector<unsigned int>&,
+        std::vector<unsigned int> const&, int);
 
 }
 }

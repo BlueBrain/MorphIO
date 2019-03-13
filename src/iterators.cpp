@@ -1,8 +1,10 @@
 #include <morphio/iterators.h>
 #include <morphio/section.h>
+#include <morphio/vascSection.h>
 
 namespace morphio {
 class Section;
+class VasculatureSection;
 
 template <typename T>
 Iterator<T>::Iterator(const Section& section)
@@ -36,6 +38,17 @@ breadth_iterator::Iterator(const Morphology& morphology)
     }
 }
 
+graph_iterator::graph_iterator(const VasculatureSection& vasculatureSection)
+{
+    container.push(vasculatureSection);
+}
+
+graph_iterator::graph_iterator(const VasculatureMorphology& vasculatureMorphology)
+{
+    auto sections = vasculatureMorphology.sections();
+    container.push(sections[0]);
+}
+
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 template <>
 upstream_iterator::Iterator(const Morphology& morphology)
@@ -54,6 +67,16 @@ bool Iterator<T>::operator!=(Iterator other) const
     return !(*this == other);
 }
 
+bool graph_iterator::operator==(graph_iterator other) const
+{
+    return container == other.container;
+}
+
+bool graph_iterator::operator!=(graph_iterator other) const
+{
+    return !(*this == other);
+}
+
 template <typename T>
 Iterator<T> Iterator<T>::operator++(int)
 {
@@ -65,6 +88,15 @@ Iterator<T> Iterator<T>::operator++(int)
 template <typename T>
 Iterator<T>::Iterator()
 {
+}
+
+graph_iterator::graph_iterator() {}
+
+graph_iterator graph_iterator::operator++(int)
+{
+    graph_iterator retval = *this;
+    ++(*this);
+    return retval;
 }
 
 // Specializations
@@ -82,6 +114,11 @@ template <>
 Section upstream_iterator::operator*() const
 {
     return container[0];
+}
+
+VasculatureSection graph_iterator::operator*() const
+{
+    return container.top();
 }
 
 template <>
@@ -125,6 +162,21 @@ upstream_iterator& upstream_iterator::operator++()
     return *this;
 }
 
+
+graph_iterator& graph_iterator::operator++()
+{
+    const auto& section = *(*this);
+    container.pop();
+    auto& neighbors = section.neighbors();
+    for (auto it = neighbors.rbegin(); it != neighbors.rend(); ++it)
+        if (visited.find(*it) == visited.end()) {
+            container.push(*it);
+            visited.insert(*it);
+        }
+    return *this;
+}
+
+// Instantiations
 template class Iterator<std::stack<Section>>;
 template class Iterator<std::queue<std::queue<Section>>>;
 template class Iterator<std::vector<Section>>;

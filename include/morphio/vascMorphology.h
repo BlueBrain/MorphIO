@@ -4,8 +4,7 @@
 #include <morphio/vascProperties.h>
 #include <morphio/types.h>
 
-namespace morphio
-{
+namespace morphio {
 
 class VasculatureMorphology
 {
@@ -16,9 +15,12 @@ public:
     VasculatureMorphology(VasculatureMorphology&&);
     VasculatureMorphology& operator=(VasculatureMorphology&&);
 
-    explicit VasculatureMorphology(const URI& source);
+    bool operator==(const VasculatureMorphology& other) const;
+    bool operator!=(const VasculatureMorphology& other) const;
+
+    VasculatureMorphology(const URI& source, unsigned int options = NO_MODIFIER);
     
-    const std::vector<VasculatureSection> rootSections() const;
+    //const std::vector<VasculatureSection> rootSections() const;
 
     const std::vector<VasculatureSection> sections() const;
 
@@ -30,19 +32,15 @@ public:
 
     const std::vector<SectionType>& sectionTypes() const;
 
-    depth_iterator depth_begin() const;
-    depth_iterator depth_end() const;
-
-    breadth_iterator breadth_begin() const;
-    breadth_iterator breadth_end() const;
+    graph_iterator begin() const;
+    graph_iterator end() const;
 
 private:
-    
-    std::shared_ptr<VasculatureProperty::Properties> _ properties;
+
+    std::shared_ptr<VasculatureProperty::Properties> _properties;
 
     template <typename Property>
     const std::vector<typename Property::Type>& get() const;
 
-}
-
-}
+};
+} // namespace morphio
