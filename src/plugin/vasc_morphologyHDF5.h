@@ -11,7 +11,6 @@ namespace morphio {
 namespace plugin {
 namespace h5 {
 using namespace morphio::vasculature;
-property::Properties load_vasc(const URI& uri);
 
 class VasculatureMorphologyHDF5
 {

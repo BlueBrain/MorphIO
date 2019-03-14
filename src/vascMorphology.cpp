@@ -33,7 +33,7 @@ VasculatureMorphology::VasculatureMorphology(const morphio::URI &source, unsigne
 
     auto loader = [&source, &options, &extension]() {
         if (extension == ".h5")
-            return plugin::h5::load_vasc(source);
+            return plugin::h5::VasculatureMorphologyHDF5().load(source);
         //if (extension == ".swc")
         //    return plugin::swc::load(source, options);
         LBTHROW(UnknownFileType(

@@ -6,17 +6,6 @@
 
 constexpr bool VERBOSE = false;
 
-namespace std {
-template <typename T, size_t N>
-string to_string(const array<T, N>& a)
-{
-    string res;
-    for (auto el : a)
-        res += to_string(el) + ", ";
-    return res;
-}
-} // namespace std
-
 namespace morphio {
 namespace Property {
 template <typename T>

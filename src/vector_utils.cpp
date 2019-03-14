@@ -162,3 +162,16 @@ std::ostream& operator<<(std::ostream& os, const morphio::Point& point)
     os << morphio::dumpPoint(point);
     return os;
 }
+
+namespace std {
+    template <typename T, size_t N>
+    string to_string(const array<T, N>& a)
+    {
+        string res;
+        for (auto el : a)
+            res += to_string(el) + ", ";
+        return res;
+    }
+    template string to_string<float, 3>(const array<float, 3>&);
+} // namespace std
+

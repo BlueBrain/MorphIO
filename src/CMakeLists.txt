@@ -13,6 +13,7 @@ set(MORPHIO_SOURCES
   morphology.cpp
   soma.cpp
   section.cpp
+  vascSection.cpp
   vascMorphology.cpp
   vascProperties.cpp
   vector_utils.cpp
@@ -25,8 +26,7 @@ set(MORPHIO_SOURCES
   mut/morphology.cpp
   mut/mitochondria.cpp
   mut/writers.cpp
-  mut/modifiers.cpp
-  vascSection.cpp)
+  mut/modifiers.cpp)
 
 file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/../VERSION MORPHIO_VERSION_STRING)
 configure_file (

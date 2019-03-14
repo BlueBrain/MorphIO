@@ -32,6 +32,12 @@ inline AtomicType<morphio::SectionType>::AtomicType()
 }
 
 template <>
+inline AtomicType<morphio::VascularSectionType>::AtomicType()
+{
+    _hid = H5Tcopy(H5T_NATIVE_INT);
+}
+
+template <>
 inline AtomicType<morphio::MorphologyVersion>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);

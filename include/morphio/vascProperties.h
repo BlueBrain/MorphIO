@@ -13,6 +13,7 @@ void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
 
 struct VascSection
 {
+    // offset
     using Type = int;
 };
 
@@ -23,6 +24,7 @@ struct Point
 
 struct SectionType
 {
+    // stores section types for vasculature
     using Type = morphio::VascularSectionType;
 };
 

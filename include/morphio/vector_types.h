@@ -48,3 +48,8 @@ std::ostream& operator<<(std::ostream& os,
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
 std::ostream& operator<<(std::ostream& os,
     const std::vector<morphio::Point>& points);
+
+namespace std {
+    template <typename T, size_t N>
+    string to_string(const array<T, N>& a);
+} // namespace std

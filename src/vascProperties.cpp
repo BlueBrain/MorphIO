@@ -3,19 +3,9 @@
 
 #include <morphio/errorMessages.h>
 #include <morphio/vascProperties.h>
+#include <morphio/properties.h>
 
 bool verbose_ = false;
-
-namespace std {
-template <typename T, size_t N>
-string to_string(const array<T, N>& a)
-{
-    string res;
-    for (auto e1 : a)
-        res += to_string(e1) + ", ";
-    return res;
-}
-}
 
 namespace morphio {
 namespace vasculature {

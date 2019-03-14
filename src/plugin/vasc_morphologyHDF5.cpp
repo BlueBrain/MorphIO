@@ -1,15 +1,13 @@
 #include "vasc_morphologyHDF5.h"
 
+#include "../detail/utilsHDF5.h"
+
 #include <iostream>
 
 namespace morphio {
 namespace plugin {
 namespace h5 {
 using namespace vasculature;
-property::Properties load_vasc(const URI& uri)
-{
-    return VasculatureMorphologyHDF5().load(uri);
-}
 
 property::Properties VasculatureMorphologyHDF5::load(const URI& uri)
 {
@@ -98,7 +96,7 @@ void VasculatureMorphologyHDF5::_readSections()
 
 void VasculatureMorphologyHDF5::_readSectionTypes()
 {
-    auto& types = _properties.get<property::SectionType>();
+    std::vector<VascularSectionType> & types = _properties.get<property::SectionType>();
 
     auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
     types.resize(_sectionsDims[0]);
