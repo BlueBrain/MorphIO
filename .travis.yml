@@ -13,7 +13,6 @@ language: c++
 sudo: required
 python:
   - 2.7
-  # - 3.5
   - 3.6
 # addons:
 #   apt:
@@ -23,6 +22,7 @@ python:
 #     sources: &sources
 #       - llvm-toolchain-precise-3.8
 #       - ubuntu-toolchain-r-test
+
 before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
   - pip install virtualenv
