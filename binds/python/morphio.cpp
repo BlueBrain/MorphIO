@@ -21,6 +21,7 @@
 #include "bind_misc.cpp"
 #include "bind_immutable.cpp"
 #include "bind_mutable.cpp"
+#include "bind_vasculature.cpp"
 
 namespace py = pybind11;
 using namespace py::literals;
@@ -28,6 +29,7 @@ using namespace py::literals;
 #pragma GCC diagnostic ignored "-Wmissing-prototypes"
 PYBIND11_MODULE(morphio, m) {
     bind_misc(m);
+    bind_vasculature(m);
     bind_immutable_module(m);
 
     py::module mut_module = m.def_submodule("mut");
