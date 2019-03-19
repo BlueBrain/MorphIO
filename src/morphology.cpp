@@ -1,6 +1,5 @@
 #include <cassert>
 #include <iostream>
-#include <unistd.h>
 
 #include <fstream>
 #include <streambuf>
@@ -26,8 +25,12 @@ Morphology::Morphology(const URI& source, unsigned int options)
     if (pos == std::string::npos)
         LBTHROW(UnknownFileType("File has no extension"));
 
-    if (access(source.c_str(), F_OK) == -1)
+    // Cross-platform check of file existance
+    std::ifstream file(source.c_str());
+    if (!file)
+    {
         LBTHROW(RawDataError("File: " + source + " does not exist."));
+    }
 
     std::string extension;
 
