@@ -1,7 +1,7 @@
 #pragma once
 
 #include <morphio/section_base.h>
-#include <morphio/iterators.h>
+//#include <morphio/iterators.h>
 #include <morphio/vasc/morphology.h>
 #include <morphio/vasc/properties.h>
 #include <morphio/types.h>
