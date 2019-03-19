@@ -32,17 +32,14 @@ Morphology::Morphology(const URI& source, unsigned int options)
         LBTHROW(RawDataError("File: " + source + " does not exist."));
     }
 
-    std::string extension;
-
-    for (auto& c : source.substr(pos))
-        extension += std::tolower(c);
+    std::string extension = source.substr(pos);
 
     auto loader = [&source, &options, &extension]() {
-        if (extension == ".h5")
+        if (extension == ".h5" || extension == ".H5")
             return plugin::h5::load(source);
-        if (extension == ".asc")
+        if (extension == ".asc" || extension == ".ASC")
             return plugin::asc::load(source, options);
-        if (extension == ".swc")
+        if (extension == ".swc" || extension == ".SWC")
             return plugin::swc::load(source, options);
         LBTHROW(UnknownFileType(
             "Unhandled file type: only SWC, ASC and H5 are supported"));
