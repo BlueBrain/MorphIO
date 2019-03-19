@@ -19,7 +19,7 @@ property::Properties VasculatureMorphologyHDF5::load(const URI& uri)
                                       ? "Could not create vasculature file "
                                       : "Could not open vasculature file " + uri + ": " + exc.what()));
     }
-    _resolve();
+    _readDatasets();
     _readSections();
     _readPoints();
     _readSectionTypes();
@@ -36,7 +36,7 @@ VasculatureMorphologyHDF5::~VasculatureMorphologyHDF5()
     _file.reset();
 }
 
-void VasculatureMorphologyHDF5::_resolve()
+void VasculatureMorphologyHDF5::_readDatasets()
 {
     HighFive::SilenceHDF5 silence;
     _points.reset(new HighFive::DataSet(_file->getDataSet("/points")));

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <morphio/vascProperties.h>
+#include <morphio/vasc/properties.h>
 #include <morphio/types.h>
 
 #include <highfive/H5DataSet.hpp>
@@ -19,7 +19,7 @@ public:
     property::Properties load(const URI& uri);
 
 private:
-    void _resolve();
+    void _readDatasets();
     //HighFive::DataSet _getStructureDataSet(size_t nSections);
     void _readPoints();
     void _readSections();

@@ -8,9 +8,6 @@ namespace vasculature
 {
 namespace property
 {
-template <typename T>
-void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
-
 struct VascSection
 {
     // offset

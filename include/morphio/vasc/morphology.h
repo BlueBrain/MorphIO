@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include <morphio/vascProperties.h>
+#include <morphio/vasc/properties.h>
 #include <morphio/types.h>
 
 namespace morphio {

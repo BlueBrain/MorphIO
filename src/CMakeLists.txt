@@ -13,9 +13,9 @@ set(MORPHIO_SOURCES
   morphology.cpp
   soma.cpp
   section.cpp
-  vascSection.cpp
-  vascMorphology.cpp
-  vascProperties.cpp
+  vasc/section.cpp
+  vasc/morphology.cpp
+  vasc/properties.cpp
   vector_utils.cpp
   version.cpp
   mut/mito_iterators.cpp

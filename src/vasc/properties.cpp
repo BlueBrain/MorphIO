@@ -2,7 +2,7 @@
 #include <cmath>
 
 #include <morphio/errorMessages.h>
-#include <morphio/vascProperties.h>
+#include <morphio/vasc/properties.h>
 #include <morphio/properties.h>
 
 bool verbose_ = false;
@@ -10,20 +10,6 @@ bool verbose_ = false;
 namespace morphio {
 namespace vasculature {
 namespace property {
-template <typename T> // resuse from property ?
-void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset)
-{
-    to.insert(to.end(), from.begin() + offset, from.end());
-}
-
-template <typename T>
-std::vector<typename T::Type> copySpan(
-    const std::vector<typename T::Type>& data, SectionRange range)
-{
-    if (data.empty())
-        return std::vector<typename T::Type>();
-    return std::vector<typename T::Type>(data.begin() + range.first, data.begin() + range.second);
-}
 
 VascPointLevel::VascPointLevel(std::vector<Point::Type> points,
     std::vector<Diameter::Type> diameters) :
@@ -41,8 +27,8 @@ VascPointLevel::VascPointLevel(const VascPointLevel& data)
 
 VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range)
 {
-    _points = copySpan<property::Point>(data._points, range);
-    _diameters = copySpan<property::Diameter>(data._diameters, range);
+    _points = morphio::Property::copySpan<property::Point>(data._points, range);
+    _diameters = morphio::Property::copySpan<property::Diameter>(data._diameters, range);
 }
 
 template <typename T>
@@ -274,13 +260,6 @@ std::ostream& operator<<(std::ostream& os, const Properties& properties)
     //os << properties._sectionLevel << std::endl;
     return os;
 }
-
-template void _appendVector(std::vector<float>&, std::vector<float> const&, int);
-template void _appendVector(std::vector<std::array<float, 3ul>>&,
-        std::vector<std::array<float, 3ul>> const&, int);
-template void _appendVector(std::vector<unsigned int>&,
-        std::vector<unsigned int> const&, int);
-
 }
 }
 }

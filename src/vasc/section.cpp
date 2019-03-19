@@ -1,5 +1,5 @@
-#include <morphio/vascMorphology.h>
-#include <morphio/vascSection.h>
+#include <morphio/vasc/morphology.h>
+#include <morphio/vasc/section.h>
 #include <morphio/vector_types.h>
 
 namespace morphio {
@@ -127,9 +127,7 @@ const range<const float> VasculatureSection::diameters() const
 
 bool VasculatureSection::operator<(const VasculatureSection& other) const
 {
-    if (this->_id > other.id())
-        return true;
-    return false;
+    return this->_id > other.id();
 }
 
 graph_iterator VasculatureSection::begin() const

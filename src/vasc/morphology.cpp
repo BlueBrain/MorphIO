@@ -5,11 +5,11 @@
 #include <fstream>
 #include <streambuf>
 
-#include <morphio/vascMorphology.h>
-#include <morphio/vascSection.h>
+#include <morphio/vasc/morphology.h>
+#include <morphio/vasc/section.h>
 
-#include "plugin/vasc_morphologyHDF5.h"
-#include "plugin/morphologySWC.h"
+#include "../plugin/vasc_morphologyHDF5.h"
+#include "../plugin/morphologySWC.h"
 
 namespace morphio {
 namespace vasculature
@@ -34,8 +34,6 @@ VasculatureMorphology::VasculatureMorphology(const morphio::URI &source, unsigne
     auto loader = [&source, &options, &extension]() {
         if (extension == ".h5")
             return plugin::h5::VasculatureMorphologyHDF5().load(source);
-        //if (extension == ".swc")
-        //    return plugin::swc::load(source, options);
         LBTHROW(UnknownFileType(
                 "Unhandled file type"));
     };
@@ -52,11 +50,7 @@ VasculatureMorphology::~VasculatureMorphology() {}
 
 bool VasculatureMorphology::operator==(const VasculatureMorphology& other) const
 {
-    if (this->_properties == other._properties)
-        return true;
-    else
-        return false;
-    //return (this->_properties && other._properties && *(this->_properties) == *(other._properties))
+    return this->_properties == other._properties;
 }
 
 bool VasculatureMorphology::operator!=(const morphio::vasculature::VasculatureMorphology& other) const
@@ -68,24 +62,7 @@ const VasculatureSection VasculatureMorphology::section(const uint32_t& id) cons
 {
     return VasculatureSection(id, _properties);
 }
-/*
-const std::vector<VasculatureSection> VasculatureMorphology::rootSections() const
-{
-    std::vector<VasculatureSection> result;
-    try {
-        const std::map<uint32_t, std::vector<uint32_t>> section_map = _properties->predecessors<morphio::VasculatureProperty::VascSection>();
-        const std::vector<int> sections = _properties->get<morphio::VasculatureProperty::VascSection>();
-        std::cout << "sections read in " << sections.size() << std::endl;
-        for (int i = 0 ; i < sections.size(); ++i) {
-            if (section_map.find(sections[i]) == section_map.end())
-                result.push_back(section(sections[i]));
-        }
-        return result;
-    } catch (const std::out_of_range& oor) {
-        return result;
-    }
-}
-*/
+
 const std::vector<VasculatureSection> VasculatureMorphology::sections() const
 {
     std::vector<VasculatureSection> sections;

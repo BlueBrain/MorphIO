@@ -1,6 +1,6 @@
 #include <morphio/iterators.h>
 #include <morphio/section.h>
-#include <morphio/vascSection.h>
+#include <morphio/vasc/section.h>
 
 namespace morphio {
 
