@@ -5,8 +5,8 @@
 #include <set>
 
 #include <morphio/types.h>
-//#include <morphio/section.h>
-//#include <morphio/vascSection.h>
+#include <morphio/vasc/section.h>
+
 namespace morphio {
 /**
 An iterator class to iterate through sections;
