@@ -4,6 +4,7 @@
 #include <morphio/errorMessages.h>
 #include <morphio/vasc/properties.h>
 #include <morphio/properties.h>
+#include <morphio/shared_utils.tpp>
 
 bool verbose_ = false;
 
@@ -27,8 +28,8 @@ VascPointLevel::VascPointLevel(const VascPointLevel& data)
 
 VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range)
 {
-    _points = morphio::Property::copySpan<property::Point>(data._points, range);
-    _diameters = morphio::Property::copySpan<property::Diameter>(data._diameters, range);
+    _points = copySpan<property::Point>(data._points, range);
+    _diameters = copySpan<property::Diameter>(data._diameters, range);
 }
 
 template <typename T>

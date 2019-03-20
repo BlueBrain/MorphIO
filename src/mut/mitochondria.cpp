@@ -1,6 +1,7 @@
 #include <morphio/mut/mito_iterators.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/writers.h>
+#include <morphio/shared_utils.tpp>
 
 namespace morphio {
 namespace mut {
@@ -61,10 +62,10 @@ static void _appendMitoProperties(Property::MitochondriaPointLevel& to,
     const Property::MitochondriaPointLevel& from,
     int offset = 0)
 {
-    Property::_appendVector(to._sectionIds, from._sectionIds, offset);
-    Property::_appendVector(to._relativePathLengths, from._relativePathLengths,
+    _appendVector(to._sectionIds, from._sectionIds, offset);
+    _appendVector(to._relativePathLengths, from._relativePathLengths,
         offset);
-    Property::_appendVector(to._diameters, from._diameters, offset);
+    _appendVector(to._diameters, from._diameters, offset);
 }
 
 const std::vector<std::shared_ptr<MitoSection>> Mitochondria::children(

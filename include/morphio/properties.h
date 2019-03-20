@@ -23,6 +23,7 @@
 
 namespace morphio {
 namespace Property {
+    /*
 template <typename T>
 void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
 extern template void _appendVector(std::vector<Point>& to, const std::vector<Point>& from, int offset);
@@ -30,7 +31,7 @@ extern template void _appendVector(std::vector<float>& to, const std::vector<flo
 extern template void _appendVector(std::vector<unsigned int>& to, const std::vector<unsigned int>& from, int offset);
 template <typename T>
 std::vector<typename T::Type> copySpan(const std::vector<typename T::Type>& data, SectionRange range);
-
+*/
 struct Section
 {
     // (offset, parent index)

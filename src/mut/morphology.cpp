@@ -10,6 +10,7 @@
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 #include <morphio/soma.h>
+#include <morphio/shared_utils.tpp>
 
 namespace morphio {
 namespace mut {
@@ -248,11 +249,11 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
 void _appendProperties(Property::PointLevel& to,
     const Property::PointLevel& from, int offset = 0)
 {
-    Property::_appendVector(to._points, from._points, offset);
-    Property::_appendVector(to._diameters, from._diameters, offset);
+    _appendVector(to._points, from._points, offset);
+    _appendVector(to._diameters, from._diameters, offset);
 
     if (!from._perimeters.empty())
-        Property::_appendVector(to._perimeters, from._perimeters, offset);
+        _appendVector(to._perimeters, from._perimeters, offset);
 }
 
 void Morphology::sanitize()
@@ -290,16 +291,16 @@ void Morphology::sanitize(const morphio::plugin::DebugInfo& debugInfo)
             addAnnotation(morphio::Property::Annotation(morphio::AnnotationType::SINGLE_CHILD, sectionId,
                 section_->properties(), "", debugInfo.getLineNumber(parentId)));
 
-            morphio::Property::_appendVector(parent->points(),
+            morphio::_appendVector(parent->points(),
                 section_->points(),
                 duplicate ? 1 : 0);
 
-            morphio::Property::_appendVector(parent->diameters(),
+            morphio::_appendVector(parent->diameters(),
                 section_->diameters(),
                 duplicate ? 1 : 0);
 
             if (!parent->perimeters().empty())
-                morphio::Property::_appendVector(parent->perimeters(),
+                morphio::_appendVector(parent->perimeters(),
                     section_->perimeters(),
                     duplicate ? 1 : 0);
 

@@ -3,26 +3,12 @@
 
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
+#include <morphio/shared_utils.tpp>
 
 constexpr bool VERBOSE = false;
 
 namespace morphio {
 namespace Property {
-template <typename T>
-void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset)
-{
-    to.insert(to.end(), from.begin() + offset, from.end());
-}
-
-template <typename T>
-std::vector<typename T::Type> copySpan(
-    const std::vector<typename T::Type>& data, SectionRange range)
-{
-    if (data.empty())
-        return std::vector<typename T::Type>();
-    return std::vector<typename T::Type>(data.begin() + static_cast<long int>(range.first),
-        data.begin() + static_cast<long int>(range.second));
-}
 
 MitochondriaPointLevel::MitochondriaPointLevel(
     const MitochondriaPointLevel& data, SectionRange range)
@@ -465,17 +451,6 @@ std::ostream& operator<<(std::ostream& os, const Properties& properties)
     return os;
 }
 
-template void _appendVector(std::vector<float>&, std::vector<float> const&,
-    int);
-template void _appendVector(std::vector<std::array<float, 3ul>>&,
-    std::vector<std::array<float, 3ul>> const&, int);
-template void _appendVector(std::vector<unsigned int>&,
-    std::vector<unsigned int> const&, int);
 
-
-template std::vector<morphio::vasculature::property::Point::Type> copySpan<morphio::vasculature::property::Point>(
-            const std::vector<morphio::vasculature::property::Point::Type>&, SectionRange);
-template std::vector<morphio::vasculature::property::Diameter::Type> copySpan<morphio::vasculature::property::Diameter>(
-            const std::vector<morphio::vasculature::property::Diameter::Type>&, SectionRange);
 } // namespace Property
 } // namespace morphio
