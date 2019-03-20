@@ -8,9 +8,9 @@
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
-#include <morphio/vascSection.h>
-#include <morphio/vascProperties.h>
-#include <morphio/vascMorphology.h>
+#include <morphio/vasc/section.h>
+#include <morphio/vasc/properties.h>
+#include <morphio/vasc/morphology.h>
 
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>

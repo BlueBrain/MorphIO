@@ -472,5 +472,10 @@ template void _appendVector(std::vector<std::array<float, 3ul>>&,
 template void _appendVector(std::vector<unsigned int>&,
     std::vector<unsigned int> const&, int);
 
+
+template std::vector<morphio::vasculature::property::Point::Type> copySpan<morphio::vasculature::property::Point>(
+            const std::vector<morphio::vasculature::property::Point::Type>&, SectionRange);
+template std::vector<morphio::vasculature::property::Diameter::Type> copySpan<morphio::vasculature::property::Diameter>(
+            const std::vector<morphio::vasculature::property::Diameter::Type>&, SectionRange);
 } // namespace Property
 } // namespace morphio
