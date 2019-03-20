@@ -1,6 +1,5 @@
-#include <morphio/vasc/morphology.h>
 #include <morphio/vasc/section.h>
-#include <morphio/vector_types.h>
+#include <morphio/iterators.h>
 
 namespace morphio {
 namespace vasculature {

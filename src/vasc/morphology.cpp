@@ -7,6 +7,7 @@
 
 #include <morphio/vasc/morphology.h>
 #include <morphio/vasc/section.h>
+#include <morphio/iterators.h>
 
 #include "../plugin/vasc_morphologyHDF5.h"
 #include "../plugin/morphologySWC.h"
