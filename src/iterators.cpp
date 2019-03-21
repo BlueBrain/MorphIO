@@ -47,8 +47,12 @@ graph_iterator::graph_iterator(const vasculature::VasculatureSection& vasculatur
 graph_iterator::graph_iterator(const vasculature::VasculatureMorphology& vasculatureMorphology)
 {
     auto sections = vasculatureMorphology.sections();
-    if (!sections.empty())
-        container.push(sections[0]);
+    for (std::size_t i = 0; i < sections.size(); ++i) {
+        if (sections[i].predecessors().empty()) {
+            container.push(sections[i]);
+            visited.insert(sections[i]);
+        }
+    }
 }
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"

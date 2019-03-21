@@ -67,7 +67,7 @@ const VasculatureSection VasculatureMorphology::section(const uint32_t& id) cons
 const std::vector<VasculatureSection> VasculatureMorphology::sections() const
 {
     std::vector<VasculatureSection> sections;
-    for (uint i = 1; i < _properties->get<property::VascSection>().size(); ++i) {
+    for (uint i = 0; i < _properties->get<property::VascSection>().size(); ++i) {
         sections.push_back(section(i));
     }
     return sections;

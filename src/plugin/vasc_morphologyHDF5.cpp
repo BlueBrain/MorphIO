@@ -69,7 +69,6 @@ void VasculatureMorphologyHDF5::_readPoints()
 
     std::vector<std::vector<float>> vec;
     vec.resize(_pointsDims[0]);
-    std::cout << _pointsDims[0] << std::endl;
     _points->read(vec);
     for (unsigned int i = 0; i < vec.size(); ++i) {
         const auto& p = vec[i];
@@ -86,7 +85,6 @@ void VasculatureMorphologyHDF5::_readSections()
 
     std::vector<int> vec;
     vec.resize(_sectionsDims[0]);
-    std::cout << _sectionsDims[0] << std::endl;
     selection.read(vec);
 
     for (auto p : vec) {
@@ -101,7 +99,6 @@ void VasculatureMorphologyHDF5::_readSectionTypes()
     auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
     types.resize(_sectionsDims[0]);
     selection.read(types);
-    types.erase(types.begin());
 }
 
 void VasculatureMorphologyHDF5::_readConnectivity()
