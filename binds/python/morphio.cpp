@@ -29,10 +29,11 @@ using namespace py::literals;
 #pragma GCC diagnostic ignored "-Wmissing-prototypes"
 PYBIND11_MODULE(morphio, m) {
     bind_misc(m);
-    bind_vasculature(m);
     bind_immutable_module(m);
 
     py::module mut_module = m.def_submodule("mut");
-
     bind_mutable_module(mut_module);
+
+    py::module vasc_module = m.def_submodule("vasculature");
+    bind_vasculature(vasc_module);
 }
