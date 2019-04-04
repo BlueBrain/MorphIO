@@ -19,3 +19,14 @@ install(
     DIRECTORY include/morphio
     DESTINATION include
     )
+
+install(
+  EXPORT MorphIOTargets
+  NAMESPACE MorphIO::
+  DESTINATION lib/cmake/MorphIO
+  )
+
+install(
+  FILES ${CMAKE_CURRENT_LIST_DIR}/CMake/MorphIOConfig.cmake
+  DESTINATION lib/cmake/MorphIO
+  )

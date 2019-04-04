@@ -61,7 +61,8 @@ set_target_properties(morphio_obj
 
 add_library(morphio_static STATIC $<TARGET_OBJECTS:morphio_obj>)
 add_library(morphio_shared SHARED $<TARGET_OBJECTS:morphio_obj>)
-set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio")
+set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio"
+                                                EXPORT_NAME "morphio")
 
 target_link_libraries(morphio_static PUBLIC gsl-lite PRIVATE HighFive lexertl)
 target_link_libraries(morphio_shared PUBLIC gsl-lite PRIVATE HighFive lexertl)
@@ -69,5 +70,7 @@ target_link_libraries(morphio_shared PUBLIC gsl-lite PRIVATE HighFive lexertl)
 install(
   # DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   TARGETS morphio_shared
-  DESTINATION lib
+  EXPORT MorphIOTargets
+  LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include
   )
