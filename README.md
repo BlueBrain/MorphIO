@@ -61,12 +61,20 @@ module load gcc/5.4.0 nix/cmake/3.9.6
 
 #### Install as a c++ library
 
+For manual installation:
 ```shell
 git clone git@github.com:bluebrain/morphio.git --recursive
 cd morphio
 mkdir build && cd build
 cmake ..
 make
+```
+
+To use the installed library:
+```CMake
+find_package(MorphIO REQUIRED)
+
+target_link_libraries(mylib MorphIO::morphio)
 ```
 
 #### Install as a Python package
