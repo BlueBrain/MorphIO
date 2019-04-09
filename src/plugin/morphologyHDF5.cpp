@@ -188,7 +188,7 @@ HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections)
     }
 }
 
-void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
+void MorphologyHDF5::_readPoints(int firstSectionOffset)
 {
     auto& points = _properties.get<Property::Point>();
     auto& diameters = _properties.get<Property::Diameter>();
@@ -213,35 +213,53 @@ void MorphologyHDF5::_readPoints(unsigned int firstSectionOffset)
                 "Reading morphology file '" + _file->getName() + "': bad number of dimensions in 'points' dataspace"));
         }
         std::vector<std::vector<float>> vec(dims[0]);
-        // points.resize(dims[0]);
         dataset.read(vec);
-        bool noNeurites = (firstSectionOffset == -1);
-        for (unsigned int i = 0; i < vec.size(); ++i) {
-            const auto& p = vec[i];
-            if (noNeurites || i < firstSectionOffset) {
-                somaPoints.push_back({p[0], p[1], p[2]});
-                somaDiameters.push_back(p[3]);
-            } else {
-                points.push_back({p[0], p[1], p[2]});
-                diameters.push_back(p[3]);
-            }
+
+        if (firstSectionOffset < 0) {
+            firstSectionOffset = vec.size();
         }
+
+        somaPoints.reserve(somaPoints.size() + firstSectionOffset);
+        somaDiameters.reserve(somaDiameters.size() + firstSectionOffset);
+        for (std::size_t i = 0; i < firstSectionOffset; ++i) {
+            const auto& p = vec[i];
+            somaPoints.emplace_back(Point{p[0], p[1], p[2]});
+            somaDiameters.emplace_back(p[3]);
+        }
+
+        points.reserve(points.size() + vec.size() - firstSectionOffset);
+        diameters.reserve(diameters.size() + vec.size() - firstSectionOffset);
+        for (std::size_t i = firstSectionOffset; i < vec.size(); ++i) {
+            const auto& p = vec[i];
+            points.emplace_back(Point{p[0], p[1], p[2]});
+            diameters.emplace_back(p[3]);
+        }
+
         return;
     }
 
     std::vector<std::vector<float>> vec;
     vec.resize(_pointsDims[0]);
     _points->read(vec);
-    bool noNeurites = (firstSectionOffset == -1);
-    for (unsigned int i = 0; i < vec.size(); ++i) {
+
+    if (firstSectionOffset < 0) {
+        firstSectionOffset = vec.size();
+    }
+
+    somaPoints.reserve(somaPoints.size() + firstSectionOffset);
+    somaDiameters.reserve(somaDiameters.size() + firstSectionOffset);
+    for (std::size_t i = 0; i < firstSectionOffset; ++i) {
         const auto& p = vec[i];
-        if (noNeurites || i < firstSectionOffset) {
-            somaPoints.push_back({p[0], p[1], p[2]});
-            somaDiameters.push_back(p[3]);
-        } else {
-            points.push_back({p[0], p[1], p[2]});
-            diameters.push_back(p[3]);
-        }
+        somaPoints.emplace_back(Point{p[0], p[1], p[2]});
+        somaDiameters.emplace_back(p[3]);
+    }
+
+    points.reserve(points.size() + vec.size() - firstSectionOffset);
+    diameters.reserve(diameters.size() + vec.size() - firstSectionOffset);
+    for (std::size_t i = firstSectionOffset; i < vec.size(); ++i) {
+        const auto& p = vec[i];
+        points.emplace_back(Point{p[0], p[1], p[2]});
+        diameters.emplace_back(p[3]);
     }
 }
 
@@ -283,14 +301,15 @@ int MorphologyHDF5::_readSections()
         std::vector<std::vector<int>> vec;
         vec.resize(dims[0] - 1);
         dataset.read(vec);
-        bool skipFirst = true;
         int firstSectionOffset = vec[1][0];
+        sections.reserve(sections.size() + vec.size() - 1);
+        bool skipFirst = true;
         for (auto p : vec) {
             if (skipFirst) {
                 skipFirst = false;
                 continue;
             }
-            sections.push_back({p[0] - firstSectionOffset, p[1] - 1});
+            sections.emplace_back(Property::Section::Type{p[0] - firstSectionOffset, p[1] - 1});
         }
 
         return firstSectionOffset;
@@ -307,13 +326,14 @@ int MorphologyHDF5::_readSections()
 
     int firstSectionOffset = vec[1][0];
 
+    sections.reserve(sections.size() + vec.size() - 1);
     bool skipFirst = true; // Skipping soma section
     for (auto p : vec) {
         if (skipFirst) {
             skipFirst = false;
             continue;
         }
-        sections.push_back({p[0] - firstSectionOffset, p[1] - 1});
+        sections.emplace_back(Property::Section::Type{p[0] - firstSectionOffset, p[1] - 1});
     }
 
     return firstSectionOffset;
@@ -428,6 +448,9 @@ void MorphologyHDF5::_readMitochondria()
     auto& mitoSectionId = _properties.get<Property::MitoNeuriteSectionId>();
     auto& pathlength = _properties.get<Property::MitoPathLength>();
     auto& diameters = _properties.get<Property::MitoDiameter>();
+    mitoSectionId.reserve(mitoSectionId.size() + points.size());
+    pathlength.reserve(pathlength.size() + points.size());
+    diameters.reserve(diameters.size() + points.size());
     for (auto p : points) {
         mitoSectionId.push_back((uint32_t)p[0]);
         pathlength.push_back(p[1]);
@@ -438,8 +461,10 @@ void MorphologyHDF5::_readMitochondria()
     _read(_g_mitochondria, "structure", MORPHOLOGY_VERSION_H5_1_1, 2,
         structure);
 
+    auto& mitoSection = _properties.get<Property::MitoSection>();
+    mitoSection.reserve(mitoSection.size() + structure.size());
     for (auto& s : structure)
-        _properties.get<Property::MitoSection>().push_back({s[0], s[1]});
+        mitoSection.emplace_back(Property::MitoSection::Type{s[0], s[1]});
 }
 
 } // namespace h5
