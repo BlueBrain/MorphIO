@@ -71,7 +71,7 @@ const std::string ErrorMessages::errorMsg(int lineNumber, ErrorLevel errorLevel,
 const std::string ErrorMessages::ERROR_OPENING_FILE() const
 {
     return "Error opening morphology file:\n" + errorMsg(0, ErrorLevel::ERROR);
-};
+}
 
 const std::string ErrorMessages::ERROR_LINE_NON_PARSABLE(int lineNumber) const
 {
@@ -110,7 +110,7 @@ std::string ErrorMessages::ERROR_SOMA_WITH_NEURITE_PARENT(
 {
     return errorMsg(sample.lineNumber, ErrorLevel::ERROR,
         "Found a soma point with a neurite as parent");
-};
+}
 
 const std::string ErrorMessages::ERROR_REPEATED_ID(
     const Sample& originalSample, const Sample& newSample) const
@@ -148,7 +148,7 @@ const std::string _col(float val1, float val2)
     bool is_ok = std::fabs(val1 - val2) < 1e-6;
     if (is_ok)
         return std::to_string(val1);
-    return "\e[1;33m" + std::to_string(val1) + " (exp. " + std::to_string(val2) + ")\e[0m";
+    return "\033[1;33m" + std::to_string(val1) + " (exp. " + std::to_string(val2) + ")\033[0m";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@ const std::string ErrorMessages::ERROR_WRONG_EXTENSION(
     const std::string filename) const
 {
     return "Filename: " + filename + " must have one of the following extensions: swc, asc or h5";
-};
+}
 
 std::string ErrorMessages::ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1,
     int length1,

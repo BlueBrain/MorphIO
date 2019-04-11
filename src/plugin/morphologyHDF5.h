@@ -25,7 +25,7 @@ private:
     bool _readV11Metadata();
     bool _readV2Metadata();
     HighFive::DataSet _getStructureDataSet(size_t nSections);
-    void _readPoints(unsigned int);
+    void _readPoints(int);
     int _readSections();
     void _readSectionTypes();
     void _readPerimeters(int);
