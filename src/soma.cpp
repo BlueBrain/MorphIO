@@ -39,6 +39,6 @@ float Soma::surface() const
 float Soma::maxDistance() const
 {
     return 0;
-};
+}
 
 } // namespace morphio

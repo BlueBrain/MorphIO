@@ -109,11 +109,11 @@ public:
                 "error"}};
 
         const std::map<ErrorLevel, std::string> COLOR{
-            {ErrorLevel::INFO, "\e[1;34m"},
-            {ErrorLevel::WARNING, "\e[1;33m"},
-            {ErrorLevel::ERROR, "\e[1;31m"}};
+            {ErrorLevel::INFO, "\033[1;34m"},
+            {ErrorLevel::WARNING, "\033[1;33m"},
+            {ErrorLevel::ERROR, "\033[1;31m"}};
 
-        const std::string COLOR_END("\e[0m");
+        const std::string COLOR_END("\033[0m");
 
         return COLOR.at(errorLevel) + _uri + ":" + std::to_string(lineNumber) + ":" + SEVERITY.at(errorLevel) + COLOR_END;
     }
