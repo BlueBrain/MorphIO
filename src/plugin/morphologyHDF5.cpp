@@ -215,13 +215,14 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset)
         std::vector<std::vector<float>> vec(dims[0]);
         dataset.read(vec);
 
-        if (firstSectionOffset < 0) {
-            firstSectionOffset = vec.size();
+        std::size_t offset = vec.size();
+        if (firstSectionOffset >= 0) {
+            offset = firstSectionOffset;
         }
 
-        somaPoints.reserve(somaPoints.size() + firstSectionOffset);
-        somaDiameters.reserve(somaDiameters.size() + firstSectionOffset);
-        for (std::size_t i = 0; i < firstSectionOffset; ++i) {
+        somaPoints.reserve(somaPoints.size() + offset);
+        somaDiameters.reserve(somaDiameters.size() + offset);
+        for (std::size_t i = 0; i < offset; ++i) {
             const auto& p = vec[i];
             somaPoints.emplace_back(Point{p[0], p[1], p[2]});
             somaDiameters.emplace_back(p[3]);
@@ -229,7 +230,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset)
 
         points.reserve(points.size() + vec.size() - firstSectionOffset);
         diameters.reserve(diameters.size() + vec.size() - firstSectionOffset);
-        for (std::size_t i = firstSectionOffset; i < vec.size(); ++i) {
+        for (std::size_t i = offset; i < vec.size(); ++i) {
             const auto& p = vec[i];
             points.emplace_back(Point{p[0], p[1], p[2]});
             diameters.emplace_back(p[3]);
@@ -242,21 +243,22 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset)
     vec.resize(_pointsDims[0]);
     _points->read(vec);
 
-    if (firstSectionOffset < 0) {
-        firstSectionOffset = vec.size();
+    std::size_t offset = vec.size();
+    if (firstSectionOffset >= 0) {
+        offset = firstSectionOffset;
     }
 
-    somaPoints.reserve(somaPoints.size() + firstSectionOffset);
-    somaDiameters.reserve(somaDiameters.size() + firstSectionOffset);
-    for (std::size_t i = 0; i < firstSectionOffset; ++i) {
+    somaPoints.reserve(somaPoints.size() + offset);
+    somaDiameters.reserve(somaDiameters.size() + offset);
+    for (std::size_t i = 0; i < offset; ++i) {
         const auto& p = vec[i];
         somaPoints.emplace_back(Point{p[0], p[1], p[2]});
         somaDiameters.emplace_back(p[3]);
     }
 
-    points.reserve(points.size() + vec.size() - firstSectionOffset);
-    diameters.reserve(diameters.size() + vec.size() - firstSectionOffset);
-    for (std::size_t i = firstSectionOffset; i < vec.size(); ++i) {
+    points.reserve(points.size() + vec.size() - offset);
+    diameters.reserve(diameters.size() + vec.size() - offset);
+    for (std::size_t i = offset; i < vec.size(); ++i) {
         const auto& p = vec[i];
         points.emplace_back(Point{p[0], p[1], p[2]});
         diameters.emplace_back(p[3]);
@@ -304,7 +306,7 @@ int MorphologyHDF5::_readSections()
         int firstSectionOffset = vec[1][0];
         sections.reserve(sections.size() + vec.size() - 1);
         bool skipFirst = true;
-        for (auto p : vec) {
+        for (const auto& p : vec) {
             if (skipFirst) {
                 skipFirst = false;
                 continue;
@@ -328,7 +330,7 @@ int MorphologyHDF5::_readSections()
 
     sections.reserve(sections.size() + vec.size() - 1);
     bool skipFirst = true; // Skipping soma section
-    for (auto p : vec) {
+    for (const auto& p : vec) {
         if (skipFirst) {
             skipFirst = false;
             continue;
@@ -451,7 +453,7 @@ void MorphologyHDF5::_readMitochondria()
     mitoSectionId.reserve(mitoSectionId.size() + points.size());
     pathlength.reserve(pathlength.size() + points.size());
     diameters.reserve(diameters.size() + points.size());
-    for (auto p : points) {
+    for (const auto& p : points) {
         mitoSectionId.push_back((uint32_t)p[0]);
         pathlength.push_back(p[1]);
         diameters.push_back(p[2]);

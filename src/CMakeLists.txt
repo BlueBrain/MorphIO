@@ -63,8 +63,9 @@ target_compile_options(morphio_obj
   PRIVATE
   -Wall
   -Wextra
+  -Werror
   -Wnon-virtual-dtor
-  -pedantic-errors
+  -pedantic
   )
 
 add_library(morphio_static STATIC $<TARGET_OBJECTS:morphio_obj>)
