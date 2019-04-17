@@ -63,7 +63,6 @@ target_compile_options(morphio_obj
   PRIVATE
   -Wall
   -Wextra
-  -Werror
   -Wnon-virtual-dtor
   -pedantic
   )
