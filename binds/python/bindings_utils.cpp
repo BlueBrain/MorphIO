@@ -44,7 +44,7 @@ void _raise_if_wrong_shape(const py::buffer_info& info) {
     const auto &shape = info.shape;
     if(shape.size() != 2 || info.shape[1] != 3) {
         std::string shape_str;
-        for(int i=0; i<shape.size(); ++i){
+        for(unsigned int i=0; i<shape.size(); ++i){
             shape_str += std::to_string(shape[i]);
             if(i != shape.size() -1)
                 shape_str += ", ";
