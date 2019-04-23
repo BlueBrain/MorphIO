@@ -9,10 +9,9 @@ cache:
   directories:
     - $HOME/.cache/pip
     # - $HOME/Library/Caches/Homebrew
-language: c++
+language: python
 sudo: required
 python:
-  # - 2.7
   - 3.6
 
 before_install:
