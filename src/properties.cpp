@@ -296,7 +296,9 @@ Annotation::Annotation(AnnotationType type, uint32_t sectionId,
     , _sectionId(sectionId)
     , _points(points)
     , _lineNumber(lineNumber)
-    , _details(details){}
+    , _details(details)
+{
+}
 
 bool Properties::operator==(const Properties& other) const
 {
