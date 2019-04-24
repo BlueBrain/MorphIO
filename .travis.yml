@@ -22,7 +22,7 @@ install:
   - pip install --upgrade pip
   - pip install .
 script:
-  # Need to concatenate all commands with otherwise Travis only looked at the output code of the last command
+  # Need to concatenate all commands with otherwise Travis only looks at the output code of the last command
 
   # Testing compilation with warning as error
   - rm -rf build; mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../.ContinousIntegration.cmake .. && make -j && popd &&
