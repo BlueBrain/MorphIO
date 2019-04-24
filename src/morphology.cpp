@@ -27,8 +27,7 @@ Morphology::Morphology(const URI& source, unsigned int options)
 
     // Cross-platform check of file existance
     std::ifstream file(source.c_str());
-    if (!file)
-    {
+    if (!file) {
         LBTHROW(RawDataError("File: " + source + " does not exist."));
     }
 

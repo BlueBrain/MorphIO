@@ -1,27 +1,18 @@
 matrix:
   include:
-    # - os: linux
-    #   dist: trusty
-    #   sudo: required
-    - os: osx
-      osx_image: xcode10.1
+    - os: linux
+      dist: trusty
+      sudo: required
+    # - os: osx
+    #   osx_image: xcode10.1
 cache:
   directories:
     - $HOME/.cache/pip
-    - $HOME/Library/Caches/Homebrew
-language: c++
+    # - $HOME/Library/Caches/Homebrew
+language: python
 sudo: required
 python:
-  - 2.7
   - 3.6
-# addons:
-#   apt:
-#     packages:
-#       - libhdf5-dev
-#       - g++-5
-#     sources: &sources
-#       - llvm-toolchain-precise-3.8
-#       - ubuntu-toolchain-r-test
 
 before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
@@ -31,6 +22,10 @@ install:
   - pip install --upgrade pip
   - pip install .
 script:
-  - ./scripts/check-clang-format-all
-  - pip install -r tests/requirement_tests.txt
-  - nosetests
+  # Need to concatenate all commands with otherwise Travis only looks at the output code of the last command
+
+  # Testing compilation with warning as error
+  - rm -rf build; mkdir build && pushd build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=../.ContinousIntegration.cmake .. && make -j && popd &&
+    ./scripts/check-clang-format-all &&
+    pip install -r tests/requirement_tests.txt &&
+    nosetests
