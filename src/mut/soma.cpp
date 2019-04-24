@@ -17,7 +17,7 @@ Soma::Soma(const Property::PointLevel& pointProperties)
 Soma::Soma(const morphio::Soma& soma)
     : _somaType(soma.type())
 {
-    _pointProperties = Property::PointLevel(soma._properties->_somaLevel);
+    _pointProperties = soma._properties->_somaLevel;
 }
 
 const Point Soma::center() const

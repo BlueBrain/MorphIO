@@ -125,7 +125,7 @@ public:
         , err_(uri)
     {
         lexertl::rules rules;
-        build_lexer(rules, sm_);
+        build_lexer(rules);
     }
 
     void start_parse(const std::string& input)
@@ -139,7 +139,7 @@ public:
         consume();
     }
 
-    void build_lexer(lexertl::rules& rules_, lexertl::state_machine& sm_)
+    void build_lexer(lexertl::rules& rules_)
     {
         rules_.push("\n", +Token::NEWLINE);
         rules_.push("[ \t\r]+", +Token::WS);

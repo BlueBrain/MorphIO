@@ -31,8 +31,8 @@ std::vector<typename T::Type> copySpan(
 {
     if (data.empty())
         return std::vector<typename T::Type>();
-    return std::vector<typename T::Type>(data.begin() + range.first,
-        data.begin() + range.second);
+    return std::vector<typename T::Type>(data.begin() + static_cast<long int>(range.first),
+                                         data.begin() + static_cast<long int>(range.second));
 }
 
 MitochondriaPointLevel::MitochondriaPointLevel(
@@ -156,7 +156,7 @@ bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
         return false;
     }
 
-    const float epsilon = 1e-6;
+    const float epsilon = 1e-6f;
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(vec1[i] - vec2[i]) > epsilon) {
             LBERROR(Warning::UNDEFINED,
@@ -181,7 +181,7 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
         return false;
     }
 
-    const float epsilon = 1e-6;
+    const float epsilon = 1e-6f;
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
             if (verbose) {
@@ -305,8 +305,8 @@ bool Properties::operator==(const Properties& other) const
     if (this == &other)
         return true;
 
-    size_t this_soma_offset = get<Section>().size() > 1 ? get<Section>()[1][0] : 0;
-    size_t other_soma_offset = other.get<Section>().size() > 1 ? other.get<Section>()[1][0] : 0;
+    size_t this_soma_offset = get<Section>().size() > 1 ? static_cast<size_t>(get<Section>()[1][0]) : 0;
+    size_t other_soma_offset = other.get<Section>().size() > 1 ? static_cast<size_t>(other.get<Section>()[1][0]) : 0;
     return (compare(this->_pointLevel, other._pointLevel, this_soma_offset,
                 other_soma_offset, "_pointLevel", verbose) &&
             compare(this->_sectionLevel, other._sectionLevel, "_sectionLevel",

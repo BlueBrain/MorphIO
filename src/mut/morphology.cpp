@@ -204,7 +204,7 @@ void Morphology::deleteSection(std::shared_ptr<Section> section, bool recursive)
 {
     if (!section)
         return;
-    int id = section->id();
+    unsigned int id = section->id();
 
     if (recursive) {
         // The deletion must start by the furthest leaves, otherwise you may cut
@@ -258,11 +258,12 @@ void Morphology::sanitize(const morphio::plugin::DebugInfo& debugInfo)
 
     for (auto it = depth_begin(); it != depth_end(); ++it) {
         std::shared_ptr<Section> section = *it;
-        int parentId = section->isRoot() ? -1 : section->parent()->id();
-        int sectionId = section->id();
+        unsigned int sectionId = section->id();
 
         if (section->isRoot())
             continue;
+
+        unsigned int parentId = section->parent()->id();
 
         if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !_checkDuplicatePoint(section->parent(), section))
             LBERROR(Warning::WRONG_DUPLICATE,
@@ -314,11 +315,10 @@ const Property::Properties Morphology::buildReadOnly() const
 
     for (auto it = depth_begin(); it != depth_end(); ++it) {
         std::shared_ptr<Section> section = *it;
-        int parentId = section->isRoot() ? -1 : section->parent()->id();
-        int sectionId = section->id();
-        int parentOnDisk = (section->isRoot() ? -1 : newIds[parentId]);
+        unsigned int sectionId = section->id();
+        int parentOnDisk = (section->isRoot() ? -1 : newIds[section->parent()->id()]);
 
-        int start = properties._pointLevel._points.size();
+        int start = static_cast<int>(properties._pointLevel._points.size());
         properties._sectionLevel._sections.push_back({start, parentOnDisk});
         properties._sectionLevel._sectionTypes.push_back(section->type());
         newIds[sectionId] = sectionIdOnDisk++;
@@ -374,6 +374,11 @@ void Morphology::applyModifiers(unsigned int modifierFlags)
         modifiers::nrn_order(*this);
 }
 
+char my_tolower(char ch)
+{
+    return static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+}
+
 void Morphology::write(const std::string& filename)
 {
     const size_t pos = filename.find_last_of(".");
@@ -384,8 +389,8 @@ void Morphology::write(const std::string& filename)
     morphio::mut::Morphology clean(*this);
     clean.sanitize();
 
-    for (auto& c : filename.substr(pos))
-        extension += std::tolower(c);
+    for (char c : filename.substr(pos))
+        extension += my_tolower(c);
 
     if (extension == ".h5")
         writer::h5(clean, filename);

@@ -58,7 +58,7 @@ bool ErrorMessages::isIgnored(Warning warning)
     return _ignoredWarnings.find(warning) != _ignoredWarnings.end();
 }
 
-const std::string ErrorMessages::errorMsg(int lineNumber, ErrorLevel errorLevel,
+const std::string ErrorMessages::errorMsg(long unsigned int lineNumber, ErrorLevel errorLevel,
     std::string msg) const
 {
     return "\n" + (_uri.empty() ? "" : errorLink(lineNumber, errorLevel) + "\n") + msg;
@@ -73,7 +73,7 @@ const std::string ErrorMessages::ERROR_OPENING_FILE() const
     return "Error opening morphology file:\n" + errorMsg(0, ErrorLevel::ERROR);
 }
 
-const std::string ErrorMessages::ERROR_LINE_NON_PARSABLE(int lineNumber) const
+const std::string ErrorMessages::ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR, "Unable to parse this line");
 }
@@ -145,7 +145,7 @@ const std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(
 **/
 const std::string _col(float val1, float val2)
 {
-    bool is_ok = std::fabs(val1 - val2) < 1e-6;
+    bool is_ok = std::fabs(val1 - val2) < 1e-6f;
     if (is_ok)
         return std::to_string(val1);
     return "\033[1;33m" + std::to_string(val1) + " (exp. " + std::to_string(val2) + ")\033[0m";
@@ -155,47 +155,47 @@ const std::string _col(float val1, float val2)
 //             NEUROLUCIDA
 ////////////////////////////////////////////////////////////////////////////////
 const std::string ErrorMessages::ERROR_SOMA_ALREADY_DEFINED(
-    int lineNumber) const
+    long unsigned int lineNumber) const
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR, "A soma is already defined");
 }
 
 const std::string ErrorMessages::ERROR_PARSING_POINT(
-    int lineNumber, const std::string& point) const
+    long unsigned int lineNumber, const std::string& point) const
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR,
         "Error converting: \"" + point + "\" to float");
 }
 
 const std::string ErrorMessages::ERROR_UNKNOWN_TOKEN(
-    int lineNumber, const std::string& token) const
+    long unsigned int lineNumber, const std::string& token) const
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR,
         "Unexpected token: " + token);
 }
 
 const std::string ErrorMessages::ERROR_UNEXPECTED_TOKEN(
-    int lineNumber, const std::string& expected, const std::string& got,
+    long unsigned int lineNumber, const std::string& expected, const std::string& got,
     const std::string& msg) const
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR,
         "Unexpected token\nExpected: " + expected + " but got " + got + " " + msg);
 }
 
-const std::string ErrorMessages::ERROR_EOF_REACHED(int lineNumber) const
+const std::string ErrorMessages::ERROR_EOF_REACHED(long unsigned int lineNumber) const
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR,
         "Can't iterate past the end");
 }
 
-const std::string ErrorMessages::ERROR_EOF_IN_NEURITE(int lineNumber) const
+const std::string ErrorMessages::ERROR_EOF_IN_NEURITE(long unsigned int lineNumber) const
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR,
         "Hit end of file while consuming a neurite");
 }
 
 const std::string ErrorMessages::ERROR_EOF_UNBALANCED_PARENS(
-    int lineNumber) const
+    long unsigned int lineNumber) const
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR,
         "Hit end of file before balanced parens");
@@ -219,9 +219,9 @@ const std::string ErrorMessages::ERROR_WRONG_EXTENSION(
 }
 
 std::string ErrorMessages::ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1,
-    int length1,
+    size_t length1,
     const std::string& vec2,
-    int length2) const
+    size_t length2) const
 {
     std::string msg("Vector length mismatch: \nLength " + vec1 + ": " + std::to_string(length1) + "\nLength " + vec2 + ": " + std::to_string(length2));
     if (length1 == 0 || length2 == 0)
@@ -285,15 +285,17 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
 }
 
 const std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info,
-    int parentId,
-    int childId) const
+    unsigned int parentId,
+    unsigned int childId) const
 {
     int parentLine = info.getLineNumber(parentId);
     int childLine = info.getLineNumber(childId);
     std::string parentMsg, childMsg;
     if (parentLine > -1 && childLine > -1) {
-        parentMsg = " starting at:\n" + errorLink(parentLine, ErrorLevel::INFO) + "\n";
-        childMsg = " starting at:\n" + errorLink(childLine, ErrorLevel::WARNING) + "\n";
+        parentMsg = " starting at:\n" + errorLink(static_cast<size_t>(parentLine),
+                                                  ErrorLevel::INFO) + "\n";
+        childMsg = " starting at:\n" + errorLink(static_cast<size_t>(childLine),
+                                                 ErrorLevel::WARNING) + "\n";
     }
 
     return "\nSection: " + std::to_string(childId) + childMsg + " is the only child of " + "section: " + std::to_string(parentId) + parentMsg + "\nIt will be merged with the parent section";
@@ -303,7 +305,7 @@ const std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
     const Sample& root, const Sample& child1, const Sample& child2)
 {
     float x = root.point[0], y = root.point[1], z = root.point[2],
-          r = root.diameter / 2.;
+          r = root.diameter / 2.f;
     std::stringstream ss;
     ss << "The soma does not conform the three point soma spec" << std::endl;
     ss << "The only valid neuro-morpho soma is:" << std::endl;
@@ -316,10 +318,10 @@ const std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
     ss << "1 1 " << x << " " << y << " " << z << " " << r << " -1" << std::endl;
     ss << "2 1 " << _col(child1.point[0], x) << " "
        << _col(child1.point[1], y - r) << " " << _col(child1.point[2], z) << " "
-       << _col(child1.diameter / 2., r) << " 1" << std::endl;
+       << _col(child1.diameter / 2.f, r) << " 1" << std::endl;
     ss << "3 1 " << _col(child2.point[0], x) << " "
        << _col(child2.point[1], y + r) << " " << _col(child2.point[2], z) << " "
-       << _col(child2.diameter / 2., r) << " 1" << std::endl;
+       << _col(child2.diameter / 2.f, r) << " 1" << std::endl;
     return ss.str();
 }
 

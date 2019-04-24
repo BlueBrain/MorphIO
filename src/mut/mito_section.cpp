@@ -4,7 +4,7 @@
 namespace morphio {
 namespace mut {
 MitoSection::MitoSection(
-    Mitochondria* mitochondria, int id,
+    Mitochondria* mitochondria, unsigned int id,
     const Property::MitochondriaPointLevel& pointProperties)
     : _id(id)
     , _mitochondria(mitochondria)
@@ -12,7 +12,7 @@ MitoSection::MitoSection(
 {
 }
 
-MitoSection::MitoSection(Mitochondria* mitochondria, int id,
+MitoSection::MitoSection(Mitochondria* mitochondria, unsigned int id,
     const morphio::MitoSection& section)
     : MitoSection(mitochondria, id,
           Property::MitochondriaPointLevel(
@@ -21,7 +21,7 @@ MitoSection::MitoSection(Mitochondria* mitochondria, int id,
 {
 }
 
-MitoSection::MitoSection(Mitochondria* mitochondria, int id,
+MitoSection::MitoSection(Mitochondria* mitochondria, unsigned int id,
     const MitoSection& section)
     : _id(id)
     , _mitochondria(mitochondria)
@@ -32,7 +32,7 @@ MitoSection::MitoSection(Mitochondria* mitochondria, int id,
 std::shared_ptr<MitoSection> MitoSection::appendSection(
     const Property::MitochondriaPointLevel& points)
 {
-    int32_t parentId = id();
+    unsigned int parentId = id();
 
     std::shared_ptr<MitoSection> ptr(new MitoSection(_mitochondria,
                                          _mitochondria->_counter,
@@ -53,7 +53,7 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
                                          _mitochondria->_counter,
                                          *original_section),
         friendDtorForSharedPtrMito);
-    int32_t parentId = id();
+    unsigned int parentId = id();
     uint32_t id = _mitochondria->_register(ptr);
 
     _mitochondria->_parent[id] = parentId;
@@ -75,7 +75,7 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
                                          _mitochondria->_counter,
                                          section),
         friendDtorForSharedPtrMito);
-    int32_t parentId = id();
+    unsigned int parentId = id();
     uint32_t childId = _mitochondria->_register(ptr);
 
     _mitochondria->_parent[childId] = parentId;

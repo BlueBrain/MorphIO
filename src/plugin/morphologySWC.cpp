@@ -34,10 +34,10 @@ const int SWC_UNDEFINED_PARENT = -1;
 class SWCBuilder
 {
 public:
-    SWCBuilder(const std::string& uri)
-        : uri(uri)
-        , err(uri)
-        , debugInfo(uri)
+    SWCBuilder(const std::string& _uri)
+        : uri(_uri)
+        , err(_uri)
+        , debugInfo(_uri)
     {
         _readSamples();
 
@@ -55,7 +55,7 @@ public:
         if (file.fail())
             LBTHROW(morphio::RawDataError(err.ERROR_OPENING_FILE()));
 
-        size_t lineNumber = 0;
+        unsigned int lineNumber = 0;
         std::string line;
         while (!std::getline(file, line).fail()) {
             ++lineNumber;
@@ -76,7 +76,7 @@ public:
             children[sample.parentId].push_back(sample.id);
 
             if (sample.type == SECTION_SOMA) {
-                lastSomaPoint = sample.id;
+                lastSomaPoint = static_cast<int>(sample.id);
             }
         }
         file.close();
@@ -101,9 +101,9 @@ public:
         if (sample.type != SECTION_SOMA)
             return;
 
-        if (sample.parentId != -1 && children[sample.id].size() > 0) {
+        if (sample.parentId != -1 && children[static_cast<int>(sample.id)].size() > 0) {
             std::vector<Sample> soma_bifurcations;
-            for (auto id : children[sample.id]) {
+            for (auto id : children[static_cast<int>(sample.id)]) {
                 if (samples[id].type == SECTION_SOMA)
                     soma_bifurcations.push_back(samples[id]);
                 else
@@ -115,14 +115,14 @@ public:
                     err.ERROR_SOMA_BIFURCATION(sample, soma_bifurcations)));
         }
 
-        if (sample.parentId != -1 && samples[sample.parentId].type != SECTION_SOMA)
+        if (sample.parentId != -1 && samples[static_cast<unsigned int>(sample.parentId)].type != SECTION_SOMA)
             LBTHROW(
                 morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample)));
     }
 
     void raiseIfSelfParent(const Sample& sample)
     {
-        if (sample.parentId == sample.id)
+        if (sample.parentId == static_cast<int>(sample.id))
             LBTHROW(morphio::RawDataError(err.ERROR_SELF_PARENT(sample)));
     }
 
@@ -146,7 +146,7 @@ public:
 
     void raiseIfNoParent(const Sample& sample)
     {
-        if (sample.parentId > -1 && samples.count(sample.parentId) == 0)
+        if (sample.parentId > -1 && samples.count(static_cast<unsigned int>(sample.parentId)) == 0)
             LBTHROW(
                 morphio::MissingParentError(err.ERROR_MISSING_PARENT(sample)));
     }
@@ -161,19 +161,22 @@ public:
 
     inline bool isRootSection(const Sample& sample)
     {
-        return isOrphanNeurite(sample) || (samples[sample.parentId].type == SECTION_SOMA && sample.type != SECTION_SOMA); // Exclude soma bifurcations
+        return isOrphanNeurite(sample) ||
+            (sample.type != SECTION_SOMA &&
+             samples[static_cast<unsigned int>(sample.parentId)].type == SECTION_SOMA); // Exclude soma bifurcations
     }
 
     inline bool isSectionStart(const Sample& sample)
     {
-        return (isRootSection(sample) || (sample.parentId > -1 && isSectionEnd(samples[sample.parentId]))); // Standard section
+        return (isRootSection(sample) || (sample.parentId > -1 && isSectionEnd(samples[static_cast<unsigned int>(sample.parentId)]))); // Standard section
     }
 
     inline bool isSectionEnd(const Sample& sample)
     {
-        return sample.id == lastSomaPoint ||       // End of soma
-               children[sample.id].size() == 0 ||  // Reached leaf
-               (children[sample.id].size() >= 2 && // Reached neurite
+        int id = static_cast<int>(sample.id);
+        return id == lastSomaPoint ||       // End of soma
+            children[id].size() == 0 ||  // Reached leaf
+            (children[id].size() >= 2 && // Reached neurite
                    // bifurcation
                    sample.type != SECTION_SOMA);
     }
@@ -186,11 +189,11 @@ public:
         somaOrSection->diameters().push_back(sample.diameter);
     }
 
-    void _pushChildren(std::vector<int32_t>& vec, int32_t id)
+    void _pushChildren(std::vector<unsigned int>& vec, int32_t id)
     {
-        for (auto childId : children[id]) {
+        for (unsigned int childId : children[id]) {
             vec.push_back(childId);
-            _pushChildren(vec, childId);
+            _pushChildren(vec, static_cast<int>(childId));
         }
     }
 
@@ -203,7 +206,7 @@ public:
     }
 
     void _checkNeuroMorphoSoma(const Sample& root,
-        const std::vector<Sample>& children)
+        const std::vector<Sample>& _children)
     {
         // The only valid neuro-morpho soma is:
         // 1 1 x   y   z r -1
@@ -211,9 +214,9 @@ public:
         // 3 1 x (y+r) z r  1
 
         float x = root.point[0], y = root.point[1], z = root.point[2],
-              d = root.diameter, r = root.diameter / 2.;
-        const Sample& child1 = children[0];
-        const Sample& child2 = children[1];
+              d = root.diameter, r = root.diameter / 2.f;
+        const Sample& child1 = _children[0];
+        const Sample& child2 = _children[1];
 
         if (child1.point[0] != x || child2.point[0] != x || child1.point[1] != y - r || child2.point[1] != y + r || child1.point[2] != z || child2.point[2] != z || child1.diameter != d || child2.diameter != d) {
             LBERROR(Warning::SOMA_NON_CONFORM,
@@ -238,7 +241,7 @@ public:
         // with a bifurcation at soma root
         case 3: {
             uint32_t somaRootId = children[-1][0];
-            auto& somaChildren = children[somaRootId];
+            auto& somaChildren = children[static_cast<int>(somaRootId)];
 
             std::vector<Sample> children_soma_points;
             for (auto child : somaChildren) {
@@ -273,14 +276,14 @@ public:
         bool originalIsIgnored = err.isIgnored(morphio::Warning::APPENDING_EMPTY_SECTION);
         set_ignored_warning(morphio::Warning::APPENDING_EMPTY_SECTION, true);
 
-        std::vector<int32_t> depthFirstSamples;
+        std::vector<unsigned int> depthFirstSamples;
         _pushChildren(depthFirstSamples, -1);
         for (const auto id : depthFirstSamples) {
             const Sample& sample = samples[id];
             if (isSectionStart(sample)) {
                 _processSectionStart(sample);
             } else if (sample.type != SECTION_SOMA) {
-                swcIdToSectionId[sample.id] = swcIdToSectionId[sample.parentId];
+                swcIdToSectionId[sample.id] = swcIdToSectionId[static_cast<unsigned int>(sample.parentId)];
             }
 
             if (sample.type == SECTION_SOMA) {
@@ -321,11 +324,12 @@ public:
             section = morph.appendRootSection(properties, sample.type);
         } else {
             // Duplicating last point of previous section if there is not already a duplicate
-            if (sample.point != samples[sample.parentId].point) {
-                properties._points.push_back(samples[sample.parentId].point);
-                properties._diameters.push_back(samples[sample.parentId].diameter);
+            unsigned int parentId = static_cast<unsigned int>(sample.parentId);
+            if (sample.point != samples[parentId].point) {
+                properties._points.push_back(samples[parentId].point);
+                properties._diameters.push_back(samples[parentId].diameter);
             }
-            section = morph.section(swcIdToSectionId[sample.parentId])
+            section = morph.section(swcIdToSectionId[parentId])
                           ->appendSection(properties, sample.type);
         }
 

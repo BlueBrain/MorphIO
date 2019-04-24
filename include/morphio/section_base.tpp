@@ -12,10 +12,10 @@ SectionBase<T>::SectionBase(const uint32_t id,
     if (id >= sections.size())
         LBTHROW(RawDataError("Requested section ID (" + std::to_string(id) + ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
 
-    const size_t start = sections[id][0];
+    const size_t start = static_cast<size_t>(sections[id][0]);
     const size_t end = id == sections.size() - 1
                            ? properties->get<typename T::PointAttribute>().size()
-                           : sections[id + 1][0];
+                           : static_cast<size_t>(sections[id + 1][0]);
 
     _range = std::make_pair(start, end);
 
@@ -88,7 +88,8 @@ T SectionBase<T>::parent() const
         LBTHROW(MissingParentError(
             "Cannot call Section::parent() on a root node (section id=" + std::to_string(_id) + ")."));
 
-    const int32_t parent = _properties->get<typename T::SectionId>()[_id][1];
+    const unsigned int parent = static_cast<unsigned int>(
+        _properties->get<typename T::SectionId>()[_id][1]);
     return T(parent, _properties);
 }
 
@@ -97,7 +98,7 @@ const std::vector<T> SectionBase<T>::children() const
 {
     std::vector<T> result;
     try {
-        const std::vector<uint32_t>& children = _properties->children<typename T::SectionId>().at(_id);
+        const std::vector<uint32_t>& children = _properties->children<typename T::SectionId>().at(static_cast<int>(_id));
         result.reserve(children.size());
         for (const uint32_t id : children)
             result.push_back(T(id, _properties));

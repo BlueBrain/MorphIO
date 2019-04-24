@@ -17,9 +17,9 @@ void bind_misc(py::module &m) {
         "Set the maximum number of warnings to be printed on screen\n"
         "0 will print no warning\n"
         "-1 will print them all");
-  m.def("set_ignored_warning", (void (*)(morphio::Warning, bool)) &morphio::set_ignored_warning,
+  m.def("set_ignored_warning", static_cast<void (*)(morphio::Warning, bool)>(&morphio::set_ignored_warning),
         "Ignore/Unignore a specific warning message", "warning"_a, "ignore"_a = true);
-  m.def("set_ignored_warning", (void (*)(const std::vector<morphio::Warning>&, bool)) &morphio::set_ignored_warning,
+  m.def("set_ignored_warning", static_cast<void (*)(const std::vector<morphio::Warning>&, bool)>(&morphio::set_ignored_warning),
         "Ignore/Unignore a list of warnings", "warning"_a, "ignore"_a = true);
     py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
         .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
@@ -109,13 +109,13 @@ void bind_misc(py::module &m) {
 
 
     py::class_<morphio::Points>(m, "Points", py::buffer_protocol())
-        .def_buffer([](morphio::Points &m) -> py::buffer_info {
+        .def_buffer([](morphio::Points &points) -> py::buffer_info {
                 return py::buffer_info(
-                    m.data(),                               /* Pointer to buffer */
+                    points.data(),                               /* Pointer to buffer */
                     sizeof(float),                          /* Size of one scalar */
                     py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
                     2,                                      /* Number of dimensions */
-                    { (int)  m.size(), 3 },                 /* Buffer dimensions */
+                    { static_cast<int>(points.size()), 3 },  /* Buffer dimensions */
                     { sizeof(float) * 3,             /* Strides (in bytes) for each index */
                             sizeof(float) }
                     );

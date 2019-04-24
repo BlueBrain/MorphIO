@@ -72,6 +72,15 @@ add_library(morphio_shared SHARED $<TARGET_OBJECTS:morphio_obj>)
 set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio"
                                                 EXPORT_NAME "morphio")
 
+target_include_directories(morphio_static
+  SYSTEM
+  PUBLIC
+   $<TARGET_PROPERTY:gsl-lite,INTERFACE_INCLUDE_DIRECTORIES>
+  PRIVATE
+   $<TARGET_PROPERTY:HighFive,INTERFACE_INCLUDE_DIRECTORIES>
+   $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
+  )
+
 target_link_libraries(morphio_static PUBLIC gsl-lite PRIVATE HighFive lexertl)
 target_link_libraries(morphio_shared PUBLIC gsl-lite PRIVATE HighFive lexertl)
 

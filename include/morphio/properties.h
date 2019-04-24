@@ -110,7 +110,7 @@ struct MitochondriaPointLevel
 struct MitochondriaSectionLevel
 {
     std::vector<Section::Type> _sections;
-    std::map<int32_t, std::vector<uint32_t>> _children;
+    std::map<int, std::vector<unsigned int>> _children;
 
     bool operator==(const MitochondriaSectionLevel& other) const;
     bool operator!=(const MitochondriaSectionLevel& other) const;
@@ -120,7 +120,7 @@ struct SectionLevel
 {
     std::vector<Section::Type> _sections;
     std::vector<SectionType::Type> _sectionTypes;
-    std::map<int32_t, std::vector<uint32_t>> _children;
+    std::map<int, std::vector<unsigned int>> _children;
 
     bool operator==(const SectionLevel& other) const;
     bool operator!=(const SectionLevel& other) const;

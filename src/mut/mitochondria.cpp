@@ -111,8 +111,8 @@ const std::map<uint32_t, std::shared_ptr<MitoSection>> Mitochondria::sections()
 
 void Mitochondria::_buildMitochondria(Property::Properties& properties) const
 {
-    uint32_t counter = 0;
-    std::map<uint32_t, uint32_t> newIds;
+    int32_t counter = 0;
+    std::map<uint32_t, int32_t> newIds;
 
     for (std::shared_ptr<MitoSection> mitoStart : _rootSections) {
         std::queue<std::shared_ptr<MitoSection>> q;
@@ -124,7 +124,7 @@ void Mitochondria::_buildMitochondria(Property::Properties& properties) const
             int32_t parentOnDisk = root ? -1 : newIds[parent(section)->id()];
 
             properties._mitochondriaSectionLevel._sections.push_back(
-                {(int)properties._mitochondriaPointLevel._diameters.size(),
+                {static_cast<int>(properties._mitochondriaPointLevel._diameters.size()),
                     parentOnDisk});
             _appendMitoProperties(properties._mitochondriaPointLevel,
                 section->_mitoPoints);

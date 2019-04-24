@@ -12,10 +12,10 @@ SectionType Section::type() const
 float Section::length() const
 {
     auto points = this->points();
-    int last = points.size() - 1;
-    if (last < 1)
+    if (points.size() < 2)
         return 0;
 
+    size_t last = points.size() - 1;
     return distance(points[0], points[last]);
 }
 

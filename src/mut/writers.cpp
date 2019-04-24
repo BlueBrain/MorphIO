@@ -38,7 +38,7 @@ void writeLine(std::ofstream& myfile, int id, int parentId, SectionType type,
            << setw(12) << std::to_string(point[0]) << " " << setw(12)
            << std::to_string(point[1]) << " " << setw(12)
            << std::to_string(point[2]) << " " << setw(12)
-           << std::to_string(diameter / 2.) << setw(12)
+           << std::to_string(diameter / 2.f) << setw(12)
            << std::to_string(parentId) << std::endl;
 }
 
@@ -74,16 +74,16 @@ void swc(const Morphology& morphology, const std::string& filename)
             Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
             plugin::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
-    const auto& points = soma->points();
-    const auto& diameters = soma->diameters();
+    const auto& soma_points = soma->points();
+    const auto& soma_diameters = soma->diameters();
 
-    if (points.size() < 1)
+    if (soma_points.size() < 1)
         LBERROR(Warning::WRITE_NO_SOMA,
             plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
 
-    for (unsigned int i = 0; i < points.size(); ++i) {
+    for (unsigned int i = 0; i < soma_points.size(); ++i) {
         writeLine(myfile, segmentIdOnDisk, i == 0 ? -1 : segmentIdOnDisk - 1,
-            SECTION_SOMA, points[i], diameters[i]);
+            SECTION_SOMA, soma_points[i], soma_diameters[i]);
         ++segmentIdOnDisk;
     }
 
@@ -119,7 +119,7 @@ void swc(const Morphology& morphology, const std::string& filename)
 }
 
 void _write_asc_points(std::ofstream& myfile, const Points& points,
-    const std::vector<float>& diameters, int indentLevel)
+    const std::vector<float>& diameters, size_t indentLevel)
 {
     for (unsigned int i = 0; i < points.size(); ++i) {
         myfile << std::string(indentLevel, ' ') << "("
@@ -132,7 +132,7 @@ void _write_asc_points(std::ofstream& myfile, const Points& points,
 
 void _write_asc_section(std::ofstream& myfile, const Morphology& morpho,
     const std::shared_ptr<Section>& section,
-    int indentLevel)
+    size_t indentLevel)
 {
     std::string indent(indentLevel, ' ');
     _write_asc_points(myfile, section->points(), section->diameters(),
@@ -237,7 +237,7 @@ void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria)
     std::vector<std::vector<float>> points;
     std::vector<std::vector<int32_t>> structure;
     for (unsigned int i = 0; i < size; ++i) {
-        points.push_back({(float)p._sectionIds[i], p._relativePathLengths[i],
+        points.push_back({static_cast<float>(p._sectionIds[i]), p._relativePathLengths[i],
             p._diameters[i]});
     }
 
@@ -263,27 +263,27 @@ void h5(const Morphology& morpho, const std::string& filename)
     std::vector<std::vector<int32_t>> raw_structure;
     std::vector<float> raw_perimeters;
 
-    const auto& points = morpho.soma()->points();
-    const auto& diameters = morpho.soma()->diameters();
+    const auto& somaPoints = morpho.soma()->points();
+    const auto& somaDiameters = morpho.soma()->diameters();
 
-    const std::size_t numberOfPoints = points.size();
-    const std::size_t numberOfDiameters = diameters.size();
+    const std::size_t numberOfSomaPoints = somaPoints.size();
+    const std::size_t numberOfSomaDiameters = somaDiameters.size();
 
-    if (numberOfPoints < 1)
+    if (numberOfSomaPoints < 1)
         LBERROR(Warning::WRITE_NO_SOMA,
             plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
-    if (numberOfPoints != numberOfDiameters)
+    if (numberOfSomaPoints != numberOfSomaDiameters)
         throw WriterError(plugin::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
-            "soma points", numberOfPoints, "soma diameters",
-            numberOfDiameters));
+            "soma points", numberOfSomaPoints, "soma diameters",
+            numberOfSomaDiameters));
 
     bool hasPerimeterData = morpho.rootSections().size() > 0
                                 ? morpho.rootSections()[0]->perimeters().size() > 0
                                 : false;
 
-    for (unsigned int i = 0; i < numberOfPoints; ++i) {
+    for (unsigned int i = 0; i < numberOfSomaPoints; ++i) {
         raw_points.push_back(
-            {points[i][0], points[i][1], points[i][2], diameters[i]});
+            {somaPoints[i][0], somaPoints[i][1], somaPoints[i][2], somaDiameters[i]});
 
         // If the morphology has some perimeter data, we need to fill some
         // perimeter dummy value in the soma range of the data structure to keep
@@ -293,7 +293,7 @@ void h5(const Morphology& morpho, const std::string& filename)
     }
 
     raw_structure.push_back({0, SECTION_SOMA, -1});
-    int offset = 0;
+    size_t offset = 0;
     offset += morpho.soma()->points().size();
 
     for (auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
@@ -306,7 +306,7 @@ void h5(const Morphology& morpho, const std::string& filename)
 
         const std::size_t numberOfPoints = points.size();
         const std::size_t numberOfPerimeters = perimeters.size();
-        raw_structure.push_back({offset, section->type(), parentOnDisk});
+        raw_structure.push_back({static_cast<int>(offset), section->type(), parentOnDisk});
 
         for (unsigned int i = 0; i < numberOfPoints; ++i)
             raw_points.push_back(
