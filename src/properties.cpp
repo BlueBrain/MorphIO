@@ -147,10 +147,10 @@ bool compare_section_structure(const std::vector<Section::Type>& vec1,
 
 template <typename T>
 bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
-    const std::string& name, bool verbose)
+    const std::string& name, bool verbose_)
 {
     if (vec1.size() != vec2.size()) {
-        if (verbose)
+        if (verbose_)
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
@@ -172,10 +172,10 @@ bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
 template <>
 bool compare(const morphio::range<const morphio::Point>& vec1,
     const morphio::range<const morphio::Point>& vec2,
-    const std::string& name, bool verbose)
+    const std::string& name, bool verbose_)
 {
     if (vec1.size() != vec2.size()) {
-        if (verbose)
+        if (verbose_)
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
@@ -184,7 +184,7 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
     const float epsilon = 1e-6f;
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
-            if (verbose) {
+            if (verbose_) {
                 LBERROR(Warning::UNDEFINED,
                     "Error comparing " + name + ", elements differ:");
                 LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
@@ -198,11 +198,11 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
 
 template <typename T, typename U>
 bool compare(const std::map<T, U>& vec1, const std::map<T, U>& vec2,
-    const std::string& name, bool verbose)
+    const std::string& name, bool verbose_)
 {
     if (vec1 == vec2)
         return true;
-    if (verbose) {
+    if (verbose_) {
         if (vec1.size() != vec2.size()) {
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
@@ -213,18 +213,18 @@ bool compare(const std::map<T, U>& vec1, const std::map<T, U>& vec2,
 }
 
 template <typename T>
-bool compare(const T& el1, const T& el2, const std::string& name, bool verbose)
+bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
 {
     if (el1 == el2)
         return true;
 
-    if (verbose)
+    if (verbose_)
         LBERROR(Warning::UNDEFINED, name + " differs");
     return false;
 }
 
 bool compare(const PointLevel& el1, const PointLevel& el2, size_t soma_offset1,
-    size_t soma_offset2, const std::string& name, bool verbose)
+    size_t soma_offset2, const std::string& name, bool verbose_)
 {
     if (&el1 == &el2)
         return true;
@@ -242,7 +242,7 @@ bool compare(const PointLevel& el1, const PointLevel& el2, size_t soma_offset1,
         el2._diameters.data() + soma_offset2,
         el2._diameters.size() - soma_offset2);
 
-    bool result = (compare(points1, points2, "_points", verbose) && compare(diameters1, diameters2, "_diameters", verbose));
+    bool result = (compare(points1, points2, "_points", verbose_) && compare(diameters1, diameters2, "_diameters", verbose_));
 
     if (el1._perimeters.size() > soma_offset1 && el2._perimeters.size() > soma_offset2) {
         if ((el1._perimeters.size() - soma_offset1) != (el2._perimeters.size() - soma_offset2))
@@ -255,9 +255,9 @@ bool compare(const PointLevel& el1, const PointLevel& el2, size_t soma_offset1,
             el2._perimeters.data() + soma_offset2,
             el2._perimeters.size() - soma_offset2);
 
-        result *= compare(perimeters1, perimeters2, "_perimeters", verbose);
+        result *= compare(perimeters1, perimeters2, "_perimeters", verbose_);
     }
-    if (!result && verbose)
+    if (!result && verbose_)
         LBERROR(Warning::UNDEFINED, "Error comparing " + name);
 
     return result;
