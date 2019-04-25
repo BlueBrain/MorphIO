@@ -132,13 +132,12 @@ private:
             } else {
                 std::shared_ptr<morphio::mut::Section> section;
                 if (parent_id > -1)
-                    section = nb_.section(static_cast<unsigned int>(parent_id))->appendSection(properties,
-                        section_type);
+                    section = nb_.section(static_cast<unsigned int>(parent_id))->appendSection(properties, section_type);
                 else
                     section = nb_.appendRootSection(properties, section_type);
                 return_id = static_cast<int>(section->id());
                 debugInfo_.setLineNumber(section->id(),
-                                         static_cast<unsigned int>(lex_.current_section_start_));
+                    static_cast<unsigned int>(lex_.current_section_start_));
             }
         }
         points.clear();

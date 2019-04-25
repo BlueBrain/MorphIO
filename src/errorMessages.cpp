@@ -292,10 +292,8 @@ const std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info,
     int childLine = info.getLineNumber(childId);
     std::string parentMsg, childMsg;
     if (parentLine > -1 && childLine > -1) {
-        parentMsg = " starting at:\n" + errorLink(static_cast<size_t>(parentLine),
-                                                  ErrorLevel::INFO) + "\n";
-        childMsg = " starting at:\n" + errorLink(static_cast<size_t>(childLine),
-                                                 ErrorLevel::WARNING) + "\n";
+        parentMsg = " starting at:\n" + errorLink(static_cast<size_t>(parentLine), ErrorLevel::INFO) + "\n";
+        childMsg = " starting at:\n" + errorLink(static_cast<size_t>(childLine), ErrorLevel::WARNING) + "\n";
     }
 
     return "\nSection: " + std::to_string(childId) + childMsg + " is the only child of " + "section: " + std::to_string(parentId) + parentMsg + "\nIt will be merged with the parent section";

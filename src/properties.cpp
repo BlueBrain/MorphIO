@@ -32,7 +32,7 @@ std::vector<typename T::Type> copySpan(
     if (data.empty())
         return std::vector<typename T::Type>();
     return std::vector<typename T::Type>(data.begin() + static_cast<long int>(range.first),
-                                         data.begin() + static_cast<long int>(range.second));
+        data.begin() + static_cast<long int>(range.second));
 }
 
 MitochondriaPointLevel::MitochondriaPointLevel(

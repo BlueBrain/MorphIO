@@ -198,7 +198,6 @@ inline bool noNeurites(int firstSectionOffset)
 }
 
 
-
 void MorphologyHDF5::_readPoints(int firstSectionOffset)
 {
     auto& points = _properties.get<Property::Point>();
@@ -239,8 +238,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset)
             somaDiameters.emplace_back(p[3]);
         }
 
-        if(!noNeurites(firstSectionOffset))
-        {
+        if (!noNeurites(firstSectionOffset)) {
             size_t size = (points.size() + vec.size() -
                            static_cast<unsigned int>(firstSectionOffset));
             points.reserve(size);
@@ -391,7 +389,6 @@ void MorphologyHDF5::_readSectionTypes()
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset)
 {
-
     if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1 || noNeurites(firstSectionOffset))
         return;
 

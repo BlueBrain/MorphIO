@@ -162,8 +162,8 @@ public:
     inline bool isRootSection(const Sample& sample)
     {
         return isOrphanNeurite(sample) ||
-            (sample.type != SECTION_SOMA &&
-             samples[static_cast<unsigned int>(sample.parentId)].type == SECTION_SOMA); // Exclude soma bifurcations
+               (sample.type != SECTION_SOMA &&
+                   samples[static_cast<unsigned int>(sample.parentId)].type == SECTION_SOMA); // Exclude soma bifurcations
     }
 
     inline bool isSectionStart(const Sample& sample)
@@ -175,8 +175,8 @@ public:
     {
         int id = static_cast<int>(sample.id);
         return id == lastSomaPoint ||       // End of soma
-            children[id].size() == 0 ||  // Reached leaf
-            (children[id].size() >= 2 && // Reached neurite
+               children[id].size() == 0 ||  // Reached leaf
+               (children[id].size() >= 2 && // Reached neurite
                    // bifurcation
                    sample.type != SECTION_SOMA);
     }
