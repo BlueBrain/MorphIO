@@ -8,28 +8,28 @@ namespace morphio {
 namespace mut {
 using morphio::plugin::ErrorMessages;
 
-Section::Section(Morphology* morphology, unsigned int id, SectionType type,
+Section::Section(Morphology* morphology, unsigned int id_, SectionType type_,
     const Property::PointLevel& pointProperties)
     : _morphology(morphology)
     , _pointProperties(pointProperties)
-    , _id(id)
-    , _sectionType(type)
+    , _id(id_)
+    , _sectionType(type_)
 {
 }
 
-Section::Section(Morphology* morphology, unsigned int id,
-    const morphio::Section& section)
-    : Section(morphology, id, section.type(),
-          Property::PointLevel(section._properties->_pointLevel,
-              section._range))
+Section::Section(Morphology* morphology, unsigned int id_,
+    const morphio::Section& section_)
+    : Section(morphology, id_, section_.type(),
+          Property::PointLevel(section_._properties->_pointLevel,
+              section_._range))
 {
 }
 
-Section::Section(Morphology* morphology, unsigned int id, const Section& section)
+Section::Section(Morphology* morphology, unsigned int id_, const Section& section_)
     : _morphology(morphology)
-    , _pointProperties(section._pointProperties)
-    , _id(id)
-    , _sectionType(section._sectionType)
+    , _pointProperties(section_._pointProperties)
+    , _id(id_)
+    , _sectionType(section_._sectionType)
 {
 }
 

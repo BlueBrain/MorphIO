@@ -94,19 +94,19 @@ PointLevel::PointLevel(const PointLevel& data, SectionRange range)
 
 template <typename T>
 bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
-    const std::string& name, bool verbose)
+    const std::string& name, bool verbose_)
 {
     if (vec1 == vec2)
         return true;
 
     if (vec1.size() != vec2.size()) {
-        if (verbose)
+        if (verbose_)
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
-    if (verbose) {
+    if (verbose_) {
         LBERROR(Warning::UNDEFINED,
             "Error comparing " + name + ", elements differ:");
         for (unsigned int i = 0; i < vec1.size(); ++i) {

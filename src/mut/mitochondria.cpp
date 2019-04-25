@@ -10,15 +10,15 @@ void friendDtorForSharedPtrMito(MitoSection* section)
 }
 
 std::shared_ptr<MitoSection> Mitochondria::appendRootSection(
-    const morphio::MitoSection& section, bool recursive)
+    const morphio::MitoSection& section_, bool recursive)
 {
-    std::shared_ptr<MitoSection> ptr(new MitoSection(this, _counter, section),
+    std::shared_ptr<MitoSection> ptr(new MitoSection(this, _counter, section_),
         friendDtorForSharedPtrMito);
     _register(ptr);
     _rootSections.push_back(ptr);
 
     if (recursive) {
-        for (const auto& child : section.children()) {
+        for (const auto& child : section_.children()) {
             ptr->appendSection(child, true);
         }
     }
@@ -27,16 +27,16 @@ std::shared_ptr<MitoSection> Mitochondria::appendRootSection(
 }
 
 std::shared_ptr<MitoSection> Mitochondria::appendRootSection(
-    std::shared_ptr<MitoSection> section, bool recursive)
+    std::shared_ptr<MitoSection> section_, bool recursive)
 {
     std::shared_ptr<MitoSection> section_copy(new MitoSection(this, _counter,
-                                                  *section),
+                                                  *section_),
         friendDtorForSharedPtrMito);
     _register(section_copy);
     _rootSections.push_back(section_copy);
 
     if (recursive) {
-        for (const auto child : section->children()) {
+        for (const auto child : section_->children()) {
             section_copy->appendSection(child, true);
         }
     }
@@ -67,10 +67,10 @@ void _appendMitoProperties(Property::MitochondriaPointLevel& to,
 }
 
 const std::vector<std::shared_ptr<MitoSection>> Mitochondria::children(
-    std::shared_ptr<MitoSection> section) const
+    std::shared_ptr<MitoSection> section_) const
 {
     try {
-        return _children.at(section->id());
+        return _children.at(section_->id());
     } catch (const std::out_of_range& e) {
         return std::vector<std::shared_ptr<MitoSection>>();
     }
@@ -83,15 +83,15 @@ const std::vector<std::shared_ptr<MitoSection>>& Mitochondria::rootSections()
 }
 
 const std::shared_ptr<MitoSection> Mitochondria::parent(
-    const std::shared_ptr<MitoSection> parent) const
+    const std::shared_ptr<MitoSection> parent_) const
 {
-    return section(_parent.at(parent->id()));
+    return section(_parent.at(parent_->id()));
 }
 
-bool Mitochondria::isRoot(const std::shared_ptr<MitoSection> section) const
+bool Mitochondria::isRoot(const std::shared_ptr<MitoSection> section_) const
 {
     try {
-        parent(section);
+        parent(section_);
         return false;
     } catch (const std::out_of_range& e) {
         return true;
