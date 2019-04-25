@@ -140,12 +140,12 @@ const std::vector<Section> Morphology::rootSections() const
 const std::vector<Section> Morphology::sections() const
 {
     // TODO: Make this more performant when needed
-    std::vector<Section> sections;
+    std::vector<Section> sections_;
     for (uint i = 1; i < _properties->get<morphio::Property::Section>().size();
          ++i) {
-        sections.push_back(section(i));
+        sections_.push_back(section(i));
     }
-    return sections;
+    return sections_;
 }
 
 template <typename Property>

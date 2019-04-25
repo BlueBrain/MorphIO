@@ -118,34 +118,34 @@ void Mitochondria::_buildMitochondria(Property::Properties& properties) const
         std::queue<std::shared_ptr<MitoSection>> q;
         q.push(mitoStart);
         while (!q.empty()) {
-            std::shared_ptr<MitoSection> section = q.front();
+            std::shared_ptr<MitoSection> section_ = q.front();
             q.pop();
-            bool root = isRoot(section);
-            int32_t parentOnDisk = root ? -1 : newIds[parent(section)->id()];
+            bool root = isRoot(section_);
+            int32_t parentOnDisk = root ? -1 : newIds[parent(section_)->id()];
 
             properties._mitochondriaSectionLevel._sections.push_back(
                 {static_cast<int>(properties._mitochondriaPointLevel._diameters.size()),
                     parentOnDisk});
             _appendMitoProperties(properties._mitochondriaPointLevel,
-                section->_mitoPoints);
+                section_->_mitoPoints);
 
-            newIds[section->id()] = counter++;
+            newIds[section_->id()] = counter++;
 
-            for (auto child : children(section))
+            for (auto child : children(section_))
                 q.push(child);
         }
     }
 }
 
-const std::shared_ptr<MitoSection> Mitochondria::mitoSection(uint32_t id) const
+const std::shared_ptr<MitoSection> Mitochondria::mitoSection(uint32_t id_) const
 {
-    return _sections.at(id);
+    return _sections.at(id_);
 }
 
 mito_depth_iterator Mitochondria::depth_begin(
-    std::shared_ptr<MitoSection> section) const
+    std::shared_ptr<MitoSection> section_) const
 {
-    return mito_depth_iterator(*this, section);
+    return mito_depth_iterator(*this, section_);
 }
 
 mito_depth_iterator Mitochondria::depth_end() const
@@ -154,9 +154,9 @@ mito_depth_iterator Mitochondria::depth_end() const
 }
 
 mito_breadth_iterator Mitochondria::breadth_begin(
-    std::shared_ptr<MitoSection> section) const
+    std::shared_ptr<MitoSection> section_) const
 {
-    return mito_breadth_iterator(*this, section);
+    return mito_breadth_iterator(*this, section_);
 }
 
 mito_breadth_iterator Mitochondria::breadth_end() const
@@ -165,9 +165,9 @@ mito_breadth_iterator Mitochondria::breadth_end() const
 }
 
 mito_upstream_iterator Mitochondria::upstream_begin(
-    std::shared_ptr<MitoSection> section) const
+    std::shared_ptr<MitoSection> section_) const
 {
-    return mito_upstream_iterator(*this, section);
+    return mito_upstream_iterator(*this, section_);
 }
 
 mito_upstream_iterator Mitochondria::upstream_end() const
@@ -175,14 +175,14 @@ mito_upstream_iterator Mitochondria::upstream_end() const
     return mito_upstream_iterator();
 }
 
-uint32_t Mitochondria::_register(std::shared_ptr<MitoSection> section)
+uint32_t Mitochondria::_register(std::shared_ptr<MitoSection> section_)
 {
-    if (_sections.count(section->id()))
+    if (_sections.count(section_->id()))
         LBTHROW(SectionBuilderError("Section already exists"));
-    _counter = std::max(_counter, section->id()) + 1;
+    _counter = std::max(_counter, section_->id()) + 1;
 
-    _sections[section->id()] = section;
-    return section->id();
+    _sections[section_->id()] = section_;
+    return section_->id();
 }
 
 } // namespace mut
