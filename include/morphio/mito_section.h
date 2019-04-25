@@ -54,8 +54,8 @@ public:
     SectionType type() const;
 
 protected:
-    MitoSection(uint32_t id, std::shared_ptr<Property::Properties> morphology)
-        : SectionBase(id, morphology)
+    MitoSection(uint32_t id_, std::shared_ptr<Property::Properties> morphology)
+        : SectionBase(id_, morphology)
     {
     }
     friend const MitoSection Mitochondria::section(const uint32_t&) const;
