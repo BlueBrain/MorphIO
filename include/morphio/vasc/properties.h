@@ -32,6 +32,9 @@ struct Diameter
 
 struct Connection
 {
+    // stores the graph connectivity between the sections
+    // If section1 is connected to section2, then the last point of section1
+    // and the first point of section2 must be equal.
     using Type = std::array<int, 2>;
 };
 

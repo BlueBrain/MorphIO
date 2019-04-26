@@ -1,6 +1,6 @@
 #pragma once
 
-#include <morphio/vasc/morphology.h>
+#include <morphio/vasc/vasculature.h>
 #include <morphio/vasc/properties.h>
 #include <morphio/types.h>
 
@@ -8,30 +8,30 @@ namespace morphio
 {
 namespace vasculature
 {
-class VasculatureSection
+class Section
 {
     using SectionId = property::VascSection;
     using PointAttribute = property::Point;
 
 public:
 
-    VasculatureSection(const VasculatureSection& section);
+    Section(const Section& section);
 
-    const VasculatureSection& operator=(const VasculatureSection& section);
+    const Section& operator=(const Section& section);
 
-    VasculatureSection(uint32_t id, std::shared_ptr<property::Properties> morphology);
+    Section(uint32_t id, std::shared_ptr<property::Properties> morphology);
 
-    bool operator==(const VasculatureSection& section) const;
-    bool operator!=(const VasculatureSection& section) const;
-    bool operator<(const VasculatureSection& other) const;
+    bool operator==(const Section& section) const;
+    bool operator!=(const Section& section) const;
+    bool operator<(const Section& other) const;
 
     //bool isRoot() const;
 
-    const std::vector<VasculatureSection> predecessors() const;
+    const std::vector<Section> predecessors() const;
 
-    const std::vector<VasculatureSection> successors() const;
+    const std::vector<Section> successors() const;
 
-    const std::vector<VasculatureSection> neighbors() const;
+    const std::vector<Section> neighbors() const;
 
     uint32_t id() const;
 
@@ -59,5 +59,5 @@ protected:
 
 }
 }
-std::ostream& operator<<(std::ostream& os, const morphio::vasculature::VasculatureSection& section);
+std::ostream& operator<<(std::ostream& os, const morphio::vasculature::Section& section);
 std::ostream& operator<<(std::ostream& os, morphio::range<const morphio::Point> points);

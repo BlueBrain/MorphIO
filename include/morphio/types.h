@@ -47,8 +47,8 @@ struct Properties;
 }
 
 namespace vasculature {
-    class VasculatureSection;
-    class VasculatureMorphology;
+    class Section;
+    class Vasculature;
 }
 
 namespace detail {

@@ -1,4 +1,4 @@
-#include "vasc_morphologyHDF5.h"
+#include "vasculatureHDF5.h"
 
 #include "../detail/utilsHDF5.h"
 
@@ -9,7 +9,7 @@ namespace plugin {
 namespace h5 {
 using namespace vasculature;
 
-property::Properties VasculatureMorphologyHDF5::load(const URI& uri)
+property::Properties VasculatureHDF5::load(const URI& uri)
 {
     try {
         HighFive::SilenceHDF5 silence;
@@ -28,7 +28,7 @@ property::Properties VasculatureMorphologyHDF5::load(const URI& uri)
     return _properties;
 }
 
-VasculatureMorphologyHDF5::~VasculatureMorphologyHDF5()
+VasculatureHDF5::~VasculatureHDF5()
 {
     _points.reset();
     _sections.reset();
@@ -36,7 +36,7 @@ VasculatureMorphologyHDF5::~VasculatureMorphologyHDF5()
     _file.reset();
 }
 
-void VasculatureMorphologyHDF5::_readDatasets()
+void VasculatureHDF5::_readDatasets()
 {
     HighFive::SilenceHDF5 silence;
     _points.reset(new HighFive::DataSet(_file->getDataSet("/points")));
@@ -62,7 +62,7 @@ void VasculatureMorphologyHDF5::_readDatasets()
     }
 }
 
-void VasculatureMorphologyHDF5::_readPoints()
+void VasculatureHDF5::_readPoints()
 {
     auto& points = _properties.get<property::Point>();
     auto& diameters = _properties.get<property::Diameter>();
@@ -77,7 +77,7 @@ void VasculatureMorphologyHDF5::_readPoints()
     }
 }
 
-void VasculatureMorphologyHDF5::_readSections()
+void VasculatureHDF5::_readSections()
 {
     auto& sections = _properties.get<property::VascSection>();
 
@@ -92,7 +92,7 @@ void VasculatureMorphologyHDF5::_readSections()
     }
 }
 
-void VasculatureMorphologyHDF5::_readSectionTypes()
+void VasculatureHDF5::_readSectionTypes()
 {
     std::vector<VascularSectionType> & types = _properties.get<property::SectionType>();
 
@@ -101,7 +101,7 @@ void VasculatureMorphologyHDF5::_readSectionTypes()
     selection.read(types);
 }
 
-void VasculatureMorphologyHDF5::_readConnectivity()
+void VasculatureHDF5::_readConnectivity()
 {
     std::vector<std::vector<int>> vec;
     vec.resize(_conDims[0]);

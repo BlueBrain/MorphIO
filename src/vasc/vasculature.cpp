@@ -5,11 +5,11 @@
 #include <fstream>
 #include <streambuf>
 
-#include <morphio/vasc/morphology.h>
+#include <morphio/vasc/vasculature.h>
 #include <morphio/vasc/section.h>
 #include <morphio/iterators.h>
 
-#include "../plugin/vasc_morphologyHDF5.h"
+#include "src/plugin/vasculatureHDF5.h"
 #include "../plugin/morphologySWC.h"
 
 namespace morphio {
@@ -18,7 +18,7 @@ namespace vasculature
 
 void buildConnectivity(std::shared_ptr<property::Properties> properties);
 
-VasculatureMorphology::VasculatureMorphology(const morphio::URI &source, unsigned int options)
+Vasculature::Vasculature(const morphio::URI &source, unsigned int options)
 {
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos)
@@ -34,7 +34,7 @@ VasculatureMorphology::VasculatureMorphology(const morphio::URI &source, unsigne
 
     auto loader = [&source, &options, &extension]() {
         if (extension == ".h5")
-            return plugin::h5::VasculatureMorphologyHDF5().load(source);
+            return plugin::h5::VasculatureHDF5().load(source);
         LBTHROW(UnknownFileType(
                 "Unhandled file type"));
     };
@@ -44,29 +44,29 @@ VasculatureMorphology::VasculatureMorphology(const morphio::URI &source, unsigne
     buildConnectivity(_properties);
 }
 
-VasculatureMorphology::VasculatureMorphology(VasculatureMorphology&&) = default;
-VasculatureMorphology& VasculatureMorphology::operator=(VasculatureMorphology&&) = default;
+Vasculature::Vasculature(Vasculature&&) = default;
+Vasculature& Vasculature::operator=(Vasculature&&) = default;
 
-VasculatureMorphology::~VasculatureMorphology() {}
+Vasculature::~Vasculature() {}
 
-bool VasculatureMorphology::operator==(const VasculatureMorphology& other) const
+bool Vasculature::operator==(const Vasculature& other) const
 {
     return this->_properties == other._properties;
 }
 
-bool VasculatureMorphology::operator!=(const morphio::vasculature::VasculatureMorphology& other) const
+bool Vasculature::operator!=(const morphio::vasculature::Vasculature& other) const
 {
     return !this->operator==(other);
 }
 
-const VasculatureSection VasculatureMorphology::section(const uint32_t& id) const
+const Section Vasculature::section(const uint32_t& id) const
 {
-    return VasculatureSection(id, _properties);
+    return Section(id, _properties);
 }
 
-const std::vector<VasculatureSection> VasculatureMorphology::sections() const
+const std::vector<Section> Vasculature::sections() const
 {
-    std::vector<VasculatureSection> sections;
+    std::vector<Section> sections;
     for (uint i = 0; i < _properties->get<property::VascSection>().size(); ++i) {
         sections.push_back(section(i));
     }
@@ -74,32 +74,32 @@ const std::vector<VasculatureSection> VasculatureMorphology::sections() const
 }
 
 template <typename Property>
-const std::vector<typename Property::Type>& VasculatureMorphology::get() const
+const std::vector<typename Property::Type>& Vasculature::get() const
 {
     return _properties->get<Property>();
 }
 
-const Points& VasculatureMorphology::points() const
+const Points& Vasculature::points() const
 {
     return get<property::Point>();
 }
 
-const std::vector<float>& VasculatureMorphology::diameters() const
+const std::vector<float>& Vasculature::diameters() const
 {
     return get<property::Diameter>();
 }
 
-const std::vector<property::SectionType::Type>& VasculatureMorphology::sectionTypes() const
+const std::vector<property::SectionType::Type>& Vasculature::sectionTypes() const
 {
     return get<property::SectionType>();
 }
 
-graph_iterator VasculatureMorphology::begin() const
+graph_iterator Vasculature::begin() const
 {
     return graph_iterator(*this);
 }
 
-graph_iterator VasculatureMorphology::end() const
+graph_iterator Vasculature::end() const
 {
     return graph_iterator();
 }

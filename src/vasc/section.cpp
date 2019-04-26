@@ -3,17 +3,17 @@
 
 namespace morphio {
 namespace vasculature {
-VasculatureSection::VasculatureSection(const uint32_t id,
+Section::Section(const uint32_t id,
         std::shared_ptr<property::Properties> properties)
         : _id(id)
         , _properties(properties)
 {
-    const auto& sections = properties->get<VasculatureSection::SectionId>();
+    const auto& sections = properties->get<Section::SectionId>();
     if (id >= sections.size())
         LBTHROW(RawDataError("Requested section ID (" + std::to_string(id) + ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
     const size_t start = sections[id];
     const size_t end = id == sections.size() - 1
-                            ? properties->get<VasculatureSection::PointAttribute>().size()
+                            ? properties->get<Section::PointAttribute>().size()
                             : sections[id + 1];
     _range = std::make_pair(start, end);
 
@@ -22,10 +22,10 @@ VasculatureSection::VasculatureSection(const uint32_t id,
         << "Section range: " << _range.first << " -> " << _range.second << std::endl;
 }
 
-VasculatureSection::VasculatureSection(const VasculatureSection &section) :_id(section._id), _range(section._range), _properties(section._properties)
+Section::Section(const Section &section) :_id(section._id), _range(section._range), _properties(section._properties)
 {}
 
-const VasculatureSection& VasculatureSection::operator=(const VasculatureSection& section)
+const Section& Section::operator=(const Section& section)
 {
     if (&section == this)
         return *this;
@@ -35,23 +35,23 @@ const VasculatureSection& VasculatureSection::operator=(const VasculatureSection
     return *this;
 }
 
-bool VasculatureSection::operator==(const VasculatureSection& other) const
+bool Section::operator==(const Section& other) const
 {
     return other._id == _id && other._properties == _properties;
 }
 
-bool VasculatureSection::operator!=(const VasculatureSection& other) const
+bool Section::operator!=(const Section& other) const
 {
     return !(*this == other);
 }
 
-uint32_t VasculatureSection::id() const
+uint32_t Section::id() const
 {
     return _id;
 }
 
 template <typename TProperty>
-const range<const typename TProperty::Type> VasculatureSection::get() const
+const range<const typename TProperty::Type> Section::get() const
 {
     auto& data = _properties->get<TProperty>();
     if (data.empty())
@@ -61,51 +61,51 @@ const range<const typename TProperty::Type> VasculatureSection::get() const
             _range.second - _range.first);
 }
 
-const std::vector<VasculatureSection> VasculatureSection::predecessors() const
+const std::vector<Section> Section::predecessors() const
 {
-    std::vector<VasculatureSection> result;
+    std::vector<Section> result;
     try {
-        const std::vector<uint32_t>& predecessors = _properties->predecessors<VasculatureSection::SectionId>().at(_id);
+        const std::vector<uint32_t>& predecessors = _properties->predecessors<Section::SectionId>().at(_id);
         result.reserve(predecessors.size());
         for (const uint32_t id : predecessors)
-            result.push_back(VasculatureSection(id, _properties));
+            result.push_back(Section(id, _properties));
         return result;
     } catch (const std::out_of_range& oor) {
         return result;
     }
 }
 
-const std::vector<VasculatureSection> VasculatureSection::successors() const
+const std::vector<Section> Section::successors() const
 {
-    std::vector<VasculatureSection> result;
+    std::vector<Section> result;
     try {
-        const std::vector<uint32_t>& successors = _properties->successors<VasculatureSection::SectionId>().at(_id);
+        const std::vector<uint32_t>& successors = _properties->successors<Section::SectionId>().at(_id);
         result.reserve(successors.size());
         for (const uint32_t id : successors)
-            result.push_back(VasculatureSection(id, _properties));
+            result.push_back(Section(id, _properties));
         return result;
     } catch (const std::out_of_range& oor) {
         return result;
     }
 }
 
-const std::vector<VasculatureSection> VasculatureSection::neighbors() const
+const std::vector<Section> Section::neighbors() const
 {
-    std::vector<VasculatureSection> pre = this->predecessors();
-    std::vector<VasculatureSection> suc = this->successors();
+    std::vector<Section> pre = this->predecessors();
+    std::vector<Section> suc = this->successors();
     for (size_t i = 0; i < suc.size(); ++i) {
         pre.push_back(suc[i]);
     }
     return pre;
 }
 
-VascularSectionType VasculatureSection::type() const
+VascularSectionType Section::type() const
 {
     auto val = _properties->get<property::SectionType>()[_id];
     return val;
 }
 
-float VasculatureSection::length() const
+float Section::length() const
 {
     auto points = this->points();
     int last = points.size() - 1;
@@ -114,27 +114,27 @@ float VasculatureSection::length() const
     return distance(points[0], points[last]);
 }
 
-const range<const Point> VasculatureSection::points() const
+const range<const Point> Section::points() const
 {
     return get<property::Point>();
 }
 
-const range<const float> VasculatureSection::diameters() const
+const range<const float> Section::diameters() const
 {
     return get<property::Diameter>();
 }
 
-bool VasculatureSection::operator<(const VasculatureSection& other) const
+bool Section::operator<(const Section& other) const
 {
     return this->_id > other.id();
 }
 
-graph_iterator VasculatureSection::begin() const
+graph_iterator Section::begin() const
 {
     return graph_iterator(*this);
 }
 
-graph_iterator VasculatureSection::end() const
+graph_iterator Section::end() const
 {
     return graph_iterator();
 }

@@ -94,7 +94,7 @@ def test_mitochondria():
 
 
 def test_vasculature():
-    morpho = vasculature.VasculatureMorphology(os.path.join(_path, "h5/test_vasculature.h5"))
+    morpho = vasculature.VasculatureMorphology(os.path.join(_path, "h5/vasculature.h5"))
     assert_array_almost_equal(morpho.section(0).points,
                        np.array([[1265.47399902,  335.42364502, 1869.19274902],
                               [1266.26647949,  335.57000732, 1869.74914551],

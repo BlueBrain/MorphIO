@@ -33,7 +33,7 @@ template <typename T>
 std::vector<typename T::Type> copySpan(const std::vector<typename T::Type>& data, SectionRange range);
 */
 
-    
+
 struct Section
 {
     // (offset, parent index)

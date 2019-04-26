@@ -12,10 +12,10 @@ namespace plugin {
 namespace h5 {
 using namespace morphio::vasculature;
 
-class VasculatureMorphologyHDF5
+class VasculatureHDF5
 {
 public:
-    virtual ~VasculatureMorphologyHDF5();
+    virtual ~VasculatureHDF5();
     property::Properties load(const URI& uri);
 
 private:

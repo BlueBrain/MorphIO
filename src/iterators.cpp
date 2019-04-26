@@ -39,12 +39,12 @@ breadth_iterator::Iterator(const Morphology& morphology)
     }
 }
 
-graph_iterator::graph_iterator(const vasculature::VasculatureSection& vasculatureSection)
+graph_iterator::graph_iterator(const vasculature::Section& vasculatureSection)
 {
     container.push(vasculatureSection);
 }
 
-graph_iterator::graph_iterator(const vasculature::VasculatureMorphology& vasculatureMorphology)
+graph_iterator::graph_iterator(const vasculature::Vasculature& vasculatureMorphology)
 {
     auto sections = vasculatureMorphology.sections();
     for (std::size_t i = 0; i < sections.size(); ++i) {
@@ -122,7 +122,7 @@ Section upstream_iterator::operator*() const
     return container[0];
 }
 
-vasculature::VasculatureSection graph_iterator::operator*() const
+vasculature::Section graph_iterator::operator*() const
 {
     return container.top();
 }

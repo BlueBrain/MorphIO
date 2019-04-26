@@ -34,22 +34,21 @@ public:
 
 class graph_iterator
 {
-    friend class vasculature::VasculatureSection;
-    friend class vasculature::VasculatureMorphology;
-    std::set<vasculature::VasculatureSection> visited;
+    friend class vasculature::Section;
+    friend class vasculature::Vasculature;
+    std::set<vasculature::Section> visited;
 
-    std::stack<vasculature::VasculatureSection> container;
+    std::stack<vasculature::Section> container;
 
         graph_iterator();
 
 
-
-    public:
-    graph_iterator(const vasculature::VasculatureSection& vasculatureSection);
-    graph_iterator(const vasculature::VasculatureMorphology& vasculatureMorphology);
+public:
+    graph_iterator(const vasculature::Section& vasculatureSection);
+    graph_iterator(const vasculature::Vasculature& vasculatureMorphology);
     bool operator==(graph_iterator other) const;
     bool operator!=(graph_iterator other) const;
-    vasculature::VasculatureSection operator*() const;
+    vasculature::Section operator*() const;
     graph_iterator& operator++();
     graph_iterator operator++(int);
 };

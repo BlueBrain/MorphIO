@@ -10,7 +10,7 @@
 #include <morphio/soma.h>
 #include <morphio/vasc/section.h>
 #include <morphio/vasc/properties.h>
-#include <morphio/vasc/morphology.h>
+#include <morphio/vasc/vasculature.h>
 
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
@@ -29,7 +29,6 @@ int main()
     clock_t begin = clock();
     morphio::Morphology m("tests/data/h5/v1/simple.h5");
     //morphio::Morphology m("data/Astrocytes_H5/astrocyte2_v3.h5");
-    //morphio::vasculature::VasculatureMorphology m("../VasculatureRepair/test_data/test_vasculature.h5");
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC * 1000.;
     std::cout << elapsed_secs << " milliseconds" << std::endl;
