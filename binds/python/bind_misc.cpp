@@ -115,7 +115,7 @@ void bind_misc(py::module &m) {
                     sizeof(float),                          /* Size of one scalar */
                     py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
                     2,                                      /* Number of dimensions */
-                    { static_cast<int>(points.size()), 3 },  /* Buffer dimensions */
+                    { static_cast<ssize_t>(points.size()), static_cast<ssize_t>(3) },  /* Buffer dimensions */
                     { sizeof(float) * 3,             /* Strides (in bytes) for each index */
                             sizeof(float) }
                     );

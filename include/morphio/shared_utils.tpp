@@ -28,7 +28,7 @@ float _somaSurface(const SomaType type, const ContainerDiameters& diameters,
             float r0 = diameters[i] * 0.5f;
             float r1 = diameters[i + 1] * 0.5f;
             float h2 = distance(points[i], points[i + 1]);
-            auto s = static_cast<float>(M_PI) * (r0 + r1) * std::sqrtf((r0 - r1) * (r0 - r1) + h2 * h2);
+            auto s = static_cast<float>(M_PI) * (r0 + r1) * std::sqrt((r0 - r1) * (r0 - r1) + h2 * h2);
             surface += s;
         }
         return surface;

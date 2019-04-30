@@ -245,7 +245,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset)
             diameters.reserve(size);
             for (std::size_t i = offset; i < vec.size(); ++i) {
                 const auto& p = vec[i];
-                points.emplace_back(p[0], p[1], p[2]);
+                points.emplace_back(Point{p[0], p[1], p[2]});
                 diameters.emplace_back(p[3]);
             }
         }
