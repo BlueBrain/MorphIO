@@ -374,7 +374,7 @@ void Morphology::applyModifiers(unsigned int modifierFlags)
         modifiers::nrn_order(*this);
 }
 
-char my_tolower(char ch)
+static inline char my_tolower(char ch)
 {
     return static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
 }
