@@ -55,7 +55,7 @@ void soma_sphere(morphio::mut::Morphology& morpho)
     }
 
     for (auto point : soma->points()) {
-        r += sqrtf(powf(point[0] - x, 2) + powf(point[1] - y, 2) + powf(point[2] - z, 2)) / size;
+        r += sqrtf(std::pow(point[0] - x, 2) + std::pow(point[1] - y, 2) + std::pow(point[2] - z, 2)) / size;
     }
 
     soma->points() = {{x, y, z}};
