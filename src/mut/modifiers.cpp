@@ -48,14 +48,14 @@ void soma_sphere(morphio::mut::Morphology& morpho)
         return;
 
     float x = 0, y = 0, z = 0, r = 0;
-    for (auto point : soma->points()) {
+    for (const Point& point : soma->points()) {
         x += point[0] / size;
         y += point[1] / size;
         z += point[2] / size;
     }
 
     for (auto point : soma->points()) {
-        r += std::sqrt(std::pow(point[0] - x, 2) + std::pow(point[1] - y, 2) + std::pow(point[2] - z, 2)) / size;
+        r += std::sqrtf(std::pow(point[0] - x, 2) + std::pow(point[1] - y, 2) + std::pow(point[2] - z, 2)) / size;
     }
 
     soma->points() = {{x, y, z}};
