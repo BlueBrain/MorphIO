@@ -107,7 +107,7 @@ graph_iterator Vasculature::end() const
 void buildConnectivity(std::shared_ptr<property::Properties> properties)
 {
 
-    const auto& sections = properties->get<property::VascSection>();
+    //const auto& sections = properties->get<property::VascSection>();
     const auto& connectivity = properties->get<property::Connection>();
     auto& successors = properties->_sectionLevel._successors;
     auto& predecessors = properties->_sectionLevel._predecessors;
