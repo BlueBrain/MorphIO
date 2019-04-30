@@ -318,7 +318,7 @@ const Property::Properties Morphology::buildReadOnly() const
         unsigned int sectionId = section_->id();
         int parentOnDisk = (section_->isRoot() ? -1 : newIds[section_->parent()->id()]);
 
-        int start = static_cast<int>(properties._pointLevel._points.size());
+        auto start = static_cast<int>(properties._pointLevel._points.size());
         properties._sectionLevel._sections.push_back({start, parentOnDisk});
         properties._sectionLevel._sectionTypes.push_back(section_->type());
         newIds[sectionId] = sectionIdOnDisk++;
