@@ -192,7 +192,7 @@ HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections)
 /**
    Returns true if the neuron has no neurites
 **/
-inline bool noNeurites(int firstSectionOffset)
+static inline bool noNeurites(int firstSectionOffset)
 {
     return (firstSectionOffset == -1);
 }
