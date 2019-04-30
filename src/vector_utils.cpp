@@ -77,7 +77,7 @@ std::vector<Point> operator-=(std::vector<Point>& points, const Point& right)
 **/
 float distance(const Point& left, const Point& right)
 {
-    return sqrtf((left[0] - right[0]) * (left[0] - right[0]) + (left[1] - right[1]) * (left[1] - right[1]) + (left[2] - right[2]) * (left[2] - right[2]));
+    return std::sqrt((left[0] - right[0]) * (left[0] - right[0]) + (left[1] - right[1]) * (left[1] - right[1]) + (left[2] - right[2]) * (left[2] - right[2]));
 }
 
 std::string dumpPoint(const Point& point)
