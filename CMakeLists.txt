@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
 project(MorphIO VERSION 2.0.0)
 
+add_subdirectory(3rdparty/coding-conventions/cpp)
+bob_begin_cxx_flags()
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
