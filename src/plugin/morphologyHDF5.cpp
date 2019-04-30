@@ -265,6 +265,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset)
     somaPoints.reserve(somaPoints.size() + offset);
     somaDiameters.reserve(somaDiameters.size() + offset);
     for (std::size_t i = 0; i < offset; ++i) {
+
         const auto& p = vec[i];
         somaPoints.emplace_back(Point{p[0], p[1], p[2]});
         somaDiameters.emplace_back(p[3]);
