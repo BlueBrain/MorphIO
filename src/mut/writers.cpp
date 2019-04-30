@@ -77,7 +77,7 @@ void swc(const Morphology& morphology, const std::string& filename)
     const auto& soma_points = soma->points();
     const auto& soma_diameters = soma->diameters();
 
-    if (soma_points.size() < 1)
+    if (soma_points.empty())
         LBERROR(Warning::WRITE_NO_SOMA,
             plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
 
