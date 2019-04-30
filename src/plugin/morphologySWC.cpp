@@ -175,7 +175,7 @@ public:
     {
         int id = static_cast<int>(sample.id);
         return id == lastSomaPoint ||       // End of soma
-               children[id].size() == 0 ||  // Reached leaf
+               children[id].empty() ||  // Reached leaf
                (children[id].size() >= 2 && // Reached neurite
                    // bifurcation
                    sample.type != SECTION_SOMA);
