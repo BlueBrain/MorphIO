@@ -383,11 +383,6 @@ void Morphology::applyModifiers(unsigned int modifierFlags)
         modifiers::nrn_order(*this);
 }
 
-static inline char my_tolower(char ch)
-{
-    return static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
-}
-
 void Morphology::write(const std::string& filename)
 {
     const size_t pos = filename.find_last_of(".");

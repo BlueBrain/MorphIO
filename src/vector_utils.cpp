@@ -143,14 +143,14 @@ std::ostream& operator<<(std::ostream& os,
     os << morphio::dumpPoints(points);
     return os;
 }
+
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point)
 {
     os << morphio::dumpPoint(point);
     return os;
 }
 
-
-inline char my_tolower(char ch)
+char my_tolower(char ch)
 {
     return static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
 }
