@@ -66,11 +66,11 @@ const Section Vasculature::section(const uint32_t& id) const
 
 const std::vector<Section> Vasculature::sections() const
 {
-    std::vector<Section> sections;
+    std::vector<Section> sections_;
     for (uint i = 0; i < _properties->get<property::VascSection>().size(); ++i) {
-        sections.push_back(section(i));
+        sections_.push_back(section(i));
     }
-    return sections;
+    return sections_;
 }
 
 template <typename Property>
