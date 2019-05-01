@@ -74,7 +74,9 @@ Morphology::Morphology(mut::Morphology morphology)
 Morphology::Morphology(Morphology&&) = default;
 Morphology& Morphology::operator=(Morphology&&) = default;
 
-Morphology::~Morphology() {}
+Morphology::~Morphology()
+{
+}
 
 bool Morphology::operator==(const Morphology& other) const
 {

@@ -17,13 +17,11 @@ public:
      * Return the section ID
      **/
     uint32_t id() const { return _id; }
-
     /**
      * Return the morphological type of this section (dendrite, axon, ...)
      **/
     SectionType& type() { return _sectionType; }
     const SectionType& type() const { return _sectionType; }
-
     /**
        Return the coordinates (x,y,z) of all points of this section
     **/
@@ -55,7 +53,6 @@ public:
        Return the PointLevel instance that contains this section's data
     **/
     Property::PointLevel& properties() { return _pointProperties; }
-
     ////////////////////////////////////////////////////////////////////////////////
     //
     // Methods that were previously in mut::Morphology
@@ -89,7 +86,6 @@ public:
     upstream_iterator upstream_end() const;
 
     ~Section() {}
-
     std::shared_ptr<Section> appendSection(const morphio::Section&,
         bool recursive = false);
 

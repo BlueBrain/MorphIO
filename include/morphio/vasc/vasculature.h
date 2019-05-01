@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <morphio/vasc/properties.h>
 #include <morphio/types.h>
+#include <morphio/vasc/properties.h>
 
 namespace morphio {
 namespace vasculature {
@@ -65,12 +65,10 @@ public:
     graph_iterator end() const;
 
 private:
-
     std::shared_ptr<property::Properties> _properties;
 
     template <typename Property>
     const std::vector<typename Property::Type>& get() const;
-
 };
 } // namespace vasculature
 } // namespace morphio

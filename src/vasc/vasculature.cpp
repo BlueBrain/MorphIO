@@ -5,20 +5,19 @@
 #include <fstream>
 #include <streambuf>
 
-#include <morphio/vasc/vasculature.h>
-#include <morphio/vasc/section.h>
 #include <morphio/iterators.h>
+#include <morphio/vasc/section.h>
+#include <morphio/vasc/vasculature.h>
 
-#include "src/plugin/vasculatureHDF5.h"
 #include "../plugin/morphologySWC.h"
+#include "src/plugin/vasculatureHDF5.h"
 
 namespace morphio {
-namespace vasculature
-{
+namespace vasculature {
 
 void buildConnectivity(std::shared_ptr<property::Properties> properties);
 
-Vasculature::Vasculature(const morphio::URI &source, unsigned int options)
+Vasculature::Vasculature(const morphio::URI& source, unsigned int options)
 {
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos)
@@ -36,7 +35,7 @@ Vasculature::Vasculature(const morphio::URI &source, unsigned int options)
         if (extension == ".h5")
             return plugin::h5::VasculatureHDF5().load(source);
         LBTHROW(UnknownFileType(
-                "Unhandled file type"));
+            "Unhandled file type"));
     };
 
     _properties = std::make_shared<property::Properties>(loader());
@@ -47,7 +46,9 @@ Vasculature::Vasculature(const morphio::URI &source, unsigned int options)
 Vasculature::Vasculature(Vasculature&&) = default;
 Vasculature& Vasculature::operator=(Vasculature&&) = default;
 
-Vasculature::~Vasculature() {}
+Vasculature::~Vasculature()
+{
+}
 
 bool Vasculature::operator==(const Vasculature& other) const
 {
@@ -107,8 +108,8 @@ graph_iterator Vasculature::end() const
 void buildConnectivity(std::shared_ptr<property::Properties> properties)
 {
     const std::vector<std::array<unsigned int, 2>>& connectivity = properties->get<property::Connection>();
-    std::map<uint32_t, std::vector<uint32_t >>& successors = properties->_sectionLevel._successors;
-    std::map<uint32_t, std::vector<uint32_t >>& predecessors = properties->_sectionLevel._predecessors;
+    std::map<uint32_t, std::vector<uint32_t>>& successors = properties->_sectionLevel._successors;
+    std::map<uint32_t, std::vector<uint32_t>>& predecessors = properties->_sectionLevel._predecessors;
 
     for (size_t i = 0; i < connectivity.size(); ++i) {
         uint32_t first = connectivity[i][0];
@@ -116,7 +117,6 @@ void buildConnectivity(std::shared_ptr<property::Properties> properties)
         successors[first].push_back(second);
         predecessors[second].push_back(first);
     }
-
 }
 
 } // namespace vasculature

@@ -1,20 +1,17 @@
 #pragma once
 
-#include <morphio/vasc/vasculature.h>
-#include <morphio/vasc/properties.h>
 #include <morphio/types.h>
+#include <morphio/vasc/properties.h>
+#include <morphio/vasc/vasculature.h>
 
-namespace morphio
-{
-namespace vasculature
-{
+namespace morphio {
+namespace vasculature {
 class Section
 {
     using SectionId = property::VascSection;
     using PointAttribute = property::Point;
 
 public:
-
     Section(const Section& section);
 
     const Section& operator=(const Section& section);
@@ -47,8 +44,6 @@ public:
     VascularSectionType type() const;
 
 protected:
-
-
     template <typename Property>
     const range<const typename Property::Type> get() const;
 
@@ -56,7 +51,6 @@ protected:
     SectionRange _range;
     std::shared_ptr<property::Properties> _properties;
 };
-
 }
 }
 std::ostream& operator<<(std::ostream& os, const morphio::vasculature::Section& section);

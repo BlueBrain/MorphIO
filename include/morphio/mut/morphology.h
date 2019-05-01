@@ -94,7 +94,6 @@ public:
      **/
     Mitochondria& mitochondria() { return _mitochondria; }
     const Mitochondria& mitochondria() const { return _mitochondria; }
-
     /**
      * Return the annotation object
      **/
@@ -179,17 +178,14 @@ public:
      * Return the soma type
      **/
     SomaType somaType() { return _soma->type(); }
-
     /**
      * Return the cell family (neuron or glia)
      **/
     CellFamily& cellFamily() { return _cellProperties->_cellFamily; }
-
     /**
      * Return the version
      **/
     MorphologyVersion& version() { return _cellProperties->_version; }
-
     /**
      * Write file to H5, SWC, ASC format depending on filename extension
      **/

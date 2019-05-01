@@ -1,12 +1,12 @@
-#include <morphio/vasc/section.h>
 #include <morphio/iterators.h>
+#include <morphio/vasc/section.h>
 
 namespace morphio {
 namespace vasculature {
 Section::Section(const uint32_t id_,
-        std::shared_ptr<property::Properties> properties)
-        : _id(id_)
-        , _properties(properties)
+    std::shared_ptr<property::Properties> properties)
+    : _id(id_)
+    , _properties(properties)
 {
     const auto& sections = properties->get<Section::SectionId>();
     if (id_ >= sections.size())
@@ -19,11 +19,15 @@ Section::Section(const uint32_t id_,
 
     if (_range.second <= _range.first)
         LBWARN << "Dereferencing broken properties section " << _id << std::endl
-        << "Section range: " << _range.first << " -> " << _range.second << std::endl;
+               << "Section range: " << _range.first << " -> " << _range.second << std::endl;
 }
 
-Section::Section(const Section &section) :_id(section._id), _range(section._range), _properties(section._properties)
-{}
+Section::Section(const Section& section)
+    : _id(section._id)
+    , _range(section._range)
+    , _properties(section._properties)
+{
+}
 
 const Section& Section::operator=(const Section& section)
 {
@@ -58,7 +62,7 @@ const range<const typename TProperty::Type> Section::get() const
         return range<const typename TProperty::Type>();
     auto ptr_start = data.data() + _range.first;
     return range<const typename TProperty::Type>(ptr_start,
-            _range.second - _range.first);
+        _range.second - _range.first);
 }
 
 const std::vector<Section> Section::predecessors() const
@@ -139,6 +143,5 @@ graph_iterator Section::end() const
 {
     return graph_iterator();
 }
-
 }
 }

@@ -16,8 +16,8 @@ MitoSection::MitoSection(Mitochondria* mitochondria, unsigned int id_,
     const morphio::MitoSection& section)
     : MitoSection(mitochondria, id_,
           Property::MitochondriaPointLevel(
-              section._properties->_mitochondriaPointLevel,
-              section._range))
+                      section._properties->_mitochondriaPointLevel,
+                      section._range))
 {
 }
 

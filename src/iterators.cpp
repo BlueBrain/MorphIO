@@ -95,7 +95,9 @@ Iterator<T>::Iterator()
 {
 }
 
-graph_iterator::graph_iterator() {}
+graph_iterator::graph_iterator()
+{
+}
 
 graph_iterator graph_iterator::operator++(int)
 {

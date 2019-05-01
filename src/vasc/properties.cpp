@@ -2,9 +2,9 @@
 #include <cmath>
 
 #include <morphio/errorMessages.h>
-#include <morphio/vasc/properties.h>
 #include <morphio/properties.h>
 #include <morphio/shared_utils.tpp>
+#include <morphio/vasc/properties.h>
 
 
 namespace morphio {
@@ -13,8 +13,9 @@ bool verbose = false;
 namespace property {
 
 VascPointLevel::VascPointLevel(std::vector<Point::Type> points,
-    std::vector<Diameter::Type> diameters) :
-    _points(points), _diameters(diameters)
+    std::vector<Diameter::Type> diameters)
+    : _points(points)
+    , _diameters(diameters)
 {
     if (_points.size() != _diameters.size())
         throw SectionBuilderError(
@@ -36,7 +37,7 @@ template <typename T>
 bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
     const std::string& name, bool verbose_)
 {
-    if (vec1==vec2)
+    if (vec1 == vec2)
         return true;
 
     if (vec1.size() != vec2.size()) {
@@ -162,7 +163,7 @@ bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
 
 bool VascSectionLevel::operator==(const VascSectionLevel& other) const
 {
-    return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose) && compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) && compare(this->_neighbors, other._neighbors,"_neighbors", verbose));
+    return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose) && compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) && compare(this->_neighbors, other._neighbors, "_neighbors", verbose));
 }
 
 bool VascSectionLevel::operator!=(const VascSectionLevel& other) const

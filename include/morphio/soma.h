@@ -48,7 +48,6 @@ public:
      * Return the soma type
      **/
     SomaType type() const { return _properties->_cellLevel._somaType; }
-
     /**
      * Return the center of gravity of the soma points
      **/

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <morphio/vasc/properties.h>
 #include <morphio/types.h>
+#include <morphio/vasc/properties.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>

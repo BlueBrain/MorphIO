@@ -16,8 +16,8 @@ property::Properties VasculatureHDF5::load(const URI& uri)
         _file.reset(new HighFive::File(uri, HighFive::File::ReadOnly));
     } catch (const HighFive::FileException& exc) {
         LBTHROW(morphio::RawDataError(_write
-                                      ? "Could not create vasculature file "
-                                      : "Could not open vasculature file " + uri + ": " + exc.what()));
+                                          ? "Could not create vasculature file "
+                                          : "Could not open vasculature file " + uri + ": " + exc.what()));
     }
     _readDatasets();
     _readSections();
@@ -44,21 +44,21 @@ void VasculatureHDF5::_readDatasets()
     _pointsDims = dataspace.getDimensions();
     if (_pointsDims.size() != 2 || _pointsDims[1] != 4) {
         LBTHROW(morphio::RawDataError("Opening vasculature file '" + _file->getName() + "': bad number of dimensions in "
-                                                                                       "points dataspace"));
+                                                                                        "points dataspace"));
     }
     _sections.reset(new HighFive::DataSet(_file->getDataSet("/structure")));
     dataspace = _sections->getSpace();
     _sectionsDims = dataspace.getDimensions();
     if (_sectionsDims.size() != 2 || _sectionsDims[1] != 2) {
         LBTHROW(morphio::RawDataError("Opening vasculature file '" + _file->getName() + "': bad number of dimensions in "
-                                                                                       "structure dataspace"));
+                                                                                        "structure dataspace"));
     }
     _connectivity.reset(new HighFive::DataSet(_file->getDataSet("/connectivity")));
     dataspace = _connectivity->getSpace();
     _conDims = dataspace.getDimensions();
-    if (_conDims.size() !=2 || _conDims[1] != 2) {
+    if (_conDims.size() != 2 || _conDims[1] != 2) {
         LBTHROW(morphio::RawDataError("Opening vasculature file '" + _file->getName() + "': bad number of dimensions in "
-                                                                                       "connectivity dataspace"));
+                                                                                        "connectivity dataspace"));
     }
 }
 
@@ -94,7 +94,7 @@ void VasculatureHDF5::_readSections()
 
 void VasculatureHDF5::_readSectionTypes()
 {
-    std::vector<VascularSectionType> & types = _properties.get<property::SectionType>();
+    std::vector<VascularSectionType>& types = _properties.get<property::SectionType>();
 
     auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
     types.resize(_sectionsDims[0]);
@@ -107,11 +107,10 @@ void VasculatureHDF5::_readConnectivity()
     vec.resize(_conDims[0]);
     _connectivity->read(vec);
     auto& con = _properties._connectivity;
-    for (size_t i=0; i < vec.size(); ++i) {
+    for (size_t i = 0; i < vec.size(); ++i) {
         con.push_back({vec[i][0], vec[i][1]});
     }
 }
-
 }
 }
 }

@@ -48,21 +48,21 @@ float _somaSurface(const SomaType type, const ContainerDiameters& diameters,
     }
     }
 }
-    template <typename T>
-    void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset)
-    {
-        to.insert(to.end(), from.begin() + offset, from.end());
-    }
+template <typename T>
+void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset)
+{
+    to.insert(to.end(), from.begin() + offset, from.end());
+}
 
-    template <typename T>
-    std::vector<typename T::Type> copySpan(
-            const std::vector<typename T::Type>& data, SectionRange range)
-    {
-        if (data.empty())
-            return std::vector<typename T::Type>();
+template <typename T>
+std::vector<typename T::Type> copySpan(
+    const std::vector<typename T::Type>& data, SectionRange range)
+{
+    if (data.empty())
+        return std::vector<typename T::Type>();
 
-        return std::vector<typename T::Type>(data.begin() + static_cast<long int>(range.first),
-                                             data.begin() + static_cast<long int>(range.second));
-    }
+    return std::vector<typename T::Type>(data.begin() + static_cast<long int>(range.first),
+        data.begin() + static_cast<long int>(range.second));
+}
 
 } // namespace morphio

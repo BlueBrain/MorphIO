@@ -2,12 +2,9 @@
 
 #include <morphio/types.h>
 
-namespace morphio
-{
-namespace vasculature
-{
-namespace property
-{
+namespace morphio {
+namespace vasculature {
+namespace property {
 struct VascSection
 {
     // offset
@@ -44,7 +41,7 @@ struct VascPointLevel
 
     VascPointLevel() {}
     VascPointLevel(std::vector<Point::Type> points,
-               std::vector<Diameter::Type> diameters);
+        std::vector<Diameter::Type> diameters);
     VascPointLevel(const VascPointLevel& data);
     VascPointLevel(const VascPointLevel& data, SectionRange range);
 };

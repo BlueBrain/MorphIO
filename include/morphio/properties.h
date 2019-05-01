@@ -190,7 +190,6 @@ struct Properties
     const morphio::MorphologyVersion& version() { return _cellLevel._version; }
     const morphio::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
     const morphio::SomaType& somaType() { return _cellLevel._somaType; }
-
     template <typename T>
     const std::map<int32_t, std::vector<uint32_t>>& children();
 
