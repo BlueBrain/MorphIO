@@ -191,7 +191,7 @@ HighFive::Attribute write_attribute(HighFive::File& file,
 {
     HighFive::Attribute a_version = file.createAttribute<typename T::value_type>(name,
         HighFive::DataSpace::From(
-                                                                                     version));
+            version));
     a_version.write(version);
     return a_version;
 }
@@ -202,7 +202,7 @@ HighFive::Attribute write_attribute(HighFive::Group& group,
 {
     HighFive::Attribute a_version = group.createAttribute<typename T::value_type>(name,
         HighFive::DataSpace::From(
-                                                                                      version));
+            version));
     a_version.write(version);
     return a_version;
 }

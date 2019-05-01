@@ -23,7 +23,7 @@ Section::Section(Morphology* morphology, unsigned int id_,
     const morphio::Section& section_)
     : Section(morphology, id_, section_.type(),
           Property::PointLevel(section_._properties->_pointLevel,
-                  section_._range))
+              section_._range))
 {
 }
 
