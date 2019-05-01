@@ -1,4 +1,4 @@
-pybind11_add_module(morphio morphio.cpp)
+pybind11_add_module(morphio SYSTEM morphio.cpp)
 
 target_include_directories(morphio
   PRIVATE

@@ -11,12 +11,12 @@ SectionType Section::type() const
 
 float Section::length() const
 {
-    auto points = this->points();
-    int last = points.size() - 1;
-    if (last < 1)
+    auto points_ = this->points();
+    if (points_.size() < 2)
         return 0;
 
-    return distance(points[0], points[last]);
+    size_t last = points_.size() - 1;
+    return distance(points_[0], points_[last]);
 }
 
 depth_iterator Section::depth_begin() const

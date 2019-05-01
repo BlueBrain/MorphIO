@@ -86,8 +86,8 @@ public:
     friend class SectionBase<Section>;
 
 protected:
-    Section(uint32_t id, std::shared_ptr<Property::Properties> morphology)
-        : SectionBase(id, morphology)
+    Section(uint32_t id_, std::shared_ptr<Property::Properties> morphology)
+        : SectionBase(id_, morphology)
     {
     }
 };

@@ -68,7 +68,7 @@ private:
         std::array<float, 4> point; // X,Y,Z,R
         for (auto& p : point) {
             try {
-                p = std::stod(lex.consume()->str());
+                p = std::stof(lex.consume()->str());
             } catch (const std::invalid_argument& e) {
                 throw RawDataError(
                     err_.ERROR_PARSING_POINT(lex.line_num(),
@@ -132,13 +132,12 @@ private:
             } else {
                 std::shared_ptr<morphio::mut::Section> section;
                 if (parent_id > -1)
-                    section = nb_.section(parent_id)->appendSection(properties,
-                        section_type);
+                    section = nb_.section(static_cast<unsigned int>(parent_id))->appendSection(properties, section_type);
                 else
                     section = nb_.appendRootSection(properties, section_type);
-                return_id = section->id();
-                debugInfo_.setLineNumber(return_id,
-                    lex_.current_section_start_);
+                return_id = static_cast<int>(section->id());
+                debugInfo_.setLineNumber(section->id(),
+                    static_cast<unsigned int>(lex_.current_section_start_));
             }
         }
         points.clear();
@@ -170,7 +169,7 @@ private:
     {
         if (parentId < 0) // Discard root sections
             return;
-        auto parent = nb_.section(parentId);
+        auto parent = nb_.section(static_cast<unsigned int>(parentId));
         auto lastParentPoint = parent->points()[parent->points().size() - 1];
         auto lastParentDiameter = parent->diameters()[parent->diameters().size() - 1];
 
@@ -186,7 +185,7 @@ private:
     {
         Points points;
         std::vector<float> diameters;
-        uint32_t section_id = nb_.sections().size();
+        int32_t section_id = static_cast<int>(nb_.sections().size());
 
         while (true) {
             const Token id = static_cast<Token>(lex_.current()->id);

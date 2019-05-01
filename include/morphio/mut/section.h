@@ -117,9 +117,9 @@ private:
     // https://stackoverflow.com/questions/8202530/how-can-i-call-a-private-destructor-from-a-shared-ptr
     friend void friendDtorForSharedPtr(Section*);
 
-    Section(Morphology*, int id, SectionType type, const Property::PointLevel&);
-    Section(Morphology*, int id, const morphio::Section& section);
-    Section(Morphology*, int id, const Section&);
+    Section(Morphology*, unsigned int id, SectionType type, const Property::PointLevel&);
+    Section(Morphology*, unsigned int id, const morphio::Section& section);
+    Section(Morphology*, unsigned int id, const Section&);
     bool _compare(const Section&, bool) const;
 
     Morphology* _morphology;

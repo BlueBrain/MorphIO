@@ -7,7 +7,7 @@ namespace morphio {
 Point operator+(const Point& left, const Point& right)
 {
     Point ret;
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
         ret[i] = left[i] + right[i];
     return ret;
 }
@@ -15,28 +15,28 @@ Point operator+(const Point& left, const Point& right)
 Point operator-(const Point& left, const Point& right)
 {
     Point ret;
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
         ret[i] = left[i] - right[i];
     return ret;
 }
 
 Point operator+=(Point& left, const Point& right)
 {
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
         left[i] += right[i];
     return left;
 }
 
 Point operator-=(Point& left, const Point& right)
 {
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
         left[i] -= right[i];
     return left;
 }
 
 Point operator/=(Point& left, float factor)
 {
-    for (int i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 3; ++i)
         left[i] /= factor;
     return left;
 }
@@ -77,7 +77,7 @@ std::vector<Point> operator-=(std::vector<Point>& points, const Point& right)
 **/
 float distance(const Point& left, const Point& right)
 {
-    return sqrt((left[0] - right[0]) * (left[0] - right[0]) + (left[1] - right[1]) * (left[1] - right[1]) + (left[2] - right[2]) * (left[2] - right[2]));
+    return std::sqrt((left[0] - right[0]) * (left[0] - right[0]) + (left[1] - right[1]) * (left[1] - right[1]) + (left[2] - right[2]) * (left[2] - right[2]));
 }
 
 std::string dumpPoint(const Point& point)
@@ -114,8 +114,8 @@ template <typename T>
 Point operator*(const Point& from, T factor)
 {
     Point ret;
-    for (int i = 0; i < 3; ++i)
-        ret[i] = from[i] * factor;
+    for (size_t i = 0; i < 3; ++i)
+        ret[i] = from[i] * static_cast<float>(factor);
     return ret;
 }
 template Point operator*<int>(const Point& from, int factor);
@@ -132,7 +132,7 @@ template Point operator*<float>(float factor, const Point& from);
 template <typename T>
 Point operator/(const Point& from, T factor)
 {
-    return from * (1 / (float)factor);
+    return from * (1 / static_cast<float>(factor));
 }
 template Point operator/(const Point& from, int factor);
 template Point operator/(const Point& from, float factor);

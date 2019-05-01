@@ -9,12 +9,12 @@ const MitoSection Mitochondria::section(const uint32_t& id) const
 
 const std::vector<MitoSection> Mitochondria::sections() const
 {
-    std::vector<MitoSection> sections;
+    std::vector<MitoSection> sections_;
     for (unsigned int i = 0;
          i < _properties->get<morphio::Property::MitoSection>().size(); ++i) {
-        sections.push_back(section(i));
+        sections_.push_back(section(i));
     }
-    return sections;
+    return sections_;
 }
 
 const std::vector<MitoSection> Mitochondria::rootSections() const

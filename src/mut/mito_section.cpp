@@ -4,26 +4,26 @@
 namespace morphio {
 namespace mut {
 MitoSection::MitoSection(
-    Mitochondria* mitochondria, int id,
+    Mitochondria* mitochondria, unsigned int id_,
     const Property::MitochondriaPointLevel& pointProperties)
-    : _id(id)
+    : _id(id_)
     , _mitochondria(mitochondria)
     , _mitoPoints(pointProperties)
 {
 }
 
-MitoSection::MitoSection(Mitochondria* mitochondria, int id,
+MitoSection::MitoSection(Mitochondria* mitochondria, unsigned int id_,
     const morphio::MitoSection& section)
-    : MitoSection(mitochondria, id,
+    : MitoSection(mitochondria, id_,
           Property::MitochondriaPointLevel(
               section._properties->_mitochondriaPointLevel,
               section._range))
 {
 }
 
-MitoSection::MitoSection(Mitochondria* mitochondria, int id,
+MitoSection::MitoSection(Mitochondria* mitochondria, unsigned int id_,
     const MitoSection& section)
-    : _id(id)
+    : _id(id_)
     , _mitochondria(mitochondria)
     , _mitoPoints(section._mitoPoints)
 {
@@ -32,7 +32,7 @@ MitoSection::MitoSection(Mitochondria* mitochondria, int id,
 std::shared_ptr<MitoSection> MitoSection::appendSection(
     const Property::MitochondriaPointLevel& points)
 {
-    int32_t parentId = id();
+    unsigned int parentId = id();
 
     std::shared_ptr<MitoSection> ptr(new MitoSection(_mitochondria,
                                          _mitochondria->_counter,
@@ -53,10 +53,10 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
                                          _mitochondria->_counter,
                                          *original_section),
         friendDtorForSharedPtrMito);
-    int32_t parentId = id();
-    uint32_t id = _mitochondria->_register(ptr);
+    unsigned int parentId = id();
+    uint32_t id_ = _mitochondria->_register(ptr);
 
-    _mitochondria->_parent[id] = parentId;
+    _mitochondria->_parent[id_] = parentId;
     _mitochondria->_children[parentId].push_back(ptr);
 
     if (recursive) {
@@ -75,7 +75,7 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
                                          _mitochondria->_counter,
                                          section),
         friendDtorForSharedPtrMito);
-    int32_t parentId = id();
+    unsigned int parentId = id();
     uint32_t childId = _mitochondria->_register(ptr);
 
     _mitochondria->_parent[childId] = parentId;

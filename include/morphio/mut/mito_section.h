@@ -9,11 +9,11 @@ namespace mut {
 class MitoSection
 {
 public:
-    MitoSection(Mitochondria* mitochondria, int id,
+    MitoSection(Mitochondria* mitochondria, unsigned int id,
         const Property::MitochondriaPointLevel& pointProperties);
-    MitoSection(Mitochondria* mitochondria, int id,
+    MitoSection(Mitochondria* mitochondria, unsigned int id,
         const morphio::MitoSection& section);
-    MitoSection(Mitochondria* mitochondria, int id, const MitoSection& section);
+    MitoSection(Mitochondria* mitochondria, unsigned int id, const MitoSection& section);
 
     std::shared_ptr<MitoSection> appendSection(
         const Property::MitochondriaPointLevel& points);
@@ -29,7 +29,7 @@ public:
     const std::vector<std::shared_ptr<MitoSection>> children() const;
 
     /**
-     * Return the diameters of all points of this section
+     * Return the section id
      **/
     uint32_t id() const { return _id; }
 

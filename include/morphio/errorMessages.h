@@ -34,9 +34,9 @@ public:
     {
     }
 
-    void setLineNumber(uint32_t sectionId, uint32_t line)
+    void setLineNumber(uint32_t sectionId, unsigned int line)
     {
-        _lineNumbers[sectionId] = line;
+        _lineNumbers[sectionId] = static_cast<int>(line);
     }
 
     int32_t getLineNumber(uint32_t sectionId) const
@@ -50,7 +50,7 @@ public:
     std::string _filename;
 
 private:
-    std::map<uint32_t, uint32_t> _lineNumbers;
+    std::map<unsigned int, int> _lineNumbers;
 };
 
 static std::set<Warning> _ignoredWarnings;
@@ -61,17 +61,19 @@ struct Sample
         : valid(false)
         , type(SECTION_UNDEFINED)
         , parentId(-1)
-        , lineNumber(-1)
+        , lineNumber(0)
     {
     }
 
-    explicit Sample(const char* line, int lineNumber)
-        : lineNumber(lineNumber)
+    explicit Sample(const char* line, unsigned int lineNumber_)
+        : lineNumber(lineNumber_)
     {
         float radius;
-        valid = sscanf(line, "%20d%20d%20f%20f%20f%20f%20d", (int*)&id, (int*)&type,
+        int int_type;
+        valid = sscanf(line, "%20u%20d%20f%20f%20f%20f%20d", &id, &int_type,
                     &point[0], &point[1], &point[2], &radius, &parentId) == 7;
 
+        type = static_cast<SectionType>(int_type);
         diameter = radius * 2; // The point array stores diameters.
 
         if (type >= SECTION_CUSTOM_START)
@@ -84,8 +86,8 @@ struct Sample
     Point point; // x, y, z and diameter
     SectionType type;
     int parentId;
-    int id;
-    int lineNumber;
+    unsigned int id;
+    unsigned int lineNumber;
 };
 
 class ErrorMessages
@@ -100,7 +102,7 @@ public:
     **/
     static bool isIgnored(Warning warning);
 
-    const std::string errorLink(int lineNumber, ErrorLevel errorLevel) const
+    const std::string errorLink(long unsigned int lineNumber, ErrorLevel errorLevel) const
     {
         std::map<ErrorLevel, std::string> SEVERITY{{ErrorLevel::INFO, "info"},
             {ErrorLevel::WARNING,
@@ -118,7 +120,7 @@ public:
         return COLOR.at(errorLevel) + _uri + ":" + std::to_string(lineNumber) + ":" + SEVERITY.at(errorLevel) + COLOR_END;
     }
 
-    const std::string errorMsg(int lineNumber, ErrorLevel errorLevel,
+    const std::string errorMsg(long unsigned int lineNumber, ErrorLevel errorLevel,
         std::string msg = "") const;
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +129,7 @@ public:
 
     const std::string ERROR_OPENING_FILE() const;
 
-    const std::string ERROR_LINE_NON_PARSABLE(int lineNumber) const;
+    const std::string ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const;
 
     const std::string ERROR_MULTIPLE_SOMATA(
         const std::vector<Sample>& somata) const;
@@ -152,24 +154,24 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     //             NEUROLUCIDA
     ////////////////////////////////////////////////////////////////////////////////
-    const std::string ERROR_SOMA_ALREADY_DEFINED(int lineNumber) const;
+    const std::string ERROR_SOMA_ALREADY_DEFINED(long unsigned int lineNumber) const;
 
-    const std::string ERROR_PARSING_POINT(int lineNumber,
+    const std::string ERROR_PARSING_POINT(long unsigned int lineNumber,
         const std::string& point) const;
 
-    const std::string ERROR_UNKNOWN_TOKEN(int lineNumber,
+    const std::string ERROR_UNKNOWN_TOKEN(long unsigned int lineNumber,
         const std::string& token) const;
 
-    const std::string ERROR_UNEXPECTED_TOKEN(int lineNumber,
+    const std::string ERROR_UNEXPECTED_TOKEN(long unsigned int lineNumber,
         const std::string& expected,
         const std::string& got,
         const std::string& msg) const;
 
-    const std::string ERROR_EOF_REACHED(int lineNumber) const;
+    const std::string ERROR_EOF_REACHED(long unsigned int lineNumber) const;
 
-    const std::string ERROR_EOF_IN_NEURITE(int lineNumber) const;
+    const std::string ERROR_EOF_IN_NEURITE(long unsigned int lineNumber) const;
 
-    const std::string ERROR_EOF_UNBALANCED_PARENS(int lineNumber) const;
+    const std::string ERROR_EOF_UNBALANCED_PARENS(long unsigned int lineNumber) const;
 
     const std::string ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
         morphio::Option flag2) const;
@@ -181,9 +183,9 @@ public:
     const std::string ERROR_WRONG_EXTENSION(const std::string filename) const;
 
     std::string ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1,
-        int length1,
+        size_t length1,
         const std::string& vec2,
-        int length2) const;
+        size_t length2) const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
@@ -197,8 +199,8 @@ public:
         std::shared_ptr<morphio::mut::Section> current,
         std::shared_ptr<morphio::mut::Section> parent) const;
     std::string WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morphio::mut::Section>);
-    const std::string WARNING_ONLY_CHILD(const DebugInfo& info, int parentId,
-        int childId) const;
+    const std::string WARNING_ONLY_CHILD(const DebugInfo& info, unsigned int parentId,
+        unsigned int childId) const;
 
     const std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
         const Sample& root, const Sample& child1, const Sample& child2);

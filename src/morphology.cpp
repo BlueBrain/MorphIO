@@ -17,7 +17,7 @@
 
 namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
-SomaType getSomaType(uint32_t nSomaPoints);
+SomaType getSomaType(long unsigned int nSomaPoints);
 
 Morphology::Morphology(const URI& source, unsigned int options)
 {
@@ -140,12 +140,12 @@ const std::vector<Section> Morphology::rootSections() const
 const std::vector<Section> Morphology::sections() const
 {
     // TODO: Make this more performant when needed
-    std::vector<Section> sections;
+    std::vector<Section> sections_;
     for (uint i = 1; i < _properties->get<morphio::Property::Section>().size();
          ++i) {
-        sections.push_back(section(i));
+        sections_.push_back(section(i));
     }
-    return sections;
+    return sections_;
 }
 
 template <typename Property>
@@ -206,10 +206,10 @@ breadth_iterator Morphology::breadth_end() const
     return breadth_iterator();
 }
 
-SomaType getSomaType(uint32_t nSomaPoints)
+SomaType getSomaType(long unsigned int nSomaPoints)
 {
     try {
-        return std::map<uint32_t, SomaType>{{0, SOMA_UNDEFINED},
+        return std::map<long unsigned int, SomaType>{{0, SOMA_UNDEFINED},
             {1, SOMA_SINGLE_POINT},
             {2, SOMA_UNDEFINED}}
             .at(nSomaPoints);
@@ -224,7 +224,7 @@ void buildChildren(std::shared_ptr<Property::Properties> properties)
         const auto& sections = properties->get<Property::Section>();
         auto& children = properties->_sectionLevel._children;
 
-        for (size_t i = 0; i < sections.size(); ++i) {
+        for (unsigned int i = 0; i < sections.size(); ++i) {
             const int32_t parent = sections[i][1];
             children[parent].push_back(i);
         }
@@ -234,7 +234,7 @@ void buildChildren(std::shared_ptr<Property::Properties> properties)
         const auto& sections = properties->get<Property::MitoSection>();
         auto& children = properties->_mitochondriaSectionLevel._children;
 
-        for (size_t i = 0; i < sections.size(); ++i) {
+        for (unsigned int i = 0; i < sections.size(); ++i) {
             const int32_t parent = sections[i][1];
             children[parent].push_back(i);
         }

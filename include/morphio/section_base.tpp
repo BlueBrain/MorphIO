@@ -3,19 +3,19 @@
 
 namespace morphio {
 template <typename T>
-SectionBase<T>::SectionBase(const uint32_t id,
+SectionBase<T>::SectionBase(const uint32_t id_,
     std::shared_ptr<Property::Properties> properties)
-    : _id(id)
+    : _id(id_)
     , _properties(properties)
 {
     const auto& sections = properties->get<typename T::SectionId>();
-    if (id >= sections.size())
-        LBTHROW(RawDataError("Requested section ID (" + std::to_string(id) + ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
+    if (_id >= sections.size())
+        LBTHROW(RawDataError("Requested section ID (" + std::to_string(_id) + ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
 
-    const size_t start = sections[id][0];
-    const size_t end = id == sections.size() - 1
+    const size_t start = static_cast<size_t>(sections[_id][0]);
+    const size_t end = _id == sections.size() - 1
                            ? properties->get<typename T::PointAttribute>().size()
-                           : sections[id + 1][0];
+                           : static_cast<size_t>(sections[_id + 1][0]);
 
     _range = std::make_pair(start, end);
 
@@ -88,8 +88,9 @@ T SectionBase<T>::parent() const
         LBTHROW(MissingParentError(
             "Cannot call Section::parent() on a root node (section id=" + std::to_string(_id) + ")."));
 
-    const int32_t parent = _properties->get<typename T::SectionId>()[_id][1];
-    return T(parent, _properties);
+    const unsigned int _parent = static_cast<unsigned int>(
+        _properties->get<typename T::SectionId>()[_id][1]);
+    return T(_parent, _properties);
 }
 
 template <typename T>
@@ -97,10 +98,10 @@ const std::vector<T> SectionBase<T>::children() const
 {
     std::vector<T> result;
     try {
-        const std::vector<uint32_t>& children = _properties->children<typename T::SectionId>().at(_id);
-        result.reserve(children.size());
-        for (const uint32_t id : children)
-            result.push_back(T(id, _properties));
+        const std::vector<uint32_t>& _children = _properties->children<typename T::SectionId>().at(static_cast<int>(_id));
+        result.reserve(_children.size());
+        for (const uint32_t id_ : _children)
+            result.push_back(T(id_, _properties));
 
         return result;
     } catch (const std::out_of_range& oor) {

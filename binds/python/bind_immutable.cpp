@@ -64,22 +64,22 @@ void bind_immutable_module(py::module &m) {
 
         // Property accessors
         .def_property_readonly("points", [](morphio::Morphology* morpho){
-                return py::array(morpho->points().size(), morpho->points().data());
+                return py::array(static_cast<py::ssize_t>(morpho->points().size()), morpho->points().data());
             },
             "Returns a list with all points from all sections")
         .def_property_readonly("diameters", [](morphio::Morphology* morpho){
                 auto diameters = morpho->diameters();
-                return py::array(diameters.size(), diameters.data());
+                return py::array(static_cast<py::ssize_t>(diameters.size()), diameters.data());
             },
             "Returns a list with all diameters from all sections (soma points are not included)")
         .def_property_readonly("perimeters", [](morphio::Morphology* obj){
                 auto data = obj->perimeters();
-                return py::array(data.size(), data.data());
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a list with all perimeters from all sections")
         .def_property_readonly("section_types", [](morphio::Morphology* obj){
                 auto data = obj->sectionTypes();
-                return py::array(data.size(), data.data());
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a vector with the section type of every section")
         .def_property_readonly("soma_type", &morphio::Morphology::somaType,
