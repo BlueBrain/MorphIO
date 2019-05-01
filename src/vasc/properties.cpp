@@ -6,10 +6,10 @@
 #include <morphio/properties.h>
 #include <morphio/shared_utils.tpp>
 
-bool verbose = false;
 
 namespace morphio {
 namespace vasculature {
+bool verbose = false;
 namespace property {
 
 VascPointLevel::VascPointLevel(std::vector<Point::Type> points,
