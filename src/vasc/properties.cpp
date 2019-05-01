@@ -6,7 +6,7 @@
 #include <morphio/properties.h>
 #include <morphio/shared_utils.tpp>
 
-bool verbose_ = false;
+bool verbose = false;
 
 namespace morphio {
 namespace vasculature {
@@ -162,7 +162,7 @@ bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
 
 bool VascSectionLevel::operator==(const VascSectionLevel& other) const
 {
-    return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose_) && compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose_) && compare(this->_neighbors, other._neighbors,"_neighbors", verbose_));
+    return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose) && compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) && compare(this->_neighbors, other._neighbors,"_neighbors", verbose));
 }
 
 bool VascSectionLevel::operator!=(const VascSectionLevel& other) const

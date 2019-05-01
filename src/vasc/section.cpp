@@ -3,18 +3,18 @@
 
 namespace morphio {
 namespace vasculature {
-Section::Section(const uint32_t id,
+Section::Section(const uint32_t id_,
         std::shared_ptr<property::Properties> properties)
-        : _id(id)
+        : _id(id_)
         , _properties(properties)
 {
     const auto& sections = properties->get<Section::SectionId>();
-    if (id >= sections.size())
-        LBTHROW(RawDataError("Requested section ID (" + std::to_string(id) + ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
-    const size_t start = sections[id];
-    const size_t end = id == sections.size() - 1
+    if (id_ >= sections.size())
+        LBTHROW(RawDataError("Requested section ID (" + std::to_string(id_) + ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
+    const size_t start = sections[id_];
+    const size_t end = id_ == sections.size() - 1
                             ? properties->get<Section::PointAttribute>().size()
-                            : sections[id + 1];
+                            : sections[id_ + 1];
     _range = std::make_pair(start, end);
 
     if (_range.second <= _range.first)
@@ -65,9 +65,9 @@ const std::vector<Section> Section::predecessors() const
 {
     std::vector<Section> result;
     try {
-        const std::vector<uint32_t>& predecessors = _properties->predecessors<Section::SectionId>().at(_id);
-        result.reserve(predecessors.size());
-        for (const uint32_t id : predecessors)
+        const std::vector<uint32_t>& predecessors_ = _properties->predecessors<Section::SectionId>().at(_id);
+        result.reserve(predecessors_.size());
+        for (const uint32_t id : predecessors_)
             result.push_back(Section(id, _properties));
         return result;
     } catch (const std::out_of_range& oor) {
@@ -79,9 +79,9 @@ const std::vector<Section> Section::successors() const
 {
     std::vector<Section> result;
     try {
-        const std::vector<uint32_t>& successors = _properties->successors<Section::SectionId>().at(_id);
-        result.reserve(successors.size());
-        for (const uint32_t id : successors)
+        const std::vector<uint32_t>& successors_ = _properties->successors<Section::SectionId>().at(_id);
+        result.reserve(successors_.size());
+        for (const uint32_t id : successors_)
             result.push_back(Section(id, _properties));
         return result;
     } catch (const std::out_of_range& oor) {
