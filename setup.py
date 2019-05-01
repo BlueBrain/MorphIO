@@ -55,7 +55,8 @@ class CMakeBuild(build_ext):
                 cmake_args += ['-A', 'x64']
             build_args += ['--', '/m']
         else:
-            cmake_args += ['-DMorphIO_CXX_WARNINGS=OFF']
+            cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
+                           '-DMorphIO_CXX_WARNINGS=OFF']
             build_args += ['--', '-j']
 
         env = os.environ.copy()
