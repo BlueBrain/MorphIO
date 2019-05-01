@@ -60,8 +60,9 @@ float _somaSurface(const SomaType type, const ContainerDiameters& diameters,
     {
         if (data.empty())
             return std::vector<typename T::Type>();
-        return std::vector<typename T::Type>(data.begin() + range.first,
-                                             data.begin() + range.second);
+
+        return std::vector<typename T::Type>(data.begin() + static_cast<long int>(range.first),
+                                             data.begin() + static_cast<long int>(range.second));
     }
 
 } // namespace morphio

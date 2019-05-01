@@ -24,6 +24,8 @@
 #include <highfive/H5DataType.hpp>
 
 #include <morphio/types.h>
+
+
 namespace HighFive {
 template <>
 inline AtomicType<morphio::SectionType>::AtomicType()

@@ -11,7 +11,7 @@ namespace property
 struct VascSection
 {
     // offset
-    using Type = int;
+    using Type = unsigned int;
 };
 
 struct Point
@@ -34,7 +34,7 @@ struct Connection
     // stores the graph connectivity between the sections
     // If section1 is connected to section2, then the last point of section1
     // and the first point of section2 must be equal.
-    using Type = std::array<int, 2>;
+    using Type = std::array<unsigned int, 2>;
 };
 
 struct VascPointLevel

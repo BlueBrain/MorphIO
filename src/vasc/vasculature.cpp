@@ -30,7 +30,7 @@ Vasculature::Vasculature(const morphio::URI &source, unsigned int options)
     std::string extension;
 
     for (auto& c : source.substr(pos))
-        extension += std::tolower(c);
+        extension += my_tolower(c);
 
     auto loader = [&source, &options, &extension]() {
         if (extension == ".h5")
@@ -106,15 +106,13 @@ graph_iterator Vasculature::end() const
 
 void buildConnectivity(std::shared_ptr<property::Properties> properties)
 {
-
-    //const auto& sections = properties->get<property::VascSection>();
-    const auto& connectivity = properties->get<property::Connection>();
-    auto& successors = properties->_sectionLevel._successors;
-    auto& predecessors = properties->_sectionLevel._predecessors;
+    const std::vector<std::array<unsigned int, 2>>& connectivity = properties->get<property::Connection>();
+    std::map<uint32_t, std::vector<uint32_t >>& successors = properties->_sectionLevel._successors;
+    std::map<uint32_t, std::vector<uint32_t >>& predecessors = properties->_sectionLevel._predecessors;
 
     for (size_t i = 0; i < connectivity.size(); ++i) {
-        int32_t first = connectivity[i][0];
-        int32_t second = connectivity[i][1];
+        uint32_t first = connectivity[i][0];
+        uint32_t second = connectivity[i][1];
         successors[first].push_back(second);
         predecessors[second].push_back(first);
     }

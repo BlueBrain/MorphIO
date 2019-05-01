@@ -119,7 +119,7 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
         return false;
     }
 
-    const float epsilon = 1e-6;
+    const float epsilon = 1e-6f;
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
             if (verbose_) {

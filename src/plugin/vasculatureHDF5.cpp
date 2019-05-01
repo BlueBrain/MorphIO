@@ -83,7 +83,7 @@ void VasculatureHDF5::_readSections()
 
     auto selection = _sections->select({0, 0}, {_sectionsDims[0], 1});
 
-    std::vector<int> vec;
+    std::vector<unsigned int> vec;
     vec.resize(_sectionsDims[0]);
     selection.read(vec);
 
@@ -103,13 +103,12 @@ void VasculatureHDF5::_readSectionTypes()
 
 void VasculatureHDF5::_readConnectivity()
 {
-    std::vector<std::vector<int>> vec;
+    std::vector<std::vector<unsigned int>> vec;
     vec.resize(_conDims[0]);
     _connectivity->read(vec);
     auto& con = _properties._connectivity;
     for (size_t i=0; i < vec.size(); ++i) {
-        const auto& c = vec[i];
-        con.push_back({c[0], c[1]});
+        con.push_back({vec[i][0], vec[i][1]});
     }
 }
 

@@ -149,6 +149,12 @@ std::ostream& operator<<(std::ostream& os, const morphio::Point& point)
     return os;
 }
 
+
+inline char my_tolower(char ch)
+{
+    return static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+}
+
 } // namespace morphio
 
 std::ostream& operator<<(std::ostream& os,

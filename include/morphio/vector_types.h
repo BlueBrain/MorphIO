@@ -35,6 +35,10 @@ extern template const Point centerOfGravity(const std::vector<std::array<float, 
 std::string dumpPoint(const Point& point);
 std::string dumpPoints(const std::vector<Point>& point);
 
+
+char my_tolower(char ch);
+
+
 /**
    Euclidian distance between two points
 **/
