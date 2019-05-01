@@ -13,6 +13,3 @@
 [submodule "multibuild"]
 	path = multibuild
 	url = https://github.com/matthew-brett/multibuild.git
-[submodule "3rdparty/coding-conventions"]
-	path = 3rdparty/coding-conventions
-	url = https://github.com/BlueBrain/hpc-coding-conventions.git
