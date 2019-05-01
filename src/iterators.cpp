@@ -5,7 +5,6 @@
 namespace morphio {
 
 class Section;
-//class VasculatureSection;
 
 template <typename T>
 Iterator<T>::Iterator(const Section& section)

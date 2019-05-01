@@ -21,7 +21,6 @@ struct Point
 
 struct SectionType
 {
-    // stores section types for vasculature
     using Type = morphio::VascularSectionType;
 };
 

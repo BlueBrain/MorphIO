@@ -20,7 +20,6 @@ public:
 
 private:
     void _readDatasets();
-    //HighFive::DataSet _getStructureDataSet(size_t nSections);
     void _readPoints();
     void _readSections();
     void _readSectionTypes();

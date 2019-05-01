@@ -121,5 +121,5 @@ void buildConnectivity(std::shared_ptr<property::Properties> properties)
 
 }
 
-}
-}
+} // namespace vasculature
+} // namespace morphio

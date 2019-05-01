@@ -258,9 +258,8 @@ std::ostream& operator<<(std::ostream& os, const VascPointLevel& prop)
 std::ostream& operator<<(std::ostream& os, const Properties& properties)
 {
     os << properties._pointLevel << std::endl;
-    //os << properties._sectionLevel << std::endl;
     return os;
 }
-}
-}
-}
+} // namespace property
+} // namespace vasculature
+} // namespace morphio

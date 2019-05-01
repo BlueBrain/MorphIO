@@ -23,7 +23,6 @@
 
 // TODO: bcoste fix me
 #include <iostream>
-//#include "iterators.h"
 
 #define LBTHROW(x) (throw x)
 #define LBWARN std::cerr
