@@ -270,7 +270,7 @@ bool CellLevel::operator==(const CellLevel& other) const
     }
     return this == &other || (this->_cellFamily == other._cellFamily
                                  // this->_somaType == other._somaType
-                             );
+                                 );
 }
 
 bool CellLevel::operator!=(const CellLevel& other) const

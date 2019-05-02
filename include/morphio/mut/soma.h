@@ -51,7 +51,6 @@ public:
     float surface() const;
 
     Property::PointLevel& properties() { return _pointProperties; }
-
 private:
     friend class Morphology;
     SomaType _somaType;

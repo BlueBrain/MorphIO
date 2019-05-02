@@ -48,7 +48,7 @@ Vasculature::~Vasculature()
 
 bool Vasculature::operator==(const Vasculature& other) const
 {
-    if(this->_properties == other._properties)
+    if (this->_properties == other._properties)
         return true;
     return (this->_properties && other._properties && *(this->_properties) == *(other._properties));
 }

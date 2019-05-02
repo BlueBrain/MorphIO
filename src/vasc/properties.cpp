@@ -178,8 +178,8 @@ bool compare(const VascPointLevel& el1, const VascPointLevel& el2, const std::st
 bool VascSectionLevel::operator==(const VascSectionLevel& other) const
 {
     return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose) &&
-                            compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) &&
-                            compare(this->_neighbors, other._neighbors, "_neighbors", verbose));
+                                 compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) &&
+                                 compare(this->_neighbors, other._neighbors, "_neighbors", verbose));
 }
 
 bool VascSectionLevel::operator!=(const VascSectionLevel& other) const
