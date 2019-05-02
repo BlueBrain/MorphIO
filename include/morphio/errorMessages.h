@@ -31,8 +31,7 @@ struct DebugInfo
 public:
     DebugInfo(std::string filename = "")
         : _filename(filename)
-    {
-    }
+    {}
 
     void setLineNumber(uint32_t sectionId, unsigned int line)
     {
@@ -43,7 +42,7 @@ public:
     {
         try {
             return _lineNumbers.at(sectionId);
-        } catch (const std::out_of_range& oor) {
+        } catch (const std::out_of_range&) {
             return -1;
         }
     }
@@ -93,9 +92,9 @@ struct Sample
 class ErrorMessages
 {
 public:
-    ErrorMessages(){};
+    ErrorMessages(){}
     ErrorMessages(const std::string& uri)
-        : _uri(uri){};
+        : _uri(uri){}
 
     /**
        Is the output of the warning ignored

@@ -1,4 +1,5 @@
 #pragma once
+#include <stdexcept>
 
 namespace morphio {
 /**
@@ -11,7 +12,6 @@ public:
         : std::runtime_error(_msg)
     {
     }
-    virtual ~MorphioError() {}
 };
 
 class NotImplementedError : public MorphioError
@@ -21,7 +21,6 @@ public:
         : MorphioError(_msg)
     {
     }
-    virtual ~NotImplementedError() {}
 };
 
 class RawDataError : public MorphioError
@@ -31,7 +30,6 @@ public:
         : MorphioError(_msg)
     {
     }
-    virtual ~RawDataError() {}
 };
 
 class UnknownFileType : public MorphioError
@@ -41,7 +39,6 @@ public:
         : MorphioError(_msg)
     {
     }
-    virtual ~UnknownFileType() {}
 };
 
 class SomaError : public MorphioError
@@ -51,7 +48,6 @@ public:
         : MorphioError(_msg)
     {
     }
-    virtual ~SomaError() {}
 };
 
 class IDSequenceError : public RawDataError
@@ -61,7 +57,6 @@ public:
         : RawDataError(_msg)
     {
     }
-    virtual ~IDSequenceError() {}
 };
 
 class MultipleTrees : public RawDataError
@@ -71,7 +66,6 @@ public:
         : RawDataError(_msg)
     {
     }
-    virtual ~MultipleTrees() {}
 };
 
 class MissingParentError : public RawDataError
@@ -81,7 +75,6 @@ public:
         : RawDataError(_msg)
     {
     }
-    virtual ~MissingParentError() {}
 };
 
 class SectionBuilderError : public RawDataError
@@ -91,7 +84,6 @@ public:
         : RawDataError(_msg)
     {
     }
-    virtual ~SectionBuilderError() {}
 };
 
 class WriterError : public MorphioError
@@ -101,6 +93,5 @@ public:
         : MorphioError(_msg)
     {
     }
-    virtual ~WriterError() {}
 };
 } // namespace morphio

@@ -104,7 +104,7 @@ const std::vector<T> SectionBase<T>::children() const
             result.push_back(T(id_, _properties));
 
         return result;
-    } catch (const std::out_of_range& oor) {
+    } catch (const std::out_of_range&) {
         return result;
     }
 }

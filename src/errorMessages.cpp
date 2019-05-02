@@ -143,7 +143,7 @@ const std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(
 /**
    Return val1 and highlight it with some color if val1 != val2
 **/
-const std::string _col(float val1, float val2)
+static const std::string _col(float val1, float val2)
 {
     bool is_ok = std::fabs(val1 - val2) < 1e-6f;
     if (is_ok)
