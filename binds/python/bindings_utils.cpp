@@ -4,6 +4,11 @@
 
 namespace py = pybind11;
 
+py::array_t<float> span_array_to_ndarray(const morphio::range<const std::array<float, 3> > &span);
+void _raise_if_wrong_shape(const py::buffer_info& info);
+morphio::Points array_to_points(py::array_t<float> &buf);
+
+
 py::array_t<float> span_array_to_ndarray(const morphio::range<const std::array<float, 3> > &span)
 {
     const void* ptr = static_cast<const void*>(span.data());

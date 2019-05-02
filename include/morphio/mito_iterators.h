@@ -23,4 +23,15 @@ public:
     MitoIterator& operator++();
     MitoIterator operator++(int);
 };
+
+template <> MitoSection MitoIterator<std::stack<MitoSection>>::operator*() const;
+template <> MitoSection MitoIterator<std::queue<MitoSection>>::operator*() const;
+template <> MitoSection MitoIterator<std::vector<MitoSection>>::operator*() const;
+template <> mito_upstream_iterator::MitoIterator(const MitoSection& section);
+template <> mito_upstream_iterator& mito_upstream_iterator::operator++();
+
+extern template class MitoIterator<std::stack<MitoSection>>;
+extern template class MitoIterator<std::queue<MitoSection>>;
+extern template class MitoIterator<std::vector<MitoSection>>;
+
 } // namespace morphio

@@ -4,6 +4,11 @@
 
 namespace morphio {
 namespace mut {
+
+void _appendMitoProperties(Property::MitochondriaPointLevel& to,
+                           const Property::MitochondriaPointLevel& from,
+                           int offset);
+
 void friendDtorForSharedPtrMito(MitoSection* section)
 {
     delete section;
@@ -36,7 +41,7 @@ std::shared_ptr<MitoSection> Mitochondria::appendRootSection(
     _rootSections.push_back(section_copy);
 
     if (recursive) {
-        for (const auto child : section_->children()) {
+        for (const auto& child : section_->children()) {
             section_copy->appendSection(child, true);
         }
     }
@@ -71,7 +76,7 @@ const std::vector<std::shared_ptr<MitoSection>> Mitochondria::children(
 {
     try {
         return _children.at(section_->id());
-    } catch (const std::out_of_range& e) {
+    } catch (const std::out_of_range&) {
         return std::vector<std::shared_ptr<MitoSection>>();
     }
 }
@@ -93,7 +98,7 @@ bool Mitochondria::isRoot(const std::shared_ptr<MitoSection> section_) const
     try {
         parent(section_);
         return false;
-    } catch (const std::out_of_range& e) {
+    } catch (const std::out_of_range&) {
         return true;
     }
 }

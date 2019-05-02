@@ -15,6 +15,18 @@
 namespace morphio {
 namespace mut {
 namespace writer {
+
+void writeLine(std::ofstream& myfile, int id, int parentId, SectionType type,
+               const Point& point, float diameter);
+std::string version_footnote();
+bool _skipDuplicate(const std::shared_ptr<Section> section);
+void _write_asc_points(std::ofstream& myfile, const Points& points,
+                       const std::vector<float>& diameters, size_t indentLevel);
+void _write_asc_section(std::ofstream& myfile, const Morphology& morpho,
+                        const std::shared_ptr<Section>& section,
+                        size_t indentLevel);
+void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria);
+
 template <typename T>
 struct base_type
 {

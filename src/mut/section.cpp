@@ -8,6 +8,8 @@ namespace morphio {
 namespace mut {
 using morphio::plugin::ErrorMessages;
 
+bool _emptySection(const std::shared_ptr<Section> section);
+
 Section::Section(Morphology* morphology, unsigned int id_, SectionType type_,
     const Property::PointLevel& pointProperties)
     : _morphology(morphology)
@@ -43,7 +45,7 @@ bool Section::isRoot() const
     try {
         parent();
         return false;
-    } catch (const std::out_of_range& e) {
+    } catch (const std::out_of_range&) {
         return true;
     }
 }
@@ -52,7 +54,7 @@ const std::vector<std::shared_ptr<Section>> Section::children() const
 {
     try {
         return _morphology->_children.at(id());
-    } catch (const std::out_of_range& e) {
+    } catch (const std::out_of_range&) {
         return std::vector<std::shared_ptr<Section>>();
     }
 }
@@ -104,6 +106,7 @@ bool _emptySection(const std::shared_ptr<Section> section)
 {
     return section->points().empty();
 }
+
 std::shared_ptr<Section> Section::appendSection(
     std::shared_ptr<Section> original_section, bool recursive)
 {
@@ -127,7 +130,7 @@ std::shared_ptr<Section> Section::appendSection(
     _morphology->_children[parentId].push_back(ptr);
 
     if (recursive) {
-        for (const auto child : original_section->children()) {
+        for (const auto& child : original_section->children()) {
             ptr->appendSection(child, true);
         }
     }

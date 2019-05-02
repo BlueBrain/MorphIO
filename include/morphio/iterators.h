@@ -27,4 +27,21 @@ public:
     Iterator& operator++();
     Iterator operator++(int);
 };
+
+template <> breadth_iterator::Iterator(const Section&);
+template <> depth_iterator::Iterator(const Section&);
+template <> upstream_iterator::Iterator(const Section&);
+template <> breadth_iterator::Iterator(const Morphology&);
+template <> depth_iterator::Iterator(const Morphology&);
+template <> upstream_iterator::Iterator(const Morphology&);
+template <> Section depth_iterator::operator*() const;
+template <> Section breadth_iterator::operator*() const;
+template <> Section upstream_iterator::operator*() const;
+template <> depth_iterator& depth_iterator::operator++();
+template <> breadth_iterator& breadth_iterator::operator++();
+template <> upstream_iterator& upstream_iterator::operator++();
+
+extern template class Iterator<std::stack<Section>>;
+extern template class Iterator<std::queue<std::queue<Section>>>;
+extern template class Iterator<std::vector<Section>>;
 } // namespace morphio

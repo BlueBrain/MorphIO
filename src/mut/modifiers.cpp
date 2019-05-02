@@ -6,6 +6,9 @@
 namespace morphio {
 namespace mut {
 namespace modifiers {
+bool NRN_order_comparator(std::shared_ptr<Section> a,
+                          std::shared_ptr<Section> b);
+
 void two_points_sections(morphio::mut::Morphology& morpho)
 {
     for (auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {

@@ -25,6 +25,7 @@
 namespace py = pybind11;
 using namespace py::literals;
 
+#pragma GCC diagnostic ignored "-Wmissing-prototypes"
 PYBIND11_MODULE(morphio, m) {
     bind_misc(m);
     bind_immutable_module(m);

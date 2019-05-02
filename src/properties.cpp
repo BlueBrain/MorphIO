@@ -65,8 +65,8 @@ MitochondriaPointLevel::MitochondriaPointLevel(
 }
 
 PointLevel::PointLevel(std::vector<Point::Type> points,
-    std::vector<Diameter::Type> diameters,
-    std::vector<Perimeter::Type> perimeters)
+                       std::vector<Diameter::Type> diameters,
+                       std::vector<Perimeter::Type> perimeters)
     : _points(points)
     , _diameters(diameters)
     , _perimeters(perimeters)
@@ -90,6 +90,17 @@ PointLevel::PointLevel(const PointLevel& data, SectionRange range)
     _points = copySpan<Property::Point>(data._points, range);
     _diameters = copySpan<Property::Diameter>(data._diameters, range);
     _perimeters = copySpan<Property::Perimeter>(data._perimeters, range);
+}
+
+PointLevel& PointLevel::operator=(const PointLevel& other)
+{
+    if(&other == this)
+        return *this;
+
+    this->_points = other._points;
+    this->_diameters = other._diameters;
+    this->_perimeters = other._perimeters;
+    return *this;
 }
 
 template <typename T>

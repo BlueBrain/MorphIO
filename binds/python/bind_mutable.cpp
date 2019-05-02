@@ -5,9 +5,10 @@
 #include <morphio/mut/soma.h>
 
 namespace py = pybind11;
-using namespace py::literals;
 
+void bind_mutable_module(py::module &m);
 void bind_mutable_module(py::module &m) {
+    using namespace py::literals;
 
     auto mutable_morphology = py::class_<morphio::mut::Morphology>(m, "Morphology")
         .def(py::init<>())
