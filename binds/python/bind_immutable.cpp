@@ -11,8 +11,7 @@
 
 namespace py = pybind11;
 
-void bind_immutable_module(py::module &m);
-void bind_immutable_module(py::module &m) {
+static void bind_immutable_module(py::module &m) {
     using namespace py::literals;
 
   // http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight=iostream#capturing-standard-output-from-ostream

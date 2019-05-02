@@ -5,10 +5,6 @@
 namespace morphio {
 namespace mut {
 
-void _appendMitoProperties(Property::MitochondriaPointLevel& to,
-                           const Property::MitochondriaPointLevel& from,
-                           int offset);
-
 void friendDtorForSharedPtrMito(MitoSection* section)
 {
     delete section;
@@ -61,7 +57,7 @@ std::shared_ptr<MitoSection> Mitochondria::appendRootSection(
     return ptr;
 }
 
-void _appendMitoProperties(Property::MitochondriaPointLevel& to,
+static void _appendMitoProperties(Property::MitochondriaPointLevel& to,
     const Property::MitochondriaPointLevel& from,
     int offset = 0)
 {

@@ -16,17 +16,6 @@ namespace morphio {
 namespace mut {
 namespace writer {
 
-void writeLine(std::ofstream& myfile, int id, int parentId, SectionType type,
-               const Point& point, float diameter);
-std::string version_footnote();
-bool _skipDuplicate(const std::shared_ptr<Section> section);
-void _write_asc_points(std::ofstream& myfile, const Points& points,
-                       const std::vector<float>& diameters, size_t indentLevel);
-void _write_asc_section(std::ofstream& myfile, const Morphology& morpho,
-                        const std::shared_ptr<Section>& section,
-                        size_t indentLevel);
-void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria);
-
 template <typename T>
 struct base_type
 {
@@ -41,7 +30,7 @@ struct base_type<std::vector<T>> : base_type<T>
 {
 };
 
-void writeLine(std::ofstream& myfile, int id, int parentId, SectionType type,
+static void writeLine(std::ofstream& myfile, int id, int parentId, SectionType type,
     const Point& point, float diameter)
 {
     using std::setw;
@@ -54,7 +43,7 @@ void writeLine(std::ofstream& myfile, int id, int parentId, SectionType type,
            << std::to_string(parentId) << std::endl;
 }
 
-std::string version_footnote()
+static std::string version_footnote()
 {
     return std::string("Created by MorphIO v") + morphio::VERSION;
 }
@@ -62,7 +51,7 @@ std::string version_footnote()
 /**
    Only skip duplicate if it has the same diameter
  **/
-bool _skipDuplicate(const std::shared_ptr<Section> section)
+static bool _skipDuplicate(const std::shared_ptr<Section> section)
 {
     return section->diameters()[0] == section->parent()->diameters().back();
 }
@@ -130,7 +119,7 @@ void swc(const Morphology& morphology, const std::string& filename)
     myfile.close();
 }
 
-void _write_asc_points(std::ofstream& myfile, const Points& points,
+static void _write_asc_points(std::ofstream& myfile, const Points& points,
     const std::vector<float>& diameters, size_t indentLevel)
 {
     for (unsigned int i = 0; i < points.size(); ++i) {
@@ -142,7 +131,7 @@ void _write_asc_points(std::ofstream& myfile, const Points& points,
     }
 }
 
-void _write_asc_section(std::ofstream& myfile, const Morphology& morpho,
+static void _write_asc_section(std::ofstream& myfile, const Morphology& morpho,
     const std::shared_ptr<Section>& section,
     size_t indentLevel)
 {
@@ -236,7 +225,7 @@ void write_dataset(HighFive::Group& file, const std::string& name, const T& raw)
     dpoints.write(raw);
 }
 
-void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria)
+static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria)
 {
     if (mitochondria.rootSections().empty())
         return;

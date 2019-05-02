@@ -6,8 +6,7 @@
 
 namespace py = pybind11;
 
-void bind_mutable_module(py::module &m);
-void bind_mutable_module(py::module &m) {
+static void bind_mutable_module(py::module &m) {
     using namespace py::literals;
 
     auto mutable_morphology = py::class_<morphio::mut::Morphology>(m, "Morphology")

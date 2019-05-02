@@ -28,6 +28,7 @@ public:
     Iterator operator++(int);
 };
 
+// Declare the specializations
 template <> breadth_iterator::Iterator(const Section&);
 template <> depth_iterator::Iterator(const Section&);
 template <> upstream_iterator::Iterator(const Section&);
@@ -41,7 +42,9 @@ template <> depth_iterator& depth_iterator::operator++();
 template <> breadth_iterator& breadth_iterator::operator++();
 template <> upstream_iterator& upstream_iterator::operator++();
 
+// Explicit declaration
 extern template class Iterator<std::stack<Section>>;
 extern template class Iterator<std::queue<std::queue<Section>>>;
 extern template class Iterator<std::vector<Section>>;
+
 } // namespace morphio

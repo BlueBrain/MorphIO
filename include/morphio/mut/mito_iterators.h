@@ -32,6 +32,7 @@ public:
     MitoIterator operator++(int);
 };
 
+// Declare the specializations
 template <> std::shared_ptr<MitoSection> MitoIterator<std::stack<std::shared_ptr<MitoSection>>>::operator*() const;
 template <> std::shared_ptr<MitoSection> MitoIterator<std::queue<std::shared_ptr<MitoSection>>>::operator*() const;
 template <> std::shared_ptr<MitoSection> MitoIterator<std::vector<std::shared_ptr<MitoSection>>>::operator*() const;
@@ -39,6 +40,7 @@ template <> mito_upstream_iterator::MitoIterator(const Mitochondria&);
 template <> mito_upstream_iterator::MitoIterator(const Mitochondria&, std::shared_ptr<MitoSection>);
 template <> mito_upstream_iterator& mito_upstream_iterator::operator++();
 
+// Explicit declaration
 extern template class MitoIterator<std::stack<std::shared_ptr<MitoSection>>>;
 extern template class MitoIterator<std::queue<std::shared_ptr<MitoSection>>>;
 extern template class MitoIterator<std::vector<std::shared_ptr<MitoSection>>>;

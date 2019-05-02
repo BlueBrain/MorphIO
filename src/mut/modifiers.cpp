@@ -6,8 +6,6 @@
 namespace morphio {
 namespace mut {
 namespace modifiers {
-bool NRN_order_comparator(std::shared_ptr<Section> a,
-                          std::shared_ptr<Section> b);
 
 void two_points_sections(morphio::mut::Morphology& morpho)
 {
@@ -68,7 +66,7 @@ void soma_sphere(morphio::mut::Morphology& morpho)
     soma->diameters() = {r};
 }
 
-bool NRN_order_comparator(std::shared_ptr<Section> a,
+static bool NRN_order_comparator(std::shared_ptr<Section> a,
     std::shared_ptr<Section> b)
 {
     return a->type() < b->type();
