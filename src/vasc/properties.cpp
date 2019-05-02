@@ -179,7 +179,8 @@ bool VascSectionLevel::operator==(const VascSectionLevel& other) const
 {
     return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose) &&
                                  compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) &&
-                                 compare(this->_neighbors, other._neighbors, "_neighbors", verbose));
+                                 compare(this->_predecessors, other._predecessors, "_predecessors", verbose) &&
+                                 compare(this->_successors, other._successors, "_successors", verbose));
 }
 
 bool VascSectionLevel::operator!=(const VascSectionLevel& other) const
@@ -253,12 +254,6 @@ template <>
 const std::vector<Diameter::Type>& Properties::get<Diameter>() const
 {
     return _pointLevel._diameters;
-}
-
-template <>
-const std::map<uint32_t, std::vector<uint32_t>>& Properties::neighbors<VascSection>()
-{
-    return _sectionLevel._neighbors;
 }
 
 template <>

@@ -57,7 +57,6 @@ struct VascSectionLevel
     std::vector<SectionType::Type> _sectionTypes;
     std::map<uint32_t, std::vector<uint32_t>> _predecessors;
     std::map<uint32_t, std::vector<uint32_t>> _successors;
-    std::map<uint32_t, std::vector<uint32_t>> _neighbors;
     bool operator==(const VascSectionLevel& other) const;
     bool operator!=(const VascSectionLevel& other) const;
 };
@@ -75,9 +74,6 @@ struct Properties
     const std::vector<typename T::Type>& get() const;
 
     template <typename T>
-    const std::map<uint32_t, std::vector<uint32_t>>& neighbors();
-
-    template <typename T>
     const std::map<uint32_t, std::vector<uint32_t>>& predecessors();
 
     template <typename T>
@@ -87,8 +83,6 @@ struct Properties
     bool operator!=(const Properties& other) const;
 };
 
-template <>
-const std::map<uint32_t, std::vector<uint32_t>>& Properties::neighbors<VascSection>();
 template <>
 const std::map<uint32_t, std::vector<uint32_t>>& Properties::predecessors<VascSection>();
 template <>
