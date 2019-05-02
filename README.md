@@ -81,7 +81,7 @@ target_link_libraries(mylib MorphIO::morphio)
 
 The python binding can directly be installed using pip:
 ```shell
-pip install --index-url  https://bbpteam.epfl.ch/repository/devpi/bbprelman/dev/+simple/ morphio
+pip install morphio
 ```
 
 ## Introduction
