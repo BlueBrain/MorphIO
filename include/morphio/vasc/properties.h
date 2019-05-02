@@ -82,6 +82,9 @@ struct Properties
 
     template <typename T>
     const std::map<uint32_t, std::vector<uint32_t>>& successors();
+
+    bool operator==(const Properties& other) const;
+    bool operator!=(const Properties& other) const;
 };
 
 template <>

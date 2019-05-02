@@ -161,14 +161,44 @@ bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
     return false;
 }
 
+bool compare(const VascPointLevel& el1, const VascPointLevel& el2, const std::string& name, bool verbose_)
+{
+    if (&el1 == &el2)
+        return true;
+
+    bool result = (compare(el1._points, el2._points, "_points", verbose_) &&
+                   compare(el1._diameters, el2._diameters, "_diameters", verbose_));
+
+    if (!result && verbose_)
+        LBERROR(Warning::UNDEFINED, "Error comparing " + name);
+
+    return result;
+}
+
 bool VascSectionLevel::operator==(const VascSectionLevel& other) const
 {
-    return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose) && compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) && compare(this->_neighbors, other._neighbors, "_neighbors", verbose));
+    return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose) &&
+                            compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) &&
+                            compare(this->_neighbors, other._neighbors, "_neighbors", verbose));
 }
 
 bool VascSectionLevel::operator!=(const VascSectionLevel& other) const
 {
     return !(this->operator==(other));
+}
+
+bool Properties::operator==(const Properties& other) const
+{
+    if (this == &other)
+        return true;
+
+    return (compare(this->_pointLevel, other._pointLevel, "_pointLevel", verbose) &&
+            compare(this->_sectionLevel, other._sectionLevel, "_sectionLevel", verbose));
+}
+
+bool Properties::operator!=(const Properties& other) const
+{
+    return !this->operator==(other);
 }
 
 template <>

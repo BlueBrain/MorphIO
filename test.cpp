@@ -27,12 +27,13 @@ int main()
 {
     using namespace std;
     clock_t begin = clock();
-    morphio::Morphology m("tests/data/h5/v1/simple.h5");
+    morphio::vasculature::Vasculature m("tests/data/h5/vasculature2.h5");
+    morphio::vasculature::Vasculature m1("tests/data/h5/vasculature2.h5");
     //morphio::Morphology m("data/Astrocytes_H5/astrocyte2_v3.h5");
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC * 1000.;
     std::cout << elapsed_secs << " milliseconds" << std::endl;
-    
+    std::cout << (m == m1) << std::endl;
     //morphio::mut::Morphology b(m);
     //for(auto it = m.begin(); it != m.end(); ++it)
     //    std::cout <<  (*it).id() << std::endl;

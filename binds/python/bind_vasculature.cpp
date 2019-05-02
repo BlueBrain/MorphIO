@@ -17,8 +17,8 @@ using namespace py::literals;
 void bind_vasculature(py::module &m) {
 
     py::class_<morphio::vasculature::Vasculature>(m, "Vasculature")
-        .def(py::init<const morphio::URI&, unsigned int>(),
-             "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
+        .def(py::init<const morphio::URI&>(),
+             "filename"_a)
         // .def(py::init<morphio::mut::Morphology&>())
         .def("__eq__", [](const morphio::vasculature::Vasculature& a, const morphio::vasculature::Vasculature& b) {
                 return a.operator==(b);

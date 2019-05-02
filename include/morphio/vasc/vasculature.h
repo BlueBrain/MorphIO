@@ -29,7 +29,7 @@ public:
     /** @name Read API */
     /** Open the given source to a vasculature file and parse it.
      */
-    Vasculature(const URI& source, unsigned int options = NO_MODIFIER);
+    explicit Vasculature(const std::string& source);
 
     /**
      * Return a vector containing all section objects.

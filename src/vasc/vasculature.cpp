@@ -17,7 +17,7 @@ namespace vasculature {
 
 void buildConnectivity(std::shared_ptr<property::Properties> properties);
 
-Vasculature::Vasculature(const morphio::URI& source, unsigned int options)
+Vasculature::Vasculature(const std::string& source)
 {
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos)
@@ -26,19 +26,15 @@ Vasculature::Vasculature(const morphio::URI& source, unsigned int options)
     if (access(source.c_str(), F_OK) == -1)
         LBTHROW(RawDataError("File: " + source + " does not exist."));
 
-    std::string extension;
+    std::string extension = source.substr(pos);
 
-    for (auto& c : source.substr(pos))
-        extension += my_tolower(c);
+    property::Properties loader;
+    if (extension == ".h5")
+        loader = plugin::h5::VasculatureHDF5().load(source);
+    else
+        LBTHROW(UnknownFileType("Unhandled file type"));
 
-    auto loader = [&source, &options, &extension]() {
-        if (extension == ".h5")
-            return plugin::h5::VasculatureHDF5().load(source);
-        LBTHROW(UnknownFileType(
-            "Unhandled file type"));
-    };
-
-    _properties = std::make_shared<property::Properties>(loader());
+    _properties = std::make_shared<property::Properties>(loader);
 
     buildConnectivity(_properties);
 }
@@ -52,7 +48,9 @@ Vasculature::~Vasculature()
 
 bool Vasculature::operator==(const Vasculature& other) const
 {
-    return this->_properties == other._properties;
+    if(this->_properties == other._properties)
+        return true;
+    return (this->_properties && other._properties && *(this->_properties) == *(other._properties));
 }
 
 bool Vasculature::operator!=(const morphio::vasculature::Vasculature& other) const
