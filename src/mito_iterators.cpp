@@ -78,4 +78,8 @@ mito_upstream_iterator& mito_upstream_iterator::operator++()
         container[0] = section.parent();
     return *this;
 }
+// Explicit declaration
+template class MitoIterator<std::stack<MitoSection>>;
+template class MitoIterator<std::queue<MitoSection>>;
+template class MitoIterator<std::vector<MitoSection>>;
 } // namespace morphio

@@ -31,13 +31,9 @@ public:
 template <>
 breadth_iterator::Iterator(const std::shared_ptr<Section>);
 template <>
-depth_iterator::Iterator(const std::shared_ptr<Section>);
-template <>
 upstream_iterator::Iterator(const std::shared_ptr<Section>);
 template <>
 breadth_iterator::Iterator(const Morphology&);
-template <>
-depth_iterator::Iterator(const Morphology&);
 template <>
 upstream_iterator::Iterator(const Morphology&);
 template <>
@@ -46,8 +42,6 @@ template <>
 std::shared_ptr<Section> breadth_iterator::operator*() const;
 template <>
 std::shared_ptr<Section> upstream_iterator::operator*() const;
-template <>
-depth_iterator& depth_iterator::operator++();
 template <>
 breadth_iterator& breadth_iterator::operator++();
 template <>

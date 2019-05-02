@@ -124,4 +124,9 @@ upstream_iterator& upstream_iterator::operator++()
         container[0] = section.parent();
     return *this;
 }
+
+template class Iterator<std::stack<Section>>;
+template class Iterator<std::queue<std::queue<Section>>>;
+template class Iterator<std::vector<Section>>;
+
 } // namespace morphio
