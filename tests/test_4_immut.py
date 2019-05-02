@@ -5,7 +5,7 @@ from itertools import combinations
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 from nose.tools import assert_equal, assert_raises, ok_
 
-from morphio import Morphology, upstream, IterType
+from morphio import Morphology, upstream, IterType, RawDataError
 import morphio.vasculature as vasculature
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -94,8 +94,15 @@ def test_mitochondria():
 
 
 def test_vasculature():
-    morpho = vasculature.VasculatureMorphology(os.path.join(_path, "h5/vasculature.h5"))
-    assert_array_almost_equal(morpho.section(0).points,
+    morphology1 = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
+    morphology2 = vasculature.Vasculature(os.path.join(_path, "h5/vasculature2.h5"))
+
+    assert_raises(RawDataError, vasculature.Vasculature, os.path.join(_path, "h5/empty_vasculature.h5"))
+
+    assert (morphology1 == morphology1)
+    assert (morphology1 != morphology2)
+
+    assert_array_almost_equal(morphology1.section(0).points,
                        np.array([[1265.47399902,  335.42364502, 1869.19274902],
                               [1266.26647949,  335.57000732, 1869.74914551],
                               [1267.09082031,  335.68869019, 1870.31469727],
@@ -109,22 +116,25 @@ def test_vasculature():
                               [1273.22216797,  336.31613159, 1875.49523926],
                               [1274.        ,  336.70001221, 1876.        ]]))
 
-    assert_array_almost_equal(morpho.section(0).diameters,
+    assert_array_almost_equal(morphology1.section(0).diameters,
                               np.array([1.96932483, 1.96932483, 1.96932483, 1.96932483, 1.96932483,
-                                     1.96932483, 1.96932483, 1.96932483, 1.96932483, 1.96932483,
-                                     1.96932483, 2.15068388]))
+                                        1.96932483, 1.96932483, 1.96932483, 1.96932483, 1.96932483,
+                                        1.96932483, 2.15068388]))
 
-    assert_equal(len(morpho.sections), 3080)
-    assert_equal(len(morpho.points), 55807)
-    assert_equal(len(morpho.diameters), 55807)
-    assert_equal(len(morpho.section_types), 3080)
-    assert_equal(len(morpho.section(0).predecessors), 0)
-    assert_equal(len(morpho.section(0).successors), 2)
-    assert_equal(morpho.section(0).successors[0].id, 1)
-    assert_equal(morpho.section(0).successors[1].id, 2)
-    assert_array_equal([sec.id for sec in morpho.sections], range(3080))
-    assert_equal(len([section.id for section in morpho.iter()]), 3080)
-    all_sections = set([sec.id for sec in morpho.sections])
-    for sec in morpho.iter():
+    assert_equal(len(morphology1.sections), 3080)
+    assert_equal(len(morphology1.points), 55807)
+    assert_equal(len(morphology1.diameters), 55807)
+    assert_array_almost_equal(morphology1.diameters[-5:],
+                              np.array([0.78039801, 0.78039801, 0.78039801, 2.11725187, 2.11725187]))
+    assert_equal(len(morphology1.section_types), 3080)
+    assert_equal(len(morphology1.section(0).predecessors), 0)
+    assert_equal(len(morphology1.section(0).successors), 2)
+    assert_equal(morphology1.section(0).successors[0].id, 1)
+    assert_equal(morphology1.section(0).successors[1].id, 2)
+    assert_array_equal([sec.id for sec in morphology1.sections], range(3080))
+    assert_equal(len([section.id for section in morphology1.iter()]), 3080)
+    all_sections = set([sec.id for sec in morphology1.sections])
+    for sec in morphology1.iter():
         all_sections.remove(sec.id)
     assert_equal(len(all_sections), 0)
+
