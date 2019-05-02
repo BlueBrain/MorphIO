@@ -46,7 +46,9 @@ public:
         : uri_(uri)
         , lex_(uri)
         , debugInfo_(uri)
-        , err_(uri){}
+        , err_(uri)
+    {
+    }
 
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;

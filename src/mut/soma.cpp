@@ -15,12 +15,14 @@ Soma::Soma(const Property::PointLevel& pointProperties)
 }
 
 Soma::Soma(const Soma& soma)
-    : _somaType(soma._somaType), _pointProperties(soma._pointProperties)
+    : _somaType(soma._somaType)
+    , _pointProperties(soma._pointProperties)
 {
 }
 
 Soma::Soma(const morphio::Soma& soma)
-    : _somaType(soma.type()), _pointProperties(soma._properties->_somaLevel)
+    : _somaType(soma.type())
+    , _pointProperties(soma._properties->_somaLevel)
 {
 }
 

@@ -15,9 +15,9 @@ namespace morphio {
 namespace mut {
 
 void _appendProperties(Property::PointLevel& to,
-                       const Property::PointLevel& from, int offset);
+    const Property::PointLevel& from, int offset);
 void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
-                  std::shared_ptr<Section> section);
+    std::shared_ptr<Section> section);
 
 using morphio::plugin::ErrorMessages;
 Morphology::Morphology(const morphio::URI& uri, unsigned int options)

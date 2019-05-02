@@ -1,6 +1,6 @@
 #include <morphio/morphology.h>
-#include <morphio/section.h>
 #include <morphio/properties.h>
+#include <morphio/section.h>
 
 namespace morphio {
 template <typename T>

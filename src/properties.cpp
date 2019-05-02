@@ -65,8 +65,8 @@ MitochondriaPointLevel::MitochondriaPointLevel(
 }
 
 PointLevel::PointLevel(std::vector<Point::Type> points,
-                       std::vector<Diameter::Type> diameters,
-                       std::vector<Perimeter::Type> perimeters)
+    std::vector<Diameter::Type> diameters,
+    std::vector<Perimeter::Type> perimeters)
     : _points(points)
     , _diameters(diameters)
     , _perimeters(perimeters)
@@ -94,7 +94,7 @@ PointLevel::PointLevel(const PointLevel& data, SectionRange range)
 
 PointLevel& PointLevel::operator=(const PointLevel& other)
 {
-    if(&other == this)
+    if (&other == this)
         return *this;
 
     this->_points = other._points;
@@ -278,8 +278,8 @@ bool SectionLevel::operator==(const SectionLevel& other) const
 {
     return (this == &other ||
             (compare_section_structure(this->_sections, other._sections, "_sections", VERBOSE) &&
-             compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", VERBOSE) &&
-             compare(this->_children, other._children, "_children", VERBOSE)));
+                compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", VERBOSE) &&
+                compare(this->_children, other._children, "_children", VERBOSE)));
 }
 
 bool SectionLevel::operator!=(const SectionLevel& other) const
