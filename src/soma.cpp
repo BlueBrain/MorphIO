@@ -24,6 +24,10 @@ float Soma::volume() const
         return 4 * static_cast<float>(M_PI) * radius * radius;
     }
 
+    case SOMA_SINGLE_POINT:
+    case SOMA_CYLINDERS:
+    case SOMA_SIMPLE_CONTOUR:
+    case SOMA_UNDEFINED:
     default:
         throw;
     }

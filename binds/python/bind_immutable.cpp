@@ -96,6 +96,7 @@ static void bind_immutable_module(py::module &m) {
                     return py::make_iterator(morpho->depth_begin(), morpho->depth_end());
                 case morphio::IterType::BREADTH_FIRST:
                     return py::make_iterator(morpho->breadth_begin(), morpho->breadth_end());
+                case morphio::IterType::UPSTREAM:
                 default:
                     LBTHROW(morphio::MorphioError("Only iteration types depth_first and breadth_first are supported"));
                 }

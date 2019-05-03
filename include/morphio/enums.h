@@ -64,10 +64,14 @@ inline std::ostream& operator<<(std::ostream& os, const MorphologyVersion v)
     switch (v) {
     case MORPHOLOGY_VERSION_H5_1:
         return os << "h5v1";
+    case MORPHOLOGY_VERSION_H5_1_1:
+        return os << "h5v1.1";
     case MORPHOLOGY_VERSION_H5_2:
         return os << "h5v2";
     case MORPHOLOGY_VERSION_SWC_1:
         return os << "swcv1";
+    case MORPHOLOGY_VERSION_ASC_1:
+        return os << "ascv1";
     default:
     case MORPHOLOGY_VERSION_UNDEFINED:
         return os << "UNDEFINED";
