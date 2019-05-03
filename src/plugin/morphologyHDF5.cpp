@@ -213,14 +213,14 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset)
             try {
                 return _file->getDataSet(path);
             } catch (HighFive::DataSetException&) {
-                LBTHROW(std::runtime_error(
+                LBTHROW(MorphioError(
                     "Could not open " + path + " dataset for morphology file " + _file->getName() + " repair stage " + _stage));
             }
         }();
 
         const auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 2 || dims[1] != _pointColumns) {
-            LBTHROW(std::runtime_error(
+            LBTHROW(MorphioError(
                 "Reading morphology file '" + _file->getName() + "': bad number of dimensions in 'points' dataspace"));
         }
         std::vector<std::vector<float>> vec(dims[0]);
@@ -296,11 +296,11 @@ int MorphologyHDF5::_readSections()
                     try {
                         return _file->getDataSet(raw_path);
                     } catch (HighFive::DataSetException&) {
-                        LBTHROW(std::runtime_error(
+                        LBTHROW(MorphioError(
                             "Could not find unraveled structure neither at " + path + " or " + raw_path + " for dataset for morphology file " + _file->getName() + " repair stage " + _stage));
                     }
                 } else {
-                    LBTHROW(std::runtime_error("Could not open " + path + " dataset for morphology file " + _file->getName() + " repair stage " + _stage));
+                    LBTHROW(MorphioError("Could not open " + path + " dataset for morphology file " + _file->getName() + " repair stage " + _stage));
                 }
             }
         }();
@@ -310,7 +310,7 @@ int MorphologyHDF5::_readSections()
         const auto dims = dataset.getSpace().getDimensions();
 
         if (dims.size() != 2 || dims[1] != _structureV2Columns) {
-            LBTHROW(std::runtime_error(
+            LBTHROW(MorphioError(
                 "Reading morphology file '" + _file->getName() + "': bad number of dimensions in 'structure' dataspace"));
         }
 
@@ -365,13 +365,13 @@ void MorphologyHDF5::_readSectionTypes()
             try {
                 return _file->getDataSet(path);
             } catch (HighFive::DataSetException&) {
-                LBTHROW(std::runtime_error("Could not open " + path + " dataset for morphology file " + _file->getName()));
+                LBTHROW(MorphioError("Could not open " + path + " dataset for morphology file " + _file->getName()));
             }
         }();
 
         const auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 2 || dims[1] != 1) {
-            LBTHROW(std::runtime_error(
+            LBTHROW(MorphioError(
                 "Reading morphology file '" + _file->getName() + "': bad number of dimensions in 'sectiontype' dataspace"));
         }
 
@@ -399,7 +399,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset)
 
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 1) {
-            LBTHROW(std::runtime_error("Reading morphology file '" + _file->getName() + "': bad number of dimensions in"
+            LBTHROW(MorphioError("Reading morphology file '" + _file->getName() + "': bad number of dimensions in"
                                                                                         " 'perimeters' dataspace"));
         }
 
@@ -411,7 +411,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset)
     } catch (...) {
         if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
             LBTHROW(
-                std::runtime_error("No empty perimeters allowed for glia "
+                MorphioError("No empty perimeters allowed for glia "
                                    "morphology"));
     }
 }
@@ -431,7 +431,7 @@ void MorphologyHDF5::_read(const std::string& groupName,
 
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != expectedDimension) {
-            LBTHROW(std::runtime_error("Reading morphology file '" + _file->getName() + "': bad number of dimensions in"
+            LBTHROW(MorphioError("Reading morphology file '" + _file->getName() + "': bad number of dimensions in"
                                                                                         " 'perimeters' dataspace"));
         }
 
@@ -440,7 +440,7 @@ void MorphologyHDF5::_read(const std::string& groupName,
     } catch (...) {
         if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
             LBTHROW(
-                std::runtime_error("No empty perimeters allowed for glia "
+                MorphioError("No empty perimeters allowed for glia "
                                    "morphology"));
     }
 }
