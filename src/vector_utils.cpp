@@ -150,7 +150,8 @@ std::ostream& operator<<(std::ostream& os, const morphio::Point& point)
     return os;
 }
 
-char my_tolower(char ch)
+// Like std::tolower but accepts char
+char my_tolower(char ch) 
 {
     return static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
 }
