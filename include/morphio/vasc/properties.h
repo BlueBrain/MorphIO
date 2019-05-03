@@ -8,6 +8,7 @@ namespace property {
 struct VascSection
 {
     // offset
+    // refers to the index in the points vector from which the section begins
     using Type = unsigned int;
 };
 
