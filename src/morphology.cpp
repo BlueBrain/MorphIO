@@ -132,7 +132,7 @@ const std::vector<Section> Morphology::rootSections() const
         }
 
         return result;
-    } catch (const std::out_of_range& oor) {
+    } catch (const std::out_of_range&) {
         return result;
     }
 }
@@ -213,7 +213,7 @@ SomaType getSomaType(long unsigned int nSomaPoints)
             {1, SOMA_SINGLE_POINT},
             {2, SOMA_UNDEFINED}}
             .at(nSomaPoints);
-    } catch (const std::out_of_range& oor) {
+    } catch (const std::out_of_range&) {
         return SOMA_SIMPLE_CONTOUR;
     }
 }

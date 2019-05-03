@@ -4,7 +4,7 @@
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
 
-bool verbose = false;
+constexpr bool VERBOSE = false;
 
 namespace std {
 template <typename T, size_t N>
@@ -92,6 +92,17 @@ PointLevel::PointLevel(const PointLevel& data, SectionRange range)
     _perimeters = copySpan<Property::Perimeter>(data._perimeters, range);
 }
 
+PointLevel& PointLevel::operator=(const PointLevel& other)
+{
+    if (&other == this)
+        return *this;
+
+    this->_points = other._points;
+    this->_diameters = other._diameters;
+    this->_perimeters = other._perimeters;
+    return *this;
+}
+
 template <typename T>
 bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
     const std::string& name, bool verbose_)
@@ -119,7 +130,7 @@ bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
     return false;
 }
 
-bool compare_section_structure(const std::vector<Section::Type>& vec1,
+static bool compare_section_structure(const std::vector<Section::Type>& vec1,
     const std::vector<Section::Type>& vec2,
     const std::string& name, bool verbose)
 {
@@ -223,7 +234,7 @@ bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
     return false;
 }
 
-bool compare(const PointLevel& el1, const PointLevel& el2, size_t soma_offset1,
+static bool compare(const PointLevel& el1, const PointLevel& el2, size_t soma_offset1,
     size_t soma_offset2, const std::string& name, bool verbose_)
 {
     if (&el1 == &el2)
@@ -265,7 +276,10 @@ bool compare(const PointLevel& el1, const PointLevel& el2, size_t soma_offset1,
 
 bool SectionLevel::operator==(const SectionLevel& other) const
 {
-    return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose) && compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) && compare(this->_children, other._children, "_children", verbose));
+    return (this == &other ||
+            (compare_section_structure(this->_sections, other._sections, "_sections", VERBOSE) &&
+                compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", VERBOSE) &&
+                compare(this->_children, other._children, "_children", VERBOSE)));
 }
 
 bool SectionLevel::operator!=(const SectionLevel& other) const
@@ -275,7 +289,7 @@ bool SectionLevel::operator!=(const SectionLevel& other) const
 
 bool CellLevel::operator==(const CellLevel& other) const
 {
-    if (verbose && this->_cellFamily != other._cellFamily) {
+    if (VERBOSE && this->_cellFamily != other._cellFamily) {
         std::cout << "this->_cellFamily: " << this->_cellFamily << std::endl;
         std::cout << "other._cellFamily: " << other._cellFamily << std::endl;
     }
@@ -308,10 +322,10 @@ bool Properties::operator==(const Properties& other) const
     size_t this_soma_offset = get<Section>().size() > 1 ? static_cast<size_t>(get<Section>()[1][0]) : 0;
     size_t other_soma_offset = other.get<Section>().size() > 1 ? static_cast<size_t>(other.get<Section>()[1][0]) : 0;
     return (compare(this->_pointLevel, other._pointLevel, this_soma_offset,
-                other_soma_offset, "_pointLevel", verbose) &&
+                other_soma_offset, "_pointLevel", VERBOSE) &&
             compare(this->_sectionLevel, other._sectionLevel, "_sectionLevel",
-                verbose) &&
-            compare(this->_cellLevel, other._cellLevel, "_cellLevel", verbose));
+                VERBOSE) &&
+            compare(this->_cellLevel, other._cellLevel, "_cellLevel", VERBOSE));
 }
 
 bool Properties::operator!=(const Properties& other) const

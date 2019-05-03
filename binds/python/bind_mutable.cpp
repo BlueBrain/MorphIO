@@ -5,9 +5,9 @@
 #include <morphio/mut/soma.h>
 
 namespace py = pybind11;
-using namespace py::literals;
 
-void bind_mutable_module(py::module &m) {
+static void bind_mutable_module(py::module &m) {
+    using namespace py::literals;
 
     auto mutable_morphology = py::class_<morphio::mut::Morphology>(m, "Morphology")
         .def(py::init<>())
@@ -94,6 +94,7 @@ void bind_mutable_module(py::module &m) {
                     return py::make_iterator(morph->depth_begin(), morph->depth_end());
                 case morphio::IterType::BREADTH_FIRST:
                     return py::make_iterator(morph->breadth_begin(), morph->breadth_end());
+                case morphio::IterType::UPSTREAM:
                 default:
                 LBTHROW(morphio::MorphioError("Only iteration types depth_first and breadth_first are supported"));
                 }

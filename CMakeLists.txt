@@ -11,18 +11,21 @@ option(${PROJECT_NAME}_CXX_WARNINGS "Compile C++ with warnings" ON)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if(${PROJECT_NAME}_CXX_WARNINGS)
     set(FLAGS "${FLAGS} -Werror -Weverything")
+    # Using std=c++11, no need for 98 compat
+    set(FLAGS "${FLAGS} -Wno-c++98-compat")
+    set(FLAGS "${FLAGS} -Wno-c++98-compat-pedantic")
+
+    # allow static objects
+    set(FLAGS "${FLAGS} -Wno-global-constructors")
+    set(FLAGS "${FLAGS} -Wno-exit-time-destructors")
+
     set(FLAGS "${FLAGS} -Wno-documentation")
     set(FLAGS "${FLAGS} -Wno-documentation-unknown-command")
-    set(FLAGS "${FLAGS} -Wno-exit-time-destructors")
+
     set(FLAGS "${FLAGS} -Wno-float-equal")
-    set(FLAGS "${FLAGS} -Wno-global-constructors")
-    set(FLAGS "${FLAGS} -Wno-missing-noreturn")
-    set(FLAGS "${FLAGS} -Wno-newline-eof")
     set(FLAGS "${FLAGS} -Wno-padded")
-    set(FLAGS "${FLAGS} -Wno-switch-enum")
-    set(FLAGS "${FLAGS} -Wno-unused-member-function")
-    set(FLAGS "${FLAGS} -Wno-weak-template-vtables")
     set(FLAGS "${FLAGS} -Wno-weak-vtables")
+    set(FLAGS "${FLAGS} -Wno-covered-switch-default")
   endif()
   if(APPLE)
     set(FLAGS "${FLAGS} -Wno-undef")

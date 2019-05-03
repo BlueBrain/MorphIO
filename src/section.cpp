@@ -69,7 +69,6 @@ const range<const float> Section::perimeters() const
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section)
 {
     os << "id: " << section.id() << std::endl;
-    ;
 
     os << section.points();
     return os;

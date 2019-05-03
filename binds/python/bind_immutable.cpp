@@ -10,9 +10,9 @@
 #include <morphio/mut/morphology.h>
 
 namespace py = pybind11;
-using namespace py::literals;
 
-void bind_immutable_module(py::module &m) {
+static void bind_immutable_module(py::module &m) {
+    using namespace py::literals;
 
   // http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight=iostream#capturing-standard-output-from-ostream
     py::add_ostream_redirect(m, "ostream_redirect");
@@ -96,6 +96,7 @@ void bind_immutable_module(py::module &m) {
                     return py::make_iterator(morpho->depth_begin(), morpho->depth_end());
                 case morphio::IterType::BREADTH_FIRST:
                     return py::make_iterator(morpho->breadth_begin(), morpho->breadth_end());
+                case morphio::IterType::UPSTREAM:
                 default:
                     LBTHROW(morphio::MorphioError("Only iteration types depth_first and breadth_first are supported"));
                 }

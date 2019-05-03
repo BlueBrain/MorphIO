@@ -11,6 +11,8 @@
 namespace morphio {
 namespace plugin {
 namespace asc {
+namespace {
+
 bool is_eof(Token type)
 {
     return type == Token::EOF_;
@@ -35,6 +37,7 @@ bool skip_sexp(size_t id)
 {
     return (id == +Token::WORD || id == +Token::STRING || id == +Token::COLOR || id == +Token::GENERATED || id == +Token::HIGH || id == +Token::INCOMPLETE || id == +Token::LOW || id == +Token::NORMAL);
 }
+}
 
 class NeurolucidaParser
 {
@@ -43,7 +46,9 @@ public:
         : uri_(uri)
         , lex_(uri)
         , debugInfo_(uri)
-        , err_(uri){};
+        , err_(uri)
+    {
+    }
 
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
@@ -69,7 +74,7 @@ private:
         for (auto& p : point) {
             try {
                 p = std::stof(lex.consume()->str());
-            } catch (const std::invalid_argument& e) {
+            } catch (const std::invalid_argument&) {
                 throw RawDataError(
                     err_.ERROR_PARSING_POINT(lex.line_num(),
                         lex.current()->str()));
@@ -233,7 +238,6 @@ private:
                         lex_.peek()->str()));
             }
         }
-        return false;
     }
 
     bool parse_block()

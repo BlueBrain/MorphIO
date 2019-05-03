@@ -37,6 +37,7 @@ float _somaSurface(const SomaType type, const ContainerDiameters& diameters,
         throw NotImplementedError(
             "Surface is not implemented for SOMA_SIMPLE_CONTOUR");
     }
+    case SOMA_UNDEFINED:
     default: {
         morphio::plugin::ErrorMessages err;
         LBTHROW(SomaError(

@@ -60,7 +60,7 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
     _mitochondria->_children[parentId].push_back(ptr);
 
     if (recursive) {
-        for (const auto child : original_section->children()) {
+        for (const auto& child : original_section->children()) {
             ptr->appendSection(child, true);
         }
     }
@@ -100,7 +100,7 @@ bool MitoSection::isRoot() const
     try {
         parent();
         return false;
-    } catch (const std::out_of_range& e) {
+    } catch (const std::out_of_range&) {
         return true;
     }
 }
@@ -109,7 +109,7 @@ const std::vector<std::shared_ptr<MitoSection>> MitoSection::children() const
 {
     try {
         return _mitochondria->_children.at(id());
-    } catch (const std::out_of_range& e) {
+    } catch (const std::out_of_range&) {
         return std::vector<std::shared_ptr<MitoSection>>();
     }
 }

@@ -1,4 +1,5 @@
 #include <morphio/morphology.h>
+#include <morphio/properties.h>
 #include <morphio/section.h>
 
 namespace morphio {
@@ -104,7 +105,7 @@ const std::vector<T> SectionBase<T>::children() const
             result.push_back(T(id_, _properties));
 
         return result;
-    } catch (const std::out_of_range& oor) {
+    } catch (const std::out_of_range&) {
         return result;
     }
 }

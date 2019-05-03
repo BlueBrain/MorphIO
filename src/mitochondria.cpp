@@ -29,7 +29,7 @@ const std::vector<MitoSection> Mitochondria::rootSections() const
         }
 
         return result;
-    } catch (const std::out_of_range& oor) {
+    } catch (const std::out_of_range&) {
         return result;
     }
 }

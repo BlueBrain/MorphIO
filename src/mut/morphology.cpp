@@ -13,6 +13,12 @@
 
 namespace morphio {
 namespace mut {
+
+void _appendProperties(Property::PointLevel& to,
+    const Property::PointLevel& from, int offset);
+void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
+    std::shared_ptr<Section> section);
+
 using morphio::plugin::ErrorMessages;
 Morphology::Morphology(const morphio::URI& uri, unsigned int options)
     : Morphology(morphio::Morphology(uri, options))
@@ -26,11 +32,11 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(
         *morphology._cellProperties);
 
-    for (const std::shared_ptr<Section> root : morphology.rootSections()) {
+    for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
 
-    for (const std::shared_ptr<MitoSection> root :
+    for (const std::shared_ptr<MitoSection>& root :
         morphology.mitochondria().rootSections()) {
         mitochondria().appendRootSection(root, true);
     }
@@ -121,7 +127,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(
         LBERROR(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
 
     if (recursive) {
-        for (const auto child : section_->children()) {
+        for (const auto& child : section_->children()) {
             section_copy->appendSection(child, true);
         }
     }
@@ -193,6 +199,7 @@ const std::map<uint32_t, std::shared_ptr<Section>> Morphology::sections() const
     return _sections;
 }
 
+
 void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
     std::shared_ptr<Section> section)
 {
@@ -236,6 +243,7 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
         _sections.erase(id);
     }
 }
+
 
 void _appendProperties(Property::PointLevel& to,
     const Property::PointLevel& from, int offset = 0)

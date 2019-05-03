@@ -25,6 +25,9 @@ namespace morphio {
 namespace Property {
 template <typename T>
 void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
+extern template void _appendVector(std::vector<Point>& to, const std::vector<Point>& from, int offset);
+extern template void _appendVector(std::vector<float>& to, const std::vector<float>& from, int offset);
+extern template void _appendVector(std::vector<unsigned int>& to, const std::vector<unsigned int>& from, int offset);
 
 struct Section
 {
@@ -85,6 +88,7 @@ struct PointLevel
         std::vector<Perimeter::Type> perimeters = std::vector<Perimeter::Type>());
     PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
+    PointLevel& operator=(const PointLevel& other);
     // bool operator==(const PointLevel& other) const;
     // bool operator!=(const PointLevel& other) const;
 };
@@ -95,7 +99,7 @@ struct MitochondriaPointLevel
     std::vector<MitoPathLength::Type> _relativePathLengths;
     std::vector<MitoDiameter::Type> _diameters;
 
-    MitochondriaPointLevel(){};
+    MitochondriaPointLevel() {}
     MitochondriaPointLevel(const MitochondriaPointLevel& data,
         SectionRange range);
 
@@ -201,7 +205,21 @@ std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);
 template <>
 std::vector<Point::Type>& Properties::get<Point>();
 template <>
+std::vector<Perimeter::Type>& Properties::get<Perimeter>();
+template <>
+std::vector<Diameter::Type>& Properties::get<Diameter>();
+template <>
+std::vector<MitoSection::Type>& Properties::get<MitoSection>();
+template <>
+std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>();
+template <>
+std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>();
+template <>
+std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>();
+template <>
 std::vector<Section::Type>& Properties::get<Section>();
+template <>
+std::vector<SectionType::Type>& Properties::get<SectionType>();
 template <>
 const std::vector<Section::Type>& Properties::get<Section>() const;
 

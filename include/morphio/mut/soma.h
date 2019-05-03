@@ -11,7 +11,9 @@ public:
         : _somaType(SOMA_UNDEFINED)
     {
     }
+
     Soma(const Property::PointLevel& pointProperties);
+    Soma(const Soma& soma);
     Soma(const morphio::Soma& soma);
 
     ~Soma() {}

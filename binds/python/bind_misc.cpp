@@ -9,9 +9,9 @@
 #include <morphio/enums.h>
 
 namespace py = pybind11;
-using namespace py::literals;
 
-void bind_misc(py::module &m) {
+static void bind_misc(py::module &m) {
+    using namespace py::literals;
 
   m.def("set_maximum_warnings", &morphio::set_maximum_warnings,
         "Set the maximum number of warnings to be printed on screen\n"
