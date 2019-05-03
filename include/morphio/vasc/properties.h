@@ -37,6 +37,7 @@ struct Connection
 
 struct VascPointLevel
 {
+    // stores point level information
     std::vector<Point::Type> _points;
     std::vector<Diameter::Type> _diameters;
 
@@ -49,11 +50,13 @@ struct VascPointLevel
 
 struct VascEdgeLevel
 {
+    // stores edge level information, more attributes can be added later
     std::vector<float> leakiness;
 };
 
 struct VascSectionLevel
 {
+    // stores section level information
     std::vector<VascSection::Type> _sections;
     std::vector<SectionType::Type> _sectionTypes;
     std::map<uint32_t, std::vector<uint32_t>> _predecessors;
