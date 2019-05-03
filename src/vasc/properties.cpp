@@ -256,14 +256,12 @@ const std::vector<Diameter::Type>& Properties::get<Diameter>() const
     return _pointLevel._diameters;
 }
 
-template <>
-const std::map<uint32_t, std::vector<uint32_t>>& Properties::predecessors<VascSection>()
+const std::map<uint32_t, std::vector<uint32_t>>& Properties::predecessors()
 {
     return _sectionLevel._predecessors;
 }
 
-template <>
-const std::map<uint32_t, std::vector<uint32_t>>& Properties::successors<VascSection>()
+const std::map<uint32_t, std::vector<uint32_t>>& Properties::successors()
 {
     return _sectionLevel._successors;
 }

@@ -77,20 +77,13 @@ struct Properties
     template <typename T>
     const std::vector<typename T::Type>& get() const;
 
-    template <typename T>
     const std::map<uint32_t, std::vector<uint32_t>>& predecessors();
-
-    template <typename T>
     const std::map<uint32_t, std::vector<uint32_t>>& successors();
 
     bool operator==(const Properties& other) const;
     bool operator!=(const Properties& other) const;
 };
 
-template <>
-const std::map<uint32_t, std::vector<uint32_t>>& Properties::predecessors<VascSection>();
-template <>
-const std::map<uint32_t, std::vector<uint32_t>>& Properties::successors<VascSection>();
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const VascPointLevel& pointLevel);

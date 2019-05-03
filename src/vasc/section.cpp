@@ -8,12 +8,12 @@ Section::Section(const uint32_t id_,
     : _id(id_)
     , _properties(properties)
 {
-    const auto& sections = properties->get<Section::SectionId>();
+    const auto& sections = properties->get<property::VascSection>();
     if (id_ >= sections.size())
         LBTHROW(RawDataError("Requested section ID (" + std::to_string(id_) + ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
     const size_t start = sections[id_];
     const size_t end_ = id_ == sections.size() - 1
-                            ? properties->get<Section::PointAttribute>().size()
+                            ? properties->get<property::Point>().size()
                             : sections[id_ + 1];
     _range = std::make_pair(start, end_);
 
@@ -69,7 +69,7 @@ const std::vector<Section> Section::predecessors() const
 {
     std::vector<Section> result;
     try {
-        const std::vector<uint32_t>& predecessors_ = _properties->predecessors<Section::SectionId>().at(_id);
+        const std::vector<uint32_t>& predecessors_ = _properties->predecessors().at(_id);
         result.reserve(predecessors_.size());
         for (const uint32_t id_ : predecessors_)
             result.push_back(Section(id_, _properties));
@@ -83,7 +83,7 @@ const std::vector<Section> Section::successors() const
 {
     std::vector<Section> result;
     try {
-        const std::vector<uint32_t>& successors_ = _properties->successors<Section::SectionId>().at(_id);
+        const std::vector<uint32_t>& successors_ = _properties->successors().at(_id);
         result.reserve(successors_.size());
         for (const uint32_t id_ : successors_)
             result.push_back(Section(id_, _properties));
