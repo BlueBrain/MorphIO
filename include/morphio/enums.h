@@ -140,6 +140,17 @@ enum SectionType
     SECTION_ALL = 32
 };
 
+enum VascularSectionType
+{
+    SECTION_VEIN = 1,
+    SECTION_ARTERY = 2,
+    SECTION_VENULE = 3,
+    SECTION_ARTERIOLE = 4,
+    SECTION_VENOUS_CAPILLARY = 5,
+    SECTION_ARTERIAL_CAPILLARY = 6,
+    SECTION_TRANSITIONAL = 7
+};
+
 /**
  * Specify the access mode of data.
  * @version 1.4

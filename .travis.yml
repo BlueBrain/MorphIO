@@ -26,6 +26,5 @@ script:
 
   # Testing compilation with warning as error
   - rm -rf build; mkdir build && pushd build && cmake .. && make -j && popd &&
-    ./scripts/check-clang-format-all &&
     pip install -r tests/requirement_tests.txt &&
     nosetests

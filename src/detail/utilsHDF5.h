@@ -24,9 +24,17 @@
 #include <highfive/H5DataType.hpp>
 
 #include <morphio/types.h>
+
+
 namespace HighFive {
 template <>
 inline AtomicType<morphio::SectionType>::AtomicType()
+{
+    _hid = H5Tcopy(H5T_NATIVE_INT);
+}
+
+template <>
+inline AtomicType<morphio::VascularSectionType>::AtomicType()
 {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }

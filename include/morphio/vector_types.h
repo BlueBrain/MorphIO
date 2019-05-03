@@ -35,6 +35,10 @@ extern template const Point centerOfGravity(const std::vector<std::array<float, 
 std::string dumpPoint(const Point& point);
 std::string dumpPoints(const std::vector<Point>& point);
 
+
+char my_tolower(char ch);
+
+
 /**
    Euclidian distance between two points
 **/
@@ -48,3 +52,8 @@ std::ostream& operator<<(std::ostream& os,
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
 std::ostream& operator<<(std::ostream& os,
     const std::vector<morphio::Point>& points);
+
+namespace std {
+template <typename T, size_t N>
+string to_string(const array<T, N>& a);
+} // namespace std

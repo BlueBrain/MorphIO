@@ -8,6 +8,9 @@
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
+#include <morphio/vasc/section.h>
+#include <morphio/vasc/properties.h>
+#include <morphio/vasc/vasculature.h>
 
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
@@ -24,16 +27,16 @@ int main()
 {
     using namespace std;
     clock_t begin = clock();
-    // morphio::Morphology m("/home/bcoste/workspace/morphology/io/tests/data/simple.swc");
-    morphio::Morphology m("/home/bcoste/workspace/morphology/io/tests/data/neurite_wrong_root_point.swc");
+    morphio::vasculature::Vasculature m("tests/data/h5/vasculature2.h5");
+    morphio::vasculature::Vasculature m1("tests/data/h5/vasculature2.h5");
+    //morphio::Morphology m("data/Astrocytes_H5/astrocyte2_v3.h5");
     clock_t end = clock();
     double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC * 1000.;
     std::cout << elapsed_secs << " milliseconds" << std::endl;
-
-    // morphio::mut::Morphology b(m);
-
-    // for(auto it = m.depth_begin(); it != m.depth_end(); ++it)
-    //     std::cout <<  (*it)->id() << std::endl;
+    std::cout << (m == m1) << std::endl;
+    //morphio::mut::Morphology b(m);
+    //for(auto it = m.begin(); it != m.end(); ++it)
+    //    std::cout <<  (*it).id() << std::endl;
 
 
     // m.sanitize();

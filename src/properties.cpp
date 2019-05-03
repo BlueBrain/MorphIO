@@ -3,37 +3,12 @@
 
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
+#include <morphio/shared_utils.tpp>
 
 constexpr bool VERBOSE = false;
 
-namespace std {
-template <typename T, size_t N>
-string to_string(const array<T, N>& a)
-{
-    string res;
-    for (auto el : a)
-        res += to_string(el) + ", ";
-    return res;
-}
-} // namespace std
-
 namespace morphio {
 namespace Property {
-template <typename T>
-void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset)
-{
-    to.insert(to.end(), from.begin() + offset, from.end());
-}
-
-template <typename T>
-std::vector<typename T::Type> copySpan(
-    const std::vector<typename T::Type>& data, SectionRange range)
-{
-    if (data.empty())
-        return std::vector<typename T::Type>();
-    return std::vector<typename T::Type>(data.begin() + static_cast<long int>(range.first),
-        data.begin() + static_cast<long int>(range.second));
-}
 
 MitochondriaPointLevel::MitochondriaPointLevel(
     const MitochondriaPointLevel& data, SectionRange range)
@@ -295,7 +270,7 @@ bool CellLevel::operator==(const CellLevel& other) const
     }
     return this == &other || (this->_cellFamily == other._cellFamily
                                  // this->_somaType == other._somaType
-                             );
+                                 );
 }
 
 bool CellLevel::operator!=(const CellLevel& other) const
@@ -476,12 +451,6 @@ std::ostream& operator<<(std::ostream& os, const Properties& properties)
     return os;
 }
 
-template void _appendVector(std::vector<float>&, std::vector<float> const&,
-    int);
-template void _appendVector(std::vector<std::array<float, 3ul>>&,
-    std::vector<std::array<float, 3ul>> const&, int);
-template void _appendVector(std::vector<unsigned int>&,
-    std::vector<unsigned int> const&, int);
 
 } // namespace Property
 } // namespace morphio

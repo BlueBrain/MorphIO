@@ -17,7 +17,6 @@ public:
     Soma(const morphio::Soma& soma);
 
     ~Soma() {}
-
     /**
        Return the coordinates (x,y,z) of all soma point
     **/
@@ -40,7 +39,6 @@ public:
        Return the soma type
     **/
     SomaType type() const { return _somaType; }
-
     /**
      * Return the center of gravity of the soma points
      **/
@@ -53,7 +51,6 @@ public:
     float surface() const;
 
     Property::PointLevel& properties() { return _pointProperties; }
-
 private:
     friend class Morphology;
     SomaType _somaType;

@@ -32,12 +32,10 @@ public:
      * Return the section id
      **/
     uint32_t id() const { return _id; }
-
     /**
      * Return the diameters of all points of this section
      **/
     std::vector<float>& diameters() { return _mitoPoints._diameters; }
-
     /**
      * Return the neurite section Ids of all points of this section
      **/

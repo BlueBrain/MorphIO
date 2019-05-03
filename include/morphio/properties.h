@@ -23,11 +23,16 @@
 
 namespace morphio {
 namespace Property {
+    /*
 template <typename T>
 void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
 extern template void _appendVector(std::vector<Point>& to, const std::vector<Point>& from, int offset);
 extern template void _appendVector(std::vector<float>& to, const std::vector<float>& from, int offset);
 extern template void _appendVector(std::vector<unsigned int>& to, const std::vector<unsigned int>& from, int offset);
+template <typename T>
+std::vector<typename T::Type> copySpan(const std::vector<typename T::Type>& data, SectionRange range);
+*/
+
 
 struct Section
 {
@@ -185,7 +190,6 @@ struct Properties
     const morphio::MorphologyVersion& version() { return _cellLevel._version; }
     const morphio::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
     const morphio::SomaType& somaType() { return _cellLevel._somaType; }
-
     template <typename T>
     const std::map<int32_t, std::vector<uint32_t>>& children();
 
