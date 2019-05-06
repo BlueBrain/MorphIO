@@ -7,7 +7,7 @@ matrix:
     - os: linux
       dist: trusty
       sudo: required
-      env: CXX=clang6
+      env: CXX=clang-6.0
     # - os: osx
     #   osx_image: xcode10.1
 cache:
