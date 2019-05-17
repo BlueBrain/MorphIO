@@ -265,6 +265,11 @@ void Morphology::sanitize(const morphio::plugin::DebugInfo& debugInfo)
 {
     morphio::plugin::ErrorMessages err(debugInfo._filename);
 
+    for (const auto& root: rootSections()) {
+        if(root->points().size() < 2)
+            throw morphio::SectionBuilderError("Root sections must have at least 2 points");
+    }
+
     for (auto it = depth_begin(); it != depth_end(); ++it) {
         std::shared_ptr<Section> section_ = *it;
         unsigned int sectionId = section_->id();

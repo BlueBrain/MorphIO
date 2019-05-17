@@ -1,10 +1,11 @@
 import os
 import numpy as np
-from numpy.testing import assert_array_equal, assert_equal
+from numpy.testing import assert_array_equal, assert_equal, assert_raises
 from nose.tools import ok_
 
 from morphio.mut import Morphology
-from morphio import set_maximum_warnings, SectionType, PointLevel, MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect
+from morphio import (SectionBuilderError, set_maximum_warnings, SectionType, PointLevel,
+                     MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect)
 
 from utils import captured_output, setup_tempdir
 
@@ -260,3 +261,25 @@ def test_duplicate_different_diameter():
             assert_array_equal(child2.points, [[3, 3, 3], [5, 5, 5]])
             assert_array_equal(child1.diameters, [10, 12])
             assert_array_equal(child2.diameters, [11, 12])
+
+
+def test_single_point_root_section():
+    m = Morphology()
+    points = []
+    diameters = []
+
+    # Too hide the warning: appending empty section
+    with captured_output():
+        with ostream_redirect(stdout=True, stderr=True):
+            m.append_root_section(PointLevel(points, diameters), SectionType(2))
+
+            with setup_tempdir('test_single_point_root_section', no_cleanup=True) as tmp_folder:
+                assert_raises(SectionBuilderError, m.write, os.path.join(tmp_folder, "h5/empty_vasculature.h5"))
+
+    m = Morphology()
+    points = [[1., 1., 1.]]
+    diameters = [2.]
+    m.append_root_section(PointLevel(points, diameters), SectionType(2))
+
+    with setup_tempdir('test_single_point_root_section', no_cleanup=True) as tmp_folder:
+        assert_raises(SectionBuilderError, m.write, os.path.join(tmp_folder, "h5/empty_vasculature.h5"))
