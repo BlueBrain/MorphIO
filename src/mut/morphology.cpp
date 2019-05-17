@@ -393,6 +393,11 @@ void Morphology::write(const std::string& filename)
     morphio::mut::Morphology clean(*this);
     clean.sanitize();
 
+    for (const auto& root: clean.rootSections()) {
+        if(root->points().size() < 2)
+            throw morphio::SectionBuilderError("Root sections must have at least 2 points");
+    }
+
     for (char c : filename.substr(pos))
         extension += my_tolower(c);
 
