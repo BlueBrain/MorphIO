@@ -3,6 +3,64 @@
 #include <morphio/vector_types.h>
 
 namespace morphio {
+
+bool Section::diff(const Section& other, bool verbose) const
+{
+    if (this->type() != other.type()) {
+        if (verbose)
+            std::cout << "Reason: section type differ" << std::endl;
+        return true;
+    }
+
+    if (this->points() != other.points()) {
+        if (verbose)
+            std::cout << "Reason: points differ" << std::endl;
+        return true;
+    }
+
+    if (this->diameters() != other.diameters()) {
+        if (verbose)
+            std::cout << "Reason: diameters differ" << std::endl;
+        return true;
+    }
+
+    if (this->perimeters() != other.perimeters()) {
+        if (verbose)
+            std::cout << "Reason: perimeters differ" << std::endl;
+        return true;
+    }
+
+    if (this->children().size() != other.children().size()) {
+        if (verbose)
+            std::cout << "Reason: different number of children" << std::endl;
+        return true;
+    }
+
+    for (unsigned int i = 0; i < this->children().size(); ++i)
+        if (this->children()[i].diff(other.children()[i], verbose)) {
+            if (verbose)
+            {
+                std::cout << "Summary: children of ";
+                ::operator<<(std::cout, *this);
+                std::cout << " differ. See the above \"Reason\" to know in what they differ." << std::endl;
+            }
+
+            return true;
+        }
+
+    return false;
+}
+
+bool Section::operator==(const Section& other) const
+{
+    return !diff(other, false);
+}
+
+bool Section::operator!=(const Section& other) const
+{
+    return diff(other, false);
+}
+
 SectionType Section::type() const
 {
     auto val = _properties->get<Property::SectionType>()[_id];
@@ -68,9 +126,9 @@ const range<const float> Section::perimeters() const
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section)
 {
-    os << "id: " << section.id() << std::endl;
-
-    os << section.points();
+    auto points = section.points();
+    os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
+    os << points[points.size() - 1] << ")])";
     return os;
 }
 

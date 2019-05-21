@@ -78,29 +78,32 @@ Morphology::~Morphology()
 {
 }
 
-bool Morphology::operator==(const Morphology& other) const
+bool Morphology::diff(const Morphology& other, bool verbose) const
 {
-    if (this->_properties == other._properties)
+    if (this->_properties->_cellLevel.diff(other._properties->_cellLevel, verbose))
         return true;
 
-    // constexpr float epsilon = 1e-5;
-    // std::array<float, 2> soma_surfaces{this->soma().surface(),
-    //                                    other.soma().surface()};
-    // std::cout << "std::abs(soma_surfaces[1] - soma_surfaces[0]): " <<
-    // std::to_string(std::abs(soma_surfaces[1] - soma_surfaces[0])) <<
-    // std::endl; if(std::abs(soma_surfaces[1] - soma_surfaces[0]) > epsilon) {
-    //     LBERROR("Soma surfaces differs: " + std::to_string(soma_surfaces[0])
-    //     +
-    //             " VS " + std::to_string(soma_surfaces[1]));
-    //     return false;
-    // }
+    if (this->rootSections().size() != other.rootSections().size()) {
+        if (verbose)
+            std::cout << "Different number of root sections" << std::endl;
+        return true;
+    }
 
-    return (this->_properties && other._properties && *(this->_properties) == *(other._properties));
+    for (unsigned int i = 0; i < this->rootSections().size(); ++i)
+        if (this->rootSections()[i].diff(other.rootSections()[i], verbose))
+            return true;
+
+    return false;
+}
+
+bool Morphology::operator==(const Morphology& other) const
+{
+    return !diff(other, false);
 }
 
 bool Morphology::operator!=(const Morphology& other) const
 {
-    return !this->operator==(other);
+    return diff(other, false);
 }
 
 const Soma Morphology::soma() const

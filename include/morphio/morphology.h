@@ -40,6 +40,11 @@ public:
      **/
     bool operator==(const Morphology& other) const;
     bool operator!=(const Morphology& other) const;
+    /**
+       Like operator!= but with verbose argument
+    **/
+    bool diff(const Morphology& other, bool verbose = true) const;
+
 
     /** @name Read API */
     //@{

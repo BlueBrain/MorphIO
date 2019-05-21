@@ -72,6 +72,11 @@ public:
     bool operator!=(const Morphology& other) const;
 
     /**
+       Like operator!= but with verbose argument
+    **/
+    bool diff(const Morphology& other, bool verbose=true) const;
+
+    /**
        Returns all section ids at the tree root
     **/
     const std::vector<std::shared_ptr<Section>>& rootSections() const;
@@ -213,7 +218,6 @@ private:
     morphio::plugin::ErrorMessages _err;
 
     uint32_t _register(std::shared_ptr<Section>);
-    bool _compare(const Morphology& other, bool verbose) const;
 
     uint32_t _counter;
     std::shared_ptr<Soma> _soma;

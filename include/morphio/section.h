@@ -34,6 +34,22 @@ class Section : public SectionBase<Section>
 
 public:
     /**
+       Equality operator:
+       Are considered equal, 2 sections with the same:
+       - point vector
+       - diameter vector
+       - perimeter vector
+       - section types
+       - topology (children/parent relationship)
+    **/
+    bool operator==(const Section& other) const;
+    bool operator!=(const Section& other) const;
+    /**
+       Like operator!= but with verbose argument
+    **/
+    bool diff(const Section& other, bool verbose = true) const;
+
+    /**
        Euclidian distance between first and last point of the section
     **/
     float length() const;

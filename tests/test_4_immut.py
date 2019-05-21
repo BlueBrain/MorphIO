@@ -147,4 +147,3 @@ def test_iterators_vasculature():
     for sec in morphology.iter():
         all_sections.remove(sec.id)
     assert_equal(len(all_sections), 0)
-

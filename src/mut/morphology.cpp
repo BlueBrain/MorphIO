@@ -411,38 +411,32 @@ void Morphology::write(const std::string& filename)
         LBTHROW(UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename)));
 }
 
-bool Morphology::_compare(const Morphology& other, bool verbose) const
+bool Morphology::diff(const Morphology& other, bool verbose) const
 {
-    if (*(this->_cellProperties) != *(other._cellProperties)) {
-        if (verbose)
-            std::cout << "Properties differ" << std::endl;
-        return false;
-    }
+    if (this->_cellProperties->diff(*other._cellProperties, verbose))
+        return true;
 
     if (this->rootSections().size() != other.rootSections().size()) {
         if (verbose)
             std::cout << "Different number of root sections" << std::endl;
-        return false;
+        return true;
     }
 
     for (unsigned int i = 0; i < this->rootSections().size(); ++i)
-        if (*(this->rootSections()[i]) != *(other.rootSections()[i])) {
-            if (verbose)
-                std::cout << "Sections differ" << std::endl;
-            return false;
-        }
+        if (this->rootSections()[i]->diff(*other.rootSections()[i], verbose))
+            return true;
 
-    return true;
+    return false;
 }
 
 bool Morphology::operator==(const Morphology& other) const
 {
-    return _compare(other, false);
+    return !diff(other, false);
 }
 
 bool Morphology::operator!=(const Morphology& other) const
 {
-    return !_compare(other, false);
+    return diff(other, false);
 }
 
 } // end namespace mut

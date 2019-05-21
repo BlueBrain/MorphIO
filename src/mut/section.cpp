@@ -91,12 +91,11 @@ upstream_iterator Section::upstream_end() const
 
 std::ostream& operator<<(std::ostream& os, Section& section)
 {
-    os << "id: " << section.id() << std::endl;
-    os << dumpPoints(section.points());
+    ::operator<<(os, section);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, std::shared_ptr<Section> sectionPtr)
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section> sectionPtr)
 {
     os << *sectionPtr;
     return os;
@@ -203,57 +202,69 @@ std::shared_ptr<Section> Section::appendSection(
     return ptr;
 }
 
-bool Section::_compare(const Section& other, bool verbose) const
+bool Section::diff(const Section& other, bool verbose) const
 {
     if (this->type() != other.type()) {
         if (verbose)
-            std::cout << "Section type differ" << std::endl;
-        return false;
+            std::cout << "Reason: section type differ" << std::endl;
+        return true;
     }
 
     if (this->points() != other.points()) {
         if (verbose)
-            std::cout << "Points differ" << std::endl;
-        return false;
+            std::cout << "Reason: points differ" << std::endl;
+        return true;
     }
 
     if (this->diameters() != other.diameters()) {
         if (verbose)
-            std::cout << "Diameters differ" << std::endl;
-        return false;
+            std::cout << "Reason: diameters differ" << std::endl;
+        return true;
     }
 
     if (this->perimeters() != other.perimeters()) {
         if (verbose)
-            std::cout << "Perimeters differ" << std::endl;
-        return false;
+            std::cout << "Reason: perimeters differ" << std::endl;
+        return true;
     }
 
     if (this->children().size() != other.children().size()) {
         if (verbose)
-            std::cout << "Different number of children" << std::endl;
-        return false;
+            std::cout << "Reason: different number of children" << std::endl;
+        return true;
     }
 
     for (unsigned int i = 0; i < this->children().size(); ++i)
-        if (*(this->children()[i]) != *(other.children()[i])) {
+        if (this->children()[i]->diff(*other.children()[i], verbose)) {
             if (verbose)
-                std::cout << "Sections differ" << std::endl;
-            return false;
+            {
+                std::cout << "Summary: children of ";
+                ::operator<<(std::cout, *this);
+                std::cout << " differ. See the above \"Reason\" to know in what they differ." << std::endl;
+            }
+            return true;
         }
 
-    return true;
+    return false;
 }
 
 bool Section::operator==(const Section& other) const
 {
-    return _compare(other, false);
+    return !diff(other, false);
 }
 
 bool Section::operator!=(const Section& other) const
 {
-    return !_compare(other, false);
+    return diff(other, false);
 }
 
 } // end namespace mut
 } // end namespace morphio
+
+std::ostream& operator<<(std::ostream& os, const morphio::mut::Section& section)
+{
+    auto points = section.points();
+    os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
+    os << points[points.size() - 1] << ")])";
+    return os;
+}
