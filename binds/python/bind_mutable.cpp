@@ -34,9 +34,6 @@ static void bind_mutable_module(py::module &m) {
         .def("__ne__", [](const morphio::mut::Morphology& a, const morphio::mut::Morphology& b) {
                 return a.operator!=(b);
             }, py::is_operator())
-        .def("diff", &morphio::mut::Morphology::diff, "Like __ne__ but with verbose argument",
-             "other"_a, "verbose"_a = true)
-
 
         // Cell sub-part accessors
         .def_property_readonly("sections", &morphio::mut::Morphology::sections,
@@ -233,8 +230,6 @@ static void bind_mutable_module(py::module &m) {
         .def("__ne__", [](const morphio::mut::Section& a, const morphio::mut::Section& b) {
                 return a.operator!=(b);
                 }, py::is_operator())
-        .def("diff", &morphio::mut::Section::diff, "Like __ne__ but with verbose argument",
-             "other"_a, "verbose"_a = true)
 
         .def_property_readonly("id", &morphio::mut::Section::id,
                                "Return the section ID")

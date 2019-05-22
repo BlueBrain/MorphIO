@@ -105,10 +105,6 @@ public:
     **/
     bool operator==(const Section& other) const;
     bool operator!=(const Section& other) const;
-    /**
-       Like operator!= but with verbose argument
-    **/
-    bool diff(const Section&, bool verbose=true) const;
 
 private:
     friend class Morphology;

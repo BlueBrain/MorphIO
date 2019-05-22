@@ -10,11 +10,12 @@ set(MORPHIO_SOURCES
   mito_iterators.cpp
   properties.cpp
   iterators.cpp
-        morphology.cpp
+  morphology.cpp
   soma.cpp
   section.cpp
+  tools.cpp
   vasc/section.cpp
-        vasc/vasculature.cpp
+  vasc/vasculature.cpp
   vasc/properties.cpp
   vector_utils.cpp
   version.cpp

@@ -11,6 +11,7 @@
 #include <morphio/mut/writers.h>
 #include <morphio/shared_utils.tpp>
 #include <morphio/soma.h>
+#include <morphio/tools.h>
 
 namespace morphio {
 namespace mut {
@@ -411,32 +412,14 @@ void Morphology::write(const std::string& filename)
         LBTHROW(UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename)));
 }
 
-bool Morphology::diff(const Morphology& other, bool verbose) const
-{
-    if (this->_cellProperties->diff(*other._cellProperties, verbose))
-        return true;
-
-    if (this->rootSections().size() != other.rootSections().size()) {
-        if (verbose)
-            std::cout << "Different number of root sections" << std::endl;
-        return true;
-    }
-
-    for (unsigned int i = 0; i < this->rootSections().size(); ++i)
-        if (this->rootSections()[i]->diff(*other.rootSections()[i], verbose))
-            return true;
-
-    return false;
-}
-
 bool Morphology::operator==(const Morphology& other) const
 {
-    return !diff(other, false);
+    return !diff(*this, other, false);
 }
 
 bool Morphology::operator!=(const Morphology& other) const
 {
-    return diff(other, false);
+    return diff(*this, other, false);
 }
 
 } // end namespace mut

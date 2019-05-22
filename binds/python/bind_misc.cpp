@@ -7,6 +7,7 @@
 
 #include <morphio/types.h>
 #include <morphio/enums.h>
+#include <morphio/tools.h>
 
 namespace py = pybind11;
 
@@ -21,6 +22,17 @@ static void bind_misc(py::module &m) {
         "Ignore/Unignore a specific warning message", "warning"_a, "ignore"_a = true);
   m.def("set_ignored_warning", static_cast<void (*)(const std::vector<morphio::Warning>&, bool)>(&morphio::set_ignored_warning),
         "Ignore/Unignore a list of warnings", "warning"_a, "ignore"_a = true);
+
+  m.def("diff", static_cast<bool (*)(const morphio::Morphology& left, const morphio::Morphology& right, bool verbose)>(&morphio::diff),
+        "Perform a diff on 2 morphologies", "left"_a, "right"_a, "verbose"_a=true);
+  m.def("diff", static_cast<bool (*)(const morphio::Section& left, const morphio::Section& right, bool verbose)>(&morphio::diff),
+        "Perform a diff on 2 morphologies", "left"_a, "right"_a, "verbose"_a=true);
+
+  m.def("diff", static_cast<bool (*)(const morphio::mut::Morphology& left, const morphio::mut::Morphology& right, bool verbose)>(&morphio::mut::diff),
+        "Perform a diff on 2 morphologies", "left"_a, "right"_a, "verbose"_a=true);
+  m.def("diff", static_cast<bool (*)(const morphio::mut::Section& left, const morphio::mut::Section& right, bool verbose)>(&morphio::mut::diff),
+        "Perform a diff on 2 morphologies", "left"_a, "right"_a, "verbose"_a=true);
+
     py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
         .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
             "Indicates that a section has only one child");

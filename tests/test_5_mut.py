@@ -4,7 +4,7 @@ from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_, assert_not_equal
 
 from morphio.mut import Morphology, Soma
-from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, MorphioError, SectionBuilderError, Morphology as ImmutableMorphology, upstream, depth_first, breadth_first
+from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, MorphioError, SectionBuilderError, Morphology as ImmutableMorphology, upstream, depth_first, breadth_first, diff
 from contextlib import contextmanager
 import sys
 from io import StringIO
@@ -314,7 +314,7 @@ def test_equality():
     a = Morphology(os.path.join(_path, 'simple2.asc'))
     assert_equal(neuron_ref, a)
     ok_(not (neuron_ref != a))
-    ok_(not neuron_ref.diff(a))
+    ok_(not diff(neuron_ref, a))
 
     def mundane_section(neuron):
         '''Not a root section, not a leaf section'''
@@ -324,12 +324,12 @@ def test_equality():
         '''Expect diff to find a difference and return EXPECTED_MSG in stdout'''
         with captured_output() as (out, _):
             with ostream_redirect(stdout=True, stderr=True):
-                ok_(neuron1.diff(neuron2))
+                ok_(diff(neuron1, neuron2))
                 assert_equal(out.getvalue().strip(), expected_msg)
 
         with captured_output() as (out, _):
             with ostream_redirect(stdout=True, stderr=True):
-                ok_(neuron1.as_immutable().diff(neuron2.as_immutable()))
+                ok_(diff(neuron1.as_immutable(), neuron2.as_immutable()))
                 assert_equal(out.getvalue().strip(), expected_msg)
 
     mundane_section(a).type = SectionType.apical_dendrite

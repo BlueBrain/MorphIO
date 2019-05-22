@@ -38,8 +38,6 @@ static void bind_immutable_module(py::module &m) {
         .def(py::self != py::self)
 
         .def("as_mutable", [](const morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })
-        .def("diff", &morphio::Morphology::diff, "Like __ne__ but with verbose argument",
-             "other"_a, "verbose"_a = true)
 
 
         // Cell sub-parts accessors
@@ -153,8 +151,6 @@ static void bind_immutable_module(py::module &m) {
         .def("__ne__", [](const morphio::Section& a, const morphio::Section& b) {
                 return a.operator!=(b);
             }, py::is_operator())
-        .def("diff", &morphio::Section::diff, "Like __ne__ but with verbose argument",
-             "other"_a, "verbose"_a = true)
 
         // Topology-related member functions
         .def_property_readonly("parent", &morphio::Section::parent,

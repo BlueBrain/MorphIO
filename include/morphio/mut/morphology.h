@@ -72,11 +72,6 @@ public:
     bool operator!=(const Morphology& other) const;
 
     /**
-       Like operator!= but with verbose argument
-    **/
-    bool diff(const Morphology& other, bool verbose=true) const;
-
-    /**
        Returns all section ids at the tree root
     **/
     const std::vector<std::shared_ptr<Section>>& rootSections() const;
@@ -215,6 +210,7 @@ public:
 private:
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
+    friend bool diff(const Morphology& left, const Morphology& right, bool verbose);
     morphio::plugin::ErrorMessages _err;
 
     uint32_t _register(std::shared_ptr<Section>);

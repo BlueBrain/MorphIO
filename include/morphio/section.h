@@ -44,10 +44,6 @@ public:
     **/
     bool operator==(const Section& other) const;
     bool operator!=(const Section& other) const;
-    /**
-       Like operator!= but with verbose argument
-    **/
-    bool diff(const Section& other, bool verbose = true) const;
 
     /**
        Euclidian distance between first and last point of the section

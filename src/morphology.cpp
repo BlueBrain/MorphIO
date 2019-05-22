@@ -8,6 +8,7 @@
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
+#include <morphio/tools.h>
 
 #include <morphio/mut/morphology.h>
 
@@ -78,32 +79,14 @@ Morphology::~Morphology()
 {
 }
 
-bool Morphology::diff(const Morphology& other, bool verbose) const
-{
-    if (this->_properties->_cellLevel.diff(other._properties->_cellLevel, verbose))
-        return true;
-
-    if (this->rootSections().size() != other.rootSections().size()) {
-        if (verbose)
-            std::cout << "Different number of root sections" << std::endl;
-        return true;
-    }
-
-    for (unsigned int i = 0; i < this->rootSections().size(); ++i)
-        if (this->rootSections()[i].diff(other.rootSections()[i], verbose))
-            return true;
-
-    return false;
-}
-
 bool Morphology::operator==(const Morphology& other) const
 {
-    return !diff(other, false);
+    return !diff(*this, other, false);
 }
 
 bool Morphology::operator!=(const Morphology& other) const
 {
-    return diff(other, false);
+    return diff(*this, other, false);
 }
 
 const Soma Morphology::soma() const

@@ -40,10 +40,6 @@ public:
      **/
     bool operator==(const Morphology& other) const;
     bool operator!=(const Morphology& other) const;
-    /**
-       Like operator!= but with verbose argument
-    **/
-    bool diff(const Morphology& other, bool verbose = true) const;
 
 
     /** @name Read API */
@@ -150,6 +146,7 @@ public:
 
 private:
     friend class mut::Morphology;
+    friend bool diff(const Morphology& left, const Morphology& right, bool verbose);
 
     std::shared_ptr<Property::Properties> _properties;
 
