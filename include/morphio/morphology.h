@@ -146,7 +146,7 @@ public:
 
 private:
     friend class mut::Morphology;
-    friend bool diff(const Morphology& left, const Morphology& right, bool verbose);
+    friend bool diff(const Morphology& left, const Morphology& right, int verbose);
 
     std::shared_ptr<Property::Properties> _properties;
 

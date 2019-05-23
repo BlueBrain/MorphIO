@@ -8,7 +8,7 @@
 namespace morphio
 {
 
-bool diff(const Morphology& left, const Morphology& right, bool verbose)
+bool diff(const Morphology& left, const Morphology& right, int verbose)
 {
     if (left._properties->_cellLevel.diff(right._properties->_cellLevel, verbose))
         return true;
@@ -26,7 +26,7 @@ bool diff(const Morphology& left, const Morphology& right, bool verbose)
     return false;
 }
 
-bool diff(const Section& left, const Section& right, bool verbose)
+bool diff(const Section& left, const Section& right, int verbose)
 {
     if (left.type() != right.type()) {
         if (verbose)
@@ -75,7 +75,7 @@ bool diff(const Section& left, const Section& right, bool verbose)
 
 namespace mut
 {
-bool diff(const Section& left, const Section& right, bool verbose)
+bool diff(const Section& left, const Section& right, int verbose)
 {
     if (left.type() != right.type()) {
         if (verbose)
@@ -121,7 +121,7 @@ bool diff(const Section& left, const Section& right, bool verbose)
     return false;
 }
 
-bool diff(const Morphology& left, const Morphology& right, bool verbose)
+bool diff(const Morphology& left, const Morphology& right, int verbose)
 {
     if (left._cellProperties->diff(*right._cellProperties, verbose))
         return true;

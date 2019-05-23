@@ -23,15 +23,15 @@ static void bind_misc(py::module &m) {
   m.def("set_ignored_warning", static_cast<void (*)(const std::vector<morphio::Warning>&, bool)>(&morphio::set_ignored_warning),
         "Ignore/Unignore a list of warnings", "warning"_a, "ignore"_a = true);
 
-  m.def("diff", static_cast<bool (*)(const morphio::Morphology& left, const morphio::Morphology& right, bool verbose)>(&morphio::diff),
-        "Perform a diff on 2 morphologies", "left"_a, "right"_a, "verbose"_a=true);
-  m.def("diff", static_cast<bool (*)(const morphio::Section& left, const morphio::Section& right, bool verbose)>(&morphio::diff),
-        "Perform a diff on 2 sections", "left"_a, "right"_a, "verbose"_a=true);
+  m.def("diff", static_cast<bool (*)(const morphio::Morphology& left, const morphio::Morphology& right, int verbose)>(&morphio::diff),
+        "Perform a diff on 2 morphologies", "left"_a, "right"_a, "verbose"_a=3);
+  m.def("diff", static_cast<bool (*)(const morphio::Section& left, const morphio::Section& right, int verbose)>(&morphio::diff),
+        "Perform a diff on 2 sections", "left"_a, "right"_a, "verbose"_a=3);
 
-  m.def("diff", static_cast<bool (*)(const morphio::mut::Morphology& left, const morphio::mut::Morphology& right, bool verbose)>(&morphio::mut::diff),
-        "Perform a diff on 2 morphologies", "left"_a, "right"_a, "verbose"_a=true);
-  m.def("diff", static_cast<bool (*)(const morphio::mut::Section& left, const morphio::mut::Section& right, bool verbose)>(&morphio::mut::diff),
-        "Perform a diff on 2 sections", "left"_a, "right"_a, "verbose"_a=true);
+  m.def("diff", static_cast<bool (*)(const morphio::mut::Morphology& left, const morphio::mut::Morphology& right, int verbose)>(&morphio::mut::diff),
+        "Perform a diff on 2 morphologies", "left"_a, "right"_a, "verbose"_a=3);
+  m.def("diff", static_cast<bool (*)(const morphio::mut::Section& left, const morphio::mut::Section& right, int verbose)>(&morphio::mut::diff),
+        "Perform a diff on 2 sections", "left"_a, "right"_a, "verbose"_a=3);
 
     py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
         .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,

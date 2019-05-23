@@ -210,7 +210,7 @@ public:
 private:
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
-    friend bool diff(const Morphology& left, const Morphology& right, bool verbose);
+    friend bool diff(const Morphology& left, const Morphology& right, int verbose);
     morphio::plugin::ErrorMessages _err;
 
     uint32_t _register(std::shared_ptr<Section>);
