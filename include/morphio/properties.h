@@ -109,7 +109,7 @@ struct SectionLevel
     /**
        Like operator!= but with verbose argument
     **/
-    bool diff(const SectionLevel& other, bool verbose) const;
+    bool diff(const SectionLevel& other, LogLevel verbose) const;
 };
 
 struct SomaLevel
@@ -134,7 +134,7 @@ struct MitochondriaPointLevel
         std::vector<MitoPathLength::Type> relativePathLengths,
         std::vector<MitoDiameter::Type> diameters);
 
-    bool diff(const MitochondriaPointLevel& other, bool verbose) const;
+    bool diff(const MitochondriaPointLevel& other, LogLevel verbose) const;
     bool operator==(const MitochondriaPointLevel& other) const;
     bool operator!=(const MitochondriaPointLevel& other) const;
 };
@@ -144,7 +144,7 @@ struct MitochondriaSectionLevel
     std::vector<Section::Type> _sections;
     std::map<int, std::vector<unsigned int>> _children;
 
-    bool diff(const MitochondriaSectionLevel& other, bool verbose) const;
+    bool diff(const MitochondriaSectionLevel& other, LogLevel verbose) const;
     bool operator==(const MitochondriaSectionLevel& other) const;
     bool operator!=(const MitochondriaSectionLevel& other) const;
 };
@@ -167,7 +167,7 @@ struct CellLevel
     MorphologyVersion _version;
     std::vector<Annotation> annotation;
 
-    bool diff(const CellLevel& other, bool verbose) const;
+    bool diff(const CellLevel& other, LogLevel verbose) const;
     bool operator==(const CellLevel& other) const;
     bool operator!=(const CellLevel& other) const;
 };

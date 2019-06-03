@@ -49,19 +49,19 @@ PointLevel& PointLevel::operator=(const PointLevel& other)
 
 template <typename T>
 bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
-    const std::string& name, bool verbose_)
+    const std::string& name, LogLevel verbose)
 {
     if (vec1 == vec2)
         return true;
 
     if (vec1.size() != vec2.size()) {
-        if (verbose_)
+        if (verbose > LogLevel::ERROR)
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
-    if (verbose_) {
+    if (verbose > LogLevel::ERROR) {
         LBERROR(Warning::UNDEFINED,
             "Error comparing " + name + ", elements differ:");
         for (unsigned int i = 0; i < vec1.size(); ++i) {
@@ -76,10 +76,10 @@ bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
 
 static bool compare_section_structure(const std::vector<Section::Type>& vec1,
     const std::vector<Section::Type>& vec2,
-    const std::string& name, bool verbose)
+    const std::string& name, LogLevel verbose)
 {
     if (vec1.size() != vec2.size()) {
-        if (verbose)
+        if (verbose > LogLevel::ERROR)
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
@@ -87,7 +87,7 @@ static bool compare_section_structure(const std::vector<Section::Type>& vec1,
 
     for (unsigned int i = 1; i < vec1.size(); ++i) {
         if (vec1[i][0] - vec1[1][0] != vec2[i][0] - vec2[1][0] || vec1[i][1] != vec2[i][1]) {
-            if (verbose) {
+            if (verbose > LogLevel::ERROR) {
                 LBERROR(Warning::UNDEFINED,
                     "Error comparing " + name + ", elements differ:");
                 LBERROR(Warning::UNDEFINED,
@@ -102,10 +102,10 @@ static bool compare_section_structure(const std::vector<Section::Type>& vec1,
 
 template <typename T>
 bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
-    const std::string& name, bool verbose_)
+    const std::string& name, LogLevel verbose)
 {
     if (vec1.size() != vec2.size()) {
-        if (verbose_)
+        if (verbose > LogLevel::ERROR)
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
@@ -127,10 +127,10 @@ bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
 template <>
 bool compare(const morphio::range<const morphio::Point>& vec1,
     const morphio::range<const morphio::Point>& vec2,
-    const std::string& name, bool verbose_)
+    const std::string& name, LogLevel verbose)
 {
     if (vec1.size() != vec2.size()) {
-        if (verbose_)
+        if (verbose > LogLevel::ERROR)
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
@@ -139,7 +139,7 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
     const float epsilon = 1e-6f;
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
-            if (verbose_) {
+            if (verbose > LogLevel::ERROR) {
                 LBERROR(Warning::UNDEFINED,
                     "Error comparing " + name + ", elements differ:");
                 LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
@@ -153,11 +153,11 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
 
 template <typename T, typename U>
 bool compare(const std::map<T, U>& vec1, const std::map<T, U>& vec2,
-    const std::string& name, bool verbose_)
+    const std::string& name, LogLevel verbose)
 {
     if (vec1 == vec2)
         return true;
-    if (verbose_) {
+    if (verbose > LogLevel::ERROR) {
         if (vec1.size() != vec2.size()) {
             LBERROR(Warning::UNDEFINED,
                 "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
@@ -168,17 +168,17 @@ bool compare(const std::map<T, U>& vec1, const std::map<T, U>& vec2,
 }
 
 template <typename T>
-bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
+bool compare(const T& el1, const T& el2, const std::string& name, LogLevel verbose)
 {
     if (el1 == el2)
         return true;
 
-    if (verbose_)
+    if (verbose > LogLevel::ERROR)
         LBERROR(Warning::UNDEFINED, name + " differs");
     return false;
 }
 
-bool SectionLevel::diff(const SectionLevel& other, bool verbose) const
+bool SectionLevel::diff(const SectionLevel& other, LogLevel verbose) const
 {
     return !(this == &other ||
              (compare_section_structure(this->_sections, other._sections, "_sections", verbose) &&
@@ -188,15 +188,15 @@ bool SectionLevel::diff(const SectionLevel& other, bool verbose) const
 
 bool SectionLevel::operator==(const SectionLevel& other) const
 {
-    return !diff(other, false);
+    return !diff(other, LogLevel::ERROR);
 }
 
 bool SectionLevel::operator!=(const SectionLevel& other) const
 {
-    return diff(other, false);
+    return diff(other, LogLevel::ERROR);
 }
 
-bool CellLevel::diff(const CellLevel& other, bool verbose) const
+bool CellLevel::diff(const CellLevel& other, LogLevel verbose) const
 {
     if (verbose && this->_cellFamily != other._cellFamily) {
         std::cout << "this->_cellFamily: " << this->_cellFamily << std::endl;
@@ -209,12 +209,12 @@ bool CellLevel::diff(const CellLevel& other, bool verbose) const
 
 bool CellLevel::operator==(const CellLevel& other) const
 {
-    return !diff(other, false);
+    return !diff(other, LogLevel::ERROR);
 }
 
 bool CellLevel::operator!=(const CellLevel& other) const
 {
-    return diff(other, false);
+    return diff(other, LogLevel::ERROR);
 }
 
 
@@ -247,7 +247,7 @@ MitochondriaPointLevel::MitochondriaPointLevel(
             std::to_string(_sectionIds.size()) + " while diameter vector has size: " + std::to_string(_diameters.size()));
 }
 
-bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other, bool verbose) const
+bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other, LogLevel verbose) const
 {
     return !(this == &other ||
              (compare_section_structure(this->_sections, other._sections, "_sections", verbose) &&
@@ -256,15 +256,15 @@ bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other, bool 
 
 bool MitochondriaSectionLevel::operator==(const MitochondriaSectionLevel& other) const
 {
-    return !diff(other, false);
+    return !diff(other, LogLevel::ERROR);
 }
 
 bool MitochondriaSectionLevel::operator!=(const MitochondriaSectionLevel& other) const
 {
-    return diff(other, false);
+    return diff(other, LogLevel::ERROR);
 }
 
-bool MitochondriaPointLevel::diff(const MitochondriaPointLevel& other, bool verbose) const
+bool MitochondriaPointLevel::diff(const MitochondriaPointLevel& other, LogLevel verbose) const
 {
     return !(this == &other ||
              (compare(this->_sectionIds, other._sectionIds, "mito section ids", verbose) &&
@@ -274,12 +274,12 @@ bool MitochondriaPointLevel::diff(const MitochondriaPointLevel& other, bool verb
 
 bool MitochondriaPointLevel::operator==(const MitochondriaPointLevel& other) const
 {
-    return !diff(other, false);
+    return !diff(other, LogLevel::ERROR);
 }
 
 bool MitochondriaPointLevel::operator!=(const MitochondriaPointLevel& other) const
 {
-    return diff(other, false);
+    return diff(other, LogLevel::ERROR);
 }
 
 Annotation::Annotation(AnnotationType type, uint32_t sectionId,

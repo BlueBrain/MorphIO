@@ -81,12 +81,12 @@ Morphology::~Morphology()
 
 bool Morphology::operator==(const Morphology& other) const
 {
-    return !diff(*this, other, false);
+    return !diff(*this, other, LogLevel::ERROR);
 }
 
 bool Morphology::operator!=(const Morphology& other) const
 {
-    return diff(*this, other, false);
+    return diff(*this, other, LogLevel::ERROR);
 }
 
 const Soma Morphology::soma() const

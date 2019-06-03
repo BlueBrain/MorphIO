@@ -414,12 +414,12 @@ void Morphology::write(const std::string& filename)
 
 bool Morphology::operator==(const Morphology& other) const
 {
-    return !diff(*this, other, false);
+    return !diff(*this, other, LogLevel::ERROR);
 }
 
 bool Morphology::operator!=(const Morphology& other) const
 {
-    return diff(*this, other, false);
+    return diff(*this, other, LogLevel::ERROR);
 }
 
 } // end namespace mut

@@ -205,12 +205,12 @@ std::shared_ptr<Section> Section::appendSection(
 
 bool Section::operator==(const Section& other) const
 {
-    return !diff(*this, other, false);
+    return !diff(*this, other, LogLevel::ERROR);
 }
 
 bool Section::operator!=(const Section& other) const
 {
-    return diff(*this, other, false);
+    return diff(*this, other, LogLevel::ERROR);
 }
 
 } // end namespace mut

@@ -7,12 +7,12 @@ namespace morphio {
 
 bool Section::operator==(const Section& other) const
 {
-    return !diff(*this, other, false);
+    return !diff(*this, other, LogLevel::ERROR);
 }
 
 bool Section::operator!=(const Section& other) const
 {
-    return diff(*this, other, false);
+    return diff(*this, other, LogLevel::ERROR);
 }
 
 SectionType Section::type() const
