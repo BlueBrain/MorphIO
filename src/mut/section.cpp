@@ -219,7 +219,15 @@ bool Section::operator!=(const Section& other) const
 std::ostream& operator<<(std::ostream& os, const morphio::mut::Section& section)
 {
     auto points = section.points();
-    os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
-    os << points[points.size() - 1] << ")])";
+    if (points.empty())
+    {
+        os << "Section(id=" << section.id() << ", points=[])";
+    }
+    else
+    {
+        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
+        os << points[points.size() - 1] << ")])";
+    }
+
     return os;
 }

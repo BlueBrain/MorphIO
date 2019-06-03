@@ -81,8 +81,15 @@ const range<const float> Section::perimeters() const
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section)
 {
     auto points = section.points();
-    os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
-    os << points[points.size() - 1] << ")])";
+    if (points.empty())
+    {
+        os << "Section(id=" << section.id() << ", points=[])";
+    }
+    else
+    {
+        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
+        os << points[points.size() - 1] << ")])";
+    }
     return os;
 }
 
