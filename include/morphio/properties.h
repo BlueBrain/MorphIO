@@ -98,33 +98,6 @@ struct PointLevel
     // bool operator!=(const PointLevel& other) const;
 };
 
-struct MitochondriaPointLevel
-{
-    std::vector<MitoNeuriteSectionId::Type> _sectionIds;
-    std::vector<MitoPathLength::Type> _relativePathLengths;
-    std::vector<MitoDiameter::Type> _diameters;
-
-    MitochondriaPointLevel() {}
-    MitochondriaPointLevel(const MitochondriaPointLevel& data,
-        SectionRange range);
-
-    MitochondriaPointLevel(
-        std::vector<uint32_t> sectionId,
-        // relative pathlength between the current points
-        // and the start of the neuronal section
-        std::vector<MitoPathLength::Type> relativePathLengths,
-        std::vector<MitoDiameter::Type> diameters);
-};
-
-struct MitochondriaSectionLevel
-{
-    std::vector<Section::Type> _sections;
-    std::map<int, std::vector<unsigned int>> _children;
-
-    bool operator==(const MitochondriaSectionLevel& other) const;
-    bool operator!=(const MitochondriaSectionLevel& other) const;
-};
-
 struct SectionLevel
 {
     std::vector<Section::Type> _sections;
@@ -133,11 +106,47 @@ struct SectionLevel
 
     bool operator==(const SectionLevel& other) const;
     bool operator!=(const SectionLevel& other) const;
+    /**
+       Like operator!= but with logLevel argument
+    **/
+    bool diff(const SectionLevel& other, LogLevel logLevel) const;
 };
 
 struct SomaLevel
 {
     Section::Type _sections;
+};
+
+struct MitochondriaPointLevel
+{
+    std::vector<MitoNeuriteSectionId::Type> _sectionIds;
+    std::vector<MitoPathLength::Type> _relativePathLengths;
+    std::vector<MitoDiameter::Type> _diameters;
+
+    MitochondriaPointLevel() {}
+    MitochondriaPointLevel(const MitochondriaPointLevel& data,
+                           SectionRange range);
+
+    MitochondriaPointLevel(
+        std::vector<uint32_t> sectionId,
+        // relative pathlength between the current points
+        // and the start of the neuronal section
+        std::vector<MitoPathLength::Type> relativePathLengths,
+        std::vector<MitoDiameter::Type> diameters);
+
+    bool diff(const MitochondriaPointLevel& other, LogLevel logLevel) const;
+    bool operator==(const MitochondriaPointLevel& other) const;
+    bool operator!=(const MitochondriaPointLevel& other) const;
+};
+
+struct MitochondriaSectionLevel
+{
+    std::vector<Section::Type> _sections;
+    std::map<int, std::vector<unsigned int>> _children;
+
+    bool diff(const MitochondriaSectionLevel& other, LogLevel logLevel) const;
+    bool operator==(const MitochondriaSectionLevel& other) const;
+    bool operator!=(const MitochondriaSectionLevel& other) const;
 };
 
 struct Annotation
@@ -158,6 +167,7 @@ struct CellLevel
     MorphologyVersion _version;
     std::vector<Annotation> annotation;
 
+    bool diff(const CellLevel& other, LogLevel logLevel) const;
     bool operator==(const CellLevel& other) const;
     bool operator!=(const CellLevel& other) const;
 };
@@ -192,9 +202,6 @@ struct Properties
     const morphio::SomaType& somaType() { return _cellLevel._somaType; }
     template <typename T>
     const std::map<int32_t, std::vector<uint32_t>>& children();
-
-    bool operator==(const Properties& other) const;
-    bool operator!=(const Properties& other) const;
 };
 
 template <>

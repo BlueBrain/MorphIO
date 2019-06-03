@@ -145,6 +145,13 @@ static void bind_immutable_module(py::module &m) {
                                "Note: the soma surface computation depends on the soma type");
 
     py::class_<morphio::Section>(m, "Section")
+        .def("__eq__", [](const morphio::Section& a, const morphio::Section& b) {
+                return a.operator==(b);
+            }, py::is_operator())
+        .def("__ne__", [](const morphio::Section& a, const morphio::Section& b) {
+                return a.operator!=(b);
+            }, py::is_operator())
+
         // Topology-related member functions
         .def_property_readonly("parent", &morphio::Section::parent,
                                "Returns the parent section of this section\n"

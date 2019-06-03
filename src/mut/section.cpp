@@ -3,6 +3,7 @@
 #include <morphio/errorMessages.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
+#include <morphio/tools.h>
 
 namespace morphio {
 namespace mut {
@@ -91,12 +92,11 @@ upstream_iterator Section::upstream_end() const
 
 std::ostream& operator<<(std::ostream& os, Section& section)
 {
-    os << "id: " << section.id() << std::endl;
-    os << dumpPoints(section.points());
+    ::operator<<(os, section);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, std::shared_ptr<Section> sectionPtr)
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section> sectionPtr)
 {
     os << *sectionPtr;
     return os;
@@ -203,57 +203,31 @@ std::shared_ptr<Section> Section::appendSection(
     return ptr;
 }
 
-bool Section::_compare(const Section& other, bool verbose) const
-{
-    if (this->type() != other.type()) {
-        if (verbose)
-            std::cout << "Section type differ" << std::endl;
-        return false;
-    }
-
-    if (this->points() != other.points()) {
-        if (verbose)
-            std::cout << "Points differ" << std::endl;
-        return false;
-    }
-
-    if (this->diameters() != other.diameters()) {
-        if (verbose)
-            std::cout << "Diameters differ" << std::endl;
-        return false;
-    }
-
-    if (this->perimeters() != other.perimeters()) {
-        if (verbose)
-            std::cout << "Perimeters differ" << std::endl;
-        return false;
-    }
-
-    if (this->children().size() != other.children().size()) {
-        if (verbose)
-            std::cout << "Different number of children" << std::endl;
-        return false;
-    }
-
-    for (unsigned int i = 0; i < this->children().size(); ++i)
-        if (*(this->children()[i]) != *(other.children()[i])) {
-            if (verbose)
-                std::cout << "Sections differ" << std::endl;
-            return false;
-        }
-
-    return true;
-}
-
 bool Section::operator==(const Section& other) const
 {
-    return _compare(other, false);
+    return !diff(*this, other, LogLevel::ERROR);
 }
 
 bool Section::operator!=(const Section& other) const
 {
-    return !_compare(other, false);
+    return diff(*this, other, LogLevel::ERROR);
 }
 
 } // end namespace mut
 } // end namespace morphio
+
+std::ostream& operator<<(std::ostream& os, const morphio::mut::Section& section)
+{
+    auto points = section.points();
+    if (points.empty())
+    {
+        os << "Section(id=" << section.id() << ", points=[])";
+    }
+    else
+    {
+        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
+        os << points[points.size() - 1] << ")])";
+    }
+
+    return os;
+}

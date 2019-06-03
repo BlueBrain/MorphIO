@@ -224,6 +224,13 @@ static void bind_mutable_module(py::module &m) {
              "immutable_section"_a, "recursive"_a=false);
 
     py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(m, "Section")
+        .def("__eq__", [](const morphio::mut::Section& a, const morphio::mut::Section& b) {
+                return a.operator==(b);
+            }, py::is_operator())
+        .def("__ne__", [](const morphio::mut::Section& a, const morphio::mut::Section& b) {
+                return a.operator!=(b);
+                }, py::is_operator())
+
         .def_property_readonly("id", &morphio::mut::Section::id,
                                "Return the section ID")
         .def_property("type",

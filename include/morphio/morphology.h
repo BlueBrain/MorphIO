@@ -41,6 +41,7 @@ public:
     bool operator==(const Morphology& other) const;
     bool operator!=(const Morphology& other) const;
 
+
     /** @name Read API */
     //@{
     /** Open the given source to a morphology file and parse it.
@@ -145,6 +146,7 @@ public:
 
 private:
     friend class mut::Morphology;
+    friend bool diff(const Morphology& left, const Morphology& right, morphio::enums::LogLevel verbose);
 
     std::shared_ptr<Property::Properties> _properties;
 

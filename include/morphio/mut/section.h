@@ -116,7 +116,6 @@ private:
     Section(Morphology*, unsigned int id, SectionType type, const Property::PointLevel&);
     Section(Morphology*, unsigned int id, const morphio::Section& section);
     Section(Morphology*, unsigned int id, const Section&);
-    bool _compare(const Section&, bool) const;
 
     Morphology* _morphology;
     Property::PointLevel _pointProperties;
@@ -126,8 +125,10 @@ private:
 
 void friendDtorForSharedPtr(Section* section);
 
-std::ostream& operator<<(std::ostream& os, Section&);
+std::ostream& operator<<(std::ostream& os, const Section&);
 std::ostream& operator<<(std::ostream& os, std::shared_ptr<Section>);
 
 } // namespace mut
 } // namespace morphio
+
+std::ostream& operator<<(std::ostream& os, const morphio::mut::Section&);

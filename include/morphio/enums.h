@@ -5,6 +5,15 @@
 
 namespace morphio {
 namespace enums {
+
+enum LogLevel
+{
+    ERROR,
+    WARNING,
+    INFO,
+    DEBUG
+};
+
 /** The list of modifier flags that can be passed when loading a morphology
  See morphio::mut::modifiers for more informations **/
 enum Option

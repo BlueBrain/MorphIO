@@ -8,6 +8,7 @@
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
+#include <morphio/tools.h>
 
 #include <morphio/mut/morphology.h>
 
@@ -80,27 +81,12 @@ Morphology::~Morphology()
 
 bool Morphology::operator==(const Morphology& other) const
 {
-    if (this->_properties == other._properties)
-        return true;
-
-    // constexpr float epsilon = 1e-5;
-    // std::array<float, 2> soma_surfaces{this->soma().surface(),
-    //                                    other.soma().surface()};
-    // std::cout << "std::abs(soma_surfaces[1] - soma_surfaces[0]): " <<
-    // std::to_string(std::abs(soma_surfaces[1] - soma_surfaces[0])) <<
-    // std::endl; if(std::abs(soma_surfaces[1] - soma_surfaces[0]) > epsilon) {
-    //     LBERROR("Soma surfaces differs: " + std::to_string(soma_surfaces[0])
-    //     +
-    //             " VS " + std::to_string(soma_surfaces[1]));
-    //     return false;
-    // }
-
-    return (this->_properties && other._properties && *(this->_properties) == *(other._properties));
+    return !diff(*this, other, LogLevel::ERROR);
 }
 
 bool Morphology::operator!=(const Morphology& other) const
 {
-    return !this->operator==(other);
+    return diff(*this, other, LogLevel::ERROR);
 }
 
 const Soma Morphology::soma() const
