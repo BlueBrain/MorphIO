@@ -29,7 +29,7 @@ set(MORPHIO_SOURCES
   mut/writers.cpp
   mut/modifiers.cpp)
 
-file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/../VERSION MORPHIO_VERSION_STRING)
+execute_process(COMMAND bash -c "git describe --tags --dirty | tr -d '\n'" OUTPUT_VARIABLE MORPHIO_VERSION_STRING)
 configure_file (
   ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp.in
   ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
