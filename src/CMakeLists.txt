@@ -29,7 +29,13 @@ set(MORPHIO_SOURCES
   mut/writers.cpp
   mut/modifiers.cpp)
 
-file(STRINGS ${CMAKE_CURRENT_SOURCE_DIR}/../VERSION MORPHIO_VERSION_STRING)
+execute_process(COMMAND python setup.py --version
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                RESULT_VARIABLE PY_VERSION_FAILED
+                OUTPUT_VARIABLE MORPHIO_VERSION_STRING
+                ERROR_VARIABLE PY_VERSION_ERROR
+                OUTPUT_STRIP_TRAILING_WHITESPACE)
+
 configure_file (
   ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp.in
   ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp
