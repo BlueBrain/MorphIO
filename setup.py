@@ -59,15 +59,13 @@ class CMakeBuild(build_ext):
                            '-DMorphIO_CXX_WARNINGS=OFF']
             build_args += ['--', '-j']
 
-        env = os.environ.copy()
-        env['CXXFLAGS'] = env.get('CXXFLAGS', '')
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         try:
             proc = subprocess.Popen(
                 "echo $CXX", shell=True, stdout=subprocess.PIPE)
             output = subprocess.check_call([cmake, ext.sourcedir] + cmake_args,
-                                           cwd=self.build_temp, env=env)
+                                           cwd=self.build_temp)
             output = subprocess.check_call([cmake, '--build', '.'] + build_args,
                                            cwd=self.build_temp)
         except subprocess.CalledProcessError as exc:
