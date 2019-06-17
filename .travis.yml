@@ -12,7 +12,16 @@ matrix:
       env:
         CXX: clang++
         CC: clang
-
+    - os: osx
+      osx_image: xcode10.1
+      env:
+        CXX: clang++
+        CC: clang
+    - os: osx
+      osx_image: xcode10.1
+      env:
+        CXX: g++
+        CC: gcc
 cache:
   directories:
     - $HOME/.cache/pip
