@@ -14,8 +14,8 @@ sudo: required
 # python:
 #   - 3.6
 
-# before_install:
-#   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
+before_install:
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
 #   - pip install virtualenv
 #   - virtualenv env && source env/bin/activate
 # install:
