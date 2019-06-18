@@ -1,24 +1,38 @@
+language: cpp
+
+addons:
+  apt:
+    packages:
+    - python3-h5py
+    - python3-lxml
+    - python3-numpy
+    - python3-pygments
+    - python3-pyparsing
+    - python3-setuptools
+    - python3-wheel
+    sources:
+    - ubuntu-toolchain-r-test
+
 matrix:
   include:
     - os: linux
       dist: trusty
       sudo: required
-      env: CXX=g++
+      compiler: g++
     - os: linux
       dist: trusty
       sudo: required
-      env: CXX=clang++
+      compiler: clang++
 cache:
   directories:
     - $HOME/.cache/pip
     # - $HOME/Library/Caches/Homebrew
-language: python
-sudo: required
-python:
-  - 3.6
+sudo: false
+# python:
+#   - 3.6
 
 before_install:
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
+  - if [ $TRAVIS_OS_NAME = linux ]; then echo all right; else brew install hdf5; fi
   - pip install virtualenv
   - virtualenv env && source env/bin/activate
 install:
