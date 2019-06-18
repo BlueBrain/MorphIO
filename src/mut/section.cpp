@@ -90,7 +90,7 @@ upstream_iterator Section::upstream_end() const
     return upstream_iterator();
 }
 
-std::ostream& operator<<(std::ostream& os, Section& section)
+static std::ostream& operator<<(std::ostream& os, Section& section)
 {
     ::operator<<(os, section);
     return os;

@@ -56,4 +56,5 @@ std::ostream& operator<<(std::ostream& os,
 namespace std {
 template <typename T, size_t N>
 string to_string(const array<T, N>& a);
+
 } // namespace std
