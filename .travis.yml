@@ -5,10 +5,7 @@ addons:
     packages:
     - libhdf5-dev
     - python3-h5py
-    - python3-lxml
     - python3-numpy
-    - python3-pygments
-    - python3-pyparsing
     - python3-setuptools
     - python3-wheel
     sources:
@@ -43,6 +40,6 @@ script:
   # Need to concatenate all commands with otherwise Travis only looks at the output code of the last command
 
   # Testing compilation with warning as error
-  - rm -rf build; mkdir build && pushd build && cmake .. && make -j && popd &&
+  - rm -rf build; mkdir build && pushd build && cmake -DBUILD_BINDINGS=OFF .. && make -j && popd &&
     pip install -r tests/requirement_tests.txt &&
     nosetests
