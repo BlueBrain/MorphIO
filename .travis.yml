@@ -1,13 +1,10 @@
-matrix:
-  include:
-    - os: linux
-      dist: trusty
-      sudo: required
-      env: CXX=g++
-    - os: linux
-      dist: trusty
-      sudo: required
-      env: CXX=clang++
+os: linux
+dist: trusty
+sudo: required
+compiler:
+  - clang
+  - gcc
+
 cache:
   directories:
     - $HOME/.cache/pip
