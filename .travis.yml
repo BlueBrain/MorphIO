@@ -3,6 +3,7 @@ language: cpp
 addons:
   apt:
     packages:
+    - libhdf5-dev
     - python3-h5py
     - python3-lxml
     - python3-numpy
