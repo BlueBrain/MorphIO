@@ -1,30 +1,33 @@
-language: c++
-os: linux
-dist: trusty
-sudo: required
-compiler:
-  - clang
-  - gcc
-
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      sudo: required
+      env: CXX=g++
+    - os: linux
+      dist: trusty
+      sudo: required
+      env: CXX=clang++
 cache:
   directories:
     - $HOME/.cache/pip
     # - $HOME/Library/Caches/Homebrew
+language: python
 sudo: required
-# python:
-#   - 3.6
+python:
+  - 3.6
 
 before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
-#   - pip install virtualenv
-#   - virtualenv env && source env/bin/activate
-# install:
-#   - pip install --upgrade pip
-#   - pip install .
+  - pip install virtualenv
+  - virtualenv env && source env/bin/activate
+install:
+  - pip install --upgrade pip
+  - pip install .
 script:
   # Need to concatenate all commands with otherwise Travis only looks at the output code of the last command
 
   # Testing compilation with warning as error
-  - rm -rf build; mkdir build && pushd build && cmake -DBUILD_BINDINGS=OFF .. && make -j && popd
-    # pip install -r tests/requirement_tests.txt &&
-    # nosetests
+  - rm -rf build; mkdir build && pushd build && cmake .. && make -j && popd &&
+    pip install -r tests/requirement_tests.txt &&
+    nosetests
