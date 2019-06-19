@@ -1,24 +1,32 @@
 matrix:
   include:
-    - os: linux
-      dist: xenial
-      sudo: required
-      env:
-        CXX: g++
-        CC: gcc
-    - os: linux
-      dist: xenial
-      sudo: required
+    # - os: linux
+    #   dist: xenial
+    #   sudo: required
+    #   python:
+    #     - 3.7
+    #   env:
+    #     CXX: g++
+    #     CC: gcc
+    # - os: linux
+    #   dist: xenial
+    #   sudo: required
+    #   python:
+    #     - 3.7
+    #   env:
+    #     CXX: clang++
+    #     CC: clang
+    - os: osx
+      osx_image: xcode10.1
+      python:
+        - 3.6
       env:
         CXX: clang++
         CC: clang
     - os: osx
       osx_image: xcode10.1
-      env:
-        CXX: clang++
-        CC: clang
-    - os: osx
-      osx_image: xcode10.1
+      python:
+        - 3.6
       env:
         CXX: g++
         CC: gcc
@@ -28,8 +36,6 @@ cache:
     # - $HOME/Library/Caches/Homebrew
 language: python
 sudo: required
-python:
-  - 3.7
 
 before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
