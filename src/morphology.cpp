@@ -129,9 +129,10 @@ const std::vector<Section> Morphology::sections() const
 {
     // TODO: Make this more performant when needed
     std::vector<Section> sections_;
-    for (uint i = 0; i < _properties->get<morphio::Property::Section>().size();
-         ++i) {
-        sections_.push_back(section(i));
+    auto count = _properties->get<morphio::Property::Section>().size();
+    sections_.reserve(count);
+    for (uint i = 0; i < count; ++i) {
+        sections_.emplace_back(section(i));
     }
     return sections_;
 }
