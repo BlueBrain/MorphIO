@@ -1,36 +1,30 @@
-language: cpp
-
-addons:
-  apt:
-    packages:
-    - libhdf5-dev
-    - python3-h5py
-    - python3-numpy
-    - python3-setuptools
-    - python3-wheel
-    sources:
-    - ubuntu-toolchain-r-test
-
 matrix:
   include:
     - os: linux
       dist: trusty
       sudo: required
-      compiler: g++
+      env:
+        CXX: g++
+        CC: gcc
     - os: linux
       dist: trusty
       sudo: required
-      compiler: clang++
+      env:
+        CXX: clang++
+        CC: clang
+    # - os: osx
+    #   osx_image: xcode10.1
 cache:
   directories:
     - $HOME/.cache/pip
     # - $HOME/Library/Caches/Homebrew
-sudo: false
-# python:
-#   - 3.6
+language: python
+sudo: required
+python:
+  - 3.6
 
 before_install:
-  - if [ $TRAVIS_OS_NAME = linux ]; then echo all right; else brew install hdf5; fi
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
   - pip install virtualenv
   - virtualenv env && source env/bin/activate
 install:
@@ -40,6 +34,6 @@ script:
   # Need to concatenate all commands with otherwise Travis only looks at the output code of the last command
 
   # Testing compilation with warning as error
-  - rm -rf build; mkdir build && pushd build && cmake -DBUILD_BINDINGS=OFF .. && make -j && popd &&
+  - rm -rf build; mkdir build && pushd build && cmake .. && make -j && popd &&
     pip install -r tests/requirement_tests.txt &&
     nosetests
