@@ -27,7 +27,7 @@ cache:
 language: python
 sudo: required
 python:
-  - 3.6
+  - 3.7
 
 before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
