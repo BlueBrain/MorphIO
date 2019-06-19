@@ -22,6 +22,7 @@ def test_v1():
     assert_equal(n.version, MORPHOLOGY_VERSION_H5_1)
 
 
+    assert_equal(len(n.sections), 84)
     assert_equal(len(n.soma.points), 3)
     assert_equal(len(list(n.iter())), 84)
     assert_equal(len(n.points), 924)
@@ -54,6 +55,7 @@ def test_v2():
     assert_equal(n.root_sections[1].type, 4)
     assert_equal(len(list(n.iter())), 85)
     assert_equal(len(n.points), 926)
+    assert_equal(len(n.sections), 85)
 
 def test_soma_no_neurite():
     n = Morphology(os.path.join(H5V1_PATH, 'soma_no_neurites.h5'))

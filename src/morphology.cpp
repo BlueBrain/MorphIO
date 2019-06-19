@@ -129,7 +129,7 @@ const std::vector<Section> Morphology::sections() const
 {
     // TODO: Make this more performant when needed
     std::vector<Section> sections_;
-    for (uint i = 1; i < _properties->get<morphio::Property::Section>().size();
+    for (uint i = 0; i < _properties->get<morphio::Property::Section>().size();
          ++i) {
         sections_.push_back(section(i));
     }

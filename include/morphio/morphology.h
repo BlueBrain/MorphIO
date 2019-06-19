@@ -78,8 +78,6 @@ public:
 
     /**
      * Return a vector containing all section objects.
-     *
-     * The first section of the vector is always the soma section.
      **/
     const std::vector<Section> sections() const;
 
