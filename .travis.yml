@@ -14,6 +14,12 @@ matrix:
         CC: clang
     # - os: osx
     #   osx_image: xcode10.1
+
+addons:
+  apt:
+    packages:
+    - clang-6.0
+
 cache:
   directories:
     - $HOME/.cache/pip
