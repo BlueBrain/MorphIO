@@ -1,3 +1,4 @@
+language: python
 matrix:
   include:
     # - os: linux
@@ -18,15 +19,15 @@ matrix:
     #     CC: clang
     - os: osx
       osx_image: xcode10.1
-      python:
-        - 3.6
+      language: generic
+      python: 3.6
       env:
         CXX: clang++
         CC: clang
     - os: osx
       osx_image: xcode10.1
-      python:
-        - 3.6
+      language: generic
+      python: 2.7
       env:
         CXX: g++
         CC: gcc
@@ -34,7 +35,6 @@ cache:
   directories:
     - $HOME/.cache/pip
     # - $HOME/Library/Caches/Homebrew
-language: python
 sudo: required
 
 before_install:
