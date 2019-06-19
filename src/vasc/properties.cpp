@@ -9,7 +9,7 @@
 
 namespace morphio {
 namespace vasculature {
-bool verbose = false;
+static bool verbose = false;
 namespace property {
 
 VascPointLevel::VascPointLevel(std::vector<Point::Type> points,
@@ -59,7 +59,7 @@ bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
     return false;
 }
 
-bool compare_section_structure(const std::vector<VascSection::Type>& vec1,
+static bool compare_section_structure(const std::vector<VascSection::Type>& vec1,
     const std::vector<VascSection::Type>& vec2,
     const std::string& name, bool verbose_)
 {
@@ -95,7 +95,7 @@ bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
         return false;
     }
 
-    const float epsilon = 1e-6;
+    const float epsilon = 1e-6f;
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(vec1[i] - vec2[i]) > epsilon) {
             LBERROR(Warning::UNDEFINED,
@@ -161,7 +161,7 @@ bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
     return false;
 }
 
-bool compare(const VascPointLevel& el1, const VascPointLevel& el2, const std::string& name, bool verbose_)
+static bool compare(const VascPointLevel& el1, const VascPointLevel& el2, const std::string& name, bool verbose_)
 {
     if (&el1 == &el2)
         return true;

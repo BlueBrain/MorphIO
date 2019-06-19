@@ -12,9 +12,9 @@
 #include <morphio/vasc/properties.h>
 
 namespace py = pybind11;
-using namespace py::literals;
 
-void bind_vasculature(py::module &m) {
+static void bind_vasculature(py::module &m) {
+    using namespace py::literals;
 
     py::class_<morphio::vasculature::Vasculature>(m, "Vasculature")
         .def(py::init<const morphio::URI&>(),

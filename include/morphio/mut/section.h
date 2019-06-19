@@ -125,10 +125,10 @@ private:
 
 void friendDtorForSharedPtr(Section* section);
 
-std::ostream& operator<<(std::ostream& os, const Section&);
-std::ostream& operator<<(std::ostream& os, std::shared_ptr<Section>);
+std::ostream& operator<<(std::ostream&, const Section&);
+std::ostream& operator<<(std::ostream&, std::shared_ptr<Section>);
 
 } // namespace mut
 } // namespace morphio
 
-std::ostream& operator<<(std::ostream& os, const morphio::mut::Section&);
+std::ostream& operator<<(std::ostream&, const morphio::mut::Section&);

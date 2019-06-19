@@ -5,6 +5,7 @@
 #include <morphio/properties.h>
 #include <morphio/shared_utils.tpp>
 
+
 namespace morphio {
 namespace Property {
 

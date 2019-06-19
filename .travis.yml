@@ -1,10 +1,18 @@
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: xenial
       sudo: required
-    # - os: osx
-    #   osx_image: xcode10.1
+      env:
+        CXX: g++
+        CC: gcc
+    - os: linux
+      dist: xenial
+      sudo: required
+      env:
+        CXX: clang++
+        CC: clang
+
 cache:
   directories:
     - $HOME/.cache/pip
@@ -12,7 +20,7 @@ cache:
 language: python
 sudo: required
 python:
-  - 3.6
+  - 3.7
 
 before_install:
   - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi

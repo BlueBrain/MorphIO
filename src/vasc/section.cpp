@@ -74,7 +74,7 @@ const std::vector<Section> Section::predecessors() const
         for (const uint32_t id_ : predecessors_)
             result.push_back(Section(id_, _properties));
         return result;
-    } catch (const std::out_of_range& oor) {
+    } catch (...){
         return result;
     }
 }
@@ -88,7 +88,7 @@ const std::vector<Section> Section::successors() const
         for (const uint32_t id_ : successors_)
             result.push_back(Section(id_, _properties));
         return result;
-    } catch (const std::out_of_range& oor) {
+    } catch (...) {
         return result;
     }
 }

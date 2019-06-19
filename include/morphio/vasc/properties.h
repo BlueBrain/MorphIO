@@ -46,6 +46,7 @@ struct VascPointLevel
         std::vector<Diameter::Type> diameters);
     VascPointLevel(const VascPointLevel& data);
     VascPointLevel(const VascPointLevel& data, SectionRange range);
+    VascPointLevel& operator=(const VascPointLevel&) = default;
 };
 
 struct VascEdgeLevel
@@ -91,6 +92,10 @@ std::ostream& operator<<(std::ostream& os, const VascPointLevel& pointLevel);
 template <>
 std::vector<Point::Type>& Properties::get<Point>();
 template <>
+std::vector<Diameter::Type>& Properties::get<Diameter>();
+template <>
+std::vector<SectionType::Type>& Properties::get<SectionType>();
+template <>
 std::vector<VascSection::Type>& Properties::get<VascSection>();
 template <>
 const std::vector<VascSection::Type>& Properties::get<VascSection>() const;
@@ -98,4 +103,9 @@ template <>
 std::vector<Connection::Type>& Properties::get<Connection>();
 }
 }
+}
+
+namespace std
+{
+extern template string to_string<float, 3>(const array<float, 3>&);
 }
