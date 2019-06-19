@@ -27,6 +27,10 @@ public:
     Iterator operator++(int);
 };
 
+using depth_iterator = Iterator<std::stack<std::shared_ptr<Section>>>;
+using breadth_iterator = Iterator<std::queue<std::queue<std::shared_ptr<Section>>>>;
+using upstream_iterator = Iterator<std::vector<std::shared_ptr<Section>>>;
+
 // Declare the specializations
 template <>
 breadth_iterator::Iterator(const std::shared_ptr<Section>);

@@ -5,7 +5,6 @@
 #include <stack>
 
 #include <morphio/types.h>
-#include <morphio/vasc/section.h>
 
 namespace morphio {
 /**
@@ -51,6 +50,11 @@ public:
     graph_iterator& operator++();
     graph_iterator operator++(int);
 };
+
+using depth_iterator = Iterator<std::stack<Section>>;
+using breadth_iterator = Iterator<std::queue<std::queue<Section>>>;
+using upstream_iterator = Iterator<std::vector<Section>>;
+
 
 // Declare the specializations
 template <>

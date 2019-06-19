@@ -4,6 +4,7 @@
 #include <morphio/properties.h>
 #include <morphio/section_base.h>
 #include <morphio/types.h>
+#include <morphio/mito_iterators.h>
 
 namespace morphio {
 class MitoSection : public SectionBase<MitoSection>

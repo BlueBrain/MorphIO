@@ -24,6 +24,10 @@ public:
     MitoIterator operator++(int);
 };
 
+using mito_depth_iterator = MitoIterator<std::stack<MitoSection>>;
+using mito_breadth_iterator = MitoIterator<std::queue<MitoSection>>;
+using mito_upstream_iterator = MitoIterator<std::vector<MitoSection>>;
+
 // Declare the specializations
 template <>
 MitoSection MitoIterator<std::stack<MitoSection>>::operator*() const;

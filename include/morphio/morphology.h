@@ -4,6 +4,7 @@
 
 #include <morphio/properties.h>
 #include <morphio/types.h>
+#include <morphio/iterators.h>
 
 namespace morphio {
 enum SomaClasses

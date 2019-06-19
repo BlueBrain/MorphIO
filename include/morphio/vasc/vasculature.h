@@ -3,6 +3,7 @@
 #include <memory>
 #include <morphio/types.h>
 #include <morphio/vasc/properties.h>
+#include <morphio/iterators.h>
 
 namespace morphio {
 namespace vasculature {
