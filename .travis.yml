@@ -1,13 +1,13 @@
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: xenial
       sudo: required
       env:
         CXX: g++
         CC: gcc
     - os: linux
-      dist: trusty
+      dist: xenial
       sudo: required
       env:
         CXX: clang++
