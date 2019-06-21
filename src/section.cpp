@@ -61,6 +61,11 @@ upstream_iterator Section::upstream_end() const
     return upstream_iterator();
 }
 
+const range<const float> Section::distances() const
+{
+    return get<Property::Distance>();
+}
+
 const range<const Point> Section::points() const
 {
     return get<Property::Point>();

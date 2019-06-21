@@ -45,6 +45,11 @@ public:
      */
     const std::vector<T> children() const;
 
+    /**
+     * Return a list of ancestor sections
+     */
+    const std::vector<T> ancestors() const;
+
     /** Return the ID of this section. */
     uint32_t id() const;
 

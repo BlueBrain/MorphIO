@@ -84,6 +84,13 @@ public:
 
     /**
      * Return a view
+    (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
+     to the distances of the points from the beginning of this section
+    **/
+    const range<const float> distances() const;
+
+    /**
+     * Return a view
      (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point perimeters
      **/

@@ -155,7 +155,10 @@ static void bind_immutable_module(py::module &m) {
         // Topology-related member functions
         .def_property_readonly("parent", &morphio::Section::parent,
                                "Returns the parent section of this section\n"
-                               "throw MissingParentError is the section doesn't have a parent")
+                               "throw MissingParentError if the section doesn't have a parent")
+        .def_property_readonly("ancestors", &morphio::Section::ancestors,
+                               "Returns the ancestor sections of this section\n"
+                               "throw MissingParentError if the section does not have ancestors")
         .def_property_readonly("is_root", &morphio::Section::isRoot,
                                "Returns true if this section is a root section (parent ID == -1)")
         .def_property_readonly("children", &morphio::Section::children,
@@ -172,6 +175,8 @@ static void bind_immutable_module(py::module &m) {
                                "Returns list of section's point coordinates")
         .def_property_readonly("diameters", [](morphio::Section* section){ return span_to_ndarray(section->diameters()); },
                                "Returns list of section's point diameters")
+        .def_property_readonly("distances", [](morphio::Section* section){ return span_to_ndarray(section->distances()); },
+                               "Returns list of section's point distances")
         .def_property_readonly("perimeters", [](morphio::Section* section){ return span_to_ndarray(section->perimeters()); },
                                "Returns list of section's point perimeters")
 

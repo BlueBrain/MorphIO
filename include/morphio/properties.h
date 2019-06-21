@@ -56,12 +56,22 @@ struct SectionType
     using Type = morphio::SectionType;
 };
 
+struct SectionPathLength
+{
+    using Type = float;
+};
+
 struct Perimeter
 {
     using Type = float;
 };
 
 struct Diameter
+{
+    using Type = float;
+};
+
+struct PathLength
 {
     using Type = float;
 };
@@ -85,6 +95,7 @@ struct PointLevel
 {
     std::vector<Point::Type> _points;
     std::vector<Diameter::Type> _diameters;
+    std::vector<PathLength::Type> _pathLengths;
     std::vector<Perimeter::Type> _perimeters;
 
     PointLevel() {}
@@ -102,6 +113,8 @@ struct SectionLevel
 {
     std::vector<Section::Type> _sections;
     std::vector<SectionType::Type> _sectionTypes;
+    std::vector<SectionPathLength::Type> _pathLengths;
+    std::map<int, std::vector<unsigned int>> _ancestors;
     std::map<int, std::vector<unsigned int>> _children;
 
     bool operator==(const SectionLevel& other) const;
@@ -142,6 +155,7 @@ struct MitochondriaPointLevel
 struct MitochondriaSectionLevel
 {
     std::vector<Section::Type> _sections;
+    std::map<int, std::vector<unsigned int>> _ancestors;
     std::map<int, std::vector<unsigned int>> _children;
 
     bool diff(const MitochondriaSectionLevel& other, LogLevel logLevel) const;

@@ -95,6 +95,22 @@ T SectionBase<T>::parent() const
 }
 
 template <typename T>
+const std::vector<T> SectionBase<T>::ancestors() const
+{
+    std::vector<T> result;
+    try {
+        const std::vector<uint32_t>& _ancestors = _properties->ancestors<typename T::SectionId>().at(static_cast<int>(_id));
+        result.reserve(_ancestors.size());
+        for (const uint32_t id_ : _ancestors)
+            result.push_back(T(id_, _properties));
+
+        return result;
+    } catch (const std::out_of_range&) {
+        return result;
+    }
+}
+
+template <typename T>
 const std::vector<T> SectionBase<T>::children() const
 {
     std::vector<T> result;

@@ -17,7 +17,8 @@
 #include "plugin/morphologySWC.h"
 
 namespace morphio {
-void buildChildren(std::shared_ptr<Property::Properties> properties);
+void buildRelatives(std::shared_ptr<Property::Properties> properties);
+void calculatePathLengths(std::shared_ptr<Property::Properties> properties);
 SomaType getSomaType(long unsigned int nSomaPoints);
 
 Morphology::Morphology(const URI& source, unsigned int options)
@@ -47,7 +48,8 @@ Morphology::Morphology(const URI& source, unsigned int options)
 
     _properties = std::make_shared<Property::Properties>(loader());
 
-    buildChildren(_properties);
+    buildRelatives(_properties);
+    calculatePathLengths(_propeties);
 
     if (version() != MORPHOLOGY_VERSION_SWC_1)
         _properties->_cellLevel._somaType = getSomaType(soma().points().size());
@@ -61,7 +63,7 @@ Morphology::Morphology(const URI& source, unsigned int options)
         mutable_morph.applyModifiers(options);
         _properties = std::make_shared<Property::Properties>(
             mutable_morph.buildReadOnly());
-        buildChildren(_properties);
+        buildRelatives(_properties);
     }
 }
 
@@ -69,7 +71,7 @@ Morphology::Morphology(mut::Morphology morphology)
 {
     morphology.sanitize();
     _properties = std::make_shared<Property::Properties>(morphology.buildReadOnly());
-    buildChildren(_properties);
+    buildRelatives(_properties);
 }
 
 Morphology::Morphology(Morphology&&) = default;
@@ -207,25 +209,69 @@ SomaType getSomaType(long unsigned int nSomaPoints)
     }
 }
 
-void buildChildren(std::shared_ptr<Property::Properties> properties)
+void buildRelatives(std::shared_ptr<Property::Properties> properties)
 {
     {
         const auto& sections = properties->get<Property::Section>();
         auto& children = properties->_sectionLevel._children;
+        auto& ancestors = properties->_sectionLevel._ancestors;
 
         for (unsigned int i = 0; i < sections.size(); ++i) {
-            const int32_t parent = sections[i][1];
+            int32_t parent = sections[i][1];
             children[parent].push_back(i);
+
+            auto& elders = ancestors[i];
+            while (parent != -1) {
+                elders.push_back(parent);
+                parent = sections[parent][1];
+            }
         }
     }
 
     {
         const auto& sections = properties->get<Property::MitoSection>();
         auto& children = properties->_mitochondriaSectionLevel._children;
+        auto& ancestors = properties->_mitochondriaSectionLevel._ancestors;
 
         for (unsigned int i = 0; i < sections.size(); ++i) {
-            const int32_t parent = sections[i][1];
+            int32_t parent = sections[i][1];
             children[parent].push_back(i);
+
+            auto& elders = ancestors[i];
+            while (parent != -1) {
+                elders.push_back(parent);
+                parent = sections[parent][1];
+            }
+        }
+    }
+}
+
+void calculatePathLengths(std::shared_ptr<Property::Properties> properties) {
+    const auto& sections = properties->get<Property::Section>();
+
+    const auto& points = properties->get<Property::Point>();
+    auto& pathLengths = properties->_pointLevel._pathLengths;
+
+    for (unsigned int i = 0; i < sections.size(); ++i) {
+        const size_t start = static_cast<size_t>(sections[i][0]);
+        const size_t end = i == sections.size() - 1
+                               ? points.size()
+                               : static_cast<size_t>(sections[i + 1][0]);
+
+        pathLengths[start] = 0.;
+        for (std::size_t j = start + 1; j < end; ++j) {
+            pathLengths[j] = distances[j - 1] + distance(points[j - 1], points[j]);
+        }
+    }
+
+    const auto& ancestors = properties->_sectionLevel._ancestors;
+    auto& sectionPathLengths = properties->_sectionLevel._pathLengths;
+    for (unsigned int i = 0; i < sections.size(); ++i) {
+        for (const auto& idx: ancestors[i]) {
+            const size_t end = idx == sections.size() - 1
+                                   ? points.size()
+                                   : static_cast<size_t>(sections[idx + 1][0]);
+            sectionPathLengths[i] += pathLengths[end - 1];
         }
     }
 }
