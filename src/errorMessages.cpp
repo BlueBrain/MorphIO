@@ -78,6 +78,13 @@ const std::string ErrorMessages::ERROR_LINE_NON_PARSABLE(long unsigned int lineN
     return errorMsg(lineNumber, ErrorLevel::ERROR, "Unable to parse this line");
 }
 
+const std::string ErrorMessages::ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
+                                                                const SectionType& type) const
+{
+    return errorMsg(lineNumber, ErrorLevel::ERROR,
+                    "Unsupported section type: " + std::to_string(type));
+}
+
 const std::string ErrorMessages::ERROR_MULTIPLE_SOMATA(
     const std::vector<Sample>& somata) const
 {

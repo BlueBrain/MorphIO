@@ -66,7 +66,11 @@ public:
             const auto& sample = Sample(line.data(), lineNumber);
             if (!sample.valid)
                 LBTHROW(morphio::RawDataError(
-                    err.ERROR_LINE_NON_PARSABLE(lineNumber)));
+                            err.ERROR_LINE_NON_PARSABLE(lineNumber)));
+
+            if (sample.type >= SECTION_CUSTOM_START)
+                LBTHROW(morphio::RawDataError(
+                            err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type)));
 
             if (samples.count(sample.id) > 0)
                 LBTHROW(morphio::RawDataError(
