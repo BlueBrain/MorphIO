@@ -75,10 +75,6 @@ struct Sample
 
         type = static_cast<SectionType>(int_type);
         diameter = radius * 2; // The point array stores diameters.
-
-        if (type >= SECTION_CUSTOM_START)
-            valid = false; // Unknown section type, custom samples are also
-                           // Regarded as unknown.
     }
 
     float diameter;
@@ -132,6 +128,9 @@ public:
     const std::string ERROR_OPENING_FILE() const;
 
     const std::string ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const;
+
+    const std::string ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
+                                                     const SectionType& type) const;
 
     const std::string ERROR_MULTIPLE_SOMATA(
         const std::vector<Sample>& somata) const;

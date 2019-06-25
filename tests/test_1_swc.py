@@ -400,3 +400,20 @@ def test_read_duplicate():
     assert_array_equal(child1.diameters, np.array([1, 1]))
     assert_array_equal(child2.diameters, np.array([4.6, 7], dtype=np.float32))
     assert_array_equal(child3.diameters, np.array([1, 4.6, 7], dtype=np.float32))
+
+
+def test_unsupported_section_type():
+    with tmp_swc_file('''1 1 0 4 0 3.0 -1
+                         2 3 0 0 2 0.5 1
+                         3 5 0 0 3 0.5 2  # <-- 5 is unsupported section type
+                         ''') as tmp_file:
+
+        with assert_raises(RawDataError) as obj:
+            Morphology(tmp_file.name)
+    assert_substring(
+        '.swc:3:error',
+        strip_color_codes(str(obj.exception)))
+
+    assert_substring(
+        'Unsupported section type: 5',
+        strip_color_codes(str(obj.exception)))
