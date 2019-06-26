@@ -119,7 +119,7 @@ def test_read_split_soma():
                          5 3 0 0 5 0.5 4
                          # soma branch, off initial point
                          6 1 2 0 0 4.0 1
-                         7 1 3 0 0 4.0 1
+                         7 1 3 0 0 4.0 6
                          # second neurite, off soma branch
                          8 3 0 0 6 0.5 1
                          9 3 0 0 7 0.5 8
@@ -417,3 +417,8 @@ def test_unsupported_section_type():
     assert_substring(
         'Unsupported section type: 5',
         strip_color_codes(str(obj.exception)))
+
+
+def test_three_point_soma():
+    n = Morphology(os.path.join(_path, 'three_point_soma.swc'))
+    assert_equal(n.soma_type, SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
