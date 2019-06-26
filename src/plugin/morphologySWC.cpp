@@ -253,7 +253,7 @@ public:
                     children_soma_points.push_back(this->samples[child]);
             }
 
-            if (somaChildren.size() == 2) {
+            if (children_soma_points.size() == 2) {
                 //  NeuroMorpho is the main provider of morphologies, but they
                 //  with SWC as their default file format: they convert all
                 //  uploads to SWC.  In the process of conversion, they turn all
