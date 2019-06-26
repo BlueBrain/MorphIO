@@ -3,12 +3,13 @@ import numpy as np
 from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_, assert_not_equal
 
+import morphio
 from morphio.mut import Morphology, Soma
 from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, MorphioError, SectionBuilderError, Morphology as ImmutableMorphology, upstream, depth_first, breadth_first, diff
 from contextlib import contextmanager
 import sys
 from io import StringIO
-from utils import assert_substring, captured_output
+from utils import assert_substring, captured_output, tmp_asc_file
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -426,3 +427,24 @@ def test_non_C_nparray():
     non_standard_stride = np.asfortranarray(points)
     section.points = non_standard_stride
     assert_array_equal(section.points, points)
+
+def test_annotation():
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            with tmp_asc_file('''((Dendrite)
+                      (3 -4 0 2)
+                      (3 -6 0 2)
+                      (3 -8 0 2)
+                      (3 -10 0 2)
+                      (
+                        (3 -10 0 2)
+                        (0 -10 0 2)
+                        (-3 -10 0 2)
+                        |       ; <-- empty sibling but still works !
+                       )
+                      )
+                 ''') as tmp_file:
+                n = Morphology(tmp_file.name)
+    assert_equal(len(n.annotations), 1)
+    annotation = n.annotations[0]
+    assert_equal(annotation.type, morphio.AnnotationType.single_child)
