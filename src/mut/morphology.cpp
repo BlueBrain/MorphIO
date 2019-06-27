@@ -53,6 +53,7 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(
         morphology._properties->_cellLevel);
 
+    _annotations = morphology.annotations();
     for (const morphio::Section& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
