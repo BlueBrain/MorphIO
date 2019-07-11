@@ -46,11 +46,6 @@ public:
     bool operator!=(const Section& other) const;
 
     /**
-       Euclidian distance between first and last point of the section
-    **/
-    float length() const;
-
-    /**
        Depth first search iterator
     **/
     depth_iterator depth_begin() const;

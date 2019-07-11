@@ -21,16 +21,6 @@ SectionType Section::type() const
     return val;
 }
 
-float Section::length() const
-{
-    auto points_ = this->points();
-    if (points_.size() < 2)
-        return 0;
-
-    size_t last = points_.size() - 1;
-    return distance(points_[0], points_[last]);
-}
-
 depth_iterator Section::depth_begin() const
 {
     return depth_iterator(*this);
