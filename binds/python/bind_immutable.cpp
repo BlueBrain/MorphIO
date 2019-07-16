@@ -9,6 +9,8 @@
 #include <morphio/enums.h>
 #include <morphio/mut/morphology.h>
 
+#include "bind_enums.h"
+
 namespace py = pybind11;
 
 static void bind_immutable_module(py::module &m) {

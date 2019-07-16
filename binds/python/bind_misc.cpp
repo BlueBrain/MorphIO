@@ -9,6 +9,8 @@
 #include <morphio/enums.h>
 #include <morphio/tools.h>
 
+#include "bind_enums.h"
+
 namespace py = pybind11;
 
 static void bind_misc(py::module &m) {

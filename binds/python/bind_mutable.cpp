@@ -4,6 +4,8 @@
 #include <morphio/mut/section.h>
 #include <morphio/mut/soma.h>
 
+#include "bind_enums.h"
+
 namespace py = pybind11;
 
 static void bind_mutable_module(py::module &m) {
