@@ -255,6 +255,18 @@ def test_empty_sibling():
     assert_array_equal(annotation.points, [[3, -10, 0], [0, -10, 0], [-3, -10, 0]])
     assert_array_equal(annotation.diameters, [2, 2, 2])
 
+def test_nested_single_child():
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            n = Morphology(os.path.join(_path, 'nested_single_children.asc'))
+    assert_array_equal(n.root_sections[0].points,
+                       [[0., 0., 0.],
+                        [0., 0., 1.],
+                        [0., 0., 2.],
+                        [0., 0., 3.],
+                        [0., 0., 4.]])
+
+
 
 
 def test_section_single_point():
