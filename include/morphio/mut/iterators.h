@@ -17,9 +17,9 @@ class Iterator
     T container;
 
 public:
+    Iterator();
     Iterator(std::shared_ptr<Section> rootSection);
     Iterator(const Morphology& morphology);
-    Iterator();
     bool operator==(Iterator other) const;
     bool operator!=(Iterator other) const;
     std::shared_ptr<Section> operator*() const;

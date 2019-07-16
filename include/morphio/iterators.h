@@ -19,9 +19,8 @@ class Iterator
 
     T container;
 
-    Iterator();
-
 public:
+    Iterator();
     Iterator(const Section& section);
     Iterator(const Morphology& morphology);
     bool operator==(Iterator other) const;

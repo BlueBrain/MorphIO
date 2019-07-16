@@ -4,6 +4,8 @@
 #include <morphio/mut/section.h>
 #include <morphio/mut/soma.h>
 
+#include "bind_enums.h"
+
 namespace py = pybind11;
 
 static void bind_mutable_module(py::module &m) {
@@ -88,13 +90,13 @@ static void bind_mutable_module(py::module &m) {
              "Write file to H5, SWC, ASC format depending on filename extension", "filename"_a)
 
         // Iterators
-        .def("iter", [](morphio::mut::Morphology* morph, morphio::IterType type) {
+        .def("iter", [](morphio::mut::Morphology* morph, IterType type) {
                 switch (type) {
-                case morphio::IterType::DEPTH_FIRST:
+                case IterType::DEPTH_FIRST:
                     return py::make_iterator(morph->depth_begin(), morph->depth_end());
-                case morphio::IterType::BREADTH_FIRST:
+                case IterType::BREADTH_FIRST:
                     return py::make_iterator(morph->breadth_begin(), morph->breadth_end());
-                case morphio::IterType::UPSTREAM:
+                case IterType::UPSTREAM:
                 default:
                 LBTHROW(morphio::MorphioError("Only iteration types depth_first and breadth_first are supported"));
                 }
@@ -104,7 +106,7 @@ static void bind_mutable_module(py::module &m) {
             "iter_type controls the order of iteration on sections of a given neurite. 2 values can be passed:\n"
             "- morphio.IterType.depth_first (default)\n"
             "- morphio.IterType.breadth_first",
-            "iter_type"_a=morphio::IterType::DEPTH_FIRST);
+            "iter_type"_a=IterType::DEPTH_FIRST);
 
 
     mutable_morphology.def("append_root_section", static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*)
@@ -285,13 +287,13 @@ static void bind_mutable_module(py::module &m) {
         .def_property_readonly("children", &morphio::mut::Section::children,
              "Returns a list of children IDs")
         // Iterators
-        .def("iter", [](morphio::mut::Section* section, morphio::IterType type) {
+        .def("iter", [](morphio::mut::Section* section, IterType type) {
                          switch (type) {
-                         case morphio::IterType::DEPTH_FIRST:
+                         case IterType::DEPTH_FIRST:
                              return py::make_iterator(section->depth_begin(), section->depth_end());
-                         case morphio::IterType::BREADTH_FIRST:
+                         case IterType::BREADTH_FIRST:
                              return py::make_iterator(section->breadth_begin(), section->breadth_end());
-                         case morphio::IterType::UPSTREAM:
+                         case IterType::UPSTREAM:
                              return py::make_iterator(section->upstream_begin(), section->upstream_end());
                          default:
                              LBTHROW(morphio::MorphioError("Only iteration types depth_first, breadth_first and upstream are supported"));
@@ -304,7 +306,7 @@ static void bind_mutable_module(py::module &m) {
             "- morphio.IterType.depth_first (default)\n"
             "- morphio.IterType.breadth_first\n"
             "- morphio.IterType.upstream\n",
-            "iter_type"_a=morphio::IterType::DEPTH_FIRST)
+            "iter_type"_a=IterType::DEPTH_FIRST)
 
         // Editing
         .def("append_section", static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::Section::*) (const morphio::Section&, bool)>(&morphio::mut::Section::appendSection),

@@ -9,6 +9,8 @@
 #include <morphio/enums.h>
 #include <morphio/tools.h>
 
+#include "bind_enums.h"
+
 namespace py = pybind11;
 
 static void bind_misc(py::module &m) {
@@ -27,10 +29,10 @@ static void bind_misc(py::module &m) {
         .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
             "Indicates that a section has only one child");
 
-    py::enum_<morphio::enums::IterType>(m, "IterType")
-        .value("depth_first", morphio::enums::IterType::DEPTH_FIRST)
-        .value("breadth_first", morphio::enums::IterType::BREADTH_FIRST)
-        .value("upstream", morphio::enums::IterType::UPSTREAM)
+    py::enum_<IterType>(m, "IterType")
+        .value("depth_first", IterType::DEPTH_FIRST)
+        .value("breadth_first", IterType::BREADTH_FIRST)
+        .value("upstream", IterType::UPSTREAM)
         .export_values();
 
     py::enum_<morphio::enums::LogLevel>(m, "LogLevel")

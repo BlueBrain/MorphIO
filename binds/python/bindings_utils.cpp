@@ -4,7 +4,6 @@
 
 namespace py = pybind11;
 
-
 static py::array_t<float> span_array_to_ndarray(const morphio::range<const std::array<float, 3> > &span)
 {
     const void* ptr = static_cast<const void*>(span.data());

@@ -87,13 +87,6 @@ inline std::ostream& operator<<(std::ostream& os, const MorphologyVersion v)
     }
 }
 
-enum IterType
-{
-    DEPTH_FIRST,
-    BREADTH_FIRST,
-    UPSTREAM
-};
-
 enum SomaType
 {
     SOMA_UNDEFINED = 0,
