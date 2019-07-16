@@ -274,7 +274,6 @@ void Morphology::sanitize(const morphio::plugin::DebugInfo& debugInfo)
         // Incrementing iterator here before we potentially delete the section
         ++it;
         unsigned int sectionId = section_->id();
-        std::cout << "sectionId: " << sectionId << std::endl;
 
         if (section_->isRoot())
             continue;
