@@ -232,7 +232,6 @@ static void bind_mutable_module(py::module &m) {
                 }, py::is_operator())
         .def("__str__", [](const morphio::mut::Section& section) {
                 std::stringstream ss;
-                // morphio::operator<<(ss, const morphio::mut::Section&);
                 ss << section;
                 return ss.str();
             })
