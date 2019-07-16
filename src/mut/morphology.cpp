@@ -267,8 +267,12 @@ void Morphology::sanitize(const morphio::plugin::DebugInfo& debugInfo)
 {
     morphio::plugin::ErrorMessages err(debugInfo._filename);
 
-    for (auto it = depth_begin(); it != depth_end(); ++it) {
+    auto it = depth_begin();
+    while (it != depth_end()) {
         std::shared_ptr<Section> section_ = *it;
+
+        // Incrementing iterator here before we potentially delete the section
+        ++it;
         unsigned int sectionId = section_->id();
 
         if (section_->isRoot())
