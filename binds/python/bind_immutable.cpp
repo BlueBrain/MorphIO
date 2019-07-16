@@ -90,13 +90,13 @@ static void bind_immutable_module(py::module &m) {
                                "Returns the version")
 
         // Iterators
-        .def("iter", [](morphio::Morphology* morpho, morphio::IterType type) {
+        .def("iter", [](morphio::Morphology* morpho, IterType type) {
                 switch (type) {
-                case morphio::IterType::DEPTH_FIRST:
+                case IterType::DEPTH_FIRST:
                     return py::make_iterator(morpho->depth_begin(), morpho->depth_end());
-                case morphio::IterType::BREADTH_FIRST:
+                case IterType::BREADTH_FIRST:
                     return py::make_iterator(morpho->breadth_begin(), morpho->breadth_end());
-                case morphio::IterType::UPSTREAM:
+                case IterType::UPSTREAM:
                 default:
                     LBTHROW(morphio::MorphioError("Only iteration types depth_first and breadth_first are supported"));
                 }
@@ -106,7 +106,7 @@ static void bind_immutable_module(py::module &m) {
             "iter_type controls the order of iteration on sections of a given neurite. 2 values can be passed:\n"
             "- morphio.IterType.depth_first (default)\n"
             "- morphio.IterType.breadth_first (default)\n"
-            "iter_type"_a=morphio::IterType::DEPTH_FIRST);
+            "iter_type"_a=IterType::DEPTH_FIRST);
 
 
 
@@ -176,13 +176,13 @@ static void bind_immutable_module(py::module &m) {
                                "Returns list of section's point perimeters")
 
         // Iterators
-        .def("iter", [](morphio::Section* section, morphio::IterType type) {
+        .def("iter", [](morphio::Section* section, IterType type) {
                 switch (type) {
-                case morphio::IterType::DEPTH_FIRST:
+                case IterType::DEPTH_FIRST:
                     return py::make_iterator(section->depth_begin(), section->depth_end());
-                case morphio::IterType::BREADTH_FIRST:
+                case IterType::BREADTH_FIRST:
                     return py::make_iterator(section->breadth_begin(), section->breadth_end());
-                case morphio::IterType::UPSTREAM:
+                case IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
                 default:
                     LBTHROW(morphio::MorphioError("Only iteration types depth_first, breadth_first and upstream are supported"));
@@ -195,7 +195,7 @@ static void bind_immutable_module(py::module &m) {
             "- morphio.IterType.depth_first (default)\n"
             "- morphio.IterType.breadth_first\n"
             "- morphio.IterType.upstream\n",
-            "iter_type"_a=morphio::IterType::DEPTH_FIRST);
+            "iter_type"_a=IterType::DEPTH_FIRST);
 
 
     py::class_<morphio::MitoSection>(m, "MitoSection")
@@ -226,13 +226,13 @@ static void bind_immutable_module(py::module &m) {
                                "end of the neuronal section\n")
 
         // Iterators
-        .def("iter", [](morphio::MitoSection* section, morphio::IterType type) {
+        .def("iter", [](morphio::MitoSection* section, IterType type) {
                 switch (type) {
-                case morphio::IterType::DEPTH_FIRST:
+                case IterType::DEPTH_FIRST:
                     return py::make_iterator(section->depth_begin(), section->depth_end());
-                case morphio::IterType::BREADTH_FIRST:
+                case IterType::BREADTH_FIRST:
                     return py::make_iterator(section->breadth_begin(), section->breadth_end());
-                case morphio::IterType::UPSTREAM:
+                case IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
                 default:
                     LBTHROW(morphio::MorphioError("Only iteration types depth_first, breadth_first and upstream are supported"));
@@ -243,6 +243,6 @@ static void bind_immutable_module(py::module &m) {
             "\n"
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
-            "iter_type"_a=morphio::IterType::DEPTH_FIRST);
+            "iter_type"_a=IterType::DEPTH_FIRST);
 
 }

@@ -16,7 +16,6 @@
 #include <morphio/soma.h>
 #include <morphio/errorMessages.h>
 
-
 #include "bindings_utils.cpp"
 #include "bind_misc.cpp"
 #include "bind_immutable.cpp"
@@ -25,6 +24,7 @@
 
 namespace py = pybind11;
 using namespace py::literals;
+
 
 #pragma GCC diagnostic ignored "-Wmissing-prototypes"
 PYBIND11_MODULE(morphio, m) {

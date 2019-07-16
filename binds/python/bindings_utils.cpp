@@ -4,6 +4,12 @@
 
 namespace py = pybind11;
 
+enum IterType
+{
+    DEPTH_FIRST,
+    BREADTH_FIRST,
+    UPSTREAM
+};
 
 static py::array_t<float> span_array_to_ndarray(const morphio::range<const std::array<float, 3> > &span)
 {
