@@ -147,3 +147,7 @@ def test_iterators_vasculature():
     for sec in morphology.iter():
         all_sections.remove(sec.id)
     assert_equal(len(all_sections), 0)
+
+def test_section___str__():
+    assert_equal(str(CELLS['asc'].root_sections[0]),
+                 'Section(id=0, points=[(0 0 0),..., (0 5 0)])')
