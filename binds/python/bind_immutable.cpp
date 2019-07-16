@@ -39,7 +39,6 @@ static void bind_immutable_module(py::module &m) {
 
         .def("as_mutable", [](const morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })
 
-
         // Cell sub-parts accessors
         .def_property_readonly("soma", &morphio::Morphology::soma,
                                "Returns the soma object")
@@ -151,6 +150,11 @@ static void bind_immutable_module(py::module &m) {
         .def("__ne__", [](const morphio::Section& a, const morphio::Section& b) {
                 return a.operator!=(b);
             }, py::is_operator())
+        .def("__str__", [](const morphio::Section& section) {
+                std::stringstream ss;
+                ss << section;
+                return ss.str();
+            })
 
         // Topology-related member functions
         .def_property_readonly("parent", &morphio::Section::parent,

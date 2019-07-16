@@ -230,6 +230,12 @@ static void bind_mutable_module(py::module &m) {
         .def("__ne__", [](const morphio::mut::Section& a, const morphio::mut::Section& b) {
                 return a.operator!=(b);
                 }, py::is_operator())
+        .def("__str__", [](const morphio::mut::Section& section) {
+                std::stringstream ss;
+                // morphio::operator<<(ss, const morphio::mut::Section&);
+                ss << section;
+                return ss.str();
+            })
 
         .def_property_readonly("id", &morphio::mut::Section::id,
                                "Return the section ID")

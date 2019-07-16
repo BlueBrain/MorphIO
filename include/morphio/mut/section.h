@@ -125,7 +125,6 @@ private:
 
 void friendDtorForSharedPtr(Section* section);
 
-std::ostream& operator<<(std::ostream&, const Section&);
 std::ostream& operator<<(std::ostream&, std::shared_ptr<Section>);
 
 } // namespace mut

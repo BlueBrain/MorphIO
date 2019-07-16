@@ -448,3 +448,7 @@ def test_annotation():
     assert_equal(len(n.annotations), 1)
     annotation = n.annotations[0]
     assert_equal(annotation.type, morphio.AnnotationType.single_child)
+
+def test_section___str__():
+    assert_equal(str(SIMPLE.root_sections[0]),
+                 'Section(id=0, points=[(0 0 0),..., (0 5 0)])')
