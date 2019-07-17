@@ -13,7 +13,6 @@ set(MORPHIO_SOURCES
   morphology.cpp
   soma.cpp
   section.cpp
-  tools.cpp
   vasc/section.cpp
   vasc/vasculature.cpp
   vasc/properties.cpp

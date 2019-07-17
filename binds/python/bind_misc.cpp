@@ -217,16 +217,4 @@ static void bind_misc(py::module &m) {
              "neuronal_section_ids"_a, "distances_to_section_start"_a, "diameters"_a);
 
     m.doc() = "pybind11 example plugin"; // optional module docstring
-
-
-  m.def("diff", static_cast<bool (*)(const morphio::Morphology& left, const morphio::Morphology& right, morphio::enums::LogLevel logLevel)>(&morphio::diff),
-        "Perform a diff on 2 morphologies, returns True if items differ", "left"_a, "right"_a, "log_level"_a=morphio::enums::LogLevel::INFO);
-  m.def("diff", static_cast<bool (*)(const morphio::Section& left, const morphio::Section& right, morphio::enums::LogLevel logLevel)>(&morphio::diff),
-        "Perform a diff on 2 sections, returns True if items differ", "left"_a, "right"_a, "log_level"_a=morphio::enums::LogLevel::INFO);
-
-  m.def("diff", static_cast<bool (*)(const morphio::mut::Morphology& left, const morphio::mut::Morphology& right, morphio::enums::LogLevel logLevel)>(&morphio::mut::diff),
-        "Perform a diff on 2 morphologies, returns True if items differ", "left"_a, "right"_a, "log_level"_a=morphio::enums::LogLevel::INFO);
-  m.def("diff", static_cast<bool (*)(const morphio::mut::Section& left, const morphio::mut::Section& right, morphio::enums::LogLevel logLevel)>(&morphio::mut::diff),
-        "Perform a diff on 2 sections, returns True if items differ", "left"_a, "right"_a, "log_level"_a=morphio::enums::LogLevel::INFO);
-
 }

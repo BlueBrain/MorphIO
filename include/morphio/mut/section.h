@@ -96,16 +96,6 @@ public:
         const Property::PointLevel&,
         SectionType sectionType = SectionType::SECTION_UNDEFINED);
 
-    /**
-    Two sections are equal if they have same:
-    - points
-    - diameters
-    - perimeters
-    - type
-    **/
-    bool operator==(const Section& other) const;
-    bool operator!=(const Section& other) const;
-
 private:
     friend class Morphology;
 

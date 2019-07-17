@@ -15,17 +15,6 @@ public:
     Vasculature(Vasculature&&);
     Vasculature& operator=(Vasculature&&);
 
-    /**
-        Equality operators :
-        Two vasculature morphologies are considered equal if they have the same:
-            - point vector
-            - diameter vector
-            - section types
-            - topology (successor / predecessor relationship)
-    **/
-    bool operator==(const Vasculature& other) const;
-    bool operator!=(const Vasculature& other) const;
-
     /** @name Read API */
     /** Open the given source to a vasculature file and parse it.
      */

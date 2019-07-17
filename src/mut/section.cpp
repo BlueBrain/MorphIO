@@ -203,16 +203,6 @@ std::shared_ptr<Section> Section::appendSection(
     return ptr;
 }
 
-bool Section::operator==(const Section& other) const
-{
-    return !diff(*this, other, LogLevel::ERROR);
-}
-
-bool Section::operator!=(const Section& other) const
-{
-    return diff(*this, other, LogLevel::ERROR);
-}
-
 } // end namespace mut
 } // end namespace morphio
 

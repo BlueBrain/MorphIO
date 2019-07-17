@@ -23,21 +23,6 @@ static void bind_immutable_module(py::module &m) {
         .def(py::init<const morphio::URI&, unsigned int>(),
              "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
         .def(py::init<morphio::mut::Morphology&>())
-        .def("__eq__", [](const morphio::Morphology& a, const morphio::Morphology& b) {
-                return a.operator==(b);
-            }, py::is_operator(),
-            "Are considered equal, 2 morphologies with the same:\n"
-            "- point vector\n"
-            "- diameter vector\n"
-            "- perimeter vector\n"
-            "- cell family\n"
-            "- section types\n"
-            "- topology (children/parent relationship)\n\n"
-            "Note: the soma types are NOT required to be equal")
-        .def("__ne__", [](const morphio::Morphology& a, const morphio::Morphology& b) {
-                return a.operator!=(b);
-            }, py::is_operator())
-        .def(py::self != py::self)
 
         .def("as_mutable", [](const morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })
 
@@ -146,12 +131,6 @@ static void bind_immutable_module(py::module &m) {
                                "Note: the soma surface computation depends on the soma type");
 
     py::class_<morphio::Section>(m, "Section")
-        .def("__eq__", [](const morphio::Section& a, const morphio::Section& b) {
-                return a.operator==(b);
-            }, py::is_operator())
-        .def("__ne__", [](const morphio::Section& a, const morphio::Section& b) {
-                return a.operator!=(b);
-            }, py::is_operator())
         .def("__str__", [](const morphio::Section& section) {
                 std::stringstream ss;
                 ss << section;

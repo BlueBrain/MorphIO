@@ -46,18 +46,6 @@ Vasculature::~Vasculature()
 {
 }
 
-bool Vasculature::operator==(const Vasculature& other) const
-{
-    if (this->_properties == other._properties)
-        return true;
-    return (this->_properties && other._properties && *(this->_properties) == *(other._properties));
-}
-
-bool Vasculature::operator!=(const morphio::vasculature::Vasculature& other) const
-{
-    return !this->operator==(other);
-}
-
 const Section Vasculature::section(const uint32_t& id) const
 {
     return Section(id, _properties);

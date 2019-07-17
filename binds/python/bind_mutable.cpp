@@ -20,23 +20,6 @@ static void bind_mutable_module(py::module &m) {
         .def(py::init<const morphio::mut::Morphology&, unsigned int>(),
              "morphology"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
 
-        .def("__eq__", [](const morphio::mut::Morphology& a, const morphio::mut::Morphology& b) {
-                return a.operator==(b);
-            }, py::is_operator(),
-            "Are considered equal, 2 morphologies with the same:\n"
-            "- root sections\n"
-            "- section topology\n"
-            "- cell family\n"
-            "For each section:"
-            "- same points\n"
-            "- same diameters\n"
-            "- same perimeters\n"
-            "- same type\n"
-            "Note: the soma types are NOT required to be equal")
-        .def("__ne__", [](const morphio::mut::Morphology& a, const morphio::mut::Morphology& b) {
-                return a.operator!=(b);
-            }, py::is_operator())
-
         // Cell sub-part accessors
         .def_property_readonly("sections", &morphio::mut::Morphology::sections,
                                "Returns a list containing IDs of all sections. "
@@ -226,12 +209,6 @@ static void bind_mutable_module(py::module &m) {
              "immutable_section"_a, "recursive"_a=false);
 
     py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(m, "Section")
-        .def("__eq__", [](const morphio::mut::Section& a, const morphio::mut::Section& b) {
-                return a.operator==(b);
-            }, py::is_operator())
-        .def("__ne__", [](const morphio::mut::Section& a, const morphio::mut::Section& b) {
-                return a.operator!=(b);
-                }, py::is_operator())
         .def("__str__", [](const morphio::mut::Section& section) {
                 std::stringstream ss;
                 ss << section;

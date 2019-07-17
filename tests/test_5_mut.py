@@ -5,7 +5,7 @@ from nose.tools import assert_equal, assert_raises, ok_, assert_not_equal
 
 import morphio
 from morphio.mut import Morphology, Soma
-from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, MorphioError, SectionBuilderError, Morphology as ImmutableMorphology, upstream, depth_first, breadth_first, diff
+from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, MorphioError, SectionBuilderError, Morphology as ImmutableMorphology, upstream, depth_first, breadth_first
 from contextlib import contextmanager
 import sys
 from io import StringIO
@@ -309,77 +309,6 @@ def test_mitochondria():
 
     assert_array_equal(np.array(first_child.relative_path_lengths, dtype=np.float32),
                        np.array([0.6, 0.7, 0.8, 0.9], dtype=np.float32))
-
-def test_equality():
-    neuron_ref = Morphology(os.path.join(_path, 'simple2.asc'))
-    a = Morphology(os.path.join(_path, 'simple2.asc'))
-    assert_equal(neuron_ref, a)
-    ok_(not (neuron_ref != a))
-    ok_(not diff(neuron_ref, a))
-
-    def mundane_section(neuron):
-        '''Not a root section, not a leaf section'''
-        return neuron.root_sections[0].children[0]
-
-    def assert_expect_diff(neuron1, neuron2, expected_msg):
-        '''Expect diff to find a difference and return EXPECTED_MSG in stdout'''
-        with captured_output() as (out, _):
-            with ostream_redirect(stdout=True, stderr=True):
-                ok_(diff(neuron1, neuron2))
-                assert_equal(out.getvalue().strip(), expected_msg)
-
-        with captured_output() as (out, _):
-            with ostream_redirect(stdout=True, stderr=True):
-                ok_(diff(neuron1.as_immutable(), neuron2.as_immutable()))
-                assert_equal(out.getvalue().strip(), expected_msg)
-
-    mundane_section(a).type = SectionType.apical_dendrite
-    assert_not_equal(neuron_ref, a)
-    ok_(not (neuron_ref == a))
-    assert_expect_diff(neuron_ref, a,
-                       'Reason: section type differ\n'
-                       'Summary: children of Section(id=0, points=[(0 0 0),..., (0 5 0)]) differ. '
-                       'See the above "Reason" to know in what they differ.')
-
-    a = Morphology(os.path.join(_path, 'simple2.asc'))
-    mundane_section(a).points = [[0,0,0], [0,0,0], [0,0,1]]
-    assert_not_equal(neuron_ref, a)
-    ok_(not (neuron_ref == a))
-    assert_expect_diff(neuron_ref, a,
-                       'Reason: points differ\n'
-                       'Summary: children of Section(id=0, points=[(0 0 0),..., (0 5 0)]) differ. '
-                       'See the above "Reason" to know in what they differ.')
-
-    a = Morphology(os.path.join(_path, 'simple2.asc'))
-    mundane_section(a).diameters = [0,0,0]
-    assert_not_equal(neuron_ref, a)
-    ok_(not (neuron_ref == a))
-    assert_expect_diff(neuron_ref, a,
-                       'Reason: diameters differ\n'
-                       'Summary: children of Section(id=0, points=[(0 0 0),..., (0 5 0)]) differ. '
-                       'See the above "Reason" to know in what they differ.')
-
-    a = Morphology(os.path.join(_path, 'simple2.asc'))
-    for section in a.iter():
-        section.perimeters = [1] * len(section.points)
-    assert_not_equal(neuron_ref, a)
-    ok_(not (neuron_ref == a))
-    assert_expect_diff(neuron_ref, a, 'Reason: perimeters differ')
-
-    a = Morphology(os.path.join(_path, 'simple2.asc'))
-    mundane_section(a).append_section(PointLevel([[-6, 5, 0], [4, 5, 6]], [2, 3]))
-    assert_not_equal(neuron_ref, a)
-    ok_(not (neuron_ref == a))
-    assert_expect_diff(neuron_ref, a,
-                       'Reason: different number of children\n'
-                       'Summary: children of Section(id=0, points=[(0 0 0),..., (0 5 0)]) differ. '
-                       'See the above "Reason" to know in what they differ.')
-
-    a = Morphology(os.path.join(_path, 'simple2.asc'))
-    a.delete_section(a.root_sections[0])
-    assert_not_equal(neuron_ref, a)
-    ok_(not (neuron_ref == a))
-    assert_expect_diff(neuron_ref, a, "Different number of root sections")
 
 
 def test_iterators():
