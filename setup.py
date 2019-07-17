@@ -1,15 +1,13 @@
+'''morphio setup.py'''
 import os
 import platform
 import re
 import subprocess
 import sys
-import sysconfig
 from distutils.version import LooseVersion
-from shutil import copyfile, copymode
 
-from setuptools import Extension, find_packages, setup
+from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
-from setuptools.command.test import test as TestCommand
 
 
 class CMakeExtension(Extension):
@@ -62,8 +60,6 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
         try:
-            proc = subprocess.Popen(
-                "echo $CXX", shell=True, stdout=subprocess.PIPE)
             output = subprocess.check_call([cmake, ext.sourcedir] + cmake_args,
                                            cwd=self.build_temp)
             output = subprocess.check_call([cmake, '--build', '.'] + build_args,
