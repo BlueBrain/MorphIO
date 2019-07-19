@@ -15,7 +15,7 @@ SIMPLE = os.path.join(_path, 'simple.swc')
 SIMPLE_NO_MODIFIER = Morphology(SIMPLE)
 
 def test_no_modifier():
-    assert_equal(SIMPLE_NO_MODIFIER, Morphology(SIMPLE, options=Option.no_modifier))
+    assert_array_equal(SIMPLE_NO_MODIFIER.points, Morphology(SIMPLE, options=Option.no_modifier).points)
 
 def test_nrn_order():
     m = Morphology(os.path.join(_path, 'reversed_NRN_neurite_order.swc'), options=Option.nrn_order)

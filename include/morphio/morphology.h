@@ -26,22 +26,6 @@ public:
     Morphology(Morphology&&);
     Morphology& operator=(Morphology&&);
 
-    /**
-       Equality operator:
-           Are considered equal, 2 morphologies with the same:
-               - point vector
-               - diameter vector
-               - perimeter vector
-               - cell family
-               - section types
-               - topology (children/parent relationship)
-
-           Note: the soma types are NOT required to be equal
-     **/
-    bool operator==(const Morphology& other) const;
-    bool operator!=(const Morphology& other) const;
-
-
     /** @name Read API */
     //@{
     /** Open the given source to a morphology file and parse it.

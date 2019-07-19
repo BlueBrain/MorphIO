@@ -19,11 +19,6 @@ CELLS = OrderedDict({
 })
 
 
-def test_equality():
-    for cell1, cell2 in combinations(['asc', 'swc', 'h5'], 2):
-        ok_(CELLS[cell1] == CELLS[cell2], '{} != {}'.format(cell1, cell2))
-
-
 def test_is_root():
     for _, cell in CELLS.items():
         ok_(all(section.is_root for section in cell.root_sections))
@@ -95,15 +90,6 @@ def test_mitochondria():
 
 def test_empty_vasculature():
     assert_raises(RawDataError, vasculature.Vasculature, os.path.join(_path, "h5/empty_vasculature.h5"))
-
-
-def test_equality_vasculature():
-    morphology1 = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
-    morphology1_bis = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
-    morphology2 = vasculature.Vasculature(os.path.join(_path, "h5/vasculature2.h5"))
-
-    assert_equal(morphology1, morphology1_bis)
-    assert_not_equal(morphology1, morphology2)
 
 
 def test_components_vasculature():

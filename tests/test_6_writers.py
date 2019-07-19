@@ -51,13 +51,12 @@ def test_write_basic():
         morpho.write(os.path.join(tmp_folder, "test_write.swc"))
         morpho.write(os.path.join(tmp_folder, "test_write.h5"))
 
-        assert_equal(ImmutMorphology(morpho), ImmutMorphology(os.path.join(tmp_folder, "test_write.asc")))
-        assert_equal(ImmutMorphology(morpho), ImmutMorphology(os.path.join(tmp_folder, "test_write.swc")))
-        assert_equal(ImmutMorphology(morpho), ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")))
-        assert_equal(ImmutMorphology(morpho), ImmutMorphology(
-            os.path.join(_path, "simple.asc")))
-        ok_(not (ImmutMorphology(morpho) != ImmutMorphology(
-            os.path.join(_path, "simple.asc"))))
+        expected = [[0., 0., 0.], [0., 5., 0.], [0., 5., 0.], [-5., 5., 0.],
+                    [0., 5., 0.], [6., 5., 0.], [0., 0., 0.], [0., -4., 0.],
+                    [0., -4., 0.], [6., -4., 0.], [0., -4., 0.], [-5., -4., 0.]]
+        assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.asc")).points, expected)
+        assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.swc")).points, expected)
+        assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")).points, expected)
 
 
 def test_write_merge_only_child():
@@ -141,8 +140,8 @@ def test_write_perimeter():
     with setup_tempdir('test_write_perimeter') as tmp_folder:
         morpho.write(os.path.join(tmp_folder, "test_write.h5"))
 
-        assert_array_equal(ImmutMorphology(morpho),
-                           ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")))
+        assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")).perimeters,
+                           [5., 6., 6., 7., 6., 8.])
 
 
 def test_write_no_soma():

@@ -289,30 +289,19 @@ def test_soma_type():
 
 def test_read_weird_ids():
     '''The ordering of IDs is not required'''
-    with tmp_swc_file('''1 1 0 0 0 3.0 -1
-                         2 3 0 0 2 0.5 1
-                         3 3 0 0 3 0.5 2
-                         4 3 0 0 4 0.5 3
-                         5 3 0 0 5 0.5 4''') as tmp_file:
-
-        normal = Morphology(tmp_file.name)
-
     with tmp_swc_file('''10000 3 0 0 5 0.5 100 # neurite 4th point
                          3 3 0 0 3 0.5 47      # neurite 2nd point
                          10 1 0 0 0 3.0 -1     # soma
                          47 3 0 0 2 0.5 10     # neurite 1st point
                          100 3 0 0 4 0.5 3     # neurite 3rd point
                          ''') as tmp_file:
-        weird = Morphology(tmp_file.name)
+        neuron = Morphology(tmp_file.name)
 
-    assert_equal(normal, weird)
-
-
-def test_equality():
-    filename = os.path.join(_path, 'simple.swc')
-    nt.ok_(not (Morphology(filename) is Morphology(filename)))
-    nt.ok_(Morphology(filename) == Morphology(filename))
-
+    assert_array_equal(neuron.soma.points, [[0, 0, 0]])
+    assert_array_equal(neuron.root_sections[0].points, [[0., 0., 2.],
+                                                        [0., 0., 3.],
+                                                        [0., 0., 4.],
+                                                        [0., 0., 5.]])
 
 def test_multiple_soma():
     with assert_raises(SomaError) as obj:

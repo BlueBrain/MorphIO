@@ -5,16 +5,6 @@
 
 namespace morphio {
 
-bool Section::operator==(const Section& other) const
-{
-    return !diff(*this, other, LogLevel::ERROR);
-}
-
-bool Section::operator!=(const Section& other) const
-{
-    return diff(*this, other, LogLevel::ERROR);
-}
-
 SectionType Section::type() const
 {
     auto val = _properties->get<Property::SectionType>()[_id];

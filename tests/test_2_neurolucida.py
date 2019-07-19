@@ -377,17 +377,10 @@ def test_single_point_section_duplicate_parent():
                       )
                      )''') as tmp_file:
 
-        bad = Morphology(tmp_file.name)
+        neuron = Morphology(tmp_file.name)
 
-    with tmp_asc_file('''
-                     ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -10 0 2)
-                     )''') as tmp_file:
-
-        good = Morphology(tmp_file.name)
-
-        assert_equal(bad, good)
+    assert_array_equal(neuron.root_sections[0].points, [[  3.,  -4.,   0.],
+                                                        [  3., -10.,   0.]])
 
 
 def test_single_point_section_duplicate_parent_complex():
@@ -414,26 +407,13 @@ def test_single_point_section_duplicate_parent_complex():
   )
  )
 ''') as bad_tmp_file:
-        bad = Morphology(bad_tmp_file.name)
+        neuron = Morphology(bad_tmp_file.name)
 
-    # Correct representation should be
-    with tmp_asc_file('''
-((Color Blue)
- (Axon)
-    (1 0 0 1)
-    (2 0 0 1)
-    (
-      (4 0 0 1)
-      |
-      (5 0 0 1)
-      |           ; Bifurcation of the bifurcation
-      (6 0 0 1)
-    )
- )
-''') as good_tmp_file:
-        good = Morphology(good_tmp_file.name)
-
-    ok_(good == bad)
+    children = neuron.root_sections[0].children
+    assert_equal(len(children), 3)
+    assert_array_equal(children[0].points, [[2, 0, 0], [4, 0, 0]])
+    assert_array_equal(children[1].points, [[2, 0, 0], [5, 0, 0]])
+    assert_array_equal(children[2].points, [[2, 0, 0], [6, 0, 0]])
 
 
 def test_spine():
@@ -448,10 +428,6 @@ def test_spine():
                                  [12.55,    -5.16,   150.00],
                                  [13.75,    -5.96,   150.00]], dtype=np.float32))
 
-
-def test_equality_with_simple():
-    ok_(Morphology(os.path.join(_path, 'simple.asc')) ==
-        Morphology(os.path.join(_path, 'simple.swc')))
 
 
 def test_markers():

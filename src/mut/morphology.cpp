@@ -417,15 +417,5 @@ void Morphology::write(const std::string& filename)
         LBTHROW(UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename)));
 }
 
-bool Morphology::operator==(const Morphology& other) const
-{
-    return !diff(*this, other, LogLevel::ERROR);
-}
-
-bool Morphology::operator!=(const Morphology& other) const
-{
-    return diff(*this, other, LogLevel::ERROR);
-}
-
 } // end namespace mut
 } // end namespace morphio

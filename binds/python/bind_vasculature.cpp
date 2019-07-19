@@ -20,19 +20,6 @@ static void bind_vasculature(py::module &m) {
         .def(py::init<const morphio::URI&>(),
              "filename"_a)
         // .def(py::init<morphio::mut::Morphology&>())
-        .def("__eq__", [](const morphio::vasculature::Vasculature& a, const morphio::vasculature::Vasculature& b) {
-                return a.operator==(b);
-            }, py::is_operator(),
-            "Are considered equal, 2 morphologies with the same:\n"
-            "- point vector\n"
-            "- diameter vector\n"
-            "- section types\n"
-            "- topology\n")
-        .def("__ne__", [](const morphio::vasculature::Vasculature& a, const morphio::vasculature::Vasculature& b) {
-                return a.operator!=(b);
-            }, py::is_operator())
-        .def(py::self != py::self)
-
         // .def("as_mutable", [](const morphio::vasculature::VasculatureMorphology* morph) { return morphio::mut::Morphology(*morph); })
 
         .def_property_readonly("sections", &morphio::vasculature::Vasculature::sections,

@@ -34,18 +34,6 @@ class Section : public SectionBase<Section>
 
 public:
     /**
-       Equality operator:
-       Are considered equal, 2 sections with the same:
-       - point vector
-       - diameter vector
-       - perimeter vector
-       - section types
-       - topology (children/parent relationship)
-    **/
-    bool operator==(const Section& other) const;
-    bool operator!=(const Section& other) const;
-
-    /**
        Depth first search iterator
     **/
     depth_iterator depth_begin() const;
