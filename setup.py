@@ -68,13 +68,15 @@ class CMakeBuild(build_ext):
             print("Status : FAIL", exc.returncode, exc.output)
             raise
 
+with open('README.md') as f:
+    long_description = f.read()
 
 setup(
     name='MorphIO',
     author='NSE Team - Blue Brain Project',
     author_email='bbp-ou-nse@groupes.epfl.ch',
     description='A neuron morphology IO library',
-    long_description='',
+    long_description=long_description,
     install_requires=['numpy>=1.14.1'],
     url='https://github.com/BlueBrain/MorphIO/',
     ext_modules=[CMakeExtension('morphio')],
