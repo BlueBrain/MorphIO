@@ -411,17 +411,17 @@ def test_root_node_split():
     '''Test that a bifurcation at the root point produces
     two root sections
     '''
-    # with tmp_swc_file('''1	1	0 0 0 1	-1
-    #                      2	3	1 0 0 1  1
-    #                      3	3	1 1 0 1  2
-    #                      4	3	1 0 1 1  2
-    #                      ''') as tmp_file:
-    #     n = Morphology(tmp_file.name)
-    #     assert_equal(len(n.root_sections), 2)
-    #     assert_array_equal(n.root_sections[0].points,
-    #                        [[1, 0, 0], [1, 1, 0]])
-    #     assert_array_equal(n.root_sections[1].points,
-    #                        [[1, 0, 0], [1, 0, 1]])
+    with tmp_swc_file('''1	1	0 0 0 1	-1
+                         2	3	1 0 0 1  1
+                         3	3	1 1 0 1  2
+                         4	3	1 0 1 1  2
+                         ''') as tmp_file:
+        n = Morphology(tmp_file.name)
+        assert_equal(len(n.root_sections), 2)
+        assert_array_equal(n.root_sections[0].points,
+                           [[1, 0, 0], [1, 1, 0]])
+        assert_array_equal(n.root_sections[1].points,
+                           [[1, 0, 0], [1, 0, 1]])
 
     # Normal bifurcation
     with tmp_swc_file('''1	1	0 0 0 1	-1
