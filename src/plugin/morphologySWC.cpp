@@ -163,7 +163,7 @@ public:
         return (sample.parentId == SWC_UNDEFINED_PARENT && sample.type != SECTION_SOMA);
     }
 
-    inline bool isRootSection(const Sample& sample)
+    inline bool isRootPoint(const Sample& sample)
     {
         return isOrphanNeurite(sample) ||
                (sample.type != SECTION_SOMA &&
@@ -172,7 +172,7 @@ public:
 
     inline bool isSectionStart(const Sample& sample)
     {
-        return (isRootSection(sample) || (sample.parentId > -1 && isSectionEnd(samples[static_cast<unsigned int>(sample.parentId)]))); // Standard section
+        return (isRootPoint(sample) || (sample.parentId > -1 && isSectionEnd(samples[static_cast<unsigned int>(sample.parentId)]))); // Standard section
     }
 
     inline bool isSectionEnd(const Sample& sample)
@@ -284,6 +284,12 @@ public:
         _pushChildren(depthFirstSamples, -1);
         for (const auto id : depthFirstSamples) {
             const Sample& sample = samples[id];
+
+            // Bifurcation right at the start
+            if(isRootPoint(sample) && isSectionEnd(sample)) {
+                continue;
+            }
+
             if (isSectionStart(sample)) {
                 _processSectionStart(sample);
             } else if (sample.type != SECTION_SOMA) {
@@ -324,7 +330,7 @@ public:
 
         std::shared_ptr<morphio::mut::Section> section;
 
-        if (isRootSection(sample)) {
+        if (isRootPoint(sample)) {
             section = morph.appendRootSection(properties, sample.type);
         } else {
             // Duplicating last point of previous section if there is not already a duplicate
@@ -333,7 +339,12 @@ public:
                 properties._points.push_back(samples[parentId].point);
                 properties._diameters.push_back(samples[parentId].diameter);
             }
-            section = morph.section(swcIdToSectionId[parentId])
+
+            // Handle the case, bifurctation at root point
+            if (isRootPoint(samples[parentId]))
+                section = morph.appendRootSection(properties, sample.type);
+            else
+                section = morph.section(swcIdToSectionId[parentId])
                           ->appendSection(properties, sample.type);
         }
 
