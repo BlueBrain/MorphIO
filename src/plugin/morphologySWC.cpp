@@ -340,7 +340,7 @@ public:
                 properties._diameters.push_back(samples[parentId].diameter);
             }
 
-            // Handle the case, bifurctation at root point
+            // Handle the case, bifurcatation at root point
             if (isRootPoint(samples[parentId]))
                 section = morph.appendRootSection(properties, sample.type);
             else
