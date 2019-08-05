@@ -122,6 +122,9 @@ static void bind_immutable_module(py::module &m) {
                                              return py::array(3, soma->center().data());
                                          },
             "Returns the center of gravity of the soma points")
+        .def_property_readonly("max_distance", &morphio::Soma::maxDistance,
+                               "Return the maximum distance between the center of gravity "
+                               "and any of the soma points")
         .def_property_readonly("type",
                                &morphio::Soma::type,
                                "Returns the soma type")
