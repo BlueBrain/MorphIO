@@ -64,6 +64,11 @@ public:
      * Note: the soma surface computation depends on the soma type
      **/
     float surface() const;
+
+    /**
+     * Return the maximum distance between the center of gravity and any of
+     * the soma points
+     */
     float maxDistance() const;
 
 private:

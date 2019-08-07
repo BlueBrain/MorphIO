@@ -50,6 +50,12 @@ public:
     **/
     float surface() const;
 
+    /**
+     * Return the maximum distance between the center of gravity and any of
+     * the soma points
+     */
+    float maxDistance() const;
+
     Property::PointLevel& properties() { return _pointProperties; }
 private:
     friend class Morphology;

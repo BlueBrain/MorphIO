@@ -333,6 +333,9 @@ static void bind_mutable_module(py::module &m) {
                                &morphio::mut::Soma::surface,
                                "Returns the soma surface\n\n"
                                "Note: the soma surface computation depends on the soma type")
+        .def_property_readonly("max_distance", &morphio::mut::Soma::maxDistance,
+                               "Return the maximum distance between the center of gravity "
+                               "and any of the soma points")
         .def_property_readonly("center", [](morphio::mut::Soma* soma){
                 return py::array(3, soma->center().data());
             },

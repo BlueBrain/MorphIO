@@ -27,6 +27,11 @@ def test_is_root():
                 for child in section.children))
 
 
+def test_distance():
+    for _, cell in CELLS.items():
+        ok_(cell.soma.max_distance == 0.)
+
+
 def test_iter():
     neuron = Morphology(os.path.join(_path, "iterators.asc"))
     root = neuron.root_sections[0]
