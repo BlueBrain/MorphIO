@@ -28,11 +28,12 @@ Point operator*(T factor, const Point& from);
 template <typename T>
 Point operator/(const Point& from, T factor);
 template <typename T>
-float maxDistanceToCenterOfGravity(const T& points);
-template <typename T>
 const Point centerOfGravity(const T& points);
+template <typename T>
+float maxDistanceToCenterOfGravity(const T& points);
 
 extern template const Point centerOfGravity(const std::vector<std::array<float, 3>>&);
+extern template const Point maxDistanceToCenterOfGravity(const std::vector<std::array<float, 3>>&);
 
 std::string dumpPoint(const Point& point);
 std::string dumpPoints(const std::vector<Point>& point);
