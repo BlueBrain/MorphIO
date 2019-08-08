@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+#include <gsl/gsl>
+
 namespace morphio {
 using Point = std::array<float, 3>;
 using Points = std::vector<Point>;
@@ -33,7 +35,7 @@ template <typename T>
 float maxDistanceToCenterOfGravity(const T& points);
 
 extern template const Point centerOfGravity(const std::vector<std::array<float, 3>>&);
-extern template float maxDistanceToCenterOfGravity(const range<const Point>&);
+extern template float maxDistanceToCenterOfGravity(const gsl::span<std::array<float, 3>>&);
 extern template float maxDistanceToCenterOfGravity(const std::vector<std::array<float, 3>>&);
 
 std::string dumpPoint(const Point& point);
