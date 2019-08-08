@@ -32,10 +32,10 @@ Point operator/(const Point& from, T factor);
 template <typename T>
 const Point centerOfGravity(const T& points);
 template <typename T>
-float maxDistanceToCenterOfGravity(const T& points);
+float maxDistanceToCenterOfGravity(T points);
 
 extern template const Point centerOfGravity(const std::vector<std::array<float, 3>>&);
-extern template float maxDistanceToCenterOfGravity(const gsl::span<std::array<float, 3>>&);
+extern template float maxDistanceToCenterOfGravity(gsl::span<const std::array<float, 3>>);
 extern template float maxDistanceToCenterOfGravity(const std::vector<std::array<float, 3>>&);
 
 std::string dumpPoint(const Point& point);

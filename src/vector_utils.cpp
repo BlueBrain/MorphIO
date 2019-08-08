@@ -112,7 +112,7 @@ template const Point centerOfGravity(const range<const Point>& points);
 template const Point centerOfGravity(const std::vector<Point>& points);
 
 template <typename T>
-float maxDistanceToCenterOfGravity(const T& points)
+float maxDistanceToCenterOfGravity(T points)
 {
     const auto c = centerOfGravity(points);
     return std::accumulate(
@@ -123,7 +123,7 @@ float maxDistanceToCenterOfGravity(const T& points)
             return std::max(a, distance(c, b));
         });
 }
-template float maxDistanceToCenterOfGravity(const range<const Point>& points);
+template float maxDistanceToCenterOfGravity(range<const Point> points);
 template float maxDistanceToCenterOfGravity(const std::vector<Point>& points);
 
 template <typename T>
