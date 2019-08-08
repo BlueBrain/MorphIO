@@ -1,3 +1,4 @@
+#include <numeric>
 #include <sstream>
 
 #include <math.h>
@@ -109,6 +110,21 @@ const Point centerOfGravity(const T& points)
 }
 template const Point centerOfGravity(const range<const Point>& points);
 template const Point centerOfGravity(const std::vector<Point>& points);
+
+template <typename T>
+float maxDistanceToCenterOfGravity(const T& points)
+{
+    const auto c = centerOfGravity(points);
+    return std::accumulate(
+        std::begin(points),
+        std::end(points),
+        0.f,
+        [&](float a, const Point& b){
+            return std::max(a, distance(c, b));
+        });
+}
+template float maxDistanceToCenterOfGravity(const range<const Point>& points);
+template float maxDistanceToCenterOfGravity(const std::vector<Point>& points);
 
 template <typename T>
 Point operator*(const Point& from, T factor)

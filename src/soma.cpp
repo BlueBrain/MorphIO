@@ -42,19 +42,7 @@ float Soma::surface() const
 
 float Soma::maxDistance() const
 {
-    const auto ps = points();
-    if (ps.size() == 0) {
-        return 0.;
-    }
-    const auto c = center();
-    float dist = distance(c, ps[0]);
-    for (size_t i = 1; i < ps.size(); ++i) {
-        const float d = distance(c, ps[i]);
-        if (d > dist) {
-            dist = d;
-        }
-    }
-    return dist;
+    return maxDistanceToCenterOfGravity(points());
 }
 
 } // namespace morphio
