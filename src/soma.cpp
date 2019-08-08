@@ -42,7 +42,7 @@ float Soma::surface() const
 
 float Soma::maxDistance() const
 {
-    return maxDistanceToCenterOfGravity(_properties->_pointLevel._points);
+    return maxDistanceToCenterOfGravity(_properties->_somaLevel._points);
 }
 
 } // namespace morphio
