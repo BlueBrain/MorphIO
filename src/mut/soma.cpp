@@ -40,7 +40,7 @@ float Soma::surface() const
 
 float Soma::maxDistance() const
 {
-    return maxDistanceToCenterOfGravity(points());
+    return maxDistanceToCenterOfGravity(_properties->_somaLevel._points);
 }
 
 std::ostream& operator<<(std::ostream& os, Soma& soma)
