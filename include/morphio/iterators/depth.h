@@ -13,7 +13,6 @@ namespace morphio {
 class depth_iterator
 {
 	friend class Section;
-	friend class Morphology;
 
 	std::stack<Section> container;
 

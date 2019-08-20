@@ -7,7 +7,6 @@ set(MORPHIO_SOURCES
   mitochondria.cpp
   errorMessages.cpp
   mito_section.cpp
-  mito_iterators.cpp
   properties.cpp
   iterators.cpp
   morphology.cpp
@@ -21,10 +20,13 @@ set(MORPHIO_SOURCES
 	iterators/upstream.cpp
 	iterators/breadth.cpp
 	iterators/depth.cpp
+	iterators/mito_upstream.cpp
+	iterators/mito_breadth.cpp
+	iterators/mito_depth.cpp
   mut/mito_iterators.cpp
   mut/mito_section.cpp
-  mut/iterators.cpp
   mut/section.cpp
+	mut/iterators.cpp
   mut/soma.cpp
   mut/morphology.cpp
   mut/mitochondria.cpp

@@ -1,4 +1,6 @@
-#include <morphio/mito_iterators.h>
+#include <morphio/iterators/mito_depth.h>
+#include <morphio/iterators/mito_breadth.h>
+#include <morphio/iterators/mito_upstream.h>
 #include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
 #include <morphio/morphology.h>

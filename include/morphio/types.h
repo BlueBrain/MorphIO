@@ -88,9 +88,9 @@ class Iterator;
 
 using SectionRange = std::pair<size_t, size_t>;
 
-using mito_depth_iterator = MitoIterator<std::stack<MitoSection>>;
-using mito_breadth_iterator = MitoIterator<std::queue<MitoSection>>;
-using mito_upstream_iterator = MitoIterator<std::vector<MitoSection>>;
+class mito_depth_iterator;
+class mito_breadth_iterator;
+class mito_upstream_iterator;
 
 class graph_iterator;
 
