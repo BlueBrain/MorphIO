@@ -9,6 +9,8 @@
 #include <morphio/section.h>
 #include <morphio/soma.h>
 #include <morphio/tools.h>
+#include <morphio/iterators/breadth.h>
+#include <morphio/iterators/depth.h>
 
 #include <morphio/mut/morphology.h>
 

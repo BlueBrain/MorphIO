@@ -18,6 +18,9 @@ set(MORPHIO_SOURCES
   vasc/properties.cpp
   vector_utils.cpp
   version.cpp
+	iterators/upstream.cpp
+	iterators/breadth.cpp
+	iterators/depth.cpp
   mut/mito_iterators.cpp
   mut/mito_section.cpp
   mut/iterators.cpp

@@ -27,6 +27,8 @@ namespace morphio {
  * is a Section referring to it.
  */
 
+class upstream_iterator;
+
 class Section : public SectionBase<Section>
 {
     using SectionId = Property::Section;

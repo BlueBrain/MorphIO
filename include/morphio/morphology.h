@@ -12,6 +12,9 @@ enum SomaClasses
     SOMA_CYLINDER
 };
 
+class breadth_iterator;
+class depth_iterator;
+
 /** Read access a Morphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure

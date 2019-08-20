@@ -2,7 +2,9 @@
 #include <morphio/section.h>
 #include <morphio/vector_types.h>
 #include <morphio/tools.h>
-
+#include <morphio/iterators/upstream.h>
+#include <morphio/iterators/breadth.h>
+#include <morphio/iterators/depth.h>
 namespace morphio {
 
 SectionType Section::type() const

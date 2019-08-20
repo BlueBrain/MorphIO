@@ -15,6 +15,7 @@
 #include <morphio/mito_section.h>
 #include <morphio/soma.h>
 #include <morphio/errorMessages.h>
+#include <morphio/iterators/upstream.h>
 
 #include "bindings_utils.cpp"
 #include "bind_misc.cpp"
