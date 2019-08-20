@@ -123,7 +123,7 @@ const std::vector<Section> Morphology::sections() const
     std::vector<Section> sections_;
     auto count = _properties->get<morphio::Property::Section>().size();
     sections_.reserve(count);
-    for (uint i = 0; i < count; ++i) {
+    for (unsigned int i = 0; i < count; ++i) {
         sections_.emplace_back(section(i));
     }
     return sections_;
