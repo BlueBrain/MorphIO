@@ -77,6 +77,7 @@ setup(
     author_email='bbp-ou-nse@groupes.epfl.ch',
     description='A neuron morphology IO library',
     long_description=long_description,
+    long_description_content_type="text/markdown",
     install_requires=['numpy>=1.14.1'],
     url='https://github.com/BlueBrain/MorphIO/',
     ext_modules=[CMakeExtension('morphio')],
