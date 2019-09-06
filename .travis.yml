@@ -29,7 +29,7 @@ matrix:
 cache:
   directories:
     - $HOME/.cache/pip
-    # - $HOME/Library/Caches/Homebrew
+    - $HOME/Library/Caches/Homebrew
 language: python
 sudo: required
 python:

@@ -26,6 +26,16 @@ graph_iterator::graph_iterator()
 {
 }
 
+bool graph_iterator::operator==(graph_iterator other) const
+{
+	return container == other.container;
+}
+
+bool graph_iterator::operator!=(graph_iterator other) const
+{
+	return !(*this == other);
+}
+
 graph_iterator graph_iterator::operator++(int)
 {
     graph_iterator retval = *this;
