@@ -1,7 +1,7 @@
 #include <numeric>
 #include <sstream>
 
-#include <math.h>
+#include <cmath>
 #include <morphio/types.h>
 
 namespace morphio {
