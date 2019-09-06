@@ -8,7 +8,7 @@
 #include <morphio/types.h>
 #include <morphio/enums.h>
 
-#include <morphio/mito_iterators.h>
+
 #include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
 #include <morphio/section.h>
@@ -16,6 +16,11 @@
 #include <morphio/soma.h>
 #include <morphio/errorMessages.h>
 #include <morphio/iterators/upstream.h>
+#include <morphio/iterators/depth.h>
+#include <morphio/iterators/breadth.h>
+#include <morphio/iterators/mito_upstream.h>
+#include <morphio/iterators/mito_breadth.h>
+#include <morphio/iterators/mito_depth.h>
 
 #include "bindings_utils.cpp"
 #include "bind_misc.cpp"
