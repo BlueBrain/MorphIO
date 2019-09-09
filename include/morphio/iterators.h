@@ -1,9 +1,5 @@
 #pragma once
 
-#include <queue>
-#include <set>
-#include <stack>
-
 #include <morphio/types.h>
 #include <morphio/vasc/section.h>
 

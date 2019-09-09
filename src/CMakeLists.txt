@@ -17,12 +17,12 @@ set(MORPHIO_SOURCES
   vasc/properties.cpp
   vector_utils.cpp
   version.cpp
-	iterators/upstream.cpp
-	iterators/breadth.cpp
-	iterators/depth.cpp
-	iterators/mito_upstream.cpp
-	iterators/mito_breadth.cpp
-	iterators/mito_depth.cpp
+  iterators/upstream.cpp
+  iterators/breadth.cpp
+  iterators/depth.cpp
+  iterators/mito_upstream.cpp
+  iterators/mito_breadth.cpp
+  iterators/mito_depth.cpp
   mut/mito_iterators.cpp
   mut/mito_section.cpp
   mut/section.cpp
