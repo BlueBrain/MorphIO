@@ -51,14 +51,14 @@ class CMakeBuild(build_ext):
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(
                 cfg.upper(),
                 extdir)]
-#            if sys.maxsize > 2**32:
-#                cmake_args += ['-A', 'x64']
+            if sys.maxsize > 2**32:
+                cmake_args += ['-A', 'x64']
 
-            cmake_args += ['-G', "Ninja"]
-            cmake_args += ['-DCMAKE_CXX_FLAGS:STRING="-m64 -fdiagnostics-absolute-paths -Wno-c++98-compat /DWIN32 /D_WINDOWS /W3 /GR /EHsc /DH5_BUILT_AS_DYNAMIC_LIB"']
-            cmake_args += ['-DCMAKE_CXX_COMPILER:FILEPATH=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/8.0.0/bin/clang-cl.exe']
-            cmake_args += ['-DCMAKE_C_COMPILER:FILEPATH=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/8.0.0/bin/clang-cl.exe']
-            cmake_args += ['-DCMAKE_MAKE_PROGRAM=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/COMMON7/IDE/COMMONEXTENSIONS/MICROSOFT/CMAKE/Ninja/ninja.exe']
+#            cmake_args += ['-G', "Ninja"]
+#            cmake_args += ['-DCMAKE_CXX_FLAGS:STRING="-m64 -fdiagnostics-absolute-paths -Wno-c++98-compat /DWIN32 /D_WINDOWS /W3 /GR /EHsc /DH5_BUILT_AS_DYNAMIC_LIB"']
+#            cmake_args += ['-DCMAKE_CXX_COMPILER:FILEPATH=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/8.0.0/bin/clang-cl.exe']
+#            cmake_args += ['-DCMAKE_C_COMPILER:FILEPATH=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/8.0.0/bin/clang-cl.exe']
+#            cmake_args += ['-DCMAKE_MAKE_PROGRAM=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/COMMON7/IDE/COMMONEXTENSIONS/MICROSOFT/CMAKE/Ninja/ninja.exe']
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
