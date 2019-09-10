@@ -1,6 +1,5 @@
 #include <cassert>
 #include <iostream>
-#include <unistd.h>
 
 #include <fstream>
 #include <streambuf>
@@ -23,8 +22,11 @@ Vasculature::Vasculature(const std::string& source)
     if (pos == std::string::npos)
         LBTHROW(UnknownFileType("File has no extension"));
 
-    if (access(source.c_str(), F_OK) == -1)
+   // Cross-platform check of file existance
+    std::ifstream file(source.c_str());
+    if (!file) {
         LBTHROW(RawDataError("File: " + source + " does not exist."));
+    }
 
     std::string extension = source.substr(pos);
 
@@ -54,7 +56,7 @@ const Section Vasculature::section(const uint32_t& id) const
 const std::vector<Section> Vasculature::sections() const
 {
     std::vector<Section> sections_;
-    for (uint i = 0; i < _properties->get<property::VascSection>().size(); ++i) {
+    for (unsigned int i = 0; i < _properties->get<property::VascSection>().size(); ++i) {
         sections_.push_back(section(i));
     }
     return sections_;

@@ -76,7 +76,8 @@ else()
   message(WARNING "Unexpected compiler type ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
-set(CMAKE_CXX_FLAGS "${FLAGS}")
+#set(CMAKE_CXX_FLAGS "-Wno-c++98-compat")
+#set(CMAKE_CXX_FLAGS "${FLAGS}")
 
 add_subdirectory(3rdparty)
 add_subdirectory(src)
