@@ -6,7 +6,7 @@ cache:
   directories:
     - $HOME/.cache/pip
     - $HOME/Library/Caches/Homebrew
-language: c++
+language: cpp
 
 
 before_install:
