@@ -1,31 +1,7 @@
 matrix:
   include:
-    - os: linux
-      dist: xenial
-      sudo: required
-      env:
-        CXX: g++
-        CC: gcc
-    - os: linux
-      dist: xenial
-      sudo: required
-      env:
-        CXX: clang++
-        CC: clang
-    - os: osx
-      osx_image: xcode10.1
-      language: generic
-      python: 3.6
-      env:
-        CXX: clang++
-        CC: clang
-    - os: osx
-      osx_image: xcode10.1
-      language: generic
-      python: 2.7
-      env:
-        CXX: g++
-        CC: gcc
+    - os: windoows	
+
 cache:
   directories:
     - $HOME/.cache/pip
