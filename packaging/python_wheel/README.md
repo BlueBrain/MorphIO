@@ -1,6 +1,9 @@
 # Usage
-  ./build_docker_image.sh # creates the docker images
-  ./build_wheel_in_manylinux1_docker.sh # Build the wheels
+
+```bash
+./build_docker_image.sh                            # creates the docker images
+./build_wheel_in_manylinux1_docker.sh              # Build the wheels
+```
 
 # Overview
 
