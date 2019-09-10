@@ -10,7 +10,7 @@ language: cpp
 
 
 before_install:
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
+  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; elif [ $TRAVIS_OS_NAME = mac ]; then brew install hdf5; fi
   - pip install virtualenv
   - virtualenv env && source env/bin/activate
 install:
