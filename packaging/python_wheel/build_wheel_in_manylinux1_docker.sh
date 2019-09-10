@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-set -o xtrace
 BASE=$(git rev-parse --show-toplevel)
 
-export PIPPROXY="-i https://bbpteam.epfl.ch/repository/devpi/simple"
-export http_proxy=${HTTP_PROXY-$http_proxy}
-export https_proxy=${HTTPS_PROXY-$https_proxy}
+PIPPROXY="-i https://bbpteam.epfl.ch/repository/devpi/simple"
+http_proxy=${HTTP_PROXY-$http_proxy}
+https_proxy=${HTTPS_PROXY-$https_proxy}
 
 docker images
 docker run  \
