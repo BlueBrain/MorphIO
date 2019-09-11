@@ -28,12 +28,14 @@ set(MORPHIO_SOURCES
   mut/writers.cpp
   mut/modifiers.cpp)
 
-execute_process(COMMAND python setup.py --version
-                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-                RESULT_VARIABLE PY_VERSION_FAILED
-                OUTPUT_VARIABLE MORPHIO_VERSION_STRING
-                ERROR_VARIABLE PY_VERSION_ERROR
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+if(NOT MORPHIO_VERSION_STRING)
+    execute_process(COMMAND git describe --tags
+                    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+                    RESULT_VARIABLE GIT_VERSION_FAILED
+                    OUTPUT_VARIABLE MORPHIO_VERSION_STRING
+                    ERROR_VARIABLE GIT_VERSION_ERROR
+                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+endif()
 
 configure_file (
   ${CMAKE_CURRENT_SOURCE_DIR}/version.cpp.in
