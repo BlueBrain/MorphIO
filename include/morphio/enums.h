@@ -144,6 +144,7 @@ enum SectionType
 
 enum VascularSectionType
 {
+    SECTION_NOT_DEFINED = 0,
     SECTION_VEIN = 1,
     SECTION_ARTERY = 2,
     SECTION_VENULE = 3,

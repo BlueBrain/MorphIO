@@ -126,6 +126,7 @@ def test_components_vasculature():
     assert_equal(len(morphology.section_types), 3080)
     assert_equal(len(morphology.section(0).predecessors), 0)
     assert_equal(len(morphology.section(0).successors), 2)
+    assert_equal(morphology.section(0).type, 0)
     assert_equal(morphology.section(0).successors[0].id, 1)
     assert_equal(morphology.section(0).successors[1].id, 2)
 
