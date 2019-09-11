@@ -5,7 +5,7 @@ from itertools import combinations
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 from nose.tools import assert_equal, assert_not_equal, assert_raises, ok_
 
-from morphio import Morphology, upstream, IterType, RawDataError
+from morphio import Morphology, upstream, IterType, RawDataError, VasculatureSectionType
 import morphio.vasculature as vasculature
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -126,7 +126,14 @@ def test_components_vasculature():
     assert_equal(len(morphology.section_types), 3080)
     assert_equal(len(morphology.section(0).predecessors), 0)
     assert_equal(len(morphology.section(0).successors), 2)
-    assert_equal(morphology.section(0).type, 0)
+
+    assert_equal(morphology.section(0).type, VasculatureSectionType.vein)
+    assert_equal(morphology.section(1).type, VasculatureSectionType.artery)
+    assert_equal(morphology.section(2).type, VasculatureSectionType.venule)
+    assert_equal(morphology.section(3).type, VasculatureSectionType.arteriole)
+    assert_equal(morphology.section(4).type, VasculatureSectionType.venous_capillary)
+    assert_equal(morphology.section(5).type, VasculatureSectionType.arterial_capillary)
+
     assert_equal(morphology.section(0).successors[0].id, 1)
     assert_equal(morphology.section(0).successors[1].id, 2)
 

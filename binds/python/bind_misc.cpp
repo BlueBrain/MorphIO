@@ -52,6 +52,7 @@ static void bind_misc(py::module &m) {
         .export_values();
 
     py::enum_<morphio::enums::VascularSectionType>(m, "VasculatureSectionType")
+        .value("undefined", morphio::enums::VascularSectionType::SECTION_NOT_DEFINED)
         .value("vein", morphio::enums::VascularSectionType::SECTION_VEIN)
         .value("artery", morphio::enums::VascularSectionType::SECTION_ARTERY)
         .value("venule", morphio::enums::VascularSectionType::SECTION_VENULE)
