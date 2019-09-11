@@ -132,6 +132,9 @@ public:
     const std::string ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
                                                      const SectionType& type) const;
 
+    const std::string ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(long unsigned int lineNumber,
+                                                                 const VascularSectionType& type) const;
+
     const std::string ERROR_MULTIPLE_SOMATA(
         const std::vector<Sample>& somata) const;
 

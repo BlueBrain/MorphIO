@@ -2,9 +2,9 @@ import os
 import numpy as np
 from itertools import chain, repeat
 from numpy.testing import assert_array_equal
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_raises
 
-from morphio import Morphology, MORPHOLOGY_VERSION_H5_1, MORPHOLOGY_VERSION_H5_2, SectionType
+from morphio import Morphology, MORPHOLOGY_VERSION_H5_1, MORPHOLOGY_VERSION_H5_2, SectionType, RawDataError
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 H5_PATH = os.path.join(_path, 'h5')
@@ -42,6 +42,10 @@ def test_v1():
                         [1.2670834064483643, -1.3914604187011719, 2.4186644554138184],
                         [1.271288275718689, -2.3130500316619873, 3.192789077758789],
                         [1.605881929397583, -2.6893420219421387, 3.992844343185425]])
+
+
+def test_wrong_section_type():
+    assert_raises(RawDataError, Morphology, os.path.join(H5V1_PATH, 'simple-broken-section-type.h5'))
 
 
 def test_v2():

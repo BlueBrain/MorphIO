@@ -43,6 +43,12 @@ def test_components_vasculature():
     assert_equal(len(morphology.section(0).predecessors), 0)
     assert_equal(len(morphology.section(0).successors), 2)
 
+    assert_equal(morphology.section(0).successors[0].id, 1)
+    assert_equal(morphology.section(0).successors[1].id, 2)
+
+
+def test_section_types():
+    morphology = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
     assert_equal(morphology.section(0).type, VasculatureSectionType.vein)
     assert_equal(morphology.section(1).type, VasculatureSectionType.artery)
     assert_equal(morphology.section(2).type, VasculatureSectionType.venule)
@@ -50,8 +56,7 @@ def test_components_vasculature():
     assert_equal(morphology.section(4).type, VasculatureSectionType.venous_capillary)
     assert_equal(morphology.section(5).type, VasculatureSectionType.arterial_capillary)
 
-    assert_equal(morphology.section(0).successors[0].id, 1)
-    assert_equal(morphology.section(0).successors[1].id, 2)
+    assert_raises(RawDataError, vasculature.Vasculature, os.path.join(_path, "h5/vasculature-broken-section-type.h5"))
 
 
 def test_iterators_vasculature():

@@ -33,22 +33,22 @@ namespace plugin {
 namespace h5 {
 Property::Properties load(const URI& uri)
 {
-    return MorphologyHDF5().load(uri);
+    return MorphologyHDF5(uri).load();
 }
 
-Property::Properties MorphologyHDF5::load(const URI& uri)
+Property::Properties MorphologyHDF5::load()
 {
     _stage = "repaired";
 
     try {
         HighFive::SilenceHDF5 silence;
-        _file.reset(new HighFive::File(uri, HighFive::File::ReadOnly));
+        _file.reset(new HighFive::File(_uri, HighFive::File::ReadOnly));
     } catch (const HighFive::FileException& exc) {
         LBTHROW(morphio::RawDataError(_write
                                           ? "Could not create morphology file "
-                                          : "Could not open morphology file " + uri + ": " + exc.what()));
+                                          : "Could not open morphology file " + _uri + ": " + exc.what()));
     }
-    _checkVersion(uri);
+    _checkVersion(_uri);
     _selectRepairStage();
     int firstSectionOffset = _readSections();
     _readPoints(firstSectionOffset);
@@ -377,7 +377,13 @@ void MorphologyHDF5::_readSectionTypes()
 
         types.resize(dims[0]);
         dataset.read(types);
-        types.erase(types.begin()); // remove soma type
+        types.erase(types.begin());// remove soma type
+        for (int type: types) {
+            if (type > SECTION_CUSTOM_START || type < 0) {
+                LBTHROW(morphio::RawDataError(
+                        _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type))));
+            }
+        }
         return;
     }
 
@@ -385,6 +391,12 @@ void MorphologyHDF5::_readSectionTypes()
     types.resize(_sectionsDims[0]);
     selection.read(types);
     types.erase(types.begin()); // remove soma type
+    for (int type: types) {
+        if (type > SECTION_CUSTOM_START || type < 0) {
+            LBTHROW(morphio::RawDataError(
+                    _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type))));
+        }
+    }
 }
 
 

@@ -85,6 +85,13 @@ const std::string ErrorMessages::ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned in
                     "Unsupported section type: " + std::to_string(type));
 }
 
+const std::string ErrorMessages::ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(long unsigned int lineNumber,
+                                                                        const VascularSectionType& type) const
+{
+    return errorMsg(lineNumber, ErrorLevel::ERROR,
+                            "Unsupported section type: " + std::to_string(type));
+}
+
 const std::string ErrorMessages::ERROR_MULTIPLE_SOMATA(
     const std::vector<Sample>& somata) const
 {

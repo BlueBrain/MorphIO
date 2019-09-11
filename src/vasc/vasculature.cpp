@@ -30,7 +30,7 @@ Vasculature::Vasculature(const std::string& source)
 
     property::Properties loader;
     if (extension == ".h5")
-        loader = plugin::h5::VasculatureHDF5().load(source);
+        loader = plugin::h5::VasculatureHDF5(source).load();
     else
         LBTHROW(UnknownFileType("File: " + source + " does not end with the .h5 extension"));
 
