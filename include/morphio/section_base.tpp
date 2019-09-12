@@ -21,9 +21,9 @@ SectionBase<T>::SectionBase(const uint32_t id_,
     _range = std::make_pair(start, end);
 
     if (_range.second <= _range.first)
-        LBWARN << "Dereferencing broken properties section " << _id << std::endl
-               << "Section range: " << _range.first << " -> " << _range.second
-               << std::endl;
+        std::cerr << "Dereferencing broken properties section " << _id << std::endl
+            << "Section range: " << _range.first << " -> " << _range.second
+            << std::endl;
 }
 
 template <typename T>

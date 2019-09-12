@@ -1,8 +1,7 @@
 #pragma once
 
+#include <map>
 #include <string>
-
-// #include "morphologySWC.h"
 
 #include <morphio/mut/modifiers.h>
 #include <morphio/mut/section.h>
