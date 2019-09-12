@@ -7,6 +7,7 @@
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
+#include <morphio/version.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
@@ -45,7 +46,7 @@ static void writeLine(std::ofstream& myfile, int id, int parentId, SectionType t
 
 static std::string version_footnote()
 {
-    return std::string("Created by MorphIO v") + morphio::VERSION;
+    return std::string("Created by MorphIO v") + getVersionString();
 }
 
 /**
