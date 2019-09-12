@@ -100,7 +100,7 @@ void VasculatureHDF5::_readSectionTypes()
     types.resize(_sectionsDims[0]);
     selection.read(types);
     for (int type: types) {
-        if (type > SECTION_CUST_START || type < 0) {
+        if (type > SECTION_CUSTOM || type < 0) {
             LBTHROW(morphio::RawDataError(
                     _err.ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(0, static_cast<VascularSectionType>(type))));
         }
