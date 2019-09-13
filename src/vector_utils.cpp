@@ -1,7 +1,9 @@
-#include <numeric>
-#include <sstream>
+#include <algorithm> // std::max
+#include <cmath> // std::sqrt
+#include <numeric> // std::accumulate
+#include <sstream> // std::stringstream
+#include <string> // std::string
 
-#include <math.h>
 #include <morphio/types.h>
 
 namespace morphio {
@@ -42,31 +44,31 @@ Point operator/=(Point& left, float factor)
     return left;
 }
 
-std::vector<Point> operator+(const std::vector<Point>& points,
+Points operator+(const Points& points,
     const Point& right)
 {
-    std::vector<Point> result;
+    Points result;
     for (auto& p : points)
         result.push_back(p + right);
     return result;
 }
-std::vector<Point> operator-(const std::vector<Point>& points,
+Points operator-(const Points& points,
     const Point& right)
 {
-    std::vector<Point> result;
+    Points result;
     for (auto& p : points)
         result.push_back(p - right);
     return result;
 }
 
-std::vector<Point> operator+=(std::vector<Point>& points, const Point& right)
+Points operator+=(Points& points, const Point& right)
 {
     for (auto& p : points)
         p += right;
     return points;
 }
 
-std::vector<Point> operator-=(std::vector<Point>& points, const Point& right)
+Points operator-=(Points& points, const Point& right)
 {
     for (auto& p : points)
         p -= right;
@@ -88,7 +90,7 @@ std::string dumpPoint(const Point& point)
     return ss.str();
 }
 
-std::string dumpPoints(const std::vector<Point>& points)
+std::string dumpPoints(const Points& points)
 {
     std::string str;
     for (const auto& point : points)
@@ -109,7 +111,7 @@ const Point centerOfGravity(const T& points)
     return Point({x / size, y / size, z / size});
 }
 template const Point centerOfGravity(const range<const Point>& points);
-template const Point centerOfGravity(const std::vector<Point>& points);
+template const Point centerOfGravity(const Points& points);
 
 template <typename T>
 float maxDistanceToCenterOfGravity(const T& points)
@@ -123,7 +125,7 @@ float maxDistanceToCenterOfGravity(const T& points)
             return std::max(a, distance(c, b));
         });
 }
-template float maxDistanceToCenterOfGravity(const std::vector<Point>& points);
+template float maxDistanceToCenterOfGravity(const Points& points);
 
 template <typename T>
 Point operator*(const Point& from, T factor)
@@ -152,8 +154,7 @@ Point operator/(const Point& from, T factor)
 template Point operator/(const Point& from, int factor);
 template Point operator/(const Point& from, float factor);
 
-std::ostream& operator<<(std::ostream& os,
-    const std::vector<morphio::Point>& points)
+std::ostream& operator<<(std::ostream& os, const Points& points)
 {
     os << morphio::dumpPoints(points);
     return os;
@@ -173,8 +174,7 @@ char my_tolower(char ch)
 
 } // namespace morphio
 
-std::ostream& operator<<(std::ostream& os,
-    const std::vector<morphio::Point>& points)
+std::ostream& operator<<(std::ostream& os, const morphio::Points& points)
 {
     os << morphio::dumpPoints(points);
     return os;
@@ -184,16 +184,3 @@ std::ostream& operator<<(std::ostream& os, const morphio::Point& point)
     os << morphio::dumpPoint(point);
     return os;
 }
-
-namespace std {
-template <typename T, size_t N>
-string to_string(const array<T, N>& a)
-{
-    string res;
-    for (auto el : a)
-        res += to_string(el) + ", ";
-    return res;
-}
-
-template string to_string<float, 3>(const array<float, 3>&);
-} // namespace std

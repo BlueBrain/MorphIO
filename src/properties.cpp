@@ -4,6 +4,7 @@
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
 #include <morphio/shared_utils.tpp>
+#include <morphio/vector_types.h>
 
 
 namespace morphio {

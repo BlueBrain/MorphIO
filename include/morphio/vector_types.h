@@ -2,6 +2,7 @@
 
 #include <array>
 #include <iostream>
+#include <string>  // std::string
 #include <vector>
 
 namespace morphio {
@@ -14,12 +15,10 @@ Point operator+=(Point& left, const Point& right);
 Point operator-=(Point& left, const Point& right);
 Point operator/=(Point& left, const float factor);
 
-std::vector<Point> operator+(const std::vector<Point>& points,
-    const Point& right);
-std::vector<Point> operator-(const std::vector<Point>& points,
-    const Point& right);
-std::vector<Point> operator+=(std::vector<Point>& points, const Point& right);
-std::vector<Point> operator-=(std::vector<Point>& points, const Point& right);
+Points operator+(const Points& points, const Point& right);
+Points operator-(const Points& points, const Point& right);
+Points operator+=(Points& points, const Point& right);
+Points operator-=(Points& points, const Point& right);
 
 template <typename T>
 Point operator*(const Point& from, T factor);
@@ -32,15 +31,14 @@ const Point centerOfGravity(const T& points);
 template <typename T>
 float maxDistanceToCenterOfGravity(const T& points);
 
-extern template const Point centerOfGravity(const std::vector<std::array<float, 3>>&);
-extern template float maxDistanceToCenterOfGravity(const std::vector<std::array<float, 3>>&);
+extern template const Point centerOfGravity(const Points&);
+extern template float maxDistanceToCenterOfGravity(const Points&);
 
 std::string dumpPoint(const Point& point);
-std::string dumpPoints(const std::vector<Point>& point);
+std::string dumpPoints(const Points& point);
 
 
 char my_tolower(char ch);
-
 
 /**
    Euclidian distance between two points
@@ -48,16 +46,20 @@ char my_tolower(char ch);
 float distance(const Point& left, const Point& right);
 
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
-std::ostream& operator<<(std::ostream& os,
-    const std::vector<morphio::Point>& points);
+std::ostream& operator<<(std::ostream& os, const Points& points);
 
 } // namespace morphio
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
-std::ostream& operator<<(std::ostream& os,
-    const std::vector<morphio::Point>& points);
+std::ostream& operator<<(std::ostream& os, const morphio::Points& points);
 
 namespace std {
 template <typename T, size_t N>
-string to_string(const array<T, N>& a);
+string to_string(const array<T, N>& a)
+{
+    string res;
+    for (auto el : a)
+        res += to_string(el) + ", ";
+    return res;
+}
 
 } // namespace std

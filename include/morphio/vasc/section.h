@@ -1,5 +1,8 @@
 #pragma once
+#include <memory> // std::shared_ptr
+#include <vector> // std::vector
 
+#include <morphio/iterators.h>
 #include <morphio/types.h>
 #include <morphio/vasc/properties.h>
 #include <morphio/vasc/vasculature.h>
