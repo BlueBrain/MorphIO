@@ -51,6 +51,17 @@ static void bind_misc(py::module &m) {
         // .value("glia_endfoot", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
         .export_values();
 
+    py::enum_<morphio::enums::VascularSectionType>(m, "VasculatureSectionType")
+        .value("undefined", morphio::enums::VascularSectionType::SECTION_NOT_DEFINED)
+        .value("vein", morphio::enums::VascularSectionType::SECTION_VEIN)
+        .value("artery", morphio::enums::VascularSectionType::SECTION_ARTERY)
+        .value("venule", morphio::enums::VascularSectionType::SECTION_VENULE)
+        .value("arteriole", morphio::enums::VascularSectionType::SECTION_ARTERIOLE)
+        .value("venous_capillary", morphio::enums::VascularSectionType::SECTION_VENOUS_CAPILLARY)
+        .value("arterial_capillary", morphio::enums::VascularSectionType::SECTION_ARTERIAL_CAPILLARY)
+        .value("transitional", morphio::enums::VascularSectionType::SECTION_TRANSITIONAL)
+        .export_values();
+
     py::enum_<morphio::enums::Option>(m, "Option", py::arithmetic())
         .value("no_modifier", morphio::enums::Option::NO_MODIFIER)
         .value("two_points_sections", morphio::enums::Option::TWO_POINTS_SECTIONS)

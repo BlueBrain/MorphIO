@@ -9,15 +9,15 @@ namespace plugin {
 namespace h5 {
 using namespace vasculature;
 
-property::Properties VasculatureHDF5::load(const URI& uri)
+property::Properties VasculatureHDF5::load()
 {
     try {
         HighFive::SilenceHDF5 silence;
-        _file.reset(new HighFive::File(uri, HighFive::File::ReadOnly));
+        _file.reset(new HighFive::File(_uri, HighFive::File::ReadOnly));
     } catch (const HighFive::FileException& exc) {
         LBTHROW(morphio::RawDataError(_write
                                           ? "Could not create vasculature file "
-                                          : "Could not open vasculature file " + uri + ": " + exc.what()));
+                                          : "Could not open vasculature file " + _uri + ": " + exc.what()));
     }
     _readDatasets();
     _readSections();
@@ -99,6 +99,12 @@ void VasculatureHDF5::_readSectionTypes()
     auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
     types.resize(_sectionsDims[0]);
     selection.read(types);
+    for (int type: types) {
+        if (type > SECTION_CUSTOM || type < 0) {
+            LBTHROW(morphio::RawDataError(
+                    _err.ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(0, static_cast<VascularSectionType>(type))));
+        }
+    }
 }
 
 void VasculatureHDF5::_readConnectivity()

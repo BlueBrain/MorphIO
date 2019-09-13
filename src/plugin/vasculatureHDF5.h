@@ -2,6 +2,7 @@
 
 #include <morphio/types.h>
 #include <morphio/vasc/properties.h>
+#include <morphio/errorMessages.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
@@ -15,8 +16,9 @@ using namespace morphio::vasculature;
 class VasculatureHDF5
 {
 public:
+    VasculatureHDF5(const std::string& uri) : _err(uri), _uri(uri){}
     virtual ~VasculatureHDF5();
-    property::Properties load(const URI& uri);
+    property::Properties load();
 
 private:
     void _readDatasets();
@@ -38,6 +40,8 @@ private:
 
     property::Properties _properties;
     bool _write;
+    ErrorMessages _err;
+    std::string _uri;
 };
 }
 }
