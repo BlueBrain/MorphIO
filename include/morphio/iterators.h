@@ -3,6 +3,7 @@
 #include <queue>
 #include <set>
 #include <stack>
+#include <iterator> // std::forward_iterator_tag
 
 #include <morphio/types.h>
 
@@ -19,6 +20,11 @@ class Iterator
     T container{};
 
 public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = typename T::value_type;
+    using pointer = value_type*;
+    using reference = value_type&;
+
     Iterator() = default;
     Iterator(const Section& section);
     Iterator(const Morphology& morphology);
@@ -59,6 +65,11 @@ extern template class Iterator<std::vector<Section>>;
 namespace vasculature {
 class graph_iterator
 {
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = Section;
+    using pointer = value_type*;
+    using reference = value_type&;
+
     friend class Section;
     friend class Vasculature;
 

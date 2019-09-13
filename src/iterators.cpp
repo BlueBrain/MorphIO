@@ -4,20 +4,10 @@
 
 namespace morphio {
 
-class Section;
-
 template <typename T>
 Iterator<T>::Iterator(const Section& section)
 {
     container.push(section);
-}
-
-template <>
-breadth_iterator::Iterator(const Section& section)
-{
-    std::queue<Section> q {};
-    q.push(section);
-    container.push(q);
 }
 
 template <typename T>
@@ -27,22 +17,6 @@ Iterator<T>::Iterator(const Morphology& morphology)
     for (auto it = roots.rbegin(); it != roots.rend(); ++it) {
         container.push(*it);
     }
-}
-
-template <>
-breadth_iterator::Iterator(const Morphology& morphology)
-{
-    for (auto const& root : morphology.rootSections()) {
-        std::queue<Section> q {};
-        q.push(root);
-        container.push(q);
-    }
-}
-
-template <>
-upstream_iterator::Iterator(const Morphology& morphology)
-{
-    (void)&morphology;
 }
 
 template <typename T>
@@ -65,39 +39,30 @@ Iterator<T> Iterator<T>::operator++(int)
     return retval;
 }
 
-// Specializations
+/* breadth_iterator */
+
 template <>
-Section depth_iterator::operator*() const
+breadth_iterator::Iterator(const Section& section)
 {
-    return container.top();
+    std::queue<Section> q {};
+    q.push(section);
+    container.push(q);
 }
+
+template <>
+breadth_iterator::Iterator(const Morphology& morphology)
+{
+    for (auto const& root : morphology.rootSections()) {
+        std::queue<Section> q {};
+        q.push(root);
+        container.push(q);
+    }
+}
+
 template <>
 Section breadth_iterator::operator*() const
 {
     return container.front().front();
-}
-template <>
-Section upstream_iterator::operator*() const
-{
-    return container[0];
-}
-
-template <>
-upstream_iterator::Iterator(const Section& section)
-{
-    container.push_back(section);
-}
-
-template <>
-depth_iterator& depth_iterator::operator++()
-{
-    const auto& section = *(*this);
-    container.pop();
-    auto& children = section.children();
-    for (auto it = children.rbegin(); it != children.rend(); ++it) {
-        container.push(*it);
-    }
-    return *this;
 }
 
 template <>
@@ -115,6 +80,26 @@ breadth_iterator& breadth_iterator::operator++()
     return *this;
 }
 
+
+/* upstream_iterator */
+
+template <>
+upstream_iterator::Iterator(const Section& section)
+{
+    container.push_back(section);
+}
+
+template <>
+upstream_iterator::Iterator(const Morphology& morphology)
+{
+    (void)&morphology;
+}
+template <>
+Section upstream_iterator::operator*() const
+{
+    return container[0];
+}
+
 template <>
 upstream_iterator& upstream_iterator::operator++()
 {
@@ -123,6 +108,26 @@ upstream_iterator& upstream_iterator::operator++()
         container.pop_back();
     } else {
         container[0] = section.parent();
+    }
+    return *this;
+}
+
+/* depth_iterator */
+
+template <>
+Section depth_iterator::operator*() const
+{
+    return container.top();
+}
+
+template <>
+depth_iterator& depth_iterator::operator++()
+{
+    const auto& section = *(*this);
+    container.pop();
+    auto& children = section.children();
+    for (auto it = children.rbegin(); it != children.rend(); ++it) {
+        container.push(*it);
     }
     return *this;
 }
