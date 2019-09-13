@@ -1,5 +1,6 @@
 #pragma once
 
+#include <morphio/mito_iterators.h>
 #include <morphio/mitochondria.h>
 #include <morphio/properties.h>
 #include <morphio/section_base.h>

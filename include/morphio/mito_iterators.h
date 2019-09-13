@@ -2,6 +2,7 @@
 
 #include <queue>
 #include <stack>
+#include <iterator> // std::forward_iterator_tag
 
 #include <morphio/types.h>
 namespace morphio {
@@ -15,6 +16,11 @@ class MitoIterator
     T container;
 
 public:
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = typename T::value_type;
+    using pointer = value_type*;
+    using reference = value_type&;
+
     MitoIterator(const MitoSection& section);
     MitoIterator();
     bool operator==(MitoIterator other) const;
@@ -23,6 +29,10 @@ public:
     MitoIterator& operator++();
     MitoIterator operator++(int);
 };
+
+using mito_depth_iterator = MitoIterator<std::stack<MitoSection>>;
+using mito_breadth_iterator = MitoIterator<std::queue<MitoSection>>;
+using mito_upstream_iterator = MitoIterator<std::vector<MitoSection>>;
 
 // Declare the specializations
 template <>

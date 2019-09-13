@@ -66,13 +66,6 @@ using upstream_iterator = Iterator<std::vector<std::shared_ptr<Section>>>;
 using SectionRange = std::pair<size_t, size_t>;
 
 template <typename T>
-class MitoIterator;
-
-using mito_depth_iterator = MitoIterator<std::stack<MitoSection>>;
-using mito_breadth_iterator = MitoIterator<std::queue<MitoSection>>;
-using mito_upstream_iterator = MitoIterator<std::vector<MitoSection>>;
-
-template <typename T>
 using range = gsl::span<T>;
 
 } // namespace morphio
