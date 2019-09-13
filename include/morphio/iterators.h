@@ -16,14 +16,14 @@ class Iterator
     friend class Section;
     friend class Morphology;
 
-    T container;
+    T container{};
 
 public:
-    Iterator();
+    Iterator() = default;
     Iterator(const Section& section);
     Iterator(const Morphology& morphology);
-    bool operator==(Iterator other) const;
-    bool operator!=(Iterator other) const;
+    bool operator==(const Iterator& other) const;
+    bool operator!=(const Iterator& other) const;
     Section operator*() const;
     Iterator& operator++();
     Iterator operator++(int);
@@ -70,8 +70,8 @@ class graph_iterator
 public:
     graph_iterator(const Section& vasculatureSection);
     graph_iterator(const Vasculature& vasculatureMorphology);
-    bool operator==(graph_iterator other) const;
-    bool operator!=(graph_iterator other) const;
+    bool operator==(const graph_iterator& other) const;
+    bool operator!=(const graph_iterator& other) const;
     Section operator*() const;
     graph_iterator& operator++();
     graph_iterator operator++(int);
