@@ -1,4 +1,5 @@
 #pragma once
+#include <iosfwd>
 
 namespace morphio {
 namespace enums {
@@ -51,6 +52,8 @@ enum MorphologyVersion
     MORPHOLOGY_VERSION_SWC_1 = 101,
     MORPHOLOGY_VERSION_UNDEFINED
 };
+std::ostream& operator<<(std::ostream& os, const MorphologyVersion v);
+
 
 enum AnnotationType
 {
@@ -72,6 +75,7 @@ enum SomaType
     SOMA_CYLINDERS,
     SOMA_SIMPLE_CONTOUR
 };
+std::ostream& operator<<(std::ostream& os, const SomaType v);
 
 /** Classification of neuron substructures. */
 enum SectionType
@@ -123,5 +127,6 @@ enum AccessMode
     MODE_READWRITE = MODE_READ | MODE_WRITE,
     MODE_READOVERWRITE = MODE_READ | MODE_OVERWRITE
 };
+
 } // namespace enums
 } // namespace morphio
