@@ -2,6 +2,7 @@
 
 #include <memory> //std::unique_ptr
 
+#include <morphio/iterators.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
 

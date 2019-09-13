@@ -35,6 +35,9 @@ public:
     Iterator operator++(int);
 };
 
+using depth_iterator = Iterator<std::stack<Section>>;
+using breadth_iterator = Iterator<std::queue<std::queue<Section>>>;
+using upstream_iterator = Iterator<std::vector<Section>>;
 
 // Declare the specializations
 template <>

@@ -132,7 +132,6 @@ depth_iterator& depth_iterator::operator++()
     return *this;
 }
 
-
 // Instantiations
 template class Iterator<std::stack<Section>>;
 template class Iterator<std::queue<std::queue<Section>>>;
