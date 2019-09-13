@@ -78,7 +78,6 @@ using mito_upstream_iterator = MitoIterator<std::vector<MitoSection>>;
 using depth_iterator = Iterator<std::stack<Section>>;
 using breadth_iterator = Iterator<std::queue<std::queue<Section>>>;
 using upstream_iterator = Iterator<std::vector<Section>>;
-class graph_iterator;
 
 template <typename T>
 using range = gsl::span<T>;

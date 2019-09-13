@@ -25,6 +25,7 @@ set(MORPHIO_SOURCES
     plugin/morphologySWC.cpp
     plugin/morphologyASC.cpp
     plugin/vasculatureHDF5.cpp
+    vasc/iterators.cpp
     vasc/section.cpp
     vasc/vasculature.cpp
     vasc/properties.cpp

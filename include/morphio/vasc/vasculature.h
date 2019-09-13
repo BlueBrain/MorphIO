@@ -1,7 +1,11 @@
 #pragma once
 
-#include <memory>
+#include <memory> // std::shared_ptr
+#include <string> // std::string
+#include <vector> // std::vector
+
 #include <morphio/types.h>
+#include <morphio/vasc/iterators.h>
 #include <morphio/vasc/properties.h>
 
 namespace morphio {
@@ -9,11 +13,11 @@ namespace vasculature {
 class Vasculature
 {
 public:
-    virtual ~Vasculature();
-
     Vasculature& operator=(const Vasculature&);
     Vasculature(Vasculature&&);
     Vasculature& operator=(Vasculature&&);
+
+    virtual ~Vasculature();
 
     /** @name Read API */
     /** Open the given source to a vasculature file and parse it.
