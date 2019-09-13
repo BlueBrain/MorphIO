@@ -8,6 +8,7 @@
 #include <morphio/types.h>
 #include <morphio/enums.h>
 #include <morphio/tools.h>
+#include <morphio/version.h>
 
 #include "bind_enums.h"
 
@@ -120,7 +121,7 @@ static void bind_misc(py::module &m) {
         .value("SOMA_CYLINDERS", morphio::enums::SomaType::SOMA_CYLINDERS)
         .value("SOMA_SIMPLE_CONTOUR", morphio::enums::SomaType::SOMA_SIMPLE_CONTOUR);
 
-    m.attr("version") = morphio::VERSION;
+    m.attr("version") = morphio::getVersionString();
 
     auto base = py::register_exception<morphio::MorphioError&>(m, "MorphioError");
     // base.ptr() signifies "inherits from"

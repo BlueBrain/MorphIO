@@ -1,7 +1,25 @@
-#include <string>
+#include <morphio/version.h>
 
-#include <morphio/types.h>
+#include <string>
 namespace morphio
 {
-  const std::string VERSION("@MORPHIO_VERSION_STRING@");
-}
+    std::string getVersionString() {
+        static const std::string version("@MORPHIO_VERSION_STRING@");
+        return version;
+    }
+
+    int getMajor()
+    {
+        return @MorphIO_VERSION_MAJOR@;
+    }
+
+    int getMinor()
+    {
+        return @MorphIO_VERSION_MINOR@;
+    }
+
+    int getPatch()
+    {
+        return @MorphIO_VERSION_PATCH@;
+    }
+} // namespace morphio
