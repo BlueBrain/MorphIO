@@ -1,31 +1,18 @@
 #pragma once
 
-#include <map>
-#include <memory>
-#include <queue>
-#include <set>
-#include <stack>
-#include <string>
-#include <vector>
-
-#include <stdint.h>
+#include <memory> // std::shared_ptr
+#include <queue> // std::queue
+#include <stack> // std::stack
+#include <string> // std::string
+#include <vector> // std::vector
 
 #include <gsl/gsl>
 #include <morphio/enums.h>
 #include <morphio/exceptions.h>
 #include <morphio/vector_types.h>
 
-#ifdef __GNUC__
-#define BRAIN_UNUSED __attribute__((unused))
-#else
-#define BRAIN_UNUSED
-#endif
-
-// TODO: bcoste fix me
-#include <iostream>
 
 #define LBTHROW(x) (throw x)
-#define LBWARN std::cerr
 
 /** @namespace morphio Blue Brain File IO classes */
 namespace morphio {
@@ -49,14 +36,11 @@ class Section;
 class Vasculature;
 }
 
-namespace detail {
-class NeurolucidaParser;
-}
-
 namespace plugin {
 struct DebugInfo;
 class ErrorMessages;
 } // namespace plugin
+
 namespace mut {
 class Section;
 class MitoSection;
@@ -99,5 +83,4 @@ class graph_iterator;
 template <typename T>
 using range = gsl::span<T>;
 
-std::ostream& operator<<(std::ostream& os, const std::vector<Point>&);
 } // namespace morphio

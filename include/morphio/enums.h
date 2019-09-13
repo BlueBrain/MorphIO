@@ -1,7 +1,5 @@
-/** @file enums.h Enumerations used in Brion. */
 #pragma once
-
-#include <ostream>
+#include <iosfwd>
 
 namespace morphio {
 namespace enums {
@@ -15,7 +13,7 @@ enum LogLevel
 };
 
 /** The list of modifier flags that can be passed when loading a morphology
- See morphio::mut::modifiers for more informations **/
+ See morphio::mut::modifiers for more information **/
 enum Option
 {
     NO_MODIFIER = 0x00,
@@ -54,6 +52,8 @@ enum MorphologyVersion
     MORPHOLOGY_VERSION_SWC_1 = 101,
     MORPHOLOGY_VERSION_UNDEFINED
 };
+std::ostream& operator<<(std::ostream& os, const MorphologyVersion v);
+
 
 enum AnnotationType
 {
@@ -67,26 +67,6 @@ enum CellFamily
     FAMILY_GLIA = 1
 };
 
-/** Output stream formatter for MorphologyVersion */
-inline std::ostream& operator<<(std::ostream& os, const MorphologyVersion v)
-{
-    switch (v) {
-    case MORPHOLOGY_VERSION_H5_1:
-        return os << "h5v1";
-    case MORPHOLOGY_VERSION_H5_1_1:
-        return os << "h5v1.1";
-    case MORPHOLOGY_VERSION_H5_2:
-        return os << "h5v2";
-    case MORPHOLOGY_VERSION_SWC_1:
-        return os << "swcv1";
-    case MORPHOLOGY_VERSION_ASC_1:
-        return os << "ascv1";
-    default:
-    case MORPHOLOGY_VERSION_UNDEFINED:
-        return os << "UNDEFINED";
-    }
-}
-
 enum SomaType
 {
     SOMA_UNDEFINED = 0,
@@ -95,25 +75,7 @@ enum SomaType
     SOMA_CYLINDERS,
     SOMA_SIMPLE_CONTOUR
 };
-
-/** Output stream formatter for MorphologyVersion */
-inline std::ostream& operator<<(std::ostream& os, const SomaType v)
-{
-    switch (v) {
-    case SOMA_SINGLE_POINT:
-        return os << "SOMA_SINGLE_POINT";
-    case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS:
-        return os << "SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS";
-    case SOMA_CYLINDERS:
-        return os << "SOMA_CYLINDERS";
-    case SOMA_SIMPLE_CONTOUR:
-        return os << "SOMA_SIMPLE_CONTOUR";
-
-    default:
-    case SOMA_UNDEFINED:
-        return os << "SOMA_UNDEFINED";
-    }
-}
+std::ostream& operator<<(std::ostream& os, const SomaType v);
 
 /** Classification of neuron substructures. */
 enum SectionType
@@ -167,5 +129,6 @@ enum AccessMode
     MODE_READWRITE = MODE_READ | MODE_WRITE,
     MODE_READOVERWRITE = MODE_READ | MODE_OVERWRITE
 };
+
 } // namespace enums
 } // namespace morphio
