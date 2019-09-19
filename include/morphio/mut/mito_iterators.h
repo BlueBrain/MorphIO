@@ -14,14 +14,11 @@ An iterator class to iterate through sections;
 template <typename T>
 class MitoIterator
 {
-    friend class Mitochondria;
-
     const Mitochondria _mitochondria;
-
     T container;
-    MitoIterator();
 
 public:
+    MitoIterator();
     MitoIterator(const Mitochondria& mitochondria,
         std::shared_ptr<MitoSection> rootSectionId = nullptr);
     MitoIterator(const Mitochondria& mitochondria);

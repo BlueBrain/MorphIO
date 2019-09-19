@@ -10,15 +10,11 @@ class Vasculature;
 
 class graph_iterator
 {
-    friend class Section;
-    friend class Vasculature;
-
     std::set<Section> visited;
     std::stack<Section> container;
 
-    graph_iterator() = default;
-
 public:
+    graph_iterator() = default;
     explicit graph_iterator(const Section& vasculatureSection);
     explicit graph_iterator(const Vasculature& vasculatureMorphology);
     bool operator==(graph_iterator other) const;
