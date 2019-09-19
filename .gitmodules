@@ -10,6 +10,3 @@
 [submodule "3rdparty/GSL_LITE"]
 	path = 3rdparty/GSL_LITE
 	url = https://github.com/martinmoene/gsl-lite.git
-[submodule "multibuild"]
-	path = multibuild
-	url = https://github.com/matthew-brett/multibuild.git
