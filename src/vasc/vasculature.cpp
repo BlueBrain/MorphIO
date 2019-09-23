@@ -9,8 +9,8 @@
 #include <morphio/vasc/section.h>
 #include <morphio/vasc/vasculature.h>
 
-#include "../plugin/morphologySWC.h"
-#include "src/plugin/vasculatureHDF5.h"
+#include "../readers/morphologySWC.h"
+#include "../readers/vasculatureHDF5.h"
 
 namespace morphio {
 namespace vasculature {
@@ -20,30 +20,26 @@ void buildConnectivity(std::shared_ptr<property::Properties> properties);
 Vasculature::Vasculature(const std::string& source)
 {
     const size_t pos = source.find_last_of(".");
-    if (pos == std::string::npos)
+    if (pos == std::string::npos) {
         LBTHROW(UnknownFileType("File has no extension"));
+    }
 
-    if (access(source.c_str(), F_OK) == -1)
+    if (access(source.c_str(), F_OK) == -1) {
         LBTHROW(RawDataError("File: " + source + " does not exist."));
+    }
 
     std::string extension = source.substr(pos);
 
     property::Properties loader;
-    if (extension == ".h5")
-        loader = plugin::h5::VasculatureHDF5(source).load();
-    else
+    if (extension == ".h5") {
+        loader = readers::h5::VasculatureHDF5(source).load();
+    } else {
         LBTHROW(UnknownFileType("File: " + source + " does not end with the .h5 extension"));
+    }
 
     _properties = std::make_shared<property::Properties>(loader);
 
     buildConnectivity(_properties);
-}
-
-Vasculature::Vasculature(Vasculature&&) = default;
-Vasculature& Vasculature::operator=(Vasculature&&) = default;
-
-Vasculature::~Vasculature()
-{
 }
 
 const Section Vasculature::section(const uint32_t& id) const

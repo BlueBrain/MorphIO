@@ -74,14 +74,14 @@ void swc(const Morphology& morphology, const std::string& filename)
     if (!morphology.mitochondria().rootSections().empty())
         LBERROR(
             Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-            plugin::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+            readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     const auto& soma_points = soma->points();
     const auto& soma_diameters = soma->diameters();
 
     if (soma_points.empty())
         LBERROR(Warning::WRITE_NO_SOMA,
-            plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
+            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
 
     for (unsigned int i = 0; i < soma_points.size(); ++i) {
         writeLine(myfile, segmentIdOnDisk, i == 0 ? -1 : segmentIdOnDisk - 1,
@@ -159,7 +159,7 @@ void asc(const Morphology& morphology, const std::string& filename)
     if (!morphology.mitochondria().rootSections().empty())
         LBERROR(
             Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-            plugin::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+            readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     std::map<morphio::SectionType, std::string> header;
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
@@ -173,7 +173,7 @@ void asc(const Morphology& morphology, const std::string& filename)
         myfile << ")\n\n";
     } else {
         LBERROR(Warning::WRITE_NO_SOMA,
-            plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
+            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
     for (auto& section : morphology.rootSections()) {
@@ -273,9 +273,9 @@ void h5(const Morphology& morpho, const std::string& filename)
 
     if (numberOfSomaPoints < 1)
         LBERROR(Warning::WRITE_NO_SOMA,
-            plugin::ErrorMessages().WARNING_WRITE_NO_SOMA());
+            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     if (numberOfSomaPoints != numberOfSomaDiameters)
-        throw WriterError(plugin::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+        throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
             "soma points", numberOfSomaPoints, "soma diameters",
             numberOfSomaDiameters));
 
@@ -317,7 +317,7 @@ void h5(const Morphology& morpho, const std::string& filename)
         if (numberOfPerimeters > 0) {
             if (numberOfPerimeters != numberOfPoints)
                 throw WriterError(
-                    plugin::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+                    readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
                         "points", numberOfPoints, "perimeters",
                         numberOfPerimeters));
             for (unsigned int i = 0; i < numberOfPerimeters; ++i)

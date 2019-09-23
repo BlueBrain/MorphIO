@@ -190,13 +190,13 @@ public:
        Check that the neuron is valid, issue warning and fix unifurcations
      **/
     void sanitize();
-    void sanitize(const morphio::plugin::DebugInfo& debugInfo);
+    void sanitize(const morphio::readers::DebugInfo& debugInfo);
 
 private:
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
     friend bool diff(const Morphology& left, const Morphology& right, morphio::enums::LogLevel verbose);
-    morphio::plugin::ErrorMessages _err;
+    morphio::readers::ErrorMessages _err;
 
     uint32_t _register(std::shared_ptr<Section>);
 

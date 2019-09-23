@@ -1,24 +1,32 @@
 #pragma once
 
+#include <memory> // std::unique_ptr
+#include <string> // std::string
+#include <vector> // std::vector
+
 #include <morphio/types.h>
 #include <morphio/vasc/properties.h>
 #include <morphio/errorMessages.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <highfive/H5Utility.hpp>
 
 namespace morphio {
-namespace plugin {
+namespace readers {
 namespace h5 {
-using namespace morphio::vasculature;
 
 class VasculatureHDF5
 {
 public:
-    VasculatureHDF5(const std::string& uri) : _err(uri), _uri(uri){}
-    virtual ~VasculatureHDF5();
-    property::Properties load();
+    explicit VasculatureHDF5(const std::string& uri)
+    : _err(uri)
+    , _uri(uri)
+    {}
+
+    virtual ~VasculatureHDF5()
+    {}
+
+    vasculature::property::Properties load();
 
 private:
     void _readDatasets();
@@ -38,11 +46,11 @@ private:
     std::unique_ptr<HighFive::DataSet> _connectivity;
     std::vector<size_t> _conDims;
 
-    property::Properties _properties;
+    vasculature::property::Properties _properties;
     bool _write;
     ErrorMessages _err;
     std::string _uri;
 };
-}
-}
-}
+} // namespace h5
+} // namespace readers
+} // morphio

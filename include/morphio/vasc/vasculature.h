@@ -13,16 +13,16 @@ namespace vasculature {
 class Vasculature
 {
 public:
-    Vasculature& operator=(const Vasculature&);
-    Vasculature(Vasculature&&);
-    Vasculature& operator=(Vasculature&&);
-
-    virtual ~Vasculature();
-
     /** @name Read API */
     /** Open the given source to a vasculature file and parse it.
      */
     explicit Vasculature(const std::string& source);
+
+    Vasculature(Vasculature&&) = default;
+    virtual ~Vasculature() {}
+
+    Vasculature& operator=(const Vasculature&) = default;
+    Vasculature& operator=(Vasculature&&) = default;
 
     /**
      * Return a vector containing all section objects.

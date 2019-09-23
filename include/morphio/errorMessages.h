@@ -1,6 +1,8 @@
 #pragma once
 
 #include <map>
+#include <memory>
+#include <set>
 #include <string>
 
 #include <morphio/mut/modifiers.h>
@@ -17,7 +19,7 @@ void set_ignored_warning(const std::vector<Warning>& warning,
 
 void LBERROR(Warning warning, const std::string& msg);
 
-namespace plugin {
+namespace readers {
 enum ErrorLevel
 {
     INFO,
@@ -215,6 +217,6 @@ private:
     std::string _uri;
 };
 
-} // namespace plugin
+} // namespace readers
 
 } // namespace morphio

@@ -36,10 +36,10 @@ class Section;
 class Vasculature;
 }
 
-namespace plugin {
+namespace readers {
 struct DebugInfo;
 class ErrorMessages;
-} // namespace plugin
+} // namespace readers
 
 namespace mut {
 class Section;

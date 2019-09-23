@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string> // std::string
+#include <vector> // std::vector
 #include <map>
 #include <morphio/types.h>
 
@@ -76,6 +78,7 @@ struct Properties
 
     template <typename T>
     std::vector<typename T::Type>& get();
+
     template <typename T>
     const std::vector<typename T::Type>& get() const;
 
@@ -102,11 +105,12 @@ template <>
 const std::vector<VascSection::Type>& Properties::get<VascSection>() const;
 template <>
 std::vector<Connection::Type>& Properties::get<Connection>();
-}
-}
-}
+
+} // namespace property
+} // namespace vasculature
+} // namespace morphio
 
 namespace std
 {
 extern template string to_string<float, 3>(const array<float, 3>&);
-}
+} // namespace std

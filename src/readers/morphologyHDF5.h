@@ -1,4 +1,7 @@
 #pragma once
+#include <memory> // std::unique_ptr
+#include <string> // std::string
+#include <vector> // std::vector
 
 #include <morphio/properties.h>
 #include <morphio/types.h>
@@ -6,10 +9,9 @@
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
-#include <highfive/H5Utility.hpp>
 
 namespace morphio {
-namespace plugin {
+namespace readers {
 namespace h5 {
 Property::Properties load(const URI& uri);
 
@@ -32,10 +34,13 @@ private:
     void _readSectionTypes();
     void _readPerimeters(int);
     void _readMitochondria();
+
     template <typename T>
-    void _read(const std::string& group, const std::string& _dataset,
-        MorphologyVersion version, unsigned int expectedDimension,
-        T& data);
+    void _read(const std::string& group,
+               const std::string& _dataset,
+               MorphologyVersion version,
+               unsigned int expectedDimension,
+               T& data);
 
     std::unique_ptr<HighFive::File> _file;
 
@@ -52,5 +57,5 @@ private:
     std::string _uri;
 };
 } // namespace h5
-} // namespace plugin
+} // namespace readers
 } // namespace morphio
