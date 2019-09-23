@@ -1,16 +1,22 @@
-#include <morphio/iterators.h>
 #include <morphio/vasc/section.h>
 
 namespace morphio {
 namespace vasculature {
+
+using graph_iterator = graph_iterator_t<Section, Vasculature>;
+
 Section::Section(const uint32_t id_,
     std::shared_ptr<property::Properties> properties)
     : _id(id_)
     , _properties(properties)
 {
     const auto& sections = properties->get<property::VascSection>();
-    if (id_ >= sections.size())
-        LBTHROW(RawDataError("Requested section ID (" + std::to_string(id_) + ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
+    if (id_ >= sections.size()) {
+        LBTHROW(RawDataError("Requested section ID (" +
+                             std::to_string(id_) +
+                             ") is out of array bounds (array size = " +
+                             std::to_string(sections.size()) + ")"));
+    }
     const size_t start = sections[id_];
     const size_t end_ = id_ == sections.size() - 1
                             ? properties->get<property::Point>().size()
@@ -143,5 +149,5 @@ graph_iterator Section::end() const
 {
     return graph_iterator();
 }
-}
-}
+} // namespace vasculature
+} // namespace morphio

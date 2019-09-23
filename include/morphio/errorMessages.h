@@ -1,9 +1,9 @@
 #pragma once
 
-#include <map>
-#include <memory>
-#include <set>
-#include <string>
+#include <map> // std::map
+#include <memory> // std::shared_ptr
+#include <set> // std::set
+#include <string> // std::string
 
 #include <morphio/mut/modifiers.h>
 #include <morphio/mut/section.h>

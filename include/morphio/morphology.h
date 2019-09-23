@@ -2,6 +2,7 @@
 
 #include <memory> //std::unique_ptr
 
+#include <morphio/section_iterators.hpp>
 #include <morphio/properties.h>
 #include <morphio/types.h>
 
@@ -99,8 +100,8 @@ public:
 
        If id == -1, the iteration will start at each root section, successively
     **/
-    depth_iterator depth_begin() const;
-    depth_iterator depth_end() const;
+    depth_iterator_t<Section, Morphology> depth_begin() const;
+    depth_iterator_t<Section, Morphology> depth_end() const;
 
     /**
        Breadth first iterator
@@ -108,8 +109,8 @@ public:
        If id == -1, the iteration will be successively performed starting
        at each root section
     **/
-    breadth_iterator breadth_begin() const;
-    breadth_iterator breadth_end() const;
+    breadth_iterator_t<Section, Morphology> breadth_begin() const;
+    breadth_iterator_t<Section, Morphology> breadth_end() const;
 
     /**
      * Return the soma type

@@ -1,8 +1,6 @@
 set(MORPHIO_SOURCES
     enums.cpp
     errorMessages.cpp
-    iterators.cpp
-    mito_iterators.cpp
     mito_section.cpp
     mitochondria.cpp
     morphology.cpp
@@ -12,9 +10,7 @@ set(MORPHIO_SOURCES
     soma.cpp
     vector_utils.cpp
     version.cpp
-    mut/mito_iterators.cpp
     mut/mito_section.cpp
-    mut/iterators.cpp
     mut/section.cpp
     mut/soma.cpp
     mut/morphology.cpp
@@ -25,7 +21,6 @@ set(MORPHIO_SOURCES
     readers/morphologySWC.cpp
     readers/morphologyASC.cpp
     readers/vasculatureHDF5.cpp
-    vasc/iterators.cpp
     vasc/section.cpp
     vasc/vasculature.cpp
     vasc/properties.cpp

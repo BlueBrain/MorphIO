@@ -6,6 +6,7 @@
 
 namespace morphio {
 namespace mut {
+
 class MitoSection
 {
 public:

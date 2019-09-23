@@ -1,14 +1,14 @@
 import os
 import numpy as np
 from numpy.testing import assert_array_equal
-from nose.tools import assert_equal, assert_raises, ok_, assert_not_equal
+from nose.tools import assert_equal, assert_raises, ok_
 
 import morphio
-from morphio.mut import Morphology, Soma
-from morphio import ostream_redirect, MitochondriaPointLevel, PointLevel, SectionType, MorphioError, SectionBuilderError, Morphology as ImmutableMorphology, upstream, depth_first, breadth_first
-from contextlib import contextmanager
-import sys
-from io import StringIO
+from morphio.mut import Morphology
+from morphio import (ostream_redirect, MitochondriaPointLevel, PointLevel,
+                     SectionType, MorphioError, SectionBuilderError,
+                     Morphology as ImmutableMorphology,
+                     upstream, depth_first, breadth_first)
 from utils import assert_substring, captured_output, tmp_asc_file
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -94,10 +94,9 @@ def test_child_section():
 
     ok_(section.is_root)
 
-    section.append_section(
-                     PointLevel([[1, 2, 3], [4, 5, 6]],
-                                [2, 3],
-                                [20, 30]))
+    section.append_section(PointLevel([[1, 2, 3], [4, 5, 6]],
+                                      [2, 3],
+                                      [20, 30]))
 
     children = m.root_sections[0].children
 
@@ -146,10 +145,10 @@ def test_mut_copy_ctor():
     assert_equal([sec.id for sec in simple.iter()],
                  [0, 1, 2, 3, 4, 5])
     copy = Morphology(simple)
-    section = copy.append_root_section(PointLevel([[1, 2, 3], [4, 5, 6]],
-                                                  [2, 2],
-                                                  [20, 20]),
-                                       SectionType.axon)
+    copy.append_root_section(PointLevel([[1, 2, 3], [4, 5, 6]],
+                                        [2, 2],
+                                        [20, 20]),
+                             SectionType.axon)
 
     # test that first object has not been mutated
     assert_equal([sec.id for sec in simple.iter()],
@@ -171,12 +170,12 @@ def test_build_read_only():
                                     SectionType.axon)
 
     section.append_section(PointLevel([[4, 5, 6], [7, 8, 9]],
-                                [2, 3],
-                                [20, 30]))
+                                      [2, 3],
+                                      [20, 30]))
 
     section.append_section(PointLevel([[4, 5, 6], [10, 11, 12]],
-                                [2, 2],
-                                [20, 20]))
+                                      [2, 2],
+                                      [20, 20]))
 
     immutable_morphology = ImmutableMorphology(m)
 
@@ -236,8 +235,6 @@ def test_mitochondria_read():
 
     assert_equal(len(mito.children(mito.root_sections[0])), 1)
 
-    child = mito.children(mitochondria[0])[0]
-
     assert_equal(mito.parent(mito.children(mitochondria[0])[0]),
                  mitochondria[0])
 
@@ -279,9 +276,10 @@ def test_mitochondria():
     morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
     morpho.soma.diameters = [1, 1]
 
-    sectionId = morpho.append_root_section(
-        PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
-        SectionType.axon)
+    morpho.append_root_section(PointLevel([[2, 2, 2], [3, 3, 3]],
+                                          [4, 4],
+                                          [5, 5]),
+                               SectionType.axon)
 
     mito = morpho.mitochondria
     first_mito_id = mito.append_root_section(MitochondriaPointLevel([0, 0], [0.5, 0.6],
@@ -328,22 +326,22 @@ def test_iterators():
                        [0, 1, 2, 3, 4, 5])
 
     assert_array_equal([sec.id for sec in SIMPLE.iter(breadth_first)],
-                       [0, 1, 2, 3, 4, 5])
+                       [0, 3, 1, 2, 4, 5])
 
     neuron = Morphology(os.path.join(_path, "iterators.asc"))
     root = neuron.root_sections[0]
     assert_array_equal([section.id for section in root.iter(depth_first)],
-                       [0,1,2,3,4,5,6])
+                       [0, 1, 2, 3, 4, 5, 6])
     assert_array_equal([section.id for section in root.iter(breadth_first)],
                        [0, 1, 4, 2, 3, 5, 6])
 
     assert_array_equal([section.id for section in neuron.iter(breadth_first)],
-                       [0, 1, 4, 2, 3, 5, 6, 7, 8, 9])
+                       [0, 7, 1, 4, 8, 9, 2, 3, 5, 6])
 
 def test_non_C_nparray():
     m = Morphology(os.path.join(_path, "simple.swc"))
     section = m.root_sections[0]
-    points = np.array([[1,2,3], [4,5,6]])
+    points = np.array([[1, 2, 3], [4, 5, 6]])
     section.points = points
     assert_array_equal(section.points, points)
 

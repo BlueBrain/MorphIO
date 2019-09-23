@@ -10,7 +10,6 @@
 
 #include <morphio/errorMessages.h>
 #include <morphio/exceptions.h>
-#include <morphio/mut/iterators.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
