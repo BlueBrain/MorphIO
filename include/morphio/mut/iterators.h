@@ -12,8 +12,6 @@ An iterator class to iterate through sections;
 template <typename T>
 class Iterator
 {
-    friend class Morphology;
-
     T container;
 
 public:

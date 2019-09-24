@@ -11,7 +11,6 @@ An iterator class to iterate through sections;
 template <typename T>
 class MitoIterator
 {
-    friend class MitoSection;
     T container;
 
 public:
