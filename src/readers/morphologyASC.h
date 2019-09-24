@@ -1,9 +1,10 @@
 #pragma once
+#include <morphio/types.h>
 
 namespace morphio {
-namespace plugin {
+namespace readers {
 namespace asc {
 Property::Properties load(const URI& uri, unsigned int options);
 } // namespace asc
-} // namespace plugin
+} // namespace readers
 } // namespace morphio

@@ -17,14 +17,14 @@ namespace py = pybind11;
 static void bind_misc(py::module &m) {
     using namespace py::literals;
 
-  m.def("set_maximum_warnings", &morphio::set_maximum_warnings,
-        "Set the maximum number of warnings to be printed on screen\n"
-        "0 will print no warning\n"
-        "-1 will print them all");
-  m.def("set_ignored_warning", static_cast<void (*)(morphio::Warning, bool)>(&morphio::set_ignored_warning),
-        "Ignore/Unignore a specific warning message", "warning"_a, "ignore"_a = true);
-  m.def("set_ignored_warning", static_cast<void (*)(const std::vector<morphio::Warning>&, bool)>(&morphio::set_ignored_warning),
-        "Ignore/Unignore a list of warnings", "warning"_a, "ignore"_a = true);
+    m.def("set_maximum_warnings", &morphio::set_maximum_warnings,
+          "Set the maximum number of warnings to be printed on screen\n"
+          "0 will print no warning\n"
+          "-1 will print them all");
+    m.def("set_ignored_warning", static_cast<void (*)(morphio::Warning, bool)>(&morphio::set_ignored_warning),
+          "Ignore/Unignore a specific warning message", "warning"_a, "ignore"_a = true);
+    m.def("set_ignored_warning", static_cast<void (*)(const std::vector<morphio::Warning>&, bool)>(&morphio::set_ignored_warning),
+          "Ignore/Unignore a list of warnings", "warning"_a, "ignore"_a = true);
 
     py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
         .value("single_child", morphio::enums::AnnotationType::SINGLE_CHILD,
@@ -227,6 +227,4 @@ static void bind_misc(py::module &m) {
         .def(py::init<std::vector<uint32_t>, std::vector<float>,
              std::vector<morphio::Property::Diameter::Type>>(),
              "neuronal_section_ids"_a, "distances_to_section_start"_a, "diameters"_a);
-
-    m.doc() = "pybind11 example plugin"; // optional module docstring
 }

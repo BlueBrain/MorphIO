@@ -1,5 +1,9 @@
 #pragma once
 
+#include <cstdint> // uint32_t
+#include <memory> // std::shared_ptr
+#include <vector> // std::vector
+
 #include <morphio/iterators.h>
 #include <morphio/morphology.h>
 #include <morphio/properties.h>

@@ -1,15 +1,15 @@
+#include "morphologyASC.h"
+
 #include <fstream>
 
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
-#include <morphio/types.h>
 
-#include "morphologyASC.h"
 
 #include "lex.cpp"
 
 namespace morphio {
-namespace plugin {
+namespace readers {
 namespace asc {
 namespace {
 
@@ -20,12 +20,20 @@ bool is_eof(Token type)
 
 bool is_end_of_branch(Token type)
 {
-    return (type == Token::GENERATED || type == Token::HIGH || type == Token::INCOMPLETE || type == Token::LOW || type == Token::NORMAL || type == Token::MIDPOINT);
+    return (type == Token::GENERATED ||
+            type == Token::HIGH ||
+            type == Token::INCOMPLETE ||
+            type == Token::LOW ||
+            type == Token::NORMAL ||
+            type == Token::MIDPOINT);
 }
 
 bool is_neurite_type(Token id)
 {
-    return (id == Token::AXON || id == Token::APICAL || id == Token::DENDRITE || id == Token::CELLBODY);
+    return (id == Token::AXON ||
+            id == Token::APICAL ||
+            id == Token::DENDRITE ||
+            id == Token::CELLBODY);
 }
 
 bool is_end_of_section(Token id)
@@ -35,7 +43,14 @@ bool is_end_of_section(Token id)
 
 bool skip_sexp(size_t id)
 {
-    return (id == +Token::WORD || id == +Token::STRING || id == +Token::COLOR || id == +Token::GENERATED || id == +Token::HIGH || id == +Token::INCOMPLETE || id == +Token::LOW || id == +Token::NORMAL);
+    return (id == +Token::WORD ||
+            id == +Token::STRING ||
+            id == +Token::COLOR ||
+            id == +Token::GENERATED ||
+            id == +Token::HIGH ||
+            id == +Token::INCOMPLETE ||
+            id == +Token::LOW ||
+            id == +Token::NORMAL);
 }
 }
 
@@ -109,9 +124,10 @@ private:
         return ret;
     }
 
-    int32_t _create_soma_or_section(Token token, int32_t parent_id,
-        std::vector<Point>& points,
-        std::vector<float>& diameters)
+    int32_t _create_soma_or_section(Token token,
+                                    int32_t parent_id,
+                                    std::vector<Point>& points,
+                                    std::vector<float>& diameters)
     {
         lex_.current_section_start_ = lex_.line_num();
         int32_t return_id;
@@ -200,8 +216,7 @@ private:
                 throw RawDataError(err_.ERROR_EOF_IN_NEURITE(lex_.line_num()));
             } else if (is_end_of_section(id)) {
                 if (!points.empty())
-                    _create_soma_or_section(token, parent_id, points,
-                        diameters);
+                    _create_soma_or_section(token, parent_id, points, diameters);
                 return true;
             } else if (is_end_of_branch(id)) {
                 lex_.consume();
@@ -288,5 +303,5 @@ Property::Properties load(const URI& uri, unsigned int options)
 }
 
 } // namespace asc
-} // namespace plugin
+} // namespace readers
 } // namespace morphio

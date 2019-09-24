@@ -4,11 +4,11 @@
 #include <morphio/types.h>
 
 namespace morphio {
-namespace plugin {
+namespace readers {
 namespace swc {
 Property::Properties load(const URI& uri, unsigned int options);
 } // namespace swc
 
-} // namespace plugin
+} // namespace readers
 
 } // namespace morphio

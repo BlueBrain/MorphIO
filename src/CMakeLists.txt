@@ -21,10 +21,10 @@ set(MORPHIO_SOURCES
     mut/mitochondria.cpp
     mut/writers.cpp
     mut/modifiers.cpp
-    plugin/morphologyHDF5.cpp
-    plugin/morphologySWC.cpp
-    plugin/morphologyASC.cpp
-    plugin/vasculatureHDF5.cpp
+    readers/morphologyHDF5.cpp
+    readers/morphologySWC.cpp
+    readers/morphologyASC.cpp
+    readers/vasculatureHDF5.cpp
     vasc/iterators.cpp
     vasc/section.cpp
     vasc/vasculature.cpp

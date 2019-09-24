@@ -7,7 +7,7 @@
 #include <lexertl/lookup.hpp>
 
 namespace morphio {
-namespace plugin {
+namespace readers {
 namespace asc {
 enum class Token
 {
@@ -119,7 +119,7 @@ private:
 public:
     size_t current_section_start_ = 0;
 
-    NeurolucidaLexer(const std::string& uri, bool debug = false)
+    explicit NeurolucidaLexer(const std::string& uri, bool debug = false)
         : uri_(uri)
         , debug_(debug)
         , err_(uri)
@@ -182,9 +182,9 @@ public:
     }
 
     size_t line_num() const { return current_line_num_; }
-    const lexertl::siterator current() const { return current_; }
-    const lexertl::siterator peek() const { return next_; }
-    static size_t skip_whitespace(lexertl::siterator& iter)
+    lexertl::siterator current() const { return current_; }
+    lexertl::siterator peek() const { return next_; }
+    size_t skip_whitespace(lexertl::siterator& iter)
     {
         const lexertl::siterator end;
         size_t endlines = 0;
@@ -207,7 +207,7 @@ public:
         return current() == end;
     }
 
-    const lexertl::siterator consume(Token t, std::string msg = "")
+    lexertl::siterator consume(Token t, std::string msg = "")
     {
         if (!msg.empty()) {
             expect(t, msg.c_str());
@@ -217,7 +217,7 @@ public:
         return consume();
     }
 
-    const lexertl::siterator consume()
+    lexertl::siterator consume()
     {
         const lexertl::siterator end;
         if (ended()) {
@@ -294,5 +294,5 @@ public:
 };
 
 } // namespace asc
-} // namespace plugin
+} // namespace readers
 } // namespace morphio

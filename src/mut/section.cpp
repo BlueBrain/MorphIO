@@ -7,7 +7,7 @@
 
 namespace morphio {
 namespace mut {
-using morphio::plugin::ErrorMessages;
+using morphio::readers::ErrorMessages;
 
 bool _emptySection(const std::shared_ptr<Section> section);
 

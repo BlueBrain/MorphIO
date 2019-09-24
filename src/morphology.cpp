@@ -12,9 +12,9 @@
 
 #include <morphio/mut/morphology.h>
 
-#include "plugin/morphologyASC.h"
-#include "plugin/morphologyHDF5.h"
-#include "plugin/morphologySWC.h"
+#include "readers/morphologyASC.h"
+#include "readers/morphologyHDF5.h"
+#include "readers/morphologySWC.h"
 
 namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
@@ -36,11 +36,11 @@ Morphology::Morphology(const URI& source, unsigned int options)
 
     auto loader = [&source, &options, &extension]() {
         if (extension == ".h5" || extension == ".H5")
-            return plugin::h5::load(source);
+            return readers::h5::load(source);
         if (extension == ".asc" || extension == ".ASC")
-            return plugin::asc::load(source, options);
+            return readers::asc::load(source, options);
         if (extension == ".swc" || extension == ".SWC")
-            return plugin::swc::load(source, options);
+            return readers::swc::load(source, options);
         LBTHROW(UnknownFileType(
             "Unhandled file type: only SWC, ASC and H5 are supported"));
     };
