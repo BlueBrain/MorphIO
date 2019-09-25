@@ -175,12 +175,12 @@ depth_iterator Morphology::depth_end() const
     return depth_iterator();
 }
 
-breadth_iterator_t<Section, Morphology> Morphology::breadth_begin() const
+breadth_iterator Morphology::breadth_begin() const
 {
     return breadth_iterator(*this);
 }
 
-breadth_iterator_t<Section, Morphology> Morphology::breadth_end() const
+breadth_iterator Morphology::breadth_end() const
 {
     return breadth_iterator();
 }

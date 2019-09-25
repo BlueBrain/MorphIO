@@ -84,7 +84,7 @@ public:
     breadth_iterator_t operator++()
     {
         if (deque_.empty()) {
-            LBTHROW(MissingParentError("XXXXXXXXXXXXXXXXXXX"));
+            LBTHROW(MorphioError("Can't iterate past the end"));
         }
 
         const auto children = detail::getChildren(deque_.front());
@@ -143,7 +143,7 @@ public:
     depth_iterator_t operator++()
     {
         if (deque_.empty()) {
-            LBTHROW(MissingParentError("XXXXXXXXXXXXXXXXXXX"));
+            LBTHROW(MorphioError("Can't iterate past the end"));
         }
 
         const auto children = detail::getChildren(deque_.front());
@@ -209,7 +209,6 @@ public:
 
     upstream_iterator_t operator++()
     {
-        //int a = *((int*) 0);
         if (end) {
             LBTHROW(MissingParentError("Cannot call iterate upstream past the root node"));
         } else if (detail::isRoot(current)) {
@@ -242,6 +241,11 @@ public:
     }
 
 private:
+    // This is a workaround for not having std::optional until c++17.
+    // Need to have a copy of a section, not a pointer, as the latter are created
+    // on the fly, so we'd have to heap allocate; however, to signal the end()
+    // of iteration, we need a 'default' section or a sentinel.  Since the concept
+    // of a default section is nebulous, a sentinel was used instead.
     union {
         char unused;
         SectionT current;

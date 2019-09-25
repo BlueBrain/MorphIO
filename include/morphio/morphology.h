@@ -13,6 +13,9 @@ enum SomaClasses
     SOMA_CYLINDER
 };
 
+using breadth_iterator = breadth_iterator_t<Section, Morphology>;
+using depth_iterator = depth_iterator_t<Section, Morphology>;
+
 /** Read access a Morphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
@@ -100,8 +103,8 @@ public:
 
        If id == -1, the iteration will start at each root section, successively
     **/
-    depth_iterator_t<Section, Morphology> depth_begin() const;
-    depth_iterator_t<Section, Morphology> depth_end() const;
+    depth_iterator depth_begin() const;
+    depth_iterator depth_end() const;
 
     /**
        Breadth first iterator
@@ -109,8 +112,8 @@ public:
        If id == -1, the iteration will be successively performed starting
        at each root section
     **/
-    breadth_iterator_t<Section, Morphology> breadth_begin() const;
-    breadth_iterator_t<Section, Morphology> breadth_end() const;
+    breadth_iterator breadth_begin() const;
+    breadth_iterator breadth_end() const;
 
     /**
      * Return the soma type
