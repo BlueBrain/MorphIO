@@ -1,4 +1,4 @@
-#include <morphio/mut/mito_iterators.h>
+#include <queue> // std::queue
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/writers.h>
 #include <morphio/shared_utils.tpp>
@@ -147,7 +147,7 @@ const std::shared_ptr<MitoSection> Mitochondria::mitoSection(uint32_t id_) const
 mito_depth_iterator Mitochondria::depth_begin(
     std::shared_ptr<MitoSection> section_) const
 {
-    return mito_depth_iterator(*this, section_);
+    return mito_depth_iterator(section_);
 }
 
 mito_depth_iterator Mitochondria::depth_end() const
@@ -158,7 +158,7 @@ mito_depth_iterator Mitochondria::depth_end() const
 mito_breadth_iterator Mitochondria::breadth_begin(
     std::shared_ptr<MitoSection> section_) const
 {
-    return mito_breadth_iterator(*this, section_);
+    return mito_breadth_iterator(section_);
 }
 
 mito_breadth_iterator Mitochondria::breadth_end() const
@@ -169,7 +169,7 @@ mito_breadth_iterator Mitochondria::breadth_end() const
 mito_upstream_iterator Mitochondria::upstream_begin(
     std::shared_ptr<MitoSection> section_) const
 {
-    return mito_upstream_iterator(*this, section_);
+    return mito_upstream_iterator(section_);
 }
 
 mito_upstream_iterator Mitochondria::upstream_end() const

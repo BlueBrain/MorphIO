@@ -35,12 +35,12 @@ def test_iter():
     neuron = Morphology(os.path.join(_path, "iterators.asc"))
     root = neuron.root_sections[0]
     assert_array_equal([section.id for section in root.iter(IterType.depth_first)],
-                       [0,1,2,3,4,5,6])
+                       [0, 1, 2, 3, 4, 5, 6])
     assert_array_equal([section.id for section in root.iter(IterType.breadth_first)],
                        [0, 1, 4, 2, 3, 5, 6])
 
     assert_array_equal([section.id for section in neuron.iter(IterType.breadth_first)],
-                       [0, 1, 4, 2, 3, 5, 6, 7, 8, 9])
+                       [0, 7, 1, 4, 8, 9, 2, 3, 5, 6])
 
 
     for _, cell in CELLS.items():

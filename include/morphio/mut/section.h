@@ -6,13 +6,20 @@
 #include <morphio/section.h>
 #include <morphio/types.h>
 
-#include <morphio/mut/iterators.h>
+#include <morphio/section_iterators.hpp>
 
 namespace morphio {
 namespace mut {
+
+using upstream_iterator = morphio::upstream_iterator_t<std::shared_ptr<Section>>;
+using breadth_iterator = morphio::breadth_iterator_t<std::shared_ptr<Section>, Morphology>;
+using depth_iterator = morphio::depth_iterator_t<std::shared_ptr<Section>, Morphology>;
+
 class Section : public std::enable_shared_from_this<Section>
 {
 public:
+    ~Section() {}
+
     /**
      * Return the section ID
      **/
@@ -85,7 +92,6 @@ public:
     upstream_iterator upstream_begin() const;
     upstream_iterator upstream_end() const;
 
-    ~Section() {}
     std::shared_ptr<Section> appendSection(const morphio::Section&,
         bool recursive = false);
 

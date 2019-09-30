@@ -1,9 +1,9 @@
-#include <morphio/mito_iterators.h>
 #include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
 
 namespace morphio {
+
 mito_depth_iterator MitoSection::depth_begin() const
 {
     return mito_depth_iterator(*this);

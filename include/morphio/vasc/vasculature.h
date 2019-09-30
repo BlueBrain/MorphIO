@@ -5,11 +5,14 @@
 #include <vector> // std::vector
 
 #include <morphio/types.h>
-#include <morphio/vasc/iterators.h>
+#include <morphio/vasc/iterators.hpp>
 #include <morphio/vasc/properties.h>
 
 namespace morphio {
 namespace vasculature {
+
+using graph_iterator = graph_iterator_t<Section, Vasculature>;
+
 class Vasculature
 {
 public:

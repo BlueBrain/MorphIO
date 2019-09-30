@@ -2,6 +2,7 @@
 
 #include <memory> //std::unique_ptr
 
+#include <morphio/section_iterators.hpp>
 #include <morphio/properties.h>
 #include <morphio/types.h>
 
@@ -11,6 +12,9 @@ enum SomaClasses
     SOMA_CONTOUR,
     SOMA_CYLINDER
 };
+
+using breadth_iterator = breadth_iterator_t<Section, Morphology>;
+using depth_iterator = depth_iterator_t<Section, Morphology>;
 
 /** Read access a Morphology file.
  *

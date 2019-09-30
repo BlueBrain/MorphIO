@@ -1,11 +1,6 @@
-#include <cassert>
-#include <iostream>
-#include <unistd.h>
+#include <unistd.h> // access / F_OK
+#include <cstdint> // uint32_t
 
-#include <fstream>
-#include <streambuf>
-
-#include <morphio/iterators.h>
 #include <morphio/vasc/section.h>
 #include <morphio/vasc/vasculature.h>
 
@@ -50,8 +45,8 @@ const Section Vasculature::section(const uint32_t& id) const
 const std::vector<Section> Vasculature::sections() const
 {
     std::vector<Section> sections_;
-    for (uint i = 0; i < _properties->get<property::VascSection>().size(); ++i) {
-        sections_.push_back(section(i));
+    for (size_t i = 0; i < _properties->get<property::VascSection>().size(); ++i) {
+        sections_.push_back(section(static_cast<uint32_t>(i)));
     }
     return sections_;
 }

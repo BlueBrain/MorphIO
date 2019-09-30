@@ -8,7 +8,6 @@
 #include <morphio/types.h>
 #include <morphio/enums.h>
 
-#include <morphio/mito_iterators.h>
 #include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
 #include <morphio/section.h>

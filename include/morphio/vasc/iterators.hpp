@@ -1,15 +1,25 @@
-#include <cstddef>  // std::size_t
-#include <morphio/vasc/section.h>
 
+#include <set>
+#include <stack>
 
 namespace morphio {
 namespace vasculature {
-graph_iterator::graph_iterator(const Section& vasculatureSection)
+
+template<typename SectionT, typename VasculatureT>
+class graph_iterator_t
+{
+    std::set<SectionT> visited;
+    std::stack<SectionT> container;
+
+public:
+graph_iterator_t() = default;
+
+explicit graph_iterator_t(const SectionT& vasculatureSection)
 {
     container.push(vasculatureSection);
 }
 
-graph_iterator::graph_iterator(const Vasculature& vasculatureMorphology)
+explicit graph_iterator_t(const VasculatureT& vasculatureMorphology)
 {
     auto sections = vasculatureMorphology.sections();
     for (std::size_t i = 0; i < sections.size(); ++i) {
@@ -19,22 +29,23 @@ graph_iterator::graph_iterator(const Vasculature& vasculatureMorphology)
         }
     }
 }
-bool graph_iterator::operator==(graph_iterator other) const
+
+bool operator==(const graph_iterator_t& other) const
 {
     return container == other.container;
 }
 
-bool graph_iterator::operator!=(graph_iterator other) const
+bool operator!=(const graph_iterator_t& other) const
 {
     return !(*this == other);
 }
 
-Section graph_iterator::operator*() const
+SectionT operator*() const
 {
     return container.top();
 }
 
-graph_iterator& graph_iterator::operator++()
+graph_iterator_t& operator++()
 {
     const auto& section = *(*this);
     container.pop();
@@ -46,12 +57,12 @@ graph_iterator& graph_iterator::operator++()
         }
     return *this;
 }
-
-graph_iterator graph_iterator::operator++(int)
+graph_iterator_t operator++(int)
 {
-    graph_iterator retval = *this;
+    graph_iterator_t retval = *this;
     ++(*this);
     return retval;
 }
+};
 }  // namespace vasculature
 }  // namespace morphio

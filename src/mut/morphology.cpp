@@ -5,7 +5,6 @@
 
 #include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
-#include <morphio/mut/iterators.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>

@@ -1,6 +1,8 @@
 #pragma once
 
-#include <morphio/iterators.h>
+#include <memory>  // std::shared_ptr
+
+#include <morphio/section_iterators.hpp>
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/section_base.h>
@@ -26,6 +28,10 @@ namespace morphio {
  * has been deallocated. The morphological data will be kept as long as there
  * is a Section referring to it.
  */
+
+using upstream_iterator = upstream_iterator_t<Section>;
+using breadth_iterator = breadth_iterator_t<Section, Morphology>;
+using depth_iterator = depth_iterator_t<Section, Morphology>;
 
 class Section : public SectionBase<Section>
 {
@@ -81,10 +87,9 @@ public:
     friend class SectionBase<Section>;
 
 protected:
-    Section(uint32_t id_, std::shared_ptr<Property::Properties> morphology)
-        : SectionBase(id_, morphology)
-    {
-    }
+    Section(uint32_t id_, std::shared_ptr<Property::Properties> properties)
+    : SectionBase(id_, properties)
+    {}
 };
 
 // explicit instanciation

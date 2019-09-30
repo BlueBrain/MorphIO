@@ -121,7 +121,9 @@ std::shared_ptr<Section> Section::appendSection(
     if (emptySection)
         LBERROR(Warning::APPENDING_EMPTY_SECTION, _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
-    if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection && !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
+    if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
+        !emptySection &&
+        !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
         LBERROR(Warning::WRONG_DUPLICATE,
             _morphology->_err.WARNING_WRONG_DUPLICATE(
                 _sections[childId], _sections.at(parentId)));

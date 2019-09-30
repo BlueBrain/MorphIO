@@ -1,4 +1,3 @@
-#include <morphio/mut/mito_iterators.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>

@@ -10,7 +10,6 @@
 
 #include <morphio/errorMessages.h>
 #include <morphio/exceptions.h>
-#include <morphio/mut/iterators.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
@@ -146,31 +145,23 @@ public:
     std::shared_ptr<Section> appendRootSection(const Property::PointLevel&,
         SectionType sectionType);
 
-    /**
-       Iterate on all sections starting at startSection via a depth-first-search
-    traversal and call the callback function fun.
-
-       startSection specifies the starting section. if startSection == -1, the
-    traversal will done on every neurite.
-    **/
-    // void traverse(std::function<void(Morphology& morphology, uint32_t
-    // sectionId)>,
-    //               uint32_t startSection = -1);
-
     void applyModifiers(unsigned int modifierFlags);
 
     /**
      * Return the soma type
      **/
     SomaType somaType() { return _soma->type(); }
+
     /**
      * Return the cell family (neuron or glia)
      **/
     CellFamily& cellFamily() { return _cellProperties->_cellFamily; }
+
     /**
      * Return the version
      **/
     MorphologyVersion& version() { return _cellProperties->_version; }
+
     /**
      * Write file to H5, SWC, ASC format depending on filename extension
      **/
@@ -195,7 +186,9 @@ public:
 private:
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
-    friend bool diff(const Morphology& left, const Morphology& right, morphio::enums::LogLevel verbose);
+    friend bool diff(const Morphology& left,
+                     const Morphology& right,
+                     morphio::enums::LogLevel verbose);
     morphio::readers::ErrorMessages _err;
 
     uint32_t _register(std::shared_ptr<Section>);
