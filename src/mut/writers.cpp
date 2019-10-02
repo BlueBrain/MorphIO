@@ -248,10 +248,11 @@ static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochon
         structure.push_back({s._sections[i][0], s._sections[i][1]});
     }
 
-    HighFive::Group g_mitochondria = h5_file.createGroup("mitochondria");
+    HighFive::Group g_organelles = h5_file.createGroup("organelles");
+    HighFive::Group g_mitochondria = g_organelles.createGroup("mitochondria");
 
-    write_dataset(g_mitochondria, "/mitochondria/points", points);
-    write_dataset(h5_file, "/mitochondria/structure", structure);
+    write_dataset(g_mitochondria, "points", points);
+    write_dataset(g_mitochondria, "structure", structure);
 }
 
 void h5(const Morphology& morpho, const std::string& filename)

@@ -37,7 +37,7 @@ const size_t _structureV1Columns = 3;
 const std::string _g_metadata("/metadata");
 const std::string _a_family("cell_family");
 const std::string _d_perimeters("/perimeters");
-const std::string _g_mitochondria("/mitochondria");
+const std::string _g_mitochondria("/organelles/mitochondria");
 
 // v1.1 & v2
 const std::string _a_version("version");

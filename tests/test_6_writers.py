@@ -181,9 +181,6 @@ def test_mitochondria():
     morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
     morpho.soma.diameters = [1, 1]
 
-    section_id = morpho.append_root_section(PointLevel([[2, 2, 2], [3, 3, 3]], [4, 4], [5, 5]),
-        SectionType.axon,)
-
     neuronal_section_ids = [0, 0]
     relative_pathlengths = np.array([0.5, 0.6], dtype=np.float32)
     diameters = [10, 20]
