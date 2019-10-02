@@ -20,6 +20,7 @@ class SectionBase;
 class Section;
 class MitoSection;
 class Mitochondria;
+class EndoplasmicReticulum;
 class Soma;
 
 namespace Property {

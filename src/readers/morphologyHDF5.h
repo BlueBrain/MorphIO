@@ -36,6 +36,7 @@ class MorphologyHDF5
     void _readSectionTypes();
     void _readPerimeters(int);
     void _readMitochondria();
+    void _readEndoplasmicReticulum();
 
     template <typename T>
     void _read(const std::string& group,

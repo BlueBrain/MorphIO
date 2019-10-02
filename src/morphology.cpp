@@ -4,6 +4,7 @@
 #include <fstream>
 #include <streambuf>
 
+#include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
 #include <morphio/section.h>
@@ -83,7 +84,13 @@ Mitochondria Morphology::mitochondria() const {
     return Mitochondria(_properties);
 }
 
-const std::vector<Property::Annotation>& Morphology::annotations() const {
+const EndoplasmicReticulum Morphology::endoplasmicReticulum() const
+{
+    return EndoplasmicReticulum(_properties);
+}
+
+const std::vector<Property::Annotation>& Morphology::annotations() const
+{
     return _properties->_annotations;
 }
 

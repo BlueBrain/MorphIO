@@ -3,6 +3,7 @@ set(MORPHIO_SOURCES
     errorMessages.cpp
     mito_section.cpp
     mitochondria.cpp
+    endoplasmic_reticulum.cpp
     morphology.cpp
     morphology.cpp
     properties.cpp

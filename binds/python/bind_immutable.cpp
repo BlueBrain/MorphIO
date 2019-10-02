@@ -5,6 +5,7 @@
 #include <pybind11/iostream.h>  // py::add_ostream_redirect
 
 #include <morphio/enums.h>
+#include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
 #include <morphio/types.h>
@@ -43,6 +44,8 @@ void bind_immutable_module(py::module& m) {
                                "Returns the soma object")
         .def_property_readonly("annotations",
                                &morphio::Morphology::annotations,
+        .def_property_readonly("endoplasmic_reticulum", &morphio::Morphology::endoplasmicReticulum,
+                               "Returns the endoplasmic reticulum object")
                                "Returns a list of annotations")
         .def_property_readonly("root_sections",
                                &morphio::Morphology::rootSections,
@@ -160,6 +163,20 @@ void bind_immutable_module(py::module& m) {
             "root_sections",
             &morphio::Mitochondria::rootSections,
             "Returns a list of all root sections (section whose parent ID is -1)");
+
+    py::class_<morphio::EndoplasmicReticulum>(
+        m, "EndoplasmicReticulum",
+        "The entry-point class to access endoplasmic reticulum data\n"
+        "Spec https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html")
+        .def_property_readonly("section_indices", &morphio::EndoplasmicReticulum::sectionIndices,
+                               "Returns the list of neuronal section indices")
+        .def_property_readonly("volumes", &morphio::EndoplasmicReticulum::volumes,
+                               "Returns the list of neuronal section indices")
+        .def_property_readonly("surface_areas", &morphio::EndoplasmicReticulum::surfaceAreas,
+                               "Returns the surface areas for each neuronal section")
+        .def_property_readonly("filament_counts", &morphio::EndoplasmicReticulum::filamentCounts,
+                               "Returns the number of filaments for each neuronal section");
+
 
 
     py::class_<morphio::Soma>(m, "Soma")

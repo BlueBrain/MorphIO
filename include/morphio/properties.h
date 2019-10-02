@@ -134,12 +134,21 @@ struct MitochondriaSectionLevel {
     bool operator!=(const MitochondriaSectionLevel& other) const;
 };
 
+struct EndoplasmicReticulumLevel
+{
+    std::vector<uint32_t> _sectionIndex;
+    std::vector<float> _volume;
+    std::vector<float> _surfaceArea;
+    std::vector<uint32_t> _filamentCount;
+};
+
 struct Annotation {
     Annotation(AnnotationType type,
                uint32_t sectionId,
                PointLevel points,
                std::string details,
                int32_t lineNumber);
+
     AnnotationType _type;
     uint32_t _sectionId;
     PointLevel _points;
@@ -171,6 +180,8 @@ struct Properties {
 
     MitochondriaPointLevel _mitochondriaPointLevel;
     MitochondriaSectionLevel _mitochondriaSectionLevel;
+
+    EndoplasmicReticulumLevel _endoplasmicReticulumLevel;
 
     std::vector<Annotation> _annotations;
 
