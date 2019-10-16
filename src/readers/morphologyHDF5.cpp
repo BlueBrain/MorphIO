@@ -472,7 +472,7 @@ void MorphologyHDF5::_readEndoplasmicReticulum()
 
         try {
             const auto group = _file->getGroup(_g_endoplasmic_reticulum);
-        } catch (HighFive::GroupException&) {
+        } catch (const HighFive::GroupException&) {
             return;
         }
     }
