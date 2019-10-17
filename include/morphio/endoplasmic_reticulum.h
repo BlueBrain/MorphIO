@@ -33,7 +33,7 @@ public:
 
 private:
     EndoplasmicReticulum(std::shared_ptr<Property::Properties> properties)
-        : _properties(properties)
+        : _properties(std::move(properties))
     {
     }
     std::shared_ptr<Property::Properties> _properties;
