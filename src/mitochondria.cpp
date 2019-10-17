@@ -1,6 +1,5 @@
 #include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
-#include <morphio/properties.h>
 
 namespace morphio {
 MitoSection Mitochondria::section(uint32_t id) const {

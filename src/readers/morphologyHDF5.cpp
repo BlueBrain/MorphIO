@@ -44,7 +44,7 @@ const std::string _g_endoplasmic_reticulum("/organelles/endoplasmic_reticulum");
 const std::string _d_section_index("section_index");
 const std::string _d_volume("volume");
 const std::string _d_surface_area("surface_area");
-const std::string _d_filament_count("filaments");
+const std::string _d_filament_count("filament_count");
 
 // v1.1 & v2
 const std::string _a_version("version");
