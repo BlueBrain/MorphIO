@@ -315,7 +315,32 @@ void Morphology::applyModifiers(unsigned int modifierFlags) {
         modifiers::nrn_order(*this);
 }
 
-void Morphology::write(const std::string& filename) {
+std::map<int, std::vector<unsigned int>> Morphology::connectivity()
+{
+    std::map<int, std::vector<unsigned int>> connectivity;
+    for(auto kv: _children)
+    {
+        int node_id = static_cast<int>(kv.first);
+        connectivity[node_id] = std::vector<unsigned int>();
+        for(auto section: kv.second)
+        {
+            connectivity[node_id].push_back(section->id());
+        }
+    }
+
+    if(!rootSections().empty())
+    {
+        connectivity[-1] = std::vector<unsigned int>();
+        for(const auto& section: rootSections())
+            connectivity[-1].push_back(section->id());
+    }
+
+    return connectivity;
+}
+
+
+void Morphology::write(const std::string& filename)
+{
     const size_t pos = filename.find_last_of(".");
     assert(pos != std::string::npos);
 

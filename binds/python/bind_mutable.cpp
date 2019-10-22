@@ -104,6 +104,10 @@ void bind_mutable_module(py::module& m) {
         .def("as_immutable",
              [](const morphio::mut::Morphology* morph) { return morphio::Morphology(*morph); })
 
+        .def_property_readonly("connectivity", &morphio::mut::Morphology::connectivity,
+                               "Return the graph connectivity of the morphology "
+                               "where each section is seen as a node\nNote: -1 is the soma node")
+
         .def_property_readonly("cell_family",
                                &morphio::mut::Morphology::cellFamily,
                                "Returns the cell family (neuron or glia)")

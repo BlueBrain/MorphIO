@@ -4,7 +4,7 @@ from itertools import combinations
 from pathlib2 import Path
 
 import numpy as np
-from nose.tools import assert_equal, assert_not_equal, assert_raises, ok_
+from nose.tools import assert_equal, assert_not_equal, assert_raises, ok_, assert_dict_equal
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from morphio import IterType, Morphology, RawDataError, upstream
@@ -60,6 +60,11 @@ def test_iter():
 def test_section_offsets():
     for cell in CELLS:
         assert_array_equal(CELLS[cell].section_offsets, [0, 2, 4, 6, 8, 10, 12])
+
+
+def test_connectivity():
+    for _, cell in CELLS.items():
+        assert_dict_equal(cell.connectivity, {-1: [0, 3], 0: [1, 2], 3: [4, 5]})
 
 
 def test_mitochondria():

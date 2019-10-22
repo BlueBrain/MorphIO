@@ -108,6 +108,9 @@ void bind_immutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a vector with the section type of every section")
+        .def_property_readonly("connectivity", &morphio::Morphology::connectivity,
+                               "Return the graph connectivity of the morphology "
+                               "where each section is seen as a node\nNote: -1 is the soma node")
         .def_property_readonly("soma_type", &morphio::Morphology::somaType, "Returns the soma type")
         .def_property_readonly("cell_family",
                                &morphio::Morphology::cellFamily,

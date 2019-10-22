@@ -181,6 +181,14 @@ class Morphology
     Property::Properties buildReadOnly() const;
 
     /**
+     * Return the graph connectivity of the morphology where each section
+     * is seen as a node
+     * Note: -1 is the soma node
+     **/
+    std::map<int, std::vector<unsigned int>> connectivity();
+
+
+    /**
        Check that the neuron is valid, issue warning and fix unifurcations
      **/
     void sanitize();
