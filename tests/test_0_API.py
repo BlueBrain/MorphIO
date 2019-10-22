@@ -27,7 +27,7 @@ def test_mut_immut_have_same_methods():
     def methods(cls):
         return set(method for method in dir(cls) if not method[:2] == '__')
 
-    only_in_immut = {'section_types', 'diameters', 'perimeters', 'points', 'as_mutable'}
+    only_in_immut = {'section_types', 'diameters', 'perimeters', 'points', 'section_offsets', 'as_mutable'}
     only_in_mut = {'write', 'append_root_section', 'delete_section', 'build_read_only', 'as_immutable'}
     assert_equal(methods(morphio.Morphology) - only_in_immut,
                  methods(morphio.mut.Morphology) - only_in_mut)

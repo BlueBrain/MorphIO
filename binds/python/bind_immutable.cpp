@@ -53,6 +53,10 @@ static void bind_immutable_module(py::module &m) {
                 return py::array(static_cast<py::ssize_t>(morpho->points().size()), morpho->points().data());
             },
             "Returns a list with all points from all sections")
+        .def_property_readonly("section_offsets", [](morphio::Morphology* morpho){
+                return py::array(static_cast<py::ssize_t>(morpho->sectionOffsets().size()), morpho->sectionOffsets().data());
+            },
+            "Returns a list with offsets to access data of a specific section in the points and diameters arrays")
         .def_property_readonly("diameters", [](morphio::Morphology* morpho){
                 auto diameters = morpho->diameters();
                 return py::array(static_cast<py::ssize_t>(diameters.size()), diameters.data());

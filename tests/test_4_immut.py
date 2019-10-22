@@ -50,10 +50,14 @@ def test_iter():
                            [0, 1, 2, 3, 4, 5])
         assert_array_equal([section.points for section in
                             cell.root_sections[0].children[0].iter(upstream)],
-                           [[[0.,  5.,  0.],
-                             [-5.,  5.,  0.]],
+                           [[[0., 5., 0.],
+                             [-5., 5., 0.]],
                             [[0., 0., 0.],
                              [0., 5., 0.]]])
+
+def test_section_offsets():
+    for _, cell in CELLS.items():
+        assert_array_equal(cell.section_offsets, [0, 2, 4, 6, 8, 10])
 
 
 def test_mitochondria():

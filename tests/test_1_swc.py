@@ -34,6 +34,7 @@ def test_read_single_neurite():
                                  [0, 0, 3],
                                  [0, 0, 4],
                                  [0, 0, 5]]))
+    assert_array_equal(n.section_offsets, [0])
 
 
 def test_skip_comments():
@@ -72,8 +73,8 @@ def test_read_simple():
     assert_equal(len(simple.root_sections[0].children), 2)
     assert_equal(simple.root_sections[0].children[0].id, 1)
     assert_equal(simple.root_sections[0].children[1].id, 2)
-    # assert_array_equal(simple.root_sections[0].children[0].points, [[0, 5, 0], [-5, 5, 0]])
-    # assert_array_equal(simple.root_sections[1].points, [[0, 0, 0], [0, -4, 0]])
+    assert_array_equal(simple.root_sections[0].children[0].points, [[0, 5, 0], [-5, 5, 0]])
+    assert_array_equal(simple.root_sections[1].points, [[0, 0, 0], [0, -4, 0]])
 
 
 def test_repeated_id():

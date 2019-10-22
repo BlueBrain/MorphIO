@@ -429,7 +429,6 @@ def test_spine():
                                  [13.75,    -5.96,   150.00]], dtype=np.float32))
 
 
-
 def test_markers():
     '''Test that markers do not prevent file from being read correctly'''
 

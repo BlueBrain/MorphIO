@@ -83,6 +83,12 @@ public:
     const Points& points() const;
 
     /**
+     * Returns a list with offsets to access data of a specific section in the points
+     * and diameters arrays
+     **/
+    const std::vector<int> sectionOffsets() const;
+
+    /**
      * Return a vector with all diameters from all sections
      * (soma points are not included)
      **/
