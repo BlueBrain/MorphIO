@@ -86,7 +86,7 @@ public:
      * Returns a list with offsets to access data of a specific section in the points
      * and diameters arrays
      **/
-    const std::vector<int> sectionOffsets() const;
+    const std::vector<uint32_t> sectionOffsets() const;
 
     /**
      * Return a vector with all diameters from all sections
