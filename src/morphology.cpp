@@ -140,10 +140,12 @@ const Points& Morphology::points() const
 
 const std::vector<uint32_t> Morphology::sectionOffsets() const
 {
-    const std::vector<std::array<int, 2>>& indices_and_parents = get<Property::Section>();
-    std::vector<uint32_t> indices(indices_and_parents.size());
+    const std::vector<Property::Section::Type>& indices_and_parents = get<Property::Section>();
+    auto size = indices_and_parents.size();
+    std::vector<uint32_t> indices(size+1);
     std::transform(indices_and_parents.begin(), indices_and_parents.end(), indices.begin(),
-                   [](const std::array<int, 2>& pair) { return pair[0]; });
+                   [](const Property::Section::Type& pair) { return pair[0]; });
+    indices[size] = points().size();
     return indices;
 }
 

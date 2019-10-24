@@ -56,8 +56,8 @@ def test_iter():
                              [0., 5., 0.]]])
 
 def test_section_offsets():
-    for cell in CELLS.values():
-        assert_array_equal(cell.section_offsets, [0, 2, 4, 6, 8, 10])
+    for cell in CELLS:
+        assert_array_equal(CELLS[cell].section_offsets, [0, 2, 4, 6, 8, 10, 12])
 
 
 def test_mitochondria():

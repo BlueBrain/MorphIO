@@ -84,7 +84,13 @@ public:
 
     /**
      * Returns a list with offsets to access data of a specific section in the points
-     * and diameters arrays
+     * and diameters arrays.
+     *
+     * Example: accessing diameters of n'th section will be located in the DIAMETERS
+     * array from DIAMETERS[sectionOffsets(n)] to DIAMETERS[sectionOffsets(n+1)-1]
+     *
+     * Note: for convenience, the last point of this array is the points() array size
+     * so that the above example works also for the last section.
      **/
     const std::vector<uint32_t> sectionOffsets() const;
 

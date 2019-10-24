@@ -34,7 +34,7 @@ def test_read_single_neurite():
                                  [0, 0, 3],
                                  [0, 0, 4],
                                  [0, 0, 5]]))
-    assert_array_equal(n.section_offsets, [0])
+    assert_array_equal(n.section_offsets, [0, 4])
 
 
 def test_skip_comments():
