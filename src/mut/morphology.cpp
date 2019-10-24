@@ -318,7 +318,7 @@ void Morphology::applyModifiers(unsigned int modifierFlags) {
 std::map<int, std::vector<unsigned int>> Morphology::connectivity()
 {
     std::map<int, std::vector<unsigned int>> connectivity;
-    for(auto kv: _children)
+    for(const auto& kv: _children)
     {
         auto node_id = static_cast<int>(kv.first);
         connectivity[node_id] = std::vector<unsigned int>();
