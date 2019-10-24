@@ -315,24 +315,21 @@ void Morphology::applyModifiers(unsigned int modifierFlags) {
         modifiers::nrn_order(*this);
 }
 
-std::map<int, std::vector<unsigned int>> Morphology::connectivity()
+std::unordered_map<int, std::vector<unsigned int>> Morphology::connectivity()
 {
-    std::map<int, std::vector<unsigned int>> connectivity;
+    std::unordered_map<int, std::vector<unsigned int>> connectivity;
+
+    const auto& roots = rootSections();
+    connectivity[-1].reserve(roots.size());
+    std::transform(roots.begin(), roots.end(), std::back_inserter(connectivity[-1]),
+                   [](const std::shared_ptr<Section>& section) { return section->id(); });
+
     for(const auto& kv: _children)
     {
-        auto node_id = static_cast<int>(kv.first);
-        connectivity[node_id] = std::vector<unsigned int>();
-        for(auto section: kv.second)
-        {
-            connectivity[node_id].push_back(section->id());
-        }
-    }
-
-    if(!rootSections().empty())
-    {
-        connectivity[-1] = std::vector<unsigned int>();
-        for(const auto& section: rootSections())
-            connectivity[-1].push_back(section->id());
+        auto& nodeEdges = connectivity[static_cast<int>(kv.first)];
+        nodeEdges.reserve(kv.second.size());
+        std::transform(kv.second.begin(), kv.second.end(), std::back_inserter(nodeEdges),
+                       [](const std::shared_ptr<Section>& section) { return section->id(); });
     }
 
     return connectivity;

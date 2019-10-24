@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 #include <ostream>
+#include <unordered_map>
 
 #include <functional>
 
@@ -185,7 +186,7 @@ class Morphology
      * is seen as a node
      * Note: -1 is the soma node
      **/
-    std::map<int, std::vector<unsigned int>> connectivity();
+    std::unordered_map<int, std::vector<unsigned int>> connectivity();
 
 
     /**

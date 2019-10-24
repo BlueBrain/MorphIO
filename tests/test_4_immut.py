@@ -63,8 +63,8 @@ def test_section_offsets():
 
 
 def test_connectivity():
-    for _, cell in CELLS.items():
-        assert_dict_equal(cell.connectivity, {-1: [0, 3], 0: [1, 2], 3: [4, 5]})
+    for cell in CELLS:
+        assert_dict_equal(CELLS[cell].connectivity, {-1: [0, 3], 0: [1, 2], 3: [4, 5]})
 
 
 def test_mitochondria():

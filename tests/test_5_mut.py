@@ -49,8 +49,8 @@ def test_connectivity():
         'h5': Morphology(os.path.join(_path, "h5/v1/simple.h5")),
     })
 
-    for _, cell in cells.items():
-        assert_dict_equal(cell.connectivity, {-1: [0, 3], 0: [1, 2], 3: [4, 5]})
+    for cell in cells:
+        assert_dict_equal(cells[cell].connectivity, {-1: [0, 3], 0: [1, 2], 3: [4, 5]})
 
 
 def test_empty_neurite():
