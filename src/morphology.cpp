@@ -145,7 +145,7 @@ const std::vector<uint32_t> Morphology::sectionOffsets() const
     std::vector<uint32_t> indices(size+1);
     std::transform(indices_and_parents.begin(), indices_and_parents.end(), indices.begin(),
                    [](const Property::Section::Type& pair) { return pair[0]; });
-    indices[size] = points().size();
+    indices[size] = static_cast<uint32_t>(points().size());
     return indices;
 }
 
