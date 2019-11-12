@@ -38,16 +38,8 @@ python:
   - 3.7
 
 before_install:
-  - if [ $TRAVIS_OS_NAME = linux ]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
-  - pip install virtualenv
-  - virtualenv env && source env/bin/activate
-install:
-  - pip install --upgrade pip
-  - pip install .
+  - if [[ $TRAVIS_OS_NAME = linux ]]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
+install: skip
 script:
-  # Need to concatenate all commands with otherwise Travis only looks at the output code of the last command
-
-  # Testing compilation with warning as error
-  - rm -rf build; mkdir build && pushd build && cmake .. && make -j && popd &&
-    pip install -r tests/requirement_tests.txt &&
-    nosetests
+  - ./python_test.sh
+  - ./cpp_test.sh

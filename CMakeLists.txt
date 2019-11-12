@@ -11,6 +11,8 @@ option(${PROJECT_NAME}_CXX_WARNINGS "Compile C++ with warnings" ON)
 include(${PROJECT_SOURCE_DIR}/CMake/CompilerFlags.cmake)
 set(CMAKE_CXX_FLAGS "${FLAGS}")
 
+set(MORPHIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+
 add_subdirectory(3rdparty)
 add_subdirectory(src)
 
@@ -18,7 +20,6 @@ if(BUILD_BINDINGS)
   add_subdirectory(binds/python)
 endif(BUILD_BINDINGS)
 
-set(MORPHIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
 install(
   DIRECTORY ${MORPHIO_INCLUDE_DIR}
   DESTINATION include
@@ -34,3 +35,6 @@ install(
   FILES ${CMAKE_CURRENT_LIST_DIR}/CMake/MorphIOConfig.cmake
   DESTINATION lib/cmake/MorphIO
   )
+
+enable_testing()
+add_subdirectory(tests)

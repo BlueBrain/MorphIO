@@ -54,9 +54,14 @@ class CMakeBuild(build_ext):
                 cmake_args += ['-A', 'x64']
             build_args += ['--', '/m']
         else:
+            try:
+                CPU_COUNT = os.cpu_count()  # python 3.4+
+            except:
+                CPU_COUNT = 2
+
             cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
                            '-DMorphIO_CXX_WARNINGS=OFF']
-            build_args += ['--', '-j']
+            build_args += ['--', '-j%d' % CPU_COUNT]
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
