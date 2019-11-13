@@ -8,3 +8,15 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
 
     REQUIRE(m.diameters().size() == 924);
 }
+
+TEST_CASE("LoadSWCMorphology", "[morphology]") {
+    const morphio::Morphology m("data/simple.swc");
+
+    REQUIRE(m.diameters().size() == 12);
+}
+
+TEST_CASE("LoadNeurolucidaMorphology", "[morphology]") {
+    const morphio::Morphology m("data/multiple_point_section.asc");
+
+    REQUIRE(m.diameters().size() == 14);
+}
