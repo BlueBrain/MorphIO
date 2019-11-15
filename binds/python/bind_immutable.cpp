@@ -70,8 +70,7 @@ static void bind_immutable_module(py::module &m) {
             "Note: perimeters belonging to the n'th section are located at indices:\n"
             "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
         .def_property_readonly("section_offsets", [](const morphio::Morphology& morpho){
-                return py::array(static_cast<py::ssize_t>(morpho.sectionOffsets().size()),
-                                 morpho.sectionOffsets().data());
+                return as_pyarray(morpho.sectionOffsets());
             },
             "Returns a list with offsets to access data of a specific section in the points\n"
             "and diameters arrays.\n"
