@@ -50,20 +50,21 @@ static void bind_immutable_module(py::module &m) {
 
         // Property accessors
         .def_property_readonly("points", [](morphio::Morphology* morpho){
-                return py::array(static_cast<py::ssize_t>(morpho->points().size()), morpho->points().data());
+                const auto& data = morpho->points();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a list with all points from all sections (soma points are not included)\n"
             "Note: points belonging to the n'th section are located at indices:\n"
             "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
         .def_property_readonly("diameters", [](const morphio::Morphology& morpho){
-                auto diameters = morpho.diameters();
-                return py::array(static_cast<py::ssize_t>(diameters.size()), diameters.data());
+                const auto& data = morpho.diameters();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a list with all diameters from all sections (soma points are not included)\n"
             "Note: diameters belonging to the n'th section are located at indices:\n"
             "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
         .def_property_readonly("perimeters", [](const morphio::Morphology& obj){
-                auto data = obj.perimeters();
+                const auto& data = obj.perimeters();
                 return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a list with all perimeters from all sections (soma points are not included)\n"
@@ -81,7 +82,7 @@ static void bind_immutable_module(py::module &m) {
             "Note: for convenience, the last point of this array is the points array size\n"
             "so that the above example works also for the last section.")
         .def_property_readonly("section_types", [](const morphio::Morphology& morph){
-                auto data = morph.sectionTypes();
+                const auto& data = morph.sectionTypes();
                 return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a vector with the section type of every section")
