@@ -1,4 +1,7 @@
+#include <utility>
+
 #include <pybind11/pybind11.h>
+
 #include <morphio/types.h>
 #include <morphio/enums.h>
 

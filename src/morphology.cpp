@@ -138,7 +138,7 @@ const Points& Morphology::points() const
     return get<Property::Point>();
 }
 
-const std::vector<uint32_t> Morphology::sectionOffsets() const
+std::vector<uint32_t> Morphology::sectionOffsets() const
 {
     const std::vector<Property::Section::Type>& indices_and_parents = get<Property::Section>();
     auto size = indices_and_parents.size();

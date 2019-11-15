@@ -92,7 +92,7 @@ public:
      * Note: for convenience, the last point of this array is the points() array size
      * so that the above example works also for the last section.
      **/
-    const std::vector<uint32_t> sectionOffsets() const;
+    std::vector<uint32_t> sectionOffsets() const;
 
     /**
      * Return a vector with all diameters from all sections
