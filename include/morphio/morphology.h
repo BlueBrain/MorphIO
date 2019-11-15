@@ -46,35 +46,35 @@ public:
     /**
      * Return the soma object
      **/
-    const Soma soma() const;
+    Soma soma() const;
 
     /**
      * Return the mitochondria object
      **/
-    const Mitochondria mitochondria() const;
+    Mitochondria mitochondria() const;
 
     /**
      * Return the annotation object
      **/
-    const std::vector<Property::Annotation> annotations() const;
+    const std::vector<Property::Annotation>& annotations() const;
 
     /**
      * Return a vector of all root sections
      * (sections whose parent ID are -1)
      **/
-    const std::vector<Section> rootSections() const;
+    std::vector<Section> rootSections() const;
 
     /**
      * Return a vector containing all section objects.
      **/
-    const std::vector<Section> sections() const;
+    std::vector<Section> sections() const;
 
     /**
      * Return the Section with the given id.
      *
      * @throw RawDataError if the id is out of range
      */
-    const Section section(const uint32_t& id) const;
+    Section section(const uint32_t& id) const;
 
     /**
      * Return a vector with all points from all sections

@@ -79,27 +79,27 @@ Morphology::~Morphology()
 {
 }
 
-const Soma Morphology::soma() const
+Soma Morphology::soma() const
 {
-    return Soma(_properties);
+    return {_properties};
 }
 
-const Mitochondria Morphology::mitochondria() const
+Mitochondria Morphology::mitochondria() const
 {
-    return Mitochondria(_properties);
+    return {_properties};
 }
 
-const std::vector<Property::Annotation> Morphology::annotations() const
+const std::vector<Property::Annotation>& Morphology::annotations() const
 {
     return _properties->_annotations;
 }
 
-const Section Morphology::section(const uint32_t& id) const
+Section Morphology::section(const uint32_t& id) const
 {
-    return Section(id, _properties);
+    return {id, _properties};
 }
 
-const std::vector<Section> Morphology::rootSections() const
+std::vector<Section> Morphology::rootSections() const
 {
     std::vector<Section> result;
     try {
@@ -115,7 +115,7 @@ const std::vector<Section> Morphology::rootSections() const
     }
 }
 
-const std::vector<Section> Morphology::sections() const
+std::vector<Section> Morphology::sections() const
 {
     // TODO: Make this more performant when needed
     std::vector<Section> sections_;
