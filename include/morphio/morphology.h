@@ -46,41 +46,53 @@ public:
     /**
      * Return the soma object
      **/
-    const Soma soma() const;
+    Soma soma() const;
 
     /**
      * Return the mitochondria object
      **/
-    const Mitochondria mitochondria() const;
+    Mitochondria mitochondria() const;
 
     /**
      * Return the annotation object
      **/
-    const std::vector<Property::Annotation> annotations() const;
+    const std::vector<Property::Annotation>& annotations() const;
 
     /**
      * Return a vector of all root sections
      * (sections whose parent ID are -1)
      **/
-    const std::vector<Section> rootSections() const;
+    std::vector<Section> rootSections() const;
 
     /**
      * Return a vector containing all section objects.
      **/
-    const std::vector<Section> sections() const;
+    std::vector<Section> sections() const;
 
     /**
      * Return the Section with the given id.
      *
      * @throw RawDataError if the id is out of range
      */
-    const Section section(const uint32_t& id) const;
+    Section section(const uint32_t& id) const;
 
     /**
      * Return a vector with all points from all sections
      * (soma points are not included)
      **/
     const Points& points() const;
+
+    /**
+     * Returns a list with offsets to access data of a specific section in the points
+     * and diameters arrays.
+     *
+     * Example: accessing diameters of n'th section will be located in the DIAMETERS
+     * array from DIAMETERS[sectionOffsets(n)] to DIAMETERS[sectionOffsets(n+1)-1]
+     *
+     * Note: for convenience, the last point of this array is the points() array size
+     * so that the above example works also for the last section.
+     **/
+    std::vector<uint32_t> sectionOffsets() const;
 
     /**
      * Return a vector with all diameters from all sections

@@ -12,6 +12,7 @@ matrix:
       env:
         CXX: clang++
         CC: clang
+
     - os: osx
       osx_image: xcode10.1
       language: generic
@@ -19,13 +20,13 @@ matrix:
       env:
         CXX: clang++
         CC: clang
-     - os: osx
-       osx_image: xcode10.1
-       language: generic
-       python: 2.7
-       env:
-         CXX: g++
-         CC: gcc
+    - os: osx
+      osx_image: xcode10.1
+      language: generic
+      python: 2.7
+      env:
+        CXX: g++
+        CC: gcc
 
 cache:
   directories:

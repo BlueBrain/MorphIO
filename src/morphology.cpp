@@ -79,27 +79,27 @@ Morphology::~Morphology()
 {
 }
 
-const Soma Morphology::soma() const
+Soma Morphology::soma() const
 {
-    return Soma(_properties);
+    return {_properties};
 }
 
-const Mitochondria Morphology::mitochondria() const
+Mitochondria Morphology::mitochondria() const
 {
-    return Mitochondria(_properties);
+    return {_properties};
 }
 
-const std::vector<Property::Annotation> Morphology::annotations() const
+const std::vector<Property::Annotation>& Morphology::annotations() const
 {
     return _properties->_annotations;
 }
 
-const Section Morphology::section(const uint32_t& id) const
+Section Morphology::section(const uint32_t& id) const
 {
-    return Section(id, _properties);
+    return {id, _properties};
 }
 
-const std::vector<Section> Morphology::rootSections() const
+std::vector<Section> Morphology::rootSections() const
 {
     std::vector<Section> result;
     try {
@@ -115,7 +115,7 @@ const std::vector<Section> Morphology::rootSections() const
     }
 }
 
-const std::vector<Section> Morphology::sections() const
+std::vector<Section> Morphology::sections() const
 {
     // TODO: Make this more performant when needed
     std::vector<Section> sections_;
@@ -137,14 +137,28 @@ const Points& Morphology::points() const
 {
     return get<Property::Point>();
 }
+
+std::vector<uint32_t> Morphology::sectionOffsets() const
+{
+    const std::vector<Property::Section::Type>& indices_and_parents = get<Property::Section>();
+    auto size = indices_and_parents.size();
+    std::vector<uint32_t> indices(size+1);
+    std::transform(indices_and_parents.begin(), indices_and_parents.end(), indices.begin(),
+                   [](const Property::Section::Type& pair) { return pair[0]; });
+    indices[size] = static_cast<uint32_t>(points().size());
+    return indices;
+}
+
 const std::vector<float>& Morphology::diameters() const
 {
     return get<Property::Diameter>();
 }
+
 const std::vector<float>& Morphology::perimeters() const
 {
     return get<Property::Perimeter>();
 }
+
 const std::vector<SectionType>& Morphology::sectionTypes() const
 {
     return get<Property::SectionType>();

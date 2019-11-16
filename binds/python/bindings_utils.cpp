@@ -1,4 +1,7 @@
+#include <utility>
+
 #include <pybind11/pybind11.h>
+
 #include <morphio/types.h>
 #include <morphio/enums.h>
 
@@ -64,4 +67,25 @@ static morphio::Points array_to_points(py::array_t<float> &buf){
         points.push_back(std::array<float, 3>{*buf.data(i, 0), *buf.data(i, 1), *buf.data(i, 2)});
     }
     return points;
+}
+
+/**
+ * @brief "Casts" a Cpp sequence to a python array (no memory copies)
+ *  Python capsule handles void pointers to objects and makes sure
+ *      that they will remain alive.
+ *
+ *      https://github.com/pybind/pybind11/issues/1042#issuecomment-325941022
+ */
+template <typename Sequence>
+inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence&& seq) {
+    // Move entire object to heap. Memory handled via Python capsule
+    Sequence* seq_ptr = new Sequence(std::move(seq));
+    // Capsule shall delete sequence object when done
+    auto capsule = py::capsule(seq_ptr,
+                               [](void* p) { delete reinterpret_cast<Sequence*>(p); });
+
+    return py::array(static_cast<py::ssize_t>(seq_ptr->size()),  // shape of array
+                     seq_ptr->data(),  // c-style contiguous strides for Sequence
+                     capsule           // numpy array references this parent
+    );
 }

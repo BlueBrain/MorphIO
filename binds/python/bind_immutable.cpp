@@ -50,21 +50,39 @@ static void bind_immutable_module(py::module &m) {
 
         // Property accessors
         .def_property_readonly("points", [](morphio::Morphology* morpho){
-                return py::array(static_cast<py::ssize_t>(morpho->points().size()), morpho->points().data());
-            },
-            "Returns a list with all points from all sections")
-        .def_property_readonly("diameters", [](morphio::Morphology* morpho){
-                auto diameters = morpho->diameters();
-                return py::array(static_cast<py::ssize_t>(diameters.size()), diameters.data());
-            },
-            "Returns a list with all diameters from all sections (soma points are not included)")
-        .def_property_readonly("perimeters", [](morphio::Morphology* obj){
-                auto data = obj->perimeters();
+                const auto& data = morpho->points();
                 return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
-            "Returns a list with all perimeters from all sections")
-        .def_property_readonly("section_types", [](morphio::Morphology* obj){
-                auto data = obj->sectionTypes();
+            "Returns a list with all points from all sections (soma points are not included)\n"
+            "Note: points belonging to the n'th section are located at indices:\n"
+            "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
+        .def_property_readonly("diameters", [](const morphio::Morphology& morpho){
+                const auto& data = morpho.diameters();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            },
+            "Returns a list with all diameters from all sections (soma points are not included)\n"
+            "Note: diameters belonging to the n'th section are located at indices:\n"
+            "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
+        .def_property_readonly("perimeters", [](const morphio::Morphology& obj){
+                const auto& data = obj.perimeters();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            },
+            "Returns a list with all perimeters from all sections (soma points are not included)\n"
+            "Note: perimeters belonging to the n'th section are located at indices:\n"
+            "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
+        .def_property_readonly("section_offsets", [](const morphio::Morphology& morpho){
+                return as_pyarray(morpho.sectionOffsets());
+            },
+            "Returns a list with offsets to access data of a specific section in the points\n"
+            "and diameters arrays.\n"
+            "\n"
+            "Example: accessing diameters of n'th section will be located in the DIAMETERS\n"
+            "array from DIAMETERS[sectionOffsets(n)] to DIAMETERS[sectionOffsets(n+1)-1]\n"
+            "\n"
+            "Note: for convenience, the last point of this array is the points array size\n"
+            "so that the above example works also for the last section.")
+        .def_property_readonly("section_types", [](const morphio::Morphology& morph){
+                const auto& data = morph.sectionTypes();
                 return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a vector with the section type of every section")
