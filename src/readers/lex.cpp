@@ -54,13 +54,13 @@ constexpr bool operator==(int lhs, Token type)
     return lhs == static_cast<int>(type);
 }
 
-inline std::ostream& operator<<(std::ostream& s, const Token& t)
+inline std::string to_string(Token t)
 {
     switch (t) {
 #define Q(x) #x
 #define T(TOK)       \
     case Token::TOK: \
-        s << Q(TOK); \
+        return Q(TOK); \
         break;
         T(EOF_)
         T(WS)
@@ -88,12 +88,14 @@ inline std::ostream& operator<<(std::ostream& s, const Token& t)
         T(NORMAL)
         T(MIDPOINT)
     default:
-        s << "Unknown";
+        return "Unknown";
 #undef T
 #undef Q
     }
+}
 
-    return s;
+inline std::ostream& operator<<(std::ostream& ostr, Token t) {
+    return ostr << to_string(t);
 }
 
 constexpr std::size_t operator+(Token type)
@@ -169,7 +171,7 @@ public:
         rules_.push("Normal", +Token::NORMAL);
         rules_.push("Midpoint", +Token::MIDPOINT);
 
-        rules_.push("\\\"[^\"]*\\\"", +Token::STRING);
+        rules_.push(R"(\"[^"]*\")", +Token::STRING);
 
         rules_.push("-?[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?", +Token::NUMBER);
         rules_.push("[a-zA-Z][0-9a-zA-Z]+", +Token::WORD);
@@ -181,9 +183,9 @@ public:
         }
     }
 
-    size_t line_num() const { return current_line_num_; }
-    lexertl::siterator current() const { return current_; }
-    lexertl::siterator peek() const { return next_; }
+    size_t line_num() const noexcept { return current_line_num_; }
+    const lexertl::siterator& current() const noexcept { return current_; }
+    const lexertl::siterator& peek() const noexcept { return next_; }
     size_t skip_whitespace(lexertl::siterator& iter)
     {
         const lexertl::siterator end;
@@ -207,7 +209,7 @@ public:
         return current() == end;
     }
 
-    lexertl::siterator consume(Token t, std::string msg = "")
+    lexertl::siterator consume(Token t, const std::string& msg = "")
     {
         if (!msg.empty()) {
             expect(t, msg.c_str());
@@ -247,21 +249,14 @@ public:
         std::cout << "Id: " << Token(current_->id) << ", Token: '"
                   << current_->str() << "' line: " << current_line_num_
                   << " Next Id: " << Token(next_->id) << ", Token: '"
-                  << next_->str() << "' line: " << next_line_num_ << std::endl;
+                  << next_->str() << "' line: " << next_line_num_ << '\n';
     }
 
     void expect(Token t, const char* msg) const
     {
         if (current()->id != +t) {
-            std::stringstream expected;
-            expected << t;
-
-            std::stringstream got;
-            got << current()->str();
-
             throw RawDataError(err_.ERROR_UNEXPECTED_TOKEN(line_num(),
-                expected.str(),
-                got.str(), msg));
+                to_string(t), current()->str(), msg));
         }
     }
 

@@ -71,7 +71,7 @@ public:
 
        Note: Root sections return -1
     **/
-    const std::shared_ptr<Section> parent() const;
+    const std::shared_ptr<Section>& parent() const;
 
     /**
        Return true if section is a root section
@@ -81,7 +81,7 @@ public:
     /**
        Return a vector of children IDs
     **/
-    const std::vector<std::shared_ptr<Section>> children() const;
+    const std::vector<std::shared_ptr<Section>>& children() const;
 
     depth_iterator depth_begin() const;
     depth_iterator depth_end() const;
@@ -105,10 +105,6 @@ public:
 private:
     friend class Morphology;
 
-    // The joy of C++:
-    // https://stackoverflow.com/questions/8202530/how-can-i-call-a-private-destructor-from-a-shared-ptr
-    friend void friendDtorForSharedPtr(Section*);
-
     Section(Morphology*, unsigned int id, SectionType type, const Property::PointLevel&);
     Section(Morphology*, unsigned int id, const morphio::Section& section);
     Section(Morphology*, unsigned int id, const Section&);
@@ -119,9 +115,7 @@ private:
     SectionType _sectionType;
 };
 
-void friendDtorForSharedPtr(Section* section);
-
-std::ostream& operator<<(std::ostream&, std::shared_ptr<Section>);
+std::ostream& operator<<(std::ostream&, const std::shared_ptr<Section>&);
 
 } // namespace mut
 } // namespace morphio

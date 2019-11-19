@@ -28,12 +28,12 @@ public:
     : _id(0)
     {}
 
-    explicit SectionBase(const SectionBase& section);
+    SectionBase(const SectionBase& section);
 
-    const SectionBase& operator=(const SectionBase& section);
+    SectionBase& operator=(const SectionBase& other);
 
-    bool operator==(const SectionBase& section) const;
-    bool operator!=(const SectionBase& section) const;
+    bool operator==(const SectionBase& other) const;
+    bool operator!=(const SectionBase& other) const;
 
     /**
      * Return true if this section is a root section (parent ID == -1)
@@ -50,15 +50,15 @@ public:
     /**
      * Return a list of children sections
      */
-    const std::vector<T> children() const;
+    std::vector<T> children() const;
 
     /** Return the ID of this section. */
     uint32_t id() const;
 
 protected:
-    SectionBase(uint32_t id, std::shared_ptr<Property::Properties> properties);
+    SectionBase(uint32_t id, const std::shared_ptr<Property::Properties>& properties);
     template <typename Property>
-    const range<const typename Property::Type> get() const;
+    range<const typename Property::Type> get() const;
 
     uint32_t _id;
     SectionRange _range;
@@ -69,6 +69,6 @@ protected:
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
 std::ostream& operator<<(std::ostream& os,
-    morphio::range<const morphio::Point> points);
+    const morphio::range<const morphio::Point>& points);
 
 #include "section_base.tpp"

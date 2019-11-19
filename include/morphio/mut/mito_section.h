@@ -20,7 +20,7 @@ public:
         const Property::MitochondriaPointLevel& points);
 
     std::shared_ptr<MitoSection> appendSection(
-        std::shared_ptr<MitoSection> original_section, bool recursive);
+        const std::shared_ptr<MitoSection>& original_section, bool recursive);
 
     std::shared_ptr<MitoSection> appendSection(
         const morphio::MitoSection& section, bool recursive);
@@ -32,15 +32,15 @@ public:
     /**
      * Return the section id
      **/
-    uint32_t id() const { return _id; }
+    uint32_t id() const noexcept { return _id; }
     /**
      * Return the diameters of all points of this section
      **/
-    std::vector<float>& diameters() { return _mitoPoints._diameters; }
+    std::vector<float>& diameters() noexcept { return _mitoPoints._diameters; }
     /**
      * Return the neurite section Ids of all points of this section
      **/
-    std::vector<uint32_t>& neuriteSectionIds()
+    std::vector<uint32_t>& neuriteSectionIds() noexcept
     {
         return _mitoPoints._sectionIds;
     }
@@ -50,13 +50,12 @@ public:
      * between the start of the neuronal section and each point
      * of this mitochondrial section
      **/
-    std::vector<float>& pathLengths()
+    std::vector<float>& pathLengths() noexcept
     {
         return _mitoPoints._relativePathLengths;
     }
 
 private:
-    friend void friendDtorForSharedPtr(Section*);
     uint32_t _id;
 
     Mitochondria* _mitochondria;
@@ -65,8 +64,6 @@ public:
     // TODO: make private
     Property::MitochondriaPointLevel _mitoPoints;
 };
-
-void friendDtorForSharedPtrMito(MitoSection* section);
 
 } // namespace mut
 } // namespace morphio

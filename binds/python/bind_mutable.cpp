@@ -27,7 +27,7 @@ static void bind_mutable_module(py::module &m) {
                                "Returns a list of all root sections IDs "
                                "(sections whose parent ID are -1)", py::return_value_policy::reference)
         .def_property_readonly("soma",
-                               static_cast<std::shared_ptr<morphio::mut::Soma>(morphio::mut::Morphology::*)()>(&morphio::mut::Morphology::soma),
+                               static_cast<std::shared_ptr<morphio::mut::Soma>&(morphio::mut::Morphology::*)()>(&morphio::mut::Morphology::soma),
                                "Returns a reference to the soma object\n\n"
                                "Note: multiple morphologies can share the same Soma instance")
         .def_property_readonly("mitochondria", static_cast<morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ()>(&morphio::mut::Morphology::mitochondria),
@@ -92,7 +92,7 @@ static void bind_mutable_module(py::module &m) {
 
 
     mutable_morphology.def("append_root_section", static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*)
-                           (std::shared_ptr<morphio::mut::Section>, bool)>(
+                           (const std::shared_ptr<morphio::mut::Section>&, bool)>(
                                &morphio::mut::Morphology::appendRootSection),
                            "Append the existing mutable Section as a root section\n"
                            "If recursive == true, all descendent will be appended as well",
@@ -128,7 +128,7 @@ static void bind_mutable_module(py::module &m) {
              "Append a new root MitoSection (if recursive == true, all descendent will be appended as well)",
              "immutable_section"_a, "recursive"_a = true)
         .def("append_root_section", static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*)
-             (const std::shared_ptr<morphio::mut::MitoSection>, bool recursive)>
+             (const std::shared_ptr<morphio::mut::MitoSection>&, bool recursive)>
              (&morphio::mut::Mitochondria::appendRootSection),
              "Append a new root MitoSection (if recursive == true, all descendent will be appended as well)",
              "section"_a, "recursive"_a = true)
@@ -197,7 +197,7 @@ static void bind_mutable_module(py::module &m) {
              "Append a new MitoSection to this mito section",
              "point_level_properties"_a)
 
-        .def("append_section", static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (std::shared_ptr<morphio::mut::MitoSection>, bool)>(&morphio::mut::MitoSection::appendSection),
+        .def("append_section", static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (const std::shared_ptr<morphio::mut::MitoSection>&, bool)>(&morphio::mut::MitoSection::appendSection),
              "Append a copy of the section to this section\n"
              "If recursive == true, all descendent will be appended as well",
              "section"_a, "recursive"_a=false)

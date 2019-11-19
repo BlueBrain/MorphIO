@@ -18,8 +18,8 @@
 
 namespace morphio {
 namespace mut {
-bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
-    std::shared_ptr<Section> current);
+bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
+    const std::shared_ptr<Section>& current);
 
 class Morphology
 {
@@ -58,37 +58,49 @@ public:
     /**
        Returns all section ids at the tree root
     **/
-    const std::vector<std::shared_ptr<Section>>& rootSections() const;
+    const std::vector<std::shared_ptr<Section>>& rootSections() const noexcept {
+        return _rootSections;
+    }
 
     /**
        Returns the dictionary id -> Section for this tree
     **/
-    const std::map<uint32_t, std::shared_ptr<Section>> sections() const;
+    const std::map<uint32_t, std::shared_ptr<Section>>& sections() const noexcept {
+        return _sections;
+    }
 
     /**
        Returns a shared pointer on the Soma
 
        Note: multiple morphologies can share the same Soma instance
     **/
-    std::shared_ptr<Soma> soma();
-    const std::shared_ptr<Soma> soma() const;
+    std::shared_ptr<Soma>& soma() noexcept {
+        return _soma;
+    }
+    const std::shared_ptr<Soma>& soma() const noexcept {
+        return _soma;
+    }
 
     /**
      * Return the mitochondria container class
      **/
-    Mitochondria& mitochondria() { return _mitochondria; }
-    const Mitochondria& mitochondria() const { return _mitochondria; }
+    Mitochondria& mitochondria() noexcept { return _mitochondria; }
+    const Mitochondria& mitochondria() const noexcept { return _mitochondria; }
     /**
      * Return the annotation object
      **/
-    const std::vector<Property::Annotation> annotations() const;
+    const std::vector<Property::Annotation>& annotations() const noexcept {
+        return _annotations;
+    }
 
     /**
        Get the shared pointer for the given section
 
        Note: multiple morphologies can share the same Section instances.
     **/
-    const std::shared_ptr<Section> section(uint32_t id) const;
+    const std::shared_ptr<Section>& section(uint32_t id) const {
+        return _sections.at(id);
+    }
 
     /**
        Depth first iterator starting at a given section id
@@ -121,7 +133,7 @@ public:
        If recursive == true, all descendent sections will be deleted as well
        Else, children will be re-attached to their grand-parent
     **/
-    void deleteSection(std::shared_ptr<Section> section, bool recursive = true);
+    void deleteSection(const std::shared_ptr<Section>& section, bool recursive = true);
 
     /**
        Append the existing morphio::Section as a root section
@@ -136,7 +148,7 @@ public:
 
        If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<Section> appendRootSection(std::shared_ptr<Section> section,
+    std::shared_ptr<Section> appendRootSection(const std::shared_ptr<Section>& section,
         bool recursive = false);
 
     /**
@@ -150,17 +162,17 @@ public:
     /**
      * Return the soma type
      **/
-    SomaType somaType() { return _soma->type(); }
+    SomaType somaType() const noexcept { return _soma->type(); }
 
     /**
      * Return the cell family (neuron or glia)
      **/
-    CellFamily& cellFamily() { return _cellProperties->_cellFamily; }
+    CellFamily cellFamily() const noexcept { return _cellProperties->_cellFamily; }
 
     /**
      * Return the version
      **/
-    MorphologyVersion& version() { return _cellProperties->_version; }
+    MorphologyVersion version() const noexcept { return _cellProperties->_version; }
 
     /**
      * Write file to H5, SWC, ASC format depending on filename extension
@@ -175,7 +187,7 @@ public:
     /**
        Return the data structure used to create read-only morphologies
     **/
-    const Property::Properties buildReadOnly() const;
+    Property::Properties buildReadOnly() const;
 
     /**
        Check that the neuron is valid, issue warning and fix unifurcations
@@ -191,7 +203,7 @@ private:
                      morphio::enums::LogLevel verbose);
     morphio::readers::ErrorMessages _err;
 
-    uint32_t _register(std::shared_ptr<Section>);
+    uint32_t _register(const std::shared_ptr<Section>&);
 
     uint32_t _counter;
     std::shared_ptr<Soma> _soma;

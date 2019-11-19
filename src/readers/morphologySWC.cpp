@@ -42,7 +42,7 @@ public:
     {
         _readSamples();
 
-        for (auto sample_pair : samples) {
+        for (const auto& sample_pair : samples) {
             const auto& sample = sample_pair.second;
             raiseIfNonConform(sample);
         }
@@ -84,7 +84,6 @@ public:
                 lastSomaPoint = static_cast<int>(sample.id);
             }
         }
-        file.close();
     }
 
     /**
@@ -187,7 +186,7 @@ public:
     }
 
     template <typename T>
-    void appendSample(std::shared_ptr<T> somaOrSection, const Sample& sample)
+    void appendSample(const std::shared_ptr<T>& somaOrSection, const Sample& sample)
     {
         debugInfo.setLineNumber(sample.id, sample.lineNumber);
         somaOrSection->points().push_back(sample.point);

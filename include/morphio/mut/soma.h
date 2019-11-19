@@ -29,8 +29,8 @@ public:
     /**
        Return the diameters of all soma points
     **/
-    std::vector<float>& diameters() { return _pointProperties._diameters; }
-    const std::vector<float>& diameters() const
+    std::vector<float>& diameters() noexcept { return _pointProperties._diameters; }
+    const std::vector<float>& diameters() const noexcept
     {
         return _pointProperties._diameters;
     }
@@ -38,11 +38,11 @@ public:
     /**
        Return the soma type
     **/
-    SomaType type() const { return _somaType; }
+    SomaType type() const noexcept { return _somaType; }
     /**
      * Return the center of gravity of the soma points
      **/
-    const Point center() const;
+    Point center() const;
 
     /**
        Return the soma surface
@@ -63,8 +63,8 @@ private:
     Property::PointLevel _pointProperties;
 };
 
-std::ostream& operator<<(std::ostream& os, std::shared_ptr<Soma> sectionPtr);
-std::ostream& operator<<(std::ostream& os, Soma& soma);
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& sectionPtr);
+std::ostream& operator<<(std::ostream& os, const Soma& soma);
 
 } // namespace mut
 } // namespace morphio

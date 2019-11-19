@@ -19,7 +19,7 @@ class MorphologyHDF5
 {
 public:
     MorphologyHDF5(const std::string& uri) : _err(uri), _uri(uri){}
-    virtual ~MorphologyHDF5();
+    virtual ~MorphologyHDF5() = default;
     Property::Properties load();
 
 private:

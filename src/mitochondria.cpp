@@ -2,22 +2,22 @@
 #include <morphio/mitochondria.h>
 
 namespace morphio {
-const MitoSection Mitochondria::section(const uint32_t& id) const
+MitoSection Mitochondria::section(uint32_t id) const
 {
-    return MitoSection(id, _properties);
+    return {id, _properties};
 }
 
-const std::vector<MitoSection> Mitochondria::sections() const
+std::vector<MitoSection> Mitochondria::sections() const
 {
-    std::vector<MitoSection> sections_;
+    std::vector<MitoSection> sections;
     for (unsigned int i = 0;
          i < _properties->get<morphio::Property::MitoSection>().size(); ++i) {
-        sections_.push_back(section(i));
+        sections.push_back(section(i));
     }
-    return sections_;
+    return sections;
 }
 
-const std::vector<MitoSection> Mitochondria::rootSections() const
+std::vector<MitoSection> Mitochondria::rootSections() const
 {
     std::vector<MitoSection> result;
     try {

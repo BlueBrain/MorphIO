@@ -37,37 +37,39 @@ Vasculature::Vasculature(const std::string& source)
     buildConnectivity(_properties);
 }
 
-const Section Vasculature::section(const uint32_t& id) const
+Section Vasculature::section(const uint32_t& id) const
 {
-    return Section(id, _properties);
+    return {id, _properties};
 }
 
-const std::vector<Section> Vasculature::sections() const
+std::vector<Section> Vasculature::sections() const
 {
     std::vector<Section> sections_;
-    for (size_t i = 0; i < _properties->get<property::VascSection>().size(); ++i) {
-        sections_.push_back(section(static_cast<uint32_t>(i)));
+    const auto& vasc_sections = _properties->get<property::VascSection>();
+    sections_.reserve(vasc_sections.size());
+    for (size_t i = 0; i < vasc_sections.size(); ++i) {
+        sections_.emplace_back(static_cast<uint32_t>(i), _properties);
     }
     return sections_;
 }
 
 template <typename Property>
-const std::vector<typename Property::Type>& Vasculature::get() const
+const std::vector<typename Property::Type>& Vasculature::get() const noexcept
 {
     return _properties->get<Property>();
 }
 
-const Points& Vasculature::points() const
+const Points& Vasculature::points() const noexcept
 {
     return get<property::Point>();
 }
 
-const std::vector<float>& Vasculature::diameters() const
+const std::vector<float>& Vasculature::diameters() const noexcept
 {
     return get<property::Diameter>();
 }
 
-const std::vector<property::SectionType::Type>& Vasculature::sectionTypes() const
+const std::vector<property::SectionType::Type>& Vasculature::sectionTypes() const noexcept
 {
     return get<property::SectionType>();
 }

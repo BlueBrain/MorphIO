@@ -2,6 +2,7 @@
 
 #include <array>
 #include <iostream>
+#include <sstream>
 #include <string>  // std::string
 #include <vector>
 
@@ -27,11 +28,11 @@ Point operator*(T factor, const Point& from);
 template <typename T>
 Point operator/(const Point& from, T factor);
 template <typename T>
-const Point centerOfGravity(const T& points);
+Point centerOfGravity(const T& points);
 template <typename T>
 float maxDistanceToCenterOfGravity(const T& points);
 
-extern template const Point centerOfGravity(const Points&);
+extern template Point centerOfGravity(const Points&);
 extern template float maxDistanceToCenterOfGravity(const Points&);
 
 std::string dumpPoint(const Point& point);
@@ -56,10 +57,9 @@ namespace std {
 template <typename T, size_t N>
 string to_string(const array<T, N>& a)
 {
-    string res;
-    for (auto el : a)
-        res += to_string(el) + ", ";
-    return res;
+    std::ostringstream oss;
+    std::copy(a.begin(), a.end(), std::ostream_iterator<T>(oss, ", "));
+    return oss.str();
 }
 
 } // namespace std

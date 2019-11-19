@@ -14,12 +14,12 @@ namespace morphio {
 class Mitochondria
 {
 public:
-    const MitoSection section(const uint32_t& id) const;
-    const std::vector<MitoSection> rootSections() const;
-    const std::vector<MitoSection> sections() const;
+    MitoSection section(uint32_t id) const;
+    std::vector<MitoSection> rootSections() const;
+    std::vector<MitoSection> sections() const;
 
 private:
-    Mitochondria(std::shared_ptr<Property::Properties> properties)
+    explicit Mitochondria(const std::shared_ptr<Property::Properties>& properties)
         : _properties(properties)
     {
     }

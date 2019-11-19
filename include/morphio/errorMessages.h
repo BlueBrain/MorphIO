@@ -101,7 +101,7 @@ public:
     **/
     static bool isIgnored(Warning warning);
 
-    const std::string errorLink(long unsigned int lineNumber, ErrorLevel errorLevel) const
+    std::string errorLink(long unsigned int lineNumber, ErrorLevel errorLevel) const
     {
         std::map<ErrorLevel, std::string> SEVERITY{{ErrorLevel::INFO, "info"},
             {ErrorLevel::WARNING,
@@ -119,73 +119,73 @@ public:
         return COLOR.at(errorLevel) + _uri + ":" + std::to_string(lineNumber) + ":" + SEVERITY.at(errorLevel) + COLOR_END;
     }
 
-    const std::string errorMsg(long unsigned int lineNumber, ErrorLevel errorLevel,
+    std::string errorMsg(long unsigned int lineNumber, ErrorLevel errorLevel,
         std::string msg = "") const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //              ERRORS
     ////////////////////////////////////////////////////////////////////////////////
 
-    const std::string ERROR_OPENING_FILE() const;
+    std::string ERROR_OPENING_FILE() const;
 
-    const std::string ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const;
+    std::string ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const;
 
-    const std::string ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
+    std::string ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
                                                      const SectionType& type) const;
 
-    const std::string ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(long unsigned int lineNumber,
+    std::string ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(long unsigned int lineNumber,
                                                                  const VascularSectionType& type) const;
 
-    const std::string ERROR_MULTIPLE_SOMATA(
+    std::string ERROR_MULTIPLE_SOMATA(
         const std::vector<Sample>& somata) const;
 
-    const std::string ERROR_MISSING_PARENT(const Sample& sample) const;
+    std::string ERROR_MISSING_PARENT(const Sample& sample) const;
 
     std::string ERROR_SOMA_BIFURCATION(
         const Sample& sample, const std::vector<Sample>& children) const;
 
     std::string ERROR_SOMA_WITH_NEURITE_PARENT(const Sample& sample) const;
 
-    const std::string ERROR_REPEATED_ID(const Sample& originalSample,
+    std::string ERROR_REPEATED_ID(const Sample& originalSample,
         const Sample& newSample) const;
 
-    const std::string ERROR_SELF_PARENT(const Sample& sample) const;
+    std::string ERROR_SELF_PARENT(const Sample& sample) const;
 
-    const std::string ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(
+    std::string ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(
         const std::string&) const;
 
-    const std::string ERROR_MISSING_MITO_PARENT(int mitoParentId) const;
+    std::string ERROR_MISSING_MITO_PARENT(int mitoParentId) const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //             NEUROLUCIDA
     ////////////////////////////////////////////////////////////////////////////////
-    const std::string ERROR_SOMA_ALREADY_DEFINED(long unsigned int lineNumber) const;
+    std::string ERROR_SOMA_ALREADY_DEFINED(long unsigned int lineNumber) const;
 
-    const std::string ERROR_PARSING_POINT(long unsigned int lineNumber,
+    std::string ERROR_PARSING_POINT(long unsigned int lineNumber,
         const std::string& point) const;
 
-    const std::string ERROR_UNKNOWN_TOKEN(long unsigned int lineNumber,
+    std::string ERROR_UNKNOWN_TOKEN(long unsigned int lineNumber,
         const std::string& token) const;
 
-    const std::string ERROR_UNEXPECTED_TOKEN(long unsigned int lineNumber,
+    std::string ERROR_UNEXPECTED_TOKEN(long unsigned int lineNumber,
         const std::string& expected,
         const std::string& got,
         const std::string& msg) const;
 
-    const std::string ERROR_EOF_REACHED(long unsigned int lineNumber) const;
+    std::string ERROR_EOF_REACHED(long unsigned int lineNumber) const;
 
-    const std::string ERROR_EOF_IN_NEURITE(long unsigned int lineNumber) const;
+    std::string ERROR_EOF_IN_NEURITE(long unsigned int lineNumber) const;
 
-    const std::string ERROR_EOF_UNBALANCED_PARENS(long unsigned int lineNumber) const;
+    std::string ERROR_EOF_UNBALANCED_PARENS(long unsigned int lineNumber) const;
 
-    const std::string ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
+    std::string ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
         morphio::Option flag2) const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WRITERS
     ////////////////////////////////////////////////////////////////////////////////
 
-    const std::string ERROR_WRONG_EXTENSION(const std::string filename) const;
+    std::string ERROR_WRONG_EXTENSION(const std::string& filename) const;
 
     std::string ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1,
         size_t length1,
@@ -204,10 +204,10 @@ public:
         std::shared_ptr<morphio::mut::Section> current,
         std::shared_ptr<morphio::mut::Section> parent) const;
     std::string WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morphio::mut::Section>);
-    const std::string WARNING_ONLY_CHILD(const DebugInfo& info, unsigned int parentId,
+    std::string WARNING_ONLY_CHILD(const DebugInfo& info, unsigned int parentId,
         unsigned int childId) const;
 
-    const std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
+    std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
         const Sample& root, const Sample& child1, const Sample& child2);
 
     std::string WARNING_WRONG_ROOT_POINT(

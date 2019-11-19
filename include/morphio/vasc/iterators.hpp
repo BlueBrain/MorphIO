@@ -1,4 +1,5 @@
 
+#include <iterator>
 #include <set>
 #include <stack>
 
@@ -6,7 +7,7 @@ namespace morphio {
 namespace vasculature {
 
 template<typename SectionT, typename VasculatureT>
-class graph_iterator_t
+class graph_iterator_t: public std::iterator<std::input_iterator_tag, SectionT>
 {
     std::set<SectionT> visited;
     std::stack<SectionT> container;
@@ -21,7 +22,7 @@ explicit graph_iterator_t(const SectionT& vasculatureSection)
 
 explicit graph_iterator_t(const VasculatureT& vasculatureMorphology)
 {
-    auto sections = vasculatureMorphology.sections();
+    const auto& sections = vasculatureMorphology.sections();
     for (std::size_t i = 0; i < sections.size(); ++i) {
         if (sections[i].predecessors().empty()) {
             container.push(sections[i]);
@@ -40,7 +41,7 @@ bool operator!=(const graph_iterator_t& other) const
     return !(*this == other);
 }
 
-SectionT operator*() const
+const SectionT& operator*() const
 {
     return container.top();
 }
@@ -49,7 +50,7 @@ graph_iterator_t& operator++()
 {
     const auto& section = *(*this);
     container.pop();
-    auto& neighbors = section.neighbors();
+    const auto& neighbors = section.neighbors();
     for (auto it = neighbors.rbegin(); it != neighbors.rend(); ++it)
         if (visited.find(*it) == visited.end()) {
             container.push(*it);
@@ -57,6 +58,7 @@ graph_iterator_t& operator++()
         }
     return *this;
 }
+
 graph_iterator_t operator++(int)
 {
     graph_iterator_t retval = *this;

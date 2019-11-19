@@ -5,7 +5,7 @@
 namespace morphio {
 template <typename T>
 SectionBase<T>::SectionBase(const uint32_t id_,
-    std::shared_ptr<Property::Properties> properties)
+    const std::shared_ptr<Property::Properties>& properties)
     : _id(id_)
     , _properties(properties)
 {
@@ -13,7 +13,7 @@ SectionBase<T>::SectionBase(const uint32_t id_,
     if (_id >= sections.size())
         LBTHROW(RawDataError("Requested section ID (" + std::to_string(_id) + ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
 
-    const size_t start = static_cast<size_t>(sections[_id][0]);
+    const auto start = static_cast<size_t>(sections[_id][0]);
     const size_t end = _id == sections.size() - 1
                            ? properties->get<typename T::PointAttribute>().size()
                            : static_cast<size_t>(sections[_id + 1][0]);
@@ -21,21 +21,21 @@ SectionBase<T>::SectionBase(const uint32_t id_,
     _range = std::make_pair(start, end);
 
     if (_range.second <= _range.first)
-        std::cerr << "Dereferencing broken properties section " << _id << std::endl
-            << "Section range: " << _range.first << " -> " << _range.second
-            << std::endl;
+        std::cerr << "Dereferencing broken properties section " << _id
+            << "\nSection range: " << _range.first << " -> " << _range.second
+            << '\n';
 }
 
 template <typename T>
-SectionBase<T>::SectionBase(const SectionBase& section)
-    : _id(section._id)
-    , _range(section._range)
-    , _properties(section._properties)
+SectionBase<T>::SectionBase(const SectionBase& other)
+    : _id(other._id)
+    , _range(other._range)
+    , _properties(other._properties)
 {
 }
 
 template <typename T>
-const SectionBase<T>& SectionBase<T>::operator=(const SectionBase& section)
+SectionBase<T>& SectionBase<T>::operator=(const SectionBase& section)
 {
     if (&section == this)
         return *this;
@@ -65,15 +65,14 @@ uint32_t SectionBase<T>::id() const
 
 template <typename T>
 template <typename TProperty>
-const range<const typename TProperty::Type> SectionBase<T>::get() const
+range<const typename TProperty::Type> SectionBase<T>::get() const
 {
-    auto& data = _properties->get<TProperty>();
+    const auto& data = _properties->get<TProperty>();
     if (data.empty())
-        return range<const typename TProperty::Type>();
+        return {};
 
     auto ptr_start = data.data() + _range.first;
-    return range<const typename TProperty::Type>(ptr_start,
-        _range.second - _range.first);
+    return {ptr_start, _range.second - _range.first};
 }
 
 template <typename T>
@@ -89,13 +88,13 @@ T SectionBase<T>::parent() const
         LBTHROW(MissingParentError(
             "Cannot call Section::parent() on a root node (section id=" + std::to_string(_id) + ")."));
 
-    const unsigned int _parent = static_cast<unsigned int>(
+    const auto _parent = static_cast<unsigned int>(
         _properties->get<typename T::SectionId>()[_id][1]);
-    return T(_parent, _properties);
+    return {_parent, _properties};
 }
 
 template <typename T>
-const std::vector<T> SectionBase<T>::children() const
+std::vector<T> SectionBase<T>::children() const
 {
     std::vector<T> result;
     try {

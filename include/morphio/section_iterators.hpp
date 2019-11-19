@@ -12,7 +12,7 @@
 namespace detail {
 
 template<typename SectionT, typename MorphologyT>
-std::vector<SectionT> getChildren(const MorphologyT& morphology)
+std::vector<SectionT> getChildren(const MorphologyT& morphology) noexcept
 {
     return morphology.rootSections();
 }
@@ -57,7 +57,7 @@ std::shared_ptr<SectionT> getParent(const std::shared_ptr<SectionT>& current)
 namespace morphio {
 
 template<typename SectionT, typename MorphologyT>
-class breadth_iterator_t {
+class breadth_iterator_t: public std::iterator<std::input_iterator_tag, const SectionT> {
 public:
     breadth_iterator_t() = default;
 
@@ -76,18 +76,18 @@ public:
     : deque_(other.deque_)
     {}
 
-    SectionT operator*() const
+    const SectionT& operator*() const
     {
         return deque_.front();
     }
 
-    breadth_iterator_t operator++()
+    breadth_iterator_t& operator++()
     {
         if (deque_.empty()) {
             LBTHROW(MorphioError("Can't iterate past the end"));
         }
 
-        const auto children = detail::getChildren(deque_.front());
+        const auto& children = detail::getChildren(deque_.front());
         deque_.pop_front();
         std::copy(children.begin(), children.end(), std::back_inserter(deque_));
 
@@ -116,7 +116,7 @@ private:
 };
 
 template<typename SectionT, typename MorphologyT>
-class depth_iterator_t {
+class depth_iterator_t: public std::iterator<std::input_iterator_tag, const SectionT> {
 public:
     depth_iterator_t() = default;
 
@@ -135,12 +135,12 @@ public:
     : deque_(other.deque_)
     {}
 
-    SectionT operator*() const
+    const SectionT& operator*() const
     {
         return deque_.front();
     }
 
-    depth_iterator_t operator++()
+    depth_iterator_t& operator++()
     {
         if (deque_.empty()) {
             LBTHROW(MorphioError("Can't iterate past the end"));
@@ -175,7 +175,7 @@ private:
 };
 
 template<typename SectionT>
-class upstream_iterator_t {
+class upstream_iterator_t: public std::iterator<std::input_iterator_tag, const SectionT> {
 public:
     upstream_iterator_t()
     : unused(0)
@@ -202,12 +202,12 @@ public:
         }
     }
 
-    SectionT operator*() const
+    const SectionT& operator*() const
     {
         return current;
     }
 
-    upstream_iterator_t operator++()
+    upstream_iterator_t& operator++()
     {
         if (end) {
             LBTHROW(MissingParentError("Cannot call iterate upstream past the root node"));

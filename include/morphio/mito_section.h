@@ -37,12 +37,12 @@ public:
     /**
      * Returns list of neuronal section IDs associated to each point
      **/
-    const range<const uint32_t> neuriteSectionIds() const;
+    range<const uint32_t> neuriteSectionIds() const;
 
     /**
      * Returns list of section's point diameters
      **/
-    const range<const float> diameters() const;
+    range<const float> diameters() const;
 
     /**
      * Returns list of relative distances between the start
@@ -52,17 +52,17 @@ public:
      *       - a relative distance of 1 means the mitochondrial point is at the
      *         end of the neuronal section
      **/
-    const range<const float> relativePathLengths() const;
+    range<const float> relativePathLengths() const;
 
     /** Return the morphological type of this section (dendrite, axon, ...). */
     SectionType type() const;
 
 protected:
-    MitoSection(uint32_t id_, std::shared_ptr<Property::Properties> morphology)
+    MitoSection(uint32_t id_, const std::shared_ptr<Property::Properties>& morphology)
         : SectionBase(id_, morphology)
     {
     }
-    friend const MitoSection Mitochondria::section(const uint32_t&) const;
+    friend MitoSection Mitochondria::section(uint32_t) const;
     friend class SectionBase<MitoSection>;
     friend class mut::MitoSection;
 };

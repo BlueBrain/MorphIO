@@ -36,7 +36,7 @@ Section::Section(Morphology* morphology, unsigned int id_, const Section& sectio
 {
 }
 
-const std::shared_ptr<Section> Section::parent() const
+const std::shared_ptr<Section>& Section::parent() const
 {
     return _morphology->_sections.at(_morphology->_parent.at(id()));
 }
@@ -51,12 +51,13 @@ bool Section::isRoot() const
     }
 }
 
-const std::vector<std::shared_ptr<Section>> Section::children() const
+const std::vector<std::shared_ptr<Section>>& Section::children() const
 {
     try {
         return _morphology->_children.at(id());
     } catch (const std::out_of_range&) {
-        return std::vector<std::shared_ptr<Section>>();
+        static std::vector<std::shared_ptr<Section>> empty;
+        return empty;
     }
 }
 
@@ -90,13 +91,13 @@ upstream_iterator Section::upstream_end() const
     return upstream_iterator();
 }
 
-static std::ostream& operator<<(std::ostream& os, Section& section)
+static std::ostream& operator<<(std::ostream& os, const Section& section)
 {
     ::operator<<(os, section);
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section> sectionPtr)
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section>& sectionPtr)
 {
     os << *sectionPtr;
     return os;
@@ -110,9 +111,8 @@ bool _emptySection(const std::shared_ptr<Section> section)
 std::shared_ptr<Section> Section::appendSection(
     std::shared_ptr<Section> original_section, bool recursive)
 {
-    std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter,
-                                     *original_section),
-        friendDtorForSharedPtr);
+    const std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter,
+                                     *original_section));
     unsigned int parentId = id();
     uint32_t childId = _morphology->_register(ptr);
     auto& _sections = _morphology->_sections;
@@ -143,9 +143,8 @@ std::shared_ptr<Section> Section::appendSection(
 std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
     bool recursive)
 {
-    std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter,
-                                     section),
-        friendDtorForSharedPtr);
+    const std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter,
+                                     section));
     unsigned int parentId = id();
     uint32_t childId = _morphology->_register(ptr);
     auto& _sections = _morphology->_sections;
@@ -184,10 +183,8 @@ std::shared_ptr<Section> Section::appendSection(
         LBTHROW(morphio::SectionBuilderError(
             "Cannot create section with type soma"));
 
-    Section* p = new Section(_morphology, _morphology->_counter, sectionType,
-        pointProperties);
-
-    std::shared_ptr<Section> ptr(p, friendDtorForSharedPtr);
+    std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter, sectionType,
+        pointProperties));
 
     uint32_t childId = _morphology->_register(ptr);
 

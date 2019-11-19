@@ -22,7 +22,7 @@ public:
     explicit Vasculature(const std::string& source);
 
     Vasculature(Vasculature&&) = default;
-    virtual ~Vasculature() {}
+    virtual ~Vasculature() = default;
 
     Vasculature& operator=(const Vasculature&) = default;
     Vasculature& operator=(Vasculature&&) = default;
@@ -30,29 +30,29 @@ public:
     /**
      * Return a vector containing all section objects.
      **/
-    const std::vector<Section> sections() const;
+    std::vector<Section> sections() const;
 
     /**
      * Return the Section with the given id.
      *
      * @throw RawDataError if the id is out of range
      */
-    const Section section(const uint32_t& id) const;
+    Section section(const uint32_t& id) const;
 
     /**
      * Return a vector with all points from all sections
      **/
-    const Points& points() const;
+    const Points& points() const noexcept;
 
     /**
      * Return a vector with all diameters from all sections
      **/
-    const std::vector<float>& diameters() const;
+    const std::vector<float>& diameters() const noexcept;
 
     /**
      * Return a vector with the section type of every section
      **/
-    const std::vector<property::SectionType::Type>& sectionTypes() const;
+    const std::vector<property::SectionType::Type>& sectionTypes() const noexcept;
 
     /**
      * graph iterators
@@ -64,7 +64,7 @@ private:
     std::shared_ptr<property::Properties> _properties;
 
     template <typename Property>
-    const std::vector<typename Property::Type>& get() const;
+    const std::vector<typename Property::Type>& get() const noexcept;
 };
 } // namespace vasculature
 } // namespace morphio

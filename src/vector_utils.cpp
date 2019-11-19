@@ -99,7 +99,7 @@ std::string dumpPoints(const Points& points)
 }
 
 template <typename T>
-const Point centerOfGravity(const T& points)
+Point centerOfGravity(const T& points)
 {
     float x = 0, y = 0, z = 0;
     float size = float(points.size());
@@ -110,8 +110,8 @@ const Point centerOfGravity(const T& points)
     }
     return Point({x / size, y / size, z / size});
 }
-template const Point centerOfGravity(const range<const Point>& points);
-template const Point centerOfGravity(const Points& points);
+template Point centerOfGravity(const range<const Point>& points);
+template Point centerOfGravity(const Points& points);
 
 template <typename T>
 float maxDistanceToCenterOfGravity(const T& points)
