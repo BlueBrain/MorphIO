@@ -6,8 +6,8 @@
 namespace morphio {
 namespace vasculature {
 
-template<typename SectionT, typename VasculatureT>
-class graph_iterator_t: public std::iterator<std::input_iterator_tag, SectionT>
+template <typename SectionT, typename VasculatureT>
+class graph_iterator_t : public std::iterator<std::input_iterator_tag, SectionT>
 {
     std::set<SectionT> visited;
     std::stack<SectionT> container;

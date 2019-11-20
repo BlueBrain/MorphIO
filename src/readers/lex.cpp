@@ -58,8 +58,8 @@ inline std::string to_string(Token t)
 {
     switch (t) {
 #define Q(x) #x
-#define T(TOK)       \
-    case Token::TOK: \
+#define T(TOK)         \
+    case Token::TOK:   \
         return Q(TOK); \
         break;
         T(EOF_)
@@ -94,7 +94,8 @@ inline std::string to_string(Token t)
     }
 }
 
-inline std::ostream& operator<<(std::ostream& ostr, Token t) {
+inline std::ostream& operator<<(std::ostream& ostr, Token t)
+{
     return ostr << to_string(t);
 }
 

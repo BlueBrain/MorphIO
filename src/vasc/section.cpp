@@ -25,7 +25,7 @@ Section::Section(const uint32_t id_,
 
     if (_range.second <= _range.first)
         std::cerr << "Dereferencing broken properties section " << _id
-            << "\nSection range: " << _range.first << " -> " << _range.second << '\n';
+                  << "\nSection range: " << _range.first << " -> " << _range.second << '\n';
 }
 
 Section& Section::operator=(const Section& section)

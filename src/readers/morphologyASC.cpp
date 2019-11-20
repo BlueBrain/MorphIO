@@ -85,7 +85,7 @@ private:
     std::tuple<Point, float> parse_point(NeurolucidaLexer& lex)
     {
         lex.expect(Token::LPAREN, "Point should start in LPAREN");
-        std::array<float, 4> point{}; // X,Y,Z,R
+        std::array<float, 4> point {}; // X,Y,Z,R
         for (auto& p : point) {
             try {
                 p = std::stof(lex.consume()->str());

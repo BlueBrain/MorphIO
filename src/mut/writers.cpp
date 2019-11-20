@@ -244,7 +244,7 @@ static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochon
 
     auto& s = properties._mitochondriaSectionLevel;
     structure.reserve(s._sections.size());
-    for (const auto& section: s._sections) {
+    for (const auto& section : s._sections) {
         structure.push_back({section[0], section[1]});
     }
 

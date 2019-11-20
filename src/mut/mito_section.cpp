@@ -35,8 +35,8 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
     unsigned int parentId = id();
 
     std::shared_ptr<MitoSection> ptr(new MitoSection(_mitochondria,
-                                         _mitochondria->_counter,
-                                         points));
+        _mitochondria->_counter,
+        points));
 
     uint32_t childId = _mitochondria->_register(ptr);
 
@@ -49,8 +49,8 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
     const std::shared_ptr<MitoSection>& original_section, bool recursive)
 {
     std::shared_ptr<MitoSection> ptr(new MitoSection(_mitochondria,
-                                         _mitochondria->_counter,
-                                         *original_section));
+        _mitochondria->_counter,
+        *original_section));
     unsigned int parentId = id();
     uint32_t id_ = _mitochondria->_register(ptr);
 
@@ -70,8 +70,8 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
     const morphio::MitoSection& section, bool recursive)
 {
     std::shared_ptr<MitoSection> ptr(new MitoSection(_mitochondria,
-                                         _mitochondria->_counter,
-                                         section));
+        _mitochondria->_counter,
+        section));
     unsigned int parentId = id();
     uint32_t childId = _mitochondria->_register(ptr);
 

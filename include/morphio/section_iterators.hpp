@@ -11,7 +11,7 @@
 
 namespace detail {
 
-template<typename SectionT, typename MorphologyT>
+template <typename SectionT, typename MorphologyT>
 std::vector<SectionT> getChildren(const MorphologyT& morphology) noexcept
 {
     return morphology.rootSections();
@@ -56,8 +56,9 @@ std::shared_ptr<SectionT> getParent(const std::shared_ptr<SectionT>& current)
 
 namespace morphio {
 
-template<typename SectionT, typename MorphologyT>
-class breadth_iterator_t: public std::iterator<std::input_iterator_tag, const SectionT> {
+template <typename SectionT, typename MorphologyT>
+class breadth_iterator_t : public std::iterator<std::input_iterator_tag, const SectionT>
+{
 public:
     breadth_iterator_t() = default;
 
@@ -115,8 +116,9 @@ private:
     std::deque<SectionT> deque_;
 };
 
-template<typename SectionT, typename MorphologyT>
-class depth_iterator_t: public std::iterator<std::input_iterator_tag, const SectionT> {
+template <typename SectionT, typename MorphologyT>
+class depth_iterator_t : public std::iterator<std::input_iterator_tag, const SectionT>
+{
 public:
     depth_iterator_t() = default;
 
@@ -174,8 +176,9 @@ private:
     std::deque<SectionT> deque_;
 };
 
-template<typename SectionT>
-class upstream_iterator_t: public std::iterator<std::input_iterator_tag, const SectionT> {
+template <typename SectionT>
+class upstream_iterator_t : public std::iterator<std::input_iterator_tag, const SectionT>
+{
 public:
     upstream_iterator_t()
     : unused(0)

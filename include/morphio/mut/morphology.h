@@ -58,14 +58,16 @@ public:
     /**
        Returns all section ids at the tree root
     **/
-    const std::vector<std::shared_ptr<Section>>& rootSections() const noexcept {
+    const std::vector<std::shared_ptr<Section>>& rootSections() const noexcept
+    {
         return _rootSections;
     }
 
     /**
        Returns the dictionary id -> Section for this tree
     **/
-    const std::map<uint32_t, std::shared_ptr<Section>>& sections() const noexcept {
+    const std::map<uint32_t, std::shared_ptr<Section>>& sections() const noexcept
+    {
         return _sections;
     }
 
@@ -74,10 +76,12 @@ public:
 
        Note: multiple morphologies can share the same Soma instance
     **/
-    std::shared_ptr<Soma>& soma() noexcept {
+    std::shared_ptr<Soma>& soma() noexcept
+    {
         return _soma;
     }
-    const std::shared_ptr<Soma>& soma() const noexcept {
+    const std::shared_ptr<Soma>& soma() const noexcept
+    {
         return _soma;
     }
 
@@ -89,7 +93,8 @@ public:
     /**
      * Return the annotation object
      **/
-    const std::vector<Property::Annotation>& annotations() const noexcept {
+    const std::vector<Property::Annotation>& annotations() const noexcept
+    {
         return _annotations;
     }
 
@@ -98,7 +103,8 @@ public:
 
        Note: multiple morphologies can share the same Section instances.
     **/
-    const std::shared_ptr<Section>& section(uint32_t id) const {
+    const std::shared_ptr<Section>& section(uint32_t id) const
+    {
         return _sections.at(id);
     }
 

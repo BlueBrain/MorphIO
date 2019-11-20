@@ -82,10 +82,12 @@ struct Properties
     template <typename T>
     const std::vector<typename T::Type>& get() const noexcept;
 
-    const std::map<uint32_t, std::vector<uint32_t>>& predecessors() const noexcept {
+    const std::map<uint32_t, std::vector<uint32_t>>& predecessors() const noexcept
+    {
         return _sectionLevel._predecessors;
     }
-    const std::map<uint32_t, std::vector<uint32_t>>& successors() const noexcept {
+    const std::map<uint32_t, std::vector<uint32_t>>& successors() const noexcept
+    {
         return _sectionLevel._successors;
     }
 

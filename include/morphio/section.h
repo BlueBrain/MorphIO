@@ -88,7 +88,7 @@ public:
 
 protected:
     Section(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
-    : SectionBase(id_, properties)
+        : SectionBase(id_, properties)
     {}
 };
 

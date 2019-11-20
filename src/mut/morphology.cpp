@@ -137,7 +137,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(
     const Property::PointLevel& pointProperties, SectionType type)
 {
     const std::shared_ptr<Section> ptr(new Section(this, _counter, type,
-                                     pointProperties));
+        pointProperties));
     _register(ptr);
     _rootSections.push_back(ptr);
 
@@ -279,7 +279,7 @@ Property::Properties Morphology::buildReadOnly() const
     using std::setw;
     int sectionIdOnDisk = 0;
     std::map<uint32_t, int32_t> newIds;
-    Property::Properties properties{};
+    Property::Properties properties {};
 
     if (_cellProperties) {
         properties._cellLevel = *_cellProperties;

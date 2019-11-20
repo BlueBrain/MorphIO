@@ -76,14 +76,14 @@ std::string ErrorMessages::ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber)
 }
 
 std::string ErrorMessages::ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
-                                                                const SectionType& type) const
+    const SectionType& type) const
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR,
                     "Unsupported section type: " + std::to_string(type));
 }
 
 std::string ErrorMessages::ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(long unsigned int lineNumber,
-                                                                        const VascularSectionType& type) const
+    const VascularSectionType& type) const
 {
     return errorMsg(lineNumber, ErrorLevel::ERROR,
                             "Unsupported section type: " + std::to_string(type));
@@ -323,11 +323,14 @@ std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
           "3 1 x (y+r) z r  1\n\n"
 
           "Got:\n"
-          "1 1 " << x << ' ' << y << ' ' << z << ' ' << r << " -1\n"
-          "2 1 " << _col(child1.point[0], x) << ' '
+          "1 1 "
+       << x << ' ' << y << ' ' << z << ' ' << r << " -1\n"
+                                                   "2 1 "
+       << _col(child1.point[0], x) << ' '
        << _col(child1.point[1], y - r) << ' ' << _col(child1.point[2], z) << ' '
        << _col(child1.diameter / 2.f, r) << " 1\n"
-          "3 1 " << _col(child2.point[0], x) << ' '
+                                            "3 1 "
+       << _col(child2.point[0], x) << ' '
        << _col(child2.point[1], y + r) << ' ' << _col(child2.point[2], z) << ' '
        << _col(child2.diameter / 2.f, r) << " 1\n";
     return ss.str();
@@ -345,9 +348,8 @@ std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(
     const std::vector<Sample>& children) const
 {
     std::ostringstream oss;
-    oss <<
-        "With a 3 points soma, neurites must be connected to the first soma "
-        "point:";
+    oss << "With a 3 points soma, neurites must be connected to the first soma "
+           "point:";
     for (const auto& child : children)
         oss << errorMsg(child.lineNumber, ErrorLevel::WARNING, "");
     return oss.str();

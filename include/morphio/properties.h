@@ -126,7 +126,7 @@ struct MitochondriaPointLevel
 
     MitochondriaPointLevel() = default;
     MitochondriaPointLevel(const MitochondriaPointLevel& data,
-                           const SectionRange& range);
+        const SectionRange& range);
 
     MitochondriaPointLevel(
         std::vector<uint32_t> sectionId,

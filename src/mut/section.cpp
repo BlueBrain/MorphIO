@@ -112,7 +112,7 @@ std::shared_ptr<Section> Section::appendSection(
     std::shared_ptr<Section> original_section, bool recursive)
 {
     const std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter,
-                                     *original_section));
+        *original_section));
     unsigned int parentId = id();
     uint32_t childId = _morphology->_register(ptr);
     auto& _sections = _morphology->_sections;
@@ -144,7 +144,7 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
     bool recursive)
 {
     const std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter,
-                                     section));
+        section));
     unsigned int parentId = id();
     uint32_t childId = _morphology->_register(ptr);
     auto& _sections = _morphology->_sections;
