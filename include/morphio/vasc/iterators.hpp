@@ -7,12 +7,17 @@ namespace morphio {
 namespace vasculature {
 
 template <typename SectionT, typename VasculatureT>
-class graph_iterator_t : public std::iterator<std::input_iterator_tag, SectionT>
+class graph_iterator_t
 {
     std::set<SectionT> visited;
     std::stack<SectionT> container;
 
 public:
+using iterator_category = std::input_iterator_tag;
+using value_type = SectionT;
+using difference_type = std::ptrdiff_t;
+using pointer = SectionT*;
+using reference = SectionT&;
 graph_iterator_t() = default;
 
 explicit graph_iterator_t(const SectionT& vasculatureSection)

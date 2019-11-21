@@ -57,9 +57,15 @@ std::shared_ptr<SectionT> getParent(const std::shared_ptr<SectionT>& current)
 namespace morphio {
 
 template <typename SectionT, typename MorphologyT>
-class breadth_iterator_t : public std::iterator<std::input_iterator_tag, const SectionT>
+class breadth_iterator_t
 {
 public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = SectionT;
+    using difference_type = std::ptrdiff_t;
+    using pointer = SectionT*;
+    using reference = SectionT&;
+
     breadth_iterator_t() = default;
 
     explicit breadth_iterator_t(const SectionT& section)
@@ -117,9 +123,15 @@ private:
 };
 
 template <typename SectionT, typename MorphologyT>
-class depth_iterator_t : public std::iterator<std::input_iterator_tag, const SectionT>
+class depth_iterator_t
 {
 public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = SectionT;
+    using difference_type = std::ptrdiff_t;
+    using pointer = SectionT*;
+    using reference = SectionT&;
+
     depth_iterator_t() = default;
 
     explicit depth_iterator_t(const SectionT& section)
@@ -177,9 +189,15 @@ private:
 };
 
 template <typename SectionT>
-class upstream_iterator_t : public std::iterator<std::input_iterator_tag, const SectionT>
+class upstream_iterator_t
 {
 public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = SectionT;
+    using difference_type = std::ptrdiff_t;
+    using pointer = SectionT*;
+    using reference = SectionT&;
+
     upstream_iterator_t()
     : unused(0)
     , end(true)
