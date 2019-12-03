@@ -20,8 +20,9 @@ public:
     /**
        Return the coordinates (x,y,z) of all soma point
     **/
-    std::vector<Point>& points() { return _pointProperties._points; }
-    const std::vector<Point>& points() const
+    std::vector<Point>& points() noexcept { return _pointProperties._points; }
+
+    const std::vector<Point>& points() const noexcept
     {
         return _pointProperties._points;
     }

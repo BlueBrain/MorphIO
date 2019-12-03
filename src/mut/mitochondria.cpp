@@ -58,20 +58,15 @@ static void _appendMitoProperties(Property::MitochondriaPointLevel& to,
     _appendVector(to._diameters, from._diameters, offset);
 }
 
-std::vector<Mitochondria::MitoSectionP> Mitochondria::children(
+const std::vector<Mitochondria::MitoSectionP>& Mitochondria::children(
     const MitoSectionP& section_) const
 {
-    try {
-        return _children.at(section_->id());
-    } catch (const std::out_of_range&) {
-        return {};
+    const auto it = _children.find(section_->id());
+    if (it == _children.end()) {
+        static std::vector<Mitochondria::MitoSectionP >empty;
+        return empty;
     }
-}
-
-const std::vector<Mitochondria::MitoSectionP>& Mitochondria::rootSections()
-    const noexcept
-{
-    return _rootSections;
+    return it->second;
 }
 
 const Mitochondria::MitoSectionP& Mitochondria::parent(
@@ -93,12 +88,6 @@ bool Mitochondria::isRoot(const MitoSectionP& section_) const
 const Mitochondria::MitoSectionP& Mitochondria::section(uint32_t id) const
 {
     return _sections.at(id);
-}
-
-const std::map<uint32_t, Mitochondria::MitoSectionP>& Mitochondria::sections()
-    const
-{
-    return _sections;
 }
 
 void Mitochondria::_buildMitochondria(Property::Properties& properties) const
@@ -129,7 +118,7 @@ void Mitochondria::_buildMitochondria(Property::Properties& properties) const
     }
 }
 
-const std::shared_ptr<MitoSection> Mitochondria::mitoSection(uint32_t id_) const
+const std::shared_ptr<MitoSection>& Mitochondria::mitoSection(uint32_t id_) const
 {
     return _sections.at(id_);
 }

@@ -25,9 +25,9 @@ public:
     std::shared_ptr<MitoSection> appendSection(
         const morphio::MitoSection& section, bool recursive);
 
-    const std::shared_ptr<MitoSection> parent() const;
+    std::shared_ptr<MitoSection> parent() const;
     bool isRoot() const;
-    const std::vector<std::shared_ptr<MitoSection>> children() const;
+    const std::vector<std::shared_ptr<MitoSection>>& children() const;
 
     /**
      * Return the section id

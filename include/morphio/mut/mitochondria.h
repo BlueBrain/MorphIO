@@ -33,9 +33,11 @@ public:
     {
     }
 
-    std::vector<MitoSectionP> children(const MitoSectionP&) const;
+    const std::vector<MitoSectionP>& children(const MitoSectionP&) const;
     const MitoSectionP& section(uint32_t id) const;
-    const std::map<uint32_t, MitoSectionP>& sections() const;
+    const std::map<uint32_t, MitoSectionP>& sections() const noexcept {
+        return _sections;
+    }
 
     /**
        Depth first iterator starting at a given section id
@@ -80,7 +82,9 @@ public:
      * Return the list of IDs of all mitochondrial root sections
      * (sections whose parent ID are -1)
      **/
-    const std::vector<MitoSectionP>& rootSections() const noexcept;
+    const std::vector<MitoSectionP>& rootSections() const noexcept {
+        return _rootSections;
+    }
 
     /**
        Append a new root MitoSection
@@ -98,7 +102,7 @@ public:
         bool recursive = false);
     MitoSectionP appendRootSection(const MitoSectionP&, bool recursive = false);
 
-    const MitoSectionP mitoSection(uint32_t id) const;
+    const MitoSectionP& mitoSection(uint32_t id) const;
 
     void _buildMitochondria(Property::Properties& properties) const;
 

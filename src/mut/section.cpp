@@ -9,7 +9,10 @@ namespace morphio {
 namespace mut {
 using morphio::readers::ErrorMessages;
 
-bool _emptySection(const std::shared_ptr<Section> section);
+static inline bool _emptySection(const std::shared_ptr<Section>& section)
+{
+    return section->points().empty();
+}
 
 Section::Section(Morphology* morphology, unsigned int id_, SectionType type_,
     const Property::PointLevel& pointProperties)
@@ -43,22 +46,21 @@ const std::shared_ptr<Section>& Section::parent() const
 
 bool Section::isRoot() const
 {
-    try {
-        parent();
-        return false;
-    } catch (const std::out_of_range&) {
-        return true;
+    const auto parentId = _morphology->_parent.find(id());
+    if (parentId != _morphology->_parent.end()) {
+        return _morphology->_sections.find(parentId->second) == _morphology->_sections.end();
     }
+    return true;
 }
 
 const std::vector<std::shared_ptr<Section>>& Section::children() const
 {
-    try {
-        return _morphology->_children.at(id());
-    } catch (const std::out_of_range&) {
+    const auto it = _morphology->_children.find(id());
+    if (it == _morphology->_children.end()) {
         static std::vector<std::shared_ptr<Section>> empty;
         return empty;
     }
+    return it->second;
 }
 
 depth_iterator Section::depth_begin() const
@@ -101,11 +103,6 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section>& secti
 {
     os << *sectionPtr;
     return os;
-}
-
-bool _emptySection(const std::shared_ptr<Section> section)
-{
-    return section->points().empty();
 }
 
 std::shared_ptr<Section> Section::appendSection(

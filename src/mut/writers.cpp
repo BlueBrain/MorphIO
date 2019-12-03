@@ -166,16 +166,17 @@ void asc(const Morphology& morphology, const std::string& filename)
     header[SECTION_DENDRITE] = "( (Color Red)\n  (Dendrite)\n";
     header[SECTION_APICAL_DENDRITE] = "( (Color Red)\n  (Apical)\n";
 
-    if (!morphology.soma()->points().empty()) {
+    const auto& soma = morphology.soma();
+    if (!soma->points().empty()) {
         myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
-        _write_asc_points(myfile, morphology.soma()->points(), morphology.soma()->diameters(), 2);
+        _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
         myfile << ")\n\n";
     } else {
         LBERROR(Warning::WRITE_NO_SOMA,
             readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
-    for (auto& section : morphology.rootSections()) {
+    for (const auto& section : morphology.rootSections()) {
         myfile << header.at(section->type());
         _write_asc_section(myfile, morphology, section, 2);
         myfile << ")\n\n";

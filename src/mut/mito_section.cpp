@@ -87,7 +87,7 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
     return ptr;
 }
 
-const std::shared_ptr<MitoSection> MitoSection::parent() const
+std::shared_ptr<MitoSection> MitoSection::parent() const
 {
     return _mitochondria->_sections.at(_mitochondria->_parent.at(id()));
 }
@@ -102,13 +102,15 @@ bool MitoSection::isRoot() const
     }
 }
 
-const std::vector<std::shared_ptr<MitoSection>> MitoSection::children() const
+const std::vector<std::shared_ptr<MitoSection>>& MitoSection::children() const
 {
-    try {
-        return _mitochondria->_children.at(id());
-    } catch (const std::out_of_range&) {
-        return std::vector<std::shared_ptr<MitoSection>>();
+    const auto& children = _mitochondria->_children;
+    const auto it = children.find(id());
+    if (it == children.end()) {
+        static std::vector<std::shared_ptr<MitoSection>> empty;
+        return empty;
     }
+    return it->second;
 }
 
 } // namespace mut
