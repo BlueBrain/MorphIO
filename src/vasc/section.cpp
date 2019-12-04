@@ -48,7 +48,7 @@ bool Section::operator!=(const Section& other) const
     return !(*this == other);
 }
 
-uint32_t Section::id() const
+uint32_t Section::id() const noexcept
 {
     return _id;
 }
@@ -57,8 +57,9 @@ template <typename TProperty>
 range<const typename TProperty::Type> Section::get() const
 {
     auto& data = _properties->get<TProperty>();
-    if (data.empty())
+    if (data.empty()) {
         return range<const typename TProperty::Type>();
+    }
     auto ptr_start = data.data() + _range.first;
     return range<const typename TProperty::Type>(ptr_start,
         _range.second - _range.first);
@@ -67,29 +68,27 @@ range<const typename TProperty::Type> Section::get() const
 std::vector<Section> Section::predecessors() const
 {
     std::vector<Section> result;
-    try {
-        const std::vector<uint32_t>& predecessors_ = _properties->predecessors().at(_id);
-        result.reserve(predecessors_.size());
-        for (const uint32_t id_ : predecessors_)
+    const auto it = _properties->predecessors().find(_id);
+    if (it != _properties->predecessors().end()) {
+        result.reserve(it->second.size());
+        for (const uint32_t id_ : it->second) {
             result.emplace_back(id_, _properties);
-        return result;
-    } catch (...){
-        return result;
+        }
     }
+    return result;
 }
 
 std::vector<Section> Section::successors() const
 {
     std::vector<Section> result;
-    try {
-        const std::vector<uint32_t>& successors_ = _properties->successors().at(_id);
-        result.reserve(successors_.size());
-        for (const uint32_t id_ : successors_)
+    const auto it = _properties->successors().find(_id);
+    if (it != _properties->successors().end()) {
+        result.reserve(it->second.size());
+        for (const uint32_t id_ : it->second) {
             result.emplace_back(id_, _properties);
-        return result;
-    } catch (...) {
-        return result;
+        }
     }
+    return result;
 }
 
 std::vector<Section> Section::neighbors() const

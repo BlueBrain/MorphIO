@@ -40,7 +40,7 @@ public:
     std::vector<Section> neighbors() const;
 
     /** Return the ID of this section. */
-    uint32_t id() const;
+    uint32_t id() const noexcept;
 
     /**
        Euclidian distance between first and last point of the section

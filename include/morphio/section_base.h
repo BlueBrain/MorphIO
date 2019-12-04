@@ -32,8 +32,8 @@ public:
 
     SectionBase& operator=(const SectionBase& other);
 
-    bool operator==(const SectionBase& other) const;
-    bool operator!=(const SectionBase& other) const;
+    inline bool operator==(const SectionBase& other) const noexcept;
+    inline bool operator!=(const SectionBase& other) const noexcept;
 
     /**
      * Return true if this section is a root section (parent ID == -1)
@@ -53,7 +53,7 @@ public:
     std::vector<T> children() const;
 
     /** Return the ID of this section. */
-    uint32_t id() const;
+    inline uint32_t id() const noexcept;
 
 protected:
     SectionBase(uint32_t id, const std::shared_ptr<Property::Properties>& properties);
@@ -64,6 +64,24 @@ protected:
     SectionRange _range;
     std::shared_ptr<Property::Properties> _properties;
 };
+
+template <typename T>
+inline bool SectionBase<T>::operator==(const SectionBase& other) const noexcept
+{
+    return other._id == _id && other._properties == _properties;
+}
+
+template <typename T>
+inline bool SectionBase<T>::operator!=(const SectionBase& other) const noexcept
+{
+    return !(*this == other);
+}
+
+template <typename T>
+inline uint32_t SectionBase<T>::id() const noexcept
+{
+    return _id;
+}
 
 } // namespace morphio
 

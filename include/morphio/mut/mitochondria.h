@@ -35,9 +35,7 @@ public:
 
     const std::vector<MitoSectionP>& children(const MitoSectionP&) const;
     const MitoSectionP& section(uint32_t id) const;
-    const std::map<uint32_t, MitoSectionP>& sections() const noexcept {
-        return _sections;
-    }
+    const std::map<uint32_t, MitoSectionP>& sections() const noexcept;
 
     /**
        Depth first iterator starting at a given section id
@@ -82,9 +80,7 @@ public:
      * Return the list of IDs of all mitochondrial root sections
      * (sections whose parent ID are -1)
      **/
-    const std::vector<MitoSectionP>& rootSections() const noexcept {
-        return _rootSections;
-    }
+    const std::vector<MitoSectionP>& rootSections() const noexcept;
 
     /**
        Append a new root MitoSection
@@ -117,5 +113,16 @@ private:
     std::vector<MitoSectionP> _rootSections;
     std::map<uint32_t, MitoSectionP> _sections;
 };
+
+inline const std::map<uint32_t, Mitochondria::MitoSectionP>& Mitochondria::sections() const noexcept
+{
+    return _sections;
+}
+
+inline const std::vector<Mitochondria::MitoSectionP>& Mitochondria::rootSections() const noexcept
+{
+    return _rootSections;
+}
+
 } // namespace mut
 } // namespace morphio

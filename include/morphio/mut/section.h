@@ -18,48 +18,47 @@ using depth_iterator = morphio::depth_iterator_t<std::shared_ptr<Section>, Morph
 class Section : public std::enable_shared_from_this<Section>
 {
 public:
-    ~Section() {}
+    ~Section() = default;
 
     /**
      * Return the section ID
      **/
-    uint32_t id() const { return _id; }
-    /**
+    inline uint32_t id() const noexcept;
+
+    /** @{
      * Return the morphological type of this section (dendrite, axon, ...)
      **/
-    SectionType& type() { return _sectionType; }
-    const SectionType& type() const { return _sectionType; }
-    /**
+    inline SectionType& type() noexcept;
+    inline const SectionType& type() const noexcept;
+    /** @} */
+
+    /** @{
        Return the coordinates (x,y,z) of all points of this section
     **/
-    std::vector<Point>& points() { return _pointProperties._points; }
-    const std::vector<Point>& points() const
-    {
-        return _pointProperties._points;
-    }
+    inline std::vector<Point>& points() noexcept;
+    inline const std::vector<Point>& points() const noexcept;
+    /** @} */
 
-    /**
+    /** @{
        Return the diameters of all points of this section
     **/
-    std::vector<float>& diameters() { return _pointProperties._diameters; }
-    const std::vector<float>& diameters() const
-    {
-        return _pointProperties._diameters;
-    }
+    inline std::vector<float>& diameters() noexcept;
+    inline const std::vector<float>& diameters() const noexcept;
+    /** @} */
 
-    /**
+    /** @{
        Return the perimeters of all points of this section
     **/
-    std::vector<float>& perimeters() { return _pointProperties._perimeters; }
-    const std::vector<float>& perimeters() const
-    {
-        return _pointProperties._perimeters;
-    }
+    inline std::vector<float>& perimeters() noexcept;
+    inline const std::vector<float>& perimeters() const noexcept;
+    /** @} */
 
-    /**
+    /** @{
        Return the PointLevel instance that contains this section's data
     **/
-    Property::PointLevel& properties() { return _pointProperties; }
+    inline Property::PointLevel& properties() noexcept;
+    inline const Property::PointLevel& properties() const noexcept;
+    /** @} */
     ////////////////////////////////////////////////////////////////////////////////
     //
     // Methods that were previously in mut::Morphology
@@ -116,6 +115,61 @@ private:
 };
 
 std::ostream& operator<<(std::ostream&, const std::shared_ptr<Section>&);
+
+inline uint32_t Section::id() const noexcept
+{
+    return _id;
+}
+
+inline SectionType& Section::type() noexcept
+{
+    return _sectionType;
+}
+
+inline const SectionType& Section::type() const noexcept
+{
+    return _sectionType;
+}
+
+inline std::vector<Point>& Section::points() noexcept
+{
+    return _pointProperties._points;
+}
+
+inline const std::vector<Point>& Section::points() const noexcept
+{
+    return _pointProperties._points;
+}
+
+inline std::vector<float>& Section::diameters() noexcept
+{
+    return _pointProperties._diameters;
+}
+
+inline const std::vector<float>& Section::diameters() const noexcept
+{
+    return _pointProperties._diameters;
+}
+
+inline std::vector<float>& Section::perimeters() noexcept
+{
+    return _pointProperties._perimeters;
+}
+
+inline const std::vector<float>& Section::perimeters() const noexcept
+{
+    return _pointProperties._perimeters;
+}
+
+inline Property::PointLevel& Section::properties() noexcept
+{
+    return _pointProperties;
+}
+
+inline const Property::PointLevel& Section::properties() const noexcept
+{
+    return _pointProperties;
+}
 
 } // namespace mut
 } // namespace morphio

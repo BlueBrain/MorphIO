@@ -42,17 +42,17 @@ public:
     /**
      * Return a vector with all points from all sections
      **/
-    const Points& points() const noexcept;
+    inline const Points& points() const noexcept;
 
     /**
      * Return a vector with all diameters from all sections
      **/
-    const std::vector<float>& diameters() const noexcept;
+    inline const std::vector<float>& diameters() const noexcept;
 
     /**
      * Return a vector with the section type of every section
      **/
-    const std::vector<property::SectionType::Type>& sectionTypes() const noexcept;
+    inline const std::vector<property::SectionType::Type>& sectionTypes() const noexcept;
 
     /**
      * graph iterators
@@ -64,7 +64,29 @@ private:
     std::shared_ptr<property::Properties> _properties;
 
     template <typename Property>
-    const std::vector<typename Property::Type>& get() const noexcept;
+    inline const std::vector<typename Property::Type>& get() const noexcept;
 };
+
+template <typename Property>
+inline const std::vector<typename Property::Type>& Vasculature::get() const noexcept
+{
+    return _properties->get<Property>();
+}
+
+inline const Points& Vasculature::points() const noexcept
+{
+    return get<property::Point>();
+}
+
+inline const std::vector<float>& Vasculature::diameters() const noexcept
+{
+    return get<property::Diameter>();
+}
+
+inline const std::vector<property::SectionType::Type>& Vasculature::sectionTypes() const noexcept
+{
+    return get<property::SectionType>();
+}
+
 } // namespace vasculature
 } // namespace morphio

@@ -31,23 +31,17 @@ public:
     /**
      * Return the  coordinates (x,y,z) of all soma points
      **/
-    range<const Point> points() const noexcept
-    {
-        return _properties->_somaLevel._points;
-    }
+    inline range<const Point> points() const noexcept;
 
     /**
      * Return the diameters of all soma points
      **/
-    range<const float> diameters() const noexcept
-    {
-        return _properties->_somaLevel._diameters;
-    }
+    inline range<const float> diameters() const noexcept;
 
     /**
      * Return the soma type
      **/
-    SomaType type() const noexcept { return _properties->_cellLevel._somaType; }
+    inline SomaType type() const noexcept;
     /**
      * Return the center of gravity of the soma points
      **/
@@ -82,4 +76,20 @@ private:
 
     std::shared_ptr<Property::Properties> _properties;
 };
+
+inline range<const Point> Soma::points() const noexcept
+{
+    return _properties->_somaLevel._points;
+}
+
+inline range<const float> Soma::diameters() const noexcept
+{
+    return _properties->_somaLevel._diameters;
+}
+
+inline SomaType Soma::type() const noexcept
+{
+    return _properties->_cellLevel._somaType;
+}
+
 } // namespace morphio

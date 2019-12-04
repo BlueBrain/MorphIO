@@ -46,24 +46,6 @@ SectionBase<T>& SectionBase<T>::operator=(const SectionBase& section)
 }
 
 template <typename T>
-bool SectionBase<T>::operator==(const SectionBase& other) const
-{
-    return other._id == _id && other._properties == _properties;
-}
-
-template <typename T>
-bool SectionBase<T>::operator!=(const SectionBase& other) const
-{
-    return !(*this == other);
-}
-
-template <typename T>
-uint32_t SectionBase<T>::id() const
-{
-    return _id;
-}
-
-template <typename T>
 template <typename TProperty>
 range<const typename TProperty::Type> SectionBase<T>::get() const
 {

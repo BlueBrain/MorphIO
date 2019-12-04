@@ -82,19 +82,21 @@ struct Properties
     template <typename T>
     const std::vector<typename T::Type>& get() const noexcept;
 
-    const std::map<uint32_t, std::vector<uint32_t>>& predecessors() const noexcept
-    {
-        return _sectionLevel._predecessors;
-    }
-    const std::map<uint32_t, std::vector<uint32_t>>& successors() const noexcept
-    {
-        return _sectionLevel._successors;
-    }
+    inline const std::map<uint32_t, std::vector<uint32_t>>& predecessors() const noexcept;
+    inline const std::map<uint32_t, std::vector<uint32_t>>& successors() const noexcept;
 
     bool operator==(const Properties& other) const;
     bool operator!=(const Properties& other) const;
 };
 
+inline const std::map<uint32_t, std::vector<uint32_t>>& Properties::predecessors() const noexcept
+{
+    return _sectionLevel._predecessors;
+    }
+    inline const std::map<uint32_t, std::vector<uint32_t>>& Properties::successors() const noexcept
+    {
+        return _sectionLevel._successors;
+    }
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const VascPointLevel& pointLevel);

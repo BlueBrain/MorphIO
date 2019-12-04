@@ -53,27 +53,6 @@ std::vector<Section> Vasculature::sections() const
     return sections_;
 }
 
-template <typename Property>
-const std::vector<typename Property::Type>& Vasculature::get() const noexcept
-{
-    return _properties->get<Property>();
-}
-
-const Points& Vasculature::points() const noexcept
-{
-    return get<property::Point>();
-}
-
-const std::vector<float>& Vasculature::diameters() const noexcept
-{
-    return get<property::Diameter>();
-}
-
-const std::vector<property::SectionType::Type>& Vasculature::sectionTypes() const noexcept
-{
-    return get<property::SectionType>();
-}
-
 graph_iterator Vasculature::begin() const
 {
     return graph_iterator(*this);
@@ -87,12 +66,12 @@ graph_iterator Vasculature::end() const
 void buildConnectivity(std::shared_ptr<property::Properties> properties)
 {
     const std::vector<std::array<unsigned int, 2>>& connectivity = properties->get<property::Connection>();
-    std::map<uint32_t, std::vector<uint32_t>>& successors = properties->_sectionLevel._successors;
-    std::map<uint32_t, std::vector<uint32_t>>& predecessors = properties->_sectionLevel._predecessors;
+    auto& successors = properties->_sectionLevel._successors;
+    auto& predecessors = properties->_sectionLevel._predecessors;
 
-    for (size_t i = 0; i < connectivity.size(); ++i) {
-        uint32_t first = connectivity[i][0];
-        uint32_t second = connectivity[i][1];
+    for (const auto& connection : connectivity) {
+        uint32_t first = connection[0];
+        uint32_t second = connection[1];
         successors[first].push_back(second);
         predecessors[second].push_back(first);
     }

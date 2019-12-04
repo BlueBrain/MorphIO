@@ -52,7 +52,7 @@ enum MorphologyVersion
     MORPHOLOGY_VERSION_SWC_1 = 101,
     MORPHOLOGY_VERSION_UNDEFINED
 };
-std::ostream& operator<<(std::ostream& os, const MorphologyVersion v);
+std::ostream& operator<<(std::ostream& os, MorphologyVersion v);
 
 
 enum AnnotationType
@@ -75,7 +75,7 @@ enum SomaType
     SOMA_CYLINDERS,
     SOMA_SIMPLE_CONTOUR
 };
-std::ostream& operator<<(std::ostream& os, const SomaType v);
+std::ostream& operator<<(std::ostream& os, SomaType v);
 
 /** Classification of neuron substructures. */
 enum SectionType
