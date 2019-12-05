@@ -6,12 +6,12 @@
 #include <morphio/vector_types.h>
 
 namespace morphio {
-Soma::Soma(std::shared_ptr<Property::Properties> properties)
+Soma::Soma(const std::shared_ptr<Property::Properties>& properties)
     : _properties(properties)
 {
 }
 
-const Point Soma::center() const
+Point Soma::center() const
 {
     return centerOfGravity(_properties->_somaLevel._points);
 }

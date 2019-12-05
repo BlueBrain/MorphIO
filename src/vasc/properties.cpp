@@ -12,8 +12,8 @@ namespace vasculature {
 static bool verbose = false;
 namespace property {
 
-VascPointLevel::VascPointLevel(std::vector<Point::Type> points,
-    std::vector<Diameter::Type> diameters)
+VascPointLevel::VascPointLevel(const std::vector<Point::Type>& points,
+    const std::vector<Diameter::Type>& diameters)
     : _points(points)
     , _diameters(diameters)
 {
@@ -203,86 +203,73 @@ bool Properties::operator!=(const Properties& other) const
 }
 
 template <>
-std::vector<VascSection::Type>& Properties::get<VascSection>()
+std::vector<VascSection::Type>& Properties::get<VascSection>() noexcept
 {
     return _sectionLevel._sections;
 }
 
 template <>
-const std::vector<VascSection::Type>& Properties::get<VascSection>() const
+const std::vector<VascSection::Type>& Properties::get<VascSection>() const noexcept
 {
     return _sectionLevel._sections;
 }
 
 template <>
-std::vector<Point::Type>& Properties::get<Point>()
+std::vector<Point::Type>& Properties::get<Point>() noexcept
 {
     return _pointLevel._points;
 }
 
 template <>
-const std::vector<Point::Type>& Properties::get<Point>() const
+const std::vector<Point::Type>& Properties::get<Point>() const noexcept
 {
     return _pointLevel._points;
 }
 
 template <>
-std::vector<Connection::Type>& Properties::get<Connection>()
+std::vector<Connection::Type>& Properties::get<Connection>() noexcept
 {
     return _connectivity;
 }
 
 template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>()
+std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept
 {
     return _sectionLevel._sectionTypes;
 }
 
 template <>
-const std::vector<SectionType::Type>& Properties::get<SectionType>() const
+const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept
 {
     return _sectionLevel._sectionTypes;
 }
 
 template <>
-std::vector<Diameter::Type>& Properties::get<Diameter>()
+std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept
 {
     return _pointLevel._diameters;
 }
 
 template <>
-const std::vector<Diameter::Type>& Properties::get<Diameter>() const
+const std::vector<Diameter::Type>& Properties::get<Diameter>() const noexcept
 {
     return _pointLevel._diameters;
-}
-
-const std::map<uint32_t, std::vector<uint32_t>>& Properties::predecessors()
-{
-    return _sectionLevel._predecessors;
-}
-
-const std::map<uint32_t, std::vector<uint32_t>>& Properties::successors()
-{
-    return _sectionLevel._successors;
 }
 
 std::ostream& operator<<(std::ostream& os, const VascPointLevel& prop)
 {
-    os << "Point level properties:" << std::endl;
+    os << "Point level properties:\n";
     os << "Point diameter"
-       << (prop._diameters.size() == prop._points.size() ? " Diameter" : "")
-       << std::endl;
+       << (prop._diameters.size() == prop._points.size() ? " Diameter\n" : "\n");
     for (unsigned int i = 0; i < prop._points.size(); ++i) {
-        os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i];
-        os << std::endl;
+        os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i] << '\n';
     }
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties)
 {
-    os << properties._pointLevel << std::endl;
-    return os;
+    return os << properties._pointLevel << '\n';
 }
 } // namespace property
 } // namespace vasculature

@@ -13,9 +13,9 @@ namespace Property {
 PointLevel::PointLevel(std::vector<Point::Type> points,
     std::vector<Diameter::Type> diameters,
     std::vector<Perimeter::Type> perimeters)
-    : _points(points)
-    , _diameters(diameters)
-    , _perimeters(perimeters)
+    : _points(std::move(points))
+    , _diameters(std::move(diameters))
+    , _perimeters(std::move(perimeters))
 {
     if (_points.size() != _diameters.size())
         throw SectionBuilderError(
@@ -201,8 +201,8 @@ bool SectionLevel::operator!=(const SectionLevel& other) const
 bool CellLevel::diff(const CellLevel& other, LogLevel logLevel) const
 {
     if (logLevel && this->_cellFamily != other._cellFamily) {
-        std::cout << "this->_cellFamily: " << this->_cellFamily << std::endl;
-        std::cout << "other._cellFamily: " << other._cellFamily << std::endl;
+        std::cout << "this->_cellFamily: " << this->_cellFamily << '\n'
+                  << "other._cellFamily: " << other._cellFamily << '\n';
     }
     return !(this == &other || (this->_cellFamily == other._cellFamily
                                  // this->_somaType == other._somaType
@@ -221,7 +221,7 @@ bool CellLevel::operator!=(const CellLevel& other) const
 
 
 MitochondriaPointLevel::MitochondriaPointLevel(
-    const MitochondriaPointLevel& data, SectionRange range)
+    const MitochondriaPointLevel& data, const SectionRange& range)
 {
     _sectionIds = copySpan<Property::MitoNeuriteSectionId>(data._sectionIds, range);
     _relativePathLengths = copySpan<Property::MitoPathLength>(data._relativePathLengths, range);
@@ -232,9 +232,9 @@ MitochondriaPointLevel::MitochondriaPointLevel(
     std::vector<MitoNeuriteSectionId::Type> sectionIds,
     std::vector<MitoPathLength::Type> relativePathLengths,
     std::vector<MitoDiameter::Type> diameters)
-    : _sectionIds(sectionIds)
-    , _relativePathLengths(relativePathLengths)
-    , _diameters(diameters)
+    : _sectionIds(std::move(sectionIds))
+    , _relativePathLengths(std::move(relativePathLengths))
+    , _diameters(std::move(diameters))
 {
     if (_sectionIds.size() != _relativePathLengths.size())
         throw SectionBuilderError(
@@ -289,155 +289,153 @@ Annotation::Annotation(AnnotationType type, uint32_t sectionId,
     int32_t lineNumber)
     : _type(type)
     , _sectionId(sectionId)
-    , _points(points)
+    , _points(std::move(points))
     , _lineNumber(lineNumber)
-    , _details(details)
+    , _details(std::move(details))
 {
 }
 
 template <>
-std::vector<Section::Type>& Properties::get<Section>()
-{
-    return _sectionLevel._sections;
-}
-
-template <>
-const std::vector<Section::Type>& Properties::get<Section>() const
+std::vector<Section::Type>& Properties::get<Section>() noexcept
 {
     return _sectionLevel._sections;
 }
 
 template <>
-std::vector<MitoSection::Type>& Properties::get<MitoSection>()
+const std::vector<Section::Type>& Properties::get<Section>() const noexcept
+{
+    return _sectionLevel._sections;
+}
+
+template <>
+std::vector<MitoSection::Type>& Properties::get<MitoSection>() noexcept
 {
     return _mitochondriaSectionLevel._sections;
 }
 
 template <>
-const std::vector<MitoSection::Type>& Properties::get<MitoSection>() const
+const std::vector<MitoSection::Type>& Properties::get<MitoSection>() const noexcept
 {
     return _mitochondriaSectionLevel._sections;
 }
 
 template <>
-std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>()
+std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>() noexcept
 {
     return _mitochondriaPointLevel._sectionIds;
 }
 
 template <>
 const std::vector<MitoNeuriteSectionId::Type>&
-    Properties::get<MitoNeuriteSectionId>() const
+    Properties::get<MitoNeuriteSectionId>() const noexcept
 {
     return _mitochondriaPointLevel._sectionIds;
 }
 
 template <>
-std::vector<Point::Type>& Properties::get<Point>()
+const std::vector<Point::Type>& Properties::get<Point>() const noexcept
 {
     return _pointLevel._points;
 }
 template <>
-const std::vector<Point::Type>& Properties::get<Point>() const
+std::vector<Point::Type>& Properties::get<Point>() noexcept
 {
     return _pointLevel._points;
 }
 
 template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>()
+const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept
 {
     return _sectionLevel._sectionTypes;
 }
 template <>
-const std::vector<SectionType::Type>& Properties::get<SectionType>() const
+std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept
 {
     return _sectionLevel._sectionTypes;
 }
 
 template <>
-std::vector<Perimeter::Type>& Properties::get<Perimeter>()
+const std::vector<Perimeter::Type>& Properties::get<Perimeter>() const noexcept
 {
     return _pointLevel._perimeters;
 }
 
 template <>
-const std::vector<Perimeter::Type>& Properties::get<Perimeter>() const
+std::vector<Perimeter::Type>& Properties::get<Perimeter>() noexcept
 {
     return _pointLevel._perimeters;
 }
 
 template <>
-std::vector<Diameter::Type>& Properties::get<Diameter>()
+const std::vector<Diameter::Type>& Properties::get<Diameter>() const noexcept
 {
     return _pointLevel._diameters;
 }
 
 template <>
-const std::vector<Diameter::Type>& Properties::get<Diameter>() const
+std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept
 {
     return _pointLevel._diameters;
 }
 
 template <>
-std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>()
+const std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() const noexcept
 {
     return _mitochondriaPointLevel._diameters;
 }
 
 template <>
-const std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() const
+std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() noexcept
 {
     return _mitochondriaPointLevel._diameters;
 }
 
 template <>
-std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>()
+const std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() const noexcept
 {
     return _mitochondriaPointLevel._relativePathLengths;
 }
 
 template <>
-const std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() const
+std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() noexcept
 {
     return _mitochondriaPointLevel._relativePathLengths;
 }
 
 template <>
-const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>()
+const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>() const noexcept
 {
     return _sectionLevel._children;
 }
 
 template <>
 const std::map<int32_t, std::vector<uint32_t>>&
-    Properties::children<MitoSection>()
+    Properties::children<MitoSection>() const noexcept
 {
     return _mitochondriaSectionLevel._children;
 }
 
 std::ostream& operator<<(std::ostream& os, const PointLevel& prop)
 {
-    os << "Point level properties:" << std::endl;
-    os << "Point Diameter"
-       << (prop._perimeters.size() == prop._points.size() ? " Perimeter" : "")
-       << std::endl;
+    os << "Point level properties:\n"
+       << "Point Diameter"
+       << (prop._perimeters.size() == prop._points.size() ? " Perimeter\n" : "\n");
     for (unsigned int i = 0; i < prop._points.size(); ++i) {
         os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i];
         if (prop._perimeters.size() == prop._points.size())
             os << ' ' << prop._perimeters[i];
-        os << std::endl;
+        os << '\n';
     }
     return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties)
 {
-    os << properties._pointLevel << std::endl;
-    // os << _sectionLevel << std::endl;
-    // os << _cellLevel << std::endl;
+    os << properties._pointLevel << '\n';
+    // os << _sectionLevel << '\n';
+    // os << _cellLevel << '\n';
     return os;
 }
-
 
 } // namespace Property
 } // namespace morphio

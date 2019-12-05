@@ -88,10 +88,10 @@ struct PointLevel
     std::vector<Diameter::Type> _diameters;
     std::vector<Perimeter::Type> _perimeters;
 
-    PointLevel() {}
+    PointLevel() = default;
     PointLevel(std::vector<Point::Type> points,
         std::vector<Diameter::Type> diameters,
-        std::vector<Perimeter::Type> perimeters = std::vector<Perimeter::Type>());
+        std::vector<Perimeter::Type> perimeters = {});
     PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
     PointLevel& operator=(const PointLevel& other);
@@ -124,9 +124,9 @@ struct MitochondriaPointLevel
     std::vector<MitoPathLength::Type> _relativePathLengths;
     std::vector<MitoDiameter::Type> _diameters;
 
-    MitochondriaPointLevel() {}
+    MitochondriaPointLevel() = default;
     MitochondriaPointLevel(const MitochondriaPointLevel& data,
-                           SectionRange range);
+        const SectionRange& range);
 
     MitochondriaPointLevel(
         std::vector<uint32_t> sectionId,
@@ -194,46 +194,70 @@ struct Properties
     // Functions
     ////////////////////////////////////////////////////////////////////////////////
     template <typename T>
-    std::vector<typename T::Type>& get();
+    std::vector<typename T::Type>& get() noexcept;
     template <typename T>
-    const std::vector<typename T::Type>& get() const;
+    const std::vector<typename T::Type>& get() const noexcept;
 
-    const morphio::MorphologyVersion& version() { return _cellLevel._version; }
-    const morphio::CellFamily& cellFamily() { return _cellLevel._cellFamily; }
-    const morphio::SomaType& somaType() { return _cellLevel._somaType; }
+    const morphio::MorphologyVersion& version() const noexcept { return _cellLevel._version; }
+    const morphio::CellFamily& cellFamily() const noexcept { return _cellLevel._cellFamily; }
+    const morphio::SomaType& somaType() const noexcept { return _cellLevel._somaType; }
     template <typename T>
-    const std::map<int32_t, std::vector<uint32_t>>& children();
+    const std::map<int32_t, std::vector<uint32_t>>& children() const noexcept;
 };
 
 template <>
-const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>();
+const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>() const noexcept;
 template <>
 const std::map<int32_t, std::vector<uint32_t>>&
-    Properties::children<MitoSection>();
+    Properties::children<MitoSection>() const noexcept;
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);
 
 template <>
-std::vector<Point::Type>& Properties::get<Point>();
+const std::vector<Point::Type>& Properties::get<Point>() const noexcept;
 template <>
-std::vector<Perimeter::Type>& Properties::get<Perimeter>();
+std::vector<Point::Type>& Properties::get<Point>() noexcept;
+
 template <>
-std::vector<Diameter::Type>& Properties::get<Diameter>();
+const std::vector<Perimeter::Type>& Properties::get<Perimeter>() const noexcept;
 template <>
-std::vector<MitoSection::Type>& Properties::get<MitoSection>();
+std::vector<Perimeter::Type>& Properties::get<Perimeter>() noexcept;
+
 template <>
-std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>();
+const std::vector<Diameter::Type>& Properties::get<Diameter>() const noexcept;
 template <>
-std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>();
+std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept;
+
 template <>
-std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>();
+const std::vector<MitoSection::Type>& Properties::get<MitoSection>() const noexcept;
 template <>
-std::vector<Section::Type>& Properties::get<Section>();
+std::vector<MitoSection::Type>& Properties::get<MitoSection>() noexcept;
+
 template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>();
+const std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() const noexcept;
 template <>
-const std::vector<Section::Type>& Properties::get<Section>() const;
+std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() noexcept;
+
+template <>
+const std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>() const noexcept;
+template <>
+std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>() noexcept;
+
+template <>
+const std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() const noexcept;
+template <>
+std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() noexcept;
+
+template <>
+const std::vector<Section::Type>& Properties::get<Section>() const noexcept;
+template <>
+std::vector<Section::Type>& Properties::get<Section>() noexcept;
+
+template <>
+const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept;
+template <>
+std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept;
 
 } // namespace Property
 } // namespace morphio

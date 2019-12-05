@@ -27,8 +27,8 @@ public:
     virtual ~Morphology();
 
     Morphology& operator=(const Morphology&);
-    Morphology(Morphology&&);
-    Morphology& operator=(Morphology&&);
+    Morphology(Morphology&&) noexcept;
+    Morphology& operator=(Morphology&&) noexcept;
 
     /** @name Read API */
     //@{
@@ -40,8 +40,8 @@ public:
         Example:
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    Morphology(const URI& source, unsigned int options = NO_MODIFIER);
-    Morphology(mut::Morphology);
+    explicit Morphology(const URI& source, unsigned int options = NO_MODIFIER);
+    explicit Morphology(mut::Morphology);
 
     /**
      * Return the soma object
@@ -74,13 +74,13 @@ public:
      *
      * @throw RawDataError if the id is out of range
      */
-    Section section(const uint32_t& id) const;
+    Section section(uint32_t id) const;
 
     /**
      * Return a vector with all points from all sections
      * (soma points are not included)
      **/
-    const Points& points() const;
+    const Points& points() const noexcept;
 
     /**
      * Returns a list with offsets to access data of a specific section in the points

@@ -14,11 +14,11 @@ class Section
     using PointAttribute = property::Point;
 
 public:
-    Section(const Section& section);
+    Section(const Section& section) = default;
 
-    const Section& operator=(const Section& section);
+    Section& operator=(const Section& section);
 
-    Section(uint32_t id, std::shared_ptr<property::Properties> morphology);
+    Section(uint32_t id, const std::shared_ptr<property::Properties>& morphology);
 
     bool operator==(const Section& section) const;
     bool operator!=(const Section& section) const;
@@ -27,20 +27,20 @@ public:
     /**
        Returns a list of predecessors or parents of the section
     **/
-    const std::vector<Section> predecessors() const;
+    std::vector<Section> predecessors() const;
 
     /**
        Returns a list of successors or children of the section
     **/
-    const std::vector<Section> successors() const;
+    std::vector<Section> successors() const;
 
     /**
        Returns a list of all neighbors of the section
     **/
-    const std::vector<Section> neighbors() const;
+    std::vector<Section> neighbors() const;
 
     /** Return the ID of this section. */
-    uint32_t id() const;
+    uint32_t id() const noexcept;
 
     /**
        Euclidian distance between first and last point of the section
@@ -55,14 +55,14 @@ public:
    (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
     to this section's point coordinates
    **/
-    const range<const Point> points() const;
+    range<const Point> points() const;
 
     /**
     * Return a view
    (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
     to this section's point diameters
    **/
-    const range<const float> diameters() const;
+    range<const float> diameters() const;
 
     /**
      * Return the morphological type of this section (artery, vein, capillary, ...)
@@ -71,13 +71,15 @@ public:
 
 protected:
     template <typename Property>
-    const range<const typename Property::Type> get() const;
+    range<const typename Property::Type> get() const;
 
     uint32_t _id;
     SectionRange _range;
     std::shared_ptr<property::Properties> _properties;
 };
-}
-}
+
+} // namespace vasculature
+} // namespace morphio
+
 std::ostream& operator<<(std::ostream& os, const morphio::vasculature::Section& section);
-std::ostream& operator<<(std::ostream& os, morphio::range<const morphio::Point> points);
+std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);

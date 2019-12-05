@@ -62,33 +62,33 @@ public:
     (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point coordinates
     **/
-    const range<const Point> points() const;
+    range<const Point> points() const;
 
     /**
      * Return a view
     (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point diameters
     **/
-    const range<const float> diameters() const;
+    range<const float> diameters() const;
 
     /**
      * Return a view
      (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point perimeters
      **/
-    const range<const float> perimeters() const;
+    range<const float> perimeters() const;
 
     /**
      * Return the morphological type of this section (dendrite, axon, ...)
      */
     SectionType type() const;
     friend class mut::Section;
-    friend Section Morphology::section(const uint32_t&) const;
+    friend Section Morphology::section(uint32_t) const;
     friend class SectionBase<Section>;
 
 protected:
-    Section(uint32_t id_, std::shared_ptr<Property::Properties> properties)
-    : SectionBase(id_, properties)
+    Section(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
+        : SectionBase(id_, properties)
     {}
 };
 
@@ -99,4 +99,4 @@ template class SectionBase<Section>;
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
 std::ostream& operator<<(std::ostream& os,
-    morphio::range<const morphio::Point> points);
+    const morphio::range<const morphio::Point>& points);

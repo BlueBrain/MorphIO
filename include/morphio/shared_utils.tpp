@@ -59,10 +59,10 @@ std::vector<typename T::Type> copySpan(
     const std::vector<typename T::Type>& data, SectionRange range)
 {
     if (data.empty())
-        return std::vector<typename T::Type>();
+        return {};
 
-    return std::vector<typename T::Type>(data.begin() + static_cast<long int>(range.first),
-        data.begin() + static_cast<long int>(range.second));
+    return {data.begin() + static_cast<long int>(range.first),
+        data.begin() + static_cast<long int>(range.second)};
 }
 
 } // namespace morphio

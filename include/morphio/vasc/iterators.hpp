@@ -1,27 +1,45 @@
 
+#include <iterator>
 #include <set>
 #include <stack>
 
 namespace morphio {
 namespace vasculature {
 
-template<typename SectionT, typename VasculatureT>
+template <typename SectionT, typename VasculatureT>
 class graph_iterator_t
 {
     std::set<SectionT> visited;
     std::stack<SectionT> container;
 
 public:
-graph_iterator_t() = default;
+    using iterator_category = std::input_iterator_tag;
+    using value_type = SectionT;
+    using difference_type = std::ptrdiff_t;
+    using pointer = SectionT*;
+    using reference = SectionT&;
+    graph_iterator_t() = default;
+    inline explicit graph_iterator_t(const SectionT& vasculatureSection);
+    inline explicit graph_iterator_t(const VasculatureT& vasculatureMorphology);
 
-explicit graph_iterator_t(const SectionT& vasculatureSection)
+    inline bool operator==(const graph_iterator_t& other) const;
+    inline bool operator!=(const graph_iterator_t& other) const;
+    inline const SectionT& operator*() const;
+
+    inline graph_iterator_t& operator++();
+    inline graph_iterator_t operator++(int);
+};
+
+template <typename SectionT, typename VasculatureT>
+inline graph_iterator_t<SectionT, VasculatureT>::graph_iterator_t(const SectionT& vasculatureSection)
 {
     container.push(vasculatureSection);
 }
 
-explicit graph_iterator_t(const VasculatureT& vasculatureMorphology)
+template <typename SectionT, typename VasculatureT>
+inline graph_iterator_t<SectionT, VasculatureT>::graph_iterator_t(const VasculatureT& vasculatureMorphology)
 {
-    auto sections = vasculatureMorphology.sections();
+    const auto& sections = vasculatureMorphology.sections();
     for (std::size_t i = 0; i < sections.size(); ++i) {
         if (sections[i].predecessors().empty()) {
             container.push(sections[i]);
@@ -30,26 +48,31 @@ explicit graph_iterator_t(const VasculatureT& vasculatureMorphology)
     }
 }
 
-bool operator==(const graph_iterator_t& other) const
+template <typename SectionT, typename VasculatureT>
+inline bool graph_iterator_t<SectionT, VasculatureT>::operator==(const graph_iterator_t& other) const
 {
     return container == other.container;
 }
 
-bool operator!=(const graph_iterator_t& other) const
+template <typename SectionT, typename VasculatureT>
+inline bool graph_iterator_t<SectionT, VasculatureT>::operator!=(const graph_iterator_t& other) const
 {
     return !(*this == other);
 }
 
-SectionT operator*() const
+template <typename SectionT, typename VasculatureT>
+inline const SectionT& graph_iterator_t<SectionT, VasculatureT>::operator*() const
 {
     return container.top();
 }
 
-graph_iterator_t& operator++()
+template <typename SectionT, typename VasculatureT>
+inline graph_iterator_t<SectionT, VasculatureT>&
+    graph_iterator_t<SectionT, VasculatureT>::operator++()
 {
     const auto& section = *(*this);
     container.pop();
-    auto& neighbors = section.neighbors();
+    const auto& neighbors = section.neighbors();
     for (auto it = neighbors.rbegin(); it != neighbors.rend(); ++it)
         if (visited.find(*it) == visited.end()) {
             container.push(*it);
@@ -57,12 +80,15 @@ graph_iterator_t& operator++()
         }
     return *this;
 }
-graph_iterator_t operator++(int)
+
+template <typename SectionT, typename VasculatureT>
+inline graph_iterator_t<SectionT, VasculatureT>
+    graph_iterator_t<SectionT, VasculatureT>::operator++(int)
 {
     graph_iterator_t retval = *this;
     ++(*this);
     return retval;
 }
-};
-}  // namespace vasculature
-}  // namespace morphio
+
+} // namespace vasculature
+} // namespace morphio

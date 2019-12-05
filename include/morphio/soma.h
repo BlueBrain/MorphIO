@@ -31,27 +31,21 @@ public:
     /**
      * Return the  coordinates (x,y,z) of all soma points
      **/
-    const range<const Point> points() const
-    {
-        return _properties->_somaLevel._points;
-    }
+    inline range<const Point> points() const noexcept;
 
     /**
      * Return the diameters of all soma points
      **/
-    const range<const float> diameters() const
-    {
-        return _properties->_somaLevel._diameters;
-    }
+    inline range<const float> diameters() const noexcept;
 
     /**
      * Return the soma type
      **/
-    SomaType type() const { return _properties->_cellLevel._somaType; }
+    inline SomaType type() const noexcept;
     /**
      * Return the center of gravity of the soma points
      **/
-    const Point center() const;
+    Point center() const;
 
     /**
      * Return the soma volume\n"
@@ -72,7 +66,7 @@ public:
     float maxDistance() const;
 
 private:
-    Soma(std::shared_ptr<Property::Properties>);
+    explicit Soma(const std::shared_ptr<Property::Properties>&);
     // TODO: find out why the following line does not work
     // when friend class Morphology; is removed
     // template <typename Property>
@@ -82,4 +76,20 @@ private:
 
     std::shared_ptr<Property::Properties> _properties;
 };
+
+inline range<const Point> Soma::points() const noexcept
+{
+    return _properties->_somaLevel._points;
+}
+
+inline range<const float> Soma::diameters() const noexcept
+{
+    return _properties->_somaLevel._diameters;
+}
+
+inline SomaType Soma::type() const noexcept
+{
+    return _properties->_cellLevel._somaType;
+}
+
 } // namespace morphio

@@ -72,21 +72,19 @@ Morphology::Morphology(mut::Morphology morphology)
     buildChildren(_properties);
 }
 
-Morphology::Morphology(Morphology&&) = default;
-Morphology& Morphology::operator=(Morphology&&) = default;
+Morphology::Morphology(Morphology&&) noexcept = default;
+Morphology& Morphology::operator=(Morphology&&) noexcept = default;
 
-Morphology::~Morphology()
-{
-}
+Morphology::~Morphology() = default;
 
 Soma Morphology::soma() const
 {
-    return {_properties};
+    return Soma(_properties);
 }
 
 Mitochondria Morphology::mitochondria() const
 {
-    return {_properties};
+    return Mitochondria(_properties);
 }
 
 const std::vector<Property::Annotation>& Morphology::annotations() const
@@ -94,7 +92,7 @@ const std::vector<Property::Annotation>& Morphology::annotations() const
     return _properties->_annotations;
 }
 
-Section Morphology::section(const uint32_t& id) const
+Section Morphology::section(uint32_t id) const
 {
     return {id, _properties};
 }
@@ -133,7 +131,7 @@ const std::vector<typename Property::Type>& Morphology::get() const
     return _properties->get<Property>();
 }
 
-const Points& Morphology::points() const
+const Points& Morphology::points() const noexcept
 {
     return get<Property::Point>();
 }

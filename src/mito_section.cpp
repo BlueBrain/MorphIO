@@ -34,17 +34,17 @@ mito_upstream_iterator MitoSection::upstream_end() const
     return mito_upstream_iterator();
 }
 
-const range<const uint32_t> MitoSection::neuriteSectionIds() const
+range<const uint32_t> MitoSection::neuriteSectionIds() const
 {
     return get<Property::MitoNeuriteSectionId>();
 }
 
-const range<const float> MitoSection::diameters() const
+range<const float> MitoSection::diameters() const
 {
     return get<Property::MitoDiameter>();
 }
 
-const range<const float> MitoSection::relativePathLengths() const
+range<const float> MitoSection::relativePathLengths() const
 {
     return get<Property::MitoPathLength>();
 }

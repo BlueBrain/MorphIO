@@ -81,13 +81,6 @@ Property::Properties MorphologyHDF5::load()
     return _properties;
 }
 
-MorphologyHDF5::~MorphologyHDF5()
-{
-    _points.reset();
-    _sections.reset();
-    _file.reset();
-}
-
 void MorphologyHDF5::_checkVersion(const std::string& source)
 {
     if (_readV11Metadata())

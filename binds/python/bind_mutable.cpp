@@ -27,7 +27,7 @@ static void bind_mutable_module(py::module &m) {
                                "Returns a list of all root sections IDs "
                                "(sections whose parent ID are -1)", py::return_value_policy::reference)
         .def_property_readonly("soma",
-                               static_cast<std::shared_ptr<morphio::mut::Soma>(morphio::mut::Morphology::*)()>(&morphio::mut::Morphology::soma),
+                               static_cast<std::shared_ptr<morphio::mut::Soma>&(morphio::mut::Morphology::*)()>(&morphio::mut::Morphology::soma),
                                "Returns a reference to the soma object\n\n"
                                "Note: multiple morphologies can share the same Soma instance")
         .def_property_readonly("mitochondria", static_cast<morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ()>(&morphio::mut::Morphology::mitochondria),
@@ -92,7 +92,7 @@ static void bind_mutable_module(py::module &m) {
 
 
     mutable_morphology.def("append_root_section", static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*)
-                           (std::shared_ptr<morphio::mut::Section>, bool)>(
+                           (const std::shared_ptr<morphio::mut::Section>&, bool)>(
                                &morphio::mut::Morphology::appendRootSection),
                            "Append the existing mutable Section as a root section\n"
                            "If recursive == true, all descendent will be appended as well",
@@ -128,7 +128,7 @@ static void bind_mutable_module(py::module &m) {
              "Append a new root MitoSection (if recursive == true, all descendent will be appended as well)",
              "immutable_section"_a, "recursive"_a = true)
         .def("append_root_section", static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*)
-             (const std::shared_ptr<morphio::mut::MitoSection>, bool recursive)>
+             (const std::shared_ptr<morphio::mut::MitoSection>&, bool recursive)>
              (&morphio::mut::Mitochondria::appendRootSection),
              "Append a new root MitoSection (if recursive == true, all descendent will be appended as well)",
              "section"_a, "recursive"_a = true)
@@ -163,49 +163,51 @@ static void bind_mutable_module(py::module &m) {
             "section_id"_a=-1);
 
 
+    using mitosection_floats_f = std::vector<float>& (morphio::mut::MitoSection::*)();
+    using mitosection_ints_f = std::vector<uint32_t>& (morphio::mut::MitoSection::*)();
 
     // py::nodelete needed because morphio::mut::MitoSection has a private destructor
     // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
     py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(m, "MitoSection")
         .def_property_readonly("id", &morphio::mut::MitoSection::id,
-                               "Return the section ID")
+            "Return the section ID")
         .def_property("diameters",
-                      &morphio::mut::MitoSection::diameters,
-                      [](morphio::mut::MitoSection* section,
-                         const std::vector<float>& _diameters) {
-                          section -> diameters() = _diameters;
-                      },
-                      "Returns the diameters of all points of this section")
+            static_cast<mitosection_floats_f>(&morphio::mut::MitoSection::diameters),
+            [](morphio::mut::MitoSection* section,
+                const std::vector<float>& _diameters) {
+                section->diameters() = _diameters;
+            },
+            "Returns the diameters of all points of this section")
         .def_property("relative_path_lengths",
-                      &morphio::mut::MitoSection::pathLengths,
-                      [](morphio::mut::MitoSection* section,
-                         const std::vector<float>& _pathLengths) {
-                          section -> pathLengths() = _pathLengths;
-                      },
-                      "Returns the relative distance (between 0 and 1)\n"
-                      "between the start of the neuronal section and each point\n"
-                      "of this mitochondrial section")
+            static_cast<mitosection_floats_f>(&morphio::mut::MitoSection::pathLengths),
+            [](morphio::mut::MitoSection* section,
+                const std::vector<float>& _pathLengths) {
+                section->pathLengths() = _pathLengths;
+            },
+            "Returns the relative distance (between 0 and 1)\n"
+            "between the start of the neuronal section and each point\n"
+            "of this mitochondrial section")
         .def_property("neurite_section_ids",
-                      &morphio::mut::MitoSection::neuriteSectionIds,
-                      [](morphio::mut::MitoSection* section,
-                         const std::vector<uint32_t>& _neuriteSectionIds) {
-                          section -> neuriteSectionIds() = _neuriteSectionIds;
-                      },
-                      "Returns the neurite section Ids of all points of this section")
+            static_cast<mitosection_ints_f>(&morphio::mut::MitoSection::neuriteSectionIds),
+            [](morphio::mut::MitoSection* section,
+                const std::vector<uint32_t>& _neuriteSectionIds) {
+                section->neuriteSectionIds() = _neuriteSectionIds;
+            },
+            "Returns the neurite section Ids of all points of this section")
 
-        .def("append_section", static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (const morphio::Property::MitochondriaPointLevel&)>(&morphio::mut::MitoSection::appendSection),
-             "Append a new MitoSection to this mito section",
-             "point_level_properties"_a)
+        .def("append_section", static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*)(const morphio::Property::MitochondriaPointLevel&)>(&morphio::mut::MitoSection::appendSection),
+            "Append a new MitoSection to this mito section",
+            "point_level_properties"_a)
 
-        .def("append_section", static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (std::shared_ptr<morphio::mut::MitoSection>, bool)>(&morphio::mut::MitoSection::appendSection),
-             "Append a copy of the section to this section\n"
-             "If recursive == true, all descendent will be appended as well",
-             "section"_a, "recursive"_a=false)
+        .def("append_section", static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*)(const std::shared_ptr<morphio::mut::MitoSection>&, bool)>(&morphio::mut::MitoSection::appendSection),
+            "Append a copy of the section to this section\n"
+            "If recursive == true, all descendent will be appended as well",
+            "section"_a, "recursive"_a = false)
 
-        .def("append_section", static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*) (const morphio::MitoSection&, bool)>(&morphio::mut::MitoSection::appendSection),
-             "Append the existing immutable MitoSection to this section\n"
-             "If recursive == true, all descendent will be appended as well",
-             "immutable_section"_a, "recursive"_a=false);
+        .def("append_section", static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*)(const morphio::MitoSection&, bool)>(&morphio::mut::MitoSection::appendSection),
+            "Append the existing immutable MitoSection to this section\n"
+            "If recursive == true, all descendent will be appended as well",
+            "immutable_section"_a, "recursive"_a = false);
 
     py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(m, "Section")
         .def("__str__", [](const morphio::mut::Section& section) {

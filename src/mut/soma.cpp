@@ -26,7 +26,7 @@ Soma::Soma(const morphio::Soma& soma)
 {
 }
 
-const Point Soma::center() const
+Point Soma::center() const
 {
     return centerOfGravity(points());
 }
@@ -43,13 +43,13 @@ float Soma::maxDistance() const
     return maxDistanceToCenterOfGravity(_pointProperties._points);
 }
 
-std::ostream& operator<<(std::ostream& os, Soma& soma)
+std::ostream& operator<<(std::ostream& os, const Soma& soma)
 {
     os << dumpPoints(soma.points());
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, std::shared_ptr<Soma> somaPtr)
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& somaPtr)
 {
     os << *somaPtr;
     return os;

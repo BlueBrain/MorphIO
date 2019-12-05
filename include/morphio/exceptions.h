@@ -8,7 +8,7 @@ namespace morphio {
 class MorphioError : public std::runtime_error
 {
 public:
-    MorphioError(const std::string& _msg)
+    explicit MorphioError(const std::string& _msg)
         : std::runtime_error(_msg)
     {
     }
@@ -17,7 +17,7 @@ public:
 class NotImplementedError : public MorphioError
 {
 public:
-    NotImplementedError(const std::string& _msg)
+    explicit NotImplementedError(const std::string& _msg)
         : MorphioError(_msg)
     {
     }
@@ -26,7 +26,7 @@ public:
 class RawDataError : public MorphioError
 {
 public:
-    RawDataError(const std::string& _msg)
+    explicit RawDataError(const std::string& _msg)
         : MorphioError(_msg)
     {
     }
@@ -35,7 +35,7 @@ public:
 class UnknownFileType : public MorphioError
 {
 public:
-    UnknownFileType(const std::string& _msg)
+    explicit UnknownFileType(const std::string& _msg)
         : MorphioError(_msg)
     {
     }
@@ -44,7 +44,7 @@ public:
 class SomaError : public MorphioError
 {
 public:
-    SomaError(const std::string& _msg)
+    explicit SomaError(const std::string& _msg)
         : MorphioError(_msg)
     {
     }
@@ -53,7 +53,7 @@ public:
 class IDSequenceError : public RawDataError
 {
 public:
-    IDSequenceError(const std::string& _msg)
+    explicit IDSequenceError(const std::string& _msg)
         : RawDataError(_msg)
     {
     }
@@ -62,7 +62,7 @@ public:
 class MultipleTrees : public RawDataError
 {
 public:
-    MultipleTrees(const std::string& _msg)
+    explicit MultipleTrees(const std::string& _msg)
         : RawDataError(_msg)
     {
     }
@@ -71,7 +71,7 @@ public:
 class MissingParentError : public RawDataError
 {
 public:
-    MissingParentError(const std::string& _msg)
+    explicit MissingParentError(const std::string& _msg)
         : RawDataError(_msg)
     {
     }
@@ -80,7 +80,7 @@ public:
 class SectionBuilderError : public RawDataError
 {
 public:
-    SectionBuilderError(const std::string& _msg)
+    explicit SectionBuilderError(const std::string& _msg)
         : RawDataError(_msg)
     {
     }
@@ -89,7 +89,7 @@ public:
 class WriterError : public MorphioError
 {
 public:
-    WriterError(const std::string& _msg)
+    explicit WriterError(const std::string& _msg)
         : MorphioError(_msg)
     {
     }

@@ -44,9 +44,9 @@ struct VascPointLevel
     std::vector<Point::Type> _points;
     std::vector<Diameter::Type> _diameters;
 
-    VascPointLevel() {}
-    VascPointLevel(std::vector<Point::Type> points,
-        std::vector<Diameter::Type> diameters);
+    VascPointLevel() = default;
+    VascPointLevel(const std::vector<Point::Type>& points,
+        const std::vector<Diameter::Type>& diameters);
     VascPointLevel(const VascPointLevel& data);
     VascPointLevel(const VascPointLevel& data, SectionRange range);
     VascPointLevel& operator=(const VascPointLevel&) = default;
@@ -77,34 +77,42 @@ struct Properties
     std::vector<Connection::Type> _connectivity;
 
     template <typename T>
-    std::vector<typename T::Type>& get();
+    std::vector<typename T::Type>& get() noexcept;
 
     template <typename T>
-    const std::vector<typename T::Type>& get() const;
+    const std::vector<typename T::Type>& get() const noexcept;
 
-    const std::map<uint32_t, std::vector<uint32_t>>& predecessors();
-    const std::map<uint32_t, std::vector<uint32_t>>& successors();
+    inline const std::map<uint32_t, std::vector<uint32_t>>& predecessors() const noexcept;
+    inline const std::map<uint32_t, std::vector<uint32_t>>& successors() const noexcept;
 
     bool operator==(const Properties& other) const;
     bool operator!=(const Properties& other) const;
 };
 
+inline const std::map<uint32_t, std::vector<uint32_t>>& Properties::predecessors() const noexcept
+{
+    return _sectionLevel._predecessors;
+    }
+    inline const std::map<uint32_t, std::vector<uint32_t>>& Properties::successors() const noexcept
+    {
+        return _sectionLevel._successors;
+    }
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const VascPointLevel& pointLevel);
 
 template <>
-std::vector<Point::Type>& Properties::get<Point>();
+std::vector<Point::Type>& Properties::get<Point>() noexcept;
 template <>
-std::vector<Diameter::Type>& Properties::get<Diameter>();
+std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept;
 template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>();
+std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept;
 template <>
-std::vector<VascSection::Type>& Properties::get<VascSection>();
+std::vector<VascSection::Type>& Properties::get<VascSection>() noexcept;
 template <>
-const std::vector<VascSection::Type>& Properties::get<VascSection>() const;
+const std::vector<VascSection::Type>& Properties::get<VascSection>() const noexcept;
 template <>
-std::vector<Connection::Type>& Properties::get<Connection>();
+std::vector<Connection::Type>& Properties::get<Connection>() noexcept;
 
 } // namespace property
 } // namespace vasculature

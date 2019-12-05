@@ -23,8 +23,7 @@ public:
     , _uri(uri)
     {}
 
-    virtual ~VasculatureHDF5()
-    {}
+    virtual ~VasculatureHDF5() = default;
 
     vasculature::property::Properties load();
 

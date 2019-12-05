@@ -18,8 +18,8 @@
 
 namespace morphio {
 namespace mut {
-bool _checkDuplicatePoint(std::shared_ptr<Section> parent,
-    std::shared_ptr<Section> current);
+bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
+    const std::shared_ptr<Section>& current);
 
 class Morphology
 {
@@ -58,37 +58,46 @@ public:
     /**
        Returns all section ids at the tree root
     **/
-    const std::vector<std::shared_ptr<Section>>& rootSections() const;
+    inline const std::vector<std::shared_ptr<Section>>& rootSections() const noexcept;
 
     /**
        Returns the dictionary id -> Section for this tree
     **/
-    const std::map<uint32_t, std::shared_ptr<Section>> sections() const;
+    inline const std::map<uint32_t, std::shared_ptr<Section>>& sections() const noexcept;
 
     /**
        Returns a shared pointer on the Soma
 
        Note: multiple morphologies can share the same Soma instance
     **/
-    std::shared_ptr<Soma> soma();
-    const std::shared_ptr<Soma> soma() const;
+    inline std::shared_ptr<Soma>& soma() noexcept;
+
+    /**
+       Returns a shared pointer on the Soma
+
+       Note: multiple morphologies can share the same Soma instance
+    **/
+    inline const std::shared_ptr<Soma>& soma() const noexcept;
 
     /**
      * Return the mitochondria container class
      **/
-    Mitochondria& mitochondria() { return _mitochondria; }
-    const Mitochondria& mitochondria() const { return _mitochondria; }
+    inline Mitochondria& mitochondria() noexcept;
+    /**
+     * Return the mitochondria container class
+     **/
+    inline const Mitochondria& mitochondria() const noexcept;
     /**
      * Return the annotation object
      **/
-    const std::vector<Property::Annotation> annotations() const;
+    inline const std::vector<Property::Annotation>& annotations() const noexcept;
 
     /**
        Get the shared pointer for the given section
 
        Note: multiple morphologies can share the same Section instances.
     **/
-    const std::shared_ptr<Section> section(uint32_t id) const;
+    inline const std::shared_ptr<Section>& section(uint32_t id) const;
 
     /**
        Depth first iterator starting at a given section id
@@ -121,7 +130,7 @@ public:
        If recursive == true, all descendent sections will be deleted as well
        Else, children will be re-attached to their grand-parent
     **/
-    void deleteSection(std::shared_ptr<Section> section, bool recursive = true);
+    void deleteSection(const std::shared_ptr<Section>& section, bool recursive = true);
 
     /**
        Append the existing morphio::Section as a root section
@@ -136,7 +145,7 @@ public:
 
        If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<Section> appendRootSection(std::shared_ptr<Section> section,
+    std::shared_ptr<Section> appendRootSection(const std::shared_ptr<Section>& section,
         bool recursive = false);
 
     /**
@@ -150,32 +159,29 @@ public:
     /**
      * Return the soma type
      **/
-    SomaType somaType() { return _soma->type(); }
+    inline SomaType somaType() const noexcept;
 
     /**
      * Return the cell family (neuron or glia)
      **/
-    CellFamily& cellFamily() { return _cellProperties->_cellFamily; }
+    inline CellFamily cellFamily() const noexcept;
 
     /**
      * Return the version
      **/
-    MorphologyVersion& version() { return _cellProperties->_version; }
+    inline MorphologyVersion version() const noexcept;
 
     /**
      * Write file to H5, SWC, ASC format depending on filename extension
      **/
     void write(const std::string& filename);
 
-    void addAnnotation(const morphio::Property::Annotation& annotation)
-    {
-        _annotations.push_back(annotation);
-    }
+    inline void addAnnotation(const morphio::Property::Annotation& annotation);
 
     /**
        Return the data structure used to create read-only morphologies
     **/
-    const Property::Properties buildReadOnly() const;
+    Property::Properties buildReadOnly() const;
 
     /**
        Check that the neuron is valid, issue warning and fix unifurcations
@@ -191,7 +197,7 @@ private:
                      morphio::enums::LogLevel verbose);
     morphio::readers::ErrorMessages _err;
 
-    uint32_t _register(std::shared_ptr<Section>);
+    uint32_t _register(const std::shared_ptr<Section>&);
 
     uint32_t _counter;
     std::shared_ptr<Soma> _soma;
@@ -204,6 +210,66 @@ private:
     std::map<uint32_t, uint32_t> _parent;
     std::map<uint32_t, std::vector<std::shared_ptr<Section>>> _children;
 };
+
+inline const std::vector<std::shared_ptr<Section>>& Morphology::rootSections() const noexcept
+{
+    return _rootSections;
+}
+
+inline const std::map<uint32_t, std::shared_ptr<Section>>& Morphology::sections() const noexcept
+{
+    return _sections;
+}
+
+inline std::shared_ptr<Soma>& Morphology::soma() noexcept
+{
+    return _soma;
+}
+
+inline const std::shared_ptr<Soma>& Morphology::soma() const noexcept
+{
+    return _soma;
+}
+
+inline Mitochondria& Morphology::mitochondria() noexcept
+{
+    return _mitochondria;
+}
+
+inline const Mitochondria& Morphology::mitochondria() const noexcept
+{
+    return _mitochondria;
+}
+
+inline const std::vector<Property::Annotation>& Morphology::annotations() const noexcept
+{
+    return _annotations;
+}
+
+inline const std::shared_ptr<Section>& Morphology::section(uint32_t id) const
+{
+    return _sections.at(id);
+}
+
+inline SomaType Morphology::somaType() const noexcept
+{
+    return _soma->type();
+}
+
+inline CellFamily Morphology::cellFamily() const noexcept
+{
+    return _cellProperties->_cellFamily;
+}
+
+inline MorphologyVersion Morphology::version() const noexcept
+{
+    return _cellProperties->_version;
+}
+
+inline void Morphology::addAnnotation(const morphio::Property::Annotation& annotation)
+{
+    _annotations.push_back(annotation);
+}
 
 } // namespace mut
 } // namespace morphio

@@ -20,43 +20,44 @@ public:
         const Property::MitochondriaPointLevel& points);
 
     std::shared_ptr<MitoSection> appendSection(
-        std::shared_ptr<MitoSection> original_section, bool recursive);
+        const std::shared_ptr<MitoSection>& original_section, bool recursive);
 
     std::shared_ptr<MitoSection> appendSection(
         const morphio::MitoSection& section, bool recursive);
 
-    const std::shared_ptr<MitoSection> parent() const;
+    std::shared_ptr<MitoSection> parent() const;
     bool isRoot() const;
-    const std::vector<std::shared_ptr<MitoSection>> children() const;
+    const std::vector<std::shared_ptr<MitoSection>>& children() const;
 
     /**
      * Return the section id
      **/
-    uint32_t id() const { return _id; }
-    /**
+    inline uint32_t id() const noexcept;
+
+    /** @{
      * Return the diameters of all points of this section
      **/
-    std::vector<float>& diameters() { return _mitoPoints._diameters; }
-    /**
+    inline const std::vector<float>& diameters() const noexcept;
+    inline std::vector<float>& diameters() noexcept;
+    /** @} */
+
+    /** @{
      * Return the neurite section Ids of all points of this section
      **/
-    std::vector<uint32_t>& neuriteSectionIds()
-    {
-        return _mitoPoints._sectionIds;
-    }
+    inline const std::vector<uint32_t>& neuriteSectionIds() const noexcept;
+    inline std::vector<uint32_t>& neuriteSectionIds() noexcept;
+    /** @} */
 
-    /**
+    /** @{
      * Return the relative distance (between 0 and 1)
      * between the start of the neuronal section and each point
      * of this mitochondrial section
      **/
-    std::vector<float>& pathLengths()
-    {
-        return _mitoPoints._relativePathLengths;
-    }
+    inline const std::vector<float>& pathLengths() const noexcept;
+    inline std::vector<float>& pathLengths() noexcept;
+    /** @} */
 
 private:
-    friend void friendDtorForSharedPtr(Section*);
     uint32_t _id;
 
     Mitochondria* _mitochondria;
@@ -65,6 +66,41 @@ public:
     // TODO: make private
     Property::MitochondriaPointLevel _mitoPoints;
 };
+
+inline uint32_t MitoSection::id() const noexcept
+{
+    return _id;
+}
+
+inline const std::vector<float>& MitoSection::diameters() const noexcept
+{
+    return _mitoPoints._diameters;
+}
+
+inline const std::vector<uint32_t>& MitoSection::neuriteSectionIds() const noexcept
+{
+    return _mitoPoints._sectionIds;
+}
+
+inline const std::vector<float>& MitoSection::pathLengths() const noexcept
+{
+    return _mitoPoints._relativePathLengths;
+}
+
+inline std::vector<float>& MitoSection::diameters() noexcept
+{
+    return _mitoPoints._diameters;
+}
+
+inline std::vector<uint32_t>& MitoSection::neuriteSectionIds() noexcept
+{
+    return _mitoPoints._sectionIds;
+}
+
+inline std::vector<float>& MitoSection::pathLengths() noexcept
+{
+    return _mitoPoints._relativePathLengths;
+}
 
 void friendDtorForSharedPtrMito(MitoSection* section);
 

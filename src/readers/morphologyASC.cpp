@@ -57,7 +57,7 @@ bool skip_sexp(size_t id)
 class NeurolucidaParser
 {
 public:
-    NeurolucidaParser(const std::string& uri)
+    explicit NeurolucidaParser(const std::string& uri)
         : uri_(uri)
         , lex_(uri)
         , debugInfo_(uri)
@@ -85,7 +85,7 @@ private:
     std::tuple<Point, float> parse_point(NeurolucidaLexer& lex)
     {
         lex.expect(Token::LPAREN, "Point should start in LPAREN");
-        std::array<float, 4> point; // X,Y,Z,R
+        std::array<float, 4> point {}; // X,Y,Z,R
         for (auto& p : point) {
             try {
                 p = std::stof(lex.consume()->str());
@@ -104,8 +104,8 @@ private:
 
         lex.consume(Token::RPAREN, "Point should end in RPAREN");
 
-        return std::tuple<Point, float>{{point[0], point[1], point[2]},
-            point[3]};
+        return std::tuple<Point, float>({point[0], point[1], point[2]},
+            point[3]);
     }
 
     bool parse_neurite_branch(int32_t parent_id, Token token)
@@ -135,7 +135,7 @@ private:
         properties._points = points;
         properties._diameters = diameters;
         if (token == Token::CELLBODY) {
-            if (nb_.soma()->points().size() != 0)
+            if (!nb_.soma()->points().empty())
                 throw SomaError(
                     err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
             nb_.soma()->properties() = properties;
@@ -206,17 +206,18 @@ private:
     {
         Points points;
         std::vector<float> diameters;
-        int32_t section_id = static_cast<int>(nb_.sections().size());
+        auto section_id = static_cast<int>(nb_.sections().size());
 
         while (true) {
-            const Token id = static_cast<Token>(lex_.current()->id);
+            const auto id = static_cast<Token>(lex_.current()->id);
             const size_t peek_id = lex_.peek()->id;
 
             if (is_eof(id)) {
                 throw RawDataError(err_.ERROR_EOF_IN_NEURITE(lex_.line_num()));
             } else if (is_end_of_section(id)) {
-                if (!points.empty())
+                if (!points.empty()) {
                     _create_soma_or_section(token, parent_id, points, diameters);
+                }
                 return true;
             } else if (is_end_of_branch(id)) {
                 lex_.consume();
@@ -259,10 +260,10 @@ private:
     {
         // parse the top level blocks, and if they are a neurite, otherwise skip
         while (!lex_.ended()) {
-            const Token peek_id = static_cast<Token>(lex_.peek()->id);
+            const auto peek_id = static_cast<Token>(lex_.peek()->id);
             if (is_neurite_type(peek_id)) {
                 lex_.consume(); // Advance to NeuriteType
-                const Token current_id = static_cast<Token>(lex_.current()->id);
+                const auto current_id = static_cast<Token>(lex_.current()->id);
 
                 lex_.consume();
                 lex_.consume(Token::RPAREN, "New Neurite should end in RPAREN");
