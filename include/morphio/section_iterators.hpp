@@ -68,55 +68,17 @@ public:
 
     breadth_iterator_t() = default;
 
-    explicit breadth_iterator_t(const SectionT& section)
-    {
-        deque_.push_front(section);
-    }
+    inline explicit breadth_iterator_t(const SectionT& section);
+    inline explicit breadth_iterator_t(const MorphologyT& morphology);
+    inline breadth_iterator_t(const breadth_iterator_t& other);
 
-    explicit breadth_iterator_t(const MorphologyT& morphology)
-    {
-        const auto& children = detail::getChildren<SectionT, MorphologyT>(morphology);
-        std::copy(children.begin(), children.end(), std::back_inserter(deque_));
-    }
+    inline const SectionT& operator*() const;
 
-    breadth_iterator_t(const breadth_iterator_t& other)
-    : deque_(other.deque_)
-    {}
+    inline breadth_iterator_t& operator++();
+    inline breadth_iterator_t operator++(int);
 
-    const SectionT& operator*() const
-    {
-        return deque_.front();
-    }
-
-    breadth_iterator_t& operator++()
-    {
-        if (deque_.empty()) {
-            LBTHROW(MorphioError("Can't iterate past the end"));
-        }
-
-        const auto& children = detail::getChildren(deque_.front());
-        deque_.pop_front();
-        std::copy(children.begin(), children.end(), std::back_inserter(deque_));
-
-        return *this;
-    }
-
-    breadth_iterator_t operator++(int)
-    {
-        breadth_iterator_t ret(*this);
-        ++(*this);
-        return ret;
-    }
-
-    bool operator==(const breadth_iterator_t& other) const
-    {
-        return deque_ == other.deque_;
-    }
-
-    bool operator!=(const breadth_iterator_t& other) const
-    {
-        return !(*this == other);
-    }
+    inline bool operator==(const breadth_iterator_t& other) const;
+    bool operator!=(const breadth_iterator_t& other) const;
 
 private:
     std::deque<SectionT> deque_;
@@ -134,55 +96,17 @@ public:
 
     depth_iterator_t() = default;
 
-    explicit depth_iterator_t(const SectionT& section)
-    {
-        deque_.push_front(section);
-    }
+    inline explicit depth_iterator_t(const SectionT& section);
+    inline explicit depth_iterator_t(const MorphologyT& morphology);
+    inline depth_iterator_t(const depth_iterator_t& other);
 
-    explicit depth_iterator_t(const MorphologyT& morphology)
-    {
-        const auto& children = detail::getChildren<SectionT, MorphologyT>(morphology);
-        std::copy(children.rbegin(), children.rend(), std::front_inserter(deque_));
-    }
+    inline const SectionT& operator*() const;
 
-    depth_iterator_t(const depth_iterator_t& other)
-    : deque_(other.deque_)
-    {}
+    inline depth_iterator_t& operator++();
+    inline depth_iterator_t operator++(int);
 
-    const SectionT& operator*() const
-    {
-        return deque_.front();
-    }
-
-    depth_iterator_t& operator++()
-    {
-        if (deque_.empty()) {
-            LBTHROW(MorphioError("Can't iterate past the end"));
-        }
-
-        const auto children = detail::getChildren(deque_.front());
-        deque_.pop_front();
-        std::copy(children.rbegin(), children.rend(), std::front_inserter(deque_));
-
-        return *this;
-    }
-
-    depth_iterator_t operator++(int)
-    {
-        depth_iterator_t ret(*this);
-        ++(*this);
-        return ret;
-    }
-
-    bool operator==(const depth_iterator_t& other) const
-    {
-        return deque_ == other.deque_;
-    }
-
-    bool operator!=(const depth_iterator_t& other) const
-    {
-        return !(*this == other);
-    }
+    inline bool operator==(const depth_iterator_t& other) const;
+    inline bool operator!=(const depth_iterator_t& other) const;
 
 private:
     std::deque<SectionT> deque_;
@@ -198,68 +122,18 @@ public:
     using pointer = SectionT*;
     using reference = SectionT&;
 
-    upstream_iterator_t()
-    : unused(0)
-    , end(true)
-    { }
+    inline upstream_iterator_t();
+    inline explicit upstream_iterator_t(const SectionT& section);
+    inline upstream_iterator_t(const upstream_iterator_t& other);
+    inline ~upstream_iterator_t();
 
-    explicit upstream_iterator_t(const SectionT& section)
-    : current(section)
-    , end(false)
-    { }
+    inline const SectionT& operator*() const;
 
-    upstream_iterator_t(const upstream_iterator_t& other)
-    {
-        end = other.end;
-        if (!other.end) {
-            new (&current) SectionT(other.current);
-        }
-    }
+    inline upstream_iterator_t& operator++();
+    inline upstream_iterator_t operator++(int);
 
-    ~upstream_iterator_t()
-    {
-        if (!end) {
-            this->current.~SectionT();
-        }
-    }
-
-    const SectionT& operator*() const
-    {
-        return current;
-    }
-
-    upstream_iterator_t& operator++()
-    {
-        if (end) {
-            LBTHROW(MissingParentError("Cannot call iterate upstream past the root node"));
-        } else if (detail::isRoot(current)) {
-            end = true;
-            this->current.~SectionT();
-        } else {
-            current = detail::getParent(current);
-        }
-        return *this;
-    }
-
-    upstream_iterator_t operator++(int)
-    {
-        upstream_iterator_t ret(*this);
-        ++(*this);
-        return ret;
-    }
-
-    bool operator==(const upstream_iterator_t& other) const
-    {
-        if (end) {
-            return end == other.end;
-        }
-        return current == other.current;
-    }
-
-    bool operator!=(const upstream_iterator_t& other) const
-    {
-        return !(*this == other);
-    }
+    inline bool operator==(const upstream_iterator_t& other) const;
+    inline bool operator!=(const upstream_iterator_t& other) const;
 
 private:
     // This is a workaround for not having std::optional until c++17.
@@ -267,11 +141,210 @@ private:
     // on the fly, so we'd have to heap allocate; however, to signal the end()
     // of iteration, we need a 'default' section or a sentinel.  Since the concept
     // of a default section is nebulous, a sentinel was used instead.
-    union {
+    union
+    {
         char unused;
         SectionT current;
     };
     bool end;
 };
+
+// breath_iterator_t class definition
+
+template <typename SectionT, typename MorphologyT>
+inline breadth_iterator_t<SectionT, MorphologyT>::breadth_iterator_t(const SectionT& section)
+{
+    deque_.push_front(section);
+}
+
+template <typename SectionT, typename MorphologyT>
+inline breadth_iterator_t<SectionT, MorphologyT>::breadth_iterator_t(const MorphologyT& morphology)
+{
+    const auto& children = detail::getChildren<SectionT, MorphologyT>(morphology);
+    std::copy(children.begin(), children.end(), std::back_inserter(deque_));
+}
+
+template <typename SectionT, typename MorphologyT>
+inline breadth_iterator_t<SectionT, MorphologyT>::breadth_iterator_t(const breadth_iterator_t& other)
+    : deque_(other.deque_)
+{
+}
+
+template <typename SectionT, typename MorphologyT>
+inline const SectionT& breadth_iterator_t<SectionT, MorphologyT>::operator*() const
+{
+    return deque_.front();
+}
+
+template <typename SectionT, typename MorphologyT>
+inline breadth_iterator_t<SectionT, MorphologyT>& breadth_iterator_t<SectionT, MorphologyT>::operator++()
+{
+    if (deque_.empty()) {
+        LBTHROW(MorphioError("Can't iterate past the end"));
+    }
+
+    const auto& children = detail::getChildren(deque_.front());
+    deque_.pop_front();
+    std::copy(children.begin(), children.end(), std::back_inserter(deque_));
+
+    return *this;
+}
+
+template <typename SectionT, typename MorphologyT>
+inline breadth_iterator_t<SectionT, MorphologyT> breadth_iterator_t<SectionT, MorphologyT>::operator++(int)
+{
+    breadth_iterator_t ret(*this);
+    ++(*this);
+    return ret;
+}
+
+template <typename SectionT, typename MorphologyT>
+inline bool breadth_iterator_t<SectionT, MorphologyT>::operator==(const breadth_iterator_t& other) const
+{
+    return deque_ == other.deque_;
+}
+
+template <typename SectionT, typename MorphologyT>
+inline bool breadth_iterator_t<SectionT, MorphologyT>::operator!=(const breadth_iterator_t& other) const
+{
+    return !(*this == other);
+}
+
+// depth_iterator_t class definition
+
+template <typename SectionT, typename MorphologyT>
+inline depth_iterator_t<SectionT, MorphologyT>::depth_iterator_t(const SectionT& section)
+{
+    deque_.push_front(section);
+}
+
+template <typename SectionT, typename MorphologyT>
+inline depth_iterator_t<SectionT, MorphologyT>::depth_iterator_t(const MorphologyT& morphology)
+{
+    const auto& children = detail::getChildren<SectionT, MorphologyT>(morphology);
+    std::copy(children.rbegin(), children.rend(), std::front_inserter(deque_));
+}
+
+template <typename SectionT, typename MorphologyT>
+inline depth_iterator_t<SectionT, MorphologyT>::depth_iterator_t(const depth_iterator_t& other)
+    : deque_(other.deque_)
+{
+}
+
+template <typename SectionT, typename MorphologyT>
+inline const SectionT& depth_iterator_t<SectionT, MorphologyT>::operator*() const
+{
+    return deque_.front();
+}
+
+template <typename SectionT, typename MorphologyT>
+inline depth_iterator_t<SectionT, MorphologyT>& depth_iterator_t<SectionT, MorphologyT>::operator++()
+{
+    if (deque_.empty()) {
+        LBTHROW(MorphioError("Can't iterate past the end"));
+    }
+
+    const auto children = detail::getChildren(deque_.front());
+    deque_.pop_front();
+    std::copy(children.rbegin(), children.rend(), std::front_inserter(deque_));
+
+    return *this;
+}
+
+template <typename SectionT, typename MorphologyT>
+inline depth_iterator_t<SectionT, MorphologyT> depth_iterator_t<SectionT, MorphologyT>::operator++(int)
+{
+    depth_iterator_t ret(*this);
+    ++(*this);
+    return ret;
+}
+
+template <typename SectionT, typename MorphologyT>
+inline bool depth_iterator_t<SectionT, MorphologyT>::operator==(const depth_iterator_t& other) const
+{
+    return deque_ == other.deque_;
+}
+
+template <typename SectionT, typename MorphologyT>
+inline bool depth_iterator_t<SectionT, MorphologyT>::operator!=(const depth_iterator_t& other) const
+{
+    return !(*this == other);
+}
+
+// upstream_iterator_t class definition
+
+template <typename SectionT>
+inline upstream_iterator_t<SectionT>::upstream_iterator_t()
+    : unused(0)
+    , end(true)
+{
+}
+
+template <typename SectionT>
+inline upstream_iterator_t<SectionT>::upstream_iterator_t(const SectionT& section)
+    : current(section)
+    , end(false)
+{
+}
+
+template <typename SectionT>
+inline upstream_iterator_t<SectionT>::upstream_iterator_t(const upstream_iterator_t& other)
+{
+    end = other.end;
+    if (!other.end) {
+        new (&current) SectionT(other.current);
+    }
+}
+
+template <typename SectionT>
+inline upstream_iterator_t<SectionT>::~upstream_iterator_t()
+{
+    if (!end) {
+        this->current.~SectionT();
+    }
+}
+
+template <typename SectionT>
+inline const SectionT& upstream_iterator_t<SectionT>::operator*() const
+{
+    return current;
+}
+
+template <typename SectionT>
+inline upstream_iterator_t<SectionT>& upstream_iterator_t<SectionT>::operator++()
+{
+    if (end) {
+        LBTHROW(MissingParentError("Cannot call iterate upstream past the root node"));
+    } else if (detail::isRoot(current)) {
+        end = true;
+        this->current.~SectionT();
+    } else {
+        current = detail::getParent(current);
+    }
+    return *this;
+}
+
+template <typename SectionT>
+inline upstream_iterator_t<SectionT> upstream_iterator_t<SectionT>::operator++(int)
+{
+    upstream_iterator_t ret(*this);
+    ++(*this);
+    return ret;
+}
+
+template <typename SectionT>
+inline bool upstream_iterator_t<SectionT>::operator==(const upstream_iterator_t& other) const
+{
+    if (end) {
+        return end == other.end;
+    }
+    return current == other.current;
+}
+
+template <typename SectionT>
+inline bool upstream_iterator_t<SectionT>::operator!=(const upstream_iterator_t& other) const
+{
+    return !(*this == other);
+}
 
 } // namespace morphio
