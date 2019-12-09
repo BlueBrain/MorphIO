@@ -1,7 +1,5 @@
 #include <cassert>
 #include <fstream>
-#include <iostream>
-#include <sstream>
 
 #include <morphio/errorMessages.h>
 #include <morphio/mut/mitochondria.h>
@@ -14,26 +12,29 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5Object.hpp>
 
-namespace morphio {
-namespace mut {
-namespace writer {
+namespace {
 
+/**
+   A structure to get the base type of nested vectors
+   https://stackoverflow.com/a/30960730
+ **/
 template <typename T>
 struct base_type
 {
     using type = T;
 };
 
-/**
-   A structure to get the base type of nested vectors
- **/
 template <typename T>
 struct base_type<std::vector<T>> : base_type<T>
 {
 };
 
-static void writeLine(std::ofstream& myfile, int id, int parentId, SectionType type,
-    const Point& point, float diameter)
+void writeLine(std::ofstream& myfile,
+               int id,
+               int parentId,
+               morphio::SectionType type,
+               const morphio::Point& point,
+               float diameter)
 {
     using std::setw;
 
@@ -45,28 +46,34 @@ static void writeLine(std::ofstream& myfile, int id, int parentId, SectionType t
            << std::to_string(parentId) << '\n';
 }
 
-static std::string version_footnote()
+std::string version_string()
 {
-    return std::string("Created by MorphIO v") + getVersionString();
+    return std::string("Created by MorphIO v") + morphio::getVersionString();
 }
 
 /**
    Only skip duplicate if it has the same diameter
  **/
-static bool _skipDuplicate(const std::shared_ptr<Section>& section)
+bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section)
 {
     return section->diameters().front() == section->parent()->diameters().back();
 }
 
+} // anonymous namespace
+
+namespace morphio {
+namespace mut {
+namespace writer {
+
 void swc(const Morphology& morphology, const std::string& filename)
 {
-    std::ofstream myfile;
-    myfile.open(filename);
+    std::ofstream myfile(filename);
     using std::setw;
 
     myfile << "# index" << setw(9) << "type" << setw(10) << 'X' << setw(13)
            << 'Y' << setw(13) << 'Z' << setw(13) << "radius" << setw(13)
-           << "parent\n";
+           << "parent" << std::endl;
+    myfile << "# " << version_string() << std::endl;
 
     int segmentIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
@@ -116,8 +123,6 @@ void swc(const Morphology& morphology, const std::string& filename)
         }
         newIds[section->id()] = segmentIdOnDisk - 1;
     }
-
-    myfile << "\n# " << version_footnote() << '\n';
 }
 
 static void _write_asc_points(std::ofstream& myfile, const Points& points,
@@ -153,8 +158,7 @@ static void _write_asc_section(std::ofstream& myfile, const Morphology& morpho,
 
 void asc(const Morphology& morphology, const std::string& filename)
 {
-    std::ofstream myfile;
-    myfile.open(filename);
+    std::ofstream myfile(filename);
 
     if (!morphology.mitochondria().rootSections().empty())
         LBERROR(
@@ -182,7 +186,7 @@ void asc(const Morphology& morphology, const std::string& filename)
         myfile << ")\n\n";
     }
 
-    myfile << "; " << version_footnote() << '\n';
+    myfile << "; " << version_string() << '\n';
 }
 
 template <typename T>
@@ -339,7 +343,7 @@ void h5(const Morphology& morpho, const std::string& filename)
     write_attribute(g_metadata, "cell_family",
         std::vector<uint32_t>{FAMILY_NEURON});
     write_attribute(h5_file, "comment",
-        std::vector<std::string>{version_footnote()});
+        std::vector<std::string>{version_string()});
 
     if (hasPerimeterData)
         write_dataset(h5_file, "/perimeters", raw_perimeters);
