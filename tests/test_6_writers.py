@@ -12,6 +12,17 @@ from utils import captured_output, setup_tempdir
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
+def test_write_empty_file():
+    '''Check that empty morphology are not written to disk'''
+    with captured_output() as (_, _):
+        with ostream_redirect(stdout=True, stderr=True):
+            with setup_tempdir('test_write_empty_file', no_cleanup=True) as tmp_folder:
+                for ext in ['asc', 'swc', 'h5']:
+                    outname = os.path.join(tmp_folder, 'empty.' + ext)
+                    Morphology().write(outname)
+                    ok_(not os.path.exists(outname))
+
+
 def test_write_soma_basic():
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]

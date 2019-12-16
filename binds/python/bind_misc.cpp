@@ -97,6 +97,7 @@ static void bind_misc(py::module &m) {
         .value("undefined", morphio::enums::Warning::UNDEFINED)
         .value("mitochondria_write_not_supported", morphio::enums::Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED)
         .value("write_no_soma", morphio::enums::Warning::WRITE_NO_SOMA)
+        .value("write_empty_morphology", morphio::enums::Warning::WRITE_EMPTY_MORPHOLOGY)
         .value("soma_non_conform", morphio::enums::SOMA_NON_CONFORM)
         .value("no_soma_found", morphio::enums::Warning::NO_SOMA_FOUND)
         .value("disconnected_neurite", morphio::enums::DISCONNECTED_NEURITE)

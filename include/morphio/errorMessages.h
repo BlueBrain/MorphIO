@@ -198,6 +198,7 @@ public:
 
     std::string WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const;
     std::string WARNING_WRITE_NO_SOMA() const;
+    std::string WARNING_WRITE_EMPTY_MORPHOLOGY() const;
     std::string WARNING_NO_SOMA_FOUND() const;
     std::string WARNING_DISCONNECTED_NEURITE(const Sample& sample) const;
     std::string WARNING_WRONG_DUPLICATE(

@@ -249,6 +249,11 @@ std::string ErrorMessages::WARNING_WRITE_NO_SOMA() const
     return "Warning: writing file without a soma";
 }
 
+std::string ErrorMessages::WARNING_WRITE_EMPTY_MORPHOLOGY() const
+{
+    return "Warning: attempting to write an empty morphology. Refusing to write.";
+}
+
 std::string ErrorMessages::WARNING_NO_SOMA_FOUND() const
 {
     return errorMsg(0, ErrorLevel::WARNING, "No soma found in file");
