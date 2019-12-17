@@ -301,8 +301,8 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
     oss << msg << "\nThe section first point should be parent section last point: "
                   "\n        : X Y Z Diameter"
                   "\nparent last point :["
-        << p0[0] << ", " << p0[1] << ", "
-        << p0[2] << ", " << d0 << "]\nchild first point :["
+        << std::to_string(p0[0]) << ", " << std::to_string(p0[1]) << ", "
+        << std:to_string(p0[2]) << ", " << std::to_string(d0) << "]\nchild first point :["
         << std::to_string(p1[0]) << ", " << std::to_string(p1[1]) << ", "
         << std::to_string(p1[2]) << ", " << std::to_string(d1) << "]\n";
     return errorMsg(0, ErrorLevel::WARNING, oss.str());
