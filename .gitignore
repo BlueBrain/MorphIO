@@ -5,6 +5,8 @@
 bin/
 src/version.cpp
 morphio.egg-info/
+MorphIO.egg-info/
+.venv
 
 *.pyc
 
