@@ -69,8 +69,7 @@ void swc(const Morphology& morphology, const std::string& filename)
 {
     const auto& soma = morphology.soma();
     const auto& soma_points = soma->points();
-    if (soma_points.empty() && morphology.rootSections().empty())
-    {
+    if (soma_points.empty() && morphology.rootSections().empty()) {
         LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
             readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
@@ -166,10 +165,9 @@ static void _write_asc_section(std::ofstream& myfile, const Morphology& morpho,
 void asc(const Morphology& morphology, const std::string& filename)
 {
     const auto& soma = morphology.soma();
-    if (soma->points().empty() && morphology.rootSections().empty())
-    {
+    if (soma->points().empty() && morphology.rootSections().empty()) {
         LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
-                readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+            readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
 
@@ -279,16 +277,14 @@ void h5(const Morphology& morpho, const std::string& filename)
     const auto& somaPoints = morpho.soma()->points();
     const auto numberOfSomaPoints = somaPoints.size();
 
-    if (numberOfSomaPoints < 1)
-    {
-        if (morpho.rootSections().empty())
-        {
+    if (numberOfSomaPoints < 1) {
+        if (morpho.rootSections().empty()) {
             LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
-                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+                readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
             return;
         }
         LBERROR(Warning::WRITE_NO_SOMA,
-                readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
 

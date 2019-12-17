@@ -246,13 +246,13 @@ std::string ErrorMessages::ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1,
 ////////////////////////////////////////////////////////////////////////////////
 std::string ErrorMessages::WARNING_WRITE_NO_SOMA() const
 {
-	  return errorMsg(0, ErrorLevel::WARNING, "Warning: writing file without a soma");
+    return errorMsg(0, ErrorLevel::WARNING, "Warning: writing file without a soma");
 }
 
 std::string ErrorMessages::WARNING_WRITE_EMPTY_MORPHOLOGY() const
 {
     return errorMsg(0, ErrorLevel::WARNING,
-										"Warning: Skipping an attempt to write an empty morphology.");
+        "Warning: Skipping an attempt to write an empty morphology.");
 }
 
 std::string ErrorMessages::WARNING_NO_SOMA_FOUND() const
