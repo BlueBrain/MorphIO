@@ -4,8 +4,10 @@ import shutil
 import sys
 import tempfile
 from contextlib import contextmanager
+from difflib import Differ
 from functools import partial
 from io import StringIO
+from pprint import pformat
 
 from nose.tools import assert_raises, ok_
 
@@ -51,8 +53,8 @@ def strip_color_codes(string):
 
 def strip_all(string):
     '''Strip color code and whitespace at the beginning end of each line'''
-    lines = (strip_color_codes(line).strip() for line in string.split('\n'))
-    return '\n'.join(filter(None, lines))
+    lines = (strip_color_codes(line).strip() for line in string.splitlines())
+    return list(filter(None, lines))
 
 
 def assert_substring(substring, string):
@@ -61,9 +63,10 @@ def assert_substring(substring, string):
 
 
 def assert_string_equal(str1, str2):
-    sep = ['\n' + 80 * '>' + '\n', '\n' + 80 * '<' + '\n']
-    ok_(strip_all(str1) == strip_all(str2), "{}\n NOT IN \n{}".format(
-        str1.join(sep), str2.join(sep)))
+	str1, str2 = strip_all(str1), strip_all(str2)
+	diff = list(Differ().compare(str1, str2))
+	if '\n'.join(str1) != '\n'.join(str2):
+		raise AssertionError('Strings does not match:\n\n' + pformat(diff))
 
 
 def _test_exception(content, exception, str1, str2, extension):

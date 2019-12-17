@@ -33,7 +33,6 @@ enum Warning
     UNDEFINED,
     MITOCHONDRIA_WRITE_NOT_SUPPORTED,
     WRITE_NO_SOMA,
-    WRITE_EMPTY_MORPHOLOGY,
     SOMA_NON_CONFORM,
     NO_SOMA_FOUND,
     DISCONNECTED_NEURITE,
@@ -41,6 +40,7 @@ enum Warning
     APPENDING_EMPTY_SECTION,
     WRONG_ROOT_POINT,
     ONLY_CHILD,
+    WRITE_EMPTY_MORPHOLOGY
 };
 
 /** The supported versions for morphology files. */

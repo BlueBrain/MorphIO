@@ -46,7 +46,7 @@ def test_empty_neurite():
         with ostream_redirect(stdout=True, stderr=True):
             root = m.append_root_section(PointLevel(), SectionType.axon)
             assert_equal(err.getvalue().strip(),
-                         'Appending empty section with id: 0')
+                         'Warning: appending empty section with id: 0')
 
     assert_equal(len(m.root_sections), 1)
     assert_equal(m.root_sections[0].type,
@@ -56,7 +56,7 @@ def test_empty_neurite():
         with ostream_redirect(stdout=True, stderr=True):
             root.append_section(PointLevel(), SectionType.axon)
             assert_equal(err.getvalue().strip(),
-                         'Appending empty section with id: 1')
+                         'Warning: appending empty section with id: 1')
 
 def test_single_neurite():
     m = Morphology()
@@ -133,7 +133,7 @@ def test_append_no_duplicate():
                                         [2, 3],
                                         [20, 30]))
             assert_equal(err.getvalue().strip(),
-                         'While appending section: 1 to parent: 0\n'
+                         'Warning: while appending section: 1 to parent: 0\n'
                          'The section first point should be parent section last point: \n'
                          '        : X Y Z Diameter\n'
                          'parent last point :[4.000000, 5.000000, 6.000000, 2.000000]\n'

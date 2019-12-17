@@ -246,31 +246,32 @@ std::string ErrorMessages::ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1,
 ////////////////////////////////////////////////////////////////////////////////
 std::string ErrorMessages::WARNING_WRITE_NO_SOMA() const
 {
-    return "Warning: writing file without a soma";
+	  return errorMsg(0, ErrorLevel::WARNING, "Warning: writing file without a soma");
 }
 
 std::string ErrorMessages::WARNING_WRITE_EMPTY_MORPHOLOGY() const
 {
-    return "Warning: attempting to write an empty morphology. Refusing to write.";
+    return errorMsg(0, ErrorLevel::WARNING,
+										"Warning: attempting to write an empty morphology. Refusing to write.");
 }
 
 std::string ErrorMessages::WARNING_NO_SOMA_FOUND() const
 {
-    return errorMsg(0, ErrorLevel::WARNING, "No soma found in file");
+    return errorMsg(0, ErrorLevel::WARNING, "Warning: no soma found in file");
 }
 
 std::string ErrorMessages::WARNING_DISCONNECTED_NEURITE(
     const Sample& sample) const
 {
     return errorMsg(sample.lineNumber, ErrorLevel::WARNING,
-        "Found a disconnected neurite.\n"
+        "Warning: found a disconnected neurite.\n"
         "Neurites are not supposed to have parentId: -1\n"
         "(although this is normal if this neuron has no soma)");
 }
 
 std::string ErrorMessages::WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morphio::mut::Section> section)
 {
-    return errorMsg(0, ErrorLevel::WARNING, "Appending empty section with id: " + std::to_string(section->id()));
+    return errorMsg(0, ErrorLevel::WARNING, "Warning: appending empty section with id: " + std::to_string(section->id()));
 }
 
 std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
@@ -278,7 +279,7 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
     std::shared_ptr<morphio::mut::Section> parent) const
 {
     std::string msg(
-        "While appending section: " + std::to_string(current->id()) + " to parent: " + std::to_string(parent->id()));
+        "Warning: while appending section: " + std::to_string(current->id()) + " to parent: " + std::to_string(parent->id()));
 
     if (parent->points().empty())
         return errorMsg(0, ErrorLevel::WARNING,
@@ -312,7 +313,10 @@ std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info,
         childMsg = " starting at:\n" + errorLink(static_cast<size_t>(childLine), ErrorLevel::WARNING) + "\n";
     }
 
-    return "\nSection: " + std::to_string(childId) + childMsg + " is the only child of " + "section: " + std::to_string(parentId) + parentMsg + "\nIt will be merged with the parent section";
+    return errorMsg(0, ErrorLevel::WARNING,
+										"Warning: section " + std::to_string(childId) + childMsg +
+										" is the only child of " + "section: " + std::to_string(parentId) +
+										parentMsg + "\nIt will be merged with the parent section");
 }
 
 std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
@@ -321,7 +325,7 @@ std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
     float x = root.point[0], y = root.point[1], z = root.point[2],
           r = root.diameter / 2.f;
     std::stringstream ss;
-    ss << "The soma does not conform the three point soma spec\n"
+    ss << "Warning: the soma does not conform the three point soma spec\n"
           "The only valid neuro-morpho soma is:\n"
           "1 1 x   y   z r -1\n"
           "2 1 x (y-r) z r  1\n"
@@ -338,14 +342,13 @@ std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
        << _col(child2.point[0], x) << ' '
        << _col(child2.point[1], y + r) << ' ' << _col(child2.point[2], z) << ' '
        << _col(child2.diameter / 2.f, r) << " 1\n";
-    return ss.str();
+    return errorMsg(0, ErrorLevel::WARNING, ss.str());
 }
 
 std::string ErrorMessages::WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const
 {
-    return errorMsg(
-        0, ErrorLevel::WARNING,
-        "This cell has mitochondria, they cannot be saved in "
+    return errorMsg(0, ErrorLevel::WARNING,
+        "Warning: this cell has mitochondria, they cannot be saved in "
         " ASC or SWC format. Please use H5 if you want to save them.");
 }
 
@@ -353,7 +356,7 @@ std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(
     const std::vector<Sample>& children) const
 {
     std::ostringstream oss;
-    oss << "With a 3 points soma, neurites must be connected to the first soma "
+    oss << "Warning: with a 3 points soma, neurites must be connected to the first soma "
            "point:";
     for (const auto& child : children)
         oss << errorMsg(child.lineNumber, ErrorLevel::WARNING, "");
