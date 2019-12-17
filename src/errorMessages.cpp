@@ -252,7 +252,7 @@ std::string ErrorMessages::WARNING_WRITE_NO_SOMA() const
 std::string ErrorMessages::WARNING_WRITE_EMPTY_MORPHOLOGY() const
 {
     return errorMsg(0, ErrorLevel::WARNING,
-										"Warning: attempting to write an empty morphology. Refusing to write.");
+										"Warning: Skipping an attempt to write an empty morphology.");
 }
 
 std::string ErrorMessages::WARNING_NO_SOMA_FOUND() const
