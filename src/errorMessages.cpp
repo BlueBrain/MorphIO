@@ -275,8 +275,8 @@ std::string ErrorMessages::WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morph
 }
 
 std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
-    std::shared_ptr<morphio::mut::Section> current,
-    std::shared_ptr<morphio::mut::Section> parent) const
+    const std::shared_ptr<Section>& current,
+    const std::shared_ptr<Section>& parent) const
 {
     std::string msg(
         "Warning: while appending section: " + std::to_string(current->id()) + " to parent: " + std::to_string(parent->id()));
@@ -289,7 +289,7 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
         return errorMsg(0, ErrorLevel::WARNING,
             msg +
                 "\nThe current section has no points. It should at "
-                "least contains " +
+                "least contains "
                 "parent section last point");
 
     auto p0 = parent->points()[parent->points().size() - 1];
@@ -297,8 +297,14 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
     auto d0 = parent->diameters()[parent->diameters().size() - 1];
     auto d1 = current->diameters()[0];
 
-    return errorMsg(0, ErrorLevel::WARNING,
-        msg + "\nThe section first point " + "should be parent section last point: " + "\n        : X Y Z Diameter" + "\nparent last point :[" + std::to_string(p0[0]) + ", " + std::to_string(p0[1]) + ", " + std::to_string(p0[2]) + ", " + std::to_string(d0) + "]" + "\nchild first point :[" + std::to_string(p1[0]) + ", " + std::to_string(p1[1]) + ", " + std::to_string(p1[2]) + ", " + std::to_string(d1) + "]\n");
+    std::ostringstream oss;
+    oss << msg << "\nThe section first point should be parent section last point: "
+                  "\n        : X Y Z Diameter"
+                  "\nparent last point :["
+        << p0[0] << ", " << p0[1] << ", "
+        << p0[2] << ", " << d0 << "]\nchild first point :[" << p1[0] << ", " << p1[1] << ", "
+        << p1[2] << ", " << d1 << "]\n";
+    return errorMsg(0, ErrorLevel::WARNING, oss.str());
 }
 
 std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info,
@@ -313,10 +319,11 @@ std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info,
         childMsg = " starting at:\n" + errorLink(static_cast<size_t>(childLine), ErrorLevel::WARNING) + "\n";
     }
 
-    return errorMsg(0, ErrorLevel::WARNING,
-										"Warning: section " + std::to_string(childId) + childMsg +
-										" is the only child of " + "section: " + std::to_string(parentId) +
-										parentMsg + "\nIt will be merged with the parent section");
+    std::ostringstream oss;
+    oss << "Warning: section " << childId << childMsg << " is the only child of "
+        << "section: " << std::to_string(parentId) << parentMsg << "\nIt will be merged with the parent section";
+
+    return errorMsg(0, ErrorLevel::WARNING, oss.str());
 }
 
 std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
@@ -358,8 +365,9 @@ std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(
     std::ostringstream oss;
     oss << "Warning: with a 3 points soma, neurites must be connected to the first soma "
            "point:";
-    for (const auto& child : children)
+    for (const auto& child : children) {
         oss << errorMsg(child.lineNumber, ErrorLevel::WARNING, "");
+    }
     return oss.str();
 }
 
