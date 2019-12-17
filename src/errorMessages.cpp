@@ -275,8 +275,8 @@ std::string ErrorMessages::WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morph
 }
 
 std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
-    const std::shared_ptr<Section>& current,
-    const std::shared_ptr<Section>& parent) const
+    const std::shared_ptr<morphio::mut::Section>& current,
+    const std::shared_ptr<morphio::mut::Section>& parent) const
 {
     std::string msg(
         "Warning: while appending section: " + std::to_string(current->id()) + " to parent: " + std::to_string(parent->id()));
