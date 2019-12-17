@@ -302,8 +302,9 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
                   "\n        : X Y Z Diameter"
                   "\nparent last point :["
         << p0[0] << ", " << p0[1] << ", "
-        << p0[2] << ", " << d0 << "]\nchild first point :[" << p1[0] << ", " << p1[1] << ", "
-        << p1[2] << ", " << d1 << "]\n";
+        << p0[2] << ", " << d0 << "]\nchild first point :["
+        << std::to_string(p1[0]) << ", " << std::to_string(p1[1]) << ", "
+        << std::to_string(p1[2]) << ", " << std::to_string(d1) << "]\n";
     return errorMsg(0, ErrorLevel::WARNING, oss.str());
 }
 
