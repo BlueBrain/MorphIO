@@ -72,3 +72,4 @@ def test_iterators_vasculature():
 
 def test_from_pathlib():
     vasc = vasculature.Vasculature(Path(_path, "h5/vasculature1.h5"))
+    assert_equal(len(vasc.sections), 3080)
