@@ -12,12 +12,20 @@ static void bind_mutable_module(py::module &m) {
 
     auto mutable_morphology = py::class_<morphio::mut::Morphology>(m, "Morphology")
         .def(py::init<>())
-        .def(py::init<const morphio::URI&, unsigned int>(),
+        .def(py::init<const std::string&, unsigned int>(),
              "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
         .def(py::init<const morphio::Morphology&, unsigned int>(),
              "morphology"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
         .def(py::init<const morphio::mut::Morphology&, unsigned int>(),
              "morphology"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
+        .def(py::init([](py::object arg, unsigned int options) {
+                          return std::unique_ptr<morphio::mut::Morphology>(
+                              new morphio::mut::Morphology(py::str(arg), options)
+                              );
+                      }),
+            "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER,
+            "Additional Ctor that accepts as filename any python object that implements __repr__ or __str__")
+
 
         // Cell sub-part accessors
         .def_property_readonly("sections", &morphio::mut::Morphology::sections,

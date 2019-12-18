@@ -20,7 +20,7 @@ namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
 SomaType getSomaType(long unsigned int nSomaPoints);
 
-Morphology::Morphology(const URI& source, unsigned int options)
+Morphology::Morphology(const std::string& source, unsigned int options)
 {
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos)

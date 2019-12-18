@@ -20,10 +20,18 @@ static void bind_immutable_module(py::module &m) {
     py::add_ostream_redirect(m, "ostream_redirect");
 
     py::class_<morphio::Morphology>(m, "Morphology")
-        .def(py::init<const morphio::URI&, unsigned int>(),
+        .def(py::init<const std::string&, unsigned int>(),
+             "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
+        .def(py::init<const std::string&, unsigned int>(),
              "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
         .def(py::init<morphio::mut::Morphology&>())
-
+        .def(py::init([](py::object arg, unsigned int options) {
+                          return std::unique_ptr<morphio::Morphology>(
+                              new morphio::Morphology(py::str(arg), options)
+                              );
+                      }),
+            "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER,
+                "Additional Ctor that accepts as filename any python object that implements __repr__ or __str__")
         .def("as_mutable", [](const morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })
 
         // Cell sub-parts accessors

@@ -2,6 +2,7 @@ import os
 import numpy as np
 from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
+from pathlib import Path
 
 import morphio
 from morphio.mut import Morphology
@@ -379,3 +380,8 @@ def test_annotation():
 def test_section___str__():
     assert_equal(str(SIMPLE.root_sections[0]),
                  'Section(id=0, points=[(0 0 0),..., (0 5 0)])')
+
+
+def test_from_pathlib():
+    neuron = Morphology(Path(_path, "simple.asc"))
+    assert_equal(len(neuron.root_sections), 2)

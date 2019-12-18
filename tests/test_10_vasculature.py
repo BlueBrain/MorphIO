@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from pathlib import Path
 from numpy.testing import assert_array_equal, assert_array_almost_equal
 from nose.tools import assert_equal, assert_not_equal, assert_raises, ok_
 
@@ -67,3 +68,7 @@ def test_iterators_vasculature():
     for sec in morphology.iter():
         all_sections.remove(sec.id)
     assert_equal(len(all_sections), 0)
+
+
+def test_from_pathlib():
+    vasc = vasculature.Vasculature(Path(_path, "h5/vasculature1.h5"))

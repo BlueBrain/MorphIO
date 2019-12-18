@@ -19,7 +19,7 @@ void _appendProperties(Property::PointLevel& to,
     const Property::PointLevel& from, int offset);
 
 using morphio::readers::ErrorMessages;
-Morphology::Morphology(const morphio::URI& uri, unsigned int options)
+Morphology::Morphology(const std::string& uri, unsigned int options)
     : Morphology(morphio::Morphology(uri, options))
 {
 }

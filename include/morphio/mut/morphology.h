@@ -41,7 +41,7 @@ public:
        Example:
            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
     **/
-    Morphology(const morphio::URI& uri, unsigned int options = NO_MODIFIER);
+    Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
 
     /**
        Build a mutable Morphology from a mutable morphology
