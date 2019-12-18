@@ -22,8 +22,6 @@ static void bind_immutable_module(py::module &m) {
     py::class_<morphio::Morphology>(m, "Morphology")
         .def(py::init<const std::string&, unsigned int>(),
              "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const std::string&, unsigned int>(),
-             "filename"_a, "options"_a=morphio::enums::Option::NO_MODIFIER)
         .def(py::init<morphio::mut::Morphology&>())
         .def(py::init([](py::object arg, unsigned int options) {
                           return std::unique_ptr<morphio::Morphology>(
