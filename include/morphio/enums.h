@@ -40,6 +40,7 @@ enum Warning
     APPENDING_EMPTY_SECTION,
     WRONG_ROOT_POINT,
     ONLY_CHILD,
+    WRITE_EMPTY_MORPHOLOGY
 };
 
 /** The supported versions for morphology files. */

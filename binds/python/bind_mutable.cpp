@@ -292,7 +292,7 @@ static void bind_mutable_module(py::module &m) {
              "If recursive == true, all descendent will be appended as well",
              "immutable_section"_a, "recursive"_a=false)
 
-        .def("append_section", static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::Section::*) (std::shared_ptr<morphio::mut::Section>, bool)>(&morphio::mut::Section::appendSection),
+        .def("append_section", static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::Section::*) (const std::shared_ptr<morphio::mut::Section>&, bool)>(&morphio::mut::Section::appendSection),
              "Append the existing mutable Section to this section\n"
              "If recursive == true, all descendent will be appended as well",
              "mutable_section"_a, "recursive"_a=false)

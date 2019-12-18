@@ -267,8 +267,8 @@ def test_soma_type():
                 assert_equal(Morphology(tmp_file.name).soma_type,
                              SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
                 assert_string_equal(
-                    err.getvalue(),
-                    '''The soma does not conform the three point soma spec
+                    '''{}:0:warning
+                       Warning: the soma does not conform the three point soma spec
                        The only valid neuro-morpho soma is:
                        1 1 x   y   z r -1
                        2 1 x (y-r) z r  1
@@ -277,8 +277,9 @@ def test_soma_type():
                        Got:
                        1 1 0 0 0 3 -1
                        2 1 1.000000 (exp. 0.000000) -3.000000 0.000000 3.000000 1
-                       3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1
-                       ''')
+                       3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1'''.format(tmp_file.name),
+                    err.getvalue(),
+				)
 
 # If this configuration is not respected -> SOMA_CYLINDERS
     with tmp_swc_file('''1 1 0 0 0 3.0 -1
@@ -320,7 +321,7 @@ def test_disconnected_neurite():
             n = Morphology(os.path.join(_path, 'disconnected_neurite.swc'))
             assert_equal(
                 _path + '''/disconnected_neurite.swc:10:warning
-Found a disconnected neurite.
+Warning: found a disconnected neurite.
 Neurites are not supposed to have parentId: -1
 (although this is normal if this neuron has no soma)''',
                 strip_color_codes(err.getvalue().strip()))
@@ -338,12 +339,12 @@ def test_neurite_wrong_root_point():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             n = Morphology(os.path.join(_path, 'neurite_wrong_root_point.swc'))
-            assert_equal(
-'''With a 3 points soma, neurites must be connected to the first soma point:
+            assert_string_equal(
+'''Warning: with a 3 points soma, neurites must be connected to the first soma point:
 {}/neurite_wrong_root_point.swc:4:warning
 
 {}/neurite_wrong_root_point.swc:6:warning'''.format(_path, _path),
-                strip_color_codes(err.getvalue().strip()))
+                err.getvalue())
     assert_equal(len(n.root_sections), 2)
     assert_array_equal(n.root_sections[0].points,
                        [[0,0,0], [0,0,1]])

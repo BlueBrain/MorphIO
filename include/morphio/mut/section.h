@@ -94,7 +94,7 @@ public:
     std::shared_ptr<Section> appendSection(const morphio::Section&,
         bool recursive = false);
 
-    std::shared_ptr<Section> appendSection(std::shared_ptr<Section> section,
+    std::shared_ptr<Section> appendSection(const std::shared_ptr<Section>& original_section,
         bool recursive = false);
 
     std::shared_ptr<Section> appendSection(

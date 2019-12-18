@@ -67,6 +67,14 @@ namespace writer {
 
 void swc(const Morphology& morphology, const std::string& filename)
 {
+    const auto& soma = morphology.soma();
+    const auto& soma_points = soma->points();
+    if (soma_points.empty() && morphology.rootSections().empty()) {
+        LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
+            readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+        return;
+    }
+
     std::ofstream myfile(filename);
     using std::setw;
 
@@ -77,14 +85,12 @@ void swc(const Morphology& morphology, const std::string& filename)
 
     int segmentIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
-    const auto& soma = morphology.soma();
 
     if (!morphology.mitochondria().rootSections().empty())
         LBERROR(
             Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
             readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
-    const auto& soma_points = soma->points();
     const auto& soma_diameters = soma->diameters();
 
     if (soma_points.empty())
@@ -158,6 +164,13 @@ static void _write_asc_section(std::ofstream& myfile, const Morphology& morpho,
 
 void asc(const Morphology& morphology, const std::string& filename)
 {
+    const auto& soma = morphology.soma();
+    if (soma->points().empty() && morphology.rootSections().empty()) {
+        LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
+            readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+        return;
+    }
+
     std::ofstream myfile(filename);
 
     if (!morphology.mitochondria().rootSections().empty())
@@ -170,7 +183,6 @@ void asc(const Morphology& morphology, const std::string& filename)
     header[SECTION_DENDRITE] = "( (Color Red)\n  (Dendrite)\n";
     header[SECTION_APICAL_DENDRITE] = "( (Color Red)\n  (Apical)\n";
 
-    const auto& soma = morphology.soma();
     if (!soma->points().empty()) {
         myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
         _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
@@ -262,6 +274,20 @@ static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochon
 
 void h5(const Morphology& morpho, const std::string& filename)
 {
+    const auto& somaPoints = morpho.soma()->points();
+    const auto numberOfSomaPoints = somaPoints.size();
+
+    if (numberOfSomaPoints < 1) {
+        if (morpho.rootSections().empty()) {
+            LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
+                readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+            return;
+        }
+        LBERROR(Warning::WRITE_NO_SOMA,
+            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    }
+
+
     HighFive::File h5_file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
 
     int sectionIdOnDisk = 1;
@@ -271,19 +297,16 @@ void h5(const Morphology& morpho, const std::string& filename)
     std::vector<std::vector<int32_t>> raw_structure;
     std::vector<float> raw_perimeters;
 
-    const auto& somaPoints = morpho.soma()->points();
     const auto& somaDiameters = morpho.soma()->diameters();
 
-    const auto numberOfSomaPoints = somaPoints.size();
     const auto numberOfSomaDiameters = somaDiameters.size();
 
-    if (numberOfSomaPoints < 1)
-        LBERROR(Warning::WRITE_NO_SOMA,
-            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+
     if (numberOfSomaPoints != numberOfSomaDiameters)
         throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
             "soma points", numberOfSomaPoints, "soma diameters",
             numberOfSomaDiameters));
+
 
     bool hasPerimeterData = !morpho.rootSections().empty()
                                 ? !morpho.rootSections()[0]->perimeters().empty()

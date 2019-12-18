@@ -7,9 +7,20 @@ from morphio.mut import Morphology
 from morphio import (SectionBuilderError, set_maximum_warnings, SectionType, PointLevel,
                      MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect)
 
-from utils import captured_output, setup_tempdir
+from utils import captured_output, setup_tempdir, assert_string_equal
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
+
+def test_write_empty_file():
+    '''Check that empty morphology are not written to disk'''
+    with captured_output() as (_, _):
+        with ostream_redirect(stdout=True, stderr=True):
+            with setup_tempdir('test_write_empty_file', no_cleanup=True) as tmp_folder:
+                for ext in ['asc', 'swc', 'h5']:
+                    outname = os.path.join(tmp_folder, 'empty.' + ext)
+                    Morphology().write(outname)
+                    ok_(not os.path.exists(outname))
 
 
 def test_write_soma_basic():
@@ -94,7 +105,7 @@ def test_write_merge_only_child():
                     morpho.write(filename)
 
                     assert_equal(err.getvalue().strip(),
-                                 'Section: 1 is the only child of section: 0\nIt will be merged with the parent section')
+                                 'Warning: section 1 is the only child of section: 0\nIt will be merged with the parent section')
 
 
             read = Morphology(filename)
@@ -199,14 +210,14 @@ def test_mitochondria():
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
                 morpho.write(os.path.join(tmp_folder, "test.swc"))
-                assert_equal(err.getvalue().strip(),
-                             "This cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
+                assert_string_equal(err.getvalue(),
+                             "Warning: this cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
 
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
                 morpho.write(os.path.join(tmp_folder, "test.asc"))
-                assert_equal(err.getvalue().strip(),
-                             "This cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
+                assert_string_equal(err.getvalue(),
+                             "Warning: this cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
 
         mito = ImmutMorphology(os.path.join(tmp_folder, 'test.h5')).mitochondria
         assert_array_equal(mito.root_sections[0].diameters,

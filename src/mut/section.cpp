@@ -106,7 +106,7 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section>& secti
 }
 
 std::shared_ptr<Section> Section::appendSection(
-    std::shared_ptr<Section> original_section, bool recursive)
+    const std::shared_ptr<Section>& original_section, bool recursive)
 {
     const std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter,
         *original_section));
@@ -120,10 +120,11 @@ std::shared_ptr<Section> Section::appendSection(
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
         !emptySection &&
-        !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
+        !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
         LBERROR(Warning::WRONG_DUPLICATE,
             _morphology->_err.WARNING_WRONG_DUPLICATE(
                 _sections[childId], _sections.at(parentId)));
+    }
 
     _morphology->_parent[childId] = parentId;
     _morphology->_children[parentId].push_back(ptr);
