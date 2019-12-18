@@ -5,10 +5,9 @@
 
 set -euxo pipefail
 
-rm -rf build;
-mkdir build 
-pushd build 
+rm -rf build
+mkdir build
+cd build
 cmake .. -DMorphIO_CXX_WARNINGS=ON
-make -j2 
+make -j2
 make test
-popd

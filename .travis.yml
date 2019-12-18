@@ -41,5 +41,5 @@ before_install:
   - if [[ $TRAVIS_OS_NAME = linux ]]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
 install: skip
 script:
-  - ./python_test.sh
-  - ./cpp_test.sh
+  - ./ci/python_test.sh
+  - ./ci/cpp_test.sh

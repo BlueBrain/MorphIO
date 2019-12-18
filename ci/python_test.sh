@@ -4,15 +4,14 @@ set -euxo pipefail
 
 VENV=env
 
-pip install virtualenv
 rm -rf "$VENV"
-virtualenv "$VENV"
+python3 -mvenv "$VENV"
 
 set +u  # ignore errors in virtualenv's activate
 source "$VENV/bin/activate"
 set -u
 
-pip install --upgrade pip
+pip install --upgrade pip setuptools
 
 # install
 pip install .
