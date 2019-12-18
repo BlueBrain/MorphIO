@@ -10,6 +10,9 @@ from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
 
+MIN_CPU_CORES = 2
+
+
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=[])
@@ -28,6 +31,18 @@ def find_cmake():
             pass
 
     raise RuntimeError("CMake >= 3.2.0 must be installed to build MorphIO")
+
+
+def get_cpu_count():
+    try:
+        return len(os.sched_getaffinity(0))  # linux only
+    except:
+        pass
+
+    try:
+        return os.cpu_count()  # python 3.4+
+    except:
+        return 1  # default
 
 
 class CMakeBuild(build_ext):
@@ -54,14 +69,11 @@ class CMakeBuild(build_ext):
                 cmake_args += ['-A', 'x64']
             build_args += ['--', '/m']
         else:
-            try:
-                CPU_COUNT = os.cpu_count()  # python 3.4+
-            except:
-                CPU_COUNT = 2
-
             cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
-                           '-DMorphIO_CXX_WARNINGS=OFF']
-            build_args += ['--', '-j%d' % CPU_COUNT]
+                           '-DMorphIO_CXX_WARNINGS=OFF',
+                           ]
+            build_args += ["--", "-j{}".format(max(MIN_CPU_CORES, get_cpu_count())),
+                           ]
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
