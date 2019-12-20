@@ -56,8 +56,9 @@ static void bind_mutable_module(py::module& m) {
                                          "instance")
                                      .def_property_readonly(
                                          "mitochondria",
-                                         static_cast<morphio::
-                                                         mut::Mitochondria& (morphio::mut::Morphology::*) ()>(&morphio::mut::Morphology::mitochondria),
+                                         static_cast<morphio::mut::Mitochondria& (
+                                             morphio::mut::Morphology::*) ()>(
+                                             &morphio::mut::Morphology::mitochondria),
                                          "Returns a reference to the mitochondria container class")
                                      .def_property_readonly("annotations",
                                                             &morphio::mut::Morphology::annotations,
@@ -72,13 +73,13 @@ static void bind_mutable_module(py::module& m) {
                                           &morphio::mut::Morphology::buildReadOnly,
                                           "Returns the data structure used to create read-only "
                                           "morphologies")
-                                     .def(
-                                         "append_root_section",
-                                         static_cast<
-                                             std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*)(const morphio::Property::PointLevel&, morphio::SectionType)>(&morphio::mut::Morphology::appendRootSection),
-                                         "Append a root Section\n",
-                                         "point_level_properties"_a,
-                                         "section_type"_a)
+                                     .def("append_root_section",
+                                          static_cast<
+                                              std::shared_ptr<
+                                                  morphio::mut::Section> (morphio::mut::Morphology::*)(const morphio::Property::PointLevel&, morphio::SectionType)>(&morphio::mut::Morphology::appendRootSection),
+                                          "Append a root Section\n",
+                                          "point_level_properties"_a,
+                                          "section_type"_a)
                                      .def(
                                          "append_root_section",
                                          static_cast<
@@ -113,8 +114,7 @@ static void bind_mutable_module(py::module& m) {
 
                                      .def_property_readonly(
                                          "cell_family",
-                                         &morphio::mut::
-                                             Morphology::cellFamily,
+                                         &morphio::mut::Morphology::cellFamily,
                                          "Returns the cell family (neuron or glia)")
 
                                      .def_property_readonly("soma_type",
