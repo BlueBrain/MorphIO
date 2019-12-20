@@ -14,7 +14,6 @@
 
 /** @namespace morphio Blue Brain File IO classes */
 namespace morphio {
-using URI = std::string;
 
 using namespace enums;
 class Morphology;

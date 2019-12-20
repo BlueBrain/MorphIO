@@ -13,7 +13,7 @@
 namespace morphio {
 namespace readers {
 namespace h5 {
-Property::Properties load(const URI& uri);
+Property::Properties load(const std::string& uri);
 
 class MorphologyHDF5
 {

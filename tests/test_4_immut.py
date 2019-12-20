@@ -1,11 +1,13 @@
 import os
-import numpy as np
 from collections import OrderedDict
 from itertools import combinations
-from numpy.testing import assert_array_equal, assert_array_almost_equal
-from nose.tools import assert_equal, assert_not_equal, assert_raises, ok_
+from pathlib import Path
 
-from morphio import Morphology, upstream, IterType, RawDataError
+import numpy as np
+from nose.tools import assert_equal, assert_not_equal, assert_raises, ok_
+from numpy.testing import assert_array_almost_equal, assert_array_equal
+
+from morphio import IterType, Morphology, RawDataError, upstream
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -99,3 +101,8 @@ def test_mitochondria():
 def test_section___str__():
     assert_equal(str(CELLS['asc'].root_sections[0]),
                  'Section(id=0, points=[(0 0 0),..., (0 5 0)])')
+
+
+def test_from_pathlib():
+    neuron = Morphology(Path(_path, "simple.asc"))
+    assert_equal(len(neuron.root_sections), 2)

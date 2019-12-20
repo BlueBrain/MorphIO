@@ -53,7 +53,7 @@ const std::string _a_apical("apical");
 namespace morphio {
 namespace readers {
 namespace h5 {
-Property::Properties load(const URI& uri)
+Property::Properties load(const std::string& uri)
 {
     return MorphologyHDF5(uri).load();
 }

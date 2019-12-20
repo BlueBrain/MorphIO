@@ -380,7 +380,7 @@ private:
     DebugInfo debugInfo;
 };
 
-Property::Properties load(const URI& uri, unsigned int options)
+Property::Properties load(const std::string& uri, unsigned int options)
 {
     auto properties = SWCBuilder(uri)._buildProperties(options);
     properties._cellLevel._cellFamily = FAMILY_NEURON;

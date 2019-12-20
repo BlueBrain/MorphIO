@@ -17,10 +17,15 @@ static void bind_vasculature(py::module &m) {
     using namespace py::literals;
 
     py::class_<morphio::vasculature::Vasculature>(m, "Vasculature")
-        .def(py::init<const morphio::URI&>(),
+        .def(py::init<const std::string&>(),
              "filename"_a)
-        // .def(py::init<morphio::mut::Morphology&>())
-        // .def("as_mutable", [](const morphio::vasculature::VasculatureMorphology* morph) { return morphio::mut::Morphology(*morph); })
+        .def(py::init([](py::object arg) {
+                          return std::unique_ptr<morphio::vasculature::Vasculature>(
+                              new morphio::vasculature::Vasculature(py::str(arg))
+                              );
+                      }),
+            "filename"_a,
+            "Additional Ctor that accepts as filename any python object that implements __repr__ or __str__")
 
         .def_property_readonly("sections", &morphio::vasculature::Vasculature::sections,
                                "Returns a vector containing all sections objects\n\n"
