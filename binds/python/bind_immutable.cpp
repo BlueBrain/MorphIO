@@ -1,20 +1,18 @@
 #include <pybind11/pybind11.h>
 
-#include <pybind11/iostream.h>
-#include <pybind11/numpy.h>
-#include <pybind11/operators.h>
-#include <pybind11/stl.h>
-#include <pybind11/stl_bind.h>
+#include <pybind11/iostream.h>  // py::add_ostream_redirect
 
 #include <morphio/enums.h>
 #include <morphio/mut/morphology.h>
+#include <morphio/soma.h>
 #include <morphio/types.h>
 
 #include "bind_enums.h"
+#include "bindings_utils.h"
 
 namespace py = pybind11;
 
-static void bind_immutable_module(py::module& m) {
+void bind_immutable_module(py::module& m) {
     using namespace py::literals;
 
     // http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight=iostream#capturing-standard-output-from-ostream

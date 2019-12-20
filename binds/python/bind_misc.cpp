@@ -1,13 +1,7 @@
 #include <pybind11/pybind11.h>
 
-#include <pybind11/iostream.h>
-#include <pybind11/numpy.h>
-#include <pybind11/operators.h>
-#include <pybind11/stl.h>
-#include <pybind11/stl_bind.h>
-
 #include <morphio/enums.h>
-#include <morphio/tools.h>
+#include <morphio/errorMessages.h>
 #include <morphio/types.h>
 #include <morphio/version.h>
 
@@ -15,7 +9,7 @@
 
 namespace py = pybind11;
 
-static void bind_misc(py::module& m) {
+void bind_misc(py::module& m) {
     using namespace py::literals;
 
     m.def("set_maximum_warnings",

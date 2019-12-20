@@ -1,13 +1,17 @@
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
-#include <morphio/mut/section.h>
-#include <morphio/mut/soma.h>
+
+#include <array>
 
 #include "bind_enums.h"
+#include "bindings_utils.h"
 
 namespace py = pybind11;
 
-static void bind_mutable_module(py::module& m) {
+void bind_mutable_module(py::module& m) {
     using namespace py::literals;
 
     auto
@@ -32,7 +36,6 @@ static void bind_mutable_module(py::module& m) {
                                           "options"_a = morphio::enums::Option::NO_MODIFIER,
                                           "Additional Ctor that accepts as filename any python "
                                           "object that implements __repr__ or __str__")
-
 
                                      // Cell sub-part accessors
                                      .def_property_readonly(
@@ -160,7 +163,6 @@ static void bind_mutable_module(py::module& m) {
                                          "- morphio.IterType.breadth_first",
                                          "iter_type"_a = IterType::DEPTH_FIRST);
 
-
     mutable_morphology.def(
         "append_root_section",
         static_cast<std::shared_ptr<morphio::mut::Section> (
@@ -206,7 +208,8 @@ static void bind_mutable_module(py::module& m) {
              static_cast<std::shared_ptr<morphio::mut::MitoSection> (
                  morphio::mut::Mitochondria::*)(const morphio::MitoSection&, bool recursive)>(
                  &morphio::mut::Mitochondria::appendRootSection),
-             "Append a new root MitoSection (if recursive == true, all descendent will be appended "
+             "Append a new root MitoSection (if recursive == true, all "
+             "descendent will be appended "
              "as well)",
              "immutable_section"_a,
              "recursive"_a = true)
@@ -214,11 +217,11 @@ static void bind_mutable_module(py::module& m) {
              static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::Mitochondria::*)(
                  const std::shared_ptr<morphio::mut::MitoSection>&, bool recursive)>(
                  &morphio::mut::Mitochondria::appendRootSection),
-             "Append a new root MitoSection (if recursive == true, all descendent will be appended "
+             "Append a new root MitoSection (if recursive == true, all "
+             "descendent will be appended "
              "as well)",
              "section"_a,
              "recursive"_a = true)
-
 
         .def(
             "depth_begin",
@@ -229,7 +232,8 @@ static void bind_mutable_module(py::module& m) {
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Depth first iterator starting at a given section id\n"
             "\n"
-            "If id == -1, the iteration will be successively performed starting\n"
+            "If id == -1, the iteration will be successively performed "
+            "starting\n"
             "at each root section",
             "section_id"_a = -1)
         .def(
@@ -241,7 +245,8 @@ static void bind_mutable_module(py::module& m) {
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Breadth first iterator starting at a given section id\n"
             "\n"
-            "If id == -1, the iteration will be successively performed starting\n"
+            "If id == -1, the iteration will be successively performed "
+            "starting\n"
             "at each root section",
             "section_id"_a = -1)
         .def(
@@ -253,15 +258,16 @@ static void bind_mutable_module(py::module& m) {
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Upstream iterator starting at a given section id\n"
             "\n"
-            "If id == -1, the iteration will be successively performed starting\n"
+            "If id == -1, the iteration will be successively performed "
+            "starting\n"
             "at each root section",
             "section_id"_a = -1);
-
 
     using mitosection_floats_f = std::vector<float>& (morphio::mut::MitoSection::*) ();
     using mitosection_ints_f = std::vector<uint32_t>& (morphio::mut::MitoSection::*) ();
 
-    // py::nodelete needed because morphio::mut::MitoSection has a private destructor
+    // py::nodelete needed because morphio::mut::MitoSection has a private
+    // destructor
     // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
     py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(m,
                                                                                       "MitoSection")
@@ -426,7 +432,6 @@ static void bind_mutable_module(py::module& m) {
              " the type of the parent section will be used",
              "point_level_properties"_a,
              "section_type"_a = morphio::SectionType::SECTION_UNDEFINED);
-
 
     py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>>(m, "Soma")
         .def(py::init<const morphio::Property::PointLevel&>())

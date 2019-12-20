@@ -1,20 +1,13 @@
 #include <pybind11/pybind11.h>
 
-#include <pybind11/iostream.h>
-#include <pybind11/numpy.h>
-#include <pybind11/operators.h>
-#include <pybind11/stl.h>
-#include <pybind11/stl_bind.h>
-
-#include <morphio/enums.h>
-#include <morphio/types.h>
-#include <morphio/vasc/properties.h>
 #include <morphio/vasc/section.h>
 #include <morphio/vasc/vasculature.h>
 
+#include "bindings_utils.h"
+
 namespace py = pybind11;
 
-static void bind_vasculature(py::module& m) {
+void bind_vasculature(py::module& m) {
     using namespace py::literals;
 
     py::class_<morphio::vasculature::Vasculature>(m, "Vasculature")
