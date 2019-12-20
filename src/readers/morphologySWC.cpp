@@ -1,11 +1,11 @@
 #include "morphologySWC.h"
 
-#include <cstdint> // uint32_t
+#include <cstdint>  // uint32_t
 #include <fstream>
-#include <map> // std::map
-#include <memory> // std::shared_ptr
-#include <string> // std::string
-#include <vector> // std::vector
+#include <map>     // std::map
+#include <memory>  // std::shared_ptr
+#include <string>  // std::string
+#include <vector>  // std::vector
 
 #include <morphio/errorMessages.h>
 #include <morphio/mut/morphology.h>
@@ -14,13 +14,12 @@
 #include <morphio/properties.h>
 
 namespace {
-bool _ignoreLine(const std::string& line)
-{
+bool _ignoreLine(const std::string& line) {
     std::size_t pos = line.find_first_not_of("\n\r\t ");
     return pos == std::string::npos || line[pos] == '#';
 }
 
-} // unnamed namespace
+}  // unnamed namespace
 
 namespace morphio {
 namespace readers {
@@ -34,12 +33,11 @@ const int SWC_UNDEFINED_PARENT = -1;
 **/
 class SWCBuilder
 {
-public:
+  public:
     explicit SWCBuilder(const std::string& _uri)
-    : uri(_uri)
-    , err(_uri)
-    , debugInfo(_uri)
-    {
+        : uri(_uri)
+        , err(_uri)
+        , debugInfo(_uri) {
         _readSamples();
 
         for (const auto& sample_pair : samples) {
@@ -50,8 +48,7 @@ public:
         checkSoma();
     }
 
-    void _readSamples()
-    {
+    void _readSamples() {
         std::ifstream file(uri.c_str());
         if (file.fail())
             LBTHROW(morphio::RawDataError(err.ERROR_OPENING_FILE()));
@@ -66,16 +63,14 @@ public:
 
             const auto& sample = Sample(line.data(), lineNumber);
             if (!sample.valid)
-                LBTHROW(morphio::RawDataError(
-                            err.ERROR_LINE_NON_PARSABLE(lineNumber)));
+                LBTHROW(morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber)));
 
             if (sample.type >= SECTION_CUSTOM_START)
                 LBTHROW(morphio::RawDataError(
-                            err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type)));
+                    err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type)));
 
             if (samples.count(sample.id) > 0)
-                LBTHROW(morphio::RawDataError(
-                    err.ERROR_REPEATED_ID(samples[sample.id], sample)));
+                LBTHROW(morphio::RawDataError(err.ERROR_REPEATED_ID(samples[sample.id], sample)));
 
             samples[sample.id] = sample;
             children[sample.parentId].push_back(sample.id);
@@ -90,8 +85,7 @@ public:
        Are considered potential somata all sample
        with parentId == -1 and sample.type == SECTION_SOMA
      **/
-    std::vector<Sample> _potentialSomata()
-    {
+    std::vector<Sample> _potentialSomata() {
         std::vector<Sample> somata;
         for (auto id : children[-1]) {
             if (samples[id].type == SECTION_SOMA)
@@ -100,8 +94,7 @@ public:
         return somata;
     }
 
-    void raiseIfBrokenSoma(const Sample& sample)
-    {
+    void raiseIfBrokenSoma(const Sample& sample) {
         if (sample.type != SECTION_SOMA)
             return;
 
@@ -115,30 +108,25 @@ public:
             }
 
             if (soma_bifurcations.size() > 1)
-                LBTHROW(morphio::SomaError(
-                    err.ERROR_SOMA_BIFURCATION(sample, soma_bifurcations)));
+                LBTHROW(morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample, soma_bifurcations)));
         }
 
-        if (sample.parentId != -1 && samples[static_cast<unsigned int>(sample.parentId)].type != SECTION_SOMA)
-            LBTHROW(
-                morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample)));
+        if (sample.parentId != -1 &&
+            samples[static_cast<unsigned int>(sample.parentId)].type != SECTION_SOMA)
+            LBTHROW(morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample)));
     }
 
-    void raiseIfSelfParent(const Sample& sample)
-    {
+    void raiseIfSelfParent(const Sample& sample) {
         if (sample.parentId == static_cast<int>(sample.id))
             LBTHROW(morphio::RawDataError(err.ERROR_SELF_PARENT(sample)));
     }
 
-    void warnIfDisconnectedNeurite(const Sample& sample)
-    {
+    void warnIfDisconnectedNeurite(const Sample& sample) {
         if (sample.parentId == SWC_UNDEFINED_PARENT && sample.type != SECTION_SOMA)
-            LBERROR(Warning::DISCONNECTED_NEURITE,
-                err.WARNING_DISCONNECTED_NEURITE(sample));
+            LBERROR(Warning::DISCONNECTED_NEURITE, err.WARNING_DISCONNECTED_NEURITE(sample));
     }
 
-    void checkSoma()
-    {
+    void checkSoma() {
         auto somata = _potentialSomata();
 
         if (somata.size() > 1)
@@ -148,70 +136,63 @@ public:
             LBERROR(Warning::NO_SOMA_FOUND, err.WARNING_NO_SOMA_FOUND());
     }
 
-    void raiseIfNoParent(const Sample& sample)
-    {
+    void raiseIfNoParent(const Sample& sample) {
         if (sample.parentId > -1 && samples.count(static_cast<unsigned int>(sample.parentId)) == 0)
-            LBTHROW(
-                morphio::MissingParentError(err.ERROR_MISSING_PARENT(sample)));
+            LBTHROW(morphio::MissingParentError(err.ERROR_MISSING_PARENT(sample)));
     }
 
     /**
        A neurite which is not attached to the soma
     **/
-    inline bool isOrphanNeurite(const Sample& sample)
-    {
+    inline bool isOrphanNeurite(const Sample& sample) {
         return (sample.parentId == SWC_UNDEFINED_PARENT && sample.type != SECTION_SOMA);
     }
 
-    inline bool isRootPoint(const Sample& sample)
-    {
+    inline bool isRootPoint(const Sample& sample) {
         return isOrphanNeurite(sample) ||
                (sample.type != SECTION_SOMA &&
-                   samples[static_cast<unsigned int>(sample.parentId)].type == SECTION_SOMA); // Exclude soma bifurcations
+                samples[static_cast<unsigned int>(sample.parentId)].type ==
+                    SECTION_SOMA);  // Exclude soma bifurcations
     }
 
-    inline bool isSectionStart(const Sample& sample)
-    {
-        return (isRootPoint(sample) || (sample.parentId > -1 && isSectionEnd(samples[static_cast<unsigned int>(sample.parentId)]))); // Standard section
+    inline bool isSectionStart(const Sample& sample) {
+        return (isRootPoint(sample) ||
+                (sample.parentId > -1 &&
+                 isSectionEnd(samples[static_cast<unsigned int>(sample.parentId)])));  // Standard
+                                                                                       // section
     }
 
-    inline bool isSectionEnd(const Sample& sample)
-    {
+    inline bool isSectionEnd(const Sample& sample) {
         int id = static_cast<int>(sample.id);
-        return id == lastSomaPoint ||       // End of soma
-               children[id].empty() ||      // Reached leaf
-               (children[id].size() >= 2 && // Reached neurite
-                   // bifurcation
-                   sample.type != SECTION_SOMA);
+        return id == lastSomaPoint ||        // End of soma
+               children[id].empty() ||       // Reached leaf
+               (children[id].size() >= 2 &&  // Reached neurite
+                                             // bifurcation
+                sample.type != SECTION_SOMA);
     }
 
     template <typename T>
-    void appendSample(const std::shared_ptr<T>& somaOrSection, const Sample& sample)
-    {
+    void appendSample(const std::shared_ptr<T>& somaOrSection, const Sample& sample) {
         debugInfo.setLineNumber(sample.id, sample.lineNumber);
         somaOrSection->points().push_back(sample.point);
         somaOrSection->diameters().push_back(sample.diameter);
     }
 
-    void _pushChildren(std::vector<unsigned int>& vec, int32_t id)
-    {
+    void _pushChildren(std::vector<unsigned int>& vec, int32_t id) {
         for (unsigned int childId : children[id]) {
             vec.push_back(childId);
             _pushChildren(vec, static_cast<int>(childId));
         }
     }
 
-    void raiseIfNonConform(const Sample& sample)
-    {
+    void raiseIfNonConform(const Sample& sample) {
         raiseIfSelfParent(sample);
         raiseIfBrokenSoma(sample);
         raiseIfNoParent(sample);
         warnIfDisconnectedNeurite(sample);
     }
 
-    void _checkNeuroMorphoSoma(const Sample& root,
-        const std::vector<Sample>& _children)
-    {
+    void _checkNeuroMorphoSoma(const Sample& root, const std::vector<Sample>& _children) {
         // The only valid neuro-morpho soma is:
         // 1 1 x   y   z r -1
         // 2 1 x (y-r) z r  1
@@ -225,22 +206,15 @@ public:
         const Sample& child1 = _children[0];
         const Sample& child2 = _children[1];
 
-        if (child1.point[0] != x ||
-            child2.point[0] != x ||
-            child1.point[1] != y - r ||
-            child2.point[1] != y + r ||
-            child1.point[2] != z ||
-            child2.point[2] != z ||
-            child1.diameter != d ||
-            child2.diameter != d) {
+        if (child1.point[0] != x || child2.point[0] != x || child1.point[1] != y - r ||
+            child2.point[1] != y + r || child1.point[2] != z || child2.point[2] != z ||
+            child1.diameter != d || child2.diameter != d) {
             LBERROR(Warning::SOMA_NON_CONFORM,
-                err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(root, child1,
-                    child2));
+                    err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(root, child1, child2));
         }
     }
 
-    SomaType somaType()
-    {
+    SomaType somaType() {
         switch (morph.soma()->points().size()) {
         case 0: {
             return SOMA_UNDEFINED;
@@ -271,8 +245,7 @@ public:
                 //   http://neuromorpho.org/SomaFormat.html
 
                 if (!ErrorMessages::isIgnored(Warning::SOMA_NON_CONFORM))
-                    _checkNeuroMorphoSoma(this->samples[somaRootId],
-                        children_soma_points);
+                    _checkNeuroMorphoSoma(this->samples[somaRootId], children_soma_points);
 
                 return SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
             }
@@ -283,8 +256,7 @@ public:
         }
     }
 
-    Property::Properties _buildProperties(unsigned int options)
-    {
+    Property::Properties _buildProperties(unsigned int options) {
         // The process might occasionally creates empty section before
         // filling them so the warning is ignored
         bool originalIsIgnored = err.isIgnored(morphio::Warning::APPENDING_EMPTY_SECTION);
@@ -303,20 +275,19 @@ public:
             if (isSectionStart(sample)) {
                 _processSectionStart(sample);
             } else if (sample.type != SECTION_SOMA) {
-                swcIdToSectionId[sample.id] = swcIdToSectionId[static_cast<unsigned int>(sample.parentId)];
+                swcIdToSectionId[sample.id] =
+                    swcIdToSectionId[static_cast<unsigned int>(sample.parentId)];
             }
 
             if (sample.type == SECTION_SOMA) {
                 appendSample(morph.soma(), sample);
             } else {
-                appendSample(morph.section(swcIdToSectionId.at(sample.id)),
-                    sample);
+                appendSample(morph.section(swcIdToSectionId.at(sample.id)), sample);
             }
         }
 
         if (morph.soma()->points().size() == 3 && !neurite_wrong_root.empty())
-            LBERROR(morphio::WRONG_ROOT_POINT,
-                err.WARNING_WRONG_ROOT_POINT(neurite_wrong_root));
+            LBERROR(morphio::WRONG_ROOT_POINT, err.WARNING_WRONG_ROOT_POINT(neurite_wrong_root));
 
         morph.sanitize();
         morph.applyModifiers(options);
@@ -334,8 +305,7 @@ public:
     section
        - Update the parent ID of the new section
     **/
-    void _processSectionStart(const Sample& sample)
-    {
+    void _processSectionStart(const Sample& sample) {
         Property::PointLevel properties;
 
         uint32_t id = 0;
@@ -355,15 +325,15 @@ public:
                 id = morph.appendRootSection(properties, sample.type)->id();
             } else {
                 id = morph.section(swcIdToSectionId[parentId])
-                    ->appendSection(properties, sample.type)
-                    ->id();
+                         ->appendSection(properties, sample.type)
+                         ->id();
             }
         }
 
         swcIdToSectionId[sample.id] = id;
     }
 
-private:
+  private:
     // Dictionary: SWC Id of the last point of a section to morphio::mut::Section ID
     std::map<uint32_t, uint32_t> swcIdToSectionId;
 
@@ -380,14 +350,13 @@ private:
     DebugInfo debugInfo;
 };
 
-Property::Properties load(const std::string& uri, unsigned int options)
-{
+Property::Properties load(const std::string& uri, unsigned int options) {
     auto properties = SWCBuilder(uri)._buildProperties(options);
     properties._cellLevel._cellFamily = FAMILY_NEURON;
     properties._cellLevel._version = MORPHOLOGY_VERSION_SWC_1;
     return properties;
 }
 
-} // namespace swc
-} // namespace readers
-} // namespace morphio
+}  // namespace swc
+}  // namespace readers
+}  // namespace morphio

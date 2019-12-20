@@ -6,11 +6,9 @@ namespace morphio {
 namespace mut {
 class Soma
 {
-public:
+  public:
     Soma()
-        : _somaType(SOMA_UNDEFINED)
-    {
-    }
+        : _somaType(SOMA_UNDEFINED) {}
 
     Soma(const Property::PointLevel& pointProperties);
     Soma(const Soma& soma);
@@ -54,49 +52,42 @@ public:
     inline Property::PointLevel& properties() noexcept;
     inline const Property::PointLevel& properties() const noexcept;
 
-private:
+  private:
     friend class Morphology;
     SomaType _somaType;
     Property::PointLevel _pointProperties;
 };
 
-inline std::vector<Point>& Soma::points() noexcept
-{
+inline std::vector<Point>& Soma::points() noexcept {
     return _pointProperties._points;
 }
 
-const std::vector<Point>& Soma::points() const noexcept
-{
+const std::vector<Point>& Soma::points() const noexcept {
     return _pointProperties._points;
 }
 
-inline std::vector<float>& Soma::diameters() noexcept
-{
+inline std::vector<float>& Soma::diameters() noexcept {
     return _pointProperties._diameters;
 }
 
-const std::vector<float>& Soma::diameters() const noexcept
-{
+const std::vector<float>& Soma::diameters() const noexcept {
     return _pointProperties._diameters;
 }
 
-inline SomaType Soma::type() const noexcept
-{
+inline SomaType Soma::type() const noexcept {
     return _somaType;
 }
 
-inline Property::PointLevel& Soma::properties() noexcept
-{
+inline Property::PointLevel& Soma::properties() noexcept {
     return _pointProperties;
 }
 
-inline const Property::PointLevel& Soma::properties() const noexcept
-{
+inline const Property::PointLevel& Soma::properties() const noexcept {
     return _pointProperties;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& sectionPtr);
 std::ostream& operator<<(std::ostream& os, const Soma& soma);
 
-} // namespace mut
-} // namespace morphio
+}  // namespace mut
+}  // namespace morphio

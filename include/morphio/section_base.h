@@ -1,8 +1,8 @@
 #pragma once
 
-#include <cstdint> // uint32_t
-#include <memory> // std::shared_ptr
-#include <vector> // std::vector
+#include <cstdint>  // uint32_t
+#include <memory>   // std::shared_ptr
+#include <vector>   // std::vector
 
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
@@ -23,10 +23,9 @@ namespace morphio {
 template <typename T>
 class SectionBase
 {
-public:
+  public:
     SectionBase()
-    : _id(0)
-    {}
+        : _id(0) {}
 
     SectionBase(const SectionBase& section);
 
@@ -55,7 +54,7 @@ public:
     /** Return the ID of this section. */
     inline uint32_t id() const noexcept;
 
-protected:
+  protected:
     SectionBase(uint32_t id, const std::shared_ptr<Property::Properties>& properties);
     template <typename Property>
     range<const typename Property::Type> get() const;
@@ -66,27 +65,23 @@ protected:
 };
 
 template <typename T>
-inline bool SectionBase<T>::operator==(const SectionBase& other) const noexcept
-{
+inline bool SectionBase<T>::operator==(const SectionBase& other) const noexcept {
     return other._id == _id && other._properties == _properties;
 }
 
 template <typename T>
-inline bool SectionBase<T>::operator!=(const SectionBase& other) const noexcept
-{
+inline bool SectionBase<T>::operator!=(const SectionBase& other) const noexcept {
     return !(*this == other);
 }
 
 template <typename T>
-inline uint32_t SectionBase<T>::id() const noexcept
-{
+inline uint32_t SectionBase<T>::id() const noexcept {
     return _id;
 }
 
-} // namespace morphio
+}  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
-std::ostream& operator<<(std::ostream& os,
-    const morphio::range<const morphio::Point>& points);
+std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);
 
 #include "section_base.tpp"

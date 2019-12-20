@@ -19,87 +19,79 @@ namespace {
    https://stackoverflow.com/a/30960730
  **/
 template <typename T>
-struct base_type
-{
+struct base_type {
     using type = T;
 };
 
 template <typename T>
-struct base_type<std::vector<T>> : base_type<T>
-{
-};
+struct base_type<std::vector<T>>: base_type<T> {};
 
 void writeLine(std::ofstream& myfile,
                int id,
                int parentId,
                morphio::SectionType type,
                const morphio::Point& point,
-               float diameter)
-{
+               float diameter) {
     using std::setw;
 
-    myfile << std::to_string(id) << setw(12) << std::to_string(type) << ' '
-           << setw(12) << std::to_string(point[0]) << ' ' << setw(12)
-           << std::to_string(point[1]) << ' ' << setw(12)
-           << std::to_string(point[2]) << ' ' << setw(12)
-           << std::to_string(diameter / 2.f) << setw(12)
-           << std::to_string(parentId) << '\n';
+    myfile << std::to_string(id) << setw(12) << std::to_string(type) << ' ' << setw(12)
+           << std::to_string(point[0]) << ' ' << setw(12) << std::to_string(point[1]) << ' '
+           << setw(12) << std::to_string(point[2]) << ' ' << setw(12)
+           << std::to_string(diameter / 2.f) << setw(12) << std::to_string(parentId) << '\n';
 }
 
-std::string version_string()
-{
+std::string version_string() {
     return std::string("Created by MorphIO v") + morphio::getVersionString();
 }
 
 /**
    Only skip duplicate if it has the same diameter
  **/
-bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section)
-{
+bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
     return section->diameters().front() == section->parent()->diameters().back();
 }
 
-} // anonymous namespace
+}  // anonymous namespace
 
 namespace morphio {
 namespace mut {
 namespace writer {
 
-void swc(const Morphology& morphology, const std::string& filename)
-{
+void swc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     const auto& soma_points = soma->points();
     if (soma_points.empty() && morphology.rootSections().empty()) {
         LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
-            readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+                readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
 
     std::ofstream myfile(filename);
     using std::setw;
 
-    myfile << "# index" << setw(9) << "type" << setw(10) << 'X' << setw(13)
-           << 'Y' << setw(13) << 'Z' << setw(13) << "radius" << setw(13)
-           << "parent" << std::endl;
+    myfile << "# index" << setw(9) << "type" << setw(10) << 'X' << setw(13) << 'Y' << setw(13)
+           << 'Z' << setw(13) << "radius" << setw(13) << "parent" << std::endl;
     myfile << "# " << version_string() << std::endl;
 
     int segmentIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
 
     if (!morphology.mitochondria().rootSections().empty())
-        LBERROR(
-            Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-            readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+        LBERROR(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
+                readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     const auto& soma_diameters = soma->diameters();
 
     if (soma_points.empty())
-        LBERROR(Warning::WRITE_NO_SOMA,
-            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+        LBERROR(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
 
     for (unsigned int i = 0; i < soma_points.size(); ++i) {
-        writeLine(myfile, segmentIdOnDisk, i == 0 ? -1 : segmentIdOnDisk - 1,
-            SECTION_SOMA, soma_points[i], soma_diameters[i]);
+        writeLine(myfile,
+                  segmentIdOnDisk,
+                  i == 0 ? -1 : segmentIdOnDisk - 1,
+                  SECTION_SOMA,
+                  soma_points[i],
+                  soma_diameters[i]);
         ++segmentIdOnDisk;
     }
 
@@ -122,8 +114,8 @@ void swc(const Morphology& morphology, const std::string& filename)
                                                 : newIds[section->parent()->id()]);
             }
 
-            writeLine(myfile, segmentIdOnDisk, parentIdOnDisk, section->type(),
-                points[i], diameters[i]);
+            writeLine(
+                myfile, segmentIdOnDisk, parentIdOnDisk, section->type(), points[i], diameters[i]);
 
             ++segmentIdOnDisk;
         }
@@ -131,25 +123,23 @@ void swc(const Morphology& morphology, const std::string& filename)
     }
 }
 
-static void _write_asc_points(std::ofstream& myfile, const Points& points,
-    const std::vector<float>& diameters, size_t indentLevel)
-{
+static void _write_asc_points(std::ofstream& myfile,
+                              const Points& points,
+                              const std::vector<float>& diameters,
+                              size_t indentLevel) {
     for (unsigned int i = 0; i < points.size(); ++i) {
-        myfile << std::string(indentLevel, ' ') << '('
-               << std::to_string(points[i][0]) << ' '
-               << std::to_string(points[i][1]) << ' '
-               << std::to_string(points[i][2]) << ' '
+        myfile << std::string(indentLevel, ' ') << '(' << std::to_string(points[i][0]) << ' '
+               << std::to_string(points[i][1]) << ' ' << std::to_string(points[i][2]) << ' '
                << std::to_string(diameters[i]) << ")\n";
     }
 }
 
-static void _write_asc_section(std::ofstream& myfile, const Morphology& morpho,
-    const std::shared_ptr<Section>& section,
-    size_t indentLevel)
-{
+static void _write_asc_section(std::ofstream& myfile,
+                               const Morphology& morpho,
+                               const std::shared_ptr<Section>& section,
+                               size_t indentLevel) {
     std::string indent(indentLevel, ' ');
-    _write_asc_points(myfile, section->points(), section->diameters(),
-        indentLevel);
+    _write_asc_points(myfile, section->points(), section->diameters(), indentLevel);
 
     if (!section->children().empty()) {
         auto children = section->children();
@@ -162,21 +152,19 @@ static void _write_asc_section(std::ofstream& myfile, const Morphology& morpho,
     }
 }
 
-void asc(const Morphology& morphology, const std::string& filename)
-{
+void asc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     if (soma->points().empty() && morphology.rootSections().empty()) {
         LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
-            readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+                readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
 
     std::ofstream myfile(filename);
 
     if (!morphology.mitochondria().rootSections().empty())
-        LBERROR(
-            Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-            readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+        LBERROR(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
+                readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     std::map<morphio::SectionType, std::string> header;
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
@@ -188,8 +176,7 @@ void asc(const Morphology& morphology, const std::string& filename)
         _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
         myfile << ")\n\n";
     } else {
-        LBERROR(Warning::WRITE_NO_SOMA,
-            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+        LBERROR(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
     for (const auto& section : morphology.rootSections()) {
@@ -203,46 +190,41 @@ void asc(const Morphology& morphology, const std::string& filename)
 
 template <typename T>
 HighFive::Attribute write_attribute(HighFive::File& file,
-    const std::string& name, const T& version)
-{
-    HighFive::Attribute a_version = file.createAttribute<typename T::value_type>(name,
-        HighFive::DataSpace::From(
-                                                                                     version));
+                                    const std::string& name,
+                                    const T& version) {
+    HighFive::Attribute a_version =
+        file.createAttribute<typename T::value_type>(name, HighFive::DataSpace::From(version));
     a_version.write(version);
     return a_version;
 }
 
 template <typename T>
 HighFive::Attribute write_attribute(HighFive::Group& group,
-    const std::string& name, const T& version)
-{
-    HighFive::Attribute a_version = group.createAttribute<typename T::value_type>(name,
-        HighFive::DataSpace::From(
-                                                                                      version));
+                                    const std::string& name,
+                                    const T& version) {
+    HighFive::Attribute a_version =
+        group.createAttribute<typename T::value_type>(name, HighFive::DataSpace::From(version));
     a_version.write(version);
     return a_version;
 }
 
 template <typename T>
-void write_dataset(HighFive::File& file, const std::string& name, const T& raw)
-{
-    HighFive::DataSet dpoints = file.createDataSet<typename base_type<T>::type>(
-        name, HighFive::DataSpace::From(raw));
+void write_dataset(HighFive::File& file, const std::string& name, const T& raw) {
+    HighFive::DataSet dpoints =
+        file.createDataSet<typename base_type<T>::type>(name, HighFive::DataSpace::From(raw));
 
     dpoints.write(raw);
 }
 
 template <typename T>
-void write_dataset(HighFive::Group& file, const std::string& name, const T& raw)
-{
-    HighFive::DataSet dpoints = file.createDataSet<typename base_type<T>::type>(
-        name, HighFive::DataSpace::From(raw));
+void write_dataset(HighFive::Group& file, const std::string& name, const T& raw) {
+    HighFive::DataSet dpoints =
+        file.createDataSet<typename base_type<T>::type>(name, HighFive::DataSpace::From(raw));
 
     dpoints.write(raw);
 }
 
-static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria)
-{
+static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria) {
     if (mitochondria.rootSections().empty())
         return;
 
@@ -255,8 +237,8 @@ static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochon
     std::vector<std::vector<int32_t>> structure;
     points.reserve(size);
     for (unsigned int i = 0; i < size; ++i) {
-        points.push_back({static_cast<float>(p._sectionIds[i]), p._relativePathLengths[i],
-            p._diameters[i]});
+        points.push_back(
+            {static_cast<float>(p._sectionIds[i]), p._relativePathLengths[i], p._diameters[i]});
     }
 
     auto& s = properties._mitochondriaSectionLevel;
@@ -272,23 +254,23 @@ static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochon
     write_dataset(g_mitochondria, "structure", structure);
 }
 
-void h5(const Morphology& morpho, const std::string& filename)
-{
+void h5(const Morphology& morpho, const std::string& filename) {
     const auto& somaPoints = morpho.soma()->points();
     const auto numberOfSomaPoints = somaPoints.size();
 
     if (numberOfSomaPoints < 1) {
         if (morpho.rootSections().empty()) {
             LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
-                readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
             return;
         }
-        LBERROR(Warning::WRITE_NO_SOMA,
-            readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+        LBERROR(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
 
-    HighFive::File h5_file(filename, HighFive::File::ReadWrite | HighFive::File::Create | HighFive::File::Truncate);
+    HighFive::File h5_file(filename,
+                           HighFive::File::ReadWrite | HighFive::File::Create |
+                               HighFive::File::Truncate);
 
     int sectionIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
@@ -304,8 +286,7 @@ void h5(const Morphology& morpho, const std::string& filename)
 
     if (numberOfSomaPoints != numberOfSomaDiameters)
         throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
-            "soma points", numberOfSomaPoints, "soma diameters",
-            numberOfSomaDiameters));
+            "soma points", numberOfSomaPoints, "soma diameters", numberOfSomaDiameters));
 
 
     bool hasPerimeterData = !morpho.rootSections().empty()
@@ -340,15 +321,12 @@ void h5(const Morphology& morpho, const std::string& filename)
         raw_structure.push_back({static_cast<int>(offset), section->type(), parentOnDisk});
 
         for (unsigned int i = 0; i < numberOfPoints; ++i)
-            raw_points.push_back(
-                {points[i][0], points[i][1], points[i][2], diameters[i]});
+            raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
 
         if (numberOfPerimeters > 0) {
             if (numberOfPerimeters != numberOfPoints)
-                throw WriterError(
-                    readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
-                        "points", numberOfPoints, "perimeters",
-                        numberOfPerimeters));
+                throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+                    "points", numberOfPoints, "perimeters", numberOfPerimeters));
             for (unsigned int i = 0; i < numberOfPerimeters; ++i)
                 raw_perimeters.push_back(perimeters[i]);
         }
@@ -363,10 +341,8 @@ void h5(const Morphology& morpho, const std::string& filename)
     HighFive::Group g_metadata = h5_file.createGroup("metadata");
 
     write_attribute(g_metadata, "version", std::vector<uint32_t>{1, 1});
-    write_attribute(g_metadata, "cell_family",
-        std::vector<uint32_t>{FAMILY_NEURON});
-    write_attribute(h5_file, "comment",
-        std::vector<std::string>{version_string()});
+    write_attribute(g_metadata, "cell_family", std::vector<uint32_t>{FAMILY_NEURON});
+    write_attribute(h5_file, "comment", std::vector<std::string>{version_string()});
 
     if (hasPerimeterData)
         write_dataset(h5_file, "/perimeters", raw_perimeters);
@@ -374,6 +350,6 @@ void h5(const Morphology& morpho, const std::string& filename)
     mitochondriaH5(h5_file, morpho.mitochondria());
 }
 
-} // end namespace writer
-} // end namespace mut
-} // end namespace morphio
+}  // end namespace writer
+}  // end namespace mut
+}  // end namespace morphio

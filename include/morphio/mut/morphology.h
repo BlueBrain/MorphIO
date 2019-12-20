@@ -19,18 +19,16 @@
 namespace morphio {
 namespace mut {
 bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
-    const std::shared_ptr<Section>& current);
+                          const std::shared_ptr<Section>& current);
 
 class Morphology
 {
-public:
+  public:
     Morphology()
         : _counter(0)
         , _soma(std::make_shared<Soma>())
-        , _cellProperties(std::make_shared<morphio::Property::CellLevel>(
-              morphio::Property::CellLevel()))
-    {
-    }
+        , _cellProperties(
+              std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())) {}
 
     /**
        Build a mutable Morphology from an on-disk morphology
@@ -137,8 +135,7 @@ public:
 
        If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<Section> appendRootSection(const morphio::Section&,
-        bool recursive = false);
+    std::shared_ptr<Section> appendRootSection(const morphio::Section&, bool recursive = false);
 
     /**
        Append an existing Section as a root section
@@ -146,13 +143,13 @@ public:
        If recursive == true, all descendent will be appended as well
     **/
     std::shared_ptr<Section> appendRootSection(const std::shared_ptr<Section>& section,
-        bool recursive = false);
+                                               bool recursive = false);
 
     /**
        Append a root Section
     **/
     std::shared_ptr<Section> appendRootSection(const Property::PointLevel&,
-        SectionType sectionType);
+                                               SectionType sectionType);
 
     void applyModifiers(unsigned int modifierFlags);
 
@@ -189,7 +186,7 @@ public:
     void sanitize();
     void sanitize(const morphio::readers::DebugInfo& debugInfo);
 
-private:
+  private:
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
     friend bool diff(const Morphology& left,
@@ -211,65 +208,53 @@ private:
     std::map<uint32_t, std::vector<std::shared_ptr<Section>>> _children;
 };
 
-inline const std::vector<std::shared_ptr<Section>>& Morphology::rootSections() const noexcept
-{
+inline const std::vector<std::shared_ptr<Section>>& Morphology::rootSections() const noexcept {
     return _rootSections;
 }
 
-inline const std::map<uint32_t, std::shared_ptr<Section>>& Morphology::sections() const noexcept
-{
+inline const std::map<uint32_t, std::shared_ptr<Section>>& Morphology::sections() const noexcept {
     return _sections;
 }
 
-inline std::shared_ptr<Soma>& Morphology::soma() noexcept
-{
+inline std::shared_ptr<Soma>& Morphology::soma() noexcept {
     return _soma;
 }
 
-inline const std::shared_ptr<Soma>& Morphology::soma() const noexcept
-{
+inline const std::shared_ptr<Soma>& Morphology::soma() const noexcept {
     return _soma;
 }
 
-inline Mitochondria& Morphology::mitochondria() noexcept
-{
+inline Mitochondria& Morphology::mitochondria() noexcept {
     return _mitochondria;
 }
 
-inline const Mitochondria& Morphology::mitochondria() const noexcept
-{
+inline const Mitochondria& Morphology::mitochondria() const noexcept {
     return _mitochondria;
 }
 
-inline const std::vector<Property::Annotation>& Morphology::annotations() const noexcept
-{
+inline const std::vector<Property::Annotation>& Morphology::annotations() const noexcept {
     return _annotations;
 }
 
-inline const std::shared_ptr<Section>& Morphology::section(uint32_t id) const
-{
+inline const std::shared_ptr<Section>& Morphology::section(uint32_t id) const {
     return _sections.at(id);
 }
 
-inline SomaType Morphology::somaType() const noexcept
-{
+inline SomaType Morphology::somaType() const noexcept {
     return _soma->type();
 }
 
-inline CellFamily Morphology::cellFamily() const noexcept
-{
+inline CellFamily Morphology::cellFamily() const noexcept {
     return _cellProperties->_cellFamily;
 }
 
-inline MorphologyVersion Morphology::version() const noexcept
-{
+inline MorphologyVersion Morphology::version() const noexcept {
     return _cellProperties->_version;
 }
 
-inline void Morphology::addAnnotation(const morphio::Property::Annotation& annotation)
-{
+inline void Morphology::addAnnotation(const morphio::Property::Annotation& annotation) {
     _annotations.push_back(annotation);
 }
 
-} // namespace mut
-} // namespace morphio
+}  // namespace mut
+}  // namespace morphio

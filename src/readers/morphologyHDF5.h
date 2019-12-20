@@ -1,11 +1,11 @@
 #pragma once
-#include <memory> // std::unique_ptr
-#include <string> // std::string
-#include <vector> // std::vector
+#include <memory>  // std::unique_ptr
+#include <string>  // std::string
+#include <vector>  // std::vector
 
+#include <morphio/errorMessages.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
-#include <morphio/errorMessages.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
@@ -17,12 +17,14 @@ Property::Properties load(const std::string& uri);
 
 class MorphologyHDF5
 {
-public:
-    MorphologyHDF5(const std::string& uri) : _err(uri), _uri(uri){}
+  public:
+    MorphologyHDF5(const std::string& uri)
+        : _err(uri)
+        , _uri(uri) {}
     virtual ~MorphologyHDF5() = default;
     Property::Properties load();
 
-private:
+  private:
     void _checkVersion(const std::string& source);
     void _selectRepairStage();
     void _resolveV1();
@@ -56,6 +58,6 @@ private:
     ErrorMessages _err;
     std::string _uri;
 };
-} // namespace h5
-} // namespace readers
-} // namespace morphio
+}  // namespace h5
+}  // namespace readers
+}  // namespace morphio

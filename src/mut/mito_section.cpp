@@ -3,40 +3,32 @@
 
 namespace morphio {
 namespace mut {
-MitoSection::MitoSection(
-    Mitochondria* mitochondria, unsigned int id_,
-    const Property::MitochondriaPointLevel& pointProperties)
+MitoSection::MitoSection(Mitochondria* mitochondria,
+                         unsigned int id_,
+                         const Property::MitochondriaPointLevel& pointProperties)
     : _id(id_)
     , _mitochondria(mitochondria)
-    , _mitoPoints(pointProperties)
-{
-}
+    , _mitoPoints(pointProperties) {}
 
-MitoSection::MitoSection(Mitochondria* mitochondria, unsigned int id_,
-    const morphio::MitoSection& section)
-    : MitoSection(mitochondria, id_,
-          Property::MitochondriaPointLevel(
-                      section._properties->_mitochondriaPointLevel,
-                      section._range))
-{
-}
+MitoSection::MitoSection(Mitochondria* mitochondria,
+                         unsigned int id_,
+                         const morphio::MitoSection& section)
+    : MitoSection(mitochondria,
+                  id_,
+                  Property::MitochondriaPointLevel(section._properties->_mitochondriaPointLevel,
+                                                   section._range)) {}
 
-MitoSection::MitoSection(Mitochondria* mitochondria, unsigned int id_,
-    const MitoSection& section)
+MitoSection::MitoSection(Mitochondria* mitochondria, unsigned int id_, const MitoSection& section)
     : _id(id_)
     , _mitochondria(mitochondria)
-    , _mitoPoints(section._mitoPoints)
-{
-}
+    , _mitoPoints(section._mitoPoints) {}
 
 std::shared_ptr<MitoSection> MitoSection::appendSection(
-    const Property::MitochondriaPointLevel& points)
-{
+    const Property::MitochondriaPointLevel& points) {
     unsigned int parentId = id();
 
-    std::shared_ptr<MitoSection> ptr(new MitoSection(_mitochondria,
-        _mitochondria->_counter,
-        points));
+    std::shared_ptr<MitoSection> ptr(
+        new MitoSection(_mitochondria, _mitochondria->_counter, points));
 
     uint32_t childId = _mitochondria->_register(ptr);
 
@@ -46,11 +38,9 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
 }
 
 std::shared_ptr<MitoSection> MitoSection::appendSection(
-    const std::shared_ptr<MitoSection>& original_section, bool recursive)
-{
-    std::shared_ptr<MitoSection> ptr(new MitoSection(_mitochondria,
-        _mitochondria->_counter,
-        *original_section));
+    const std::shared_ptr<MitoSection>& original_section, bool recursive) {
+    std::shared_ptr<MitoSection> ptr(
+        new MitoSection(_mitochondria, _mitochondria->_counter, *original_section));
     unsigned int parentId = id();
     uint32_t id_ = _mitochondria->_register(ptr);
 
@@ -66,12 +56,10 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
     return ptr;
 }
 
-std::shared_ptr<MitoSection> MitoSection::appendSection(
-    const morphio::MitoSection& section, bool recursive)
-{
-    std::shared_ptr<MitoSection> ptr(new MitoSection(_mitochondria,
-        _mitochondria->_counter,
-        section));
+std::shared_ptr<MitoSection> MitoSection::appendSection(const morphio::MitoSection& section,
+                                                        bool recursive) {
+    std::shared_ptr<MitoSection> ptr(
+        new MitoSection(_mitochondria, _mitochondria->_counter, section));
     unsigned int parentId = id();
     uint32_t childId = _mitochondria->_register(ptr);
 
@@ -87,13 +75,11 @@ std::shared_ptr<MitoSection> MitoSection::appendSection(
     return ptr;
 }
 
-std::shared_ptr<MitoSection> MitoSection::parent() const
-{
+std::shared_ptr<MitoSection> MitoSection::parent() const {
     return _mitochondria->_sections.at(_mitochondria->_parent.at(id()));
 }
 
-bool MitoSection::isRoot() const
-{
+bool MitoSection::isRoot() const {
     try {
         parent();
         return false;
@@ -102,8 +88,7 @@ bool MitoSection::isRoot() const
     }
 }
 
-const std::vector<std::shared_ptr<MitoSection>>& MitoSection::children() const
-{
+const std::vector<std::shared_ptr<MitoSection>>& MitoSection::children() const {
     const auto& children = _mitochondria->_children;
     const auto it = children.find(id());
     if (it == children.end()) {
@@ -113,5 +98,5 @@ const std::vector<std::shared_ptr<MitoSection>>& MitoSection::children() const
     return it->second;
 }
 
-} // namespace mut
-} // namespace morphio
+}  // namespace mut
+}  // namespace morphio

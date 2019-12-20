@@ -13,66 +13,47 @@ namespace readers {
 namespace asc {
 namespace {
 
-bool is_eof(Token type)
-{
+bool is_eof(Token type) {
     return type == Token::EOF_;
 }
 
-bool is_end_of_branch(Token type)
-{
-    return (type == Token::GENERATED ||
-            type == Token::HIGH ||
-            type == Token::INCOMPLETE ||
-            type == Token::LOW ||
-            type == Token::NORMAL ||
-            type == Token::MIDPOINT);
+bool is_end_of_branch(Token type) {
+    return (type == Token::GENERATED || type == Token::HIGH || type == Token::INCOMPLETE ||
+            type == Token::LOW || type == Token::NORMAL || type == Token::MIDPOINT);
 }
 
-bool is_neurite_type(Token id)
-{
-    return (id == Token::AXON ||
-            id == Token::APICAL ||
-            id == Token::DENDRITE ||
+bool is_neurite_type(Token id) {
+    return (id == Token::AXON || id == Token::APICAL || id == Token::DENDRITE ||
             id == Token::CELLBODY);
 }
 
-bool is_end_of_section(Token id)
-{
+bool is_end_of_section(Token id) {
     return (id == Token::RPAREN || id == Token::PIPE);
 }
 
-bool skip_sexp(size_t id)
-{
-    return (id == +Token::WORD ||
-            id == +Token::STRING ||
-            id == +Token::COLOR ||
-            id == +Token::GENERATED ||
-            id == +Token::HIGH ||
-            id == +Token::INCOMPLETE ||
-            id == +Token::LOW ||
-            id == +Token::NORMAL);
+bool skip_sexp(size_t id) {
+    return (id == +Token::WORD || id == +Token::STRING || id == +Token::COLOR ||
+            id == +Token::GENERATED || id == +Token::HIGH || id == +Token::INCOMPLETE ||
+            id == +Token::LOW || id == +Token::NORMAL);
 }
-}
+}  // namespace
 
 class NeurolucidaParser
 {
-public:
+  public:
     explicit NeurolucidaParser(const std::string& uri)
         : uri_(uri)
         , lex_(uri)
         , debugInfo_(uri)
-        , err_(uri)
-    {
-    }
+        , err_(uri) {}
 
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
-    morphio::mut::Morphology& parse()
-    {
+    morphio::mut::Morphology& parse() {
         std::ifstream ifs(uri_);
         std::string input((std::istreambuf_iterator<char>(ifs)),
-            (std::istreambuf_iterator<char>()));
+                          (std::istreambuf_iterator<char>()));
 
         lex_.start_parse(input);
 
@@ -81,18 +62,15 @@ public:
         return nb_;
     }
 
-private:
-    std::tuple<Point, float> parse_point(NeurolucidaLexer& lex)
-    {
+  private:
+    std::tuple<Point, float> parse_point(NeurolucidaLexer& lex) {
         lex.expect(Token::LPAREN, "Point should start in LPAREN");
-        std::array<float, 4> point {}; // X,Y,Z,R
+        std::array<float, 4> point{};  // X,Y,Z,R
         for (auto& p : point) {
             try {
                 p = std::stof(lex.consume()->str());
             } catch (const std::invalid_argument&) {
-                throw RawDataError(
-                    err_.ERROR_PARSING_POINT(lex.line_num(),
-                        lex.current()->str()));
+                throw RawDataError(err_.ERROR_PARSING_POINT(lex.line_num(), lex.current()->str()));
             }
         }
 
@@ -104,18 +82,17 @@ private:
 
         lex.consume(Token::RPAREN, "Point should end in RPAREN");
 
-        return std::tuple<Point, float>({point[0], point[1], point[2]},
-            point[3]);
+        return std::tuple<Point, float>({point[0], point[1], point[2]}, point[3]);
     }
 
-    bool parse_neurite_branch(int32_t parent_id, Token token)
-    {
+    bool parse_neurite_branch(int32_t parent_id, Token token) {
         lex_.consume(Token::LPAREN, "New branch should start with LPAREN");
 
         bool ret = true;
         while (true) {
             ret &= parse_neurite_section(parent_id, token);
-            if (lex_.ended() || (lex_.current()->id != +Token::PIPE && lex_.current()->id != +Token::LPAREN)) {
+            if (lex_.ended() ||
+                (lex_.current()->id != +Token::PIPE && lex_.current()->id != +Token::LPAREN)) {
                 break;
             }
             lex_.consume();
@@ -127,8 +104,7 @@ private:
     int32_t _create_soma_or_section(Token token,
                                     int32_t parent_id,
                                     std::vector<Point>& points,
-                                    std::vector<float>& diameters)
-    {
+                                    std::vector<float>& diameters) {
         lex_.current_section_start_ = lex_.line_num();
         int32_t return_id;
         morphio::Property::PointLevel properties;
@@ -136,8 +112,7 @@ private:
         properties._diameters = diameters;
         if (token == Token::CELLBODY) {
             if (!nb_.soma()->points().empty())
-                throw SomaError(
-                    err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
+                throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
             nb_.soma()->properties() = properties;
 
             return_id = -1;
@@ -153,12 +128,13 @@ private:
             } else {
                 std::shared_ptr<morphio::mut::Section> section;
                 if (parent_id > -1)
-                    section = nb_.section(static_cast<unsigned int>(parent_id))->appendSection(properties, section_type);
+                    section = nb_.section(static_cast<unsigned int>(parent_id))
+                                  ->appendSection(properties, section_type);
                 else
                     section = nb_.appendRootSection(properties, section_type);
                 return_id = static_cast<int>(section->id());
                 debugInfo_.setLineNumber(section->id(),
-                    static_cast<unsigned int>(lex_.current_section_start_));
+                                         static_cast<unsigned int>(lex_.current_section_start_));
             }
         }
         points.clear();
@@ -185,10 +161,8 @@ private:
                                    (9 -10 0 2)
                                  )
      */
-    void insertLastPointParentSection(int32_t parentId,
-        morphio::Property::PointLevel& properties)
-    {
-        if (parentId < 0) // Discard root sections
+    void insertLastPointParentSection(int32_t parentId, morphio::Property::PointLevel& properties) {
+        if (parentId < 0)  // Discard root sections
             return;
         auto parent = nb_.section(static_cast<unsigned int>(parentId));
         auto lastParentPoint = parent->points()[parent->points().size() - 1];
@@ -198,12 +172,10 @@ private:
             return;
 
         properties._points.insert(properties._points.begin(), lastParentPoint);
-        properties._diameters.insert(properties._diameters.begin(),
-            lastParentDiameter);
+        properties._diameters.insert(properties._diameters.begin(), lastParentDiameter);
     }
 
-    bool parse_neurite_section(int32_t parent_id, Token token)
-    {
+    bool parse_neurite_section(int32_t parent_id, Token token) {
         Points points;
         std::vector<float> diameters;
         auto section_id = static_cast<int>(nb_.sections().size());
@@ -239,30 +211,25 @@ private:
                     diameters.push_back(radius);
                 } else if (peek_id == +Token::LPAREN) {
                     if (!points.empty()) {
-                        section_id = _create_soma_or_section(token, parent_id,
-                            points, diameters);
+                        section_id = _create_soma_or_section(token, parent_id, points, diameters);
                     }
                     parse_neurite_branch(section_id, token);
                 } else {
                     throw RawDataError(
-                        err_.ERROR_UNKNOWN_TOKEN(lex_.line_num(),
-                            lex_.peek()->str()));
+                        err_.ERROR_UNKNOWN_TOKEN(lex_.line_num(), lex_.peek()->str()));
                 }
             } else {
-                throw RawDataError(
-                    err_.ERROR_UNKNOWN_TOKEN(lex_.line_num(),
-                        lex_.peek()->str()));
+                throw RawDataError(err_.ERROR_UNKNOWN_TOKEN(lex_.line_num(), lex_.peek()->str()));
             }
         }
     }
 
-    bool parse_block()
-    {
+    bool parse_block() {
         // parse the top level blocks, and if they are a neurite, otherwise skip
         while (!lex_.ended()) {
             const auto peek_id = static_cast<Token>(lex_.peek()->id);
             if (is_neurite_type(peek_id)) {
-                lex_.consume(); // Advance to NeuriteType
+                lex_.consume();  // Advance to NeuriteType
                 const auto current_id = static_cast<Token>(lex_.current()->id);
 
                 lex_.consume();
@@ -282,15 +249,14 @@ private:
     std::string uri_;
     NeurolucidaLexer lex_;
 
-public:
+  public:
     DebugInfo debugInfo_;
 
-private:
+  private:
     ErrorMessages err_;
 };
 
-Property::Properties load(const std::string& uri, unsigned int options)
-{
+Property::Properties load(const std::string& uri, unsigned int options) {
     NeurolucidaParser parser(uri);
 
     morphio::mut::Morphology& nb_ = parser.parse();
@@ -303,6 +269,6 @@ Property::Properties load(const std::string& uri, unsigned int options)
     return properties;
 }
 
-} // namespace asc
-} // namespace readers
-} // namespace morphio
+}  // namespace asc
+}  // namespace readers
+}  // namespace morphio

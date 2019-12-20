@@ -20,8 +20,7 @@ namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
 SomaType getSomaType(long unsigned int nSomaPoints);
 
-Morphology::Morphology(const std::string& source, unsigned int options)
-{
+Morphology::Morphology(const std::string& source, unsigned int options) {
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos)
         LBTHROW(UnknownFileType("File has no extension"));
@@ -41,8 +40,7 @@ Morphology::Morphology(const std::string& source, unsigned int options)
             return readers::asc::load(source, options);
         if (extension == ".swc" || extension == ".SWC")
             return readers::swc::load(source, options);
-        LBTHROW(UnknownFileType(
-            "Unhandled file type: only SWC, ASC and H5 are supported"));
+        LBTHROW(UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported"));
     };
 
     _properties = std::make_shared<Property::Properties>(loader());
@@ -55,18 +53,18 @@ Morphology::Morphology(const std::string& source, unsigned int options)
     // Sad trick because, contrary to SWC and ASC, H5 does not create a
     // mut::Morphology object on which we can directly call
     // mut::Morphology::applyModifiers
-    if (options && (version() == MORPHOLOGY_VERSION_H5_1 || version() == MORPHOLOGY_VERSION_H5_1_1 || version() == MORPHOLOGY_VERSION_H5_2)) {
+    if (options &&
+        (version() == MORPHOLOGY_VERSION_H5_1 || version() == MORPHOLOGY_VERSION_H5_1_1 ||
+         version() == MORPHOLOGY_VERSION_H5_2)) {
         mut::Morphology mutable_morph(*this);
         mutable_morph.sanitize();
         mutable_morph.applyModifiers(options);
-        _properties = std::make_shared<Property::Properties>(
-            mutable_morph.buildReadOnly());
+        _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
         buildChildren(_properties);
     }
 }
 
-Morphology::Morphology(mut::Morphology morphology)
-{
+Morphology::Morphology(mut::Morphology morphology) {
     morphology.sanitize();
     _properties = std::make_shared<Property::Properties>(morphology.buildReadOnly());
     buildChildren(_properties);
@@ -77,31 +75,27 @@ Morphology& Morphology::operator=(Morphology&&) noexcept = default;
 
 Morphology::~Morphology() = default;
 
-Soma Morphology::soma() const
-{
+Soma Morphology::soma() const {
     return Soma(_properties);
 }
 
-Mitochondria Morphology::mitochondria() const
-{
+Mitochondria Morphology::mitochondria() const {
     return Mitochondria(_properties);
 }
 
-const std::vector<Property::Annotation>& Morphology::annotations() const
-{
+const std::vector<Property::Annotation>& Morphology::annotations() const {
     return _properties->_annotations;
 }
 
-Section Morphology::section(uint32_t id) const
-{
+Section Morphology::section(uint32_t id) const {
     return {id, _properties};
 }
 
-std::vector<Section> Morphology::rootSections() const
-{
+std::vector<Section> Morphology::rootSections() const {
     std::vector<Section> result;
     try {
-        const std::vector<uint32_t>& children = _properties->children<morphio::Property::Section>().at(-1);
+        const std::vector<uint32_t>& children =
+            _properties->children<morphio::Property::Section>().at(-1);
         result.reserve(children.size());
         for (auto id : children) {
             result.push_back(section(id));
@@ -113,8 +107,7 @@ std::vector<Section> Morphology::rootSections() const
     }
 }
 
-std::vector<Section> Morphology::sections() const
-{
+std::vector<Section> Morphology::sections() const {
     // TODO: Make this more performant when needed
     std::vector<Section> sections_;
     auto count = _properties->get<morphio::Property::Section>().size();
@@ -126,91 +119,78 @@ std::vector<Section> Morphology::sections() const
 }
 
 template <typename Property>
-const std::vector<typename Property::Type>& Morphology::get() const
-{
+const std::vector<typename Property::Type>& Morphology::get() const {
     return _properties->get<Property>();
 }
 
-const Points& Morphology::points() const noexcept
-{
+const Points& Morphology::points() const noexcept {
     return get<Property::Point>();
 }
 
-std::vector<uint32_t> Morphology::sectionOffsets() const
-{
+std::vector<uint32_t> Morphology::sectionOffsets() const {
     const std::vector<Property::Section::Type>& indices_and_parents = get<Property::Section>();
     auto size = indices_and_parents.size();
-    std::vector<uint32_t> indices(size+1);
-    std::transform(indices_and_parents.begin(), indices_and_parents.end(), indices.begin(),
+    std::vector<uint32_t> indices(size + 1);
+    std::transform(indices_and_parents.begin(),
+                   indices_and_parents.end(),
+                   indices.begin(),
                    [](const Property::Section::Type& pair) { return pair[0]; });
     indices[size] = static_cast<uint32_t>(points().size());
     return indices;
 }
 
-const std::vector<float>& Morphology::diameters() const
-{
+const std::vector<float>& Morphology::diameters() const {
     return get<Property::Diameter>();
 }
 
-const std::vector<float>& Morphology::perimeters() const
-{
+const std::vector<float>& Morphology::perimeters() const {
     return get<Property::Perimeter>();
 }
 
-const std::vector<SectionType>& Morphology::sectionTypes() const
-{
+const std::vector<SectionType>& Morphology::sectionTypes() const {
     return get<Property::SectionType>();
 }
 
-const CellFamily& Morphology::cellFamily() const
-{
+const CellFamily& Morphology::cellFamily() const {
     return _properties->cellFamily();
 }
 
-const SomaType& Morphology::somaType() const
-{
+const SomaType& Morphology::somaType() const {
     return _properties->somaType();
 }
 
-const MorphologyVersion& Morphology::version() const
-{
+const MorphologyVersion& Morphology::version() const {
     return _properties->version();
 }
 
-depth_iterator Morphology::depth_begin() const
-{
+depth_iterator Morphology::depth_begin() const {
     return depth_iterator(*this);
 }
 
-depth_iterator Morphology::depth_end() const
-{
+depth_iterator Morphology::depth_end() const {
     return depth_iterator();
 }
 
-breadth_iterator Morphology::breadth_begin() const
-{
+breadth_iterator Morphology::breadth_begin() const {
     return breadth_iterator(*this);
 }
 
-breadth_iterator Morphology::breadth_end() const
-{
+breadth_iterator Morphology::breadth_end() const {
     return breadth_iterator();
 }
 
-SomaType getSomaType(long unsigned int nSomaPoints)
-{
+SomaType getSomaType(long unsigned int nSomaPoints) {
     try {
         return std::map<long unsigned int, SomaType>{{0, SOMA_UNDEFINED},
-            {1, SOMA_SINGLE_POINT},
-            {2, SOMA_UNDEFINED}}
+                                                     {1, SOMA_SINGLE_POINT},
+                                                     {2, SOMA_UNDEFINED}}
             .at(nSomaPoints);
     } catch (const std::out_of_range&) {
         return SOMA_SIMPLE_CONTOUR;
     }
 }
 
-void buildChildren(std::shared_ptr<Property::Properties> properties)
-{
+void buildChildren(std::shared_ptr<Property::Properties> properties) {
     {
         const auto& sections = properties->get<Property::Section>();
         auto& children = properties->_sectionLevel._children;
@@ -232,4 +212,4 @@ void buildChildren(std::shared_ptr<Property::Properties> properties)
     }
 }
 
-} // namespace morphio
+}  // namespace morphio

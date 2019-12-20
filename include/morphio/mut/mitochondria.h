@@ -1,7 +1,7 @@
 #pragma once
 
-#include <memory>
 #include <map>
+#include <memory>
 
 #include <morphio/mito_section.h>
 #include <morphio/properties.h>
@@ -13,7 +13,8 @@ namespace morphio {
 namespace mut {
 
 using mito_upstream_iterator = morphio::upstream_iterator_t<std::shared_ptr<MitoSection>>;
-using mito_breadth_iterator = morphio::breadth_iterator_t<std::shared_ptr<MitoSection>, Mitochondria>;
+using mito_breadth_iterator =
+    morphio::breadth_iterator_t<std::shared_ptr<MitoSection>, Mitochondria>;
 using mito_depth_iterator = morphio::depth_iterator_t<std::shared_ptr<MitoSection>, Mitochondria>;
 
 /**
@@ -27,11 +28,10 @@ using mito_depth_iterator = morphio::depth_iterator_t<std::shared_ptr<MitoSectio
 class Mitochondria
 {
     using MitoSectionP = std::shared_ptr<MitoSection>;
-public:
+
+  public:
     Mitochondria()
-        : _counter(0)
-    {
-    }
+        : _counter(0) {}
 
     const std::vector<MitoSectionP>& children(const MitoSectionP&) const;
     const MitoSectionP& section(uint32_t id) const;
@@ -85,8 +85,7 @@ public:
     /**
        Append a new root MitoSection
     **/
-    MitoSectionP appendRootSection(
-        const Property::MitochondriaPointLevel& points);
+    MitoSectionP appendRootSection(const Property::MitochondriaPointLevel& points);
 
     /**
        Append a root MitoSection
@@ -94,15 +93,14 @@ public:
        If recursive == true, all descendent mito sections will be appended as
     well
     **/
-    MitoSectionP appendRootSection(const morphio::MitoSection&,
-        bool recursive = false);
+    MitoSectionP appendRootSection(const morphio::MitoSection&, bool recursive = false);
     MitoSectionP appendRootSection(const MitoSectionP&, bool recursive = false);
 
     const MitoSectionP& mitoSection(uint32_t id) const;
 
     void _buildMitochondria(Property::Properties& properties) const;
 
-private:
+  private:
     friend class MitoSection;
 
     uint32_t _register(const MitoSectionP& section);
@@ -114,15 +112,14 @@ private:
     std::map<uint32_t, MitoSectionP> _sections;
 };
 
-inline const std::map<uint32_t, Mitochondria::MitoSectionP>& Mitochondria::sections() const noexcept
-{
+inline const std::map<uint32_t, Mitochondria::MitoSectionP>& Mitochondria::sections() const
+    noexcept {
     return _sections;
 }
 
-inline const std::vector<Mitochondria::MitoSectionP>& Mitochondria::rootSections() const noexcept
-{
+inline const std::vector<Mitochondria::MitoSectionP>& Mitochondria::rootSections() const noexcept {
     return _rootSections;
 }
 
-} // namespace mut
-} // namespace morphio
+}  // namespace mut
+}  // namespace morphio

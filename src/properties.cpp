@@ -11,35 +11,32 @@ namespace morphio {
 namespace Property {
 
 PointLevel::PointLevel(std::vector<Point::Type> points,
-    std::vector<Diameter::Type> diameters,
-    std::vector<Perimeter::Type> perimeters)
+                       std::vector<Diameter::Type> diameters,
+                       std::vector<Perimeter::Type> perimeters)
     : _points(std::move(points))
     , _diameters(std::move(diameters))
-    , _perimeters(std::move(perimeters))
-{
+    , _perimeters(std::move(perimeters)) {
     if (_points.size() != _diameters.size())
         throw SectionBuilderError(
-            "Point vector have size: " + std::to_string(_points.size()) + " while Diameter vector has size: " + std::to_string(_diameters.size()));
+            "Point vector have size: " + std::to_string(_points.size()) +
+            " while Diameter vector has size: " + std::to_string(_diameters.size()));
 
     if (_perimeters.size() > 0 && _points.size() != _perimeters.size())
         throw SectionBuilderError(
-            "Point vector have size: " + std::to_string(_points.size()) + " while Perimeter vector has size: " + std::to_string(_perimeters.size()));
+            "Point vector have size: " + std::to_string(_points.size()) +
+            " while Perimeter vector has size: " + std::to_string(_perimeters.size()));
 }
 
 PointLevel::PointLevel(const PointLevel& data)
-    : PointLevel(data._points, data._diameters, data._perimeters)
-{
-}
+    : PointLevel(data._points, data._diameters, data._perimeters) {}
 
-PointLevel::PointLevel(const PointLevel& data, SectionRange range)
-{
+PointLevel::PointLevel(const PointLevel& data, SectionRange range) {
     _points = copySpan<Property::Point>(data._points, range);
     _diameters = copySpan<Property::Diameter>(data._diameters, range);
     _perimeters = copySpan<Property::Perimeter>(data._perimeters, range);
 }
 
-PointLevel& PointLevel::operator=(const PointLevel& other)
-{
+PointLevel& PointLevel::operator=(const PointLevel& other) {
     if (&other == this)
         return *this;
 
@@ -50,25 +47,27 @@ PointLevel& PointLevel::operator=(const PointLevel& other)
 }
 
 template <typename T>
-bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
-    const std::string& name, LogLevel logLevel)
-{
+bool compare(const std::vector<T>& vec1,
+             const std::vector<T>& vec2,
+             const std::string& name,
+             LogLevel logLevel) {
     if (vec1 == vec2)
         return true;
 
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR)
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
+                        " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     if (logLevel > LogLevel::ERROR) {
-        LBERROR(Warning::UNDEFINED,
-            "Error comparing " + name + ", elements differ:");
+        LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
         for (unsigned int i = 0; i < vec1.size(); ++i) {
             if (vec1[i] != vec2[i]) {
-                LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                LBERROR(Warning::UNDEFINED,
+                        std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
             }
         }
     }
@@ -77,23 +76,26 @@ bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
 }
 
 static bool compare_section_structure(const std::vector<Section::Type>& vec1,
-    const std::vector<Section::Type>& vec2,
-    const std::string& name, LogLevel logLevel)
-{
+                                      const std::vector<Section::Type>& vec2,
+                                      const std::string& name,
+                                      LogLevel logLevel) {
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR)
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
+                        " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     for (unsigned int i = 1; i < vec1.size(); ++i) {
         if (vec1[i][0] - vec1[1][0] != vec2[i][0] - vec2[1][0] || vec1[i][1] != vec2[i][1]) {
             if (logLevel > LogLevel::ERROR) {
+                LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 LBERROR(Warning::UNDEFINED,
-                    "Error comparing " + name + ", elements differ:");
-                LBERROR(Warning::UNDEFINED,
-                    std::to_string(vec1[i][0] - vec1[1][0]) + ", " + std::to_string(vec1[i][1]) + " <--> " + std::to_string(vec2[i][0] - vec2[1][0]) + ", " + std::to_string(vec2[i][1]));
+                        std::to_string(vec1[i][0] - vec1[1][0]) + ", " +
+                            std::to_string(vec1[i][1]) + " <--> " +
+                            std::to_string(vec2[i][0] - vec2[1][0]) + ", " +
+                            std::to_string(vec2[i][1]));
             }
             return false;
         }
@@ -103,22 +105,24 @@ static bool compare_section_structure(const std::vector<Section::Type>& vec1,
 }
 
 template <typename T>
-bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
-    const std::string& name, LogLevel logLevel)
-{
+bool compare(const morphio::range<T>& vec1,
+             const morphio::range<T>& vec2,
+             const std::string& name,
+             LogLevel logLevel) {
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR)
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
+                        " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     const float epsilon = 1e-6f;
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(vec1[i] - vec2[i]) > epsilon) {
+            LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", elements differ:");
-            LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                    std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
             LBERROR(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
             return false;
         }
@@ -128,13 +132,14 @@ bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
 
 template <>
 bool compare(const morphio::range<const morphio::Point>& vec1,
-    const morphio::range<const morphio::Point>& vec2,
-    const std::string& name, LogLevel logLevel)
-{
+             const morphio::range<const morphio::Point>& vec2,
+             const std::string& name,
+             LogLevel logLevel) {
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR)
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
+                        " vs " + std::to_string(vec2.size()));
         return false;
     }
 
@@ -142,9 +147,9 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
             if (logLevel > LogLevel::ERROR) {
+                LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 LBERROR(Warning::UNDEFINED,
-                    "Error comparing " + name + ", elements differ:");
-                LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                        std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
                 LBERROR(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
             }
             return false;
@@ -154,15 +159,17 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
 }
 
 template <typename T, typename U>
-bool compare(const std::map<T, U>& vec1, const std::map<T, U>& vec2,
-    const std::string& name, LogLevel logLevel)
-{
+bool compare(const std::map<T, U>& vec1,
+             const std::map<T, U>& vec2,
+             const std::string& name,
+             LogLevel logLevel) {
     if (vec1 == vec2)
         return true;
     if (logLevel > LogLevel::ERROR) {
         if (vec1.size() != vec2.size()) {
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
+                        " vs " + std::to_string(vec2.size()));
         }
     }
 
@@ -170,8 +177,7 @@ bool compare(const std::map<T, U>& vec1, const std::map<T, U>& vec2,
 }
 
 template <typename T>
-bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLevel)
-{
+bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLevel) {
     if (el1 == el2)
         return true;
 
@@ -180,49 +186,42 @@ bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLe
     return false;
 }
 
-bool SectionLevel::diff(const SectionLevel& other, LogLevel logLevel) const
-{
+bool SectionLevel::diff(const SectionLevel& other, LogLevel logLevel) const {
     return !(this == &other ||
              (compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
               compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
               compare(this->_children, other._children, "_children", logLevel)));
 }
 
-bool SectionLevel::operator==(const SectionLevel& other) const
-{
+bool SectionLevel::operator==(const SectionLevel& other) const {
     return !diff(other, LogLevel::ERROR);
 }
 
-bool SectionLevel::operator!=(const SectionLevel& other) const
-{
+bool SectionLevel::operator!=(const SectionLevel& other) const {
     return diff(other, LogLevel::ERROR);
 }
 
-bool CellLevel::diff(const CellLevel& other, LogLevel logLevel) const
-{
+bool CellLevel::diff(const CellLevel& other, LogLevel logLevel) const {
     if (logLevel && this->_cellFamily != other._cellFamily) {
         std::cout << "this->_cellFamily: " << this->_cellFamily << '\n'
                   << "other._cellFamily: " << other._cellFamily << '\n';
     }
     return !(this == &other || (this->_cellFamily == other._cellFamily
-                                 // this->_somaType == other._somaType
-                                 ));
+                                // this->_somaType == other._somaType
+                                ));
 }
 
-bool CellLevel::operator==(const CellLevel& other) const
-{
+bool CellLevel::operator==(const CellLevel& other) const {
     return !diff(other, LogLevel::ERROR);
 }
 
-bool CellLevel::operator!=(const CellLevel& other) const
-{
+bool CellLevel::operator!=(const CellLevel& other) const {
     return diff(other, LogLevel::ERROR);
 }
 
 
-MitochondriaPointLevel::MitochondriaPointLevel(
-    const MitochondriaPointLevel& data, const SectionRange& range)
-{
+MitochondriaPointLevel::MitochondriaPointLevel(const MitochondriaPointLevel& data,
+                                               const SectionRange& range) {
     _sectionIds = copySpan<Property::MitoNeuriteSectionId>(data._sectionIds, range);
     _relativePathLengths = copySpan<Property::MitoPathLength>(data._relativePathLengths, range);
     _diameters = copySpan<Property::MitoDiameter>(data._diameters, range);
@@ -234,189 +233,166 @@ MitochondriaPointLevel::MitochondriaPointLevel(
     std::vector<MitoDiameter::Type> diameters)
     : _sectionIds(std::move(sectionIds))
     , _relativePathLengths(std::move(relativePathLengths))
-    , _diameters(std::move(diameters))
-{
+    , _diameters(std::move(diameters)) {
     if (_sectionIds.size() != _relativePathLengths.size())
         throw SectionBuilderError(
             "While building MitochondriaPointLevel:\n"
             "section IDs vector have size: " +
-            std::to_string(_sectionIds.size()) + " while relative path length vector has size: " + std::to_string(_relativePathLengths.size()));
+            std::to_string(_sectionIds.size()) + " while relative path length vector has size: " +
+            std::to_string(_relativePathLengths.size()));
 
     if (_sectionIds.size() != _diameters.size())
         throw SectionBuilderError(
             "While building MitochondriaPointLevel:\n"
             "section IDs vector have size: " +
-            std::to_string(_sectionIds.size()) + " while diameter vector has size: " + std::to_string(_diameters.size()));
+            std::to_string(_sectionIds.size()) +
+            " while diameter vector has size: " + std::to_string(_diameters.size()));
 }
 
-bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other, LogLevel logLevel) const
-{
+bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other,
+                                    LogLevel logLevel) const {
     return !(this == &other ||
              (compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
               compare(this->_children, other._children, "_children", logLevel)));
 }
 
-bool MitochondriaSectionLevel::operator==(const MitochondriaSectionLevel& other) const
-{
+bool MitochondriaSectionLevel::operator==(const MitochondriaSectionLevel& other) const {
     return !diff(other, LogLevel::ERROR);
 }
 
-bool MitochondriaSectionLevel::operator!=(const MitochondriaSectionLevel& other) const
-{
+bool MitochondriaSectionLevel::operator!=(const MitochondriaSectionLevel& other) const {
     return diff(other, LogLevel::ERROR);
 }
 
-bool MitochondriaPointLevel::diff(const MitochondriaPointLevel& other, LogLevel logLevel) const
-{
+bool MitochondriaPointLevel::diff(const MitochondriaPointLevel& other, LogLevel logLevel) const {
     return !(this == &other ||
              (compare(this->_sectionIds, other._sectionIds, "mito section ids", logLevel) &&
-              compare(this->_relativePathLengths, other._relativePathLengths, "mito relative pathlength", logLevel) &&
+              compare(this->_relativePathLengths,
+                      other._relativePathLengths,
+                      "mito relative pathlength",
+                      logLevel) &&
               compare(this->_diameters, other._diameters, "mito section diameters", logLevel)));
 }
 
-bool MitochondriaPointLevel::operator==(const MitochondriaPointLevel& other) const
-{
+bool MitochondriaPointLevel::operator==(const MitochondriaPointLevel& other) const {
     return !diff(other, LogLevel::ERROR);
 }
 
-bool MitochondriaPointLevel::operator!=(const MitochondriaPointLevel& other) const
-{
+bool MitochondriaPointLevel::operator!=(const MitochondriaPointLevel& other) const {
     return diff(other, LogLevel::ERROR);
 }
 
-Annotation::Annotation(AnnotationType type, uint32_t sectionId,
-    PointLevel points, std::string details,
-    int32_t lineNumber)
+Annotation::Annotation(AnnotationType type,
+                       uint32_t sectionId,
+                       PointLevel points,
+                       std::string details,
+                       int32_t lineNumber)
     : _type(type)
     , _sectionId(sectionId)
     , _points(std::move(points))
     , _lineNumber(lineNumber)
-    , _details(std::move(details))
-{
-}
+    , _details(std::move(details)) {}
 
 template <>
-std::vector<Section::Type>& Properties::get<Section>() noexcept
-{
+std::vector<Section::Type>& Properties::get<Section>() noexcept {
     return _sectionLevel._sections;
 }
 
 template <>
-const std::vector<Section::Type>& Properties::get<Section>() const noexcept
-{
+const std::vector<Section::Type>& Properties::get<Section>() const noexcept {
     return _sectionLevel._sections;
 }
 
 template <>
-std::vector<MitoSection::Type>& Properties::get<MitoSection>() noexcept
-{
+std::vector<MitoSection::Type>& Properties::get<MitoSection>() noexcept {
     return _mitochondriaSectionLevel._sections;
 }
 
 template <>
-const std::vector<MitoSection::Type>& Properties::get<MitoSection>() const noexcept
-{
+const std::vector<MitoSection::Type>& Properties::get<MitoSection>() const noexcept {
     return _mitochondriaSectionLevel._sections;
 }
 
 template <>
-std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>() noexcept
-{
+std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>() noexcept {
     return _mitochondriaPointLevel._sectionIds;
 }
 
 template <>
-const std::vector<MitoNeuriteSectionId::Type>&
-    Properties::get<MitoNeuriteSectionId>() const noexcept
-{
+const std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>() const
+    noexcept {
     return _mitochondriaPointLevel._sectionIds;
 }
 
 template <>
-const std::vector<Point::Type>& Properties::get<Point>() const noexcept
-{
+const std::vector<Point::Type>& Properties::get<Point>() const noexcept {
     return _pointLevel._points;
 }
 template <>
-std::vector<Point::Type>& Properties::get<Point>() noexcept
-{
+std::vector<Point::Type>& Properties::get<Point>() noexcept {
     return _pointLevel._points;
 }
 
 template <>
-const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept
-{
+const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept {
     return _sectionLevel._sectionTypes;
 }
 template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept
-{
+std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept {
     return _sectionLevel._sectionTypes;
 }
 
 template <>
-const std::vector<Perimeter::Type>& Properties::get<Perimeter>() const noexcept
-{
+const std::vector<Perimeter::Type>& Properties::get<Perimeter>() const noexcept {
     return _pointLevel._perimeters;
 }
 
 template <>
-std::vector<Perimeter::Type>& Properties::get<Perimeter>() noexcept
-{
+std::vector<Perimeter::Type>& Properties::get<Perimeter>() noexcept {
     return _pointLevel._perimeters;
 }
 
 template <>
-const std::vector<Diameter::Type>& Properties::get<Diameter>() const noexcept
-{
+const std::vector<Diameter::Type>& Properties::get<Diameter>() const noexcept {
     return _pointLevel._diameters;
 }
 
 template <>
-std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept
-{
+std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept {
     return _pointLevel._diameters;
 }
 
 template <>
-const std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() const noexcept
-{
+const std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() const noexcept {
     return _mitochondriaPointLevel._diameters;
 }
 
 template <>
-std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() noexcept
-{
+std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() noexcept {
     return _mitochondriaPointLevel._diameters;
 }
 
 template <>
-const std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() const noexcept
-{
+const std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() const noexcept {
     return _mitochondriaPointLevel._relativePathLengths;
 }
 
 template <>
-std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() noexcept
-{
+std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() noexcept {
     return _mitochondriaPointLevel._relativePathLengths;
 }
 
 template <>
-const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>() const noexcept
-{
+const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>() const noexcept {
     return _sectionLevel._children;
 }
 
 template <>
-const std::map<int32_t, std::vector<uint32_t>>&
-    Properties::children<MitoSection>() const noexcept
-{
+const std::map<int32_t, std::vector<uint32_t>>& Properties::children<MitoSection>() const noexcept {
     return _mitochondriaSectionLevel._children;
 }
 
-std::ostream& operator<<(std::ostream& os, const PointLevel& prop)
-{
+std::ostream& operator<<(std::ostream& os, const PointLevel& prop) {
     os << "Point level properties:\n"
        << "Point Diameter"
        << (prop._perimeters.size() == prop._points.size() ? " Perimeter\n" : "\n");
@@ -429,13 +405,12 @@ std::ostream& operator<<(std::ostream& os, const PointLevel& prop)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const Properties& properties)
-{
+std::ostream& operator<<(std::ostream& os, const Properties& properties) {
     os << properties._pointLevel << '\n';
     // os << _sectionLevel << '\n';
     // os << _cellLevel << '\n';
     return os;
 }
 
-} // namespace Property
-} // namespace morphio
+}  // namespace Property
+}  // namespace morphio

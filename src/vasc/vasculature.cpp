@@ -1,5 +1,5 @@
-#include <unistd.h> // access / F_OK
-#include <cstdint> // uint32_t
+#include <cstdint>   // uint32_t
+#include <unistd.h>  // access / F_OK
 
 #include <morphio/vasc/section.h>
 #include <morphio/vasc/vasculature.h>
@@ -12,8 +12,7 @@ namespace vasculature {
 
 void buildConnectivity(std::shared_ptr<property::Properties> properties);
 
-Vasculature::Vasculature(const std::string& source)
-{
+Vasculature::Vasculature(const std::string& source) {
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos) {
         LBTHROW(UnknownFileType("File has no extension"));
@@ -37,13 +36,11 @@ Vasculature::Vasculature(const std::string& source)
     buildConnectivity(_properties);
 }
 
-Section Vasculature::section(const uint32_t& id) const
-{
+Section Vasculature::section(const uint32_t& id) const {
     return {id, _properties};
 }
 
-std::vector<Section> Vasculature::sections() const
-{
+std::vector<Section> Vasculature::sections() const {
     std::vector<Section> sections_;
     const auto& vasc_sections = _properties->get<property::VascSection>();
     sections_.reserve(vasc_sections.size());
@@ -53,19 +50,17 @@ std::vector<Section> Vasculature::sections() const
     return sections_;
 }
 
-graph_iterator Vasculature::begin() const
-{
+graph_iterator Vasculature::begin() const {
     return graph_iterator(*this);
 }
 
-graph_iterator Vasculature::end() const
-{
+graph_iterator Vasculature::end() const {
     return graph_iterator();
 }
 
-void buildConnectivity(std::shared_ptr<property::Properties> properties)
-{
-    const std::vector<std::array<unsigned int, 2>>& connectivity = properties->get<property::Connection>();
+void buildConnectivity(std::shared_ptr<property::Properties> properties) {
+    const std::vector<std::array<unsigned int, 2>>& connectivity =
+        properties->get<property::Connection>();
     auto& successors = properties->_sectionLevel._successors;
     auto& predecessors = properties->_sectionLevel._predecessors;
 
@@ -77,5 +72,5 @@ void buildConnectivity(std::shared_ptr<property::Properties> properties)
     }
 }
 
-} // namespace vasculature
-} // namespace morphio
+}  // namespace vasculature
+}  // namespace morphio

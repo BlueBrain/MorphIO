@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory> // std::shared_ptr
-#include <string> // std::string
-#include <vector> // std::vector
+#include <memory>  // std::shared_ptr
+#include <string>  // std::string
+#include <vector>  // std::vector
 
 #include <morphio/types.h>
 #include <morphio/vasc/iterators.hpp>
@@ -15,7 +15,7 @@ using graph_iterator = graph_iterator_t<Section, Vasculature>;
 
 class Vasculature
 {
-public:
+  public:
     /** @name Read API */
     /** Open the given source to a vasculature file and parse it.
      */
@@ -56,11 +56,11 @@ public:
 
     /**
      * graph iterators
-    **/
+     **/
     graph_iterator begin() const;
     graph_iterator end() const;
 
-private:
+  private:
     std::shared_ptr<property::Properties> _properties;
 
     template <typename Property>
@@ -68,25 +68,21 @@ private:
 };
 
 template <typename Property>
-inline const std::vector<typename Property::Type>& Vasculature::get() const noexcept
-{
+inline const std::vector<typename Property::Type>& Vasculature::get() const noexcept {
     return _properties->get<Property>();
 }
 
-inline const Points& Vasculature::points() const noexcept
-{
+inline const Points& Vasculature::points() const noexcept {
     return get<property::Point>();
 }
 
-inline const std::vector<float>& Vasculature::diameters() const noexcept
-{
+inline const std::vector<float>& Vasculature::diameters() const noexcept {
     return get<property::Diameter>();
 }
 
-inline const std::vector<property::SectionType::Type>& Vasculature::sectionTypes() const noexcept
-{
+inline const std::vector<property::SectionType::Type>& Vasculature::sectionTypes() const noexcept {
     return get<property::SectionType>();
 }
 
-} // namespace vasculature
-} // namespace morphio
+}  // namespace vasculature
+}  // namespace morphio

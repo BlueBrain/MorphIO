@@ -7,8 +7,8 @@ namespace morphio {
 namespace readers {
 namespace swc {
 Property::Properties load(const std::string& uri, unsigned int options);
-} // namespace swc
+}  // namespace swc
 
-} // namespace readers
+}  // namespace readers
 
-} // namespace morphio
+}  // namespace morphio

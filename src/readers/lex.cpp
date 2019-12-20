@@ -9,8 +9,7 @@
 namespace morphio {
 namespace readers {
 namespace asc {
-enum class Token
-{
+enum class Token {
     EOF_,
     WS = 1,
     NEWLINE,
@@ -44,18 +43,15 @@ enum class Token
     MIDPOINT,
 };
 
-const std::map<Token, SectionType> TokenSectionTypeMap{
-    {Token::AXON, SECTION_AXON},
-    {Token::APICAL, SECTION_APICAL_DENDRITE},
-    {Token::DENDRITE, SECTION_DENDRITE}};
+const std::map<Token, SectionType> TokenSectionTypeMap{{Token::AXON, SECTION_AXON},
+                                                       {Token::APICAL, SECTION_APICAL_DENDRITE},
+                                                       {Token::DENDRITE, SECTION_DENDRITE}};
 
-constexpr bool operator==(int lhs, Token type)
-{
+constexpr bool operator==(int lhs, Token type) {
     return lhs == static_cast<int>(type);
 }
 
-inline std::string to_string(Token t)
-{
+inline std::string to_string(Token t) {
     switch (t) {
 #define Q(x) #x
 #define T(TOK)         \
@@ -94,19 +90,17 @@ inline std::string to_string(Token t)
     }
 }
 
-inline std::ostream& operator<<(std::ostream& ostr, Token t)
-{
+inline std::ostream& operator<<(std::ostream& ostr, Token t) {
     return ostr << to_string(t);
 }
 
-constexpr std::size_t operator+(Token type)
-{
+constexpr std::size_t operator+(Token type) {
     return static_cast<std::size_t>(type);
 }
 
 class NeurolucidaLexer
 {
-private:
+  private:
     std::string uri_;
     bool debug_;
     ErrorMessages err_;
@@ -119,20 +113,18 @@ private:
     mutable size_t current_line_num_ = 1;
     mutable size_t next_line_num_ = 1;
 
-public:
+  public:
     size_t current_section_start_ = 0;
 
     explicit NeurolucidaLexer(const std::string& uri, bool debug = false)
         : uri_(uri)
         , debug_(debug)
-        , err_(uri)
-    {
+        , err_(uri) {
         lexertl::rules rules;
         build_lexer(rules);
     }
 
-    void start_parse(const std::string& input)
-    {
+    void start_parse(const std::string& input) {
         current_ = next_ = lexertl::siterator(input.begin(), input.end(), sm_);
         // will set the above, current_ to next_, AND consume whitespace
         size_t n_skipped = skip_whitespace(current_);
@@ -142,8 +134,7 @@ public:
         consume();
     }
 
-    void build_lexer(lexertl::rules& rules_)
-    {
+    void build_lexer(lexertl::rules& rules_) {
         rules_.push("\n", +Token::NEWLINE);
         rules_.push("[ \t\r]+", +Token::WS);
         rules_.push(";[^\n]*", +Token::COMMENT);
@@ -184,11 +175,16 @@ public:
         }
     }
 
-    size_t line_num() const noexcept { return current_line_num_; }
-    const lexertl::siterator& current() const noexcept { return current_; }
-    const lexertl::siterator& peek() const noexcept { return next_; }
-    size_t skip_whitespace(lexertl::siterator& iter)
-    {
+    size_t line_num() const noexcept {
+        return current_line_num_;
+    }
+    const lexertl::siterator& current() const noexcept {
+        return current_;
+    }
+    const lexertl::siterator& peek() const noexcept {
+        return next_;
+    }
+    size_t skip_whitespace(lexertl::siterator& iter) {
         const lexertl::siterator end;
         size_t endlines = 0;
         while (iter != end) {
@@ -204,14 +200,12 @@ public:
         return endlines;
     }
 
-    bool ended() const
-    {
+    bool ended() const {
         const lexertl::siterator end;
         return current() == end;
     }
 
-    lexertl::siterator consume(Token t, const std::string& msg = "")
-    {
+    lexertl::siterator consume(Token t, const std::string& msg = "") {
         if (!msg.empty()) {
             expect(t, msg.c_str());
         } else {
@@ -220,8 +214,7 @@ public:
         return consume();
     }
 
-    lexertl::siterator consume()
-    {
+    lexertl::siterator consume() {
         const lexertl::siterator end;
         if (ended()) {
             throw RawDataError(err_.ERROR_EOF_REACHED(line_num()));
@@ -245,27 +238,22 @@ public:
         return current_;
     }
 
-    void state() const
-    {
-        std::cout << "Id: " << Token(current_->id) << ", Token: '"
-                  << current_->str() << "' line: " << current_line_num_
-                  << " Next Id: " << Token(next_->id) << ", Token: '"
-                  << next_->str() << "' line: " << next_line_num_ << '\n';
+    void state() const {
+        std::cout << "Id: " << Token(current_->id) << ", Token: '" << current_->str()
+                  << "' line: " << current_line_num_ << " Next Id: " << Token(next_->id)
+                  << ", Token: '" << next_->str() << "' line: " << next_line_num_ << '\n';
     }
 
-    void expect(Token t, const char* msg) const
-    {
+    void expect(Token t, const char* msg) const {
         if (current()->id != +t) {
-            throw RawDataError(err_.ERROR_UNEXPECTED_TOKEN(line_num(),
-                to_string(t), current()->str(), msg));
+            throw RawDataError(
+                err_.ERROR_UNEXPECTED_TOKEN(line_num(), to_string(t), current()->str(), msg));
         }
     }
 
     // advance iterator until sexp is consumed, including final paren
-    void consume_until_balanced_paren()
-    {
-        expect(Token::LPAREN,
-            "consume_until_balanced_paren should start in LPAREN");
+    void consume_until_balanced_paren() {
+        expect(Token::LPAREN, "consume_until_balanced_paren should start in LPAREN");
         size_t opening_count = 1;
         while (opening_count != 0) {
             size_t id = consume()->id;
@@ -280,15 +268,13 @@ public:
                 break;
             }
             if (ended()) {
-                throw RawDataError(
-                    err_.ERROR_EOF_UNBALANCED_PARENS(line_num()));
+                throw RawDataError(err_.ERROR_EOF_UNBALANCED_PARENS(line_num()));
             }
         }
-        consume(Token::RPAREN,
-            "consume_until_balanced_paren should end in RPAREN");
+        consume(Token::RPAREN, "consume_until_balanced_paren should end in RPAREN");
     }
 };
 
-} // namespace asc
-} // namespace readers
-} // namespace morphio
+}  // namespace asc
+}  // namespace readers
+}  // namespace morphio

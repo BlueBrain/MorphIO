@@ -15,9 +15,9 @@ using upstream_iterator = morphio::upstream_iterator_t<std::shared_ptr<Section>>
 using breadth_iterator = morphio::breadth_iterator_t<std::shared_ptr<Section>, Morphology>;
 using depth_iterator = morphio::depth_iterator_t<std::shared_ptr<Section>, Morphology>;
 
-class Section : public std::enable_shared_from_this<Section>
+class Section: public std::enable_shared_from_this<Section>
 {
-public:
+  public:
     ~Section() = default;
 
     /**
@@ -91,17 +91,15 @@ public:
     upstream_iterator upstream_begin() const;
     upstream_iterator upstream_end() const;
 
-    std::shared_ptr<Section> appendSection(const morphio::Section&,
-        bool recursive = false);
+    std::shared_ptr<Section> appendSection(const morphio::Section&, bool recursive = false);
 
     std::shared_ptr<Section> appendSection(const std::shared_ptr<Section>& original_section,
-        bool recursive = false);
+                                           bool recursive = false);
 
     std::shared_ptr<Section> appendSection(
-        const Property::PointLevel&,
-        SectionType sectionType = SectionType::SECTION_UNDEFINED);
+        const Property::PointLevel&, SectionType sectionType = SectionType::SECTION_UNDEFINED);
 
-private:
+  private:
     friend class Morphology;
 
     Section(Morphology*, unsigned int id, SectionType type, const Property::PointLevel&);
@@ -116,62 +114,51 @@ private:
 
 std::ostream& operator<<(std::ostream&, const std::shared_ptr<Section>&);
 
-inline uint32_t Section::id() const noexcept
-{
+inline uint32_t Section::id() const noexcept {
     return _id;
 }
 
-inline SectionType& Section::type() noexcept
-{
+inline SectionType& Section::type() noexcept {
     return _sectionType;
 }
 
-inline const SectionType& Section::type() const noexcept
-{
+inline const SectionType& Section::type() const noexcept {
     return _sectionType;
 }
 
-inline std::vector<Point>& Section::points() noexcept
-{
+inline std::vector<Point>& Section::points() noexcept {
     return _pointProperties._points;
 }
 
-inline const std::vector<Point>& Section::points() const noexcept
-{
+inline const std::vector<Point>& Section::points() const noexcept {
     return _pointProperties._points;
 }
 
-inline std::vector<float>& Section::diameters() noexcept
-{
+inline std::vector<float>& Section::diameters() noexcept {
     return _pointProperties._diameters;
 }
 
-inline const std::vector<float>& Section::diameters() const noexcept
-{
+inline const std::vector<float>& Section::diameters() const noexcept {
     return _pointProperties._diameters;
 }
 
-inline std::vector<float>& Section::perimeters() noexcept
-{
+inline std::vector<float>& Section::perimeters() noexcept {
     return _pointProperties._perimeters;
 }
 
-inline const std::vector<float>& Section::perimeters() const noexcept
-{
+inline const std::vector<float>& Section::perimeters() const noexcept {
     return _pointProperties._perimeters;
 }
 
-inline Property::PointLevel& Section::properties() noexcept
-{
+inline Property::PointLevel& Section::properties() noexcept {
     return _pointProperties;
 }
 
-inline const Property::PointLevel& Section::properties() const noexcept
-{
+inline const Property::PointLevel& Section::properties() const noexcept {
     return _pointProperties;
 }
 
-} // namespace mut
-} // namespace morphio
+}  // namespace mut
+}  // namespace morphio
 
 std::ostream& operator<<(std::ostream&, const morphio::mut::Section&);

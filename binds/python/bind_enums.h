@@ -3,9 +3,4 @@
 **/
 #pragma once
 
-enum IterType
-{
-    DEPTH_FIRST,
-    BREADTH_FIRST,
-    UPSTREAM
-};
+enum IterType { DEPTH_FIRST, BREADTH_FIRST, UPSTREAM };

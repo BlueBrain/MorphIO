@@ -1,17 +1,13 @@
 #pragma once
 
-#include <memory> //std::unique_ptr
+#include <memory>  //std::unique_ptr
 
-#include <morphio/section_iterators.hpp>
 #include <morphio/properties.h>
+#include <morphio/section_iterators.hpp>
 #include <morphio/types.h>
 
 namespace morphio {
-enum SomaClasses
-{
-    SOMA_CONTOUR,
-    SOMA_CYLINDER
-};
+enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
 
 using breadth_iterator = breadth_iterator_t<Section, Morphology>;
 using depth_iterator = depth_iterator_t<Section, Morphology>;
@@ -23,7 +19,7 @@ using depth_iterator = depth_iterator_t<Section, Morphology>;
  */
 class Morphology
 {
-public:
+  public:
     virtual ~Morphology();
 
     Morphology& operator=(const Morphology&);
@@ -142,13 +138,15 @@ public:
      **/
     const MorphologyVersion& version() const;
 
-private:
+  private:
     friend class mut::Morphology;
-    friend bool diff(const Morphology& left, const Morphology& right, morphio::enums::LogLevel verbose);
+    friend bool diff(const Morphology& left,
+                     const Morphology& right,
+                     morphio::enums::LogLevel verbose);
 
     std::shared_ptr<Property::Properties> _properties;
 
     template <typename Property>
     const std::vector<typename Property::Type>& get() const;
 };
-} // namespace morphio
+}  // namespace morphio

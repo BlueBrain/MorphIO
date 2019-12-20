@@ -1,12 +1,11 @@
-#include <ostream>
 #include <morphio/enums.h>
+#include <ostream>
 
 namespace morphio {
 namespace enums {
 
 /** Output stream formatter for MorphologyVersion */
-std::ostream& operator<<(std::ostream& os, const MorphologyVersion v)
-{
+std::ostream& operator<<(std::ostream& os, const MorphologyVersion v) {
     switch (v) {
     case MORPHOLOGY_VERSION_H5_1:
         return os << "h5v1";
@@ -25,8 +24,7 @@ std::ostream& operator<<(std::ostream& os, const MorphologyVersion v)
 }
 
 /** Output stream formatter for MorphologyVersion */
-std::ostream& operator<<(std::ostream& os, const SomaType v)
-{
+std::ostream& operator<<(std::ostream& os, const SomaType v) {
     switch (v) {
     case SOMA_SINGLE_POINT:
         return os << "SOMA_SINGLE_POINT";
@@ -43,5 +41,5 @@ std::ostream& operator<<(std::ostream& os, const SomaType v)
     }
 }
 
-} // namespace enums
-} // namespace morphio
+}  // namespace enums
+}  // namespace morphio
