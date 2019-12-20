@@ -1,7 +1,8 @@
+#include <pybind11/pybind11.h>
+
 #include <pybind11/iostream.h>
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
-#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 
@@ -15,11 +16,12 @@
 #include <morphio/section.h>
 #include <morphio/soma.h>
 
+#include "bindings_utils.cpp"
+
 #include "bind_immutable.cpp"
 #include "bind_misc.cpp"
 #include "bind_mutable.cpp"
 #include "bind_vasculature.cpp"
-#include "bindings_utils.cpp"
 
 namespace py = pybind11;
 using namespace py::literals;
