@@ -2,6 +2,7 @@ import os
 import numpy as np
 from numpy.testing import assert_array_equal, assert_equal, assert_raises
 from nose.tools import ok_
+import h5py
 
 from morphio.mut import Morphology
 from morphio import (SectionBuilderError, set_maximum_warnings, SectionType, PointLevel,
@@ -61,7 +62,8 @@ def test_write_basic():
     with setup_tempdir('test_write_basic') as tmp_folder:
         morpho.write(os.path.join(tmp_folder, "test_write.asc"))
         morpho.write(os.path.join(tmp_folder, "test_write.swc"))
-        morpho.write(os.path.join(tmp_folder, "test_write.h5"))
+        h5_out = os.path.join(tmp_folder, "test_write.h5")
+        morpho.write(h5_out)
 
         expected = [[0., 0., 0.], [0., 5., 0.], [0., 5., 0.], [-5., 5., 0.],
                     [0., 5., 0.], [6., 5., 0.], [0., 0., 0.], [0., -4., 0.],
@@ -69,6 +71,10 @@ def test_write_basic():
         assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.asc")).points, expected)
         assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.swc")).points, expected)
         assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")).points, expected)
+
+        with h5py.File(h5_out) as h5_file:
+            ok_(not '/perimeters' in h5_file.keys())
+
 
 
 def test_write_merge_only_child():
