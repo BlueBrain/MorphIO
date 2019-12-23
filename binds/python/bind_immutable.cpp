@@ -1,3 +1,5 @@
+#include "bind_immutable.h"
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/iostream.h>  // py::add_ostream_redirect
