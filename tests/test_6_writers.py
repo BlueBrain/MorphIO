@@ -5,6 +5,7 @@ from nose.tools import ok_
 
 from morphio.mut import Morphology
 from morphio import (SectionBuilderError, set_maximum_warnings, SectionType, PointLevel,
+                     WriterError,
                      MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect)
 
 from utils import captured_output, setup_tempdir, assert_string_equal
@@ -149,10 +150,16 @@ def test_write_perimeter():
                                      [6, 8]))
 
     with setup_tempdir('test_write_perimeter') as tmp_folder:
-        morpho.write(os.path.join(tmp_folder, "test_write.h5"))
+        h5_out = os.path.join(tmp_folder, "test_write.h5")
+        morpho.write(h5_out)
 
-        assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")).perimeters,
+        assert_array_equal(ImmutMorphology(h5_out).perimeters,
                            [5., 6., 6., 7., 6., 8.])
+
+        # Cannot right a morph with perimeter data to ASC and SWC
+        for ext in ['swc', 'asc']:
+            out_path = os.path.join(tmp_folder, "test_write_perimeter." + ext)
+            assert_raises(WriterError, morpho.write, out_path)
 
 
 def test_write_no_soma():
@@ -160,14 +167,12 @@ def test_write_no_soma():
     dendrite = morpho.append_root_section(
                                      PointLevel([[0, 0, 0],
                                                  [0, 5, 0]],
-                                                [2, 2],
-                                                [5, 6]),
+                                                [2, 2]),
                                      SectionType.basal_dendrite)
     dendrite = morpho.append_root_section(
                                      PointLevel([[0, 1, 0],
                                                  [0, 7, 0]],
-                                                [2, 2],
-                                                [5, 6]),
+                                                [2, 2]),
                                      SectionType.basal_dendrite)
 
     with setup_tempdir('test_write_no_soma') as tmp_folder:

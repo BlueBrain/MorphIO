@@ -29,6 +29,13 @@ struct base_type<std::vector<T>> : base_type<T>
 {
 };
 
+bool hasPerimeterData(const morphio::mut::Morphology& morpho)
+{
+    return !morpho.rootSections().empty()
+        ? !morpho.rootSections()[0]->perimeters().empty()
+        : false;
+}
+
 void writeLine(std::ofstream& myfile,
                int id,
                int parentId,
@@ -74,6 +81,9 @@ void swc(const Morphology& morphology, const std::string& filename)
             readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
+
+    if (hasPerimeterData(morphology))
+        throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
 
     std::ofstream myfile(filename);
     using std::setw;
@@ -170,6 +180,9 @@ void asc(const Morphology& morphology, const std::string& filename)
             readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
+
+    if (hasPerimeterData(morphology))
+        throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
 
     std::ofstream myfile(filename);
 
@@ -308,9 +321,7 @@ void h5(const Morphology& morpho, const std::string& filename)
             numberOfSomaDiameters));
 
 
-    bool hasPerimeterData = !morpho.rootSections().empty()
-                                ? !morpho.rootSections()[0]->perimeters().empty()
-                                : false;
+    bool hasPerimeterData_ = hasPerimeterData(morpho);
 
     for (unsigned int i = 0; i < numberOfSomaPoints; ++i) {
         raw_points.push_back(
@@ -319,7 +330,7 @@ void h5(const Morphology& morpho, const std::string& filename)
         // If the morphology has some perimeter data, we need to fill some
         // perimeter dummy value in the soma range of the data structure to keep
         // the length matching
-        if (hasPerimeterData)
+        if (hasPerimeterData_)
             raw_perimeters.push_back(0);
     }
 
