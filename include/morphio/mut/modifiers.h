@@ -24,8 +24,8 @@ void soma_sphere(morphio::mut::Morphology& morpho);
 
 void nrn_order(morphio::mut::Morphology& morpho);
 
-} // namespace modifiers
+}  // namespace modifiers
 
-} // namespace mut
+}  // namespace mut
 
-} // namespace morphio
+}  // namespace morphio

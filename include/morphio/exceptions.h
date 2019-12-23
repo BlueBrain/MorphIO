@@ -5,93 +5,73 @@ namespace morphio {
 /**
    Base class of all morphio errors
  **/
-class MorphioError : public std::runtime_error
+class MorphioError: public std::runtime_error
 {
-public:
+  public:
     explicit MorphioError(const std::string& _msg)
-        : std::runtime_error(_msg)
-    {
-    }
+        : std::runtime_error(_msg) {}
 };
 
-class NotImplementedError : public MorphioError
+class NotImplementedError: public MorphioError
 {
-public:
+  public:
     explicit NotImplementedError(const std::string& _msg)
-        : MorphioError(_msg)
-    {
-    }
+        : MorphioError(_msg) {}
 };
 
-class RawDataError : public MorphioError
+class RawDataError: public MorphioError
 {
-public:
+  public:
     explicit RawDataError(const std::string& _msg)
-        : MorphioError(_msg)
-    {
-    }
+        : MorphioError(_msg) {}
 };
 
-class UnknownFileType : public MorphioError
+class UnknownFileType: public MorphioError
 {
-public:
+  public:
     explicit UnknownFileType(const std::string& _msg)
-        : MorphioError(_msg)
-    {
-    }
+        : MorphioError(_msg) {}
 };
 
-class SomaError : public MorphioError
+class SomaError: public MorphioError
 {
-public:
+  public:
     explicit SomaError(const std::string& _msg)
-        : MorphioError(_msg)
-    {
-    }
+        : MorphioError(_msg) {}
 };
 
-class IDSequenceError : public RawDataError
+class IDSequenceError: public RawDataError
 {
-public:
+  public:
     explicit IDSequenceError(const std::string& _msg)
-        : RawDataError(_msg)
-    {
-    }
+        : RawDataError(_msg) {}
 };
 
-class MultipleTrees : public RawDataError
+class MultipleTrees: public RawDataError
 {
-public:
+  public:
     explicit MultipleTrees(const std::string& _msg)
-        : RawDataError(_msg)
-    {
-    }
+        : RawDataError(_msg) {}
 };
 
-class MissingParentError : public RawDataError
+class MissingParentError: public RawDataError
 {
-public:
+  public:
     explicit MissingParentError(const std::string& _msg)
-        : RawDataError(_msg)
-    {
-    }
+        : RawDataError(_msg) {}
 };
 
-class SectionBuilderError : public RawDataError
+class SectionBuilderError: public RawDataError
 {
-public:
+  public:
     explicit SectionBuilderError(const std::string& _msg)
-        : RawDataError(_msg)
-    {
-    }
+        : RawDataError(_msg) {}
 };
 
-class WriterError : public MorphioError
+class WriterError: public MorphioError
 {
-public:
+  public:
     explicit WriterError(const std::string& _msg)
-        : MorphioError(_msg)
-    {
-    }
+        : MorphioError(_msg) {}
 };
-} // namespace morphio
+}  // namespace morphio

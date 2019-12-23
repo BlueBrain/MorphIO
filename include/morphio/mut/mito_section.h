@@ -9,21 +9,19 @@ namespace mut {
 
 class MitoSection
 {
-public:
-    MitoSection(Mitochondria* mitochondria, unsigned int id,
-        const Property::MitochondriaPointLevel& pointProperties);
-    MitoSection(Mitochondria* mitochondria, unsigned int id,
-        const morphio::MitoSection& section);
+  public:
+    MitoSection(Mitochondria* mitochondria,
+                unsigned int id,
+                const Property::MitochondriaPointLevel& pointProperties);
+    MitoSection(Mitochondria* mitochondria, unsigned int id, const morphio::MitoSection& section);
     MitoSection(Mitochondria* mitochondria, unsigned int id, const MitoSection& section);
 
-    std::shared_ptr<MitoSection> appendSection(
-        const Property::MitochondriaPointLevel& points);
+    std::shared_ptr<MitoSection> appendSection(const Property::MitochondriaPointLevel& points);
 
-    std::shared_ptr<MitoSection> appendSection(
-        const std::shared_ptr<MitoSection>& original_section, bool recursive);
+    std::shared_ptr<MitoSection> appendSection(const std::shared_ptr<MitoSection>& original_section,
+                                               bool recursive);
 
-    std::shared_ptr<MitoSection> appendSection(
-        const morphio::MitoSection& section, bool recursive);
+    std::shared_ptr<MitoSection> appendSection(const morphio::MitoSection& section, bool recursive);
 
     std::shared_ptr<MitoSection> parent() const;
     bool isRoot() const;
@@ -57,52 +55,45 @@ public:
     inline std::vector<float>& pathLengths() noexcept;
     /** @} */
 
-private:
+  private:
     uint32_t _id;
 
     Mitochondria* _mitochondria;
 
-public:
+  public:
     // TODO: make private
     Property::MitochondriaPointLevel _mitoPoints;
 };
 
-inline uint32_t MitoSection::id() const noexcept
-{
+inline uint32_t MitoSection::id() const noexcept {
     return _id;
 }
 
-inline const std::vector<float>& MitoSection::diameters() const noexcept
-{
+inline const std::vector<float>& MitoSection::diameters() const noexcept {
     return _mitoPoints._diameters;
 }
 
-inline const std::vector<uint32_t>& MitoSection::neuriteSectionIds() const noexcept
-{
+inline const std::vector<uint32_t>& MitoSection::neuriteSectionIds() const noexcept {
     return _mitoPoints._sectionIds;
 }
 
-inline const std::vector<float>& MitoSection::pathLengths() const noexcept
-{
+inline const std::vector<float>& MitoSection::pathLengths() const noexcept {
     return _mitoPoints._relativePathLengths;
 }
 
-inline std::vector<float>& MitoSection::diameters() noexcept
-{
+inline std::vector<float>& MitoSection::diameters() noexcept {
     return _mitoPoints._diameters;
 }
 
-inline std::vector<uint32_t>& MitoSection::neuriteSectionIds() noexcept
-{
+inline std::vector<uint32_t>& MitoSection::neuriteSectionIds() noexcept {
     return _mitoPoints._sectionIds;
 }
 
-inline std::vector<float>& MitoSection::pathLengths() noexcept
-{
+inline std::vector<float>& MitoSection::pathLengths() noexcept {
     return _mitoPoints._relativePathLengths;
 }
 
 void friendDtorForSharedPtrMito(MitoSection* section);
 
-} // namespace mut
-} // namespace morphio
+}  // namespace mut
+}  // namespace morphio

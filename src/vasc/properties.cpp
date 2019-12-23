@@ -13,46 +13,45 @@ static bool verbose = false;
 namespace property {
 
 VascPointLevel::VascPointLevel(const std::vector<Point::Type>& points,
-    const std::vector<Diameter::Type>& diameters)
+                               const std::vector<Diameter::Type>& diameters)
     : _points(points)
-    , _diameters(diameters)
-{
+    , _diameters(diameters) {
     if (_points.size() != _diameters.size())
         throw SectionBuilderError(
-            "Point vector have size: " + std::to_string(_points.size()) + "while Diameter vector has size: " + std::to_string(_diameters.size()));
+            "Point vector have size: " + std::to_string(_points.size()) +
+            "while Diameter vector has size: " + std::to_string(_diameters.size()));
 }
 
 VascPointLevel::VascPointLevel(const VascPointLevel& data)
-    : VascPointLevel(data._points, data._diameters)
-{
-}
+    : VascPointLevel(data._points, data._diameters) {}
 
-VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range)
-{
+VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range) {
     _points = copySpan<property::Point>(data._points, range);
     _diameters = copySpan<property::Diameter>(data._diameters, range);
 }
 
 template <typename T>
-bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
-    const std::string& name, bool verbose_)
-{
+bool compare(const std::vector<T>& vec1,
+             const std::vector<T>& vec2,
+             const std::string& name,
+             bool verbose_) {
     if (vec1 == vec2)
         return true;
 
     if (vec1.size() != vec2.size()) {
         if (verbose_)
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
+                        " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     if (verbose_) {
-        LBERROR(Warning::UNDEFINED,
-            "Error comparing " + name + ", elements differ:");
+        LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
         for (unsigned int i = 0; i < vec1.size(); ++i) {
             if (vec1[i] != vec2[i]) {
-                LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                LBERROR(Warning::UNDEFINED,
+                        std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
             }
         }
     }
@@ -60,23 +59,24 @@ bool compare(const std::vector<T>& vec1, const std::vector<T>& vec2,
 }
 
 static bool compare_section_structure(const std::vector<VascSection::Type>& vec1,
-    const std::vector<VascSection::Type>& vec2,
-    const std::string& name, bool verbose_)
-{
+                                      const std::vector<VascSection::Type>& vec2,
+                                      const std::string& name,
+                                      bool verbose_) {
     if (vec1.size() != vec2.size()) {
         if (verbose_)
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
+                        " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     for (unsigned int i = 1; i < vec1.size(); ++i) {
         if (vec1[i] - vec1[1] != vec2[i] - vec2[1]) {
             if (verbose_) {
+                LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 LBERROR(Warning::UNDEFINED,
-                    "Error comparing " + name + ", elements differ:");
-                LBERROR(Warning::UNDEFINED,
-                    std::to_string(vec1[i] - vec1[1]) + " <--> " + std::to_string(vec2[i] - vec2[1]));
+                        std::to_string(vec1[i] - vec1[1]) + " <--> " +
+                            std::to_string(vec2[i] - vec2[1]));
             }
             return false;
         }
@@ -85,22 +85,24 @@ static bool compare_section_structure(const std::vector<VascSection::Type>& vec1
 }
 
 template <typename T>
-bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
-    const std::string& name, bool verbose_)
-{
+bool compare(const morphio::range<T>& vec1,
+             const morphio::range<T>& vec2,
+             const std::string& name,
+             bool verbose_) {
     if (vec1.size() != vec2.size()) {
         if (verbose_)
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
+                        " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     const float epsilon = 1e-6f;
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(vec1[i] - vec2[i]) > epsilon) {
+            LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", elements differ:");
-            LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                    std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
             LBERROR(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
             return false;
         }
@@ -110,13 +112,14 @@ bool compare(const morphio::range<T>& vec1, const morphio::range<T>& vec2,
 
 template <>
 bool compare(const morphio::range<const morphio::Point>& vec1,
-    const morphio::range<const morphio::Point>& vec2,
-    const std::string& name, bool verbose_)
-{
+             const morphio::range<const morphio::Point>& vec2,
+             const std::string& name,
+             bool verbose_) {
     if (vec1.size() != vec2.size()) {
         if (verbose_)
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
+                        " vs " + std::to_string(vec2.size()));
         return false;
     }
 
@@ -124,9 +127,9 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
             if (verbose_) {
+                LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 LBERROR(Warning::UNDEFINED,
-                    "Error comparing " + name + ", elements differ:");
-                LBERROR(Warning::UNDEFINED, std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                        std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
                 LBERROR(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
             }
             return false;
@@ -136,23 +139,24 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
 }
 
 template <typename T, typename U>
-bool compare(const std::map<T, U>& vec1, const std::map<T, U>& vec2,
-    const std::string& name, bool verbose_)
-{
+bool compare(const std::map<T, U>& vec1,
+             const std::map<T, U>& vec2,
+             const std::string& name,
+             bool verbose_) {
     if (vec1 == vec2)
         return true;
     if (verbose_) {
         if (vec1.size() != vec2.size()) {
             LBERROR(Warning::UNDEFINED,
-                "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
+                        " vs " + std::to_string(vec2.size()));
         }
     }
     return false;
 }
 
 template <typename T>
-bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
-{
+bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_) {
     if (el1 == el2)
         return true;
 
@@ -161,8 +165,10 @@ bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
     return false;
 }
 
-static bool compare(const VascPointLevel& el1, const VascPointLevel& el2, const std::string& name, bool verbose_)
-{
+static bool compare(const VascPointLevel& el1,
+                    const VascPointLevel& el2,
+                    const std::string& name,
+                    bool verbose_) {
     if (&el1 == &el2)
         return true;
 
@@ -175,21 +181,19 @@ static bool compare(const VascPointLevel& el1, const VascPointLevel& el2, const 
     return result;
 }
 
-bool VascSectionLevel::operator==(const VascSectionLevel& other) const
-{
-    return this == &other || (compare_section_structure(this->_sections, other._sections, "_sections", verbose) &&
-                                 compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) &&
-                                 compare(this->_predecessors, other._predecessors, "_predecessors", verbose) &&
-                                 compare(this->_successors, other._successors, "_successors", verbose));
+bool VascSectionLevel::operator==(const VascSectionLevel& other) const {
+    return this == &other ||
+           (compare_section_structure(this->_sections, other._sections, "_sections", verbose) &&
+            compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) &&
+            compare(this->_predecessors, other._predecessors, "_predecessors", verbose) &&
+            compare(this->_successors, other._successors, "_successors", verbose));
 }
 
-bool VascSectionLevel::operator!=(const VascSectionLevel& other) const
-{
+bool VascSectionLevel::operator!=(const VascSectionLevel& other) const {
     return !(this->operator==(other));
 }
 
-bool Properties::operator==(const Properties& other) const
-{
+bool Properties::operator==(const Properties& other) const {
     if (this == &other)
         return true;
 
@@ -197,67 +201,56 @@ bool Properties::operator==(const Properties& other) const
             compare(this->_sectionLevel, other._sectionLevel, "_sectionLevel", verbose));
 }
 
-bool Properties::operator!=(const Properties& other) const
-{
+bool Properties::operator!=(const Properties& other) const {
     return !this->operator==(other);
 }
 
 template <>
-std::vector<VascSection::Type>& Properties::get<VascSection>() noexcept
-{
+std::vector<VascSection::Type>& Properties::get<VascSection>() noexcept {
     return _sectionLevel._sections;
 }
 
 template <>
-const std::vector<VascSection::Type>& Properties::get<VascSection>() const noexcept
-{
+const std::vector<VascSection::Type>& Properties::get<VascSection>() const noexcept {
     return _sectionLevel._sections;
 }
 
 template <>
-std::vector<Point::Type>& Properties::get<Point>() noexcept
-{
+std::vector<Point::Type>& Properties::get<Point>() noexcept {
     return _pointLevel._points;
 }
 
 template <>
-const std::vector<Point::Type>& Properties::get<Point>() const noexcept
-{
+const std::vector<Point::Type>& Properties::get<Point>() const noexcept {
     return _pointLevel._points;
 }
 
 template <>
-std::vector<Connection::Type>& Properties::get<Connection>() noexcept
-{
+std::vector<Connection::Type>& Properties::get<Connection>() noexcept {
     return _connectivity;
 }
 
 template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept
-{
+std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept {
     return _sectionLevel._sectionTypes;
 }
 
 template <>
-const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept
-{
+const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept {
     return _sectionLevel._sectionTypes;
 }
 
 template <>
-std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept
-{
+std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept {
     return _pointLevel._diameters;
 }
 
 template <>
-const std::vector<Diameter::Type>& Properties::get<Diameter>() const noexcept
-{
+const std::vector<Diameter::Type>& Properties::get<Diameter>() const noexcept {
     return _pointLevel._diameters;
 }
 
-std::ostream& operator<<(std::ostream& os, const VascPointLevel& prop)
-{
+std::ostream& operator<<(std::ostream& os, const VascPointLevel& prop) {
     os << "Point level properties:\n";
     os << "Point diameter"
        << (prop._diameters.size() == prop._points.size() ? " Diameter\n" : "\n");
@@ -267,10 +260,9 @@ std::ostream& operator<<(std::ostream& os, const VascPointLevel& prop)
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const Properties& properties)
-{
+std::ostream& operator<<(std::ostream& os, const Properties& properties) {
     return os << properties._pointLevel << '\n';
 }
-} // namespace property
-} // namespace vasculature
-} // namespace morphio
+}  // namespace property
+}  // namespace vasculature
+}  // namespace morphio

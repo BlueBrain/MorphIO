@@ -9,4 +9,4 @@ int getMajor();
 int getMinor();
 int getPatch();
 
-} // namespace morphio
+}  // namespace morphio

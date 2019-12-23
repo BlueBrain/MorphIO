@@ -1,6 +1,6 @@
 #include "vasculatureHDF5.h"
 
-#include <highfive/H5Utility.hpp> // for HighFive::SilenceHDF5
+#include <highfive/H5Utility.hpp>  // for HighFive::SilenceHDF5
 
 #include "utilsHDF5.h"
 
@@ -8,15 +8,14 @@ namespace morphio {
 namespace readers {
 namespace h5 {
 
-vasculature::property::Properties VasculatureHDF5::load()
-{
+vasculature::property::Properties VasculatureHDF5::load() {
     try {
         HighFive::SilenceHDF5 silence;
         _file.reset(new HighFive::File(_uri, HighFive::File::ReadOnly));
     } catch (const HighFive::FileException& exc) {
-        LBTHROW(morphio::RawDataError(_write
-                                      ? "Could not create vasculature file "
-                                      : "Could not open vasculature file " + _uri + ": " + exc.what()));
+        LBTHROW(morphio::RawDataError(_write ? "Could not create vasculature file "
+                                             : "Could not open vasculature file " + _uri + ": " +
+                                                   exc.what()));
     }
     _readDatasets();
     _readSections();
@@ -27,8 +26,7 @@ vasculature::property::Properties VasculatureHDF5::load()
     return _properties;
 }
 
-void VasculatureHDF5::_readDatasets()
-{
+void VasculatureHDF5::_readDatasets() {
     HighFive::SilenceHDF5 silence;
     _points.reset(new HighFive::DataSet(_file->getDataSet("/points")));
     auto dataspace = _points->getSpace();
@@ -53,8 +51,7 @@ void VasculatureHDF5::_readDatasets()
     }
 }
 
-void VasculatureHDF5::_readPoints()
-{
+void VasculatureHDF5::_readPoints() {
     auto& points = _properties.get<vasculature::property::Point>();
     auto& diameters = _properties.get<vasculature::property::Diameter>();
 
@@ -67,8 +64,7 @@ void VasculatureHDF5::_readPoints()
     }
 }
 
-void VasculatureHDF5::_readSections()
-{
+void VasculatureHDF5::_readSections() {
     auto& sections = _properties.get<vasculature::property::VascSection>();
     auto selection = _sections->select({0, 0}, {_sectionsDims[0], 1});
 
@@ -81,23 +77,21 @@ void VasculatureHDF5::_readSections()
     }
 }
 
-void VasculatureHDF5::_readSectionTypes()
-{
+void VasculatureHDF5::_readSectionTypes() {
     std::vector<VascularSectionType>& types = _properties.get<vasculature::property::SectionType>();
 
     auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
     types.resize(_sectionsDims[0]);
     selection.read(types);
-    for (int type: types) {
+    for (int type : types) {
         if (type > SECTION_CUSTOM || type < 0) {
-            LBTHROW(morphio::RawDataError(
-                    _err.ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(0, static_cast<VascularSectionType>(type))));
+            LBTHROW(morphio::RawDataError(_err.ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(
+                0, static_cast<VascularSectionType>(type))));
         }
     }
 }
 
-void VasculatureHDF5::_readConnectivity()
-{
+void VasculatureHDF5::_readConnectivity() {
     std::vector<std::vector<unsigned int>> vec;
     vec.resize(_conDims[0]);
     _connectivity->read(vec);
@@ -106,6 +100,6 @@ void VasculatureHDF5::_readConnectivity()
         con.push_back({v[0], v[1]});
     }
 }
-} // namespace h5
-} // namespace readers
-} // namespace morphio
+}  // namespace h5
+}  // namespace readers
+}  // namespace morphio

@@ -49,17 +49,16 @@ float distance(const Point& left, const Point& right);
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
 std::ostream& operator<<(std::ostream& os, const Points& points);
 
-} // namespace morphio
+}  // namespace morphio
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
 std::ostream& operator<<(std::ostream& os, const morphio::Points& points);
 
 namespace std {
 template <typename T, size_t N>
-string to_string(const array<T, N>& a)
-{
+string to_string(const array<T, N>& a) {
     std::ostringstream oss;
     std::copy(a.begin(), a.end(), std::ostream_iterator<T>(oss, ", "));
     return oss.str();
 }
 
-} // namespace std
+}  // namespace std

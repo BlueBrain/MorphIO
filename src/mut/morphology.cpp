@@ -15,28 +15,22 @@
 namespace morphio {
 namespace mut {
 
-void _appendProperties(Property::PointLevel& to,
-    const Property::PointLevel& from, int offset);
+void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset);
 
 using morphio::readers::ErrorMessages;
 Morphology::Morphology(const std::string& uri, unsigned int options)
-    : Morphology(morphio::Morphology(uri, options))
-{
-}
+    : Morphology(morphio::Morphology(uri, options)) {}
 
 Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int options)
     : _counter(0)
-    , _soma(std::make_shared<Soma>(*morphology.soma()))
-{
-    _cellProperties = std::make_shared<morphio::Property::CellLevel>(
-        *morphology._cellProperties);
+    , _soma(std::make_shared<Soma>(*morphology.soma())) {
+    _cellProperties = std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties);
 
     for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
 
-    for (const std::shared_ptr<MitoSection>& root :
-        morphology.mitochondria().rootSections()) {
+    for (const std::shared_ptr<MitoSection>& root : morphology.mitochondria().rootSections()) {
         mitochondria().appendRootSection(root, true);
     }
 
@@ -45,8 +39,7 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
 
 Morphology::Morphology(const morphio::Morphology& morphology, unsigned int options)
     : _counter(0)
-    , _soma(std::make_shared<Soma>(morphology.soma()))
-{
+    , _soma(std::make_shared<Soma>(morphology.soma())) {
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(
         morphology._properties->_cellLevel);
 
@@ -55,8 +48,7 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
         appendRootSection(root, true);
     }
 
-    for (const morphio::MitoSection& root :
-        morphology.mitochondria().rootSections()) {
+    for (const morphio::MitoSection& root : morphology.mitochondria().rootSections()) {
         mitochondria().appendRootSection(root, true);
     }
 
@@ -67,8 +59,7 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
    Return false if there is no duplicate point
  **/
 bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
-    const std::shared_ptr<Section>& current)
-{
+                          const std::shared_ptr<Section>& current) {
     // Weird edge case where parent is empty: skipping it
     if (parent->points().empty())
         return true;
@@ -93,9 +84,8 @@ bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
     return true;
 }
 
-std::shared_ptr<Section> Morphology::appendRootSection(
-    const morphio::Section& section_, bool recursive)
-{
+std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& section_,
+                                                       bool recursive) {
     const std::shared_ptr<Section> ptr(new Section(this, _counter, section_));
     _register(ptr);
     _rootSections.push_back(ptr);
@@ -113,16 +103,16 @@ std::shared_ptr<Section> Morphology::appendRootSection(
     return ptr;
 }
 
-std::shared_ptr<Section> Morphology::appendRootSection(
-    const std::shared_ptr<Section>& section_, bool recursive)
-{
+std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Section>& section_,
+                                                       bool recursive) {
     const std::shared_ptr<Section> section_copy(new Section(this, _counter, *section_));
     _register(section_copy);
     _rootSections.push_back(section_copy);
 
     const bool emptySection = section_copy->points().empty();
     if (emptySection)
-        LBERROR(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
+        LBERROR(Warning::APPENDING_EMPTY_SECTION,
+                _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
 
     if (recursive) {
         for (const auto& child : section_->children()) {
@@ -133,11 +123,9 @@ std::shared_ptr<Section> Morphology::appendRootSection(
     return section_copy;
 }
 
-std::shared_ptr<Section> Morphology::appendRootSection(
-    const Property::PointLevel& pointProperties, SectionType type)
-{
-    const std::shared_ptr<Section> ptr(new Section(this, _counter, type,
-        pointProperties));
+std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLevel& pointProperties,
+                                                       SectionType type) {
+    const std::shared_ptr<Section> ptr(new Section(this, _counter, type, pointProperties));
     _register(ptr);
     _rootSections.push_back(ptr);
 
@@ -148,8 +136,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(
     return ptr;
 }
 
-uint32_t Morphology::_register(const std::shared_ptr<Section>& section_)
-{
+uint32_t Morphology::_register(const std::shared_ptr<Section>& section_) {
     if (_sections.count(section_->id()))
         LBTHROW(SectionBuilderError("Section already exists"));
     _counter = std::max(_counter, section_->id()) + 1;
@@ -158,17 +145,15 @@ uint32_t Morphology::_register(const std::shared_ptr<Section>& section_)
     return section_->id();
 }
 
-Morphology::~Morphology()
-{
-    auto roots = _rootSections; // Need to iterate on a copy
+Morphology::~Morphology() {
+    auto roots = _rootSections;  // Need to iterate on a copy
     for (const auto& root : roots) {
         deleteSection(root, true);
     }
 }
 
 static void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
-    const std::shared_ptr<Section>& section)
-{
+                         const std::shared_ptr<Section>& section) {
     vec.erase(std::remove(vec.begin(), vec.end(), section), vec.end());
 }
 
@@ -183,8 +168,7 @@ void Morphology::deleteSection(const std::shared_ptr<Section>& section_, bool re
         // The deletion must start by the furthest leaves, otherwise you may cut
         // the topology and forget to remove some sections
         std::vector<std::shared_ptr<Section>> ids;
-        std::copy(section_->breadth_begin(), breadth_end(),
-            std::back_inserter(ids));
+        std::copy(section_->breadth_begin(), breadth_end(), std::back_inserter(ids));
 
         for (auto it = ids.rbegin(); it != ids.rend(); ++it) {
             deleteSection(*it, false);
@@ -207,9 +191,7 @@ void Morphology::deleteSection(const std::shared_ptr<Section>& section_, bool re
 }
 
 
-void _appendProperties(Property::PointLevel& to,
-    const Property::PointLevel& from, int offset = 0)
-{
+void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset = 0) {
     _appendVector(to._points, from._points, offset);
     _appendVector(to._diameters, from._diameters, offset);
 
@@ -217,13 +199,11 @@ void _appendProperties(Property::PointLevel& to,
         _appendVector(to._perimeters, from._perimeters, offset);
 }
 
-void Morphology::sanitize()
-{
+void Morphology::sanitize() {
     sanitize(morphio::readers::DebugInfo());
 }
 
-void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo)
-{
+void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo) {
     morphio::readers::ErrorMessages err(debugInfo._filename);
 
     auto it = depth_begin();
@@ -239,9 +219,10 @@ void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo)
 
         unsigned int parentId = section_->parent()->id();
 
-        if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !_checkDuplicatePoint(section_->parent(), section_))
+        if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
+            !_checkDuplicatePoint(section_->parent(), section_))
             LBERROR(Warning::WRONG_DUPLICATE,
-                err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
+                    err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
 
         auto parent = section_->parent();
         bool isUnifurcation = parent->children().size() == 1;
@@ -249,37 +230,34 @@ void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo)
         // This "if" condition ensures that "unifurcations" (ie. successive
         // sections with only 1 child) get merged together into a bigger section
         if (isUnifurcation) {
-            LBERROR(Warning::ONLY_CHILD,
-                err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
+            LBERROR(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
             bool duplicate = _checkDuplicatePoint(section_->parent(), section_);
 
-            addAnnotation(morphio::Property::Annotation(morphio::AnnotationType::SINGLE_CHILD, sectionId,
-                section_->properties(), "", debugInfo.getLineNumber(parentId)));
+            addAnnotation(morphio::Property::Annotation(morphio::AnnotationType::SINGLE_CHILD,
+                                                        sectionId,
+                                                        section_->properties(),
+                                                        "",
+                                                        debugInfo.getLineNumber(parentId)));
 
-            morphio::_appendVector(parent->points(),
-                section_->points(),
-                duplicate ? 1 : 0);
+            morphio::_appendVector(parent->points(), section_->points(), duplicate ? 1 : 0);
 
-            morphio::_appendVector(parent->diameters(),
-                section_->diameters(),
-                duplicate ? 1 : 0);
+            morphio::_appendVector(parent->diameters(), section_->diameters(), duplicate ? 1 : 0);
 
             if (!parent->perimeters().empty())
                 morphio::_appendVector(parent->perimeters(),
-                    section_->perimeters(),
-                    duplicate ? 1 : 0);
+                                       section_->perimeters(),
+                                       duplicate ? 1 : 0);
 
             deleteSection(section_, false);
         }
     }
 }
 
-Property::Properties Morphology::buildReadOnly() const
-{
+Property::Properties Morphology::buildReadOnly() const {
     using std::setw;
     int sectionIdOnDisk = 0;
     std::map<uint32_t, int32_t> newIds;
-    Property::Properties properties {};
+    Property::Properties properties{};
 
     if (_cellProperties) {
         properties._cellLevel = *_cellProperties;
@@ -304,31 +282,26 @@ Property::Properties Morphology::buildReadOnly() const
     return properties;
 }
 
-depth_iterator Morphology::depth_begin() const
-{
+depth_iterator Morphology::depth_begin() const {
     return depth_iterator(*this);
 }
 
-depth_iterator Morphology::depth_end() const
-{
+depth_iterator Morphology::depth_end() const {
     return depth_iterator();
 }
 
-breadth_iterator Morphology::breadth_begin() const
-{
+breadth_iterator Morphology::breadth_begin() const {
     return breadth_iterator(*this);
 }
 
-breadth_iterator Morphology::breadth_end() const
-{
+breadth_iterator Morphology::breadth_end() const {
     return breadth_iterator();
 }
 
-void Morphology::applyModifiers(unsigned int modifierFlags)
-{
+void Morphology::applyModifiers(unsigned int modifierFlags) {
     if (modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS)
-        LBTHROW(SectionBuilderError(
-            _err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS)));
+        LBTHROW(
+            SectionBuilderError(_err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS)));
 
     if (modifierFlags & SOMA_SPHERE)
         modifiers::soma_sphere(*this);
@@ -343,8 +316,7 @@ void Morphology::applyModifiers(unsigned int modifierFlags)
         modifiers::nrn_order(*this);
 }
 
-void Morphology::write(const std::string& filename)
-{
+void Morphology::write(const std::string& filename) {
     const size_t pos = filename.find_last_of(".");
     assert(pos != std::string::npos);
 
@@ -353,8 +325,8 @@ void Morphology::write(const std::string& filename)
     morphio::mut::Morphology clean(*this);
     clean.sanitize();
 
-    for (const auto& root: clean.rootSections()) {
-        if(root->points().size() < 2)
+    for (const auto& root : clean.rootSections()) {
+        if (root->points().size() < 2)
             throw morphio::SectionBuilderError("Root sections must have at least 2 points");
     }
 
@@ -371,5 +343,5 @@ void Morphology::write(const std::string& filename)
         LBTHROW(UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename)));
 }
 
-} // end namespace mut
-} // end namespace morphio
+}  // end namespace mut
+}  // end namespace morphio

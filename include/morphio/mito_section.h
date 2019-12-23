@@ -10,12 +10,12 @@ using mito_upstream_iterator = upstream_iterator_t<MitoSection>;
 using mito_breadth_iterator = morphio::breadth_iterator_t<MitoSection, Mitochondria>;
 using mito_depth_iterator = morphio::depth_iterator_t<MitoSection, Mitochondria>;
 
-class MitoSection : public SectionBase<MitoSection>
+class MitoSection: public SectionBase<MitoSection>
 {
     using SectionId = Property::MitoSection;
     using PointAttribute = Property::MitoDiameter;
 
-public:
+  public:
     /**
        Depth first search iterator
     **/
@@ -54,13 +54,11 @@ public:
      **/
     range<const float> relativePathLengths() const;
 
-protected:
+  protected:
     MitoSection(uint32_t id_, const std::shared_ptr<Property::Properties>& morphology)
-        : SectionBase(id_, morphology)
-    {
-    }
+        : SectionBase(id_, morphology) {}
     friend MitoSection Mitochondria::section(uint32_t) const;
     friend class SectionBase<MitoSection>;
     friend class mut::MitoSection;
 };
-} // namespace morphio
+}  // namespace morphio

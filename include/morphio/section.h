@@ -2,10 +2,10 @@
 
 #include <memory>  // std::shared_ptr
 
-#include <morphio/section_iterators.hpp>
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/section_base.h>
+#include <morphio/section_iterators.hpp>
 #include <morphio/types.h>
 
 namespace morphio {
@@ -33,12 +33,12 @@ using upstream_iterator = upstream_iterator_t<Section>;
 using breadth_iterator = breadth_iterator_t<Section, Morphology>;
 using depth_iterator = depth_iterator_t<Section, Morphology>;
 
-class Section : public SectionBase<Section>
+class Section: public SectionBase<Section>
 {
     using SectionId = Property::Section;
     using PointAttribute = Property::Point;
 
-public:
+  public:
     /**
        Depth first search iterator
     **/
@@ -86,17 +86,15 @@ public:
     friend Section Morphology::section(uint32_t) const;
     friend class SectionBase<Section>;
 
-protected:
+  protected:
     Section(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
-        : SectionBase(id_, properties)
-    {}
+        : SectionBase(id_, properties) {}
 };
 
 // explicit instanciation
 template class SectionBase<Section>;
 
-} // namespace morphio
+}  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
-std::ostream& operator<<(std::ostream& os,
-    const morphio::range<const morphio::Point>& points);
+std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);

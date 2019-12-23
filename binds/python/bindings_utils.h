@@ -1,0 +1,49 @@
+#pragma once
+
+#include <pybind11/numpy.h>
+#include <pybind11/pybind11.h>
+
+#include <morphio/types.h>
+
+namespace py = pybind11;
+
+morphio::Points array_to_points(py::array_t<float>& buf);
+py::array_t<float> span_array_to_ndarray(const morphio::range<const morphio::Point>& span);
+
+template <typename T>
+py::array_t<float> span_to_ndarray(const morphio::range<const T>& span) {
+    const void* ptr = static_cast<const void*>(span.data());
+    const auto buffer_info = py::buffer_info(
+        // Cast from (const void*) to (void*) for function signature matching
+        const_cast<void*>(ptr),             /* Pointer to buffer */
+        sizeof(T),                          /* Size of one scalar */
+        py::format_descriptor<T>::format(), /* Python struct-style format descriptor */
+        1,                                  /* Number of dimensions */
+
+        // Forced cast to prevent error:
+        // template argument deduction/substitution failed */
+        {static_cast<int>(span.size())}, /* buffer dimentions */
+        {sizeof(T)});                    /* Strides (in bytes) for each index */
+    return py::array(buffer_info);
+}
+
+
+/**
+ * @brief "Casts" a Cpp sequence to a python array (no memory copies)
+ *  Python capsule handles void pointers to objects and makes sure
+ *      that they will remain alive.
+ *
+ *      https://github.com/pybind/pybind11/issues/1042#issuecomment-325941022
+ */
+template <typename Sequence>
+inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence&& seq) {
+    // Move entire object to heap. Memory handled via Python capsule
+    Sequence* seq_ptr = new Sequence(std::move(seq));
+    // Capsule shall delete sequence object when done
+    auto capsule = py::capsule(seq_ptr, [](void* p) { delete reinterpret_cast<Sequence*>(p); });
+
+    return py::array(static_cast<py::ssize_t>(seq_ptr->size()),  // shape of array
+                     seq_ptr->data(),  // c-style contiguous strides for Sequence
+                     capsule           // numpy array references this parent
+    );
+}

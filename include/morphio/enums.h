@@ -4,18 +4,11 @@
 namespace morphio {
 namespace enums {
 
-enum LogLevel
-{
-    ERROR,
-    WARNING,
-    INFO,
-    DEBUG
-};
+enum LogLevel { ERROR, WARNING, INFO, DEBUG };
 
 /** The list of modifier flags that can be passed when loading a morphology
  See morphio::mut::modifiers for more information **/
-enum Option
-{
+enum Option {
     NO_MODIFIER = 0x00,
     TWO_POINTS_SECTIONS = 0x01,
     SOMA_SPHERE = 0x02,
@@ -28,8 +21,7 @@ enum Option
    defined in ErrorMessages.
    It is used to define which warnings are ignored by the user
 **/
-enum Warning
-{
+enum Warning {
     UNDEFINED,
     MITOCHONDRIA_WRITE_NOT_SUPPORTED,
     WRITE_NO_SOMA,
@@ -44,8 +36,7 @@ enum Warning
 };
 
 /** The supported versions for morphology files. */
-enum MorphologyVersion
-{
+enum MorphologyVersion {
     MORPHOLOGY_VERSION_H5_1 = 1,
     MORPHOLOGY_VERSION_H5_2 = 2,
     MORPHOLOGY_VERSION_H5_1_1 = 3,
@@ -56,20 +47,14 @@ enum MorphologyVersion
 std::ostream& operator<<(std::ostream& os, MorphologyVersion v);
 
 
-enum AnnotationType
-{
+enum AnnotationType {
     SINGLE_CHILD,
 };
 
 /** The cell family represented by morphio::Morphology. */
-enum CellFamily
-{
-    FAMILY_NEURON = 0,
-    FAMILY_GLIA = 1
-};
+enum CellFamily { FAMILY_NEURON = 0, FAMILY_GLIA = 1 };
 
-enum SomaType
-{
+enum SomaType {
     SOMA_UNDEFINED = 0,
     SOMA_SINGLE_POINT,
     SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS,
@@ -79,14 +64,13 @@ enum SomaType
 std::ostream& operator<<(std::ostream& os, SomaType v);
 
 /** Classification of neuron substructures. */
-enum SectionType
-{
+enum SectionType {
     SECTION_UNDEFINED = 0,
-    SECTION_SOMA = 1, //!< neuron cell body
+    SECTION_SOMA = 1,  //!< neuron cell body
     SECTION_AXON = 2,
-    SECTION_DENDRITE = 3,        //!< general or basal dendrite (near to soma)
-    SECTION_APICAL_DENDRITE = 4, //!< apical dendrite (far from soma)
-    SECTION_GLIA_PROCESS = 2,    // TODO: nasty overload there
+    SECTION_DENDRITE = 3,         //!< general or basal dendrite (near to soma)
+    SECTION_APICAL_DENDRITE = 4,  //!< apical dendrite (far from soma)
+    SECTION_GLIA_PROCESS = 2,     // TODO: nasty overload there
     SECTION_GLIA_ENDFOOT = 3,
 
     // All section types equal or above this number are custom types according
@@ -105,8 +89,7 @@ enum SectionType
     SECTION_ALL = 32
 };
 
-enum VascularSectionType
-{
+enum VascularSectionType {
     SECTION_NOT_DEFINED = 0,
     SECTION_VEIN = 1,
     SECTION_ARTERY = 2,
@@ -122,8 +105,7 @@ enum VascularSectionType
  * Specify the access mode of data.
  * @version 1.4
  */
-enum AccessMode
-{
+enum AccessMode {
     MODE_READ = 0x00000001,
     MODE_WRITE = 0x00000002,
     MODE_OVERWRITE = 0x00000004 | MODE_WRITE,
@@ -131,5 +113,5 @@ enum AccessMode
     MODE_READOVERWRITE = MODE_READ | MODE_OVERWRITE
 };
 
-} // namespace enums
-} // namespace morphio
+}  // namespace enums
+}  // namespace morphio

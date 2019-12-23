@@ -7,24 +7,20 @@ namespace morphio {
 namespace mut {
 namespace modifiers {
 
-void two_points_sections(morphio::mut::Morphology& morpho)
-{
+void two_points_sections(morphio::mut::Morphology& morpho) {
     for (auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
         std::shared_ptr<Section> section = *it;
         size_t size = section->points().size();
         if (size < 2)
             continue;
         section->points() = {section->points()[0], section->points()[size - 1]};
-        section->diameters() = {section->diameters()[0],
-            section->diameters()[size - 1]};
+        section->diameters() = {section->diameters()[0], section->diameters()[size - 1]};
         if (!section->perimeters().empty())
-            section->perimeters() = {section->perimeters()[0],
-                section->perimeters()[size - 1]};
+            section->perimeters() = {section->perimeters()[0], section->perimeters()[size - 1]};
     }
 }
 
-void no_duplicate_point(morphio::mut::Morphology& morpho)
-{
+void no_duplicate_point(morphio::mut::Morphology& morpho) {
     for (auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
         std::shared_ptr<Section> section = *it;
         size_t size = section->points().size();
@@ -40,8 +36,7 @@ void no_duplicate_point(morphio::mut::Morphology& morpho)
     }
 }
 
-void soma_sphere(morphio::mut::Morphology& morpho)
-{
+void soma_sphere(morphio::mut::Morphology& morpho) {
     auto soma = morpho.soma();
     float size = static_cast<float>(soma->points().size());
 
@@ -56,30 +51,23 @@ void soma_sphere(morphio::mut::Morphology& morpho)
     }
 
     for (auto point : soma->points()) {
-        r += sqrtf(powf(point[0] - x, 2) +
-                   powf(point[1] - y, 2) +
-                   powf(point[2] - z, 2)) /
-             size;
+        r += sqrtf(powf(point[0] - x, 2) + powf(point[1] - y, 2) + powf(point[2] - z, 2)) / size;
     }
 
     soma->points() = {{x, y, z}};
     soma->diameters() = {r};
 }
 
-static bool NRN_order_comparator(std::shared_ptr<Section> a,
-    std::shared_ptr<Section> b)
-{
+static bool NRN_order_comparator(std::shared_ptr<Section> a, std::shared_ptr<Section> b) {
     return a->type() < b->type();
 }
 
-void nrn_order(morphio::mut::Morphology& morpho)
-{
-    std::sort(morpho._rootSections.begin(), morpho._rootSections.end(),
-        NRN_order_comparator);
+void nrn_order(morphio::mut::Morphology& morpho) {
+    std::sort(morpho._rootSections.begin(), morpho._rootSections.end(), NRN_order_comparator);
 }
 
-} // namespace modifiers
+}  // namespace modifiers
 
-} // namespace mut
+}  // namespace mut
 
-} // namespace morphio
+}  // namespace morphio

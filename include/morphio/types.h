@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory> // std::shared_ptr
-#include <string> // std::string
-#include <vector> // std::vector
+#include <memory>  // std::shared_ptr
+#include <string>  // std::string
+#include <vector>  // std::vector
 
 #include <gsl/gsl>
 #include <morphio/enums.h>
@@ -31,12 +31,12 @@ struct Properties;
 namespace vasculature {
 class Section;
 class Vasculature;
-}
+}  // namespace vasculature
 
 namespace readers {
 struct DebugInfo;
 class ErrorMessages;
-} // namespace readers
+}  // namespace readers
 
 namespace mut {
 class Section;
@@ -44,11 +44,11 @@ class MitoSection;
 class Soma;
 class Morphology;
 class Mitochondria;
-} // namespace mut
+}  // namespace mut
 
 using SectionRange = std::pair<size_t, size_t>;
 
 template <typename T>
 using range = gsl::span<T>;
 
-} // namespace morphio
+}  // namespace morphio

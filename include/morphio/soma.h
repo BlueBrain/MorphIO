@@ -27,7 +27,7 @@ namespace morphio {
  */
 class Soma
 {
-public:
+  public:
     /**
      * Return the  coordinates (x,y,z) of all soma points
      **/
@@ -65,7 +65,7 @@ public:
      */
     float maxDistance() const;
 
-private:
+  private:
     explicit Soma(const std::shared_ptr<Property::Properties>&);
     // TODO: find out why the following line does not work
     // when friend class Morphology; is removed
@@ -77,19 +77,16 @@ private:
     std::shared_ptr<Property::Properties> _properties;
 };
 
-inline range<const Point> Soma::points() const noexcept
-{
+inline range<const Point> Soma::points() const noexcept {
     return _properties->_somaLevel._points;
 }
 
-inline range<const float> Soma::diameters() const noexcept
-{
+inline range<const float> Soma::diameters() const noexcept {
     return _properties->_somaLevel._diameters;
 }
 
-inline SomaType Soma::type() const noexcept
-{
+inline SomaType Soma::type() const noexcept {
     return _properties->_cellLevel._somaType;
 }
 
-} // namespace morphio
+}  // namespace morphio

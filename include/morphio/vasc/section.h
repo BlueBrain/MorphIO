@@ -1,6 +1,6 @@
 #pragma once
-#include <memory> // std::shared_ptr
-#include <vector> // std::vector
+#include <memory>  // std::shared_ptr
+#include <vector>  // std::vector
 
 #include <morphio/types.h>
 #include <morphio/vasc/properties.h>
@@ -13,7 +13,7 @@ class Section
     using SectionId = property::VascSection;
     using PointAttribute = property::Point;
 
-public:
+  public:
     Section(const Section& section) = default;
 
     Section& operator=(const Section& section);
@@ -69,7 +69,7 @@ public:
      */
     VascularSectionType type() const;
 
-protected:
+  protected:
     template <typename Property>
     range<const typename Property::Type> get() const;
 
@@ -78,8 +78,8 @@ protected:
     std::shared_ptr<property::Properties> _properties;
 };
 
-} // namespace vasculature
-} // namespace morphio
+}  // namespace vasculature
+}  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::vasculature::Section& section);
 std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);
