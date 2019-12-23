@@ -86,6 +86,7 @@ foreach(TARGET morphio_shared morphio_static)
     SYSTEM
     PUBLIC
      $<BUILD_INTERFACE:${MORPHIO_INCLUDE_DIR}>
+     $<INSTALL_INTERFACE:include>
      $<TARGET_PROPERTY:gsl-lite,INTERFACE_INCLUDE_DIRECTORIES>
     PRIVATE
      $<TARGET_PROPERTY:HighFive,INTERFACE_INCLUDE_DIRECTORIES>
@@ -99,5 +100,4 @@ install(
   TARGETS morphio_shared
   EXPORT MorphIOTargets
   LIBRARY DESTINATION lib
-  PUBLIC_HEADER DESTINATION include
   )

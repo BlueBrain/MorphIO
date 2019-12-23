@@ -11,7 +11,7 @@ option(${PROJECT_NAME}_CXX_WARNINGS "Compile C++ with warnings" ON)
 include(${PROJECT_SOURCE_DIR}/CMake/CompilerFlags.cmake)
 set(CMAKE_CXX_FLAGS "${FLAGS}")
 
-set(MORPHIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include)
+set(MORPHIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/)
 
 add_subdirectory(3rdparty)
 add_subdirectory(src)
