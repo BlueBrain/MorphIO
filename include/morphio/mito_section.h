@@ -54,10 +54,7 @@ class MitoSection: public SectionBase<MitoSection>
      **/
     range<const float> relativePathLengths() const;
 
-    /** Return the morphological type of this section (dendrite, axon, ...). */
-    SectionType type() const;
-
-  protected:
+protected:
     MitoSection(uint32_t id_, const std::shared_ptr<Property::Properties>& morphology)
         : SectionBase(id_, morphology) {}
     friend MitoSection Mitochondria::section(uint32_t) const;
