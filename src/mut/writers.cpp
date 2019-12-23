@@ -379,7 +379,7 @@ void h5(const Morphology& morpho, const std::string& filename)
     write_attribute(h5_file, "comment",
         std::vector<std::string>{version_string()});
 
-    if (hasPerimeterData)
+    if (hasPerimeterData_)
         write_dataset(h5_file, "/perimeters", raw_perimeters);
 
     mitochondriaH5(h5_file, morpho.mitochondria());
