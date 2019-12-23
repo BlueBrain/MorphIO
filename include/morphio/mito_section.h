@@ -54,7 +54,7 @@ class MitoSection: public SectionBase<MitoSection>
      **/
     range<const float> relativePathLengths() const;
 
-protected:
+  protected:
     MitoSection(uint32_t id_, const std::shared_ptr<Property::Properties>& morphology)
         : SectionBase(id_, morphology) {}
     friend MitoSection Mitochondria::section(uint32_t) const;
