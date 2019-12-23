@@ -22,5 +22,6 @@ changes=$(git-clang-format 'HEAD~1')
 if [[ $(echo "$changes" | grep -n1 'changed files') ]]; then
     echo "The following files require changes to pass the current clang-format"
     echo "$changes"
+    echo "Run ./ci/check_clang_format.sh to apply the required changes to your repo"
     exit 1
 fi
