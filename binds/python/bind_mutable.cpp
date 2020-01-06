@@ -245,9 +245,6 @@ void bind_mutable_module(py::module& m) {
             "at each root section",
             "section_id"_a = -1);
 
-    using mitosection_floats_f = std::vector<float>& (morphio::mut::MitoSection::*) ();
-    using mitosection_ints_f = std::vector<uint32_t>& (morphio::mut::MitoSection::*) ();
-
     // py::nodelete needed because morphio::mut::MitoSection has a private
     // destructor
     // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
@@ -341,8 +338,7 @@ void bind_mutable_module(py::module& m) {
         .def_property("points",
                       [](py::object &obj){
                           auto& section = obj.cast<morphio::mut::Section&>();
-                          std::vector<long int> strides{static_cast<py::size_t>(sizeof(float) * 3),
-                                                        static_cast<py::size_t>(sizeof(float))};
+                          std::vector<long int> strides{sizeof(float) * 3, sizeof(float)};
                           std::vector<long int> shape{static_cast<py::ssize_t>(section.points().size()), 3};
 
                           return py::array_t<float>(shape,
