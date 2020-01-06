@@ -47,3 +47,11 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence&& seq) {
                      capsule           // numpy array references this parent
     );
 }
+
+template <typename Sequence, typename PyObj>
+inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence& seq, PyObj& ref) {
+    return py::array_t<typename Sequence::value_type>({static_cast<py::ssize_t>(seq.size())},
+                                                      {sizeof(typename Sequence::value_type)},
+                                                      seq.data(),
+                                                      ref);
+}
