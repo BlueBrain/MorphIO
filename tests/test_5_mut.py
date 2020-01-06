@@ -407,6 +407,8 @@ def test_mutate_properties():
     section.diameters = [18]
     assert_array_equal(section.diameters, [18])
 
+    section.points = np.empty((3))
+
 
 def test_mutate_mito_properties():
     morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
@@ -416,9 +418,18 @@ def test_mutate_mito_properties():
     section.diameters[0] = 14
     assert_array_equal(section.diameters, [14, 30, 40, 50])
 
+    with assert_raises(IndexError):
+        section.diameters[4] = 2
+
     # Test mutate the whole diamters array
     section.diameters = [18]
     assert_array_equal(section.diameters, [18])
+
+    # Set to empty
+    section.diameters = np.empty((0, 3))
+    assert_array_equal(section.diameters, [])
+    with assert_raises(IndexError):
+        section.diameters[0] = 2
 
     # Test mutate single neurite section id
     section.neurite_section_ids[0] = 14
