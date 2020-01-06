@@ -399,6 +399,11 @@ def test_mutate_properties():
     assert_array_equal(section.points,
                        [[3, 3, 3], [1, 1, 1], [2, 2, 2]])
 
+    # Test mutate with numpy indexing
+    section.points[[0, 2]] = [4, 4, 4]
+    assert_array_equal(section.points,
+                       [[4, 4, 4], [1, 1, 1], [4, 4, 4]])
+
     with assert_raises(IndexError):
         section.points[3] = [0, 0, 0]
 
