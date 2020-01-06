@@ -254,10 +254,7 @@ void bind_mutable_module(py::module& m) {
         .def_property("diameters",
                       [](py::object &obj){
                           auto& section = obj.cast<morphio::mut::MitoSection&>();
-                          return py::array_t<float>({static_cast<py::ssize_t>(section.diameters().size())},
-                                                    {sizeof(float)},
-                                                    section.diameters().data(),
-                                                    obj);
+                          return as_pyarray(section.diameters(), obj);
                       },
             [](morphio::mut::MitoSection* section,
                 const std::vector<float>& _diameters) {
@@ -267,10 +264,7 @@ void bind_mutable_module(py::module& m) {
         .def_property("relative_path_lengths",
                       [](py::object &obj){
                           auto& section = obj.cast<morphio::mut::MitoSection&>();
-                          return py::array_t<float>({static_cast<py::ssize_t>(section.pathLengths().size())},
-                                                    {sizeof(float)},
-                                                    section.pathLengths().data(),
-                                                    obj);
+                          return as_pyarray(section.pathLengths(), obj);
                       },
             [](morphio::mut::MitoSection* section,
                 const std::vector<float>& _pathLengths) {
@@ -282,10 +276,7 @@ void bind_mutable_module(py::module& m) {
         .def_property("neurite_section_ids",
                       [](py::object &obj){
                           auto& section = obj.cast<morphio::mut::MitoSection&>();
-                          return py::array_t<uint32_t>({static_cast<py::ssize_t>(section.neuriteSectionIds().size())},
-                                                       {sizeof(uint32_t)},
-                                                       section.neuriteSectionIds().data(),
-                                                       obj);
+                          return as_pyarray(section.neuriteSectionIds(), obj);
                       },
             [](morphio::mut::MitoSection* section,
                const std::vector<uint32_t>& _neuriteSectionIds) {
@@ -354,10 +345,7 @@ void bind_mutable_module(py::module& m) {
         .def_property("diameters",
              [](py::object &obj){
                  auto& section = obj.cast<morphio::mut::Section&>();
-                 return py::array_t<float>({static_cast<py::ssize_t>(section.diameters().size())},
-                                           {sizeof(float)},
-                                  section.diameters().data(),
-                                  obj);
+                 return as_pyarray(section.diameters(), obj);
              },
                       [](morphio::mut::Section* section,
                          py::array_t<float> _diameters) {
@@ -367,10 +355,7 @@ void bind_mutable_module(py::module& m) {
         .def_property("perimeters",
                       [](py::object &obj){
                           auto& section = obj.cast<morphio::mut::Section&>();
-                          return py::array_t<float>({static_cast<py::ssize_t>(section.perimeters().size())},
-                                                    {sizeof(float)},
-                                                    section.perimeters().data(),
-                                                    obj);
+                          return as_pyarray(section.perimeters(), obj);
                       },
                       [](morphio::mut::Section* section,
                          py::array_t<float> _perimeters) {
