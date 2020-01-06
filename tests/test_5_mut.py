@@ -385,3 +385,53 @@ def test_section___str__():
 def test_from_pathlib():
     neuron = Morphology(Path(_path, "simple.asc"))
     assert_equal(len(neuron.root_sections), 2)
+
+def test_mutate_properties():
+    neuron = Morphology(Path(_path, "simple.asc"))
+    section = neuron.section(1)
+
+    # Test mutate a single point
+    section.points[0] = [1, 1, 1]
+    assert_array_equal(section.points, [[1, 1, 1], [-5, 5, 0]])
+
+    # Test mutate the whole points array
+    section.points = [[3, 3, 3], [1, 1, 1], [2, 2, 2]]
+    assert_array_equal(section.points,
+                       [[3, 3, 3], [1, 1, 1], [2, 2, 2]])
+
+    # Test mutate single diameter
+    section.diameters[0] = 14
+    assert_array_equal(section.diameters, [14, 3])
+
+    # Test mutate the whole diamters array
+    section.diameters = [18]
+    assert_array_equal(section.diameters, [18])
+
+
+def test_mutate_mito_properties():
+    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    section = morpho.mitochondria.section(1)
+
+    # Test mutate single diameter
+    section.diameters[0] = 14
+    assert_array_equal(section.diameters, [14, 30, 40, 50])
+
+    # Test mutate the whole diamters array
+    section.diameters = [18]
+    assert_array_equal(section.diameters, [18])
+
+    # Test mutate single neurite section id
+    section.neurite_section_ids[0] = 14
+    assert_array_equal(section.neurite_section_ids, [14, 4, 4, 5])
+
+    # Test mutate the whole neurite section id array
+    section.neurite_section_ids = [18]
+    assert_array_equal(section.neurite_section_ids, [18])
+
+    # Test mutate single relative path length
+    section.relative_path_lengths[0] = 14
+    assert_array_equal(section.relative_path_lengths, np.array([14, 0.7, 0.8, 0.9], dtype=np.float32))
+
+    # Test mutate the whole relative path length array
+    section.relative_path_lengths = [18]
+    assert_array_equal(section.relative_path_lengths, [18])
