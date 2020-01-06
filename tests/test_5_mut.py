@@ -407,6 +407,13 @@ def test_mutate_properties():
     with assert_raises(IndexError):
         section.points[3] = [0, 0, 0]
 
+    # Test that assigning from an existing array produces a copy
+    a = np.array([[10, 10, 10], [20, 20, 20]])
+    section.points = a
+    assert_array_equal(section.points, [[10, 10, 10], [20, 20, 20]])
+    a[0] = [0, 0, 0]
+    assert_array_equal(section.points, [[10, 10, 10], [20, 20, 20]])
+
     # Set to empty
     section.points = np.empty((0, 3))
     assert_array_equal(section.points, np.empty((0, 3)))
