@@ -343,7 +343,7 @@ void bind_mutable_module(py::module& m) {
 
                           return py::array_t<float>(shape,
                                                     strides,
-                                                    static_cast<const float*>(section.points().front().data()),
+                                                    section.points().front().data(),
                                                     obj);
                       },
                       [](morphio::mut::Section* section,
