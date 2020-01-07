@@ -83,7 +83,9 @@ void swc(const Morphology& morphology, const std::string& filename)
     }
 
     if (hasPerimeterData(morphology))
+    {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
+    }
 
     std::ofstream myfile(filename);
     using std::setw;
@@ -182,7 +184,9 @@ void asc(const Morphology& morphology, const std::string& filename)
     }
 
     if (hasPerimeterData(morphology))
+    {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
+    }
 
     std::ofstream myfile(filename);
 
@@ -331,7 +335,9 @@ void h5(const Morphology& morpho, const std::string& filename)
         // perimeter dummy value in the soma range of the data structure to keep
         // the length matching
         if (hasPerimeterData_)
+        {
             raw_perimeters.push_back(0);
+        }
     }
 
     raw_structure.push_back({0, SECTION_SOMA, -1});
@@ -380,7 +386,9 @@ void h5(const Morphology& morpho, const std::string& filename)
         std::vector<std::string>{version_string()});
 
     if (hasPerimeterData_)
+    {
         write_dataset(h5_file, "/perimeters", raw_perimeters);
+    }
 
     mitochondriaH5(h5_file, morpho.mitochondria());
 }
