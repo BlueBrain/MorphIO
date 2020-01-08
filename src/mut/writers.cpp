@@ -61,7 +61,7 @@ void swc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     const auto& soma_points = soma->points();
     if (soma_points.empty() && morphology.rootSections().empty()) {
-        LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
+        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                 readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
@@ -77,13 +77,13 @@ void swc(const Morphology& morphology, const std::string& filename) {
     std::map<uint32_t, int32_t> newIds;
 
     if (!morphology.mitochondria().rootSections().empty())
-        LBERROR(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
+        printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                 readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     const auto& soma_diameters = soma->diameters();
 
     if (soma_points.empty())
-        LBERROR(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
 
     for (unsigned int i = 0; i < soma_points.size(); ++i) {
         writeLine(myfile,
@@ -155,7 +155,7 @@ static void _write_asc_section(std::ofstream& myfile,
 void asc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     if (soma->points().empty() && morphology.rootSections().empty()) {
-        LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
+        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                 readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
@@ -163,7 +163,7 @@ void asc(const Morphology& morphology, const std::string& filename) {
     std::ofstream myfile(filename);
 
     if (!morphology.mitochondria().rootSections().empty())
-        LBERROR(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
+        printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                 readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     std::map<morphio::SectionType, std::string> header;
@@ -176,7 +176,7 @@ void asc(const Morphology& morphology, const std::string& filename) {
         _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
         myfile << ")\n\n";
     } else {
-        LBERROR(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
     for (const auto& section : morphology.rootSections()) {
@@ -260,11 +260,11 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
     if (numberOfSomaPoints < 1) {
         if (morpho.rootSections().empty()) {
-            LBERROR(Warning::WRITE_EMPTY_MORPHOLOGY,
+            printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                     readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
             return;
         }
-        LBERROR(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
 

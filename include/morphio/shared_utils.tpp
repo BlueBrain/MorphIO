@@ -43,7 +43,7 @@ float _somaSurface(const SomaType type,
     case SOMA_UNDEFINED:
     default: {
         morphio::readers::ErrorMessages err;
-        LBTHROW(SomaError(err.ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA("Soma::surface")));
+        throw SomaError(err.ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA("Soma::surface"));
     }
     }
 }

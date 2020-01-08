@@ -51,7 +51,7 @@ class SWCBuilder
     void _readSamples() {
         std::ifstream file(uri.c_str());
         if (file.fail())
-            LBTHROW(morphio::RawDataError(err.ERROR_OPENING_FILE()));
+            throw morphio::RawDataError(err.ERROR_OPENING_FILE());
 
         unsigned int lineNumber = 0;
         std::string line;
@@ -63,14 +63,14 @@ class SWCBuilder
 
             const auto& sample = Sample(line.data(), lineNumber);
             if (!sample.valid)
-                LBTHROW(morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber)));
+                throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
 
             if (sample.type >= SECTION_CUSTOM_START)
-                LBTHROW(morphio::RawDataError(
-                    err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type)));
+                throw morphio::RawDataError(
+                    err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type));
 
             if (samples.count(sample.id) > 0)
-                LBTHROW(morphio::RawDataError(err.ERROR_REPEATED_ID(samples[sample.id], sample)));
+                throw morphio::RawDataError(err.ERROR_REPEATED_ID(samples[sample.id], sample));
 
             samples[sample.id] = sample;
             children[sample.parentId].push_back(sample.id);
@@ -108,37 +108,37 @@ class SWCBuilder
             }
 
             if (soma_bifurcations.size() > 1)
-                LBTHROW(morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample, soma_bifurcations)));
+                throw morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample, soma_bifurcations));
         }
 
         if (sample.parentId != -1 &&
             samples[static_cast<unsigned int>(sample.parentId)].type != SECTION_SOMA)
-            LBTHROW(morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample)));
+            throw morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample));
     }
 
     void raiseIfSelfParent(const Sample& sample) {
         if (sample.parentId == static_cast<int>(sample.id))
-            LBTHROW(morphio::RawDataError(err.ERROR_SELF_PARENT(sample)));
+            throw morphio::RawDataError(err.ERROR_SELF_PARENT(sample));
     }
 
     void warnIfDisconnectedNeurite(const Sample& sample) {
         if (sample.parentId == SWC_UNDEFINED_PARENT && sample.type != SECTION_SOMA)
-            LBERROR(Warning::DISCONNECTED_NEURITE, err.WARNING_DISCONNECTED_NEURITE(sample));
+            printError(Warning::DISCONNECTED_NEURITE, err.WARNING_DISCONNECTED_NEURITE(sample));
     }
 
     void checkSoma() {
         auto somata = _potentialSomata();
 
         if (somata.size() > 1)
-            LBTHROW(morphio::SomaError(err.ERROR_MULTIPLE_SOMATA(somata)));
+            throw morphio::SomaError(err.ERROR_MULTIPLE_SOMATA(somata));
 
         if (somata.empty())
-            LBERROR(Warning::NO_SOMA_FOUND, err.WARNING_NO_SOMA_FOUND());
+            printError(Warning::NO_SOMA_FOUND, err.WARNING_NO_SOMA_FOUND());
     }
 
     void raiseIfNoParent(const Sample& sample) {
         if (sample.parentId > -1 && samples.count(static_cast<unsigned int>(sample.parentId)) == 0)
-            LBTHROW(morphio::MissingParentError(err.ERROR_MISSING_PARENT(sample)));
+            throw morphio::MissingParentError(err.ERROR_MISSING_PARENT(sample));
     }
 
     /**
@@ -209,7 +209,7 @@ class SWCBuilder
         if (child1.point[0] != x || child2.point[0] != x || child1.point[1] != y - r ||
             child2.point[1] != y + r || child1.point[2] != z || child2.point[2] != z ||
             child1.diameter != d || child2.diameter != d) {
-            LBERROR(Warning::SOMA_NON_CONFORM,
+            printError(Warning::SOMA_NON_CONFORM,
                     err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(root, child1, child2));
         }
     }
@@ -287,7 +287,7 @@ class SWCBuilder
         }
 
         if (morph.soma()->points().size() == 3 && !neurite_wrong_root.empty())
-            LBERROR(morphio::WRONG_ROOT_POINT, err.WARNING_WRONG_ROOT_POINT(neurite_wrong_root));
+            printError(morphio::WRONG_ROOT_POINT, err.WARNING_WRONG_ROOT_POINT(neurite_wrong_root));
 
         morph.sanitize();
         morph.applyModifiers(options);

@@ -10,8 +10,6 @@
 #include <morphio/vector_types.h>
 
 
-#define LBTHROW(x) (throw x)
-
 /** @namespace morphio Blue Brain File IO classes */
 namespace morphio {
 

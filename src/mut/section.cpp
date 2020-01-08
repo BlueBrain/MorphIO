@@ -99,12 +99,12 @@ std::shared_ptr<Section> Section::appendSection(const std::shared_ptr<Section>& 
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
-        LBERROR(Warning::APPENDING_EMPTY_SECTION,
+        printError(Warning::APPENDING_EMPTY_SECTION,
                 _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
-        LBERROR(Warning::WRONG_DUPLICATE,
+        printError(Warning::WRONG_DUPLICATE,
                 _morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
                                                           _sections.at(parentId)));
     }
@@ -129,12 +129,12 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
-        LBERROR(Warning::APPENDING_EMPTY_SECTION,
+        printError(Warning::APPENDING_EMPTY_SECTION,
                 _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
-        LBERROR(Warning::WRONG_DUPLICATE,
+        printError(Warning::WRONG_DUPLICATE,
                 _morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
                                                           _sections.at(parentId)));
 
@@ -159,7 +159,7 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
         sectionType = type();
 
     if (sectionType == SECTION_SOMA)
-        LBTHROW(morphio::SectionBuilderError("Cannot create section with type soma"));
+        throw morphio::SectionBuilderError("Cannot create section with type soma");
 
     std::shared_ptr<Section> ptr(
         new Section(_morphology, _morphology->_counter, sectionType, pointProperties));
@@ -168,12 +168,12 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
-        LBERROR(Warning::APPENDING_EMPTY_SECTION,
+        printError(Warning::APPENDING_EMPTY_SECTION,
                 _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
-        LBERROR(Warning::WRONG_DUPLICATE,
+        printError(Warning::WRONG_DUPLICATE,
                 _morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId], _sections[parentId]));
 
     _morphology->_parent[childId] = parentId;

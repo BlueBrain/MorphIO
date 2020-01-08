@@ -23,12 +23,12 @@ SomaType getSomaType(long unsigned int nSomaPoints);
 Morphology::Morphology(const std::string& source, unsigned int options) {
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos)
-        LBTHROW(UnknownFileType("File has no extension"));
+        throw UnknownFileType("File has no extension");
 
     // Cross-platform check of file existance
     std::ifstream file(source.c_str());
     if (!file) {
-        LBTHROW(RawDataError("File: " + source + " does not exist."));
+        throw RawDataError("File: " + source + " does not exist.");
     }
 
     std::string extension = source.substr(pos);
@@ -40,7 +40,7 @@ Morphology::Morphology(const std::string& source, unsigned int options) {
             return readers::asc::load(source, options);
         if (extension == ".swc" || extension == ".SWC")
             return readers::swc::load(source, options);
-        LBTHROW(UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported"));
+        throw UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported");
     };
 
     _properties = std::make_shared<Property::Properties>(loader());

@@ -10,9 +10,9 @@ Section::Section(const uint32_t id_, const std::shared_ptr<property::Properties>
     , _properties(properties) {
     const auto& sections = properties->get<property::VascSection>();
     if (id_ >= sections.size()) {
-        LBTHROW(RawDataError(
+        throw RawDataError(
             "Requested section ID (" + std::to_string(id_) +
-            ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
+            ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")");
     }
     const size_t start = sections[id_];
     const size_t end_ = id_ == sections.size() - 1 ? properties->get<property::Point>().size()

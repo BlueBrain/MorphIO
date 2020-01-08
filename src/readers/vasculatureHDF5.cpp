@@ -13,9 +13,9 @@ vasculature::property::Properties VasculatureHDF5::load() {
         HighFive::SilenceHDF5 silence;
         _file.reset(new HighFive::File(_uri, HighFive::File::ReadOnly));
     } catch (const HighFive::FileException& exc) {
-        LBTHROW(morphio::RawDataError(_write ? "Could not create vasculature file "
-                                             : "Could not open vasculature file " + _uri + ": " +
-                                                   exc.what()));
+        throw morphio::RawDataError(_write ? "Could not create vasculature file "
+                                    : "Could not open vasculature file " + _uri + ": " +
+                                    exc.what());
     }
     _readDatasets();
     _readSections();
@@ -32,22 +32,22 @@ void VasculatureHDF5::_readDatasets() {
     auto dataspace = _points->getSpace();
     _pointsDims = dataspace.getDimensions();
     if (_pointsDims.size() != 2 || _pointsDims[1] != 4) {
-        LBTHROW(morphio::RawDataError("Opening vasculature file '" + _file->getName() +
-                                      "': bad number of dimensions in points dataspace"));
+        throw morphio::RawDataError("Opening vasculature file '" + _file->getName() +
+                                    "': bad number of dimensions in points dataspace");
     }
     _sections.reset(new HighFive::DataSet(_file->getDataSet("/structure")));
     dataspace = _sections->getSpace();
     _sectionsDims = dataspace.getDimensions();
     if (_sectionsDims.size() != 2 || _sectionsDims[1] != 2) {
-        LBTHROW(morphio::RawDataError("Opening vasculature file '" + _file->getName() +
-                                      "': bad number of dimensions in structure dataspace"));
+        throw morphio::RawDataError("Opening vasculature file '" + _file->getName() +
+                                    "': bad number of dimensions in structure dataspace");
     }
     _connectivity.reset(new HighFive::DataSet(_file->getDataSet("/connectivity")));
     dataspace = _connectivity->getSpace();
     _conDims = dataspace.getDimensions();
     if (_conDims.size() != 2 || _conDims[1] != 2) {
-        LBTHROW(morphio::RawDataError("Opening vasculature file '" + _file->getName() +
-                                      "': bad number of dimensions in connectivity dataspace"));
+        throw morphio::RawDataError("Opening vasculature file '" + _file->getName() +
+                                    "': bad number of dimensions in connectivity dataspace");
     }
 }
 
@@ -85,8 +85,8 @@ void VasculatureHDF5::_readSectionTypes() {
     selection.read(types);
     for (int type : types) {
         if (type > SECTION_CUSTOM || type < 0) {
-            LBTHROW(morphio::RawDataError(_err.ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(
-                0, static_cast<VascularSectionType>(type))));
+            throw morphio::RawDataError(_err.ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(
+                                            0, static_cast<VascularSectionType>(type)));
         }
     }
 }

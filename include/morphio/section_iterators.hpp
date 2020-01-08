@@ -169,7 +169,7 @@ template <typename SectionT, typename MorphologyT>
 inline breadth_iterator_t<SectionT, MorphologyT>&
 breadth_iterator_t<SectionT, MorphologyT>::operator++() {
     if (deque_.empty()) {
-        LBTHROW(MorphioError("Can't iterate past the end"));
+        throw MorphioError("Can't iterate past the end");
     }
 
     const auto& children = detail::getChildren(deque_.front());
@@ -225,7 +225,7 @@ template <typename SectionT, typename MorphologyT>
 inline depth_iterator_t<SectionT, MorphologyT>&
 depth_iterator_t<SectionT, MorphologyT>::operator++() {
     if (deque_.empty()) {
-        LBTHROW(MorphioError("Can't iterate past the end"));
+        throw MorphioError("Can't iterate past the end");
     }
 
     const auto children = detail::getChildren(deque_.front());
@@ -290,7 +290,7 @@ inline const SectionT& upstream_iterator_t<SectionT>::operator*() const {
 template <typename SectionT>
 inline upstream_iterator_t<SectionT>& upstream_iterator_t<SectionT>::operator++() {
     if (end) {
-        LBTHROW(MissingParentError("Cannot call iterate upstream past the root node"));
+        throw MissingParentError("Cannot call iterate upstream past the root node");
     } else if (detail::isRoot(current)) {
         end = true;
         this->current.~SectionT();

@@ -15,11 +15,11 @@ void buildConnectivity(std::shared_ptr<property::Properties> properties);
 Vasculature::Vasculature(const std::string& source) {
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos) {
-        LBTHROW(UnknownFileType("File has no extension"));
+        throw UnknownFileType("File has no extension");
     }
 
     if (access(source.c_str(), F_OK) == -1) {
-        LBTHROW(RawDataError("File: " + source + " does not exist."));
+        throw RawDataError("File: " + source + " does not exist.");
     }
 
     std::string extension = source.substr(pos);
@@ -28,7 +28,7 @@ Vasculature::Vasculature(const std::string& source) {
     if (extension == ".h5") {
         loader = readers::h5::VasculatureHDF5(source).load();
     } else {
-        LBTHROW(UnknownFileType("File: " + source + " does not end with the .h5 extension"));
+        throw UnknownFileType("File: " + source + " does not end with the .h5 extension");
     }
 
     _properties = std::make_shared<property::Properties>(loader);

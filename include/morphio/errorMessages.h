@@ -16,7 +16,7 @@ void set_maximum_warnings(int n_warnings);
 void set_ignored_warning(Warning warning, bool ignore = true);
 void set_ignored_warning(const std::vector<Warning>& warning, bool ignore = true);
 
-void LBERROR(Warning warning, const std::string& msg);
+void printError(Warning warning, const std::string& msg);
 
 namespace readers {
 enum ErrorLevel { INFO, WARNING, ERROR };
