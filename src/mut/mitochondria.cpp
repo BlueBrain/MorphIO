@@ -136,7 +136,7 @@ mito_upstream_iterator Mitochondria::upstream_end() const {
 
 uint32_t Mitochondria::_register(const MitoSectionP& section_) {
     if (_sections.count(section_->id()))
-        LBTHROW(SectionBuilderError("Section already exists"));
+        throw SectionBuilderError("Section already exists");
     _counter = std::max(_counter, section_->id()) + 1;
 
     _sections[section_->id()] = section_;

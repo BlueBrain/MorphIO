@@ -92,7 +92,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 
     const bool emptySection = ptr->points().empty();
     if (emptySection)
-        LBERROR(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+        printError(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
 
     if (recursive) {
         for (const auto& child : section_.children()) {
@@ -111,7 +111,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
 
     const bool emptySection = section_copy->points().empty();
     if (emptySection)
-        LBERROR(Warning::APPENDING_EMPTY_SECTION,
+        printError(Warning::APPENDING_EMPTY_SECTION,
                 _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
 
     if (recursive) {
@@ -131,14 +131,14 @@ std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLeve
 
     bool emptySection = ptr->points().empty();
     if (emptySection)
-        LBERROR(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+        printError(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
 
     return ptr;
 }
 
 uint32_t Morphology::_register(const std::shared_ptr<Section>& section_) {
     if (_sections.count(section_->id()))
-        LBTHROW(SectionBuilderError("Section already exists"));
+        throw SectionBuilderError("Section already exists");
     _counter = std::max(_counter, section_->id()) + 1;
 
     _sections[section_->id()] = section_;
@@ -221,7 +221,7 @@ void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo) {
 
         if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
             !_checkDuplicatePoint(section_->parent(), section_))
-            LBERROR(Warning::WRONG_DUPLICATE,
+            printError(Warning::WRONG_DUPLICATE,
                     err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
 
         auto parent = section_->parent();
@@ -230,7 +230,7 @@ void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo) {
         // This "if" condition ensures that "unifurcations" (ie. successive
         // sections with only 1 child) get merged together into a bigger section
         if (isUnifurcation) {
-            LBERROR(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
+            printError(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
             bool duplicate = _checkDuplicatePoint(section_->parent(), section_);
 
             addAnnotation(morphio::Property::Annotation(morphio::AnnotationType::SINGLE_CHILD,
@@ -300,8 +300,7 @@ breadth_iterator Morphology::breadth_end() const {
 
 void Morphology::applyModifiers(unsigned int modifierFlags) {
     if (modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS)
-        LBTHROW(
-            SectionBuilderError(_err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS)));
+            throw SectionBuilderError(_err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
 
     if (modifierFlags & SOMA_SPHERE)
         modifiers::soma_sphere(*this);
@@ -340,7 +339,7 @@ void Morphology::write(const std::string& filename) {
     else if (extension == ".swc")
         writer::swc(clean, filename);
     else
-        LBTHROW(UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename)));
+        throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
 }
 
 }  // end namespace mut

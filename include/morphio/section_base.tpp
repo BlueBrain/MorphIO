@@ -10,9 +10,9 @@ SectionBase<T>::SectionBase(const uint32_t id_,
     , _properties(properties) {
     const auto& sections = properties->get<typename T::SectionId>();
     if (_id >= sections.size())
-        LBTHROW(RawDataError(
+        throw RawDataError(
             "Requested section ID (" + std::to_string(_id) +
-            ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")"));
+            ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")");
 
     const auto start = static_cast<size_t>(sections[_id][0]);
     const size_t end = _id == sections.size() - 1
@@ -61,8 +61,8 @@ bool SectionBase<T>::isRoot() const {
 template <typename T>
 T SectionBase<T>::parent() const {
     if (isRoot())
-        LBTHROW(MissingParentError("Cannot call Section::parent() on a root node (section id=" +
-                                   std::to_string(_id) + ")."));
+        throw MissingParentError("Cannot call Section::parent() on a root node (section id=" +
+                                  std::to_string(_id) + ").");
 
     const auto _parent = static_cast<unsigned int>(
         _properties->get<typename T::SectionId>()[_id][1]);

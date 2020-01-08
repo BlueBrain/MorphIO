@@ -40,17 +40,17 @@ bool compare(const std::vector<T>& vec1,
 
     if (vec1.size() != vec2.size()) {
         if (verbose_)
-            LBERROR(Warning::UNDEFINED,
+            printError(Warning::UNDEFINED,
                     "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
                         " vs " + std::to_string(vec2.size()));
         return false;
     }
 
     if (verbose_) {
-        LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
+        printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
         for (unsigned int i = 0; i < vec1.size(); ++i) {
             if (vec1[i] != vec2[i]) {
-                LBERROR(Warning::UNDEFINED,
+                printError(Warning::UNDEFINED,
                         std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
             }
         }
@@ -64,7 +64,7 @@ static bool compare_section_structure(const std::vector<VascSection::Type>& vec1
                                       bool verbose_) {
     if (vec1.size() != vec2.size()) {
         if (verbose_)
-            LBERROR(Warning::UNDEFINED,
+            printError(Warning::UNDEFINED,
                     "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
                         " vs " + std::to_string(vec2.size()));
         return false;
@@ -73,8 +73,8 @@ static bool compare_section_structure(const std::vector<VascSection::Type>& vec1
     for (unsigned int i = 1; i < vec1.size(); ++i) {
         if (vec1[i] - vec1[1] != vec2[i] - vec2[1]) {
             if (verbose_) {
-                LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-                LBERROR(Warning::UNDEFINED,
+                printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
+                printError(Warning::UNDEFINED,
                         std::to_string(vec1[i] - vec1[1]) + " <--> " +
                             std::to_string(vec2[i] - vec2[1]));
             }
@@ -91,7 +91,7 @@ bool compare(const morphio::range<T>& vec1,
              bool verbose_) {
     if (vec1.size() != vec2.size()) {
         if (verbose_)
-            LBERROR(Warning::UNDEFINED,
+            printError(Warning::UNDEFINED,
                     "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
                         " vs " + std::to_string(vec2.size()));
         return false;
@@ -100,10 +100,10 @@ bool compare(const morphio::range<T>& vec1,
     const float epsilon = 1e-6f;
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(vec1[i] - vec2[i]) > epsilon) {
-            LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-            LBERROR(Warning::UNDEFINED,
+            printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
+            printError(Warning::UNDEFINED,
                     std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
-            LBERROR(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
+            printError(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
             return false;
         }
     }
@@ -117,7 +117,7 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
              bool verbose_) {
     if (vec1.size() != vec2.size()) {
         if (verbose_)
-            LBERROR(Warning::UNDEFINED,
+            printError(Warning::UNDEFINED,
                     "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
                         " vs " + std::to_string(vec2.size()));
         return false;
@@ -127,10 +127,10 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
             if (verbose_) {
-                LBERROR(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-                LBERROR(Warning::UNDEFINED,
+                printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
+                printError(Warning::UNDEFINED,
                         std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
-                LBERROR(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
+                printError(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
             }
             return false;
         }
@@ -147,7 +147,7 @@ bool compare(const std::map<T, U>& vec1,
         return true;
     if (verbose_) {
         if (vec1.size() != vec2.size()) {
-            LBERROR(Warning::UNDEFINED,
+            printError(Warning::UNDEFINED,
                     "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
                         " vs " + std::to_string(vec2.size()));
         }
@@ -161,7 +161,7 @@ bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_)
         return true;
 
     if (verbose_)
-        LBERROR(Warning::UNDEFINED, name + " differs");
+        printError(Warning::UNDEFINED, name + " differs");
     return false;
 }
 
@@ -176,7 +176,7 @@ static bool compare(const VascPointLevel& el1,
                    compare(el1._diameters, el2._diameters, "_diameters", verbose_));
 
     if (!result && verbose_)
-        LBERROR(Warning::UNDEFINED, "Error comparing " + name);
+        printError(Warning::UNDEFINED, "Error comparing " + name);
 
     return result;
 }

@@ -131,9 +131,8 @@ void bind_mutable_module(py::module& m) {
                     return py::make_iterator(morph->breadth_begin(), morph->breadth_end());
                 case IterType::UPSTREAM:
                 default:
-                    LBTHROW(
-                        morphio::MorphioError("Only iteration types depth_first and "
-                                              "breadth_first are supported"));
+                    throw morphio::MorphioError("Only iteration types depth_first and "
+                                                "breadth_first are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive
@@ -384,9 +383,8 @@ void bind_mutable_module(py::module& m) {
                 case IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
                 default:
-                    LBTHROW(
-                        morphio::MorphioError("Only iteration types depth_first, breadth_first and "
-                                              "upstream are supported"));
+                    throw morphio::MorphioError("Only iteration types depth_first, breadth_first and "
+                                                "upstream are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,

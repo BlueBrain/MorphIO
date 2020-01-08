@@ -26,7 +26,7 @@ void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
         set_ignored_warning(warning, ignore);
 }
 
-void LBERROR(Warning warning, const std::string& msg) {
+void printError(Warning warning, const std::string& msg) {
     static int error = 0;
     if (readers::ErrorMessages::isIgnored(warning) || MORPHIO_MAX_N_WARNINGS == 0)
         return;
