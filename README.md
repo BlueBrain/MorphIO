@@ -5,27 +5,25 @@
 * [Installation](#installation)
    * [Dependencies](#dependencies)
    * [Installation instructions](#installation-instructions)
-      * [Install as a c++ library](#install-as-a-c-library)
+      * [Install as a C++ library](#install-as-a-c-library)
       * [Install as a Python package](#install-as-a-python-package)
 * [Introduction](#introduction)
    * [Quick summary](#quick-summary)
+   * [Include/Imports](#includeimports)
    * [Read-only API](#read-only-api)
       * [C++](#c)
       * [Python](#python)
    * [Mutable (read/write) API](#mutable-readwrite-api)
       * [C++](#c-1)
       * [Python](#python-1)
-* [Converter](#converter)
-* [Usage](#usage)
-   * [Immutable C++](#immutable-c)
-   * [Immutable Python](#immutable-python)
-   * [Mutable C++](#mutable-c)
+      * [Creating morphologies with the mutable API](#creating-morphologies-with-the-mutable-api)
+   * [Mutable Python](#mutable-python)
       * [Reading morphologies](#reading-morphologies)
       * [Creating morphologies](#creating-morphologies)
-   * [Mutable Python](#mutable-python)
-      * [Reading morphologies](#reading-morphologies-1)
-      * [Creating morphologies](#creating-morphologies-1)
+   * [Opening flags](#opening-flags)
    * [Mitochondria](#mitochondria)
+   * [Tips](#tips)
+      * [Maximum number of warnings](#maximum-number-of-warnings)
 * [Specification](#specification)
 
 
@@ -34,6 +32,7 @@
 
 ### Dependencies
 To build MorphIO from sources, the following dependencies are required:
+
 - cmake >= 3.2
 - libhdf5-dev
 - A C++11 compiler
@@ -59,7 +58,7 @@ module load gcc/5.4.0 nix/cmake/3.9.6
 
 ### Installation instructions
 
-#### Install as a c++ library
+#### Install as a C++ library
 
 For manual installation:
 ```shell
@@ -106,8 +105,8 @@ One important concept is that MorphIO is splitted into a *read-only* part and a 
 
 ### Quick summary
 *C++ vs Python*:
-- c++ accessors become python properties
-- style: c++ functions are camel case while python ones are snake case
+- C++ accessors become python properties
+- style: C++ functions are camel case while python ones are snake case
 
 ### Include/imports
 
@@ -164,8 +163,9 @@ In Python the API is available under the `morphio.mut` module:
 from morphio.mut import Morphology, Section, Soma
 ```
 
+### Mutable Read/Write API
 
-### C++
+#### C++
 
 ```cpp
 #include <morphio/morphology.h>
@@ -201,7 +201,7 @@ int main()
 }
 ```
 
-### Python
+#### Python
 
 ```python
 from morphio import Morphology
