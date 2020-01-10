@@ -31,9 +31,7 @@ struct base_type<std::vector<T>> : base_type<T>
 
 bool hasPerimeterData(const morphio::mut::Morphology& morpho)
 {
-    return !morpho.rootSections().empty()
-        ? !morpho.rootSections()[0]->perimeters().empty()
-        : false;
+    return !morpho.rootSections().empty() && !morpho.rootSections().front()->perimeters().empty();
 }
 
 void writeLine(std::ofstream& myfile,
