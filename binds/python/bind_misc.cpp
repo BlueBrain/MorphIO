@@ -143,6 +143,7 @@ void bind_misc(py::module& m) {
     py::register_exception<morphio::MultipleTrees&>(m, "MultipleTrees", raw.ptr());
     py::register_exception<morphio::MissingParentError&>(m, "MissingParentError", raw.ptr());
     py::register_exception<morphio::SectionBuilderError&>(m, "SectionBuilderError", raw.ptr());
+    py::register_exception<morphio::WriterError&>(m, "WriterError", base.ptr());
 
 
     py::class_<morphio::Points>(m, "Points", py::buffer_protocol())

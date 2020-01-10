@@ -2,9 +2,11 @@ import os
 import numpy as np
 from numpy.testing import assert_array_equal, assert_equal, assert_raises
 from nose.tools import ok_
+import h5py
 
 from morphio.mut import Morphology
 from morphio import (SectionBuilderError, set_maximum_warnings, SectionType, PointLevel,
+                     WriterError,
                      MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect)
 
 from utils import captured_output, setup_tempdir, assert_string_equal
@@ -60,7 +62,8 @@ def test_write_basic():
     with setup_tempdir('test_write_basic') as tmp_folder:
         morpho.write(os.path.join(tmp_folder, "test_write.asc"))
         morpho.write(os.path.join(tmp_folder, "test_write.swc"))
-        morpho.write(os.path.join(tmp_folder, "test_write.h5"))
+        h5_out = os.path.join(tmp_folder, "test_write.h5")
+        morpho.write(h5_out)
 
         expected = [[0., 0., 0.], [0., 5., 0.], [0., 5., 0.], [-5., 5., 0.],
                     [0., 5., 0.], [6., 5., 0.], [0., 0., 0.], [0., -4., 0.],
@@ -68,6 +71,10 @@ def test_write_basic():
         assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.asc")).points, expected)
         assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.swc")).points, expected)
         assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")).points, expected)
+
+        with h5py.File(h5_out) as h5_file:
+            ok_('/perimeters' not in h5_file.keys())
+
 
 
 def test_write_merge_only_child():
@@ -149,10 +156,16 @@ def test_write_perimeter():
                                      [6, 8]))
 
     with setup_tempdir('test_write_perimeter') as tmp_folder:
-        morpho.write(os.path.join(tmp_folder, "test_write.h5"))
+        h5_out = os.path.join(tmp_folder, "test_write.h5")
+        morpho.write(h5_out)
 
-        assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")).perimeters,
+        assert_array_equal(ImmutMorphology(h5_out).perimeters,
                            [5., 6., 6., 7., 6., 8.])
+
+        # Cannot right a morph with perimeter data to ASC and SWC
+        for ext in ['swc', 'asc']:
+            out_path = os.path.join(tmp_folder, "test_write_perimeter." + ext)
+            assert_raises(WriterError, morpho.write, out_path)
 
 
 def test_write_no_soma():
@@ -160,14 +173,12 @@ def test_write_no_soma():
     dendrite = morpho.append_root_section(
                                      PointLevel([[0, 0, 0],
                                                  [0, 5, 0]],
-                                                [2, 2],
-                                                [5, 6]),
+                                                [2, 2]),
                                      SectionType.basal_dendrite)
     dendrite = morpho.append_root_section(
                                      PointLevel([[0, 1, 0],
                                                  [0, 7, 0]],
-                                                [2, 2],
-                                                [5, 6]),
+                                                [2, 2]),
                                      SectionType.basal_dendrite)
 
     with setup_tempdir('test_write_no_soma') as tmp_folder:

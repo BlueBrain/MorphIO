@@ -174,6 +174,8 @@ class ErrorMessages
                                              const std::string& vec2,
                                              size_t length2) const;
 
+    std::string ERROR_PERIMETER_DATA_NOT_WRITABLE();
+
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
     ////////////////////////////////////////////////////////////////////////////////
