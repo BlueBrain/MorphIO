@@ -41,6 +41,7 @@ enum class Token {
     LOW,
     NORMAL,
     MIDPOINT,
+    ORIGIN,
 };
 
 const std::map<Token, SectionType> TokenSectionTypeMap{{Token::AXON, SECTION_AXON},
@@ -83,6 +84,7 @@ inline std::string to_string(Token t) {
         T(LOW)
         T(NORMAL)
         T(MIDPOINT)
+        T(ORIGIN)
     default:
         return "Unknown";
 #undef T
@@ -162,6 +164,7 @@ class NeurolucidaLexer
         rules_.push("Low", +Token::LOW);
         rules_.push("Normal", +Token::NORMAL);
         rules_.push("Midpoint", +Token::MIDPOINT);
+        rules_.push("Origin", +Token::ORIGIN);
 
         rules_.push(R"(\"[^"]*\")", +Token::STRING);
 
