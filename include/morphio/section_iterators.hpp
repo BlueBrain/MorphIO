@@ -65,7 +65,7 @@ class breadth_iterator_t
     inline explicit breadth_iterator_t(const MorphologyT& morphology);
     inline breadth_iterator_t(const breadth_iterator_t& other);
 
-    inline const SectionT& operator*() const;
+    inline SectionT operator*() const;
 
     inline breadth_iterator_t& operator++();
     inline breadth_iterator_t operator++(int);
@@ -93,7 +93,7 @@ class depth_iterator_t
     inline explicit depth_iterator_t(const MorphologyT& morphology);
     inline depth_iterator_t(const depth_iterator_t& other);
 
-    inline const SectionT& operator*() const;
+    inline SectionT operator*() const;
 
     inline depth_iterator_t& operator++();
     inline depth_iterator_t operator++(int);
@@ -120,7 +120,7 @@ class upstream_iterator_t
     inline upstream_iterator_t(const upstream_iterator_t& other);
     inline ~upstream_iterator_t();
 
-    inline const SectionT& operator*() const;
+    inline SectionT operator*() const;
 
     inline upstream_iterator_t& operator++();
     inline upstream_iterator_t operator++(int);
@@ -161,7 +161,7 @@ inline breadth_iterator_t<SectionT, MorphologyT>::breadth_iterator_t(
     : deque_(other.deque_) {}
 
 template <typename SectionT, typename MorphologyT>
-inline const SectionT& breadth_iterator_t<SectionT, MorphologyT>::operator*() const {
+inline SectionT breadth_iterator_t<SectionT, MorphologyT>::operator*() const {
     return deque_.front();
 }
 
@@ -217,7 +217,7 @@ inline depth_iterator_t<SectionT, MorphologyT>::depth_iterator_t(const depth_ite
     : deque_(other.deque_) {}
 
 template <typename SectionT, typename MorphologyT>
-inline const SectionT& depth_iterator_t<SectionT, MorphologyT>::operator*() const {
+inline SectionT depth_iterator_t<SectionT, MorphologyT>::operator*() const {
     return deque_.front();
 }
 
@@ -283,7 +283,7 @@ inline upstream_iterator_t<SectionT>::~upstream_iterator_t() {
 }
 
 template <typename SectionT>
-inline const SectionT& upstream_iterator_t<SectionT>::operator*() const {
+inline SectionT upstream_iterator_t<SectionT>::operator*() const {
     return current;
 }
 
