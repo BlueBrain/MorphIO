@@ -19,7 +19,8 @@ bool is_eof(Token type) {
 
 bool is_end_of_branch(Token type) {
     return (type == Token::GENERATED || type == Token::HIGH || type == Token::INCOMPLETE ||
-            type == Token::LOW || type == Token::NORMAL || type == Token::MIDPOINT);
+            type == Token::LOW || type == Token::NORMAL || type == Token::MIDPOINT ||
+            type == Token::ORIGIN);
 }
 
 bool is_neurite_type(Token id) {
