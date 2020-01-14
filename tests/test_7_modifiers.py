@@ -18,26 +18,37 @@ def test_no_modifier():
     assert_array_equal(SIMPLE_NO_MODIFIER.points, Morphology(SIMPLE, options=Option.no_modifier).points)
 
 def test_nrn_order():
-    m = Morphology(os.path.join(_path, 'reversed_NRN_neurite_order.swc'), options=Option.nrn_order)
+    filename = os.path.join(_path, 'reversed_NRN_neurite_order.swc')
+
+    m = Morphology(filename, options=Option.nrn_order)
     assert_equal([section.type for section in m.root_sections],
                  [SectionType.axon,
                   SectionType.basal_dendrite,
                   SectionType.apical_dendrite])
 
-
-    normal = Morphology(os.path.join(_path, 'reversed_NRN_neurite_order.swc'))
+    normal = Morphology(filename)
     m = MutableMorphology(normal, options=Option.nrn_order)
     assert_equal([section.type for section in m.root_sections],
                  [SectionType.axon,
                   SectionType.basal_dendrite,
                   SectionType.apical_dendrite])
 
-    normal = MutableMorphology(os.path.join(_path, 'reversed_NRN_neurite_order.swc'))
+    normal = MutableMorphology(filename)
     m = MutableMorphology(normal, options=Option.nrn_order)
     assert_equal([section.type for section in m.root_sections],
                  [SectionType.axon,
                   SectionType.basal_dendrite,
                   SectionType.apical_dendrite])
+
+
+def test_nrn_order_stability():
+    m = Morphology(os.path.join(_path, 'mono-type.asc'), Option.nrn_order)
+    assert_array_equal([root.points[0, 0] for root in m.root_sections
+                        if root.type == SectionType.basal_dendrite], [0, 1, 2, 3])
+    assert_array_equal([root.points[0, 0] for root in m.root_sections
+                        if root.type == SectionType.axon], [0, 1])
+    assert_array_equal([root.points[0, 0] for root in m.root_sections
+                        if root.type == SectionType.apical_dendrite], [1, 0])
 
 
 def test_two_point_section():

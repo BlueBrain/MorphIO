@@ -63,7 +63,7 @@ static bool NRN_order_comparator(std::shared_ptr<Section> a, std::shared_ptr<Sec
 }
 
 void nrn_order(morphio::mut::Morphology& morpho) {
-    std::sort(morpho._rootSections.begin(), morpho._rootSections.end(), NRN_order_comparator);
+    std::stable_sort(morpho._rootSections.begin(), morpho._rootSections.end(), NRN_order_comparator);
 }
 
 }  // namespace modifiers
