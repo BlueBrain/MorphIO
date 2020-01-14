@@ -244,39 +244,34 @@ void bind_mutable_module(py::module& m) {
             "at each root section",
             "section_id"_a = -1);
 
+    using mitosection_floats_f = std::vector<float>& (morphio::mut::MitoSection::*) ();
+    using mitosection_ints_f = std::vector<uint32_t>& (morphio::mut::MitoSection::*) ();
+
     // py::nodelete needed because morphio::mut::MitoSection has a private
     // destructor
     // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
     py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(m,
                                                                                       "MitoSection")
         .def_property_readonly("id", &morphio::mut::MitoSection::id, "Return the section ID")
-        .def_property("diameters",
-                      [](py::object &obj){
-                          auto& section = obj.cast<morphio::mut::MitoSection&>();
-                          return as_pyarray(section.diameters(), obj);
-                      },
-            [](morphio::mut::MitoSection* section,
-                const std::vector<float>& _diameters) {
+        .def_property(
+            "diameters",
+            static_cast<mitosection_floats_f>(&morphio::mut::MitoSection::diameters),
+            [](morphio::mut::MitoSection* section, const std::vector<float>& _diameters) {
                 section->diameters() = _diameters;
             },
             "Returns the diameters of all points of this section")
-        .def_property("relative_path_lengths",
-                      [](py::object &obj){
-                          auto& section = obj.cast<morphio::mut::MitoSection&>();
-                          return as_pyarray(section.pathLengths(), obj);
-                      },
-            [](morphio::mut::MitoSection* section,
-                const std::vector<float>& _pathLengths) {
+        .def_property(
+            "relative_path_lengths",
+            static_cast<mitosection_floats_f>(&morphio::mut::MitoSection::pathLengths),
+            [](morphio::mut::MitoSection* section, const std::vector<float>& _pathLengths) {
                 section->pathLengths() = _pathLengths;
             },
             "Returns the relative distance (between 0 and 1)\n"
             "between the start of the neuronal section and each point\n"
             "of this mitochondrial section")
-        .def_property("neurite_section_ids",
-                      [](py::object &obj){
-                          auto& section = obj.cast<morphio::mut::MitoSection&>();
-                          return as_pyarray(section.neuriteSectionIds(), obj);
-                      },
+        .def_property(
+            "neurite_section_ids",
+            static_cast<mitosection_ints_f>(&morphio::mut::MitoSection::neuriteSectionIds),
             [](morphio::mut::MitoSection* section,
                const std::vector<uint32_t>& _neuriteSectionIds) {
                 section->neuriteSectionIds() = _neuriteSectionIds;
@@ -325,42 +320,36 @@ void bind_mutable_module(py::module& m) {
             },
             "Returns the morphological type of this section "
             "(dendrite, axon, ...)")
-        .def_property("points",
-                      [](py::object &obj){
-                          auto& section = obj.cast<morphio::mut::Section&>();
-                          std::vector<long int> strides{sizeof(float) * 3, sizeof(float)};
-                          std::vector<long int> shape{static_cast<py::ssize_t>(section.points().size()), 3};
-
-                          return py::array_t<float>(shape,
-                                                    strides,
-                                                    section.points().front().data(),
-                                                    obj);
-                      },
-                      [](morphio::mut::Section* section,
-                         py::array_t<float> _points) {
-                          section -> points() = array_to_points(_points);
-                      },
-                      "Returns the coordinates (x,y,z) of all points of this section")
-        .def_property("diameters",
-             [](py::object &obj){
-                 auto& section = obj.cast<morphio::mut::Section&>();
-                 return as_pyarray(section.diameters(), obj);
-             },
-                      [](morphio::mut::Section* section,
-                         py::array_t<float> _diameters) {
-                          section -> diameters() = _diameters.cast<std::vector<float>>();
-                      },
-                      "Returns the diameters of all points of this section")
-        .def_property("perimeters",
-                      [](py::object &obj){
-                          auto& section = obj.cast<morphio::mut::Section&>();
-                          return as_pyarray(section.perimeters(), obj);
-                      },
-                      [](morphio::mut::Section* section,
-                         py::array_t<float> _perimeters) {
-                          section -> perimeters() = _perimeters.cast<std::vector<float>>();
-                      },
-                      "Returns the perimeters of all points of this section")
+        .def_property(
+            "points",
+            [](morphio::mut::Section* section) {
+                return py::array(static_cast<py::ssize_t>(section->points().size()),
+                                 section->points().data());
+            },
+            [](morphio::mut::Section* section, py::array_t<float> _points) {
+                section->points() = array_to_points(_points);
+            },
+            "Returns the coordinates (x,y,z) of all points of this section")
+        .def_property(
+            "diameters",
+            [](morphio::mut::Section* section) {
+                return py::array(static_cast<py::ssize_t>(section->diameters().size()),
+                                 section->diameters().data());
+            },
+            [](morphio::mut::Section* section, py::array_t<float> _diameters) {
+                section->diameters() = _diameters.cast<std::vector<float>>();
+            },
+            "Returns the diameters of all points of this section")
+        .def_property(
+            "perimeters",
+            [](morphio::mut::Section* section) {
+                return py::array(static_cast<py::ssize_t>(section->perimeters().size()),
+                                 section->perimeters().data());
+            },
+            [](morphio::mut::Section* section, py::array_t<float> _perimeters) {
+                section->perimeters() = _perimeters.cast<std::vector<float>>();
+            },
+            "Returns the perimeters of all points of this section")
         .def_property_readonly("is_root",
                                &morphio::mut::Section::isRoot,
                                "Return True if section is a root section")
