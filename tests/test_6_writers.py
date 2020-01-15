@@ -3,6 +3,7 @@ import numpy as np
 from numpy.testing import assert_array_equal, assert_equal, assert_raises
 from nose.tools import ok_
 import h5py
+from pathlib import Path
 
 from morphio.mut import Morphology
 from morphio import (SectionBuilderError, set_maximum_warnings, SectionType, PointLevel,
@@ -32,6 +33,8 @@ def test_write_soma_basic():
 
     with setup_tempdir('test_write_soma_basic') as tmp_folder:
         morpho.write(os.path.join(tmp_folder, "test_write.swc"))
+        morpho.write(Path(tmp_folder, "test_write_pathlib.swc"))
+        assert_equal(len(os.listdir(tmp_folder)), 2)
 
 
 def test_write_basic():
