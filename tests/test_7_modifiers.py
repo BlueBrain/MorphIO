@@ -50,6 +50,14 @@ def test_nrn_order_stability():
     assert_array_equal([root.points[0, 0] for root in m.root_sections
                         if root.type == SectionType.apical_dendrite], [1, 0])
 
+    # This morphology used to give a different order when opened with nrn_order flag
+    filename = os.path.join(_path, 'nrn-order-already-sorted.h5')
+    a = Morphology(filename, Option.nrn_order)
+    b = Morphology(filename)
+    for sec1, sec2 in zip(a.root_sections, b.root_sections):
+        assert_array_equal(sec1.points, sec2.points)
+
+
 
 def test_two_point_section():
     m = Morphology(os.path.join(_path, 'multiple_point_section.asc'), options=Option.two_points_sections)
