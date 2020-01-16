@@ -60,21 +60,31 @@ const std::string _a_apical("apical");
 namespace morphio {
 namespace readers {
 namespace h5 {
-Property::Properties load(const std::string& uri) {
-    return MorphologyHDF5(uri).load();
-}
 
-Property::Properties MorphologyHDF5::load() {
-    _stage = "repaired";
+MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group): _group(group){}
 
+Property::Properties load(const URI& uri)
+{
     try {
         HighFive::SilenceHDF5 silence;
-        _file.reset(new HighFive::File(_uri, HighFive::File::ReadOnly));
+        auto file = HighFive::File(uri, HighFive::File::ReadOnly);
+        return MorphologyHDF5(file.getGroup("/")).load();
+
     } catch (const HighFive::FileException& exc) {
-        throw morphio::RawDataError(_write ? "Could not create morphology file "
-                              : "Could not open morphology file " + _uri + ": " +
+        throw morphio::RawDataError("Could not open morphology file " + uri + ": " +
                               exc.what());
     }
+}
+
+Property::Properties load(const HighFive::Group& group)
+{
+    return MorphologyHDF5(group).load();
+}
+
+Property::Properties MorphologyHDF5::load()
+{
+    _stage = "repaired";
+
     _checkVersion(_uri);
     _selectRepairStage();
     int firstSectionOffset = _readSections();
@@ -110,7 +120,7 @@ void MorphologyHDF5::_selectRepairStage() {
     for (const auto& stage : {"repaired", "unraveled", "raw"}) {
         try {
             HighFive::SilenceHDF5 silence;
-            _file->getDataSet("/" + _g_root + "/" + stage + "/" + _d_points);
+            _group.getDataSet("/" + _g_root + "/" + stage + "/" + _d_points);
             _stage = stage;
             return;
         } catch (const HighFive::DataSetException&) {
@@ -121,28 +131,26 @@ void MorphologyHDF5::_selectRepairStage() {
 
 void MorphologyHDF5::_resolveV1() {
     HighFive::SilenceHDF5 silence;
-    _points.reset(new HighFive::DataSet(_file->getDataSet("/" + _d_points)));
+    _points.reset(new HighFive::DataSet(_group.getDataSet("/" + _d_points)));
     auto dataspace = _points->getSpace();
     _pointsDims = dataspace.getDimensions();
 
     if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns) {
-        throw morphio::RawDataError("Opening morphology file '" + _file->getName() +
-                                     "': bad number of dimensions in 'points' dataspace");
+        throw morphio::RawDataError("Bad number of dimensions in 'points' dataspace");
     }
 
-    _sections.reset(new HighFive::DataSet(_file->getDataSet(_d_structure)));
+    _sections.reset(new HighFive::DataSet(_group.getDataSet(_d_structure)));
     dataspace = _sections->getSpace();
     _sectionsDims = dataspace.getDimensions();
     if (_sectionsDims.size() != 2 || _sectionsDims[1] != _structureV1Columns) {
-        throw morphio::RawDataError("Opening morphology file '" + _file->getName() +
-                                    "': bad number of dimensions in 'structure' dataspace");
+        throw morphio::RawDataError("Bad number of dimensions in 'structure' dataspace");
     }
 }
 
 bool MorphologyHDF5::_readV11Metadata() {
     try {
         HighFive::SilenceHDF5 silence;
-        const auto metadata = _file->getGroup(_g_metadata);
+        const auto metadata = _group.getGroup(_g_metadata);
         const auto attr = metadata.getAttribute(_a_version);
 
         uint32_t version[2];
@@ -172,7 +180,7 @@ bool MorphologyHDF5::_readV11Metadata() {
 bool MorphologyHDF5::_readV2Metadata() {
     try {
         HighFive::SilenceHDF5 silence;
-        const auto root = _file->getGroup(_g_root);
+        const auto root = _group.getGroup(_g_root);
         const auto attr = root.getAttribute(_a_version);
         attr.read(_properties.version());
         if (_properties.version() == MORPHOLOGY_VERSION_H5_2)
@@ -182,7 +190,7 @@ bool MorphologyHDF5::_readV2Metadata() {
 
     try {
         HighFive::SilenceHDF5 silence;
-        _file->getGroup(_g_root);
+        _group.getGroup(_g_root);
         _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_2;
         return true;
     } catch (const HighFive::Exception&) {
@@ -190,12 +198,16 @@ bool MorphologyHDF5::_readV2Metadata() {
     }
 }
 
-HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections) {
+HighFive::DataSet MorphologyHDF5::_getStructureDataSet()
+{
     try {
         HighFive::SilenceHDF5 silence;
-        return _file->getDataSet(_d_structure);
+        return _group.getDataSet(_d_structure);
     } catch (const HighFive::DataSetException&) {
-        return _file->createDataSet<int>(_d_structure, HighFive::DataSpace({nSections, 3}));
+        throw;
+        //FIXME: NO EMPTY DATASET IS CREATED IN CASE THIS ONE IS EMPTY
+        //return _group.createDataSet<int>(_d_structure,
+        //    HighFive::DataSpace({nSections, 3}));
     }
 }
 
@@ -219,17 +231,18 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
         auto dataset = [this]() {
             std::string path = "/" + _g_root + "/" + _stage + "/" + _d_points;
             try {
-                return _file->getDataSet(path);
+                return _group.getDataSet(path);
             } catch (HighFive::DataSetException&) {
-                throw MorphioError("Could not open " + path + " dataset for morphology file " +
-                                   _file->getName() + " repair stage " + _stage);
+                throw (MorphioError(
+                    "Could not open " + path + " dataset " +
+                    " repair stage " + _stage));
             }
         }();
 
         const auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 2 || dims[1] != _pointColumns) {
-            throw MorphioError("Reading morphology file '" + _file->getName() +
-                               "': bad number of dimensions in 'points' dataspace");
+            throw (MorphioError(
+                "': bad number of dimensions in 'points' dataspace"));
         }
         std::vector<std::vector<float>> vec(dims[0]);
         dataset.read(vec);
@@ -296,22 +309,20 @@ int MorphologyHDF5::_readSections() {
         auto dataset = [this]() {
             std::string path = "/" + _g_root + "/" + _g_structure + "/" + _stage;
             try {
-                return _file->getDataSet(path);
+                return _group.getDataSet(path);
             } catch (HighFive::DataSetException&) {
                 if (_stage == "unraveled") {
                     std::string raw_path = "/" + _g_root + "/" + _g_structure + "/raw";
                     try {
-                        return _file->getDataSet(raw_path);
+                        return _group.getDataSet(raw_path);
                     } catch (HighFive::DataSetException&) {
-                        throw MorphioError("Could not find unraveled structure neither at " +
-                                           path + " or " + raw_path +
-                                           " for dataset for morphology file " +
-                                           _file->getName() + " repair stage " + _stage);
+                        throw (MorphioError("Could not find unraveled structure neither at " +
+                                             path + " or " + raw_path +
+                                             + " repair stage " + _stage));
                     }
                 } else {
-                    throw MorphioError("Could not open " + path +
-                                       " dataset for morphology file " + _file->getName() +
-                                       " repair stage " + _stage);
+                    throw (MorphioError("Could not open " + path +
+                                         " repair stage " + _stage));
                 }
             }
         }();
@@ -321,8 +332,8 @@ int MorphologyHDF5::_readSections() {
         const auto dims = dataset.getSpace().getDimensions();
 
         if (dims.size() != 2 || dims[1] != _structureV2Columns) {
-            throw MorphioError("Reading morphology file '" + _file->getName() +
-                               "': bad number of dimensions in 'structure' dataspace");
+            throw (MorphioError(
+                "': bad number of dimensions in 'structure' dataspace"));
         }
 
         std::vector<std::vector<int>> vec;
@@ -373,17 +384,16 @@ void MorphologyHDF5::_readSectionTypes() {
         auto dataset = [this]() {
             std::string path = "/" + _g_root + "/" + _g_structure + "/" + _d_type;
             try {
-                return _file->getDataSet(path);
+                return _group.getDataSet(path);
             } catch (HighFive::DataSetException&) {
-                throw MorphioError("Could not open " + path + " dataset for morphology file " +
-                                   _file->getName());
+                throw (MorphioError("Could not open " + path +
+                                     " dataset for morphology file "));
             }
         }();
 
         const auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 2 || dims[1] != 1) {
-            throw MorphioError("Reading morphology file '" + _file->getName() +
-                               "': bad number of dimensions in 'sectiontype' dataspace");
+            throw (MorphioError("': bad number of dimensions in 'sectiontype' dataspace"));
         }
 
         types.resize(dims[0]);
@@ -417,12 +427,11 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
 
     try {
         HighFive::SilenceHDF5 silence;
-        HighFive::DataSet dataset = _file->getDataSet(_d_perimeters);
+        HighFive::DataSet dataset = _group.getDataSet(_d_perimeters);
 
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 1) {
-            throw MorphioError("Reading morphology file '" + _file->getName() +
-                               "': bad number of dimensions in 'perimeters' dataspace");
+            throw (MorphioError("': bad number of dimensions in 'perimeters' dataspace"));
         }
 
         std::vector<float> perimeters;
@@ -446,14 +455,13 @@ void MorphologyHDF5::_read(const std::string& groupName,
     if (_properties.version() != version)
         return;
     try {
-        const auto group = _file->getGroup(groupName);
+        const auto group = _group.getGroup(groupName);
 
         HighFive::DataSet dataset = group.getDataSet(_dataset);
 
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != expectedDimension) {
-            throw MorphioError("Reading morphology file '" + _file->getName() +
-                                "': bad number of dimensions in 'perimeters' dataspace");
+            throw (MorphioError("': bad number of dimensions in 'perimeters' dataspace"));
         }
 
         data.resize(dims[0]);
@@ -470,7 +478,7 @@ void MorphologyHDF5::_readEndoplasmicReticulum() {
         HighFive::SilenceHDF5 silence;
 
         try {
-            const auto group = _file->getGroup(_g_endoplasmic_reticulum);
+            const auto group = _group->getGroup(_g_endoplasmic_reticulum);
         } catch (const HighFive::GroupException&) {
             return;
         }
@@ -504,7 +512,7 @@ void MorphologyHDF5::_readMitochondria() {
         HighFive::SilenceHDF5 silence;
 
         try {
-            const auto group = _file->getGroup(_g_mitochondria);
+            const auto group = _group.getGroup(_g_mitochondria);
         } catch (HighFive::GroupException&) {
             return;
         }

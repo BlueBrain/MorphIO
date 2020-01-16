@@ -2,6 +2,7 @@
 
 #include <memory>  //std::unique_ptr
 
+#include "../../3rdparty/HighFive/include/highfive/H5Group.hpp"
 #include <morphio/properties.h>
 #include <morphio/section_iterators.hpp>
 #include <morphio/types.h>
