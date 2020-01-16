@@ -115,7 +115,9 @@ void bind_mutable_module(py::module& m) {
         .def_property_readonly("version", &morphio::mut::Morphology::version, "Returns the version")
 
         .def("write",
-             &morphio::mut::Morphology::write,
+             [](morphio::mut::Morphology* morph, py::object arg) {
+                 morph->write(py::str(arg));
+             },
              "Write file to H5, SWC, ASC format depending on filename "
              "extension",
              "filename"_a)
