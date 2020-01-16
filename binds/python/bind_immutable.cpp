@@ -120,19 +120,17 @@ void bind_immutable_module(py::module& m) {
             [](morphio::Morphology* morpho, IterType type) {
                 switch (type) {
                 case IterType::DEPTH_FIRST:
-   									return py::make_iterator<py::return_value_policy::reference_internal,
-																						 morphio::depth_iterator,
-																						 morphio::depth_iterator,
-																						 morphio::Section>(
-																							 morpho->depth_begin(), morpho->depth_end()
-																							 );
+                    return py::make_iterator<py::return_value_policy::reference_internal,
+                                             morphio::depth_iterator,
+                                             morphio::depth_iterator,
+                                             morphio::Section>(morpho->depth_begin(),
+                                                               morpho->depth_end());
                 case IterType::BREADTH_FIRST:
-  									return py::make_iterator<py::return_value_policy::reference_internal,
-																						 morphio::breadth_iterator,
-																						 morphio::breadth_iterator,
-																						 morphio::Section>(
-																							 morpho->breadth_begin(), morpho->breadth_end()
-																							 );
+                    return py::make_iterator<py::return_value_policy::reference_internal,
+                                             morphio::breadth_iterator,
+                                             morphio::breadth_iterator,
+                                             morphio::Section>(morpho->breadth_begin(),
+                                                               morpho->breadth_end());
                 case IterType::UPSTREAM:
                 default:
                     throw morphio::MorphioError(
@@ -243,26 +241,23 @@ void bind_immutable_module(py::module& m) {
             [](morphio::Section* section, IterType type) {
                 switch (type) {
                 case IterType::DEPTH_FIRST:
-									return py::make_iterator<py::return_value_policy::reference_internal,
-																					 morphio::depth_iterator,
-																					 morphio::depth_iterator,
-																					 morphio::Section>(
-																						 section->depth_begin(), section->depth_end()
-																						 );
+                    return py::make_iterator<py::return_value_policy::reference_internal,
+                                             morphio::depth_iterator,
+                                             morphio::depth_iterator,
+                                             morphio::Section>(section->depth_begin(),
+                                                               section->depth_end());
                 case IterType::BREADTH_FIRST:
-									return py::make_iterator<py::return_value_policy::reference_internal,
-																					 morphio::breadth_iterator,
-																					 morphio::breadth_iterator,
-																					 morphio::Section>(
-																						 section->breadth_begin(), section->breadth_end()
-																						 );
+                    return py::make_iterator<py::return_value_policy::reference_internal,
+                                             morphio::breadth_iterator,
+                                             morphio::breadth_iterator,
+                                             morphio::Section>(section->breadth_begin(),
+                                                               section->breadth_end());
                 case IterType::UPSTREAM:
-									return py::make_iterator<py::return_value_policy::reference_internal,
-																					 morphio::upstream_iterator,
-																					 morphio::upstream_iterator,
-																					 morphio::Section>(
-																						 section->upstream_begin(), section->upstream_end()
-																						 );
+                    return py::make_iterator<py::return_value_policy::reference_internal,
+                                             morphio::upstream_iterator,
+                                             morphio::upstream_iterator,
+                                             morphio::Section>(section->upstream_begin(),
+                                                               section->upstream_end());
                 default:
                     throw morphio::MorphioError("Only iteration types depth_first, breadth_first and "
                                               "upstream are supported");
@@ -326,26 +321,23 @@ void bind_immutable_module(py::module& m) {
             [](morphio::MitoSection* section, IterType type) {
                 switch (type) {
                 case IterType::DEPTH_FIRST:
-									return py::make_iterator<py::return_value_policy::reference_internal,
-																					 morphio::mito_depth_iterator,
-																					 morphio::mito_depth_iterator,
-																					 morphio::MitoSection>(
-																						 section->depth_begin(), section->depth_end()
-																						 );
+                    return py::make_iterator<py::return_value_policy::reference_internal,
+                                             morphio::mito_depth_iterator,
+                                             morphio::mito_depth_iterator,
+                                             morphio::MitoSection>(section->depth_begin(),
+                                                                   section->depth_end());
                 case IterType::BREADTH_FIRST:
-									return py::make_iterator<py::return_value_policy::reference_internal,
-																					 morphio::mito_breadth_iterator,
-																					 morphio::mito_breadth_iterator,
-																					 morphio::MitoSection>(
-																						 section->breadth_begin(), section->breadth_end()
-																						 );
+                    return py::make_iterator<py::return_value_policy::reference_internal,
+                                             morphio::mito_breadth_iterator,
+                                             morphio::mito_breadth_iterator,
+                                             morphio::MitoSection>(section->breadth_begin(),
+                                                                   section->breadth_end());
                 case IterType::UPSTREAM:
-									return py::make_iterator<py::return_value_policy::reference_internal,
-																					 morphio::mito_upstream_iterator,
-																					 morphio::mito_upstream_iterator,
-																					 morphio::MitoSection>(
-																						 section->upstream_begin(), section->upstream_end()
-																						 );
+                    return py::make_iterator<py::return_value_policy::reference_internal,
+                                             morphio::mito_upstream_iterator,
+                                             morphio::mito_upstream_iterator,
+                                             morphio::MitoSection>(section->upstream_begin(),
+                                                                   section->upstream_end());
                 default:
                     throw morphio::MorphioError("Only iteration types depth_first, breadth_first and "
                                                 "upstream are supported");
