@@ -36,7 +36,7 @@ python:
   - 3.7
 
 before_install:
-  - if [[ $TRAVIS_OS_NAME = linux ]]; then sudo apt-get install libhdf5-dev; else brew install hdf5; fi
+  - ./ci/before_install.sh
 install: skip
 script:
   - ./ci/python_test.sh
