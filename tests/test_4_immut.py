@@ -106,3 +106,20 @@ def test_section___str__():
 def test_from_pathlib():
     neuron = Morphology(Path(_path, "simple.asc"))
     assert_equal(len(neuron.root_sections), 2)
+
+
+def test_more_iter():
+    '''This used to fail at commit f74ce1f56de805ebeb27584051bbbb3a65cd1213'''
+    m = Morphology(os.path.join(_path, 'simple.asc'))
+
+    sections = list(m.iter())
+    assert_array_equal([s1.id for s1 in sections],
+                       [0, 1, 2, 3, 4, 5])
+
+    sections = list(m.iter(IterType.breadth_first))
+    assert_array_equal([s.id for s in sections],
+                       [0, 3, 1, 2, 4, 5])
+
+    sections = list(m.section(2).iter(IterType.upstream))
+    assert_array_equal([s.id for s in sections],
+                       [2, 0])
