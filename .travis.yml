@@ -1,14 +1,12 @@
-matrix:
+jobs:
   include:
     - os: linux
       dist: xenial
-      sudo: required
       env:
         CXX: g++
         CC: gcc
     - os: linux
       dist: xenial
-      sudo: required
       env:
         CXX: clang++
         CC: clang
@@ -31,7 +29,6 @@ cache:
     - $HOME/.cache/pip
     # - $HOME/Library/Caches/Homebrew
 language: python
-sudo: required
 python:
   - 3.7
 
