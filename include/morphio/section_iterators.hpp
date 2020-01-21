@@ -309,8 +309,8 @@ inline upstream_iterator_t<SectionT> upstream_iterator_t<SectionT>::operator++(i
 
 template <typename SectionT>
 inline bool upstream_iterator_t<SectionT>::operator==(const upstream_iterator_t& other) const {
-    if (end) {
-        return end == other.end;
+    if ((end || other.end) && end != other.end) {
+        return false;
     }
     return current == other.current;
 }
