@@ -24,10 +24,10 @@ jobs:
         CXX: g++
         CC: gcc
 
-cache:
-  directories:
-    - $HOME/.cache/pip
-    # - $HOME/Library/Caches/Homebrew
+# cache:
+#   directories:
+#     - $HOME/.cache/pip
+#     - $HOME/Library/Caches/Homebrew
 language: python
 python:
   - 3.7
