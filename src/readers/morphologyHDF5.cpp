@@ -30,14 +30,14 @@ const std::string _d_points("points");
 const size_t _pointColumns = 4;
 
 // v1
-const std::string _d_structure("/structure");
+const std::string _d_structure("structure");
 const size_t _structureV1Columns = 3;
 
 // v1.1
-const std::string _g_metadata("/metadata");
+const std::string _g_metadata("metadata");
 const std::string _a_family("cell_family");
-const std::string _d_perimeters("/perimeters");
-const std::string _g_mitochondria("/organelles/mitochondria");
+const std::string _d_perimeters("perimeters");
+const std::string _g_mitochondria("organelles/mitochondria");
 
 // endoplasmic reticulum
 const std::string _g_endoplasmic_reticulum("/organelles/endoplasmic_reticulum");
@@ -131,7 +131,7 @@ void MorphologyHDF5::_selectRepairStage() {
 
 void MorphologyHDF5::_resolveV1() {
     HighFive::SilenceHDF5 silence;
-    _points.reset(new HighFive::DataSet(_group.getDataSet("/" + _d_points)));
+    _points.reset(new HighFive::DataSet(_group.getDataSet(_d_points)));
     auto dataspace = _points->getSpace();
     _pointsDims = dataspace.getDimensions();
 

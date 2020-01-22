@@ -21,6 +21,30 @@ namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
 SomaType getSomaType(long unsigned int nSomaPoints);
 
+//Morphology::Morphology(const Property::Properties& properties, unsigned int options) {}
+
+Morphology::Morphology(const HighFive::Group& group, unsigned int options)
+{
+    _properties = std::make_shared<Property::Properties>(readers::h5::load(group));
+
+    buildChildren(_properties);
+
+    if (version() != MORPHOLOGY_VERSION_SWC_1)
+        _properties->_cellLevel._somaType = getSomaType(soma().points().size());
+
+    // Sad trick because, contrary to SWC and ASC, H5 does not create a
+    // mut::Morphology object on which we can directly call
+    // mut::Morphology::applyModifiers
+    if (options && (version() == MORPHOLOGY_VERSION_H5_1 || version() == MORPHOLOGY_VERSION_H5_1_1 || version() == MORPHOLOGY_VERSION_H5_2)) {
+        mut::Morphology mutable_morph(*this);
+        mutable_morph.sanitize();
+        mutable_morph.applyModifiers(options);
+        _properties = std::make_shared<Property::Properties>(
+            mutable_morph.buildReadOnly());
+        buildChildren(_properties);
+    }
+}
+
 Morphology::Morphology(const std::string& source, unsigned int options) {
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos)

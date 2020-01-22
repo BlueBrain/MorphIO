@@ -2,7 +2,7 @@
 
 #include <memory>  //std::unique_ptr
 
-#include "../../3rdparty/HighFive/include/highfive/H5Group.hpp"
+#include <highfive/H5Group.hpp>
 #include <morphio/properties.h>
 #include <morphio/section_iterators.hpp>
 #include <morphio/types.h>
@@ -37,8 +37,10 @@ class Morphology
         Example:
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
-    explicit Morphology(mut::Morphology);
+    Morphology(const URI& source, unsigned int options = NO_MODIFIER);
+    Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+    //Morphology(const Property::Properties& properties, unsigned int options);
+    Morphology(mut::Morphology);
 
     /**
      * Return the soma object

@@ -89,8 +89,8 @@ foreach(TARGET morphio_shared morphio_static)
      $<BUILD_INTERFACE:${MORPHIO_INCLUDE_DIR}>
      $<INSTALL_INTERFACE:include>
      $<TARGET_PROPERTY:gsl-lite,INTERFACE_INCLUDE_DIRECTORIES>
-    PRIVATE
      $<TARGET_PROPERTY:HighFive,INTERFACE_INCLUDE_DIRECTORIES>
+    PRIVATE
      $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
     )
   target_link_libraries(${TARGET} PUBLIC gsl-lite PRIVATE HighFive lexertl)
@@ -101,4 +101,5 @@ install(
   TARGETS morphio_shared
   EXPORT MorphIOTargets
   LIBRARY DESTINATION lib
+  PUBLIC_HEADER DESTINATION include
   )
