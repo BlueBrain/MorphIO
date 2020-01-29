@@ -159,13 +159,11 @@ const SomaType& Morphology::somaType() const {
     return _properties->somaType();
 }
 
-const std::map<int, std::vector<unsigned int>>& Morphology::connectivity() const
-{
+const std::map<int, std::vector<unsigned int>>& Morphology::connectivity() const {
     return _properties->children<Property::Section>();
 }
 
-const MorphologyVersion& Morphology::version() const
-{
+const MorphologyVersion& Morphology::version() const {
     return _properties->version();
 }
 

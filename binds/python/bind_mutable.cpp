@@ -104,7 +104,8 @@ void bind_mutable_module(py::module& m) {
         .def("as_immutable",
              [](const morphio::mut::Morphology* morph) { return morphio::Morphology(*morph); })
 
-        .def_property_readonly("connectivity", &morphio::mut::Morphology::connectivity,
+        .def_property_readonly("connectivity",
+                               &morphio::mut::Morphology::connectivity,
                                "Return the graph connectivity of the morphology "
                                "where each section is seen as a node\nNote: -1 is the soma node")
 
@@ -118,13 +119,12 @@ void bind_mutable_module(py::module& m) {
 
         .def_property_readonly("version", &morphio::mut::Morphology::version, "Returns the version")
 
-        .def("write",
-             [](morphio::mut::Morphology* morph, py::object arg) {
-                 morph->write(py::str(arg));
-             },
-             "Write file to H5, SWC, ASC format depending on filename "
-             "extension",
-             "filename"_a)
+        .def(
+            "write",
+            [](morphio::mut::Morphology* morph, py::object arg) { morph->write(py::str(arg)); },
+            "Write file to H5, SWC, ASC format depending on filename "
+            "extension",
+            "filename"_a)
 
         // Iterators
         .def(

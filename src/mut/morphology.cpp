@@ -315,20 +315,22 @@ void Morphology::applyModifiers(unsigned int modifierFlags) {
         modifiers::nrn_order(*this);
 }
 
-std::unordered_map<int, std::vector<unsigned int>> Morphology::connectivity()
-{
+std::unordered_map<int, std::vector<unsigned int>> Morphology::connectivity() {
     std::unordered_map<int, std::vector<unsigned int>> connectivity;
 
     const auto& roots = rootSections();
     connectivity[-1].reserve(roots.size());
-    std::transform(roots.begin(), roots.end(), std::back_inserter(connectivity[-1]),
+    std::transform(roots.begin(),
+                   roots.end(),
+                   std::back_inserter(connectivity[-1]),
                    [](const std::shared_ptr<Section>& section) { return section->id(); });
 
-    for(const auto& kv: _children)
-    {
+    for (const auto& kv : _children) {
         auto& nodeEdges = connectivity[static_cast<int>(kv.first)];
         nodeEdges.reserve(kv.second.size());
-        std::transform(kv.second.begin(), kv.second.end(), std::back_inserter(nodeEdges),
+        std::transform(kv.second.begin(),
+                       kv.second.end(),
+                       std::back_inserter(nodeEdges),
                        [](const std::shared_ptr<Section>& section) { return section->id(); });
     }
 
@@ -336,8 +338,7 @@ std::unordered_map<int, std::vector<unsigned int>> Morphology::connectivity()
 }
 
 
-void Morphology::write(const std::string& filename)
-{
+void Morphology::write(const std::string& filename) {
     const size_t pos = filename.find_last_of(".");
     assert(pos != std::string::npos);
 
