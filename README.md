@@ -1,4 +1,4 @@
-# MorphIO [![Build Status](https://travis-ci.com/wizmer/morpho-tool.svg?token=KRP9rHiV52PC6mX3ACXp&branch=master)](https://travis-ci.com/wizmer/morpho-tool)
+# MorphIO [![Build Status](https://travis-ci.com/BlueBrain/MorphIO.svg?token=KRP9rHiV52PC6mX3ACXp&branch=master)](https://travis-ci.com/BlueBrain/MorphIO)
 
 ## Table of content
 
@@ -66,7 +66,7 @@ git clone git@github.com:bluebrain/morphio.git --recursive
 cd morphio
 mkdir build && cd build
 cmake ..
-make
+make install
 ```
 
 To use the installed library:
@@ -92,21 +92,21 @@ It supports the following formats:
 - H5 v1
 - H5 v2
 
-It provides 3 classes that are the starting point of every morphology analysis:
-- Soma: contains the information related to the soma
+It provides 3 C++ classes that are the starting point of every morphology analysis:
+- `Soma`: contains the information related to the soma.
 
-- Section: a section is the succession of points between two bifurcation. To the bare minimum
-the Section object will contain the section type, the position and diameter of each point.
+- `Section`: a section is the succession of points between two bifurcations. To the bare minimum
+the `Section` object will contain the section type, the position and diameter of each point.
 
-- Morphology: the morphology object will contain general information about the loaded cell
-but will also provide accessors to the different section.
+- `Morphology`: the morphology object contains general information about the loaded cell
+but also provides accessors to the different sections.
 
-One important concept is that MorphIO is splitted into a *read-only* part and a *read/write* one.
+One important concept is that MorphIO is split into a *read-only* part and a *read/write* one.
 
 ### Quick summary
 *C++ vs Python*:
-- C++ accessors become python properties
-- style: C++ functions are camel case while python ones are snake case
+- C++ accessors become Python properties.
+- style: C++ functions are camel case while Python ones are snake case.
 
 ### Include/imports
 
@@ -180,23 +180,20 @@ int main()
     auto first_root = roots[0];
 
     // iterate on sections starting at first_root
-    for(auto it = first_root.depth_begin(); it != first_root.depth_end(); ++it) {
-        const morphio::Section &section = (*it);
+    for (auto it = first_root.depth_begin(); it != first_root.depth_end(); ++it) {
+        const morphio::Section &section = *it;
 
-        std::cout << "Section type: " << section.type() << std::endl;
-        std::cout << "Section id: " << section.id() << std::endl;
-        std::cout << "Parent section id: " << section.parent().id() << std::endl;
-        std::cout << "Number of child sections: " << section.children().size() << std::endl;
-        std::cout << "X - Y - Z - Diameter" << std::endl;
-        for(int i = 0; i<section.points().size(); ++i) {
-            std::cout <<
-                section.points()[i][0] << ' ' <<
-                section.points()[i][1] << ' ' <<
-                section.points()[i][2] << ' ' <<
-                section.diameters()[i] << std::endl;
+        std::cout << "Section type: " << section.type()
+                  << "\nSection id: " << section.id()
+                  << "\nParent section id: " << section.parent().id()
+                  << "\nNumber of child sections: " << section.children().size()
+                  << "\nX - Y - Z - Diameter";
+        for (auto i = 0u; i < section.points().size(); ++i) {
+            const auto& point = section.points()[i];
+            std::copy(point.begin(), point.end(), std::ostream_iterator<float>(std::cout, " "));
+            std::cout << '\n' << section.diameters()[i] << '\n';
         }
-
-        std::cout << std::endl;
+        std::cout << '\n';
     }
 }
 ```
@@ -222,12 +219,9 @@ for section in first_root.iter():
         print('{} - {}'.format(point, diameter))
 ```
 
-
-
-
 #### Creating morphologies with the mutable API
 
-Here is a simple example to create a morphology from scratch and writing it to disk
+Here is a simple example to create a morphology from scratch and write it to disk
 
 ```C++
 #include <morphio/mut/morphology.h>
@@ -238,14 +232,14 @@ int main()
     morpho.soma()->points() = {{0, 0, 0}, {1, 1, 1}};
     morpho.soma()->diameters() = {1, 1};
 
-    std::shared_ptr<morphio::mut::Section> section = morpho.appendRootSection(
+    auto section = morpho.appendRootSection(
         morphio::Property::PointLevel(
             {{2, 2, 2}, {3, 3, 3}}, // x,y,z coordinates of each point
             {4, 4}, // diameter of each point
             {5, 5}),
         morphio::SectionType::SECTION_AXON); // (optional) perimeter of each point
 
-    std::shared_ptr<morphio::mut::Section> childSection = section.appendSection(
+    auto childSection = section->appendSection(
         morphio::Property::PointLevel(
             {{3, 3, 3}, {4, 4, 4}},
             {4, 4},
@@ -316,20 +310,21 @@ morpho.write("outfile.h5")
 When opening the file, modifier flags can be passed to alter the morphology representation.
 The following flags are supported:
 
-- morphio::NO\_MODIFIER:
+- `morphio::NO\_MODIFIER`:
 This is the default flag, it will do nothing.
-- morphio::TWO\_POINTS\_SECTIONS:
+- `morphio::TWO\_POINTS\_SECTIONS`:
 Each section gets reduce to a line made of the first and last point.
-- morphio::SOMA\_SPHERE:
+- `morphio::SOMA\_SPHERE`:
 The soma is reduced to a sphere which is the center of gravity of the real soma.
-- morphio::NO\_DUPLICATES:
+- `morphio::NO\_DUPLICATES`:
 The duplicate point are not present. It means the first point of each section
 is no longer the last point of the parent section.
-- morphio::NRN\_ORDER:
+- `morphio::NRN\_ORDER`:
 Neurite are reordered according to the
 [NEURON simulator ordering](https://github.com/neuronsimulator/nrn/blob/2dbf2ebf95f1f8e5a9f0565272c18b1c87b2e54c/share/lib/hoc/import3d/import3d_gui.hoc#L874)
 
 Multiple flags can be passed by using the standard bit flag manipulation (works the same way in C++ and Python):
+
 C++:
 ```C++
 #include <morphio/Morphology.h>
@@ -349,13 +344,13 @@ As mitochondria can be represented as trees, one can define the concept of *mito
 similar to neuronal section and end up with a similar API. The morphology object has a
 *mitochondria* handle method that exposes the basic methods:
 
-- root_sections: returns the section ID of the starting mitochondrial section
+- `root_sections`: returns the section ID of the starting mitochondrial section
 of each mitochondrion.
-- section(id): returns a given mitochondrial section
-- append_section: creates a new mitochondrial section
-_ depth_begin: a depth first iterator
-_ breadth_begin: a breadth first iterator
-_ upstream_begin: an upstream iterator
+- `section(id)`: returns a given mitochondrial section
+- `append_section`: creates a new mitochondrial section
+_ `depth_begin`: a depth first iterator
+_ `breadth_begin`: a breadth first iterator
+_ `upstream_begin`: an upstream iterator
 
 ```python
 from morphio.mut import Morphology
@@ -425,3 +420,8 @@ morphio.set_maximum_warnings(0)
 
 # Specification
 See https://github.com/BlueBrain/MorphIO/blob/master/doc/specification.md
+
+# Contributing
+
+If you want to improve the project or you see any issue, every contribution is welcome.
+Please check the [contribution guidelines](CONTRIBUTING.md) for more information.
