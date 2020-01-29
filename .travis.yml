@@ -8,6 +8,12 @@ jobs:
     - os: linux
       dist: xenial
       env:
+        CXX: g++
+        CC: gcc
+      python: 2.7
+    - os: linux
+      dist: xenial
+      env:
         CXX: clang++
         CC: clang
 
