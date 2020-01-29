@@ -5,7 +5,7 @@ set -euxo pipefail
 VENV=env
 
 rm -rf "$VENV"
-python -mvenv "$VENV"
+virtualenv -p $(which python) "$VENV"
 
 set +u  # ignore errors in virtualenv's activate
 source "$VENV/bin/activate"
