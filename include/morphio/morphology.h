@@ -107,6 +107,14 @@ class Morphology
     const std::vector<SectionType>& sectionTypes() const;
 
     /**
+     * Return the graph connectivity of the morphology where each section
+     * is seen as a node
+     * Note: -1 is the soma node
+     **/
+    const std::map<int, std::vector<unsigned int>>& connectivity() const;
+
+
+    /**
        Depth first iterator starting at a given section id
 
        If id == -1, the iteration will start at each root section, successively

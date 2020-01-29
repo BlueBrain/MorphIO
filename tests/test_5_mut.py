@@ -1,7 +1,8 @@
+from collections import OrderedDict
 import os
 import numpy as np
 from numpy.testing import assert_array_equal
-from nose.tools import assert_equal, assert_raises, ok_
+from nose.tools import assert_equal, assert_raises, ok_, assert_dict_equal
 from pathlib2 import Path
 
 import morphio
@@ -39,6 +40,17 @@ def test_point_level():
 
     assert_substring("Point vector have size: 2 while Perimeter vector has size: 1",
                      str(obj.exception))
+
+
+def test_connectivity():
+    cells = OrderedDict({
+        'asc': Morphology(os.path.join(_path, "simple.asc")),
+        'swc': Morphology(os.path.join(_path, "simple.swc")),
+        'h5': Morphology(os.path.join(_path, "h5/v1/simple.h5")),
+    })
+
+    for cell in cells:
+        assert_dict_equal(cells[cell].connectivity, {-1: [0, 3], 0: [1, 2], 3: [4, 5]})
 
 
 def test_empty_neurite():
