@@ -24,16 +24,23 @@ jobs:
         CXX: g++
         CC: gcc
 
-# cache:
-#   directories:
-#     - $HOME/.cache/pip
-#     - $HOME/Library/Caches/Homebrew
+addons:
+  homebrew:
+    packages:
+    - hdf5
+  apt:
+    packages:
+    - libhdf5-dev
+
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+
 language: python
 python:
   - 3.7
 
-before_install:
-  - if [[ $TRAVIS_OS_NAME = linux ]]; then sudo apt-get install libhdf5-dev; else brew list hdf5 || brew install hdf5; fi
 install: skip
 script:
   - ./ci/python_test.sh
