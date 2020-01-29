@@ -2,7 +2,7 @@ import os
 import numpy as np
 from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises, ok_
-from pathlib import Path
+from pathlib2 import Path
 
 import morphio
 from morphio.mut import Morphology

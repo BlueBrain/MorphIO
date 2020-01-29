@@ -3,7 +3,7 @@ import numpy as np
 from numpy.testing import assert_array_equal, assert_equal, assert_raises
 from nose.tools import ok_
 import h5py
-from pathlib import Path
+from pathlib2 import Path
 
 from morphio.mut import Morphology
 from morphio import (SectionBuilderError, set_maximum_warnings, SectionType, PointLevel,

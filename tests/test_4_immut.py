@@ -1,7 +1,7 @@
 import os
 from collections import OrderedDict
 from itertools import combinations
-from pathlib import Path
+from pathlib2 import Path
 
 import numpy as np
 from nose.tools import assert_equal, assert_not_equal, assert_raises, ok_
