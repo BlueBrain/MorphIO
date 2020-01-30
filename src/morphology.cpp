@@ -84,13 +84,11 @@ Mitochondria Morphology::mitochondria() const {
     return Mitochondria(_properties);
 }
 
-const EndoplasmicReticulum Morphology::endoplasmicReticulum() const
-{
+const EndoplasmicReticulum Morphology::endoplasmicReticulum() const {
     return EndoplasmicReticulum(_properties);
 }
 
-const std::vector<Property::Annotation>& Morphology::annotations() const
-{
+const std::vector<Property::Annotation>& Morphology::annotations() const {
     return _properties->_annotations;
 }
 

@@ -134,8 +134,7 @@ struct MitochondriaSectionLevel {
     bool operator!=(const MitochondriaSectionLevel& other) const;
 };
 
-struct EndoplasmicReticulumLevel
-{
+struct EndoplasmicReticulumLevel {
     std::vector<uint32_t> _sectionIndex;
     std::vector<float> _volume;
     std::vector<float> _surfaceArea;

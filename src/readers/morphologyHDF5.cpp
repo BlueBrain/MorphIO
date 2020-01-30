@@ -465,8 +465,7 @@ void MorphologyHDF5::_read(const std::string& groupName,
     }
 }
 
-void MorphologyHDF5::_readEndoplasmicReticulum()
-{
+void MorphologyHDF5::_readEndoplasmicReticulum() {
     {
         HighFive::SilenceHDF5 silence;
 
@@ -478,18 +477,29 @@ void MorphologyHDF5::_readEndoplasmicReticulum()
     }
 
 
-    _read(_g_endoplasmic_reticulum, _d_section_index, MORPHOLOGY_VERSION_H5_1_1, 1,
+    _read(_g_endoplasmic_reticulum,
+          _d_section_index,
+          MORPHOLOGY_VERSION_H5_1_1,
+          1,
           _properties._endoplasmicReticulumLevel._sectionIndex);
-    _read(_g_endoplasmic_reticulum, _d_volume, MORPHOLOGY_VERSION_H5_1_1, 1,
+    _read(_g_endoplasmic_reticulum,
+          _d_volume,
+          MORPHOLOGY_VERSION_H5_1_1,
+          1,
           _properties._endoplasmicReticulumLevel._volume);
-    _read(_g_endoplasmic_reticulum, _d_surface_area, MORPHOLOGY_VERSION_H5_1_1, 1,
+    _read(_g_endoplasmic_reticulum,
+          _d_surface_area,
+          MORPHOLOGY_VERSION_H5_1_1,
+          1,
           _properties._endoplasmicReticulumLevel._surfaceArea);
-    _read(_g_endoplasmic_reticulum, _d_filament_count, MORPHOLOGY_VERSION_H5_1_1, 1,
+    _read(_g_endoplasmic_reticulum,
+          _d_filament_count,
+          MORPHOLOGY_VERSION_H5_1_1,
+          1,
           _properties._endoplasmicReticulumLevel._filamentCount);
 }
 
-void MorphologyHDF5::_readMitochondria()
-{
+void MorphologyHDF5::_readMitochondria() {
     {
         HighFive::SilenceHDF5 silence;
 

@@ -10,7 +10,7 @@ namespace morphio {
  **/
 class EndoplasmicReticulum
 {
-public:
+  public:
     /**
        Returns the list of neuronal section indices
     **/
@@ -31,13 +31,11 @@ public:
     **/
     const std::vector<uint32_t>& filamentCounts() const;
 
-private:
+  private:
     EndoplasmicReticulum(std::shared_ptr<Property::Properties> properties)
-        : _properties(std::move(properties))
-    {
-    }
+        : _properties(std::move(properties)) {}
     std::shared_ptr<Property::Properties> _properties;
 
     friend class Morphology;
 };
-} // namespace morphio
+}  // namespace morphio
