@@ -39,6 +39,13 @@ const std::string _a_family("cell_family");
 const std::string _d_perimeters("/perimeters");
 const std::string _g_mitochondria("/organelles/mitochondria");
 
+// endoplasmic reticulum
+const std::string _g_endoplasmic_reticulum("/organelles/endoplasmic_reticulum");
+const std::string _d_section_index("section_index");
+const std::string _d_volume("volume");
+const std::string _d_surface_area("surface_area");
+const std::string _d_filament_count("filament_count");
+
 // v1.1 & v2
 const std::string _a_version("version");
 
@@ -75,6 +82,7 @@ Property::Properties MorphologyHDF5::load() {
     _readSectionTypes();
     _readPerimeters(firstSectionOffset);
     _readMitochondria();
+    _readEndoplasmicReticulum();
 
     return _properties;
 }
@@ -455,6 +463,40 @@ void MorphologyHDF5::_read(const std::string& groupName,
             throw MorphioError("No empty perimeters allowed for glia "
                                "morphology");
     }
+}
+
+void MorphologyHDF5::_readEndoplasmicReticulum() {
+    {
+        HighFive::SilenceHDF5 silence;
+
+        try {
+            const auto group = _file->getGroup(_g_endoplasmic_reticulum);
+        } catch (const HighFive::GroupException&) {
+            return;
+        }
+    }
+
+
+    _read(_g_endoplasmic_reticulum,
+          _d_section_index,
+          MORPHOLOGY_VERSION_H5_1_1,
+          1,
+          _properties._endoplasmicReticulumLevel._sectionIndex);
+    _read(_g_endoplasmic_reticulum,
+          _d_volume,
+          MORPHOLOGY_VERSION_H5_1_1,
+          1,
+          _properties._endoplasmicReticulumLevel._volume);
+    _read(_g_endoplasmic_reticulum,
+          _d_surface_area,
+          MORPHOLOGY_VERSION_H5_1_1,
+          1,
+          _properties._endoplasmicReticulumLevel._surfaceArea);
+    _read(_g_endoplasmic_reticulum,
+          _d_filament_count,
+          MORPHOLOGY_VERSION_H5_1_1,
+          1,
+          _properties._endoplasmicReticulumLevel._filamentCount);
 }
 
 void MorphologyHDF5::_readMitochondria() {

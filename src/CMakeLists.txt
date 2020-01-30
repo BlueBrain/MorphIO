@@ -1,4 +1,5 @@
 set(MORPHIO_SOURCES
+    endoplasmic_reticulum.cpp
     enums.cpp
     errorMessages.cpp
     mito_section.cpp

@@ -50,6 +50,11 @@ class Morphology
     Mitochondria mitochondria() const;
 
     /**
+     * Return the endoplasmic reticulum object
+     **/
+    const EndoplasmicReticulum endoplasmicReticulum() const;
+
+    /**
      * Return the annotation object
      **/
     const std::vector<Property::Annotation>& annotations() const;

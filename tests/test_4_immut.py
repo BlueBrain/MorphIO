@@ -103,6 +103,14 @@ def test_mitochondria():
     assert_equal(len(mito_root[1].children), 0)
 
 
+def test_endoplasmic_reticulum():
+    morpho = Morphology(os.path.join(_path, "h5/v1/endoplasmic-reticulum.h5"))
+    er = morpho.endoplasmic_reticulum
+    assert_array_equal(er.section_indices, [1, 4, 5])
+    assert_array_almost_equal(er.volumes, [10.55, 47.12, 0.83])
+    assert_array_almost_equal(er.surface_areas, [111.24, 87.44, 0.11], decimal=5)
+    assert_array_equal(er.filament_counts, [12, 42, 8])
+
 def test_section___str__():
     assert_equal(str(CELLS['asc'].root_sections[0]),
                  'Section(id=0, points=[(0 0 0),..., (0 5 0)])')
