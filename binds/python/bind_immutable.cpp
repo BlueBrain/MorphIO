@@ -42,14 +42,12 @@ void bind_immutable_module(py::module& m) {
         .def_property_readonly("mitochondria",
                                &morphio::Morphology::mitochondria,
                                "Returns the soma object")
-        .def_property_readonly(
-            "annotations",
-            &morphio::Morphology::annotations,
-            "Returns a list of annotations")
-        .def_property_readonly(
-                "endoplasmic_reticulum",
-                &morphio::Morphology::endoplasmicReticulum,
-                "Returns the endoplasmic reticulum object")
+        .def_property_readonly("annotations",
+                               &morphio::Morphology::annotations,
+                               "Returns a list of annotations")
+        .def_property_readonly("endoplasmic_reticulum",
+                               &morphio::Morphology::endoplasmicReticulum,
+                               "Returns the endoplasmic reticulum object")
         .def_property_readonly("root_sections",
                                &morphio::Morphology::rootSections,
                                "Returns a list of all root sections "
