@@ -7,8 +7,7 @@ namespace mut {
 class Soma
 {
   public:
-    Soma()
-        : _somaType(SOMA_UNDEFINED) {}
+    Soma() {}
 
     Soma(const Property::PointLevel& pointProperties);
     Soma(const Soma& soma);
@@ -54,7 +53,6 @@ class Soma
 
   private:
     friend class Morphology;
-    SomaType _somaType;
     Property::PointLevel _pointProperties;
 };
 
@@ -75,7 +73,15 @@ const std::vector<float>& Soma::diameters() const noexcept {
 }
 
 inline SomaType Soma::type() const noexcept {
-    return _somaType;
+    // this function seems not complete, see /src/readers/morphologySWC.cpp, line 217 for a more complete one
+    try {
+        return std::map<long unsigned int, SomaType>{{0, SOMA_UNDEFINED},
+                                                     {1, SOMA_SINGLE_POINT},
+                                                     {2, SOMA_UNDEFINED}}
+            .at(_pointProperties._points.size());
+    } catch (const std::out_of_range&) {
+        return SOMA_SIMPLE_CONTOUR;
+    }
 }
 
 inline Property::PointLevel& Soma::properties() noexcept {
@@ -88,6 +94,5 @@ inline const Property::PointLevel& Soma::properties() const noexcept {
 
 std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& sectionPtr);
 std::ostream& operator<<(std::ostream& os, const Soma& soma);
-
 }  // namespace mut
 }  // namespace morphio

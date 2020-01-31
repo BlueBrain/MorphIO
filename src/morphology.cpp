@@ -49,7 +49,7 @@ Morphology::Morphology(const std::string& source, unsigned int options) {
     buildChildren(_properties);
 
     if (version() != MORPHOLOGY_VERSION_SWC_1)
-        _properties->_cellLevel._somaType = getSomaType(soma().points().size());
+        _properties->_cellLevel._somaType = soma().type(); 
 
     // Sad trick because, contrary to SWC and ASC, H5 does not create a
     // mut::Morphology object on which we can directly call
@@ -186,17 +186,6 @@ breadth_iterator Morphology::breadth_begin() const {
 
 breadth_iterator Morphology::breadth_end() const {
     return breadth_iterator();
-}
-
-SomaType getSomaType(long unsigned int nSomaPoints) {
-    try {
-        return std::map<long unsigned int, SomaType>{{0, SOMA_UNDEFINED},
-                                                     {1, SOMA_SINGLE_POINT},
-                                                     {2, SOMA_UNDEFINED}}
-            .at(nSomaPoints);
-    } catch (const std::out_of_range&) {
-        return SOMA_SIMPLE_CONTOUR;
-    }
 }
 
 void buildChildren(std::shared_ptr<Property::Properties> properties) {

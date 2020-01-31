@@ -114,6 +114,7 @@ class Morphology
     **/
     breadth_iterator breadth_begin() const;
     breadth_iterator breadth_end() const;
+    SomaType getSomaType() const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //
