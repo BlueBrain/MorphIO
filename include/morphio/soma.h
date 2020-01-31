@@ -41,7 +41,7 @@ class Soma
     /**
      * Return the soma type
      **/
-    SomaType type() const noexcept;
+    inline SomaType type() const noexcept;
     /**
      * Return the center of gravity of the soma points
      **/
@@ -79,6 +79,10 @@ class Soma
 
 inline range<const Point> Soma::points() const noexcept {
     return _properties->_somaLevel._points;
+}
+
+inline SomaType Soma::type() const noexcept {
+    return _properties->_cellLevel._somaType;
 }
 
 inline range<const float> Soma::diameters() const noexcept {

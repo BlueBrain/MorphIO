@@ -1,6 +1,7 @@
 #include <cassert>
 #include <iostream>
 
+#include <array>
 #include <fstream>
 #include <streambuf>
 
@@ -188,19 +189,11 @@ breadth_iterator Morphology::breadth_end() const {
     return breadth_iterator();
 }
 
+std::array<SomaType, 3> nPoints2somaTypeMap = {SOMA_UNDEFINED, SOMA_SINGLE_POINT, SOMA_UNDEFINED};
 SomaType getSomaType(long unsigned int nSomaPoints) noexcept {
-    switch (nSomaPoints) {
-    case 0:
-    case 2: {
-        return SOMA_UNDEFINED;
-    }
-    case 1: {
-        return SOMA_SINGLE_POINT;
-    }
-    default: {
-        return SOMA_SIMPLE_CONTOUR;
-    }
-    }
+    // use of a std::array for speed
+    return (nSomaPoints < nPoints2somaTypeMap.size()) ? nPoints2somaTypeMap[nSomaPoints]
+                                                      : SOMA_SIMPLE_CONTOUR;
 }
 
 void buildChildren(std::shared_ptr<Property::Properties> properties) {

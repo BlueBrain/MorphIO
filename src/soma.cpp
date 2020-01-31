@@ -9,10 +9,6 @@ namespace morphio {
 Soma::Soma(const std::shared_ptr<Property::Properties>& properties)
     : _properties(properties) {}
 
-SomaType Soma::type() const noexcept {
-    return morphio::getSomaType(points().size());
-}
-
 Point Soma::center() const {
     return centerOfGravity(_properties->_somaLevel._points);
 }
