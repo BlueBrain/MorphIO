@@ -7,8 +7,7 @@ namespace mut {
 class Soma
 {
   public:
-    Soma()
-        : _somaType(SOMA_UNDEFINED) {}
+    Soma() {}
 
     Soma(const Property::PointLevel& pointProperties);
     Soma(const Soma& soma);
@@ -31,7 +30,7 @@ class Soma
     /**
        Return the soma type
     **/
-    inline SomaType type() const noexcept;
+    SomaType type() const noexcept;
     /**
      * Return the center of gravity of the soma points
      **/
@@ -54,7 +53,6 @@ class Soma
 
   private:
     friend class Morphology;
-    SomaType _somaType;
     Property::PointLevel _pointProperties;
 };
 
@@ -74,9 +72,6 @@ const std::vector<float>& Soma::diameters() const noexcept {
     return _pointProperties._diameters;
 }
 
-inline SomaType Soma::type() const noexcept {
-    return _somaType;
-}
 
 inline Property::PointLevel& Soma::properties() noexcept {
     return _pointProperties;

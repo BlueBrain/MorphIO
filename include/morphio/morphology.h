@@ -12,6 +12,8 @@ enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
 using breadth_iterator = breadth_iterator_t<Section, Morphology>;
 using depth_iterator = depth_iterator_t<Section, Morphology>;
 
+SomaType getSomaType(long unsigned int nSomaPoints) noexcept;
+
 /** Read access a Morphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure

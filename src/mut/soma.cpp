@@ -9,16 +9,17 @@
 namespace morphio {
 namespace mut {
 Soma::Soma(const Property::PointLevel& pointProperties)
-    : _somaType(SOMA_UNDEFINED)
-    , _pointProperties(pointProperties) {}
+    : _pointProperties(pointProperties) {}
 
 Soma::Soma(const Soma& soma)
-    : _somaType(soma._somaType)
-    , _pointProperties(soma._pointProperties) {}
+    : _pointProperties(soma._pointProperties) {}
 
 Soma::Soma(const morphio::Soma& soma)
-    : _somaType(soma.type())
-    , _pointProperties(soma._properties->_somaLevel) {}
+    : _pointProperties(soma._properties->_somaLevel) {}
+
+SomaType Soma::type() const noexcept {
+    return morphio::getSomaType(points().size());
+}
 
 Point Soma::center() const {
     return centerOfGravity(points());

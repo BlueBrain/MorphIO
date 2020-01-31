@@ -41,7 +41,7 @@ class Soma
     /**
      * Return the soma type
      **/
-    inline SomaType type() const noexcept;
+    SomaType type() const noexcept;
     /**
      * Return the center of gravity of the soma points
      **/
@@ -83,10 +83,6 @@ inline range<const Point> Soma::points() const noexcept {
 
 inline range<const float> Soma::diameters() const noexcept {
     return _properties->_somaLevel._diameters;
-}
-
-inline SomaType Soma::type() const noexcept {
-    return _properties->_cellLevel._somaType;
 }
 
 }  // namespace morphio

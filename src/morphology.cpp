@@ -19,7 +19,7 @@
 
 namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
-SomaType getSomaType(long unsigned int nSomaPoints);
+
 
 Morphology::Morphology(const std::string& source, unsigned int options) {
     const size_t pos = source.find_last_of(".");
@@ -188,14 +188,18 @@ breadth_iterator Morphology::breadth_end() const {
     return breadth_iterator();
 }
 
-SomaType getSomaType(long unsigned int nSomaPoints) {
-    try {
-        return std::map<long unsigned int, SomaType>{{0, SOMA_UNDEFINED},
-                                                     {1, SOMA_SINGLE_POINT},
-                                                     {2, SOMA_UNDEFINED}}
-            .at(nSomaPoints);
-    } catch (const std::out_of_range&) {
+SomaType getSomaType(long unsigned int nSomaPoints) noexcept {
+    switch (nSomaPoints) {
+    case 0:
+    case 2: {
+        return SOMA_UNDEFINED;
+    }
+    case 1: {
+        return SOMA_SINGLE_POINT;
+    }
+    default: {
         return SOMA_SIMPLE_CONTOUR;
+    }
     }
 }
 
