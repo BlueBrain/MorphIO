@@ -116,7 +116,7 @@ jobs:
 
     - name: Install HDF5
       env:
-        "HDF5_DIR": $GITHUB_WORKSPACE
+        "HDF5_DIR": ${GITHUB_WORKSPACE}/libhdf5
         "HDF5_VERSION": "1.8.17"
       run: python ci/get_hdf5.py
 
