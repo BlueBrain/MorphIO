@@ -115,7 +115,7 @@ jobs:
       env:
         "HDF5_DIR": $GITHUB_WORKSPACE
         "HDF5_VERSION": "1.8.17"
-      run: python ci/get_hdf5.py
+      run: pip install requests && python ci/get_hdf5.py
 
     - name: Configure
       shell: cmake -P {0}
