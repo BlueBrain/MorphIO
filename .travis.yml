@@ -1,28 +1,28 @@
-language: cpp
-matrix:
-  include:
-    - os: windows
+# language: cpp
+# matrix:
+#   include:
+#     - os: windows
 
-addons:
-  homebrew:
-    packages:
-    - hdf5
-  apt:
-    packages:
-    - libhdf5-dev
+# addons:
+#   homebrew:
+#     packages:
+#     - hdf5
+#   apt:
+#     packages:
+#     - libhdf5-dev
 
 
-cache:
-  directories:
-    - $HOME/.cache/pip
+# cache:
+#   directories:
+#     - $HOME/.cache/pip
 
-# language: python
-# python:
-#   - 3.7
+# # language: python
+# # python:
+# #   - 3.7
 
-install: skip
-script:
-  - python ci/get-pip.py && pip install requests && python ci/get_hdf5.py
-  - mkdir build && cd build
-  - cmake ..
-  - cmake --build .
+# install: skip
+# script:
+#   - python ci/get-pip.py && pip install requests && python ci/get_hdf5.py
+#   - mkdir build && cd build
+#   - cmake ..
+#   - cmake --build .
