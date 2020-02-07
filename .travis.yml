@@ -26,6 +26,7 @@ cache:
 
 install: skip
 script:
+  - python get_hdf5.py
   - mkdir build && cd build
   - cmake ..
   - cmake --build .
