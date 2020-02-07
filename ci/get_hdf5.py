@@ -52,12 +52,12 @@ VSVERSION_TO_GENERATOR = {
 
 def download_hdf5(version, outfile):
     if version.split(".")[:2] == ["1", "10"]:
-        file = HDF5_110_FILE.format(version=version)
+        hdf5_file = HDF5_110_FILE.format(version=version)
     else:
-        file = HDF5_18_FILE.format(version=version)
+        hdf5_file = HDF5_18_FILE.format(version=version)
 
-    print("Downloading ", file)
-    r = requests.get(file, stream=True)
+    print("Downloading {}".format(hdf5_file), file=stderr)
+    r = requests.get(hdf5_file, stream=True)
     try:
         r.raise_for_status()
     except requests.HTTPError:
