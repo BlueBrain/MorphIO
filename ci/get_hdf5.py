@@ -72,41 +72,41 @@ def download_hdf5(version, outfile):
 
 def build_hdf5(version, hdf5_file, install_path, cmake_generator, use_prefix):
     try:
-        with mkdtemp() as hdf5_extract_path:
-            generator_args = (
-                ["-G", cmake_generator]
-                if cmake_generator is not None
-                else []
-            )
-            prefix_args = CMAKE_HDF5_LIBRARY_PREFIX if use_prefix else []
+        hdf5_extract_path = mkdtemp()
+        generator_args = (
+            ["-G", cmake_generator]
+            if cmake_generator is not None
+            else []
+        )
+        prefix_args = CMAKE_HDF5_LIBRARY_PREFIX if use_prefix else []
 
-            with ZipFile(hdf5_file) as z:
-                z.extractall(hdf5_extract_path)
-            old_dir = getcwd()
+        with ZipFile(hdf5_file) as z:
+            z.extractall(hdf5_extract_path)
+        old_dir = getcwd()
 
-            with mkdtemp() as new_dir:
-                chdir(new_dir)
-                cfg_cmd = CMAKE_CONFIGURE_CMD + [
-                    get_cmake_install_path(install_path),
-                    get_cmake_config_path(version, hdf5_extract_path),
-                ] + generator_args + prefix_args
-                build_cmd = CMAKE_BUILD_CMD + [
-                    '.',
-                ] + CMAKE_INSTALL_ARG
-                print("Configuring HDF5 version {version}...".format(version=version))
-                print(' '.join(cfg_cmd))
-                p = run(cfg_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
-                print(p.stdout)
-                p.check_returncode()
-                print("Building HDF5 version {version}...".format(version=version))
-                print(' '.join(build_cmd))
-                p = run(build_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
-                print(p.stdout)
-                p.check_returncode()
-                print("Installed HDF5 version {version} to {install_path}".format(
-                    version=version, install_path=install_path,
-                ))
-                chdir(old_dir)
+        new_dir = mkdtemp()
+        chdir(new_dir)
+        cfg_cmd = CMAKE_CONFIGURE_CMD + [
+            get_cmake_install_path(install_path),
+            get_cmake_config_path(version, hdf5_extract_path),
+        ] + generator_args + prefix_args
+        build_cmd = CMAKE_BUILD_CMD + [
+            '.',
+        ] + CMAKE_INSTALL_ARG
+        print("Configuring HDF5 version {version}...".format(version=version))
+        print(' '.join(cfg_cmd))
+        p = run(cfg_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+        print(p.stdout)
+        p.check_returncode()
+        print("Building HDF5 version {version}...".format(version=version))
+        print(' '.join(build_cmd))
+        p = run(build_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+        print(p.stdout)
+        p.check_returncode()
+        print("Installed HDF5 version {version} to {install_path}".format(
+            version=version, install_path=install_path,
+        ))
+        chdir(old_dir)
     except OSError as e:
         if e.winerror == 145:
             print("Hit the rmtree race condition, continuing anyway...")
