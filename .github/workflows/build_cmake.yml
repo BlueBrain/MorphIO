@@ -111,11 +111,14 @@ jobs:
         python-version: '3.6' # Version range or exact version of a Python version to use, using SemVer's version range syntax
         architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
 
+    - name: Pip install requests
+      run: pip install requests
+
     - name: Install HDF5
       env:
         "HDF5_DIR": $GITHUB_WORKSPACE
         "HDF5_VERSION": "1.8.17"
-      run: pip install requests && python ci/get_hdf5.py
+      run: python ci/get_hdf5.py
 
     - name: Configure
       shell: cmake -P {0}
