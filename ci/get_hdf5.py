@@ -56,14 +56,14 @@ def download_hdf5(version, outfile):
     else:
         hdf5_file = HDF5_18_FILE.format(version=version)
 
-    print("Downloading {}".format(hdf5_file), file=stderr)
+    print("Downloading {}".format(hdf5_file))
     r = requests.get(hdf5_file, stream=True)
     try:
         r.raise_for_status()
     except requests.HTTPError:
         print("Failed to download hdf5 version {version}, exiting".format(
             version=version
-        ), file=stderr)
+        ))
         exit(1)
     else:
         for chunk in r.iter_content(chunk_size=None):
@@ -93,23 +93,23 @@ def build_hdf5(version, hdf5_file, install_path, cmake_generator, use_prefix):
                 build_cmd = CMAKE_BUILD_CMD + [
                     '.',
                 ] + CMAKE_INSTALL_ARG
-                print("Configuring HDF5 version {version}...".format(version=version), file=stderr)
-                print(' '.join(cfg_cmd), file=stderr)
+                print("Configuring HDF5 version {version}...".format(version=version))
+                print(' '.join(cfg_cmd))
                 p = run(cfg_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
                 print(p.stdout)
                 p.check_returncode()
-                print("Building HDF5 version {version}...".format(version=version), file=stderr)
-                print(' '.join(build_cmd), file=stderr)
+                print("Building HDF5 version {version}...".format(version=version))
+                print(' '.join(build_cmd))
                 p = run(build_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
                 print(p.stdout)
                 p.check_returncode()
                 print("Installed HDF5 version {version} to {install_path}".format(
                     version=version, install_path=install_path,
-                ), file=stderr)
+                ))
                 chdir(old_dir)
     except OSError as e:
         if e.winerror == 145:
-            print("Hit the rmtree race condition, continuing anyway...", file=stderr)
+            print("Hit the rmtree race condition, continuing anyway...")
         else:
             raise
     for f in glob(pjoin(install_path, 'bin/*.dll')):
@@ -153,9 +153,9 @@ def main():
             download_hdf5(version, f)
             build_hdf5(version, f, install_path, cmake_generator, use_prefix)
     else:
-        print("using cached hdf5", file=stderr)
+        print("using cached hdf5")
     if install_path is not None:
-        print("hdf5 files: ", file=stderr)
+        print("hdf5 files: ")
         for dirpath, dirnames, filenames in walk(install_path):
             for file in filenames:
                 print(" * " + pjoin(dirpath, file))
