@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-#Taken at: https://raw.githubusercontent.com/h5py/h5py/master/ci/appveyor/get_hdf5.py
-
 Script for downloading and building HDF5 on Windows
 This does not support MPI, nor non-Windows OSes
 
@@ -11,11 +9,11 @@ CI environment which thrown away each time
 
 from os import environ, makedirs, walk, getcwd, chdir
 from os.path import join as pjoin, exists
-from tempfile import TemporaryFile, mkdtemp
+from tempfile import TemporaryFile, TemporaryDirectory
 from sys import exit, stderr
 from shutil import copy
 from glob import glob
-from subprocess import call, PIPE, STDOUT
+from subprocess import run, PIPE, STDOUT
 from zipfile import ZipFile
 import requests
 
@@ -52,18 +50,18 @@ VSVERSION_TO_GENERATOR = {
 
 def download_hdf5(version, outfile):
     if version.split(".")[:2] == ["1", "10"]:
-        hdf5_file = HDF5_110_FILE.format(version=version)
+        file = HDF5_110_FILE.format(version=version)
     else:
-        hdf5_file = HDF5_18_FILE.format(version=version)
+        file = HDF5_18_FILE.format(version=version)
 
-    print("Downloading {}".format(hdf5_file))
-    r = requests.get(hdf5_file, stream=True)
+    print("Downloading " + file, file=stderr)
+    r = requests.get(file, stream=True)
     try:
         r.raise_for_status()
     except requests.HTTPError:
         print("Failed to download hdf5 version {version}, exiting".format(
             version=version
-        ))
+        ), file=stderr)
         exit(1)
     else:
         for chunk in r.iter_content(chunk_size=None):
@@ -72,44 +70,44 @@ def download_hdf5(version, outfile):
 
 def build_hdf5(version, hdf5_file, install_path, cmake_generator, use_prefix):
     try:
-        hdf5_extract_path = mkdtemp()
-        generator_args = (
-            ["-G", cmake_generator]
-            if cmake_generator is not None
-            else []
-        )
-        prefix_args = CMAKE_HDF5_LIBRARY_PREFIX if use_prefix else []
+        with TemporaryDirectory() as hdf5_extract_path:
+            generator_args = (
+                ["-G", cmake_generator]
+                if cmake_generator is not None
+                else []
+            )
+            prefix_args = CMAKE_HDF5_LIBRARY_PREFIX if use_prefix else []
 
-        with ZipFile(hdf5_file) as z:
-            z.extractall(hdf5_extract_path)
-        old_dir = getcwd()
+            with ZipFile(hdf5_file) as z:
+                z.extractall(hdf5_extract_path)
+            old_dir = getcwd()
 
-        new_dir = mkdtemp()
-        chdir(new_dir)
-        cfg_cmd = CMAKE_CONFIGURE_CMD + [
-            get_cmake_install_path(install_path),
-            get_cmake_config_path(version, hdf5_extract_path),
-        ] + generator_args + prefix_args
-        build_cmd = CMAKE_BUILD_CMD + [
-            '.',
-        ] + CMAKE_INSTALL_ARG
-        print("Configuring HDF5 version {version}...".format(version=version))
-        print(' '.join(cfg_cmd))
-        p = call(cfg_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
-        print(p.stdout)
-        p.check_returncode()
-        print("Building HDF5 version {version}...".format(version=version))
-        print(' '.join(build_cmd))
-        p = call(build_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
-        print(p.stdout)
-        p.check_returncode()
-        print("Installed HDF5 version {version} to {install_path}".format(
-            version=version, install_path=install_path,
-        ))
-        chdir(old_dir)
+            with TemporaryDirectory() as new_dir:
+                chdir(new_dir)
+                cfg_cmd = CMAKE_CONFIGURE_CMD + [
+                    get_cmake_install_path(install_path),
+                    get_cmake_config_path(version, hdf5_extract_path),
+                ] + generator_args + prefix_args
+                build_cmd = CMAKE_BUILD_CMD + [
+                    '.',
+                ] + CMAKE_INSTALL_ARG
+                print("Configuring HDF5 version {version}...".format(version=version), file=stderr)
+                print(' '.join(cfg_cmd), file=stderr)
+                p = run(cfg_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+                print(p.stdout)
+                p.check_returncode()
+                print("Building HDF5 version {version}...".format(version=version), file=stderr)
+                print(' '.join(build_cmd), file=stderr)
+                p = run(build_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+                print(p.stdout)
+                p.check_returncode()
+                print("Installed HDF5 version {version} to {install_path}".format(
+                    version=version, install_path=install_path,
+                ), file=stderr)
+                chdir(old_dir)
     except OSError as e:
         if e.winerror == 145:
-            print("Hit the rmtree race condition, continuing anyway...")
+            print("Hit the rmtree race condition, continuing anyway...", file=stderr)
         else:
             raise
     for f in glob(pjoin(install_path, 'bin/*.dll')):
@@ -146,16 +144,16 @@ def main():
         if vs_version == '9-64':
             # Needed for
             # http://help.appveyor.com/discussions/kb/38-visual-studio-2008-64-bit-builds
-            call("ci\\appveyor\\vs2008_patch\\setup_x64.bat")
+            run("ci\\appveyor\\vs2008_patch\\setup_x64.bat")
 
     if not hdf5_install_cached(install_path):
         with TemporaryFile() as f:
             download_hdf5(version, f)
             build_hdf5(version, f, install_path, cmake_generator, use_prefix)
     else:
-        print("using cached hdf5")
+        print("using cached hdf5", file=stderr)
     if install_path is not None:
-        print("hdf5 files: ")
+        print("hdf5 files: ", file=stderr)
         for dirpath, dirnames, filenames in walk(install_path):
             for file in filenames:
                 print(" * " + pjoin(dirpath, file))
