@@ -68,8 +68,8 @@ class CMakeBuild(build_ext):
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(
                 cfg.upper(),
                 extdir)]
-            # if sys.maxsize > 2**32:
-            #     cmake_args += ['-A', 'x64']
+            if sys.maxsize > 2**32:
+                cmake_args += ['-A', 'x64']
 
             #"C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO\2019\COMMUNITY\COMMON7\IDE\COMMONEXTENSIONS\MICROSOFT\CMAKE\CMake\bin\cmake.exe"
             # -G "Ninja" -DCMAKE_INSTALL_PREFIX:PATH="C:\Users\bcoste\workspace\morphio\out\install\x64-Clang-Debug"
@@ -81,14 +81,14 @@ class CMakeBuild(build_ext):
             # -DCMAKE_MAKE_PROGRAM="C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO\2019\COMMUNITY\COMMON7\IDE\COMMONEXTENSIONS\MICROSOFT\CMAKE\Ninja\ninja.exe"
             #"C:\Users\bcoste\workspace\morphio" 2>&1"
 
-            cmake_args += ['-G', "Ninja"]
-            cmake_args += ['-DCMAKE_CXX_FLAGS:STRING="-m64 -fdiagnostics-absolute-paths -Wno-c++98-compat /DWIN32 /D_WINDOWS /W3 /GR /DH5_BUILT_AS_DYNAMIC_LIB /EHa"']
-            cmake_args += ['-DCMAKE_CXX_COMPILER:FILEPATH=clang-cl.exe']
-            cmake_args += ['-DCMAKE_C_COMPILER:FILEPATH=clang-cl.exe']
-            # cmake_args += ['-DCMAKE_CXX_COMPILER:FILEPATH=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/bin/clang-cl.exe']
-            # cmake_args += ['-DCMAKE_C_COMPILER:FILEPATH=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/bin/clang-cl.exe']
-            cmake_args += ['-DCMAKE_BUILD_TYPE="Debug"']
-            cmake_args += ['-DCMAKE_MAKE_PROGRAM=ninja.exe']
+            # cmake_args += ['-G', "Ninja"]
+            # cmake_args += ['-DCMAKE_CXX_FLAGS:STRING="-m64 -fdiagnostics-absolute-paths -Wno-c++98-compat /DWIN32 /D_WINDOWS /W3 /GR /DH5_BUILT_AS_DYNAMIC_LIB /EHa"']
+            # cmake_args += ['-DCMAKE_CXX_COMPILER:FILEPATH=clang-cl.exe']
+            # cmake_args += ['-DCMAKE_C_COMPILER:FILEPATH=clang-cl.exe']
+            # # cmake_args += ['-DCMAKE_CXX_COMPILER:FILEPATH=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/bin/clang-cl.exe']
+            # # cmake_args += ['-DCMAKE_C_COMPILER:FILEPATH=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/bin/clang-cl.exe']
+            # cmake_args += ['-DCMAKE_BUILD_TYPE="Debug"']
+            # cmake_args += ['-DCMAKE_MAKE_PROGRAM=ninja.exe']
 
             # build_args += ['--', '/m']
         else:
