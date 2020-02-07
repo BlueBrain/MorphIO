@@ -22,7 +22,7 @@ cache:
 
 install: skip
 script:
-  - python3 ci/get_hdf5.py
+  - pip install requests; python ci/get_hdf5.py
   - mkdir build && cd build
   - cmake ..
   - cmake --build .

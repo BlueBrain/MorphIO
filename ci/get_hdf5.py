@@ -11,7 +11,7 @@ CI environment which thrown away each time
 
 from os import environ, makedirs, walk, getcwd, chdir
 from os.path import join as pjoin, exists
-from tempfile import TemporaryFile, TemporaryDirectory
+from tempfile import TemporaryFile, mkdtemp
 from sys import exit, stderr
 from shutil import copy
 from glob import glob
@@ -72,7 +72,7 @@ def download_hdf5(version, outfile):
 
 def build_hdf5(version, hdf5_file, install_path, cmake_generator, use_prefix):
     try:
-        with TemporaryDirectory() as hdf5_extract_path:
+        with mkdtemp() as hdf5_extract_path:
             generator_args = (
                 ["-G", cmake_generator]
                 if cmake_generator is not None
@@ -84,7 +84,7 @@ def build_hdf5(version, hdf5_file, install_path, cmake_generator, use_prefix):
                 z.extractall(hdf5_extract_path)
             old_dir = getcwd()
 
-            with TemporaryDirectory() as new_dir:
+            with mkdtemp() as new_dir:
                 chdir(new_dir)
                 cfg_cmd = CMAKE_CONFIGURE_CMD + [
                     get_cmake_install_path(install_path),
