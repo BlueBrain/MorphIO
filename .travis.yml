@@ -1,28 +1,11 @@
-jobs:
+language: cpp
+matrix:
   include:
-    - os: linux
-      dist: xenial
-      env:
-        CXX: g++
-        CC: gcc
-    - os: linux
-      dist: xenial
-      env:
-        CXX: clang++
-        CC: clang
-
-    - os: osx
-      osx_image: xcode10.1
-      language: generic
-      env:
-        CXX: clang++
-        CC: clang
-    - os: osx
-      osx_image: xcode10.1
-      language: generic
-      env:
-        CXX: g++
-        CC: gcc
+    - os: windows
+      script:
+        - mkdir build && cd build
+        - cmake ..
+        - cmake --build .
 
 addons:
   homebrew:
@@ -37,11 +20,12 @@ cache:
   directories:
     - $HOME/.cache/pip
 
-language: python
-python:
-  - 3.7
+# language: python
+# python:
+#   - 3.7
 
 install: skip
 script:
-  - ./ci/python_test.sh
-  - ./ci/cpp_test.sh
+  - mkdir build && cd build
+  - cmake ..
+  - cmake --build .

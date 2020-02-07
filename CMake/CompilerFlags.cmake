@@ -1,4 +1,5 @@
 # Taken from https://github.com/BlueBrain/hpc-coding-conventions/blob/master/cpp/cmake/bob.cmake#L192-L255
+message("Seriously bro " MorphIO_CXX_WARNINGS)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if(${PROJECT_NAME}_CXX_WARNINGS)
     set(FLAGS "${FLAGS} -Werror -Weverything")
