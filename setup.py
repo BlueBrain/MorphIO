@@ -90,7 +90,7 @@ class CMakeBuild(build_ext):
             # cmake_args += ['-DCMAKE_BUILD_TYPE="Debug"']
             # cmake_args += ['-DCMAKE_MAKE_PROGRAM=ninja.exe']
 
-            # build_args += ['--', '/m']
+            build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
                            '-DMorphIO_CXX_WARNINGS=OFF',
