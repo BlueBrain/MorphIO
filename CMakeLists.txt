@@ -10,7 +10,7 @@ option(${PROJECT_NAME}_CXX_WARNINGS "Compile C++ with warnings" ON)
 option(EXTERNAL_HIGHFIVE "Use HighFive from external source" OFF)
 
 include(${PROJECT_SOURCE_DIR}/CMake/CompilerFlags.cmake)
-set(CMAKE_CXX_FLAGS "${FLAGS}")
+#set(CMAKE_CXX_FLAGS "${FLAGS}")
 
 if (EXTERNAL_HIGHFIVE)
   find_package(HighFive REQUIRED)

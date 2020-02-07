@@ -4,6 +4,7 @@
 #include <sstream>    // std::stringstream
 #include <string>     // std::string
 
+#include <cmath>
 #include <morphio/types.h>
 
 namespace morphio {
