@@ -56,7 +56,7 @@ def download_hdf5(version, outfile):
     else:
         file = HDF5_18_FILE.format(version=version)
 
-    print("Downloading " + file, file=stderr)
+    print("Downloading ", file)
     r = requests.get(file, stream=True)
     try:
         r.raise_for_status()

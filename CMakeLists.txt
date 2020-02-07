@@ -7,8 +7,6 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 option(BUILD_BINDINGS "Build the python bindings" ON)
 option(${PROJECT_NAME}_CXX_WARNINGS "Compile C++ with warnings" OFF)
-message("a to bitch")
-message(${MorphIO_CXX_WARNINGS})
 
 include(${PROJECT_SOURCE_DIR}/CMake/CompilerFlags.cmake)
 #set(CMAKE_CXX_FLAGS "${FLAGS}")
