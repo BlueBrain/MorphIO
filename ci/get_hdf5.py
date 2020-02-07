@@ -140,7 +140,8 @@ def main():
         if not exists(install_path):
             makedirs(install_path)
     if vs_version is not None:
-        cmake_generator = VSVERSION_TO_GENERATOR[vs_version]
+        # cmake_generator = VSVERSION_TO_GENERATOR[vs_version]
+        cmake_generator = 'Ninja'
         if vs_version == '9-64':
             # Needed for
             # http://help.appveyor.com/discussions/kb/38-visual-studio-2008-64-bit-builds
