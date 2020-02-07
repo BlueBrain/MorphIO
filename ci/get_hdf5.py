@@ -15,7 +15,7 @@ from tempfile import TemporaryFile, mkdtemp
 from sys import exit, stderr
 from shutil import copy
 from glob import glob
-from subprocess import run, PIPE, STDOUT
+from subprocess import call, PIPE, STDOUT
 from zipfile import ZipFile
 import requests
 
@@ -95,12 +95,12 @@ def build_hdf5(version, hdf5_file, install_path, cmake_generator, use_prefix):
         ] + CMAKE_INSTALL_ARG
         print("Configuring HDF5 version {version}...".format(version=version))
         print(' '.join(cfg_cmd))
-        p = run(cfg_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+        p = call(cfg_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
         print(p.stdout)
         p.check_returncode()
         print("Building HDF5 version {version}...".format(version=version))
         print(' '.join(build_cmd))
-        p = run(build_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+        p = call(build_cmd, stdout=PIPE, stderr=STDOUT, universal_newlines=True)
         print(p.stdout)
         p.check_returncode()
         print("Installed HDF5 version {version} to {install_path}".format(
@@ -146,7 +146,7 @@ def main():
         if vs_version == '9-64':
             # Needed for
             # http://help.appveyor.com/discussions/kb/38-visual-studio-2008-64-bit-builds
-            run("ci\\appveyor\\vs2008_patch\\setup_x64.bat")
+            call("ci\\appveyor\\vs2008_patch\\setup_x64.bat")
 
     if not hdf5_install_cached(install_path):
         with TemporaryFile() as f:
