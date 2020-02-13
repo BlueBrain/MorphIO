@@ -136,14 +136,14 @@ void MorphologyHDF5::_resolveV1() {
     _pointsDims = dataspace.getDimensions();
 
     if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns) {
-        throw morphio::RawDataError("Bad number of dimensions in 'points' dataspace");
+        throw morphio::RawDataError("Error opening morphology: bad number of dimensions in 'points' dataspace.");
     }
 
     _sections.reset(new HighFive::DataSet(_group.getDataSet(_d_structure)));
     dataspace = _sections->getSpace();
     _sectionsDims = dataspace.getDimensions();
     if (_sectionsDims.size() != 2 || _sectionsDims[1] != _structureV1Columns) {
-        throw morphio::RawDataError("Bad number of dimensions in 'structure' dataspace");
+        throw morphio::RawDataError("Error opening morphology: bad number of dimensions in 'structure' dataspace.");
     }
 }
 
@@ -170,7 +170,7 @@ bool MorphologyHDF5::_readV11Metadata() {
         // All other exceptions are not expected because if the metadata
         // group exits it must contain at least the version, and for
         // version 1.1 it must contain the family.
-        throw morphio::RawDataError(std::string("Error reading morphology metadata: ") + e.what());
+        throw morphio::RawDataError(std::string("Error reading morphology metadata.") + e.what());
     }
 
     _resolveV1();
@@ -242,7 +242,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
         const auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 2 || dims[1] != _pointColumns) {
             throw (MorphioError(
-                "': bad number of dimensions in 'points' dataspace"));
+                "'Error reading morphologies: bad number of dimensions in 'points' dataspace"));
         }
         std::vector<std::vector<float>> vec(dims[0]);
         dataset.read(vec);
@@ -333,7 +333,7 @@ int MorphologyHDF5::_readSections() {
 
         if (dims.size() != 2 || dims[1] != _structureV2Columns) {
             throw (MorphioError(
-                "': bad number of dimensions in 'structure' dataspace"));
+                "Error reading morphologies: bad number of dimensions in 'structure' dataspace"));
         }
 
         std::vector<std::vector<int>> vec;
@@ -387,13 +387,13 @@ void MorphologyHDF5::_readSectionTypes() {
                 return _group.getDataSet(path);
             } catch (HighFive::DataSetException&) {
                 throw (MorphioError("Could not open " + path +
-                                     " dataset for morphology file "));
+                                     " dataset for morphology."));
             }
         }();
 
         const auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 2 || dims[1] != 1) {
-            throw (MorphioError("': bad number of dimensions in 'sectiontype' dataspace"));
+            throw (MorphioError("Error reading morhologies: bad number of dimensions in 'sectiontype' dataspace"));
         }
 
         types.resize(dims[0]);
@@ -431,7 +431,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
 
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != 1) {
-            throw (MorphioError("': bad number of dimensions in 'perimeters' dataspace"));
+            throw (MorphioError("Error reading morhologies: bad number of dimensions in 'perimeters' dataspace"));
         }
 
         std::vector<float> perimeters;
@@ -461,7 +461,7 @@ void MorphologyHDF5::_read(const std::string& groupName,
 
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != expectedDimension) {
-            throw (MorphioError("': bad number of dimensions in 'perimeters' dataspace"));
+            throw (MorphioError("'Error reading morhologies: bad number of dimensions in 'perimeters' dataspace"));
         }
 
         data.resize(dims[0]);
