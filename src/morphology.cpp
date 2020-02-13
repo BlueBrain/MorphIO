@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <streambuf>
+#include <memory>
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mitochondria.h>
@@ -20,12 +21,9 @@
 namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
 SomaType getSomaType(long unsigned int nSomaPoints);
+Property::Properties loadURI (const URI& source, unsigned int options);
 
-//Morphology::Morphology(const Property::Properties& properties, unsigned int options) {}
-
-Morphology::Morphology(const HighFive::Group& group, unsigned int options)
-{
-    _properties = std::make_shared<Property::Properties>(readers::h5::load(group));
+Morphology::Morphology(const Property::Properties& properties, unsigned int options):_properties(std::make_shared<Property::Properties>(properties)) {
 
     buildChildren(_properties);
 
@@ -45,48 +43,14 @@ Morphology::Morphology(const HighFive::Group& group, unsigned int options)
     }
 }
 
-Morphology::Morphology(const std::string& source, unsigned int options) {
-    const size_t pos = source.find_last_of(".");
-    if (pos == std::string::npos)
-        throw UnknownFileType("File has no extension");
+Morphology::Morphology(const HighFive::Group& group, unsigned int options): Morphology(readers::h5::load(group), options)
+{
 
-    // Cross-platform check of file existance
-    std::ifstream file(source.c_str());
-    if (!file) {
-        throw RawDataError("File: " + source + " does not exist.");
-    }
+}
 
-    std::string extension = source.substr(pos);
+Morphology::Morphology(const URI& source, unsigned int options): Morphology(loadURI(source, options), options)
+{
 
-    auto loader = [&source, &options, &extension]() {
-        if (extension == ".h5" || extension == ".H5")
-            return readers::h5::load(source);
-        if (extension == ".asc" || extension == ".ASC")
-            return readers::asc::load(source, options);
-        if (extension == ".swc" || extension == ".SWC")
-            return readers::swc::load(source, options);
-        throw UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported");
-    };
-
-    _properties = std::make_shared<Property::Properties>(loader());
-
-    buildChildren(_properties);
-
-    if (version() != MORPHOLOGY_VERSION_SWC_1)
-        _properties->_cellLevel._somaType = getSomaType(soma().points().size());
-
-    // Sad trick because, contrary to SWC and ASC, H5 does not create a
-    // mut::Morphology object on which we can directly call
-    // mut::Morphology::applyModifiers
-    if (options &&
-        (version() == MORPHOLOGY_VERSION_H5_1 || version() == MORPHOLOGY_VERSION_H5_1_1 ||
-         version() == MORPHOLOGY_VERSION_H5_2)) {
-        mut::Morphology mutable_morph(*this);
-        mutable_morph.sanitize();
-        mutable_morph.applyModifiers(options);
-        _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
-        buildChildren(_properties);
-    }
 }
 
 Morphology::Morphology(mut::Morphology morphology) {
@@ -243,6 +207,34 @@ void buildChildren(std::shared_ptr<Property::Properties> properties) {
             children[parent].push_back(i);
         }
     }
+}
+
+Property::Properties loadURI (const URI& source, unsigned int options){
+
+    const size_t pos = source.find_last_of(".");
+    if (pos == std::string::npos)
+        LBTHROW(UnknownFileType("File has no extension"));
+
+    // Cross-platform check of file existance
+    std::ifstream file(source.c_str());
+    if (!file) {
+        LBTHROW(RawDataError("File: " + source + " does not exist."));
+    }
+
+    std::string extension = source.substr(pos);
+
+    auto loader = [&source, &options, &extension]() {
+        if (extension == ".h5" || extension == ".H5")
+            return readers::h5::load(source);
+        if (extension == ".asc" || extension == ".ASC")
+            return readers::asc::load(source, options);
+        if (extension == ".swc" || extension == ".SWC")
+            return readers::swc::load(source, options);
+        LBTHROW(UnknownFileType(
+                    "Unhandled file type: only SWC, ASC and H5 are supported"));
+    };
+
+    return loader();
 }
 
 }  // namespace morphio

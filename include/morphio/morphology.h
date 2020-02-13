@@ -39,7 +39,6 @@ class Morphology
      */
     Morphology(const URI& source, unsigned int options = NO_MODIFIER);
     Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
-    //Morphology(const Property::Properties& properties, unsigned int options);
     Morphology(mut::Morphology);
 
     /**
@@ -159,6 +158,7 @@ class Morphology
     friend bool diff(const Morphology& left,
                      const Morphology& right,
                      morphio::enums::LogLevel verbose);
+    Morphology(const Property::Properties& properties, unsigned int options);
 
     std::shared_ptr<Property::Properties> _properties;
 

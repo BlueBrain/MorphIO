@@ -15,7 +15,7 @@ set(CMAKE_CXX_FLAGS "${FLAGS}")
 if (EXTERNAL_HIGHFIVE)
   find_package(HighFive REQUIRED)
 endif()
-add_subdirectory(3rdparty EXCLUDE_FROM_ALL)
+add_subdirectory(3rdparty)
 set(MORPHIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/)
 
 add_subdirectory(3rdparty)
