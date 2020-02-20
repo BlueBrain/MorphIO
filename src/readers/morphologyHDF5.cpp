@@ -63,7 +63,7 @@ namespace h5 {
 
 MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group): _group(group){}
 
-Property::Properties load(const URI& uri)
+Property::Properties load(const std::string& uri)
 {
     try {
         HighFive::SilenceHDF5 silence;
@@ -478,7 +478,7 @@ void MorphologyHDF5::_readEndoplasmicReticulum() {
         HighFive::SilenceHDF5 silence;
 
         try {
-            const auto group = _group->getGroup(_g_endoplasmic_reticulum);
+            const auto group = _group.getGroup(_g_endoplasmic_reticulum);
         } catch (const HighFive::GroupException&) {
             return;
         }

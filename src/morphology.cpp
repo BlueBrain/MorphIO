@@ -21,7 +21,7 @@
 namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
 SomaType getSomaType(long unsigned int nSomaPoints);
-Property::Properties loadURI (const URI& source, unsigned int options);
+Property::Properties loadURI (const std::string& source, unsigned int options);
 
 Morphology::Morphology(const Property::Properties& properties, unsigned int options):_properties(std::make_shared<Property::Properties>(properties)) {
 
@@ -48,7 +48,7 @@ Morphology::Morphology(const HighFive::Group& group, unsigned int options): Morp
 
 }
 
-Morphology::Morphology(const URI& source, unsigned int options): Morphology(loadURI(source, options), options)
+Morphology::Morphology(const std::string& source, unsigned int options): Morphology(loadURI(source, options), options)
 {
 
 }
@@ -209,16 +209,16 @@ void buildChildren(std::shared_ptr<Property::Properties> properties) {
     }
 }
 
-Property::Properties loadURI (const URI& source, unsigned int options){
+Property::Properties loadURI (const std::string& source, unsigned int options){
 
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos)
-        LBTHROW(UnknownFileType("File has no extension"));
+        throw(UnknownFileType("File has no extension"));
 
     // Cross-platform check of file existance
     std::ifstream file(source.c_str());
     if (!file) {
-        LBTHROW(RawDataError("File: " + source + " does not exist."));
+        throw (RawDataError("File: " + source + " does not exist."));
     }
 
     std::string extension = source.substr(pos);
@@ -230,7 +230,7 @@ Property::Properties loadURI (const URI& source, unsigned int options){
             return readers::asc::load(source, options);
         if (extension == ".swc" || extension == ".SWC")
             return readers::swc::load(source, options);
-        LBTHROW(UnknownFileType(
+        throw (UnknownFileType(
                     "Unhandled file type: only SWC, ASC and H5 are supported"));
     };
 
