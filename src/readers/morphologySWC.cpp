@@ -210,7 +210,7 @@ class SWCBuilder
             child2.point[1] != y + r || child1.point[2] != z || child2.point[2] != z ||
             child1.diameter != d || child2.diameter != d) {
             printError(Warning::SOMA_NON_CONFORM,
-                    err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(root, child1, child2));
+                       err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(root, child1, child2));
         }
     }
 

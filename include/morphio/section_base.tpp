@@ -62,7 +62,7 @@ template <typename T>
 T SectionBase<T>::parent() const {
     if (isRoot())
         throw MissingParentError("Cannot call Section::parent() on a root node (section id=" +
-                                  std::to_string(_id) + ").");
+                                 std::to_string(_id) + ").");
 
     const auto _parent = static_cast<unsigned int>(
         _properties->get<typename T::SectionId>()[_id][1]);

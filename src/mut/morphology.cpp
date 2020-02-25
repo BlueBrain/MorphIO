@@ -112,7 +112,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
     const bool emptySection = section_copy->points().empty();
     if (emptySection)
         printError(Warning::APPENDING_EMPTY_SECTION,
-                _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
+                   _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
 
     if (recursive) {
         for (const auto& child : section_->children()) {
@@ -222,7 +222,7 @@ void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo) {
         if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
             !_checkDuplicatePoint(section_->parent(), section_))
             printError(Warning::WRONG_DUPLICATE,
-                    err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
+                       err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
 
         auto parent = section_->parent();
         bool isUnifurcation = parent->children().size() == 1;
@@ -300,7 +300,8 @@ breadth_iterator Morphology::breadth_end() const {
 
 void Morphology::applyModifiers(unsigned int modifierFlags) {
     if (modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS)
-            throw SectionBuilderError(_err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
+        throw SectionBuilderError(
+            _err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
 
     if (modifierFlags & SOMA_SPHERE)
         modifiers::soma_sphere(*this);

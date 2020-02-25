@@ -26,8 +26,7 @@ struct base_type {
 template <typename T>
 struct base_type<std::vector<T>>: base_type<T> {};
 
-bool hasPerimeterData(const morphio::mut::Morphology& morpho)
-{
+bool hasPerimeterData(const morphio::mut::Morphology& morpho) {
     return !morpho.rootSections().empty() && !morpho.rootSections().front()->perimeters().empty();
 }
 
@@ -67,12 +66,11 @@ void swc(const Morphology& morphology, const std::string& filename) {
     const auto& soma_points = soma->points();
     if (soma_points.empty() && morphology.rootSections().empty()) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
 
-    if (hasPerimeterData(morphology))
-    {
+    if (hasPerimeterData(morphology)) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
 
@@ -88,7 +86,7 @@ void swc(const Morphology& morphology, const std::string& filename) {
 
     if (!morphology.mitochondria().rootSections().empty())
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-                readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+                   readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     const auto& soma_diameters = soma->diameters();
 
@@ -166,12 +164,11 @@ void asc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     if (soma->points().empty() && morphology.rootSections().empty()) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
 
-    if (hasPerimeterData(morphology))
-    {
+    if (hasPerimeterData(morphology)) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
 
@@ -179,7 +176,7 @@ void asc(const Morphology& morphology, const std::string& filename) {
 
     if (!morphology.mitochondria().rootSections().empty())
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-                readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+                   readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
     std::map<morphio::SectionType, std::string> header;
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
@@ -276,7 +273,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
     if (numberOfSomaPoints < 1) {
         if (morpho.rootSections().empty()) {
             printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+                       readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
             return;
         }
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
@@ -313,8 +310,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
         // If the morphology has some perimeter data, we need to fill some
         // perimeter dummy value in the soma range of the data structure to keep
         // the length matching
-        if (hasPerimeterData_)
-        {
+        if (hasPerimeterData_) {
             raw_perimeters.push_back(0);
         }
     }
@@ -359,8 +355,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
     write_attribute(g_metadata, "cell_family", std::vector<uint32_t>{FAMILY_NEURON});
     write_attribute(h5_file, "comment", std::vector<std::string>{version_string()});
 
-    if (hasPerimeterData_)
-    {
+    if (hasPerimeterData_) {
         write_dataset(h5_file, "/perimeters", raw_perimeters);
     }
 
