@@ -32,7 +32,7 @@ class MorphologyHDF5
     void _resolveV1();
     bool _readV11Metadata();
     bool _readV2Metadata();
-    HighFive::DataSet _getStructureDataSet();
+    HighFive::DataSet _getStructureDataSet(size_t nSections);
     void _readPoints(int);
     int _readSections();
     void _readSectionTypes();
@@ -47,7 +47,7 @@ class MorphologyHDF5
                unsigned int expectedDimension,
                T& data);
 
-    const HighFive::Group _group;
+    HighFive::Group _group;
 
     std::unique_ptr<HighFive::DataSet> _points;
     std::vector<size_t> _pointsDims;

@@ -198,15 +198,12 @@ bool MorphologyHDF5::_readV2Metadata() {
     }
 }
 
-HighFive::DataSet MorphologyHDF5::_getStructureDataSet() {
+HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections) {
     try {
         HighFive::SilenceHDF5 silence;
         return _group.getDataSet(_d_structure);
     } catch (const HighFive::DataSetException&) {
-        throw;
-        // FIXME: NO EMPTY DATASET IS CREATED IN CASE THIS ONE IS EMPTY
-        // return _group.createDataSet<int>(_d_structure,
-        //    HighFive::DataSpace({nSections, 3}));
+        return _group.createDataSet<int>(_d_structure, HighFive::DataSpace({nSections, 3}));
     }
 }
 
