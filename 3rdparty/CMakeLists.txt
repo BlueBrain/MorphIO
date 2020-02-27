@@ -1,7 +1,6 @@
 find_package(HDF5 REQUIRED)
 
 if (NOT EXTERNAL_HIGHFIVE)
-  SET(HIGHFIVE_UNIT_TESTS OFF)
   add_subdirectory(HighFive EXCLUDE_FROM_ALL)
   target_include_directories(HighFive SYSTEM INTERFACE)
 endif()
