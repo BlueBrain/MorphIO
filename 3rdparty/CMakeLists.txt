@@ -1,8 +1,7 @@
 find_package(HDF5 REQUIRED)
 
 if (NOT EXTERNAL_HIGHFIVE)
-  set(USE_BOOST OFF)
-  set(HIGHFIVE_USE_BOOST OFF)
+  set(HIGHFIVE_USE_BOOST OFF CACHE BOOL "" FORCE)
   add_subdirectory(HighFive EXCLUDE_FROM_ALL)
   target_include_directories(HighFive SYSTEM INTERFACE)
 endif()
