@@ -57,7 +57,6 @@ class MorphologyHDF5
 
     std::string _stage;
     Property::Properties _properties;
-    bool _write;
     ErrorMessages _err;
     std::string _uri;
 };
