@@ -11,10 +11,15 @@ set +u  # ignore errors in virtualenv's activate
 source "$VENV/bin/activate"
 set -u
 
+which pip
+
 pip install --upgrade pip setuptools
 
 # install
 pip install .
 
 pip install -r tests/requirement_tests.txt
-nosetests
+CURRENT=$(pwd)
+
+cd ..
+nosetests ${CURRENT}/tests

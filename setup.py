@@ -79,7 +79,7 @@ class CMakeBuild(build_ext):
             os.makedirs(self.build_temp)
         try:
             subprocess.check_call([cmake, ext.sourcedir] + cmake_args, cwd=self.build_temp)
-            subprocess.check_call([cmake, '--build', '.', '--target', 'morphio'] + build_args, cwd=self.build_temp)
+            subprocess.check_call([cmake, '--build', '.', '--target', '_morphio'] + build_args, cwd=self.build_temp)
         except subprocess.CalledProcessError as exc:
             print("Status : FAIL", exc.returncode, exc.output)
             raise
@@ -96,8 +96,10 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=['numpy>=1.14.1'],
     url='https://github.com/BlueBrain/MorphIO/',
-    ext_modules=[CMakeExtension('morphio')],
+    ext_modules=[CMakeExtension('morphio._morphio')],
     cmdclass=dict(build_ext=CMakeBuild),
+    packages=['morphio', 'morphio.mut', 'morphio.vasculature'],
+
     license="BBP-internal-confidential",
     keywords=('computational neuroscience',
               'morphology',
