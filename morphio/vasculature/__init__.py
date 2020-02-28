@@ -1,1 +1,1 @@
-from ..morphio.vasculature import *
+from .._morphio.vasculature import *

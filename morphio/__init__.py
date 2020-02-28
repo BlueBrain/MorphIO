@@ -1,1 +1,1 @@
-from .morphio import *
+from ._morphio import *

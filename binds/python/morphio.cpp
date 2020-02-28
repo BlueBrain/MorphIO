@@ -7,7 +7,7 @@
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(morphio, m) {
+PYBIND11_MODULE(_morphio, m) {
     bind_misc(m);
     bind_immutable_module(m);
 

@@ -19,4 +19,7 @@ pip install --upgrade pip setuptools
 pip install .
 
 pip install -r tests/requirement_tests.txt
-nosetests
+CURRENT=$(pwd)
+
+cd ..
+nosetests ${CURRENT}/tests
