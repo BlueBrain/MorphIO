@@ -96,8 +96,10 @@ setup(
     long_description_content_type="text/markdown",
     install_requires=['numpy>=1.14.1'],
     url='https://github.com/BlueBrain/MorphIO/',
-    ext_modules=[CMakeExtension('morphio')],
+    ext_modules=[CMakeExtension('morphio.morphio')],
     cmdclass=dict(build_ext=CMakeBuild),
+    packages=['morphio'],
+
     license="BBP-internal-confidential",
     keywords=('computational neuroscience',
               'morphology',
