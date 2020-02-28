@@ -11,6 +11,8 @@ set +u  # ignore errors in virtualenv's activate
 source "$VENV/bin/activate"
 set -u
 
+which pip
+
 pip install --upgrade pip setuptools
 
 # install
