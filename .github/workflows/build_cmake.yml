@@ -205,6 +205,16 @@ jobs:
 
         execute_process(COMMAND ccache -s)
 
+    - name: Check content
+      shell: bash
+      run: |
+        echo "Checking path"
+        pwd
+        echo "Checking current dir content"
+        ls -lR
+
+        echo "::set-env name=HDF5_INCLUDE_DIRS::hdf5-1.10.4/build/includes"
+
     # - name: Configure
     #   shell: cmake -P {0}
     #   run: |
