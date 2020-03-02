@@ -255,8 +255,8 @@ jobs:
             -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
             -G Ninja
             -D CMAKE_MAKE_PROGRAM=ninja
-            -D HDF5_INCLUDE_DIRS=C:/Program Files/HDF_Group/HDF5/1.10.4/include
-            -D HDF5_LIBRARIES=C:/Program Files/HDF_Group/HDF5/1.10.4/lib
+            -D HDF5_INCLUDE_DIRS="C:/Program Files/HDF_Group/HDF5/1.10.4/include"
+            -D HDF5_LIBRARIES="C:/Program Files/HDF_Group/HDF5/1.10.4/lib"
 
           RESULT_VARIABLE result
         )
