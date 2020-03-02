@@ -221,11 +221,13 @@ jobs:
     #     echo "Checking current dir content"
     #     ls -lR
 
-        # echo "::set-env name=HDF5_INCLUDE_DIRS::C:/Program Files/HDF_Group/HDF5/1.10.4/include"
-        # echo "::set-env name=HDF5_LIBRARIES::C:/Program Files/HDF_Group/HDF5/1.10.4/lib"
 
     - name: Configure
       shell: cmake -P {0}
+      env:
+        HDF5_INCLUDE_DIRS: C:/Program Files/HDF_Group/HDF5/1.10.4/include
+        HDF5_LIBRARIES: C:/Program Files/HDF_Group/HDF5/1.10.4/lib
+
       run: |
         set(ENV{CC} ${{ matrix.config.cc }})
         set(ENV{CXX} ${{ matrix.config.cxx }})
