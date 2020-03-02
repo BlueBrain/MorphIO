@@ -84,7 +84,7 @@ jobs:
             COMMAND chmod +x ${cmake_dir}/cmake
           )
         endif()
-        message("::add-path::${cmake_dir}")
+        message("::add-path::.")
 
 
     - name: Download ccache
@@ -119,7 +119,7 @@ jobs:
       shell: bash
       run: |
         echo $PATH
-        ls d:/a/MorphIO/MorphIO/cmake-3.16.2-win64-x64/bin
+        ls
         python -m pip install requests
         python ci/get_hdf5.py
 
