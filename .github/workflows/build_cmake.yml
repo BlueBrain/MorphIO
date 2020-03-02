@@ -29,11 +29,11 @@ jobs:
             os: windows-latest,
             cc: "gcc", cxx: "g++"
           }
-        - {
-            name: "Ubuntu Latest GCC", artifact: "Linux.tar.xz",
-            os: ubuntu-latest,
-            cc: "gcc", cxx: "g++"
-          }
+        # - {
+        #     name: "Ubuntu Latest GCC", artifact: "Linux.tar.xz",
+        #     os: ubuntu-latest,
+        #     cc: "gcc", cxx: "g++"
+        #   }
         # - {
         #     name: "macOS Latest Clang", artifact: "macOS.tar.xz",
         #     os: macos-latest,
@@ -121,6 +121,7 @@ jobs:
       run: |
         echo $PATH
         which cmake
+        cmake --help
         python -m pip install requests
         python ci/get_hdf5.py
 

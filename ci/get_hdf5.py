@@ -89,7 +89,6 @@ def build_hdf5(version, hdf5_file, install_path, cmake_generator, use_prefix):
                     get_cmake_config_path(version, hdf5_extract_path),
                 ] + generator_args + prefix_args
 
-
                 build_cmd = CMAKE_BUILD_CMD + [
                     '.',
                 ] + CMAKE_INSTALL_ARG + ['-D', 'CMAKE_C_COMPILER_LAUNCHER=ccache', '-D', 'CMAKE_CXX_COMPILER_LAUNCHER=ccache']
