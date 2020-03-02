@@ -7,7 +7,7 @@ env:
   NINJA_VERSION: 1.9.0
   BUILD_TYPE: Release
   CCACHE_VERSION: 3.7.7
-  HDF5_VERSION: "1.10.5"
+  HDF5_VERSION: "1.10.4"
   HDF5_VSVERSION: "14"
   HDF5_DIR: "C:\\hdf5\\1.8.17\\VS14"
 jobs:
