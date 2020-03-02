@@ -86,7 +86,7 @@ jobs:
             COMMAND chmod +x ${cmake_dir}/cmake
           )
         endif()
-        message("::add-path::$ENV{GITHUB_WORKSPACE}/ninja-dir")
+        message("::add-path::$ENV{GITHUB_WORKSPACE}\ninja-dir")
         message("::add-path::${cmake_dir}")
 
 
@@ -121,8 +121,8 @@ jobs:
     - name: Download HDF5
       shell: bash
       run: |
+        echo $PATH
         which cmake
-        ls d:\a\MorphIO\MorphIO/ninja-dir
         python -m pip install requests
         python ci/get_hdf5.py
 
