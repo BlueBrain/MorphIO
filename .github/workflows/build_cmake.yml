@@ -213,22 +213,16 @@ jobs:
 
         execute_process(COMMAND ccache -s)
 
-    - name: Check content
-      shell: bash
-      run: |
-        echo "Checking path"
-        pwd
-        echo "Checking current dir content"
-        ls -lR
+    # - name: Check content
+    #   shell: bash
+    #   run: |
+    #     echo "Checking path"
+    #     pwd
+    #     echo "Checking current dir content"
+    #     ls -lR
 
-        echo "::set-env name=HDF5_INCLUDE_DIRS::hdf5-1.10.4/src"
-        echo "::set-env name=HDF5_LIBRARIES::hdf5-1.10.4/build/bin"
-
-    - name: Test variable
-      shell: bash
-      run: |
-        echo ${HDF5_INCLUDE_DIRS}
-        ls ${HDF5_INCLUDE_DIRS}
+        # echo "::set-env name=HDF5_INCLUDE_DIRS::C:/Program Files/HDF_Group/HDF5/1.10.4/include"
+        # echo "::set-env name=HDF5_LIBRARIES::C:/Program Files/HDF_Group/HDF5/1.10.4/lib"
 
     - name: Configure
       shell: cmake -P {0}
