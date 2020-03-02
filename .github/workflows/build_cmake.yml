@@ -84,7 +84,7 @@ jobs:
             COMMAND chmod +x ${cmake_dir}/cmake
           )
         endif()
-        message("::add-path::.")
+        message("::add-path::${GITHUB_WORKSPACE}")
 
 
     - name: Download ccache
