@@ -9,7 +9,7 @@ env:
   CCACHE_VERSION: 3.7.7
   HDF5_VERSION: "1.8.17"
   HDF5_VSVERSION: "14"
-  HDF5_DIR: "C:\\hdf5\\%HDF5_VERSION%\\%HDF5_VSVERSION%"
+  HDF5_DIR: "C:\\hdf5\\1.8.17\\VS14"
 jobs:
   build:
     name: ${{ matrix.config.name }}
@@ -88,13 +88,13 @@ jobs:
         message("::add-path::${cmake_dir}")
 
 
-    - name: Download ccache
-      id: ccache
-      shell: cmake -P {0}
-      run: |
-        set(ccache_url "https://github.com/cristianadam/ccache/releases/download/v$ENV{CCACHE_VERSION}/${{ runner.os }}.tar.xz")
-        file(DOWNLOAD "${ccache_url}" ./ccache.tar.xz SHOW_PROGRESS)
-        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ccache.tar.xz)
+    # - name: Download ccache
+    #   id: ccache
+    #   shell: cmake -P {0}
+    #   run: |
+    #     set(ccache_url "https://github.com/cristianadam/ccache/releases/download/v$ENV{CCACHE_VERSION}/${{ runner.os }}.tar.xz")
+    #     file(DOWNLOAD "${ccache_url}" ./ccache.tar.xz SHOW_PROGRESS)
+    #     execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ccache.tar.xz)
 
     # - name: Prepare ccache timestamp
     #   id: ccache_cache_timestamp
