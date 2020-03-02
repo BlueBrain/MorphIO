@@ -80,13 +80,11 @@ jobs:
 
         if (NOT "${{ runner.os }}" STREQUAL "Windows")
           execute_process(
-            COMMAND mkdir ninja-dir
             COMMAND chmod +x ninja
-            COMMAND mv ninja ninja-dir
             COMMAND chmod +x ${cmake_dir}/cmake
           )
         endif()
-        message("::add-path::$ENV{GITHUB_WORKSPACE}\ninja-dir")
+        message("::add-path::$ENV{GITHUB_WORKSPACE}")
         message("::add-path::${cmake_dir}")
 
 
