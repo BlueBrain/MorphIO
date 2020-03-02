@@ -119,6 +119,7 @@ jobs:
       shell: bash
       run: |
         echo $PATH
+        ls d:/a/MorphIO/MorphIO/cmake-3.16.2-win64-x64/bin
         python -m pip install requests
         python ci/get_hdf5.py
 
