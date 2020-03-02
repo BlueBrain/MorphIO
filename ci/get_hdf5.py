@@ -54,7 +54,8 @@ def download_hdf5(version, outfile):
     else:
         file = HDF5_18_FILE.format(version=version)
 
-    print("Downloading " + file, file=stderr)
+    print("Downloading HDF5 version {version}...".format(version=version))
+
     r = requests.get(file, stream=True)
     try:
         r.raise_for_status()
@@ -136,9 +137,6 @@ def main():
     version = environ.get("HDF5_VERSION", DEFAULT_VERSION)
     vs_version = environ.get("HDF5_VSVERSION")
     use_prefix = True if environ.get("H5PY_USE_PREFIX") is not None else False
-
-    import os
-    print('os: {}'.format(os.environ['PATH']))
 
     if install_path is not None:
         if not exists(install_path):
