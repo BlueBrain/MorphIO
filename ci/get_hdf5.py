@@ -150,7 +150,7 @@ def main():
             run("ci\\appveyor\\vs2008_patch\\setup_x64.bat")
 
     if not hdf5_install_cached(install_path):
-        with TemporaryFile('test-temp') as f:
+        with TemporaryFile(suffix='test-temp') as f:
             download_hdf5(version, f)
             build_hdf5(version, f, install_path, cmake_generator, use_prefix)
             print('Copy complete')
