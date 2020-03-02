@@ -88,41 +88,33 @@ jobs:
         # message("::add-path::${cmake_dir}")
 
 
-    # - name: Download ccache
-    #   id: ccache
-    #   shell: cmake -P {0}
-    #   run: |
-    #     set(ccache_url "https://github.com/cristianadam/ccache/releases/download/v$ENV{CCACHE_VERSION}/${{ runner.os }}.tar.xz")
-    #     file(DOWNLOAD "${ccache_url}" ./ccache.tar.xz SHOW_PROGRESS)
-    #     execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ccache.tar.xz)
+    - name: Download ccache
+      id: ccache
+      shell: cmake -P {0}
+      run: |
+        set(ccache_url "https://github.com/cristianadam/ccache/releases/download/v$ENV{CCACHE_VERSION}/${{ runner.os }}.tar.xz")
+        file(DOWNLOAD "${ccache_url}" ./ccache.tar.xz SHOW_PROGRESS)
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ccache.tar.xz)
 
-    # - name: Prepare ccache timestamp
-    #   id: ccache_cache_timestamp
-    #   shell: cmake -P {0}
-    #   run: |
-    #     string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
-    #     message("::set-output name=timestamp::${current_date}")
+    - name: Prepare ccache timestamp
+      id: ccache_cache_timestamp
+      shell: cmake -P {0}
+      run: |
+        string(TIMESTAMP current_date "%Y-%m-%d-%H;%M;%S" UTC)
+        message("::set-output name=timestamp::${current_date}")
 
-    # - name: ccache cache files
-    #   uses: actions/cache@v1.1.0
-    #   with:
-    #     path: .ccache
-    #     key: ${{ matrix.config.name }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
-    #     restore-keys: |
-    #       ${{ matrix.config.name }}-ccache-
+    - name: ccache cache files
+      uses: actions/cache@v1.1.0
+      with:
+        path: .ccache
+        key: ${{ matrix.config.name }}-ccache-${{ steps.ccache_cache_timestamp.outputs.timestamp }}
+        restore-keys: |
+          ${{ matrix.config.name }}-ccache-
 
     - uses: actions/setup-python@v1
       with:
         python-version: '3.6' # Version range or exact version of a Python version to use, using SemVer's version range syntax
         architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
-
-    # - name: Download HDF5
-    #   shell: bash
-    #   run: |
-    #     echo $PATH
-    #     python -m pip install requests
-    #     python ci/get_hdf5.py
-
 
     - name: Download HDF5
       shell: bash
@@ -314,3 +306,11 @@ jobs:
     #     if (NOT result EQUAL 0)
     #       message(FATAL_ERROR "Running tests failed!")
     #     endif()
+
+
+    # - name: Download HDF5
+    #   shell: bash
+    #   run: |
+    #     echo $PATH
+    #     python -m pip install requests
+    #     python ci/get_hdf5.py
