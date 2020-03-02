@@ -247,6 +247,7 @@ jobs:
           set(path_separator ";")
         endif()
         set(ENV{PATH} "$ENV{GITHUB_WORKSPACE}${path_separator}$ENV{PATH}")
+        set(HDF5_ROOT "C:/Program Files/HDF_Group/HDF5/1.10.4/")
         set(HDF5_INCLUDE_DIRS "C:/Program Files/HDF_Group/HDF5/1.10.4/include")
         set(HDF5_LIBRARIES "C:/Program Files/HDF_Group/HDF5/1.10.4/lib")
 
