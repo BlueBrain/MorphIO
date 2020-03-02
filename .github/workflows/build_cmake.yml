@@ -157,6 +157,8 @@ jobs:
             -D CMAKE_C_COMPILER_LAUNCHER=ccache
             -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
             -D BUILD_TESTING=OFF
+            -D HDF5_BUILD_TOOLS=OFF
+            -D HDF5_BUILD_EXAMPLES=OFF
           RESULT_VARIABLE result
         )
         if (NOT result EQUAL 0)
@@ -200,6 +202,11 @@ jobs:
           COMMAND ${{ steps.cmake_and_ninja.outputs.cmake_dir }}/cmake --build hdf5-1.10.4/build
           RESULT_VARIABLE result
         )
+
+        execute_process(
+          COMMAND ${{ steps.cmake_and_ninja.outputs.cmake_dir }}/cmake --install hdf5-1.10.4/build
+        )
+
         if (NOT result EQUAL 0)
           message(FATAL_ERROR "Bad exit status")
         endif()
@@ -214,12 +221,14 @@ jobs:
         echo "Checking current dir content"
         ls -lR
 
-        echo "::set-env name=HDF5_INCLUDE_DIRS::hdf5-1.10.4/build/includes"
+        echo "::set-env name=HDF5_INCLUDE_DIRS::hdf5-1.10.4/src"
+        echo "::set-env name=HDF5_LIBRARIES::hdf5-1.10.4/build/bin"
 
     - name: Test variable
       shell: bash
       run: |
         echo ${HDF5_INCLUDE_DIRS}
+        ls ${HDF5_INCLUDE_DIRS}
 
     - name: Configure
       shell: cmake -P {0}
