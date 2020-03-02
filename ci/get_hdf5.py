@@ -138,6 +138,9 @@ def main():
     vs_version = environ.get("HDF5_VSVERSION")
     use_prefix = True if environ.get("H5PY_USE_PREFIX") is not None else False
 
+    import os
+    print('os: {}'.format(os.environ['PATH']))
+
     if install_path is not None:
         if not exists(install_path):
             makedirs(install_path)

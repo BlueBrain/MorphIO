@@ -119,7 +119,6 @@ jobs:
       shell: bash
       run: |
         echo $PATH
-        env
         python -m pip install requests
         python ci/get_hdf5.py
 
