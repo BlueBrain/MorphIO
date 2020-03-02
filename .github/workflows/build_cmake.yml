@@ -118,8 +118,6 @@ jobs:
     - name: Download HDF5
       shell: bash
       run: |
-        echo $PATH
-        ls
         python -m pip install requests
         python ci/get_hdf5.py
 
