@@ -114,8 +114,8 @@ jobs:
     - name: Download HDF5
       shell: bash
       run: |
-        python3 -m pip install requests
-        python3 -3.7 ci/get_hdf5.py
+        python -m pip install requests
+        python -3.7 ci/get_hdf5.py
 
     # - name: Download HDF5
     #   shell: bash
