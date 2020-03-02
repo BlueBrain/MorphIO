@@ -84,6 +84,8 @@ jobs:
             COMMAND chmod +x ${cmake_dir}/cmake
           )
         endif()
+        message("::add-path::${cmake_dir}")
+
 
     - name: Download ccache
       id: ccache
@@ -92,6 +94,7 @@ jobs:
         set(ccache_url "https://github.com/cristianadam/ccache/releases/download/v$ENV{CCACHE_VERSION}/${{ runner.os }}.tar.xz")
         file(DOWNLOAD "${ccache_url}" ./ccache.tar.xz SHOW_PROGRESS)
         execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ccache.tar.xz)
+        echo ${PATH}
 
     # - name: Prepare ccache timestamp
     #   id: ccache_cache_timestamp
@@ -115,9 +118,12 @@ jobs:
 
     - name: Download HDF5
       shell: bash
+      env:
+        PATH: ${{ steps.cmake_and_ninja.outputs.cmake_dir }}:${PATH}
       run: |
         python -m pip install requests
         python ci/get_hdf5.py
+
 
     # - name: Download HDF5
     #   shell: bash
