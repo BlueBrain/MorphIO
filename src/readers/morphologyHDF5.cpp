@@ -172,7 +172,7 @@ bool MorphologyHDF5::_readV2Metadata() {
         HighFive::SilenceHDF5 silence;
         const auto root = _file->getGroup(_g_root);
         const auto attr = root.getAttribute(_a_version);
-        attr.read(_properties.version());
+        attr.read(_properties._cellLevel._version);
         if (_properties.version() == MORPHOLOGY_VERSION_H5_2)
             return true;
     } catch (const HighFive::Exception&) {
