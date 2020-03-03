@@ -71,9 +71,7 @@ Property::Properties MorphologyHDF5::load() {
         HighFive::SilenceHDF5 silence;
         _file.reset(new HighFive::File(_uri, HighFive::File::ReadOnly));
     } catch (const HighFive::FileException& exc) {
-        throw morphio::RawDataError(_write ? "Could not create morphology file "
-                              : "Could not open morphology file " + _uri + ": " +
-                              exc.what());
+        throw morphio::RawDataError("Could not open morphology file " + _uri + ": " + exc.what());
     }
     _checkVersion(_uri);
     _selectRepairStage();
