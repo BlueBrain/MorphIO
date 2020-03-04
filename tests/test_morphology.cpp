@@ -20,3 +20,9 @@ TEST_CASE("LoadNeurolucidaMorphology", "[morphology]") {
 
     REQUIRE(m.diameters().size() == 14);
 }
+
+TEST_CASE("LoadBadDimensionMorphology", "[morphology]") {
+
+    REQUIRE_THROWS(morphio::Morphology("data/h5/v1/monodim.h5"));
+
+}
