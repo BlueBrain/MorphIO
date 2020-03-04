@@ -107,7 +107,7 @@ void MorphologyHDF5::_checkVersion(const std::string& source) {
         _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_1;
         return;
     } catch (...) {
-        throw morphio::RawDataError("Unknown morphology file format for file " + source);
+        throw morphio::RawDataError("Unknown morphology format in " + source);
     }
 }
 
