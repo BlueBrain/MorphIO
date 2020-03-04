@@ -22,7 +22,5 @@ TEST_CASE("LoadNeurolucidaMorphology", "[morphology]") {
 }
 
 TEST_CASE("LoadBadDimensionMorphology", "[morphology]") {
-
     REQUIRE_THROWS(morphio::Morphology("data/h5/v1/monodim.h5"));
-
 }
