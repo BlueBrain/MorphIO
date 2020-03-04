@@ -1,4 +1,4 @@
-pybind11_add_module(morphio
+pybind11_add_module(_morphio
     SYSTEM
     morphio.cpp
     bind_immutable.cpp
@@ -8,11 +8,11 @@ pybind11_add_module(morphio
     bind_vasculature.cpp
     )
 
-target_include_directories(morphio
+target_include_directories(_morphio
   PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../../include
   )
 
-target_link_libraries(morphio
+target_link_libraries(_morphio
     PRIVATE
     morphio_static)
