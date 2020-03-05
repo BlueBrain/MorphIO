@@ -36,4 +36,6 @@ from ._morphio import (
     Soma,
     Section,
     MitoSection,
+    mut,
+    vasculature,
 )
