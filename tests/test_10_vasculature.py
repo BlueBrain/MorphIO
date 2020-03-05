@@ -1,11 +1,12 @@
 import os
-import numpy as np
-from pathlib2 import Path
-from numpy.testing import assert_array_equal, assert_array_almost_equal
-from nose.tools import assert_equal, assert_not_equal, assert_raises, ok_
 
-from morphio import Morphology, upstream, IterType, RawDataError, VasculatureSectionType
+import numpy as np
+from nose.tools import assert_equal, assert_raises
+from numpy.testing import assert_array_almost_equal, assert_array_equal
+from pathlib2 import Path
+
 import morphio.vasculature as vasculature
+from morphio import RawDataError, VasculatureSectionType
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 

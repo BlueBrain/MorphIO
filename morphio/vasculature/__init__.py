@@ -1,1 +1,1 @@
-from .._morphio.vasculature import *
+from .._morphio.vasculature import Vasculature, Section

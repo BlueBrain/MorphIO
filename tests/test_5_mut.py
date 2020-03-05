@@ -1,16 +1,17 @@
-from collections import OrderedDict
 import os
+from collections import OrderedDict
+
 import numpy as np
+from nose.tools import assert_dict_equal, assert_equal, assert_raises, ok_
 from numpy.testing import assert_array_equal
-from nose.tools import assert_equal, assert_raises, ok_, assert_dict_equal
 from pathlib2 import Path
 
 import morphio
+from morphio import MitochondriaPointLevel, MorphioError
+from morphio import Morphology as ImmutableMorphology
+from morphio import (PointLevel, SectionBuilderError, SectionType,
+                     IterType, ostream_redirect)
 from morphio.mut import Morphology
-from morphio import (ostream_redirect, MitochondriaPointLevel, PointLevel,
-                     SectionType, MorphioError, SectionBuilderError,
-                     Morphology as ImmutableMorphology,
-                     upstream, depth_first, breadth_first)
 from utils import assert_substring, captured_output, tmp_asc_file
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -323,32 +324,32 @@ def test_mitochondria():
 
 
 def test_iterators():
-    assert_array_equal([sec.id for sec in SIMPLE.section(5).iter(upstream)],
+    assert_array_equal([sec.id for sec in SIMPLE.section(5).iter(IterType.upstream)],
                        [5, 3])
 
-    assert_array_equal([sec.id for sec in SIMPLE.section(0).iter(depth_first)],
+    assert_array_equal([sec.id for sec in SIMPLE.section(0).iter(IterType.depth_first)],
                        [0, 1, 2])
 
-    assert_array_equal([sec.id for sec in SIMPLE.section(0).iter(breadth_first)],
+    assert_array_equal([sec.id for sec in SIMPLE.section(0).iter(IterType.breadth_first)],
                        [0, 1, 2])
 
     assert_array_equal([sec.id for sec in SIMPLE.iter()],
                        [0, 1, 2, 3, 4, 5])
 
-    assert_array_equal([sec.id for sec in SIMPLE.iter(depth_first)],
+    assert_array_equal([sec.id for sec in SIMPLE.iter(IterType.depth_first)],
                        [0, 1, 2, 3, 4, 5])
 
-    assert_array_equal([sec.id for sec in SIMPLE.iter(breadth_first)],
+    assert_array_equal([sec.id for sec in SIMPLE.iter(IterType.breadth_first)],
                        [0, 3, 1, 2, 4, 5])
 
     neuron = Morphology(os.path.join(_path, "iterators.asc"))
     root = neuron.root_sections[0]
-    assert_array_equal([section.id for section in root.iter(depth_first)],
+    assert_array_equal([section.id for section in root.iter(IterType.depth_first)],
                        [0, 1, 2, 3, 4, 5, 6])
-    assert_array_equal([section.id for section in root.iter(breadth_first)],
+    assert_array_equal([section.id for section in root.iter(IterType.breadth_first)],
                        [0, 1, 4, 2, 3, 5, 6])
 
-    assert_array_equal([section.id for section in neuron.iter(breadth_first)],
+    assert_array_equal([section.id for section in neuron.iter(IterType.breadth_first)],
                        [0, 7, 1, 4, 8, 9, 2, 3, 5, 6])
 
 def test_non_C_nparray():

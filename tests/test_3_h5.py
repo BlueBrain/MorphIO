@@ -4,7 +4,7 @@ from itertools import chain, repeat
 from numpy.testing import assert_array_equal
 from nose.tools import assert_equal, assert_raises
 
-from morphio import Morphology, MORPHOLOGY_VERSION_H5_1, MORPHOLOGY_VERSION_H5_2, SectionType, RawDataError
+from morphio import Morphology, MorphologyVersion, SectionType, RawDataError
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 H5_PATH = os.path.join(_path, 'h5')
@@ -19,7 +19,7 @@ def test_v1():
     assert_equal(n.root_sections[1].type, 2)
 
     n = Morphology(os.path.join(H5V1_PATH, 'Neuron.h5'))
-    assert_equal(n.version, MORPHOLOGY_VERSION_H5_1)
+    assert_equal(n.version, MorphologyVersion.MORPHOLOGY_VERSION_H5_1)
 
 
     assert_equal(len(n.sections), 84)
@@ -50,7 +50,7 @@ def test_wrong_section_type():
 
 def test_v2():
     n = Morphology(os.path.join(H5V2_PATH, 'Neuron.h5'))
-    assert_equal(n.version, MORPHOLOGY_VERSION_H5_2)
+    assert_equal(n.version, MorphologyVersion.MORPHOLOGY_VERSION_H5_2)
 
 
     # This is a bug in the Neuron.h5 file
