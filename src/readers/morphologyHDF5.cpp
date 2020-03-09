@@ -125,7 +125,7 @@ void MorphologyHDF5::_resolveV1() {
 
     if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns) {
         throw morphio::RawDataError("Opening morphology file '" + _file->getName() +
-                                     "': bad number of dimensions in 'points' dataspace");
+                                    "': bad number of dimensions in 'points' dataspace");
     }
 
     _sections.reset(new HighFive::DataSet(_file->getDataSet(_d_structure)));
@@ -216,8 +216,9 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     using float_2dvec = std::vector<std::vector<float>>;
 
     auto loadPoints = [&](const float_2dvec& vec, bool has_neurites) {
-        const std::size_t section_offset = has_neurites ?
-            static_cast<std::size_t>(firstSectionOffset) : vec.size();
+        const std::size_t section_offset = has_neurites
+                                               ? static_cast<std::size_t>(firstSectionOffset)
+                                               : vec.size();
 
         // points and diameters are TrivialType's. Fastest to resize then assign values
         somaPoints.resize(somaPoints.size() + section_offset);
@@ -260,13 +261,11 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
         std::vector<std::vector<float>> vec(dims[0]);
         dataset.read(vec);
         loadPoints(vec, v2HasNeurites(firstSectionOffset));
-    }
-    else {
+    } else {
         std::vector<std::vector<float>> vec(_pointsDims[0]);
         _points->read(vec);
         loadPoints(vec, std::size_t(firstSectionOffset) < _pointsDims[0]);
     }
-
 }
 
 int MorphologyHDF5::_readSections() {
@@ -285,15 +284,13 @@ int MorphologyHDF5::_readSections() {
                     try {
                         return _file->getDataSet(raw_path);
                     } catch (HighFive::DataSetException&) {
-                        throw MorphioError("Could not find unraveled structure neither at " +
-                                           path + " or " + raw_path +
-                                           " for dataset for morphology file " +
+                        throw MorphioError("Could not find unraveled structure neither at " + path +
+                                           " or " + raw_path + " for dataset for morphology file " +
                                            _file->getName() + " repair stage " + _stage);
                     }
                 } else {
-                    throw MorphioError("Could not open " + path +
-                                       " dataset for morphology file " + _file->getName() +
-                                       " repair stage " + _stage);
+                    throw MorphioError("Could not open " + path + " dataset for morphology file " +
+                                       _file->getName() + " repair stage " + _stage);
                 }
             }
         }();
@@ -414,8 +411,9 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
                                                       perimeters.end());
     } catch (...) {
         if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
-            throw MorphioError("No empty perimeters allowed for glia "
-                             "morphology");
+            throw MorphioError(
+                "No empty perimeters allowed for glia "
+                "morphology");
     }
 }
 
@@ -435,15 +433,16 @@ void MorphologyHDF5::_read(const std::string& groupName,
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != expectedDimension) {
             throw MorphioError("Reading morphology file '" + _file->getName() +
-                                "': bad number of dimensions in 'perimeters' dataspace");
+                               "': bad number of dimensions in 'perimeters' dataspace");
         }
 
         data.resize(dims[0]);
         dataset.read(data);
     } catch (...) {
         if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
-            throw MorphioError("No empty perimeters allowed for glia "
-                               "morphology");
+            throw MorphioError(
+                "No empty perimeters allowed for glia "
+                "morphology");
     }
 }
 
