@@ -199,10 +199,10 @@ HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections) {
 
 
 /**
-   Returns true if the neuron has no neurites
+   Returns true if the neuron has neurites (for MORPHOLOGY_VERSION_H5_2)
 **/
-static inline bool noNeurites(int firstSectionOffset) {
-    return (firstSectionOffset == -1);
+static inline bool v2HasNeurites(int firstSectionOffset) {
+    return (firstSectionOffset > -1);
 }
 
 
@@ -212,6 +212,34 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
 
     auto& somaPoints = _properties._somaLevel._points;
     auto& somaDiameters = _properties._somaLevel._diameters;
+
+    using float_2dvec = std::vector<std::vector<float>>;
+
+    auto loadPoints = [&](const float_2dvec& vec, bool has_neurites) {
+        const std::size_t section_offset = has_neurites ?
+            static_cast<std::size_t>(firstSectionOffset) : vec.size();
+
+        // points and diameters are TrivialType's. Fastest to resize then assign values
+        somaPoints.resize(somaPoints.size() + section_offset);
+        somaDiameters.resize(somaDiameters.size() + section_offset);
+        for (std::size_t i = 0; i < section_offset; ++i) {
+            const auto& p = vec[i];
+            somaPoints[i] = {p[0], p[1], p[2]};
+            somaDiameters[i] = p[3];
+        }
+
+        if (has_neurites) {
+            size_t size = (points.size() + vec.size() - section_offset);
+            points.resize(size);
+            diameters.resize(size);
+            for (std::size_t i = section_offset; i < vec.size(); ++i) {
+                const auto& p = vec[i];
+                const std::size_t section_i = i - section_offset;
+                points[section_i] = {p[0], p[1], p[2]};
+                diameters[section_i] = p[3];
+            }
+        }
+    };
 
     if (_properties.version() == MORPHOLOGY_VERSION_H5_2) {
         auto dataset = [this]() {
@@ -231,58 +259,14 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
         }
         std::vector<std::vector<float>> vec(dims[0]);
         dataset.read(vec);
-
-        std::size_t offset = vec.size();
-        if (firstSectionOffset >= 0) {
-            offset = static_cast<size_t>(firstSectionOffset);
-        }
-
-        somaPoints.reserve(somaPoints.size() + offset);
-        somaDiameters.reserve(somaDiameters.size() + offset);
-        for (std::size_t i = 0; i < offset; ++i) {
-            const auto& p = vec[i];
-            somaPoints.emplace_back(Point{p[0], p[1], p[2]});
-            somaDiameters.emplace_back(p[3]);
-        }
-
-        if (!noNeurites(firstSectionOffset)) {
-            size_t size = (points.size() + vec.size() -
-                           static_cast<unsigned int>(firstSectionOffset));
-            points.reserve(size);
-            diameters.reserve(size);
-            for (std::size_t i = offset; i < vec.size(); ++i) {
-                const auto& p = vec[i];
-                points.emplace_back(Point{p[0], p[1], p[2]});
-                diameters.emplace_back(p[3]);
-            }
-        }
-        return;
+        loadPoints(vec, v2HasNeurites(firstSectionOffset));
+    }
+    else {
+        std::vector<std::vector<float>> vec(_pointsDims[0]);
+        _points->read(vec);
+        loadPoints(vec, std::size_t(firstSectionOffset) < _pointsDims[0]);
     }
 
-    std::vector<std::vector<float>> vec;
-    vec.resize(_pointsDims[0]);
-    _points->read(vec);
-
-    std::size_t offset = vec.size();
-    if (firstSectionOffset >= 0) {
-        offset = static_cast<unsigned int>(firstSectionOffset);
-    }
-
-    somaPoints.reserve(somaPoints.size() + offset);
-    somaDiameters.reserve(somaDiameters.size() + offset);
-    for (std::size_t i = 0; i < offset; ++i) {
-        const auto& p = vec[i];
-        somaPoints.emplace_back(Point{p[0], p[1], p[2]});
-        somaDiameters.emplace_back(p[3]);
-    }
-
-    points.reserve(points.size() + vec.size() - offset);
-    diameters.reserve(diameters.size() + vec.size() - offset);
-    for (std::size_t i = offset; i < vec.size(); ++i) {
-        const auto& p = vec[i];
-        points.emplace_back(Point{p[0], p[1], p[2]});
-        diameters.emplace_back(p[3]);
-    }
 }
 
 int MorphologyHDF5::_readSections() {
@@ -410,7 +394,7 @@ void MorphologyHDF5::_readSectionTypes() {
 
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
-    if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1 || noNeurites(firstSectionOffset))
+    if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1 || !v2HasNeurites(firstSectionOffset))
         return;
 
     try {
