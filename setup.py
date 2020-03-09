@@ -99,15 +99,16 @@ setup(
     ext_modules=[CMakeExtension('morphio._morphio')],
     cmdclass=dict(build_ext=CMakeBuild),
     packages=['morphio', 'morphio.mut', 'morphio.vasculature'],
-
-    license="BBP-internal-confidential",
+    license="LGPLv3",
     keywords=('computational neuroscience',
               'morphology',
               'neuron'
               'neurolucida'
               'neuromorphology'),
     zip_safe=False,
-    classifiers=[],
+    classifiers=[
+        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    ],
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
 )
