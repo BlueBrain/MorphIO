@@ -4,8 +4,8 @@
 
 namespace morphio {
 template <typename T>
-SectionBase<T>::SectionBase(const uint32_t id_,
-                            const std::shared_ptr<Property::Properties>& properties)
+inline SectionBase<T>::SectionBase(const uint32_t id_,
+                                   const std::shared_ptr<Property::Properties>& properties)
     : _id(id_)
     , _properties(properties) {
     const auto& sections = properties->get<typename T::SectionId>();
@@ -27,13 +27,13 @@ SectionBase<T>::SectionBase(const uint32_t id_,
 }
 
 template <typename T>
-SectionBase<T>::SectionBase(const SectionBase& other)
+inline SectionBase<T>::SectionBase(const SectionBase& other)
     : _id(other._id)
     , _range(other._range)
     , _properties(other._properties) {}
 
 template <typename T>
-SectionBase<T>& SectionBase<T>::operator=(const SectionBase& section) {
+inline SectionBase<T>& SectionBase<T>::operator=(const SectionBase& section) {
     if (&section == this)
         return *this;
     _id = section._id;
@@ -44,7 +44,7 @@ SectionBase<T>& SectionBase<T>::operator=(const SectionBase& section) {
 
 template <typename T>
 template <typename TProperty>
-range<const typename TProperty::Type> SectionBase<T>::get() const {
+inline range<const typename TProperty::Type> SectionBase<T>::get() const {
     const auto& data = _properties->get<TProperty>();
     if (data.empty())
         return {};
@@ -54,15 +54,15 @@ range<const typename TProperty::Type> SectionBase<T>::get() const {
 }
 
 template <typename T>
-bool SectionBase<T>::isRoot() const {
+inline bool SectionBase<T>::isRoot() const {
     return _properties->get<typename T::SectionId>()[_id][1] == -1;
 }
 
 template <typename T>
-T SectionBase<T>::parent() const {
+inline T SectionBase<T>::parent() const {
     if (isRoot())
         throw MissingParentError("Cannot call Section::parent() on a root node (section id=" +
-                                  std::to_string(_id) + ").");
+                                 std::to_string(_id) + ").");
 
     const auto _parent = static_cast<unsigned int>(
         _properties->get<typename T::SectionId>()[_id][1]);
@@ -70,7 +70,7 @@ T SectionBase<T>::parent() const {
 }
 
 template <typename T>
-std::vector<T> SectionBase<T>::children() const {
+inline std::vector<T> SectionBase<T>::children() const {
     std::vector<T> result;
     try {
         const std::vector<uint32_t>& _children = _properties->children<typename T::SectionId>().at(
@@ -83,6 +83,21 @@ std::vector<T> SectionBase<T>::children() const {
     } catch (const std::out_of_range&) {
         return result;
     }
+}
+
+template <typename T>
+inline bool SectionBase<T>::operator==(const SectionBase& other) const noexcept {
+    return other._id == _id && other._properties == _properties;
+}
+
+template <typename T>
+inline bool SectionBase<T>::operator!=(const SectionBase& other) const noexcept {
+    return !(*this == other);
+}
+
+template <typename T>
+inline uint32_t SectionBase<T>::id() const noexcept {
+    return _id;
 }
 
 }  // namespace morphio

@@ -6,9 +6,9 @@
 
 namespace morphio {
 template <typename ContainerDiameters, typename ContainerPoints>
-float _somaSurface(const SomaType type,
-                   const ContainerDiameters& diameters,
-                   const ContainerPoints& points) {
+inline float _somaSurface(const SomaType type,
+                          const ContainerDiameters& diameters,
+                          const ContainerPoints& points) {
     size_t size = points.size();
     if (size == 0)
         return 0.;
@@ -48,13 +48,13 @@ float _somaSurface(const SomaType type,
     }
 }
 template <typename T>
-void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset) {
+inline void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset) {
     to.insert(to.end(), from.begin() + offset, from.end());
 }
 
 template <typename T>
-std::vector<typename T::Type> copySpan(const std::vector<typename T::Type>& data,
-                                       SectionRange range) {
+inline std::vector<typename T::Type> copySpan(const std::vector<typename T::Type>& data,
+                                              SectionRange range) {
     if (data.empty())
         return {};
 

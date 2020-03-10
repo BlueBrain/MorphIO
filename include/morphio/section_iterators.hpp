@@ -9,43 +9,47 @@
 #include <morphio/exceptions.h>
 #include <morphio/types.h>
 
+namespace morphio {
 namespace detail {
 
 template <typename SectionT, typename MorphologyT>
-std::vector<SectionT> getChildren(const MorphologyT& morphology) noexcept {
+inline std::vector<SectionT> getChildren(const MorphologyT& morphology) noexcept {
     return morphology.rootSections();
 }
 
 template <typename SectionT>
-std::vector<SectionT> getChildren(const SectionT& section) {
+inline std::vector<SectionT> getChildren(const SectionT& section) {
     return section.children();
 }
 
 template <typename SectionT>
-std::vector<std::shared_ptr<SectionT>> getChildren(const std::shared_ptr<SectionT>& section) {
+inline std::vector<std::shared_ptr<SectionT>> getChildren(
+    const std::shared_ptr<SectionT>& section) {
     return section->children();
 }
 
 template <typename SectionT>
-bool isRoot(const SectionT& current) {
+inline bool isRoot(const SectionT& current) {
     return current.isRoot();
 }
 
 template <typename SectionT>
-bool isRoot(const std::shared_ptr<SectionT>& current) {
+inline bool isRoot(const std::shared_ptr<SectionT>& current) {
     return current->isRoot();
 }
 
 template <typename SectionT>
-SectionT getParent(const SectionT& current) {
+inline SectionT getParent(const SectionT& current) {
     return current.parent();
 }
 
 template <typename SectionT>
-std::shared_ptr<SectionT> getParent(const std::shared_ptr<SectionT>& current) {
+inline std::shared_ptr<SectionT> getParent(const std::shared_ptr<SectionT>& current) {
     return current->parent();
 }
 }  // namespace detail
+}  // namespace morphio
+
 
 namespace morphio {
 
@@ -61,16 +65,16 @@ class breadth_iterator_t
 
     breadth_iterator_t() = default;
 
-    inline explicit breadth_iterator_t(const SectionT& section);
-    inline explicit breadth_iterator_t(const MorphologyT& morphology);
-    inline breadth_iterator_t(const breadth_iterator_t& other);
+    explicit breadth_iterator_t(const SectionT& section);
+    explicit breadth_iterator_t(const MorphologyT& morphology);
+    breadth_iterator_t(const breadth_iterator_t& other);
 
-    inline SectionT operator*() const;
+    SectionT operator*() const;
 
-    inline breadth_iterator_t& operator++();
-    inline breadth_iterator_t operator++(int);
+    breadth_iterator_t& operator++();
+    breadth_iterator_t operator++(int);
 
-    inline bool operator==(const breadth_iterator_t& other) const;
+    bool operator==(const breadth_iterator_t& other) const;
     bool operator!=(const breadth_iterator_t& other) const;
 
   private:
@@ -89,17 +93,17 @@ class depth_iterator_t
 
     depth_iterator_t() = default;
 
-    inline explicit depth_iterator_t(const SectionT& section);
-    inline explicit depth_iterator_t(const MorphologyT& morphology);
-    inline depth_iterator_t(const depth_iterator_t& other);
+    explicit depth_iterator_t(const SectionT& section);
+    explicit depth_iterator_t(const MorphologyT& morphology);
+    depth_iterator_t(const depth_iterator_t& other);
 
-    inline SectionT operator*() const;
+    SectionT operator*() const;
 
-    inline depth_iterator_t& operator++();
-    inline depth_iterator_t operator++(int);
+    depth_iterator_t& operator++();
+    depth_iterator_t operator++(int);
 
-    inline bool operator==(const depth_iterator_t& other) const;
-    inline bool operator!=(const depth_iterator_t& other) const;
+    bool operator==(const depth_iterator_t& other) const;
+    bool operator!=(const depth_iterator_t& other) const;
 
   private:
     std::deque<SectionT> deque_;
@@ -115,18 +119,18 @@ class upstream_iterator_t
     using pointer = SectionT*;
     using reference = SectionT&;
 
-    inline upstream_iterator_t();
-    inline explicit upstream_iterator_t(const SectionT& section);
-    inline upstream_iterator_t(const upstream_iterator_t& other);
-    inline ~upstream_iterator_t();
+    upstream_iterator_t();
+    explicit upstream_iterator_t(const SectionT& section);
+    upstream_iterator_t(const upstream_iterator_t& other);
+    ~upstream_iterator_t();
 
-    inline SectionT operator*() const;
+    SectionT operator*() const;
 
-    inline upstream_iterator_t& operator++();
-    inline upstream_iterator_t operator++(int);
+    upstream_iterator_t& operator++();
+    upstream_iterator_t operator++(int);
 
-    inline bool operator==(const upstream_iterator_t& other) const;
-    inline bool operator!=(const upstream_iterator_t& other) const;
+    bool operator==(const upstream_iterator_t& other) const;
+    bool operator!=(const upstream_iterator_t& other) const;
 
   private:
     // This is a workaround for not having std::optional until c++17.
@@ -166,8 +170,8 @@ inline SectionT breadth_iterator_t<SectionT, MorphologyT>::operator*() const {
 }
 
 template <typename SectionT, typename MorphologyT>
-inline breadth_iterator_t<SectionT, MorphologyT>&
-breadth_iterator_t<SectionT, MorphologyT>::operator++() {
+inline breadth_iterator_t<SectionT, MorphologyT>& breadth_iterator_t<SectionT, MorphologyT>::
+operator++() {
     if (deque_.empty()) {
         throw MorphioError("Can't iterate past the end");
     }
@@ -180,8 +184,8 @@ breadth_iterator_t<SectionT, MorphologyT>::operator++() {
 }
 
 template <typename SectionT, typename MorphologyT>
-inline breadth_iterator_t<SectionT, MorphologyT>
-breadth_iterator_t<SectionT, MorphologyT>::operator++(int) {
+inline breadth_iterator_t<SectionT, MorphologyT> breadth_iterator_t<SectionT, MorphologyT>::
+operator++(int) {
     breadth_iterator_t ret(*this);
     ++(*this);
     return ret;
@@ -222,8 +226,8 @@ inline SectionT depth_iterator_t<SectionT, MorphologyT>::operator*() const {
 }
 
 template <typename SectionT, typename MorphologyT>
-inline depth_iterator_t<SectionT, MorphologyT>&
-depth_iterator_t<SectionT, MorphologyT>::operator++() {
+inline depth_iterator_t<SectionT, MorphologyT>& depth_iterator_t<SectionT, MorphologyT>::
+operator++() {
     if (deque_.empty()) {
         throw MorphioError("Can't iterate past the end");
     }

@@ -11,7 +11,7 @@ morphio::Points array_to_points(py::array_t<float>& buf);
 py::array_t<float> span_array_to_ndarray(const morphio::range<const morphio::Point>& span);
 
 template <typename T>
-py::array_t<float> span_to_ndarray(const morphio::range<const T>& span) {
+inline py::array_t<float> span_to_ndarray(const morphio::range<const T>& span) {
     const void* ptr = static_cast<const void*>(span.data());
     const auto buffer_info = py::buffer_info(
         // Cast from (const void*) to (void*) for function signature matching
