@@ -213,28 +213,25 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     auto& somaPoints = _properties._somaLevel._points;
     auto& somaDiameters = _properties._somaLevel._diameters;
 
-    using float_2dvec = std::vector<std::vector<float>>;
-
-    auto loadPoints = [&](const float_2dvec& vec, bool has_neurites) {
-        const std::size_t section_offset = has_neurites
-                                               ? static_cast<std::size_t>(firstSectionOffset)
-                                               : vec.size();
+    auto loadPoints = [&](const std::vector<std::vector<float>>& hd5fData, bool hasNeurites) {
+        const std::size_t section_offset = hasNeurites ? std::size_t(firstSectionOffset)
+                                                       : hd5fData.size();
 
         // points and diameters are PODs. Fastest to resize then assign values
         somaPoints.resize(somaPoints.size() + section_offset);
         somaDiameters.resize(somaDiameters.size() + section_offset);
         for (std::size_t i = 0; i < section_offset; ++i) {
-            const auto& p = vec[i];
+            const auto& p = hd5fData[i];
             somaPoints[i] = {p[0], p[1], p[2]};
             somaDiameters[i] = p[3];
         }
 
-        if (has_neurites) {
-            size_t size = (points.size() + vec.size() - section_offset);
+        if (hasNeurites) {
+            const size_t size = (points.size() + hd5fData.size() - section_offset);
             points.resize(size);
             diameters.resize(size);
-            for (std::size_t i = section_offset; i < vec.size(); ++i) {
-                const auto& p = vec[i];
+            for (std::size_t i = section_offset; i < hd5fData.size(); ++i) {
+                const auto& p = hd5fData[i];
                 const std::size_t section_i = i - section_offset;
                 points[section_i] = {p[0], p[1], p[2]};
                 diameters[section_i] = p[3];
