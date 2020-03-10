@@ -220,7 +220,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
                                                ? static_cast<std::size_t>(firstSectionOffset)
                                                : vec.size();
 
-        // points and diameters are TrivialType's. Fastest to resize then assign values
+        // points and diameters are PODs. Fastest to resize then assign values
         somaPoints.resize(somaPoints.size() + section_offset);
         somaDiameters.resize(somaDiameters.size() + section_offset);
         for (std::size_t i = 0; i < section_offset; ++i) {
@@ -411,9 +411,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
                                                       perimeters.end());
     } catch (...) {
         if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
-            throw MorphioError(
-                "No empty perimeters allowed for glia "
-                "morphology");
+            throw MorphioError("No empty perimeters allowed for glia morphology");
     }
 }
 
@@ -440,9 +438,7 @@ void MorphologyHDF5::_read(const std::string& groupName,
         dataset.read(data);
     } catch (...) {
         if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
-            throw MorphioError(
-                "No empty perimeters allowed for glia "
-                "morphology");
+            throw MorphioError("No empty perimeters allowed for glia morphology");
     }
 }
 
