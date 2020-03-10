@@ -170,8 +170,8 @@ inline SectionT breadth_iterator_t<SectionT, MorphologyT>::operator*() const {
 }
 
 template <typename SectionT, typename MorphologyT>
-inline breadth_iterator_t<SectionT, MorphologyT>& breadth_iterator_t<SectionT, MorphologyT>::
-operator++() {
+inline breadth_iterator_t<SectionT, MorphologyT>&
+breadth_iterator_t<SectionT, MorphologyT>::operator++() {
     if (deque_.empty()) {
         throw MorphioError("Can't iterate past the end");
     }
@@ -184,8 +184,8 @@ operator++() {
 }
 
 template <typename SectionT, typename MorphologyT>
-inline breadth_iterator_t<SectionT, MorphologyT> breadth_iterator_t<SectionT, MorphologyT>::
-operator++(int) {
+inline breadth_iterator_t<SectionT, MorphologyT>
+breadth_iterator_t<SectionT, MorphologyT>::operator++(int) {
     breadth_iterator_t ret(*this);
     ++(*this);
     return ret;
@@ -226,8 +226,8 @@ inline SectionT depth_iterator_t<SectionT, MorphologyT>::operator*() const {
 }
 
 template <typename SectionT, typename MorphologyT>
-inline depth_iterator_t<SectionT, MorphologyT>& depth_iterator_t<SectionT, MorphologyT>::
-operator++() {
+inline depth_iterator_t<SectionT, MorphologyT>&
+depth_iterator_t<SectionT, MorphologyT>::operator++() {
     if (deque_.empty()) {
         throw MorphioError("Can't iterate past the end");
     }
