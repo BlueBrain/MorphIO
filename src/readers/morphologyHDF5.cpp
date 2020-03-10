@@ -125,7 +125,7 @@ void MorphologyHDF5::_resolveV1() {
 
     if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns) {
         throw morphio::RawDataError("Opening morphology file '" + _file->getName() +
-                                     "': bad number of dimensions in 'points' dataspace");
+                                    "': bad number of dimensions in 'points' dataspace");
     }
 
     _sections.reset(new HighFive::DataSet(_file->getDataSet(_d_structure)));
@@ -199,10 +199,10 @@ HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections) {
 
 
 /**
-   Returns true if the neuron has no neurites
+   Returns true if the neuron has neurites (for MORPHOLOGY_VERSION_H5_2)
 **/
-static inline bool noNeurites(int firstSectionOffset) {
-    return (firstSectionOffset == -1);
+static inline bool v2HasNeurites(int firstSectionOffset) {
+    return (firstSectionOffset > -1);
 }
 
 
@@ -212,6 +212,32 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
 
     auto& somaPoints = _properties._somaLevel._points;
     auto& somaDiameters = _properties._somaLevel._diameters;
+
+    auto loadPoints = [&](const std::vector<std::vector<float>>& hd5fData, bool hasNeurites) {
+        const std::size_t section_offset = hasNeurites ? std::size_t(firstSectionOffset)
+                                                       : hd5fData.size();
+
+        // points and diameters are PODs. Fastest to resize then assign values
+        somaPoints.resize(somaPoints.size() + section_offset);
+        somaDiameters.resize(somaDiameters.size() + section_offset);
+        for (std::size_t i = 0; i < section_offset; ++i) {
+            const auto& p = hd5fData[i];
+            somaPoints[i] = {p[0], p[1], p[2]};
+            somaDiameters[i] = p[3];
+        }
+
+        if (hasNeurites) {
+            const size_t size = (points.size() + hd5fData.size() - section_offset);
+            points.resize(size);
+            diameters.resize(size);
+            for (std::size_t i = section_offset; i < hd5fData.size(); ++i) {
+                const auto& p = hd5fData[i];
+                const std::size_t section_i = i - section_offset;
+                points[section_i] = {p[0], p[1], p[2]};
+                diameters[section_i] = p[3];
+            }
+        }
+    };
 
     if (_properties.version() == MORPHOLOGY_VERSION_H5_2) {
         auto dataset = [this]() {
@@ -231,57 +257,11 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
         }
         std::vector<std::vector<float>> vec(dims[0]);
         dataset.read(vec);
-
-        std::size_t offset = vec.size();
-        if (firstSectionOffset >= 0) {
-            offset = static_cast<size_t>(firstSectionOffset);
-        }
-
-        somaPoints.reserve(somaPoints.size() + offset);
-        somaDiameters.reserve(somaDiameters.size() + offset);
-        for (std::size_t i = 0; i < offset; ++i) {
-            const auto& p = vec[i];
-            somaPoints.emplace_back(Point{p[0], p[1], p[2]});
-            somaDiameters.emplace_back(p[3]);
-        }
-
-        if (!noNeurites(firstSectionOffset)) {
-            size_t size = (points.size() + vec.size() -
-                           static_cast<unsigned int>(firstSectionOffset));
-            points.reserve(size);
-            diameters.reserve(size);
-            for (std::size_t i = offset; i < vec.size(); ++i) {
-                const auto& p = vec[i];
-                points.emplace_back(Point{p[0], p[1], p[2]});
-                diameters.emplace_back(p[3]);
-            }
-        }
-        return;
-    }
-
-    std::vector<std::vector<float>> vec;
-    vec.resize(_pointsDims[0]);
-    _points->read(vec);
-
-    std::size_t offset = vec.size();
-    if (firstSectionOffset >= 0) {
-        offset = static_cast<unsigned int>(firstSectionOffset);
-    }
-
-    somaPoints.reserve(somaPoints.size() + offset);
-    somaDiameters.reserve(somaDiameters.size() + offset);
-    for (std::size_t i = 0; i < offset; ++i) {
-        const auto& p = vec[i];
-        somaPoints.emplace_back(Point{p[0], p[1], p[2]});
-        somaDiameters.emplace_back(p[3]);
-    }
-
-    points.reserve(points.size() + vec.size() - offset);
-    diameters.reserve(diameters.size() + vec.size() - offset);
-    for (std::size_t i = offset; i < vec.size(); ++i) {
-        const auto& p = vec[i];
-        points.emplace_back(Point{p[0], p[1], p[2]});
-        diameters.emplace_back(p[3]);
+        loadPoints(vec, v2HasNeurites(firstSectionOffset));
+    } else {
+        std::vector<std::vector<float>> vec(_pointsDims[0]);
+        _points->read(vec);
+        loadPoints(vec, std::size_t(firstSectionOffset) < _pointsDims[0]);
     }
 }
 
@@ -301,15 +281,13 @@ int MorphologyHDF5::_readSections() {
                     try {
                         return _file->getDataSet(raw_path);
                     } catch (HighFive::DataSetException&) {
-                        throw MorphioError("Could not find unraveled structure neither at " +
-                                           path + " or " + raw_path +
-                                           " for dataset for morphology file " +
+                        throw MorphioError("Could not find unraveled structure neither at " + path +
+                                           " or " + raw_path + " for dataset for morphology file " +
                                            _file->getName() + " repair stage " + _stage);
                     }
                 } else {
-                    throw MorphioError("Could not open " + path +
-                                       " dataset for morphology file " + _file->getName() +
-                                       " repair stage " + _stage);
+                    throw MorphioError("Could not open " + path + " dataset for morphology file " +
+                                       _file->getName() + " repair stage " + _stage);
                 }
             }
         }();
@@ -410,7 +388,7 @@ void MorphologyHDF5::_readSectionTypes() {
 
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
-    if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1 || noNeurites(firstSectionOffset))
+    if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1 || !v2HasNeurites(firstSectionOffset))
         return;
 
     try {
@@ -430,8 +408,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
                                                       perimeters.end());
     } catch (...) {
         if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
-            throw MorphioError("No empty perimeters allowed for glia "
-                             "morphology");
+            throw MorphioError("No empty perimeters allowed for glia morphology");
     }
 }
 
@@ -451,15 +428,14 @@ void MorphologyHDF5::_read(const std::string& groupName,
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != expectedDimension) {
             throw MorphioError("Reading morphology file '" + _file->getName() +
-                                "': bad number of dimensions in 'perimeters' dataspace");
+                               "': bad number of dimensions in 'perimeters' dataspace");
         }
 
         data.resize(dims[0]);
         dataset.read(data);
     } catch (...) {
         if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
-            throw MorphioError("No empty perimeters allowed for glia "
-                               "morphology");
+            throw MorphioError("No empty perimeters allowed for glia morphology");
     }
 }
 
