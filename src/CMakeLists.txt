@@ -6,25 +6,26 @@ set(MORPHIO_SOURCES
     mitochondria.cpp
     morphology.cpp
     morphology.cpp
-    properties.cpp
-    section.cpp
-    soma.cpp
-    vector_utils.cpp
-    version.cpp
+    mut/endoplasmic_reticulum.cpp
     mut/mito_section.cpp
+    mut/mitochondria.cpp
+    mut/modifiers.cpp
+    mut/morphology.cpp
     mut/section.cpp
     mut/soma.cpp
-    mut/morphology.cpp
-    mut/mitochondria.cpp
     mut/writers.cpp
-    mut/modifiers.cpp
+    properties.cpp
+    readers/morphologyASC.cpp
     readers/morphologyHDF5.cpp
     readers/morphologySWC.cpp
-    readers/morphologyASC.cpp
     readers/vasculatureHDF5.cpp
+    section.cpp
+    soma.cpp
+    vasc/properties.cpp
     vasc/section.cpp
     vasc/vasculature.cpp
-    vasc/properties.cpp
+    vector_utils.cpp
+    version.cpp
     )
 
 if(NOT MORPHIO_VERSION_STRING)

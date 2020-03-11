@@ -455,22 +455,22 @@ void MorphologyHDF5::_readEndoplasmicReticulum() {
           _d_section_index,
           MORPHOLOGY_VERSION_H5_1_1,
           1,
-          _properties._endoplasmicReticulumLevel._sectionIndex);
+          _properties._endoplasmicReticulumLevel._sectionIndices);
     _read(_g_endoplasmic_reticulum,
           _d_volume,
           MORPHOLOGY_VERSION_H5_1_1,
           1,
-          _properties._endoplasmicReticulumLevel._volume);
+          _properties._endoplasmicReticulumLevel._volumes);
     _read(_g_endoplasmic_reticulum,
           _d_surface_area,
           MORPHOLOGY_VERSION_H5_1_1,
           1,
-          _properties._endoplasmicReticulumLevel._surfaceArea);
+          _properties._endoplasmicReticulumLevel._surfaceAreas);
     _read(_g_endoplasmic_reticulum,
           _d_filament_count,
           MORPHOLOGY_VERSION_H5_1_1,
           1,
-          _properties._endoplasmicReticulumLevel._filamentCount);
+          _properties._endoplasmicReticulumLevel._filamentCounts);
 }
 
 void MorphologyHDF5::_readMitochondria() {
