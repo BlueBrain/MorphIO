@@ -293,12 +293,12 @@ int MorphologyHDF5::_readSections() {
                         return _group.getDataSet(raw_path);
                     } catch (HighFive::DataSetException&) {
                         throw(MorphioError("Could not find unraveled structure neither at " + path +
-                                           " or " + raw_path + " for dataset for morphology '" + 
-					   _uri + "' repair stage " + _stage));
+                                           " or " + raw_path + " for dataset for morphology '" +
+                                           _uri + "' repair stage " + _stage));
                     }
                 } else {
                     throw(MorphioError("Could not open " + path + " dataset for morphology '" +
-					    _uri  + "' repair stage " + _stage));
+                                       _uri + "' repair stage " + _stage));
                 }
             }
         }();
