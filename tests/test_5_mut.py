@@ -419,7 +419,7 @@ def test_endoplasmic_reticulum():
     assert_equal(reticulum.surface_areas, [3, 3])
     assert_equal(reticulum.filament_counts, [4, 4])
 
-    neuron = Morphology('simple-with-endoplasmic-reticulum.h5')
+    neuron = Morphology(Path(_path, 'simple-with-endoplasmic-reticulum.h5'))
     reticulum = neuron.endoplasmic_reticulum
     assert_equal(reticulum.section_indices, [1, 1])
     assert_equal(reticulum.volumes, [2, 2])
