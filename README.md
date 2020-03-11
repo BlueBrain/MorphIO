@@ -422,6 +422,9 @@ morphio.set_maximum_warnings(0)
 See https://github.com/BlueBrain/MorphIO/blob/master/doc/specification.md
 
 # Contributing
-
 If you want to improve the project or you see any issue, every contribution is welcome.
 Please check the [contribution guidelines](CONTRIBUTING.md) for more information.
+
+# License
+MorphIO is licensed under the terms of the GNU Lesser General Public License version 3.
+Refer to COPYING.LESSER and COPYING for details.

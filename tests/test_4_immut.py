@@ -1,13 +1,12 @@
 import os
 from collections import OrderedDict
-from itertools import combinations
-from pathlib2 import Path
 
 import numpy as np
-from nose.tools import assert_equal, assert_not_equal, assert_raises, ok_, assert_dict_equal
+from nose.tools import assert_dict_equal, assert_equal, ok_
 from numpy.testing import assert_array_almost_equal, assert_array_equal
+from pathlib2 import Path
 
-from morphio import IterType, Morphology, RawDataError, upstream
+from morphio import IterType, Morphology
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -51,7 +50,7 @@ def test_iter():
         assert_array_equal([section.id for section in cell.iter(IterType.depth_first)],
                            [0, 1, 2, 3, 4, 5])
         assert_array_equal([section.points for section in
-                            cell.root_sections[0].children[0].iter(upstream)],
+                            cell.root_sections[0].children[0].iter(IterType.upstream)],
                            [[[0., 5., 0.],
                              [-5., 5., 0.]],
                             [[0., 0., 0.],
