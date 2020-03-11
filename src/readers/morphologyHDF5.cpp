@@ -134,7 +134,6 @@ void MorphologyHDF5::_resolveV1() {
     _pointsDims = dataspace.getDimensions();
 
     if (_pointsDims.size() != 2 || _pointsDims[1] != _pointColumns) {
-<<<<<<< HEAD
         throw morphio::RawDataError("Opening morphology '" + _uri +
                                     "': bad number of dimensions in 'points' dataspace.");
     }
@@ -437,7 +436,6 @@ void MorphologyHDF5::_read(const std::string& groupName,
 
         auto dims = dataset.getSpace().getDimensions();
         if (dims.size() != expectedDimension) {
-<<<<<<< HEAD
             throw(MorphioError("Reading morhology '" + _uri +
                                "': bad number of dimensions in 'perimeters' dataspace"));
         }
