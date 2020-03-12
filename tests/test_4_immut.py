@@ -110,6 +110,7 @@ def test_endoplasmic_reticulum():
     assert_array_almost_equal(er.surface_areas, [111.24, 87.44, 0.11], decimal=5)
     assert_array_equal(er.filament_counts, [12, 42, 8])
 
+
 def test_section___str__():
     assert_equal(str(CELLS['asc'].root_sections[0]),
                  'Section(id=0, points=[(0 0 0),..., (0 5 0)])')

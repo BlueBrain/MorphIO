@@ -22,6 +22,7 @@
       * [Creating morphologies](#creating-morphologies)
    * [Opening flags](#opening-flags)
    * [Mitochondria](#mitochondria)
+   * [Endoplasmic reticulum](#endoplasmic-reticulum)
    * [Tips](#tips)
       * [Maximum number of warnings](#maximum-number-of-warnings)
 * [Specification](#specification)
@@ -312,7 +313,7 @@ The following flags are supported:
 
 - `morphio::NO_MODIFIER`:
 This is the default flag, it will do nothing.
-- `morphio::TWO_POINTS\_SECTIONS`:
+- `morphio::TWO_POINTS_SECTIONS`:
 Each section gets reduce to a line made of the first and last point.
 - `morphio::SOMA_SPHERE`:
 The soma is reduced to a sphere which is the center of gravity of the real soma.
@@ -405,7 +406,7 @@ for mitochondrial_section in morpho.mitochondria.root_sections:
 ### Endoplasmic reticulum
 
 Endoplasmic reticulum can also be stored and written to H5 file.
-The specification is part of the [H5 documentation][https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html]
+The specification is part of the [H5 documentation](https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html)
 There is one endoplasmic reticulum object per morphology. It contains 4 attributes. Each attribute is a array and each line
 refer to the value of the attribute for a specific neuronal section.
 
