@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string>
 
+#include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
 #include <morphio/mut/morphology.h>
@@ -23,7 +24,8 @@ Morphology::Morphology(const std::string& uri, unsigned int options)
 
 Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int options)
     : _counter(0)
-    , _soma(std::make_shared<Soma>(*morphology.soma())) {
+    , _soma(std::make_shared<Soma>(*morphology.soma()))
+    , _endoplasmicReticulum(morphology.endoplasmicReticulum()) {
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties);
 
     for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
@@ -39,7 +41,8 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
 
 Morphology::Morphology(const morphio::Morphology& morphology, unsigned int options)
     : _counter(0)
-    , _soma(std::make_shared<Soma>(morphology.soma())) {
+    , _soma(std::make_shared<Soma>(morphology.soma()))
+    , _endoplasmicReticulum(morphology.endoplasmicReticulum()) {
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(
         morphology._properties->_cellLevel);
 

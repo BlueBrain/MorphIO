@@ -2,7 +2,8 @@ import os
 from collections import OrderedDict
 
 import numpy as np
-from nose.tools import assert_dict_equal, assert_equal, assert_raises, ok_
+from numpy.testing import assert_equal
+from nose.tools import assert_dict_equal, assert_raises, ok_
 from numpy.testing import assert_array_equal
 from pathlib2 import Path
 
@@ -12,7 +13,7 @@ from morphio import Morphology as ImmutableMorphology
 from morphio import (PointLevel, SectionBuilderError, SectionType,
                      IterType, ostream_redirect)
 from morphio.mut import Morphology
-from utils import assert_substring, captured_output, tmp_asc_file
+from utils import assert_substring, captured_output, tmp_asc_file, setup_tempdir
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -398,3 +399,33 @@ def test_section___str__():
 def test_from_pathlib():
     neuron = Morphology(Path(_path, "simple.asc"))
     assert_equal(len(neuron.root_sections), 2)
+
+
+def test_endoplasmic_reticulum():
+    neuron = Morphology(Path(_path, "simple.asc"))
+    reticulum = neuron.endoplasmic_reticulum
+    assert_equal(reticulum.section_indices, [])
+    assert_equal(reticulum.volumes, [])
+    assert_equal(reticulum.surface_areas, [])
+    assert_equal(reticulum.filament_counts, [])
+
+    reticulum.section_indices = [1, 1]
+    reticulum.volumes = [2, 2]
+    reticulum.surface_areas = [3, 3]
+    reticulum.filament_counts = [4, 4]
+
+    assert_equal(reticulum.section_indices, [1, 1])
+    assert_equal(reticulum.volumes, [2, 2])
+    assert_equal(reticulum.surface_areas, [3, 3])
+    assert_equal(reticulum.filament_counts, [4, 4])
+
+    with setup_tempdir('test-endoplasmic-reticulum') as folder:
+        path = Path(folder, 'with-reticulum.h5')
+        neuron.write(path)
+
+        neuron = Morphology(path)
+    reticulum = neuron.endoplasmic_reticulum
+    assert_equal(reticulum.section_indices, [1, 1])
+    assert_equal(reticulum.volumes, [2, 2])
+    assert_equal(reticulum.surface_areas, [3, 3])
+    assert_equal(reticulum.filament_counts, [4, 4])

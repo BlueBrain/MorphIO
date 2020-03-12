@@ -11,6 +11,7 @@
 
 #include <morphio/errorMessages.h>
 #include <morphio/exceptions.h>
+#include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
@@ -86,6 +87,16 @@ class Morphology
      * Return the mitochondria container class
      **/
     inline const Mitochondria& mitochondria() const noexcept;
+
+    /**
+     * Return the endoplasmic reticulum container class
+     **/
+    inline EndoplasmicReticulum& endoplasmicReticulum() noexcept;
+    /**
+     * Return the endoplasmic reticulum container class
+     **/
+    inline const EndoplasmicReticulum& endoplasmicReticulum() const noexcept;
+
     /**
      * Return the annotation object
      **/
@@ -212,6 +223,7 @@ class Morphology
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
     std::vector<morphio::Property::Annotation> _annotations;
     Mitochondria _mitochondria;
+    EndoplasmicReticulum _endoplasmicReticulum;
 
     std::map<uint32_t, uint32_t> _parent;
     std::map<uint32_t, std::vector<std::shared_ptr<Section>>> _children;
@@ -239,6 +251,14 @@ inline Mitochondria& Morphology::mitochondria() noexcept {
 
 inline const Mitochondria& Morphology::mitochondria() const noexcept {
     return _mitochondria;
+}
+
+inline EndoplasmicReticulum& Morphology::endoplasmicReticulum() noexcept {
+    return _endoplasmicReticulum;
+}
+
+inline const EndoplasmicReticulum& Morphology::endoplasmicReticulum() const noexcept {
+    return _endoplasmicReticulum;
 }
 
 inline const std::vector<Property::Annotation>& Morphology::annotations() const noexcept {

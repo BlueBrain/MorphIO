@@ -1,0 +1,54 @@
+#pragma once
+
+#include <morphio/properties.h>
+#include <morphio/types.h>
+
+namespace morphio {
+namespace mut {
+/**
+ * The entry-point class to access endoplasmic reticulum data
+ *
+ * Spec https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
+ **/
+class EndoplasmicReticulum
+{
+  public:
+    EndoplasmicReticulum() = default;
+    EndoplasmicReticulum(const std::vector<uint32_t>& sectionIndices,
+                         const std::vector<float>& volumes,
+                         const std::vector<float>& surfaceAreas,
+                         const std::vector<uint32_t>& filamentCounts);
+    EndoplasmicReticulum(const EndoplasmicReticulum& endoplasmicReticulum);
+    EndoplasmicReticulum(const morphio::EndoplasmicReticulum& endoplasmicReticulum);
+
+
+    /**
+       Returns the list of neuronal section indices
+    **/
+    const std::vector<uint32_t>& sectionIndices() const noexcept;
+    std::vector<uint32_t>& sectionIndices() noexcept;
+
+    /**
+       Returns the volumes for each neuronal section
+    **/
+    const std::vector<float>& volumes() const noexcept;
+    std::vector<float>& volumes() noexcept;
+
+    /**
+       Returns the surface areas for each neuronal section
+    **/
+    const std::vector<float>& surfaceAreas() const noexcept;
+    std::vector<float>& surfaceAreas() noexcept;
+
+    /**
+       Returns the number of filaments for each neuronal section
+    **/
+    const std::vector<uint32_t>& filamentCounts() const noexcept;
+    std::vector<uint32_t>& filamentCounts() noexcept;
+
+  private:
+    morphio::Property::EndoplasmicReticulumLevel _properties;
+    EndoplasmicReticulum(const morphio::Property::EndoplasmicReticulumLevel&);
+};
+}  // namespace mut
+}  // namespace morphio
