@@ -13,7 +13,7 @@ from morphio import Morphology as ImmutableMorphology
 from morphio import (PointLevel, SectionBuilderError, SectionType,
                      IterType, ostream_redirect)
 from morphio.mut import Morphology
-from utils import assert_substring, captured_output, tmp_asc_file
+from utils import assert_substring, captured_output, tmp_asc_file, setup_tempdir
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -419,7 +419,11 @@ def test_endoplasmic_reticulum():
     assert_equal(reticulum.surface_areas, [3, 3])
     assert_equal(reticulum.filament_counts, [4, 4])
 
-    neuron = Morphology(Path(_path, 'simple-with-endoplasmic-reticulum.h5'))
+    with setup_tempdir('test-endoplasmic-reticulum') as folder:
+        path = Path(folder, 'with-reticulum.h5')
+        neuron.write(path)
+
+        neuron = Morphology(path)
     reticulum = neuron.endoplasmic_reticulum
     assert_equal(reticulum.section_indices, [1, 1])
     assert_equal(reticulum.volumes, [2, 2])
