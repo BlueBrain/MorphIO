@@ -406,21 +406,22 @@ for mitochondrial_section in morpho.mitochondria.root_sections:
 ### Endoplasmic reticulum
 
 Endoplasmic reticulum can also be stored and written to H5 file.
-The specification is part of the [H5 documentation](https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html)
-There is one endoplasmic reticulum object per morphology. It contains 4 attributes. Each attribute is a array and each line
-refer to the value of the attribute for a specific neuronal section.
+The specification is part of the [BBP morphology documentation](https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html)
+There is one endoplasmic reticulum object per morphology. It contains 4 attributes. Each attribute is an array and each line
+refers to the value of the attribute for a specific neuronal section.
 
 - section_index:
-This dataset represents the index of the neuronal section that the reticulum lies in.
+Each row of this dataset represents the index of a neuronal section. Each row of the other properties (eg. volume) refer to the part of the reticulum
+present in the corresponding section for each row.
 
 - volume:
-A 1 column data set composed of floating point numbers representing the volume of the part of the reticulum lying in section referenced by the corresponding row in the section_index data set.
+One column dataset indexed by section_index. Contains volumes of the reticulum per each corresponding section it lies in.
 
 - surface_area:
-Similar to the volume data set, this data set represents the surface area of the reticulum in each section in the section_index data set.
+Similar to the volume dataset, this dataset represents the surface area of the reticulum in each section in the section_index dataset.
 
 - filament_count:
-This 1 column data set is composed of integers that represent the number of filaments in the segment of the reticulum lying in the section referenced by the corresponding row in the section_index data set.
+This 1 column dataset is composed of integers that represent the number of filaments in the segment of the reticulum lying in the section referenced by the corresponding row in the section_index dataset.
 
 
 #### Reading endoplasmic reticula from H5 files
