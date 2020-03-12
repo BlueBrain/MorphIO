@@ -135,13 +135,3 @@ def test_more_iter():
     sections = list(m.section(2).iter(IterType.upstream))
     assert_array_equal([s.id for s in sections],
                        [2, 0])
-
-
-def test_gogo():
-    morpho = Morphology(os.path.join(_path, 'h5/v1/endoplasmic-reticulum.h5'))
-    reticulum = morpho.endoplasmic_reticulum
-    print('{indices}, {volumes}, {areas}, {counts}'.format(
-        indices=reticulum.section_indices,
-        volumes=reticulum.volumes,
-        areas=reticulum.surface_areas,
-        counts=reticulum.filament_counts))
