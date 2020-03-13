@@ -5,17 +5,20 @@ import morphio
 def test_doc_exists():
     cls = morphio.Morphology
 
-    classes = [morphio.Morphology,
-               morphio.mut.Morphology,
-               morphio.Section,
-               morphio.mut.Section,
-               morphio.Soma,
-               morphio.mut.Soma,
-               morphio.MitoSection,
-               morphio.mut.MitoSection,
-               morphio.Mitochondria,
-               morphio.mut.Mitochondria
-               ]
+    classes = [
+        morphio.EndoplasmicReticulum,
+        morphio.MitoSection,
+        morphio.Mitochondria,
+        morphio.Morphology,
+        morphio.Section,
+        morphio.Soma,
+        morphio.mut.EndoplasmicReticulum,
+        morphio.mut.MitoSection,
+        morphio.mut.Mitochondria,
+        morphio.mut.Morphology,
+        morphio.mut.Section,
+        morphio.mut.Soma,
+    ]
     for cls in classes:
         public_methods = (method for method in dir(cls) if not method[:2] == '__')
         for method in public_methods:
@@ -28,7 +31,7 @@ def test_mut_immut_have_same_methods():
         return set(method for method in dir(cls) if not method[:2] == '__')
 
     only_in_immut = {'section_types', 'diameters', 'perimeters', 'points', 'section_offsets',
-                     'as_mutable', 'endoplasmic_reticulum'}
+                     'as_mutable'}
     only_in_mut = {'write', 'append_root_section', 'delete_section', 'build_read_only',
                    'as_immutable'}
     assert_equal(methods(morphio.Morphology) - only_in_immut,
@@ -39,6 +42,9 @@ def test_mut_immut_have_same_methods():
 
     assert_equal(methods(morphio.Soma),
                  methods(morphio.mut.Soma))
+
+    assert_equal(methods(morphio.EndoplasmicReticulum),
+                 methods(morphio.mut.EndoplasmicReticulum))
 
     # assert_equal(methods(morphio.Mitochondria),
     #              methods(morphio.mut.Mitochondria))

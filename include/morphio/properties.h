@@ -135,10 +135,10 @@ struct MitochondriaSectionLevel {
 };
 
 struct EndoplasmicReticulumLevel {
-    std::vector<uint32_t> _sectionIndex;
-    std::vector<float> _volume;
-    std::vector<float> _surfaceArea;
-    std::vector<uint32_t> _filamentCount;
+    std::vector<uint32_t> _sectionIndices;
+    std::vector<float> _volumes;
+    std::vector<float> _surfaceAreas;
+    std::vector<uint32_t> _filamentCounts;
 };
 
 struct Annotation {

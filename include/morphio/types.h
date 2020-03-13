@@ -14,13 +14,13 @@
 namespace morphio {
 
 using namespace enums;
-class Morphology;
-template <class T>
-class SectionBase;
-class Section;
+class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
-class EndoplasmicReticulum;
+class Morphology;
+class Section;
+template <class T>
+class SectionBase;
 class Soma;
 
 namespace Property {
@@ -38,11 +38,12 @@ class ErrorMessages;
 }  // namespace readers
 
 namespace mut {
-class Section;
+class EndoplasmicReticulum;
 class MitoSection;
-class Soma;
-class Morphology;
 class Mitochondria;
+class Morphology;
+class Section;
+class Soma;
 }  // namespace mut
 
 using SectionRange = std::pair<size_t, size_t>;

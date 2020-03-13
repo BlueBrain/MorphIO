@@ -4,6 +4,8 @@
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
+#include <morphio/endoplasmic_reticulum.h>
+#include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 
@@ -16,6 +18,7 @@ namespace py = pybind11;
 
 void bind_mutable_module(py::module& m) {
     using namespace py::literals;
+
 
     py::class_<morphio::mut::Morphology>(m, "Morphology")
         .def(py::init<>())
@@ -59,6 +62,11 @@ void bind_mutable_module(py::module& m) {
             static_cast<morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ()>(
                 &morphio::mut::Morphology::mitochondria),
             "Returns a reference to the mitochondria container class")
+        .def_property_readonly(
+            "endoplasmic_reticulum",
+            static_cast<morphio::mut::EndoplasmicReticulum& (morphio::mut::Morphology::*) ()>(
+                &morphio::mut::Morphology::endoplasmicReticulum),
+            "Returns a reference to the endoplasmic reticulum container class")
         .def_property_readonly("annotations",
                                &morphio::mut::Morphology::annotations,
                                "Returns a list of annotations")
@@ -454,4 +462,56 @@ void bind_mutable_module(py::module& m) {
             "center",
             [](morphio::mut::Soma* soma) { return py::array(3, soma->center().data()); },
             "Returns the center of gravity of the soma points");
+
+    py::class_<morphio::mut::EndoplasmicReticulum>(m, "EndoplasmicReticulum")
+        .def(py::init<>())
+        .def(py::init<const std::vector<uint32_t>&,
+                      const std::vector<float>&,
+                      const std::vector<float>&,
+                      const std::vector<uint32_t>&>())
+        .def(py::init<const morphio::EndoplasmicReticulum&>())
+        .def(py::init<const morphio::mut::EndoplasmicReticulum&>())
+
+        .def_property(
+            "section_indices",
+            [](morphio::mut::EndoplasmicReticulum* reticulum) {
+                return py::array(static_cast<py::ssize_t>(reticulum->sectionIndices().size()),
+                                 reticulum->sectionIndices().data());
+            },
+            [](morphio::mut::EndoplasmicReticulum* reticulum, py::array_t<uint32_t> indices) {
+                reticulum->sectionIndices() = indices.cast<std::vector<uint32_t>>();
+            },
+            "Returns the list of neuronal section indices")
+        .def_property(
+            "volumes",
+            [](morphio::mut::EndoplasmicReticulum* reticulum) {
+                return py::array(static_cast<py::ssize_t>(reticulum->volumes().size()),
+                                 reticulum->volumes().data());
+            },
+            [](morphio::mut::EndoplasmicReticulum* reticulum, py::array_t<float> volumes) {
+                reticulum->volumes() = volumes.cast<std::vector<float>>();
+            },
+            "Returns the volumes for each neuronal section")
+
+        .def_property(
+            "surface_areas",
+            [](morphio::mut::EndoplasmicReticulum* reticulum) {
+                return py::array(static_cast<py::ssize_t>(reticulum->surfaceAreas().size()),
+                                 reticulum->surfaceAreas().data());
+            },
+            [](morphio::mut::EndoplasmicReticulum* reticulum, py::array_t<float> areas) {
+                reticulum->surfaceAreas() = areas.cast<std::vector<float>>();
+            },
+            "Returns the surface areas for each neuronal section")
+
+        .def_property(
+            "filament_counts",
+            [](morphio::mut::EndoplasmicReticulum* reticulum) {
+                return py::array(static_cast<py::ssize_t>(reticulum->filamentCounts().size()),
+                                 reticulum->filamentCounts().data());
+            },
+            [](morphio::mut::EndoplasmicReticulum* reticulum, py::array_t<uint32_t> counts) {
+                reticulum->filamentCounts() = counts.cast<std::vector<uint32_t>>();
+            },
+            "Returns the number of filaments for each neuronal section");
 }

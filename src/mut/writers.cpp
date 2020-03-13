@@ -266,6 +266,21 @@ static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochon
     write_dataset(g_mitochondria, "structure", structure);
 }
 
+
+static void endoplasmicReticulumH5(HighFive::File& h5_file, const EndoplasmicReticulum& reticulum) {
+    if (reticulum.sectionIndices().empty())
+        return;
+
+    HighFive::Group g_organelles = h5_file.createGroup("organelles");
+    HighFive::Group g_reticulum = g_organelles.createGroup("endoplasmic_reticulum");
+
+    write_dataset(g_reticulum, "section_index", reticulum.sectionIndices());
+    write_dataset(g_reticulum, "volume", reticulum.volumes());
+    write_dataset(g_reticulum, "filament_count", reticulum.filamentCounts());
+    write_dataset(g_reticulum, "surface_area", reticulum.surfaceAreas());
+}
+
+
 void h5(const Morphology& morpho, const std::string& filename) {
     const auto& somaPoints = morpho.soma()->points();
     const auto numberOfSomaPoints = somaPoints.size();
@@ -360,6 +375,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
     }
 
     mitochondriaH5(h5_file, morpho.mitochondria());
+    endoplasmicReticulumH5(h5_file, morpho.endoplasmicReticulum());
 }
 
 }  // end namespace writer

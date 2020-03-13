@@ -22,6 +22,7 @@
       * [Creating morphologies](#creating-morphologies)
    * [Opening flags](#opening-flags)
    * [Mitochondria](#mitochondria)
+   * [Endoplasmic reticulum](#endoplasmic-reticulum)
    * [Tips](#tips)
       * [Maximum number of warnings](#maximum-number-of-warnings)
 * [Specification](#specification)
@@ -310,16 +311,16 @@ morpho.write("outfile.h5")
 When opening the file, modifier flags can be passed to alter the morphology representation.
 The following flags are supported:
 
-- `morphio::NO\_MODIFIER`:
+- `morphio::NO_MODIFIER`:
 This is the default flag, it will do nothing.
-- `morphio::TWO\_POINTS\_SECTIONS`:
+- `morphio::TWO_POINTS_SECTIONS`:
 Each section gets reduce to a line made of the first and last point.
-- `morphio::SOMA\_SPHERE`:
+- `morphio::SOMA_SPHERE`:
 The soma is reduced to a sphere which is the center of gravity of the real soma.
-- `morphio::NO\_DUPLICATES`:
+- `morphio::NO_DUPLICATES`:
 The duplicate point are not present. It means the first point of each section
 is no longer the last point of the parent section.
-- `morphio::NRN\_ORDER`:
+- `morphio::NRN_ORDER`:
 Neurite are reordered according to the
 [NEURON simulator ordering](https://github.com/neuronsimulator/nrn/blob/2dbf2ebf95f1f8e5a9f0565272c18b1c87b2e54c/share/lib/hoc/import3d/import3d_gui.hoc#L874)
 
@@ -401,6 +402,53 @@ for mitochondrial_section in morpho.mitochondria.root_sections:
           diameters=mitochondrial_section.diameters))
 
     print("Number of children: {}".format(len(mitochondrial_section.children)))
+```
+### Endoplasmic reticulum
+
+Endoplasmic reticulum can also be stored and written to H5 file.
+The specification is part of the [BBP morphology documentation](https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html)
+There is one endoplasmic reticulum object per morphology. It contains 4 attributes. Each attribute is an array and each line
+refers to the value of the attribute for a specific neuronal section.
+
+- section_index:
+Each row of this dataset represents the index of a neuronal section. Each row of the other properties (eg. volume) refer to the part of the reticulum
+present in the corresponding section for each row.
+
+- volume:
+One column dataset indexed by section_index. Contains volumes of the reticulum per each corresponding section it lies in.
+
+- surface_area:
+Similar to the volume dataset, this dataset represents the surface area of the reticulum in each section in the section_index dataset.
+
+- filament_count:
+This 1 column dataset is composed of integers that represent the number of filaments in the segment of the reticulum lying in the section referenced by the corresponding row in the section_index dataset.
+
+
+#### Reading endoplasmic reticula from H5 files
+
+```python
+from morphio import Morphology
+
+morpho = Morphology('/my/file')
+reticulum = morpho.endoplasmic_reticulum
+print('{indices}, {volumes}, {areas}, {counts}'.format(
+    indices=reticulum.section_indices,
+    volumes=reticulum.volumes,
+    areas=reticulum.surface_areas,
+    counts=reticulum.filament_counts))
+```
+
+#### Writing endoplasmic reticula from H5 files
+
+```python
+neuron = Morphology()
+
+reticulum = neuron.endoplasmic_reticulum
+reticulum.section_indices = [1, 1]
+reticulum.volumes = [2, 2]
+reticulum.surface_areas = [3, 3]
+reticulum.filament_counts = [4, 4]
+neuron.write('/my/out/file.h5')  # Has to be written to h5
 ```
 
 ### Tips
