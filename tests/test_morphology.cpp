@@ -30,8 +30,8 @@ TEST_CASE("LoadBadDimensionMorphology", "[morphology]") {
 TEST_CASE("LoadMergedMorphology", "[morphology]") {
     auto file = HighFive::File("data/h5/merged.h5", HighFive::File::ReadOnly);
     REQUIRE_NOTHROW(morphio::readers::h5::MorphologyHDF5(
-        file.getGroup("/00/00000009b4fa102d58b173a995525c3e")));
-    auto g = file.getGroup("/00/00000009b4fa102d58b173a995525c3e");
+        file.getGroup("/00/00/00000009b4fa102d58b173a995525c3e")));
+    auto g = file.getGroup("/00/00/00000009b4fa102d58b173a995525c3e");
     morphio::Morphology m(g);
     REQUIRE(m.rootSections().size() == 8);
 }
