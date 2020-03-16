@@ -16,7 +16,7 @@ which pip
 pip install --upgrade pip setuptools
 
 # install
-pip install .
+pip install -vvv .
 
 pip install -r tests/requirement_tests.txt
 CURRENT=$(pwd)
