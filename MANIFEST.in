@@ -1,5 +1,22 @@
 recursive-include src *
 recursive-include binds *
 recursive-include include *
-recursive-include 3rdparty *
+
+include 3rdparty/GSL_LITE/CMakeLists.txt 3rdparty/GSL_LITE/gsl-lite.natvis
+recursive-include 3rdparty/GSL_LITE/cmake/ *
+recursive-include 3rdparty/GSL_LITE/include/ *
+
+include 3rdparty/HighFive/CMakeLists.txt
+recursive-include 3rdparty/HighFive/include/ *
+recursive-include 3rdparty/HighFive/CMake/ *
+recursive-include 3rdparty/HighFive/doc/ *
+
+recursive-include 3rdparty/pybind11/include/ *
+include 3rdparty/pybind11/CMakeLists.txt
+
+include 3rdparty/lexertl/CMakeLists.txt
+recursive-include 3rdparty/lexertl/lexertl/ *
+include 3rdparty/lexertl/examples
+
+recursive-include 3rdparty/pybind11/tools/ *
 include CMakeLists.txt

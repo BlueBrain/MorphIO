@@ -2,6 +2,7 @@
 
 #include <memory>  //std::unique_ptr
 
+#include <highfive/H5Group.hpp>
 #include <morphio/properties.h>
 #include <morphio/section_iterators.hpp>
 #include <morphio/types.h>
@@ -37,6 +38,7 @@ class Morphology
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
     explicit Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
     explicit Morphology(mut::Morphology);
 
     /**
@@ -156,6 +158,7 @@ class Morphology
     friend bool diff(const Morphology& left,
                      const Morphology& right,
                      morphio::enums::LogLevel verbose);
+    Morphology(const Property::Properties& properties, unsigned int options);
 
     std::shared_ptr<Property::Properties> _properties;
 

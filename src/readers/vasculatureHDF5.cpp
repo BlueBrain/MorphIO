@@ -14,8 +14,8 @@ vasculature::property::Properties VasculatureHDF5::load() {
         _file.reset(new HighFive::File(_uri, HighFive::File::ReadOnly));
     } catch (const HighFive::FileException& exc) {
         throw morphio::RawDataError(_write ? "Could not create vasculature file "
-                                    : "Could not open vasculature file " + _uri + ": " +
-                                    exc.what());
+                                           : "Could not open vasculature file " + _uri + ": " +
+                                                 exc.what());
     }
     _readDatasets();
     _readSections();
@@ -86,7 +86,7 @@ void VasculatureHDF5::_readSectionTypes() {
     for (int type : types) {
         if (type > SECTION_CUSTOM || type < 0) {
             throw morphio::RawDataError(_err.ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(
-                                            0, static_cast<VascularSectionType>(type)));
+                0, static_cast<VascularSectionType>(type)));
         }
     }
 }

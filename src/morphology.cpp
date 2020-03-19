@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include <fstream>
+#include <memory>
 #include <streambuf>
 
 #include <morphio/endoplasmic_reticulum.h>
@@ -20,32 +21,10 @@
 namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
 SomaType getSomaType(long unsigned int nSomaPoints);
+Property::Properties loadURI(const std::string& source, unsigned int options);
 
-Morphology::Morphology(const std::string& source, unsigned int options) {
-    const size_t pos = source.find_last_of(".");
-    if (pos == std::string::npos)
-        throw UnknownFileType("File has no extension");
-
-    // Cross-platform check of file existance
-    std::ifstream file(source.c_str());
-    if (!file) {
-        throw RawDataError("File: " + source + " does not exist.");
-    }
-
-    std::string extension = source.substr(pos);
-
-    auto loader = [&source, &options, &extension]() {
-        if (extension == ".h5" || extension == ".H5")
-            return readers::h5::load(source);
-        if (extension == ".asc" || extension == ".ASC")
-            return readers::asc::load(source, options);
-        if (extension == ".swc" || extension == ".SWC")
-            return readers::swc::load(source, options);
-        throw UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported");
-    };
-
-    _properties = std::make_shared<Property::Properties>(loader());
-
+Morphology::Morphology(const Property::Properties& properties, unsigned int options)
+    : _properties(std::make_shared<Property::Properties>(properties)) {
     buildChildren(_properties);
 
     if (version() != MORPHOLOGY_VERSION_SWC_1)
@@ -64,6 +43,12 @@ Morphology::Morphology(const std::string& source, unsigned int options) {
         buildChildren(_properties);
     }
 }
+
+Morphology::Morphology(const HighFive::Group& group, unsigned int options)
+    : Morphology(readers::h5::load(group), options) {}
+
+Morphology::Morphology(const std::string& source, unsigned int options)
+    : Morphology(loadURI(source, options), options) {}
 
 Morphology::Morphology(mut::Morphology morphology) {
     morphology.sanitize();
@@ -219,6 +204,32 @@ void buildChildren(std::shared_ptr<Property::Properties> properties) {
             children[parent].push_back(i);
         }
     }
+}
+
+Property::Properties loadURI(const std::string& source, unsigned int options) {
+    const size_t pos = source.find_last_of(".");
+    if (pos == std::string::npos)
+        throw(UnknownFileType("File has no extension"));
+
+    // Cross-platform check of file existance
+    std::ifstream file(source.c_str());
+    if (!file) {
+        throw(RawDataError("File: " + source + " does not exist."));
+    }
+
+    std::string extension = source.substr(pos);
+
+    auto loader = [&source, &options, &extension]() {
+        if (extension == ".h5" || extension == ".H5")
+            return readers::h5::load(source);
+        if (extension == ".asc" || extension == ".ASC")
+            return readers::asc::load(source, options);
+        if (extension == ".swc" || extension == ".SWC")
+            return readers::swc::load(source, options);
+        throw(UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported"));
+    };
+
+    return loader();
 }
 
 }  // namespace morphio

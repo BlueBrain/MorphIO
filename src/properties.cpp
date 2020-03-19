@@ -57,8 +57,8 @@ bool compare(const std::vector<T>& vec1,
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR)
             printError(Warning::UNDEFINED,
-                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
-                        " vs " + std::to_string(vec2.size()));
+                       "Error comparing " + name + ", size differs: " +
+                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
@@ -67,7 +67,7 @@ bool compare(const std::vector<T>& vec1,
         for (unsigned int i = 0; i < vec1.size(); ++i) {
             if (vec1[i] != vec2[i]) {
                 printError(Warning::UNDEFINED,
-                        std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                           std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
             }
         }
     }
@@ -82,8 +82,8 @@ static bool compare_section_structure(const std::vector<Section::Type>& vec1,
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR)
             printError(Warning::UNDEFINED,
-                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
-                        " vs " + std::to_string(vec2.size()));
+                       "Error comparing " + name + ", size differs: " +
+                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
@@ -92,10 +92,10 @@ static bool compare_section_structure(const std::vector<Section::Type>& vec1,
             if (logLevel > LogLevel::ERROR) {
                 printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 printError(Warning::UNDEFINED,
-                        std::to_string(vec1[i][0] - vec1[1][0]) + ", " +
-                            std::to_string(vec1[i][1]) + " <--> " +
-                            std::to_string(vec2[i][0] - vec2[1][0]) + ", " +
-                            std::to_string(vec2[i][1]));
+                           std::to_string(vec1[i][0] - vec1[1][0]) + ", " +
+                               std::to_string(vec1[i][1]) + " <--> " +
+                               std::to_string(vec2[i][0] - vec2[1][0]) + ", " +
+                               std::to_string(vec2[i][1]));
             }
             return false;
         }
@@ -112,8 +112,8 @@ bool compare(const morphio::range<T>& vec1,
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR)
             printError(Warning::UNDEFINED,
-                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
-                        " vs " + std::to_string(vec2.size()));
+                       "Error comparing " + name + ", size differs: " +
+                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
@@ -122,7 +122,7 @@ bool compare(const morphio::range<T>& vec1,
         if (std::fabs(vec1[i] - vec2[i]) > epsilon) {
             printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
             printError(Warning::UNDEFINED,
-                    std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                       std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
             printError(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
             return false;
         }
@@ -138,8 +138,8 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR)
             printError(Warning::UNDEFINED,
-                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
-                        " vs " + std::to_string(vec2.size()));
+                       "Error comparing " + name + ", size differs: " +
+                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 
@@ -149,7 +149,7 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
             if (logLevel > LogLevel::ERROR) {
                 printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 printError(Warning::UNDEFINED,
-                        std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                           std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
                 printError(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
             }
             return false;
@@ -168,8 +168,8 @@ bool compare(const std::map<T, U>& vec1,
     if (logLevel > LogLevel::ERROR) {
         if (vec1.size() != vec2.size()) {
             printError(Warning::UNDEFINED,
-                    "Error comparing " + name + ", size differs: " + std::to_string(vec1.size()) +
-                        " vs " + std::to_string(vec2.size()));
+                       "Error comparing " + name + ", size differs: " +
+                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         }
     }
 

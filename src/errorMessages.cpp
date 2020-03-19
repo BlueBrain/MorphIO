@@ -209,8 +209,7 @@ std::string ErrorMessages::ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1,
     return msg;
 }
 
-std::string ErrorMessages::ERROR_PERIMETER_DATA_NOT_WRITABLE()
-{
+std::string ErrorMessages::ERROR_PERIMETER_DATA_NOT_WRITABLE() {
     return "Cannot write a file with perimeter data to ASC or SWC format";
 }
 
