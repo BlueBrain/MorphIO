@@ -1,4 +1,7 @@
-'''morphio setup.py'''
+'''morphio setup.py
+
+It is more or less a wrapper to call 'cmake' and 'cmake --build'
+'''
 import os
 import platform
 import re
@@ -80,12 +83,9 @@ class CMakeBuild(build_ext):
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
-        try:
-            subprocess.check_call([cmake, ext.sourcedir] + cmake_args, cwd=self.build_temp)
-            subprocess.check_call([cmake, '--build', '.', '--target', '_morphio'] + build_args, cwd=self.build_temp)
-        except subprocess.CalledProcessError as exc:
-            print("Status : FAIL", exc.returncode, exc.output)
-            raise
+
+        subprocess.check_call([cmake, ext.sourcedir] + cmake_args, cwd=self.build_temp)
+        subprocess.check_call([cmake, '--build', '.', '--target', '_morphio'] + build_args, cwd=self.build_temp)
 
 with open('README.md') as f:
     long_description = f.read()

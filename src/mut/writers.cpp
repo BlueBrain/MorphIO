@@ -26,6 +26,8 @@ struct base_type {
 template <typename T>
 struct base_type<std::vector<T>>: base_type<T> {};
 
+constexpr int FLOAT_PRECISION_PRINT = 9;
+
 bool hasPerimeterData(const morphio::mut::Morphology& morpho) {
     return !morpho.rootSections().empty() && !morpho.rootSections().front()->perimeters().empty();
 }
@@ -38,10 +40,11 @@ void writeLine(std::ofstream& myfile,
                float diameter) {
     using std::setw;
 
-    myfile << std::to_string(id) << setw(12) << std::to_string(type) << ' ' << setw(12)
-           << std::to_string(point[0]) << ' ' << setw(12) << std::to_string(point[1]) << ' '
-           << setw(12) << std::to_string(point[2]) << ' ' << setw(12)
-           << std::to_string(diameter / 2.f) << setw(12) << std::to_string(parentId) << '\n';
+    myfile << std::to_string(id) << setw(12) << std::to_string(type) << ' ' << setw(12);
+    myfile << std::fixed << std::setprecision(FLOAT_PRECISION_PRINT) << point[0] << ' ' << setw(12)
+           << point[1] << ' ' << setw(12) << point[2] << ' ' << setw(12) << diameter / 2.f
+           << setw(12);
+    myfile << std::to_string(parentId) << '\n';
 }
 
 std::string version_string() {
@@ -136,9 +139,9 @@ static void _write_asc_points(std::ofstream& myfile,
                               const std::vector<float>& diameters,
                               size_t indentLevel) {
     for (unsigned int i = 0; i < points.size(); ++i) {
-        myfile << std::string(indentLevel, ' ') << '(' << std::to_string(points[i][0]) << ' '
-               << std::to_string(points[i][1]) << ' ' << std::to_string(points[i][2]) << ' '
-               << std::to_string(diameters[i]) << ")\n";
+        myfile << std::fixed << std::setprecision(FLOAT_PRECISION_PRINT)
+               << std::string(indentLevel, ' ') << '(' << points[i][0] << ' ' << points[i][1] << ' '
+               << points[i][2] << ' ' << diameters[i] << ")\n";
     }
 }
 
