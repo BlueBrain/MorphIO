@@ -155,6 +155,7 @@ class Morphology
 
   private:
     friend class mut::Morphology;
+    Morphology(const Property::Properties& properties, unsigned int options);
 
     std::shared_ptr<Property::Properties> _properties;
 

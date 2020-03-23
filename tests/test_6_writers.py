@@ -225,13 +225,15 @@ def test_mitochondria():
             with ostream_redirect(stdout=True, stderr=True):
                 morpho.write(os.path.join(tmp_folder, "test.swc"))
                 assert_string_equal(err.getvalue(),
-                             "Warning: this cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
+                                    "Warning: this cell has mitochondria, they cannot be saved in "
+                                    " ASC or SWC format. Please use H5 if you want to save them.")
 
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
                 morpho.write(os.path.join(tmp_folder, "test.asc"))
                 assert_string_equal(err.getvalue(),
-                             "Warning: this cell has mitochondria, they cannot be saved in  ASC or SWC format. Please use H5 if you want to save them.")
+                                    "Warning: this cell has mitochondria, they cannot be saved in "
+                                    " ASC or SWC format. Please use H5 if you want to save them.")
 
         mito = ImmutMorphology(os.path.join(tmp_folder, 'test.h5')).mitochondria
         assert_array_equal(mito.root_sections[0].diameters,

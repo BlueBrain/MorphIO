@@ -80,9 +80,9 @@ void swc(const Morphology& morphology, const std::string& filename) {
     std::ofstream myfile(filename);
     using std::setw;
 
+    myfile << "# " << version_string() << std::endl;
     myfile << "# index" << setw(9) << "type" << setw(10) << 'X' << setw(13) << 'Y' << setw(13)
            << 'Z' << setw(13) << "radius" << setw(13) << "parent" << std::endl;
-    myfile << "# " << version_string() << std::endl;
 
     int segmentIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
