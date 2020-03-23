@@ -155,9 +155,6 @@ class Morphology
 
   private:
     friend class mut::Morphology;
-    friend bool diff(const Morphology& left,
-                     const Morphology& right,
-                     morphio::enums::LogLevel verbose);
     Morphology(const Property::Properties& properties, unsigned int options);
 
     std::shared_ptr<Property::Properties> _properties;
