@@ -1,6 +1,6 @@
 # Taken from https://github.com/BlueBrain/hpc-coding-conventions/blob/master/cpp/cmake/bob.cmake#L192-L255
 if (WIN32)
-  set(FLAGS "${FLAGS} -DH5_BUILT_AS_DYNAMIC_LIB /EHsc")
+  set(FLAGS "${FLAGS} /DH5_BUILT_AS_DYNAMIC_LIB /EHsc")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if(${PROJECT_NAME}_CXX_WARNINGS)
     set(FLAGS "${FLAGS} -Werror -Weverything")

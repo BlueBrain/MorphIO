@@ -1,7 +1,7 @@
 #include <morphio/errorMessages.h>
 #include <morphio/types.h>
 
-# define M_PI           3.14159265358979323846f
+# define PI           3.14159265358979323846f
 
 namespace morphio {
 template <typename ContainerDiameters, typename ContainerPoints>
@@ -15,12 +15,12 @@ float _somaSurface(const SomaType type,
     switch (type) {
     case SOMA_SINGLE_POINT: {
         float radius = diameters[0] / 2.f;
-        return 4.f * M_PI * radius * radius;
+        return 4.f * PI * radius * radius;
     }
 
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: {
         float radius = diameters[0] / 2.f;
-        return 4.f * M_PI * radius * radius;
+        return 4.f * PI * radius * radius;
     }
     case SOMA_CYLINDERS: {
         // Surface is approximated as the sum of areas of the conical frustums
@@ -30,7 +30,7 @@ float _somaSurface(const SomaType type,
             float r0 = diameters[i] * 0.5f;
             float r1 = diameters[i + 1] * 0.5f;
             float h2 = distance(points[i], points[i + 1]);
-            auto s = static_cast<float>(M_PI) * (r0 + r1) *
+            auto s = static_cast<float>(PI) * (r0 + r1) *
                      std::sqrt((r0 - r1) * (r0 - r1) + h2 * h2);
             surface += s;
         }
