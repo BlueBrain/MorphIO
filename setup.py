@@ -55,7 +55,6 @@ class CMakeBuild(build_ext):
             self.build_extension(ext, cmake)
 
     def build_extension(self, ext, cmake):
-        print('COUCOUCOUCOU')
         extdir = os.path.abspath(
             os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
@@ -65,37 +64,15 @@ class CMakeBuild(build_ext):
                       '-DHIGHFIVE_UNIT_TESTS=OFF',
         ]
 
-        # cfg = 'Debug' if self.debug else 'Release'
-        cfg = 'Debug'
+        cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
 
         if platform.system() == "Windows":
-
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(
                 cfg.upper(),
                 extdir)]
             if sys.maxsize > 2**32:
                 cmake_args += ['-A', 'x64']
-
-            #"C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO\2019\COMMUNITY\COMMON7\IDE\COMMONEXTENSIONS\MICROSOFT\CMAKE\CMake\bin\cmake.exe"
-            # -G "Ninja" -DCMAKE_INSTALL_PREFIX:PATH="C:\Users\bcoste\workspace\morphio\out\install\x64-Clang-Debug"
-            # -DCMAKE_CXX_FLAGS:STRING="-m64 -fdiagnostics-absolute-paths -Wno-c++98-compat /DWIN32 /D_WINDOWS /W3 /GR /DH5_BUILT_AS_DYNAMIC_LIB /EHa"
-            # -DMorphIO_CXX_WARNINGS:BOOL="False"
-            # -DCMAKE_CXX_COMPILER:FILEPATH="C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/bin/clang-cl.exe"
-            # -DCMAKE_C_COMPILER:FILEPATH="C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/bin/clang-cl.exe"
-            # -DCMAKE_BUILD_TYPE="Debug"
-            # -DCMAKE_MAKE_PROGRAM="C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO\2019\COMMUNITY\COMMON7\IDE\COMMONEXTENSIONS\MICROSOFT\CMAKE\Ninja\ninja.exe"
-            #"C:\Users\bcoste\workspace\morphio" 2>&1"
-
-            # cmake_args += ['-G', "Ninja"]
-            # cmake_args += ['-DCMAKE_CXX_FLAGS:STRING="-m64 -fdiagnostics-absolute-paths -Wno-c++98-compat /DWIN32 /D_WINDOWS /W3 /GR /DH5_BUILT_AS_DYNAMIC_LIB /EHa"']
-            # cmake_args += ['-DCMAKE_CXX_COMPILER:FILEPATH=clang-cl.exe']
-            # cmake_args += ['-DCMAKE_C_COMPILER:FILEPATH=clang-cl.exe']
-            # # cmake_args += ['-DCMAKE_CXX_COMPILER:FILEPATH=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/bin/clang-cl.exe']
-            # # cmake_args += ['-DCMAKE_C_COMPILER:FILEPATH=C:/PROGRAM FILES (X86)/MICROSOFT VISUAL STUDIO/2019/COMMUNITY/VC/Tools/Llvm/bin/clang-cl.exe']
-            # cmake_args += ['-DCMAKE_BUILD_TYPE="Debug"']
-            # cmake_args += ['-DCMAKE_MAKE_PROGRAM=ninja.exe']
-
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
@@ -104,9 +81,6 @@ class CMakeBuild(build_ext):
             build_args += ["--", "-j{}".format(max(MIN_CPU_CORES, get_cpu_count())),
                            ]
 
-        print('BUILD ARGS: {}'.format(build_args))
-        print('CMAKE ARGS: {}'.format(' '.join(cmake_args)))
-        print("ext.sourcedir: {}".format(ext.sourcedir))
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
 
