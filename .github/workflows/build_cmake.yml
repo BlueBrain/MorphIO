@@ -167,7 +167,6 @@ jobs:
             -D CMAKE_C_COMPILER_LAUNCHER=ccache
             -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
             -D BUILD_TESTING=OFF
-            -D H5_BUILT_AS_DYNAMIC_LIB=1
             -D HDF5_BUILD_TOOLS=OFF
             -D HDF5_BUILD_EXAMPLES=OFF
           RESULT_VARIABLE result
@@ -265,7 +264,6 @@ jobs:
             -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
             -G Ninja
             -D CMAKE_MAKE_PROGRAM=ninja
-            -DCMAKE_CXX_FLAGS:STRING="/DH5_BUILT_AS_DYNAMIC_LIB"
           RESULT_VARIABLE result
         )
 
