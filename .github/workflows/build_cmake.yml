@@ -265,6 +265,7 @@ jobs:
             -G Ninja
             -D CMAKE_MAKE_PROGRAM=ninja
           RESULT_VARIABLE result
+          -D H5_BUILT_AS_DYNAMIC_LIB=1
         )
 
         if (NOT result EQUAL 0)
