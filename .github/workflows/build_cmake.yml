@@ -264,8 +264,8 @@ jobs:
             -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
             -G Ninja
             -D CMAKE_MAKE_PROGRAM=ninja
+            -D H5_BUILT_AS_DYNAMIC_LIB=1
           RESULT_VARIABLE result
-          -D H5_BUILT_AS_DYNAMIC_LIB=1
         )
 
         if (NOT result EQUAL 0)
