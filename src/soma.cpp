@@ -17,7 +17,7 @@ float Soma::volume() const {
     switch (_properties->_cellLevel._somaType) {
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: {
         float radius = diameters()[0] / 2;
-        return 4 * static_cast<float>(M_PI) * radius * radius;
+        return 4 * static_cast<float>(PI) * radius * radius;
     }
 
     case SOMA_SINGLE_POINT:
