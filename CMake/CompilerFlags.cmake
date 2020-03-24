@@ -1,5 +1,7 @@
 # Taken from https://github.com/BlueBrain/hpc-coding-conventions/blob/master/cpp/cmake/bob.cmake#L192-L255
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+if (WIN32)
+  set(FLAGS "${FLAGS} -DH5_BUILT_AS_DYNAMIC_LIB")
+elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if(${PROJECT_NAME}_CXX_WARNINGS)
     set(FLAGS "${FLAGS} -Werror -Weverything")
     # Using std=c++11, no need for 98 compat
