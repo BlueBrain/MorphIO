@@ -92,8 +92,7 @@ with open('README.md') as f:
 
 setup(
     name='MorphIO',
-    author='NSE Team - Blue Brain Project',
-    author_email='bbp-ou-nse@groupes.epfl.ch',
+    author='Blue Brain Project, EPFL',
     description='A neuron morphology IO library',
     long_description=long_description,
     long_description_content_type="text/markdown",
