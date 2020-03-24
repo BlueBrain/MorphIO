@@ -167,6 +167,7 @@ jobs:
             -D CMAKE_C_COMPILER_LAUNCHER=ccache
             -D CMAKE_CXX_COMPILER_LAUNCHER=ccache
             -D BUILD_TESTING=OFF
+            -D H5_BUILT_AS_DYNAMIC_LIB=1
             -D HDF5_BUILD_TOOLS=OFF
             -D HDF5_BUILD_EXAMPLES=OFF
           RESULT_VARIABLE result
