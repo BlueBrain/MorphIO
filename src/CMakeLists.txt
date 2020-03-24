@@ -82,10 +82,11 @@ endif()
 
 add_library(morphio_static STATIC $<TARGET_OBJECTS:morphio_obj>)
 add_library(morphio_shared SHARED $<TARGET_OBJECTS:morphio_obj>)
-set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio"
-                                                EXPORT_NAME "morphio")
 
 foreach(TARGET morphio_shared morphio_static)
+  set_target_properties(${TARGET} PROPERTIES OUTPUT_NAME "morphio"
+    EXPORT_NAME "morphio")
+
   target_include_directories(${TARGET}
     SYSTEM
     PUBLIC
