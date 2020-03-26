@@ -282,6 +282,7 @@ Property::Properties Morphology::buildReadOnly() const {
 
     mitochondria()._buildMitochondria(properties);
     properties._annotations = annotations();
+    properties._endoplasmicReticulumLevel = endoplasmicReticulum().buildReadOnly();
     return properties;
 }
 

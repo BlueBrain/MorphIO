@@ -46,6 +46,12 @@ class EndoplasmicReticulum
     const std::vector<uint32_t>& filamentCounts() const noexcept;
     std::vector<uint32_t>& filamentCounts() noexcept;
 
+    /**
+       Returns the data structure that stores ER data
+       This data structure is used to create the immutable object
+    **/
+    Property::EndoplasmicReticulumLevel buildReadOnly() const noexcept;
+
   private:
     morphio::Property::EndoplasmicReticulumLevel _properties;
     EndoplasmicReticulum(const morphio::Property::EndoplasmicReticulumLevel&);
