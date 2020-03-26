@@ -52,5 +52,9 @@ std::vector<uint32_t>& EndoplasmicReticulum::filamentCounts() noexcept {
     return _properties._filamentCounts;
 }
 
+Property::EndoplasmicReticulumLevel EndoplasmicReticulum::buildReadOnly() const noexcept {
+    return _properties;
+}
+
 }  // namespace mut
 }  // namespace morphio

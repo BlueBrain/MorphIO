@@ -98,6 +98,9 @@ class Mitochondria
 
     const MitoSectionP& mitoSection(uint32_t id) const;
 
+    /**
+       Fill the 'properties' variable with the mitochondria data
+    **/
     void _buildMitochondria(Property::Properties& properties) const;
 
   private:
