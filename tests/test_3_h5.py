@@ -1,10 +1,12 @@
 import os
-import numpy as np
 from itertools import chain, repeat
-from numpy.testing import assert_array_equal
-from nose.tools import assert_equal, assert_raises
 
-from morphio import Morphology, MorphologyVersion, SectionType, RawDataError
+from nose.tools import assert_equal, assert_raises
+from numpy.testing import assert_array_equal
+
+from morphio import (Morphology, MorphologyVersion, RawDataError, SectionType,
+                     ostream_redirect)
+from utils import captured_output
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 H5_PATH = os.path.join(_path, 'h5')
@@ -20,7 +22,6 @@ def test_v1():
 
     n = Morphology(os.path.join(H5V1_PATH, 'Neuron.h5'))
     assert_equal(n.version, MorphologyVersion.MORPHOLOGY_VERSION_H5_1)
-
 
     assert_equal(len(n.sections), 84)
     assert_equal(len(n.soma.points), 3)
@@ -72,3 +73,10 @@ def test_soma_no_neurite():
                        [6,6,15])
 
     assert_equal(len(n.root_sections), 0)
+
+
+def test_single_children():
+    with captured_output() as (_, _):
+        with ostream_redirect(stdout=True, stderr=True):
+            neuron = Morphology(os.path.join(H5V1_PATH, 'two_child_unmerged.h5'))
+    assert_equal(len(list(neuron.iter())), 3)
