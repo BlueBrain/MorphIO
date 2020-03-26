@@ -36,7 +36,7 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
          version() == MORPHOLOGY_VERSION_H5_2)) {
         mut::Morphology mutable_morph(*this);
         mutable_morph.sanitize();
-        if(options){
+        if (options) {
             mutable_morph.applyModifiers(options);
         }
         _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
