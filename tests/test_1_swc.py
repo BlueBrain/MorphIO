@@ -21,7 +21,6 @@ def test_read_single_neurite():
                          3 3 0 0 3 0.5 2
                          4 3 0 0 4 0.5 3
                          5 3 0 0 5 0.5 4''') as tmp_file:
-
         n = Morphology(tmp_file.name)
 
     assert_array_equal(n.soma.points, [[0, 4, 0]])
