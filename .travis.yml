@@ -26,8 +26,6 @@ jobs:
     - os: windows
       language: c++
       env:
-        - HIGHFIVE_USE_XTENSOR=True
-        - HIGHFIVE_PARALLEL_HDF5=False
         - MINCONDA_VERSION="latest"
         - CMAKE_GENERATOR="Visual Studio 15 2017 Win64" ;
         - TESTS_TARGET="RUN_TESTS";
@@ -60,19 +58,22 @@ install:
   - conda install -c conda-forge boost-cpp hdf5 eigen;
   - which $CXX
   - which $CC
-  - $CXX --version
-  - cmake --version
-  - cd ${TRAVIS_BUILD_DIR}
-  - mkdir -p build && pushd build
-  - >
-    cmake --debug-output
-    -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
-    -G "${CMAKE_GENERATOR}" ../
-  - cmake --build .
-  - CTEST_OUTPUT_ON_FAILURE=1 cmake --build . --target ${TESTS_TARGET}
-  - popd
+  - which python
+  - python --version
+  - which virtualenv
+  # - $CXX --version
+  # - cmake --version
+  # - cd ${TRAVIS_BUILD_DIR}
+  # - mkdir -p build && pushd build
+  # - >
+  #   cmake --debug-output
+  #   -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+  #   -G "${CMAKE_GENERATOR}" ../
+  # - cmake --build .
+  # - CTEST_OUTPUT_ON_FAILURE=1 cmake --build . --target ${TESTS_TARGET}
+  # - popd
 
 
-script:
-  - ./ci/python_test.sh
-  - ./ci/cpp_test.sh
+# script:
+#   - ./ci/python_test.sh
+#   - ./ci/cpp_test.sh
