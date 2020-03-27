@@ -1,34 +1,43 @@
 jobs:
   include:
-    # - os: linux
-    #   dist: xenial
-    #   env:
-    #     CXX: g++
-    #     CC: gcc
-    # - os: linux
-    #   dist: xenial
-    #   env:
-    #     CXX: clang++
-    #     CC: clang
+    - os: linux
+      dist: xenial
+      env:
+        CXX: g++
+        CC: gcc
+    - os: linux
+      dist: xenial
+      env:
+        CXX: clang++
+        CC: clang
 
-    # - os: osx
-    #   osx_image: xcode10.1
-    #   language: generic
-    #   env:
-    #     CXX: clang++
-    #     CC: clang
-    # - os: osx
-    #   osx_image: xcode10.1
-    #   language: generic
-    #   env:
-    #     CXX: g++
-    #     CC: gcc
+    - os: osx
+      osx_image: xcode10.1
+      language: generic
+      env:
+        CXX: clang++
+        CC: clang
+    - os: osx
+      osx_image: xcode10.1
+      language: generic
+      env:
+        CXX: g++
+        CC: gcc
     - os: windows
       language: c++
       env:
         - MINCONDA_VERSION="latest"
         - CMAKE_GENERATOR="Visual Studio 15 2017 Win64" ;
         - TESTS_TARGET="RUN_TESTS";
+      install:
+        - choco install --yes miniconda3
+        - source C:/Tools/miniconda3/Scripts/activate ;
+        - conda config --set always_yes yes --set changeps1 no
+        - conda update -q conda
+        - conda install -c conda-forge xtl xsimd xtensor
+        - conda install -c conda-forge boost-cpp hdf5 eigen;
+        - which $CXX
+        - which $CC
 
 
 addons:
@@ -48,17 +57,7 @@ language: python
 python:
   - 3.7
 
-# install: skip
-install:
-  - choco install --yes miniconda3
-  - source C:/Tools/miniconda3/Scripts/activate ;
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda install -c conda-forge xtl xsimd xtensor
-  - conda install -c conda-forge boost-cpp hdf5 eigen;
-  - which $CXX
-  - which $CC
-
+install: skip
 
 script:
   - ./ci/python_test.sh
