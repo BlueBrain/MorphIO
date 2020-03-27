@@ -50,6 +50,7 @@ python:
 
 # install: skip
 install:
+  - echo $SHELL
   - . ./ci/setup_windows.sh
 
 
