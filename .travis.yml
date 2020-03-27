@@ -24,6 +24,7 @@ jobs:
     #     CXX: g++
     #     CC: gcc
     - os: windows
+      language: c++
       env:
         - HIGHFIVE_USE_XTENSOR=True
         - HIGHFIVE_PARALLEL_HDF5=False
