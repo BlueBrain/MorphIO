@@ -1,5 +1,9 @@
 #include <cstdint>   // uint32_t
-#include <fstream>
+#if _WIN32
+#include <io.h>  // access / F_OK
+#else
+#include <unistd.h>  // access / F_OK
+#endif
 
 #include <morphio/vasc/section.h>
 #include <morphio/vasc/vasculature.h>
@@ -18,9 +22,7 @@ Vasculature::Vasculature(const std::string& source) {
         throw UnknownFileType("File has no extension");
     }
 
-    // Cross-platform check of file existance
-    std::ifstream file(source.c_str());
-    if (!file) {
+    if (access(source.c_str(), F_OK) == -1) {
         throw RawDataError("File: " + source + " does not exist.");
     }
 

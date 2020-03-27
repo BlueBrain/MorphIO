@@ -4,7 +4,6 @@ set -euxo pipefail
 
 VENV=env
 
-uname -a
 if [[ "$OSTYPE" != "msys" ]]; then
     rm -rf "$VENV"
     python3 -mvenv "$VENV"
