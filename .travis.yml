@@ -59,7 +59,8 @@ install:
   - which $CXX
   - which $CC
   - python -mvenv env
-  - . env/bin/activate
+  - ls -R env
+  - . env/bin/Scripts/activate.bat
   - python setup.py build
   # - $CXX --version
   # - cmake --version
