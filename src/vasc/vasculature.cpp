@@ -1,6 +1,6 @@
 #include <cstdint>   // uint32_t
-#if _WIN32
-#include <io.h>  // access / F_OK
+#if defined(WIN32) || defined(__WIN32__) || defined(_WIN32) || defined(_MSC_VER) || defined(__MINGW32__)
+#define F_OK    0
 #else
 #include <unistd.h>  // access / F_OK
 #endif
