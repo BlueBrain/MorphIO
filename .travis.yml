@@ -50,8 +50,13 @@ python:
 
 # install: skip
 install:
-  - echo $SHELL
-  - . ./ci/setup_windows.sh
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+      choco install --yes miniconda3
+      source C:/Tools/miniconda3/Scripts/activate;
+      conda config --set always_yes yes --set changeps1 no;
+      conda update -q conda;
+      conda install -c conda-forge hdf5;
+    fi
 
 
 script:
