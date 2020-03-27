@@ -4,12 +4,13 @@ set -euxo pipefail
 
 VENV=env
 
-rm -rf "$VENV"
-python3 -mvenv "$VENV"
+uname -a
+# rm -rf "$VENV"
+# python3 -mvenv "$VENV"
 
-set +u  # ignore errors in virtualenv's activate
-source "$VENV/bin/activate"
-set -u
+# set +u  # ignore errors in virtualenv's activate
+# source "$VENV/bin/activate"
+# set -u
 
 # which pip
 
