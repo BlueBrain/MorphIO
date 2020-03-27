@@ -1,5 +1,6 @@
 jobs:
   include:
+    #### LINUX #######
     - os: linux
       dist: xenial
       env:
@@ -11,34 +12,34 @@ jobs:
         CXX: clang++
         CC: clang
 
+    #### MAC OS #######
     - os: osx
       osx_image: xcode10.1
       language: generic
       env:
         CXX: clang++
         CC: clang
+
+    #### WINDOWS #######
     - os: osx
       osx_image: xcode10.1
       language: generic
       env:
         CXX: g++
         CC: gcc
+
     - os: windows
       language: c++
       env:
         - MINCONDA_VERSION="latest"
-        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64" ;
+        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
         - TESTS_TARGET="RUN_TESTS";
       install:
         - choco install --yes miniconda3
-        - source C:/Tools/miniconda3/Scripts/activate ;
+        - source C:/Tools/miniconda3/Scripts/activate
         - conda config --set always_yes yes --set changeps1 no
         - conda update -q conda
-        - conda install -c conda-forge xtl xsimd xtensor
-        - conda install -c conda-forge boost-cpp hdf5 eigen;
-        - which $CXX
-        - which $CC
-
+        - conda install -c conda-forge hdf5
 
 addons:
   homebrew:
@@ -47,7 +48,6 @@ addons:
   apt:
     packages:
     - libhdf5-dev
-
 
 cache:
   directories:
