@@ -58,9 +58,9 @@ install:
   - conda install -c conda-forge boost-cpp hdf5 eigen;
   - which $CXX
   - which $CC
-  - which python
-  - python --version
-  - which virtualenv
+  - python -mvenv env
+  - . env/bin/activate
+  - python setup.py build
   # - $CXX --version
   # - cmake --version
   # - cd ${TRAVIS_BUILD_DIR}
