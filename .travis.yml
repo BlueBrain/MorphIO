@@ -58,9 +58,9 @@ install:
   - conda install -c conda-forge boost-cpp hdf5 eigen;
   - which $CXX
   - which $CC
-  - python -mvenv env
-  - ls -R env
-  - . env/Scripts/activate.bat
+  # - python -mvenv env
+  # - ls -R env
+  # - . env/Scripts/activate.bat
   - python setup.py build
   # - $CXX --version
   # - cmake --version
