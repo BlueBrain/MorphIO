@@ -3,8 +3,9 @@
 #include <numeric>    // std::accumulate
 #include <sstream>    // std::stringstream
 #include <string>     // std::string
-
+#include <cctype>     // std::tolower
 #include <cmath>
+
 #include <morphio/types.h>
 
 namespace morphio {
