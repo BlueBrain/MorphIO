@@ -319,10 +319,10 @@ def test_disconnected_neurite():
         with ostream_redirect(stdout=True, stderr=True):
             n = Morphology(os.path.join(_path, 'disconnected_neurite.swc'))
             assert_equal(
-                _path + '''/disconnected_neurite.swc:10:warning
+                '''{}:10:warning
 Warning: found a disconnected neurite.
 Neurites are not supposed to have parentId: -1
-(although this is normal if this neuron has no soma)''',
+(although this is normal if this neuron has no soma)'''.format(os.path.join(_path, 'disconnected_neurite.swc')),
                 strip_color_codes(err.getvalue().strip()))
 
 def test_neurite_wrong_root_point():
@@ -337,12 +337,13 @@ def test_neurite_wrong_root_point():
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            n = Morphology(os.path.join(_path, 'neurite_wrong_root_point.swc'))
+            path = os.path.join(_path, 'neurite_wrong_root_point.swc')
+            n = Morphology(path)
             assert_string_equal(
 '''Warning: with a 3 points soma, neurites must be connected to the first soma point:
-{}/neurite_wrong_root_point.swc:4:warning
+{}:4:warning
 
-{}/neurite_wrong_root_point.swc:6:warning'''.format(_path, _path),
+{}:6:warning'''.format(path, path),
                 err.getvalue())
     assert_equal(len(n.root_sections), 2)
     assert_array_equal(n.root_sections[0].points,
