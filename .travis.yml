@@ -32,7 +32,6 @@ jobs:
       language: c++
       env:
         - MINCONDA_VERSION="latest"
-        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
         - TESTS_TARGET="RUN_TESTS";
       install:
         - choco install --yes miniconda3
