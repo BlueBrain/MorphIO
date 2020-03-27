@@ -24,7 +24,7 @@ jobs:
     #     CXX: g++
     #     CC: gcc
     - os: windows
-      language: c++
+      language: bash
       env:
         - MINCONDA_VERSION="latest"
         - CMAKE_GENERATOR="Visual Studio 15 2017 Win64" ;
@@ -50,31 +50,9 @@ python:
 
 # install: skip
 install:
-  - choco install --yes miniconda3
-  - source C:/Tools/miniconda3/Scripts/activate ;
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda install -c conda-forge xtl xsimd xtensor
-  - conda install -c conda-forge boost-cpp hdf5 eigen;
-  - which $CXX
-  - which $CC
-  # - python -mvenv env
-  # - ls -R env
-  # - . env/Scripts/activate.bat
-  - python setup.py build
-  # - $CXX --version
-  # - cmake --version
-  # - cd ${TRAVIS_BUILD_DIR}
-  # - mkdir -p build && pushd build
-  # - >
-  #   cmake --debug-output
-  #   -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
-  #   -G "${CMAKE_GENERATOR}" ../
-  # - cmake --build .
-  # - CTEST_OUTPUT_ON_FAILURE=1 cmake --build . --target ${TESTS_TARGET}
-  # - popd
+  - . ./ci/setup_windows.sh
 
 
-# script:
-#   - ./ci/python_test.sh
+script:
+  - ./ci/python_test.sh
 #   - ./ci/cpp_test.sh
