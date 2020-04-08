@@ -277,7 +277,7 @@ void bind_mutable_module(py::module& m) {
             "at each root section",
             "section_id"_a = -1);
 
-    using mitosection_floats_f = std::vector<float>& (morphio::mut::MitoSection::*) ();
+    using mitosection_floats_f = std::vector<morphio::floatType>& (morphio::mut::MitoSection::*) ();
     using mitosection_ints_f = std::vector<uint32_t>& (morphio::mut::MitoSection::*) ();
 
     // py::nodelete needed because morphio::mut::MitoSection has a private
@@ -289,14 +289,16 @@ void bind_mutable_module(py::module& m) {
         .def_property(
             "diameters",
             static_cast<mitosection_floats_f>(&morphio::mut::MitoSection::diameters),
-            [](morphio::mut::MitoSection* section, const std::vector<float>& _diameters) {
+            [](morphio::mut::MitoSection* section,
+               const std::vector<morphio::floatType>& _diameters) {
                 section->diameters() = _diameters;
             },
             "Returns the diameters of all points of this section")
         .def_property(
             "relative_path_lengths",
             static_cast<mitosection_floats_f>(&morphio::mut::MitoSection::pathLengths),
-            [](morphio::mut::MitoSection* section, const std::vector<float>& _pathLengths) {
+            [](morphio::mut::MitoSection* section,
+               const std::vector<morphio::floatType>& _pathLengths) {
                 section->pathLengths() = _pathLengths;
             },
             "Returns the relative distance (between 0 and 1)\n"
@@ -360,7 +362,7 @@ void bind_mutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(section->points().size()),
                                  section->points().data());
             },
-            [](morphio::mut::Section* section, py::array_t<float> _points) {
+            [](morphio::mut::Section* section, py::array_t<morphio::floatType> _points) {
                 section->points() = array_to_points(_points);
             },
             "Returns the coordinates (x,y,z) of all points of this section")
@@ -370,8 +372,8 @@ void bind_mutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(section->diameters().size()),
                                  section->diameters().data());
             },
-            [](morphio::mut::Section* section, py::array_t<float> _diameters) {
-                section->diameters() = _diameters.cast<std::vector<float>>();
+            [](morphio::mut::Section* section, py::array_t<morphio::floatType> _diameters) {
+                section->diameters() = _diameters.cast<std::vector<morphio::floatType>>();
             },
             "Returns the diameters of all points of this section")
         .def_property(
@@ -380,8 +382,8 @@ void bind_mutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(section->perimeters().size()),
                                  section->perimeters().data());
             },
-            [](morphio::mut::Section* section, py::array_t<float> _perimeters) {
-                section->perimeters() = _perimeters.cast<std::vector<float>>();
+            [](morphio::mut::Section* section, py::array_t<morphio::floatType> _perimeters) {
+                section->perimeters() = _perimeters.cast<std::vector<morphio::floatType>>();
             },
             "Returns the perimeters of all points of this section")
         .def_property_readonly("is_root",
@@ -455,7 +457,7 @@ void bind_mutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(soma->points().size()),
                                  soma->points().data());
             },
-            [](morphio::mut::Soma* soma, py::array_t<float> _points) {
+            [](morphio::mut::Soma* soma, py::array_t<morphio::floatType> _points) {
                 soma->points() = array_to_points(_points);
             },
             "Returns the coordinates (x,y,z) of all soma point")
@@ -465,8 +467,8 @@ void bind_mutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(soma->diameters().size()),
                                  soma->diameters().data());
             },
-            [](morphio::mut::Soma* soma, py::array_t<float> _diameters) {
-                soma->diameters() = _diameters.cast<std::vector<float>>();
+            [](morphio::mut::Soma* soma, py::array_t<morphio::floatType> _diameters) {
+                soma->diameters() = _diameters.cast<std::vector<morphio::floatType>>();
             },
             "Returns the diameters of all soma points")
         .def_property_readonly("type", &morphio::mut::Soma::type, "Returns the soma type")
@@ -486,8 +488,8 @@ void bind_mutable_module(py::module& m) {
     py::class_<morphio::mut::EndoplasmicReticulum>(m, "EndoplasmicReticulum")
         .def(py::init<>())
         .def(py::init<const std::vector<uint32_t>&,
-                      const std::vector<float>&,
-                      const std::vector<float>&,
+                      const std::vector<morphio::floatType>&,
+                      const std::vector<morphio::floatType>&,
                       const std::vector<uint32_t>&>())
         .def(py::init<const morphio::EndoplasmicReticulum&>())
         .def(py::init<const morphio::mut::EndoplasmicReticulum&>())
@@ -508,8 +510,9 @@ void bind_mutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(reticulum->volumes().size()),
                                  reticulum->volumes().data());
             },
-            [](morphio::mut::EndoplasmicReticulum* reticulum, py::array_t<float> volumes) {
-                reticulum->volumes() = volumes.cast<std::vector<float>>();
+            [](morphio::mut::EndoplasmicReticulum* reticulum,
+               py::array_t<morphio::floatType> volumes) {
+                reticulum->volumes() = volumes.cast<std::vector<morphio::floatType>>();
             },
             "Returns the volumes for each neuronal section")
 
@@ -519,8 +522,9 @@ void bind_mutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(reticulum->surfaceAreas().size()),
                                  reticulum->surfaceAreas().data());
             },
-            [](morphio::mut::EndoplasmicReticulum* reticulum, py::array_t<float> areas) {
-                reticulum->surfaceAreas() = areas.cast<std::vector<float>>();
+            [](morphio::mut::EndoplasmicReticulum* reticulum,
+               py::array_t<morphio::floatType> areas) {
+                reticulum->surfaceAreas() = areas.cast<std::vector<morphio::floatType>>();
             },
             "Returns the surface areas for each neuronal section")
 

@@ -92,7 +92,7 @@ VascularSectionType Section::type() const {
     return val;
 }
 
-float Section::length() const {
+floatType Section::length() const {
     const auto& points_ = this->points();
     if (points_.size() < 2)
         return 0;
@@ -105,7 +105,7 @@ range<const Point> Section::points() const {
     return get<property::Point>();
 }
 
-range<const float> Section::diameters() const {
+range<const floatType> Section::diameters() const {
     return get<property::Diameter>();
 }
 

@@ -15,8 +15,8 @@ class EndoplasmicReticulum
   public:
     EndoplasmicReticulum() = default;
     EndoplasmicReticulum(const std::vector<uint32_t>& sectionIndices,
-                         const std::vector<float>& volumes,
-                         const std::vector<float>& surfaceAreas,
+                         const std::vector<morphio::floatType>& volumes,
+                         const std::vector<morphio::floatType>& surfaceAreas,
                          const std::vector<uint32_t>& filamentCounts);
     EndoplasmicReticulum(const EndoplasmicReticulum& endoplasmicReticulum);
     EndoplasmicReticulum(const morphio::EndoplasmicReticulum& endoplasmicReticulum);
@@ -31,14 +31,14 @@ class EndoplasmicReticulum
     /**
        Returns the volumes for each neuronal section
     **/
-    const std::vector<float>& volumes() const noexcept;
-    std::vector<float>& volumes() noexcept;
+    const std::vector<morphio::floatType>& volumes() const noexcept;
+    std::vector<morphio::floatType>& volumes() noexcept;
 
     /**
        Returns the surface areas for each neuronal section
     **/
-    const std::vector<float>& surfaceAreas() const noexcept;
-    std::vector<float>& surfaceAreas() noexcept;
+    const std::vector<morphio::floatType>& surfaceAreas() const noexcept;
+    std::vector<morphio::floatType>& surfaceAreas() noexcept;
 
     /**
        Returns the number of filaments for each neuronal section

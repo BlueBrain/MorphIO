@@ -148,15 +148,17 @@ void bind_misc(py::module& m) {
 
     py::class_<morphio::Points>(m, "Points", py::buffer_protocol())
         .def_buffer([](morphio::Points& points) -> py::buffer_info {
-            return py::buffer_info(points.data(),                          /* Pointer to buffer */
-                                   sizeof(float),                          /* Size of one scalar */
-                                   py::format_descriptor<float>::format(), /* Python struct-style
-                                                                              format descriptor */
+            return py::buffer_info(points.data(),              /* Pointer to buffer */
+                                   sizeof(morphio::floatType), /* Size of one scalar */
+                                   py::format_descriptor<morphio::floatType>::format(), /* Python
+                                                                              struct-style format
+                                                                              descriptor */
                                    2, /* Number of dimensions */
                                    {static_cast<ssize_t>(points.size()),
-                                    static_cast<ssize_t>(3)}, /* Buffer dimensions */
-                                   {sizeof(float) * 3, /* Strides (in bytes) for each index */
-                                    sizeof(float)});
+                                    static_cast<ssize_t>(3)},       /* Buffer dimensions */
+                                   {sizeof(morphio::floatType) * 3, /* Strides (in bytes) for each
+                                                                       index */
+                                    sizeof(morphio::floatType)});
         });
 
     py::class_<morphio::Property::Properties>(
@@ -258,7 +260,7 @@ void bind_misc(py::module& m) {
         "neuronal section, relative distance to start of neuronal section, diameter)")
         .def(py::init<>())
         .def(py::init<std::vector<uint32_t>,
-                      std::vector<float>,
+                      std::vector<morphio::floatType>,
                       std::vector<morphio::Property::Diameter::Type>>(),
              "neuronal_section_ids"_a,
              "distances_to_section_start"_a,

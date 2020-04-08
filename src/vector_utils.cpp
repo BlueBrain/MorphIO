@@ -34,7 +34,7 @@ Point operator-=(Point& left, const Point& right) {
     return left;
 }
 
-Point operator/=(Point& left, float factor) {
+Point operator/=(Point& left, floatType factor) {
     for (size_t i = 0; i < left.size(); ++i)
         left[i] /= factor;
     return left;
@@ -68,7 +68,7 @@ Points operator-=(Points& points, const Point& right) {
 /**
    Euclidian distance between two points
 **/
-float distance(const Point& left, const Point& right) {
+floatType distance(const Point& left, const Point& right) {
     return std::sqrt((left[0] - right[0]) * (left[0] - right[0]) +
                      (left[1] - right[1]) * (left[1] - right[1]) +
                      (left[2] - right[2]) * (left[2] - right[2]));
@@ -103,13 +103,16 @@ template Point centerOfGravity(const range<const Point>& points);
 template Point centerOfGravity(const Points& points);
 
 template <typename T>
-float maxDistanceToCenterOfGravity(const T& points) {
+floatType maxDistanceToCenterOfGravity(const T& points) {
     const auto c = centerOfGravity(points);
-    return std::accumulate(std::begin(points), std::end(points), 0.f, [&](float a, const Point& b) {
-        return std::max(a, distance(c, b));
-    });
+    return std::accumulate(std::begin(points),
+                           std::end(points),
+                           static_cast<morphio::floatType>(0),
+                           [&](morphio::floatType a, const Point& b) {
+                               return std::max(a, distance(c, b));
+                           });
 }
-template float maxDistanceToCenterOfGravity(const Points& points);
+template floatType maxDistanceToCenterOfGravity(const Points& points);
 
 template <typename T>
 Point operator*(const Point& from, T factor) {
@@ -120,21 +123,21 @@ Point operator*(const Point& from, T factor) {
     return ret;
 }
 template Point operator*<int>(const Point& from, int factor);
-template Point operator*<float>(const Point& from, float factor);
+template Point operator*<morphio::floatType>(const Point& from, floatType factor);
 
 template <typename T>
 Point operator*(T factor, const Point& from) {
     return from * factor;
 }
 template Point operator*<int>(int factor, const Point& from);
-template Point operator*<float>(float factor, const Point& from);
+template Point operator*<morphio::floatType>(morphio::floatType factor, const Point& from);
 
 template <typename T>
 Point operator/(const Point& from, T factor) {
-    return from * (1 / static_cast<float>(factor));
+    return from * (1 / static_cast<morphio::floatType>(factor));
 }
 template Point operator/(const Point& from, int factor);
-template Point operator/(const Point& from, float factor);
+template Point operator/(const Point& from, floatType factor);
 
 std::ostream& operator<<(std::ostream& os, const Points& points) {
     return os << morphio::dumpPoints(points);

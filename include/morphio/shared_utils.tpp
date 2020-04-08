@@ -6,7 +6,7 @@
 
 namespace morphio {
 template <typename ContainerDiameters, typename ContainerPoints>
-float _somaSurface(const SomaType type,
+floatType _somaSurface(const SomaType type,
                    const ContainerDiameters& diameters,
                    const ContainerPoints& points) {
     size_t size = points.size();
@@ -15,23 +15,23 @@ float _somaSurface(const SomaType type,
 
     switch (type) {
     case SOMA_SINGLE_POINT: {
-        float radius = diameters[0] / 2.f;
-        return 4.f * static_cast<float>(M_PI) * radius * radius;
+        floatType radius = diameters[0] / static_cast<morphio::floatType>(2);
+        return static_cast<morphio::floatType>(4) * static_cast<morphio::floatType>(M_PI) * radius * radius;
     }
 
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: {
-        float radius = diameters[0] / 2.f;
-        return 4.f * static_cast<float>(M_PI) * radius * radius;
+        floatType radius = diameters[0] / static_cast<morphio::floatType>(2);
+        return static_cast<morphio::floatType>(4) * static_cast<morphio::floatType>(M_PI) * radius * radius;
     }
     case SOMA_CYLINDERS: {
         // Surface is approximated as the sum of areas of the conical frustums
         // defined by each segments. Does not include the endcaps areas
-        float surface = 0;
+        floatType surface = 0;
         for (unsigned int i = 0; i < size - 1; ++i) {
-            float r0 = diameters[i] * 0.5f;
-            float r1 = diameters[i + 1] * 0.5f;
-            float h2 = distance(points[i], points[i + 1]);
-            auto s = static_cast<float>(M_PI) * (r0 + r1) *
+            floatType r0 = diameters[i] * static_cast<morphio::floatType>(0.5);
+            floatType r1 = diameters[i + 1] * static_cast<morphio::floatType>(0.5);
+            floatType h2 = distance(points[i], points[i + 1]);
+            auto s = static_cast<morphio::floatType>(M_PI) * (r0 + r1) *
                      std::sqrt((r0 - r1) * (r0 - r1) + h2 * h2);
             surface += s;
         }

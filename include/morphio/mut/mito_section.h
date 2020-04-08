@@ -35,8 +35,8 @@ class MitoSection
     /** @{
      * Return the diameters of all points of this section
      **/
-    inline const std::vector<float>& diameters() const noexcept;
-    inline std::vector<float>& diameters() noexcept;
+    inline const std::vector<morphio::floatType>& diameters() const noexcept;
+    inline std::vector<morphio::floatType>& diameters() noexcept;
     /** @} */
 
     /** @{
@@ -51,8 +51,8 @@ class MitoSection
      * between the start of the neuronal section and each point
      * of this mitochondrial section
      **/
-    inline const std::vector<float>& pathLengths() const noexcept;
-    inline std::vector<float>& pathLengths() noexcept;
+    inline const std::vector<morphio::floatType>& pathLengths() const noexcept;
+    inline std::vector<morphio::floatType>& pathLengths() noexcept;
     /** @} */
 
   private:
@@ -69,7 +69,7 @@ inline uint32_t MitoSection::id() const noexcept {
     return _id;
 }
 
-inline const std::vector<float>& MitoSection::diameters() const noexcept {
+inline const std::vector<morphio::floatType>& MitoSection::diameters() const noexcept {
     return _mitoPoints._diameters;
 }
 
@@ -77,11 +77,11 @@ inline const std::vector<uint32_t>& MitoSection::neuriteSectionIds() const noexc
     return _mitoPoints._sectionIds;
 }
 
-inline const std::vector<float>& MitoSection::pathLengths() const noexcept {
+inline const std::vector<morphio::floatType>& MitoSection::pathLengths() const noexcept {
     return _mitoPoints._relativePathLengths;
 }
 
-inline std::vector<float>& MitoSection::diameters() noexcept {
+inline std::vector<morphio::floatType>& MitoSection::diameters() noexcept {
     return _mitoPoints._diameters;
 }
 
@@ -89,7 +89,7 @@ inline std::vector<uint32_t>& MitoSection::neuriteSectionIds() noexcept {
     return _mitoPoints._sectionIds;
 }
 
-inline std::vector<float>& MitoSection::pathLengths() noexcept {
+inline std::vector<morphio::floatType>& MitoSection::pathLengths() noexcept {
     return _mitoPoints._relativePathLengths;
 }
 

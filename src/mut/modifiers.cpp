@@ -38,12 +38,12 @@ void no_duplicate_point(morphio::mut::Morphology& morpho) {
 
 void soma_sphere(morphio::mut::Morphology& morpho) {
     auto soma = morpho.soma();
-    float size = static_cast<float>(soma->points().size());
+    floatType size = static_cast<morphio::floatType>(soma->points().size());
 
     if (size < 2)
         return;
 
-    float x = 0, y = 0, z = 0, r = 0;
+    floatType x = 0, y = 0, z = 0, r = 0;
     for (const Point& point : soma->points()) {
         x += point[0] / size;
         y += point[1] / size;
@@ -51,7 +51,11 @@ void soma_sphere(morphio::mut::Morphology& morpho) {
     }
 
     for (auto point : soma->points()) {
+#ifdef MORPHIO_USE_DOUBLE
+        r += sqrt(pow(point[0] - x, 2) + pow(point[1] - y, 2) + pow(point[2] - z, 2)) / size;
+#else
         r += sqrtf(powf(point[0] - x, 2) + powf(point[1] - y, 2) + powf(point[2] - z, 2)) / size;
+#endif
     }
 
     soma->points() = {{x, y, z}};

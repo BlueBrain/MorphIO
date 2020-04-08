@@ -97,7 +97,7 @@ bool compare(const morphio::range<T>& vec1,
         return false;
     }
 
-    const float epsilon = 1e-6f;
+    const floatType epsilon = static_cast<morphio::floatType>(1e-6);
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(vec1[i] - vec2[i]) > epsilon) {
             printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
@@ -123,7 +123,7 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
         return false;
     }
 
-    const float epsilon = 1e-6f;
+    const floatType epsilon = static_cast<morphio::floatType>(1e-6);
     for (unsigned int i = 0; i < vec1.size(); ++i) {
         if (std::fabs(distance(vec1[i], vec2[i])) > epsilon) {
             if (verbose_) {

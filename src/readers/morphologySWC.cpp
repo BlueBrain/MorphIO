@@ -198,11 +198,11 @@ class SWCBuilder
         // 2 1 x (y-r) z r  1
         // 3 1 x (y+r) z r  1
 
-        float x = root.point[0];
-        float y = root.point[1];
-        float z = root.point[2];
-        float d = root.diameter;
-        float r = root.diameter / 2.f;
+        floatType x = root.point[0];
+        floatType y = root.point[1];
+        floatType z = root.point[2];
+        floatType d = root.diameter;
+        floatType r = root.diameter / static_cast<morphio::floatType>(2);
         const Sample& child1 = _children[0];
         const Sample& child2 = _children[1];
 

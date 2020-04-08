@@ -37,13 +37,17 @@ void writeLine(std::ofstream& myfile,
                int parentId,
                morphio::SectionType type,
                const morphio::Point& point,
-               float diameter) {
+               morphio::floatType diameter) {
     using std::setw;
 
+
     myfile << std::to_string(id) << setw(12) << std::to_string(type) << ' ' << setw(12);
-    myfile << std::fixed << std::setprecision(FLOAT_PRECISION_PRINT) << point[0] << ' ' << setw(12)
-           << point[1] << ' ' << setw(12) << point[2] << ' ' << setw(12) << diameter / 2.f
-           << setw(12);
+    myfile << std::fixed
+#if !defined(MORPHIO_USE_DOUBLE)
+           << std::setprecision(FLOAT_PRECISION_PRINT)
+#endif
+           << point[0] << ' ' << setw(12) << point[1] << ' ' << setw(12) << point[2] << ' '
+           << setw(12) << diameter / static_cast<morphio::floatType>(2) << setw(12);
     myfile << std::to_string(parentId) << '\n';
 }
 
@@ -136,7 +140,7 @@ void swc(const Morphology& morphology, const std::string& filename) {
 
 static void _write_asc_points(std::ofstream& myfile,
                               const Points& points,
-                              const std::vector<float>& diameters,
+                              const std::vector<morphio::floatType>& diameters,
                               size_t indentLevel) {
     for (unsigned int i = 0; i < points.size(); ++i) {
         myfile << std::fixed << std::setprecision(FLOAT_PRECISION_PRINT)
@@ -248,12 +252,13 @@ static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochon
     auto& p = properties._mitochondriaPointLevel;
     size_t size = p._diameters.size();
 
-    std::vector<std::vector<float>> points;
+    std::vector<std::vector<morphio::floatType>> points;
     std::vector<std::vector<int32_t>> structure;
     points.reserve(size);
     for (unsigned int i = 0; i < size; ++i) {
-        points.push_back(
-            {static_cast<float>(p._sectionIds[i]), p._relativePathLengths[i], p._diameters[i]});
+        points.push_back({static_cast<morphio::floatType>(p._sectionIds[i]),
+                          p._relativePathLengths[i],
+                          p._diameters[i]});
     }
 
     auto& s = properties._mitochondriaSectionLevel;
@@ -305,9 +310,9 @@ void h5(const Morphology& morpho, const std::string& filename) {
     int sectionIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
 
-    std::vector<std::vector<float>> raw_points;
+    std::vector<std::vector<morphio::floatType>> raw_points;
     std::vector<std::vector<int32_t>> raw_structure;
-    std::vector<float> raw_perimeters;
+    std::vector<morphio::floatType> raw_perimeters;
 
     const auto& somaDiameters = morpho.soma()->diameters();
 

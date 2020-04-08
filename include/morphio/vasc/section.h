@@ -45,7 +45,7 @@ class Section
     /**
        Euclidian distance between first and last point of the section
     **/
-    float length() const;
+    floatType length() const;
 
     graph_iterator begin() const;
     graph_iterator end() const;
@@ -62,7 +62,7 @@ class Section
    (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
     to this section's point diameters
    **/
-    range<const float> diameters() const;
+    range<const floatType> diameters() const;
 
     /**
      * Return the morphological type of this section (artery, vein, capillary, ...)

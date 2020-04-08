@@ -136,8 +136,8 @@ std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(int mitoParentId) const {
 /**
    Return val1 and highlight it with some color if val1 != val2
 **/
-static std::string _col(float val1, float val2) {
-    bool is_ok = std::fabs(val1 - val2) < 1e-6f;
+static std::string _col(morphio::floatType val1, morphio::floatType val2) {
+    bool is_ok = std::fabs(val1 - val2) < static_cast<morphio::floatType>(1e-6);
     if (is_ok)
         return std::to_string(val1);
     return "\033[1;33m" + std::to_string(val1) + " (exp. " + std::to_string(val2) + ")\033[0m";
@@ -152,7 +152,9 @@ std::string ErrorMessages::ERROR_SOMA_ALREADY_DEFINED(long unsigned int lineNumb
 
 std::string ErrorMessages::ERROR_PARSING_POINT(long unsigned int lineNumber,
                                                const std::string& point) const {
-    return errorMsg(lineNumber, ErrorLevel::ERROR, "Error converting: \"" + point + "\" to float");
+    return errorMsg(lineNumber,
+                    ErrorLevel::ERROR,
+                    "Error converting: \"" + point + "\" to floatType");
 }
 
 std::string ErrorMessages::ERROR_UNKNOWN_TOKEN(long unsigned int lineNumber,
@@ -303,7 +305,8 @@ std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info,
 std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& root,
                                                                 const Sample& child1,
                                                                 const Sample& child2) {
-    float x = root.point[0], y = root.point[1], z = root.point[2], r = root.diameter / 2.f;
+    floatType x = root.point[0], y = root.point[1], z = root.point[2],
+              r = root.diameter / static_cast<morphio::floatType>(2);
     std::stringstream ss;
     ss << "Warning: the soma does not conform the three point soma spec\n"
           "The only valid neuro-morpho soma is:\n"
@@ -317,11 +320,13 @@ std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& ro
        << " -1\n"
           "2 1 "
        << _col(child1.point[0], x) << ' ' << _col(child1.point[1], y - r) << ' '
-       << _col(child1.point[2], z) << ' ' << _col(child1.diameter / 2.f, r)
+       << _col(child1.point[2], z) << ' '
+       << _col(child1.diameter / static_cast<morphio::floatType>(2), r)
        << " 1\n"
           "3 1 "
        << _col(child2.point[0], x) << ' ' << _col(child2.point[1], y + r) << ' '
-       << _col(child2.point[2], z) << ' ' << _col(child2.diameter / 2.f, r) << " 1\n";
+       << _col(child2.point[2], z) << ' '
+       << _col(child2.diameter / static_cast<morphio::floatType>(2), r) << " 1\n";
     return errorMsg(0, ErrorLevel::WARNING, ss.str());
 }
 

@@ -6,11 +6,11 @@ const std::vector<uint32_t>& EndoplasmicReticulum::sectionIndices() const {
     return _properties->_endoplasmicReticulumLevel._sectionIndices;
 }
 
-const std::vector<float>& EndoplasmicReticulum::volumes() const {
+const std::vector<morphio::floatType>& EndoplasmicReticulum::volumes() const {
     return _properties->_endoplasmicReticulumLevel._volumes;
 }
 
-const std::vector<float>& EndoplasmicReticulum::surfaceAreas() const {
+const std::vector<morphio::floatType>& EndoplasmicReticulum::surfaceAreas() const {
     return _properties->_endoplasmicReticulumLevel._surfaceAreas;
 }
 

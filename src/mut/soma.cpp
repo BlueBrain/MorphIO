@@ -24,11 +24,13 @@ Point Soma::center() const {
     return centerOfGravity(points());
 }
 
-float Soma::surface() const {
-    return _somaSurface<std::vector<float>, std::vector<Point>>(type(), diameters(), points());
+floatType Soma::surface() const {
+    return _somaSurface<std::vector<morphio::floatType>, std::vector<Point>>(type(),
+                                                                             diameters(),
+                                                                             points());
 }
 
-float Soma::maxDistance() const {
+floatType Soma::maxDistance() const {
     return maxDistanceToCenterOfGravity(_pointProperties._points);
 }
 

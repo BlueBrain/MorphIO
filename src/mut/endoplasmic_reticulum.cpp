@@ -5,8 +5,8 @@
 namespace morphio {
 namespace mut {
 EndoplasmicReticulum::EndoplasmicReticulum(const std::vector<uint32_t>& sectionIndices,
-                                           const std::vector<float>& volumes,
-                                           const std::vector<float>& surfaceAreas,
+                                           const std::vector<morphio::floatType>& volumes,
+                                           const std::vector<morphio::floatType>& surfaceAreas,
                                            const std::vector<uint32_t>& filamentCounts) {
     _properties._sectionIndices = sectionIndices;
     _properties._volumes = volumes;
@@ -28,19 +28,19 @@ std::vector<uint32_t>& EndoplasmicReticulum::sectionIndices() noexcept {
     return _properties._sectionIndices;
 }
 
-const std::vector<float>& EndoplasmicReticulum::volumes() const noexcept {
+const std::vector<morphio::floatType>& EndoplasmicReticulum::volumes() const noexcept {
     return _properties._volumes;
 }
 
-std::vector<float>& EndoplasmicReticulum::volumes() noexcept {
+std::vector<morphio::floatType>& EndoplasmicReticulum::volumes() noexcept {
     return _properties._volumes;
 }
 
-const std::vector<float>& EndoplasmicReticulum::surfaceAreas() const noexcept {
+const std::vector<morphio::floatType>& EndoplasmicReticulum::surfaceAreas() const noexcept {
     return _properties._surfaceAreas;
 }
 
-std::vector<float>& EndoplasmicReticulum::surfaceAreas() noexcept {
+std::vector<morphio::floatType>& EndoplasmicReticulum::surfaceAreas() noexcept {
     return _properties._surfaceAreas;
 }
 

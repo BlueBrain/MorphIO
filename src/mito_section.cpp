@@ -32,11 +32,11 @@ range<const uint32_t> MitoSection::neuriteSectionIds() const {
     return get<Property::MitoNeuriteSectionId>();
 }
 
-range<const float> MitoSection::diameters() const {
+range<const floatType> MitoSection::diameters() const {
     return get<Property::MitoDiameter>();
 }
 
-range<const float> MitoSection::relativePathLengths() const {
+range<const floatType> MitoSection::relativePathLengths() const {
     return get<Property::MitoPathLength>();
 }
 

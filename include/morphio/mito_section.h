@@ -42,7 +42,7 @@ class MitoSection: public SectionBase<MitoSection>
     /**
      * Returns list of section's point diameters
      **/
-    range<const float> diameters() const;
+    range<const floatType> diameters() const;
 
     /**
      * Returns list of relative distances between the start
@@ -52,7 +52,7 @@ class MitoSection: public SectionBase<MitoSection>
      *       - a relative distance of 1 means the mitochondrial point is at the
      *         end of the neuronal section
      **/
-    range<const float> relativePathLengths() const;
+    range<const floatType> relativePathLengths() const;
 
   protected:
     MitoSection(uint32_t id_, const std::shared_ptr<Property::Properties>& morphology)

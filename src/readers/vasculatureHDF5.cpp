@@ -55,7 +55,7 @@ void VasculatureHDF5::_readPoints() {
     auto& points = _properties.get<vasculature::property::Point>();
     auto& diameters = _properties.get<vasculature::property::Diameter>();
 
-    std::vector<std::vector<float>> vec;
+    std::vector<std::vector<morphio::floatType>> vec;
     vec.resize(_pointsDims[0]);
     _points->read(vec);
     for (const auto& p : vec) {

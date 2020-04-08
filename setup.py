@@ -49,6 +49,14 @@ def get_cpu_count():
 
 
 class CMakeBuild(build_ext):
+    user_options = build_ext.user_options + [
+        ("cmake-defs=", None, "Additional CMake definitions, comma split")
+    ]
+
+    def initialize_options(self):
+        build_ext.initialize_options(self)
+        self.cmake_defs = None
+
     def run(self):
         cmake = find_cmake()
         for ext in self.extensions:
@@ -63,6 +71,9 @@ class CMakeBuild(build_ext):
                       '-DHIGHFIVE_EXAMPLES=OFF',
                       '-DHIGHFIVE_UNIT_TESTS=OFF',
         ]
+
+        if self.cmake_defs:
+            cmake_args += ["-D" + opt for opt in self.cmake_defs.split(",")]
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]

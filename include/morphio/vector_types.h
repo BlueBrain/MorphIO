@@ -7,14 +7,20 @@
 #include <vector>
 
 namespace morphio {
-using Point = std::array<float, 3>;
+#ifdef MORPHIO_USE_DOUBLE
+using floatType = double;
+#else
+using floatType = float;
+#endif
+
+using Point = std::array<morphio::floatType, 3>;
 using Points = std::vector<Point>;
 
 Point operator+(const Point& left, const Point& right);
 Point operator-(const Point& left, const Point& right);
 Point operator+=(Point& left, const Point& right);
 Point operator-=(Point& left, const Point& right);
-Point operator/=(Point& left, const float factor);
+Point operator/=(Point& left, const floatType factor);
 
 Points operator+(const Points& points, const Point& right);
 Points operator-(const Points& points, const Point& right);
@@ -30,10 +36,10 @@ Point operator/(const Point& from, T factor);
 template <typename T>
 Point centerOfGravity(const T& points);
 template <typename T>
-float maxDistanceToCenterOfGravity(const T& points);
+floatType maxDistanceToCenterOfGravity(const T& points);
 
 extern template Point centerOfGravity(const Points&);
-extern template float maxDistanceToCenterOfGravity(const Points&);
+extern template floatType maxDistanceToCenterOfGravity(const Points&);
 
 std::string dumpPoint(const Point& point);
 std::string dumpPoints(const Points& point);
@@ -44,7 +50,7 @@ char my_tolower(char ch);
 /**
    Euclidian distance between two points
 **/
-float distance(const Point& left, const Point& right);
+floatType distance(const Point& left, const Point& right);
 
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
 std::ostream& operator<<(std::ostream& os, const Points& points);
