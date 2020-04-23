@@ -127,6 +127,12 @@ void bind_mutable_module(py::module& m) {
 
         .def_property_readonly("version", &morphio::mut::Morphology::version, "Returns the version")
 
+        .def("sanitize",
+             static_cast<void (morphio::mut::Morphology::*) ()>(
+                 &morphio::mut::Morphology::sanitize),
+             "Fixes the morphology single child sections and issues warnings"
+             "if the section starts and ends are inconsistent")
+
         .def(
             "write",
             [](morphio::mut::Morphology* morph, py::object arg) { morph->write(py::str(arg)); },
@@ -315,6 +321,7 @@ void bind_mutable_module(py::module& m) {
              "If recursive == true, all descendent will be appended as well",
              "immutable_section"_a,
              "recursive"_a = false);
+
 
     py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(m, "Section")
         .def("__str__",

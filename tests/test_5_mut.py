@@ -429,3 +429,36 @@ def test_endoplasmic_reticulum():
     assert_equal(reticulum.volumes, [2, 2])
     assert_equal(reticulum.surface_areas, [3, 3])
     assert_equal(reticulum.filament_counts, [4, 4])
+
+
+def test_sanitize():
+    m = Morphology()
+    section = m.append_root_section(PointLevel([[1, 0, 0],
+                                                [2, 0, 0]], [2, 2], [20, 20]),
+                                    SectionType.axon)
+    section.append_section(PointLevel([[2, 0, 0],
+                                       [3, 0, 0]], [2, 2], [20, 20]))
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            m.sanitize()
+            assert_equal(len(list(m.iter())), 1)
+            assert_equal(err.getvalue().strip(),
+                         'Warning: section 1 is the only child of section: 0\nIt will be merged '
+                         'with the parent section')
+
+    # Checking that sanitize() issues a warning on missing duplicate
+    m = Morphology()
+    section = m.append_root_section(PointLevel([[1, 0, 0],
+                                                [2, 0, 0]], [2, 2], [20, 20]),
+                                    SectionType.axon)
+    section.append_section(PointLevel([[2, 0, 0],
+                                       [3, 0, 0]], [2, 2], [20, 20]))
+    with captured_output() as (_, err):
+        with ostream_redirect():
+            section.append_section(PointLevel([[2, 1, 0],
+                                               [2, 0, 0]], [2, 2], [20, 20]))
+    with captured_output() as (_, err):
+        with ostream_redirect():
+            m.sanitize()
+            assert_equal(err.getvalue().strip(),
+                         'Warning: while appending section: 2 to parent: 0\nThe section first point should be parent section last point: \n        : X Y Z Diameter\nparent last point :[2.000000, 0.000000, 0.000000, 2.000000]\nchild first point :[2.000000, 1.000000, 0.000000, 2.000000]')
