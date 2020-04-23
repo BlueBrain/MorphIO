@@ -446,7 +446,7 @@ def test_sanitize():
                          'Warning: section 1 is the only child of section: 0\nIt will be merged '
                          'with the parent section')
 
-    # Checking that sanitize issue a warning on missing duplicate
+    # Checking that sanitize() issues a warning on missing duplicate
     m = Morphology()
     section = m.append_root_section(PointLevel([[1, 0, 0],
                                                 [2, 0, 0]], [2, 2], [20, 20]),
