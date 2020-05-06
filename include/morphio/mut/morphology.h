@@ -228,8 +228,6 @@ class Morphology
     std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     std::vector<std::shared_ptr<Section>> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
-    std::vector<morphio::Property::Annotation> _annotations;
-    std::vector<morphio::Property::Marker> _markers;
     Mitochondria _mitochondria;
     EndoplasmicReticulum _endoplasmicReticulum;
 
@@ -269,20 +267,20 @@ inline const EndoplasmicReticulum& Morphology::endoplasmicReticulum() const noex
     return _endoplasmicReticulum;
 }
 
-inline const std::vector<Property::Annotation>& Morphology::annotations() const noexcept {
-    return _annotations;
-}
-
-inline const std::vector<Property::Marker>& Morphology::markers() const noexcept {
-    return _markers;
-}
-
 inline const std::shared_ptr<Section>& Morphology::section(uint32_t id) const {
     return _sections.at(id);
 }
 
 inline SomaType Morphology::somaType() const noexcept {
     return _soma->type();
+}
+
+inline const std::vector<Property::Annotation>& Morphology::annotations() const noexcept {
+    return _cellProperties->_annotations;
+}
+
+inline const std::vector<Property::Marker>& Morphology::markers() const noexcept {
+    return _cellProperties->_markers;
 }
 
 inline CellFamily Morphology::cellFamily() const noexcept {
@@ -294,11 +292,11 @@ inline MorphologyVersion Morphology::version() const noexcept {
 }
 
 inline void Morphology::addAnnotation(const morphio::Property::Annotation& annotation) {
-    _annotations.push_back(annotation);
+    _cellProperties->_annotations.push_back(annotation);
 }
 
 inline void Morphology::addMarker(const morphio::Property::Marker& marker) {
-    _markers.push_back(marker);
+    _cellProperties->_markers.push_back(marker);
 }
 
 }  // namespace mut

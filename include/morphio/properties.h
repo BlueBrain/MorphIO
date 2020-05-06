@@ -154,7 +154,8 @@ struct CellLevel {
     morphio::CellFamily _cellFamily;
     SomaType _somaType;
     MorphologyVersion _version;
-    std::vector<Annotation> annotation;
+    std::vector<Annotation> _annotations;
+    std::vector<Marker> _markers;
 
     bool diff(const CellLevel& other, LogLevel logLevel) const;
     bool operator==(const CellLevel& other) const;
@@ -176,9 +177,6 @@ struct Properties {
     MitochondriaSectionLevel _mitochondriaSectionLevel;
 
     EndoplasmicReticulumLevel _endoplasmicReticulumLevel;
-
-    std::vector<Annotation> _annotations;
-    std::vector<Marker> _markers;
 
     ////////////////////////////////////////////////////////////////////////////////
     // Functions

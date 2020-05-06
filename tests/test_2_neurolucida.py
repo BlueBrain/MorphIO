@@ -566,7 +566,7 @@ def test_markers():
                                     dtype=np.float32))
 
 
-def test_pia():
+def test_markers():
     cell = Morphology(os.path.join(_path, 'pia.asc'))
 
     # The for loop tests that the various constructors keep the markers alive
