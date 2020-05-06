@@ -5,7 +5,7 @@ import numpy as np
 from morphio import Morphology, RawDataError, SomaError, ostream_redirect
 from nose import tools as nt
 from nose.tools import assert_equal, eq_, ok_
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from .utils import _test_asc_exception, assert_substring, captured_output, tmp_asc_file
 
@@ -564,3 +564,29 @@ def test_markers():
                                      [-268.17,  -130.62,   -24.75],
                                      [-266.79,  -131.77,   -26.13]],
                                     dtype=np.float32))
+
+
+def test_pia():
+    m = Morphology(os.path.join(_path, 'pia.asc'))
+    assert_equal(len(m.root_sections), 1)
+    assert_array_equal(m.root_sections[0].points,
+                       np.array([[-2.87, -9.24, -5.06],
+                                 [-2.76, -10.41, -5.13],
+                                 [-2.03, -12.48, -5.13],
+                                 [-1.62, -13.30, -5.56]], dtype=np.float32))
+
+    assert_equal(len(m.markers), 2)
+    pia = m.markers[0]
+    assert_equal(pia.label, 'pia')
+    assert_array_equal(pia.points,
+                       [[0, 1, 2],
+                        [0, 2, 2],
+                        [0, 3, 2],
+                        [0, 4, 2]])
+    assert_array_equal(pia.diameters, [3, 3, 3, 3])
+
+    assert_equal(m.markers[1].label, 'layer1-2')
+    assert_array_equal(m.markers[1].points,
+                       np.array([[983.07, 455.36, -0.19],
+                                 [1192.31, 420.35, -0.19]], dtype=np.float32))
+    assert_array_equal(m.markers[1].diameters, np.array([0.15, 0.15], dtype=np.float32))

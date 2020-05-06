@@ -155,7 +155,6 @@ class NeurolucidaLexer
         rules_.push("Axon", +Token::AXON);
         rules_.push("Apical", +Token::APICAL);
         rules_.push("Dendrite", +Token::DENDRITE);
-        // rules_.push("\\\"CellBody\\\"", +Token::CELLBODY);
         rules_.push("CellBody", +Token::CELLBODY);
 
         rules_.push("Generated", +Token::GENERATED);

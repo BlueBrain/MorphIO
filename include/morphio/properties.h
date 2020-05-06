@@ -145,6 +145,11 @@ struct Annotation {
     std::string _details;
 };
 
+struct Marker {
+    PointLevel _pointLevel;
+    std::string _label;
+};
+
 struct CellLevel {
     morphio::CellFamily _cellFamily;
     SomaType _somaType;
@@ -173,6 +178,7 @@ struct Properties {
     EndoplasmicReticulumLevel _endoplasmicReticulumLevel;
 
     std::vector<Annotation> _annotations;
+    std::vector<Marker> _markers;
 
     ////////////////////////////////////////////////////////////////////////////////
     // Functions

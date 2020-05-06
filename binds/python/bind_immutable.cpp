@@ -46,6 +46,9 @@ void bind_immutable_module(py::module& m) {
         .def_property_readonly("annotations",
                                &morphio::Morphology::annotations,
                                "Returns a list of annotations")
+        .def_property_readonly("markers",
+                               &morphio::Morphology::markers,
+                               "Returns the list of NeuroLucida markers")
         .def_property_readonly("endoplasmic_reticulum",
                                &morphio::Morphology::endoplasmicReticulum,
                                "Returns the endoplasmic reticulum object")

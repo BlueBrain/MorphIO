@@ -103,6 +103,11 @@ class Morphology
     inline const std::vector<Property::Annotation>& annotations() const noexcept;
 
     /**
+     * Return the markers from the ASC file
+     **/
+    inline const std::vector<Property::Marker>& markers() const noexcept;
+
+    /**
        Get the shared pointer for the given section
 
        Note: multiple morphologies can share the same Section instances.
@@ -186,6 +191,7 @@ class Morphology
     void write(const std::string& filename);
 
     inline void addAnnotation(const morphio::Property::Annotation& annotation);
+    inline void addMarker(const morphio::Property::Marker& marker);
 
     /**
        Return the data structure used to create read-only morphologies
@@ -223,6 +229,7 @@ class Morphology
     std::vector<std::shared_ptr<Section>> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
     std::vector<morphio::Property::Annotation> _annotations;
+    std::vector<morphio::Property::Marker> _markers;
     Mitochondria _mitochondria;
     EndoplasmicReticulum _endoplasmicReticulum;
 
@@ -266,6 +273,10 @@ inline const std::vector<Property::Annotation>& Morphology::annotations() const 
     return _annotations;
 }
 
+inline const std::vector<Property::Marker>& Morphology::markers() const noexcept {
+    return _markers;
+}
+
 inline const std::shared_ptr<Section>& Morphology::section(uint32_t id) const {
     return _sections.at(id);
 }
@@ -284,6 +295,10 @@ inline MorphologyVersion Morphology::version() const noexcept {
 
 inline void Morphology::addAnnotation(const morphio::Property::Annotation& annotation) {
     _annotations.push_back(annotation);
+}
+
+inline void Morphology::addMarker(const morphio::Property::Marker& marker) {
+    _markers.push_back(marker);
 }
 
 }  // namespace mut

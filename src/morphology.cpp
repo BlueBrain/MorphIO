@@ -77,6 +77,10 @@ const std::vector<Property::Annotation>& Morphology::annotations() const {
     return _properties->_annotations;
 }
 
+const std::vector<Property::Marker>& Morphology::markers() const {
+    return _properties->_markers;
+}
+
 Section Morphology::section(uint32_t id) const {
     return {id, _properties};
 }
