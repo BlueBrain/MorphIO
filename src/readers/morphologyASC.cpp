@@ -131,11 +131,11 @@ class NeurolucidaParser
             marker._pointLevel = properties;
             marker._label = header.label;
             nb_.addMarker(marker);
+            return_id = -1;
         } else if (header.token == Token::CELLBODY) {
             if (!nb_.soma()->points().empty())
                 throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
             nb_.soma()->properties() = properties;
-
             return_id = -1;
         } else {
             SectionType section_type = TokenSectionTypeMap.at(header.token);
