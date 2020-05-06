@@ -580,10 +580,10 @@ def test_pia():
     assert_equal(pia.label, 'pia')
     assert_array_equal(pia.points,
                        [[0, 1, 2],
-                        [0, 2, 2],
-                        [0, 3, 2],
-                        [0, 4, 2]])
-    assert_array_equal(pia.diameters, [3, 3, 3, 3])
+                        [3, 4, 5],
+                        [6, 7, 8],
+                        [9, 10, 11]])
+    assert_array_equal(pia.diameters, [3, 4, 5, 6])
 
     assert_equal(m.markers[1].label, 'layer1-2')
     assert_array_equal(m.markers[1].points,
