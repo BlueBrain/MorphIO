@@ -56,7 +56,7 @@ class NeurolucidaParser
   public:
     explicit NeurolucidaParser(const std::string& uri)
         : uri_(uri)
-        , lex_(uri, true)
+        , lex_(uri)
         , debugInfo_(uri)
         , err_(uri) {}
 
