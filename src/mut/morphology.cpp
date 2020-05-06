@@ -36,6 +36,8 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
         mitochondria().appendRootSection(root, true);
     }
 
+    this->_markers = morphology._markers;
+    this->_annotations = morphology._annotations;
     applyModifiers(options);
 }
 
@@ -47,6 +49,8 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
         morphology._properties->_cellLevel);
 
     _annotations = morphology.annotations();
+    _markers = morphology.markers();
+
     for (const morphio::Section& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }

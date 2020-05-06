@@ -567,26 +567,29 @@ def test_markers():
 
 
 def test_pia():
-    m = Morphology(os.path.join(_path, 'pia.asc'))
-    assert_equal(len(m.root_sections), 1)
-    assert_array_equal(m.root_sections[0].points,
-                       np.array([[-2.87, -9.24, -5.06],
-                                 [-2.76, -10.41, -5.13],
-                                 [-2.03, -12.48, -5.13],
-                                 [-1.62, -13.30, -5.56]], dtype=np.float32))
+    cell = Morphology(os.path.join(_path, 'pia.asc'))
 
-    assert_equal(len(m.markers), 2)
-    pia = m.markers[0]
-    assert_equal(pia.label, 'pia')
-    assert_array_equal(pia.points,
-                       [[0, 1, 2],
-                        [3, 4, 5],
-                        [6, 7, 8],
-                        [9, 10, 11]])
-    assert_array_equal(pia.diameters, [3, 4, 5, 6])
+    # The for loop tests that the various constructors keep the markers alive
+    for m in (cell, cell.as_mutable(), cell.as_mutable().as_immutable()):
+        assert_equal(len(m.root_sections), 1)
+        assert_array_equal(m.root_sections[0].points,
+                           np.array([[-2.87, -9.24, -5.06],
+                                     [-2.76, -10.41, -5.13],
+                                     [-2.03, -12.48, -5.13],
+                                     [-1.62, -13.30, -5.56]], dtype=np.float32))
 
-    assert_equal(m.markers[1].label, 'layer1-2')
-    assert_array_equal(m.markers[1].points,
-                       np.array([[983.07, 455.36, -0.19],
-                                 [1192.31, 420.35, -0.19]], dtype=np.float32))
-    assert_array_equal(m.markers[1].diameters, np.array([0.15, 0.15], dtype=np.float32))
+        assert_equal(len(m.markers), 2)
+        pia = m.markers[0]
+        assert_equal(pia.label, 'pia')
+        assert_array_equal(pia.points,
+                           [[0, 1, 2],
+                            [3, 4, 5],
+                            [6, 7, 8],
+                            [9, 10, 11]])
+        assert_array_equal(pia.diameters, [3, 4, 5, 6])
+
+        assert_equal(m.markers[1].label, 'layer1-2')
+        assert_array_equal(m.markers[1].points,
+                           np.array([[983.07, 455.36, -0.19],
+                                     [1192.31, 420.35, -0.19]], dtype=np.float32))
+        assert_array_equal(m.markers[1].diameters, np.array([0.15, 0.15], dtype=np.float32))
