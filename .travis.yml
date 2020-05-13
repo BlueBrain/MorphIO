@@ -1,6 +1,5 @@
 jobs:
   include:
-    #### LINUX #######
     - os: linux
       dist: xenial
       env:
@@ -12,15 +11,12 @@ jobs:
         CXX: clang++
         CC: clang
 
-    #### MAC OS #######
     - os: osx
       osx_image: xcode10.1
       language: generic
       env:
         CXX: clang++
         CC: clang
-
-    #### WINDOWS #######
     - os: osx
       osx_image: xcode10.1
       language: generic
