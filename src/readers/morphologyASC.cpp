@@ -47,7 +47,7 @@ bool is_end_of_section(Token id) {
 bool skip_sexp(size_t id) {
     return (id == +Token::WORD || id == +Token::COLOR || id == +Token::GENERATED ||
             id == +Token::HIGH || id == +Token::INCOMPLETE || id == +Token::LOW ||
-            id == +Token::NORMAL);
+            id == +Token::NORMAL || id == +Token::FONT);
 }
 }  // namespace
 
@@ -56,7 +56,7 @@ class NeurolucidaParser
   public:
     explicit NeurolucidaParser(const std::string& uri)
         : uri_(uri)
-        , lex_(uri)
+        , lex_(uri, false)
         , debugInfo_(uri)
         , err_(uri) {}
 
@@ -213,13 +213,17 @@ class NeurolucidaParser
         Header header;
 
         while (true) {
-            const auto id = static_cast<Token>(lex_.current()->id);
+            const Token id = static_cast<Token>(lex_.current()->id);
             const size_t peek_id = lex_.peek()->id;
 
             if (is_eof(id)) {
                 throw RawDataError(err_.ERROR_EOF_IN_NEURITE(lex_.line_num()));
             } else if (id == Token::WORD) {
                 lex_.consume();
+            } else if (id == Token::IMAGECOORDS) {
+                lex_.consume_until(Token::RPAREN);
+                lex_.consume(Token::RPAREN);
+                lex_.consume(Token::LPAREN);
             } else if (id == Token::STRING) {
                 header.label = lex_.current()->str();
                 // Get rid of quotes
@@ -231,6 +235,8 @@ class NeurolucidaParser
                 if (skip_sexp(peek_id)) {
                     // skip words/strings/markers
                     lex_.consume_until_balanced_paren();
+                    if (peek_id == +Token::FONT)
+                        lex_.consume_until_balanced_paren();
                 } else if (is_neurite_type(static_cast<Token>(peek_id))) {
                     header.token = static_cast<Token>(peek_id);
                     lex_.consume();  // Advance to NeuriteType

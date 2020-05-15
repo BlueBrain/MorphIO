@@ -11,6 +11,9 @@ from .utils import _test_asc_exception, assert_substring, captured_output, tmp_a
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
+NEUROLUCIDA_MARKERS = ['Dot', 'FilledCircle', 'SnowFlake', 'Asterisk', 'OpenCircle',
+                       'OpenStar', 'Flower', 'OpenSquare', 'FilledStar', 'DoubleCircle']
+
 
 def test_soma():
     with tmp_asc_file('''("CellBody"
@@ -566,7 +569,7 @@ def test_markers():
                                     dtype=np.float32))
 
 
-def test_markers():
+def test_string_markers():
     cell = Morphology(os.path.join(_path, 'pia.asc'))
 
     # The for loop tests that the various constructors keep the markers alive
@@ -593,3 +596,77 @@ def test_markers():
                            np.array([[983.07, 455.36, -0.19],
                                      [1192.31, 420.35, -0.19]], dtype=np.float32))
         assert_array_equal(m.markers[1].diameters, np.array([0.15, 0.15], dtype=np.float32))
+
+def test_neurolucida_markers():
+    SIMPLE = Morphology(os.path.join(_path, 'simple.asc'))
+    for marker in NEUROLUCIDA_MARKERS:
+        with tmp_asc_file(f'''
+({marker}
+  (Color White)
+  (Name "fat end")
+  (   81.58   -77.98   -20.32     0.50)  ; 1
+)  ;  End of markers
+
+("CellBody"
+ (Color Red)
+ (CellBody)
+ (0 0 0 2)
+ )
+
+
+({marker}
+  (Color White)
+  (Name "fat end")
+  (   51.58   -77.78   -24.32     0.52)  ; 1
+)  ;  End of markers
+
+ ((Dendrite)
+  (0 0 0 2)
+  (0 5 0 2)
+  (
+   (-5 5 0 3)
+   |
+   (6 5 0 3)
+   )
+  )
+
+
+ ((Axon)
+  (0 0 0 2)
+  (0 -4 0 2)
+  (
+   (6 -4 0 4)
+   |
+   (-5 -4 0 4)
+   )
+  )
+                         )''') as tmp_file:
+            neuron = Morphology(tmp_file.name)
+
+        assert_array_equal(neuron.points, SIMPLE.points)
+        assert_equal(len(neuron.markers), 2)
+        assert_array_almost_equal(neuron.markers[0].points,
+                                  np.array([[81.58, -77.98, -20.32]], dtype=np.float32))
+        assert_array_almost_equal(neuron.markers[0].diameters,
+                                  np.array([0.5], dtype=np.float32))
+        assert_array_almost_equal(neuron.markers[1].points,
+                                  np.array([[51.580002, -77.779999, -24.32]],
+                                           dtype=np.float32))
+        assert_array_almost_equal(neuron.markers[1].diameters,
+                                  np.array([0.52], dtype=np.float32))
+
+def test_skip_font():
+    assert_array_equal(Morphology(os.path.join(_path, 'simple-with-font.asc')).points,
+                       Morphology(os.path.join(_path, 'simple.asc')).points)
+
+def test_skip_font():
+    assert_array_equal(Morphology(os.path.join(_path, 'simple-with-font.asc')).points,
+                       Morphology(os.path.join(_path, 'simple.asc')).points)
+
+def test_skip_imagecoord():
+    assert_array_equal(Morphology(os.path.join(_path, 'simple-with-image-coord.asc')).points,
+                       Morphology(os.path.join(_path, 'simple.asc')).points)
+
+def test_skip_imagecoord():
+    assert_array_equal(Morphology(os.path.join(_path, 'simple-with-image-coord.asc')).points,
+                       Morphology(os.path.join(_path, 'simple.asc')).points)

@@ -32,6 +32,8 @@ enum class Token {
 
     // Special WORDS
     COLOR = 101,
+    FONT,
+    IMAGECOORDS,
     RGB,
 
     // end of branch weirdness
@@ -77,6 +79,8 @@ inline std::string to_string(Token t) {
         T(DENDRITE)
         T(CELLBODY)
         T(COLOR)
+        T(FONT)
+        T(IMAGECOORDS)
         T(RGB)
         T(GENERATED)
         T(HIGH)
@@ -151,12 +155,14 @@ class NeurolucidaLexer
         rules_.push("\\|", +Token::PIPE);
 
         rules_.push("Color", +Token::COLOR);
+        rules_.push("Font", +Token::FONT);
 
         rules_.push("Axon", +Token::AXON);
         rules_.push("Apical", +Token::APICAL);
         rules_.push("Dendrite", +Token::DENDRITE);
         rules_.push("CellBody", +Token::CELLBODY);
 
+        rules_.push("ImageCoords", +Token::IMAGECOORDS);
         rules_.push("Generated", +Token::GENERATED);
         rules_.push("High", +Token::HIGH);
         rules_.push("Incomplete", +Token::INCOMPLETE);
@@ -251,6 +257,11 @@ class NeurolucidaLexer
             throw RawDataError(
                 err_.ERROR_UNEXPECTED_TOKEN(line_num(), to_string(t), current()->str(), msg));
         }
+    }
+
+    void consume_until(Token endpoint) {
+        while (consume()->id != +endpoint)
+            ;
     }
 
     // advance iterator until sexp is consumed, including final paren
