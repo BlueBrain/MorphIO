@@ -70,16 +70,19 @@ set_target_properties(morphio_obj
   CXX_EXTENSIONS NO
   )
 
-target_compile_options(morphio_obj
-  PRIVATE
-  -Wall
-  -Wextra
-  -Wnon-virtual-dtor
-  -pedantic
-  )
+if (NOT WIN32)
+  target_compile_options(morphio_obj
+    PRIVATE
+    -Wall
+    -Wextra
+    -Wnon-virtual-dtor
+    -pedantic
+    )
+endif()
 
 add_library(morphio_static STATIC $<TARGET_OBJECTS:morphio_obj>)
 add_library(morphio_shared SHARED $<TARGET_OBJECTS:morphio_obj>)
+
 set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio"
                                                 EXPORT_NAME "morphio")
 

@@ -4,21 +4,22 @@ set -euxo pipefail
 
 VENV=env
 
-rm -rf "$VENV"
-python3 -mvenv "$VENV"
+if [[ "$OSTYPE" != "msys" ]]; then
+    rm -rf "$VENV"
+    python3 -mvenv "$VENV"
 
-set +u  # ignore errors in virtualenv's activate
-source "$VENV/bin/activate"
-set -u
+    set +u  # ignore errors in virtualenv's activate
+    source "$VENV/bin/activate"
+    set -u
 
-which pip
+    which pip
 
-pip install --upgrade pip setuptools
+    pip install --upgrade pip setuptools
+fi
 
-# install
-pip install -vvv .
-
+pip install .
 pip install -r tests/requirement_tests.txt
+
 CURRENT=$(pwd)
 
 cd ..

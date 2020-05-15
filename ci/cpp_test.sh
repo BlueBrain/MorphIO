@@ -7,7 +7,7 @@ set -euxo pipefail
 
 rm -rf build
 mkdir build
-cd build
-cmake .. -DMorphIO_CXX_WARNINGS=ON
-make -j2
-make test
+pushd build
+cmake -DMorphIO_CXX_WARNINGS=ON -G "${CMAKE_GENERATOR:-Unix Makefiles}" ..
+cmake --build .
+popd

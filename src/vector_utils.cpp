@@ -3,6 +3,7 @@
 #include <numeric>    // std::accumulate
 #include <sstream>    // std::stringstream
 #include <string>     // std::string
+#include <cctype>     // std::tolower
 
 #include <morphio/types.h>
 

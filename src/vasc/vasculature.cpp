@@ -1,5 +1,10 @@
 #include <cstdint>   // uint32_t
+#if defined(WIN32) || defined(__WIN32__) || defined(_WIN32) || defined(_MSC_VER) || defined(__MINGW32__)
+#define F_OK    0
+#include <io.h>
+#else
 #include <unistd.h>  // access / F_OK
+#endif
 
 #include <morphio/vasc/section.h>
 #include <morphio/vasc/vasculature.h>

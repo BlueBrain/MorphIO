@@ -13,7 +13,7 @@ set_target_properties(unittests
   )
 
 target_link_libraries(unittests
-    PRIVATE morphio_shared HighFive
+    PRIVATE morphio_static HighFive
 )
 
 add_test(NAME unittests

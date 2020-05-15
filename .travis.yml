@@ -24,6 +24,19 @@ jobs:
         CXX: g++
         CC: gcc
 
+    - os: windows
+      language: c++
+      env:
+        - MINCONDA_VERSION="latest"
+        - CMAKE_GENERATOR="Visual Studio 15 2017 Win64"
+        - TESTS_TARGET="RUN_TESTS";
+      install:
+        - choco install --yes miniconda3
+        - source C:/Tools/miniconda3/Scripts/activate
+        - conda config --set always_yes yes --set changeps1 no
+        - conda update -q conda
+        - conda install -c conda-forge hdf5
+
 addons:
   homebrew:
     packages:
@@ -31,7 +44,6 @@ addons:
   apt:
     packages:
     - libhdf5-dev
-
 
 cache:
   directories:
@@ -42,6 +54,7 @@ python:
   - 3.7
 
 install: skip
+
 script:
   - ./ci/python_test.sh
   - ./ci/cpp_test.sh

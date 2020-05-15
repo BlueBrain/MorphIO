@@ -35,9 +35,11 @@ def ignored_warning(warning):
 
 @contextmanager
 def _tmp_file(content, extension):
-    with tempfile.NamedTemporaryFile(suffix='.' + extension, mode='w') as tmp_file:
+    with tempfile.NamedTemporaryFile(suffix='.' + extension, mode='w', delete=False) as tmp_file:
         tmp_file.write(content)
         tmp_file.seek(0)
+        tmp_file.close()
+
         yield tmp_file
 
 

@@ -71,9 +71,8 @@ class CMakeBuild(build_ext):
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(
                 cfg.upper(),
                 extdir)]
-            if sys.maxsize > 2**32:
-                cmake_args += ['-A', 'x64']
-            build_args += ['--', '/m']
+            cmake_args += ['-G', os.getenv('MORPHIO_CMAKE_GENERATOR',
+                                           "Visual Studio 15 2017 Win64")]
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
                            '-DMorphIO_CXX_WARNINGS=OFF',
