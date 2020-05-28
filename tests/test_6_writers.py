@@ -2,7 +2,6 @@ import os
 import numpy as np
 from numpy.testing import assert_array_equal, assert_equal, assert_raises
 from nose.tools import ok_
-import h5py
 from pathlib2 import Path
 
 from morphio.mut import Morphology
@@ -75,6 +74,7 @@ def test_write_basic():
         assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.swc")).points, expected)
         assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")).points, expected)
 
+        import h5py
         with h5py.File(h5_out, 'r') as h5_file:
             ok_('/perimeters' not in h5_file.keys())
 
