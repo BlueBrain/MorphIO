@@ -135,7 +135,7 @@ class Morphology
     /**
        Delete the given section
 
-       Will silently fail if the section id is not part of the tree
+       Will silently fail if the section is not part of the tree
 
        If recursive == true, all descendent sections will be deleted as well
        Else, children will be re-attached to their grand-parent

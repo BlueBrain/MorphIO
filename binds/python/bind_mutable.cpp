@@ -100,13 +100,13 @@ void bind_mutable_module(py::module& m) {
              &morphio::mut::Morphology::deleteSection,
              "Delete the given section\n"
              "\n"
-             "Will silently fail if the section id is not part of the "
+             "Will silently fail if the section is not part of the "
              "tree\n"
              "\n"
              "If recursive == true, all descendent sections will be "
              "deleted as well\n"
              "Else, children will be re-attached to their grand-parent",
-             "section_id"_a,
+             "section"_a,
              "recursive"_a = true)
 
         .def("as_immutable",
