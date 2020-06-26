@@ -28,6 +28,8 @@ environment:
     #   HDF5_VERSION: "1.10.1"
 
 install:
+  - git submodule update --init --recursive
+
   # We need wheel installed to build wheels
   - "%PYTHON%\\python.exe -m pip install --upgrade wheel pip setuptools"
   - "py -3.6 -m pip install --upgrade wheel pip setuptools virtualenv"
