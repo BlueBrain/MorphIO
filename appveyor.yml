@@ -10,10 +10,10 @@ environment:
 
     - PYTHON: "C:\\Python36"
       TOXENV: "py36-test-deps"
-      HDF5_VSVERSION: "14"
+      HDF5_VSVERSION: "14-64"
       HDF5_DIR: "C:\\hdf5\\%HDF5_VERSION%\\%HDF5_VSVERSION%"
       HDF5_VERSION: "1.10.1"
-      MORPHIO_CMAKE_GENERATOR: "Visual Studio 14 2015"
+      MORPHIO_CMAKE_GENERATOR: "Visual Studio 14 2015 Win64"
 
     # - PYTHON: "C:\\Python37"
     #   TOXENV: "py37-test-deps"
