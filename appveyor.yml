@@ -36,6 +36,8 @@ install:
   - "py -3.6 -m pip install --upgrade wheel pip setuptools virtualenv"
   - "py -3.6 -m pip install requests"
   - "py -3.6 ci\\appveyor\\get_hdf5.py"
+  - set LIBRARY_PATH=%HDF5_DIR%\lib
+  - SET PATH=%HDF5_DIR%\lib;%PATH%
   - "py -3.6 -m pip install -vvv ."
 
 build: off
@@ -50,8 +52,6 @@ test_script:
   # to put the Python evrsion you want to use on PATH.
   - "py -3.6 -m pip install -r tests/requirement_tests.txt"
   - "cd .."
-  - set LIBRARY_PATH=%HDF5_DIR%\lib
-  - SET PATH=%HDF5_DIR%\lib;%PATH%
   - "py -3.6 -m nose morphio/tests"
 
 # This is commented out as there's no easy way to deal with numpy dropping
