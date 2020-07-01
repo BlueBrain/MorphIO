@@ -39,6 +39,7 @@ install:
   - set LIBRARY_PATH=%HDF5_DIR%\lib
   - SET PATH=%HDF5_DIR%\lib;%PATH%
   - set HDF5_INCLUDE_DIRS=%HDF5_DIR%\include
+  - SET HDF5_INCLUDE_DIRS=%HDF5_DIR%\include
   - "py -3.6 -m pip install -vvv ."
 
 build: off
