@@ -328,11 +328,9 @@ int MorphologyHDF5::_readSections() {
         return firstSectionOffset;
     }
 
-    auto selection = _sections->select({0, 0}, {_sectionsDims[0], 2}, {1, 2});
-
     std::vector<std::vector<int>> vec;
     vec.resize(_sectionsDims[0]);
-    selection.read(vec);
+    _sections->read(vec); 
 
     if (vec.size() < 2)  // Neuron without any neurites
         return -1;
@@ -346,7 +344,7 @@ int MorphologyHDF5::_readSections() {
             skipFirst = false;
             continue;
         }
-        sections.emplace_back(Property::Section::Type{p[0] - firstSectionOffset, p[1] - 1});
+        sections.emplace_back(Property::Section::Type{p[0] - firstSectionOffset, p[2] - 1});
     }
 
     return firstSectionOffset;
@@ -383,16 +381,22 @@ void MorphologyHDF5::_readSectionTypes() {
         return;
     }
 
-    auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
+    std::vector<std::vector<int>> vec;
+    vec.resize(_sectionsDims[0]);
+    _sections->read(vec);
     types.resize(_sectionsDims[0]);
-    selection.read(types);
-    types.erase(types.begin());  // remove soma type
-    for (int type : types) {
+    for (const auto &v : vec) {
+        const auto type = v[1];
+
         if (type > SECTION_CUSTOM_START || type < 0) {
             throw morphio::RawDataError(
                 _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type)));
         }
+
+        types.push_back(static_cast<SectionType>(type));
     }
+
+    types.erase(types.begin());  // remove soma type
 }
 
 
