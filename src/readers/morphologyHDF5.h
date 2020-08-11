@@ -35,7 +35,8 @@ class MorphologyHDF5
     HighFive::DataSet _getStructureDataSet(size_t nSections);
     void _readPoints(int);
     int _readSections();
-    void _readSectionTypes();
+    int _readV1Sections();
+    int _readV2Sections();
     void _readPerimeters(int);
     void _readMitochondria();
     void _readEndoplasmicReticulum();
