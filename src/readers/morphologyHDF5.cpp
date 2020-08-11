@@ -275,8 +275,8 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
 }
 
 inline int MorphologyHDF5::_readSections() {
-    return (_properties.version() == MORPHOLOGY_VERSION_H5_2) ?
-            _readV2Sections() : _readV1Sections();
+    return (_properties.version() == MORPHOLOGY_VERSION_H5_2) ? _readV2Sections()
+                                                              : _readV1Sections();
 }
 
 int MorphologyHDF5::_readV1Sections() {
@@ -292,7 +292,7 @@ int MorphologyHDF5::_readV1Sections() {
     int firstSectionOffset = vec[1][0];
     sections.reserve(sections.size() + vec.size() - 1);
     types.reserve(vec.size() - 1);  // remove soma type
-    
+
     for (size_t i = 1; i < vec.size(); ++i) {
         const auto& p = vec[i];
         const auto& type = p[1];
@@ -301,11 +301,11 @@ int MorphologyHDF5::_readV1Sections() {
             throw morphio::RawDataError(
                 _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type)));
         }
-        
+
         sections.emplace_back(Property::Section::Type{p[0] - firstSectionOffset, p[2] - 1});
         types.emplace_back(static_cast<SectionType>(type));
     }
-    
+
     return firstSectionOffset;
 }
 
@@ -326,16 +326,16 @@ int MorphologyHDF5::_readV2Sections() {
                     return _group.getDataSet(raw_path);
                 } catch (HighFive::DataSetException&) {
                     throw(MorphioError("Could not find unraveled structure neither at " + path +
-                                        " or " + raw_path + " for dataset for morphology '" +
-                                        _uri + "' repair stage " + _stage));
+                                       " or " + raw_path + " for dataset for morphology '" + _uri +
+                                       "' repair stage " + _stage));
                 }
             } else {
-                throw(MorphioError("Could not open " + path + " dataset for morphology '" +
-                                    _uri + "' repair stage " + _stage));
+                throw(MorphioError("Could not open " + path + " dataset for morphology '" + _uri +
+                                   "' repair stage " + _stage));
             }
         }
     }();
-    
+
     auto dataset_types = [this]() {
         std::string path = "/" + _g_root + "/" + _g_structure + "/" + _d_type;
         try {
@@ -351,7 +351,7 @@ int MorphologyHDF5::_readV2Sections() {
 
     if (dims.size() != 2 || dims[1] != _structureV2Columns) {
         throw(MorphioError("Error reading morphologies " + _uri +
-                            " bad number of dimensions in 'structure' dataspace"));
+                           " bad number of dimensions in 'structure' dataspace"));
     }
 
     std::vector<std::vector<int>> vec;
