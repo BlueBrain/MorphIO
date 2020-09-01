@@ -295,10 +295,10 @@ int MorphologyHDF5::_readV1Sections() {
 
     // The first contains soma related value so it is skipped
     for (size_t i = 1; i < vec.size(); ++i) {
-        const auto& p = vec[i];
-        const auto& type = p[1];
+        const int& p = vec[i];
+        const int& type = p[1];
 
-        if (type > static_cast<int>(SECTION_CUSTOM_START) || type < 0) {
+        if (type > SECTION_CUSTOM_START || type < 0) {
             throw morphio::RawDataError(
                 _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type)));
         }
@@ -364,10 +364,10 @@ int MorphologyHDF5::_readV2Sections() {
 
     // The first contains soma related value so it is skipped
     for (size_t i = 1; i < vec.size(); ++i) {
-        const auto& p = vec[i];
-        const auto& type = types[i];
+        const int& p = vec[i];
+        const int& type = types[i];
 
-        if (type > static_cast<int>(SECTION_CUSTOM_START) || type < 0) {
+        if (type > SECTION_CUSTOM_START || type < 0) {
             throw morphio::RawDataError(
                 _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type)));
         }
