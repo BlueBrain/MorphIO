@@ -292,7 +292,7 @@ int MorphologyHDF5::_readV1Sections() {
     int firstSectionOffset = vec[1][0];
     sections.reserve(sections.size() + vec.size() - 1);
     types.reserve(vec.size() - 1);  // remove soma type
-
+    // The first contains soma related value so it is skipped
     for (size_t i = 1; i < vec.size(); ++i) {
         const auto& p = vec[i];
         const auto& type = p[1];
