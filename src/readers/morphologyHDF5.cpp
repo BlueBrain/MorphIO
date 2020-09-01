@@ -297,7 +297,7 @@ int MorphologyHDF5::_readV1Sections() {
         const auto& p = vec[i];
         const auto& type = p[1];
 
-        if (type > SECTION_CUSTOM_START || type < 0) {
+        if (type > static_cast<int>(SECTION_CUSTOM_START) || type < 0) {
             throw morphio::RawDataError(
                 _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type)));
         }
@@ -365,7 +365,7 @@ int MorphologyHDF5::_readV2Sections() {
         const auto& p = vec[i];
         const auto& type = types[i];
 
-        if (type > SECTION_CUSTOM_START || type < 0) {
+        if (type > static_cast<int>(SECTION_CUSTOM_START) || type < 0) {
             throw morphio::RawDataError(
                 _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type)));
         }
