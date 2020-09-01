@@ -46,8 +46,13 @@ def test_v1():
 
 
 def test_wrong_section_type():
-    assert_raises(RawDataError, Morphology, os.path.join(H5V1_PATH, 'simple-broken-section-type.h5'))
+    with assert_raises(RawDataError) as cm:
+        Morphology(os.path.join(H5V1_PATH, 'simple-broken-section-type.h5'))
+    assert_equal(str(cm.exception).strip(), 'Unsupported section type: 9')
 
+    with assert_raises(RawDataError) as cm:
+        Morphology(os.path.join(H5V1_PATH, 'simple-negative-section-type.h5'))
+    assert_equal(str(cm.exception).strip(), 'Unsupported section type: -2')
 
 def test_v2():
     n = Morphology(os.path.join(H5V2_PATH, 'Neuron.h5'))
