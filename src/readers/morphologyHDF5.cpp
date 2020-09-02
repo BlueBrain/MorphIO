@@ -87,7 +87,6 @@ Property::Properties MorphologyHDF5::load() {
     _selectRepairStage();
     int firstSectionOffset = _readSections();
     _readPoints(firstSectionOffset);
-    _readSectionTypes();
     _readPerimeters(firstSectionOffset);
     _readMitochondria();
     _readEndoplasmicReticulum();
@@ -275,126 +274,117 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     }
 }
 
-int MorphologyHDF5::_readSections() {
+inline int MorphologyHDF5::_readSections() {
+    return (_properties.version() == MORPHOLOGY_VERSION_H5_2) ? _readV2Sections()
+                                                              : _readV1Sections();
+}
+
+int MorphologyHDF5::_readV1Sections() {
     auto& sections = _properties.get<Property::Section>();
+    auto& types = _properties.get<Property::SectionType>();
 
-    if (_properties.version() == MORPHOLOGY_VERSION_H5_2) {
-        // fixes BBPSDK-295 by restoring old BBPSDK 0.13 implementation
-        HighFive::SilenceHDF5 silence;
-        auto dataset = [this]() {
-            std::string path = "/" + _g_root + "/" + _g_structure + "/" + _stage;
-            try {
-                return _group.getDataSet(path);
-            } catch (HighFive::DataSetException&) {
-                if (_stage == "unraveled") {
-                    std::string raw_path = "/" + _g_root + "/" + _g_structure + "/raw";
-                    try {
-                        return _group.getDataSet(raw_path);
-                    } catch (HighFive::DataSetException&) {
-                        throw(MorphioError("Could not find unraveled structure neither at " + path +
-                                           " or " + raw_path + " for dataset for morphology '" +
-                                           _uri + "' repair stage " + _stage));
-                    }
-                } else {
-                    throw(MorphioError("Could not open " + path + " dataset for morphology '" +
-                                       _uri + "' repair stage " + _stage));
-                }
-            }
-        }();
-
-        _sections.reset(new HighFive::DataSet(dataset));
-
-        const auto dims = dataset.getSpace().getDimensions();
-
-        if (dims.size() != 2 || dims[1] != _structureV2Columns) {
-            throw(MorphioError("Error reading morphologies " + _uri +
-                               " bad number of dimensions in 'structure' dataspace"));
-        }
-
-        std::vector<std::vector<int>> vec;
-        vec.resize(dims[0] - 1);
-        dataset.read(vec);
-        int firstSectionOffset = vec[1][0];
-        sections.reserve(sections.size() + vec.size() - 1);
-        bool skipFirst = true;
-        for (const auto& p : vec) {
-            if (skipFirst) {
-                skipFirst = false;
-                continue;
-            }
-            sections.emplace_back(Property::Section::Type{p[0] - firstSectionOffset, p[1] - 1});
-        }
-
-        return firstSectionOffset;
-    }
-
-    auto selection = _sections->select({0, 0}, {_sectionsDims[0], 2}, {1, 2});
+    // Important: The code used to split the reading of the sections and types
+    //            into two separate fine-grained H5 selections. This does not
+    //            reduce the number of I/O operations, but increases them by
+    //            forcing HDF5 + MPI-IO to read in 4-byte groups. Thus, we now
+    //            read the whole dataset at once, and split it in memory.
 
     std::vector<std::vector<int>> vec;
-    vec.resize(_sectionsDims[0]);
-    selection.read(vec);
+    _sections->read(vec); 
 
     if (vec.size() < 2)  // Neuron without any neurites
         return -1;
 
     int firstSectionOffset = vec[1][0];
-
     sections.reserve(sections.size() + vec.size() - 1);
-    bool skipFirst = true;  // Skipping soma section
-    for (const auto& p : vec) {
-        if (skipFirst) {
-            skipFirst = false;
-            continue;
+    types.reserve(vec.size() - 1);  // remove soma type
+
+    // The first contains soma related value so it is skipped
+    for (size_t i = 1; i < vec.size(); ++i) {
+        const auto& p = vec[i];
+        const int& type = p[1];  // Explicit int for Clang (<0 comparison)
+
+        if (type > SECTION_CUSTOM_START || type < 0) {
+            throw morphio::RawDataError(
+                _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type)));
         }
-        sections.emplace_back(Property::Section::Type{p[0] - firstSectionOffset, p[1] - 1});
+
+        sections.emplace_back(Property::Section::Type{p[0] - firstSectionOffset, p[2] - 1});
+        types.emplace_back(static_cast<SectionType>(type));
     }
 
     return firstSectionOffset;
 }
 
-void MorphologyHDF5::_readSectionTypes() {
+int MorphologyHDF5::_readV2Sections() {
+    auto& sections = _properties.get<Property::Section>();
     auto& types = _properties.get<Property::SectionType>();
 
-    if (_properties.version() == MORPHOLOGY_VERSION_H5_2) {
-        auto dataset = [this]() {
-            std::string path = "/" + _g_root + "/" + _g_structure + "/" + _d_type;
-            try {
-                return _group.getDataSet(path);
-            } catch (HighFive::DataSetException&) {
-                throw(MorphioError("Could not open " + path + " dataset for morphology: " + _uri));
-            }
-        }();
-
-        const auto dims = dataset.getSpace().getDimensions();
-        if (dims.size() != 2 || dims[1] != 1) {
-            throw(MorphioError("Error reading morhologies: " + _uri +
-                               " bad number of dimensions in 'sectiontype' dataspace"));
-        }
-
-        types.resize(dims[0]);
-        dataset.read(types);
-        types.erase(types.begin());  // remove soma type
-        for (int type : types) {
-            if (type > SECTION_CUSTOM_START || type < 0) {
-                throw morphio::RawDataError(
-                    _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type)));
+    // fixes BBPSDK-295 by restoring old BBPSDK 0.13 implementation
+    HighFive::SilenceHDF5 silence;
+    auto dataset = [this]() {
+        std::string path = "/" + _g_root + "/" + _g_structure + "/" + _stage;
+        try {
+            return _group.getDataSet(path);
+        } catch (HighFive::DataSetException&) {
+            if (_stage == "unraveled") {
+                std::string raw_path = "/" + _g_root + "/" + _g_structure + "/raw";
+                try {
+                    return _group.getDataSet(raw_path);
+                } catch (HighFive::DataSetException&) {
+                    throw(MorphioError("Could not find unraveled structure neither at " + path +
+                                       " or " + raw_path + " for dataset for morphology '" + _uri +
+                                       "' repair stage " + _stage));
+                }
+            } else {
+                throw(MorphioError("Could not open " + path + " dataset for morphology '" + _uri +
+                                   "' repair stage " + _stage));
             }
         }
-        return;
+    }();
+
+    auto dataset_types = [this]() {
+        std::string path = "/" + _g_root + "/" + _g_structure + "/" + _d_type;
+        try {
+            return _group.getDataSet(path);
+        } catch (HighFive::DataSetException&) {
+            throw(MorphioError("Could not open " + path + " dataset for morphology: " + _uri));
+        }
+    }();
+
+    _sections.reset(new HighFive::DataSet(dataset));
+
+    const auto dims = dataset.getSpace().getDimensions();
+
+    if (dims.size() != 2 || dims[1] != _structureV2Columns) {
+        throw(MorphioError("Error reading morphologies " + _uri +
+                           " bad number of dimensions in 'structure' dataspace"));
     }
 
-    auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
-    types.resize(_sectionsDims[0]);
-    selection.read(types);
-    types.erase(types.begin());  // remove soma type
-    for (int type : types) {
+    std::vector<std::vector<int>> vec;
+    dataset.read(vec);
+    dataset_types.read(types);
+
+    int firstSectionOffset = vec[1][0];
+    sections.reserve(sections.size() + vec.size() - 1);
+
+    // The first contains soma related value so it is skipped
+    for (size_t i = 1; i < vec.size(); ++i) {
+        const auto& p = vec[i];
+        const int& type = types[i];  // Explicit int for Clang (<0 comparison)
+
         if (type > SECTION_CUSTOM_START || type < 0) {
             throw morphio::RawDataError(
                 _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type)));
         }
-    }
-}
 
+        sections.emplace_back(Property::Section::Type{p[0] - firstSectionOffset, p[1] - 1});
+    }
+
+    types.erase(types.begin());  // remove soma type
+
+    return firstSectionOffset;
+}
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
     if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1 || !v2HasNeurites(firstSectionOffset))
