@@ -283,6 +283,12 @@ int MorphologyHDF5::_readV1Sections() {
     auto& sections = _properties.get<Property::Section>();
     auto& types = _properties.get<Property::SectionType>();
 
+    // Important: The code used to split the reading of the sections and types
+    //            into two separate fine-grained H5 selections. This does not
+    //            reduce the number of I/O operations, but increases them by
+    //            forcing HDF5 + MPI-IO to read in 4-byte groups. Thus, we now
+    //            read the whole dataset at once, and split it in memory.
+
     std::vector<std::vector<int>> vec;
     _sections->read(vec); 
 
@@ -296,7 +302,7 @@ int MorphologyHDF5::_readV1Sections() {
     // The first contains soma related value so it is skipped
     for (size_t i = 1; i < vec.size(); ++i) {
         const auto& p = vec[i];
-        const int& type = p[1];
+        const int& type = p[1]; // Explicit int for CMake (<0 comparison)
 
         if (type > SECTION_CUSTOM_START || type < 0) {
             throw morphio::RawDataError(
@@ -365,7 +371,7 @@ int MorphologyHDF5::_readV2Sections() {
     // The first contains soma related value so it is skipped
     for (size_t i = 1; i < vec.size(); ++i) {
         const auto& p = vec[i];
-        const int& type = types[i];
+        const int& type = types[i]; // Explicit int for CMake (<0 comparison)
 
         if (type > SECTION_CUSTOM_START || type < 0) {
             throw morphio::RawDataError(
