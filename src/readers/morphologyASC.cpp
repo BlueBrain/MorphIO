@@ -42,10 +42,10 @@ bool skip_sexp(size_t id) {
 class NeurolucidaParser
 {
   public:
-    explicit NeurolucidaParser(const std::string& input, const std::string& uri)
+    explicit NeurolucidaParser(const std::string&& input, const std::string& uri)
         : uri_(uri)
         , lex_(uri)
-        , input_(std::move(input))
+        , input_(input)
         , debugInfo_(uri)
         , err_(uri) {}
 
@@ -255,8 +255,8 @@ class NeurolucidaParser
     ErrorMessages err_;
 };
 
-Property::Properties load(const std::string& input, const std::string& uri, unsigned int options) {
-    NeurolucidaParser parser(input, uri);
+Property::Properties load(const std::string&& input, const std::string& uri, unsigned int options) {
+    NeurolucidaParser parser(std::move(input), uri);
 
     morphio::mut::Morphology& nb_ = parser.parse();
     nb_.sanitize(parser.debugInfo_);

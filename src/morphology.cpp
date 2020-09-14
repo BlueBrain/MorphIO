@@ -230,7 +230,7 @@ Property::Properties loadURI(const std::string& source, unsigned int options) {
             std::string input((std::istreambuf_iterator<char>(ifs)),
                               (std::istreambuf_iterator<char>()));
 
-            return readers::asc::load(input, source, options);
+            return readers::asc::load(std::move(input), source, options);
         }
         if (extension == ".swc" || extension == ".SWC")
             return readers::swc::load(source, options);
