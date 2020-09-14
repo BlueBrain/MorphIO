@@ -7,6 +7,7 @@
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/enums.h>
 #include <morphio/mut/morphology.h>
+#include <morphio/mut/writers.h>
 #include <morphio/soma.h>
 #include <morphio/types.h>
 
@@ -143,7 +144,32 @@ void bind_immutable_module(py::module& m) {
             "can be passed:\n"
             "- morphio.IterType.depth_first (default)\n"
             "- morphio.IterType.breadth_first (default)\n"
-            "iter_type"_a = IterType::DEPTH_FIRST);
+            "iter_type"_a = IterType::DEPTH_FIRST)
+
+        // Make class picklable
+        .def(py::pickle(
+            [](const morphio::Morphology& morphology) {  // __getstate__
+                // Return a tuple that fully encodes the state of the object
+                if (!morphio::mut::writer::_shouldBeWritten(morphology))
+                    return py::make_tuple("");
+                std::ostringstream oss;
+                morphio::mut::writer::_asc_to_stream(morphology, oss);
+
+                return py::make_tuple(oss.str());
+            },
+            [](py::tuple t) {  // __setstate__
+                if (t.size() != 1)
+                    throw std::runtime_error("Invalid state!");
+
+                auto str = t[0].cast<std::string>();
+
+                if (str.empty())
+                    return morphio::Morphology(morphio::mut::Morphology());
+
+                /* Create a new C++ instance */
+                const std::stringstream ss(str);
+                return morphio::Morphology(ss);
+            }));
 
 
     py::class_<morphio::Mitochondria>(

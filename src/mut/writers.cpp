@@ -134,7 +134,7 @@ void swc(const Morphology& morphology, const std::string& filename) {
     }
 }
 
-static void _write_asc_points(std::ofstream& myfile,
+static void _write_asc_points(std::ostream& myfile,
                               const Points& points,
                               const std::vector<float>& diameters,
                               size_t indentLevel) {
@@ -145,7 +145,7 @@ static void _write_asc_points(std::ofstream& myfile,
     }
 }
 
-static void _write_asc_section(std::ofstream& myfile,
+static void _write_asc_section(std::ostream& myfile,
                                const Morphology& morpho,
                                const std::shared_ptr<Section>& section,
                                size_t indentLevel) {
@@ -163,20 +163,26 @@ static void _write_asc_section(std::ofstream& myfile,
     }
 }
 
-void asc(const Morphology& morphology, const std::string& filename) {
+/*
+ * Returns true if the morphology satisfies requirements to be written to disk in ASC format
+ * Returns false if the morphology is empty
+ * Raises if the morphology has perimeter data
+ */
+bool _shouldBeWritten(const Morphology& morphology) {
     const auto& soma = morphology.soma();
     if (soma->points().empty() && morphology.rootSections().empty()) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
-        return;
+        return false;
     }
 
     if (hasPerimeterData(morphology)) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
+    return true;
+}
 
-    std::ofstream myfile(filename);
-
+void _asc_to_stream(const Morphology& morphology, std::ostream& stream) {
     if (!morphology.mitochondria().rootSections().empty())
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                    readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
@@ -186,21 +192,31 @@ void asc(const Morphology& morphology, const std::string& filename) {
     header[SECTION_DENDRITE] = "( (Color Red)\n  (Dendrite)\n";
     header[SECTION_APICAL_DENDRITE] = "( (Color Red)\n  (Apical)\n";
 
+    const auto& soma = morphology.soma();
     if (!soma->points().empty()) {
-        myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
-        _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
-        myfile << ")\n\n";
+        stream << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
+        _write_asc_points(stream, soma->points(), soma->diameters(), 2);
+        stream << ")\n\n";
     } else {
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
     for (const auto& section : morphology.rootSections()) {
-        myfile << header.at(section->type());
-        _write_asc_section(myfile, morphology, section, 2);
-        myfile << ")\n\n";
+        stream << header.at(section->type());
+        _write_asc_section(stream, morphology, section, 2);
+        stream << ")\n\n";
     }
 
-    myfile << "; " << version_string() << '\n';
+    stream << "; " << version_string() << '\n';
+}
+
+void asc(const Morphology& morphology, const std::string& filename) {
+    if (!_shouldBeWritten(morphology))
+        return;
+
+    std::ofstream myfile(filename);
+
+    _asc_to_stream(morphology, myfile);
 }
 
 template <typename T>

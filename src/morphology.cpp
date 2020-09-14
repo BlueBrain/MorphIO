@@ -47,6 +47,9 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
 Morphology::Morphology(const HighFive::Group& group, unsigned int options)
     : Morphology(readers::h5::load(group), options) {}
 
+Morphology::Morphology(const std::stringstream& stream, unsigned int options)
+    : Morphology(readers::asc::load(stream.str(), "Stream", options), options) {}
+
 Morphology::Morphology(const std::string& source, unsigned int options)
     : Morphology(loadURI(source, options), options) {}
 
@@ -222,8 +225,13 @@ Property::Properties loadURI(const std::string& source, unsigned int options) {
     auto loader = [&source, &options, &extension]() {
         if (extension == ".h5" || extension == ".H5")
             return readers::h5::load(source);
-        if (extension == ".asc" || extension == ".ASC")
-            return readers::asc::load(source, options);
+        if (extension == ".asc" || extension == ".ASC") {
+            std::ifstream ifs(source);
+            std::string input((std::istreambuf_iterator<char>(ifs)),
+                              (std::istreambuf_iterator<char>()));
+
+            return readers::asc::load(input, source, options);
+        }
         if (extension == ".swc" || extension == ".SWC")
             return readers::swc::load(source, options);
         throw(UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported"));

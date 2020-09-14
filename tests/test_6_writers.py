@@ -1,17 +1,19 @@
 import os
+import pickle
+from pathlib import Path
+
 import numpy as np
-from numpy.testing import assert_array_equal, assert_equal, assert_raises
 from nose.tools import ok_
-from pathlib2 import Path
+from numpy.testing import assert_array_equal, assert_equal, assert_raises
 
+from morphio import MitochondriaPointLevel, Warning
+from morphio import Morphology as ImmutMorphology
+from morphio import (PointLevel, SectionBuilderError, SectionType, WriterError,
+                     ostream_redirect, set_maximum_warnings)
 from morphio.mut import Morphology
-from morphio import (SectionBuilderError, set_maximum_warnings, SectionType, PointLevel,
-                     WriterError,
-                     MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect)
+from utils import assert_string_equal, captured_output, setup_tempdir, ignored_warning
 
-from utils import captured_output, setup_tempdir, assert_string_equal
-
-_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+_path = Path(__file__).parent / 'data'
 
 
 def test_write_empty_file():
@@ -48,18 +50,18 @@ def test_write_basic():
     dendrite.append_section(PointLevel([[0, 5, 0], [6, 5, 0]], [2, 3]))
 
     axon = morpho.append_root_section(
-                                 PointLevel([[0, 0, 0],
-                                             [0, -4, 0]],
-                                            [2, 2]),
-                                 SectionType.axon)
+        PointLevel([[0, 0, 0],
+                    [0, -4, 0]],
+                   [2, 2]),
+        SectionType.axon)
 
     axon.append_section(PointLevel([[0, -4, 0],
-                                      [6, -4, 0]],
-                                     [2, 4]))
+                                    [6, -4, 0]],
+                                   [2, 4]))
 
     axon = axon.append_section(PointLevel([[0, -4, 0],
-                                             [-5, -4, 0]],
-                                            [2, 4]))
+                                           [-5, -4, 0]],
+                                          [2, 4]))
 
     with setup_tempdir('test_write_basic') as tmp_folder:
         morpho.write(os.path.join(tmp_folder, "test_write.asc"))
@@ -70,14 +72,16 @@ def test_write_basic():
         expected = [[0., 0., 0.], [0., 5., 0.], [0., 5., 0.], [-5., 5., 0.],
                     [0., 5., 0.], [6., 5., 0.], [0., 0., 0.], [0., -4., 0.],
                     [0., -4., 0.], [6., -4., 0.], [0., -4., 0.], [-5., -4., 0.]]
-        assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.asc")).points, expected)
-        assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.swc")).points, expected)
-        assert_array_equal(ImmutMorphology(os.path.join(tmp_folder, "test_write.h5")).points, expected)
+        assert_array_equal(ImmutMorphology(os.path.join(
+            tmp_folder, "test_write.asc")).points, expected)
+        assert_array_equal(ImmutMorphology(os.path.join(
+            tmp_folder, "test_write.swc")).points, expected)
+        assert_array_equal(ImmutMorphology(os.path.join(
+            tmp_folder, "test_write.h5")).points, expected)
 
         import h5py
         with h5py.File(h5_out, 'r') as h5_file:
             ok_('/perimeters' not in h5_file.keys())
-
 
 
 def test_write_merge_only_child():
@@ -99,10 +103,10 @@ def test_write_merge_only_child():
     morpho.soma.diameters = [2]
 
     root = morpho.append_root_section(
-                                 PointLevel([[0, 0, 0],
-                                             [0, 5, 0]],
-                                            [2, 2]),
-                                 SectionType.basal_dendrite)
+        PointLevel([[0, 0, 0],
+                    [0, 5, 0]],
+                   [2, 2]),
+        SectionType.basal_dendrite)
     child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
     son1 = child.append_section(PointLevel([[0, 6, 0], [0, 7, 0]], [2, 3]))
     son2 = child.append_section(PointLevel([[0, 6, 0], [4, 5, 6]], [3, 3]))
@@ -116,7 +120,6 @@ def test_write_merge_only_child():
 
                     assert_equal(err.getvalue().strip(),
                                  'Warning: section 1 is the only child of section: 0\nIt will be merged with the parent section')
-
 
             read = Morphology(filename)
             root = read.root_sections[0]
@@ -133,30 +136,29 @@ def test_write_merge_only_child():
                                [[0, 6, 0], [4, 5, 6]])
 
 
-
 def test_write_perimeter():
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0]]
     morpho.soma.diameters = [2]
 
     dendrite = morpho.append_root_section(
-                                     PointLevel([[0, 0, 0],
-                                                 [0, 5, 0]],
-                                                [2, 2],
-                                                [5, 6]),
-                                     SectionType.basal_dendrite)
+        PointLevel([[0, 0, 0],
+                    [0, 5, 0]],
+                   [2, 2],
+                   [5, 6]),
+        SectionType.basal_dendrite)
 
     dendrite.append_section(
-                          PointLevel([[0, 5, 0],
-                                      [-5, 5, 0]],
-                                     [2, 3],
-                                     [6, 7]))
+        PointLevel([[0, 5, 0],
+                    [-5, 5, 0]],
+                   [2, 3],
+                   [6, 7]))
 
     dendrite.append_section(
-                          PointLevel([[0, 5, 0],
-                                      [6, 5, 0]],
-                                     [2, 3],
-                                     [6, 8]))
+        PointLevel([[0, 5, 0],
+                    [6, 5, 0]],
+                   [2, 3],
+                   [6, 8]))
 
     with setup_tempdir('test_write_perimeter') as tmp_folder:
         h5_out = os.path.join(tmp_folder, "test_write.h5")
@@ -174,15 +176,15 @@ def test_write_perimeter():
 def test_write_no_soma():
     morpho = Morphology()
     dendrite = morpho.append_root_section(
-                                     PointLevel([[0, 0, 0],
-                                                 [0, 5, 0]],
-                                                [2, 2]),
-                                     SectionType.basal_dendrite)
+        PointLevel([[0, 0, 0],
+                    [0, 5, 0]],
+                   [2, 2]),
+        SectionType.basal_dendrite)
     dendrite = morpho.append_root_section(
-                                     PointLevel([[0, 1, 0],
-                                                 [0, 7, 0]],
-                                                [2, 2]),
-                                     SectionType.basal_dendrite)
+        PointLevel([[0, 1, 0],
+                    [0, 7, 0]],
+                   [2, 2]),
+        SectionType.basal_dendrite)
 
     with setup_tempdir('test_write_no_soma') as tmp_folder:
         for ext in ['asc', 'h5', 'swc']:
@@ -211,13 +213,13 @@ def test_mitochondria():
     diameters = [10, 20]
     mito_id = morpho.mitochondria.append_root_section(
         MitochondriaPointLevel(neuronal_section_ids,
-                                   relative_pathlengths,
-                                   diameters))
+                               relative_pathlengths,
+                               diameters))
 
     mito_id.append_section(
         MitochondriaPointLevel([0, 0, 0, 0],
-                                        [0.6, 0.7, 0.8, 0.9],
-                                        [20, 30, 40, 50]))
+                               [0.6, 0.7, 0.8, 0.9],
+                               [20, 30, 40, 50]))
     with setup_tempdir('test_mitochondria') as tmp_folder:
         morpho.write(os.path.join(tmp_folder, "test.h5"))
 
@@ -254,6 +256,7 @@ def test_mitochondria():
         assert_array_equal(mito.section(0).neurite_section_ids,
                            neuronal_section_ids)
 
+
 def test_duplicate_different_diameter():
     '''Test that starting a child section with a different diamete
     work as expected'''
@@ -262,12 +265,11 @@ def test_duplicate_different_diameter():
     morpho.soma.diameters = [1, 1]
 
     section = morpho.append_root_section(PointLevel([[2, 2, 2], [3, 3, 3]],
-                                                       [4, 4]),
+                                                    [4, 4]),
                                          SectionType.axon,)
 
     section.append_section(PointLevel([[3, 3, 3], [4, 4, 4]], [10, 12]))
     section.append_section(PointLevel([[3, 3, 3], [5, 5, 5]], [11, 12]))
-
 
     with setup_tempdir('test_write_duplicate_different_diameter', no_cleanup=True) as tmp_folder:
         for ext in ['asc', 'h5', 'swc']:
@@ -297,7 +299,8 @@ def test_single_point_root_section():
             m.append_root_section(PointLevel(points, diameters), SectionType(2))
 
             with setup_tempdir('test_single_point_root_section', no_cleanup=True) as tmp_folder:
-                assert_raises(SectionBuilderError, m.write, os.path.join(tmp_folder, "h5/empty_vasculature.h5"))
+                assert_raises(SectionBuilderError, m.write, os.path.join(
+                    tmp_folder, "h5/empty_vasculature.h5"))
 
     m = Morphology()
     points = [[1., 1., 1.]]
@@ -305,4 +308,31 @@ def test_single_point_root_section():
     m.append_root_section(PointLevel(points, diameters), SectionType(2))
 
     with setup_tempdir('test_single_point_root_section', no_cleanup=True) as tmp_folder:
-        assert_raises(SectionBuilderError, m.write, os.path.join(tmp_folder, "h5/empty_vasculature.h5"))
+        assert_raises(SectionBuilderError, m.write, os.path.join(
+            tmp_folder, "h5/empty_vasculature.h5"))
+
+
+def test_pickle_roundtrip():
+    '''From pybind11 doc:
+    https://pybind11.readthedocs.io/en/stable/advanced/classes.html#pickling-support
+
+    The second argument to dumps is also crucial: it selects the pickle protocol version 2,
+    since the older version 1 is not supported. Newer versions are also fine—for instance,
+    specify -1 to always use the latest available version.
+    Beware: failure to follow these instructions will cause important pybind11 memory allocation
+    routines to be skipped during unpickling, which
+    will likely lead to memory corruption and/or segmentation faults.
+    '''
+    before_pickle = ImmutMorphology(_path / 'simple.asc')
+    data = pickle.dumps(before_pickle, 2)  # Must use pickle protocol >= 2
+    after_pickle = pickle.loads(data)
+    assert_array_equal(before_pickle.points,
+                       after_pickle.points)
+
+def test_pickle_empty_morph():
+    empty_morph = Morphology().as_immutable()
+    with ignored_warning(Warning.write_empty_morphology):
+        data = pickle.dumps(empty_morph, 2)  # Must use pickle protocol >= 2
+    after_pickle = pickle.loads(data)
+    assert_array_equal(empty_morph.points,
+                       after_pickle.points)

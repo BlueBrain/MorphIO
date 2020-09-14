@@ -37,6 +37,7 @@ class Morphology
         Example:
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
+    explicit Morphology(const std::stringstream& stream, unsigned int options = NO_MODIFIER);
     explicit Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
     explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
     explicit Morphology(mut::Morphology);
