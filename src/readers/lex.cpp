@@ -168,7 +168,7 @@ class NeurolucidaLexer
 
         rules_.push(R"(\"[^"]*\")", +Token::STRING);
 
-        rules_.push("-?[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?", +Token::NUMBER);
+        rules_.push("[+-]?[0-9]+(\\.[0-9]+)?([eE][+-]?[0-9]+)?", +Token::NUMBER);
         rules_.push("[a-zA-Z][0-9a-zA-Z]+", +Token::WORD);
 
         lexertl::generator::build(rules_, sm_);

@@ -31,6 +31,21 @@ def test_soma():
         nt.assert_equal(len(n.root_sections), 0)
 
 
+def test_parse_number_with_plus_symbol():
+    with tmp_asc_file('''("CellBody"
+                         (Color Red)
+                         (CellBody)
+                         (1  1 0 1 S1)
+                         (1 +1 0 1 S2)  ; <- there is a '+' symbol
+                         (1  1 0 2 S3)
+                         )''') as tmp_file:
+        n = Morphology(tmp_file.name)
+        assert_array_equal(n.soma.points,
+                           [[1, 1, 0],
+                            [1, 1, 0],
+                            [1, 1, 0]])
+
+
 def test_unknown_token():
     _test_asc_exception('''
                    ("CellBody"
