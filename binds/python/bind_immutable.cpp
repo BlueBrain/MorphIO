@@ -146,7 +146,6 @@ void bind_immutable_module(py::module& m) {
             "- morphio.IterType.breadth_first (default)\n"
             "iter_type"_a = IterType::DEPTH_FIRST)
 
-        // Make class picklable
         .def(py::pickle(
             [](const morphio::Morphology& morphology) {  // __getstate__
                 // Return a tuple that fully encodes the state of the object
