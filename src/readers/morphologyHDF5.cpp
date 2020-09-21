@@ -61,10 +61,6 @@ namespace morphio {
 namespace readers {
 namespace h5 {
 
-MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group)
-    : _group(group)
-    , _uri("HDF5 Group") {}
-
 Property::Properties load(const std::string& uri) {
     try {
         HighFive::SilenceHDF5 silence;
@@ -94,6 +90,10 @@ Property::Properties MorphologyHDF5::load() {
 
     return _properties;
 }
+
+MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group)
+    : _group(group)
+    , _uri("HDF5 Group") {}
 
 void MorphologyHDF5::_checkVersion(const std::string& source) {
     if (_readV11Metadata())
