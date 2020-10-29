@@ -54,7 +54,6 @@ class MorphologyHDF5
     std::vector<size_t> _pointsDims;
 
     std::unique_ptr<HighFive::DataSet> _sections;
-    std::vector<size_t> _sectionsDims;
 
     std::string _stage;
     Property::Properties _properties;
