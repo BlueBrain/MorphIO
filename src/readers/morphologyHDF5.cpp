@@ -27,7 +27,7 @@
 namespace {
 // v1 & v2
 const std::string _d_points("points");
-const size_t _pointColumns = 4;
+constexpr size_t _pointColumns = 4;
 
 // v1
 const std::string _d_structure("structure");
@@ -216,7 +216,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     auto& somaPoints = _properties._somaLevel._points;
     auto& somaDiameters = _properties._somaLevel._diameters;
 
-    auto loadPoints = [&](const std::vector<std::array<float, 4>>& hd5fData, bool hasNeurites) {
+    auto loadPoints = [&](const std::vector<std::array<float, _pointColumns>>& hd5fData, bool hasNeurites) {
         const std::size_t section_offset = hasNeurites ? std::size_t(firstSectionOffset)
                                                        : hd5fData.size();
 
@@ -258,13 +258,13 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
             throw(MorphioError("'Error reading morphologies: " + _uri +
                                " bad number of dimensions in 'points' dataspace"));
         }
-        std::vector<std::array<float, 4>> vec(dims[0]);
+        std::vector<std::array<float, _pointColumns>> vec(dims[0]);
         if (vec.size() > 0) {
             dataset.read(vec.front().data());
         }
         loadPoints(vec, v2HasNeurites(firstSectionOffset));
     } else {
-        std::vector<std::array<float, 4>> vec(_pointsDims[0]);
+        std::vector<std::array<float, _pointColumns>> vec(_pointsDims[0]);
         if (vec.size() > 0) {
             _points->read(vec.front().data());
         }
@@ -295,7 +295,9 @@ int MorphologyHDF5::_readV1Sections() {
     }
 
     std::vector<std::array<int, _structureV1Columns>> vec(dims[0]);
-    _sections->read(vec.front().data());
+    if (vec.size() > 0) {
+        _sections->read(vec.front().data());
+    }
 
     if (vec.size() < 2)  // Neuron without any neurites
         return -1;
