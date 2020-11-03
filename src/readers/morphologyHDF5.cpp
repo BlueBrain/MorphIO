@@ -216,7 +216,8 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     auto& somaPoints = _properties._somaLevel._points;
     auto& somaDiameters = _properties._somaLevel._diameters;
 
-    auto loadPoints = [&](const std::vector<std::array<float, _pointColumns>>& hd5fData, bool hasNeurites) {
+    auto loadPoints = [&](const std::vector<std::array<float, _pointColumns>>& hd5fData,
+                          bool hasNeurites) {
         const std::size_t section_offset = hasNeurites ? std::size_t(firstSectionOffset)
                                                        : hd5fData.size();
 
