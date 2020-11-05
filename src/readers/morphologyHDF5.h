@@ -19,9 +19,6 @@ Property::Properties load(const HighFive::Group& group);
 class MorphologyHDF5
 {
   public:
-    MorphologyHDF5(const std::string& uri)
-        : _err(uri)
-        , _uri(uri) {}
     MorphologyHDF5(const HighFive::Group& group);
     virtual ~MorphologyHDF5() = default;
     Property::Properties load();
