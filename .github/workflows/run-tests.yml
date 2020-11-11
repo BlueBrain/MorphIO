@@ -6,14 +6,22 @@ jobs:
   build:
     name: Run tests on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    env:
+      MINCONDA_VERSION: "latest"
+      CMAKE_GENERATOR: "Visual Studio 15 2017 Win64"
+      TESTS_TARGET: "RUN_TESTS"
+
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         compiler:
           - CC: clang
             CXX: clang++
           - CC: gcc
             CXX: g++
+        include:
+          - os: windows-latest
+            compiler: "unused"
 
     steps:
       - name: Checkout repository
@@ -28,6 +36,17 @@ jobs:
       - name: Install packages on MacOS
         if: runner.os == 'macOS'
         run: brew update && brew install cmake hdf5
+
+      - name: Install packages on MacOS
+        if: runner.os == 'windows'
+        run: brew update && brew install cmake hdf5
+        install:
+          - choco install --yes miniconda3
+          - source C:/Tools/miniconda3/Scripts/activate
+          - conda config --set always_yes yes --set changeps1 no
+          - conda update -q conda
+          - conda install -c conda-forge hdf5
+
 
       - name: Build and run unittests
         env:
