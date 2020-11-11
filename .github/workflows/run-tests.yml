@@ -39,7 +39,6 @@ jobs:
 
       - name: Install packages on MacOS
         if: runner.os == 'windows'
-        run: brew update && brew install cmake hdf5
         run: |
           choco install --yes miniconda3
           source C:/Tools/miniconda3/Scripts/activate
