@@ -8,7 +8,24 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-18.04, macos-latest]
+        os: [ubuntu-latest, macos-latest]
+        include:
+        - os: ubuntu-latest
+          CC: clang
+          CXX: clang++
+
+        - os: ubuntu-latest
+          CC: gcc
+          CXX: g++
+
+        - os: macos-latest
+          CC: clang
+          CXX: clang++
+
+        - os: macos-latest
+          CC: gcc
+          CXX: g++
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -24,6 +41,8 @@ jobs:
         run: brew update && brew install cmake hdf5
 
       - name: Build and run unittests
+        env:
+          CC: ${{ matrix.compiler }}
         run: |
           ./ci/python_test.sh
           ./ci/cpp_test.sh
