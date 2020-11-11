@@ -1,0 +1,19 @@
+name: Run tests
+on:
+    pull_requests:
+
+jobs:
+    build:
+        name: coverage-test
+        runs-on: ubuntu-18.04
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+              with:
+                submodules: 'true'
+            - name: Install packages
+              run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev
+            - name: Build and run unittests
+              run: |
+                ./ci/python_test.sh
+                ./ci/cpp_test.sh
