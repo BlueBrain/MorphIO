@@ -3,17 +3,27 @@ on:
     pull_request:
 
 jobs:
-    build:
-        name: coverage-test
-        runs-on: ubuntu-18.04
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v2
-              with:
-                submodules: 'true'
-            - name: Install packages
-              run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev
-            - name: Build and run unittests
-              run: |
-                ./ci/python_test.sh
-                ./ci/cpp_test.sh
+  build:
+    name: Run tests on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, macos-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Install packages on Linux
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev
+
+      - name: Install packages on MacOS
+        if: runner.os == 'macOS'
+        run: brew update && brew install cmake hdf5
+
+      - name: Build and run unittests
+        run: |
+          ./ci/python_test.sh
+          ./ci/cpp_test.sh
