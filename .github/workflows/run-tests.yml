@@ -40,12 +40,12 @@ jobs:
       - name: Install packages on MacOS
         if: runner.os == 'windows'
         run: brew update && brew install cmake hdf5
-        install:
-          - choco install --yes miniconda3
-          - source C:/Tools/miniconda3/Scripts/activate
-          - conda config --set always_yes yes --set changeps1 no
-          - conda update -q conda
-          - conda install -c conda-forge hdf5
+        run: |
+          choco install --yes miniconda3
+          source C:/Tools/miniconda3/Scripts/activate
+          conda config --set always_yes yes --set changeps1 no
+          conda update -q conda
+          conda install -c conda-forge hdf5
 
 
       - name: Build and run unittests
