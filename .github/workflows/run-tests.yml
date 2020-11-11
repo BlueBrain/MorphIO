@@ -41,8 +41,6 @@ jobs:
         run: brew update && brew install cmake hdf5
 
       - name: Build and run unittests
-        env:
-          CC: ${{ matrix.compiler }}
         run: |
           ./ci/python_test.sh
           ./ci/cpp_test.sh
