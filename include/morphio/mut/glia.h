@@ -6,8 +6,9 @@
 namespace morphio {
 namespace mut {
 
-class  Glia: public Morphology {
-public:
+class Glia: public Morphology
+{
+  public:
     Glia();
     Glia(const std::string& source);
 };

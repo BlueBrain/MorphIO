@@ -4,12 +4,12 @@
 #include <morphio/types.h>
 
 namespace morphio {
-class  Glia: public Morphology {
-public:
+class Glia: public Morphology
+{
+  public:
     Glia(const std::string& source);
 
-private:
+  private:
     Soma soma() const;
-
 };
-}
+}  // namespace morphio

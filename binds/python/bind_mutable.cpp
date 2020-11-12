@@ -6,8 +6,8 @@
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
-#include <morphio/mut/mitochondria.h>
 #include <morphio/mut/glia.h>
+#include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 
 #include <array>
@@ -177,14 +177,13 @@ void bind_mutable_module(py::module& m) {
 
     py::class_<morphio::mut::Glia, morphio::mut::Morphology>(m, "Glia")
         .def(py::init<>())
-        .def(py::init<const std::string &>())
+        .def(py::init<const std::string&>())
         .def(py::init([](py::object arg) {
-            return std::unique_ptr<morphio::mut::Glia>(
-                new morphio::mut::Glia(py::str(arg)));
-        }),
-            "filename"_a,
-            "Additional Ctor that accepts as filename any python "
-            "object that implements __repr__ or __str__");
+                 return std::unique_ptr<morphio::mut::Glia>(new morphio::mut::Glia(py::str(arg)));
+             }),
+             "filename"_a,
+             "Additional Ctor that accepts as filename any python "
+             "object that implements __repr__ or __str__");
 
 
     py::class_<morphio::mut::Mitochondria>(m, "Mitochondria")
