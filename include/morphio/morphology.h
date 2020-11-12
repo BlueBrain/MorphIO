@@ -153,7 +153,7 @@ class Morphology
      **/
     const MorphologyVersion& version() const;
 
-  private:
+  protected:
     friend class mut::Morphology;
     Morphology(const Property::Properties& properties, unsigned int options);
 

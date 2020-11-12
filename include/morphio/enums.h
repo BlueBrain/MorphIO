@@ -52,7 +52,7 @@ enum AnnotationType {
 };
 
 /** The cell family represented by morphio::Morphology. */
-enum CellFamily { FAMILY_NEURON = 0, FAMILY_GLIA = 1 };
+enum CellFamily { NEURON = 0, GLIA = 1, SPINE = 2 };
 
 enum SomaType {
     SOMA_UNDEFINED = 0,

@@ -96,8 +96,9 @@ void bind_misc(py::module& m) {
         .export_values();
 
     py::enum_<morphio::enums::CellFamily>(m, "CellFamily")
-        .value("FAMILY_NEURON", morphio::enums::CellFamily::FAMILY_NEURON)
-        .value("FAMILY_GLIA", morphio::enums::CellFamily::FAMILY_GLIA)
+        .value("NEURON", morphio::enums::CellFamily::NEURON)
+        .value("GLIA", morphio::enums::CellFamily::GLIA)
+        .value("SPINE", morphio::enums::CellFamily::SPINE)
         .export_values();
 
 

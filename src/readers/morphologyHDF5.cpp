@@ -416,7 +416,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
         _properties.get<Property::Perimeter>().assign(perimeters.begin() + firstSectionOffset,
                                                       perimeters.end());
     } catch (...) {
-        if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
+        if (_properties._cellLevel._cellFamily == GLIA)
             throw MorphioError("No empty perimeters allowed for glia morphology");
     }
 }
@@ -443,7 +443,7 @@ void MorphologyHDF5::_read(const std::string& groupName,
         data.resize(dims[0]);
         dataset.read(data);
     } catch (...) {
-        if (_properties._cellLevel._cellFamily == FAMILY_GLIA)
+        if (_properties._cellLevel._cellFamily == GLIA)
             throw MorphioError("No empty perimeters allowed for glia morphology");
     }
 }
