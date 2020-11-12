@@ -348,11 +348,11 @@ Python:
 import morphio
 
 # Immutable
-immutable_glia = morphio.Glia("astrocyte.h5")
+immutable_glia = morphio.GlialCell("astrocyte.h5")
 
 # Mutable
-empty_glia = morphio.mut.Glia()
-mutable_glia = morphio.mut.Glia("astrocyte.h5")
+empty_glia = morphio.mut.GlialCell()
+mutable_glia = morphio.mut.GlialCell("astrocyte.h5")
 ```
 
 

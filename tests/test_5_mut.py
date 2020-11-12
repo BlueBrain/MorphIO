@@ -12,7 +12,7 @@ from morphio import MitochondriaPointLevel, MorphioError, RawDataError
 from morphio import Morphology as ImmutableMorphology
 from morphio import (PointLevel, SectionBuilderError, SectionType,
                      IterType, ostream_redirect, CellFamily)
-from morphio.mut import Morphology, Glia
+from morphio.mut import Morphology, GlialCell
 from utils import assert_substring, captured_output, tmp_asc_file, setup_tempdir
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -465,14 +465,14 @@ def test_sanitize():
 
 
 def test_glia():
-    g = Glia()
+    g = GlialCell()
     assert_equal(g.cell_family, CellFamily.GLIA)
 
-    g = Glia(os.path.join(_path, 'astrocyte.h5'))
+    g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
     assert_equal(g.cell_family, CellFamily.GLIA)
 
-    g = Glia(Path(_path, 'astrocyte.h5'))
+    g = GlialCell(Path(_path, 'astrocyte.h5'))
     assert_equal(g.cell_family, CellFamily.GLIA)
 
-    assert_raises(RawDataError, Glia, Path(_path, 'simple.swc'))
-    assert_raises(RawDataError, Glia, Path(_path, 'h5/v1/simple.h5'))
+    assert_raises(RawDataError, GlialCell, Path(_path, 'simple.swc'))
+    assert_raises(RawDataError, GlialCell, Path(_path, 'h5/v1/simple.h5'))

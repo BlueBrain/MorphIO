@@ -6,7 +6,7 @@
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
-#include <morphio/mut/glia.h>
+#include <morphio/mut/glial_cell.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 
@@ -175,11 +175,11 @@ void bind_mutable_module(py::module& m) {
              "mutable_section"_a,
              "recursive"_a = false);
 
-    py::class_<morphio::mut::Glia, morphio::mut::Morphology>(m, "Glia")
+    py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(m, "GlialCell")
         .def(py::init<>())
         .def(py::init<const std::string&>())
         .def(py::init([](py::object arg) {
-                 return std::unique_ptr<morphio::mut::Glia>(new morphio::mut::Glia(py::str(arg)));
+                 return std::unique_ptr<morphio::mut::GlialCell>(new morphio::mut::GlialCell(py::str(arg)));
              }),
              "filename"_a,
              "Additional Ctor that accepts as filename any python "

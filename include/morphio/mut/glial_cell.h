@@ -6,11 +6,11 @@
 namespace morphio {
 namespace mut {
 
-class Glia: public Morphology
+class GlialCell: public Morphology
 {
   public:
-    Glia();
-    Glia(const std::string& source);
+    GlialCell();
+    GlialCell(const std::string& source);
 };
 
 }  // namespace mut

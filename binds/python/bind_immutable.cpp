@@ -6,7 +6,7 @@
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/enums.h>
-#include <morphio/glia.h>
+#include <morphio/glial_cell.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
 #include <morphio/types.h>
@@ -146,10 +146,10 @@ void bind_immutable_module(py::module& m) {
             "- morphio.IterType.breadth_first (default)\n"
             "iter_type"_a = IterType::DEPTH_FIRST);
 
-    py::class_<morphio::Glia, morphio::Morphology>(m, "Glia")
+    py::class_<morphio::GlialCell, morphio::Morphology>(m, "GlialCell")
         .def(py::init<const std::string&>())
         .def(py::init([](py::object arg) {
-                 return std::unique_ptr<morphio::Glia>(new morphio::Glia(py::str(arg)));
+                 return std::unique_ptr<morphio::GlialCell>(new morphio::GlialCell(py::str(arg)));
              }),
              "filename"_a,
              "Additional Ctor that accepts as filename any python object that implements __repr__ "

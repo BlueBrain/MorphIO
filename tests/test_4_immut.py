@@ -6,7 +6,7 @@ from nose.tools import assert_dict_equal, assert_equal, ok_, assert_raises
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from pathlib2 import Path
 
-from morphio import IterType, Morphology, Glia, CellFamily, RawDataError
+from morphio import IterType, Morphology, GlialCell, CellFamily, RawDataError
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -139,11 +139,11 @@ def test_more_iter():
 
 
 def test_glia():
-    g = Glia(os.path.join(_path, 'astrocyte.h5'))
+    g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
     assert_equal(g.cell_family, CellFamily.GLIA)
 
-    g = Glia(Path(_path, 'astrocyte.h5'))
+    g = GlialCell(Path(_path, 'astrocyte.h5'))
     assert_equal(g.cell_family, CellFamily.GLIA)
 
-    assert_raises(RawDataError, Glia, Path(_path, 'simple.swc'))
-    assert_raises(RawDataError, Glia, Path(_path, 'h5/v1/simple.h5'))
+    assert_raises(RawDataError, GlialCell, Path(_path, 'simple.swc'))
+    assert_raises(RawDataError, GlialCell, Path(_path, 'h5/v1/simple.h5'))
