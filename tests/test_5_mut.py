@@ -11,7 +11,7 @@ import morphio
 from morphio import MitochondriaPointLevel, MorphioError
 from morphio import Morphology as ImmutableMorphology
 from morphio import (PointLevel, SectionBuilderError, SectionType,
-                     IterType, ostream_redirect)
+                     IterType, ostream_redirect, CellFamily)
 from morphio.mut import Morphology, Glia
 from utils import assert_substring, captured_output, tmp_asc_file, setup_tempdir
 
@@ -466,3 +466,10 @@ def test_sanitize():
 
 def test_glia():
     g = Glia()
+    assert_equal(g.cell_family, CellFamily.GLIA)
+
+    g = Glia(os.path.join(_path, 'astrocyte.h5'))
+    assert_equal(g.cell_family, CellFamily.GLIA)
+
+    g = Glia(Path(_path, 'astrocyte.h5'))
+    assert_equal(g.cell_family, CellFamily.GLIA)

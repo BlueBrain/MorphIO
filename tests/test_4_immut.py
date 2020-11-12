@@ -140,3 +140,6 @@ def test_more_iter():
 def test_glia():
     m = Glia(os.path.join(_path, 'simple.asc'))
     assert_equal(m.cell_family, CellFamily.GLIA)
+
+    m = Glia(Path(_path, 'simple.asc'))
+    assert_equal(m.cell_family, CellFamily.GLIA)

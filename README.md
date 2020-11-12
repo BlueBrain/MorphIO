@@ -21,6 +21,7 @@
       * [Reading morphologies](#reading-morphologies)
       * [Creating morphologies](#creating-morphologies)
    * [Opening flags](#opening-flags)
+   * [Glia](#glia)
    * [Mitochondria](#mitochondria)
    * [Endoplasmic reticulum](#endoplasmic-reticulum)
    * [Tips](#tips)
@@ -337,6 +338,23 @@ Python:
 from morphio import Morphology, Option
 Morphology("myfile.asc", options=Option.no_duplicates|Option.nrn_order)
 ```
+
+### Glia
+MorphIO also support reading and writing glia (such as astrycytes) from/to disk according to the H5 specification
+https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
+
+Python:
+```python
+import morphio
+
+# Immutable
+immutable_glia = morphio.Glia("astrocyte.h5")
+
+# Mutable
+empty_glia = morphio.mut.Glia()
+mutable_glia = morphio.mut.Glia("astrocyte.h5")
+```
+
 
 ### Mitochondria
 
