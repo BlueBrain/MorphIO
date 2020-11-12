@@ -340,7 +340,7 @@ Morphology("myfile.asc", options=Option.no_duplicates|Option.nrn_order)
 ```
 
 ### Glia
-MorphIO also support reading and writing glia (such as astrycytes) from/to disk according to the H5 specification
+MorphIO also support reading and writing glia (such as astrocytes) from/to disk according to the H5 specification
 https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
 
 Python:

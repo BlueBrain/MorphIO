@@ -8,7 +8,7 @@ from numpy.testing import assert_array_equal
 from pathlib2 import Path
 
 import morphio
-from morphio import MitochondriaPointLevel, MorphioError
+from morphio import MitochondriaPointLevel, MorphioError, RawDataError
 from morphio import Morphology as ImmutableMorphology
 from morphio import (PointLevel, SectionBuilderError, SectionType,
                      IterType, ostream_redirect, CellFamily)
@@ -473,3 +473,6 @@ def test_glia():
 
     g = Glia(Path(_path, 'astrocyte.h5'))
     assert_equal(g.cell_family, CellFamily.GLIA)
+
+    assert_raises(RawDataError, Glia, Path(_path, 'simple.swc'))
+    assert_raises(RawDataError, Glia, Path(_path, 'h5/v1/simple.h5'))
