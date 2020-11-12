@@ -6,6 +6,7 @@ from numpy.testing import assert_equal
 from nose.tools import assert_dict_equal, assert_raises, ok_
 from numpy.testing import assert_array_equal
 from pathlib2 import Path
+from tempfile import TemporaryDirectory
 
 import morphio
 from morphio import MitochondriaPointLevel, MorphioError, RawDataError
@@ -476,3 +477,12 @@ def test_glia():
 
     assert_raises(RawDataError, GlialCell, Path(_path, 'simple.swc'))
     assert_raises(RawDataError, GlialCell, Path(_path, 'h5/v1/simple.h5'))
+
+
+def test_glia_round_trip():
+    with TemporaryDirectory() as folder:
+        g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
+        filename = Path(folder, 'glial-cell.h5')
+        g.write(filename)
+        g2 = GlialCell(filename)
+        assert_equal(len(g.sections), len(g2.sections))

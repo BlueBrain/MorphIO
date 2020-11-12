@@ -179,7 +179,8 @@ void bind_mutable_module(py::module& m) {
         .def(py::init<>())
         .def(py::init<const std::string&>())
         .def(py::init([](py::object arg) {
-                 return std::unique_ptr<morphio::mut::GlialCell>(new morphio::mut::GlialCell(py::str(arg)));
+                 return std::unique_ptr<morphio::mut::GlialCell>(
+                     new morphio::mut::GlialCell(py::str(arg)));
              }),
              "filename"_a,
              "Additional Ctor that accepts as filename any python "
