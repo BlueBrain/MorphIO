@@ -6,7 +6,7 @@ from nose.tools import assert_dict_equal, assert_equal, ok_
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from pathlib2 import Path
 
-from morphio import IterType, Morphology, Spine, CellFamily
+from morphio import IterType, Morphology, Glia, CellFamily
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -137,6 +137,6 @@ def test_more_iter():
     assert_array_equal([s.id for s in sections],
                        [2, 0])
 
-def test_spine():
-    m = Spine(os.path.join(_path, 'simple.asc'))
-    assert_equal(m.cell_family, CellFamily.SPINE)
+def test_glia():
+    m = Glia(os.path.join(_path, 'simple.asc'))
+    assert_equal(m.cell_family, CellFamily.GLIA)

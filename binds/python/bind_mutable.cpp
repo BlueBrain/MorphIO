@@ -7,6 +7,7 @@
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/mitochondria.h>
+#include <morphio/mut/glia.h>
 #include <morphio/mut/morphology.h>
 
 #include <array>
@@ -173,6 +174,11 @@ void bind_mutable_module(py::module& m) {
              "If recursive == true, all descendent will be appended as well",
              "mutable_section"_a,
              "recursive"_a = false);
+
+    py::class_<morphio::mut::Glia, morphio::mut::Morphology>(m, "Glia")
+        .def(py::init<>())
+        .def(py::init<const std::string &>());
+
 
     py::class_<morphio::mut::Mitochondria>(m, "Mitochondria")
         .def(py::init<>())

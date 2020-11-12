@@ -12,7 +12,7 @@ from morphio import MitochondriaPointLevel, MorphioError
 from morphio import Morphology as ImmutableMorphology
 from morphio import (PointLevel, SectionBuilderError, SectionType,
                      IterType, ostream_redirect)
-from morphio.mut import Morphology
+from morphio.mut import Morphology, Glia
 from utils import assert_substring, captured_output, tmp_asc_file, setup_tempdir
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -462,3 +462,7 @@ def test_sanitize():
             m.sanitize()
             assert_equal(err.getvalue().strip(),
                          'Warning: while appending section: 2 to parent: 0\nThe section first point should be parent section last point: \n        : X Y Z Diameter\nparent last point :[2.000000, 0.000000, 0.000000, 2.000000]\nchild first point :[2.000000, 1.000000, 0.000000, 2.000000]')
+
+
+def test_glia():
+    g = Glia()

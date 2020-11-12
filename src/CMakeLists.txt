@@ -2,12 +2,13 @@ set(MORPHIO_SOURCES
     endoplasmic_reticulum.cpp
     enums.cpp
     errorMessages.cpp
+    glia.cpp
     mito_section.cpp
     mitochondria.cpp
     morphology.cpp
     morphology.cpp
-    spine.cpp
     mut/endoplasmic_reticulum.cpp
+    mut/glia.cpp
     mut/mito_section.cpp
     mut/mitochondria.cpp
     mut/modifiers.cpp
