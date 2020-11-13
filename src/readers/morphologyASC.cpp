@@ -265,7 +265,7 @@ Property::Properties load(const std::string& uri, unsigned int options) {
     nb_.applyModifiers(options);
 
     Property::Properties properties = nb_.buildReadOnly();
-    properties._cellLevel._cellFamily = FAMILY_NEURON;
+    properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = MORPHOLOGY_VERSION_ASC_1;
     return properties;
 }

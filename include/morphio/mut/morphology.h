@@ -207,7 +207,7 @@ class Morphology
     void sanitize();
     void sanitize(const morphio::readers::DebugInfo& debugInfo);
 
-  private:
+  public:
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
     friend bool diff(const Morphology& left,

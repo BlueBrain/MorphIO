@@ -2,11 +2,11 @@ import os
 from collections import OrderedDict
 
 import numpy as np
-from nose.tools import assert_dict_equal, assert_equal, ok_
+from nose.tools import assert_dict_equal, assert_equal, ok_, assert_raises
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from pathlib2 import Path
 
-from morphio import IterType, Morphology
+from morphio import IterType, Morphology, GlialCell, CellFamily, RawDataError
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -136,3 +136,14 @@ def test_more_iter():
     sections = list(m.section(2).iter(IterType.upstream))
     assert_array_equal([s.id for s in sections],
                        [2, 0])
+
+
+def test_glia():
+    g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
+    assert_equal(g.cell_family, CellFamily.GLIA)
+
+    g = GlialCell(Path(_path, 'astrocyte.h5'))
+    assert_equal(g.cell_family, CellFamily.GLIA)
+
+    assert_raises(RawDataError, GlialCell, Path(_path, 'simple.swc'))
+    assert_raises(RawDataError, GlialCell, Path(_path, 'h5/v1/simple.h5'))

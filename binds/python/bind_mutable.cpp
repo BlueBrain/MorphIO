@@ -6,6 +6,7 @@
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
+#include <morphio/mut/glial_cell.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 
@@ -173,6 +174,18 @@ void bind_mutable_module(py::module& m) {
              "If recursive == true, all descendent will be appended as well",
              "mutable_section"_a,
              "recursive"_a = false);
+
+    py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(m, "GlialCell")
+        .def(py::init<>())
+        .def(py::init<const std::string&>())
+        .def(py::init([](py::object arg) {
+                 return std::unique_ptr<morphio::mut::GlialCell>(
+                     new morphio::mut::GlialCell(py::str(arg)));
+             }),
+             "filename"_a,
+             "Additional Ctor that accepts as filename any python "
+             "object that implements __repr__ or __str__");
+
 
     py::class_<morphio::mut::Mitochondria>(m, "Mitochondria")
         .def(py::init<>())
