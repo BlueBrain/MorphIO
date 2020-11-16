@@ -216,32 +216,34 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     auto& somaPoints = _properties._somaLevel._points;
     auto& somaDiameters = _properties._somaLevel._diameters;
 
-    auto loadPoints = [&](const std::vector<std::array<float, _pointColumns>>& hd5fData,
-                          bool hasNeurites) {
-        const std::size_t section_offset = hasNeurites ? std::size_t(firstSectionOffset)
-                                                       : hd5fData.size();
+    auto loadPoints =
+        [&](const std::vector<std::array<morphio::floatType, _pointColumns>>& hd5fData,
+            bool hasNeurites) {
+            const std::size_t section_offset = hasNeurites ? std::size_t(firstSectionOffset)
+                                                           : hd5fData.size();
 
-        // points and diameters are PODs. Fastest to resize then assign values
-        somaPoints.resize(somaPoints.size() + section_offset);
-        somaDiameters.resize(somaDiameters.size() + section_offset);
-        for (std::size_t i = 0; i < section_offset; ++i) {
-            const auto& p = hd5fData[i];
-            somaPoints[i] = {p[0], p[1], p[2]};
-            somaDiameters[i] = p[3];
-        }
-
-        if (hasNeurites) {
-            const size_t size = (points.size() + hd5fData.size() - section_offset);
-            points.resize(size);
-            diameters.resize(size);
-            for (std::size_t i = section_offset; i < hd5fData.size(); ++i) {
+            // points and diameters are PODs. Fastest to resize then assign values
+            somaPoints.resize(somaPoints.size() + section_offset);
+            somaDiameters.resize(somaDiameters.size() + section_offset);
+            for (std::size_t i = 0; i < section_offset; ++i) {
                 const auto& p = hd5fData[i];
-                const std::size_t section_i = i - section_offset;
-                points[section_i] = {p[0], p[1], p[2]};
-                diameters[section_i] = p[3];
+                somaPoints[i] = {p[0], p[1], p[2]};
+                somaDiameters[i] = p[3];
             }
-        }
-    };
+
+
+            if (hasNeurites) {
+                const size_t size = (points.size() + hd5fData.size() - section_offset);
+                points.resize(size);
+                diameters.resize(size);
+                for (std::size_t i = section_offset; i < hd5fData.size(); ++i) {
+                    const auto& p = hd5fData[i];
+                    const std::size_t section_i = i - section_offset;
+                    points[section_i] = {p[0], p[1], p[2]};
+                    diameters[section_i] = p[3];
+                }
+            }
+        };
 
     if (_properties.version() == MORPHOLOGY_VERSION_H5_2) {
         auto dataset = [this]() {
@@ -259,13 +261,13 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
             throw(MorphioError("'Error reading morphologies: " + _uri +
                                " bad number of dimensions in 'points' dataspace"));
         }
-        std::vector<std::array<float, _pointColumns>> vec(dims[0]);
+        std::vector<std::array<morphio::floatType, _pointColumns>> vec(dims[0]);
         if (vec.size() > 0) {
             dataset.read(vec.front().data());
         }
         loadPoints(vec, v2HasNeurites(firstSectionOffset));
     } else {
-        std::vector<std::array<float, _pointColumns>> vec(_pointsDims[0]);
+        std::vector<std::array<morphio::floatType, _pointColumns>> vec(_pointsDims[0]);
         if (vec.size() > 0) {
             _points->read(vec.front().data());
         }
@@ -410,7 +412,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
                                " bad number of dimensions in 'perimeters' dataspace"));
         }
 
-        std::vector<float> perimeters;
+        std::vector<morphio::floatType> perimeters;
         perimeters.resize(dims[0]);
         dataset.read(perimeters);
         _properties.get<Property::Perimeter>().assign(perimeters.begin() + firstSectionOffset,
@@ -493,7 +495,7 @@ void MorphologyHDF5::_readMitochondria() {
         }
     }
 
-    std::vector<std::vector<float>> points;
+    std::vector<std::vector<morphio::floatType>> points;
     _read(_g_mitochondria, _d_points, MORPHOLOGY_VERSION_H5_1_1, 2, points);
 
     auto& mitoSectionId = _properties.get<Property::MitoNeuriteSectionId>();

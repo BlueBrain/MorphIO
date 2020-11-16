@@ -24,16 +24,6 @@
 
 namespace morphio {
 namespace Property {
-/*
-template <typename T>
-void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset);
-extern template void _appendVector(std::vector<Point>& to, const std::vector<Point>& from, int
-offset); extern template void _appendVector(std::vector<float>& to, const std::vector<float>& from,
-int offset); extern template void _appendVector(std::vector<unsigned int>& to, const
-std::vector<unsigned int>& from, int offset); template <typename T> std::vector<typename T::Type>
-copySpan(const std::vector<typename T::Type>& data, SectionRange range);
-*/
-
 
 struct Section {
     // (offset, parent index)
@@ -54,19 +44,19 @@ struct SectionType {
 };
 
 struct Perimeter {
-    using Type = float;
+    using Type = floatType;
 };
 
 struct Diameter {
-    using Type = float;
+    using Type = floatType;
 };
 
 struct MitoPathLength {
-    using Type = float;
+    using Type = floatType;
 };
 
 struct MitoDiameter {
-    using Type = float;
+    using Type = floatType;
 };
 
 struct MitoNeuriteSectionId {
@@ -136,8 +126,8 @@ struct MitochondriaSectionLevel {
 
 struct EndoplasmicReticulumLevel {
     std::vector<uint32_t> _sectionIndices;
-    std::vector<float> _volumes;
-    std::vector<float> _surfaceAreas;
+    std::vector<morphio::floatType> _volumes;
+    std::vector<morphio::floatType> _surfaceAreas;
     std::vector<uint32_t> _filamentCounts;
 };
 

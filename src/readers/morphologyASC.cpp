@@ -64,12 +64,16 @@ class NeurolucidaParser
     }
 
   private:
-    std::tuple<Point, float> parse_point(NeurolucidaLexer& lex) {
+    std::tuple<Point, floatType> parse_point(NeurolucidaLexer& lex) {
         lex.expect(Token::LPAREN, "Point should start in LPAREN");
-        std::array<float, 4> point{};  // X,Y,Z,R
+        std::array<morphio::floatType, 4> point{};  // X,Y,Z,R
         for (auto& p : point) {
             try {
+#ifdef MORPHIO_USE_DOUBLE
+                p = std::stod(lex.consume()->str());
+#else
                 p = std::stof(lex.consume()->str());
+#endif
             } catch (const std::invalid_argument&) {
                 throw RawDataError(err_.ERROR_PARSING_POINT(lex.line_num(), lex.current()->str()));
             }
@@ -83,7 +87,7 @@ class NeurolucidaParser
 
         lex.consume(Token::RPAREN, "Point should end in RPAREN");
 
-        return std::tuple<Point, float>({point[0], point[1], point[2]}, point[3]);
+        return std::tuple<Point, floatType>({point[0], point[1], point[2]}, point[3]);
     }
 
     bool parse_neurite_branch(int32_t parent_id, Token token) {
@@ -105,7 +109,7 @@ class NeurolucidaParser
     int32_t _create_soma_or_section(Token token,
                                     int32_t parent_id,
                                     std::vector<Point>& points,
-                                    std::vector<float>& diameters) {
+                                    std::vector<morphio::floatType>& diameters) {
         lex_.current_section_start_ = lex_.line_num();
         int32_t return_id;
         morphio::Property::PointLevel properties;
@@ -178,7 +182,7 @@ class NeurolucidaParser
 
     bool parse_neurite_section(int32_t parent_id, Token token) {
         Points points;
-        std::vector<float> diameters;
+        std::vector<morphio::floatType> diameters;
         auto section_id = static_cast<int>(nb_.sections().size());
 
         while (true) {
@@ -206,7 +210,7 @@ class NeurolucidaParser
                     lex_.consume_until_balanced_paren();
                 } else if (peek_id == +Token::NUMBER) {
                     Point point;
-                    float radius;
+                    floatType radius;
                     std::tie(point, radius) = parse_point(lex_);
                     points.push_back(point);
                     diameters.push_back(radius);

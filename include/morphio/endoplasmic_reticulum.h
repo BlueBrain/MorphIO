@@ -19,12 +19,12 @@ class EndoplasmicReticulum
     /**
        Returns the volumes for each neuronal section
     **/
-    const std::vector<float>& volumes() const;
+    const std::vector<morphio::floatType>& volumes() const;
 
     /**
        Returns the surface areas for each neuronal section
     **/
-    const std::vector<float>& surfaceAreas() const;
+    const std::vector<morphio::floatType>& surfaceAreas() const;
 
     /**
        Returns the number of filaments for each neuronal section

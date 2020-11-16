@@ -42,15 +42,15 @@ class Section: public std::enable_shared_from_this<Section>
     /** @{
        Return the diameters of all points of this section
     **/
-    inline std::vector<float>& diameters() noexcept;
-    inline const std::vector<float>& diameters() const noexcept;
+    inline std::vector<morphio::floatType>& diameters() noexcept;
+    inline const std::vector<morphio::floatType>& diameters() const noexcept;
     /** @} */
 
     /** @{
        Return the perimeters of all points of this section
     **/
-    inline std::vector<float>& perimeters() noexcept;
-    inline const std::vector<float>& perimeters() const noexcept;
+    inline std::vector<morphio::floatType>& perimeters() noexcept;
+    inline const std::vector<morphio::floatType>& perimeters() const noexcept;
     /** @} */
 
     /** @{
@@ -134,19 +134,19 @@ inline const std::vector<Point>& Section::points() const noexcept {
     return _pointProperties._points;
 }
 
-inline std::vector<float>& Section::diameters() noexcept {
+inline std::vector<morphio::floatType>& Section::diameters() noexcept {
     return _pointProperties._diameters;
 }
 
-inline const std::vector<float>& Section::diameters() const noexcept {
+inline const std::vector<morphio::floatType>& Section::diameters() const noexcept {
     return _pointProperties._diameters;
 }
 
-inline std::vector<float>& Section::perimeters() noexcept {
+inline std::vector<morphio::floatType>& Section::perimeters() noexcept {
     return _pointProperties._perimeters;
 }
 
-inline const std::vector<float>& Section::perimeters() const noexcept {
+inline const std::vector<morphio::floatType>& Section::perimeters() const noexcept {
     return _pointProperties._perimeters;
 }
 

@@ -37,3 +37,4 @@ jobs:
         run: |
           ./ci/python_test.sh
           ./ci/cpp_test.sh
+          ./ci/cpp_test.sh "-DMORPHIO_USE_DOUBLE=ON"

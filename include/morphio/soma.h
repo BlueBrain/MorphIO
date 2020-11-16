@@ -36,7 +36,7 @@ class Soma
     /**
      * Return the diameters of all soma points
      **/
-    inline range<const float> diameters() const noexcept;
+    inline range<const floatType> diameters() const noexcept;
 
     /**
      * Return the soma type
@@ -51,19 +51,19 @@ class Soma
      * Return the soma volume\n"
      * Note: the soma volume computation depends on the soma type
      **/
-    float volume() const;
+    floatType volume() const;
 
     /**
      * Return the soma surface\n"
      * Note: the soma surface computation depends on the soma type
      **/
-    float surface() const;
+    floatType surface() const;
 
     /**
      * Return the maximum distance between the center of gravity and any of
      * the soma points
      */
-    float maxDistance() const;
+    floatType maxDistance() const;
 
   private:
     explicit Soma(const std::shared_ptr<Property::Properties>&);
@@ -81,7 +81,7 @@ inline range<const Point> Soma::points() const noexcept {
     return _properties->_somaLevel._points;
 }
 
-inline range<const float> Soma::diameters() const noexcept {
+inline range<const floatType> Soma::diameters() const noexcept {
     return _properties->_somaLevel._diameters;
 }
 

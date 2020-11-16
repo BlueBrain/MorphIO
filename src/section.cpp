@@ -38,11 +38,11 @@ range<const Point> Section::points() const {
     return get<Property::Point>();
 }
 
-range<const float> Section::diameters() const {
+range<const floatType> Section::diameters() const {
     return get<Property::Diameter>();
 }
 
-range<const float> Section::perimeters() const {
+range<const floatType> Section::perimeters() const {
     return get<Property::Perimeter>();
 }
 

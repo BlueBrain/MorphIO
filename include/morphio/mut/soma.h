@@ -24,8 +24,8 @@ class Soma
     /**
        Return the diameters of all soma points
     **/
-    inline std::vector<float>& diameters() noexcept;
-    inline const std::vector<float>& diameters() const noexcept;
+    inline std::vector<morphio::floatType>& diameters() noexcept;
+    inline const std::vector<morphio::floatType>& diameters() const noexcept;
     /** @} */
 
     /**
@@ -41,13 +41,13 @@ class Soma
        Return the soma surface
        Note: the soma surface computation depends on the soma type
     **/
-    float surface() const;
+    floatType surface() const;
 
     /**
      * Return the maximum distance between the center of gravity and any of
      * the soma points
      */
-    float maxDistance() const;
+    floatType maxDistance() const;
 
     inline Property::PointLevel& properties() noexcept;
     inline const Property::PointLevel& properties() const noexcept;
@@ -66,11 +66,11 @@ const std::vector<Point>& Soma::points() const noexcept {
     return _pointProperties._points;
 }
 
-inline std::vector<float>& Soma::diameters() noexcept {
+inline std::vector<morphio::floatType>& Soma::diameters() noexcept {
     return _pointProperties._diameters;
 }
 
-const std::vector<float>& Soma::diameters() const noexcept {
+const std::vector<morphio::floatType>& Soma::diameters() const noexcept {
     return _pointProperties._diameters;
 }
 

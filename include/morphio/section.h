@@ -69,14 +69,14 @@ class Section: public SectionBase<Section>
     (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point diameters
     **/
-    range<const float> diameters() const;
+    range<const floatType> diameters() const;
 
     /**
      * Return a view
      (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point perimeters
      **/
-    range<const float> perimeters() const;
+    range<const floatType> perimeters() const;
 
     /**
      * Return the morphological type of this section (dendrite, axon, ...)

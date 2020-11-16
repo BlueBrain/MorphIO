@@ -47,7 +47,7 @@ class Vasculature
     /**
      * Return a vector with all diameters from all sections
      **/
-    inline const std::vector<float>& diameters() const noexcept;
+    inline const std::vector<morphio::floatType>& diameters() const noexcept;
 
     /**
      * Return a vector with the section type of every section
@@ -76,7 +76,7 @@ inline const Points& Vasculature::points() const noexcept {
     return get<property::Point>();
 }
 
-inline const std::vector<float>& Vasculature::diameters() const noexcept {
+inline const std::vector<morphio::floatType>& Vasculature::diameters() const noexcept {
     return get<property::Diameter>();
 }
 

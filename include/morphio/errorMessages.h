@@ -54,10 +54,15 @@ struct Sample {
 
     explicit Sample(const char* line, unsigned int lineNumber_)
         : lineNumber(lineNumber_) {
-        float radius;
+        floatType radius;
         int int_type;
+#ifdef MORPHIO_USE_DOUBLE
+        const auto format = "%20u%20d%20lg%20lg%20lg%20lg%20d";
+#else
+        const auto format = "%20u%20d%20f%20f%20f%20f%20d";
+#endif
         valid = sscanf(line,
-                       "%20u%20d%20f%20f%20f%20f%20d",
+                       format,
                        &id,
                        &int_type,
                        &point[0],
@@ -70,7 +75,7 @@ struct Sample {
         diameter = radius * 2;  // The point array stores diameters.
     }
 
-    float diameter;
+    floatType diameter;
     bool valid;
     Point point;  // x, y, z and diameter
     SectionType type;

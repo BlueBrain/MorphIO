@@ -101,12 +101,12 @@ class Morphology
      * Return a vector with all diameters from all sections
      * (soma points are not included)
      **/
-    const std::vector<float>& diameters() const;
+    const std::vector<morphio::floatType>& diameters() const;
 
     /**
      * Return a vector with all perimeters from all sections
      **/
-    const std::vector<float>& perimeters() const;
+    const std::vector<morphio::floatType>& perimeters() const;
 
     /**
      * Return a vector with the section type of every section

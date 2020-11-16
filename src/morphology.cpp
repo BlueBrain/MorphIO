@@ -129,11 +129,11 @@ std::vector<uint32_t> Morphology::sectionOffsets() const {
     return indices;
 }
 
-const std::vector<float>& Morphology::diameters() const {
+const std::vector<morphio::floatType>& Morphology::diameters() const {
     return get<Property::Diameter>();
 }
 
-const std::vector<float>& Morphology::perimeters() const {
+const std::vector<morphio::floatType>& Morphology::perimeters() const {
     return get<Property::Perimeter>();
 }
 
