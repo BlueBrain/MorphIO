@@ -47,7 +47,7 @@ void writeLine(std::ofstream& myfile,
            << std::setprecision(FLOAT_PRECISION_PRINT)
 #endif
            << point[0] << ' ' << setw(12) << point[1] << ' ' << setw(12) << point[2] << ' '
-           << setw(12) << diameter / static_cast<morphio::floatType>(2) << setw(12);
+           << setw(12) << diameter / 2 << setw(12);
     myfile << std::to_string(parentId) << '\n';
 }
 

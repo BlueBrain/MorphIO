@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <cmath>
 #include <iostream>
 #include <sstream>
 #include <string>  // std::string
@@ -9,8 +10,12 @@
 namespace morphio {
 #ifdef MORPHIO_USE_DOUBLE
 using floatType = double;
+constexpr floatType epsilon = 1e-6;
+constexpr floatType PI = M_PI;
 #else
 using floatType = float;
+constexpr floatType epsilon = 1e-6f;
+constexpr floatType PI = static_cast<floatType>(M_PI);
 #endif
 
 using Point = std::array<morphio::floatType, 3>;

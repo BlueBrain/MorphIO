@@ -107,7 +107,7 @@ floatType maxDistanceToCenterOfGravity(const T& points) {
     const auto c = centerOfGravity(points);
     return std::accumulate(std::begin(points),
                            std::end(points),
-                           static_cast<morphio::floatType>(0),
+                           floatType{0},
                            [&](morphio::floatType a, const Point& b) {
                                return std::max(a, distance(c, b));
                            });

@@ -202,7 +202,7 @@ class SWCBuilder
         floatType y = root.point[1];
         floatType z = root.point[2];
         floatType d = root.diameter;
-        floatType r = root.diameter / static_cast<morphio::floatType>(2);
+        floatType r = root.diameter / 2;
         const Sample& child1 = _children[0];
         const Sample& child2 = _children[1];
 
