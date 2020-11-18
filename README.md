@@ -491,6 +491,9 @@ See https://github.com/BlueBrain/MorphIO/blob/master/doc/specification.md
 If you want to improve the project or you see any issue, every contribution is welcome.
 Please check the [contribution guidelines](CONTRIBUTING.md) for more information.
 
+# Acknowledgements
+This research was supported by the EBRAINS research infrastructure, funded from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3).
+
 # License
 MorphIO is licensed under the terms of the GNU Lesser General Public License version 3.
 Refer to COPYING.LESSER and COPYING for details.
