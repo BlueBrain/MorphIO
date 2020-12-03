@@ -5,9 +5,7 @@ set -euxo pipefail
 VENV=$(pwd)/build/venv-python-test/
 
 if [[ ! -d "$VENV" ]]; then
-    # We use virtualenv instead of `python3 -mvenv` because of python2 tests
-    pip install virtualenv
-    virtualenv "$VENV"
+    python3 -mvenv "$VENV"
 fi
 
 BIN=$VENV/bin/
