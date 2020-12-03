@@ -66,6 +66,8 @@ jobs:
 
       - name: Build wheels Windows
         if: runner.os == 'Windows'
+        env:
+          MORPHIO_CMAKE_GENERATOR: 'Visual Studio 16 2019'
         run: |
           conda config --set always_yes yes --set changeps1 no
           conda update -q conda
