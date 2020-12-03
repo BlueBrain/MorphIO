@@ -65,7 +65,7 @@ jobs:
         run: |
           conda config --set always_yes yes --set changeps1 no
           conda update -q conda
-          conda install -c conda-forge hdf
+          conda install -c conda-forge hdf5
           python -m cibuildwheel --output-dir dist
 
       - name: Store wheel as artifact
