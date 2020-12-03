@@ -22,5 +22,6 @@ pip install -r tests/requirement_tests.txt
 
 CURRENT=$(pwd)
 
+echo "wut"
 cd ..
 nosetests ${CURRENT}/tests
