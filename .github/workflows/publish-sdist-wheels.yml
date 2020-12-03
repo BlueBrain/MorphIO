@@ -13,7 +13,7 @@ env:
   CIBW_BUILD_VERBOSITY: 2
   # Only build on Python 3.x
   CIBW_BUILD: 'cp3?-*'
-  CIBW_SKIP: 'cp35-* cp39-* *-manylinux_i686'
+  CIBW_SKIP: 'cp35-* cp39-* *-manylinux_i686 .*win32.*'
   CIBW_BEFORE_TEST: pip install nose mock
   CIBW_TEST_COMMAND: nosetests -s -v -P {project}/python/tests
 
@@ -35,11 +35,11 @@ jobs:
         with:
           python-version: '3.7'
 
-      - name: Add msbuild to PATH
+      - name: Add msbuild to PATH on Windows
         uses: microsoft/setup-msbuild@v1.0.2
         if: runner.os == 'Windows'
 
-      - name: Setup Minicondo on windows
+      - name: Setup Miniconda on Windows
         uses: conda-incubator/setup-miniconda@v2
         if: runner.os == 'Windows'
         with:
@@ -57,14 +57,14 @@ jobs:
         run: |
           python -m cibuildwheel --output-dir dist
 
-      - name: Build wheels Mac OS
+      - name: Build wheels on Mac OS
         if: runner.os == 'macOS'
         env:
           CIBW_BEFORE_BUILD: 'brew update; brew install cmake hdf5'
         run: |
           python -m cibuildwheel --output-dir dist
 
-      - name: Build wheels Windows
+      - name: Build wheels on Windows
         if: runner.os == 'Windows'
         env:
           MORPHIO_CMAKE_GENERATOR: 'Visual Studio 16 2019'
