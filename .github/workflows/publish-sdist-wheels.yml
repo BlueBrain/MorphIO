@@ -53,11 +53,16 @@ jobs:
         run: |
           python -m cibuildwheel --output-dir dist
 
+      - name: Setup Minicondo on windows
+        uses: conda-incubator/setup-miniconda@v2
+        if: runner.os == 'Windows'
+        with:
+          auto-update-conda: true
+          python-version: '3.7'
+
       - name: Build wheels Windows
         if: runner.os == 'Windows'
         run: |
-          choco install --yes miniconda3
-          . C:/Tools/miniconda3/Scripts/activate
           conda config --set always_yes yes --set changeps1 no
           conda update -q conda
           conda install -c conda-forge hdf
