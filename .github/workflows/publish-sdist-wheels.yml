@@ -57,7 +57,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           choco install --yes miniconda3
-          source C:/Tools/miniconda3/Scripts/activate
+          . C:/Tools/miniconda3/Scripts/activate
           conda config --set always_yes yes --set changeps1 no
           conda update -q conda
           conda install -c conda-forge hdf
