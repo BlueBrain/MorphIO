@@ -22,5 +22,5 @@ pip install -r tests/requirement_tests.txt
 
 CURRENT=$(pwd)
 
-cd ..
+cd ../..
 nosetests ${CURRENT}/tests
