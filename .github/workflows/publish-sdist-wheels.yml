@@ -35,6 +35,11 @@ jobs:
         with:
           python-version: '3.7'
 
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+        if: runner.os == 'Windows'
+        with:
+          vs-version: '[15,16)'
 
       - name: Setup Minicondo on windows
         uses: conda-incubator/setup-miniconda@v2
