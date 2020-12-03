@@ -110,7 +110,7 @@ setup(
     url='https://github.com/BlueBrain/MorphIO/',
     ext_modules=[CMakeExtension('morphio._morphio')],
     cmdclass=dict(build_ext=CMakeBuild),
-    packages=['morphio', 'morphio.mut', 'morphio.vasculature'],
+    packages=['morphio', 'morphio.mut', 'morphio.vasculature', 'tests'],
     license="LGPLv3",
     keywords=('computational neuroscience',
               'morphology',
