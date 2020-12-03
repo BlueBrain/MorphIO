@@ -14,7 +14,7 @@ from morphio import Morphology as ImmutableMorphology
 from morphio import (PointLevel, SectionBuilderError, SectionType,
                      IterType, ostream_redirect, CellFamily)
 from morphio.mut import Morphology, GlialCell
-from utils import assert_substring, captured_output, tmp_asc_file, setup_tempdir
+from . utils import assert_substring, captured_output, tmp_asc_file, setup_tempdir
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
