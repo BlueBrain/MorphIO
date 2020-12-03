@@ -35,6 +35,14 @@ jobs:
         with:
           python-version: '3.7'
 
+
+      - name: Setup Minicondo on windows
+        uses: conda-incubator/setup-miniconda@v2
+        if: runner.os == 'Windows'
+        with:
+          auto-update-conda: true
+          python-version: '3.7'
+
       - name: Install cibuildwheel
         run: |
           python -m pip install cibuildwheel==1.6.4
@@ -52,13 +60,6 @@ jobs:
           CIBW_BEFORE_BUILD: 'brew update; brew install cmake hdf5'
         run: |
           python -m cibuildwheel --output-dir dist
-
-      - name: Setup Minicondo on windows
-        uses: conda-incubator/setup-miniconda@v2
-        if: runner.os == 'Windows'
-        with:
-          auto-update-conda: true
-          python-version: '3.7'
 
       - name: Build wheels Windows
         if: runner.os == 'Windows'
