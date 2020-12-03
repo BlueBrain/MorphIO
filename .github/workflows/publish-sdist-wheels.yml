@@ -12,8 +12,9 @@ env:
   MACOSX_DEPLOYMENT_TARGET: '10.13'
   CIBW_BUILD_VERBOSITY: 2
   # Only build on Python 3.x
-  CIBW_BUILD: 'cp3?-*'
-  CIBW_SKIP: 'cp35-* cp39-* *-manylinux_i686 .*win32.*'
+  # CIBW_BUILD: 'cp3?-*'
+  CIBW_BUILD: 'cp36-win_amd64'
+  # CIBW_SKIP: 'cp35-* cp39-* *-manylinux_i686 *win32.*'
   CIBW_BEFORE_TEST: pip install nose mock
   CIBW_TEST_COMMAND: nosetests -s -v -P {project}/python/tests
 
