@@ -82,14 +82,13 @@ class CMakeBuild(build_ext):
             cmake_args += ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY_{}={}'.format(
                 cfg.upper(),
                 extdir)]
-            cmake_args += ['-G', os.getenv('MORPHIO_CMAKE_GENERATOR',
-                                           "Visual Studio 15 2017 Win64")]
+            cmake_args += ['-G', os.getenv('MORPHIO_CMAKE_GENERATOR', "Visual Studio 15 2017 Win64")]
         else:
-            cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
-                           '-DMorphIO_CXX_WARNINGS=OFF',
-                           ]
+            cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg)]
             build_args += ["--", "-j{}".format(max(MIN_CPU_CORES, get_cpu_count())),
                            ]
+
+        cmake_args.append('-DMorphIO_CXX_WARNINGS=OFF')
 
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
