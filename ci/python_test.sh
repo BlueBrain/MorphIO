@@ -23,4 +23,4 @@ pip install -r tests/requirement_tests.txt
 CURRENT=$(pwd)
 
 cd ..
-nosetests ${CURRENT}/tests
+nosetests -P ${CURRENT}/tests
