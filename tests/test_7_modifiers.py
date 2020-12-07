@@ -5,7 +5,7 @@ from numpy.testing import assert_array_equal
 
 from morphio import Morphology, Option, SectionType, ostream_redirect
 from morphio.mut import Morphology as MutableMorphology
-from . utils import captured_output
+from utils import captured_output
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SIMPLE = os.path.join(_path, 'simple.swc')

@@ -2,14 +2,14 @@ import os
 import numpy as np
 from numpy.testing import assert_array_equal, assert_equal, assert_raises
 from nose.tools import ok_
-from pathlib import Path
+from pathlib2 import Path
 
 from morphio.mut import Morphology
 from morphio import (SectionBuilderError, set_maximum_warnings, SectionType, PointLevel,
                      WriterError,
                      MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect)
 
-from . utils import captured_output, setup_tempdir, assert_string_equal
+from utils import captured_output, setup_tempdir, assert_string_equal
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 

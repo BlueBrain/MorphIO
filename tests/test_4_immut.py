@@ -4,7 +4,7 @@ from collections import OrderedDict
 import numpy as np
 from nose.tools import assert_dict_equal, assert_equal, ok_, assert_raises
 from numpy.testing import assert_array_almost_equal, assert_array_equal
-from pathlib import Path
+from pathlib2 import Path
 
 from morphio import IterType, Morphology, GlialCell, CellFamily, RawDataError
 

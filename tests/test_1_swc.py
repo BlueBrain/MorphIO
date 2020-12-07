@@ -7,7 +7,7 @@ from numpy.testing import assert_array_equal
 
 from morphio import (Morphology, RawDataError, SectionType, SomaError, SomaType,
                      ostream_redirect, set_maximum_warnings, set_ignored_warning, Warning)
-from . utils import (_test_swc_exception, assert_substring, assert_string_equal, captured_output,
+from utils import (_test_swc_exception, assert_substring, assert_string_equal, captured_output,
                    strip_color_codes, tmp_swc_file, strip_all, ignored_warning)
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")

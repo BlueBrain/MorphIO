@@ -7,7 +7,7 @@ from numpy.testing import assert_array_equal
 from nose import tools as nt
 from morphio import Morphology, RawDataError, SomaError, ostream_redirect
 
-from . utils import tmp_asc_file, _test_asc_exception, captured_output, assert_substring
+from utils import tmp_asc_file, _test_asc_exception, captured_output, assert_substring
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
