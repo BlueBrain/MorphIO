@@ -5,7 +5,7 @@ import numpy as np
 from numpy.testing import assert_equal
 from nose.tools import assert_dict_equal, assert_raises, ok_
 from numpy.testing import assert_array_equal
-from pathlib2 import Path
+from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import morphio

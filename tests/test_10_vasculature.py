@@ -3,7 +3,7 @@ import os
 import numpy as np
 from nose.tools import assert_equal, assert_raises
 from numpy.testing import assert_array_almost_equal, assert_array_equal
-from pathlib2 import Path
+from pathlib import Path
 
 import morphio.vasculature as vasculature
 from morphio import RawDataError, VasculatureSectionType
