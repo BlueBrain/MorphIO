@@ -1,11 +1,9 @@
 name: Publish sdist and wheels macos-manylinux
 
-# on:
-#   push:
-#     tags:
-#       - 'v[0-9]+.[0-9]+.[0-9]+'
 on:
-  pull_request:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 env:
   CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
@@ -81,42 +79,42 @@ jobs:
           name: dist
           path: dist
 
-  # build_sdist:
-  #   name: Build sdist
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@master
-  #     - name: Set up Python 3.6
-  #       uses: actions/setup-python@v2
-  #       with:
-  #         python-version: 3.6
-  #     - name: Build a source tarball
-  #       run:
-  #         python setup.py sdist
-  #     - name: Store sdist as artifact
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: dist
-  #         path: dist
+  build_sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+      - name: Build a source tarball
+        run:
+          python setup.py sdist
+      - name: Store sdist as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: dist
+          path: dist
 
-  # upload_wheels:
-  #   runs-on: ubuntu-latest
-  #   needs: [build_wheels, build_sdist]
-  #   name: Upload wheels to PyPI
-  #   steps:
-  #     - name: Download artifacts produced during the build_wheels and build_sdist jobs
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: dist
-  #         path: dist
+  upload_wheels:
+    runs-on: ubuntu-latest
+    needs: [build_wheels, build_sdist]
+    name: Upload wheels to PyPI
+    steps:
+      - name: Download artifacts produced during the build_wheels and build_sdist jobs
+        uses: actions/download-artifact@v2
+        with:
+          name: dist
+          path: dist
 
-  #     - name: Display structure of downloaded files
-  #       run: ls -R
-  #       working-directory: dist
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: dist
 
-  #     - name: Publish package to PyPI
-  #       uses: pypa/gh-action-pypi-publish@master
-  #       with:
-  #         user: __token__
-  #         password: ${{ secrets.PYPI_PASSWORD }}
-  #         packages_dir: dist/
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_PASSWORD }}
+          packages_dir: dist/

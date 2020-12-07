@@ -1,0 +1,17 @@
+name: clang-format-check
+on:
+    pull_request:
+
+jobs:
+  build:
+    name: clang-format-check
+    runs-on: ubuntu-18.04
+    steps:
+        - name: Fetch repository
+          uses: actions/checkout@v1
+        - name: Install apt
+          run: sudo apt-get update -y
+        - name: Install packages
+          run: sudo apt-get install python3-venv
+        - name: check_clang_format
+          run: ci/check_clang_format.sh
