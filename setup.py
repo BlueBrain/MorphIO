@@ -111,7 +111,6 @@ setup(
     ext_modules=[CMakeExtension('morphio._morphio')],
     cmdclass=dict(build_ext=CMakeBuild),
     packages=['morphio', 'morphio.mut', 'morphio.vasculature'],
-    test_suite='tests.test_suite',
     license="LGPLv3",
     keywords=('computational neuroscience',
               'morphology',
