@@ -6,7 +6,7 @@ from numpy.testing import assert_array_equal
 
 from morphio import (Morphology, MorphologyVersion, RawDataError, SectionType,
                      ostream_redirect)
-from utils import captured_output
+from . utils import captured_output
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 H5_PATH = os.path.join(_path, 'h5')

@@ -9,7 +9,7 @@ from morphio import (SectionBuilderError, set_maximum_warnings, SectionType, Poi
                      WriterError,
                      MitochondriaPointLevel, Morphology as ImmutMorphology, ostream_redirect)
 
-from utils import captured_output, setup_tempdir, assert_string_equal
+from . utils import captured_output, setup_tempdir, assert_string_equal
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
