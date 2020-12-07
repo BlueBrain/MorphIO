@@ -2,19 +2,25 @@
 
 set -euxo pipefail
 
-VENV=$(pwd)/build/venv-python-test/
+VENV=env
 
-if [[ ! -d "$VENV" ]]; then
+if [[ "$OSTYPE" != "msys" ]]; then
+    rm -rf "$VENV"
     python3 -mvenv "$VENV"
+
+    set +u  # ignore errors in virtualenv's activate
+    source "$VENV/bin/activate"
+    set -u
+
+    which pip
+
+    pip install --upgrade pip setuptools
 fi
 
-BIN=$VENV/bin/
+pip install .
+pip install -r tests/requirement_tests.txt
 
-source $BIN/activate
-pip -v install --upgrade pip setuptools wheel
+CURRENT=$(pwd)
 
-# install
-pip -v install --force .
-pip install nose h5py
-
-nosetests -s -v -P tests
+cd ..
+nosetests ${CURRENT}/tests
