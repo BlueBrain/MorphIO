@@ -1,9 +1,10 @@
 name: Publish sdist and wheels macos-manylinux
 
 on:
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+  # push:
+  #   tags:
+  #     - 'v[0-9]+.[0-9]+.[0-9]+'
 
 env:
   CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
@@ -11,7 +12,7 @@ env:
   CIBW_BUILD_VERBOSITY: 2
   # Only build on Python 3.x
   CIBW_BUILD: 'cp3?-*'
-  CIBW_SKIP: 'cp35-* cp39-* *-manylinux_i686 *-win32'
+  CIBW_SKIP: 'cp35-* *-manylinux_i686 *-win32'
   CIBW_BEFORE_TEST: pip install nose mock h5py
   CIBW_TEST_COMMAND: nosetests -s -v -P {project}/tests
 
