@@ -28,7 +28,7 @@ jobs:
 
       - name: Install packages on MacOS
         if: runner.os == 'macOS'
-        run: brew update && brew install cmake hdf5
+        run: brew update && brew install hdf5
 
       - name: Build and run unittests
         env:
