@@ -206,14 +206,15 @@ int main()
 from morphio import Morphology
 
 m = Morphology("sample.asc")
-roots = m.rootSections
+roots = m.root_sections
 first_root = roots[0]
 
 # iterate on sections starting at first_root
 for section in first_root.iter():
     print("Section type: {}".format(section.type))
     print("Section id: {}".format(section.id))
-    print("Parent section id: {}".format(section.parent.id))
+    if not section.is_root:
+       print("Parent section id: {}".format(section.parent.id))
     print("Number of child sections: {}".format(len(section.children)))
     print("X - Y - Z - Diameter")
 
