@@ -1,9 +1,10 @@
 name: Publish sdist and wheels macos-manylinux
 
 on:
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+  # push:
+  #   tags:
+  #     - 'v[0-9]+.[0-9]+.[0-9]+'
 
 env:
   CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
@@ -45,7 +46,7 @@ jobs:
       - name: Build wheels Mac OS
         if: runner.os == 'macOS'
         env:
-          CIBW_BEFORE_BUILD: 'brew update; brew install cmake hdf5'
+          CIBW_BEFORE_BUILD: 'brew update; brew unlink gcc@8; brew install cmake hdf5'
         run: |
           python -m cibuildwheel --output-dir dist
       - name: Store wheel as artifact
