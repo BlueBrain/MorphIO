@@ -45,7 +45,7 @@ jobs:
       - name: Build wheels Mac OS
         if: runner.os == 'macOS'
         env:
-          CIBW_BEFORE_BUILD: 'brew update; brew install cmake hdf5'
+          CIBW_BEFORE_BUILD: 'brew update; brew unlink gcc@8 gcc@9; brew install cmake hdf5'
         run: |
           python -m cibuildwheel --output-dir dist
       - name: Store wheel as artifact
