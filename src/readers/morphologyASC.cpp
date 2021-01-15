@@ -123,11 +123,10 @@ class NeurolucidaParser
             return_id = -1;
         } else {
             SectionType section_type = TokenSectionTypeMap.at(token);
-            insertLastPointParentSection(parent_id, properties);
+            insertLastPointParentSection(parent_id, properties, diameters);
 
-            // Condition to remove single point section that duplicate parent
-            // point See test_single_point_section_duplicate_parent for an
-            // example
+            // Condition to remove a single point section that is made of only the duplicate point
+            // See test_single_point_section_duplicate_parent for an example
             if (parent_id > -1 && properties._points.size() == 1) {
                 return_id = parent_id;
             } else {
@@ -152,32 +151,41 @@ class NeurolucidaParser
       Add the last point of parent section to the beginning of this section
       if not already present.
 
-     The idea is that these two structures should represent the same morphology:
+      The diameter is taken from the child section next point as does NEURON.
+      Here is the spec:
+      https://bbpteam.epfl.ch/project/issues/browse/NSETM-1178?focusedCommentId=135030&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-135030
 
-     (3 -8 0 2)     and          (3 -8 0 2)
-     (3 -10 0 2)                 (3 -10 0 2)
-     (                           (
-       (0 -10 0 2)                 (3 -10 0 2)  <-- duplicate parent point
-       (-3 -10 0 2)                (0 -10 0 2)
-       |                           (-3 -10 0 2)
-       (6 -10 0 2)                 |
-       (9 -10 0 2)                 (3 -10 0 2)  <-- duplicate parent point
-     )                             (6 -10 0 2)
-                                   (9 -10 0 2)
-                                 )
+      In term of diameters, the result should look like the right picture of:
+      https://github.com/BlueBrain/NeuroM/issues/654#issuecomment-332864540
+
+      The idea is that these two structures should represent the same morphology:
+
+      (3 -8 0 2)     and          (3 -8 0 2)
+      (3 -10 0 2)                 (3 -10 0 2)
+      (                           (
+        (0 -10 0 2)                 (3 -10 0 2)  <-- duplicate parent point
+        (-3 -10 0 2)                (0 -10 0 2)
+        |                           (-3 -10 0 2)
+        (6 -10 0 2)                 |
+        (9 -10 0 2)                 (3 -10 0 2)  <-- duplicate parent point
+      )                             (6 -10 0 2)
+                                    (9 -10 0 2)
+                                  )
      */
-    void insertLastPointParentSection(int32_t parentId, morphio::Property::PointLevel& properties) {
+    void insertLastPointParentSection(int32_t parentId,
+                                      morphio::Property::PointLevel& properties,
+                                      std::vector<morphio::floatType>& diameters) {
         if (parentId < 0)  // Discard root sections
             return;
         auto parent = nb_.section(static_cast<unsigned int>(parentId));
         auto lastParentPoint = parent->points()[parent->points().size() - 1];
-        auto lastParentDiameter = parent->diameters()[parent->diameters().size() - 1];
+        auto childSectionNextDiameter = diameters[0];
 
         if (lastParentPoint == properties._points[0])
             return;
 
         properties._points.insert(properties._points.begin(), lastParentPoint);
-        properties._diameters.insert(properties._diameters.begin(), lastParentDiameter);
+        properties._diameters.insert(properties._diameters.begin(), childSectionNextDiameter);
     }
 
     bool parse_neurite_section(int32_t parent_id, Token token) {
