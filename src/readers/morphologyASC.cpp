@@ -150,6 +150,7 @@ class NeurolucidaParser
     /*
       Add the last point of parent section to the beginning of this section
       if not already present.
+      See https://github.com/BlueBrain/MorphIO/pull/221
 
       The diameter is taken from the child section next point as does NEURON.
       Here is the spec:
@@ -158,19 +159,19 @@ class NeurolucidaParser
       In term of diameters, the result should look like the right picture of:
       https://github.com/BlueBrain/NeuroM/issues/654#issuecomment-332864540
 
-      The idea is that these two structures should represent the same morphology:
+     The idea is that these two structures should represent the same morphology:
 
-      (3 -8 0 2)     and          (3 -8 0 2)
-      (3 -10 0 2)                 (3 -10 0 2)
-      (                           (
-        (0 -10 0 2)                 (3 -10 0 2)  <-- duplicate parent point
-        (-3 -10 0 2)                (0 -10 0 2)
-        |                           (-3 -10 0 2)
-        (6 -10 0 2)                 |
-        (9 -10 0 2)                 (3 -10 0 2)  <-- duplicate parent point
-      )                             (6 -10 0 2)
-                                    (9 -10 0 2)
-                                  )
+     (3 -8 0 5)     and          (3 -8 0 5)
+     (3 -10 0 5)                 (3 -10 0 5)
+     (                           (
+       (0 -10 0 2)                 (3 -10 0 2)  <-- duplicate parent point, note that the
+       (-3 -10 0 2)                (0 -10 0 2)      diameter is 2 and not 5
+       |                           (-3 -10 0 2)
+       (6 -10 0 2)                 |
+       (9 -10 0 2)                 (3 -10 0 2)  <-- duplicate parent point, note that the
+     )                             (6 -10 0 2)      diameter is 2 and not 5
+                                   (9 -10 0 2)
+                                 )
      */
     void insertLastPointParentSection(int32_t parentId,
                                       morphio::Property::PointLevel& properties,
