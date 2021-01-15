@@ -1,11 +1,12 @@
 import os
 
+import numpy as np
+from morphio import Morphology, Option, SectionType, ostream_redirect
+from morphio.mut import Morphology as MutableMorphology
 from nose.tools import assert_equal
 from numpy.testing import assert_array_equal
 
-from morphio import Morphology, Option, SectionType, ostream_redirect
-from morphio.mut import Morphology as MutableMorphology
-from . utils import captured_output
+from .utils import captured_output
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SIMPLE = os.path.join(_path, 'simple.swc')
@@ -75,20 +76,20 @@ def test_no_duplicate():
         with ostream_redirect(stdout=True, stderr=True):
             m = Morphology(SIMPLE, options=Option.no_duplicates)
 
-    neurite1 = [[[0.,0.,0.], [0,5,0]],
-                [[-5,5,0]],
-                [[6,5,0]]]
+    neurite1 = np.array([[0.,0.,0.], [0,5,0],
+                         [-5,5,0],
+                         [6,5,0]])
 
-    neurite2 = [[[0,0,0], [0,-4,0]],
-                [[6,-4,0]],
-                [[-5,-4,0]]]
+    neurite2 = np.array([[0,0,0], [0,-4,0],
+                [6,-4,0],
+                [-5,-4,0]])
 
-    assert_array_equal([section.points.tolist() for section in m.iter()],
-                       neurite1 + neurite2)
+    assert_array_equal(np.vstack([section.points for section in m.iter()]),
+                       np.vstack([neurite1, neurite2]))
 
     # Combining options NO_DUPLICATES and NRN_ORDER
     with captured_output():
         with ostream_redirect(stdout=True, stderr=True):
             m = Morphology(SIMPLE, options=Option.no_duplicates|Option.nrn_order)
-    assert_array_equal([section.points.tolist() for section in m.iter()],
-                       neurite2 + neurite1)
+    assert_array_equal(np.vstack([section.points for section in m.iter()]),
+                       np.vstack([neurite2, neurite1]))
