@@ -33,7 +33,7 @@ enum class Token {
     // Special WORDS
     COLOR = 101,
     FONT,
-    IMAGECOORDS,
+    MARKER,
     RGB,
 
     // end of branch weirdness
@@ -80,7 +80,7 @@ inline std::string to_string(Token t) {
         T(CELLBODY)
         T(COLOR)
         T(FONT)
-        T(IMAGECOORDS)
+        T(MARKER)
         T(RGB)
         T(GENERATED)
         T(HIGH)
@@ -162,7 +162,17 @@ class NeurolucidaLexer
         rules_.push("Dendrite", +Token::DENDRITE);
         rules_.push("CellBody", +Token::CELLBODY);
 
-        rules_.push("ImageCoords", +Token::IMAGECOORDS);
+        rules_.push("Dot", +Token::MARKER);
+        rules_.push("FilledCircle", +Token::MARKER);
+        rules_.push("SnowFlake", +Token::MARKER);
+        rules_.push("Asterisk", +Token::MARKER);
+        rules_.push("OpenCircle", +Token::MARKER);
+        rules_.push("OpenStar", +Token::MARKER);
+        rules_.push("Flower", +Token::MARKER);
+        rules_.push("OpenSquare", +Token::MARKER);
+        rules_.push("FilledStar", +Token::MARKER);
+        rules_.push("DoubleCircle", +Token::MARKER);
+
         rules_.push("Generated", +Token::GENERATED);
         rules_.push("High", +Token::HIGH);
         rules_.push("Incomplete", +Token::INCOMPLETE);
@@ -266,7 +276,7 @@ class NeurolucidaLexer
 
     // advance iterator until sexp is consumed, including final paren
     void consume_until_balanced_paren() {
-        expect(Token::LPAREN, "consume_until_balanced_paren should start in LPAREN");
+        // expect(Token::LPAREN, "consume_until_balanced_paren should start in LPAREN");
         size_t opening_count = 1;
         while (opening_count != 0) {
             size_t id = consume()->id;

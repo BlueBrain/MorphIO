@@ -218,11 +218,10 @@ class NeurolucidaParser
 
             if (is_eof(id)) {
                 throw RawDataError(err_.ERROR_EOF_IN_NEURITE(lex_.line_num()));
-            } else if (id == Token::WORD) {
+            } else if (id == Token::MARKER) {
                 lex_.consume();
-            } else if (id == Token::IMAGECOORDS) {
-                lex_.consume_until(Token::RPAREN);
-                lex_.consume(Token::RPAREN);
+            } else if (id == Token::WORD) {
+                lex_.consume_until_balanced_paren();
                 lex_.consume(Token::LPAREN);
             } else if (id == Token::STRING) {
                 header.label = lex_.current()->str();
