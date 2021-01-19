@@ -139,7 +139,7 @@ class NeurolucidaParser
             return_id = -1;
         } else {
             SectionType section_type = TokenSectionTypeMap.at(header.token);
-            insertLastPointParentSection(header.parent_id, properties);
+            insertLastPointParentSection(header.parent_id, properties, diameters);
 
             // Condition to remove single point section that duplicate parent
             // point See test_single_point_section_duplicate_parent for an

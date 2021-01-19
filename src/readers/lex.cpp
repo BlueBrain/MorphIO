@@ -276,7 +276,6 @@ class NeurolucidaLexer
 
     // advance iterator until sexp is consumed, including final paren
     void consume_until_balanced_paren() {
-        // expect(Token::LPAREN, "consume_until_balanced_paren should start in LPAREN");
         size_t opening_count = 1;
         while (opening_count != 0) {
             size_t id = consume()->id;
