@@ -1,13 +1,13 @@
 import os
+
 import morphio
 import numpy as np
-from nose.tools import eq_, ok_, assert_equal
-
-from numpy.testing import assert_array_equal
-from nose import tools as nt
 from morphio import Morphology, RawDataError, SomaError, ostream_redirect
+from nose import tools as nt
+from nose.tools import assert_equal, eq_, ok_
+from numpy.testing import assert_array_equal
 
-from . utils import tmp_asc_file, _test_asc_exception, captured_output, assert_substring
+from .utils import _test_asc_exception, assert_substring, captured_output, tmp_asc_file
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -135,38 +135,37 @@ def test_skip_header():
 
 without_duplicate = '''
                      ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
+                      (3 -4 0 5)
+                      (3 -6 0 5)
+                      (3 -8 0 5)
+                      (3 -10 0 5)
                       (
                         (0 -10 0 2)
-                        (-3 -10 0 2)
+                        (-3 -10 0 0.3)
                         |
                         (6 -10 0 2)
-                        (9 -10 0 2)
+                        (9 -10 0 0.3)
                       )
                       )
                      '''
 
 with_duplicate = '''
                      ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
+                      (3 -4 0 5)
+                      (3 -6 0 5)
+                      (3 -8 0 5)
+                      (3 -10 0 5)
                       (
                         (3 -10 0 2) ; duplicate
                         (0 -10 0 2)
-                        (-3 -10 0 2)
+                        (-3 -10 0 0.3)
                         |
                         (3 -10 0 2) ; duplicate
                         (6 -10 0 2)
-                        (9 -10 0 2)
+                        (9 -10 0 0.3)
                       )
                       )
                      '''
-
 
 def test_read_with_duplicates():
     '''Section points are duplicated in the file
@@ -190,11 +189,15 @@ would look like'''
                        [[3, -10, 0],
                         [0, -10, 0],
                         [-3, -10, 0]])
+    assert_array_equal(n.root_sections[0].children[0].diameters,
+                       np.array([2, 2, 0.3], dtype=np.float32))
 
     assert_array_equal(n.root_sections[0].children[1].points,
                        [[3, -10, 0],
                         [6, -10, 0],
                         [9, -10, 0]])
+    assert_array_equal(n.root_sections[0].children[1].diameters,
+                       np.array([2, 2, 0.3], dtype=np.float32))
 
 
 def test_read_without_duplicates():
@@ -209,6 +212,36 @@ def test_read_without_duplicates():
 
     assert_array_equal(n_with_duplicate.root_sections[0].points,
                        n_without_duplicate.root_sections[0].points)
+
+    assert_array_equal(n_with_duplicate.root_sections[0].children[0].diameters,
+                       n_without_duplicate.root_sections[0].children[0].diameters)
+
+    assert_array_equal(n_with_duplicate.root_sections[0].diameters,
+                       n_without_duplicate.root_sections[0].diameters)
+
+
+def test_explicit_duplicates_with_arbitrary_diameter():
+    '''If the duplicate is already in the file with an arbitrary diameter, it should be preserved'''
+    with tmp_asc_file('''
+                     ((Dendrite)
+                      (3 -4 0 5)
+                      (3 -6 0 5)
+                      (3 -8 0 5)
+                      (3 -10 0 5)
+                      (
+                        (3 -10 0 20) ; duplicate
+                        (0 -10 0 2)
+                        (-3 -10 0 0.3)
+                        |
+                        (3 -10 0 2)
+                        (6 -10 0 2)
+                        (9 -10 0 0.3)
+                      )
+                      )
+                     ''') as tmp_file:
+        n = Morphology(tmp_file.name)
+        assert_array_equal(n.root_sections[0].children[0].diameters,
+                           np.array([20, 2, 0.3], dtype=np.float32))
 
 
 def test_unfinished_file():
@@ -235,14 +268,14 @@ def test_empty_sibling():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             with tmp_asc_file('''((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
+                      (3 -4 0 10)
+                      (3 -6 0 9)
+                      (3 -8 0 8)
+                      (3 -10 0 7)
                       (
-                        (3 -10 0 2)
-                        (0 -10 0 2)
-                        (-3 -10 0 2)
+                        (3 -10 0 6)
+                        (0 -10 0 5)
+                        (-3 -10 0 4)
                         |       ; <-- empty sibling but still works !
                        )
                       )
@@ -262,13 +295,15 @@ def test_empty_sibling():
                                  [0, -10, 0],
                                  [-3, -10, 0]],
                                 dtype=np.float32))
+    assert_array_equal(n.root_sections[0].diameters,
+                       np.array([10, 9, 8, 7, 5, 4], dtype=np.float32))
 
     assert_equal(len(n.annotations), 1)
     annotation = n.annotations[0]
     assert_equal(annotation.type, morphio.AnnotationType.single_child)
     assert_equal(annotation.line_number, 6)
     assert_array_equal(annotation.points, [[3, -10, 0], [0, -10, 0], [-3, -10, 0]])
-    assert_array_equal(annotation.diameters, [2, 2, 2])
+    assert_array_equal(annotation.diameters, [6, 5, 4])
 
 def test_nested_single_child():
     with captured_output() as (_, err):
@@ -280,8 +315,7 @@ def test_nested_single_child():
                         [0., 0., 2.],
                         [0., 0., 3.],
                         [0., 0., 4.]])
-
-
+    assert_array_equal(n.root_sections[0].diameters, np.array([8, 7, 6, 5, 4], dtype=np.float32))
 
 
 def test_section_single_point():
@@ -295,9 +329,9 @@ def test_section_single_point():
                       (3 -8 0 2)
                       (3 -10 0 2)
                       (
-                        (3 -10 2 4)  ; single point section
+                        (3 -10 2 4)  ; single point section without duplicate
                        |
-                        (3 -10 0 2)  ; normal section
+                        (3 -10 0 2)  ; normal section with duplicate
                         (3 -10 1 2)
                         (3 -10 2 2)
                       )
@@ -309,6 +343,8 @@ def test_section_single_point():
         assert_array_equal(n.root_sections[0].children[0].points,
                            np.array([[3, -10, 0],
                                      [3, -10, 2]], dtype=np.float32))
+        assert_array_equal(n.root_sections[0].children[0].diameters,
+                           np.array([4, 4], dtype=np.float32))
 
         assert_array_equal(n.root_sections[0].children[1].points,
                            np.array([[3, -10, 0],
@@ -325,9 +361,9 @@ def test_single_children():
                       (3 -8 0 2)
                       (3 -10 0 2)
                       (
-                        (3 -10 0 2)  ; merged with parent section
-                        (0 -10 0 2)  ; merged with parent section
-                        (-3 -10 0 2) ; merged with parent section
+                        (3 -10 0 4)  ; merged with parent section
+                        (0 -10 0 4)  ; merged with parent section
+                        (-3 -10 0 3) ; merged with parent section
                         (
                           (-5 -5 5 5)
                           |
@@ -356,6 +392,8 @@ def test_single_children():
                                      [0, -10, 0],
                                      [-3, -10, 0]],
                                     dtype=np.float32))
+        assert_array_equal(n.root_sections[0].diameters,
+                           np.array([2, 2, 2, 2, 4, 3], dtype=np.float32))
 
         assert_equal(len(n.root_sections[0].children), 2)
 
@@ -396,6 +434,7 @@ def test_single_point_section_duplicate_parent():
 
     assert_array_equal(neuron.root_sections[0].points, [[  3.,  -4.,   0.],
                                                         [  3., -10.,   0.]])
+    assert_array_equal(neuron.root_sections[0].diameters, np.array([2, 2], dtype=np.float32))
 
 
 def test_single_point_section_duplicate_parent_complex():
