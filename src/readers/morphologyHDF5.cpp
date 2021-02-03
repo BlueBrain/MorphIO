@@ -187,6 +187,7 @@ bool MorphologyHDF5::_readV2Metadata() {
         HighFive::SilenceHDF5 silence;
         _group.getGroup(_g_root);
         _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_2;
+        _properties._cellLevel._cellFamily = CellFamily::NEURON;
         return true;
     } catch (const HighFive::Exception&) {
         return false;
