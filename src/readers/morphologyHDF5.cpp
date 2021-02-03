@@ -141,6 +141,8 @@ void MorphologyHDF5::_resolveV1() {
 }
 
 bool MorphologyHDF5::_readV11Metadata() {
+    uint32_t family;
+
     try {
         HighFive::SilenceHDF5 silence;
         const auto metadata = _group.getGroup(_g_metadata);
@@ -151,12 +153,8 @@ bool MorphologyHDF5::_readV11Metadata() {
         if (version[0] != 1 || version[1] != 1)
             return false;
 
-        _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_1_1;
-
         const auto familyAttr = metadata.getAttribute(_a_family);
-        uint32_t family;
         familyAttr.read(family);
-        _properties._cellLevel._cellFamily = static_cast<CellFamily>(family);
     } catch (const HighFive::GroupException&) {
         return false;
     } catch (const HighFive::Exception& e) {
@@ -166,6 +164,8 @@ bool MorphologyHDF5::_readV11Metadata() {
         throw morphio::RawDataError("Error reading morphology " + _uri + "  metadata." + e.what());
     }
 
+    _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_1_1;
+    _properties._cellLevel._cellFamily = static_cast<CellFamily>(family);
     _resolveV1();
     return true;
 }
@@ -176,18 +176,11 @@ bool MorphologyHDF5::_readV2Metadata() {
         const auto root = _group.getGroup(_g_root);
         const auto attr = root.getAttribute(_a_version);
         attr.read(_properties._cellLevel._version);
-        if (_properties.version() == MORPHOLOGY_VERSION_H5_2)
+        if (_properties.version() == MORPHOLOGY_VERSION_H5_2) {
+            _properties._cellLevel._cellFamily = CellFamily::NEURON;
             return true;
+        }
     } catch (const HighFive::Exception&) {
-    }
-
-    try {
-        HighFive::SilenceHDF5 silence;
-        _group.getGroup(_g_root);
-        _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_2;
-        return true;
-    } catch (const HighFive::Exception&) {
-        return false;
     }
 }
 

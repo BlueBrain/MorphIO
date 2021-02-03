@@ -1,26 +1,27 @@
 import os
 from itertools import chain, repeat
+from pathlib import Path
 
+from morphio import (CellFamily, Morphology, MorphologyVersion, RawDataError, SectionType,
+                     ostream_redirect)
 from nose.tools import assert_equal, assert_raises
 from numpy.testing import assert_array_equal
 
-from morphio import (Morphology, MorphologyVersion, RawDataError, SectionType,
-                     ostream_redirect)
-from . utils import captured_output
+from .utils import captured_output
 
-_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
-H5_PATH = os.path.join(_path, 'h5')
-H5V1_PATH = os.path.join(H5_PATH, 'v1')
-H5V2_PATH = os.path.join(H5_PATH, 'v2')
+_path = Path(os.path.dirname(os.path.abspath(__file__)), "data")
+H5_PATH = Path(_path, 'h5')
+H5V1_PATH = Path(H5_PATH, 'v1')
+H5V2_PATH = Path(H5_PATH, 'v2')
 
 
 def test_v1():
-    n = Morphology(os.path.join(H5V1_PATH, 'simple.h5'))
+    n = Morphology(H5V1_PATH / 'simple.h5')
     assert_equal(len(n.root_sections), 2)
     assert_equal(n.root_sections[0].type, 3)
     assert_equal(n.root_sections[1].type, 2)
 
-    n = Morphology(os.path.join(H5V1_PATH, 'Neuron.h5'))
+    n = Morphology(H5V1_PATH / 'Neuron.h5')
     assert_equal(n.version, MorphologyVersion.MORPHOLOGY_VERSION_H5_1)
 
     assert_equal(len(n.sections), 84)
@@ -47,15 +48,15 @@ def test_v1():
 
 def test_wrong_section_type():
     with assert_raises(RawDataError) as cm:
-        Morphology(os.path.join(H5V1_PATH, 'simple-broken-section-type.h5'))
+        Morphology(H5V1_PATH / 'simple-broken-section-type.h5')
     assert_equal(str(cm.exception).strip(), 'Unsupported section type: 9')
 
     with assert_raises(RawDataError) as cm:
-        Morphology(os.path.join(H5V1_PATH, 'simple-negative-section-type.h5'))
+        Morphology(H5V1_PATH / 'simple-negative-section-type.h5')
     assert_equal(str(cm.exception).strip(), 'Unsupported section type: -2')
 
 def test_v2():
-    n = Morphology(os.path.join(H5V2_PATH, 'Neuron.h5'))
+    n = Morphology(H5V2_PATH / 'Neuron.h5')
     assert_equal(n.version, MorphologyVersion.MORPHOLOGY_VERSION_H5_2)
 
 
@@ -66,9 +67,15 @@ def test_v2():
     assert_equal(len(list(n.iter())), 85)
     assert_equal(len(n.points), 926)
     assert_equal(len(n.sections), 85)
+    assert_equal(n.cell_family, CellFamily.NEURON)
+
+def test_v2_without_cellfamily_info():
+    '''This H5v2 cell has no metadata but we check that the correct CellFamily type is set'''
+    n = Morphology(H5V2_PATH / 'no-metadata.h5')
+    assert_equal(n.cell_family, CellFamily.NEURON)
 
 def test_soma_no_neurite():
-    n = Morphology(os.path.join(H5V1_PATH, 'soma_no_neurites.h5'))
+    n = Morphology(H5V1_PATH / 'soma_no_neurites.h5')
 
     assert_array_equal(n.soma.points,
                        [[ 0.,  0.,  0.],
@@ -83,5 +90,5 @@ def test_soma_no_neurite():
 def test_single_children():
     with captured_output() as (_, _):
         with ostream_redirect(stdout=True, stderr=True):
-            neuron = Morphology(os.path.join(H5V1_PATH, 'two_child_unmerged.h5'))
+            neuron = Morphology(H5V1_PATH / 'two_child_unmerged.h5')
     assert_equal(len(list(neuron.iter())), 3)
