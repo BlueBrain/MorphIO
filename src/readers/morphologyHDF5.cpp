@@ -182,6 +182,15 @@ bool MorphologyHDF5::_readV2Metadata() {
         }
     } catch (const HighFive::Exception&) {
     }
+
+    try {
+        HighFive::SilenceHDF5 silence;
+        _group.getGroup(_g_root);
+        _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_2;
+        return true;
+    } catch (const HighFive::Exception&) {
+        return false;
+    }
 }
 
 HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections) {
