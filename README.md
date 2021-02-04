@@ -477,6 +477,9 @@ neuron.write('/my/out/file.h5')  # Has to be written to h5
 
 #### NeuroLucida markers
 
+<details>
+  <summary>Click to expand!</summary>
+  
 A marker is an [s-expression](https://fr.wikipedia.org/wiki/S-expression) at the top level of the Neurolucida file that contains additional information about the morphology. For example:
 
 ```lisp
@@ -552,6 +555,8 @@ assert_array_equal(pia.points,
 # fetch the diameters with the `diameters` attribute
 assert_array_equal(pia.diameters, [3, 4, 5, 6])
 ```
+
+</details>
 
 ### Tips
 #### Maximum number of warnings
