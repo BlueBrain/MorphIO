@@ -488,6 +488,25 @@ morphio.set_maximum_warnings(0)
 # Specification
 See https://github.com/BlueBrain/MorphIO/blob/master/doc/specification.md
 
+
+# H5v2
+
+Starting at version 2.5.2, the file format `h5v2` is no longer supported.
+If you have morphologies in this format, you can convert them with:
+
+```bash
+pip install morphio==2.5.1 morph-tool==2.3.0
+```
+
+and then:
+```python
+# single file, OUTPUT must end with `.h5`
+morph-tool convert file INPUTFILE OUTPUT
+
+# bulk conversion
+morph-tool convert folder -ext h5 INPUTDIR OUTPUTDIR
+```
+
 # Contributing
 If you want to improve the project or you see any issue, every contribution is welcome.
 Please check the [contribution guidelines](CONTRIBUTING.md) for more information.
