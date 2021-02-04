@@ -151,6 +151,8 @@ struct Marker {
 };
 
 struct CellLevel {
+    CellLevel()
+        : _version(MORPHOLOGY_VERSION_UNDEFINED) {}
     morphio::CellFamily _cellFamily;
     SomaType _somaType;
     MorphologyVersion _version;

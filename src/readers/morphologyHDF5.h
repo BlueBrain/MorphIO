@@ -25,15 +25,11 @@ class MorphologyHDF5
 
   private:
     void _checkVersion(const std::string& source);
-    void _selectRepairStage();
     void _resolveV1();
-    bool _readV11Metadata();
-    bool _readV2Metadata();
+    void _readMetadata(const std::string& source);
     HighFive::DataSet _getStructureDataSet(size_t nSections);
     void _readPoints(int);
     int _readSections();
-    int _readV1Sections();
-    int _readV2Sections();
     void _readPerimeters(int);
     void _readMitochondria();
     void _readEndoplasmicReticulum();
@@ -52,7 +48,6 @@ class MorphologyHDF5
 
     std::unique_ptr<HighFive::DataSet> _sections;
 
-    std::string _stage;
     Property::Properties _properties;
     ErrorMessages _err;
     std::string _uri;

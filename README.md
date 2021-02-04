@@ -594,11 +594,11 @@ See https://github.com/BlueBrain/MorphIO/blob/master/doc/specification.md
 
 # H5v2
 
-Starting at version 2.5.2, the file format `h5v2` is no longer supported.
-If you have morphologies in this format, you can convert them with:
+Starting at version 2.6.0, the file format `h5v2` is no longer supported.
+If you have morphologies in this format, you can convert them to h5v1 with:
 
 ```bash
-pip install morphio==2.5.1 morph-tool==2.3.0
+pip install "morphio<2.6" "morph-tool==2.3.0"
 ```
 
 and then:
