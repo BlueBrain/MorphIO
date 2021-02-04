@@ -24,6 +24,7 @@
    * [Glia](#glia)
    * [Mitochondria](#mitochondria)
    * [Endoplasmic reticulum](#endoplasmic-reticulum)
+   * [NeuroLucida markers](#neurolucida-markers)
    * [Tips](#tips)
       * [Maximum number of warnings](#maximum-number-of-warnings)
 * [Specification](#specification)
@@ -122,6 +123,7 @@ One important concept is that MorphIO is split into a *read-only* part and a *re
 - Python mutable
 ```python
 from morphio import Morphology, Section, Soma
+
 ```
 
 - C++ immutable
@@ -134,6 +136,7 @@ from morphio import Morphology, Section, Soma
 - Python immutable
 ```python
 from morphio.mut import Morphology, Section, Soma
+
 ```
 
 ### Read-only API
@@ -163,6 +166,7 @@ In Python the API is available under the `morphio.mut` module:
 
 ```Python
 from morphio.mut import Morphology, Section, Soma
+
 ```
 
 ### Mutable Read/Write API
@@ -285,8 +289,8 @@ for section in m.iter(first_root):
 Here is a simple example to create a morphology from scratch and writing it to disk
 
 ```python
+from morphio import PointLevel, SectionType
 from morphio.mut import Morphology
-from morphio import SectionType, PointLevel
 
 morpho = Morphology()
 morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
@@ -337,6 +341,7 @@ Morphology("myfile.asc", options=morphio::NO_DUPLICATES|morphio::NRN_ORDER)
 Python:
 ```python
 from morphio import Morphology, Option
+
 Morphology("myfile.asc", options=Option.no_duplicates|Option.nrn_order)
 ```
 
@@ -373,8 +378,8 @@ _ `breadth_begin`: a breadth first iterator
 _ `upstream_begin`: an upstream iterator
 
 ```python
-from morphio.mut import Morphology
 from morphio import MitochondriaPointLevel, PointLevel, SectionType
+from morphio.mut import Morphology
 
 morpho = Morphology()
 
@@ -468,6 +473,84 @@ reticulum.volumes = [2, 2]
 reticulum.surface_areas = [3, 3]
 reticulum.filament_counts = [4, 4]
 neuron.write('/my/out/file.h5')  # Has to be written to h5
+```
+
+#### NeuroLucida markers
+
+A marker is an [s-expression](https://fr.wikipedia.org/wiki/S-expression) at the top level of the Neurolucida file that contains additional information about the morphology. For example:
+
+```lisp
+("pia"
+  (Closed)
+  (MBFObjectType 5)
+  (0 1 2 3)
+  (3 4 5 4)
+  (6 7 8 5)
+  (9 10 11 6)
+ )
+```
+
+This PR adds a `Morphology.markers` attribute that stores the markers found in the file.
+A Marker object has 3 attributes:
+- label
+- points
+- diameters.
+
+##### Specification
+
+The following s-expressions are parsed:
+- Any s-exp with a top level string. Like:
+    ```lisp
+    ("pia"
+    (Closed)
+    (MBFObjectType 5)
+    (0 1 2 3)
+    (3 4 5 4)
+    (6 7 8 5)
+    (9 10 11 6)
+    )
+    ```
+- An sexp with one of the following top level s-exp:
+  * Dot
+  * FilledCircle
+  * SnowFlake
+  * Asterisk
+  * OpenCircle
+  * OpenStar
+  * Flower
+  * OpenSquare
+  * FilledStar
+  * DoubleCircle
+
+  Example:
+  ```lisp
+  (FilledCircle
+  (Color RGB (64, 0, 128))
+  (Name "Marker 11")
+  (Set "axons")
+  ( -189.59    55.67    28.68     0.12)  ; 1
+  )  ;  End of markers
+  ```
+
+##### Usage
+
+```python
+cell = Morphology(os.path.join(_path, 'pia.asc'))
+all_markers = cell.markers
+pia = m.markers[0]
+
+# fetch the label marker with the `label` attribute
+assert_equal(pia.label, 'pia')
+
+# fetch the points with the `points` attribute
+assert_array_equal(pia.points,
+                       [[0, 1, 2],
+                        [3, 4, 5],
+                        [6, 7, 8],
+                        [9, 10, 11]])
+
+# fetch the diameters with the `diameters` attribute
+assert_array_equal(pia.diameters, [3, 4, 5, 6])
 ```
 
 ### Tips
