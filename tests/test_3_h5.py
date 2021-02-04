@@ -3,7 +3,6 @@ from itertools import chain, repeat
 from pathlib import Path
 
 import requests
-import validators
 from morphio import (CellFamily, Morphology, MorphologyVersion, RawDataError, SectionType,
                      ostream_redirect)
 from nose.tools import assert_equal, assert_raises, ok_
