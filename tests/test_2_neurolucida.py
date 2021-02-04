@@ -13,7 +13,7 @@ from .utils import _test_asc_exception, assert_substring, captured_output, tmp_a
 DATA_DIR = Path(__file__).parent / 'data'
 
 NEUROLUCIDA_MARKERS = ['Dot', 'FilledCircle', 'SnowFlake', 'Asterisk', 'OpenCircle',
-                       'OpenStar', 'Flower', 'OpenSquare', 'FilledStar', 'DoubleCircle']
+                       'OpenStar', 'Flower', 'OpenSquare', 'FilledStar', 'DoubleCircle', 'Circle1']
 
 
 def test_soma():

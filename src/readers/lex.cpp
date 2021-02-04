@@ -172,6 +172,7 @@ class NeurolucidaLexer
         rules_.push("OpenSquare", +Token::MARKER);
         rules_.push("FilledStar", +Token::MARKER);
         rules_.push("DoubleCircle", +Token::MARKER);
+        rules_.push("Circle[0-9]+", +Token::MARKER);
 
         rules_.push("Generated", +Token::GENERATED);
         rules_.push("High", +Token::HIGH);
