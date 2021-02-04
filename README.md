@@ -475,7 +475,7 @@ reticulum.filament_counts = [4, 4]
 neuron.write('/my/out/file.h5')  # Has to be written to h5
 ```
 
-#### NeuroLucida markers
+### NeuroLucida markers
 
 <details>
   <summary>Click to expand!</summary>
