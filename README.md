@@ -346,6 +346,10 @@ Morphology("myfile.asc", options=Option.no_duplicates|Option.nrn_order)
 ```
 
 ### Glia
+
+<details>
+  <summary>Click to expand!</summary>
+  
 MorphIO also support reading and writing glia (such as astrocytes) from/to disk according to the H5 specification
 https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
 
@@ -360,9 +364,12 @@ immutable_glia = morphio.GlialCell("astrocyte.h5")
 empty_glia = morphio.mut.GlialCell()
 mutable_glia = morphio.mut.GlialCell("astrocyte.h5")
 ```
-
+</details>
 
 ### Mitochondria
+
+<details>
+  <summary>Click to expand!</summary>
 
 It is also possible to read and write mitochondria from/to the h5 files (*SWC and ASC are not supported*).
 As mitochondria can be represented as trees, one can define the concept of *mitochondrial section*
@@ -427,7 +434,13 @@ for mitochondrial_section in morpho.mitochondria.root_sections:
 
     print("Number of children: {}".format(len(mitochondrial_section.children)))
 ```
+
+</details>
+
 ### Endoplasmic reticulum
+
+<details>
+  <summary>Click to expand!</summary>
 
 Endoplasmic reticulum can also be stored and written to H5 file.
 The specification is part of the [BBP morphology documentation](https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html)
@@ -474,6 +487,8 @@ reticulum.surface_areas = [3, 3]
 reticulum.filament_counts = [4, 4]
 neuron.write('/my/out/file.h5')  # Has to be written to h5
 ```
+
+</details>
 
 ### NeuroLucida markers
 
