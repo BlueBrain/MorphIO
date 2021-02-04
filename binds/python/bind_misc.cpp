@@ -252,6 +252,21 @@ void bind_misc(py::module& m) {
             [](morphio::Property::Annotation* a) { return a->_points._perimeters; },
             "Returns the list of perimeters of annotated points");
 
+    py::class_<morphio::Property::Marker>(m,
+                                          "Marker",
+                                          "Container class for NeuroLucida extra Markers ")
+        .def_property_readonly(
+            "label",
+            [](morphio::Property::Marker* marker) { return marker->_label; },
+            "Returns the label")
+        .def_property_readonly(
+            "points",
+            [](morphio::Property::Marker* marker) { return marker->_pointLevel._points; },
+            "Returns the list of coordinates of the marker points")
+        .def_property_readonly(
+            "diameters",
+            [](morphio::Property::Marker* marker) { return marker->_pointLevel._diameters; },
+            "Returns the list of diameters of the marker points");
 
     py::class_<morphio::Property::MitochondriaPointLevel>(
         m,

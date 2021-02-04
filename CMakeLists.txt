@@ -6,7 +6,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 option(BUILD_BINDINGS "Build the python bindings" ON)
-option(${PROJECT_NAME}_CXX_WARNINGS "Compile C++ with warnings" ON)
+option(MorphIO_CXX_WARNINGS "Compile C++ with warnings" ON)
 option(EXTERNAL_HIGHFIVE "Use HighFive from external source" OFF)
 option(MORPHIO_USE_DOUBLE "Use doubles instead of floats" OFF)
 

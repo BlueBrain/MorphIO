@@ -291,7 +291,7 @@ def test_single_point_root_section():
     points = []
     diameters = []
 
-    # Too hide the warning: appending empty section
+    # To hide warning: appending empty section
     with captured_output():
         with ostream_redirect(stdout=True, stderr=True):
             m.append_root_section(PointLevel(points, diameters), SectionType(2))

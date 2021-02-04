@@ -74,7 +74,11 @@ const EndoplasmicReticulum Morphology::endoplasmicReticulum() const {
 }
 
 const std::vector<Property::Annotation>& Morphology::annotations() const {
-    return _properties->_annotations;
+    return _properties->_cellLevel._annotations;
+}
+
+const std::vector<Property::Marker>& Morphology::markers() const {
+    return _properties->_cellLevel._markers;
 }
 
 Section Morphology::section(uint32_t id) const {

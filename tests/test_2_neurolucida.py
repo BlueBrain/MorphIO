@@ -1,15 +1,19 @@
 import os
+from pathlib import Path
 
 import morphio
 import numpy as np
 from morphio import Morphology, RawDataError, SomaError, ostream_redirect
 from nose import tools as nt
 from nose.tools import assert_equal, eq_, ok_
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 from .utils import _test_asc_exception, assert_substring, captured_output, tmp_asc_file
 
-_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+DATA_DIR = Path(__file__).parent / 'data'
+
+NEUROLUCIDA_MARKERS = ['Dot', 'FilledCircle', 'SnowFlake', 'Asterisk', 'OpenCircle',
+                       'OpenStar', 'Flower', 'OpenSquare', 'FilledStar', 'DoubleCircle']
 
 
 def test_soma():
@@ -308,7 +312,7 @@ def test_empty_sibling():
 def test_nested_single_child():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            n = Morphology(os.path.join(_path, 'nested_single_children.asc'))
+            n = Morphology(DATA_DIR / 'nested_single_children.asc')
     assert_array_equal(n.root_sections[0].points,
                        [[0., 0., 0.],
                         [0., 0., 1.],
@@ -407,7 +411,7 @@ def test_single_children():
 
 
 def test_spine():
-    neuron = Morphology(os.path.join(_path, 'spine.asc'))
+    neuron = Morphology(DATA_DIR / 'spine.asc')
     assert_equal(len(neuron.root_sections), 1)
     assert_array_equal(neuron.root_sections[0].points,
                        np.array([[3.22,    -1.15,   150.00],
@@ -471,7 +475,7 @@ def test_single_point_section_duplicate_parent_complex():
 
 
 def test_spine():
-    neuron = Morphology(os.path.join(_path, 'spine.asc'))
+    neuron = Morphology(DATA_DIR / 'spine.asc')
     assert_equal(len(neuron.root_sections), 1)
     assert_array_equal(neuron.root_sections[0].points,
                        np.array([[3.22,    -1.15,   150.00],
@@ -564,3 +568,102 @@ def test_markers():
                                      [-268.17,  -130.62,   -24.75],
                                      [-266.79,  -131.77,   -26.13]],
                                     dtype=np.float32))
+
+
+def test_string_markers():
+    cell = Morphology(DATA_DIR / 'pia.asc')
+
+    # The for loop tests that the various constructors keep the markers alive
+    for m in (cell, cell.as_mutable(), cell.as_mutable().as_immutable()):
+        assert_equal(len(m.root_sections), 1)
+        assert_array_equal(m.root_sections[0].points,
+                           np.array([[-2.87, -9.24, -5.06],
+                                     [-2.76, -10.41, -5.13],
+                                     [-2.03, -12.48, -5.13],
+                                     [-1.62, -13.30, -5.56]], dtype=np.float32))
+
+        assert_equal(len(m.markers), 2)
+        pia = m.markers[0]
+        assert_equal(pia.label, 'pia')
+        assert_array_equal(pia.points,
+                           [[0, 1, 2],
+                            [3, 4, 5],
+                            [6, 7, 8],
+                            [9, 10, 11]])
+        assert_array_equal(pia.diameters, [3, 4, 5, 6])
+
+        assert_equal(m.markers[1].label, 'layer1-2')
+        assert_array_equal(m.markers[1].points,
+                           np.array([[983.07, 455.36, -0.19],
+                                     [1192.31, 420.35, -0.19]], dtype=np.float32))
+        assert_array_equal(m.markers[1].diameters, np.array([0.15, 0.15], dtype=np.float32))
+
+def test_neurolucida_markers():
+    SIMPLE = Morphology(DATA_DIR / 'simple.asc')
+    for marker in NEUROLUCIDA_MARKERS[:1]:
+        with tmp_asc_file(f'''
+({marker}
+  (Color White)
+  (Name "fat end")
+  (   81.58   -77.98   -20.32     0.50)  ; 1
+)  ;  End of markers
+
+("CellBody"
+ (Color Red)
+ (CellBody)
+ (0 0 0 2)
+ )
+
+
+({marker}
+  (Color White)
+  (Name "fat end")
+  (   51.58   -77.78   -24.32     0.52)  ; 1
+)  ;  End of markers
+
+ ((Dendrite)
+  (0 0 0 2)
+  (0 5 0 2)
+  (
+   (-5 5 0 3)
+   |
+   (6 5 0 3)
+   )
+  )
+
+
+ ((Axon)
+  (0 0 0 2)
+  (0 -4 0 2)
+  (
+   (6 -4 0 4)
+   |
+   (-5 -4 0 4)
+   )
+  )
+                         )''') as tmp_file:
+            neuron = Morphology(tmp_file.name)
+
+        assert_array_equal(neuron.points, SIMPLE.points)
+        assert_equal(len(neuron.markers), 2)
+        assert_array_almost_equal(neuron.markers[0].points,
+                                  np.array([[81.58, -77.98, -20.32]], dtype=np.float32))
+        assert_array_almost_equal(neuron.markers[0].diameters,
+                                  np.array([0.5], dtype=np.float32))
+        assert_array_almost_equal(neuron.markers[1].points,
+                                  np.array([[51.580002, -77.779999, -24.32]],
+                                           dtype=np.float32))
+        assert_array_almost_equal(neuron.markers[1].diameters,
+                                  np.array([0.52], dtype=np.float32))
+
+def test_skip_font():
+    assert_array_equal(Morphology(DATA_DIR / 'simple-with-font.asc').points,
+                       Morphology(DATA_DIR / 'simple.asc').points)
+
+def test_skip_imagecoord():
+    assert_array_equal(Morphology(DATA_DIR / 'simple-with-image-coord.asc').points,
+                       Morphology(DATA_DIR / 'simple.asc').points)
+
+def test_Sections_block():
+    assert_array_equal(Morphology(DATA_DIR / 'sections-block.asc').points,
+                       Morphology(DATA_DIR / 'simple.asc').points)

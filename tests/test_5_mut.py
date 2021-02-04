@@ -387,10 +387,12 @@ def test_annotation():
                        )
                       )
                  ''') as tmp_file:
-                n = Morphology(tmp_file.name)
-    assert_equal(len(n.annotations), 1)
-    annotation = n.annotations[0]
-    assert_equal(annotation.type, morphio.AnnotationType.single_child)
+                cell = Morphology(tmp_file.name)
+
+    for n in (cell, cell.as_immutable(), cell.as_immutable().as_mutable()):
+        assert_equal(len(n.annotations), 1)
+        annotation = n.annotations[0]
+        assert_equal(annotation.type, morphio.AnnotationType.single_child)
 
 def test_section___str__():
     assert_equal(str(SIMPLE.root_sections[0]),

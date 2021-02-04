@@ -71,6 +71,9 @@ void bind_mutable_module(py::module& m) {
         .def_property_readonly("annotations",
                                &morphio::mut::Morphology::annotations,
                                "Returns a list of annotations")
+        .def_property_readonly("markers",
+                               &morphio::mut::Morphology::markers,
+                               "Returns the list of NeuroLucida markers")
         .def("section",
              &morphio::mut::Morphology::section,
              "Returns the section with the given id\n\n"

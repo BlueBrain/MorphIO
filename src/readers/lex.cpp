@@ -32,6 +32,8 @@ enum class Token {
 
     // Special WORDS
     COLOR = 101,
+    FONT,
+    MARKER,
     RGB,
 
     // end of branch weirdness
@@ -77,6 +79,8 @@ inline std::string to_string(Token t) {
         T(DENDRITE)
         T(CELLBODY)
         T(COLOR)
+        T(FONT)
+        T(MARKER)
         T(RGB)
         T(GENERATED)
         T(HIGH)
@@ -151,12 +155,23 @@ class NeurolucidaLexer
         rules_.push("\\|", +Token::PIPE);
 
         rules_.push("Color", +Token::COLOR);
+        rules_.push("Font", +Token::FONT);
 
         rules_.push("Axon", +Token::AXON);
         rules_.push("Apical", +Token::APICAL);
         rules_.push("Dendrite", +Token::DENDRITE);
-        // rules_.push("\\\"CellBody\\\"", +Token::CELLBODY);
         rules_.push("CellBody", +Token::CELLBODY);
+
+        rules_.push("Dot", +Token::MARKER);
+        rules_.push("FilledCircle", +Token::MARKER);
+        rules_.push("SnowFlake", +Token::MARKER);
+        rules_.push("Asterisk", +Token::MARKER);
+        rules_.push("OpenCircle", +Token::MARKER);
+        rules_.push("OpenStar", +Token::MARKER);
+        rules_.push("Flower", +Token::MARKER);
+        rules_.push("OpenSquare", +Token::MARKER);
+        rules_.push("FilledStar", +Token::MARKER);
+        rules_.push("DoubleCircle", +Token::MARKER);
 
         rules_.push("Generated", +Token::GENERATED);
         rules_.push("High", +Token::HIGH);
@@ -254,9 +269,13 @@ class NeurolucidaLexer
         }
     }
 
+    void consume_until(Token endpoint) {
+        while (consume()->id != +endpoint)
+            ;
+    }
+
     // advance iterator until sexp is consumed, including final paren
     void consume_until_balanced_paren() {
-        expect(Token::LPAREN, "consume_until_balanced_paren should start in LPAREN");
         size_t opening_count = 1;
         while (opening_count != 0) {
             size_t id = consume()->id;

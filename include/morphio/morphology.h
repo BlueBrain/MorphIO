@@ -62,6 +62,11 @@ class Morphology
     const std::vector<Property::Annotation>& annotations() const;
 
     /**
+     * Return the markers
+     **/
+    const std::vector<Property::Marker>& markers() const;
+
+    /**
      * Return a vector of all root sections
      * (sections whose parent ID are -1)
      **/

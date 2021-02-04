@@ -46,7 +46,6 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(
         morphology._properties->_cellLevel);
 
-    _annotations = morphology.annotations();
     for (const morphio::Section& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -262,10 +261,8 @@ Property::Properties Morphology::buildReadOnly() const {
     std::map<uint32_t, int32_t> newIds;
     Property::Properties properties{};
 
-    if (_cellProperties) {
-        properties._cellLevel = *_cellProperties;
-        properties._cellLevel._somaType = _soma->type();
-    }
+    properties._cellLevel = *_cellProperties;
+    properties._cellLevel._somaType = _soma->type();
     _appendProperties(properties._somaLevel, _soma->_pointProperties);
 
     for (auto it = depth_begin(); it != depth_end(); ++it) {
@@ -281,7 +278,6 @@ Property::Properties Morphology::buildReadOnly() const {
     }
 
     mitochondria()._buildMitochondria(properties);
-    properties._annotations = annotations();
     properties._endoplasmicReticulumLevel = endoplasmicReticulum().buildReadOnly();
     return properties;
 }
