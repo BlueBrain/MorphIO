@@ -133,7 +133,7 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
                 "https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/"
                 "index.html for the list of supported versions.");
         }
-    } catch (const HighFive::Exception& e) {
+    } catch (const HighFive::Exception&) {
     }
 
     try {
@@ -148,7 +148,7 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
             _properties._cellLevel._cellFamily = CellFamily::NEURON;
         }
         return;
-    } catch (const HighFive::Exception& e) {
+    } catch (const HighFive::Exception&) {
     }
 
 
@@ -157,7 +157,7 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
         uint32_t potential_h5v2_version;
         try {
             _group.getGroup(_g_root).getAttribute(_a_version).read(potential_h5v2_version);
-        } catch (const HighFive::Exception& e) {
+        } catch (const HighFive::Exception&) {
         }
 
         // More informative throw for h5v2 format
