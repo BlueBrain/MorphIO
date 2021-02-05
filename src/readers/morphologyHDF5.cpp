@@ -116,11 +116,14 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
 
         uint32_t version[2];
         attr.read(version);
-        if (version[0] == 1 && version[1] >= 1) {
+        if (version[0] == 1 && (version[1] == 1 || version[1] == 2)) {
             uint32_t family;
             const auto familyAttr = metadata.getAttribute(_a_family);
             familyAttr.read(family);
-            _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_1_1;
+            if (version[1] == 1)
+                _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_1_1;
+            else
+                _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_1_2;
             _properties._cellLevel._cellFamily = static_cast<CellFamily>(family);
         } else {
             throw morphio::RawDataError(
@@ -177,10 +180,7 @@ HighFive::DataSet MorphologyHDF5::_getStructureDataSet(size_t nSections) {
 }
 
 
-/**
-   Returns true if the neuron has neurites (for MORPHOLOGY_VERSION_H5_2)
-**/
-static inline bool v2HasNeurites(int firstSectionOffset) {
+static inline bool HasNeurites(int firstSectionOffset) {
     return (firstSectionOffset > -1);
 }
 
@@ -274,7 +274,7 @@ int MorphologyHDF5::_readSections() {
 }
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
-    if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1 || !v2HasNeurites(firstSectionOffset))
+    if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1 || !HasNeurites(firstSectionOffset))
         return;
 
     try {

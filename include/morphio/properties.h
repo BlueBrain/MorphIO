@@ -153,9 +153,9 @@ struct Marker {
 struct CellLevel {
     CellLevel()
         : _version(MORPHOLOGY_VERSION_UNDEFINED) {}
+    MorphologyVersion _version;
     morphio::CellFamily _cellFamily;
     SomaType _somaType;
-    MorphologyVersion _version;
     std::vector<Annotation> _annotations;
     std::vector<Marker> _markers;
 

@@ -87,6 +87,8 @@ void bind_misc(py::module& m) {
                morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_2)
         .value("MORPHOLOGY_VERSION_H5_1_1",
                morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_1)
+        .value("MORPHOLOGY_VERSION_H5_1_2",
+               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_2)
         .value("MORPHOLOGY_VERSION_SWC_1",
                morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_SWC_1)
         .value("MORPHOLOGY_VERSION_UNDEFINED",

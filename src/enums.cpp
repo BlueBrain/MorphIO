@@ -11,6 +11,8 @@ std::ostream& operator<<(std::ostream& os, const MorphologyVersion v) {
         return os << "h5v1";
     case MORPHOLOGY_VERSION_H5_1_1:
         return os << "h5v1.1";
+    case MORPHOLOGY_VERSION_H5_1_2:
+        return os << "h5v1.2";
     case MORPHOLOGY_VERSION_H5_2:
         return os << "h5v2";
     case MORPHOLOGY_VERSION_SWC_1:
