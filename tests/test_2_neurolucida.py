@@ -1,4 +1,5 @@
 import os
+from itertools import product
 from pathlib import Path
 
 import morphio
@@ -12,9 +13,40 @@ from .utils import _test_asc_exception, assert_substring, captured_output, tmp_a
 
 DATA_DIR = Path(__file__).parent / 'data'
 
-NEUROLUCIDA_MARKERS = ['Dot', 'FilledCircle', 'SnowFlake', 'Asterisk', 'OpenCircle',
-                       'OpenStar', 'Flower', 'OpenSquare', 'FilledStar', 'DoubleCircle', 'Circle1']
-
+NEUROLUCIDA_MARKERS = [
+ 'Dot',
+ 'Plus',
+ 'Cross',
+ 'Splat',
+ 'Flower',
+ 'Circle',
+ 'Flower',
+ 'TriStar',
+ 'OpenStar',
+ 'Asterisk',
+ 'SnowFlake',
+ 'OpenCircle',
+ 'ShadedStar',
+ 'FilledStar',
+ 'TexacoStar',
+ 'MoneyGreen',
+ 'DarkYellow',
+ 'OpenSquare',
+ 'OpenDiamond',
+ 'CircleArrow',
+ 'CircleCross',
+ 'OpenQuadStar',
+ 'DoubleCircle',
+ 'FilledSquare',
+ 'MalteseCross',
+ 'FilledCircle',
+ 'FilledDiamond',
+ 'FilledQuadStar',
+ 'OpenUpTriangle',
+ 'FilledUpTriangle',
+ 'OpenDownTriangle',
+ 'FilledDownTriangle',
+ ]
 
 def test_soma():
     with tmp_asc_file('''("CellBody"
@@ -600,7 +632,8 @@ def test_string_markers():
 
 def test_neurolucida_markers():
     SIMPLE = Morphology(DATA_DIR / 'simple.asc')
-    for marker in NEUROLUCIDA_MARKERS[:1]:
+    for marker, suffix in product(NEUROLUCIDA_MARKERS, ['', '7', '123']):
+        marker += suffix
         with tmp_asc_file(f'''
 ({marker}
   (Color White)
