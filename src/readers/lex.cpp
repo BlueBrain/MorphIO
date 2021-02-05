@@ -162,6 +162,8 @@ class NeurolucidaLexer
         rules_.push("Dendrite", +Token::DENDRITE);
         rules_.push("CellBody", +Token::CELLBODY);
 
+        // The code snippet used to infer the marker list is available at:
+        // https://github.com/BlueBrain/MorphIO/pull/229
         rules_.push("Dot[0-9]*", +Token::MARKER);
         rules_.push("Plus[0-9]*", +Token::MARKER);
         rules_.push("Cross[0-9]*", +Token::MARKER);
