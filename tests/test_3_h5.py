@@ -2,12 +2,13 @@ import os
 from itertools import chain, repeat
 from pathlib import Path
 
+import requests
 from morphio import (CellFamily, Morphology, MorphologyVersion, RawDataError, SectionType,
                      ostream_redirect)
-from nose.tools import assert_equal, assert_raises
+from nose.tools import assert_equal, assert_raises, ok_
 from numpy.testing import assert_array_equal
 
-from .utils import captured_output
+from .utils import assert_substring, captured_output
 
 _path = Path(os.path.dirname(os.path.abspath(__file__)), "data")
 H5_PATH = Path(_path, 'h5')
@@ -20,6 +21,7 @@ def test_v1():
     assert_equal(len(n.root_sections), 2)
     assert_equal(n.root_sections[0].type, 3)
     assert_equal(n.root_sections[1].type, 2)
+    assert_equal(n.version, MorphologyVersion.MORPHOLOGY_VERSION_H5_1_1)
 
     n = Morphology(H5V1_PATH / 'Neuron.h5')
     assert_equal(n.version, MorphologyVersion.MORPHOLOGY_VERSION_H5_1)
@@ -56,23 +58,15 @@ def test_wrong_section_type():
     assert_equal(str(cm.exception).strip(), 'Unsupported section type: -2')
 
 def test_v2():
-    n = Morphology(H5V2_PATH / 'Neuron.h5')
-    assert_equal(n.version, MorphologyVersion.MORPHOLOGY_VERSION_H5_2)
+    with assert_raises(RawDataError) as cm:
+        Morphology(H5V2_PATH / 'Neuron.h5')
+    assert_substring('h5v2 is no longer supported, see: https://github.com/BlueBrain/MorphIO#H5v2',
+                     str(cm.exception))
 
+    request = requests.get('https://github.com/BlueBrain/MorphIO#H5v2')
+    assert_equal(request.status_code, 200,
+                 'The exception message points to a dead link')
 
-    # This is a bug in the Neuron.h5 file
-    # First neurite should not have a type: soma
-    assert_equal(n.root_sections[0].type, 1)
-    assert_equal(n.root_sections[1].type, 4)
-    assert_equal(len(list(n.iter())), 85)
-    assert_equal(len(n.points), 926)
-    assert_equal(len(n.sections), 85)
-    assert_equal(n.cell_family, CellFamily.NEURON)
-
-def test_v2_without_cellfamily_info():
-    '''This H5v2 cell has no metadata but we check that the correct CellFamily type is set'''
-    n = Morphology(H5V2_PATH / 'no-metadata.h5')
-    assert_equal(n.cell_family, CellFamily.NEURON)
 
 def test_soma_no_neurite():
     n = Morphology(H5V1_PATH / 'soma_no_neurites.h5')

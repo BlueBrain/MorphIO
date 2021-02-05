@@ -42,6 +42,7 @@ enum MorphologyVersion {
     MORPHOLOGY_VERSION_H5_1_1 = 3,
     MORPHOLOGY_VERSION_ASC_1 = 4,
     MORPHOLOGY_VERSION_SWC_1 = 101,
+    MORPHOLOGY_VERSION_H5_1_2 = 5,
     MORPHOLOGY_VERSION_UNDEFINED
 };
 std::ostream& operator<<(std::ostream& os, MorphologyVersion v);
