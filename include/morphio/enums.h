@@ -35,19 +35,6 @@ enum Warning {
     WRITE_EMPTY_MORPHOLOGY
 };
 
-/** The supported versions for morphology files. */
-enum MorphologyVersion {
-    MORPHOLOGY_VERSION_H5_1 = 1,
-    MORPHOLOGY_VERSION_H5_2 = 2,
-    MORPHOLOGY_VERSION_H5_1_1 = 3,
-    MORPHOLOGY_VERSION_ASC_1 = 4,
-    MORPHOLOGY_VERSION_SWC_1 = 101,
-    MORPHOLOGY_VERSION_H5_1_2 = 5,
-    MORPHOLOGY_VERSION_UNDEFINED
-};
-std::ostream& operator<<(std::ostream& os, MorphologyVersion v);
-
-
 enum AnnotationType {
     SINGLE_CHILD,
 };

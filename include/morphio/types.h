@@ -47,6 +47,7 @@ class Soma;
 }  // namespace mut
 
 using SectionRange = std::pair<size_t, size_t>;
+using MorphologyVersion = std::tuple<std::string, uint32_t, uint32_t>;
 
 template <typename T>
 using range = gsl::span<T>;

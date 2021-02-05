@@ -37,7 +37,6 @@ class MorphologyHDF5
     template <typename T>
     void _read(const std::string& group,
                const std::string& _dataset,
-               MorphologyVersion version,
                unsigned int expectedDimension,
                T& data);
 

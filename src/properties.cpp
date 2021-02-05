@@ -217,6 +217,16 @@ bool CellLevel::operator!=(const CellLevel& other) const {
     return diff(other, LogLevel::ERROR);
 }
 
+std::string CellLevel::fileFormat() const {
+    return std::get<0>(_version);
+}
+    uint32_t CellLevel::majorVersion() {
+        return std::get<1>(_version);
+    }
+    std::string CellLevel::minorVersion() {
+        return std::get<2>(_version);
+    }
+
 
 MitochondriaPointLevel::MitochondriaPointLevel(const MitochondriaPointLevel& data,
                                                const SectionRange& range) {
