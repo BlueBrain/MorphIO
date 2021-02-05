@@ -47,7 +47,7 @@ bool is_end_of_section(Token id) {
 bool skip_sexp(size_t id) {
     return (id == +Token::WORD || id == +Token::COLOR || id == +Token::GENERATED ||
             id == +Token::HIGH || id == +Token::INCOMPLETE || id == +Token::LOW ||
-            id == +Token::NORMAL || id == +Token::FONT);
+            id == +Token::NORMAL || id == +Token::FONT || id == +Token::MARKER);
 }
 }  // namespace
 
