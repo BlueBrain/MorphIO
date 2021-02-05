@@ -573,26 +573,6 @@ The following s-expressions are parsed:
   )  ;  End of markers
   ```
 
-⚠️ Only top level markers are currently supported. This means the following nested marker won't be available the the MorphIO API.
-
-```python
-( (Color White)  ; [10,1]
-  (Dendrite)
-  ( -290.87  -113.09   -16.32     2.06)  ; Root
-  ( -290.87  -113.09   -16.32     2.06)  ; R, 1
-  (
-    ( -277.14  -119.13   -18.02     0.69)  ; R-1, 1
-    ( -275.54  -119.99   -16.67     0.69)  ; R-1, 2
-    (Cross  ;  [3,3]
-      (Color Orange)
-      (Name "Marker 3")
-      ( -271.87  -121.14   -16.27     0.69)  ; 1
-      ( -269.34  -122.29   -15.48     0.69)  ; 2
-    )  ;  End of markers
-  )
- )
-```
-
 ##### Usage
 
 ```python
@@ -612,6 +592,26 @@ assert_array_equal(pia.points,
 
 # fetch the diameters with the `diameters` attribute
 assert_array_equal(pia.diameters, [3, 4, 5, 6])
+```
+
+⚠️ Only top level markers are currently supported. This means the following nested marker won't be available the the MorphIO API.
+
+```python
+( (Color White)  ; [10,1]
+  (Dendrite)
+  ( -290.87  -113.09   -16.32     2.06)  ; Root
+  ( -290.87  -113.09   -16.32     2.06)  ; R, 1
+  (
+    ( -277.14  -119.13   -18.02     0.69)  ; R-1, 1
+    ( -275.54  -119.99   -16.67     0.69)  ; R-1, 2
+    (Cross  ;  [3,3]
+      (Color Orange)
+      (Name "Marker 3")
+      ( -271.87  -121.14   -16.27     0.69)  ; 1
+      ( -269.34  -122.29   -15.48     0.69)  ; 2
+    )  ;  End of markers
+  )
+ )
 ```
 
 </details>
