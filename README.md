@@ -349,7 +349,7 @@ Morphology("myfile.asc", options=Option.no_duplicates|Option.nrn_order)
 
 <details>
   <summary>Click to expand!</summary>
-  
+
 MorphIO also support reading and writing glia (such as astrocytes) from/to disk according to the H5 specification
 https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
 
@@ -494,7 +494,7 @@ neuron.write('/my/out/file.h5')  # Has to be written to h5
 
 <details>
   <summary>Click to expand!</summary>
-  
+
 A marker is an [s-expression](https://fr.wikipedia.org/wiki/S-expression) at the top level of the Neurolucida file that contains additional information about the morphology. For example:
 
 ```lisp
@@ -528,17 +528,40 @@ The following s-expressions are parsed:
     (9 10 11 6)
     )
     ```
-- An sexp with one of the following top level s-exp:
-  * Dot
-  * FilledCircle
-  * SnowFlake
-  * Asterisk
-  * OpenCircle
-  * OpenStar
-  * Flower
-  * OpenSquare
-  * FilledStar
-  * DoubleCircle
+- An sexp with one of the following top level regular expression:
+
+  - Dot[0-9]*
+  - Plus[0-9]*
+  - Cross[0-9]*
+  - Splat[0-9]*
+  - Flower[0-9]*
+  - Circle[0-9]*
+  - Flower[0-9]*
+  - TriStar[0-9]*
+  - OpenStar[0-9]*
+  - Asterisk[0-9]*
+  - SnowFlake[0-9]*
+  - OpenCircle[0-9]*
+  - ShadedStar[0-9]*
+  - FilledStar[0-9]*
+  - TexacoStar[0-9]*
+  - MoneyGreen[0-9]*
+  - DarkYellow[0-9]*
+  - OpenSquare[0-9]*
+  - OpenDiamond[0-9]*
+  - CircleArrow[0-9]*
+  - CircleCross[0-9]*
+  - OpenQuadStar[0-9]*
+  - DoubleCircle[0-9]*
+  - FilledSquare[0-9]*
+  - MalteseCross[0-9]*
+  - FilledCircle[0-9]*
+  - FilledDiamond[0-9]*
+  - FilledQuadStar[0-9]*
+  - OpenUpTriangle[0-9]*
+  - FilledUpTriangle[0-9]*
+  - OpenDownTriangle[0-9]*
+  - FilledDownTriangle[0-9]*
 
   Example:
   ```lisp
@@ -569,6 +592,26 @@ assert_array_equal(pia.points,
 
 # fetch the diameters with the `diameters` attribute
 assert_array_equal(pia.diameters, [3, 4, 5, 6])
+```
+
+⚠️ Only top level markers are currently supported. This means the following nested marker won't be available the the MorphIO API.
+
+```python
+( (Color White)  ; [10,1]
+  (Dendrite)
+  ( -290.87  -113.09   -16.32     2.06)  ; Root
+  ( -290.87  -113.09   -16.32     2.06)  ; R, 1
+  (
+    ( -277.14  -119.13   -18.02     0.69)  ; R-1, 1
+    ( -275.54  -119.99   -16.67     0.69)  ; R-1, 2
+    (Cross  ;  [3,3]
+      (Color Orange)
+      (Name "Marker 3")
+      ( -271.87  -121.14   -16.27     0.69)  ; 1
+      ( -269.34  -122.29   -15.48     0.69)  ; 2
+    )  ;  End of markers
+  )
+ )
 ```
 
 </details>
