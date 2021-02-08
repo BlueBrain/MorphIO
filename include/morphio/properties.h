@@ -192,7 +192,7 @@ struct Properties {
     template <typename T>
     const std::vector<typename T::Type>& get() const noexcept;
 
-    const MorphologyVersion& version() const noexcept {
+    const morphio::MorphologyVersion& version() const noexcept {
         return _cellLevel._version;
     }
     const morphio::CellFamily& cellFamily() const noexcept {

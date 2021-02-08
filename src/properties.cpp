@@ -220,12 +220,14 @@ bool CellLevel::operator!=(const CellLevel& other) const {
 std::string CellLevel::fileFormat() const {
     return std::get<0>(_version);
 }
-    uint32_t CellLevel::majorVersion() {
-        return std::get<1>(_version);
-    }
-    uint32_t CellLevel::minorVersion() {
-        return std::get<2>(_version);
-    }
+
+uint32_t CellLevel::majorVersion() {
+    return std::get<1>(_version);
+}
+
+uint32_t CellLevel::minorVersion() {
+    return std::get<2>(_version);
+}
 
 
 MitochondriaPointLevel::MitochondriaPointLevel(const MitochondriaPointLevel& data,
