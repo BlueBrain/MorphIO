@@ -27,12 +27,12 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
     : _properties(std::make_shared<Property::Properties>(properties)) {
     buildChildren(_properties);
 
-    if (fileFormat() != "swc")
+    if (_properties->_cellLevel.fileFormat() != "swc")
         _properties->_cellLevel._somaType = getSomaType(soma().points().size());
 
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders
-    if (fileFormat() == "h5") {
+    if (properties._cellLevel.fileFormat() == "h5") {
         mut::Morphology mutable_morph(*this);
         mutable_morph.sanitize();
         if (options) {

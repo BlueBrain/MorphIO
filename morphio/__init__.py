@@ -15,7 +15,6 @@ from ._morphio import (
     MitochondriaPointLevel,
     MorphioError,
     Morphology,
-    MorphologyVersion,
     MultipleTrees,
     Option,
     PointLevel,

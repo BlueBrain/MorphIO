@@ -75,7 +75,8 @@ Property::Properties MorphologyHDF5::load() {
     _readPerimeters(firstSectionOffset);
     _readMitochondria();
     _readEndoplasmicReticulum();
-    _properties._cellLevel._version[0] = "h5";
+    std::get<0>(_properties._cellLevel._version) = "h5";
+
     return _properties;
 }
 
@@ -114,9 +115,12 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
         const auto metadata = _group.getGroup(_g_metadata);
         const auto attr = metadata.getAttribute(_a_version);
 
-        attr.read(&(_properties._cellLevel._version + 1));
-        const auto majorVersion = _properties.majorVersion()
-        const auto minorVersion = _properties.minorVersion()
+        uint32_t versions[2];
+        attr.read(&versions);
+        std::get<1>(_properties._cellLevel._version) = versions[0];
+        std::get<2>(_properties._cellLevel._version) = versions[1];
+        const auto majorVersion = _properties._cellLevel.majorVersion();
+        const auto minorVersion = _properties._cellLevel.minorVersion();
         if (majorVersion == 1 && (minorVersion == 1 || minorVersion == 2)) {
             uint32_t family;
             const auto familyAttr = metadata.getAttribute(_a_family);
@@ -138,9 +142,9 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
 
         // The fact that the resolution passes and majorVersion is still uninitialized tells us
         // it is h5v1.0
-        if (_properties.majorVersion() == 0) {
-            _properties.majorVersion() == 1;
-            _properties.minorVersion() == 0;
+        if (_properties._cellLevel.majorVersion() == 0) {
+            std::get<1>(_properties._cellLevel._version) = 1;  // major version
+            std::get<2>(_properties._cellLevel._version) = 0;  // minor version
             // Version 1.0 only support NEURON has a CellFamily.
             // Other CellFamily have been added in version 1.1:
             // https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
@@ -274,7 +278,8 @@ int MorphologyHDF5::_readSections() {
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
     // Perimeter information is available starting at v1.1
-    if (!(_version[0] == 1 && _version[1] > 0 && HasNeurites(firstSectionOffset)))
+    if (!(_properties._cellLevel.majorVersion() == 1 &&
+          _properties._cellLevel.minorVersion() > 0 && HasNeurites(firstSectionOffset)))
         return;
 
     try {
@@ -303,7 +308,8 @@ void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& _dataset,
                            unsigned int expectedDimension,
                            T& data) {
-    if (_version[0] != 1 || _version[1] < 1)
+    if (_properties._cellLevel.majorVersion() != 1 ||
+        _properties._cellLevel.minorVersion() < 1)
         return;
     try {
         const auto group = _group.getGroup(groupName);

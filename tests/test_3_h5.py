@@ -3,7 +3,7 @@ from itertools import chain, repeat
 from pathlib import Path
 
 import requests
-from morphio import (CellFamily, Morphology, MorphologyVersion, RawDataError, SectionType,
+from morphio import (CellFamily, Morphology, RawDataError, SectionType,
                      ostream_redirect)
 from nose.tools import assert_equal, assert_raises, ok_
 from numpy.testing import assert_array_equal
@@ -21,10 +21,10 @@ def test_v1():
     assert_equal(len(n.root_sections), 2)
     assert_equal(n.root_sections[0].type, 3)
     assert_equal(n.root_sections[1].type, 2)
-    assert_equal(n.version, MorphologyVersion.MORPHOLOGY_VERSION_H5_1_1)
+    assert_equal(n.version, ("h5", 1, 1))
 
     n = Morphology(H5V1_PATH / 'Neuron.h5')
-    assert_equal(n.version, MorphologyVersion.MORPHOLOGY_VERSION_H5_1)
+    assert_equal(n.version, ("h5", 1, 0))
 
     assert_equal(len(n.sections), 84)
     assert_equal(len(n.soma.points), 3)

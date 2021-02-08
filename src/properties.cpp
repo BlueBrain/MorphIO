@@ -223,7 +223,7 @@ std::string CellLevel::fileFormat() const {
     uint32_t CellLevel::majorVersion() {
         return std::get<1>(_version);
     }
-    std::string CellLevel::minorVersion() {
+    uint32_t CellLevel::minorVersion() {
         return std::get<2>(_version);
     }
 
