@@ -76,23 +76,30 @@ class NeurolucidaParser
     }
 
   private:
-    std::tuple<Point, floatType> parse_point(NeurolucidaLexer& lex) {
+    std::tuple<Point, floatType> parse_point(NeurolucidaLexer& lex, bool is_marker) {
         lex.expect(Token::LPAREN, "Point should start in LPAREN");
-        std::array<morphio::floatType, 4> point{};  // X,Y,Z,R
-        for (auto& p : point) {
+        std::array<morphio::floatType, 4> point{};  // X,Y,Z,D
+        for (unsigned int i = 0; i < 4; i++) {
             try {
 #ifdef MORPHIO_USE_DOUBLE
-                p = std::stod(lex.consume()->str());
+                point[i] = std::stod(lex.consume()->str());
 #else
-                p = std::stof(lex.consume()->str());
+                point[i] = std::stof(lex.consume()->str());
 #endif
             } catch (const std::invalid_argument&) {
                 throw RawDataError(err_.ERROR_PARSING_POINT(lex.line_num(), lex.current()->str()));
+            }
+
+            // Markers can have an s-exp (X Y Z) without diameter
+            if (is_marker && i == 2 && (lex_.peek()->str() == ")")) {
+                point[3] = 0;
+                break;
             }
         }
 
         lex.consume();
 
+        // case where the s-exp is (X Y Z R WORD). For example: (1 1 0 1 S1)
         if (lex.current()->id == +Token::WORD) {
             lex.consume(Token::WORD);
         }
@@ -231,13 +238,14 @@ class NeurolucidaParser
             } else if (id == Token::RPAREN) {
                 return header;
             } else if (id == Token::LPAREN) {
+                const auto next_token = static_cast<Token>(peek_id);
                 if (skip_sexp(peek_id)) {
                     // skip words/strings/markers
                     lex_.consume_until_balanced_paren();
                     if (peek_id == +Token::FONT)
                         lex_.consume_until_balanced_paren();
-                } else if (is_neurite_type(static_cast<Token>(peek_id))) {
-                    header.token = static_cast<Token>(peek_id);
+                } else if (is_neurite_type(next_token)) {
+                    header.token = next_token;
                     lex_.consume();  // Advance to NeuriteType
                     lex_.consume();
                     lex_.consume(Token::RPAREN, "New Neurite should end in RPAREN");
@@ -286,7 +294,7 @@ class NeurolucidaParser
                 } else if (peek_id == +Token::NUMBER) {
                     Point point;
                     floatType radius;
-                    std::tie(point, radius) = parse_point(lex_);
+                    std::tie(point, radius) = parse_point(lex_, (header.token == Token::STRING));
                     points.push_back(point);
                     diameters.push_back(radius);
                 } else if (peek_id == +Token::LPAREN) {
@@ -300,6 +308,8 @@ class NeurolucidaParser
                     throw RawDataError(
                         err_.ERROR_UNKNOWN_TOKEN(lex_.line_num(), lex_.peek()->str()));
                 }
+            } else if (id == Token::STRING) {
+                lex_.consume();
             } else {
                 throw RawDataError(err_.ERROR_UNKNOWN_TOKEN(lex_.line_num(), lex_.peek()->str()));
             }
