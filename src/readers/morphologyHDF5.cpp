@@ -278,8 +278,8 @@ int MorphologyHDF5::_readSections() {
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
     // Perimeter information is available starting at v1.1
-    if (!(_properties._cellLevel.majorVersion() == 1 &&
-          _properties._cellLevel.minorVersion() > 0 && HasNeurites(firstSectionOffset)))
+    if (!(_properties._cellLevel.majorVersion() == 1 && _properties._cellLevel.minorVersion() > 0 &&
+          HasNeurites(firstSectionOffset)))
         return;
 
     try {
@@ -308,8 +308,7 @@ void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& _dataset,
                            unsigned int expectedDimension,
                            T& data) {
-    if (_properties._cellLevel.majorVersion() != 1 ||
-        _properties._cellLevel.minorVersion() < 1)
+    if (_properties._cellLevel.majorVersion() != 1 || _properties._cellLevel.minorVersion() < 1)
         return;
     try {
         const auto group = _group.getGroup(groupName);

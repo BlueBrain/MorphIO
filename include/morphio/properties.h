@@ -151,7 +151,8 @@ struct Marker {
 };
 
 struct CellLevel {
-    CellLevel() : _version({"undefined", 0, 0}) {}
+    CellLevel()
+        : _version({"undefined", 0, 0}) {}
 
     // A tuple (file format (std::string), major version, minor version)
     MorphologyVersion _version;
