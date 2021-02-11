@@ -573,6 +573,8 @@ The following s-expressions are parsed:
   )  ;  End of markers
   ```
 
+ℹ️ Markers can may have only `(X Y Z)` specified instead of the more common `(X Y Z D)`. In this case, diameters are set to 0.
+
 ##### Usage
 
 ```python
