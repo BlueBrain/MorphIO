@@ -705,3 +705,5 @@ def test_marker_with_string():
     m = Morphology(DATA_DIR / 'marker-with-string.asc')
     assert_array_equal(m.markers[0].points, np.array([[  -0.97    , -141.169998,   84.769997]],
                                                      dtype=np.float32))
+def test_version():
+    assert_array_equal(Morphology(DATA_DIR / 'simple.asc').version, ('asc', 1, 0))

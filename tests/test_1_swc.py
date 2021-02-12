@@ -447,3 +447,7 @@ def test_root_node_split():
 def test_three_point_soma():
     n = Morphology(os.path.join(_path, 'three_point_soma.swc'))
     assert_equal(n.soma_type, SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+
+def test_version():
+    assert_array_equal(Morphology(os.path.join(_path, 'simple.swc')).version,
+                       ('swc', 1, 0))

@@ -152,7 +152,9 @@ struct Marker {
 
 struct CellLevel {
     CellLevel()
-        : _version(MORPHOLOGY_VERSION_UNDEFINED) {}
+        : _version({"undefined", 0, 0}) {}
+
+    // A tuple (file format (std::string), major version, minor version)
     MorphologyVersion _version;
     morphio::CellFamily _cellFamily;
     SomaType _somaType;
@@ -162,6 +164,9 @@ struct CellLevel {
     bool diff(const CellLevel& other, LogLevel logLevel) const;
     bool operator==(const CellLevel& other) const;
     bool operator!=(const CellLevel& other) const;
+    std::string fileFormat() const;
+    uint32_t majorVersion();
+    uint32_t minorVersion();
 };
 
 // The lowest level data blob
@@ -188,9 +193,6 @@ struct Properties {
     template <typename T>
     const std::vector<typename T::Type>& get() const noexcept;
 
-    morphio::MorphologyVersion& version() noexcept {
-        return _cellLevel._version;
-    }
     const morphio::MorphologyVersion& version() const noexcept {
         return _cellLevel._version;
     }

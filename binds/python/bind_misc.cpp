@@ -80,23 +80,6 @@ void bind_misc(py::module& m) {
         .export_values();
 
 
-    py::enum_<morphio::enums::MorphologyVersion>(m, "MorphologyVersion")
-        .value("MORPHOLOGY_VERSION_H5_1",
-               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1)
-        .value("MORPHOLOGY_VERSION_H5_2",
-               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_2)
-        .value("MORPHOLOGY_VERSION_H5_1_1",
-               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_1)
-        .value("MORPHOLOGY_VERSION_H5_1_2",
-               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_H5_1_2)
-        .value("MORPHOLOGY_VERSION_SWC_1",
-               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_SWC_1)
-        .value("MORPHOLOGY_VERSION_UNDEFINED",
-               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_UNDEFINED)
-        .value("MORPHOLOGY_VERSION_ASC_1",
-               morphio::enums::MorphologyVersion::MORPHOLOGY_VERSION_ASC_1)
-        .export_values();
-
     py::enum_<morphio::enums::CellFamily>(m, "CellFamily")
         .value("NEURON", morphio::enums::CellFamily::NEURON)
         .value("GLIA", morphio::enums::CellFamily::GLIA)

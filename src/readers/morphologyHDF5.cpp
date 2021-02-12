@@ -75,6 +75,7 @@ Property::Properties MorphologyHDF5::load() {
     _readPerimeters(firstSectionOffset);
     _readMitochondria();
     _readEndoplasmicReticulum();
+    std::get<0>(_properties._cellLevel._version) = "h5";
 
     return _properties;
 }
@@ -114,21 +115,21 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
         const auto metadata = _group.getGroup(_g_metadata);
         const auto attr = metadata.getAttribute(_a_version);
 
-        uint32_t version[2];
-        attr.read(version);
-        if (version[0] == 1 && (version[1] == 1 || version[1] == 2)) {
+        uint32_t versions[2];
+        attr.read(&versions);
+        std::get<1>(_properties._cellLevel._version) = versions[0];
+        std::get<2>(_properties._cellLevel._version) = versions[1];
+        const auto majorVersion = _properties._cellLevel.majorVersion();
+        const auto minorVersion = _properties._cellLevel.minorVersion();
+        if (majorVersion == 1 && (minorVersion == 1 || minorVersion == 2)) {
             uint32_t family;
             const auto familyAttr = metadata.getAttribute(_a_family);
             familyAttr.read(family);
-            if (version[1] == 1)
-                _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_1_1;
-            else
-                _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_1_2;
             _properties._cellLevel._cellFamily = static_cast<CellFamily>(family);
         } else {
             throw morphio::RawDataError(
-                "Error in " + source + "\nUnsupported h5 version: " + std::to_string(version[0]) +
-                "." + std::to_string(version[1]) +
+                "Error in " + source + "\nUnsupported h5 version: " + std::to_string(majorVersion) +
+                "." + std::to_string(minorVersion) +
                 "See "
                 "https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/"
                 "index.html for the list of supported versions.");
@@ -139,9 +140,11 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
     try {
         _resolveV1();
 
-        // The fact that the resolution passes and _version is not set yet tells us it is h5v1.0
-        if (_properties._cellLevel._version == MORPHOLOGY_VERSION_UNDEFINED) {
-            _properties._cellLevel._version = MORPHOLOGY_VERSION_H5_1;
+        // The fact that the resolution passes and majorVersion is still uninitialized tells us
+        // it is h5v1.0
+        if (_properties._cellLevel.majorVersion() == 0) {
+            std::get<1>(_properties._cellLevel._version) = 1;  // major version
+            std::get<2>(_properties._cellLevel._version) = 0;  // minor version
             // Version 1.0 only support NEURON has a CellFamily.
             // Other CellFamily have been added in version 1.1:
             // https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
@@ -274,7 +277,9 @@ int MorphologyHDF5::_readSections() {
 }
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
-    if (_properties.version() != MORPHOLOGY_VERSION_H5_1_1 || !HasNeurites(firstSectionOffset))
+    // Perimeter information is available starting at v1.1
+    if (!(_properties._cellLevel.majorVersion() == 1 && _properties._cellLevel.minorVersion() > 0 &&
+          HasNeurites(firstSectionOffset)))
         return;
 
     try {
@@ -301,10 +306,9 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
 template <typename T>
 void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& _dataset,
-                           MorphologyVersion version,
                            unsigned int expectedDimension,
                            T& data) {
-    if (_properties.version() != version)
+    if (_properties._cellLevel.majorVersion() != 1 || _properties._cellLevel.minorVersion() < 1)
         return;
     try {
         const auto group = _group.getGroup(groupName);
@@ -339,22 +343,18 @@ void MorphologyHDF5::_readEndoplasmicReticulum() {
 
     _read(_g_endoplasmic_reticulum,
           _d_section_index,
-          MORPHOLOGY_VERSION_H5_1_1,
           1,
           _properties._endoplasmicReticulumLevel._sectionIndices);
     _read(_g_endoplasmic_reticulum,
           _d_volume,
-          MORPHOLOGY_VERSION_H5_1_1,
           1,
           _properties._endoplasmicReticulumLevel._volumes);
     _read(_g_endoplasmic_reticulum,
           _d_surface_area,
-          MORPHOLOGY_VERSION_H5_1_1,
           1,
           _properties._endoplasmicReticulumLevel._surfaceAreas);
     _read(_g_endoplasmic_reticulum,
           _d_filament_count,
-          MORPHOLOGY_VERSION_H5_1_1,
           1,
           _properties._endoplasmicReticulumLevel._filamentCounts);
 }
@@ -371,7 +371,7 @@ void MorphologyHDF5::_readMitochondria() {
     }
 
     std::vector<std::vector<morphio::floatType>> points;
-    _read(_g_mitochondria, _d_points, MORPHOLOGY_VERSION_H5_1_1, 2, points);
+    _read(_g_mitochondria, _d_points, 2, points);
 
     auto& mitoSectionId = _properties.get<Property::MitoNeuriteSectionId>();
     auto& pathlength = _properties.get<Property::MitoPathLength>();
@@ -386,7 +386,7 @@ void MorphologyHDF5::_readMitochondria() {
     }
 
     std::vector<std::vector<int32_t>> structure;
-    _read(_g_mitochondria, "structure", MORPHOLOGY_VERSION_H5_1_1, 2, structure);
+    _read(_g_mitochondria, "structure", 2, structure);
 
     auto& mitoSection = _properties.get<Property::MitoSection>();
     mitoSection.reserve(mitoSection.size() + structure.size());
