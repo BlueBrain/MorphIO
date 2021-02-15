@@ -23,7 +23,7 @@ namespace mut {
 bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
                           const std::shared_ptr<Section>& current);
 
-class Morphology
+class Morphology : public std::enable_shared_from_this<Morphology>
 {
   public:
     Morphology()
@@ -31,6 +31,13 @@ class Morphology
         , _soma(std::make_shared<Soma>())
         , _cellProperties(
               std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())) {}
+
+    /*
+     * Since the Morphology object must always live in a shared pointer
+     * we need to prevent its construction from implicit ctors.
+     */
+    Morphology(const Morphology&) = delete;
+    Morphology(const Morphology&&) = delete;
 
     /**
        Build a mutable Morphology from an on-disk morphology
@@ -41,17 +48,17 @@ class Morphology
        Example:
            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
     **/
-    Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
+    virtual void init(const std::string& uri, unsigned int options = NO_MODIFIER);
 
     /**
        Build a mutable Morphology from a mutable morphology
     **/
-    Morphology(const morphio::mut::Morphology& morphology, unsigned int options = NO_MODIFIER);
+    virtual void init(const morphio::mut::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
     /**
        Build a mutable Morphology from a read-only morphology
     **/
-    Morphology(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
+    virtual void init(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
     virtual ~Morphology();
 
@@ -221,7 +228,7 @@ class Morphology
                      morphio::enums::LogLevel verbose);
     morphio::readers::ErrorMessages _err;
 
-    uint32_t _register(const std::shared_ptr<Section>&);
+    uint32_t _register(std::shared_ptr<Section>);
 
     uint32_t _counter;
     std::shared_ptr<Soma> _soma;

@@ -21,21 +21,34 @@ void bind_mutable_module(py::module& m) {
     using namespace py::literals;
 
 
-    py::class_<morphio::mut::Morphology>(m, "Morphology")
+    py::class_<morphio::mut::Morphology, std::shared_ptr<morphio::mut::Morphology>>(m, "Morphology")
         .def(py::init<>())
-        .def(py::init<const std::string&, unsigned int>(),
+        .def(py::init([](const std::string& filename, unsigned int options){
+            auto ptr = std::make_shared<morphio::mut::Morphology>();
+            ptr->init(filename, options);
+            return ptr;
+        }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const morphio::Morphology&, unsigned int>(),
-             "morphology"_a,
-             "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const morphio::mut::Morphology&, unsigned int>(),
+        .def(py::init([](const morphio::Morphology& morph, unsigned int options) {
+            auto ptr = std::make_shared<morphio::mut::Morphology>();
+            ptr->init(morph, options);
+            return ptr;
+        }),
+            "morphology"_a,
+            "options"_a = morphio::enums::Option::NO_MODIFIER)
+        .def(py::init([](const morphio::mut::Morphology& morph, unsigned int options) {
+            auto ptr = std::make_shared<morphio::mut::Morphology>();
+            ptr->init(morph, options);
+            return ptr;
+        }),
              "morphology"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
         .def(py::init([](py::object arg, unsigned int options) {
-                 return std::unique_ptr<morphio::mut::Morphology>(
-                     new morphio::mut::Morphology(py::str(arg), options));
-             }),
+            auto ptr = std::make_shared<morphio::mut::Morphology>();
+            ptr->init(py::str(arg), options);
+            return ptr;
+        }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER,
              "Additional Ctor that accepts as filename any python "
@@ -178,16 +191,17 @@ void bind_mutable_module(py::module& m) {
              "mutable_section"_a,
              "recursive"_a = false);
 
-    py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(m, "GlialCell")
+    py::class_<morphio::mut::GlialCell, morphio::mut::Morphology,
+               std::shared_ptr<morphio::mut::GlialCell>>(m, "GlialCell")
         .def(py::init<>())
-        .def(py::init<const std::string&>())
-        .def(py::init([](py::object arg) {
-                 return std::unique_ptr<morphio::mut::GlialCell>(
-                     new morphio::mut::GlialCell(py::str(arg)));
-             }),
-             "filename"_a,
-             "Additional Ctor that accepts as filename any python "
-             "object that implements __repr__ or __str__");
+        .def(py::init([](py::object arg, unsigned int options) {
+            auto ptr = std::make_shared<morphio::mut::GlialCell>();
+            ptr->init(py::str(arg), options);
+            return ptr;
+        }),
+            "filename"_a,
+            "options"_a = morphio::enums::Option::NO_MODIFIER,
+            "Ctor from a existing file");
 
 
     py::class_<morphio::mut::Mitochondria>(m, "Mitochondria")

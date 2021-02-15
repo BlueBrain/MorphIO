@@ -19,30 +19,34 @@ namespace mut {
 void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset);
 
 using morphio::readers::ErrorMessages;
-Morphology::Morphology(const std::string& uri, unsigned int options)
-    : Morphology(morphio::Morphology(uri, options)) {}
 
-Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int options)
-    : _counter(0)
-    , _soma(std::make_shared<Soma>(*morphology.soma()))
-    , _endoplasmicReticulum(morphology.endoplasmicReticulum()) {
-    _cellProperties = std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties);
+void Morphology::init(const std::string& uri, unsigned int options) {
+    init(morphio::Morphology(uri, options));
+}
 
-    for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
+void Morphology::init(const morphio::mut::Morphology& morphology, unsigned int options) {
+    _soma = morphology.soma();
+    _endoplasmicReticulum = morphology.endoplasmicReticulum();
+
+    _cellProperties = std::make_shared<morphio::Property::CellLevel>(
+        *morphology._cellProperties);
+
+    for (const auto& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
 
-    for (const std::shared_ptr<MitoSection>& root : morphology.mitochondria().rootSections()) {
+    for (const auto& root : morphology.mitochondria().rootSections()) {
         mitochondria().appendRootSection(root, true);
     }
 
     applyModifiers(options);
 }
 
-Morphology::Morphology(const morphio::Morphology& morphology, unsigned int options)
-    : _counter(0)
-    , _soma(std::make_shared<Soma>(morphology.soma()))
-    , _endoplasmicReticulum(morphology.endoplasmicReticulum()) {
+void Morphology::init(const morphio::Morphology& morphology,
+                      unsigned int options) {
+    _soma = std::make_shared<Soma>(morphology.soma());
+    _endoplasmicReticulum = morphology.endoplasmicReticulum();
+
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(
         morphology._properties->_cellLevel);
 
@@ -88,7 +92,9 @@ bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
 
 std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& section_,
                                                        bool recursive) {
-    const std::shared_ptr<Section> ptr(new Section(this, _counter, section_));
+    const std::shared_ptr<Section> ptr(
+        new Section(std::weak_ptr<Morphology>(shared_from_this()),
+                    _counter, section_));
     _register(ptr);
     _rootSections.push_back(ptr);
 
@@ -107,7 +113,9 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 
 std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Section>& section_,
                                                        bool recursive) {
-    const std::shared_ptr<Section> section_copy(new Section(this, _counter, *section_));
+    const std::shared_ptr<Section> section_copy(
+        new Section(std::weak_ptr<Morphology>(shared_from_this()),
+                    _counter, *section_));
     _register(section_copy);
     _rootSections.push_back(section_copy);
 
@@ -127,7 +135,9 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
 
 std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLevel& pointProperties,
                                                        SectionType type) {
-    const std::shared_ptr<Section> ptr(new Section(this, _counter, type, pointProperties));
+    const std::shared_ptr<Section> ptr(
+        new Section(std::weak_ptr<Morphology>(shared_from_this()),
+                    _counter, type, pointProperties));
     _register(ptr);
     _rootSections.push_back(ptr);
 
@@ -138,7 +148,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLeve
     return ptr;
 }
 
-uint32_t Morphology::_register(const std::shared_ptr<Section>& section_) {
+uint32_t Morphology::_register(std::shared_ptr<Section> section_) {
     if (_sections.count(section_->id()))
         throw SectionBuilderError("Section already exists");
     _counter = std::max(_counter, section_->id()) + 1;
@@ -148,10 +158,6 @@ uint32_t Morphology::_register(const std::shared_ptr<Section>& section_) {
 }
 
 Morphology::~Morphology() {
-    auto roots = _rootSections;  // Need to iterate on a copy
-    for (const auto& root : roots) {
-        deleteSection(root, true);
-    }
 }
 
 static void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
@@ -159,8 +165,8 @@ static void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
     vec.erase(std::remove(vec.begin(), vec.end(), section), vec.end());
 }
 
-void Morphology::deleteSection(const std::shared_ptr<Section>& section_, bool recursive)
 
+void Morphology::deleteSection(const std::shared_ptr<Section>& section_, bool recursive)
 {
     if (!section_)
         return;
@@ -345,10 +351,11 @@ void Morphology::write(const std::string& filename) {
 
     std::string extension;
 
-    morphio::mut::Morphology clean(*this);
-    clean.sanitize();
+    auto clean = std::make_shared<morphio::mut::Morphology>();
+    clean->init(*this);
+    clean->sanitize();
 
-    for (const auto& root : clean.rootSections()) {
+    for (const auto& root : clean->rootSections()) {
         if (root->points().size() < 2)
             throw morphio::SectionBuilderError("Root sections must have at least 2 points");
     }
@@ -357,11 +364,11 @@ void Morphology::write(const std::string& filename) {
         extension += my_tolower(c);
 
     if (extension == ".h5")
-        writer::h5(clean, filename);
+        writer::h5(*clean, filename);
     else if (extension == ".asc")
-        writer::asc(clean, filename);
+        writer::asc(*clean, filename);
     else if (extension == ".swc")
-        writer::swc(clean, filename);
+        writer::swc(*clean, filename);
     else
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
 }

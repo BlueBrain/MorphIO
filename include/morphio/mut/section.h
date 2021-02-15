@@ -59,11 +59,6 @@ class Section: public std::enable_shared_from_this<Section>
     inline Property::PointLevel& properties() noexcept;
     inline const Property::PointLevel& properties() const noexcept;
     /** @} */
-    ////////////////////////////////////////////////////////////////////////////////
-    //
-    // Methods that were previously in mut::Morphology
-    //
-    ////////////////////////////////////////////////////////////////////////////////
 
     /**
        Get the parent ID
@@ -102,11 +97,17 @@ class Section: public std::enable_shared_from_this<Section>
   private:
     friend class Morphology;
 
-    Section(Morphology*, unsigned int id, SectionType type, const Property::PointLevel&);
-    Section(Morphology*, unsigned int id, const morphio::Section& section);
-    Section(Morphology*, unsigned int id, const Section&);
+    Section(std::weak_ptr<Morphology>, unsigned int id, SectionType type, const Property::PointLevel&);
+    Section(std::weak_ptr<Morphology>, unsigned int id, const morphio::Section& section);
+    Section(std::weak_ptr<Morphology>, unsigned int id, const Section&);
 
-    Morphology* _morphology;
+    /*
+      Getter of the Morphology object.
+      Will raise if the Morphology no longer exists
+     */
+    std::shared_ptr<Morphology> _getMorphology() const;
+
+    std::weak_ptr<Morphology> _morphology;
     Property::PointLevel _pointProperties;
     uint32_t _id;
     SectionType _sectionType;

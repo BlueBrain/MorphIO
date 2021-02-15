@@ -1,24 +1,22 @@
 import os
 from collections import OrderedDict
-
-import numpy as np
-from numpy.testing import assert_equal
-from nose.tools import assert_dict_equal, assert_raises, ok_
-from numpy.testing import assert_array_equal
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import morphio
-from morphio import MitochondriaPointLevel, MorphioError, RawDataError
+import numpy as np
+from morphio import CellFamily, IterType, MitochondriaPointLevel, MorphioError
 from morphio import Morphology as ImmutableMorphology
-from morphio import (PointLevel, SectionBuilderError, SectionType,
-                     IterType, ostream_redirect, CellFamily)
-from morphio.mut import Morphology, GlialCell
-from . utils import assert_substring, captured_output, tmp_asc_file, setup_tempdir
+from morphio import PointLevel, RawDataError, SectionBuilderError, SectionType, ostream_redirect
+from morphio.mut import GlialCell, Morphology
+from nose.tools import assert_dict_equal, assert_raises, ok_
+from numpy.testing import assert_array_equal, assert_equal
 
-_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+from .utils import assert_substring, captured_output, setup_tempdir, tmp_asc_file
 
-SIMPLE = Morphology(os.path.join(_path, "simple.swc"))
+DATA_DIR = Path(__file__).parent / 'data'
+
+SIMPLE = Morphology(str(Path(DATA_DIR, "simple.swc")))
 
 
 def test_point_level():
@@ -47,9 +45,9 @@ def test_point_level():
 
 def test_connectivity():
     cells = OrderedDict({
-        'asc': Morphology(os.path.join(_path, "simple.asc")),
-        'swc': Morphology(os.path.join(_path, "simple.swc")),
-        'h5': Morphology(os.path.join(_path, "h5/v1/simple.h5")),
+        'asc': Morphology(Path(DATA_DIR, "simple.asc")),
+        'swc': Morphology(Path(DATA_DIR, "simple.swc")),
+        'h5': Morphology(Path(DATA_DIR, "h5/v1/simple.h5")),
     })
 
     for cell in cells:
@@ -157,7 +155,7 @@ def test_append_no_duplicate():
 
 
 def test_mut_copy_ctor():
-    simple = Morphology(os.path.join(_path, "simple.swc"))
+    simple = Morphology(str(Path(DATA_DIR, "simple.swc")))
     assert_equal([sec.id for sec in simple.iter()],
                  [0, 1, 2, 3, 4, 5])
     copy = Morphology(simple)
@@ -230,13 +228,13 @@ def test_build_read_only():
 
 
 def test_mutable_immutable_equivalence():
-    morpho = ImmutableMorphology(os.path.join(_path, "simple.swc"))
+    morpho = ImmutableMorphology(Path(DATA_DIR, "simple.swc"))
     assert_array_equal(morpho.points, morpho.as_mutable().as_immutable().points)
 
 
 def test_mitochondria_read():
     '''Read a H5 file with a mitochondria'''
-    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    morpho = Morphology(Path(DATA_DIR, "h5/v1/mitochondria.h5"))
     mito = morpho.mitochondria
     assert_equal(len(mito.root_sections), 2)
 
@@ -268,7 +266,7 @@ def test_sections_are_not_dereferenced():
     '''There used to be a bug where if you would call:
     mitochondria.sections, that would dereference all section pointers
     if mitochondria.sections was not kept in a variable'''
-    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    morpho = Morphology(Path(DATA_DIR, "h5/v1/mitochondria.h5"))
 
     # This lines used to cause a bug
     morpho.mitochondria.sections  # pylint: disable=pointless-statement
@@ -344,7 +342,7 @@ def test_iterators():
     assert_array_equal([sec.id for sec in SIMPLE.iter(IterType.breadth_first)],
                        [0, 3, 1, 2, 4, 5])
 
-    neuron = Morphology(os.path.join(_path, "iterators.asc"))
+    neuron = Morphology(Path(DATA_DIR, "iterators.asc"))
     root = neuron.root_sections[0]
     assert_array_equal([section.id for section in root.iter(IterType.depth_first)],
                        [0, 1, 2, 3, 4, 5, 6])
@@ -355,7 +353,7 @@ def test_iterators():
                        [0, 7, 1, 4, 8, 9, 2, 3, 5, 6])
 
 def test_non_C_nparray():
-    m = Morphology(os.path.join(_path, "simple.swc"))
+    m = Morphology(Path(DATA_DIR, "simple.swc"))
     section = m.root_sections[0]
     points = np.array([[1, 2, 3], [4, 5, 6]])
     section.points = points
@@ -400,12 +398,12 @@ def test_section___str__():
 
 
 def test_from_pathlib():
-    neuron = Morphology(Path(_path, "simple.asc"))
+    neuron = Morphology(Path(DATA_DIR, "simple.asc"))
     assert_equal(len(neuron.root_sections), 2)
 
 
 def test_endoplasmic_reticulum():
-    neuron = Morphology(Path(_path, "simple.asc"))
+    neuron = Morphology(Path(DATA_DIR, "simple.asc"))
     reticulum = neuron.endoplasmic_reticulum
     assert_equal(reticulum.section_indices, [])
     assert_equal(reticulum.volumes, [])
@@ -466,25 +464,40 @@ def test_sanitize():
             assert_equal(err.getvalue().strip(),
                          'Warning: while appending section: 2 to parent: 0\nThe section first point should be parent section last point: \n        : X Y Z Diameter\nparent last point :[2.000000, 0.000000, 0.000000, 2.000000]\nchild first point :[2.000000, 1.000000, 0.000000, 2.000000]')
 
-
 def test_glia():
     g = GlialCell()
     assert_equal(g.cell_family, CellFamily.GLIA)
 
-    g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
+    g = GlialCell(Path(DATA_DIR, 'astrocyte.h5'))
     assert_equal(g.cell_family, CellFamily.GLIA)
 
-    g = GlialCell(Path(_path, 'astrocyte.h5'))
+    g = GlialCell(Path(DATA_DIR, 'astrocyte.h5'))
     assert_equal(g.cell_family, CellFamily.GLIA)
 
-    assert_raises(RawDataError, GlialCell, Path(_path, 'simple.swc'))
-    assert_raises(RawDataError, GlialCell, Path(_path, 'h5/v1/simple.h5'))
+    assert_raises(RawDataError, GlialCell, Path(DATA_DIR, 'simple.swc'))
+    assert_raises(RawDataError, GlialCell, Path(DATA_DIR, 'h5/v1/simple.h5'))
 
 
 def test_glia_round_trip():
     with TemporaryDirectory() as folder:
-        g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
+        g = GlialCell(Path(DATA_DIR, 'astrocyte.h5'))
         filename = Path(folder, 'glial-cell.h5')
         g.write(filename)
         g2 = GlialCell(filename)
         assert_equal(len(g.sections), len(g2.sections))
+
+def test_lifetime_issue():
+    m = Morphology(DATA_DIR / 'simple.swc')
+    s = m.root_sections[0]
+    del m # ~mut.Morphology() called
+    with assert_raises(RuntimeError) as obj:
+        s.children
+    assert_substring("This section (id: 0) can no longer be used in the context of the whole "
+                     "morphology because the Morphology object it belongs to has been deleted",
+                     str(obj.exception))
+
+def test_simple():
+    simple = Morphology(str(Path(DATA_DIR, "simple.swc")))
+
+if __name__ == '__main__':
+    test_simple()

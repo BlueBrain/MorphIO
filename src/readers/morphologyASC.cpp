@@ -55,7 +55,8 @@ class NeurolucidaParser
 {
   public:
     explicit NeurolucidaParser(const std::string& uri)
-        : uri_(uri)
+        : morph(std::make_shared<morphio::mut::Morphology>())
+        , uri_(uri)
         , lex_(uri, false)
         , debugInfo_(uri)
         , err_(uri) {}
@@ -63,7 +64,7 @@ class NeurolucidaParser
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
-    morphio::mut::Morphology& parse() {
+    std::shared_ptr<morphio::mut::Morphology> parse() {
         std::ifstream ifs(uri_);
         std::string input((std::istreambuf_iterator<char>(ifs)),
                           (std::istreambuf_iterator<char>()));
@@ -72,7 +73,7 @@ class NeurolucidaParser
 
         parse_root_sexps();
 
-        return nb_;
+        return morph;
     }
 
   private:
@@ -137,12 +138,12 @@ class NeurolucidaParser
             Property::Marker marker;
             marker._pointLevel = properties;
             marker._label = header.label;
-            nb_.addMarker(marker);
+            morph->addMarker(marker);
             return_id = -1;
         } else if (header.token == Token::CELLBODY) {
-            if (!nb_.soma()->points().empty())
+            if (!morph->soma()->points().empty())
                 throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
-            nb_.soma()->properties() = properties;
+            morph->soma()->properties() = properties;
             return_id = -1;
         } else {
             SectionType section_type = TokenSectionTypeMap.at(header.token);
@@ -156,10 +157,10 @@ class NeurolucidaParser
             } else {
                 std::shared_ptr<morphio::mut::Section> section;
                 if (header.parent_id > -1)
-                    section = nb_.section(static_cast<unsigned int>(header.parent_id))
+                    section = morph->section(static_cast<unsigned int>(header.parent_id))
                                   ->appendSection(properties, section_type);
                 else
-                    section = nb_.appendRootSection(properties, section_type);
+                    section = morph->appendRootSection(properties, section_type);
                 return_id = static_cast<int>(section->id());
                 debugInfo_.setLineNumber(section->id(),
                                          static_cast<unsigned int>(lex_.current_section_start_));
@@ -202,7 +203,7 @@ class NeurolucidaParser
                                       std::vector<morphio::floatType>& diameters) {
         if (parentId < 0)  // Discard root sections
             return;
-        auto parent = nb_.section(static_cast<unsigned int>(parentId));
+        auto parent = morph->section(static_cast<unsigned int>(parentId));
         auto lastParentPoint = parent->points()[parent->points().size() - 1];
         auto childSectionNextDiameter = diameters[0];
 
@@ -266,7 +267,7 @@ class NeurolucidaParser
     bool parse_neurite_section(Header header) {
         Points points;
         std::vector<morphio::floatType> diameters;
-        auto section_id = static_cast<int>(nb_.sections().size());
+        auto section_id = static_cast<int>(morph->sections().size());
 
         while (true) {
             const auto id = static_cast<Token>(lex_.current()->id);
@@ -332,7 +333,7 @@ class NeurolucidaParser
         }
     }
 
-    morphio::mut::Morphology nb_;
+    std::shared_ptr<morphio::mut::Morphology> morph;
 
     std::string uri_;
     NeurolucidaLexer lex_;
@@ -347,11 +348,11 @@ class NeurolucidaParser
 Property::Properties load(const std::string& uri, unsigned int options) {
     NeurolucidaParser parser(uri);
 
-    morphio::mut::Morphology& nb_ = parser.parse();
-    nb_.sanitize(parser.debugInfo_);
-    nb_.applyModifiers(options);
+    std::shared_ptr<morphio::mut::Morphology> morph = parser.parse();
+    morph->sanitize(parser.debugInfo_);
+    morph->applyModifiers(options);
 
-    Property::Properties properties = nb_.buildReadOnly();
+    Property::Properties properties = morph->buildReadOnly();
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"asc", 1, 0};
     return properties;

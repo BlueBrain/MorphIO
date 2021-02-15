@@ -10,7 +10,7 @@ class GlialCell: public Morphology
 {
   public:
     GlialCell();
-    GlialCell(const std::string& source);
+    virtual void init(const std::string& uri, unsigned int options = NO_MODIFIER);
 };
 
 }  // namespace mut

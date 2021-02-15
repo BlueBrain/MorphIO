@@ -36,7 +36,11 @@ void bind_immutable_module(py::module& m) {
              "Additional Ctor that accepts as filename any python object that implements __repr__ "
              "or __str__")
         .def("as_mutable",
-             [](const morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })
+             [](const morphio::Morphology& morph) {
+                 auto ptr = std::make_shared<morphio::mut::Morphology>();
+                 ptr->init(morph);
+                 return ptr;
+             })
 
         // Cell sub-parts accessors
         .def_property_readonly("soma", &morphio::Morphology::soma, "Returns the soma object")

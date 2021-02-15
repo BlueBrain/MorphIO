@@ -35,7 +35,8 @@ class SWCBuilder
 {
   public:
     explicit SWCBuilder(const std::string& _uri)
-        : uri(_uri)
+        : morph(std::make_shared<morphio::mut::Morphology>())
+        , uri(_uri)
         , err(_uri)
         , debugInfo(_uri) {
         _readSamples();
@@ -215,7 +216,7 @@ class SWCBuilder
     }
 
     SomaType somaType() {
-        switch (morph.soma()->points().size()) {
+        switch (morph->soma()->points().size()) {
         case 0: {
             return SOMA_UNDEFINED;
         }
@@ -280,19 +281,19 @@ class SWCBuilder
             }
 
             if (sample.type == SECTION_SOMA) {
-                appendSample(morph.soma(), sample);
+                appendSample(morph->soma(), sample);
             } else {
-                appendSample(morph.section(swcIdToSectionId.at(sample.id)), sample);
+                appendSample(morph->section(swcIdToSectionId.at(sample.id)), sample);
             }
         }
 
-        if (morph.soma()->points().size() == 3 && !neurite_wrong_root.empty())
+        if (morph->soma()->points().size() == 3 && !neurite_wrong_root.empty())
             printError(morphio::WRONG_ROOT_POINT, err.WARNING_WRONG_ROOT_POINT(neurite_wrong_root));
 
-        morph.sanitize();
-        morph.applyModifiers(options);
+        morph->sanitize();
+        morph->applyModifiers(options);
 
-        Property::Properties properties = morph.buildReadOnly();
+        Property::Properties properties = morph->buildReadOnly();
         properties._cellLevel._somaType = somaType();
 
         set_ignored_warning(morphio::Warning::APPENDING_EMPTY_SECTION, originalIsIgnored);
@@ -311,7 +312,7 @@ class SWCBuilder
         uint32_t id = 0;
 
         if (isRootPoint(sample)) {
-            id = morph.appendRootSection(properties, sample.type)->id();
+            id = morph->appendRootSection(properties, sample.type)->id();
         } else {
             // Duplicating last point of previous section if there is not already a duplicate
             auto parentId = static_cast<unsigned int>(sample.parentId);
@@ -322,9 +323,9 @@ class SWCBuilder
 
             // Handle the case, bifurcatation at root point
             if (isRootPoint(samples[parentId])) {
-                id = morph.appendRootSection(properties, sample.type)->id();
+                id = morph->appendRootSection(properties, sample.type)->id();
             } else {
-                id = morph.section(swcIdToSectionId[parentId])
+                id = morph->section(swcIdToSectionId[parentId])
                          ->appendSection(properties, sample.type)
                          ->id();
             }
@@ -344,7 +345,7 @@ class SWCBuilder
     int lastSomaPoint = -1;
     std::map<int32_t, std::vector<uint32_t>> children;
     std::map<uint32_t, Sample> samples;
-    mut::Morphology morph;
+    std::shared_ptr<mut::Morphology> morph;
     std::string uri;
     ErrorMessages err;
     DebugInfo debugInfo;

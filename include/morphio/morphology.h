@@ -39,7 +39,7 @@ class Morphology
      */
     explicit Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
     explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
-    explicit Morphology(mut::Morphology);
+    explicit Morphology(const mut::Morphology&);
 
     /**
      * Return the soma object

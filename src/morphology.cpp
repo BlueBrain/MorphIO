@@ -33,12 +33,13 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders
     if (properties._cellLevel.fileFormat() == "h5") {
-        mut::Morphology mutable_morph(*this);
-        mutable_morph.sanitize();
+        auto mutable_morph = std::make_shared<mut::Morphology>();
+        mutable_morph->init(*this);
+        mutable_morph->sanitize();
         if (options) {
-            mutable_morph.applyModifiers(options);
+            mutable_morph->applyModifiers(options);
         }
-        _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
+        _properties = std::make_shared<Property::Properties>(mutable_morph->buildReadOnly());
         buildChildren(_properties);
     }
 }
@@ -49,9 +50,11 @@ Morphology::Morphology(const HighFive::Group& group, unsigned int options)
 Morphology::Morphology(const std::string& source, unsigned int options)
     : Morphology(loadURI(source, options), options) {}
 
-Morphology::Morphology(mut::Morphology morphology) {
-    morphology.sanitize();
-    _properties = std::make_shared<Property::Properties>(morphology.buildReadOnly());
+Morphology::Morphology(const mut::Morphology& morphology) {
+    auto morph = std::make_shared<mut::Morphology>();
+    morph->init(morphology);
+    morph->sanitize();
+    _properties = std::make_shared<Property::Properties>(morph->buildReadOnly());
     buildChildren(_properties);
 }
 

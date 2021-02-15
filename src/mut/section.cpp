@@ -13,7 +13,17 @@ static inline bool _emptySection(const std::shared_ptr<Section>& section) {
     return section->points().empty();
 }
 
-Section::Section(Morphology* morphology,
+std::shared_ptr<Morphology> Section::_getMorphology() const {
+    auto shared = _morphology.lock();
+    if (shared)
+        return shared;
+    else
+        throw std::runtime_error(
+            "This section (id: " + std::to_string(id()) + ") can no longer be used in the context of the whole morphology "
+            "because the Morphology object it belongs to has been deleted");
+}
+
+Section::Section(std::weak_ptr<Morphology>(morphology),
                  unsigned int id_,
                  SectionType type_,
                  const Property::PointLevel& pointProperties)
@@ -22,33 +32,36 @@ Section::Section(Morphology* morphology,
     , _id(id_)
     , _sectionType(type_) {}
 
-Section::Section(Morphology* morphology, unsigned int id_, const morphio::Section& section_)
+Section::Section(std::weak_ptr<Morphology> morphology, unsigned int id_, const morphio::Section& section_)
     : Section(morphology,
               id_,
               section_.type(),
               Property::PointLevel(section_._properties->_pointLevel, section_._range)) {}
 
-Section::Section(Morphology* morphology, unsigned int id_, const Section& section_)
+Section::Section(std::weak_ptr<Morphology> morphology, unsigned int id_, const Section& section_)
     : _morphology(morphology)
     , _pointProperties(section_._pointProperties)
     , _id(id_)
     , _sectionType(section_._sectionType) {}
 
 const std::shared_ptr<Section>& Section::parent() const {
-    return _morphology->_sections.at(_morphology->_parent.at(id()));
+    auto morph = _getMorphology();
+    return morph->_sections.at(morph->_parent.at(id()));
 }
 
 bool Section::isRoot() const {
-    const auto parentId = _morphology->_parent.find(id());
-    if (parentId != _morphology->_parent.end()) {
-        return _morphology->_sections.find(parentId->second) == _morphology->_sections.end();
+    auto morph = _getMorphology();
+    const auto parentId = morph->_parent.find(id());
+    if (parentId != morph->_parent.end()) {
+        return morph->_sections.find(parentId->second) == morph->_sections.end();
     }
     return true;
 }
 
 const std::vector<std::shared_ptr<Section>>& Section::children() const {
-    const auto it = _morphology->_children.find(id());
-    if (it == _morphology->_children.end()) {
+    auto morph = _getMorphology();
+    const auto it = morph->_children.find(id());
+    if (it == morph->_children.end()) {
         static std::vector<std::shared_ptr<Section>> empty;
         return empty;
     }
@@ -91,26 +104,27 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section>& secti
 
 std::shared_ptr<Section> Section::appendSection(const std::shared_ptr<Section>& original_section,
                                                 bool recursive) {
+    auto morph = _getMorphology();
     const std::shared_ptr<Section> ptr(
-        new Section(_morphology, _morphology->_counter, *original_section));
+        new Section(_morphology, morph->_counter, *original_section));
     unsigned int parentId = id();
-    uint32_t childId = _morphology->_register(ptr);
-    auto& _sections = _morphology->_sections;
+    uint32_t childId = morph->_register(ptr);
+    auto& _sections = morph->_sections;
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
         printError(Warning::APPENDING_EMPTY_SECTION,
-                   _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+                   morph->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
         printError(Warning::WRONG_DUPLICATE,
-                   _morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
+                   morph->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
                                                              _sections.at(parentId)));
     }
 
-    _morphology->_parent[childId] = parentId;
-    _morphology->_children[parentId].push_back(ptr);
+    morph->_parent[childId] = parentId;
+    morph->_children[parentId].push_back(ptr);
 
     if (recursive) {
         for (const auto& child : original_section->children()) {
@@ -122,24 +136,26 @@ std::shared_ptr<Section> Section::appendSection(const std::shared_ptr<Section>& 
 }
 
 std::shared_ptr<Section> Section::appendSection(const morphio::Section& section, bool recursive) {
-    const std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter, section));
+    auto morph = _getMorphology();
+    const std::shared_ptr<Section> ptr(new Section(_morphology,
+                                                   morph->_counter, section));
     unsigned int parentId = id();
-    uint32_t childId = _morphology->_register(ptr);
-    auto& _sections = _morphology->_sections;
+    uint32_t childId = morph->_register(ptr);
+    auto& _sections = morph->_sections;
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
         printError(Warning::APPENDING_EMPTY_SECTION,
-                   _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+                   morph->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
         printError(Warning::WRONG_DUPLICATE,
-                   _morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
+                   morph->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
                                                              _sections.at(parentId)));
 
-    _morphology->_parent[childId] = parentId;
-    _morphology->_children[parentId].push_back(ptr);
+    morph->_parent[childId] = parentId;
+    morph->_children[parentId].push_back(ptr);
 
     if (recursive) {
         for (const auto& child : section.children()) {
@@ -152,9 +168,10 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
 
 std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& pointProperties,
                                                 SectionType sectionType) {
+    auto morph = _getMorphology();
     unsigned int parentId = id();
 
-    auto& _sections = _morphology->_sections;
+    auto& _sections = morph->_sections;
     if (sectionType == SectionType::SECTION_UNDEFINED)
         sectionType = type();
 
@@ -162,23 +179,23 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
         throw morphio::SectionBuilderError("Cannot create section with type soma");
 
     std::shared_ptr<Section> ptr(
-        new Section(_morphology, _morphology->_counter, sectionType, pointProperties));
+        new Section(_morphology, morph->_counter, sectionType, pointProperties));
 
-    uint32_t childId = _morphology->_register(ptr);
+    uint32_t childId = morph->_register(ptr);
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
         printError(Warning::APPENDING_EMPTY_SECTION,
-                   _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+                   morph->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
         printError(Warning::WRONG_DUPLICATE,
-                   _morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
+                   morph->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
                                                              _sections[parentId]));
 
-    _morphology->_parent[childId] = parentId;
-    _morphology->_children[parentId].push_back(ptr);
+    morph->_parent[childId] = parentId;
+    morph->_children[parentId].push_back(ptr);
     return ptr;
 }
 

@@ -1,2 +1,2 @@
-from .._morphio.mut import (Morphology, Section, Soma, MitoSection,
-                            Mitochondria, GlialCell, EndoplasmicReticulum)
+from .._morphio.mut import Mitochondria, GlialCell
+from .._morphio.mut import EndoplasmicReticulum, MitoSection, Morphology, Section, Soma
