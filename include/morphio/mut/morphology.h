@@ -48,17 +48,17 @@ class Morphology : public std::enable_shared_from_this<Morphology>
        Example:
            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
     **/
-    virtual void init(const std::string& uri, unsigned int options = NO_MODIFIER);
+    void init(const std::string& uri, unsigned int options = NO_MODIFIER);
 
     /**
        Build a mutable Morphology from a mutable morphology
     **/
-    virtual void init(const morphio::mut::Morphology& morphology, unsigned int options = NO_MODIFIER);
+    void init(const morphio::mut::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
     /**
        Build a mutable Morphology from a read-only morphology
     **/
-    virtual void init(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
+    void init(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
     virtual ~Morphology();
 

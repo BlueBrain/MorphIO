@@ -93,7 +93,6 @@ It supports the following formats:
 - SWC
 - ASC (aka. neurolucida)
 - H5 v1
-- H5 v2
 
 It provides 3 C++ classes that are the starting point of every morphology analysis:
 - `Soma`: contains the information related to the soma.
@@ -173,15 +172,18 @@ from morphio.mut import Morphology, Section, Soma
 
 #### C++
 
+⚠️`morphio::mut::Morphology` object **have** to be created through a shared pointer and not directly on the stack. Failure to do so will result in errors while trying to initialize the sections.
+
 ```cpp
-#include <morphio/morphology.h>
-#include <morphio/section.h>
+#include <morphio/mut/morphology.h>
+#include <morphio/mut/section.h>
 
 int main()
 {
-    auto m = morphio::Morphology("sample.asc");
+    auto m = std::make_shared<morphio::mut::Morphology>();
+    m->init("sample.asc");
 
-    auto roots = m.rootSections();
+    auto roots = m->rootSections();
 
     auto first_root = roots[0];
 
@@ -207,7 +209,7 @@ int main()
 #### Python
 
 ```python
-from morphio import Morphology
+from morphio.mut import Morphology
 
 m = Morphology("sample.asc")
 roots = m.root_sections
@@ -235,7 +237,7 @@ Here is a simple example to create a morphology from scratch and write it to dis
 
 int main()
 {
-    morphio::mut::Morphology morpho;
+    auto morpho = std::make_shared<morphio::mut::Morphology>();
     morpho.soma()->points() = {{0, 0, 0}, {1, 1, 1}};
     morpho.soma()->diameters() = {1, 1};
 

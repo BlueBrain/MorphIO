@@ -14,9 +14,6 @@ EndoplasmicReticulum::EndoplasmicReticulum(const std::vector<uint32_t>& sectionI
     _properties._filamentCounts = filamentCounts;
 }
 
-EndoplasmicReticulum::EndoplasmicReticulum(const EndoplasmicReticulum& endoplasmicReticulum)
-    : _properties(endoplasmicReticulum._properties) {}
-
 EndoplasmicReticulum::EndoplasmicReticulum(
     const morphio::EndoplasmicReticulum& endoplasmicReticulum)
     : _properties(endoplasmicReticulum._properties->_endoplasmicReticulumLevel) {}

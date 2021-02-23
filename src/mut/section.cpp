@@ -23,7 +23,7 @@ std::shared_ptr<Morphology> Section::_getMorphology() const {
             "because the Morphology object it belongs to has been deleted");
 }
 
-Section::Section(std::weak_ptr<Morphology>(morphology),
+Section::Section(std::weak_ptr<Morphology> morphology,
                  unsigned int id_,
                  SectionType type_,
                  const Property::PointLevel& pointProperties)

@@ -18,7 +18,6 @@ class EndoplasmicReticulum
                          const std::vector<morphio::floatType>& volumes,
                          const std::vector<morphio::floatType>& surfaceAreas,
                          const std::vector<uint32_t>& filamentCounts);
-    EndoplasmicReticulum(const EndoplasmicReticulum& endoplasmicReticulum);
     EndoplasmicReticulum(const morphio::EndoplasmicReticulum& endoplasmicReticulum);
 
 
