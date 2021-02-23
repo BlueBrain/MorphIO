@@ -16,7 +16,7 @@ from .utils import assert_substring, captured_output, setup_tempdir, tmp_asc_fil
 
 DATA_DIR = Path(__file__).parent / 'data'
 
-SIMPLE = Morphology(str(Path(DATA_DIR, "simple.swc")))
+SIMPLE = Morphology(Path(DATA_DIR, "simple.swc"))
 
 
 def test_point_level():
@@ -155,7 +155,7 @@ def test_append_no_duplicate():
 
 
 def test_mut_copy_ctor():
-    simple = Morphology(str(Path(DATA_DIR, "simple.swc")))
+    simple = Morphology(Path(DATA_DIR, "simple.swc"))
     assert_equal([sec.id for sec in simple.iter()],
                  [0, 1, 2, 3, 4, 5])
     copy = Morphology(simple)
@@ -495,9 +495,3 @@ def test_lifetime_issue():
     assert_substring("This section (id: 0) can no longer be used in the context of the whole "
                      "morphology because the Morphology object it belongs to has been deleted",
                      str(obj.exception))
-
-def test_simple():
-    simple = Morphology(str(Path(DATA_DIR, "simple.swc")))
-
-if __name__ == '__main__':
-    test_simple()
