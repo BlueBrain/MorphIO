@@ -1,9 +1,10 @@
 name: Publish sdist and wheels macos-manylinux
 
 on:
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+  # push:
+  #   tags:
+  #     - 'v[0-9]+.[0-9]+.[0-9]+'
 
 env:
   CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
@@ -62,7 +63,10 @@ jobs:
     name: Build sdist
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
       - name: Set up Python 3.6
         uses: actions/setup-python@v2
         with:
@@ -70,6 +74,11 @@ jobs:
       - name: Build a source tarball
         run:
           python setup.py sdist
+      - name: Test tarball
+        run:
+          pip install -r tests/requirement_tests.txt
+          pip install dist/*
+          nosetests -s -v -P tests
       - name: Store sdist as artifact
         uses: actions/upload-artifact@v2
         with:
