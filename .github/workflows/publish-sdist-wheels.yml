@@ -75,7 +75,7 @@ jobs:
         run:
           python setup.py sdist
       - name: Test tarball
-        run:
+        run: |
           pip install -r tests/requirement_tests.txt
           pip install dist/*
           nosetests -s -v -P tests
