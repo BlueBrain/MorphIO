@@ -486,7 +486,15 @@ def test_glia_round_trip():
         g2 = GlialCell(filename)
         assert_equal(len(g.sections), len(g2.sections))
 
-def test_lifetime_issue():
+
+def _get_section():
+    m = Morphology(DATA_DIR / 'simple.swc')
+    s = m.root_sections[0]
+    return s
+
+def test_lifetime_1():
+    '''Attempting to access topological information after a Morphology has been destroyed should
+    raise'''
     m = Morphology(DATA_DIR / 'simple.swc')
     s = m.root_sections[0]
     del m # ~mut.Morphology() called
@@ -495,3 +503,35 @@ def test_lifetime_issue():
     assert_substring("This section (id: 0) can no longer be used in the context of the whole "
                      "morphology because the Morphology object it belongs to has been deleted",
                      str(obj.exception))
+
+
+def test_lifetime_2():
+    '''Attempting to access topological information after a Morphology has been destroyed should
+    raise'''
+    section = _get_section()
+    assert_array_equal(section.points,
+                       np.array([[0., 0., 0.],
+                                 [0., 5., 0.]], dtype=np.float32))
+
+    with assert_raises(RuntimeError) as obj:
+        section.children
+    assert_substring("This section (id: 0) can no longer be used in the context of the whole "
+                     "morphology because the Morphology object it belongs to has been deleted",
+                     str(obj.exception))
+
+def test_lifetime_3():
+    '''Copy a section from a destroyed morphology should work because it does not use any
+    topological information'''
+    section = _get_section()
+
+    # Proof that the morphology has really been destroyed
+    with assert_raises(RuntimeError) as obj:
+        section.children
+
+    morph = Morphology()
+    morph.append_root_section(section)
+    del section
+    assert_equal(len(morph.root_sections), 1)
+    assert_array_equal(morph.root_sections[0].points,
+                       np.array([[0., 0., 0.],
+                                 [0., 5., 0.]], dtype=np.float32))
