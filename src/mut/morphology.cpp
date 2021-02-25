@@ -28,8 +28,7 @@ void Morphology::init(const morphio::mut::Morphology& morphology, unsigned int o
     _soma = morphology.soma();
     _endoplasmicReticulum = morphology.endoplasmicReticulum();
 
-    _cellProperties = std::make_shared<morphio::Property::CellLevel>(
-        *morphology._cellProperties);
+    _cellProperties = std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties);
 
     for (const auto& root : morphology.rootSections()) {
         appendRootSection(root, true);
@@ -42,8 +41,7 @@ void Morphology::init(const morphio::mut::Morphology& morphology, unsigned int o
     applyModifiers(options);
 }
 
-void Morphology::init(const morphio::Morphology& morphology,
-                      unsigned int options) {
+void Morphology::init(const morphio::Morphology& morphology, unsigned int options) {
     _soma = std::make_shared<Soma>(morphology.soma());
     _endoplasmicReticulum = morphology.endoplasmicReticulum();
 
@@ -93,8 +91,7 @@ bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
 std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& section_,
                                                        bool recursive) {
     const std::shared_ptr<Section> ptr(
-        new Section(std::weak_ptr<Morphology>(shared_from_this()),
-                    _counter, section_));
+        new Section(std::weak_ptr<Morphology>(shared_from_this()), _counter, section_));
     _register(ptr);
     _rootSections.push_back(ptr);
 
@@ -114,8 +111,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Section>& section_,
                                                        bool recursive) {
     const std::shared_ptr<Section> section_copy(
-        new Section(std::weak_ptr<Morphology>(shared_from_this()),
-                    _counter, *section_));
+        new Section(std::weak_ptr<Morphology>(shared_from_this()), _counter, *section_));
     _register(section_copy);
     _rootSections.push_back(section_copy);
 
@@ -135,9 +131,8 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
 
 std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLevel& pointProperties,
                                                        SectionType type) {
-    const std::shared_ptr<Section> ptr(
-        new Section(std::weak_ptr<Morphology>(shared_from_this()),
-                    _counter, type, pointProperties));
+    const std::shared_ptr<Section> ptr(new Section(
+        std::weak_ptr<Morphology>(shared_from_this()), _counter, type, pointProperties));
     _register(ptr);
     _rootSections.push_back(ptr);
 
@@ -166,8 +161,7 @@ static void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
 }
 
 
-void Morphology::deleteSection(const std::shared_ptr<Section>& section_, bool recursive)
-{
+void Morphology::deleteSection(const std::shared_ptr<Section>& section_, bool recursive) {
     if (!section_)
         return;
     unsigned int id = section_->id();

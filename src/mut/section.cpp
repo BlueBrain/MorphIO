@@ -18,9 +18,9 @@ std::shared_ptr<Morphology> Section::_getMorphology() const {
     if (shared)
         return shared;
     else
-        throw std::runtime_error(
-            "This section (id: " + std::to_string(id()) + ") can no longer be used in the context of the whole morphology "
-            "because the Morphology object it belongs to has been deleted");
+        throw std::runtime_error("This section (id: " + std::to_string(id()) +
+                                 ") can no longer be used in the context of the whole morphology "
+                                 "because the Morphology object it belongs to has been deleted");
 }
 
 Section::Section(std::weak_ptr<Morphology> morphology,
@@ -32,7 +32,9 @@ Section::Section(std::weak_ptr<Morphology> morphology,
     , _id(id_)
     , _sectionType(type_) {}
 
-Section::Section(std::weak_ptr<Morphology> morphology, unsigned int id_, const morphio::Section& section_)
+Section::Section(std::weak_ptr<Morphology> morphology,
+                 unsigned int id_,
+                 const morphio::Section& section_)
     : Section(morphology,
               id_,
               section_.type(),
@@ -119,8 +121,7 @@ std::shared_ptr<Section> Section::appendSection(const std::shared_ptr<Section>& 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
         printError(Warning::WRONG_DUPLICATE,
-                   morph->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
-                                                             _sections.at(parentId)));
+                   morph->_err.WARNING_WRONG_DUPLICATE(_sections[childId], _sections.at(parentId)));
     }
 
     morph->_parent[childId] = parentId;
@@ -137,8 +138,7 @@ std::shared_ptr<Section> Section::appendSection(const std::shared_ptr<Section>& 
 
 std::shared_ptr<Section> Section::appendSection(const morphio::Section& section, bool recursive) {
     auto morph = _getMorphology();
-    const std::shared_ptr<Section> ptr(new Section(_morphology,
-                                                   morph->_counter, section));
+    const std::shared_ptr<Section> ptr(new Section(_morphology, morph->_counter, section));
     unsigned int parentId = id();
     uint32_t childId = morph->_register(ptr);
     auto& _sections = morph->_sections;
@@ -151,8 +151,7 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
         printError(Warning::WRONG_DUPLICATE,
-                   morph->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
-                                                             _sections.at(parentId)));
+                   morph->_err.WARNING_WRONG_DUPLICATE(_sections[childId], _sections.at(parentId)));
 
     morph->_parent[childId] = parentId;
     morph->_children[parentId].push_back(ptr);
@@ -191,8 +190,7 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
         printError(Warning::WRONG_DUPLICATE,
-                   morph->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
-                                                             _sections[parentId]));
+                   morph->_err.WARNING_WRONG_DUPLICATE(_sections[childId], _sections[parentId]));
 
     morph->_parent[childId] = parentId;
     morph->_children[parentId].push_back(ptr);

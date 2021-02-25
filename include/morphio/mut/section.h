@@ -97,7 +97,10 @@ class Section: public std::enable_shared_from_this<Section>
   private:
     friend class Morphology;
 
-    Section(std::weak_ptr<Morphology>, unsigned int id, SectionType type, const Property::PointLevel&);
+    Section(std::weak_ptr<Morphology>,
+            unsigned int id,
+            SectionType type,
+            const Property::PointLevel&);
     Section(std::weak_ptr<Morphology>, unsigned int id, const morphio::Section& section);
     Section(std::weak_ptr<Morphology>, unsigned int id, const Section&);
 

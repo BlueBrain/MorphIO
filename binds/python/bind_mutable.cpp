@@ -191,17 +191,18 @@ void bind_mutable_module(py::module& m) {
              "mutable_section"_a,
              "recursive"_a = false);
 
-    py::class_<morphio::mut::GlialCell, morphio::mut::Morphology,
+    py::class_<morphio::mut::GlialCell,
+               morphio::mut::Morphology,
                std::shared_ptr<morphio::mut::GlialCell>>(m, "GlialCell")
         .def(py::init<>())
         .def(py::init([](py::object arg, unsigned int options) {
-            auto ptr = std::make_shared<morphio::mut::GlialCell>();
-            ptr->init(py::str(arg), options);
-            return ptr;
-        }),
-            "filename"_a,
-            "options"_a = morphio::enums::Option::NO_MODIFIER,
-            "Ctor from a existing file");
+                 auto ptr = std::make_shared<morphio::mut::GlialCell>();
+                 ptr->init(py::str(arg), options);
+                 return ptr;
+             }),
+             "filename"_a,
+             "options"_a = morphio::enums::Option::NO_MODIFIER,
+             "Ctor from a existing file");
 
 
     py::class_<morphio::mut::Mitochondria>(m, "Mitochondria")

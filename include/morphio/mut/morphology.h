@@ -23,7 +23,7 @@ namespace mut {
 bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
                           const std::shared_ptr<Section>& current);
 
-class Morphology : public std::enable_shared_from_this<Morphology>
+class Morphology: public std::enable_shared_from_this<Morphology>
 {
   public:
     Morphology()
