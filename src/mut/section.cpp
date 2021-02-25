@@ -30,7 +30,10 @@ Section::Section(std::weak_ptr<Morphology> morphology,
     : _morphology(morphology)
     , _pointProperties(pointProperties)
     , _id(id_)
-    , _sectionType(type_) {}
+    , _sectionType(type_) {
+    // Sanity check that the morphology is alive
+    _getMorphology();
+}
 
 Section::Section(std::weak_ptr<Morphology> morphology,
                  unsigned int id_,
@@ -38,13 +41,19 @@ Section::Section(std::weak_ptr<Morphology> morphology,
     : Section(morphology,
               id_,
               section_.type(),
-              Property::PointLevel(section_._properties->_pointLevel, section_._range)) {}
+              Property::PointLevel(section_._properties->_pointLevel, section_._range)) {
+    // Sanity check that the morphology is alive
+    _getMorphology();
+}
 
 Section::Section(std::weak_ptr<Morphology> morphology, unsigned int id_, const Section& section_)
     : _morphology(morphology)
     , _pointProperties(section_._pointProperties)
     , _id(id_)
-    , _sectionType(section_._sectionType) {}
+    , _sectionType(section_._sectionType) {
+    // Sanity check that the morphology is alive
+    _getMorphology();
+}
 
 const std::shared_ptr<Section>& Section::parent() const {
     auto morph = _getMorphology();
