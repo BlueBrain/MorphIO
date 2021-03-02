@@ -2,12 +2,13 @@
 
 ## Table of content
 
+* [Introduction](#introduction)
 * [Installation](#installation)
    * [Dependencies](#dependencies)
    * [Installation instructions](#installation-instructions)
       * [Install as a C++ library](#install-as-a-c-library)
       * [Install as a Python package](#install-as-a-python-package)
-* [Introduction](#introduction)
+* [Usage](#usage)
    * [Quick summary](#quick-summary)
    * [Include/Imports](#includeimports)
    * [Read-only API](#read-only-api)
@@ -30,6 +31,25 @@
 * [Specification](#specification)
 
 
+## Introduction
+
+MorphIO is a library for reading and writing neuron morphology files.
+It supports the following formats:
+- SWC
+- ASC (aka. neurolucida)
+- H5 v1
+- H5 v2
+
+It provides 3 C++ classes that are the starting point of every morphology analysis:
+- `Soma`: contains the information related to the soma.
+
+- `Section`: a section is the succession of points between two bifurcations. To the bare minimum
+the `Section` object will contain the section type, the position and diameter of each point.
+
+- `Morphology`: the morphology object contains general information about the loaded cell
+but also provides accessors to the different sections.
+
+One important concept is that MorphIO is split into a *read-only* part and a *read/write* one.
 
 ## Installation
 
@@ -86,25 +106,8 @@ The python binding can directly be installed using pip:
 pip install morphio
 ```
 
-## Introduction
 
-MorphIO is a library for reading and writing neuron morphology files.
-It supports the following formats:
-- SWC
-- ASC (aka. neurolucida)
-- H5 v1
-- H5 v2
-
-It provides 3 C++ classes that are the starting point of every morphology analysis:
-- `Soma`: contains the information related to the soma.
-
-- `Section`: a section is the succession of points between two bifurcations. To the bare minimum
-the `Section` object will contain the section type, the position and diameter of each point.
-
-- `Morphology`: the morphology object contains general information about the loaded cell
-but also provides accessors to the different sections.
-
-One important concept is that MorphIO is split into a *read-only* part and a *read/write* one.
+## Usage
 
 ### Quick summary
 *C++ vs Python*:
