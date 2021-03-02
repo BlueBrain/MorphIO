@@ -3,8 +3,7 @@ from itertools import chain, repeat
 from pathlib import Path
 
 import requests
-from morphio import (CellFamily, Morphology, RawDataError, SectionType,
-                     ostream_redirect)
+from morphio import CellFamily, Morphology, RawDataError, SectionType, ostream_redirect
 from nose.tools import assert_equal, assert_raises, ok_
 from numpy.testing import assert_array_equal
 
@@ -85,4 +84,4 @@ def test_single_children():
     with captured_output() as (_, _):
         with ostream_redirect(stdout=True, stderr=True):
             neuron = Morphology(H5V1_PATH / 'two_child_unmerged.h5')
-    assert_equal(len(list(neuron.iter())), 3)
+    assert_equal(len(list(neuron.iter())), 8)

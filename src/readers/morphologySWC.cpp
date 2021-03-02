@@ -289,7 +289,6 @@ class SWCBuilder
         if (morph.soma()->points().size() == 3 && !neurite_wrong_root.empty())
             printError(morphio::WRONG_ROOT_POINT, err.WARNING_WRONG_ROOT_POINT(neurite_wrong_root));
 
-        morph.sanitize();
         morph.applyModifiers(options);
 
         Property::Properties properties = morph.buildReadOnly();

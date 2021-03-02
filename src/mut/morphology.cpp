@@ -350,10 +350,7 @@ void Morphology::write(const std::string& filename) {
 
     std::string extension;
 
-    morphio::mut::Morphology clean(*this);
-    clean.sanitize();
-
-    for (const auto& root : clean.rootSections()) {
+    for (const auto& root : rootSections()) {
         if (root->points().size() < 2)
             throw morphio::SectionBuilderError("Root sections must have at least 2 points");
     }
@@ -362,12 +359,14 @@ void Morphology::write(const std::string& filename) {
         extension += my_tolower(c);
 
     if (extension == ".h5")
-        writer::h5(clean, filename);
+        writer::h5(*this, filename);
     else if (extension == ".asc")
-        writer::asc(clean, filename);
-    else if (extension == ".swc")
+        writer::asc(*this, filename);
+    else if (extension == ".swc") {
+        morphio::mut::Morphology clean(*this);
+        clean.sanitize();
         writer::swc(clean, filename);
-    else
+    } else
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
 }
 

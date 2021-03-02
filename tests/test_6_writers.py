@@ -82,7 +82,11 @@ def test_write_basic():
 
 def test_write_merge_only_child():
     '''The root section has only one child
-    The child should be merged with its parent section
+
+    When writing, children should *not* be merged with their parent section.
+    Except if the output extension is SWC because we have no choice (there is no
+    way to represent single children in SWC)
+
     Special care must be given for the potential duplicate point
                              o
                             /
@@ -114,23 +118,33 @@ def test_write_merge_only_child():
                     filename = Path(tmp_folder, 'test.{}'.format(extension))
                     morpho.write(filename)
 
-                    assert_equal(err.getvalue().strip(),
-                                 'Warning: section 1 is the only child of section: 0\nIt will be merged with the parent section')
+                    if extension == 'swc':
+                        assert_equal(err.getvalue().strip(),
+                                     'Warning: section 1 is the only child of section: 0\nIt will be merged with the parent section')
 
 
             read = Morphology(filename)
-            root = read.root_sections[0]
-            assert_array_equal(root.points,
-                               [[0, 0, 0],
-                                [0, 5, 0],
-                                [0, 6, 0]])
-            assert_equal(len(root.children), 2)
 
-            assert_array_equal(root.children[0].points,
-                               [[0, 6, 0], [0, 7, 0]])
+            if extension != 'swc':
+                root = read.root_sections[0]
+                assert_array_equal(root.points,
+                                   [[0, 0, 0],
+                                    [0, 5, 0]])
+                assert_equal(len(root.children), 1)
 
-            assert_array_equal(root.children[1].points,
-                               [[0, 6, 0], [4, 5, 6]])
+            else:
+                root = read.root_sections[0]
+                assert_array_equal(root.points,
+                                   [[0, 0, 0],
+                                    [0, 5, 0],
+                                    [0, 6, 0]])
+                assert_equal(len(root.children), 2)
+
+                assert_array_equal(root.children[0].points,
+                                   [[0, 6, 0], [0, 7, 0]])
+
+                assert_array_equal(root.children[1].points,
+                                   [[0, 6, 0], [4, 5, 6]])
 
 
 

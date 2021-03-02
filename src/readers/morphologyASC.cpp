@@ -348,7 +348,6 @@ Property::Properties load(const std::string& uri, unsigned int options) {
     NeurolucidaParser parser(uri);
 
     morphio::mut::Morphology& nb_ = parser.parse();
-    nb_.sanitize(parser.debugInfo_);
     nb_.applyModifiers(options);
 
     Property::Properties properties = nb_.buildReadOnly();

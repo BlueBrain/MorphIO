@@ -297,63 +297,6 @@ def test_unfinished_file():
                         "Hit end of file while consuming a neurite",
                         ":12:error")
 
-
-def test_empty_sibling():
-    '''The empty sibling will be removed and the single child will be merged
-    with its parent'''
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            with tmp_asc_file('''((Dendrite)
-                      (3 -4 0 10)
-                      (3 -6 0 9)
-                      (3 -8 0 8)
-                      (3 -10 0 7)
-                      (
-                        (3 -10 0 6)
-                        (0 -10 0 5)
-                        (-3 -10 0 4)
-                        |       ; <-- empty sibling but still works !
-                       )
-                      )
-                 ''') as tmp_file:
-                n = Morphology(tmp_file.name)
-                assert_substring('is the only child of section: 0 starting at:',
-                                 err.getvalue().strip())
-                assert_substring('It will be merged with the parent section',
-                                 err.getvalue().strip())
-
-    assert_equal(len(n.root_sections), 1)
-    assert_array_equal(n.root_sections[0].points,
-                       np.array([[3, -4, 0],
-                                 [3, -6, 0],
-                                 [3, -8, 0],
-                                 [3, -10, 0],
-                                 [0, -10, 0],
-                                 [-3, -10, 0]],
-                                dtype=np.float32))
-    assert_array_equal(n.root_sections[0].diameters,
-                       np.array([10, 9, 8, 7, 5, 4], dtype=np.float32))
-
-    assert_equal(len(n.annotations), 1)
-    annotation = n.annotations[0]
-    assert_equal(annotation.type, morphio.AnnotationType.single_child)
-    assert_equal(annotation.line_number, 6)
-    assert_array_equal(annotation.points, [[3, -10, 0], [0, -10, 0], [-3, -10, 0]])
-    assert_array_equal(annotation.diameters, [6, 5, 4])
-
-def test_nested_single_child():
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            n = Morphology(DATA_DIR / 'nested_single_children.asc')
-    assert_array_equal(n.root_sections[0].points,
-                       [[0., 0., 0.],
-                        [0., 0., 1.],
-                        [0., 0., 2.],
-                        [0., 0., 3.],
-                        [0., 0., 4.]])
-    assert_array_equal(n.root_sections[0].diameters, np.array([8, 7, 6, 5, 4], dtype=np.float32))
-
-
 def test_section_single_point():
     '''Test single point section.
     The parent section last point will be duplicated
@@ -389,7 +332,11 @@ def test_section_single_point():
 
 
 def test_single_children():
-    '''Single children are merged with their parent'''
+    '''Single children are no longer merged with their parent
+
+    They used to be until the decision in:
+    https://github.com/BlueBrain/MorphIO/issues/235
+    '''
     with tmp_asc_file('''
                      ((Dendrite)
                       (3 -4 0 2)
@@ -409,13 +356,7 @@ def test_single_children():
                       )
                  ''') as tmp_file:
 
-        with captured_output() as (_, err):
-            with ostream_redirect(stdout=True, stderr=True):
-                n = Morphology(tmp_file.name)
-                assert_substring('is the only child of section: 0 starting at:',
-                                 err.getvalue().strip())
-                assert_substring('It will be merged with the parent section',
-                                 err.getvalue().strip())
+        n = Morphology(tmp_file.name)
 
         nt.assert_equal(len(n.soma.points), 0)
         nt.assert_equal(len(n.soma.points), 0)
@@ -424,22 +365,9 @@ def test_single_children():
                            np.array([[3, -4, 0],
                                      [3, -6, 0],
                                      [3, -8, 0],
-                                     [3, -10, 0],
-                                     [0, -10, 0],
-                                     [-3, -10, 0]],
+                                     [3, -10, 0]],
                                     dtype=np.float32))
-        assert_array_equal(n.root_sections[0].diameters,
-                           np.array([2, 2, 2, 2, 4, 3], dtype=np.float32))
-
-        assert_equal(len(n.root_sections[0].children), 2)
-
-        assert_array_equal(n.root_sections[0].children[0].points,
-                           np.array([[-3, -10, 0],
-                                     [-5, -5, 5]]))
-
-        assert_array_equal(n.root_sections[0].children[1].points,
-                           np.array([[-3, -10, 0],
-                                     [-6, -6, 6]]))
+        assert_equal(len(n.root_sections[0].children), 1)
 
 
 def test_spine():
