@@ -332,7 +332,7 @@ def test_section_single_point():
 
 
 def test_single_children():
-    '''Single children are no longer merged with their parent
+    '''Single children are no longer (starting at v2.8) merged with their parent
 
     They used to be until the decision in:
     https://github.com/BlueBrain/MorphIO/issues/235
@@ -344,9 +344,9 @@ def test_single_children():
                       (3 -8 0 2)
                       (3 -10 0 2)
                       (
-                        (3 -10 0 4)  ; merged with parent section
-                        (0 -10 0 4)  ; merged with parent section
-                        (-3 -10 0 3) ; merged with parent section
+                        (3 -10 0 4)
+                        (0 -10 0 4)
+                        (-3 -10 0 3)
                         (
                           (-5 -5 5 5)
                           |

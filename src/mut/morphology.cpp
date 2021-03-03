@@ -364,6 +364,10 @@ void Morphology::write(const std::string& filename) {
         writer::asc(*this, filename);
     else if (extension == ".swc") {
         morphio::mut::Morphology clean(*this);
+        // Due to the structure based on IDs and parent IDs of SWC
+        // the concept of section does not have any meaning for the file format.
+        // And due to how the swc writer() works, the file needs to be cleaned
+        // or the parent ID will be messed up
         clean.sanitize();
         writer::swc(clean, filename);
     } else
