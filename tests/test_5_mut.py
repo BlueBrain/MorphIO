@@ -388,7 +388,7 @@ def test_annotation():
                       )
                  """) as tmp_file:
                 cell = Morphology(tmp_file.name)
-                cell.sanitize()
+                cell.remove_unifurcations()
 
     for n in (cell, cell.as_immutable(), cell.as_immutable().as_mutable()):
         assert_equal(len(n.annotations), 1)
@@ -414,7 +414,7 @@ def test_empty_sibling():
                       )
                  ''') as tmp_file:
                 n = Morphology(tmp_file.name)
-                n.sanitize()
+                n.remove_unifurcations()
                 assert_substring('is the only child of section: 0',
                                  err.getvalue().strip())
                 assert_substring('It will be merged with the parent section',
@@ -443,7 +443,7 @@ def test_nested_single_child():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             n = Morphology(DATA_DIR / 'nested_single_children.asc')
-            n.sanitize()
+            n.remove_unifurcations()
     assert_array_equal(n.root_sections[0].points,
                        [[0., 0., 0.],
                         [0., 0., 1.],
@@ -493,7 +493,7 @@ def test_endoplasmic_reticulum():
     assert_equal(reticulum.filament_counts, [4, 4])
 
 
-def test_sanitize():
+def test_remove_unifurcations():
     m = Morphology()
     section = m.append_root_section(PointLevel([[1, 0, 0],
                                                 [2, 0, 0]], [2, 2], [20, 20]),
@@ -502,13 +502,13 @@ def test_sanitize():
                                        [3, 0, 0]], [2, 2], [20, 20]))
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            m.sanitize()
+            m.remove_unifurcations()
             assert_equal(len(list(m.iter())), 1)
             assert_equal(err.getvalue().strip(),
                          'Warning: section 1 is the only child of section: 0\nIt will be merged '
                          'with the parent section')
 
-    # Checking that sanitize() issues a warning on missing duplicate
+    # Checking that remove_unifurcations() issues a warning on missing duplicate
     m = Morphology()
     section = m.append_root_section(PointLevel([[1, 0, 0],
                                                 [2, 0, 0]], [2, 2], [20, 20]),
@@ -521,7 +521,7 @@ def test_sanitize():
                                                [2, 0, 0]], [2, 2], [20, 20]))
     with captured_output() as (_, err):
         with ostream_redirect():
-            m.sanitize()
+            m.remove_unifurcations()
             assert_equal(err.getvalue().strip(),
                          'Warning: while appending section: 2 to parent: 0\nThe section first point should be parent section last point: \n        : X Y Z Diameter\nparent last point :[2.000000, 0.000000, 0.000000, 2.000000]\nchild first point :[2.000000, 1.000000, 0.000000, 2.000000]')
 

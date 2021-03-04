@@ -206,11 +206,11 @@ void _appendProperties(Property::PointLevel& to, const Property::PointLevel& fro
         _appendVector(to._perimeters, from._perimeters, offset);
 }
 
-void Morphology::sanitize() {
-    sanitize(morphio::readers::DebugInfo());
+void Morphology::removeUnifurcations() {
+    removeUnifurcations(morphio::readers::DebugInfo());
 }
 
-void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo) {
+void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInfo) {
     morphio::readers::ErrorMessages err(debugInfo._filename);
 
     auto it = depth_begin();
@@ -368,7 +368,7 @@ void Morphology::write(const std::string& filename) {
         // the concept of section does not have any meaning for the file format.
         // And due to how the swc writer() works, the file needs to be cleaned
         // or the parent ID will be messed up
-        clean.sanitize();
+        clean.removeUnifurcations();
         writer::swc(clean, filename);
     } else
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));

@@ -131,9 +131,9 @@ void bind_mutable_module(py::module& m) {
 
         .def_property_readonly("version", &morphio::mut::Morphology::version, "Returns the version")
 
-        .def("sanitize",
+        .def("remove_unifurcations",
              static_cast<void (morphio::mut::Morphology::*) ()>(
-                 &morphio::mut::Morphology::sanitize),
+                 &morphio::mut::Morphology::removeUnifurcations),
              "Fixes the morphology single child sections and issues warnings"
              "if the section starts and ends are inconsistent")
 

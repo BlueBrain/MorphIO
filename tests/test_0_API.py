@@ -32,7 +32,7 @@ def test_mut_immut_have_same_methods():
 
     only_in_immut = {'section_types', 'diameters', 'perimeters', 'points', 'section_offsets',
                      'as_mutable'}
-    only_in_mut = {'sanitize', 'write', 'append_root_section', 'delete_section', 'build_read_only',
+    only_in_mut = {'remove_unifurcations', 'write', 'append_root_section', 'delete_section', 'build_read_only',
                    'as_immutable'}
     assert_equal(methods(morphio.Morphology) - only_in_immut,
                  methods(morphio.mut.Morphology) - only_in_mut)
