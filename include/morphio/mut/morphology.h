@@ -213,6 +213,11 @@ class Morphology
     void removeUnifurcations();
     void removeUnifurcations(const morphio::readers::DebugInfo& debugInfo);
 
+    /**
+       Used before writing to SWC to check that there is no unifurcation
+     **/
+    bool _checkUnifurcations();
+
   public:
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);

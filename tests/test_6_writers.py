@@ -9,7 +9,7 @@ from morphio.mut import Morphology
 from nose.tools import ok_
 from numpy.testing import assert_array_equal, assert_equal, assert_raises
 
-from .utils import assert_string_equal, captured_output, setup_tempdir
+from .utils import assert_string_equal, captured_output, setup_tempdir, assert_substring
 
 
 def test_write_empty_file():
@@ -79,15 +79,9 @@ def test_write_basic():
             ok_('/perimeters' not in h5_file.keys())
 
 
+def _morpho_with_unifurcation():
+    ''' Helper function that returns a morphology with a unifurcation
 
-def test_write_merge_only_child():
-    '''The root section has only one child
-
-    When writing, children should *not* be merged with their parent section.
-    Except if the output extension is SWC because we have no choice (there is no
-    way to represent single children in SWC)
-
-    Special care must be given for the potential duplicate point
                              o
                             /
                            / son 1
@@ -110,41 +104,45 @@ def test_write_merge_only_child():
     child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
     son1 = child.append_section(PointLevel([[0, 6, 0], [0, 7, 0]], [2, 3]))
     son2 = child.append_section(PointLevel([[0, 6, 0], [4, 5, 6]], [3, 3]))
+    return morpho
 
+
+def test_write_merge_only_child_asc_h5():
+    '''The root section has only one child
+
+    When writing, children should *not* be merged with their parent section.
+
+    Note: See `test_write_merge_only_child_swc` for the SWC case.
+    '''
+
+    morpho = _morpho_with_unifurcation()
     with setup_tempdir('test_write_merge_only_child') as tmp_folder:
-        for extension in ['swc', 'asc', 'h5']:
+        for extension in ['asc', 'h5']:
             with captured_output() as (_, err):
                 with ostream_redirect(stdout=True, stderr=True):
                     filename = Path(tmp_folder, 'test.{}'.format(extension))
                     morpho.write(filename)
 
-                    if extension == 'swc':
-                        assert_equal(err.getvalue().strip(),
-                                     'Warning: section 1 is the only child of section: 0\nIt will be merged with the parent section')
-
-
             read = Morphology(filename)
 
-            if extension != 'swc':
-                root = read.root_sections[0]
-                assert_array_equal(root.points,
-                                   [[0, 0, 0],
-                                    [0, 5, 0]])
-                assert_equal(len(root.children), 1)
+            root = read.root_sections[0]
+            assert_array_equal(root.points,
+                               [[0, 0, 0],
+                                [0, 5, 0]])
+            assert_equal(len(root.children), 1)
 
-            else:
-                root = read.root_sections[0]
-                assert_array_equal(root.points,
-                                   [[0, 0, 0],
-                                    [0, 5, 0],
-                                    [0, 6, 0]])
-                assert_equal(len(root.children), 2)
 
-                assert_array_equal(root.children[0].points,
-                                   [[0, 6, 0], [0, 7, 0]])
-
-                assert_array_equal(root.children[1].points,
-                                   [[0, 6, 0], [4, 5, 6]])
+def test_write_merge_only_child_swc():
+    '''Attempts to write a morphology with unifurcations with SWC should result
+    in an exception.
+    '''
+    morpho = _morpho_with_unifurcation()
+    with assert_raises(WriterError) as obj:
+       morpho.write('/tmp/bla.swc')  # the path does not need to exists since it will fail before
+    assert_substring("Section 0 has a single child section. "
+                     "Single child section are not allowed when writing to SWC. "
+                     "Please sanitize the morphology first.",
+                     str(obj.exception),)
 
 
 

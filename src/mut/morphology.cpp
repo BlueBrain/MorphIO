@@ -260,6 +260,23 @@ void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInf
     }
 }
 
+bool Morphology::_checkUnifurcations() {
+    for (auto it = depth_begin(); it != depth_end(); ++it) {
+        std::shared_ptr<Section> section_ = *it;
+        if (section_->isRoot())
+            continue;
+
+        unsigned int parentId = section_->parent()->id();
+
+        auto parent = section_->parent();
+        bool isUnifurcation = parent->children().size() == 1;
+
+        if (isUnifurcation) {
+            throw WriterError(readers::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(parentId));
+        }
+    }
+}
+
 Property::Properties Morphology::buildReadOnly() const {
     using std::setw;
     int sectionIdOnDisk = 0;
@@ -363,13 +380,8 @@ void Morphology::write(const std::string& filename) {
     else if (extension == ".asc")
         writer::asc(*this, filename);
     else if (extension == ".swc") {
-        morphio::mut::Morphology clean(*this);
-        // Due to the structure based on IDs and parent IDs of SWC
-        // the concept of section does not have any meaning for the file format.
-        // And due to how the swc writer() works, the file needs to be cleaned
-        // or the parent ID will be messed up
-        clean.removeUnifurcations();
-        writer::swc(clean, filename);
+        _checkUnifurcations();
+        writer::swc(*this, filename);
     } else
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
 }
