@@ -260,7 +260,7 @@ void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInf
     }
 }
 
-bool Morphology::_checkUnifurcations() {
+void Morphology::_raiseIfUnifurcations() {
     for (auto it = depth_begin(); it != depth_end(); ++it) {
         std::shared_ptr<Section> section_ = *it;
         if (section_->isRoot())
@@ -380,7 +380,7 @@ void Morphology::write(const std::string& filename) {
     else if (extension == ".asc")
         writer::asc(*this, filename);
     else if (extension == ".swc") {
-        _checkUnifurcations();
+        _raiseIfUnifurcations();
         writer::swc(*this, filename);
     } else
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));

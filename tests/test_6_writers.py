@@ -79,19 +79,14 @@ def test_write_basic():
             ok_('/perimeters' not in h5_file.keys())
 
 
-def _morpho_with_unifurcation():
-    ''' Helper function that returns a morphology with a unifurcation
+def test_write_merge_only_child_asc_h5():
+    '''The root section has only one child
 
-                             o
-                            /
-                           / son 1
-      root       child    /
-    o--------o----------o<
-                          \
-                           \  son 2
-                            \
-                             o
+    When writing, children should *not* be merged with their parent section.
+
+    Note: See `test_write_merge_only_child_swc` for the SWC case.
     '''
+
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0]]
     morpho.soma.diameters = [2]
@@ -102,18 +97,6 @@ def _morpho_with_unifurcation():
                                             [2, 2]),
                                  SectionType.basal_dendrite)
     child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
-    return morpho
-
-
-def test_write_merge_only_child_asc_h5():
-    '''The root section has only one child
-
-    When writing, children should *not* be merged with their parent section.
-
-    Note: See `test_write_merge_only_child_swc` for the SWC case.
-    '''
-
-    morpho = _morpho_with_unifurcation()
     with setup_tempdir('test_write_merge_only_child') as tmp_folder:
         for extension in ['asc', 'h5']:
             with captured_output() as (_, err):
@@ -134,7 +117,17 @@ def test_write_merge_only_child_swc():
     '''Attempts to write a morphology with unifurcations with SWC should result
     in an exception.
     '''
-    morpho = _morpho_with_unifurcation()
+    morpho = Morphology()
+    morpho.soma.points = [[0, 0, 0]]
+    morpho.soma.diameters = [2]
+
+    root = morpho.append_root_section(
+                                 PointLevel([[0, 0, 0],
+                                             [0, 5, 0]],
+                                            [2, 2]),
+                                 SectionType.basal_dendrite)
+    child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
+
     with assert_raises(WriterError) as obj:
        morpho.write('/tmp/bla.swc')  # the path does not need to exists since it will fail before
     assert_substring("Section 0 has a single child section. "

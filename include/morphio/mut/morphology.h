@@ -216,7 +216,7 @@ class Morphology
     /**
        Used before writing to SWC to check that there is no unifurcation
      **/
-    bool _checkUnifurcations();
+    void _raiseIfUnifurcations();
 
   public:
     friend class Section;
