@@ -102,8 +102,6 @@ def _morpho_with_unifurcation():
                                             [2, 2]),
                                  SectionType.basal_dendrite)
     child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
-    son1 = child.append_section(PointLevel([[0, 6, 0], [0, 7, 0]], [2, 3]))
-    son2 = child.append_section(PointLevel([[0, 6, 0], [4, 5, 6]], [3, 3]))
     return morpho
 
 
