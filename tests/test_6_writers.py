@@ -140,7 +140,7 @@ def test_write_merge_only_child_swc():
     with assert_raises(WriterError) as obj:
        morpho.write('/tmp/bla.swc')  # the path does not need to exists since it will fail before
     assert_substring("Section 0 has a single child section. "
-                     "Single child section are not allowed when writing to SWC. "
+                     "Single child section are not allowed when writing to SWC format. "
                      "Please sanitize the morphology first.",
                      str(obj.exception),)
 
