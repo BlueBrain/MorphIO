@@ -1,0 +1,440 @@
+#pragma once
+
+#include <assert.h>
+#include <sstream>
+#include <string>
+
+#include <morphio/endoplasmic_reticulum.h>
+#include <morphio/mito_section.h>
+#include <morphio/mitochondria.h>
+#include <morphio/mut/morphology.h>
+#include <morphio/mut/section.h>
+#include <morphio/mut/writers.h>
+#include <morphio/shared_utils.tpp>
+#include <morphio/soma.h>
+
+
+namespace morphio {
+namespace mut {
+
+template <typename SectionT>
+inline const std::vector<std::shared_ptr<Section>>& TMorphology<SectionT>::rootSections() const noexcept {
+    return _rootSections;
+}
+
+template <typename SectionT>
+inline const std::map<uint32_t, std::shared_ptr<Section>>& TMorphology<SectionT>::sections() const noexcept {
+    return _sections;
+}
+
+template <typename SectionT>
+inline std::shared_ptr<Soma>& TMorphology<SectionT>::soma() noexcept {
+    return _soma;
+}
+
+template <typename SectionT>
+inline const std::shared_ptr<Soma>& TMorphology<SectionT>::soma() const noexcept {
+    return _soma;
+}
+
+template <typename SectionT>
+inline Mitochondria& TMorphology<SectionT>::mitochondria() noexcept {
+    return _mitochondria;
+}
+
+template <typename SectionT>
+inline const Mitochondria& TMorphology<SectionT>::mitochondria() const noexcept {
+    return _mitochondria;
+}
+
+template <typename SectionT>
+inline EndoplasmicReticulum& TMorphology<SectionT>::endoplasmicReticulum() noexcept {
+    return _endoplasmicReticulum;
+}
+
+template <typename SectionT>
+inline const EndoplasmicReticulum& TMorphology<SectionT>::endoplasmicReticulum() const noexcept {
+    return _endoplasmicReticulum;
+}
+
+template <typename SectionT>
+inline const std::shared_ptr<Section>& TMorphology<SectionT>::section(uint32_t id) const {
+    return _sections.at(id);
+}
+
+template <typename SectionT>
+inline SomaType TMorphology<SectionT>::somaType() const noexcept {
+    return _soma->type();
+}
+
+template <typename SectionT>
+inline const std::vector<Property::Annotation>& TMorphology<SectionT>::annotations() const noexcept {
+    return _cellProperties->_annotations;
+}
+
+template <typename SectionT>
+inline const std::vector<Property::Marker>& TMorphology<SectionT>::markers() const noexcept {
+    return _cellProperties->_markers;
+}
+
+template <typename SectionT>
+inline CellFamily TMorphology<SectionT>::cellFamily() const noexcept {
+    return _cellProperties->_cellFamily;
+}
+
+template <typename SectionT>
+inline MorphologyVersion TMorphology<SectionT>::version() const noexcept {
+    return _cellProperties->_version;
+}
+
+template <typename SectionT>
+inline void TMorphology<SectionT>::addAnnotation(const morphio::Property::Annotation& annotation) {
+    _cellProperties->_annotations.push_back(annotation);
+}
+
+template <typename SectionT>
+inline void TMorphology<SectionT>::addMarker(const morphio::Property::Marker& marker) {
+    _cellProperties->_markers.push_back(marker);
+}
+
+
+using morphio::readers::ErrorMessages;
+template <typename SectionT>
+TMorphology<SectionT>::TMorphology(const std::string& uri, unsigned int options)
+    : TMorphology(morphio::Morphology(uri, options)) {}
+
+template <typename SectionT>
+TMorphology<SectionT>::TMorphology(const morphio::mut::TMorphology<SectionT>& morphology, unsigned int options)
+    : _counter(0)
+    , _soma(std::make_shared<Soma>(*morphology.soma()))
+    , _endoplasmicReticulum(morphology.endoplasmicReticulum()) {
+    _cellProperties = std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties);
+
+    for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
+        appendRootSection(root, true);
+    }
+
+    for (const std::shared_ptr<MitoSection>& root : morphology.mitochondria().rootSections()) {
+        mitochondria().appendRootSection(root, true);
+    }
+
+    applyModifiers(options);
+}
+
+template <typename SectionT>
+TMorphology<SectionT>::TMorphology(const morphio::Morphology& morphology, unsigned int options)
+    : _counter(0)
+    , _soma(std::make_shared<Soma>(morphology.soma()))
+    , _endoplasmicReticulum(morphology.endoplasmicReticulum()) {
+    _cellProperties = std::make_shared<morphio::Property::CellLevel>(
+        morphology._properties->_cellLevel);
+
+    for (const morphio::Section& root : morphology.rootSections()) {
+        appendRootSection(root, true);
+    }
+
+    for (const morphio::MitoSection& root : morphology.mitochondria().rootSections()) {
+        mitochondria().appendRootSection(root, true);
+    }
+
+    applyModifiers(options);
+}
+
+
+template <typename SectionT>
+std::shared_ptr<Section> TMorphology<SectionT>::appendRootSection(const morphio::Section& section_,
+                                                       bool recursive) {
+    const std::shared_ptr<Section> ptr(new Section(this, _counter, section_));
+    _register(ptr);
+    _rootSections.push_back(ptr);
+
+    const bool emptySection = ptr->points().empty();
+    if (emptySection)
+        printError(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+
+    if (recursive) {
+        for (const auto& child : section_.children()) {
+            ptr->appendSection(child, true);
+        }
+    }
+
+    return ptr;
+}
+
+template <typename SectionT>
+std::shared_ptr<Section> TMorphology<SectionT>::appendRootSection(const std::shared_ptr<Section>& section_,
+                                                       bool recursive) {
+    const std::shared_ptr<Section> section_copy(new Section(this, _counter, *section_));
+    _register(section_copy);
+    _rootSections.push_back(section_copy);
+
+    const bool emptySection = section_copy->points().empty();
+    if (emptySection)
+        printError(Warning::APPENDING_EMPTY_SECTION,
+                   _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
+
+    if (recursive) {
+        for (const auto& child : section_->children()) {
+            section_copy->appendSection(child, true);
+        }
+    }
+
+    return section_copy;
+}
+
+template <typename SectionT>
+std::shared_ptr<Section> TMorphology<SectionT>::appendRootSection(const Property::PointLevel& pointProperties,
+                                                       SectionT type) {
+    const std::shared_ptr<Section> ptr(new Section(this, _counter, type, pointProperties));
+    _register(ptr);
+    _rootSections.push_back(ptr);
+
+    bool emptySection = ptr->points().empty();
+    if (emptySection)
+        printError(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+
+    return ptr;
+}
+
+template <typename SectionT>
+uint32_t TMorphology<SectionT>::_register(const std::shared_ptr<Section>& section_) {
+    if (_sections.count(section_->id()))
+        throw SectionBuilderError("Section already exists");
+    _counter = std::max(_counter, section_->id()) + 1;
+
+    _sections[section_->id()] = section_;
+    return section_->id();
+}
+
+template <typename SectionT>
+TMorphology<SectionT>::~TMorphology() {
+    auto roots = _rootSections;  // Need to iterate on a copy
+    for (const auto& root : roots) {
+        deleteSection(root, true);
+    }
+}
+
+/*
+static void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
+                         const std::shared_ptr<Section>& section) {
+    vec.erase(std::remove(vec.begin(), vec.end(), section), vec.end());
+}
+*/
+
+template <typename SectionT>
+void TMorphology<SectionT>::deleteSection(const std::shared_ptr<Section>& section_, bool recursive)
+
+{
+    if (!section_)
+        return;
+    unsigned int id = section_->id();
+
+    if (recursive) {
+        // The deletion must start by the furthest leaves, otherwise you may cut
+        // the topology and forget to remove some sections
+        std::vector<std::shared_ptr<Section>> ids;
+        std::copy(section_->breadth_begin(), breadth_end(), std::back_inserter(ids));
+
+        for (auto it = ids.rbegin(); it != ids.rend(); ++it) {
+            deleteSection(*it, false);
+        }
+    } else {
+        for (auto& child : section_->children()) {
+            // Re-link children to their "grand-parent"
+            _parent[child->id()] = _parent[id];
+            _children[_parent[id]].push_back(child);
+            if (section_->isRoot())
+                _rootSections.push_back(child);
+        }
+
+        /*
+        eraseByValue(_rootSections, section_);
+        eraseByValue(_children[_parent[id]], section_);
+        */
+        _rootSections.erase(std::remove(_rootSections.begin(), _rootSections.end(), section_), _rootSections.end());
+        _children[_parent[id]].erase(std::remove(_children[_parent[id]].begin(), _children[_parent[id]].end(), section_), _children[_parent[id]].end());
+
+
+        _children.erase(id);
+        _parent.erase(id);
+        _sections.erase(id);
+    }
+}
+
+
+template <typename SectionT>
+void TMorphology<SectionT>::sanitize() {
+    sanitize(morphio::readers::DebugInfo());
+}
+
+template <typename SectionT>
+void TMorphology<SectionT>::sanitize(const morphio::readers::DebugInfo& debugInfo) {
+    morphio::readers::ErrorMessages err(debugInfo._filename);
+
+    auto it = depth_begin();
+    while (it != depth_end()) {
+        std::shared_ptr<Section> section_ = *it;
+
+        // Incrementing iterator here before we potentially delete the section
+        ++it;
+        unsigned int sectionId = section_->id();
+
+        if (section_->isRoot())
+            continue;
+
+        unsigned int parentId = section_->parent()->id();
+
+        if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
+            !_checkDuplicatePoint(section_->parent(), section_))
+            printError(Warning::WRONG_DUPLICATE,
+                       err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
+
+        auto parent = section_->parent();
+        bool isUnifurcation = parent->children().size() == 1;
+
+        // This "if" condition ensures that "unifurcations" (ie. successive
+        // sections with only 1 child) get merged together into a bigger section
+        if (isUnifurcation) {
+            printError(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
+            bool duplicate = _checkDuplicatePoint(section_->parent(), section_);
+
+            addAnnotation(morphio::Property::Annotation(morphio::AnnotationType::SINGLE_CHILD,
+                                                        sectionId,
+                                                        section_->properties(),
+                                                        "",
+                                                        debugInfo.getLineNumber(parentId)));
+
+            morphio::_appendVector(parent->points(), section_->points(), duplicate ? 1 : 0);
+
+            morphio::_appendVector(parent->diameters(), section_->diameters(), duplicate ? 1 : 0);
+
+            if (!parent->perimeters().empty())
+                morphio::_appendVector(parent->perimeters(),
+                                       section_->perimeters(),
+                                       duplicate ? 1 : 0);
+
+            deleteSection(section_, false);
+        }
+    }
+}
+
+template <typename SectionT>
+Property::Properties TMorphology<SectionT>::buildReadOnly() const {
+    using std::setw;
+    int sectionIdOnDisk = 0;
+    std::map<uint32_t, int32_t> newIds;
+    Property::Properties properties{};
+
+    properties._cellLevel = *_cellProperties;
+    properties._cellLevel._somaType = _soma->type();
+    _appendProperties(properties._somaLevel, _soma->_pointProperties, 0);
+
+    for (auto it = depth_begin(); it != depth_end(); ++it) {
+        const std::shared_ptr<Section>& section_ = *it;
+        unsigned int sectionId = section_->id();
+        int parentOnDisk = (section_->isRoot() ? -1 : newIds[section_->parent()->id()]);
+
+        auto start = static_cast<int>(properties._pointLevel._points.size());
+        properties._sectionLevel._sections.push_back({start, parentOnDisk});
+        properties._sectionLevel._sectionTypes.push_back(section_->type());
+        newIds[sectionId] = sectionIdOnDisk++;
+        _appendProperties(properties._pointLevel, section_->_pointProperties, 0);
+    }
+
+    mitochondria()._buildMitochondria(properties);
+    properties._endoplasmicReticulumLevel = endoplasmicReticulum().buildReadOnly();
+    return properties;
+}
+
+template <typename SectionT>
+depth_iterator TMorphology<SectionT>::depth_begin() const {
+    return depth_iterator(*this);
+}
+
+template <typename SectionT>
+depth_iterator TMorphology<SectionT>::depth_end() const {
+    return depth_iterator();
+}
+
+template <typename SectionT>
+breadth_iterator TMorphology<SectionT>::breadth_begin() const {
+    return breadth_iterator(*this);
+}
+
+template <typename SectionT>
+breadth_iterator TMorphology<SectionT>::breadth_end() const {
+    return breadth_iterator();
+}
+
+template <typename SectionT>
+void TMorphology<SectionT>::applyModifiers(unsigned int modifierFlags) {
+    if (modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS)
+        throw SectionBuilderError(
+            _err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
+
+    if (modifierFlags & SOMA_SPHERE)
+        modifiers::soma_sphere(*this);
+
+    if (modifierFlags & NO_DUPLICATES)
+        modifiers::no_duplicate_point(*this);
+
+    if (modifierFlags & TWO_POINTS_SECTIONS)
+        modifiers::two_points_sections(*this);
+
+    if (modifierFlags & NRN_ORDER)
+        modifiers::nrn_order(*this);
+}
+
+template <typename SectionT>
+std::unordered_map<int, std::vector<unsigned int>> TMorphology<SectionT>::connectivity() {
+    std::unordered_map<int, std::vector<unsigned int>> connectivity;
+
+    const auto& roots = rootSections();
+    connectivity[-1].reserve(roots.size());
+    std::transform(roots.begin(),
+                   roots.end(),
+                   std::back_inserter(connectivity[-1]),
+                   [](const std::shared_ptr<Section>& section) { return section->id(); });
+
+    for (const auto& kv : _children) {
+        auto& nodeEdges = connectivity[static_cast<int>(kv.first)];
+        nodeEdges.reserve(kv.second.size());
+        std::transform(kv.second.begin(),
+                       kv.second.end(),
+                       std::back_inserter(nodeEdges),
+                       [](const std::shared_ptr<Section>& section) { return section->id(); });
+    }
+
+    return connectivity;
+}
+
+template <typename SectionT>
+void TMorphology<SectionT>::write(const std::string& filename) {
+    const size_t pos = filename.find_last_of(".");
+    assert(pos != std::string::npos);
+
+    std::string extension;
+
+    morphio::mut::TMorphology<SectionT> clean(*this);
+    clean.sanitize();
+
+    for (const auto& root : clean.rootSections()) {
+        if (root->points().size() < 2)
+            throw morphio::SectionBuilderError("Root sections must have at least 2 points");
+    }
+
+    for (char c : filename.substr(pos))
+        extension += my_tolower(c);
+
+    if (extension == ".h5")
+        writer::h5(clean, filename);
+    else if (extension == ".asc")
+        writer::asc(clean, filename);
+    else if (extension == ".swc")
+        writer::swc(clean, filename);
+    else
+        throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
+}
+
+}  // namespace mut
+}  // namespace morphio

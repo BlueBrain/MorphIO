@@ -55,6 +55,7 @@ target_include_directories(morphio_obj
   PUBLIC
   ${CMAKE_SOURCE_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/../include
+  ${CMAKE_CURRENT_SOURCE_DIR}
   )
 
 target_include_directories(morphio_obj

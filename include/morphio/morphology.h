@@ -8,24 +8,33 @@
 #include <morphio/types.h>
 
 namespace morphio {
+
+template <typename SectionT>
+class TMorphology;  // pre-declare the template class itself
+
+void buildChildren(std::shared_ptr<Property::Properties> properties);
+SomaType getSomaType(long unsigned int nSomaPoints);
+Property::Properties loadURI(const std::string& source, unsigned int options);
+
 enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
 
-using breadth_iterator = breadth_iterator_t<Section, Morphology>;
-using depth_iterator = depth_iterator_t<Section, Morphology>;
+using breadth_iterator = breadth_iterator_t<Section, TMorphology<SectionType>>;
+using depth_iterator = depth_iterator_t<Section, TMorphology<SectionType>>;
 
-/** Read access a Morphology file.
+/** Read access a TMorphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
  * release of resources upon destruction.
  */
-class Morphology
+template <typename SectionT>
+class TMorphology
 {
   public:
-    virtual ~Morphology();
+    virtual ~TMorphology();
 
-    Morphology& operator=(const Morphology&);
-    Morphology(Morphology&&) noexcept;
-    Morphology& operator=(Morphology&&) noexcept;
+    TMorphology& operator=(const TMorphology<SectionT>&);
+    TMorphology(TMorphology<SectionT>&&) noexcept;
+    TMorphology& operator=(TMorphology<SectionT>&&) noexcept;
 
     /** @name Read API */
     //@{
@@ -35,11 +44,11 @@ class Morphology
        their enum: morphio::enum::Option and can be composed.
 
         Example:
-            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
+            TMorphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
-    explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
-    explicit Morphology(mut::Morphology);
+    explicit TMorphology(const std::string& source, unsigned int options = NO_MODIFIER);
+    explicit TMorphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+    explicit TMorphology(mut::Morphology);
 
     /**
      * Return the soma object
@@ -159,8 +168,8 @@ class Morphology
     const MorphologyVersion& version() const;
 
   protected:
-    friend class mut::Morphology;
-    Morphology(const Property::Properties& properties, unsigned int options);
+    friend class mut::TMorphology<SectionType>;
+    TMorphology(const Property::Properties& properties, unsigned int options);
 
     std::shared_ptr<Property::Properties> _properties;
 
@@ -168,3 +177,6 @@ class Morphology
     const std::vector<typename Property::Type>& get() const;
 };
 }  // namespace morphio
+
+
+#include "morphology.tpp"

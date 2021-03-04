@@ -2,11 +2,9 @@
 
 #include <map>
 #include <memory>
-
 #include <morphio/mito_section.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
-
 #include <morphio/mut/mito_section.h>
 
 namespace morphio {

@@ -100,7 +100,7 @@ class Section: public std::enable_shared_from_this<Section>
         const Property::PointLevel&, SectionType sectionType = SectionType::SECTION_UNDEFINED);
 
   private:
-    friend class Morphology;
+    friend class mut::TMorphology<SectionType>;
 
     Section(Morphology*, unsigned int id, SectionType type, const Property::PointLevel&);
     Section(Morphology*, unsigned int id, const morphio::Section& section);

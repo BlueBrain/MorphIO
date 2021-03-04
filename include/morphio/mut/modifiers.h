@@ -21,7 +21,6 @@ void no_duplicate_point(morphio::mut::Morphology& morpho);
 center of gravity
 **/
 void soma_sphere(morphio::mut::Morphology& morpho);
-
 void nrn_order(morphio::mut::Morphology& morpho);
 
 }  // namespace modifiers

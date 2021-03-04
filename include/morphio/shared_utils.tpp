@@ -1,3 +1,6 @@
+#pragma once
+
+
 #include <morphio/errorMessages.h>
 #include <morphio/types.h>
 
