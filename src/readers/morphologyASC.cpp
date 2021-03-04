@@ -63,7 +63,7 @@ class NeurolucidaParser
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
-    morphio::mut::Morphology& parse() {
+    morphio::mut::TMorphology& parse() {
         std::ifstream ifs(uri_);
         std::string input((std::istreambuf_iterator<char>(ifs)),
                           (std::istreambuf_iterator<char>()));
@@ -332,7 +332,7 @@ class NeurolucidaParser
         }
     }
 
-    morphio::mut::Morphology nb_;
+    morphio::mut::TMorphology nb_;
 
     std::string uri_;
     NeurolucidaLexer lex_;
@@ -347,7 +347,7 @@ class NeurolucidaParser
 Property::Properties load(const std::string& uri, unsigned int options) {
     NeurolucidaParser parser(uri);
 
-    morphio::mut::Morphology& nb_ = parser.parse();
+    morphio::mut::TMorphology& nb_ = parser.parse();
     nb_.sanitize(parser.debugInfo_);
     nb_.applyModifiers(options);
 

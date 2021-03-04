@@ -39,7 +39,7 @@ enum AnnotationType {
     SINGLE_CHILD,
 };
 
-/** The cell family represented by morphio::Morphology. */
+/** The cell family represented by morphio::TMorphology. */
 enum CellFamily { NEURON = 0, GLIA = 1 };
 
 enum SomaType {

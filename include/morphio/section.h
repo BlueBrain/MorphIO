@@ -21,7 +21,7 @@ namespace morphio {
  * special meaning for it.
  *
  * Sections cannot be directly created, but are returned by several
- * morphio::Morphology and morphio::Section methods.
+ * morphio::TMorphology and morphio::Section methods.
  *
  * This is a lightweight object with STL container style thread safety.
  * It is also safe to use a section after the morphology from where it comes
@@ -30,8 +30,8 @@ namespace morphio {
  */
 
 using upstream_iterator = upstream_iterator_t<Section>;
-using breadth_iterator = breadth_iterator_t<Section, Morphology>;
-using depth_iterator = depth_iterator_t<Section, Morphology>;
+using breadth_iterator = breadth_iterator_t<Section, TMorphology>;
+using depth_iterator = depth_iterator_t<Section, TMorphology>;
 
 class Section: public SectionBase<Section>
 {
@@ -83,7 +83,7 @@ class Section: public SectionBase<Section>
      */
     SectionType type() const;
     friend class mut::Section;
-    friend Section Morphology::section(uint32_t) const;
+    friend Section TMorphology::section(uint32_t) const;
     friend class SectionBase<Section>;
 
   protected:

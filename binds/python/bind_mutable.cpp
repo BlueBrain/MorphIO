@@ -21,20 +21,20 @@ void bind_mutable_module(py::module& m) {
     using namespace py::literals;
 
 
-    py::class_<morphio::mut::Morphology>(m, "Morphology")
+    py::class_<morphio::mut::TMorphology>(m, "TMorphology")
         .def(py::init<>())
         .def(py::init<const std::string&, unsigned int>(),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const morphio::Morphology&, unsigned int>(),
+        .def(py::init<const morphio::TMorphology&, unsigned int>(),
              "morphology"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const morphio::mut::Morphology&, unsigned int>(),
+        .def(py::init<const morphio::mut::TMorphology&, unsigned int>(),
              "morphology"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
         .def(py::init([](py::object arg, unsigned int options) {
-                 return std::unique_ptr<morphio::mut::Morphology>(
-                     new morphio::mut::Morphology(py::str(arg), options));
+                 return std::unique_ptr<morphio::mut::TMorphology>(
+                     new morphio::mut::TMorphology(py::str(arg), options));
              }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER,
@@ -43,57 +43,57 @@ void bind_mutable_module(py::module& m) {
 
         // Cell sub-part accessors
         .def_property_readonly("sections",
-                               &morphio::mut::Morphology::sections,
+                               &morphio::mut::TMorphology::sections,
                                "Returns a list containing IDs of all sections. "
                                "The first section of the vector is the soma section")
         .def_property_readonly("root_sections",
-                               &morphio::mut::Morphology::rootSections,
+                               &morphio::mut::TMorphology::rootSections,
                                "Returns a list of all root sections IDs "
                                "(sections whose parent ID are -1)",
                                py::return_value_policy::reference)
         .def_property_readonly(
             "soma",
-            static_cast<std::shared_ptr<morphio::mut::Soma>& (morphio::mut::Morphology::*) ()>(
-                &morphio::mut::Morphology::soma),
+            static_cast<std::shared_ptr<morphio::mut::Soma>& (morphio::mut::TMorphology::*) ()>(
+                &morphio::mut::TMorphology::soma),
             "Returns a reference to the soma object\n\n"
             "Note: multiple morphologies can share the same Soma "
             "instance")
         .def_property_readonly(
             "mitochondria",
-            static_cast<morphio::mut::Mitochondria& (morphio::mut::Morphology::*) ()>(
-                &morphio::mut::Morphology::mitochondria),
+            static_cast<morphio::mut::Mitochondria& (morphio::mut::TMorphology::*) ()>(
+                &morphio::mut::TMorphology::mitochondria),
             "Returns a reference to the mitochondria container class")
         .def_property_readonly(
             "endoplasmic_reticulum",
-            static_cast<morphio::mut::EndoplasmicReticulum& (morphio::mut::Morphology::*) ()>(
-                &morphio::mut::Morphology::endoplasmicReticulum),
+            static_cast<morphio::mut::EndoplasmicReticulum& (morphio::mut::TMorphology::*) ()>(
+                &morphio::mut::TMorphology::endoplasmicReticulum),
             "Returns a reference to the endoplasmic reticulum container class")
         .def_property_readonly("annotations",
-                               &morphio::mut::Morphology::annotations,
+                               &morphio::mut::TMorphology::annotations,
                                "Returns a list of annotations")
         .def_property_readonly("markers",
-                               &morphio::mut::Morphology::markers,
+                               &morphio::mut::TMorphology::markers,
                                "Returns the list of NeuroLucida markers")
         .def("section",
-             &morphio::mut::Morphology::section,
+             &morphio::mut::TMorphology::section,
              "Returns the section with the given id\n\n"
              "Note: multiple morphologies can share the same Section "
              "instances",
              "section_id"_a)
         .def("build_read_only",
-             &morphio::mut::Morphology::buildReadOnly,
+             &morphio::mut::TMorphology::buildReadOnly,
              "Returns the data structure used to create read-only "
              "morphologies")
         .def("append_root_section",
-             static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*)(
+             static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::TMorphology::*)(
                  const morphio::Property::PointLevel&, morphio::SectionType)>(
-                 &morphio::mut::Morphology::appendRootSection),
+                 &morphio::mut::TMorphology::appendRootSection),
              "Append a root Section\n",
              "point_level_properties"_a,
              "section_type"_a)
         .def("append_root_section",
-             static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*)(
-                 const morphio::Section&, bool)>(&morphio::mut::Morphology::appendRootSection),
+             static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::TMorphology::*)(
+                 const morphio::Section&, bool)>(&morphio::mut::TMorphology::appendRootSection),
              "Append the existing immutable Section as a root section\n"
              "If recursive == true, all descendent will be appended as "
              "well",
@@ -101,7 +101,7 @@ void bind_mutable_module(py::module& m) {
              "recursive"_a = false)
 
         .def("delete_section",
-             &morphio::mut::Morphology::deleteSection,
+             &morphio::mut::TMorphology::deleteSection,
              "Delete the given section\n"
              "\n"
              "Will silently fail if the section is not part of the "
@@ -114,32 +114,32 @@ void bind_mutable_module(py::module& m) {
              "recursive"_a = true)
 
         .def("as_immutable",
-             [](const morphio::mut::Morphology* morph) { return morphio::Morphology(*morph); })
+             [](const morphio::mut::TMorphology* morph) { return morphio::TMorphology(*morph); })
 
         .def_property_readonly("connectivity",
-                               &morphio::mut::Morphology::connectivity,
+                               &morphio::mut::TMorphology::connectivity,
                                "Return the graph connectivity of the morphology "
                                "where each section is seen as a node\nNote: -1 is the soma node")
 
         .def_property_readonly("cell_family",
-                               &morphio::mut::Morphology::cellFamily,
+                               &morphio::mut::TMorphology::cellFamily,
                                "Returns the cell family (neuron or glia)")
 
         .def_property_readonly("soma_type",
-                               &morphio::mut::Morphology::somaType,
+                               &morphio::mut::TMorphology::somaType,
                                "Returns the soma type")
 
-        .def_property_readonly("version", &morphio::mut::Morphology::version, "Returns the version")
+        .def_property_readonly("version", &morphio::mut::TMorphology::version, "Returns the version")
 
         .def("sanitize",
-             static_cast<void (morphio::mut::Morphology::*) ()>(
-                 &morphio::mut::Morphology::sanitize),
+             static_cast<void (morphio::mut::TMorphology::*) ()>(
+                 &morphio::mut::TMorphology::sanitize),
              "Fixes the morphology single child sections and issues warnings"
              "if the section starts and ends are inconsistent")
 
         .def(
             "write",
-            [](morphio::mut::Morphology* morph, py::object arg) { morph->write(py::str(arg)); },
+            [](morphio::mut::TMorphology* morph, py::object arg) { morph->write(py::str(arg)); },
             "Write file to H5, SWC, ASC format depending on filename "
             "extension",
             "filename"_a)
@@ -147,7 +147,7 @@ void bind_mutable_module(py::module& m) {
         // Iterators
         .def(
             "iter",
-            [](morphio::mut::Morphology* morph, IterType type) {
+            [](morphio::mut::TMorphology* morph, IterType type) {
                 switch (type) {
                 case IterType::DEPTH_FIRST:
                     return py::make_iterator(morph->depth_begin(), morph->depth_end());
@@ -171,14 +171,14 @@ void bind_mutable_module(py::module& m) {
             "iter_type"_a = IterType::DEPTH_FIRST)
         .def("append_root_section",
              static_cast<std::shared_ptr<morphio::mut::Section> (
-                 morphio::mut::Morphology::*)(const std::shared_ptr<morphio::mut::Section>&, bool)>(
-                 &morphio::mut::Morphology::appendRootSection),
+                 morphio::mut::TMorphology::*)(const std::shared_ptr<morphio::mut::Section>&, bool)>(
+                 &morphio::mut::TMorphology::appendRootSection),
              "Append the existing mutable Section as a root section\n"
              "If recursive == true, all descendent will be appended as well",
              "mutable_section"_a,
              "recursive"_a = false);
 
-    py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(m, "GlialCell")
+    py::class_<morphio::mut::GlialCell, morphio::mut::TMorphology>(m, "GlialCell")
         .def(py::init<>())
         .def(py::init<const std::string&>())
         .def(py::init([](py::object arg) {

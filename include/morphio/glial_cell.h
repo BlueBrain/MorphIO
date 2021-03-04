@@ -4,7 +4,7 @@
 #include <morphio/types.h>
 
 namespace morphio {
-class GlialCell: public Morphology
+class GlialCell: public TMorphology
 {
   public:
     GlialCell(const std::string& source);

@@ -13,7 +13,7 @@ static inline bool _emptySection(const std::shared_ptr<Section>& section) {
     return section->points().empty();
 }
 
-Section::Section(Morphology* morphology,
+Section::Section(TMorphology* morphology,
                  unsigned int id_,
                  SectionType type_,
                  const Property::PointLevel& pointProperties)
@@ -22,13 +22,13 @@ Section::Section(Morphology* morphology,
     , _id(id_)
     , _sectionType(type_) {}
 
-Section::Section(Morphology* morphology, unsigned int id_, const morphio::Section& section_)
+Section::Section(TMorphology* morphology, unsigned int id_, const morphio::Section& section_)
     : Section(morphology,
               id_,
               section_.type(),
               Property::PointLevel(section_._properties->_pointLevel, section_._range)) {}
 
-Section::Section(Morphology* morphology, unsigned int id_, const Section& section_)
+Section::Section(TMorphology* morphology, unsigned int id_, const Section& section_)
     : _morphology(morphology)
     , _pointProperties(section_._pointProperties)
     , _id(id_)

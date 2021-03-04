@@ -21,7 +21,7 @@ namespace morphio {
  * approximated as spheres.
  *
  * The coordinates system used by a soma will be in the same as the
- * brain::Morphology from where it comes.
+ * brain::TMorphology from where it comes.
  *
  * @version unstable
  */
@@ -68,10 +68,10 @@ class Soma
   private:
     explicit Soma(const std::shared_ptr<Property::Properties>&);
     // TODO: find out why the following line does not work
-    // when friend class Morphology; is removed
+    // when friend class TMorphology; is removed
     // template <typename Property>
-    // friend const morphio::Soma morphio::Morphology::soma() const;
-    friend class Morphology;
+    // friend const morphio::Soma morphio::TMorphology::soma() const;
+    friend class TMorphology;
     friend class mut::Soma;
 
     std::shared_ptr<Property::Properties> _properties;

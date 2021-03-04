@@ -6,8 +6,8 @@ namespace morphio {
 /**
  * The entry-point class to access mitochondrial data
  *
- * By design, it is the equivalent of the Morphology class but at the
- *mitochondrial level. As the Morphology class, it implements a section accessor
+ * By design, it is the equivalent of the TMorphology class but at the
+ *mitochondrial level. As the TMorphology class, it implements a section accessor
  *and a root section accessor returning views on the Properties object for the
  *queried mitochondrial section.
  **/
@@ -23,6 +23,6 @@ class Mitochondria
         : _properties(properties) {}
     std::shared_ptr<Property::Properties> _properties;
 
-    friend class Morphology;
+    friend class TMorphology;
 };
 }  // namespace morphio

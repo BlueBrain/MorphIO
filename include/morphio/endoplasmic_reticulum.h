@@ -6,7 +6,7 @@ namespace morphio {
 /**
  * The entry-point class to access endoplasmic reticulum data
  *
- * Spec https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
+ * Spec https://bbpteam.epfl.ch/documentation/projects/TMorphology%20Documentation/latest/h5v1.html
  **/
 class EndoplasmicReticulum
 {
@@ -36,7 +36,7 @@ class EndoplasmicReticulum
         : _properties(std::move(properties)) {}
     std::shared_ptr<Property::Properties> _properties;
 
-    friend class Morphology;
+    friend class TMorphology;
     friend class morphio::mut::EndoplasmicReticulum;
 };
 }  // namespace morphio

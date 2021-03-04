@@ -17,7 +17,7 @@ using namespace enums;
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
-class Morphology;
+class TMorphology;
 class Section;
 template <class T>
 class SectionBase;
@@ -41,7 +41,8 @@ namespace mut {
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
-class Morphology;
+template <typename Type>
+class TMorphology;
 class Section;
 class Soma;
 }  // namespace mut

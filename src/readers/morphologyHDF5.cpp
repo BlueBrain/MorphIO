@@ -131,7 +131,7 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
                 "Error in " + source + "\nUnsupported h5 version: " + std::to_string(majorVersion) +
                 "." + std::to_string(minorVersion) +
                 "See "
-                "https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/"
+                "https://bbpteam.epfl.ch/documentation/projects/TMorphology%20Documentation/latest/"
                 "index.html for the list of supported versions.");
         }
     } catch (const HighFive::Exception&) {
@@ -147,7 +147,7 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
             std::get<2>(_properties._cellLevel._version) = 0;  // minor version
             // Version 1.0 only support NEURON has a CellFamily.
             // Other CellFamily have been added in version 1.1:
-            // https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
+            // https://bbpteam.epfl.ch/documentation/projects/TMorphology%20Documentation/latest/h5v1.html
             _properties._cellLevel._cellFamily = CellFamily::NEURON;
         }
         return;

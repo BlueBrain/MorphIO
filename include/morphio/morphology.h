@@ -10,22 +10,22 @@
 namespace morphio {
 enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
 
-using breadth_iterator = breadth_iterator_t<Section, Morphology>;
-using depth_iterator = depth_iterator_t<Section, Morphology>;
+using breadth_iterator = breadth_iterator_t<Section, TMorphology>;
+using depth_iterator = depth_iterator_t<Section, TMorphology>;
 
-/** Read access a Morphology file.
+/** Read access a TMorphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
  * release of resources upon destruction.
  */
-class Morphology
+class TMorphology
 {
   public:
-    virtual ~Morphology();
+    virtual ~TMorphology();
 
-    Morphology& operator=(const Morphology&);
-    Morphology(Morphology&&) noexcept;
-    Morphology& operator=(Morphology&&) noexcept;
+    TMorphology& operator=(const TMorphology&);
+    TMorphology(TMorphology&&) noexcept;
+    TMorphology& operator=(TMorphology&&) noexcept;
 
     /** @name Read API */
     //@{
@@ -35,11 +35,11 @@ class Morphology
        their enum: morphio::enum::Option and can be composed.
 
         Example:
-            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
+            TMorphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
-    explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
-    explicit Morphology(mut::Morphology);
+    explicit TMorphology(const std::string& source, unsigned int options = NO_MODIFIER);
+    explicit TMorphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+    explicit TMorphology(mut::TMorphology<SectionType>);
 
     /**
      * Return the soma object
@@ -159,8 +159,9 @@ class Morphology
     const MorphologyVersion& version() const;
 
   protected:
-    friend class mut::Morphology;
-    Morphology(const Property::Properties& properties, unsigned int options);
+    template <typename Type>
+    friend class mut::TMorphology;
+    TMorphology(const Property::Properties& properties, unsigned int options);
 
     std::shared_ptr<Property::Properties> _properties;
 

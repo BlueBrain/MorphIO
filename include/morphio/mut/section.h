@@ -12,8 +12,10 @@ namespace morphio {
 namespace mut {
 
 using upstream_iterator = morphio::upstream_iterator_t<std::shared_ptr<Section>>;
-using breadth_iterator = morphio::breadth_iterator_t<std::shared_ptr<Section>, Morphology>;
-using depth_iterator = morphio::depth_iterator_t<std::shared_ptr<Section>, Morphology>;
+template<typename Type>
+using breadth_iterator = morphio::breadth_iterator_t<std::shared_ptr<Section>, TMorphology<Type>>;
+template<typename Type>
+using depth_iterator = morphio::depth_iterator_t<std::shared_ptr<Section>, TMorphology<Type>>;
 
 class Section: public std::enable_shared_from_this<Section>
 {
@@ -61,7 +63,7 @@ class Section: public std::enable_shared_from_this<Section>
     /** @} */
     ////////////////////////////////////////////////////////////////////////////////
     //
-    // Methods that were previously in mut::Morphology
+    // Methods that were previously in mut::TMorphology
     //
     ////////////////////////////////////////////////////////////////////////////////
 
@@ -82,11 +84,15 @@ class Section: public std::enable_shared_from_this<Section>
     **/
     const std::vector<std::shared_ptr<Section>>& children() const;
 
-    depth_iterator depth_begin() const;
-    depth_iterator depth_end() const;
+    template<typename Type>
+    depth_iterator<Type> depth_begin() const;
+    template<typename Type>
+    depth_iterator<Type> depth_end() const;
 
-    breadth_iterator breadth_begin() const;
-    breadth_iterator breadth_end() const;
+    template<typename Type>
+    breadth_iterator<Type> breadth_begin() const;
+    template<typename Type>
+    breadth_iterator<Type> breadth_end() const;
 
     upstream_iterator upstream_begin() const;
     upstream_iterator upstream_end() const;
@@ -100,13 +106,19 @@ class Section: public std::enable_shared_from_this<Section>
         const Property::PointLevel&, SectionType sectionType = SectionType::SECTION_UNDEFINED);
 
   private:
-    friend class Morphology;
+    template <typename Type>
+    friend class TMorphology;
 
-    Section(Morphology*, unsigned int id, SectionType type, const Property::PointLevel&);
-    Section(Morphology*, unsigned int id, const morphio::Section& section);
-    Section(Morphology*, unsigned int id, const Section&);
+    template <typename Type>
+    Section(TMorphology<Type>*, unsigned int id, SectionType type, const Property::PointLevel&);
+    template <typename Type>
+    Section(TMorphology<Type>*, unsigned int id, const morphio::Section& section);
+    template <typename Type>
+    Section(TMorphology<Type>*, unsigned int id, const Section&);
 
-    Morphology* _morphology;
+    TMorphology<SectionType>* _morphology;
+
+
     Property::PointLevel _pointProperties;
     uint32_t _id;
     SectionType _sectionType;

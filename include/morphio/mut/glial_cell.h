@@ -6,7 +6,7 @@
 namespace morphio {
 namespace mut {
 
-class GlialCell: public Morphology
+class GlialCell: public TMorphology
 {
   public:
     GlialCell();

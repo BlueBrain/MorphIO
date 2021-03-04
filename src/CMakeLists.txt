@@ -12,7 +12,6 @@ set(MORPHIO_SOURCES
     mut/mito_section.cpp
     mut/mitochondria.cpp
     mut/modifiers.cpp
-    mut/morphology.cpp
     mut/section.cpp
     mut/soma.cpp
     mut/writers.cpp

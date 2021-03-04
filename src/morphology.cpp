@@ -23,7 +23,7 @@ void buildChildren(std::shared_ptr<Property::Properties> properties);
 SomaType getSomaType(long unsigned int nSomaPoints);
 Property::Properties loadURI(const std::string& source, unsigned int options);
 
-Morphology::Morphology(const Property::Properties& properties, unsigned int options)
+TMorphology::TMorphology(const Property::Properties& properties, unsigned int options)
     : _properties(std::make_shared<Property::Properties>(properties)) {
     buildChildren(_properties);
 
@@ -33,7 +33,7 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders
     if (properties._cellLevel.fileFormat() == "h5") {
-        mut::Morphology mutable_morph(*this);
+        mut::TMorphology<SectionType> mutable_morph(*this);
         mutable_morph.sanitize();
         if (options) {
             mutable_morph.applyModifiers(options);
@@ -43,48 +43,49 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
     }
 }
 
-Morphology::Morphology(const HighFive::Group& group, unsigned int options)
-    : Morphology(readers::h5::load(group), options) {}
+TMorphology::TMorphology(const HighFive::Group& group, unsigned int options)
+    : TMorphology(readers::h5::load(group), options) {}
 
-Morphology::Morphology(const std::string& source, unsigned int options)
-    : Morphology(loadURI(source, options), options) {}
+TMorphology::TMorphology(const std::string& source, unsigned int options)
+    : TMorphology(loadURI(source, options), options) {}
 
-Morphology::Morphology(mut::Morphology morphology) {
+
+TMorphology::TMorphology(mut::TMorphology<SectionType> morphology) {
     morphology.sanitize();
     _properties = std::make_shared<Property::Properties>(morphology.buildReadOnly());
     buildChildren(_properties);
 }
 
-Morphology::Morphology(Morphology&&) noexcept = default;
-Morphology& Morphology::operator=(Morphology&&) noexcept = default;
+TMorphology::TMorphology(TMorphology&&) noexcept = default;
+TMorphology& TMorphology::operator=(TMorphology&&) noexcept = default;
 
-Morphology::~Morphology() = default;
+TMorphology::~TMorphology() = default;
 
-Soma Morphology::soma() const {
+Soma TMorphology::soma() const {
     return Soma(_properties);
 }
 
-Mitochondria Morphology::mitochondria() const {
+Mitochondria TMorphology::mitochondria() const {
     return Mitochondria(_properties);
 }
 
-const EndoplasmicReticulum Morphology::endoplasmicReticulum() const {
+const EndoplasmicReticulum TMorphology::endoplasmicReticulum() const {
     return EndoplasmicReticulum(_properties);
 }
 
-const std::vector<Property::Annotation>& Morphology::annotations() const {
+const std::vector<Property::Annotation>& TMorphology::annotations() const {
     return _properties->_cellLevel._annotations;
 }
 
-const std::vector<Property::Marker>& Morphology::markers() const {
+const std::vector<Property::Marker>& TMorphology::markers() const {
     return _properties->_cellLevel._markers;
 }
 
-Section Morphology::section(uint32_t id) const {
+Section TMorphology::section(uint32_t id) const {
     return {id, _properties};
 }
 
-std::vector<Section> Morphology::rootSections() const {
+std::vector<Section> TMorphology::rootSections() const {
     std::vector<Section> result;
     try {
         const std::vector<uint32_t>& children =
@@ -100,7 +101,7 @@ std::vector<Section> Morphology::rootSections() const {
     }
 }
 
-std::vector<Section> Morphology::sections() const {
+std::vector<Section> TMorphology::sections() const {
     // TODO: Make this more performant when needed
     std::vector<Section> sections_;
     auto count = _properties->get<morphio::Property::Section>().size();
@@ -112,15 +113,15 @@ std::vector<Section> Morphology::sections() const {
 }
 
 template <typename Property>
-const std::vector<typename Property::Type>& Morphology::get() const {
+const std::vector<typename Property::Type>& TMorphology::get() const {
     return _properties->get<Property>();
 }
 
-const Points& Morphology::points() const noexcept {
+const Points& TMorphology::points() const noexcept {
     return get<Property::Point>();
 }
 
-std::vector<uint32_t> Morphology::sectionOffsets() const {
+std::vector<uint32_t> TMorphology::sectionOffsets() const {
     const std::vector<Property::Section::Type>& indices_and_parents = get<Property::Section>();
     auto size = indices_and_parents.size();
     std::vector<uint32_t> indices(size + 1);
@@ -132,47 +133,47 @@ std::vector<uint32_t> Morphology::sectionOffsets() const {
     return indices;
 }
 
-const std::vector<morphio::floatType>& Morphology::diameters() const {
+const std::vector<morphio::floatType>& TMorphology::diameters() const {
     return get<Property::Diameter>();
 }
 
-const std::vector<morphio::floatType>& Morphology::perimeters() const {
+const std::vector<morphio::floatType>& TMorphology::perimeters() const {
     return get<Property::Perimeter>();
 }
 
-const std::vector<SectionType>& Morphology::sectionTypes() const {
+const std::vector<SectionType>& TMorphology::sectionTypes() const {
     return get<Property::SectionType>();
 }
 
-const CellFamily& Morphology::cellFamily() const {
+const CellFamily& TMorphology::cellFamily() const {
     return _properties->cellFamily();
 }
 
-const SomaType& Morphology::somaType() const {
+const SomaType& TMorphology::somaType() const {
     return _properties->somaType();
 }
 
-const std::map<int, std::vector<unsigned int>>& Morphology::connectivity() const {
+const std::map<int, std::vector<unsigned int>>& TMorphology::connectivity() const {
     return _properties->children<Property::Section>();
 }
 
-const MorphologyVersion& Morphology::version() const {
+const MorphologyVersion& TMorphology::version() const {
     return _properties->version();
 }
 
-depth_iterator Morphology::depth_begin() const {
+depth_iterator TMorphology::depth_begin() const {
     return depth_iterator(*this);
 }
 
-depth_iterator Morphology::depth_end() const {
+depth_iterator TMorphology::depth_end() const {
     return depth_iterator();
 }
 
-breadth_iterator Morphology::breadth_begin() const {
+breadth_iterator TMorphology::breadth_begin() const {
     return breadth_iterator(*this);
 }
 
-breadth_iterator Morphology::breadth_end() const {
+breadth_iterator TMorphology::breadth_end() const {
     return breadth_iterator();
 }
 

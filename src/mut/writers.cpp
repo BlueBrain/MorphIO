@@ -28,7 +28,7 @@ struct base_type<std::vector<T>>: base_type<T> {};
 
 constexpr int FLOAT_PRECISION_PRINT = 9;
 
-bool hasPerimeterData(const morphio::mut::Morphology& morpho) {
+bool hasPerimeterData(const morphio::mut::TMorphology& morpho) {
     return !morpho.rootSections().empty() && !morpho.rootSections().front()->perimeters().empty();
 }
 
@@ -68,7 +68,7 @@ namespace morphio {
 namespace mut {
 namespace writer {
 
-void swc(const Morphology& morphology, const std::string& filename) {
+void swc(const TMorphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     const auto& soma_points = soma->points();
     if (soma_points.empty() && morphology.rootSections().empty()) {
@@ -150,7 +150,7 @@ static void _write_asc_points(std::ofstream& myfile,
 }
 
 static void _write_asc_section(std::ofstream& myfile,
-                               const Morphology& morpho,
+                               const TMorphology& morpho,
                                const std::shared_ptr<Section>& section,
                                size_t indentLevel) {
     std::string indent(indentLevel, ' ');
@@ -167,7 +167,7 @@ static void _write_asc_section(std::ofstream& myfile,
     }
 }
 
-void asc(const Morphology& morphology, const std::string& filename) {
+void asc(const TMorphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     if (soma->points().empty() && morphology.rootSections().empty()) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
@@ -289,7 +289,7 @@ static void endoplasmicReticulumH5(HighFive::File& h5_file, const EndoplasmicRet
 }
 
 
-void h5(const Morphology& morpho, const std::string& filename) {
+void h5(const TMorphology& morpho, const std::string& filename) {
     const auto& somaPoints = morpho.soma()->points();
     const auto numberOfSomaPoints = somaPoints.size();
 

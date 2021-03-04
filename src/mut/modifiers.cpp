@@ -7,7 +7,7 @@ namespace morphio {
 namespace mut {
 namespace modifiers {
 
-void two_points_sections(morphio::mut::Morphology& morpho) {
+void two_points_sections(morphio::mut::TMorphology& morpho) {
     for (auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
         std::shared_ptr<Section> section = *it;
         size_t size = section->points().size();
@@ -20,7 +20,7 @@ void two_points_sections(morphio::mut::Morphology& morpho) {
     }
 }
 
-void no_duplicate_point(morphio::mut::Morphology& morpho) {
+void no_duplicate_point(morphio::mut::TMorphology& morpho) {
     for (auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
         std::shared_ptr<Section> section = *it;
         size_t size = section->points().size();
@@ -36,7 +36,7 @@ void no_duplicate_point(morphio::mut::Morphology& morpho) {
     }
 }
 
-void soma_sphere(morphio::mut::Morphology& morpho) {
+void soma_sphere(morphio::mut::TMorphology& morpho) {
     auto soma = morpho.soma();
     floatType size = static_cast<morphio::floatType>(soma->points().size());
 
@@ -66,7 +66,7 @@ static bool NRN_order_comparator(std::shared_ptr<Section> a, std::shared_ptr<Sec
     return a->type() < b->type();
 }
 
-void nrn_order(morphio::mut::Morphology& morpho) {
+void nrn_order(morphio::mut::TMorphology& morpho) {
     std::stable_sort(morpho._rootSections.begin(),
                      morpho._rootSections.end(),
                      NRN_order_comparator);

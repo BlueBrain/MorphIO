@@ -22,50 +22,50 @@ void bind_immutable_module(py::module& m) {
     // http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight=iostream#capturing-standard-output-from-ostream
     py::add_ostream_redirect(m, "ostream_redirect");
 
-    py::class_<morphio::Morphology>(m, "Morphology")
+    py::class_<morphio::TMorphology>(m, "TMorphology")
         .def(py::init<const std::string&, unsigned int>(),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<morphio::mut::Morphology&>())
+        .def(py::init<morphio::mut::TMorphology&>())
         .def(py::init([](py::object arg, unsigned int options) {
-                 return std::unique_ptr<morphio::Morphology>(
-                     new morphio::Morphology(py::str(arg), options));
+                 return std::unique_ptr<morphio::TMorphology>(
+                     new morphio::TMorphology(py::str(arg), options));
              }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER,
              "Additional Ctor that accepts as filename any python object that implements __repr__ "
              "or __str__")
         .def("as_mutable",
-             [](const morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })
+             [](const morphio::TMorphology* morph) { return morphio::mut::TMorphology(*morph); })
 
         // Cell sub-parts accessors
-        .def_property_readonly("soma", &morphio::Morphology::soma, "Returns the soma object")
+        .def_property_readonly("soma", &morphio::TMorphology::soma, "Returns the soma object")
         .def_property_readonly("mitochondria",
-                               &morphio::Morphology::mitochondria,
+                               &morphio::TMorphology::mitochondria,
                                "Returns the soma object")
         .def_property_readonly("annotations",
-                               &morphio::Morphology::annotations,
+                               &morphio::TMorphology::annotations,
                                "Returns a list of annotations")
         .def_property_readonly("markers",
-                               &morphio::Morphology::markers,
+                               &morphio::TMorphology::markers,
                                "Returns the list of NeuroLucida markers")
         .def_property_readonly("endoplasmic_reticulum",
-                               &morphio::Morphology::endoplasmicReticulum,
+                               &morphio::TMorphology::endoplasmicReticulum,
                                "Returns the endoplasmic reticulum object")
         .def_property_readonly("root_sections",
-                               &morphio::Morphology::rootSections,
+                               &morphio::TMorphology::rootSections,
                                "Returns a list of all root sections "
                                "(sections whose parent ID are -1)")
         .def_property_readonly("sections",
-                               &morphio::Morphology::sections,
+                               &morphio::TMorphology::sections,
                                "Returns a vector containing all sections objects\n\n"
                                "Notes:\n"
                                "- Soma is not included\n"
                                "- First section ID is 1 (0 is reserved for the soma)\n"
-                               "- To select sections by ID use: Morphology::section(id)")
+                               "- To select sections by ID use: TMorphology::section(id)")
 
         .def("section",
-             &morphio::Morphology::section,
+             &morphio::TMorphology::section,
              "Returns the Section with the given id\n"
              "throw RawDataError if the id is out of range",
              "section_id"_a)
@@ -73,34 +73,34 @@ void bind_immutable_module(py::module& m) {
         // Property accessors
         .def_property_readonly(
             "points",
-            [](morphio::Morphology* morpho) {
+            [](morphio::TMorphology* morpho) {
                 const auto& data = morpho->points();
                 return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a list with all points from all sections (soma points are not included)\n"
             "Note: points belonging to the n'th section are located at indices:\n"
-            "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
+            "[TMorphology.sectionOffsets(n), TMorphology.sectionOffsets(n+1)[")
         .def_property_readonly(
             "diameters",
-            [](const morphio::Morphology& morpho) {
+            [](const morphio::TMorphology& morpho) {
                 const auto& data = morpho.diameters();
                 return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a list with all diameters from all sections (soma points are not included)\n"
             "Note: diameters belonging to the n'th section are located at indices:\n"
-            "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
+            "[TMorphology.sectionOffsets(n), TMorphology.sectionOffsets(n+1)[")
         .def_property_readonly(
             "perimeters",
-            [](const morphio::Morphology& obj) {
+            [](const morphio::TMorphology& obj) {
                 const auto& data = obj.perimeters();
                 return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a list with all perimeters from all sections (soma points are not included)\n"
             "Note: perimeters belonging to the n'th section are located at indices:\n"
-            "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
+            "[TMorphology.sectionOffsets(n), TMorphology.sectionOffsets(n+1)[")
         .def_property_readonly(
             "section_offsets",
-            [](const morphio::Morphology& morpho) { return as_pyarray(morpho.sectionOffsets()); },
+            [](const morphio::TMorphology& morpho) { return as_pyarray(morpho.sectionOffsets()); },
             "Returns a list with offsets to access data of a specific section in the points\n"
             "and diameters arrays.\n"
             "\n"
@@ -111,25 +111,25 @@ void bind_immutable_module(py::module& m) {
             "so that the above example works also for the last section.")
         .def_property_readonly(
             "section_types",
-            [](const morphio::Morphology& morph) {
+            [](const morphio::TMorphology& morph) {
                 const auto& data = morph.sectionTypes();
                 return py::array(static_cast<py::ssize_t>(data.size()), data.data());
             },
             "Returns a vector with the section type of every section")
         .def_property_readonly("connectivity",
-                               &morphio::Morphology::connectivity,
+                               &morphio::TMorphology::connectivity,
                                "Return the graph connectivity of the morphology "
                                "where each section is seen as a node\nNote: -1 is the soma node")
-        .def_property_readonly("soma_type", &morphio::Morphology::somaType, "Returns the soma type")
+        .def_property_readonly("soma_type", &morphio::TMorphology::somaType, "Returns the soma type")
         .def_property_readonly("cell_family",
-                               &morphio::Morphology::cellFamily,
+                               &morphio::TMorphology::cellFamily,
                                "Returns the cell family (neuron or glia)")
-        .def_property_readonly("version", &morphio::Morphology::version, "Returns the version")
+        .def_property_readonly("version", &morphio::TMorphology::version, "Returns the version")
 
         // Iterators
         .def(
             "iter",
-            [](morphio::Morphology* morpho, IterType type) {
+            [](morphio::TMorphology* morpho, IterType type) {
                 switch (type) {
                 case IterType::DEPTH_FIRST:
                     return py::make_iterator(morpho->depth_begin(), morpho->depth_end());
@@ -149,7 +149,7 @@ void bind_immutable_module(py::module& m) {
             "- morphio.IterType.breadth_first (default)\n"
             "iter_type"_a = IterType::DEPTH_FIRST);
 
-    py::class_<morphio::GlialCell, morphio::Morphology>(m, "GlialCell")
+    py::class_<morphio::GlialCell, morphio::TMorphology>(m, "GlialCell")
         .def(py::init<const std::string&>())
         .def(py::init([](py::object arg) {
                  return std::unique_ptr<morphio::GlialCell>(new morphio::GlialCell(py::str(arg)));
@@ -162,8 +162,8 @@ void bind_immutable_module(py::module& m) {
         m,
         "Mitochondria",
         "The entry-point class to access mitochondrial data\n"
-        "By design, it is the equivalent of the Morphology class but at the mitochondrial level\n"
-        "As the Morphology class, it implements a section accessor and a root section accessor\n"
+        "By design, it is the equivalent of the TMorphology class but at the mitochondrial level\n"
+        "As the TMorphology class, it implements a section accessor and a root section accessor\n"
         "returning views on the Properties object for the queried mitochondrial section")
         .def("section",
              &morphio::Mitochondria::section,
@@ -182,7 +182,7 @@ void bind_immutable_module(py::module& m) {
         "EndoplasmicReticulum",
         "The entry-point class to access endoplasmic reticulum data\n"
         "Spec "
-        "https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/"
+        "https://bbpteam.epfl.ch/documentation/projects/TMorphology%20Documentation/latest/"
         "h5v1.html")
         .def_property_readonly("section_indices",
                                &morphio::EndoplasmicReticulum::sectionIndices,
@@ -249,7 +249,7 @@ void bind_immutable_module(py::module& m) {
             "id",
             &morphio::Section::id,
             "Returns the section ID\n"
-            "The section ID can be used to query sections via Morphology::section(uint32_t id)")
+            "The section ID can be used to query sections via TMorphology::section(uint32_t id)")
         .def_property_readonly("type",
                                &morphio::Section::type,
                                "Returns the morphological type of this section "

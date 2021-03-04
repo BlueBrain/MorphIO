@@ -6,25 +6,25 @@
 
 
 TEST_CASE("LoadH5Morphology", "[morphology]") {
-    const morphio::Morphology m("data/h5/v1/Neuron.h5");
+    const morphio::TMorphology m("data/h5/v1/Neuron.h5");
 
     REQUIRE(m.diameters().size() == 924);
 }
 
 TEST_CASE("LoadSWCMorphology", "[morphology]") {
-    const morphio::Morphology m("data/simple.swc");
+    const morphio::TMorphology m("data/simple.swc");
 
     REQUIRE(m.diameters().size() == 12);
 }
 
 TEST_CASE("LoadNeurolucidaMorphology", "[morphology]") {
-    const morphio::Morphology m("data/multiple_point_section.asc");
+    const morphio::TMorphology m("data/multiple_point_section.asc");
 
     REQUIRE(m.diameters().size() == 14);
 }
 
 TEST_CASE("LoadBadDimensionMorphology", "[morphology]") {
-    REQUIRE_THROWS(morphio::Morphology("data/h5/v1/monodim.h5"));
+    REQUIRE_THROWS(morphio::TMorphology("data/h5/v1/monodim.h5"));
 }
 
 TEST_CASE("LoadMergedMorphology", "[morphology]") {
@@ -32,6 +32,6 @@ TEST_CASE("LoadMergedMorphology", "[morphology]") {
     REQUIRE_NOTHROW(morphio::readers::h5::MorphologyHDF5(
         file.getGroup("/00/00/00000009b4fa102d58b173a995525c3e")));
     auto g = file.getGroup("/00/00/00000009b4fa102d58b173a995525c3e");
-    morphio::Morphology m(g);
+    morphio::TMorphology m(g);
     REQUIRE(m.rootSections().size() == 8);
 }

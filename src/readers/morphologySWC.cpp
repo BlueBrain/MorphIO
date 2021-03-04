@@ -344,7 +344,7 @@ class SWCBuilder
     int lastSomaPoint = -1;
     std::map<int32_t, std::vector<uint32_t>> children;
     std::map<uint32_t, Sample> samples;
-    mut::Morphology morph;
+    mut::TMorphology morph;
     std::string uri;
     ErrorMessages err;
     DebugInfo debugInfo;

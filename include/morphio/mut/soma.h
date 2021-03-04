@@ -53,7 +53,8 @@ class Soma
     inline const Property::PointLevel& properties() const noexcept;
 
   private:
-    friend class Morphology;
+    template <typename Type>
+    friend class TMorphology;
     SomaType _somaType;
     Property::PointLevel _pointProperties;
 };

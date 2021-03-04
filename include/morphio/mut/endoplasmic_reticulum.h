@@ -8,7 +8,7 @@ namespace mut {
 /**
  * The entry-point class to access endoplasmic reticulum data
  *
- * Spec https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
+ * Spec https://bbpteam.epfl.ch/documentation/projects/TMorphology%20Documentation/latest/h5v1.html
  **/
 class EndoplasmicReticulum
 {
