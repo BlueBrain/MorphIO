@@ -17,7 +17,9 @@ using namespace enums;
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
-class Morphology;
+template <class T>
+class TMorphology;
+using Morphology = TMorphology<SectionType>;
 class Section;
 template <class T>
 class SectionBase;

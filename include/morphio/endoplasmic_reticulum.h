@@ -36,7 +36,7 @@ class EndoplasmicReticulum
         : _properties(std::move(properties)) {}
     std::shared_ptr<Property::Properties> _properties;
 
-    friend class Morphology;
+    friend class TMorphology<SectionType>;
     friend class morphio::mut::EndoplasmicReticulum;
 };
 }  // namespace morphio
