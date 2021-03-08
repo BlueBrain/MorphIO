@@ -8,7 +8,6 @@
 #include <unordered_map>
 
 #include <functional>
-
 #include <morphio/errorMessages.h>
 #include <morphio/exceptions.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
@@ -18,42 +17,54 @@
 #include <morphio/section.h>
 #include <morphio/types.h>
 
+
 namespace morphio {
 namespace mut {
+
+template <typename SectionT>
+class TMorphology;  // pre-declare the template class itself
+template <typename SectionT>
+bool diff(const TMorphology<SectionT>& left,
+          const TMorphology<SectionT>& right,
+          morphio::enums::LogLevel verbose);
+
+
 bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
                           const std::shared_ptr<Section>& current);
 
-class Morphology
+template <typename SectionT>
+class TMorphology
 {
   public:
-    Morphology()
+    TMorphology()
         : _counter(0)
         , _soma(std::make_shared<Soma>())
         , _cellProperties(
-              std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())) {}
+              std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())) { }
 
     /**
-       Build a mutable Morphology from an on-disk morphology
+       Build a mutable TMorphology from an on-disk morphology
 
        options is the modifier flags to be applied. All flags are defined in
     their enum: morphio::enum::Option and can be composed.
 
        Example:
-           Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
+           TMorphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
     **/
-    Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
+    TMorphology(const std::string& uri, unsigned int options = NO_MODIFIER);
 
     /**
-       Build a mutable Morphology from a mutable morphology
+       Build a mutable TMorphology from a mutable morphology
     **/
-    Morphology(const morphio::mut::Morphology& morphology, unsigned int options = NO_MODIFIER);
+    TMorphology(const morphio::mut::TMorphology<SectionT>& morphology,
+                unsigned int options = NO_MODIFIER);
 
     /**
-       Build a mutable Morphology from a read-only morphology
+       Build a mutable TMorphology from a read-only morphology
     **/
-    Morphology(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
+    TMorphology(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
-    virtual ~Morphology();
+    virtual ~TMorphology();
 
     /**
        Returns all section ids at the tree root
@@ -165,8 +176,7 @@ class Morphology
     /**
        Append a root Section
     **/
-    std::shared_ptr<Section> appendRootSection(const Property::PointLevel&,
-                                               SectionType sectionType);
+    std::shared_ptr<Section> appendRootSection(const Property::PointLevel&, SectionT sectionType);
 
     void applyModifiers(unsigned int modifierFlags);
 
@@ -215,10 +225,10 @@ class Morphology
 
   public:
     friend class Section;
-    friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
-    friend bool diff(const Morphology& left,
-                     const Morphology& right,
-                     morphio::enums::LogLevel verbose);
+    friend bool diff<>(const TMorphology& left,
+                       const TMorphology& right,
+                       morphio::enums::LogLevel verbose);
+    friend void modifiers::nrn_order(TMorphology<SectionType>& morpho);
     morphio::readers::ErrorMessages _err;
 
     uint32_t _register(const std::shared_ptr<Section>&);
@@ -235,69 +245,11 @@ class Morphology
     std::map<uint32_t, std::vector<std::shared_ptr<Section>>> _children;
 };
 
-inline const std::vector<std::shared_ptr<Section>>& Morphology::rootSections() const noexcept {
-    return _rootSections;
-}
 
-inline const std::map<uint32_t, std::shared_ptr<Section>>& Morphology::sections() const noexcept {
-    return _sections;
-}
-
-inline std::shared_ptr<Soma>& Morphology::soma() noexcept {
-    return _soma;
-}
-
-inline const std::shared_ptr<Soma>& Morphology::soma() const noexcept {
-    return _soma;
-}
-
-inline Mitochondria& Morphology::mitochondria() noexcept {
-    return _mitochondria;
-}
-
-inline const Mitochondria& Morphology::mitochondria() const noexcept {
-    return _mitochondria;
-}
-
-inline EndoplasmicReticulum& Morphology::endoplasmicReticulum() noexcept {
-    return _endoplasmicReticulum;
-}
-
-inline const EndoplasmicReticulum& Morphology::endoplasmicReticulum() const noexcept {
-    return _endoplasmicReticulum;
-}
-
-inline const std::shared_ptr<Section>& Morphology::section(uint32_t id) const {
-    return _sections.at(id);
-}
-
-inline SomaType Morphology::somaType() const noexcept {
-    return _soma->type();
-}
-
-inline const std::vector<Property::Annotation>& Morphology::annotations() const noexcept {
-    return _cellProperties->_annotations;
-}
-
-inline const std::vector<Property::Marker>& Morphology::markers() const noexcept {
-    return _cellProperties->_markers;
-}
-
-inline CellFamily Morphology::cellFamily() const noexcept {
-    return _cellProperties->_cellFamily;
-}
-
-inline MorphologyVersion Morphology::version() const noexcept {
-    return _cellProperties->_version;
-}
-
-inline void Morphology::addAnnotation(const morphio::Property::Annotation& annotation) {
-    _cellProperties->_annotations.push_back(annotation);
-}
-
-inline void Morphology::addMarker(const morphio::Property::Marker& marker) {
-    _cellProperties->_markers.push_back(marker);
-}
+void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset);
 
 }  // namespace mut
 }  // namespace morphio
+
+
+#include "morphology.tpp"
