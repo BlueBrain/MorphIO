@@ -17,8 +17,12 @@ using namespace enums;
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
-class Morphology;
+// class Morphology;
 class Section;
+
+template <class T>
+class TMorphology;
+
 template <class T>
 class SectionBase;
 class Soma;

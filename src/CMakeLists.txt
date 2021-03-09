@@ -6,7 +6,6 @@ set(MORPHIO_SOURCES
     mito_section.cpp
     mitochondria.cpp
     morphology.cpp
-    morphology.cpp
     mut/endoplasmic_reticulum.cpp
     mut/glial_cell.cpp
     mut/mito_section.cpp

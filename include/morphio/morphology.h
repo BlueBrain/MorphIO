@@ -10,36 +10,37 @@
 namespace morphio {
 enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
 
-using breadth_iterator = breadth_iterator_t<Section, Morphology>;
-using depth_iterator = depth_iterator_t<Section, Morphology>;
+using breadth_iterator = breadth_iterator_t<Section, TMorphology<SectionType>>;
+using depth_iterator = depth_iterator_t<Section, TMorphology<SectionType>>;
 
-/** Read access a Morphology file.
+/** Read access a TMorphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
  * release of resources upon destruction.
  */
-class Morphology
+template <typename SectionT>
+class TMorphology
 {
   public:
-    virtual ~Morphology();
+    virtual ~TMorphology();
 
-    Morphology& operator=(const Morphology&);
-    Morphology(Morphology&&) noexcept;
-    Morphology& operator=(Morphology&&) noexcept;
+    TMorphology& operator=(const TMorphology<SectionT>&);
+    TMorphology(TMorphology<SectionT>&&) noexcept;
+    TMorphology& operator=(TMorphology<SectionT>&&) noexcept;
 
     /** @name Read API */
     //@{
-    /** Open the given source to a morphology file and parse it.
+    /** Open the given source to a TMorphology file and parse it.
 
         options is the modifier flags to be applied. All flags are defined in
        their enum: morphio::enum::Option and can be composed.
 
         Example:
-            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
+            TMorphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
-    explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
-    explicit Morphology(mut::Morphology);
+    explicit TMorphology(const std::string& source, unsigned int options = NO_MODIFIER);
+    explicit TMorphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+    explicit TMorphology(mut::Morphology);
 
     /**
      * Return the soma object
@@ -119,7 +120,7 @@ class Morphology
     const std::vector<SectionType>& sectionTypes() const;
 
     /**
-     * Return the graph connectivity of the morphology where each section
+     * Return the graph connectivity of the TMorphology where each section
      * is seen as a node
      * Note: -1 is the soma node
      **/
@@ -133,7 +134,6 @@ class Morphology
     **/
     depth_iterator depth_begin() const;
     depth_iterator depth_end() const;
-
     /**
        Breadth first iterator
 
@@ -142,7 +142,6 @@ class Morphology
     **/
     breadth_iterator breadth_begin() const;
     breadth_iterator breadth_end() const;
-
     /**
      * Return the soma type
      **/
@@ -160,11 +159,19 @@ class Morphology
 
   protected:
     friend class mut::Morphology;
-    Morphology(const Property::Properties& properties, unsigned int options);
+    TMorphology(const Property::Properties& properties, unsigned int options);
 
     std::shared_ptr<Property::Properties> _properties;
 
     template <typename Property>
     const std::vector<typename Property::Type>& get() const;
 };
+
+void buildChildren(std::shared_ptr<Property::Properties> properties);
+SomaType getSomaType(long unsigned int nSomaPoints);
+Property::Properties loadURI(const std::string& source, unsigned int options);
+
+
+using Morphology = TMorphology<SectionType>;
+
 }  // namespace morphio
