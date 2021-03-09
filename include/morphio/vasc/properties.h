@@ -18,7 +18,7 @@ struct Point {
     using Type = morphio::Point;
 };
 
-struct SectionType {
+struct NeuronSectionType {
     using Type = morphio::VascularSectionType;
 };
 
@@ -54,7 +54,7 @@ struct VascEdgeLevel {
 struct VascSectionLevel {
     // stores section level information
     std::vector<VascSection::Type> _sections;
-    std::vector<SectionType::Type> _sectionTypes;
+    std::vector<NeuronSectionType::Type> _sectionTypes;
     std::map<uint32_t, std::vector<uint32_t>> _predecessors;
     std::map<uint32_t, std::vector<uint32_t>> _successors;
     bool operator==(const VascSectionLevel& other) const;
@@ -95,7 +95,7 @@ std::vector<Point::Type>& Properties::get<Point>() noexcept;
 template <>
 std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept;
 template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept;
+std::vector<NeuronSectionType::Type>& Properties::get<NeuronSectionType>() noexcept;
 template <>
 std::vector<VascSection::Type>& Properties::get<VascSection>() noexcept;
 template <>

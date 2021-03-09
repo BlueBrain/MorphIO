@@ -145,7 +145,7 @@ class NeurolucidaParser
             nb_.soma()->properties() = properties;
             return_id = -1;
         } else {
-            SectionType section_type = TokenSectionTypeMap.at(header.token);
+            NeuronSectionType section_type = TokenSectionTypeMap.at(header.token);
             insertLastPointParentSection(header.parent_id, properties, diameters);
 
             // Condition to remove single point section that duplicate parent

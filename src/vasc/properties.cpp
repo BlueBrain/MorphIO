@@ -229,12 +229,12 @@ std::vector<Connection::Type>& Properties::get<Connection>() noexcept {
 }
 
 template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept {
+std::vector<NeuronSectionType::Type>& Properties::get<NeuronSectionType>() noexcept {
     return _sectionLevel._sectionTypes;
 }
 
 template <>
-const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept {
+const std::vector<NeuronSectionType::Type>& Properties::get<NeuronSectionType>() const noexcept {
     return _sectionLevel._sectionTypes;
 }
 

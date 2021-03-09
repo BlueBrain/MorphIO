@@ -19,9 +19,7 @@
 #include "readers/morphologySWC.h"
 
 namespace morphio {
-void buildChildren(std::shared_ptr<Property::Properties> properties);
-SomaType getSomaType(long unsigned int nSomaPoints);
-Property::Properties loadURI(const std::string& source, unsigned int options);
+
 
 
 SomaType getSomaType(long unsigned int nSomaPoints) {

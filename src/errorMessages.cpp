@@ -3,6 +3,12 @@
 #include <sstream>
 
 namespace morphio {
+namespace mut{
+    class Section;
+}
+}
+namespace morphio {
+
 static int MORPHIO_MAX_N_WARNINGS = 100;
 
 /**
@@ -50,6 +56,25 @@ bool ErrorMessages::isIgnored(Warning warning) {
     return _ignoredWarnings.find(warning) != _ignoredWarnings.end();
 }
 
+
+
+std::string ErrorMessages::errorLink(long unsigned int lineNumber, ErrorLevel errorLevel) const {
+    std::map<ErrorLevel, std::string> SEVERITY{{ErrorLevel::INFO, "info"},
+                                               {ErrorLevel::WARNING, "warning"},
+                                               {ErrorLevel::ERROR, "error"}};
+
+    const std::map<ErrorLevel, std::string> COLOR{{ErrorLevel::INFO, "\033[1;34m"},
+                                                  {ErrorLevel::WARNING, "\033[1;33m"},
+                                                  {ErrorLevel::ERROR, "\033[1;31m"}};
+
+    const std::string COLOR_END("\033[0m");
+
+    return COLOR.at(errorLevel) + _uri + ":" + std::to_string(lineNumber) + ":" +
+           SEVERITY.at(errorLevel) + COLOR_END;
+}
+
+
+
 std::string ErrorMessages::errorMsg(long unsigned int lineNumber,
                                     ErrorLevel errorLevel,
                                     std::string msg) const {
@@ -69,7 +94,7 @@ std::string ErrorMessages::ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber)
 }
 
 std::string ErrorMessages::ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
-                                                          const SectionType& type) const {
+                                                          const NeuronSectionType& type) const {
     return errorMsg(lineNumber,
                     ErrorLevel::ERROR,
                     "Unsupported section type: " + std::to_string(type));

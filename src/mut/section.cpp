@@ -15,7 +15,7 @@ static inline bool _emptySection(const std::shared_ptr<Section>& section) {
 
 Section::Section(Morphology* morphology,
                  unsigned int id_,
-                 SectionType type_,
+                 NeuronSectionType type_,
                  const Property::PointLevel& pointProperties)
     : _morphology(morphology)
     , _pointProperties(pointProperties)
@@ -151,11 +151,11 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
 }
 
 std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& pointProperties,
-                                                SectionType sectionType) {
+                                                NeuronSectionType sectionType) {
     unsigned int parentId = id();
 
     auto& _sections = _morphology->_sections;
-    if (sectionType == SectionType::SECTION_UNDEFINED)
+    if (sectionType == NeuronSectionType::SECTION_UNDEFINED)
         sectionType = type();
 
     if (sectionType == SECTION_SOMA)

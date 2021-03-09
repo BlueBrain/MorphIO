@@ -49,14 +49,14 @@ void bind_misc(py::module& m) {
         .value("info", morphio::enums::LogLevel::INFO)
         .value("debug", morphio::enums::LogLevel::DEBUG);
 
-    py::enum_<morphio::enums::SectionType>(m, "SectionType")
-        .value("undefined", morphio::enums::SectionType::SECTION_UNDEFINED)
-        .value("soma", morphio::enums::SectionType::SECTION_SOMA)
-        .value("axon", morphio::enums::SectionType::SECTION_AXON)
-        .value("basal_dendrite", morphio::enums::SectionType::SECTION_DENDRITE)
-        .value("apical_dendrite", morphio::enums::SectionType::SECTION_APICAL_DENDRITE)
-        // .value("glia_process", morphio::enums::SectionType::SECTION_GLIA_PROCESS)
-        // .value("glia_endfoot", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
+    py::enum_<morphio::enums::NeuronSectionType>(m, "SectionType")
+        .value("undefined", morphio::enums::NeuronSectionType::SECTION_UNDEFINED)
+        .value("soma", morphio::enums::NeuronSectionType::SECTION_SOMA)
+        .value("axon", morphio::enums::NeuronSectionType::SECTION_AXON)
+        .value("basal_dendrite", morphio::enums::NeuronSectionType::SECTION_DENDRITE)
+        .value("apical_dendrite", morphio::enums::NeuronSectionType::SECTION_APICAL_DENDRITE)
+        // .value("glia_process", morphio::enums::NeuronSectionType::SECTION_GLIA_PROCESS)
+        // .value("glia_endfoot", morphio::enums::NeuronSectionType::SECTION_GLIA_ENDFOOT)
         .export_values();
 
     py::enum_<morphio::enums::VascularSectionType>(m, "VasculatureSectionType")

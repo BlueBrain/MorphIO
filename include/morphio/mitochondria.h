@@ -23,6 +23,6 @@ class Mitochondria
         : _properties(properties) {}
     std::shared_ptr<Property::Properties> _properties;
 
-    friend class TMorphology<SectionType>;
+    friend class TMorphology<NeuronSectionType>;
 };
 }  // namespace morphio

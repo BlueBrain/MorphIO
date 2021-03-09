@@ -46,7 +46,7 @@ enum class Token {
     ORIGIN,
 };
 
-const std::map<Token, SectionType> TokenSectionTypeMap{{Token::AXON, SECTION_AXON},
+const std::map<Token, NeuronSectionType> TokenSectionTypeMap{{Token::AXON, SECTION_AXON},
                                                        {Token::APICAL, SECTION_APICAL_DENDRITE},
                                                        {Token::DENDRITE, SECTION_DENDRITE}};
 

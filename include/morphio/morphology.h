@@ -10,9 +10,10 @@
 namespace morphio {
 enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
 
-using breadth_iterator = breadth_iterator_t<Section, TMorphology<SectionType>>;
-using depth_iterator = depth_iterator_t<Section, TMorphology<SectionType>>;
-
+/*
+using breadth_iterator = breadth_iterator_t<Section, TMorphology<NeuronSectionType>>;
+using depth_iterator = depth_iterator_t<Section, TMorphology<NeuronSectionType>>;
+*/
 /** Read access a TMorphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
@@ -119,7 +120,7 @@ class TMorphology
     /**
      * Return a vector with the section type of every section
      **/
-    const std::vector<SectionType>& sectionTypes() const;
+    const std::vector<NeuronSectionType>& sectionTypes() const;
 
     /**
      * Return the graph connectivity of the TMorphology where each section
@@ -134,18 +135,24 @@ class TMorphology
 
        If id == -1, the iteration will start at each root section, successively
     **/
+    /*
     depth_iterator depth_begin() const;
     depth_iterator depth_end() const;
-
+    */
+    depth_iterator_t<Section, TMorphology<SectionT>> depth_begin() const;
+    depth_iterator_t<Section, TMorphology<SectionT>> depth_end() const;
     /**
        Breadth first iterator
 
        If id == -1, the iteration will be successively performed starting
        at each root section
     **/
+    /*
     breadth_iterator breadth_begin() const;
     breadth_iterator breadth_end() const;
-
+    */
+    breadth_iterator_t<Section, TMorphology<SectionT>> breadth_begin() const;
+    breadth_iterator_t<Section, TMorphology<SectionT>> breadth_end() const;
     /**
      * Return the soma type
      **/
@@ -162,7 +169,7 @@ class TMorphology
     const MorphologyVersion& version() const;
 
   protected:
-    friend class mut::TMorphology<SectionType>;
+    friend class mut::TMorphology<NeuronSectionType>;
     TMorphology(const Property::Properties& properties, unsigned int options);
 
     std::shared_ptr<Property::Properties> _properties;
@@ -170,6 +177,12 @@ class TMorphology
     template <typename Property>
     const std::vector<typename Property::Type>& get() const;
 };
+
+void buildChildren(std::shared_ptr<Property::Properties> properties);
+SomaType getSomaType(long unsigned int nSomaPoints);
+Property::Properties loadURI(const std::string& source, unsigned int options);
+
+
 }  // namespace morphio
 
 #include "morphology.tpp"

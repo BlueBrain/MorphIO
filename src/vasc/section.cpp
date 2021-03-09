@@ -88,7 +88,7 @@ std::vector<Section> Section::neighbors() const {
 }
 
 VascularSectionType Section::type() const {
-    auto val = _properties->get<property::SectionType>()[_id];
+    auto val = _properties->get<property::NeuronSectionType>()[_id];
     return val;
 }
 

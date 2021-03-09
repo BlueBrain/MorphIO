@@ -4,7 +4,7 @@
 #include <memory>   // std::shared_ptr
 #include <vector>   // std::vector
 
-#include <morphio/morphology.h>
+//#include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
 

@@ -9,10 +9,11 @@
 #include <morphio/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
+
 #include <morphio/mut/writers.h>
-#include <morphio/shared_utils.tpp>
+//#include <morphio/shared_utils.tpp>
 #include <morphio/soma.h>
-#include <morphio/mut/Section.h>
+#include <morphio/mut/section.h>
 
 
 namespace morphio {

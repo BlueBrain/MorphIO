@@ -6,7 +6,7 @@
 #include <string>  // std::string
 
 #include <morphio/mut/modifiers.h>
-#include <morphio/mut/section.h>
+//#include <morphio/mut/section.h>
 
 namespace morphio {
 /**
@@ -71,14 +71,14 @@ struct Sample {
                        &radius,
                        &parentId) == 7;
 
-        type = static_cast<SectionType>(int_type);
+        type = static_cast<NeuronSectionType>(int_type);
         diameter = radius * 2;  // The point array stores diameters.
     }
 
     floatType diameter;
     bool valid;
     Point point;  // x, y, z and diameter
-    SectionType type;
+    NeuronSectionType type;
     int parentId;
     unsigned int id;
     unsigned int lineNumber;
@@ -96,20 +96,7 @@ class ErrorMessages
     **/
     static bool isIgnored(Warning warning);
 
-    std::string errorLink(long unsigned int lineNumber, ErrorLevel errorLevel) const {
-        std::map<ErrorLevel, std::string> SEVERITY{{ErrorLevel::INFO, "info"},
-                                                   {ErrorLevel::WARNING, "warning"},
-                                                   {ErrorLevel::ERROR, "error"}};
-
-        const std::map<ErrorLevel, std::string> COLOR{{ErrorLevel::INFO, "\033[1;34m"},
-                                                      {ErrorLevel::WARNING, "\033[1;33m"},
-                                                      {ErrorLevel::ERROR, "\033[1;31m"}};
-
-        const std::string COLOR_END("\033[0m");
-
-        return COLOR.at(errorLevel) + _uri + ":" + std::to_string(lineNumber) + ":" +
-               SEVERITY.at(errorLevel) + COLOR_END;
-    }
+    std::string errorLink(long unsigned int lineNumber, ErrorLevel errorLevel) const ;
 
     std::string errorMsg(long unsigned int lineNumber,
                          ErrorLevel errorLevel,
@@ -124,7 +111,7 @@ class ErrorMessages
     std::string ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const;
 
     std::string ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
-                                               const SectionType& type) const;
+                                               const NeuronSectionType& type) const;
 
     std::string ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(long unsigned int lineNumber,
                                                            const VascularSectionType& type) const;

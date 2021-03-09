@@ -2,7 +2,7 @@
 
 #include <memory>  // std::shared_ptr
 
-#include <morphio/morphology.h>
+//#include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/section_base.h>
 #include <morphio/section_iterators.hpp>
@@ -30,8 +30,8 @@ namespace morphio {
  */
 
 using upstream_iterator = upstream_iterator_t<Section>;
-using breadth_iterator = breadth_iterator_t<Section, Morphology>;
-using depth_iterator = depth_iterator_t<Section, Morphology>;
+using breadth_iterator = breadth_iterator_t<Section, morphio::Morphology>;
+using depth_iterator = depth_iterator_t<Section, morphio::Morphology>;
 
 class Section: public SectionBase<Section>
 {
@@ -81,8 +81,9 @@ class Section: public SectionBase<Section>
     /**
      * Return the morphological type of this section (dendrite, axon, ...)
      */
-    SectionType type() const;
+    NeuronSectionType type() const;
     friend class mut::Section;
+    //friend Section TMorphology<NeuronSectionType>::section(uint32_t) const;
     friend Section Morphology::section(uint32_t) const;
     friend class SectionBase<Section>;
 

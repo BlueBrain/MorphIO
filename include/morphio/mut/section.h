@@ -28,8 +28,8 @@ class Section: public std::enable_shared_from_this<Section>
     /** @{
      * Return the morphological type of this section (dendrite, axon, ...)
      **/
-    inline SectionType& type() noexcept;
-    inline const SectionType& type() const noexcept;
+    inline NeuronSectionType& type() noexcept;
+    inline const NeuronSectionType& type() const noexcept;
     /** @} */
 
     /** @{
@@ -97,19 +97,19 @@ class Section: public std::enable_shared_from_this<Section>
                                            bool recursive = false);
 
     std::shared_ptr<Section> appendSection(
-        const Property::PointLevel&, SectionType sectionType = SectionType::SECTION_UNDEFINED);
+        const Property::PointLevel&, NeuronSectionType sectionType = NeuronSectionType::SECTION_UNDEFINED);
 
   private:
-    friend class mut::TMorphology<SectionType>;
+    friend class mut::TMorphology<NeuronSectionType>;
 
-    Section(Morphology*, unsigned int id, SectionType type, const Property::PointLevel&);
+    Section(Morphology*, unsigned int id, NeuronSectionType type, const Property::PointLevel&);
     Section(Morphology*, unsigned int id, const morphio::Section& section);
     Section(Morphology*, unsigned int id, const Section&);
 
     Morphology* _morphology;
     Property::PointLevel _pointProperties;
     uint32_t _id;
-    SectionType _sectionType;
+    NeuronSectionType _sectionType;
 };
 
 std::ostream& operator<<(std::ostream&, const std::shared_ptr<Section>&);
@@ -118,11 +118,11 @@ inline uint32_t Section::id() const noexcept {
     return _id;
 }
 
-inline SectionType& Section::type() noexcept {
+inline NeuronSectionType& Section::type() noexcept {
     return _sectionType;
 }
 
-inline const SectionType& Section::type() const noexcept {
+inline const NeuronSectionType& Section::type() const noexcept {
     return _sectionType;
 }
 

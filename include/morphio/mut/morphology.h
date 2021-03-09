@@ -17,9 +17,15 @@
 #include <morphio/section.h>
 #include <morphio/types.h>
 
+class ErrorMessages;
 
 namespace morphio {
 namespace mut {
+
+/*
+using breadth_iterator = breadth_iterator_t<Section, TMorphology<NeuronSectionType>>;
+using depth_iterator = depth_iterator_t<Section, TMorphology<NeuronSectionType>>;
+*/
 
 template <typename SectionT>
 class TMorphology;  // pre-declare the template class itself
@@ -130,8 +136,12 @@ class TMorphology
 
        If id == -1, the iteration will start at each root section, successively
     **/
+    /*
     depth_iterator depth_begin() const;
     depth_iterator depth_end() const;
+    */
+    depth_iterator_t<Section, TMorphology<SectionT>> depth_begin() const;
+    depth_iterator_t<Section, TMorphology<SectionT>> depth_end() const;
 
     /**
        Breadth first iterator
@@ -139,8 +149,12 @@ class TMorphology
        If id == -1, the iteration will be successively performed starting
        at each root section
     **/
+    /*
     breadth_iterator breadth_begin() const;
     breadth_iterator breadth_end() const;
+    */
+    breadth_iterator_t<Section, TMorphology<SectionT>> breadth_begin() const;
+    breadth_iterator_t<Section, TMorphology<SectionT>> breadth_end() const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //
@@ -228,8 +242,9 @@ class TMorphology
     friend bool diff<>(const TMorphology& left,
                        const TMorphology& right,
                        morphio::enums::LogLevel verbose);
-    friend void modifiers::nrn_order(TMorphology<SectionType>& morpho);
-    morphio::readers::ErrorMessages _err;
+
+    friend void modifiers::nrn_order(TMorphology<NeuronSectionType>& morpho);
+    morphio::readers::ErrorMessages *_err;
 
     uint32_t _register(const std::shared_ptr<Section>&);
 

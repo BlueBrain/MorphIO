@@ -39,8 +39,8 @@ struct Point {
     using Type = morphio::Point;
 };
 
-struct SectionType {
-    using Type = morphio::SectionType;
+struct NeuronSectionType {
+    using Type = morphio::NeuronSectionType;
 };
 
 struct Perimeter {
@@ -81,7 +81,7 @@ struct PointLevel {
 
 struct SectionLevel {
     std::vector<Section::Type> _sections;
-    std::vector<SectionType::Type> _sectionTypes;
+    std::vector<NeuronSectionType::Type> _sectionTypes;
     std::map<int, std::vector<unsigned int>> _children;
 
     bool operator==(const SectionLevel& other) const;
@@ -256,9 +256,9 @@ template <>
 std::vector<Section::Type>& Properties::get<Section>() noexcept;
 
 template <>
-const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept;
+const std::vector<NeuronSectionType::Type>& Properties::get<NeuronSectionType>() const noexcept;
 template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept;
+std::vector<NeuronSectionType::Type>& Properties::get<NeuronSectionType>() noexcept;
 
 }  // namespace Property
 }  // namespace morphio

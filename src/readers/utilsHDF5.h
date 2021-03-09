@@ -26,7 +26,7 @@
 
 namespace HighFive {
 template <>
-inline AtomicType<morphio::SectionType>::AtomicType() {
+inline AtomicType<morphio::NeuronSectionType>::AtomicType() {
     _hid = H5Tcopy(H5T_NATIVE_INT);
 }
 

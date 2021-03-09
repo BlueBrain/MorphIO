@@ -52,7 +52,7 @@ class Vasculature
     /**
      * Return a vector with the section type of every section
      **/
-    inline const std::vector<property::SectionType::Type>& sectionTypes() const noexcept;
+    inline const std::vector<property::NeuronSectionType::Type>& sectionTypes() const noexcept;
 
     /**
      * graph iterators
@@ -80,8 +80,8 @@ inline const std::vector<morphio::floatType>& Vasculature::diameters() const noe
     return get<property::Diameter>();
 }
 
-inline const std::vector<property::SectionType::Type>& Vasculature::sectionTypes() const noexcept {
-    return get<property::SectionType>();
+inline const std::vector<property::NeuronSectionType::Type>& Vasculature::sectionTypes() const noexcept {
+    return get<property::NeuronSectionType>();
 }
 
 }  // namespace vasculature

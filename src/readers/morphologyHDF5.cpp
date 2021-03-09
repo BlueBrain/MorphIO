@@ -232,7 +232,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
 
 int MorphologyHDF5::_readSections() {
     auto& sections = _properties.get<Property::Section>();
-    auto& types = _properties.get<Property::SectionType>();
+    auto& types = _properties.get<Property::NeuronSectionType>();
 
     // Important: The code used to split the reading of the sections and types
     //            into two separate fine-grained H5 selections. This does not
@@ -266,11 +266,11 @@ int MorphologyHDF5::_readSections() {
 
         if (type > SECTION_CUSTOM_START || type < 0) {
             throw morphio::RawDataError(
-                _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<SectionType>(type)));
+                _err.ERROR_UNSUPPORTED_SECTION_TYPE(0, static_cast<NeuronSectionType>(type)));
         }
 
         sections.emplace_back(Property::Section::Type{p[0] - firstSectionOffset, p[2] - 1});
-        types.emplace_back(static_cast<SectionType>(type));
+        types.emplace_back(static_cast<NeuronSectionType>(type));
     }
 
     return firstSectionOffset;
