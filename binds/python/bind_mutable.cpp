@@ -86,7 +86,7 @@ void bind_mutable_module(py::module& m) {
              "morphologies")
         .def("append_root_section",
              static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::Morphology::*)(
-                 const morphio::Property::PointLevel&, morphio::NeuronSectionType)>(
+                 const morphio::Property::PointLevel&, morphio::SectionType)>(
                  &morphio::mut::Morphology::appendRootSection),
              "Append a root Section\n",
              "point_level_properties"_a,
@@ -352,9 +352,9 @@ void bind_mutable_module(py::module& m) {
         .def_property_readonly("id", &morphio::mut::Section::id, "Return the section ID")
         .def_property(
             "type",
-            static_cast<const morphio::NeuronSectionType& (morphio::mut::Section::*) () const>(
+            static_cast<const morphio::SectionType& (morphio::mut::Section::*) () const>(
                 &morphio::mut::Section::type),
-            [](morphio::mut::Section* section, morphio::NeuronSectionType _type) {
+            [](morphio::mut::Section* section, morphio::SectionType _type) {
                 section->type() = _type;
             },
             "Returns the morphological type of this section "
@@ -444,13 +444,13 @@ void bind_mutable_module(py::module& m) {
 
         .def("append_section",
              static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::Section::*)(
-                 const morphio::Property::PointLevel&, morphio::NeuronSectionType)>(
+                 const morphio::Property::PointLevel&, morphio::SectionType)>(
                  &morphio::mut::Section::appendSection),
              "Append a new Section to this section\n"
              " If section_type is omitted or set to 'undefined'"
              " the type of the parent section will be used",
              "point_level_properties"_a,
-             "section_type"_a = morphio::NeuronSectionType::SECTION_UNDEFINED);
+             "section_type"_a = morphio::SectionType::SECTION_UNDEFINED);
 
     py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>>(m, "Soma")
         .def(py::init<const morphio::Property::PointLevel&>())

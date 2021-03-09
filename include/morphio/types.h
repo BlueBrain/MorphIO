@@ -19,7 +19,7 @@ class MitoSection;
 class Mitochondria;
 template <class T>
 class TMorphology;
-using Morphology = TMorphology<NeuronSectionType>;
+using Morphology = TMorphology<SectionType>;
 class Section;
 template <class T>
 class SectionBase;
@@ -45,7 +45,7 @@ class MitoSection;
 class Mitochondria;
 template <class T>
 class TMorphology;
-using Morphology = TMorphology<NeuronSectionType>;
+using Morphology = TMorphology<SectionType>;
 class Section;
 class Soma;
 }  // namespace mut

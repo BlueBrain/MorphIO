@@ -5,8 +5,8 @@
 
 namespace morphio {
 
-NeuronSectionType Section::type() const {
-    auto val = _properties->get<Property::NeuronSectionType>()[_id];
+SectionType Section::type() const {
+    auto val = _properties->get<Property::SectionType>()[_id];
     return val;
 }
 

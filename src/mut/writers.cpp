@@ -35,7 +35,7 @@ bool hasPerimeterData(const morphio::mut::Morphology& morpho) {
 void writeLine(std::ofstream& myfile,
                int id,
                int parentId,
-               morphio::NeuronSectionType type,
+               morphio::SectionType type,
                const morphio::Point& point,
                morphio::floatType diameter) {
     using std::setw;
@@ -185,7 +185,7 @@ void asc(const Morphology& morphology, const std::string& filename) {
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                    readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
 
-    std::map<morphio::NeuronSectionType, std::string> header;
+    std::map<morphio::SectionType, std::string> header;
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
     header[SECTION_DENDRITE] = "( (Color Red)\n  (Dendrite)\n";
     header[SECTION_APICAL_DENDRITE] = "( (Color Red)\n  (Apical)\n";

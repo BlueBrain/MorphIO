@@ -158,8 +158,8 @@ const std::vector<morphio::floatType>& TMorphology<SectionT>::perimeters() const
 }
 
 template <typename SectionT>
-const std::vector<NeuronSectionType>& TMorphology<SectionT>::sectionTypes() const {
-    return get<Property::NeuronSectionType>();
+const std::vector<SectionType>& TMorphology<SectionT>::sectionTypes() const {
+    return get<Property::SectionType>();
 }
 
 template <typename SectionT>

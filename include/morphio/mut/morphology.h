@@ -23,8 +23,8 @@ namespace morphio {
 namespace mut {
 
 /*
-using breadth_iterator = breadth_iterator_t<Section, TMorphology<NeuronSectionType>>;
-using depth_iterator = depth_iterator_t<Section, TMorphology<NeuronSectionType>>;
+using breadth_iterator = breadth_iterator_t<Section, TMorphology<SectionType>>;
+using depth_iterator = depth_iterator_t<Section, TMorphology<SectionType>>;
 */
 
 template <typename SectionT>
@@ -243,7 +243,7 @@ class TMorphology
                        const TMorphology& right,
                        morphio::enums::LogLevel verbose);
 
-    friend void modifiers::nrn_order(TMorphology<NeuronSectionType>& morpho);
+    friend void modifiers::nrn_order(TMorphology<SectionType>& morpho);
     morphio::readers::ErrorMessages *_err;
 
     uint32_t _register(const std::shared_ptr<Section>&);

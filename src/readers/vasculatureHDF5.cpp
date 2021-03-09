@@ -78,7 +78,7 @@ void VasculatureHDF5::_readSections() {
 }
 
 void VasculatureHDF5::_readSectionTypes() {
-    std::vector<VascularSectionType>& types = _properties.get<vasculature::property::NeuronSectionType>();
+    std::vector<VascularSectionType>& types = _properties.get<vasculature::property::SectionType>();
 
     auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
     types.resize(_sectionsDims[0]);

@@ -52,7 +52,7 @@ enum SomaType {
 std::ostream& operator<<(std::ostream& os, SomaType v);
 
 /** Classification of neuron substructures. */
-enum NeuronSectionType {
+enum SectionType {
     SECTION_UNDEFINED = 0,
     SECTION_SOMA = 1,  //!< neuron cell body
     SECTION_AXON = 2,

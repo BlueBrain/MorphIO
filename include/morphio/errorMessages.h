@@ -71,14 +71,14 @@ struct Sample {
                        &radius,
                        &parentId) == 7;
 
-        type = static_cast<NeuronSectionType>(int_type);
+        type = static_cast<SectionType>(int_type);
         diameter = radius * 2;  // The point array stores diameters.
     }
 
     floatType diameter;
     bool valid;
     Point point;  // x, y, z and diameter
-    NeuronSectionType type;
+    SectionType type;
     int parentId;
     unsigned int id;
     unsigned int lineNumber;
@@ -111,7 +111,7 @@ class ErrorMessages
     std::string ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const;
 
     std::string ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
-                                               const NeuronSectionType& type) const;
+                                               const SectionType& type) const;
 
     std::string ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(long unsigned int lineNumber,
                                                            const VascularSectionType& type) const;

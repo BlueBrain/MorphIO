@@ -344,11 +344,11 @@ std::vector<Point::Type>& Properties::get<Point>() noexcept {
 }
 
 template <>
-const std::vector<NeuronSectionType::Type>& Properties::get<NeuronSectionType>() const noexcept {
+const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept {
     return _sectionLevel._sectionTypes;
 }
 template <>
-std::vector<NeuronSectionType::Type>& Properties::get<NeuronSectionType>() noexcept {
+std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept {
     return _sectionLevel._sectionTypes;
 }
 

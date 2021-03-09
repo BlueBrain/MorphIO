@@ -81,9 +81,9 @@ class Section: public SectionBase<Section>
     /**
      * Return the morphological type of this section (dendrite, axon, ...)
      */
-    NeuronSectionType type() const;
+    SectionType type() const;
     friend class mut::Section;
-    //friend Section TMorphology<NeuronSectionType>::section(uint32_t) const;
+    //friend Section TMorphology<SectionType>::section(uint32_t) const;
     friend Section Morphology::section(uint32_t) const;
     friend class SectionBase<Section>;
 

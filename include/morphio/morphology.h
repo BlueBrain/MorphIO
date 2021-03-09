@@ -11,16 +11,14 @@ namespace morphio {
 enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
 
 /*
-using breadth_iterator = breadth_iterator_t<Section, TMorphology<NeuronSectionType>>;
-using depth_iterator = depth_iterator_t<Section, TMorphology<NeuronSectionType>>;
+using breadth_iterator = breadth_iterator_t<Section, TMorphology<SectionType>>;
+using depth_iterator = depth_iterator_t<Section, TMorphology<SectionType>>;
 */
 /** Read access a TMorphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
  * release of resources upon destruction.
  */
-template <typename SectionT>
-class TMorphology;  // pre-declare the template class itself
 template <typename SectionT>
 class TMorphology
 {
@@ -120,7 +118,7 @@ class TMorphology
     /**
      * Return a vector with the section type of every section
      **/
-    const std::vector<NeuronSectionType>& sectionTypes() const;
+    const std::vector<SectionType>& sectionTypes() const;
 
     /**
      * Return the graph connectivity of the TMorphology where each section
@@ -169,7 +167,7 @@ class TMorphology
     const MorphologyVersion& version() const;
 
   protected:
-    friend class mut::TMorphology<NeuronSectionType>;
+    friend class mut::TMorphology<SectionType>;
     TMorphology(const Property::Properties& properties, unsigned int options);
 
     std::shared_ptr<Property::Properties> _properties;

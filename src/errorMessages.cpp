@@ -94,7 +94,7 @@ std::string ErrorMessages::ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber)
 }
 
 std::string ErrorMessages::ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
-                                                          const NeuronSectionType& type) const {
+                                                          const SectionType& type) const {
     return errorMsg(lineNumber,
                     ErrorLevel::ERROR,
                     "Unsupported section type: " + std::to_string(type));

@@ -53,7 +53,7 @@ class Soma
     inline const Property::PointLevel& properties() const noexcept;
 
   private:
-    friend class mut::TMorphology<NeuronSectionType>;
+    friend class mut::TMorphology<SectionType>;
     SomaType _somaType;
     Property::PointLevel _pointProperties;
 };
