@@ -41,7 +41,7 @@ class TTree
     using breadth_iterator = breadth_iterator_t<Node, CRTP>;
     using depth_iterator = depth_iterator_t<Node, CRTP>;
 
-    virtual ~TTree();
+    ~TTree();
 
     TTree& operator=(const TTree<Node, CRTP, Mut>&);
     TTree(TTree<Node, CRTP, Mut>&&) noexcept;
@@ -58,8 +58,8 @@ class TTree
             TTree("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
     TTree(const std::string& source, unsigned int options = NO_MODIFIER);
-    explicit TTree(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
-    explicit TTree(Mut);
+    TTree(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+    TTree(Mut);
 
     /**
      * Return a vector of all root sections
@@ -166,7 +166,7 @@ TTree<Node, CRTP, Mut>::TTree(const Property::Properties& properties, unsigned i
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders
     if (properties._cellLevel.fileFormat() == "h5") {
-        Mut mutable_morph(*dynamic_cast<CRTP*>(this));
+        Mut mutable_morph(*static_cast<CRTP*>(this));
         mutable_morph.sanitize();
         if (options) {
             mutable_morph.applyModifiers(options);
@@ -198,12 +198,13 @@ template <typename Node, typename CRTP, typename Mut>
 TTree<Node, CRTP, Mut>& TTree<Node, CRTP, Mut>::operator=(TTree&&) noexcept = default;
 
 template <typename Node, typename CRTP, typename Mut>
-TTree<Node, CRTP, Mut>::~TTree() = default;
-
-template <typename Node, typename CRTP, typename Mut>
 Node TTree<Node, CRTP, Mut>::section(uint32_t id) const {
     return {id, _properties};
 }
+
+template <typename Node, typename CRTP, typename Mut>
+TTree<Node, CRTP, Mut>::~TTree() = default;
+
 
 template <typename Node, typename CRTP, typename Mut>
 std::vector<Node> TTree<Node, CRTP, Mut>::rootSections() const {
@@ -290,7 +291,7 @@ const MorphologyVersion& TTree<Node, CRTP, Mut>::version() const {
 
 template <typename Node, typename CRTP, typename Mut>
 depth_iterator_t<Node, CRTP> TTree<Node, CRTP, Mut>::depth_begin() const {
-    return depth_iterator(*dynamic_cast<const CRTP*>(this));
+    return depth_iterator(*static_cast<const CRTP*>(this));
 }
 
 template <typename Node, typename CRTP, typename Mut>
@@ -300,7 +301,7 @@ depth_iterator_t<Node, CRTP> TTree<Node, CRTP, Mut>::depth_end() const {
 
 template <typename Node, typename CRTP, typename Mut>
 breadth_iterator_t<Node, CRTP> TTree<Node, CRTP, Mut>::breadth_begin() const {
-    return breadth_iterator(*dynamic_cast<const CRTP*>(this));
+    return breadth_iterator(*static_cast<const CRTP*>(this));
 }
 
 template <typename Node, typename CRTP, typename Mut>

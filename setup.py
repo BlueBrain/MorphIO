@@ -75,7 +75,8 @@ class CMakeBuild(build_ext):
         if self.cmake_defs:
             cmake_args += ["-D" + opt for opt in self.cmake_defs.split(",")]
 
-        cfg = 'Debug' if self.debug else 'Release'
+        # cfg = 'Debug' if self.debug else 'Release'
+        cfg = 'Debug'
         build_args = ['--config', cfg]
 
         if platform.system() == "Windows":

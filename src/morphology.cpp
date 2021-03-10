@@ -25,6 +25,8 @@
 
 namespace morphio {
 
+
+
 void buildChildren(std::shared_ptr<Property::Properties> properties) {
     {
         const auto& sections = properties->get<Property::Section>();
@@ -78,7 +80,6 @@ SomaType getSomaType(long unsigned int nSomaPoints) {
 }
 
 
-
 Morphology::Morphology(const Property::Properties& properties, unsigned int options)
     : TTree<Section, Morphology, morphio::mut::Morphology>(properties, options) {
 
@@ -119,5 +120,6 @@ const SomaType& Morphology::somaType() const {
     return _properties->somaType();
 }
 
+template class TTree<Section, Morphology, mut::Morphology>;
 
 }  // namespace morphio

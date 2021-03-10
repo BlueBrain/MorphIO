@@ -14,9 +14,10 @@
 #include <morphio/tools.h>
 #include <morphio/morphology.h>
 
+extern template class morphio::TTree<morphio::Section, morphio::Morphology, morphio::mut::Morphology>;
+
 namespace morphio {
 
-extern template class TTree<morphio::Section, morphio::Morphology, morphio::mut::Morphology>;
 namespace mut {
 
 void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset);

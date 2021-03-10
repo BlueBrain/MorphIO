@@ -12,6 +12,8 @@
 namespace morphio {
 enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
 
+// extern template class TTree<morphio::Section, morphio::Morphology, morphio::mut::Morphology>;
+
 SomaType getSomaType(long unsigned int nSomaPoints);
 
 // extern template class TTree<SectionType>;
