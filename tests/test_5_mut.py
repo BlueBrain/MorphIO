@@ -482,10 +482,10 @@ def test_sanitize():
 #     assert_raises(RawDataError, GlialCell, Path(_path, 'h5/v1/simple.h5'))
 
 
-def test_glia_round_trip():
-    with TemporaryDirectory() as folder:
-        g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
-        filename = Path(folder, 'glial-cell.h5')
-        g.write(filename)
-        g2 = GlialCell(filename)
-        assert_equal(len(g.sections), len(g2.sections))
+# def test_glia_round_trip():
+#     with TemporaryDirectory() as folder:
+#         g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
+#         filename = Path(folder, 'glial-cell.h5')
+#         g.write(filename)
+#         g2 = GlialCell(filename)
+#         assert_equal(len(g.sections), len(g2.sections))

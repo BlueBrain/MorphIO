@@ -57,6 +57,7 @@ public:
 
 protected:
     Morphology(const Property::Properties& properties, unsigned int options = NO_MODIFIER);
+    void init();
 };
 
 }  // namespace morphio

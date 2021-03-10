@@ -82,19 +82,29 @@ SomaType getSomaType(long unsigned int nSomaPoints) {
 
 Morphology::Morphology(const Property::Properties& properties, unsigned int options)
     : TTree<Section, Morphology, morphio::mut::Morphology>(properties, options) {
+    init();
+}
 
+Morphology::Morphology(const std::string& source, unsigned int options)
+    : TTree<Section, Morphology, morphio::mut::Morphology>(source, options) {
+    init();
+}
+
+Morphology::Morphology(const HighFive::Group& group, unsigned int options)
+    : TTree<Section, Morphology, morphio::mut::Morphology>(group, options) {
+    init();
+}
+
+Morphology::Morphology(morphio::mut::Morphology morphology)
+    : TTree<Section, Morphology, morphio::mut::Morphology>(morphology) {
+    init();
+}
+
+void Morphology::init() {
     if (_properties->_cellLevel.fileFormat() != "swc")
         _properties->_cellLevel._somaType = getSomaType(soma().points().size());
 }
 
-Morphology::Morphology(const std::string& source, unsigned int options)
-    : TTree<Section, Morphology, morphio::mut::Morphology>(source, options) {}
-
-Morphology::Morphology(const HighFive::Group& group, unsigned int options)
-    : TTree<Section, Morphology, morphio::mut::Morphology>(group, options) {}
-
-Morphology::Morphology(morphio::mut::Morphology morphology)
-    : TTree<Section, Morphology, morphio::mut::Morphology>(morphology) {}
 
 Soma Morphology::soma() const {
     return Soma(_properties);
@@ -120,6 +130,7 @@ const SomaType& Morphology::somaType() const {
     return _properties->somaType();
 }
 
+// Explicit instantiation
 template class TTree<Section, Morphology, mut::Morphology>;
 
 }  // namespace morphio
