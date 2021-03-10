@@ -2,7 +2,6 @@
 
 #include <memory>  // std::shared_ptr
 
-#include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/section_base.h>
 #include <morphio/section_iterators.hpp>
@@ -29,6 +28,8 @@ namespace morphio {
  * is a Section referring to it.
  */
 
+class Morphology;
+
 using upstream_iterator = upstream_iterator_t<Section>;
 using breadth_iterator = breadth_iterator_t<Section, Morphology>;
 using depth_iterator = depth_iterator_t<Section, Morphology>;
@@ -39,6 +40,8 @@ class Section: public SectionBase<Section>
     using PointAttribute = Property::Point;
 
   public:
+    using Type = SectionType;
+
     /**
        Depth first search iterator
     **/
@@ -83,7 +86,10 @@ class Section: public SectionBase<Section>
      */
     SectionType type() const;
     friend class mut::Section;
-    friend Section TMorphology<SectionType>::section(uint32_t) const;
+
+    template<typename Node, typename CRTP, typename Mut>
+    friend class TTree;
+
     friend class SectionBase<Section>;
 
   protected:

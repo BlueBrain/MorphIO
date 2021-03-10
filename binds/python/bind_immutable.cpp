@@ -8,6 +8,8 @@
 #include <morphio/enums.h>
 // #include <morphio/glial_cell.h>
 #include <morphio/mut/morphology.h>
+
+#include <morphio/morphology.h>
 #include <morphio/soma.h>
 #include <morphio/types.h>
 

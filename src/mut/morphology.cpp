@@ -12,8 +12,11 @@
 #include <morphio/shared_utils.tpp>
 #include <morphio/soma.h>
 #include <morphio/tools.h>
+#include <morphio/morphology.h>
 
 namespace morphio {
+
+extern template class TTree<morphio::Section, morphio::Morphology, morphio::mut::Morphology>;
 namespace mut {
 
 void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset);

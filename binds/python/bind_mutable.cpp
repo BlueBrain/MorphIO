@@ -9,6 +9,7 @@
 #include <morphio/mut/glial_cell.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
+#include <morphio/morphology.h>
 
 #include <array>
 

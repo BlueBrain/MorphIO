@@ -20,10 +20,10 @@ class Mitochondria;
 // class Morphology;
 class Section;
 
-template <class T>
-class TMorphology;
+template <class TSection, class CRTP, class Mut>
+class TTree;
 
-using Morphology = TMorphology<SectionType>;
+class Morphology;
 
 
 template <class T>

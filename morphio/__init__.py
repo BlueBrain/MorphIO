@@ -5,7 +5,7 @@ from ._morphio import (
     CellFamily,
     CellLevel,
     EndoplasmicReticulum,
-    GlialCell,
+    # GlialCell,
     IDSequenceError,
     IterType,
     LogLevel,

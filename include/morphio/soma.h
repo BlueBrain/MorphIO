@@ -1,6 +1,5 @@
 #pragma once
 
-#include <morphio/morphology.h>
 #include <morphio/types.h>
 
 namespace morphio {
@@ -71,7 +70,7 @@ class Soma
     // when friend class Morphology; is removed
     // template <typename Property>
     // friend const morphio::Soma morphio::Morphology::soma() const;
-    friend class TMorphology<SectionType>;
+    friend class Morphology;
     friend class mut::Soma;
 
     std::shared_ptr<Property::Properties> _properties;
