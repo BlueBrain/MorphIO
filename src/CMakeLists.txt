@@ -2,7 +2,6 @@ set(MORPHIO_SOURCES
     endoplasmic_reticulum.cpp
     enums.cpp
     errorMessages.cpp
-    glial_cell.cpp
     mito_section.cpp
     mitochondria.cpp
     morphology.cpp

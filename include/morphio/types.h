@@ -23,6 +23,9 @@ class Section;
 template <class T>
 class TMorphology;
 
+using Morphology = TMorphology<SectionType>;
+
+
 template <class T>
 class SectionBase;
 class Soma;

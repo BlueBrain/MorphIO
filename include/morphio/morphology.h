@@ -22,7 +22,7 @@ template <typename SectionT>
 class TMorphology
 {
   public:
-    virtual ~TMorphology();
+    ~TMorphology();
 
     TMorphology& operator=(const TMorphology<SectionT>&);
     TMorphology(TMorphology<SectionT>&&) noexcept;
@@ -38,7 +38,7 @@ class TMorphology
         Example:
             TMorphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit TMorphology(const std::string& source, unsigned int options = NO_MODIFIER);
+    TMorphology(const std::string& source, unsigned int options = NO_MODIFIER);
     explicit TMorphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
     explicit TMorphology(mut::Morphology);
 
@@ -171,7 +171,7 @@ void buildChildren(std::shared_ptr<Property::Properties> properties);
 SomaType getSomaType(long unsigned int nSomaPoints);
 Property::Properties loadURI(const std::string& source, unsigned int options);
 
-
-using Morphology = TMorphology<SectionType>;
+extern template class TMorphology<SectionType>;
+extern template class TMorphology<GlialSectionType>;
 
 }  // namespace morphio

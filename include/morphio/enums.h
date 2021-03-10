@@ -77,6 +77,12 @@ enum SectionType {
     SECTION_ALL = 32
 };
 
+enum class GlialSectionType {
+    SECTION_UNDEFINED = 0,
+    SECTION_GLIA_PROCESS = 2,
+    SECTION_GLIA_ENDFOOT = 3,
+};
+
 enum VascularSectionType {
     SECTION_NOT_DEFINED = 0,
     SECTION_VEIN = 1,

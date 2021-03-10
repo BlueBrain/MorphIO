@@ -20,18 +20,6 @@
 #include "readers/morphologyASC.h"
 #include "readers/morphologyHDF5.h"
 #include "readers/morphologySWC.h"
-namespace morphio
-{
-    namespace readers
-    {
-        namespace h5
-        {
-            Property::Properties load(const std::string& uri);
-            Property::Properties load(const HighFive::Group& group);
-        }
-    }
-}
-
 
 
 namespace morphio {
@@ -58,6 +46,7 @@ TMorphology<SectionT>::TMorphology(const Property::Properties& properties, unsig
         buildChildren(_properties);
     }
 }
+
 template <typename SectionT>
 TMorphology<SectionT>::TMorphology(const HighFive::Group& group, unsigned int options)
     : TMorphology(readers::h5::load(group), options) {}
@@ -220,7 +209,6 @@ breadth_iterator TMorphology<SectionT>::breadth_end() const {
     return breadth_iterator();
 }
 
-template class TMorphology<SectionType>;
 
 
 SomaType getSomaType(long unsigned int nSomaPoints) {
@@ -251,6 +239,7 @@ void buildChildren(std::shared_ptr<Property::Properties> properties) {
         }
     }
 }
+
 Property::Properties loadURI(const std::string& source, unsigned int options) {
     const size_t pos = source.find_last_of(".");
     if (pos == std::string::npos)
@@ -272,5 +261,9 @@ Property::Properties loadURI(const std::string& source, unsigned int options) {
     };
     return loader();
 }
+
+// Explicit instantiation
+template class TMorphology<SectionType>;
+// template class TMorphology<GlialSectionType>;
 
 }  // namespace morphio

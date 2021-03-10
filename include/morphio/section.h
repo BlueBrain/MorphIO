@@ -83,7 +83,7 @@ class Section: public SectionBase<Section>
      */
     SectionType type() const;
     friend class mut::Section;
-    friend Section Morphology::section(uint32_t) const;
+    friend Section TMorphology<SectionType>::section(uint32_t) const;
     friend class SectionBase<Section>;
 
   protected:
