@@ -14,8 +14,6 @@
 #include <morphio/tools.h>
 #include <morphio/morphology.h>
 
-extern template class morphio::TTree<morphio::Section, morphio::Morphology, morphio::mut::Morphology>;
-
 namespace morphio {
 
 namespace mut {
