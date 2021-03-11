@@ -159,8 +159,7 @@ static void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
     vec.erase(std::remove(vec.begin(), vec.end(), section), vec.end());
 }
 
-void Morphology::deleteSection(const std::shared_ptr<Section>& section_, bool recursive)
-
+void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive)
 {
     if (!section_)
         return;
@@ -176,16 +175,16 @@ void Morphology::deleteSection(const std::shared_ptr<Section>& section_, bool re
             deleteSection(*it, false);
         }
     } else {
-        for (auto& child : section_->children()) {
-            // Re-link children to their "grand-parent"
-            _parent[child->id()] = _parent[id];
-            _children[_parent[id]].push_back(child);
-            if (section_->isRoot())
+        // careful not to use a ref here or you will face ref invalidation problem with vector resize
+        for (auto child : section_->children()) {
+            if (section_->isRoot()) {
                 _rootSections.push_back(child);
+            } else {
+                // Re-link children to their "grand-parent"
+                _children[_parent[id]].push_back(child);
+                _parent[child->id()] = _parent[id];
+            }
         }
-
-        bool a = std::find(_rootSections.begin(), _rootSections.end(), section_) != _rootSections.end();
-        std::cout << a << std::endl;
         eraseByValue(_rootSections, section_);
         eraseByValue(_children[_parent[id]], section_);
         _children.erase(id);

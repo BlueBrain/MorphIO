@@ -145,7 +145,7 @@ class Morphology
        If recursive == true, all descendent sections will be deleted as well
        Else, children will be re-attached to their grand-parent
     **/
-    void deleteSection(const std::shared_ptr<Section>& section, bool recursive = true);
+    void deleteSection(std::shared_ptr<Section> section, bool recursive = true);
 
     /**
        Append the existing morphio::Section as a root section

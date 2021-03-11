@@ -73,7 +73,7 @@ void nrn_order(morphio::mut::Morphology& morpho) {
 }
 
 void no_single_point_root(morphio::mut::Morphology& morpho) {
-    for (auto& rootSection : morpho.rootSections()) {
+    for (const auto& rootSection : morpho.rootSections()) {
         if (rootSection->points().size() == 1) {
             for (const auto& it : rootSection->children()) {
                 it->points().insert(it->points().begin(), rootSection->points()[0]);
@@ -82,8 +82,6 @@ void no_single_point_root(morphio::mut::Morphology& morpho) {
             morpho.deleteSection(rootSection, false);
         }
     }
-    auto s = morpho.rootSections().size();
-    std::cout << s << std::endl;
 }
 
 }  // namespace modifiers

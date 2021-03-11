@@ -41,7 +41,6 @@ TEST_CASE("LoadSinglePointRootTest", "[morphology]") {
     REQUIRE(m.rootSections()[0].isRoot() == true);
 }
 
-
 TEST_CASE("LoadSinglePointRoot", "[morphology]") {
     const morphio::Morphology m("data/single_point_root.asc", morphio::enums::Option::NO_SINGLE_POINT_ROOT);
 //    const morphio::Morphology m("data/single_point_root.asc");
