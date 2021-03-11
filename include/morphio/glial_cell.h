@@ -14,8 +14,6 @@ namespace morphio {
 
 // extern template class TTree<morphio::Section, morphio::GlialCell, morphio::mut::GlialCell>;
 
-SomaType getSomaType(long unsigned int nSomaPoints);
-
 // extern template class TTree<SectionType>;
 // extern template class TTree<GlialSectionType>;
 

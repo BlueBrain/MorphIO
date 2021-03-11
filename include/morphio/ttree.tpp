@@ -27,7 +27,9 @@ Property::Properties load(const std::string& uri, unsigned int options);
 
 void buildChildren(std::shared_ptr<Property::Properties> properties);
 
+
 Property::Properties loadURI(const std::string& source, unsigned int options);
+
 
 
 
@@ -164,7 +166,7 @@ template <typename Node, typename CRTP, typename Mut>
 TTree<Node, CRTP, Mut>::TTree(const Property::Properties& properties, unsigned int options)
     : _properties(std::make_shared<Property::Properties>(properties)) {
     buildChildren(_properties);
-
+    const CellFamily cellFamilly = _properties->_cellLevel._cellFamily ;
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders
     if (properties._cellLevel.fileFormat() == "h5") {
@@ -174,6 +176,7 @@ TTree<Node, CRTP, Mut>::TTree(const Property::Properties& properties, unsigned i
             mutable_morph.applyModifiers(options);
         }
         _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
+        _properties->_cellLevel._cellFamily  = cellFamilly;
         buildChildren(_properties);
     }
 }
@@ -311,5 +314,6 @@ breadth_iterator_t<Node, CRTP> TTree<Node, CRTP, Mut>::breadth_end() const {
     return breadth_iterator();
 }
 
+SomaType getSomaType(long unsigned int nSomaPoints);
 
 } // namespace morphio

@@ -22,6 +22,7 @@ set(MORPHIO_SOURCES
     readers/vasculatureHDF5.cpp
     section.cpp
     soma.cpp
+    ttree.cpp
     vasc/properties.cpp
     vasc/section.cpp
     vasc/vasculature.cpp
