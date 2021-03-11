@@ -506,6 +506,22 @@ def test_single_point_section_duplicate_parent_complex():
     assert_array_equal(children[2].points, [[2, 0, 0], [6, 0, 0]])
 
 
+def test_root_node_split():
+    """Test that a bifurcation at the root point produces two root sections."""
+    with tmp_asc_file('''
+                     ((Dendrite)
+                      (3 -4 0 2)
+                      (
+                        (3 -10 2 4)
+                       |
+                        (3 -10 0 2)
+                      )
+                     )''') as tmp_file:
+
+        n = Morphology(tmp_file.name)
+        nt.assert_equal(len(n.root_sections), 2)
+
+
 def test_spine():
     neuron = Morphology(DATA_DIR / 'spine.asc')
     assert_equal(len(neuron.root_sections), 1)

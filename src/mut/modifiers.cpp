@@ -72,6 +72,20 @@ void nrn_order(morphio::mut::Morphology& morpho) {
                      NRN_order_comparator);
 }
 
+void no_single_point_root(morphio::mut::Morphology& morpho) {
+    for (auto& rootSection : morpho.rootSections()) {
+        if (rootSection->points().size() == 1) {
+            for (const auto& it : rootSection->children()) {
+                it->points().insert(it->points().begin(), rootSection->points()[0]);
+                it->diameters().insert(it->diameters().begin(), rootSection->diameters()[0]);
+            }
+            morpho.deleteSection(rootSection, false);
+        }
+    }
+    auto s = morpho.rootSections().size();
+    std::cout << s << std::endl;
+}
+
 }  // namespace modifiers
 
 }  // namespace mut

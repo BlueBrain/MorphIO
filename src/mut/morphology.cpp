@@ -184,6 +184,8 @@ void Morphology::deleteSection(const std::shared_ptr<Section>& section_, bool re
                 _rootSections.push_back(child);
         }
 
+        bool a = std::find(_rootSections.begin(), _rootSections.end(), section_) != _rootSections.end();
+        std::cout << a << std::endl;
         eraseByValue(_rootSections, section_);
         eraseByValue(_children[_parent[id]], section_);
         _children.erase(id);
@@ -314,6 +316,9 @@ void Morphology::applyModifiers(unsigned int modifierFlags) {
 
     if (modifierFlags & NRN_ORDER)
         modifiers::nrn_order(*this);
+
+    if (modifierFlags & NO_SINGLE_POINT_ROOT)
+        modifiers::no_single_point_root(*this);
 }
 
 std::unordered_map<int, std::vector<unsigned int>> Morphology::connectivity() {

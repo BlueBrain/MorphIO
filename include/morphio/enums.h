@@ -13,7 +13,8 @@ enum Option {
     TWO_POINTS_SECTIONS = 0x01,
     SOMA_SPHERE = 0x02,
     NO_DUPLICATES = 0x04,
-    NRN_ORDER = 0x08
+    NRN_ORDER = 0x08,
+    NO_SINGLE_POINT_ROOT = 0x10
 };
 
 /**
