@@ -71,6 +71,7 @@ class Soma
     // template <typename Property>
     // friend const morphio::Soma morphio::Morphology::soma() const;
     friend class Morphology;
+    friend class GlialCell;
     friend class mut::Soma;
 
     std::shared_ptr<Property::Properties> _properties;

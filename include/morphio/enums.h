@@ -2,6 +2,8 @@
 #include <iosfwd>
 
 namespace morphio {
+enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
+
 namespace enums {
 
 enum LogLevel { ERROR, WARNING, INFO, DEBUG };
@@ -78,9 +80,9 @@ enum SectionType {
 };
 
 enum class GlialSectionType {
-    SECTION_UNDEFINED = 0,
-    SECTION_GLIA_PROCESS = 2,
-    SECTION_GLIA_ENDFOOT = 3,
+    SECTION_GLIA_SOMA = 1,
+    SECTION_GLIA_ENDFOOT = 2,
+    SECTION_GLIA_PROCESS = 3,
 };
 
 enum VascularSectionType {

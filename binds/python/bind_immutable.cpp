@@ -6,9 +6,10 @@
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/enums.h>
-// #include <morphio/glial_cell.h>
-#include <morphio/mut/morphology.h>
 
+#include <morphio/mut/morphology.h>
+#include <morphio/mut/glial_cell.h>
+#include <morphio/glial_cell.h>
 #include <morphio/morphology.h>
 #include <morphio/soma.h>
 #include <morphio/types.h>
@@ -151,14 +152,133 @@ void bind_immutable_module(py::module& m) {
             "- morphio.IterType.breadth_first (default)\n"
             "iter_type"_a = IterType::DEPTH_FIRST);
 
-    // py::class_<morphio::GlialCell, morphio::Morphology>(m, "GlialCell")
-    //     .def(py::init<const std::string&>())
-    //     .def(py::init([](py::object arg) {
-    //              return std::unique_ptr<morphio::GlialCell>(new morphio::GlialCell(py::str(arg)));
-    //          }),
-    //          "filename"_a,
-    //          "Additional Ctor that accepts as filename any python object that implements __repr__ "
-    //          "or __str__");
+ py::class_<morphio::GlialCell>(m, "GlialCell")
+        .def(py::init<const std::string&, unsigned int>(),
+             "filename"_a,
+             "options"_a = morphio::enums::Option::NO_MODIFIER)
+        .def(py::init<morphio::mut::GlialCell&>())
+        .def(py::init([](py::object arg, unsigned int options) {
+                 return std::unique_ptr<morphio::GlialCell>(
+                     new morphio::GlialCell(py::str(arg), options));
+             }),
+             "filename"_a,
+             "options"_a = morphio::enums::Option::NO_MODIFIER,
+             "Additional Ctor that accepts as filename any python object that implements __repr__ "
+             "or __str__")
+        .def("as_mutable",
+             [](const morphio::GlialCell* morph) { return morphio::mut::GlialCell(*morph); })
+
+
+        // Cell sub-parts accessors
+        .def_property_readonly("soma", &morphio::GlialCell::soma, "Returns the soma object")
+        .def_property_readonly("mitochondria",
+                               &morphio::GlialCell::mitochondria,
+                               "Returns the soma object")
+        .def_property_readonly("annotations",
+                               &morphio::GlialCell::annotations,
+                               "Returns a list of annotations")
+        .def_property_readonly("markers",
+                               &morphio::GlialCell::markers,
+                               "Returns the list of NeuroLucida markers")
+        .def_property_readonly("endoplasmic_reticulum",
+                               &morphio::GlialCell::endoplasmicReticulum,
+                               "Returns the endoplasmic reticulum object")
+        .def_property_readonly("root_sections",
+                               &morphio::GlialCell::rootSections,
+                               "Returns a list of all root sections "
+                               "(sections whose parent ID are -1)")
+        .def_property_readonly("sections",
+                               &morphio::GlialCell::sections,
+                               "Returns a vector containing all sections objects\n\n"
+                               "Notes:\n"
+                               "- Soma is not included\n"
+                               "- First section ID is 1 (0 is reserved for the soma)\n"
+                               "- To select sections by ID use: GlialCell::section(id)")
+
+        .def("section",
+             &morphio::GlialCell::section,
+             "Returns the Section with the given id\n"
+             "throw RawDataError if the id is out of range",
+             "section_id"_a)
+
+        // Property accessors
+        .def_property_readonly(
+            "points",
+            [](morphio::GlialCell* morpho) {
+                const auto& data = morpho->points();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            },
+            "Returns a list with all points from all sections (soma points are not included)\n"
+            "Note: points belonging to the n'th section are located at indices:\n"
+            "[GlialCell.sectionOffsets(n), GlialCell.sectionOffsets(n+1)[")
+        .def_property_readonly(
+            "diameters",
+            [](const morphio::GlialCell& morpho) {
+                const auto& data = morpho.diameters();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            },
+            "Returns a list with all diameters from all sections (soma points are not included)\n"
+            "Note: diameters belonging to the n'th section are located at indices:\n"
+            "[GlialCell.sectionOffsets(n), GlialCell.sectionOffsets(n+1)[")
+        .def_property_readonly(
+            "perimeters",
+            [](const morphio::GlialCell& obj) {
+                const auto& data = obj.perimeters();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            },
+            "Returns a list with all perimeters from all sections (soma points are not included)\n"
+            "Note: perimeters belonging to the n'th section are located at indices:\n"
+            "[GlialCell.sectionOffsets(n), GlialCell.sectionOffsets(n+1)[")
+        .def_property_readonly(
+            "section_offsets",
+            [](const morphio::GlialCell& morpho) { return as_pyarray(morpho.sectionOffsets()); },
+            "Returns a list with offsets to access data of a specific section in the points\n"
+            "and diameters arrays.\n"
+            "\n"
+            "Example: accessing diameters of n'th section will be located in the DIAMETERS\n"
+            "array from DIAMETERS[sectionOffsets(n)] to DIAMETERS[sectionOffsets(n+1)-1]\n"
+            "\n"
+            "Note: for convenience, the last point of this array is the points array size\n"
+            "so that the above example works also for the last section.")
+        .def_property_readonly(
+            "section_types",
+            [](const morphio::GlialCell& morph) {
+                const auto& data = morph.sectionTypes();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            },
+            "Returns a vector with the section type of every section")
+        .def_property_readonly("connectivity",
+                               &morphio::GlialCell::connectivity,
+                               "Return the graph connectivity of the GlialCell "
+                               "where each section is seen as a node\nNote: -1 is the soma node")
+        .def_property_readonly("soma_type", &morphio::GlialCell::somaType, "Returns the soma type")
+        .def_property_readonly("cell_family",
+                               &morphio::GlialCell::cellFamily,
+                               "Returns the cell family (neuron or glia)")
+        .def_property_readonly("version", &morphio::GlialCell::version, "Returns the version")
+
+        // Iterators
+        .def(
+            "iter",
+            [](morphio::GlialCell* morpho, IterType type) {
+                switch (type) {
+                case IterType::DEPTH_FIRST:
+                    return py::make_iterator(morpho->depth_begin(), morpho->depth_end());
+                case IterType::BREADTH_FIRST:
+                    return py::make_iterator(morpho->breadth_begin(), morpho->breadth_end());
+                case IterType::UPSTREAM:
+                default:
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first and breadth_first are supported");
+                }
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Section iterator that runs successively on every neurite\n"
+            "iter_type controls the order of iteration on sections of a given neurite. 2 values "
+            "can be passed:\n"
+            "- morphio.IterType.depth_first (default)\n"
+            "- morphio.IterType.breadth_first (default)\n"
+            "iter_type"_a = IterType::DEPTH_FIRST);
 
     py::class_<morphio::Mitochondria>(
         m,
