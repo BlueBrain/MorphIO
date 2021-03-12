@@ -89,7 +89,7 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section>& secti
     return os;
 }
 
-std::shared_ptr<Section> Section::appendSection(const std::shared_ptr<Section>& original_section,
+std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> original_section,
                                                 bool recursive) {
     const std::shared_ptr<Section> ptr(
         new Section(_morphology, _morphology->_counter, *original_section));
@@ -112,8 +112,12 @@ std::shared_ptr<Section> Section::appendSection(const std::shared_ptr<Section>& 
     _morphology->_parent[childId] = parentId;
     _morphology->_children[parentId].push_back(ptr);
 
+    // Careful not to use a reference here or you will face ref invalidation problem with vector
+    // resize The argument `original_section` of this function could be a reference to the
+    // `_children` array and that reference might be invalidated by this `push_back` (in case
+    // `vector` needs to reallocate the array)
     if (recursive) {
-        for (const auto& child : original_section->children()) {
+        for (auto child : original_section->children()) {
             ptr->appendSection(child, true);
         }
     }
@@ -142,7 +146,7 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
     _morphology->_children[parentId].push_back(ptr);
 
     if (recursive) {
-        for (const auto& child : section.children()) {
+        for (auto child : section.children()) {
             ptr->appendSection(child, true);
         }
     }

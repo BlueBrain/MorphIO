@@ -467,6 +467,27 @@ def test_sanitize():
                          'Warning: while appending section: 2 to parent: 0\nThe section first point should be parent section last point: \n        : X Y Z Diameter\nparent last point :[2.000000, 0.000000, 0.000000, 2.000000]\nchild first point :[2.000000, 1.000000, 0.000000, 2.000000]')
 
 
+def test_remove_rootsection():
+    morpho = Morphology(os.path.join(_path, 'single_point_root.asc'))
+    assert_equal(len(morpho.root_sections), 1)
+    to_remove = []
+    for root in morpho.root_sections:
+        if len(root.points) == 1:
+            to_remove.append(root)
+    for root in to_remove:
+        morpho.delete_section(root, False)
+    assert_equal(len(morpho.root_sections), 2)
+
+
+def test_remove_rootsection_in_loop():
+    morpho = Morphology(os.path.join(_path, 'single_point_root.asc'))
+    assert_equal(len(morpho.root_sections), 1)
+    for root in morpho.root_sections:
+        if len(root.points) == 1:
+            morpho.delete_section(root, False)
+    assert_equal(len(morpho.root_sections), 2)
+
+
 def test_glia():
     g = GlialCell()
     assert_equal(g.cell_family, CellFamily.GLIA)
