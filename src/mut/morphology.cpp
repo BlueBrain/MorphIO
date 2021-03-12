@@ -110,7 +110,6 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
     const std::shared_ptr<Section> section_copy(new Section(this, _counter, *section_));
     _register(section_copy);
     _rootSections.push_back(section_copy);
-
     const bool emptySection = section_copy->points().empty();
     if (emptySection)
         printError(Warning::APPENDING_EMPTY_SECTION,
@@ -159,8 +158,7 @@ static void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
     vec.erase(std::remove(vec.begin(), vec.end(), section), vec.end());
 }
 
-void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive)
-{
+void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive) {
     if (!section_)
         return;
     unsigned int id = section_->id();
@@ -175,7 +173,8 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
             deleteSection(*it, false);
         }
     } else {
-        // careful not to use a ref here or you will face ref invalidation problem with vector resize
+        // Careful not to use a reference here or you will face reference invalidation problem
+        // with vector resize
         for (auto child : section_->children()) {
             if (section_->isRoot()) {
                 _rootSections.push_back(child);
