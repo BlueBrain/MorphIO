@@ -89,7 +89,7 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section>& secti
     return os;
 }
 
-std::shared_ptr<Section> Section::appendSection(const std::shared_ptr<Section>& original_section,
+std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> original_section,
                                                 bool recursive) {
     const std::shared_ptr<Section> ptr(
         new Section(_morphology, _morphology->_counter, *original_section));
