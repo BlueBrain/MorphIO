@@ -1,24 +1,305 @@
 #pragma once
 
-#include <morphio/mut/morphology.h>
+#include <cstdint>
+#include <iomanip>
+#include <iostream>
+#include <memory>
+#include <ostream>
+#include <unordered_map>
+
+#include <functional>
+
+#include <morphio/errorMessages.h>
+#include <morphio/exceptions.h>
+#include <morphio/mut/endoplasmic_reticulum.h>
+#include <morphio/mut/mitochondria.h>
+#include <morphio/mut/soma.h>
+#include <morphio/properties.h>
+#include <morphio/section.h>
 #include <morphio/types.h>
 
 namespace morphio {
-
-class GlialCell;
-
 namespace mut {
+bool _checkDuplicatePoint(const std::shared_ptr<GlialSection>& parent,
+                          const std::shared_ptr<GlialSection>& current);
 
-class GlialCell: public Morphology
+class GlialCell
 {
   public:
-    GlialCell();
-    GlialCell(const std::string& source);
-     /**
+    GlialCell()
+        : _counter(0)
+        , _soma(std::make_shared<Soma>())
+        , _cellProperties(
+              std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())) {}
+
+    /**
+       Build a mutable GlialCell from an on-disk glialCell
+
+       options is the modifier flags to be applied. All flags are defined in
+    their enum: morphio::enum::Option and can be composed.
+
+       Example:
+           GlialCell("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
+    **/
+    GlialCell(const std::string& uri, unsigned int options = NO_MODIFIER);
+
+    /**
+       Build a mutable GlialCell from a mutable glialCell
+    **/
+    GlialCell(const morphio::mut::GlialCell& glialCell, unsigned int options = NO_MODIFIER);
+
+    /**
        Build a mutable GlialCell from a read-only glialCell
     **/
-    GlialCell(const morphio::GlialCell& gliaCell, unsigned int options = NO_MODIFIER);
+    GlialCell(const morphio::GlialCell& glialCell, unsigned int options = NO_MODIFIER);
+
+    virtual ~GlialCell();
+
+    /**
+       Returns all section ids at the tree root
+    **/
+    inline const std::vector<std::shared_ptr<GlialSection>>& rootSections() const noexcept;
+
+    /**
+       Returns the dictionary id -> GlialSection for this tree
+    **/
+    inline const std::map<uint32_t, std::shared_ptr<GlialSection>>& sections() const noexcept;
+
+    /**
+       Returns a shared pointer on the Soma
+
+       Note: multiple morphologies can share the same Soma instance
+    **/
+    inline std::shared_ptr<Soma>& soma() noexcept;
+
+    /**
+       Returns a shared pointer on the Soma
+
+       Note: multiple morphologies can share the same Soma instance
+    **/
+    inline const std::shared_ptr<Soma>& soma() const noexcept;
+
+    /**
+     * Return the mitochondria container class
+     **/
+    inline Mitochondria& mitochondria() noexcept;
+    /**
+     * Return the mitochondria container class
+     **/
+    inline const Mitochondria& mitochondria() const noexcept;
+
+    /**
+     * Return the endoplasmic reticulum container class
+     **/
+    inline EndoplasmicReticulum& endoplasmicReticulum() noexcept;
+    /**
+     * Return the endoplasmic reticulum container class
+     **/
+    inline const EndoplasmicReticulum& endoplasmicReticulum() const noexcept;
+
+    /**
+     * Return the annotation object
+     **/
+    inline const std::vector<Property::Annotation>& annotations() const noexcept;
+
+    /**
+     * Return the markers from the ASC file
+     **/
+    inline const std::vector<Property::Marker>& markers() const noexcept;
+
+    /**
+       Get the shared pointer for the given section
+
+       Note: multiple morphologies can share the same GlialSection instances.
+    **/
+    inline const std::shared_ptr<GlialSection>& section(uint32_t id) const;
+
+    /**
+       Depth first iterator starting at a given section id
+
+       If id == -1, the iteration will start at each root section, successively
+    **/
+    glial_depth_iterator glial_depth_begin() const;
+    glial_depth_iterator glial_depth_end() const;
+
+    /**
+       Breadth first iterator
+
+       If id == -1, the iteration will be successively performed starting
+       at each root section
+    **/
+    glial_breadth_iterator glial_breadth_begin() const;
+    glial_breadth_iterator glial_breadth_end() const;
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //
+    //   Tree manipulation methods
+    //
+    ////////////////////////////////////////////////////////////////////////////////
+
+    /**
+       Delete the given section
+
+       Will silently fail if the section is not part of the tree
+
+       If recursive == true, all descendent sections will be deleted as well
+       Else, children will be re-attached to their grand-parent
+    **/
+    void deleteSection(const std::shared_ptr<GlialSection>& section, bool recursive = true);
+
+    /**
+       Append the existing morphio::GlialSection as a root section
+
+       If recursive == true, all descendent will be appended as well
+    **/
+    std::shared_ptr<GlialSection> appendRootSection(const morphio::Section<CellFamily::GLIA>&, bool recursive = false);
+
+    /**
+       Append an existing GlialSection as a root section
+
+       If recursive == true, all descendent will be appended as well
+    **/
+    std::shared_ptr<GlialSection> appendRootSection(const std::shared_ptr<GlialSection>& section,
+                                               bool recursive = false);
+
+    /**
+       Append a root GlialSection
+    **/
+    std::shared_ptr<GlialSection> appendRootSection(const Property::PointLevel&,
+                                               GlialSectionType sectionType);
+
+    void applyModifiers(unsigned int modifierFlags);
+
+    /**
+     * Return the soma type
+     **/
+    inline SomaType somaType() const noexcept;
+
+    /**
+     * Return the cell family (neuron or glia)
+     **/
+    inline CellFamily cellFamily() const noexcept;
+
+    /**
+     * Return the version
+     **/
+    inline MorphologyVersion version() const noexcept;
+
+    /**
+     * Write file to H5, SWC, ASC format depending on filename extension
+     **/
+    void write(const std::string& filename);
+
+    inline void addAnnotation(const morphio::Property::Annotation& annotation);
+    inline void addMarker(const morphio::Property::Marker& marker);
+
+    /**
+       Return the data structure used to create read-only morphologies
+    **/
+    Property::Properties buildReadOnly() const;
+
+    /**
+     * Return the graph connectivity of the glialCell where each section
+     * is seen as a node
+     * Note: -1 is the soma node
+     **/
+    std::unordered_map<int, std::vector<unsigned int>> connectivity();
+
+
+    /**
+       Fixes the glialCell single child sections and issues warnings
+       if the section starts and ends are inconsistent
+     **/
+    void sanitize();
+    void sanitize(const morphio::readers::DebugInfo& debugInfo);
+
+  public:
+    friend class GlialSection;
+    friend void modifiers::nrn_order(morphio::mut::GlialCell& morpho);
+    friend bool diff(const GlialCell& left,
+                     const GlialCell& right,
+                     morphio::enums::LogLevel verbose);
+    morphio::readers::ErrorMessages _err;
+
+    uint32_t _register(const std::shared_ptr<GlialSection>&);
+
+    uint32_t _counter;
+    std::shared_ptr<Soma> _soma;
+    std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
+    std::vector<std::shared_ptr<GlialSection>> _rootSections;
+    std::map<uint32_t, std::shared_ptr<GlialSection>> _sections;
+    Mitochondria _mitochondria;
+    EndoplasmicReticulum _endoplasmicReticulum;
+
+    std::map<uint32_t, uint32_t> _parent;
+    std::map<uint32_t, std::vector<std::shared_ptr<GlialSection>>> _children;
 };
+
+inline const std::vector<std::shared_ptr<GlialSection>>& GlialCell::rootSections() const noexcept {
+    return _rootSections;
+}
+
+inline const std::map<uint32_t, std::shared_ptr<GlialSection>>& GlialCell::sections() const noexcept {
+    return _sections;
+}
+
+inline std::shared_ptr<Soma>& GlialCell::soma() noexcept {
+    return _soma;
+}
+
+inline const std::shared_ptr<Soma>& GlialCell::soma() const noexcept {
+    return _soma;
+}
+
+inline Mitochondria& GlialCell::mitochondria() noexcept {
+    return _mitochondria;
+}
+
+inline const Mitochondria& GlialCell::mitochondria() const noexcept {
+    return _mitochondria;
+}
+
+inline EndoplasmicReticulum& GlialCell::endoplasmicReticulum() noexcept {
+    return _endoplasmicReticulum;
+}
+
+inline const EndoplasmicReticulum& GlialCell::endoplasmicReticulum() const noexcept {
+    return _endoplasmicReticulum;
+}
+
+inline const std::shared_ptr<GlialSection>& GlialCell::section(uint32_t id) const {
+    return _sections.at(id);
+}
+
+inline SomaType GlialCell::somaType() const noexcept {
+    return _soma->type();
+}
+
+inline const std::vector<Property::Annotation>& GlialCell::annotations() const noexcept {
+    return _cellProperties->_annotations;
+}
+
+inline const std::vector<Property::Marker>& GlialCell::markers() const noexcept {
+    return _cellProperties->_markers;
+}
+
+/*
+inline CellFamily GlialCell::cellFamily() const noexcept {
+    return _cellProperties->_cellFamily;
+}
+*/
+
+inline MorphologyVersion GlialCell::version() const noexcept {
+    return _cellProperties->_version;
+}
+
+inline void GlialCell::addAnnotation(const morphio::Property::Annotation& annotation) {
+    _cellProperties->_annotations.push_back(annotation);
+}
+
+inline void GlialCell::addMarker(const morphio::Property::Marker& marker) {
+    _cellProperties->_markers.push_back(marker);
+}
 
 }  // namespace mut
 }  // namespace morphio

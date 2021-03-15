@@ -13,6 +13,7 @@ set(MORPHIO_SOURCES
     mut/modifiers.cpp
     mut/morphology.cpp
     mut/section.cpp
+    mut/glial_section.cpp
     mut/soma.cpp
     mut/writers.cpp
     properties.cpp

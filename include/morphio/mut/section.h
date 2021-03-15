@@ -91,7 +91,8 @@ class Section: public std::enable_shared_from_this<Section>
     upstream_iterator upstream_begin() const;
     upstream_iterator upstream_end() const;
 
-    std::shared_ptr<Section> appendSection(const morphio::Section&, bool recursive = false);
+    template <typename Family>
+    std::shared_ptr<Section> appendSection(const morphio::Section<Family>&, bool recursive = false);
 
     std::shared_ptr<Section> appendSection(const std::shared_ptr<Section>& original_section,
                                            bool recursive = false);
@@ -102,8 +103,10 @@ class Section: public std::enable_shared_from_this<Section>
   private:
     friend class Morphology;
 
+
     Section(Morphology*, unsigned int id, SectionType type, const Property::PointLevel&);
-    Section(Morphology*, unsigned int id, const morphio::Section& section);
+    template <typename Family>
+    Section(Morphology*, unsigned int id, const morphio::Section<Family>& section);
     Section(Morphology*, unsigned int id, const Section&);
 
     Morphology* _morphology;

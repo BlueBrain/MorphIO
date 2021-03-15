@@ -14,23 +14,24 @@
 namespace morphio {
 
 using namespace enums;
+template <class Family>
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
-// class Morphology;
+template <class Family>
 class Section;
 
 template <class TSection, class CRTP, class Mut>
 class TTree;
-
 class Morphology;
-
+class GlialCell;
 
 template <class T>
 class SectionBase;
 class Soma;
 
 namespace Property {
+template <typename Family>
 struct Properties;
 }
 
@@ -49,7 +50,9 @@ class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
 class Morphology;
+class GlialCell;
 class Section;
+class GlialSection;
 class Soma;
 }  // namespace mut
 
@@ -58,5 +61,18 @@ using MorphologyVersion = std::tuple<std::string, uint32_t, uint32_t>;
 
 template <typename T>
 using range = gsl::span<T>;
+
+
+struct CellFamily {
+    struct NEURON {
+        using  Type = SectionType;
+        static constexpr int value = 0;
+    };
+    struct GLIA {
+        using  Type = GlialSectionType;
+        static constexpr int value = 1;
+    };
+};
+
 
 }  // namespace morphio

@@ -48,8 +48,8 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(
         morphology._properties->_cellLevel);
 
-    for (const morphio::Section& root : morphology.rootSections()) {
-        appendRootSection(root, true);
+    for (const morphio::Section<CellFamily::NEURON>& root : morphology.rootSections()) {
+        appendRootSection<CellFamily::NEURON>(root, true);
     }
 
     for (const morphio::MitoSection& root : morphology.mitochondria().rootSections()) {

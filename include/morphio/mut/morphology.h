@@ -152,7 +152,7 @@ class Morphology
 
        If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<Section> appendRootSection(const morphio::Section&, bool recursive = false);
+    std::shared_ptr<Section> appendRootSection(const morphio::Section<CellFamily::NEURON>&, bool recursive = false);
 
     /**
        Append an existing Section as a root section
@@ -283,9 +283,11 @@ inline const std::vector<Property::Marker>& Morphology::markers() const noexcept
     return _cellProperties->_markers;
 }
 
+/*
 inline CellFamily Morphology::cellFamily() const noexcept {
     return _cellProperties->_cellFamily;
 }
+*/
 
 inline MorphologyVersion Morphology::version() const noexcept {
     return _cellProperties->_version;

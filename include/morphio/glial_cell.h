@@ -17,7 +17,8 @@ namespace morphio {
 // extern template class TTree<SectionType>;
 // extern template class TTree<GlialSectionType>;
 
-class GlialCell: public TTree<Section, GlialCell, morphio::mut::GlialCell> {
+
+class GlialCell: public TTree<Section<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell> {
 public:
     GlialCell(const std::string& source, unsigned int options = NO_MODIFIER);
     GlialCell(const HighFive::Group& group, unsigned int options = NO_MODIFIER);

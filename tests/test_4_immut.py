@@ -147,3 +147,7 @@ def test_glia():
 
      assert_raises(RawDataError, GlialCell, Path(_path, 'simple.swc'))
      assert_raises(RawDataError, GlialCell, Path(_path, 'h5/v1/simple.h5'))
+
+
+def test_neuron():
+    assert_raises(RawDataError, Morphology, Path(_path, 'astrocyte.h5'))

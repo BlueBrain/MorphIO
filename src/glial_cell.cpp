@@ -28,35 +28,34 @@ namespace morphio {
 
 
 GlialCell::GlialCell(const Property::Properties& properties, unsigned int options)
-    : TTree<Section, GlialCell, morphio::mut::GlialCell>(properties, options) {
+    : TTree<Section<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell>(properties, options) {
     init();
 }
 
 GlialCell::GlialCell(const std::string& source, unsigned int options)
-    : TTree<Section, GlialCell, morphio::mut::GlialCell>(source, options) {
+    : TTree<Section<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell>(source, options) {
+    /*
     if (_properties->_cellLevel._cellFamily != CellFamily::GLIA)
         throw(RawDataError("File: " + source +
                            " is not a GlialCell file. It should be a H5 file the cell type GLIA."));
+    */
     init();
 }
 
 GlialCell::GlialCell(const HighFive::Group& group, unsigned int options)
-    : TTree<Section, GlialCell, morphio::mut::GlialCell>(group, options) {
+    : TTree<Section<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell>(group, options) {
     init();
 }
 
 GlialCell::GlialCell(morphio::mut::GlialCell glialCell)
-    : TTree<Section, GlialCell, morphio::mut::GlialCell>(glialCell) {
+    : TTree<Section<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell>(glialCell) {
     init();
 }
 
 void GlialCell::init() {
     if (_properties->_cellLevel.fileFormat() != "swc")
         _properties->_cellLevel._somaType = getSomaType(soma().points().size());
-
-
 }
-
 
 Soma GlialCell::soma() const {
     return Soma(_properties);
@@ -83,6 +82,6 @@ const SomaType& GlialCell::somaType() const {
 }
 
 // Explicit instantiation
-template class TTree<Section, GlialCell, mut::GlialCell>;
+template class TTree<Section<CellFamily::GLIA>, GlialCell, mut::GlialCell>;
 
 }  // namespace morphio

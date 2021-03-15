@@ -42,7 +42,7 @@ enum AnnotationType {
 };
 
 /** The cell family represented by morphio::Morphology. */
-enum CellFamily { NEURON = 0, GLIA = 1 };
+//enum CellFamily { NEURON = 0, GLIA = 1 };
 
 enum SomaType {
     SOMA_UNDEFINED = 0,
@@ -60,8 +60,6 @@ enum SectionType {
     SECTION_AXON = 2,
     SECTION_DENDRITE = 3,         //!< general or basal dendrite (near to soma)
     SECTION_APICAL_DENDRITE = 4,  //!< apical dendrite (far from soma)
-    SECTION_GLIA_PROCESS = 2,     // TODO: nasty overload there
-    SECTION_GLIA_ENDFOOT = 3,
 
     // All section types equal or above this number are custom types according
     // to neuromorpho.org standard
@@ -79,7 +77,8 @@ enum SectionType {
     SECTION_ALL = 32
 };
 
-enum class GlialSectionType {
+enum GlialSectionType {
+    SECTION_GLIA_UNDEFINED = 0,
     SECTION_GLIA_SOMA = 1,
     SECTION_GLIA_ENDFOOT = 2,
     SECTION_GLIA_PROCESS = 3,
@@ -96,6 +95,7 @@ enum VascularSectionType {
     SECTION_TRANSITIONAL = 7,
     SECTION_CUSTOM = 8
 };
+
 
 /**
  * Specify the access mode of data.

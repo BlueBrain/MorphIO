@@ -153,6 +153,7 @@ class TTree
 
   protected:
     friend class mut::Morphology;
+    friend class mut::GlialCell;
     TTree(const Property::Properties& properties, unsigned int options);
 
     std::shared_ptr<Property::Properties> _properties;
@@ -166,7 +167,6 @@ template <typename Node, typename CRTP, typename Mut>
 TTree<Node, CRTP, Mut>::TTree(const Property::Properties& properties, unsigned int options)
     : _properties(std::make_shared<Property::Properties>(properties)) {
     buildChildren(_properties);
-    const CellFamily cellFamilly = _properties->_cellLevel._cellFamily ;
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders
     if (properties._cellLevel.fileFormat() == "h5") {
@@ -176,7 +176,6 @@ TTree<Node, CRTP, Mut>::TTree(const Property::Properties& properties, unsigned i
             mutable_morph.applyModifiers(options);
         }
         _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
-        _properties->_cellLevel._cellFamily  = cellFamilly;
         buildChildren(_properties);
     }
 }
@@ -277,12 +276,15 @@ const std::vector<morphio::floatType>& TTree<Node, CRTP, Mut>::perimeters() cons
 template <typename Node, typename CRTP, typename Mut>
 const std::vector<typename Node::Type>& TTree<Node, CRTP, Mut>::sectionTypes() const {
     return get<Property::SectionType>();
+
 }
 
+/*
 template <typename Node, typename CRTP, typename Mut>
 const CellFamily& TTree<Node, CRTP, Mut>::cellFamily() const {
     return _properties->cellFamily();
 }
+*/
 
 template <typename Node, typename CRTP, typename Mut>
 const std::map<int, std::vector<unsigned int>>& TTree<Node, CRTP, Mut>::connectivity() const {

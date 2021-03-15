@@ -8,6 +8,7 @@ namespace morphio {
  *
  * Spec https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
  **/
+template <typename Family>
 class EndoplasmicReticulum
 {
   public:
@@ -32,9 +33,9 @@ class EndoplasmicReticulum
     const std::vector<uint32_t>& filamentCounts() const;
 
   private:
-    EndoplasmicReticulum(std::shared_ptr<Property::Properties> properties)
+    EndoplasmicReticulum(std::shared_ptr<Property::Properties<Family>> properties)
         : _properties(std::move(properties)) {}
-    std::shared_ptr<Property::Properties> _properties;
+    std::shared_ptr<Property::Properties<Family>> _properties;
 
     friend class Morphology;
     friend class GlialCell;
