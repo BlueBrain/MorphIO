@@ -153,14 +153,19 @@ Morphology::~Morphology() {
     }
 }
 
-static void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
-                         const std::shared_ptr<Section>& section) {
+void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
+                              const std::shared_ptr<Section> section) {
+    if (section->_morphology == this) {
+        section->_morphology = nullptr;
+        section->_id = 0xffffffff;
+    }
     vec.erase(std::remove(vec.begin(), vec.end(), section), vec.end());
 }
 
 void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive) {
     if (!section_)
         return;
+
     unsigned int id = section_->id();
 
     if (recursive) {
