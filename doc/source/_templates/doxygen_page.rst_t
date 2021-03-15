@@ -1,4 +1,0 @@
-{{ title }}
-{{ "=" * title | length }}
-
-.. iframe:: ../cpp/{{ file }}
