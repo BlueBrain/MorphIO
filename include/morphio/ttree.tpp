@@ -295,7 +295,7 @@ const MorphologyVersion& TTree<Node, CRTP, Mut>::version() const {
 
 template <typename Node, typename CRTP, typename Mut>
 depth_iterator_t<Node> TTree<Node, CRTP, Mut>::depth_begin() const {
-    return depth_iterator(rootSections()[0]);
+    return depth_iterator(rootSections());
 }
 
 template <typename Node, typename CRTP, typename Mut>
@@ -305,7 +305,7 @@ depth_iterator_t<Node> TTree<Node, CRTP, Mut>::depth_end() const {
 
 template <typename Node, typename CRTP, typename Mut>
 breadth_iterator_t<Node> TTree<Node, CRTP, Mut>::breadth_begin() const {
-    return breadth_iterator(rootSections()[0]);
+    return breadth_iterator(rootSections());
 }
 
 template <typename Node, typename CRTP, typename Mut>

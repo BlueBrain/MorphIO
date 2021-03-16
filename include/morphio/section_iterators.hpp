@@ -62,6 +62,7 @@ class breadth_iterator_t
     breadth_iterator_t() = default;
 
     inline explicit breadth_iterator_t(const SectionT& section);
+    inline explicit breadth_iterator_t(const std::vector<SectionT>& sections);
     inline breadth_iterator_t(const breadth_iterator_t& other);
 
     inline SectionT operator*() const;
@@ -89,6 +90,7 @@ class depth_iterator_t
     depth_iterator_t() = default;
 
     inline explicit depth_iterator_t(const SectionT& section);
+    inline explicit depth_iterator_t(const std::vector<SectionT>& sections);
     inline depth_iterator_t(const depth_iterator_t& other);
 
     inline SectionT operator*() const;
@@ -147,6 +149,11 @@ inline breadth_iterator_t<SectionT>::breadth_iterator_t(const SectionT& section)
 }
 
 template <typename SectionT>
+inline breadth_iterator_t<SectionT>::breadth_iterator_t(const std::vector<SectionT>& sections) {
+    std::copy(sections.begin(), sections.end(), std::back_inserter(deque_));
+}
+
+template <typename SectionT>
 inline breadth_iterator_t<SectionT>::breadth_iterator_t(
     const breadth_iterator_t& other)
     : deque_(other.deque_) {}
@@ -195,6 +202,11 @@ inline bool breadth_iterator_t<SectionT>::operator!=(
 template <typename SectionT>
 inline depth_iterator_t<SectionT>::depth_iterator_t(const SectionT& section) {
     deque_.push_front(section);
+}
+
+template <typename SectionT>
+inline depth_iterator_t<SectionT>::depth_iterator_t(const std::vector<SectionT>& sections) {
+    std::copy(sections.rbegin(), sections.rend(), std::front_inserter(deque_));
 }
 
 template <typename SectionT>
