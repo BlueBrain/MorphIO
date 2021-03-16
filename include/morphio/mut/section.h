@@ -108,6 +108,11 @@ class Section: public std::enable_shared_from_this<Section>
 
 
     /**
+      If section is an orphan, in other words it does not belong to an a morphology
+    **/
+    void throwIfNoOwningMorphology() const;
+
+    /**
       Getter for _morphology; checks the pointer is non-null, throws otherwise
     **/
     Morphology* getOwningMorphologyOrThrow() const;

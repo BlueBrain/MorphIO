@@ -34,10 +34,14 @@ Section::Section(Morphology* morphology, unsigned int id_, const Section& sectio
     , _id(id_)
     , _sectionType(section_._sectionType) {}
 
-Morphology* Section::getOwningMorphologyOrThrow() const {
+void Section::throwIfNoOwningMorphology() const {
     if (!_morphology) {
         throw std::runtime_error("Section does not belong to a morphology, impossible operation");
     }
+}
+
+Morphology* Section::getOwningMorphologyOrThrow() const {
+    throwIfNoOwningMorphology();
     return _morphology;
 }
 
@@ -67,26 +71,32 @@ const std::vector<std::shared_ptr<Section>>& Section::children() const {
 }
 
 depth_iterator Section::depth_begin() const {
+    throwIfNoOwningMorphology();
     return depth_iterator(const_cast<Section*>(this)->shared_from_this());
 }
 
 depth_iterator Section::depth_end() const {
+    throwIfNoOwningMorphology();
     return depth_iterator();
 }
 
 breadth_iterator Section::breadth_begin() const {
+    throwIfNoOwningMorphology();
     return breadth_iterator(const_cast<Section*>(this)->shared_from_this());
 }
 
 breadth_iterator Section::breadth_end() const {
+    throwIfNoOwningMorphology();
     return breadth_iterator();
 }
 
 upstream_iterator Section::upstream_begin() const {
+    throwIfNoOwningMorphology();
     return upstream_iterator(const_cast<Section*>(this)->shared_from_this());
 }
 
 upstream_iterator Section::upstream_end() const {
+    throwIfNoOwningMorphology();
     return upstream_iterator();
 }
 
