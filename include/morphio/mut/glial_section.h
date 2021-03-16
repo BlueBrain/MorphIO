@@ -13,8 +13,8 @@ namespace mut {
 
 
 using glial_upstream_iterator = morphio::upstream_iterator_t<std::shared_ptr<GlialSection>>;
-using glial_breadth_iterator = morphio::breadth_iterator_t<std::shared_ptr<GlialSection>, GlialCell>;
-using glial_depth_iterator = morphio::depth_iterator_t<std::shared_ptr<GlialSection>, GlialCell>;
+using glial_breadth_iterator = morphio::breadth_iterator_t<std::shared_ptr<GlialSection>>;
+using glial_depth_iterator = morphio::depth_iterator_t<std::shared_ptr<GlialSection>>;
 
 class GlialSection: public std::enable_shared_from_this<GlialSection>
 {

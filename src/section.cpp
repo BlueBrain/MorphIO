@@ -12,53 +12,57 @@ typename Family::Type Section<Family>::type() const {
 }
 
 template <typename Family>
-depth_iterator Section<Family>::depth_begin() const {
-    return depth_iterator(*this);
+depth_iterator_t<Section<Family>> Section<Family>::depth_begin() const {
+    return depth_iterator_t<Section<Family>>(*this);
 }
 
 template <typename Family>
-depth_iterator Section<Family>::depth_end() const {
-    return depth_iterator();
+depth_iterator_t<Section<Family>> Section<Family>::depth_end() const {
+    return depth_iterator_t<Section<Family>>();
 }
 
 template <typename Family>
-breadth_iterator Section<Family>::breadth_begin() const {
-    return breadth_iterator(*this);
+breadth_iterator_t<Section<Family>> Section<Family>::breadth_begin() const {
+    return breadth_iterator_t<Section<Family>>(*this);
 }
 
 template <typename Family>
-breadth_iterator Section<Family>::breadth_end() const {
-    return breadth_iterator();
+breadth_iterator_t<Section<Family>> Section<Family>::breadth_end() const {
+    return breadth_iterator_t<Section<Family>>();
 }
 
 template <typename Family>
-upstream_iterator Section<Family>::upstream_begin() const {
+upstream_iterator_t<Section<Family>> Section<Family>::upstream_begin() const {
     return upstream_iterator(*this);
 }
 
 template <typename Family>
-upstream_iterator Section<Family>::upstream_end() const {
-    return upstream_iterator();
+upstream_iterator_t<Section<Family>> Section<Family>::upstream_end() const {
+    return upstream_iterator_t<Section<Family>>();
 }
 
 template <typename Family>
 range<const Point> Section<Family>::points() const {
-    return get<Property::Point>();
+    return this-> template get<Property::Point>();
 }
 
 template <typename Family>
 range<const floatType> Section<Family>::diameters() const {
-    return get<Property::Diameter>();
+    return this -> template get<Property::Diameter>();
 }
 
 template <typename Family>
 range<const floatType> Section<Family>::perimeters() const {
-    return get<Property::Perimeter>();
+    return this -> template get<Property::Perimeter>();
 }
+
+template class SectionBase<Section<CellFamily::NEURON>>;
+template class SectionBase<Section<CellFamily::GLIA>>;
 
 }  // namespace morphio
 
-std::ostream& operator<<(std::ostream& os, const morphio::Section& section) {
+template <typename Family>
+std::ostream& operator<<(std::ostream& os, const morphio::Section<Family>& section) {
     const auto& points = section.points();
     if (points.empty()) {
         os << "Section(id=" << section.id() << ", points=[])";

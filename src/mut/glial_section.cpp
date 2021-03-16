@@ -14,8 +14,8 @@ extern template class Section<CellFamily::GLIA>;
 namespace mut {
 using morphio::readers::ErrorMessages;
 
-using glial_depth_iterator = depth_iterator_t<std::shared_ptr<GlialSection>, GlialCell>;
-using glial_breadth_iterator = breadth_iterator_t<std::shared_ptr<GlialSection>, GlialCell>;
+using glial_depth_iterator = depth_iterator_t<std::shared_ptr<GlialSection>>;
+using glial_breadth_iterator = breadth_iterator_t<std::shared_ptr<GlialSection>>;
 using glial_upstream_iterator = upstream_iterator_t<std::shared_ptr<GlialSection>>;
 
 static inline bool _emptySection(const std::shared_ptr<GlialSection>& section) {

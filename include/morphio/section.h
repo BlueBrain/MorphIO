@@ -29,12 +29,6 @@ namespace morphio {
  */
 
 class Morphology;
-template <typename Family>
-using upstream_iterator = upstream_iterator_t<Section<Family>>;
-template <typename Family>
-using breadth_iterator = breadth_iterator_t<Section<Family>, Morphology>;
-template <typename Family>
-using depth_iterator = depth_iterator_t<Section<Family>, Morphology>;
 
 template <typename Family>
 class Section: public SectionBase<Section<Family>>
@@ -48,20 +42,20 @@ class Section: public SectionBase<Section<Family>>
     /**
        Depth first search iterator
     **/
-    depth_iterator<Family> depth_begin() const;
-    depth_iterator<Family> depth_end() const;
+    depth_iterator_t<Section> depth_begin() const;
+    depth_iterator_t<Section> depth_end() const;
 
     /**
        Breadth first search iterator
     **/
-    breadth_iterator<Family> breadth_begin() const;
-    breadth_iterator<Family> breadth_end() const;
+    breadth_iterator_t<Section> breadth_begin() const;
+    breadth_iterator_t<Section> breadth_end() const;
 
     /**
        Upstream first search iterator
     **/
-    upstream_iterator<Family> upstream_begin() const;
-    upstream_iterator<Family> upstream_end() const;
+    upstream_iterator_t<Section> upstream_begin() const;
+    upstream_iterator_t<Section> upstream_end() const;
 
     /**
      * Return a view
@@ -87,7 +81,7 @@ class Section: public SectionBase<Section<Family>>
     /**
      * Return the morphological type of this section (dendrite, axon, ...)
      */
-    Type type() const;
+    typename Family::Type type() const;
     friend class mut::Section;
     friend class mut::GlialSection;
 
@@ -102,8 +96,8 @@ class Section: public SectionBase<Section<Family>>
 };
 
 // explicit instanciation
-template class SectionBase<Section<CellFamily::NEURON>>;
-template class SectionBase<Section<CellFamily::GLIA>>;
+extern template class SectionBase<Section<CellFamily::NEURON>>;
+extern template class SectionBase<Section<CellFamily::GLIA>>;
 
 }  // namespace morphio
 

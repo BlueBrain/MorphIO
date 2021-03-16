@@ -211,7 +211,7 @@ void GlialCell::sanitize(const morphio::readers::DebugInfo& debugInfo) {
     morphio::readers::ErrorMessages err(debugInfo._filename);
 
     glial_depth_iterator it = depth_begin();
-    while (it != glial_depth_end()) {
+    while (it != depth_end()) {
         std::shared_ptr<GlialSection> section_ = *it;
 
 
@@ -268,7 +268,7 @@ Property::Properties GlialCell::buildReadOnly() const {
     properties._cellLevel._somaType = _soma->type();
     _appendProperties(properties._somaLevel, _soma->_pointProperties);
 
-    for (auto it = depth_begin(); it != glial_depth_end(); ++it) {
+    for (auto it = depth_begin(); it != depth_end(); ++it) {
         const std::shared_ptr<GlialSection>& section_ = *it;
         unsigned int sectionId = section_->id();
         int parentOnDisk = (section_->isRoot() ? -1 : newIds[section_->parent()->id()]);
@@ -286,7 +286,7 @@ Property::Properties GlialCell::buildReadOnly() const {
 }
 
 glial_depth_iterator GlialCell::depth_begin() const {
-    return glial_depth_iterator(*this);
+    return glial_depth_iterator(rootSections()[0]);
 }
 
 glial_depth_iterator GlialCell::depth_end() const {
@@ -294,7 +294,7 @@ glial_depth_iterator GlialCell::depth_end() const {
 }
 
 glial_breadth_iterator GlialCell::breadth_begin() const {
-    return glial_breadth_iterator(*this);
+    return glial_breadth_iterator(rootSections()[0]);
 }
 
 glial_breadth_iterator GlialCell::breadth_end() const {
@@ -346,7 +346,7 @@ void GlialCell::write(const std::string& filename) {
         extension += my_tolower(c);
 
     if (extension == ".h5")
-        writer::h5(clean, filename);
+        writer::h5<GlialCell, GlialSection>(clean, filename);
     else
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
 }

@@ -291,7 +291,7 @@ static void endoplasmicReticulumH5(HighFive::File& h5_file, const EndoplasmicRet
 }
 
 
-template <typename Cell>
+template <typename Cell, typename Node>
 void h5(const Cell& morpho, const std::string& filename) {
     const auto& somaPoints = morpho.soma()->points();
     const auto numberOfSomaPoints = somaPoints.size();
@@ -346,7 +346,7 @@ void h5(const Cell& morpho, const std::string& filename) {
     offset += morpho.soma()->points().size();
 
     for (auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
-        const std::shared_ptr<Section>& section = *it;
+        const std::shared_ptr<Node>& section = *it;
         int parentOnDisk = (section->isRoot() ? 0 : newIds[section->parent()->id()]);
 
         const auto& points = section->points();
@@ -355,7 +355,8 @@ void h5(const Cell& morpho, const std::string& filename) {
 
         const auto numberOfPoints = points.size();
         const auto numberOfPerimeters = perimeters.size();
-        raw_structure.push_back({static_cast<int>(offset), section->type(), parentOnDisk});
+        raw_structure.push_back({static_cast<int>(offset),
+                static_cast<int>(section->type()), parentOnDisk});
 
         for (unsigned int i = 0; i < numberOfPoints; ++i)
             raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
@@ -389,8 +390,8 @@ void h5(const Cell& morpho, const std::string& filename) {
     endoplasmicReticulumH5(h5_file, morpho.endoplasmicReticulum());
 }
 
-template void h5(const Morphology& morpho, const std::string& filename);
-template void h5(const GlialCell& morpho, const std::string& filename);
+template void h5<Morphology, Section>(const Morphology& morpho, const std::string& filename);
+template void h5<GlialCell, GlialSection>(const GlialCell& morpho, const std::string& filename);
 
 }  // end namespace writer
 }  // end namespace mut

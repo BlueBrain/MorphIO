@@ -285,7 +285,7 @@ Property::Properties Morphology::buildReadOnly() const {
 }
 
 depth_iterator Morphology::depth_begin() const {
-    return depth_iterator(*this);
+    return depth_iterator(rootSections()[0]);
 }
 
 depth_iterator Morphology::depth_end() const {
@@ -293,7 +293,7 @@ depth_iterator Morphology::depth_end() const {
 }
 
 breadth_iterator Morphology::breadth_begin() const {
-    return breadth_iterator(*this);
+    return breadth_iterator(rootSections()[0]);
 }
 
 breadth_iterator Morphology::breadth_end() const {
@@ -359,7 +359,7 @@ void Morphology::write(const std::string& filename) {
         extension += my_tolower(c);
 
     if (extension == ".h5")
-        writer::h5(clean, filename);
+        writer::h5<Morphology, Section>(clean, filename);
     else if (extension == ".asc")
         writer::asc(clean, filename);
     else if (extension == ".swc")

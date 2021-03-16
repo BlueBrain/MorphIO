@@ -49,7 +49,7 @@ std::shared_ptr<SectionT> getParent(const std::shared_ptr<SectionT>& current) {
 
 namespace morphio {
 
-template <typename SectionT, typename MorphologyT>
+template <typename SectionT>
 class breadth_iterator_t
 {
   public:
@@ -62,7 +62,6 @@ class breadth_iterator_t
     breadth_iterator_t() = default;
 
     inline explicit breadth_iterator_t(const SectionT& section);
-    inline explicit breadth_iterator_t(const MorphologyT& morphology);
     inline breadth_iterator_t(const breadth_iterator_t& other);
 
     inline SectionT operator*() const;
@@ -77,7 +76,7 @@ class breadth_iterator_t
     std::deque<SectionT> deque_;
 };
 
-template <typename SectionT, typename MorphologyT>
+template <typename SectionT>
 class depth_iterator_t
 {
   public:
@@ -90,7 +89,6 @@ class depth_iterator_t
     depth_iterator_t() = default;
 
     inline explicit depth_iterator_t(const SectionT& section);
-    inline explicit depth_iterator_t(const MorphologyT& morphology);
     inline depth_iterator_t(const depth_iterator_t& other);
 
     inline SectionT operator*() const;
@@ -143,31 +141,24 @@ class upstream_iterator_t
 
 // breath_iterator_t class definition
 
-template <typename SectionT, typename MorphologyT>
-inline breadth_iterator_t<SectionT, MorphologyT>::breadth_iterator_t(const SectionT& section) {
+template <typename SectionT>
+inline breadth_iterator_t<SectionT>::breadth_iterator_t(const SectionT& section) {
     deque_.push_front(section);
 }
 
-template <typename SectionT, typename MorphologyT>
-inline breadth_iterator_t<SectionT, MorphologyT>::breadth_iterator_t(
-    const MorphologyT& morphology) {
-    const auto& children = detail::getChildren<SectionT, MorphologyT>(morphology);
-    std::copy(children.begin(), children.end(), std::back_inserter(deque_));
-}
-
-template <typename SectionT, typename MorphologyT>
-inline breadth_iterator_t<SectionT, MorphologyT>::breadth_iterator_t(
+template <typename SectionT>
+inline breadth_iterator_t<SectionT>::breadth_iterator_t(
     const breadth_iterator_t& other)
     : deque_(other.deque_) {}
 
-template <typename SectionT, typename MorphologyT>
-inline SectionT breadth_iterator_t<SectionT, MorphologyT>::operator*() const {
+template <typename SectionT>
+inline SectionT breadth_iterator_t<SectionT>::operator*() const {
     return deque_.front();
 }
 
-template <typename SectionT, typename MorphologyT>
-inline breadth_iterator_t<SectionT, MorphologyT>&
-breadth_iterator_t<SectionT, MorphologyT>::operator++() {
+template <typename SectionT>
+inline breadth_iterator_t<SectionT>&
+breadth_iterator_t<SectionT>::operator++() {
     if (deque_.empty()) {
         throw MorphioError("Can't iterate past the end");
     }
@@ -179,51 +170,45 @@ breadth_iterator_t<SectionT, MorphologyT>::operator++() {
     return *this;
 }
 
-template <typename SectionT, typename MorphologyT>
-inline breadth_iterator_t<SectionT, MorphologyT>
-breadth_iterator_t<SectionT, MorphologyT>::operator++(int) {
+template <typename SectionT>
+inline breadth_iterator_t<SectionT>
+breadth_iterator_t<SectionT>::operator++(int) {
     breadth_iterator_t ret(*this);
     ++(*this);
     return ret;
 }
 
-template <typename SectionT, typename MorphologyT>
-inline bool breadth_iterator_t<SectionT, MorphologyT>::operator==(
+template <typename SectionT>
+inline bool breadth_iterator_t<SectionT>::operator==(
     const breadth_iterator_t& other) const {
     return deque_ == other.deque_;
 }
 
-template <typename SectionT, typename MorphologyT>
-inline bool breadth_iterator_t<SectionT, MorphologyT>::operator!=(
+template <typename SectionT>
+inline bool breadth_iterator_t<SectionT>::operator!=(
     const breadth_iterator_t& other) const {
     return !(*this == other);
 }
 
 // depth_iterator_t class definition
 
-template <typename SectionT, typename MorphologyT>
-inline depth_iterator_t<SectionT, MorphologyT>::depth_iterator_t(const SectionT& section) {
+template <typename SectionT>
+inline depth_iterator_t<SectionT>::depth_iterator_t(const SectionT& section) {
     deque_.push_front(section);
 }
 
-template <typename SectionT, typename MorphologyT>
-inline depth_iterator_t<SectionT, MorphologyT>::depth_iterator_t(const MorphologyT& morphology) {
-    const auto& children = detail::getChildren<SectionT, MorphologyT>(morphology);
-    std::copy(children.rbegin(), children.rend(), std::front_inserter(deque_));
-}
-
-template <typename SectionT, typename MorphologyT>
-inline depth_iterator_t<SectionT, MorphologyT>::depth_iterator_t(const depth_iterator_t& other)
+template <typename SectionT>
+inline depth_iterator_t<SectionT>::depth_iterator_t(const depth_iterator_t& other)
     : deque_(other.deque_) {}
 
-template <typename SectionT, typename MorphologyT>
-inline SectionT depth_iterator_t<SectionT, MorphologyT>::operator*() const {
+template <typename SectionT>
+inline SectionT depth_iterator_t<SectionT>::operator*() const {
     return deque_.front();
 }
 
-template <typename SectionT, typename MorphologyT>
-inline depth_iterator_t<SectionT, MorphologyT>&
-depth_iterator_t<SectionT, MorphologyT>::operator++() {
+template <typename SectionT>
+inline depth_iterator_t<SectionT>&
+depth_iterator_t<SectionT>::operator++() {
     if (deque_.empty()) {
         throw MorphioError("Can't iterate past the end");
     }
@@ -235,22 +220,22 @@ depth_iterator_t<SectionT, MorphologyT>::operator++() {
     return *this;
 }
 
-template <typename SectionT, typename MorphologyT>
-inline depth_iterator_t<SectionT, MorphologyT> depth_iterator_t<SectionT, MorphologyT>::operator++(
+template <typename SectionT>
+inline depth_iterator_t<SectionT> depth_iterator_t<SectionT>::operator++(
     int) {
     depth_iterator_t ret(*this);
     ++(*this);
     return ret;
 }
 
-template <typename SectionT, typename MorphologyT>
-inline bool depth_iterator_t<SectionT, MorphologyT>::operator==(
+template <typename SectionT>
+inline bool depth_iterator_t<SectionT>::operator==(
     const depth_iterator_t& other) const {
     return deque_ == other.deque_;
 }
 
-template <typename SectionT, typename MorphologyT>
-inline bool depth_iterator_t<SectionT, MorphologyT>::operator!=(
+template <typename SectionT>
+inline bool depth_iterator_t<SectionT>::operator!=(
     const depth_iterator_t& other) const {
     return !(*this == other);
 }

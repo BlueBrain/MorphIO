@@ -12,8 +12,8 @@ namespace morphio {
 namespace mut {
 
 using upstream_iterator = morphio::upstream_iterator_t<std::shared_ptr<Section>>;
-using breadth_iterator = morphio::breadth_iterator_t<std::shared_ptr<Section>, Morphology>;
-using depth_iterator = morphio::depth_iterator_t<std::shared_ptr<Section>, Morphology>;
+using breadth_iterator = morphio::breadth_iterator_t<std::shared_ptr<Section>>;
+using depth_iterator = morphio::depth_iterator_t<std::shared_ptr<Section>>;
 
 class Section: public std::enable_shared_from_this<Section>
 {
