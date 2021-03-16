@@ -1,7 +1,7 @@
 #include <stack>
 
 #include <morphio/errorMessages.h>
-#include <morphio/mut/glialCell.h>
+#include <morphio/mut/glial_cell.h>
 #include <morphio/mut/glial_section.h>
 #include <morphio/tools.h>
 
@@ -15,7 +15,7 @@ static inline bool _emptySection(const std::shared_ptr<GlialSection>& section) {
 
 GlialSection::GlialSection(GlialCell* glialCell,
                  unsigned int id_,
-                 SectionType type_,
+                 GlialSectionType type_,
                  const Property::PointLevel& pointProperties)
     : _morphology(glialCell)
     , _pointProperties(pointProperties)

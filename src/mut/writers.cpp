@@ -289,7 +289,8 @@ static void endoplasmicReticulumH5(HighFive::File& h5_file, const EndoplasmicRet
 }
 
 
-void h5(const Morphology& morpho, const std::string& filename) {
+template <typename Cell>
+void h5(const Cell& morpho, const std::string& filename) {
     const auto& somaPoints = morpho.soma()->points();
     const auto numberOfSomaPoints = somaPoints.size();
 

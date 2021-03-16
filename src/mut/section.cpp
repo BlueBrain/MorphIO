@@ -5,6 +5,8 @@
 #include <morphio/mut/section.h>
 #include <morphio/tools.h>
 
+extern template class morphio::Section<morphio::CellFamily::NEURON>;
+
 namespace morphio {
 namespace mut {
 using morphio::readers::ErrorMessages;
@@ -22,7 +24,8 @@ Section::Section(Morphology* morphology,
     , _id(id_)
     , _sectionType(type_) {}
 
-Section::Section(Morphology* morphology, unsigned int id_, const morphio::Section& section_)
+
+Section::Section(Morphology* morphology, unsigned int id_, const morphio::Section<CellFamily::NEURON>& section_)
     : Section(morphology,
               id_,
               section_.type(),
@@ -121,7 +124,7 @@ std::shared_ptr<Section> Section::appendSection(const std::shared_ptr<Section>& 
     return ptr;
 }
 
-std::shared_ptr<Section> Section::appendSection(const morphio::Section& section, bool recursive) {
+std::shared_ptr<Section> Section::appendSection(const morphio::Section<CellFamily::NEURON>& section, bool recursive) {
     const std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter, section));
     unsigned int parentId = id();
     uint32_t childId = _morphology->_register(ptr);

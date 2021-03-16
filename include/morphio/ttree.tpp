@@ -115,7 +115,7 @@ class TTree
     /**
      * Return a vector with the section type of every section
      **/
-    const std::vector<typename Node::Type>& sectionTypes() const;
+    const std::vector<typename Node::Type> sectionTypes() const;
 
     /**
      * Return the graph connectivity of the TTree where each section
@@ -274,9 +274,11 @@ const std::vector<morphio::floatType>& TTree<Node, CRTP, Mut>::perimeters() cons
 }
 
 template <typename Node, typename CRTP, typename Mut>
-const std::vector<typename Node::Type>& TTree<Node, CRTP, Mut>::sectionTypes() const {
-    return get<Property::SectionType>();
-
+const std::vector<typename Node::Type> TTree<Node, CRTP, Mut>::sectionTypes() const {
+    std::vector<typename Node::Type> res;
+    for(auto type: get<Property::SectionType>())
+        res.push_back(static_cast<typename Node::Type>(type));
+    return res;
 }
 
 /*

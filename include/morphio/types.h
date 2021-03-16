@@ -14,7 +14,6 @@
 namespace morphio {
 
 using namespace enums;
-template <class Family>
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
@@ -31,7 +30,6 @@ class SectionBase;
 class Soma;
 
 namespace Property {
-template <typename Family>
 struct Properties;
 }
 
@@ -74,5 +72,6 @@ struct CellFamily {
     };
 };
 
+using GlialSection = Section<CellFamily::GLIA>;
 
 }  // namespace morphio

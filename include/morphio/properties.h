@@ -39,10 +39,8 @@ struct Point {
     using Type = morphio::Point;
 };
 
-template <typename Family>
 struct SectionType {
-    //using Type = morphio::SectionType;
-     using Type = typename morphio::Section<Family>::Type;
+    using Type = uint32_t;
 };
 
 struct Perimeter {
@@ -81,11 +79,9 @@ struct PointLevel {
     // bool operator!=(const PointLevel& other) const;
 };
 
-template <typename Family>
 struct SectionLevel {
     std::vector<Section::Type> _sections;
-    //std::vector<SectionType::Type<Family>> _sectionTypes;
-    std::vector<SectionType::Type<Family>> _sectionTypes;
+    std::vector<SectionType::Type> _sectionTypes;
     std::map<int, std::vector<unsigned int>> _children;
 
     bool operator==(const SectionLevel& other) const;
@@ -160,7 +156,7 @@ struct CellLevel {
 
     // A tuple (file format (std::string), major version, minor version)
     MorphologyVersion _version;
-    //morphio::CellFamily _cellFamily;
+    morphio::CellFamily _cellFamily;
     SomaType _somaType;
     std::vector<Annotation> _annotations;
     std::vector<Marker> _markers;
@@ -174,14 +170,13 @@ struct CellLevel {
 };
 
 // The lowest level data blob
-template <typename Family>
 struct Properties {
     ////////////////////////////////////////////////////////////////////////////////
     // Data stuctures
     ////////////////////////////////////////////////////////////////////////////////
 
     PointLevel _pointLevel;
-    SectionLevel<Family> _sectionLevel;
+    SectionLevel _sectionLevel;
     CellLevel _cellLevel;
     PointLevel _somaLevel;
 
@@ -201,11 +196,9 @@ struct Properties {
     const morphio::MorphologyVersion& version() const noexcept {
         return _cellLevel._version;
     }
-    /*
     const morphio::CellFamily& cellFamily() const noexcept {
         return _cellLevel._cellFamily;
     }
-    */
     const morphio::SomaType& somaType() const noexcept {
         return _cellLevel._somaType;
     }
@@ -218,11 +211,10 @@ const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>() 
 template <>
 const std::map<int32_t, std::vector<uint32_t>>& Properties::children<MitoSection>() const noexcept;
 
-template <typename Family>
-std::ostream& operator<<(std::ostream& os, const Properties<Family>& properties);
+std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);
 
-
+template <>
 const std::vector<Point::Type>& Properties::get<Point>() const noexcept;
 template <>
 std::vector<Point::Type>& Properties::get<Point>() noexcept;
@@ -263,10 +255,8 @@ const std::vector<Section::Type>& Properties::get<Section>() const noexcept;
 template <>
 std::vector<Section::Type>& Properties::get<Section>() noexcept;
 
-
-//template <>
-//const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept;
-
+template <>
+const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept;
 template <>
 std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept;
 

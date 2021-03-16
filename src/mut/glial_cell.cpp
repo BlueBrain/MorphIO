@@ -275,7 +275,7 @@ Property::Properties GlialCell::buildReadOnly() const {
 
         auto start = static_cast<int>(properties._pointLevel._points.size());
         properties._sectionLevel._sections.push_back({start, parentOnDisk});
-        properties._sectionLevel._sectionTypes.push_back(section_->type());
+        properties._sectionLevel._sectionTypes.push_back(static_cast<uint32_t>(section_->type()));
         newIds[sectionId] = sectionIdOnDisk++;
         _appendProperties(properties._pointLevel, section_->_pointProperties);
     }
@@ -302,21 +302,7 @@ glial_breadth_iterator GlialCell::glial_breadth_end() const {
 }
 
 void GlialCell::applyModifiers(unsigned int modifierFlags) {
-    if (modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS)
-        throw SectionBuilderError(
-            _err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
-
-    if (modifierFlags & SOMA_SPHERE)
-        modifiers::soma_sphere(*this);
-
-    if (modifierFlags & NO_DUPLICATES)
-        modifiers::no_duplicate_point(*this);
-
-    if (modifierFlags & TWO_POINTS_SECTIONS)
-        modifiers::two_points_sections(*this);
-
-    if (modifierFlags & NRN_ORDER)
-        modifiers::nrn_order(*this);
+    modifierFlags *= 2;
 }
 
 std::unordered_map<int, std::vector<unsigned int>> GlialCell::connectivity() {
@@ -361,10 +347,6 @@ void GlialCell::write(const std::string& filename) {
 
     if (extension == ".h5")
         writer::h5(clean, filename);
-    else if (extension == ".asc")
-        writer::asc(clean, filename);
-    else if (extension == ".swc")
-        writer::swc(clean, filename);
     else
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
 }

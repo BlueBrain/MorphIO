@@ -99,6 +99,7 @@ class Section: public SectionBase<Section<Family>>
      */
     Type type() const;
     friend class mut::Section;
+    friend class mut::GlialSection;
 
     template<typename Node, typename CRTP, typename Mut>
     friend class TTree;
