@@ -146,11 +146,6 @@ class TTree
      **/
     const MorphologyVersion& version() const;
 
-    /**
-     * Return the cell family (neuron or glia)
-     **/
-    const CellFamily& cellFamily() const;
-
   protected:
     friend class mut::Morphology;
     friend class mut::GlialCell;

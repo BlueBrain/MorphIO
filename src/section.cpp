@@ -74,6 +74,10 @@ std::ostream& operator<<(std::ostream& os, const morphio::Node<Family>& section)
     return os;
 }
 
+template std::ostream& operator<<(std::ostream& os, const morphio::NeuronalSection& section);
+template std::ostream& operator<<(std::ostream& os, const morphio::GlialSection& section);
+
+
 // operator<< must be defined in the global namespace to be usable there
 std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points) {
     for (const auto& point : points) {
