@@ -26,6 +26,8 @@ bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
 class Morphology
 {
   public:
+    using Family = CellFamily::NEURON;
+
     Morphology()
         : _counter(0)
         , _soma(std::make_shared<Soma>())

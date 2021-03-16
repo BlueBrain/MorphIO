@@ -146,6 +146,7 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
             // Version 1.0 only support NEURON has a CellFamily.
             // Other CellFamily have been added in version 1.1:
             // https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
+            _properties._cellLevel._cellFamily = CellFamily::NEURON::value;
         }
         return;
     } catch (const HighFive::Exception&) {
@@ -295,7 +296,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
         _properties.get<Property::Perimeter>().assign(perimeters.begin() + firstSectionOffset,
                                                       perimeters.end());
     } catch (...) {
-        if (_properties._cellLevel._cellFamily == 1)
+        if (_properties._cellLevel._cellFamily == CellFamily::GLIA::value)
             throw MorphioError("No empty perimeters allowed for glia morphology");
     }
 }
@@ -321,7 +322,7 @@ void MorphologyHDF5::_read(const std::string& groupName,
         data.resize(dims[0]);
         dataset.read(data);
     } catch (...) {
-        if (_properties._cellLevel._cellFamily == 1)
+        if (_properties._cellLevel._cellFamily == CellFamily::GLIA::value)
             throw MorphioError("No empty perimeters allowed for glia morphology");
     }
 }

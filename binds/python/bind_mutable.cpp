@@ -122,9 +122,9 @@ void bind_mutable_module(py::module& m) {
                                "Return the graph connectivity of the morphology "
                                "where each section is seen as a node\nNote: -1 is the soma node")
 
-        .def_property_readonly("cell_family",
-                               &morphio::mut::Morphology::cellFamily,
-                               "Returns the cell family (neuron or glia)")
+        // .def_property_readonly("cell_family",
+        //                        &morphio::mut::Morphology::cellFamily,
+        //                        "Returns the cell family (neuron or glia)")
 
         .def_property_readonly("soma_type",
                                &morphio::mut::Morphology::somaType,

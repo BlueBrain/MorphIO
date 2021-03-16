@@ -379,7 +379,7 @@ void h5(const Cell& morpho, const std::string& filename) {
     HighFive::Group g_metadata = h5_file.createGroup("metadata");
 
     write_attribute(g_metadata, "version", std::vector<uint32_t>{1, 2});
-    write_attribute(g_metadata, "cell_family", std::vector<uint32_t>{0}); // TODO fix this
+    write_attribute(g_metadata, "cell_family", std::vector<uint32_t>{Cell::Family::value});
     write_attribute(h5_file, "comment", std::vector<std::string>{version_string()});
 
     if (hasPerimeterData_) {

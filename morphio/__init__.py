@@ -2,7 +2,7 @@ from ._morphio import (
     AccessMode,
     Annotation,
     AnnotationType,
-    CellFamily,
+    # CellFamily,
     CellLevel,
     EndoplasmicReticulum,
     GlialCell,

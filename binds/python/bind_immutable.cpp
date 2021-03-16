@@ -124,9 +124,9 @@ void bind_immutable_module(py::module& m) {
                                "Return the graph connectivity of the morphology "
                                "where each section is seen as a node\nNote: -1 is the soma node")
         .def_property_readonly("soma_type", &morphio::Morphology::somaType, "Returns the soma type")
-        .def_property_readonly("cell_family",
-                               &morphio::Morphology::cellFamily,
-                               "Returns the cell family (neuron or glia)")
+        // .def_property_readonly("cell_family",
+        //                        &morphio::Morphology::cellFamily,
+        //                        "Returns the cell family (neuron or glia)")
         .def_property_readonly("version", &morphio::Morphology::version, "Returns the version")
 
         // Iterators
@@ -252,9 +252,9 @@ void bind_immutable_module(py::module& m) {
                                "Return the graph connectivity of the GlialCell "
                                "where each section is seen as a node\nNote: -1 is the soma node")
         .def_property_readonly("soma_type", &morphio::GlialCell::somaType, "Returns the soma type")
-        .def_property_readonly("cell_family",
-                               &morphio::GlialCell::cellFamily,
-                               "Returns the cell family (neuron or glia)")
+        // .def_property_readonly("cell_family",
+        //                        &morphio::GlialCell::cellFamily,
+        //                        "Returns the cell family (neuron or glia)")
         .def_property_readonly("version", &morphio::GlialCell::version, "Returns the version")
 
         // Iterators
