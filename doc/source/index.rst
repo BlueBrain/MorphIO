@@ -4,5 +4,6 @@
    :hidden:
 
    Home <self>
+   api
    specification
    specification_neurolucida
