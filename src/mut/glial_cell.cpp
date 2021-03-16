@@ -278,7 +278,7 @@ Property::Properties GlialCell::buildReadOnly() const {
 }
 
 glial_depth_iterator GlialCell::depth_begin() const {
-    return glial_depth_iterator(rootSections()[0]);
+    return glial_depth_iterator(rootSections());
 }
 
 glial_depth_iterator GlialCell::depth_end() const {
@@ -286,7 +286,7 @@ glial_depth_iterator GlialCell::depth_end() const {
 }
 
 glial_breadth_iterator GlialCell::breadth_begin() const {
-    return glial_breadth_iterator(rootSections()[0]);
+    return glial_breadth_iterator(rootSections());
 }
 
 glial_breadth_iterator GlialCell::breadth_end() const {

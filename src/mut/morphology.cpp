@@ -285,7 +285,7 @@ Property::Properties Morphology::buildReadOnly() const {
 }
 
 depth_iterator Morphology::depth_begin() const {
-    return depth_iterator(rootSections()[0]);
+    return depth_iterator(rootSections());
 }
 
 depth_iterator Morphology::depth_end() const {
@@ -293,7 +293,7 @@ depth_iterator Morphology::depth_end() const {
 }
 
 breadth_iterator Morphology::breadth_begin() const {
-    return breadth_iterator(rootSections()[0]);
+    return breadth_iterator(rootSections());
 }
 
 breadth_iterator Morphology::breadth_end() const {

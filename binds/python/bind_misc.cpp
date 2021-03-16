@@ -55,10 +55,13 @@ void bind_misc(py::module& m) {
         .value("axon", morphio::enums::SectionType::SECTION_AXON)
         .value("basal_dendrite", morphio::enums::SectionType::SECTION_DENDRITE)
         .value("apical_dendrite", morphio::enums::SectionType::SECTION_APICAL_DENDRITE)
-        // .value("glia_process", morphio::enums::SectionType::SECTION_GLIA_PROCESS)
-        // .value("glia_endfoot", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
         .export_values();
-
+     py::enum_<morphio::enums::GlialSectionType>(m, "GlialSectionType")
+        .value("undefined", morphio::enums::GlialSectionType::UNDEFINED)
+        .value("soma", morphio::enums::GlialSectionType::SOMA)
+        .value("endfoot", morphio::enums::GlialSectionType::ENDFOOT)
+        .value("glial_process", morphio::enums::GlialSectionType::PROCESS)
+        .export_values();
     py::enum_<morphio::enums::VascularSectionType>(m, "VasculatureSectionType")
         .value("undefined", morphio::enums::VascularSectionType::SECTION_NOT_DEFINED)
         .value("vein", morphio::enums::VascularSectionType::SECTION_VEIN)
