@@ -199,14 +199,6 @@ bool SectionLevel::operator!=(const SectionLevel& other) const {
     return diff(other, LogLevel::ERROR);
 }
 
-bool CellLevel::operator==(const CellLevel& other) const {
-    return !diff(other, LogLevel::ERROR);
-}
-
-bool CellLevel::operator!=(const CellLevel& other) const {
-    return diff(other, LogLevel::ERROR);
-}
-
 std::string CellLevel::fileFormat() const {
     return std::get<0>(_version);
 }

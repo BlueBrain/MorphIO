@@ -179,18 +179,6 @@ void bind_mutable_module(py::module& m) {
              "mutable_section"_a,
              "recursive"_a = false);
 
-    py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(m, "GlialCell")
-        .def(py::init<>())
-        .def(py::init<const std::string&>())
-        .def(py::init([](py::object arg) {
-                 return std::unique_ptr<morphio::mut::GlialCell>(
-                     new morphio::mut::GlialCell(py::str(arg)));
-             }),
-             "filename"_a,
-             "Additional Ctor that accepts as filename any python "
-             "object that implements __repr__ or __str__");
-
-
     py::class_<morphio::mut::Mitochondria>(m, "Mitochondria")
         .def(py::init<>())
         .def_property_readonly("root_sections",

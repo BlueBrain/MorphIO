@@ -9,7 +9,7 @@
 
 namespace morphio {
 
-extern template class Section<CellFamily::GLIA>;
+extern template class Node<CellFamily::GLIA>;
 
 namespace mut {
 using morphio::readers::ErrorMessages;

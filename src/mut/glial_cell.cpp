@@ -18,7 +18,7 @@ namespace morphio {
 
 namespace mut {
 
-void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset);
+extern void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset=0);
 
 using morphio::readers::ErrorMessages;
 GlialCell::GlialCell(const std::string& uri, unsigned int options)
@@ -48,7 +48,7 @@ GlialCell::GlialCell(const morphio::GlialCell& morphology, unsigned int options)
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(
         morphology._properties->_cellLevel);
 
-    for (const morphio::Section<CellFamily::GLIA>& root : morphology.rootSections()) {
+    for (const auto& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
 
@@ -88,7 +88,7 @@ bool _checkDuplicatePoint(const std::shared_ptr<GlialSection>& parent,
     return true;
 }
 
-std::shared_ptr<GlialSection> GlialCell::appendRootSection(const morphio::Section<CellFamily::GLIA>& section_,
+std::shared_ptr<GlialSection> GlialCell::appendRootSection(const morphio::GlialSection& section_,
                                                        bool recursive) {
     const std::shared_ptr<GlialSection> ptr(new GlialSection(this, _counter, section_));
     _register(ptr);
@@ -194,14 +194,6 @@ void GlialCell::deleteSection(const std::shared_ptr<GlialSection>& section_, boo
     }
 }
 
-
-void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset = 0) {
-    _appendVector(to._points, from._points, offset);
-    _appendVector(to._diameters, from._diameters, offset);
-
-    if (!from._perimeters.empty())
-        _appendVector(to._perimeters, from._perimeters, offset);
-}
 
 void GlialCell::sanitize() {
     sanitize(morphio::readers::DebugInfo());

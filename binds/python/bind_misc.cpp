@@ -80,12 +80,6 @@ void bind_misc(py::module& m) {
         .export_values();
 
 
-    py::enum_<morphio::enums::CellFamily>(m, "CellFamily")
-        .value("NEURON", morphio::enums::CellFamily::NEURON)
-        .value("GLIA", morphio::enums::CellFamily::GLIA)
-        .export_values();
-
-
     py::enum_<morphio::enums::Warning>(m, "Warning")
         .value("undefined", morphio::enums::Warning::UNDEFINED)
         .value("mitochondria_write_not_supported",

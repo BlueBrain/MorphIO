@@ -48,7 +48,7 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(
         morphology._properties->_cellLevel);
 
-    for (const morphio::Section<CellFamily::NEURON>& root : morphology.rootSections()) {
+    for (const morphio::NeuronalSection& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
 
@@ -88,7 +88,7 @@ bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
     return true;
 }
 
-std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section<CellFamily::NEURON>& section_,
+std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& section_,
                                                        bool recursive) {
     const std::shared_ptr<Section> ptr(new Section(this, _counter, section_));
     _register(ptr);

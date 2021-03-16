@@ -13,8 +13,8 @@ bool diff(const Morphology& left,
    Perform a diff on 2 sections, returns True if items differ
 **/
 template <typename Family>
-bool diff(const Section<Family>& left,
-          const Section<Family>& right,
+bool diff(const Node<Family>& left,
+          const Node<Family>& right,
           morphio::enums::LogLevel verbose = morphio::enums::LogLevel::INFO);
 
 namespace mut {

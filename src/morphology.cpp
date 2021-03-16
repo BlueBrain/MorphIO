@@ -29,22 +29,22 @@ namespace morphio {
 
 
 Morphology::Morphology(const Property::Properties& properties, unsigned int options)
-    : TTree<Section<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(properties, options) {
+    : TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(properties, options) {
     init();
 }
 
 Morphology::Morphology(const std::string& source, unsigned int options)
-    : TTree<Section<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(source, options) {
+    : TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(source, options) {
     init();
 }
 
 Morphology::Morphology(const HighFive::Group& group, unsigned int options)
-    : TTree<Section<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(group, options) {
+    : TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(group, options) {
     init();
 }
 
 Morphology::Morphology(morphio::mut::Morphology morphology)
-    : TTree<Section<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(morphology) {
+    : TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(morphology) {
     init();
 }
 
@@ -79,6 +79,6 @@ const SomaType& Morphology::somaType() const {
 }
 
 // Explicit instantiation
-template class TTree<Section<CellFamily::NEURON>, Morphology, mut::Morphology>;
+template class TTree<Node<CellFamily::NEURON>, Morphology, mut::Morphology>;
 
 }  // namespace morphio

@@ -6,63 +6,64 @@ namespace morphio {
 
 
 template <typename Family>
-typename Family::Type Section<Family>::type() const {
-    // auto a = _properties->get<Property::SectionType>();
-    return Family::Type(0);
+typename Family::Type Node<Family>::type() const {
+    return static_cast<typename Family::Type>(
+        this -> _properties-> template get<Property::SectionType>()[0]
+        );
 }
 
 template <typename Family>
-depth_iterator_t<Section<Family>> Section<Family>::depth_begin() const {
-    return depth_iterator_t<Section<Family>>(*this);
+depth_iterator_t<Node<Family>> Node<Family>::depth_begin() const {
+    return depth_iterator_t<Node<Family>>(*this);
 }
 
 template <typename Family>
-depth_iterator_t<Section<Family>> Section<Family>::depth_end() const {
-    return depth_iterator_t<Section<Family>>();
+depth_iterator_t<Node<Family>> Node<Family>::depth_end() const {
+    return depth_iterator_t<Node<Family>>();
 }
 
 template <typename Family>
-breadth_iterator_t<Section<Family>> Section<Family>::breadth_begin() const {
-    return breadth_iterator_t<Section<Family>>(*this);
+breadth_iterator_t<Node<Family>> Node<Family>::breadth_begin() const {
+    return breadth_iterator_t<Node<Family>>(*this);
 }
 
 template <typename Family>
-breadth_iterator_t<Section<Family>> Section<Family>::breadth_end() const {
-    return breadth_iterator_t<Section<Family>>();
+breadth_iterator_t<Node<Family>> Node<Family>::breadth_end() const {
+    return breadth_iterator_t<Node<Family>>();
 }
 
 template <typename Family>
-upstream_iterator_t<Section<Family>> Section<Family>::upstream_begin() const {
-    return upstream_iterator(*this);
+upstream_iterator_t<Node<Family>> Node<Family>::upstream_begin() const {
+    return upstream_iterator_t<Node<Family>>(*this);
 }
 
 template <typename Family>
-upstream_iterator_t<Section<Family>> Section<Family>::upstream_end() const {
-    return upstream_iterator_t<Section<Family>>();
+upstream_iterator_t<Node<Family>> Node<Family>::upstream_end() const {
+    return upstream_iterator_t<Node<Family>>();
 }
 
 template <typename Family>
-range<const Point> Section<Family>::points() const {
+range<const Point> Node<Family>::points() const {
     return this-> template get<Property::Point>();
 }
 
 template <typename Family>
-range<const floatType> Section<Family>::diameters() const {
+range<const floatType> Node<Family>::diameters() const {
     return this -> template get<Property::Diameter>();
 }
 
 template <typename Family>
-range<const floatType> Section<Family>::perimeters() const {
+range<const floatType> Node<Family>::perimeters() const {
     return this -> template get<Property::Perimeter>();
 }
 
-template class SectionBase<Section<CellFamily::NEURON>>;
-template class SectionBase<Section<CellFamily::GLIA>>;
+template class Node<CellFamily::NEURON>;
+template class Node<CellFamily::GLIA>;
 
 }  // namespace morphio
 
 template <typename Family>
-std::ostream& operator<<(std::ostream& os, const morphio::Section<Family>& section) {
+std::ostream& operator<<(std::ostream& os, const morphio::Node<Family>& section) {
     const auto& points = section.points();
     if (points.empty()) {
         os << "Section(id=" << section.id() << ", points=[])";

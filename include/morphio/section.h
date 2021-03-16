@@ -31,7 +31,7 @@ namespace morphio {
 class Morphology;
 
 template <typename Family>
-class Section: public SectionBase<Section<Family>>
+class Node: public SectionBase<Node<Family>>
 {
     using SectionId = Property::Section;
     using PointAttribute = Property::Point;
@@ -42,20 +42,20 @@ class Section: public SectionBase<Section<Family>>
     /**
        Depth first search iterator
     **/
-    depth_iterator_t<Section> depth_begin() const;
-    depth_iterator_t<Section> depth_end() const;
+    depth_iterator_t<Node> depth_begin() const;
+    depth_iterator_t<Node> depth_end() const;
 
     /**
        Breadth first search iterator
     **/
-    breadth_iterator_t<Section> breadth_begin() const;
-    breadth_iterator_t<Section> breadth_end() const;
+    breadth_iterator_t<Node> breadth_begin() const;
+    breadth_iterator_t<Node> breadth_end() const;
 
     /**
        Upstream first search iterator
     **/
-    upstream_iterator_t<Section> upstream_begin() const;
-    upstream_iterator_t<Section> upstream_end() const;
+    upstream_iterator_t<Node> upstream_begin() const;
+    upstream_iterator_t<Node> upstream_end() const;
 
     /**
      * Return a view
@@ -88,19 +88,19 @@ class Section: public SectionBase<Section<Family>>
     template<typename Node, typename CRTP, typename Mut>
     friend class TTree;
 
-    friend class SectionBase<Section>;
+    friend class SectionBase<Node>;
 
   protected:
-    Section<Family>(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
-        : SectionBase<Section<Family>>(id_, properties) {}
+    Node<Family>(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
+        : SectionBase<Node<Family>>(id_, properties) {}
 };
 
 // explicit instanciation
-extern template class SectionBase<Section<CellFamily::NEURON>>;
-extern template class SectionBase<Section<CellFamily::GLIA>>;
+extern template class Node<CellFamily::NEURON>;
+extern template class Node<CellFamily::GLIA>;
 
 }  // namespace morphio
 
 template <typename Family>
-std::ostream& operator<<(std::ostream& os, const morphio::Section<Family>& section);
+std::ostream& operator<<(std::ostream& os, const morphio::Node<Family>& section);
 std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);

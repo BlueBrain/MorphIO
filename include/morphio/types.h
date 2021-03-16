@@ -18,7 +18,7 @@ class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
 template <class Family>
-class Section;
+class Node;
 
 template <class TSection, class CRTP, class Mut>
 class TTree;
@@ -72,6 +72,10 @@ struct CellFamily {
     };
 };
 
-using GlialSection = Section<CellFamily::GLIA>;
+using NeuronalSection = Node<CellFamily::NEURON>;
+using GlialSection = Node<CellFamily::GLIA>;
+
+// legacy name
+using Section = NeuronalSection;
 
 }  // namespace morphio

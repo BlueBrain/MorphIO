@@ -80,7 +80,7 @@ inline uint32_t SectionBase<T>::id() const noexcept {
 
 }  // namespace morphio
 template <typename Family>
-std::ostream& operator<<(std::ostream& os, const morphio::Section<Family>& section);
+std::ostream& operator<<(std::ostream& os, const morphio::Node<Family>& section);
 std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);
 
 #include "section_base.tpp"

@@ -161,9 +161,6 @@ struct CellLevel {
     std::vector<Annotation> _annotations;
     std::vector<Marker> _markers;
 
-    bool diff(const CellLevel& other, LogLevel logLevel) const;
-    bool operator==(const CellLevel& other) const;
-    bool operator!=(const CellLevel& other) const;
     std::string fileFormat() const;
     uint32_t majorVersion();
     uint32_t minorVersion();
