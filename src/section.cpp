@@ -1,48 +1,58 @@
-#include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/tools.h>
 #include <morphio/vector_types.h>
 
 namespace morphio {
 
-SectionType Section::type() const {
-    auto val = _properties->get<Property::SectionType>()[_id];
-    return val;
+
+template <typename Family>
+typename Family::Type Section<Family>::type() const {
+    // auto a = _properties->get<Property::SectionType>();
+    return Family::Type(0);
 }
 
-depth_iterator Section::depth_begin() const {
+template <typename Family>
+depth_iterator Section<Family>::depth_begin() const {
     return depth_iterator(*this);
 }
 
-depth_iterator Section::depth_end() const {
+template <typename Family>
+depth_iterator Section<Family>::depth_end() const {
     return depth_iterator();
 }
 
-breadth_iterator Section::breadth_begin() const {
+template <typename Family>
+breadth_iterator Section<Family>::breadth_begin() const {
     return breadth_iterator(*this);
 }
 
-breadth_iterator Section::breadth_end() const {
+template <typename Family>
+breadth_iterator Section<Family>::breadth_end() const {
     return breadth_iterator();
 }
 
-upstream_iterator Section::upstream_begin() const {
+template <typename Family>
+upstream_iterator Section<Family>::upstream_begin() const {
     return upstream_iterator(*this);
 }
 
-upstream_iterator Section::upstream_end() const {
+template <typename Family>
+upstream_iterator Section<Family>::upstream_end() const {
     return upstream_iterator();
 }
 
-range<const Point> Section::points() const {
+template <typename Family>
+range<const Point> Section<Family>::points() const {
     return get<Property::Point>();
 }
 
-range<const floatType> Section::diameters() const {
+template <typename Family>
+range<const floatType> Section<Family>::diameters() const {
     return get<Property::Diameter>();
 }
 
-range<const floatType> Section::perimeters() const {
+template <typename Family>
+range<const floatType> Section<Family>::perimeters() const {
     return get<Property::Perimeter>();
 }
 

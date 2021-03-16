@@ -119,8 +119,8 @@ class GlialCell
 
        If id == -1, the iteration will start at each root section, successively
     **/
-    glial_depth_iterator glial_depth_begin() const;
-    glial_depth_iterator glial_depth_end() const;
+    glial_depth_iterator depth_begin() const;
+    glial_depth_iterator depth_end() const;
 
     /**
        Breadth first iterator
@@ -128,8 +128,8 @@ class GlialCell
        If id == -1, the iteration will be successively performed starting
        at each root section
     **/
-    glial_breadth_iterator glial_breadth_begin() const;
-    glial_breadth_iterator glial_breadth_end() const;
+    glial_breadth_iterator breadth_begin() const;
+    glial_breadth_iterator breadth_end() const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //

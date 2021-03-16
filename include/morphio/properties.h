@@ -156,7 +156,7 @@ struct CellLevel {
 
     // A tuple (file format (std::string), major version, minor version)
     MorphologyVersion _version;
-    morphio::CellFamily _cellFamily;
+    uint32_t _cellFamily;
     SomaType _somaType;
     std::vector<Annotation> _annotations;
     std::vector<Marker> _markers;
@@ -195,9 +195,6 @@ struct Properties {
 
     const morphio::MorphologyVersion& version() const noexcept {
         return _cellLevel._version;
-    }
-    const morphio::CellFamily& cellFamily() const noexcept {
-        return _cellLevel._cellFamily;
     }
     const morphio::SomaType& somaType() const noexcept {
         return _cellLevel._somaType;

@@ -4,6 +4,7 @@
 #include <morphio/errorMessages.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
+#include <morphio/mut/glial_cell.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 #include <morphio/version.h>
@@ -28,7 +29,8 @@ struct base_type<std::vector<T>>: base_type<T> {};
 
 constexpr int FLOAT_PRECISION_PRINT = 9;
 
-bool hasPerimeterData(const morphio::mut::Morphology& morpho) {
+template <typename Cell>
+bool hasPerimeterData(const Cell& morpho) {
     return !morpho.rootSections().empty() && !morpho.rootSections().front()->perimeters().empty();
 }
 
@@ -376,7 +378,7 @@ void h5(const Cell& morpho, const std::string& filename) {
     HighFive::Group g_metadata = h5_file.createGroup("metadata");
 
     write_attribute(g_metadata, "version", std::vector<uint32_t>{1, 2});
-    write_attribute(g_metadata, "cell_family", std::vector<uint32_t>{morpho.cellFamily()});
+    write_attribute(g_metadata, "cell_family", std::vector<uint32_t>{0}); // TODO fix this
     write_attribute(h5_file, "comment", std::vector<std::string>{version_string()});
 
     if (hasPerimeterData_) {
@@ -386,6 +388,9 @@ void h5(const Cell& morpho, const std::string& filename) {
     mitochondriaH5(h5_file, morpho.mitochondria());
     endoplasmicReticulumH5(h5_file, morpho.endoplasmicReticulum());
 }
+
+template void h5(const Morphology& morpho, const std::string& filename);
+template void h5(const GlialCell& morpho, const std::string& filename);
 
 }  // end namespace writer
 }  // end namespace mut

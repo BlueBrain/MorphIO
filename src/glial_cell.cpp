@@ -22,7 +22,6 @@
 #include "readers/morphologyHDF5.h"
 #include "readers/morphologySWC.h"
 
-
 namespace morphio {
 
 

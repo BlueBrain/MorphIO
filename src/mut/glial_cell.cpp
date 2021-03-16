@@ -210,7 +210,7 @@ void GlialCell::sanitize() {
 void GlialCell::sanitize(const morphio::readers::DebugInfo& debugInfo) {
     morphio::readers::ErrorMessages err(debugInfo._filename);
 
-    glial_depth_iterator it = glial_depth_begin();
+    glial_depth_iterator it = depth_begin();
     while (it != glial_depth_end()) {
         std::shared_ptr<GlialSection> section_ = *it;
 
@@ -268,7 +268,7 @@ Property::Properties GlialCell::buildReadOnly() const {
     properties._cellLevel._somaType = _soma->type();
     _appendProperties(properties._somaLevel, _soma->_pointProperties);
 
-    for (auto it = glial_depth_begin(); it != glial_depth_end(); ++it) {
+    for (auto it = depth_begin(); it != glial_depth_end(); ++it) {
         const std::shared_ptr<GlialSection>& section_ = *it;
         unsigned int sectionId = section_->id();
         int parentOnDisk = (section_->isRoot() ? -1 : newIds[section_->parent()->id()]);
@@ -285,19 +285,19 @@ Property::Properties GlialCell::buildReadOnly() const {
     return properties;
 }
 
-glial_depth_iterator GlialCell::glial_depth_begin() const {
+glial_depth_iterator GlialCell::depth_begin() const {
     return glial_depth_iterator(*this);
 }
 
-glial_depth_iterator GlialCell::glial_depth_end() const {
+glial_depth_iterator GlialCell::depth_end() const {
     return glial_depth_iterator();
 }
 
-glial_breadth_iterator GlialCell::glial_breadth_begin() const {
+glial_breadth_iterator GlialCell::breadth_begin() const {
     return glial_breadth_iterator(*this);
 }
 
-glial_breadth_iterator GlialCell::glial_breadth_end() const {
+glial_breadth_iterator GlialCell::breadth_end() const {
     return glial_breadth_iterator();
 }
 

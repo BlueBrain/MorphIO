@@ -352,7 +352,6 @@ Property::Properties load(const std::string& uri, unsigned int options) {
     nb_.applyModifiers(options);
 
     Property::Properties properties = nb_.buildReadOnly();
-    properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"asc", 1, 0};
     return properties;
 }

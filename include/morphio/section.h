@@ -36,15 +36,6 @@ using breadth_iterator = breadth_iterator_t<Section<Family>, Morphology>;
 template <typename Family>
 using depth_iterator = depth_iterator_t<Section<Family>, Morphology>;
 
-/*
-template <typename Family>
-class Section {
-public:
- Section<Family>() {};
- typename Family::Type type;
-
-};
-*/
 template <typename Family>
 class Section: public SectionBase<Section<Family>>
 {
@@ -52,7 +43,6 @@ class Section: public SectionBase<Section<Family>>
     using PointAttribute = Property::Point;
 
   public:
-    //using Type = SectionType;
     using Type = typename Family::Type;
 
     /**

@@ -352,7 +352,6 @@ class SWCBuilder
 
 Property::Properties load(const std::string& uri, unsigned int options) {
     auto properties = SWCBuilder(uri)._buildProperties(options);
-    properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"swc", 1, 0};
     return properties;
 }

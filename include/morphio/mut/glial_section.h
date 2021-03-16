@@ -99,7 +99,7 @@ class GlialSection: public std::enable_shared_from_this<GlialSection>
                                            bool recursive = false);
 
     std::shared_ptr<GlialSection> appendSection(
-        const Property::PointLevel&, GlialSectionType sectionType = GlialSectionType::SECTION_GLIA_UNDEFINED);
+        const Property::PointLevel&, GlialSectionType sectionType = GlialSectionType::UNDEFINED);
 
   private:
     friend class GlialCell;
