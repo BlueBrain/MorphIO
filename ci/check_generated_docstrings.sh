@@ -35,7 +35,7 @@ if [[ ! -d $VENV ]]; then
     $VENV/bin/python -m pip install $PACKAGE
 fi
 
-DOCSTRING_PATH=./binds/python/docstrings.h
+DOCSTRING_PATH=./binds/python/generated/docstrings.h
 rm -f $DOCSTRING_PATH
 
 $VENV/bin/python -m pybind11_mkdoc \
@@ -48,4 +48,4 @@ $VENV/bin/python -m pybind11_mkdoc \
   -I./include
 
 # fail if there are diffs in the generated docstrings
-git diff --exit-code -- ./binds/python/docstrings.h
+git diff --exit-code -- ./binds/python/generated/docstrings.h
