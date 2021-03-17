@@ -233,6 +233,10 @@ class Morphology
 
     std::map<uint32_t, uint32_t> _parent;
     std::map<uint32_t, std::vector<std::shared_ptr<Section>>> _children;
+
+  private:
+    void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
+                      const std::shared_ptr<Section> section);
 };
 
 inline const std::vector<std::shared_ptr<Section>>& Morphology::rootSections() const noexcept {

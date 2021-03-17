@@ -106,6 +106,17 @@ class Section: public std::enable_shared_from_this<Section>
     Section(Morphology*, unsigned int id, const morphio::Section& section);
     Section(Morphology*, unsigned int id, const Section&);
 
+
+    /**
+      If section is an orphan, in other words it does not belong to an a morphology
+    **/
+    void throwIfNoOwningMorphology() const;
+
+    /**
+      Getter for _morphology; checks the pointer is non-null, throws otherwise
+    **/
+    Morphology* getOwningMorphologyOrThrow() const;
+
     Morphology* _morphology;
     Property::PointLevel _pointProperties;
     uint32_t _id;

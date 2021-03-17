@@ -18,6 +18,7 @@ from . utils import assert_substring, captured_output, tmp_asc_file, setup_tempd
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
+DATA_DIR = Path(__file__).parent / 'data'
 SIMPLE = Morphology(os.path.join(_path, "simple.swc"))
 
 
@@ -509,3 +510,52 @@ def test_glia_round_trip():
         g.write(filename)
         g2 = GlialCell(filename)
         assert_equal(len(g.sections), len(g2.sections))
+
+def _get_section():
+    '''this is used so that the reference to m is destroyed'''
+    m = Morphology(DATA_DIR / 'simple.swc')
+    s = m.root_sections[0]
+    return s
+
+def test_lifetime_destroyed_morphology():
+    '''accessing topological info after a Morphology has been destroyed should raise'''
+    m = Morphology(DATA_DIR / 'simple.swc')
+    s = m.root_sections[0]
+
+    del m # ~mut.Morphology() called
+
+    with assert_raises(RuntimeError) as obj:
+        s.children
+
+def test_lifetime_destroyed_morphology():
+    '''accessing topological info after a Morphology has been destroyed should raise'''
+    section = _get_section()
+    assert_array_equal(section.points,
+                       np.array([[0., 0., 0.],
+                                 [0., 5., 0.]], dtype=np.float32))
+
+    with assert_raises(RuntimeError) as obj:
+        section.children
+
+def test_lifetime_copy_single_section():
+    '''Copying a single section from a destroyed morphology works because it
+    does not use any topological information'''
+    section = _get_section()
+
+    # Proof that the morphology has really been destroyed
+    with assert_raises(RuntimeError) as obj:
+        section.children
+
+    morph = Morphology()
+    morph.append_root_section(section)
+    del section
+    assert_equal(len(morph.root_sections), 1)
+    assert_array_equal(morph.root_sections[0].points,
+                       np.array([[0., 0., 0.],
+                                 [0., 5., 0.]], dtype=np.float32))
+
+def test_lifetime_iteration_fails_with_orphan_section():
+    section = _get_section()
+    for iter_type in IterType.depth_first, IterType.breadth_first, IterType.upstream:
+        with assert_raises(RuntimeError) as obj:
+            section.iter(iter_type)

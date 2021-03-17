@@ -34,21 +34,36 @@ Section::Section(Morphology* morphology, unsigned int id_, const Section& sectio
     , _id(id_)
     , _sectionType(section_._sectionType) {}
 
+void Section::throwIfNoOwningMorphology() const {
+    if (!_morphology) {
+        throw std::runtime_error("Section does not belong to a morphology, impossible operation");
+    }
+}
+
+Morphology* Section::getOwningMorphologyOrThrow() const {
+    throwIfNoOwningMorphology();
+    return _morphology;
+}
+
 const std::shared_ptr<Section>& Section::parent() const {
-    return _morphology->_sections.at(_morphology->_parent.at(id()));
+    const Morphology* morphology = getOwningMorphologyOrThrow();
+    return morphology->_sections.at(morphology->_parent.at(id()));
 }
 
 bool Section::isRoot() const {
-    const auto parentId = _morphology->_parent.find(id());
-    if (parentId != _morphology->_parent.end()) {
-        return _morphology->_sections.find(parentId->second) == _morphology->_sections.end();
+    const Morphology* morphology = getOwningMorphologyOrThrow();
+    const auto parentId = morphology->_parent.find(id());
+    if (parentId != morphology->_parent.end()) {
+        return morphology->_sections.find(parentId->second) == morphology->_sections.end();
     }
     return true;
 }
 
 const std::vector<std::shared_ptr<Section>>& Section::children() const {
-    const auto it = _morphology->_children.find(id());
-    if (it == _morphology->_children.end()) {
+    const Morphology* morphology = getOwningMorphologyOrThrow();
+
+    const auto it = morphology->_children.find(id());
+    if (it == morphology->_children.end()) {
         static std::vector<std::shared_ptr<Section>> empty;
         return empty;
     }
@@ -56,26 +71,32 @@ const std::vector<std::shared_ptr<Section>>& Section::children() const {
 }
 
 depth_iterator Section::depth_begin() const {
+    throwIfNoOwningMorphology();
     return depth_iterator(const_cast<Section*>(this)->shared_from_this());
 }
 
 depth_iterator Section::depth_end() const {
+    throwIfNoOwningMorphology();
     return depth_iterator();
 }
 
 breadth_iterator Section::breadth_begin() const {
+    throwIfNoOwningMorphology();
     return breadth_iterator(const_cast<Section*>(this)->shared_from_this());
 }
 
 breadth_iterator Section::breadth_end() const {
+    throwIfNoOwningMorphology();
     return breadth_iterator();
 }
 
 upstream_iterator Section::upstream_begin() const {
+    throwIfNoOwningMorphology();
     return upstream_iterator(const_cast<Section*>(this)->shared_from_this());
 }
 
 upstream_iterator Section::upstream_end() const {
+    throwIfNoOwningMorphology();
     return upstream_iterator();
 }
 
@@ -91,26 +112,28 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section>& secti
 
 std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> original_section,
                                                 bool recursive) {
+    Morphology* morphology = getOwningMorphologyOrThrow();
+
     const std::shared_ptr<Section> ptr(
-        new Section(_morphology, _morphology->_counter, *original_section));
+        new Section(morphology, morphology->_counter, *original_section));
     unsigned int parentId = id();
-    uint32_t childId = _morphology->_register(ptr);
-    auto& _sections = _morphology->_sections;
+    uint32_t childId = morphology->_register(ptr);
+    auto& _sections = morphology->_sections;
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
         printError(Warning::APPENDING_EMPTY_SECTION,
-                   _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+                   morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
         printError(Warning::WRONG_DUPLICATE,
-                   _morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
-                                                             _sections.at(parentId)));
+                   morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
+                                                            _sections.at(parentId)));
     }
 
-    _morphology->_parent[childId] = parentId;
-    _morphology->_children[parentId].push_back(ptr);
+    morphology->_parent[childId] = parentId;
+    morphology->_children[parentId].push_back(ptr);
 
     // Careful not to use a reference here or you will face ref invalidation problem with vector
     // resize The argument `original_section` of this function could be a reference to the
@@ -126,24 +149,25 @@ std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> origina
 }
 
 std::shared_ptr<Section> Section::appendSection(const morphio::Section& section, bool recursive) {
-    const std::shared_ptr<Section> ptr(new Section(_morphology, _morphology->_counter, section));
+    Morphology* morphology = getOwningMorphologyOrThrow();
+    const std::shared_ptr<Section> ptr(new Section(morphology, morphology->_counter, section));
     unsigned int parentId = id();
-    uint32_t childId = _morphology->_register(ptr);
-    auto& _sections = _morphology->_sections;
+    uint32_t childId = morphology->_register(ptr);
+    auto& _sections = morphology->_sections;
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
         printError(Warning::APPENDING_EMPTY_SECTION,
-                   _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+                   morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
         printError(Warning::WRONG_DUPLICATE,
-                   _morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
-                                                             _sections.at(parentId)));
+                   morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
+                                                            _sections.at(parentId)));
 
-    _morphology->_parent[childId] = parentId;
-    _morphology->_children[parentId].push_back(ptr);
+    morphology->_parent[childId] = parentId;
+    morphology->_children[parentId].push_back(ptr);
 
     if (recursive) {
         for (auto child : section.children()) {
@@ -156,9 +180,10 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
 
 std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& pointProperties,
                                                 SectionType sectionType) {
+    Morphology* morphology = getOwningMorphologyOrThrow();
     unsigned int parentId = id();
 
-    auto& _sections = _morphology->_sections;
+    auto& _sections = morphology->_sections;
     if (sectionType == SectionType::SECTION_UNDEFINED)
         sectionType = type();
 
@@ -166,23 +191,23 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
         throw morphio::SectionBuilderError("Cannot create section with type soma");
 
     std::shared_ptr<Section> ptr(
-        new Section(_morphology, _morphology->_counter, sectionType, pointProperties));
+        new Section(morphology, morphology->_counter, sectionType, pointProperties));
 
-    uint32_t childId = _morphology->_register(ptr);
+    uint32_t childId = morphology->_register(ptr);
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection)
         printError(Warning::APPENDING_EMPTY_SECTION,
-                   _morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+                   morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
         printError(Warning::WRONG_DUPLICATE,
-                   _morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
-                                                             _sections[parentId]));
+                   morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
+                                                            _sections[parentId]));
 
-    _morphology->_parent[childId] = parentId;
-    _morphology->_children[parentId].push_back(ptr);
+    morphology->_parent[childId] = parentId;
+    morphology->_children[parentId].push_back(ptr);
     return ptr;
 }
 
