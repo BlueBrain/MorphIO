@@ -6,7 +6,7 @@
 # from the C++ doxygen comments. This is beneficial for maintaining
 # consistency and reducing duplication.
 #
-# In order to enable libsonata to be built without enforcing clang
+# In order to enable morphio to be built without enforcing clang
 # as a dependency (required by mkdoc.py), we include the generated
 # docstrings in source control.
 #
