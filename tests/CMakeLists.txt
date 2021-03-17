@@ -1,6 +1,7 @@
 set(TESTS_SRC
     main.cpp
     test_morphology.cpp
+    test_mut_morphology.cpp
 )
 
 add_executable(unittests ${TESTS_SRC})

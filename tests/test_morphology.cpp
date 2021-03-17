@@ -3,6 +3,7 @@
 
 #include <highfive/H5File.hpp>
 #include <morphio/morphology.h>
+#include <morphio/mut/morphology.h>
 
 
 TEST_CASE("LoadH5Morphology", "[morphology]") {

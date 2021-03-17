@@ -8,7 +8,7 @@ from numpy.testing import assert_array_equal
 from morphio import (Morphology, RawDataError, SectionType, SomaError, SomaType,
                      ostream_redirect, set_maximum_warnings, set_ignored_warning, Warning)
 from . utils import (_test_swc_exception, assert_substring, assert_string_equal, captured_output,
-                   strip_color_codes, tmp_swc_file, strip_all, ignored_warning)
+                   strip_color_codes, tmp_swc_file, ignored_warning)
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -447,6 +447,7 @@ def test_root_node_split():
 def test_three_point_soma():
     n = Morphology(os.path.join(_path, 'three_point_soma.swc'))
     assert_equal(n.soma_type, SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+
 
 def test_version():
     assert_array_equal(Morphology(os.path.join(_path, 'simple.swc')).version,
