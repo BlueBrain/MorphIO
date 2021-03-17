@@ -40,7 +40,9 @@ rm -f $DOCSTRING_PATH
 
 $VENV/bin/python -m pybind11_mkdoc \
   -o $DOCSTRING_PATH \
-  ./include/morphio/**/*.h \
+  ./include/morphio/mut/*.h \
+  ./include/morphio/vasc/*.h \
+  ./include/morphio/*.h \
   -Wno-pragma-once-outside-header \
   -ferror-limit=100000 \
   -I./include
