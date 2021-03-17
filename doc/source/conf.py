@@ -78,7 +78,7 @@ def doxygen_build(app):
 def render_doxygen_pages(app):
     """Render the templated output."""
     NAMESPACE_SEP = "_1_1"
-    NAMESPACE_ROOT = "bbp"
+    NAMESPACE_ROOT = "morphio"
 
     root_dir = Path(app.confdir)
     template_dir = root_dir / "_templates"
