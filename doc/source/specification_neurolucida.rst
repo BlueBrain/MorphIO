@@ -1,5 +1,8 @@
+Specification Neurolucida
+=========================
+
 Soma
-====
+----
 
 * Files without a soma are valid.
 * Multiple soma
@@ -7,13 +10,13 @@ Soma
   `Unit test <https://github.com/BlueBrain/MorphIO/blob/5e111f3141f7a1ee72e0260111ce569741d80acb/tests/test_neurolucida.py#L58>`_
 
 Ignored keywords
-================
+----------------
 
 All S-expressions starting with a keyword other than ``CellBody, Axon, Dendrite, Apical`` will be
 skipped.
 
 Duplicate points
-================
+----------------
 
 When reading an ASC file, the last point of a section will be added as the first point of the
 child sections if not already present. That means these two representations are equivalent:
@@ -62,7 +65,7 @@ be displayed if the first point of a section differs from the last point of the 
 
 
 Single point section
-====================
+--------------------
 A section made of only one point will be treated differently depending on whether the point
 is a duplicate of the parent section last point or not.
 
@@ -118,7 +121,7 @@ is a duplicate of the parent section last point or not.
       )
 
 Single child section
-====================
+--------------------
 Section with only one child section will have their child merged with.
 
 .. code-block:: lisp
@@ -161,7 +164,7 @@ will be interpreted the same as:
 `Unit test <https://github.com/BlueBrain/MorphIO/blob/5e111f3141f7a1ee72e0260111ce569741d80acb/tests/test_neurolucida.py#L285>`_
 
 Empty siblings
---------------
+**************
 
 File with empty siblings are handled correctly:
 
