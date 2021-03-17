@@ -8,7 +8,7 @@ namespace morphio {
 template <typename Family>
 typename Family::Type Node<Family>::type() const {
     return static_cast<typename Family::Type>(
-        this -> _properties-> template get<Property::SectionType>()[0]
+        this -> _properties-> template get<Property::SectionType>()[this->_id]
         );
 }
 

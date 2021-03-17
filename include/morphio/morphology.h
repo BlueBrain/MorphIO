@@ -11,8 +11,6 @@
 
 namespace morphio {
 
-// extern template class TTree<SectionType>;
-// extern template class TTree<GlialSectionType>;
 
 class Morphology: public TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology> {
 public:
