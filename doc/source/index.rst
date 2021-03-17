@@ -1,4 +1,5 @@
 .. include:: ../../README.rst
+   :end-before: .. substitutions
 
 .. toctree::
    :hidden:

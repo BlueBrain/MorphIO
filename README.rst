@@ -438,6 +438,7 @@ object has a *mitochondria* handle method that exposes the basic methods:
 * ``upstream_begin``: an upstream iterator
 
 .. code-block:: python
+
     from morphio import MitochondriaPointLevel, PointLevel, SectionType
     from morphio.mut import Morphology
 
@@ -474,6 +475,7 @@ object has a *mitochondria* handle method that exposes the basic methods:
 Reading mithochondria from H5 files:
 
 .. code-block:: python
+
     from morphio import Morphology
 
     morpho = Morphology("file_with_mithochondria.h5")
@@ -509,6 +511,7 @@ Reading endoplasmic reticula from H5 files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
+
     from morphio import Morphology
 
     morpho = Morphology('/my/file')
@@ -540,6 +543,7 @@ A marker is an `s-expression <https://en.wikipedia.org/wiki/S-expression>`__ at 
 Neurolucida file that contains additional information about the morphology. For example:
 
 .. code-block:: lisp
+
   ("pia"
     (Closed)
     (MBFObjectType 5)
@@ -643,6 +647,7 @@ The following s-expressions are parsed:
 ⚠️ Only top level markers are currently supported. This means the following nested marker won't be available the the MorphIO API.
 
 .. code-block:: lisp
+
   ( (Color White)  ; [10,1]
     (Dendrite)
     ( -290.87  -113.09   -16.32     2.06)  ; Root
