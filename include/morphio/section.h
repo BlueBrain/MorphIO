@@ -30,14 +30,14 @@ namespace morphio {
 
 class Morphology;
 
-template <typename Family>
-class Node: public SectionBase<Node<Family>>
+template <typename CellType>
+class Node: public SectionBase<Node<CellType>>
 {
     using SectionId = Property::Section;
     using PointAttribute = Property::Point;
 
   public:
-    using Type = typename Family::Type;
+    using Type = typename CellType::Type;
 
     /**
        Depth first search iterator
@@ -81,7 +81,7 @@ class Node: public SectionBase<Node<Family>>
     /**
      * Return the morphological type of this section (dendrite, axon, ...)
      */
-    typename Family::Type type() const;
+    typename CellType::Type type() const;
     friend class mut::Section;
     friend class mut::GlialSection;
 
@@ -91,8 +91,8 @@ class Node: public SectionBase<Node<Family>>
     friend class SectionBase<Node>;
 
   protected:
-    Node<Family>(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
-        : SectionBase<Node<Family>>(id_, properties) {}
+    Node<CellType>(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
+        : SectionBase<Node<CellType>>(id_, properties) {}
 };
 
 // explicit instanciation
@@ -101,6 +101,6 @@ extern template class Node<CellFamily::GLIA>;
 
 }  // namespace morphio
 
-template <typename Family>
-std::ostream& operator<<(std::ostream& os, const morphio::Node<Family>& section);
+template <typename CellType>
+std::ostream& operator<<(std::ostream& os, const morphio::Node<CellType>& section);
 std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);

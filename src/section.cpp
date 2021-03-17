@@ -5,55 +5,55 @@
 namespace morphio {
 
 
-template <typename Family>
-typename Family::Type Node<Family>::type() const {
-    return static_cast<typename Family::Type>(
+template <typename CellType>
+typename CellType::Type Node<CellType>::type() const {
+    return static_cast<typename CellType::Type>(
         this -> _properties-> template get<Property::SectionType>()[this->_id]
         );
 }
 
-template <typename Family>
-depth_iterator_t<Node<Family>> Node<Family>::depth_begin() const {
-    return depth_iterator_t<Node<Family>>(*this);
+template <typename CellType>
+depth_iterator_t<Node<CellType>> Node<CellType>::depth_begin() const {
+    return depth_iterator_t<Node<CellType>>(*this);
 }
 
-template <typename Family>
-depth_iterator_t<Node<Family>> Node<Family>::depth_end() const {
-    return depth_iterator_t<Node<Family>>();
+template <typename CellType>
+depth_iterator_t<Node<CellType>> Node<CellType>::depth_end() const {
+    return depth_iterator_t<Node<CellType>>();
 }
 
-template <typename Family>
-breadth_iterator_t<Node<Family>> Node<Family>::breadth_begin() const {
-    return breadth_iterator_t<Node<Family>>(*this);
+template <typename CellType>
+breadth_iterator_t<Node<CellType>> Node<CellType>::breadth_begin() const {
+    return breadth_iterator_t<Node<CellType>>(*this);
 }
 
-template <typename Family>
-breadth_iterator_t<Node<Family>> Node<Family>::breadth_end() const {
-    return breadth_iterator_t<Node<Family>>();
+template <typename CellType>
+breadth_iterator_t<Node<CellType>> Node<CellType>::breadth_end() const {
+    return breadth_iterator_t<Node<CellType>>();
 }
 
-template <typename Family>
-upstream_iterator_t<Node<Family>> Node<Family>::upstream_begin() const {
-    return upstream_iterator_t<Node<Family>>(*this);
+template <typename CellType>
+upstream_iterator_t<Node<CellType>> Node<CellType>::upstream_begin() const {
+    return upstream_iterator_t<Node<CellType>>(*this);
 }
 
-template <typename Family>
-upstream_iterator_t<Node<Family>> Node<Family>::upstream_end() const {
-    return upstream_iterator_t<Node<Family>>();
+template <typename CellType>
+upstream_iterator_t<Node<CellType>> Node<CellType>::upstream_end() const {
+    return upstream_iterator_t<Node<CellType>>();
 }
 
-template <typename Family>
-range<const Point> Node<Family>::points() const {
+template <typename CellType>
+range<const Point> Node<CellType>::points() const {
     return this-> template get<Property::Point>();
 }
 
-template <typename Family>
-range<const floatType> Node<Family>::diameters() const {
+template <typename CellType>
+range<const floatType> Node<CellType>::diameters() const {
     return this -> template get<Property::Diameter>();
 }
 
-template <typename Family>
-range<const floatType> Node<Family>::perimeters() const {
+template <typename CellType>
+range<const floatType> Node<CellType>::perimeters() const {
     return this -> template get<Property::Perimeter>();
 }
 
@@ -62,8 +62,8 @@ template class Node<CellFamily::GLIA>;
 
 }  // namespace morphio
 
-template <typename Family>
-std::ostream& operator<<(std::ostream& os, const morphio::Node<Family>& section) {
+template <typename CellType>
+std::ostream& operator<<(std::ostream& os, const morphio::Node<CellType>& section) {
     const auto& points = section.points();
     if (points.empty()) {
         os << "Section(id=" << section.id() << ", points=[])";

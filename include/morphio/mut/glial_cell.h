@@ -26,7 +26,7 @@ bool _checkDuplicatePoint(const std::shared_ptr<GlialSection>& parent,
 class GlialCell
 {
   public:
-    using Family = CellFamily::GLIA;
+    using CellType = CellFamily::GLIA;
 
     GlialCell()
         : _counter(0)
