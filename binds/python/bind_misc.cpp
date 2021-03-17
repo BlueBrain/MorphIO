@@ -200,9 +200,6 @@ void bind_misc(py::module& m) {
                                              "CellLevel",
                                              "Container class for information available at the "
                                              "cell level (cell type, file version, soma type)")
-        // .def_readwrite("cell_family",
-        //                &morphio::Property::CellLevel::_cellFamily,
-        //                "Returns the cell family (neuron or glia)")
         .def_readwrite("soma_type",
                        &morphio::Property::CellLevel::_somaType,
                        "Returns the soma type")

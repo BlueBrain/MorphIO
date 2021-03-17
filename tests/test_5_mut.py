@@ -12,10 +12,10 @@ import morphio
 from morphio import MitochondriaPointLevel, MorphioError, RawDataError
 from morphio import Morphology as ImmutableMorphology
 from morphio import (PointLevel, SectionBuilderError, SectionType,
-                     IterType, ostream_redirect, # CellFamily
+                     IterType, ostream_redirect,
                      )
-from morphio.mut import Morphology
-# , GlialCell
+from morphio.mut import Morphology, GlialCell
+
 from . utils import assert_substring, captured_output, tmp_asc_file, setup_tempdir
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -469,24 +469,20 @@ def test_sanitize():
                          'Warning: while appending section: 2 to parent: 0\nThe section first point should be parent section last point: \n        : X Y Z Diameter\nparent last point :[2.000000, 0.000000, 0.000000, 2.000000]\nchild first point :[2.000000, 1.000000, 0.000000, 2.000000]')
 
 
-# def test_glia():
-#     g = GlialCell()
-#     assert_equal(g.cell_family, CellFamily.GLIA)
+def test_glia():
+    g = GlialCell()
+    g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
 
-#     g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
-#     assert_equal(g.cell_family, CellFamily.GLIA)
+    g = GlialCell(Path(_path, 'astrocyte.h5'))
 
-#     g = GlialCell(Path(_path, 'astrocyte.h5'))
-#     assert_equal(g.cell_family, CellFamily.GLIA)
-
-#     assert_raises(RawDataError, GlialCell, Path(_path, 'simple.swc'))
-#     assert_raises(RawDataError, GlialCell, Path(_path, 'h5/v1/simple.h5'))
+    assert_raises(RawDataError, GlialCell, Path(_path, 'simple.swc'))
+    assert_raises(RawDataError, GlialCell, Path(_path, 'h5/v1/simple.h5'))
 
 
-# def test_glia_round_trip():
-#     with TemporaryDirectory() as folder:
-#         g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
-#         filename = Path(folder, 'glial-cell.h5')
-#         g.write(filename)
-#         g2 = GlialCell(filename)
-#         assert_equal(len(g.sections), len(g2.sections))
+def test_glia_round_trip():
+    with TemporaryDirectory() as folder:
+        g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
+        filename = Path(folder, 'glial-cell.h5')
+        g.write(filename)
+        g2 = GlialCell(filename)
+        assert_equal(len(g.sections), len(g2.sections))

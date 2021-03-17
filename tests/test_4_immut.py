@@ -7,7 +7,7 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 from pathlib import Path
 
 from morphio import IterType, Morphology, RawDataError, GlialCell
-#CellFamily
+
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 

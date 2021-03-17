@@ -74,17 +74,6 @@ bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
     if (parent->points().back() != current->points().front())
         return false;
 
-    // // As perimeter is optional, it must either be defined for parent and
-    // current
-    // // or not be defined at all
-    // if(parent->perimeters().empty() != current->perimeters().empty())
-    //     return false;
-
-    // if(!parent->perimeters().empty() &&
-    //    parent->perimeters()[parent->perimeters().size()-1] !=
-    //    current->perimeters()[0])
-    //     return false;
-
     return true;
 }
 

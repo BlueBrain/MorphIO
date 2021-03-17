@@ -17,7 +17,7 @@ using namespace enums;
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
-template <class Family>
+template <class CellType>
 class Node;
 
 template <class TSection, class CRTP, class Mut>
