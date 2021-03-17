@@ -15,5 +15,8 @@ jobs:
           run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev python3-venv libclang1-9
         - name: Check docstrings
           run: |
-            export LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu/libclang-9.so
-            ci/check_generated_docstrings.sh
+            export LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu/libclang-9.so.1
+            ci/check_generated_docstrings.sh || true
+
+            export LIBCLANG_PATH=libLLVM-10.so.1
+            ci/check_generated_docstrings.sh || true
