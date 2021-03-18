@@ -103,9 +103,8 @@ def render_doxygen_pages(app):
         type_, name = f.name.split(NAMESPACE_ROOT, maxsplit=1)
         name = NAMESPACE_ROOT + name
 
-        name = "".join(
-            s.capitalize() for s in name.replace(NAMESPACE_SEP, "::").split("_")
-        ).rstrip(".html")
+        name = "".join(s.capitalize() for s in name.replace(NAMESPACE_SEP, "::").split("_"))
+        name = re.sub(r"\.html?$", "", name)
         name = name[0].lower() + name[1:]
         name = name.replace("morphio::", "")
 
