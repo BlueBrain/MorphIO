@@ -236,7 +236,7 @@ def test_mutable_immutable_equivalence():
 
 
 def test_mitochondria_read():
-    '''Read a H5 file with a mitochondria'''
+    """Read a H5 file with a mitochondria"""
     morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
     mito = morpho.mitochondria
     assert_equal(len(mito.root_sections), 2)
@@ -266,9 +266,9 @@ def test_mitochondria_read():
 
 
 def test_sections_are_not_dereferenced():
-    '''There used to be a bug where if you would call:
+    """There used to be a bug where if you would call:
     mitochondria.sections, that would dereference all section pointers
-    if mitochondria.sections was not kept in a variable'''
+    if mitochondria.sections was not kept in a variable"""
     morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
 
     # This lines used to cause a bug
@@ -375,7 +375,7 @@ def test_non_C_nparray():
 def test_annotation():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            with tmp_asc_file('''((Dendrite)
+            with tmp_asc_file("""((Dendrite)
                       (3 -4 0 2)
                       (3 -6 0 2)
                       (3 -8 0 2)
@@ -387,7 +387,7 @@ def test_annotation():
                         |       ; <-- empty sibling but still works !
                        )
                       )
-                 ''') as tmp_file:
+                 """) as tmp_file:
                 cell = Morphology(tmp_file.name)
 
     for n in (cell, cell.as_immutable(), cell.as_immutable().as_mutable()):
@@ -511,39 +511,45 @@ def test_glia_round_trip():
         g2 = GlialCell(filename)
         assert_equal(len(g.sections), len(g2.sections))
 
+
 def _get_section():
-    '''this is used so that the reference to m is destroyed'''
+    """This is used so that the reference to m is destroyed."""
     m = Morphology(DATA_DIR / 'simple.swc')
     s = m.root_sections[0]
     return s
 
+
 def test_lifetime_destroyed_morphology():
-    '''accessing topological info after a Morphology has been destroyed should raise'''
+    """Accessing topological info after a Morphology has been destroyed should raise."""
     m = Morphology(DATA_DIR / 'simple.swc')
     s = m.root_sections[0]
 
-    del m # ~mut.Morphology() called
+    del m  # ~mut.Morphology() called
 
-    with assert_raises(RuntimeError) as obj:
+    with assert_raises(RuntimeError):
         s.children
 
-def test_lifetime_destroyed_morphology():
-    '''accessing topological info after a Morphology has been destroyed should raise'''
+
+def test_lifetime_access_properties_no_morphology():
+    """Accessing topological info after a Morphology has been destroyed should raise but
+    "self properties" should be available.
+    """
     section = _get_section()
     assert_array_equal(section.points,
                        np.array([[0., 0., 0.],
                                  [0., 5., 0.]], dtype=np.float32))
 
-    with assert_raises(RuntimeError) as obj:
+    with assert_raises(RuntimeError):
         section.children
 
+
 def test_lifetime_copy_single_section():
-    '''Copying a single section from a destroyed morphology works because it
-    does not use any topological information'''
+    """Copying a single section from a destroyed morphology works because it
+    does not use any topological information"""
     section = _get_section()
 
     # Proof that the morphology has really been destroyed
-    with assert_raises(RuntimeError) as obj:
+    with assert_raises(RuntimeError):
         section.children
 
     morph = Morphology()
@@ -554,8 +560,9 @@ def test_lifetime_copy_single_section():
                        np.array([[0., 0., 0.],
                                  [0., 5., 0.]], dtype=np.float32))
 
+
 def test_lifetime_iteration_fails_with_orphan_section():
     section = _get_section()
     for iter_type in IterType.depth_first, IterType.breadth_first, IterType.upstream:
-        with assert_raises(RuntimeError) as obj:
+        with assert_raises(RuntimeError):
             section.iter(iter_type)
