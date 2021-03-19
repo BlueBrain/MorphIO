@@ -4,6 +4,7 @@
 #include <string>
 
 #include <morphio/endoplasmic_reticulum.h>
+#include <morphio/glial_cell.h>
 #include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
 #include <morphio/mut/glial_cell.h>
@@ -12,13 +13,14 @@
 #include <morphio/shared_utils.tpp>
 #include <morphio/soma.h>
 #include <morphio/tools.h>
-#include <morphio/glial_cell.h>
 
 namespace morphio {
 
 namespace mut {
 
-extern void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset=0);
+extern void _appendProperties(Property::PointLevel& to,
+                              const Property::PointLevel& from,
+                              int offset = 0);
 
 using morphio::readers::ErrorMessages;
 GlialCell::GlialCell(const std::string& uri, unsigned int options)
@@ -89,7 +91,7 @@ bool _checkDuplicatePoint(const std::shared_ptr<GlialSection>& parent,
 }
 
 std::shared_ptr<GlialSection> GlialCell::appendRootSection(const morphio::GlialSection& section_,
-                                                       bool recursive) {
+                                                           bool recursive) {
     const std::shared_ptr<GlialSection> ptr(new GlialSection(this, _counter, section_));
     _register(ptr);
     _rootSections.push_back(ptr);
@@ -107,8 +109,8 @@ std::shared_ptr<GlialSection> GlialCell::appendRootSection(const morphio::GlialS
     return ptr;
 }
 
-std::shared_ptr<GlialSection> GlialCell::appendRootSection(const std::shared_ptr<GlialSection>& section_,
-                                                       bool recursive) {
+std::shared_ptr<GlialSection> GlialCell::appendRootSection(
+    const std::shared_ptr<GlialSection>& section_, bool recursive) {
     const std::shared_ptr<GlialSection> section_copy(new GlialSection(this, _counter, *section_));
     _register(section_copy);
     _rootSections.push_back(section_copy);
@@ -127,9 +129,10 @@ std::shared_ptr<GlialSection> GlialCell::appendRootSection(const std::shared_ptr
     return section_copy;
 }
 
-std::shared_ptr<GlialSection> GlialCell::appendRootSection(const Property::PointLevel& pointProperties,
-                                                       GlialSectionType type) {
-    const std::shared_ptr<GlialSection> ptr(new GlialSection(this, _counter, type, pointProperties));
+std::shared_ptr<GlialSection> GlialCell::appendRootSection(
+    const Property::PointLevel& pointProperties, GlialSectionType type) {
+    const std::shared_ptr<GlialSection> ptr(
+        new GlialSection(this, _counter, type, pointProperties));
     _register(ptr);
     _rootSections.push_back(ptr);
 
@@ -172,7 +175,7 @@ void GlialCell::deleteSection(const std::shared_ptr<GlialSection>& section_, boo
         // The deletion must start by the furthest leaves, otherwise you may cut
         // the topology and forget to remove some sections
         std::vector<std::shared_ptr<GlialSection>> ids;
-        //std::copy(section_->breadth_begin(), breadth_end(), std::back_inserter(ids));
+        // std::copy(section_->breadth_begin(), breadth_end(), std::back_inserter(ids));
 
         for (auto it = ids.rbegin(); it != ids.rend(); ++it) {
             deleteSection(*it, false);

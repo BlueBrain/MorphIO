@@ -92,11 +92,11 @@ class GlialSection: public std::enable_shared_from_this<GlialSection>
     glial_upstream_iterator upstream_begin() const;
     glial_upstream_iterator upstream_end() const;
 
+    std::shared_ptr<GlialSection> appendSection(const morphio::GlialSection&,
+                                                bool recursive = false);
 
-    std::shared_ptr<GlialSection> appendSection(const morphio::GlialSection&, bool recursive = false);
-
-    std::shared_ptr<GlialSection> appendSection(const std::shared_ptr<GlialSection>& original_section,
-                                           bool recursive = false);
+    std::shared_ptr<GlialSection> appendSection(
+        const std::shared_ptr<GlialSection>& original_section, bool recursive = false);
 
     std::shared_ptr<GlialSection> appendSection(
         const Property::PointLevel&, GlialSectionType sectionType = GlialSectionType::UNDEFINED);

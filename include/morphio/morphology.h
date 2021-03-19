@@ -4,16 +4,16 @@
 
 #include <highfive/H5Group.hpp>
 #include <morphio/properties.h>
-#include <morphio/section_iterators.hpp>
 #include <morphio/section.h>
-#include <morphio/types.h>
+#include <morphio/section_iterators.hpp>
 #include <morphio/ttree.tpp>
+#include <morphio/types.h>
 
 namespace morphio {
 
-
-class Morphology: public TTree<NeuronalSection, Morphology, morphio::mut::Morphology> {
-public:
+class Morphology: public TTree<NeuronalSection, Morphology, morphio::mut::Morphology>
+{
+  public:
     Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
     Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
     Morphology(morphio::mut::Morphology morphology);
@@ -48,10 +48,10 @@ public:
      **/
     const SomaType& somaType() const;
 
-protected:
+  protected:
     Morphology(const Property::Properties& properties, unsigned int options = NO_MODIFIER);
 
-private:
+  private:
     void init();
 };
 

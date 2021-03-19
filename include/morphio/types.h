@@ -65,11 +65,11 @@ https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest
 
 struct CellFamily {
     struct NEURON {
-        using  Type = SectionType;
+        using Type = SectionType;
         static constexpr int value = 0;
     };
     struct GLIA {
-        using  Type = GlialSectionType;
+        using Type = GlialSectionType;
         static constexpr int value = 1;
     };
 };

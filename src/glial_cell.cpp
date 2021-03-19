@@ -1,8 +1,8 @@
 #include <cassert>
 #include <fstream>
 #include <memory>
-#include <streambuf>
 #include <sstream>
+#include <streambuf>
 #include <string>
 
 #include <morphio/glial_cell.h>
@@ -25,7 +25,6 @@
 namespace morphio {
 
 
-
 GlialCell::GlialCell(const Property::Properties& properties, unsigned int options)
     : TTree<GlialSection, GlialCell, morphio::mut::GlialCell>(properties, options) {
     init();
@@ -33,9 +32,10 @@ GlialCell::GlialCell(const Property::Properties& properties, unsigned int option
 
 GlialCell::GlialCell(const std::string& source, unsigned int options)
     : TTree<GlialSection, GlialCell, morphio::mut::GlialCell>(source, options) {
-    if (_properties->_cellLevel.fileFormat() != "h5" || _properties->_cellLevel._cellFamily != CellFamily::GLIA::value) {
-        if (_properties->_cellLevel._cellFamily != CellFamily::GLIA::value ) {
-                throw(RawDataError("File: " + source +
+    if (_properties->_cellLevel.fileFormat() != "h5" ||
+        _properties->_cellLevel._cellFamily != CellFamily::GLIA::value) {
+        if (_properties->_cellLevel._cellFamily != CellFamily::GLIA::value) {
+            throw(RawDataError("File: " + source +
                                " is not a GLIA file. It should be a H5 file the cell type GLIA."));
         }
     }

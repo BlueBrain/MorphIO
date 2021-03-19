@@ -154,8 +154,7 @@ inline breadth_iterator_t<SectionT>::breadth_iterator_t(const std::vector<Sectio
 }
 
 template <typename SectionT>
-inline breadth_iterator_t<SectionT>::breadth_iterator_t(
-    const breadth_iterator_t& other)
+inline breadth_iterator_t<SectionT>::breadth_iterator_t(const breadth_iterator_t& other)
     : deque_(other.deque_) {}
 
 template <typename SectionT>
@@ -164,8 +163,7 @@ inline SectionT breadth_iterator_t<SectionT>::operator*() const {
 }
 
 template <typename SectionT>
-inline breadth_iterator_t<SectionT>&
-breadth_iterator_t<SectionT>::operator++() {
+inline breadth_iterator_t<SectionT>& breadth_iterator_t<SectionT>::operator++() {
     if (deque_.empty()) {
         throw MorphioError("Can't iterate past the end");
     }
@@ -178,22 +176,19 @@ breadth_iterator_t<SectionT>::operator++() {
 }
 
 template <typename SectionT>
-inline breadth_iterator_t<SectionT>
-breadth_iterator_t<SectionT>::operator++(int) {
+inline breadth_iterator_t<SectionT> breadth_iterator_t<SectionT>::operator++(int) {
     breadth_iterator_t ret(*this);
     ++(*this);
     return ret;
 }
 
 template <typename SectionT>
-inline bool breadth_iterator_t<SectionT>::operator==(
-    const breadth_iterator_t& other) const {
+inline bool breadth_iterator_t<SectionT>::operator==(const breadth_iterator_t& other) const {
     return deque_ == other.deque_;
 }
 
 template <typename SectionT>
-inline bool breadth_iterator_t<SectionT>::operator!=(
-    const breadth_iterator_t& other) const {
+inline bool breadth_iterator_t<SectionT>::operator!=(const breadth_iterator_t& other) const {
     return !(*this == other);
 }
 
@@ -219,8 +214,7 @@ inline SectionT depth_iterator_t<SectionT>::operator*() const {
 }
 
 template <typename SectionT>
-inline depth_iterator_t<SectionT>&
-depth_iterator_t<SectionT>::operator++() {
+inline depth_iterator_t<SectionT>& depth_iterator_t<SectionT>::operator++() {
     if (deque_.empty()) {
         throw MorphioError("Can't iterate past the end");
     }
@@ -233,22 +227,19 @@ depth_iterator_t<SectionT>::operator++() {
 }
 
 template <typename SectionT>
-inline depth_iterator_t<SectionT> depth_iterator_t<SectionT>::operator++(
-    int) {
+inline depth_iterator_t<SectionT> depth_iterator_t<SectionT>::operator++(int) {
     depth_iterator_t ret(*this);
     ++(*this);
     return ret;
 }
 
 template <typename SectionT>
-inline bool depth_iterator_t<SectionT>::operator==(
-    const depth_iterator_t& other) const {
+inline bool depth_iterator_t<SectionT>::operator==(const depth_iterator_t& other) const {
     return deque_ == other.deque_;
 }
 
 template <typename SectionT>
-inline bool depth_iterator_t<SectionT>::operator!=(
-    const depth_iterator_t& other) const {
+inline bool depth_iterator_t<SectionT>::operator!=(const depth_iterator_t& other) const {
     return !(*this == other);
 }
 

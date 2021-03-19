@@ -85,7 +85,7 @@ class Node: public SectionBase<Node<CellType>>
     friend class mut::Section;
     friend class mut::GlialSection;
 
-    template<typename Node, typename CRTP, typename Mut>
+    template <typename Node, typename CRTP, typename Mut>
     friend class TTree;
 
     friend class SectionBase<Node>;

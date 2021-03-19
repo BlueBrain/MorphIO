@@ -7,10 +7,10 @@
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/enums.h>
 
-#include <morphio/mut/morphology.h>
-#include <morphio/mut/glial_cell.h>
 #include <morphio/glial_cell.h>
 #include <morphio/morphology.h>
+#include <morphio/mut/glial_cell.h>
+#include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
 #include <morphio/types.h>
 
@@ -149,7 +149,7 @@ void bind_immutable_module(py::module& m) {
             "- morphio.IterType.breadth_first (default)\n"
             "iter_type"_a = IterType::DEPTH_FIRST);
 
- py::class_<morphio::GlialCell>(m, "GlialCell")
+    py::class_<morphio::GlialCell>(m, "GlialCell")
         .def(py::init<const std::string&, unsigned int>(),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)

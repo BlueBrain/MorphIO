@@ -5,12 +5,12 @@
 #include <pybind11/pybind11.h>
 
 #include <morphio/endoplasmic_reticulum.h>
+#include <morphio/glial_cell.h>
+#include <morphio/morphology.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/glial_cell.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
-#include <morphio/morphology.h>
-#include <morphio/glial_cell.h>
 
 #include <array>
 
@@ -176,8 +176,8 @@ void bind_mutable_module(py::module& m) {
              "If recursive == true, all descendent will be appended as well",
              "mutable_section"_a,
              "recursive"_a = false);
-             
- py::class_<morphio::mut::GlialCell>(m, "GlialCell")
+
+    py::class_<morphio::mut::GlialCell>(m, "GlialCell")
         .def(py::init<>())
         .def(py::init<const std::string&, unsigned int>(),
              "filename"_a,
@@ -330,7 +330,7 @@ void bind_mutable_module(py::module& m) {
              "If recursive == true, all descendent will be appended as well",
              "mutable_section"_a,
              "recursive"_a = false);
-             
+
 
     py::class_<morphio::mut::Mitochondria>(m, "Mitochondria")
         .def(py::init<>())
@@ -577,7 +577,7 @@ void bind_mutable_module(py::module& m) {
 
         .def("append_section",
              static_cast<std::shared_ptr<morphio::mut::Section> (
-                 morphio::mut::Section::*)(const std::shared_ptr<morphio::mut::Section>&, bool)>(
+                 morphio::mut::Section::*)(std::shared_ptr<morphio::mut::Section>, bool)>(
                  &morphio::mut::Section::appendSection),
              "Append the existing mutable Section to this section\n"
              "If recursive == true, all descendent will be appended as well",
@@ -629,8 +629,9 @@ void bind_mutable_module(py::module& m) {
             "center",
             [](morphio::mut::Soma* soma) { return py::array(3, soma->center().data()); },
             "Returns the center of gravity of the soma points");
-            
- py::class_<morphio::mut::GlialSection, std::shared_ptr<morphio::mut::GlialSection>>(m, "GlialSection")
+
+    py::class_<morphio::mut::GlialSection, std::shared_ptr<morphio::mut::GlialSection>>(
+        m, "GlialSection")
         .def("__str__",
              [](const morphio::mut::GlialSection& section) {
                  std::stringstream ss;
@@ -700,8 +701,9 @@ void bind_mutable_module(py::module& m) {
                 case IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
                 default:
-                    throw morphio::MorphioError("Only iteration types depth_first, breadth_first and "
-                                                "upstream are supported");
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first, breadth_first and "
+                        "upstream are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -715,8 +717,9 @@ void bind_mutable_module(py::module& m) {
 
         // Editing
         .def("append_section",
-             static_cast<std::shared_ptr<morphio::mut::GlialSection> (morphio::mut::GlialSection::*)(
-                 const morphio::GlialSection&, bool)>(&morphio::mut::GlialSection::appendSection),
+             static_cast<std::shared_ptr<morphio::mut::GlialSection> (
+                 morphio::mut::GlialSection::*)(const morphio::GlialSection&, bool)>(
+                 &morphio::mut::GlialSection::appendSection),
              "Append the existing immutable GlialSection to this section"
              "If recursive == true, all descendent will be appended as well",
              "immutable_section"_a,
@@ -724,23 +727,24 @@ void bind_mutable_module(py::module& m) {
 
         .def("append_section",
              static_cast<std::shared_ptr<morphio::mut::GlialSection> (
-                 morphio::mut::GlialSection::*)(const std::shared_ptr<morphio::mut::GlialSection>&, bool)>(
-                 &morphio::mut::GlialSection::appendSection),
+                 morphio::mut::GlialSection::*)(const std::shared_ptr<morphio::mut::GlialSection>&,
+                                                bool)>(&morphio::mut::GlialSection::appendSection),
              "Append the existing mutable GlialSection to this section\n"
              "If recursive == true, all descendent will be appended as well",
              "mutable_section"_a,
              "recursive"_a = false)
 
-        .def("append_section",
-             static_cast<std::shared_ptr<morphio::mut::GlialSection> (morphio::mut::GlialSection::*)(
-                 const morphio::Property::PointLevel&, morphio::GlialSectionType)>(
-                 &morphio::mut::GlialSection::appendSection),
-             "Append a new GlialSection to this section\n"
-             " If section_type is omitted or set to 'undefined'"
-             " the type of the parent section will be used",
-             "point_level_properties"_a,
-             "section_type"_a = morphio::GlialSectionType::UNDEFINED);
-            
+        .def(
+            "append_section",
+            static_cast<std::shared_ptr<morphio::mut::GlialSection> (morphio::mut::GlialSection::*)(
+                const morphio::Property::PointLevel&, morphio::GlialSectionType)>(
+                &morphio::mut::GlialSection::appendSection),
+            "Append a new GlialSection to this section\n"
+            " If section_type is omitted or set to 'undefined'"
+            " the type of the parent section will be used",
+            "point_level_properties"_a,
+            "section_type"_a = morphio::GlialSectionType::UNDEFINED);
+
 
     py::class_<morphio::mut::EndoplasmicReticulum>(m, "EndoplasmicReticulum")
         .def(py::init<>())

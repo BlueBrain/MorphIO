@@ -97,7 +97,7 @@ class CMakeBuild(build_ext):
         subprocess.check_call([cmake, ext.sourcedir] + cmake_args, cwd=self.build_temp)
         subprocess.check_call([cmake, '--build', '.', '--target', '_morphio'] + build_args, cwd=self.build_temp)
 
-with open('README.md') as f:
+with open('README.rst') as f:
     long_description = f.read()
 
 setup(
@@ -105,8 +105,11 @@ setup(
     author='Blue Brain Project, EPFL',
     description='A neuron morphology IO library',
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type='text/x-rst',
     install_requires=['numpy>=1.14.1'],
+    extras_require={
+        'docs': ['sphinx-bluebrain-theme'],
+    },
     url='https://github.com/BlueBrain/MorphIO/',
     ext_modules=[CMakeExtension('morphio._morphio')],
     cmdclass=dict(build_ext=CMakeBuild),

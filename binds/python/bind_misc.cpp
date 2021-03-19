@@ -56,7 +56,7 @@ void bind_misc(py::module& m) {
         .value("basal_dendrite", morphio::enums::SectionType::SECTION_DENDRITE)
         .value("apical_dendrite", morphio::enums::SectionType::SECTION_APICAL_DENDRITE)
         .export_values();
-     py::enum_<morphio::enums::GlialSectionType>(m, "GlialSectionType")
+    py::enum_<morphio::enums::GlialSectionType>(m, "GlialSectionType")
         .value("undefined", morphio::enums::GlialSectionType::UNDEFINED)
         .value("soma", morphio::enums::GlialSectionType::SOMA)
         .value("endfoot", morphio::enums::GlialSectionType::ENDFOOT)
