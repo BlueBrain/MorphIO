@@ -18,6 +18,10 @@ enum Option {
     NRN_ORDER = 0x08
 };
 
+/*Those values must correspond to the values of the cell family in the spec.
+https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html*/
+
+
 /**
    This enum should be kept in sync with the warnings
    defined in ErrorMessages.

@@ -27,12 +27,12 @@ namespace morphio {
 
 
 GlialCell::GlialCell(const Property::Properties& properties, unsigned int options)
-    : TTree<Node<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell>(properties, options) {
+    : TTree<GlialSection, GlialCell, morphio::mut::GlialCell>(properties, options) {
     init();
 }
 
 GlialCell::GlialCell(const std::string& source, unsigned int options)
-    : TTree<Node<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell>(source, options) {
+    : TTree<GlialSection, GlialCell, morphio::mut::GlialCell>(source, options) {
     if (_properties->_cellLevel.fileFormat() != "h5" || _properties->_cellLevel._cellFamily != CellFamily::GLIA::value) {
         if (_properties->_cellLevel._cellFamily != CellFamily::GLIA::value ) {
                 throw(RawDataError("File: " + source +
@@ -43,12 +43,12 @@ GlialCell::GlialCell(const std::string& source, unsigned int options)
 }
 
 GlialCell::GlialCell(const HighFive::Group& group, unsigned int options)
-    : TTree<Node<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell>(group, options) {
+    : TTree<GlialSection, GlialCell, morphio::mut::GlialCell>(group, options) {
     init();
 }
 
 GlialCell::GlialCell(morphio::mut::GlialCell glialCell)
-    : TTree<Node<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell>(glialCell) {
+    : TTree<GlialSection, GlialCell, morphio::mut::GlialCell>(glialCell) {
     init();
 }
 

@@ -29,12 +29,12 @@ namespace morphio {
 
 
 Morphology::Morphology(const Property::Properties& properties, unsigned int options)
-    : TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(properties, options) {
+    : TTree<NeuronalSection, Morphology, morphio::mut::Morphology>(properties, options) {
     init();
 }
 
 Morphology::Morphology(const std::string& source, unsigned int options)
-    : TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(source, options) {
+    : TTree<NeuronalSection, Morphology, morphio::mut::Morphology>(source, options) {
     if (_properties->_cellLevel.fileFormat() == "h5") {
         if (_properties->_cellLevel._cellFamily != CellFamily::NEURON::value ) {
                 throw(RawDataError("File is not a NEURON file. It should be a H5 file the cell type NEURON."));
@@ -44,12 +44,12 @@ Morphology::Morphology(const std::string& source, unsigned int options)
 }
 
 Morphology::Morphology(const HighFive::Group& group, unsigned int options)
-    : TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(group, options) {
+    : TTree<NeuronalSection, Morphology, morphio::mut::Morphology>(group, options) {
     init();
 }
 
 Morphology::Morphology(morphio::mut::Morphology morphology)
-    : TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(morphology) {
+    : TTree<NeuronalSection, Morphology, morphio::mut::Morphology>(morphology) {
     init();
 }
 

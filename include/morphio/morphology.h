@@ -12,7 +12,7 @@
 namespace morphio {
 
 
-class Morphology: public TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology> {
+class Morphology: public TTree<NeuronalSection, Morphology, morphio::mut::Morphology> {
 public:
     Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
     Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);

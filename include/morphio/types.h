@@ -60,6 +60,8 @@ using MorphologyVersion = std::tuple<std::string, uint32_t, uint32_t>;
 template <typename T>
 using range = gsl::span<T>;
 
+/*Those values must correspond to the values of the cell family in the spec.
+https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html*/
 
 struct CellFamily {
     struct NEURON {

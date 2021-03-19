@@ -91,7 +91,7 @@ class Section: public std::enable_shared_from_this<Section>
     upstream_iterator upstream_begin() const;
     upstream_iterator upstream_end() const;
 
-    std::shared_ptr<Section> appendSection(const morphio::Node<CellFamily::NEURON>&, bool recursive = false);
+    std::shared_ptr<Section> appendSection(const morphio::NeuronalSection&, bool recursive = false);
     std::shared_ptr<Section> appendSection(const std::shared_ptr<Section>& original_section,
                                            bool recursive = false);
 
@@ -103,7 +103,7 @@ class Section: public std::enable_shared_from_this<Section>
 
 
     Section(Morphology*, unsigned int id, SectionType type, const Property::PointLevel&);
-    Section(Morphology*, unsigned int id, const morphio::Node<CellFamily::NEURON>& section);
+    Section(Morphology*, unsigned int id, const morphio::NeuronalSection& section);
     Section(Morphology*, unsigned int id, const Section&);
 
     Morphology* _morphology;

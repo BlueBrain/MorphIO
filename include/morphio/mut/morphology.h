@@ -154,7 +154,7 @@ class Morphology
 
        If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<Section> appendRootSection(const morphio::Node<CellFamily::NEURON>&, bool recursive = false);
+    std::shared_ptr<Section> appendRootSection(const morphio::NeuronalSection&, bool recursive = false);
 
     /**
        Append an existing Section as a root section

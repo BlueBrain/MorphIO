@@ -276,13 +276,6 @@ const std::vector<typename Node::Type> TTree<Node, CRTP, Mut>::sectionTypes() co
     return res;
 }
 
-/*
-template <typename Node, typename CRTP, typename Mut>
-const CellFamily& TTree<Node, CRTP, Mut>::cellFamily() const {
-    return _properties->cellFamily();
-}
-*/
-
 template <typename Node, typename CRTP, typename Mut>
 const std::map<int, std::vector<unsigned int>>& TTree<Node, CRTP, Mut>::connectivity() const {
     return _properties->children<Property::Section>();

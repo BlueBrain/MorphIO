@@ -154,7 +154,7 @@ class GlialCell
 
        If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<GlialSection> appendRootSection(const morphio::Node<CellFamily::GLIA>&, bool recursive = false);
+    std::shared_ptr<GlialSection> appendRootSection(const morphio::GlialSection&, bool recursive = false);
 
     /**
        Append an existing GlialSection as a root section
