@@ -3,12 +3,12 @@
 #include <memory>  //std::unique_ptr
 
 #include <highfive/H5Group.hpp>
-#include <morphio/properties.h>
-#include <morphio/section_iterators.hpp>
-#include <morphio/section.h>
-#include <morphio/types.h>
-#include <morphio/ttree.tpp>
 #include <morphio/mut/glial_cell.h>
+#include <morphio/properties.h>
+#include <morphio/section.h>
+#include <morphio/section_iterators.hpp>
+#include <morphio/ttree.tpp>
+#include <morphio/types.h>
 
 namespace morphio {
 
@@ -18,8 +18,9 @@ namespace morphio {
 // extern template class TTree<GlialSectionType>;
 
 
-class GlialCell: public TTree<Node<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell> {
-public:
+class GlialCell: public TTree<Node<CellFamily::GLIA>, GlialCell, morphio::mut::GlialCell>
+{
+  public:
     GlialCell(const std::string& source, unsigned int options = NO_MODIFIER);
     GlialCell(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
     GlialCell(morphio::mut::GlialCell glialCell);
@@ -54,10 +55,10 @@ public:
      **/
     const SomaType& somaType() const;
 
-protected:
+  protected:
     GlialCell(const Property::Properties& properties, unsigned int options = NO_MODIFIER);
 
-private:
+  private:
     void init();
 };
 

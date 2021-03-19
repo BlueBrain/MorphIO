@@ -6,7 +6,6 @@
 #include <morphio/tools.h>
 
 
-
 namespace morphio {
 
 extern template class Node<CellFamily::GLIA>;
@@ -23,19 +22,21 @@ static inline bool _emptySection(const std::shared_ptr<GlialSection>& section) {
 }
 
 GlialSection::GlialSection(GlialCell* glialCell,
-                 unsigned int id_,
-                 GlialSectionType type_,
-                 const Property::PointLevel& pointProperties)
+                           unsigned int id_,
+                           GlialSectionType type_,
+                           const Property::PointLevel& pointProperties)
     : _morphology(glialCell)
     , _pointProperties(pointProperties)
     , _id(id_)
     , _sectionType(type_) {}
 
-GlialSection::GlialSection(GlialCell* glialCell, unsigned int id_, const morphio::GlialSection& section_)
+GlialSection::GlialSection(GlialCell* glialCell,
+                           unsigned int id_,
+                           const morphio::GlialSection& section_)
     : GlialSection(glialCell,
-              id_,
-              section_.type(),
-              Property::PointLevel(section_._properties->_pointLevel, section_._range)) {}
+                   id_,
+                   section_.type(),
+                   Property::PointLevel(section_._properties->_pointLevel, section_._range)) {}
 
 GlialSection::GlialSection(GlialCell* glialCell, unsigned int id_, const GlialSection& section_)
     : _morphology(glialCell)
@@ -98,8 +99,8 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<GlialSection>& 
     return os;
 }
 
-std::shared_ptr<GlialSection> GlialSection::appendSection(const std::shared_ptr<GlialSection>& original_section,
-                                                bool recursive) {
+std::shared_ptr<GlialSection> GlialSection::appendSection(
+    const std::shared_ptr<GlialSection>& original_section, bool recursive) {
     const std::shared_ptr<GlialSection> ptr(
         new GlialSection(_morphology, _morphology->_counter, *original_section));
     unsigned int parentId = id();
@@ -130,8 +131,10 @@ std::shared_ptr<GlialSection> GlialSection::appendSection(const std::shared_ptr<
     return ptr;
 }
 
-std::shared_ptr<GlialSection> GlialSection::appendSection(const morphio::GlialSection& section, bool recursive) {
-    const std::shared_ptr<GlialSection> ptr(new GlialSection(_morphology, _morphology->_counter, section));
+std::shared_ptr<GlialSection> GlialSection::appendSection(const morphio::GlialSection& section,
+                                                          bool recursive) {
+    const std::shared_ptr<GlialSection> ptr(
+        new GlialSection(_morphology, _morphology->_counter, section));
     unsigned int parentId = id();
     uint32_t childId = _morphology->_register(ptr);
     auto& _sections = _morphology->_sections;
@@ -159,8 +162,8 @@ std::shared_ptr<GlialSection> GlialSection::appendSection(const morphio::GlialSe
     return ptr;
 }
 
-std::shared_ptr<GlialSection> GlialSection::appendSection(const Property::PointLevel& pointProperties,
-                                                GlialSectionType sectionType) {
+std::shared_ptr<GlialSection> GlialSection::appendSection(
+    const Property::PointLevel& pointProperties, GlialSectionType sectionType) {
     unsigned int parentId = id();
 
     auto& _sections = _morphology->_sections;

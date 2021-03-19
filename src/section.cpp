@@ -8,8 +8,7 @@ namespace morphio {
 template <typename CellType>
 typename CellType::Type Node<CellType>::type() const {
     return static_cast<typename CellType::Type>(
-        this -> _properties-> template get<Property::SectionType>()[this->_id]
-        );
+        this->_properties->template get<Property::SectionType>()[this->_id]);
 }
 
 template <typename CellType>
@@ -44,17 +43,17 @@ upstream_iterator_t<Node<CellType>> Node<CellType>::upstream_end() const {
 
 template <typename CellType>
 range<const Point> Node<CellType>::points() const {
-    return this-> template get<Property::Point>();
+    return this->template get<Property::Point>();
 }
 
 template <typename CellType>
 range<const floatType> Node<CellType>::diameters() const {
-    return this -> template get<Property::Diameter>();
+    return this->template get<Property::Diameter>();
 }
 
 template <typename CellType>
 range<const floatType> Node<CellType>::perimeters() const {
-    return this -> template get<Property::Perimeter>();
+    return this->template get<Property::Perimeter>();
 }
 
 template class Node<CellFamily::NEURON>;

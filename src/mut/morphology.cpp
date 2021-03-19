@@ -6,13 +6,13 @@
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
+#include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 #include <morphio/shared_utils.tpp>
 #include <morphio/soma.h>
 #include <morphio/tools.h>
-#include <morphio/morphology.h>
 
 namespace morphio {
 

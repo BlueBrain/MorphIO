@@ -28,7 +28,6 @@ Property::Properties loadURI(const std::string& source, unsigned int options) {
 }
 
 
-
 void buildChildren(std::shared_ptr<Property::Properties> properties) {
     {
         const auto& sections = properties->get<Property::Section>();
@@ -61,4 +60,4 @@ SomaType getSomaType(long unsigned int nSomaPoints) {
 }
 
 
-}
+}  // namespace morphio

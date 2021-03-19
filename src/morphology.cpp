@@ -1,8 +1,8 @@
 #include <cassert>
 #include <fstream>
 #include <memory>
-#include <streambuf>
 #include <sstream>
+#include <streambuf>
 #include <string>
 
 #include <morphio/morphology.h>
@@ -36,8 +36,9 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
 Morphology::Morphology(const std::string& source, unsigned int options)
     : TTree<Node<CellFamily::NEURON>, Morphology, morphio::mut::Morphology>(source, options) {
     if (_properties->_cellLevel.fileFormat() == "h5") {
-        if (_properties->_cellLevel._cellFamily != CellFamily::NEURON::value ) {
-                throw(RawDataError("File is not a NEURON file. It should be a H5 file the cell type NEURON."));
+        if (_properties->_cellLevel._cellFamily != CellFamily::NEURON::value) {
+            throw(RawDataError(
+                "File is not a NEURON file. It should be a H5 file the cell type NEURON."));
         }
     }
     init();

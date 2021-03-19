@@ -154,7 +154,8 @@ class GlialCell
 
        If recursive == true, all descendent will be appended as well
     **/
-    std::shared_ptr<GlialSection> appendRootSection(const morphio::Node<CellFamily::GLIA>&, bool recursive = false);
+    std::shared_ptr<GlialSection> appendRootSection(const morphio::Node<CellFamily::GLIA>&,
+                                                    bool recursive = false);
 
     /**
        Append an existing GlialSection as a root section
@@ -162,13 +163,13 @@ class GlialCell
        If recursive == true, all descendent will be appended as well
     **/
     std::shared_ptr<GlialSection> appendRootSection(const std::shared_ptr<GlialSection>& section,
-                                               bool recursive = false);
+                                                    bool recursive = false);
 
     /**
        Append a root GlialSection
     **/
     std::shared_ptr<GlialSection> appendRootSection(const Property::PointLevel&,
-                                               GlialSectionType sectionType);
+                                                    GlialSectionType sectionType);
 
     void applyModifiers(unsigned int modifierFlags);
 
@@ -241,7 +242,8 @@ inline const std::vector<std::shared_ptr<GlialSection>>& GlialCell::rootSections
     return _rootSections;
 }
 
-inline const std::map<uint32_t, std::shared_ptr<GlialSection>>& GlialCell::sections() const noexcept {
+inline const std::map<uint32_t, std::shared_ptr<GlialSection>>& GlialCell::sections() const
+    noexcept {
     return _sections;
 }
 

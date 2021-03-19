@@ -251,7 +251,8 @@ std::string ErrorMessages::WARNING_APPENDING_EMPTY_SECTION(
     std::shared_ptr<morphio::mut::GlialSection> glial_section) {
     return errorMsg(0,
                     ErrorLevel::WARNING,
-                    "Warning: appending empty section with id: " + std::to_string(glial_section->id()));
+                    "Warning: appending empty section with id: " +
+                        std::to_string(glial_section->id()));
 }
 
 std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
