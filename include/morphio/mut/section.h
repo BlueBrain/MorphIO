@@ -92,8 +92,7 @@ class Section: public std::enable_shared_from_this<Section>
     upstream_iterator upstream_end() const;
 
 
-    std::shared_ptr<Section> appendSection(const morphio::NeuronalSection&,
-                                           bool recursive = false);
+    std::shared_ptr<Section> appendSection(const morphio::NeuronalSection&, bool recursive = false);
     std::shared_ptr<Section> appendSection(std::shared_ptr<Section> original_section,
                                            bool recursive = false);
 
