@@ -1,8 +1,6 @@
-import os
 from collections import OrderedDict
 
 import numpy as np
-from nose.tools import assert_dict_equal, assert_raises, ok_
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -16,7 +14,7 @@ from numpy.testing import assert_array_equal, assert_equal
 
 from .utils import assert_substring, captured_output, setup_tempdir, tmp_asc_file
 
-DATA_DIR = Path(__file__).parent /  "data"
+DATA_DIR = Path(__file__).parent / "data"
 
 SIMPLE = Morphology(Path(DATA_DIR, "simple.swc"))
 
@@ -236,7 +234,7 @@ def test_mutable_immutable_equivalence():
 
 def test_mitochondria_read():
     """Read a H5 file with a mitochondria"""
-    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    morpho = Morphology(DATA_DIR / "h5/v1/mitochondria.h5")
     mito = morpho.mitochondria
     assert_equal(len(mito.root_sections), 2)
 
@@ -439,6 +437,7 @@ def test_empty_sibling():
     assert_array_equal(annotation.points, [[3, -10, 0], [0, -10, 0], [-3, -10, 0]])
     assert_array_equal(annotation.diameters, [6, 5, 4])
 
+
 def test_nested_single_child():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
@@ -527,7 +526,7 @@ def test_remove_unifurcations():
 
 
 def test_remove_rootsection():
-    morpho = Morphology(os.path.join(_path, 'single_point_root.asc'))
+    morpho = Morphology(DATA_DIR / 'single_point_root.asc')
     assert_equal(len(morpho.root_sections), 1)
     to_remove = []
     for root in morpho.root_sections:
@@ -539,7 +538,7 @@ def test_remove_rootsection():
 
 
 def test_remove_rootsection_in_loop():
-    morpho = Morphology(os.path.join(_path, 'single_point_root.asc'))
+    morpho = Morphology(DATA_DIR / 'single_point_root.asc')
     assert_equal(len(morpho.root_sections), 1)
     for root in morpho.root_sections:
         if len(root.points) == 1:
