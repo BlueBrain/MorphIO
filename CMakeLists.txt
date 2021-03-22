@@ -8,7 +8,13 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 option(BUILD_BINDINGS "Build the python bindings" ON)
 option(MorphIO_CXX_WARNINGS "Compile C++ with warnings" ON)
 option(EXTERNAL_HIGHFIVE "Use HighFive from external source" OFF)
+option(MORPHIO_TESTS "Build tests" ON)
 option(MORPHIO_USE_DOUBLE "Use doubles instead of floats" OFF)
+
+set(MORPHIO_ENABLE_COVERAGE OFF)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(MORPHIO_ENABLE_COVERAGE ON)
+endif()
 
 if(MORPHIO_USE_DOUBLE)
   add_definitions(-DMORPHIO_USE_DOUBLE)
@@ -17,7 +23,8 @@ else()
   message("Floating Point Type: float")
 endif()
 
-include(${PROJECT_SOURCE_DIR}/CMake/CompilerFlags.cmake)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake)
+include(CompilerFlags)
 set(CMAKE_CXX_FLAGS "${FLAGS}")
 
 if (EXTERNAL_HIGHFIVE)
@@ -48,5 +55,8 @@ install(
   DESTINATION lib/cmake/MorphIO
   )
 
-enable_testing()
-add_subdirectory(tests)
+
+if (MORPHIO_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
+endif()

@@ -72,6 +72,16 @@ set_target_properties(morphio_obj
   CXX_EXTENSIONS NO
   )
 
+if (MORPHIO_ENABLE_COVERAGE)
+  target_compile_options(morphio_obj
+    PUBLIC -g -O0 --coverage -fprofile-arcs -ftest-coverage
+    )
+  target_link_libraries(morphio_obj
+    PUBLIC gcov
+    )
+endif()
+
+
 if (NOT WIN32)
   target_compile_options(morphio_obj
     PRIVATE
@@ -87,7 +97,6 @@ add_library(morphio_shared SHARED $<TARGET_OBJECTS:morphio_obj>)
 
 set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio"
                                                 EXPORT_NAME "morphio")
-
 foreach(TARGET morphio_shared morphio_static)
   target_include_directories(${TARGET}
     SYSTEM
