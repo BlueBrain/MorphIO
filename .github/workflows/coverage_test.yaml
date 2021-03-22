@@ -1,0 +1,26 @@
+name: coverage-test
+on: [pull_request, push]
+
+jobs:
+    build:
+        name: coverage-test
+        runs-on: ubuntu-18.04
+        # Run on external PRs, but not internal PRs as they'll be run by the push
+        if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v2
+            - name: Fetch repository
+              run: git fetch --prune --unshallow
+            - name: Get submodules
+              run: git submodule update --init --force --recursive
+            - name: Install packages
+              run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev lcov
+            - name: Build and run unittests
+              run: ci/coverage_test.sh
+            - name: Upload Coverage to Coveralls
+              uses: coverallsapp/github-action@master
+              with:
+                github-token: ${{ secrets.GITHUB_TOKEN }}
+                path-to-lcov: build/build-coverage/coverage.info.cleaned
