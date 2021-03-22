@@ -24,6 +24,11 @@ void soma_sphere(morphio::mut::Morphology& morpho);
 
 void nrn_order(morphio::mut::Morphology& morpho);
 
+void soma_sphere(morphio::mut::GlialCell& morpho);
+
+void nrn_order(morphio::mut::GlialCell& morpho);
+
+
 }  // namespace modifiers
 
 }  // namespace mut

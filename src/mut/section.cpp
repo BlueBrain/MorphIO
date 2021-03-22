@@ -5,6 +5,8 @@
 #include <morphio/mut/section.h>
 #include <morphio/tools.h>
 
+extern template class morphio::Node<morphio::CellFamily::NEURON>;
+
 namespace morphio {
 namespace mut {
 using morphio::readers::ErrorMessages;
@@ -21,6 +23,7 @@ Section::Section(Morphology* morphology,
     , _pointProperties(pointProperties)
     , _id(id_)
     , _sectionType(type_) {}
+
 
 Section::Section(Morphology* morphology, unsigned int id_, const morphio::Section& section_)
     : Section(morphology,

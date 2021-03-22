@@ -2,7 +2,6 @@
 
 #include <memory>  // std::shared_ptr
 
-#include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/section_base.h>
 #include <morphio/section_iterators.hpp>
@@ -29,33 +28,34 @@ namespace morphio {
  * is a Section referring to it.
  */
 
-using upstream_iterator = upstream_iterator_t<Section>;
-using breadth_iterator = breadth_iterator_t<Section, Morphology>;
-using depth_iterator = depth_iterator_t<Section, Morphology>;
+class Morphology;
 
-class Section: public SectionBase<Section>
+template <typename CellType>
+class Node: public SectionBase<Node<CellType>>
 {
     using SectionId = Property::Section;
     using PointAttribute = Property::Point;
 
   public:
+    using Type = typename CellType::Type;
+
     /**
        Depth first search iterator
     **/
-    depth_iterator depth_begin() const;
-    depth_iterator depth_end() const;
+    depth_iterator_t<Node> depth_begin() const;
+    depth_iterator_t<Node> depth_end() const;
 
     /**
        Breadth first search iterator
     **/
-    breadth_iterator breadth_begin() const;
-    breadth_iterator breadth_end() const;
+    breadth_iterator_t<Node> breadth_begin() const;
+    breadth_iterator_t<Node> breadth_end() const;
 
     /**
        Upstream first search iterator
     **/
-    upstream_iterator upstream_begin() const;
-    upstream_iterator upstream_end() const;
+    upstream_iterator_t<Node> upstream_begin() const;
+    upstream_iterator_t<Node> upstream_end() const;
 
     /**
      * Return a view
@@ -81,20 +81,26 @@ class Section: public SectionBase<Section>
     /**
      * Return the morphological type of this section (dendrite, axon, ...)
      */
-    SectionType type() const;
+    typename CellType::Type type() const;
     friend class mut::Section;
-    friend Section Morphology::section(uint32_t) const;
-    friend class SectionBase<Section>;
+    friend class mut::GlialSection;
+
+    template <typename Node, typename CRTP, typename Mut>
+    friend class TTree;
+
+    friend class SectionBase<Node>;
 
   protected:
-    Section(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
-        : SectionBase(id_, properties) {}
+    Node<CellType>(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
+        : SectionBase<Node<CellType>>(id_, properties) {}
 };
 
 // explicit instanciation
-template class SectionBase<Section>;
+extern template class Node<CellFamily::NEURON>;
+extern template class Node<CellFamily::GLIA>;
 
 }  // namespace morphio
 
-std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
+template <typename CellType>
+std::ostream& operator<<(std::ostream& os, const morphio::Node<CellType>& section);
 std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);

@@ -247,9 +247,51 @@ std::string ErrorMessages::WARNING_APPENDING_EMPTY_SECTION(
                     "Warning: appending empty section with id: " + std::to_string(section->id()));
 }
 
+std::string ErrorMessages::WARNING_APPENDING_EMPTY_SECTION(
+    std::shared_ptr<morphio::mut::GlialSection> glial_section) {
+    return errorMsg(0,
+                    ErrorLevel::WARNING,
+                    "Warning: appending empty section with id: " +
+                        std::to_string(glial_section->id()));
+}
+
 std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
     const std::shared_ptr<morphio::mut::Section>& current,
     const std::shared_ptr<morphio::mut::Section>& parent) const {
+    std::string msg("Warning: while appending section: " + std::to_string(current->id()) +
+                    " to parent: " + std::to_string(parent->id()));
+
+    if (parent->points().empty())
+        return errorMsg(0, ErrorLevel::WARNING, msg + "\nThe parent section is empty.");
+
+    if (current->points().empty())
+        return errorMsg(0,
+                        ErrorLevel::WARNING,
+                        msg +
+                            "\nThe current section has no points. It should at "
+                            "least contains "
+                            "parent section last point");
+
+    auto p0 = parent->points()[parent->points().size() - 1];
+    auto p1 = current->points()[0];
+    auto d0 = parent->diameters()[parent->diameters().size() - 1];
+    auto d1 = current->diameters()[0];
+
+    std::ostringstream oss;
+    oss << msg
+        << "\nThe section first point should be parent section last point: "
+           "\n        : X Y Z Diameter"
+           "\nparent last point :["
+        << std::to_string(p0[0]) << ", " << std::to_string(p0[1]) << ", " << std::to_string(p0[2])
+        << ", " << std::to_string(d0) << "]\nchild first point :[" << std::to_string(p1[0]) << ", "
+        << std::to_string(p1[1]) << ", " << std::to_string(p1[2]) << ", " << std::to_string(d1)
+        << "]\n";
+    return errorMsg(0, ErrorLevel::WARNING, oss.str());
+}
+
+std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
+    const std::shared_ptr<morphio::mut::GlialSection>& current,
+    const std::shared_ptr<morphio::mut::GlialSection>& parent) const {
     std::string msg("Warning: while appending section: " + std::to_string(current->id()) +
                     " to parent: " + std::to_string(parent->id()));
 

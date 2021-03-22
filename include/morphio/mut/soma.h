@@ -54,6 +54,7 @@ class Soma
 
   private:
     friend class Morphology;
+    friend class GlialCell;
     SomaType _somaType;
     Property::PointLevel _pointProperties;
 };

@@ -122,10 +122,8 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
         const auto majorVersion = _properties._cellLevel.majorVersion();
         const auto minorVersion = _properties._cellLevel.minorVersion();
         if (majorVersion == 1 && (minorVersion == 1 || minorVersion == 2)) {
-            uint32_t family;
             const auto familyAttr = metadata.getAttribute(_a_family);
-            familyAttr.read(family);
-            _properties._cellLevel._cellFamily = static_cast<CellFamily>(family);
+            familyAttr.read(_properties._cellLevel._cellFamily);
         } else {
             throw morphio::RawDataError(
                 "Error in " + source + "\nUnsupported h5 version: " + std::to_string(majorVersion) +
@@ -148,7 +146,7 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
             // Version 1.0 only support NEURON has a CellFamily.
             // Other CellFamily have been added in version 1.1:
             // https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
-            _properties._cellLevel._cellFamily = CellFamily::NEURON;
+            _properties._cellLevel._cellFamily = CellFamily::NEURON::value;
         }
         return;
     } catch (const HighFive::Exception&) {
@@ -298,7 +296,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
         _properties.get<Property::Perimeter>().assign(perimeters.begin() + firstSectionOffset,
                                                       perimeters.end());
     } catch (...) {
-        if (_properties._cellLevel._cellFamily == GLIA)
+        if (_properties._cellLevel._cellFamily == CellFamily::GLIA::value)
             throw MorphioError("No empty perimeters allowed for glia morphology");
     }
 }
@@ -324,7 +322,7 @@ void MorphologyHDF5::_read(const std::string& groupName,
         data.resize(dims[0]);
         dataset.read(data);
     } catch (...) {
-        if (_properties._cellLevel._cellFamily == GLIA)
+        if (_properties._cellLevel._cellFamily == CellFamily::GLIA::value)
             throw MorphioError("No empty perimeters allowed for glia morphology");
     }
 }

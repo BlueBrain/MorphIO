@@ -2,6 +2,8 @@
 #include <iosfwd>
 
 namespace morphio {
+enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
+
 namespace enums {
 
 enum LogLevel { ERROR, WARNING, INFO, DEBUG };
@@ -15,6 +17,10 @@ enum Option {
     NO_DUPLICATES = 0x04,
     NRN_ORDER = 0x08
 };
+
+/*Those values must correspond to the values of the cell family in the spec.
+https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html*/
+
 
 /**
    This enum should be kept in sync with the warnings
@@ -39,9 +45,6 @@ enum AnnotationType {
     SINGLE_CHILD,
 };
 
-/** The cell family represented by morphio::Morphology. */
-enum CellFamily { NEURON = 0, GLIA = 1 };
-
 enum SomaType {
     SOMA_UNDEFINED = 0,
     SOMA_SINGLE_POINT,
@@ -58,8 +61,6 @@ enum SectionType {
     SECTION_AXON = 2,
     SECTION_DENDRITE = 3,         //!< general or basal dendrite (near to soma)
     SECTION_APICAL_DENDRITE = 4,  //!< apical dendrite (far from soma)
-    SECTION_GLIA_PROCESS = 2,     // TODO: nasty overload there
-    SECTION_GLIA_ENDFOOT = 3,
 
     // All section types equal or above this number are custom types according
     // to neuromorpho.org standard
@@ -77,6 +78,13 @@ enum SectionType {
     SECTION_ALL = 32
 };
 
+enum class GlialSectionType {
+    UNDEFINED = 0,
+    SOMA = 1,
+    ENDFOOT = 2,
+    PROCESS = 3,
+};
+
 enum VascularSectionType {
     SECTION_NOT_DEFINED = 0,
     SECTION_VEIN = 1,
@@ -88,6 +96,7 @@ enum VascularSectionType {
     SECTION_TRANSITIONAL = 7,
     SECTION_CUSTOM = 8
 };
+
 
 /**
  * Specify the access mode of data.

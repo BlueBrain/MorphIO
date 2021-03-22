@@ -24,5 +24,6 @@ class Mitochondria
     std::shared_ptr<Property::Properties> _properties;
 
     friend class Morphology;
+    friend class GlialCell;
 };
 }  // namespace morphio

@@ -6,7 +6,6 @@ set(MORPHIO_SOURCES
     mito_section.cpp
     mitochondria.cpp
     morphology.cpp
-    morphology.cpp
     mut/endoplasmic_reticulum.cpp
     mut/glial_cell.cpp
     mut/mito_section.cpp
@@ -14,6 +13,7 @@ set(MORPHIO_SOURCES
     mut/modifiers.cpp
     mut/morphology.cpp
     mut/section.cpp
+    mut/glial_section.cpp
     mut/soma.cpp
     mut/writers.cpp
     properties.cpp
@@ -23,6 +23,7 @@ set(MORPHIO_SOURCES
     readers/vasculatureHDF5.cpp
     section.cpp
     soma.cpp
+    ttree.cpp
     vasc/properties.cpp
     vasc/section.cpp
     vasc/vasculature.cpp

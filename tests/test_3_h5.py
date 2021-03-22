@@ -3,7 +3,7 @@ from itertools import chain, repeat
 from pathlib import Path
 
 import requests
-from morphio import (CellFamily, Morphology, RawDataError, SectionType,
+from morphio import (Morphology, RawDataError, SectionType,
                      ostream_redirect)
 from nose.tools import assert_equal, assert_raises, ok_
 from numpy.testing import assert_array_equal

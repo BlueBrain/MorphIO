@@ -40,7 +40,7 @@ struct Point {
 };
 
 struct SectionType {
-    using Type = morphio::SectionType;
+    using Type = uint32_t;
 };
 
 struct Perimeter {
@@ -156,14 +156,11 @@ struct CellLevel {
 
     // A tuple (file format (std::string), major version, minor version)
     MorphologyVersion _version;
-    morphio::CellFamily _cellFamily;
+    uint32_t _cellFamily;
     SomaType _somaType;
     std::vector<Annotation> _annotations;
     std::vector<Marker> _markers;
 
-    bool diff(const CellLevel& other, LogLevel logLevel) const;
-    bool operator==(const CellLevel& other) const;
-    bool operator!=(const CellLevel& other) const;
     std::string fileFormat() const;
     uint32_t majorVersion();
     uint32_t minorVersion();
@@ -195,9 +192,6 @@ struct Properties {
 
     const morphio::MorphologyVersion& version() const noexcept {
         return _cellLevel._version;
-    }
-    const morphio::CellFamily& cellFamily() const noexcept {
-        return _cellLevel._cellFamily;
     }
     const morphio::SomaType& somaType() const noexcept {
         return _cellLevel._somaType;

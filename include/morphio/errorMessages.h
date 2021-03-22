@@ -5,6 +5,7 @@
 #include <set>     // std::set
 #include <string>  // std::string
 
+#include <morphio/mut/glial_section.h>
 #include <morphio/mut/modifiers.h>
 #include <morphio/mut/section.h>
 
@@ -192,7 +193,11 @@ class ErrorMessages
     std::string WARNING_DISCONNECTED_NEURITE(const Sample& sample) const;
     std::string WARNING_WRONG_DUPLICATE(const std::shared_ptr<morphio::mut::Section>& current,
                                         const std::shared_ptr<morphio::mut::Section>& parent) const;
+    std::string WARNING_WRONG_DUPLICATE(
+        const std::shared_ptr<morphio::mut::GlialSection>& current,
+        const std::shared_ptr<morphio::mut::GlialSection>& parent) const;
     std::string WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morphio::mut::Section>);
+    std::string WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morphio::mut::GlialSection>);
     std::string WARNING_ONLY_CHILD(const DebugInfo& info,
                                    unsigned int parentId,
                                    unsigned int childId) const;

@@ -6,6 +6,7 @@
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
+#include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
@@ -14,6 +15,7 @@
 #include <morphio/tools.h>
 
 namespace morphio {
+
 namespace mut {
 
 void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset);
@@ -46,7 +48,7 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
     _cellProperties = std::make_shared<morphio::Property::CellLevel>(
         morphology._properties->_cellLevel);
 
-    for (const morphio::Section& root : morphology.rootSections()) {
+    for (const morphio::NeuronalSection& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
 
@@ -71,17 +73,6 @@ bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
 
     if (parent->points().back() != current->points().front())
         return false;
-
-    // // As perimeter is optional, it must either be defined for parent and
-    // current
-    // // or not be defined at all
-    // if(parent->perimeters().empty() != current->perimeters().empty())
-    //     return false;
-
-    // if(!parent->perimeters().empty() &&
-    //    parent->perimeters()[parent->perimeters().size()-1] !=
-    //    current->perimeters()[0])
-    //     return false;
 
     return true;
 }
@@ -288,7 +279,7 @@ Property::Properties Morphology::buildReadOnly() const {
 }
 
 depth_iterator Morphology::depth_begin() const {
-    return depth_iterator(*this);
+    return depth_iterator(rootSections());
 }
 
 depth_iterator Morphology::depth_end() const {
@@ -296,7 +287,7 @@ depth_iterator Morphology::depth_end() const {
 }
 
 breadth_iterator Morphology::breadth_begin() const {
-    return breadth_iterator(*this);
+    return breadth_iterator(rootSections());
 }
 
 breadth_iterator Morphology::breadth_end() const {
@@ -362,7 +353,7 @@ void Morphology::write(const std::string& filename) {
         extension += my_tolower(c);
 
     if (extension == ".h5")
-        writer::h5(clean, filename);
+        writer::h5<Morphology, Section>(clean, filename);
     else if (extension == ".asc")
         writer::asc(clean, filename);
     else if (extension == ".swc")

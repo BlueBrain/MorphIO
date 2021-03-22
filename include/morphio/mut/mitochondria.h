@@ -13,9 +13,8 @@ namespace morphio {
 namespace mut {
 
 using mito_upstream_iterator = morphio::upstream_iterator_t<std::shared_ptr<MitoSection>>;
-using mito_breadth_iterator =
-    morphio::breadth_iterator_t<std::shared_ptr<MitoSection>, Mitochondria>;
-using mito_depth_iterator = morphio::depth_iterator_t<std::shared_ptr<MitoSection>, Mitochondria>;
+using mito_breadth_iterator = morphio::breadth_iterator_t<std::shared_ptr<MitoSection>>;
+using mito_depth_iterator = morphio::depth_iterator_t<std::shared_ptr<MitoSection>>;
 
 /**
  * The entry-point class to access mitochondrial data

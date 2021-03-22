@@ -37,6 +37,7 @@ class EndoplasmicReticulum
     std::shared_ptr<Property::Properties> _properties;
 
     friend class Morphology;
+    friend class GlialCell;
     friend class morphio::mut::EndoplasmicReticulum;
 };
 }  // namespace morphio

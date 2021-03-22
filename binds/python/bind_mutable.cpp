@@ -5,6 +5,8 @@
 #include <pybind11/pybind11.h>
 
 #include <morphio/endoplasmic_reticulum.h>
+#include <morphio/glial_cell.h>
+#include <morphio/morphology.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/glial_cell.h>
 #include <morphio/mut/mitochondria.h>
@@ -40,6 +42,7 @@ void bind_mutable_module(py::module& m) {
              "options"_a = morphio::enums::Option::NO_MODIFIER,
              "Additional Ctor that accepts as filename any python "
              "object that implements __repr__ or __str__")
+
 
         // Cell sub-part accessors
         .def_property_readonly("sections",
@@ -121,10 +124,6 @@ void bind_mutable_module(py::module& m) {
                                "Return the graph connectivity of the morphology "
                                "where each section is seen as a node\nNote: -1 is the soma node")
 
-        .def_property_readonly("cell_family",
-                               &morphio::mut::Morphology::cellFamily,
-                               "Returns the cell family (neuron or glia)")
-
         .def_property_readonly("soma_type",
                                &morphio::mut::Morphology::somaType,
                                "Returns the soma type")
@@ -178,16 +177,159 @@ void bind_mutable_module(py::module& m) {
              "mutable_section"_a,
              "recursive"_a = false);
 
-    py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(m, "GlialCell")
+    py::class_<morphio::mut::GlialCell>(m, "GlialCell")
         .def(py::init<>())
-        .def(py::init<const std::string&>())
-        .def(py::init([](py::object arg) {
+        .def(py::init<const std::string&, unsigned int>(),
+             "filename"_a,
+             "options"_a = morphio::enums::Option::NO_MODIFIER)
+        .def(py::init<const morphio::GlialCell&, unsigned int>(),
+             "morphology"_a,
+             "options"_a = morphio::enums::Option::NO_MODIFIER)
+        .def(py::init<const morphio::mut::GlialCell&, unsigned int>(),
+             "morphology"_a,
+             "options"_a = morphio::enums::Option::NO_MODIFIER)
+        .def(py::init([](py::object arg, unsigned int options) {
                  return std::unique_ptr<morphio::mut::GlialCell>(
-                     new morphio::mut::GlialCell(py::str(arg)));
+                     new morphio::mut::GlialCell(py::str(arg), options));
              }),
              "filename"_a,
+             "options"_a = morphio::enums::Option::NO_MODIFIER,
              "Additional Ctor that accepts as filename any python "
-             "object that implements __repr__ or __str__");
+             "object that implements __repr__ or __str__")
+
+
+        // Cell sub-part accessors
+        .def_property_readonly("sections",
+                               &morphio::mut::GlialCell::sections,
+                               "Returns a list containing IDs of all sections. "
+                               "The first section of the vector is the soma section")
+        .def_property_readonly("root_sections",
+                               &morphio::mut::GlialCell::rootSections,
+                               "Returns a list of all root sections IDs "
+                               "(sections whose parent ID are -1)",
+                               py::return_value_policy::reference)
+        .def_property_readonly(
+            "soma",
+            static_cast<std::shared_ptr<morphio::mut::Soma>& (morphio::mut::GlialCell::*) ()>(
+                &morphio::mut::GlialCell::soma),
+            "Returns a reference to the soma object\n\n"
+            "Note: multiple morphologies can share the same Soma "
+            "instance")
+        .def_property_readonly(
+            "mitochondria",
+            static_cast<morphio::mut::Mitochondria& (morphio::mut::GlialCell::*) ()>(
+                &morphio::mut::GlialCell::mitochondria),
+            "Returns a reference to the mitochondria container class")
+        .def_property_readonly(
+            "endoplasmic_reticulum",
+            static_cast<morphio::mut::EndoplasmicReticulum& (morphio::mut::GlialCell::*) ()>(
+                &morphio::mut::GlialCell::endoplasmicReticulum),
+            "Returns a reference to the endoplasmic reticulum container class")
+        .def_property_readonly("annotations",
+                               &morphio::mut::GlialCell::annotations,
+                               "Returns a list of annotations")
+        .def_property_readonly("markers",
+                               &morphio::mut::GlialCell::markers,
+                               "Returns the list of NeuroLucida markers")
+        .def("section",
+             &morphio::mut::GlialCell::section,
+             "Returns the section with the given id\n\n"
+             "Note: multiple morphologies can share the same Section "
+             "instances",
+             "section_id"_a)
+        .def("build_read_only",
+             &morphio::mut::GlialCell::buildReadOnly,
+             "Returns the data structure used to create read-only "
+             "morphologies")
+        .def("append_root_section",
+             static_cast<std::shared_ptr<morphio::mut::GlialSection> (morphio::mut::GlialCell::*)(
+                 const morphio::Property::PointLevel&, morphio::GlialSectionType)>(
+                 &morphio::mut::GlialCell::appendRootSection),
+             "Append a root Section\n",
+             "point_level_properties"_a,
+             "section_type"_a)
+        .def("append_root_section",
+             static_cast<std::shared_ptr<morphio::mut::GlialSection> (morphio::mut::GlialCell::*)(
+                 const morphio::GlialSection&, bool)>(&morphio::mut::GlialCell::appendRootSection),
+             "Append the existing immutable Section as a root section\n"
+             "If recursive == true, all descendent will be appended as "
+             "well",
+             "immutable_section"_a,
+             "recursive"_a = false)
+
+        .def("delete_section",
+             &morphio::mut::GlialCell::deleteSection,
+             "Delete the given section\n"
+             "\n"
+             "Will silently fail if the section is not part of the "
+             "tree\n"
+             "\n"
+             "If recursive == true, all descendent sections will be "
+             "deleted as well\n"
+             "Else, children will be re-attached to their grand-parent",
+             "section"_a,
+             "recursive"_a = true)
+
+        .def("as_immutable",
+             [](const morphio::mut::GlialCell* morph) { return morphio::GlialCell(*morph); })
+
+        .def_property_readonly("connectivity",
+                               &morphio::mut::GlialCell::connectivity,
+                               "Return the graph connectivity of the morphology "
+                               "where each section is seen as a node\nNote: -1 is the soma node")
+
+        .def_property_readonly("soma_type",
+                               &morphio::mut::GlialCell::somaType,
+                               "Returns the soma type")
+
+        .def_property_readonly("version", &morphio::mut::GlialCell::version, "Returns the version")
+
+        .def("sanitize",
+             static_cast<void (morphio::mut::GlialCell::*) ()>(
+                 &morphio::mut::GlialCell::sanitize),
+             "Fixes the morphology single child sections and issues warnings"
+             "if the section starts and ends are inconsistent")
+
+        .def(
+            "write",
+            [](morphio::mut::GlialCell* morph, py::object arg) { morph->write(py::str(arg)); },
+            "Write file to H5, SWC, ASC format depending on filename "
+            "extension",
+            "filename"_a)
+
+        // Iterators
+        .def(
+            "iter",
+            [](morphio::mut::GlialCell* morph, IterType type) {
+                switch (type) {
+                case IterType::DEPTH_FIRST:
+                    return py::make_iterator(morph->depth_begin(), morph->depth_end());
+                case IterType::BREADTH_FIRST:
+                    return py::make_iterator(morph->breadth_begin(), morph->breadth_end());
+                case IterType::UPSTREAM:
+                default:
+                    throw morphio::MorphioError("Only iteration types depth_first and "
+                                                "breadth_first are supported");
+                }
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive
+                                      while iterator exists */
+            ,
+            "Section iterator that runs successively on every "
+            "neurite\n"
+            "iter_type controls the order of iteration on sections of "
+            "a given neurite. 2 values can be passed:\n"
+            "- morphio.IterType.depth_first (default)\n"
+            "- morphio.IterType.breadth_first",
+            "iter_type"_a = IterType::DEPTH_FIRST)
+        .def("append_root_section",
+             static_cast<std::shared_ptr<morphio::mut::GlialSection> (
+                 morphio::mut::GlialCell::*)(const std::shared_ptr<morphio::mut::GlialSection>&, bool)>(
+                 &morphio::mut::GlialCell::appendRootSection),
+             "Append the existing mutable Section as a root section\n"
+             "If recursive == true, all descendent will be appended as well",
+             "mutable_section"_a,
+             "recursive"_a = false);
 
 
     py::class_<morphio::mut::Mitochondria>(m, "Mitochondria")
@@ -487,6 +629,122 @@ void bind_mutable_module(py::module& m) {
             "center",
             [](morphio::mut::Soma* soma) { return py::array(3, soma->center().data()); },
             "Returns the center of gravity of the soma points");
+
+    py::class_<morphio::mut::GlialSection, std::shared_ptr<morphio::mut::GlialSection>>(
+        m, "GlialSection")
+        .def("__str__",
+             [](const morphio::mut::GlialSection& section) {
+                 std::stringstream ss;
+                 ss << section;
+                 return ss.str();
+             })
+
+        .def_property_readonly("id", &morphio::mut::GlialSection::id, "Return the section ID")
+        .def_property(
+            "type",
+            static_cast<const morphio::GlialSectionType& (morphio::mut::GlialSection::*) () const>(
+                &morphio::mut::GlialSection::type),
+            [](morphio::mut::GlialSection* section, morphio::GlialSectionType _type) {
+                section->type() = _type;
+            },
+            "Returns the morphological type of this section "
+            "(dendrite, axon, ...)")
+        .def_property(
+            "points",
+            [](morphio::mut::GlialSection* section) {
+                return py::array(static_cast<py::ssize_t>(section->points().size()),
+                                 section->points().data());
+            },
+            [](morphio::mut::GlialSection* section, py::array_t<morphio::floatType> _points) {
+                section->points() = array_to_points(_points);
+            },
+            "Returns the coordinates (x,y,z) of all points of this section")
+        .def_property(
+            "diameters",
+            [](morphio::mut::GlialSection* section) {
+                return py::array(static_cast<py::ssize_t>(section->diameters().size()),
+                                 section->diameters().data());
+            },
+            [](morphio::mut::GlialSection* section, py::array_t<morphio::floatType> _diameters) {
+                section->diameters() = _diameters.cast<std::vector<morphio::floatType>>();
+            },
+            "Returns the diameters of all points of this section")
+        .def_property(
+            "perimeters",
+            [](morphio::mut::GlialSection* section) {
+                return py::array(static_cast<py::ssize_t>(section->perimeters().size()),
+                                 section->perimeters().data());
+            },
+            [](morphio::mut::GlialSection* section, py::array_t<morphio::floatType> _perimeters) {
+                section->perimeters() = _perimeters.cast<std::vector<morphio::floatType>>();
+            },
+            "Returns the perimeters of all points of this section")
+        .def_property_readonly("is_root",
+                               &morphio::mut::GlialSection::isRoot,
+                               "Return True if section is a root section")
+        .def_property_readonly("parent",
+                               &morphio::mut::GlialSection::parent,
+                               "Get the parent ID\n\n"
+                               "Note: Root sections return -1")
+        .def_property_readonly("children",
+                               &morphio::mut::GlialSection::children,
+                               "Returns a list of children IDs")
+        // Iterators
+        .def(
+            "iter",
+            [](morphio::mut::GlialSection* section, IterType type) {
+                switch (type) {
+                case IterType::DEPTH_FIRST:
+                    return py::make_iterator(section->depth_begin(), section->depth_end());
+                case IterType::BREADTH_FIRST:
+                    return py::make_iterator(section->breadth_begin(), section->breadth_end());
+                case IterType::UPSTREAM:
+                    return py::make_iterator(section->upstream_begin(), section->upstream_end());
+                default:
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first, breadth_first and "
+                        "upstream are supported");
+                }
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "GlialSection iterator\n"
+            "\n"
+            "iter_type controls the iteration order. 3 values can be passed:\n"
+            "- morphio.IterType.depth_first (default)\n"
+            "- morphio.IterType.breadth_first\n"
+            "- morphio.IterType.upstream\n",
+            "iter_type"_a = IterType::DEPTH_FIRST)
+
+        // Editing
+        .def("append_section",
+             static_cast<std::shared_ptr<morphio::mut::GlialSection> (
+                 morphio::mut::GlialSection::*)(const morphio::GlialSection&, bool)>(
+                 &morphio::mut::GlialSection::appendSection),
+             "Append the existing immutable GlialSection to this section"
+             "If recursive == true, all descendent will be appended as well",
+             "immutable_section"_a,
+             "recursive"_a = false)
+
+        .def("append_section",
+             static_cast<std::shared_ptr<morphio::mut::GlialSection> (
+                 morphio::mut::GlialSection::*)(const std::shared_ptr<morphio::mut::GlialSection>&,
+                                                bool)>(&morphio::mut::GlialSection::appendSection),
+             "Append the existing mutable GlialSection to this section\n"
+             "If recursive == true, all descendent will be appended as well",
+             "mutable_section"_a,
+             "recursive"_a = false)
+
+        .def(
+            "append_section",
+            static_cast<std::shared_ptr<morphio::mut::GlialSection> (morphio::mut::GlialSection::*)(
+                const morphio::Property::PointLevel&, morphio::GlialSectionType)>(
+                &morphio::mut::GlialSection::appendSection),
+            "Append a new GlialSection to this section\n"
+            " If section_type is omitted or set to 'undefined'"
+            " the type of the parent section will be used",
+            "point_level_properties"_a,
+            "section_type"_a = morphio::GlialSectionType::UNDEFINED);
+
 
     py::class_<morphio::mut::EndoplasmicReticulum>(m, "EndoplasmicReticulum")
         .def(py::init<>())

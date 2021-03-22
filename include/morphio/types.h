@@ -17,8 +17,14 @@ using namespace enums;
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
+template <class CellType>
+class Node;
+
+template <class TSection, class CRTP, class Mut>
+class TTree;
 class Morphology;
-class Section;
+class GlialCell;
+
 template <class T>
 class SectionBase;
 class Soma;
@@ -42,7 +48,9 @@ class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
 class Morphology;
+class GlialCell;
 class Section;
+class GlialSection;
 class Soma;
 }  // namespace mut
 
@@ -51,5 +59,25 @@ using MorphologyVersion = std::tuple<std::string, uint32_t, uint32_t>;
 
 template <typename T>
 using range = gsl::span<T>;
+
+/*Those values must correspond to the values of the cell family in the spec.
+https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html*/
+
+struct CellFamily {
+    struct NEURON {
+        using Type = SectionType;
+        static constexpr int value = 0;
+    };
+    struct GLIA {
+        using Type = GlialSectionType;
+        static constexpr int value = 1;
+    };
+};
+
+using NeuronalSection = Node<CellFamily::NEURON>;
+using GlialSection = Node<CellFamily::GLIA>;
+
+// legacy name
+using Section = NeuronalSection;
 
 }  // namespace morphio

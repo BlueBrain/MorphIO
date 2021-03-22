@@ -1,54 +1,68 @@
-#include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/tools.h>
 #include <morphio/vector_types.h>
 
 namespace morphio {
 
-SectionType Section::type() const {
-    auto val = _properties->get<Property::SectionType>()[_id];
-    return val;
+
+template <typename CellType>
+typename CellType::Type Node<CellType>::type() const {
+    return static_cast<typename CellType::Type>(
+        this->_properties->template get<Property::SectionType>()[this->_id]);
 }
 
-depth_iterator Section::depth_begin() const {
-    return depth_iterator(*this);
+template <typename CellType>
+depth_iterator_t<Node<CellType>> Node<CellType>::depth_begin() const {
+    return depth_iterator_t<Node<CellType>>(*this);
 }
 
-depth_iterator Section::depth_end() const {
-    return depth_iterator();
+template <typename CellType>
+depth_iterator_t<Node<CellType>> Node<CellType>::depth_end() const {
+    return depth_iterator_t<Node<CellType>>();
 }
 
-breadth_iterator Section::breadth_begin() const {
-    return breadth_iterator(*this);
+template <typename CellType>
+breadth_iterator_t<Node<CellType>> Node<CellType>::breadth_begin() const {
+    return breadth_iterator_t<Node<CellType>>(*this);
 }
 
-breadth_iterator Section::breadth_end() const {
-    return breadth_iterator();
+template <typename CellType>
+breadth_iterator_t<Node<CellType>> Node<CellType>::breadth_end() const {
+    return breadth_iterator_t<Node<CellType>>();
 }
 
-upstream_iterator Section::upstream_begin() const {
-    return upstream_iterator(*this);
+template <typename CellType>
+upstream_iterator_t<Node<CellType>> Node<CellType>::upstream_begin() const {
+    return upstream_iterator_t<Node<CellType>>(*this);
 }
 
-upstream_iterator Section::upstream_end() const {
-    return upstream_iterator();
+template <typename CellType>
+upstream_iterator_t<Node<CellType>> Node<CellType>::upstream_end() const {
+    return upstream_iterator_t<Node<CellType>>();
 }
 
-range<const Point> Section::points() const {
-    return get<Property::Point>();
+template <typename CellType>
+range<const Point> Node<CellType>::points() const {
+    return this->template get<Property::Point>();
 }
 
-range<const floatType> Section::diameters() const {
-    return get<Property::Diameter>();
+template <typename CellType>
+range<const floatType> Node<CellType>::diameters() const {
+    return this->template get<Property::Diameter>();
 }
 
-range<const floatType> Section::perimeters() const {
-    return get<Property::Perimeter>();
+template <typename CellType>
+range<const floatType> Node<CellType>::perimeters() const {
+    return this->template get<Property::Perimeter>();
 }
+
+template class Node<CellFamily::NEURON>;
+template class Node<CellFamily::GLIA>;
 
 }  // namespace morphio
 
-std::ostream& operator<<(std::ostream& os, const morphio::Section& section) {
+template <typename CellType>
+std::ostream& operator<<(std::ostream& os, const morphio::Node<CellType>& section) {
     const auto& points = section.points();
     if (points.empty()) {
         os << "Section(id=" << section.id() << ", points=[])";
@@ -58,6 +72,10 @@ std::ostream& operator<<(std::ostream& os, const morphio::Section& section) {
     }
     return os;
 }
+
+template std::ostream& operator<<(std::ostream& os, const morphio::NeuronalSection& section);
+template std::ostream& operator<<(std::ostream& os, const morphio::GlialSection& section);
+
 
 // operator<< must be defined in the global namespace to be usable there
 std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points) {

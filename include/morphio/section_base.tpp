@@ -1,4 +1,3 @@
-#include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/section.h>
 

@@ -2,6 +2,7 @@
 #include <fstream>
 
 #include <morphio/errorMessages.h>
+#include <morphio/mut/glial_cell.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
@@ -28,7 +29,8 @@ struct base_type<std::vector<T>>: base_type<T> {};
 
 constexpr int FLOAT_PRECISION_PRINT = 9;
 
-bool hasPerimeterData(const morphio::mut::Morphology& morpho) {
+template <typename Cell>
+bool hasPerimeterData(const Cell& morpho) {
     return !morpho.rootSections().empty() && !morpho.rootSections().front()->perimeters().empty();
 }
 
@@ -289,7 +291,8 @@ static void endoplasmicReticulumH5(HighFive::File& h5_file, const EndoplasmicRet
 }
 
 
-void h5(const Morphology& morpho, const std::string& filename) {
+template <typename Cell, typename Node>
+void h5(const Cell& morpho, const std::string& filename) {
     const auto& somaPoints = morpho.soma()->points();
     const auto numberOfSomaPoints = somaPoints.size();
 
@@ -343,7 +346,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
     offset += morpho.soma()->points().size();
 
     for (auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
-        const std::shared_ptr<Section>& section = *it;
+        const std::shared_ptr<Node>& section = *it;
         int parentOnDisk = (section->isRoot() ? 0 : newIds[section->parent()->id()]);
 
         const auto& points = section->points();
@@ -352,7 +355,8 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
         const auto numberOfPoints = points.size();
         const auto numberOfPerimeters = perimeters.size();
-        raw_structure.push_back({static_cast<int>(offset), section->type(), parentOnDisk});
+        raw_structure.push_back(
+            {static_cast<int>(offset), static_cast<int>(section->type()), parentOnDisk});
 
         for (unsigned int i = 0; i < numberOfPoints; ++i)
             raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
@@ -375,9 +379,8 @@ void h5(const Morphology& morpho, const std::string& filename) {
     HighFive::Group g_metadata = h5_file.createGroup("metadata");
 
     write_attribute(g_metadata, "version", std::vector<uint32_t>{1, 2});
-    write_attribute(g_metadata,
-                    "cell_family",
-                    std::vector<uint32_t>{static_cast<uint32_t>(morpho.cellFamily())});
+    write_attribute(g_metadata, "cell_family", std::vector<uint32_t>{Cell::CellType::value});
+
     write_attribute(h5_file, "comment", std::vector<std::string>{version_string()});
 
     if (hasPerimeterData_) {
@@ -387,6 +390,9 @@ void h5(const Morphology& morpho, const std::string& filename) {
     mitochondriaH5(h5_file, morpho.mitochondria());
     endoplasmicReticulumH5(h5_file, morpho.endoplasmicReticulum());
 }
+
+template void h5<Morphology, Section>(const Morphology& morpho, const std::string& filename);
+template void h5<GlialCell, GlialSection>(const GlialCell& morpho, const std::string& filename);
 
 }  // end namespace writer
 }  // end namespace mut

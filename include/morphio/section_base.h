@@ -4,7 +4,6 @@
 #include <memory>   // std::shared_ptr
 #include <vector>   // std::vector
 
-#include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
 
@@ -80,8 +79,8 @@ inline uint32_t SectionBase<T>::id() const noexcept {
 }
 
 }  // namespace morphio
-
-std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
+template <typename CellType>
+std::ostream& operator<<(std::ostream& os, const morphio::Node<CellType>& section);
 std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);
 
 #include "section_base.tpp"
