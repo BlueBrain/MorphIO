@@ -9,9 +9,10 @@
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
-#include <morphio/shared_utils.tpp>
 #include <morphio/soma.h>
 #include <morphio/tools.h>
+
+#include "../shared_utils.hpp"
 
 namespace morphio {
 namespace mut {

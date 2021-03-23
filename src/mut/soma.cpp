@@ -1,10 +1,9 @@
-#include <cmath>
-
 #include <morphio/mut/soma.h>
 #include <morphio/soma.h>
 
 #include <morphio/section.h>
-#include <morphio/shared_utils.tpp>
+
+#include "../shared_utils.hpp"
 
 namespace morphio {
 namespace mut {

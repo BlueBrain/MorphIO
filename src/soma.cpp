@@ -1,7 +1,8 @@
 #include <morphio/section.h>
-#include <morphio/shared_utils.tpp>
 #include <morphio/soma.h>
 #include <morphio/vector_types.h>
+
+#include "shared_utils.hpp"
 
 namespace morphio {
 Soma::Soma(const std::shared_ptr<Property::Properties>& properties)

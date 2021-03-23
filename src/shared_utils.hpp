@@ -3,10 +3,22 @@
 
 
 namespace morphio {
+
+template <typename T, size_t N>
+std::string valueToString(const std::array<T, N>& a) {
+    std::ostringstream oss;
+    std::copy(a.begin(), a.end(), std::ostream_iterator<T>(oss, ", "));
+    return oss.str();
+}
+template <typename T>
+std::string valueToString(const T a) {
+    return std::to_string(a);
+}
+
 template <typename ContainerDiameters, typename ContainerPoints>
 floatType _somaSurface(const SomaType type,
-                   const ContainerDiameters& diameters,
-                   const ContainerPoints& points) {
+                       const ContainerDiameters& diameters,
+                       const ContainerPoints& points) {
     size_t size = points.size();
     if (size == 0)
         return 0.;
@@ -29,8 +41,7 @@ floatType _somaSurface(const SomaType type,
             floatType r0 = static_cast<morphio::floatType>(diameters[i]) * floatType{0.5};
             floatType r1 = static_cast<morphio::floatType>(diameters[i + 1]) * floatType{0.5};
             floatType h2 = distance(points[i], points[i + 1]);
-            auto s = morphio::PI * (r0 + r1) *
-                     std::sqrt((r0 - r1) * (r0 - r1) + h2 * h2);
+            auto s = morphio::PI * (r0 + r1) * std::sqrt((r0 - r1) * (r0 - r1) + h2 * h2);
             surface += s;
         }
         return surface;

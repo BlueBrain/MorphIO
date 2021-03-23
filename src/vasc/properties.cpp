@@ -3,11 +3,12 @@
 
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
-#include <morphio/shared_utils.tpp>
 #include <morphio/vasc/properties.h>
 
+#include "../shared_utils.hpp"
 
 namespace morphio {
+
 namespace vasculature {
 static bool verbose = false;
 namespace property {
@@ -48,10 +49,10 @@ bool compare(const std::vector<T>& vec1,
 
     if (verbose_) {
         printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-        for (unsigned int i = 0; i < vec1.size(); ++i) {
+        for (size_t i = 0; i < vec1.size(); ++i) {
             if (vec1[i] != vec2[i]) {
                 printError(Warning::UNDEFINED,
-                           std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                           valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
             }
         }
     }
@@ -70,7 +71,7 @@ static bool compare_section_structure(const std::vector<VascSection::Type>& vec1
         return false;
     }
 
-    for (unsigned int i = 1; i < vec1.size(); ++i) {
+    for (size_t i = 1; i < vec1.size(); ++i) {
         if (vec1[i] - vec1[1] != vec2[i] - vec2[1]) {
             if (verbose_) {
                 printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
@@ -97,12 +98,12 @@ bool compare(const morphio::range<T>& vec1,
         return false;
     }
 
-    for (unsigned int i = 0; i < vec1.size(); ++i) {
+    for (size_t i = 0; i < vec1.size(); ++i) {
         if (std::fabs(vec1[i] - vec2[i]) > morphio::epsilon) {
             printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
             printError(Warning::UNDEFINED,
-                       std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
-            printError(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
+                       valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
+            printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
             return false;
         }
     }
@@ -122,13 +123,13 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
         return false;
     }
 
-    for (unsigned int i = 0; i < vec1.size(); ++i) {
+    for (size_t i = 0; i < vec1.size(); ++i) {
         if (std::fabs(distance(vec1[i], vec2[i])) > morphio::epsilon) {
             if (verbose_) {
                 printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 printError(Warning::UNDEFINED,
-                           std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
-                printError(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
+                           valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
+                printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
             }
             return false;
         }
@@ -252,7 +253,7 @@ std::ostream& operator<<(std::ostream& os, const VascPointLevel& prop) {
     os << "Point level properties:\n";
     os << "Point diameter"
        << (prop._diameters.size() == prop._points.size() ? " Diameter\n" : "\n");
-    for (unsigned int i = 0; i < prop._points.size(); ++i) {
+    for (size_t i = 0; i < prop._points.size(); ++i) {
         os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i] << '\n';
     }
     return os;

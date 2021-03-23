@@ -106,7 +106,3 @@ std::vector<Connection::Type>& Properties::get<Connection>() noexcept;
 }  // namespace property
 }  // namespace vasculature
 }  // namespace morphio
-
-namespace std {
-extern template string to_string<morphio::floatType, 3>(const array<morphio::floatType, 3>&);
-}  // namespace std

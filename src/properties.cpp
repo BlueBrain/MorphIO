@@ -3,8 +3,9 @@
 
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
-#include <morphio/shared_utils.tpp>
 #include <morphio/vector_types.h>
+
+#include "shared_utils.hpp"
 
 
 namespace morphio {
@@ -67,7 +68,7 @@ bool compare(const std::vector<T>& vec1,
         for (unsigned int i = 0; i < vec1.size(); ++i) {
             if (vec1[i] != vec2[i]) {
                 printError(Warning::UNDEFINED,
-                           std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
+                           valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
             }
         }
     }
@@ -121,8 +122,8 @@ bool compare(const morphio::range<T>& vec1,
         if (std::fabs(vec1[i] - vec2[i]) > morphio::epsilon) {
             printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
             printError(Warning::UNDEFINED,
-                       std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
-            printError(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
+                       valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
+            printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
             return false;
         }
     }
@@ -147,8 +148,8 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
             if (logLevel > LogLevel::ERROR) {
                 printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 printError(Warning::UNDEFINED,
-                           std::to_string(vec1[i]) + " <--> " + std::to_string(vec2[i]));
-                printError(Warning::UNDEFINED, std::to_string(vec2[i] - vec1[i]));
+                           valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
+                printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
             }
             return false;
         }
