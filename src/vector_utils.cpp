@@ -1,7 +1,6 @@
 #include <algorithm>  // std::max
 #include <cmath>      // std::sqrt
 #include <numeric>    // std::accumulate
-#include <sstream>    // std::stringstream
 #include <string>     // std::string
 #include <cctype>     // std::tolower
 
