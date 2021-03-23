@@ -210,8 +210,13 @@ class Morphology
        Fixes the morphology single child sections and issues warnings
        if the section starts and ends are inconsistent
      **/
-    void sanitize();
-    void sanitize(const morphio::readers::DebugInfo& debugInfo);
+    void removeUnifurcations();
+    void removeUnifurcations(const morphio::readers::DebugInfo& debugInfo);
+
+    /**
+       Used before writing to SWC to check that there is no unifurcation
+     **/
+    void _raiseIfUnifurcations();
 
   public:
     friend class Section;

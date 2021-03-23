@@ -9,7 +9,7 @@ from morphio.mut import Morphology
 from nose.tools import ok_
 from numpy.testing import assert_array_equal, assert_equal, assert_raises
 
-from .utils import assert_string_equal, captured_output, setup_tempdir
+from .utils import assert_string_equal, captured_output, setup_tempdir, assert_substring
 
 
 def test_write_empty_file():
@@ -79,20 +79,43 @@ def test_write_basic():
             ok_('/perimeters' not in h5_file.keys())
 
 
-
-def test_write_merge_only_child():
+def test_write_merge_only_child_asc_h5():
     '''The root section has only one child
-    The child should be merged with its parent section
-    Special care must be given for the potential duplicate point
-                             o
-                            /
-                           / son 1
-      root       child    /
-    o--------o----------o<
-                          \
-                           \  son 2
-                            \
-                             o
+
+    When writing, children should *not* be merged with their parent section.
+
+    Note: See `test_write_merge_only_child_swc` for the SWC case.
+    '''
+
+    morpho = Morphology()
+    morpho.soma.points = [[0, 0, 0]]
+    morpho.soma.diameters = [2]
+
+    root = morpho.append_root_section(
+                                 PointLevel([[0, 0, 0],
+                                             [0, 5, 0]],
+                                            [2, 2]),
+                                 SectionType.basal_dendrite)
+    child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
+    with setup_tempdir('test_write_merge_only_child') as tmp_folder:
+        for extension in ['asc', 'h5']:
+            with captured_output() as (_, err):
+                with ostream_redirect(stdout=True, stderr=True):
+                    filename = Path(tmp_folder, 'test.{}'.format(extension))
+                    morpho.write(filename)
+
+            read = Morphology(filename)
+
+            root = read.root_sections[0]
+            assert_array_equal(root.points,
+                               [[0, 0, 0],
+                                [0, 5, 0]])
+            assert_equal(len(root.children), 1)
+
+
+def test_write_merge_only_child_swc():
+    '''Attempts to write a morphology with unifurcations with SWC should result
+    in an exception.
     '''
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0]]
@@ -104,33 +127,13 @@ def test_write_merge_only_child():
                                             [2, 2]),
                                  SectionType.basal_dendrite)
     child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
-    son1 = child.append_section(PointLevel([[0, 6, 0], [0, 7, 0]], [2, 3]))
-    son2 = child.append_section(PointLevel([[0, 6, 0], [4, 5, 6]], [3, 3]))
 
-    with setup_tempdir('test_write_merge_only_child') as tmp_folder:
-        for extension in ['swc', 'asc', 'h5']:
-            with captured_output() as (_, err):
-                with ostream_redirect(stdout=True, stderr=True):
-                    filename = Path(tmp_folder, 'test.{}'.format(extension))
-                    morpho.write(filename)
-
-                    assert_equal(err.getvalue().strip(),
-                                 'Warning: section 1 is the only child of section: 0\nIt will be merged with the parent section')
-
-
-            read = Morphology(filename)
-            root = read.root_sections[0]
-            assert_array_equal(root.points,
-                               [[0, 0, 0],
-                                [0, 5, 0],
-                                [0, 6, 0]])
-            assert_equal(len(root.children), 2)
-
-            assert_array_equal(root.children[0].points,
-                               [[0, 6, 0], [0, 7, 0]])
-
-            assert_array_equal(root.children[1].points,
-                               [[0, 6, 0], [4, 5, 6]])
+    with assert_raises(WriterError) as obj:
+       morpho.write('/tmp/bla.swc')  # the path does not need to exists since it will fail before
+    assert_substring("Section 0 has a single child section. "
+                     "Single child section are not allowed when writing to SWC format. "
+                     "Please sanitize the morphology first.",
+                     str(obj.exception),)
 
 
 

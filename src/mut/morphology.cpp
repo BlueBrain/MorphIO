@@ -206,11 +206,11 @@ void _appendProperties(Property::PointLevel& to, const Property::PointLevel& fro
         _appendVector(to._perimeters, from._perimeters, offset);
 }
 
-void Morphology::sanitize() {
-    sanitize(morphio::readers::DebugInfo());
+void Morphology::removeUnifurcations() {
+    removeUnifurcations(morphio::readers::DebugInfo());
 }
 
-void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo) {
+void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInfo) {
     morphio::readers::ErrorMessages err(debugInfo._filename);
 
     auto it = depth_begin();
@@ -256,6 +256,23 @@ void Morphology::sanitize(const morphio::readers::DebugInfo& debugInfo) {
                                        duplicate ? 1 : 0);
 
             deleteSection(section_, false);
+        }
+    }
+}
+
+void Morphology::_raiseIfUnifurcations() {
+    for (auto it = depth_begin(); it != depth_end(); ++it) {
+        std::shared_ptr<Section> section_ = *it;
+        if (section_->isRoot())
+            continue;
+
+        unsigned int parentId = section_->parent()->id();
+
+        auto parent = section_->parent();
+        bool isUnifurcation = parent->children().size() == 1;
+
+        if (isUnifurcation) {
+            throw WriterError(readers::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(parentId));
         }
     }
 }
@@ -350,10 +367,7 @@ void Morphology::write(const std::string& filename) {
 
     std::string extension;
 
-    morphio::mut::Morphology clean(*this);
-    clean.sanitize();
-
-    for (const auto& root : clean.rootSections()) {
+    for (const auto& root : rootSections()) {
         if (root->points().size() < 2)
             throw morphio::SectionBuilderError("Root sections must have at least 2 points");
     }
@@ -362,12 +376,13 @@ void Morphology::write(const std::string& filename) {
         extension += my_tolower(c);
 
     if (extension == ".h5")
-        writer::h5(clean, filename);
+        writer::h5(*this, filename);
     else if (extension == ".asc")
-        writer::asc(clean, filename);
-    else if (extension == ".swc")
-        writer::swc(clean, filename);
-    else
+        writer::asc(*this, filename);
+    else if (extension == ".swc") {
+        _raiseIfUnifurcations();
+        writer::swc(*this, filename);
+    } else
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
 }
 

@@ -34,7 +34,6 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
     // their respective loaders
     if (properties._cellLevel.fileFormat() == "h5") {
         mut::Morphology mutable_morph(*this);
-        mutable_morph.sanitize();
         if (options) {
             mutable_morph.applyModifiers(options);
         }
@@ -50,7 +49,6 @@ Morphology::Morphology(const std::string& source, unsigned int options)
     : Morphology(loadURI(source, options), options) {}
 
 Morphology::Morphology(mut::Morphology morphology) {
-    morphology.sanitize();
     _properties = std::make_shared<Property::Properties>(morphology.buildReadOnly());
     buildChildren(_properties);
 }

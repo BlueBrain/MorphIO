@@ -215,6 +215,15 @@ std::string ErrorMessages::ERROR_PERIMETER_DATA_NOT_WRITABLE() {
     return "Cannot write a file with perimeter data to ASC or SWC format";
 }
 
+std::string ErrorMessages::ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const {
+    return ("Section " + std::to_string(parentId) +
+            " has a single child section. "
+            "Single child section are not allowed when writing to SWC format. "
+            "Please sanitize the morphology first.\n"
+            "Tip: you can use 'removeUnifurcations() (C++) / remove_unifurcations() (python)'");
+}
+
+
 ////////////////////////////////////////////////////////////////////////////////
 //              WARNINGS
 ////////////////////////////////////////////////////////////////////////////////

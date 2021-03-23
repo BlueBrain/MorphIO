@@ -9,12 +9,6 @@ Soma
   ASC files with *multiple* CellBody tags will raise an error.
   `Unit test <https://github.com/BlueBrain/MorphIO/blob/5e111f3141f7a1ee72e0260111ce569741d80acb/tests/test_neurolucida.py#L58>`_
 
-Ignored keywords
-----------------
-
-All S-expressions starting with a keyword other than ``CellBody, Axon, Dendrite, Apical`` will be
-skipped.
-
 Duplicate points
 ----------------
 

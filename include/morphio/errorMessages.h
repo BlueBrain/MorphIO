@@ -180,6 +180,8 @@ class ErrorMessages
                                              size_t length2) const;
 
     std::string ERROR_PERIMETER_DATA_NOT_WRITABLE();
+    std::string ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const;
+
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
