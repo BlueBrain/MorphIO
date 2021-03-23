@@ -1,8 +1,9 @@
 set(TESTS_SRC
-    main.cpp
-    test_morphology.cpp
-    test_mut_morphology.cpp
-)
+        main.cpp
+        test_morphology_readers.cpp
+        test_immutable_morphology.cpp
+        test_mutable_morphology.cpp
+        )
 set(TESTS_LINK_LIBRAIRIES morphio_static HighFive)
 
 add_executable(unittests ${TESTS_SRC})

@@ -15,3 +15,12 @@ TEST_CASE("RemoveRootsection", "[mutMorphology]") {
     }
     REQUIRE(morpho.rootSections().size() == 2);
 }
+
+
+TEST_CASE("RemoveUnifurcation", "[mutMorphology]") {
+    morphio::mut::Morphology morpho("data/nested_single_children.asc");
+    REQUIRE(morpho.rootSections().size() == 1);
+    REQUIRE(morpho.rootSections()[0]->points().size() == 2);
+    morpho.removeUnifurcations();
+    REQUIRE(morpho.rootSections()[0]->points().size() == 5);
+}
