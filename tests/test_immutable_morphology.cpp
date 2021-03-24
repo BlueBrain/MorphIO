@@ -199,8 +199,9 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
     REQUIRE(std::vector<morphio::floatType>(diameters.begin(), diameters.end()) ==
             std::vector<morphio::floatType>{morphio::floatType(10.0), morphio::floatType(20.0)});
     auto relativePathLength = rootSection.relativePathLengths();
-    REQUIRE(std::vector<morphio::floatType>(relativePathLength.begin(), relativePathLength.end()) ==
-            std::vector<morphio::floatType>{morphio::floatType(0.5), morphio::floatType(0.6)});
+    REQUIRE(
+        std::vector<morphio::floatType>(relativePathLength.begin(), relativePathLength.end()) ==
+        std::vector<morphio::floatType>{morphio::floatType(0.5), morphio::floatType(0.6000000238)});
     auto neuriteSectionIds = rootSection.neuriteSectionIds();
     REQUIRE(std::vector<morphio::floatType>(neuriteSectionIds.begin(), neuriteSectionIds.end()) ==
             std::vector<morphio::floatType>{morphio::floatType(0.0), morphio::floatType(0.0)});
@@ -255,9 +256,9 @@ TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
     morphio::Morphology morph = morphio::Morphology("data/h5/v1/endoplasmic-reticulum.h5");
     morphio::EndoplasmicReticulum er = morph.endoplasmicReticulum();
     REQUIRE(er.sectionIndices() == std::vector<uint32_t>{1, 4, 5});
-    REQUIRE(er.volumes() == std::vector<morphio::floatType>{morphio::floatType(10.55),
-                                                            morphio::floatType(47.12),
-                                                            morphio::floatType(0.83)});
+    REQUIRE(er.volumes() == std::vector<morphio::floatType>{morphio::floatType(10.5500001907),
+                                                            morphio::floatType(47.1199989319),
+                                                            morphio::floatType(0.8299999833)});
     REQUIRE(er.surfaceAreas() == std::vector<morphio::floatType>{morphio::floatType(111.24),
                                                                  morphio::floatType(87.44),
                                                                  morphio::floatType(0.11)});
