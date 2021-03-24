@@ -16,7 +16,7 @@ class Files
 {
   public:
     Files()
-        : fileNames({"data/simple.asc", "data/simple.swc", "data/h5/v1/simple.h5"}){}
+        : fileNames({"data/simple.asc", "data/simple.swc", "data/h5/v1/simple.h5"}) {}
     std::vector<std::string> fileNames;
     std::vector<morphio::Morphology> morphs() {
         std::vector<morphio::Morphology> res;
