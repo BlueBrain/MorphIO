@@ -1,4 +1,5 @@
 #include "contrib/catch.hpp"
+#include <cmath>
 #include <gsl/gsl>
 
 #include <morphio/endoplasmic_reticulum.h>
@@ -10,6 +11,14 @@
 #include <morphio/properties.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
+
+float roundf(float a) {
+    return std::ceil(a * 100.0f) / 100.0f;
+}
+
+double round(double a) {
+    return std::ceil(a * 100.0) / 100.0;
+}
 
 class Files
 {
@@ -199,9 +208,18 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
     REQUIRE(std::vector<morphio::floatType>(diameters.begin(), diameters.end()) ==
             std::vector<morphio::floatType>{morphio::floatType(10.0), morphio::floatType(20.0)});
     auto relativePathLength = rootSection.relativePathLengths();
-    REQUIRE(
-        std::vector<morphio::floatType>(relativePathLength.begin(), relativePathLength.end()) ==
-        std::vector<morphio::floatType>{morphio::floatType(0.5), morphio::floatType(0.6000000238)});
+    auto res = std::vector<morphio::floatType>(relativePathLength.begin(),
+                                               relativePathLength.end());
+
+
+#ifdef MORPHIO_USE_DOUBLE
+    REQUIRE(round(res.at(0)) == round(morphio::floatType(0.5)));
+    REQUIRE(round(res.at(1)) == round(morphio::floatType(0.6000000238)));
+#else
+    REQUIRE(roundf(res.at(0)) == roundf(morphio::floatType(0.5)));
+    REQUIRE(roundf(res.at(1)) == roundf(morphio::floatType(0.6000000238)));
+#endif
+
     auto neuriteSectionIds = rootSection.neuriteSectionIds();
     REQUIRE(std::vector<morphio::floatType>(neuriteSectionIds.begin(), neuriteSectionIds.end()) ==
             std::vector<morphio::floatType>{morphio::floatType(0.0), morphio::floatType(0.0)});
@@ -252,13 +270,21 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
     REQUIRE(rootSection.children().size() == 0);
 }
 
+
 TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
     morphio::Morphology morph = morphio::Morphology("data/h5/v1/endoplasmic-reticulum.h5");
     morphio::EndoplasmicReticulum er = morph.endoplasmicReticulum();
     REQUIRE(er.sectionIndices() == std::vector<uint32_t>{1, 4, 5});
-    REQUIRE(er.volumes() == std::vector<morphio::floatType>{morphio::floatType(10.5500001907),
-                                                            morphio::floatType(47.1199989319),
-                                                            morphio::floatType(0.8299999833)});
+#ifdef MORPHIO_USE_DOUBLE
+    REQUIRE(round(er.volumes().at(0)) == round(morphio::floatType(10.5500001907)));
+    REQUIRE(round(er.volumes().at(1)) == round(morphio::floatType(47.1199989319)));
+    REQUIRE(round(er.volumes().at(2)) == round(morphio::floatType(0.8299999833)));
+#else
+    REQUIRE(roundf(er.volumes().at(0)) == roundf(morphio::floatType(10.5500001907)));
+    REQUIRE(roundf(er.volumes().at(1)) == roundf(morphio::floatType(47.1199989319)));
+    REQUIRE(roundf(er.volumes().at(2)) == roundf(morphio::floatType(0.8299999833)));
+#endif
+
     REQUIRE(er.surfaceAreas() == std::vector<morphio::floatType>{morphio::floatType(111.24),
                                                                  morphio::floatType(87.44),
                                                                  morphio::floatType(0.11)});
