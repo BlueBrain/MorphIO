@@ -11,7 +11,6 @@
 #include <morphio/section.h>
 #include <morphio/soma.h>
 
-
 class Files
 {
   public:
@@ -198,13 +197,13 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
     REQUIRE(rootSection.id() == 0);
     auto diameters = rootSection.diameters();
     REQUIRE(std::vector<morphio::floatType>(diameters.begin(), diameters.end()) ==
-            std::vector<morphio::floatType>{10.0f, 20.0f});
+            std::vector<morphio::floatType>{morphio::floatType(10.0), morphio::floatType(20.0)});
     auto relativePathLength = rootSection.relativePathLengths();
     REQUIRE(std::vector<morphio::floatType>(relativePathLength.begin(), relativePathLength.end()) ==
-            std::vector<morphio::floatType>{0.5f, 0.6f});
+            std::vector<morphio::floatType>{morphio::floatType(0.5), morphio::floatType(0.6)});
     auto neuriteSectionIds = rootSection.neuriteSectionIds();
     REQUIRE(std::vector<morphio::floatType>(neuriteSectionIds.begin(), neuriteSectionIds.end()) ==
-            std::vector<morphio::floatType>{0.0f, 0.0f});
+            std::vector<morphio::floatType>{morphio::floatType(0.0), morphio::floatType(0.0)});
     REQUIRE(rootSection.children().size() == 1);
 
     auto child = rootSection.children().at(0);
@@ -212,25 +211,43 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
 
     diameters = child.diameters();
     REQUIRE(std::vector<morphio::floatType>(diameters.begin(), diameters.end()) ==
-            std::vector<morphio::floatType>{20.0f, 30.0f, 40.0f, 50.0f});
+            std::vector<morphio::floatType>{morphio::floatType(20.0),
+                                            morphio::floatType(30.0),
+                                            morphio::floatType(40.0),
+                                            morphio::floatType(50.0)});
     relativePathLength = child.relativePathLengths();
     REQUIRE(std::vector<morphio::floatType>(relativePathLength.begin(), relativePathLength.end()) ==
-            std::vector<morphio::floatType>{0.6f, 0.7f, 0.8f, 0.9f});
+            std::vector<morphio::floatType>{morphio::floatType(0.6),
+                                            morphio::floatType(0.7),
+                                            morphio::floatType(0.8),
+                                            morphio::floatType(0.9)});
     neuriteSectionIds = child.neuriteSectionIds();
     REQUIRE(std::vector<morphio::floatType>(neuriteSectionIds.begin(), neuriteSectionIds.end()) ==
-            std::vector<morphio::floatType>{3.0f, 4.0f, 4.0f, 5.0f});
+            std::vector<morphio::floatType>{morphio::floatType(3.0),
+                                            morphio::floatType(4.0),
+                                            morphio::floatType(4.0),
+                                            morphio::floatType(5.0)});
 
     rootSection = mito.rootSections().at(1);
 
     diameters = rootSection.diameters();
     REQUIRE(std::vector<morphio::floatType>(diameters.begin(), diameters.end()) ==
-            std::vector<morphio::floatType>{5.0f, 6.0f, 7.0f, 8.0f});
+            std::vector<morphio::floatType>{morphio::floatType(5.0),
+                                            morphio::floatType(6.0),
+                                            morphio::floatType(7.0),
+                                            morphio::floatType(8.0)});
     relativePathLength = rootSection.relativePathLengths();
     REQUIRE(std::vector<morphio::floatType>(relativePathLength.begin(), relativePathLength.end()) ==
-            std::vector<morphio::floatType>{0.6f, 0.7f, 0.8f, 0.9f});
+            std::vector<morphio::floatType>{morphio::floatType(0.6),
+                                            morphio::floatType(0.7),
+                                            morphio::floatType(0.8),
+                                            morphio::floatType(0.9)});
     neuriteSectionIds = rootSection.neuriteSectionIds();
     REQUIRE(std::vector<morphio::floatType>(neuriteSectionIds.begin(), neuriteSectionIds.end()) ==
-            std::vector<morphio::floatType>{0.0f, 1.0f, 1.0f, 2.0f});
+            std::vector<morphio::floatType>{morphio::floatType(0.0),
+                                            morphio::floatType(1.0),
+                                            morphio::floatType(1.0),
+                                            morphio::floatType(2.0)});
     REQUIRE(rootSection.children().size() == 0);
 }
 
@@ -238,8 +255,12 @@ TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
     morphio::Morphology morph = morphio::Morphology("data/h5/v1/endoplasmic-reticulum.h5");
     morphio::EndoplasmicReticulum er = morph.endoplasmicReticulum();
     REQUIRE(er.sectionIndices() == std::vector<uint32_t>{1, 4, 5});
-    REQUIRE(er.volumes() == std::vector<morphio::floatType>{10.55f, 47.12f, 0.83f});
-    REQUIRE(er.surfaceAreas() == std::vector<morphio::floatType>{111.24f, 87.44f, 0.11f});
+    REQUIRE(er.volumes() == std::vector<morphio::floatType>{morphio::floatType(10.55),
+                                                            morphio::floatType(47.12),
+                                                            morphio::floatType(0.83)});
+    REQUIRE(er.surfaceAreas() == std::vector<morphio::floatType>{morphio::floatType(111.24),
+                                                                 morphio::floatType(87.44),
+                                                                 morphio::floatType(0.11)});
     REQUIRE(er.filamentCounts() == std::vector<uint32_t>{12, 42, 8});
 }
 
