@@ -6,6 +6,7 @@
 #include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
+#include <morphio/mut/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
@@ -26,8 +27,22 @@ class Files
     }
 };
 
+TEST_CASE("fromMut", "[immutableMorphology]") {
+    Files files;
+    std::vector<morphio::Morphology> morphs;
+    for (const auto& names : files.fileNames) {
+        morphio::mut::Morphology mutMorph = morphio::mut::Morphology(names);
+        morphs.emplace_back(morphio::Morphology(mutMorph));
+    }
+    const auto& expectedMorphs = files.morphs();
+    for (size_t i = 0; i<expectedMorphs.size();++i){
+        REQUIRE(expectedMorphs.at(i).somaType()==morphs.at(i).somaType());
+        REQUIRE(expectedMorphs.at(i).sectionTypes()==morphs.at(i).sectionTypes());
+        REQUIRE(expectedMorphs.at(i).perimeters()==morphs.at(i).perimeters());
+    }
+}
 
-TEST_CASE("isRoot", "[immutableMorphology]") {
+TEST_CASE("sections", "[immutableMorphology]") {
     Files files;
     for (const auto& morph : files.morphs()) {
         for (const morphio::Section& section : morph.rootSections()) {
@@ -36,8 +51,53 @@ TEST_CASE("isRoot", "[immutableMorphology]") {
                 REQUIRE(!child.isRoot());
             }
         }
+        auto sections = morph.sections();
+        REQUIRE(sections.size() == 6);
     }
 }
+
+TEST_CASE("modifers", "[immutableMorphology]") {
+    morphio::Morphology morphNoModifier = morphio::Morphology(
+        "data/reversed_NRN_neurite_order.swc");
+    std::vector<morphio::SectionType> rootSectionTypesNoModifier;
+    for (auto sectionNoMod : morphNoModifier.rootSections()) {
+        rootSectionTypesNoModifier.push_back(sectionNoMod.type());
+    }
+    REQUIRE(rootSectionTypesNoModifier == std::vector<morphio::SectionType>{
+        morphio::SECTION_APICAL_DENDRITE,
+        morphio::SECTION_DENDRITE,
+        morphio::SECTION_AXON,
+    });
+
+    morphio::Morphology morph = morphio::Morphology("data/reversed_NRN_neurite_order.swc",
+                                                    morphio::Option::NRN_ORDER);
+
+    std::vector<morphio::SectionType> rootSectionTypes;
+    for (auto section : morph.rootSections()) {
+        rootSectionTypes.push_back(section.type());
+    }
+    REQUIRE(rootSectionTypes.size() == 3);
+    REQUIRE(rootSectionTypes ==
+            std::vector<morphio::SectionType>{morphio::SECTION_AXON,
+                                              morphio::SECTION_DENDRITE,
+                                              morphio::SECTION_APICAL_DENDRITE});
+
+
+    morphio::Morphology morphModifierh5 = morphio::Morphology(
+        "data/h5/v1/simple.h5", morphio::Option::NRN_ORDER);
+
+    std::vector<morphio::SectionType> rootSectionTypesH5;
+    for (auto section : morphModifierh5.rootSections()) {
+        rootSectionTypesH5.push_back(section.type());
+    }
+    // Should be inverted without the option
+    REQUIRE(rootSectionTypesH5 ==
+            std::vector<morphio::SectionType>{morphio::SECTION_AXON,
+                                              morphio::SECTION_DENDRITE,
+                                              });
+}
+
+
 
 TEST_CASE("distance", "[immutableMorphology]") {
     Files files;
@@ -45,6 +105,33 @@ TEST_CASE("distance", "[immutableMorphology]") {
         REQUIRE(morph.soma().maxDistance() == 0);
     }
 }
+
+TEST_CASE("properties", "[immutableMorphology]") {
+    Files files;
+    for (const auto& morph : files.morphs()) {
+        REQUIRE(morph.somaType() == morphio::enums::SomaType::SOMA_SINGLE_POINT);
+        auto perimeters = morph.perimeters();
+        REQUIRE(std::vector<morphio::floatType>(perimeters.begin(), perimeters.end())
+                    .empty());  // empty
+                                // atm
+        const auto& sectionTypes = morph.sectionTypes();
+        REQUIRE(std::vector<morphio::SectionType>(sectionTypes.begin(), sectionTypes.end()) ==
+                std::vector<morphio::SectionType>{morphio::SECTION_DENDRITE,
+                                                  morphio::SECTION_DENDRITE,
+                                                  morphio::SECTION_DENDRITE,
+                                                  morphio::SECTION_AXON,
+                                                  morphio::SECTION_AXON,
+                                                  morphio::SECTION_AXON});
+    }
+    std::string text;
+    uint32_t major;
+    uint32_t minor;
+    std::tie(text, major, minor) = files.morphs().at(0).version();
+    REQUIRE(text == "asc");
+    REQUIRE(major == 1);
+    REQUIRE(minor == 0);
+}
+
 
 TEST_CASE("iter", "[immutableMorphology]") {
     morphio::Morphology iterMorph = morphio::Morphology("data/iterators.asc");
@@ -176,4 +263,48 @@ TEST_CASE("glia", "[immutableMorphology]") {
         throwCorrectError = true;
     }
     REQUIRE(throwCorrectError);
+}
+
+TEST_CASE("markers", "[immutableMorphology]") {
+    morphio::Morphology morph = morphio::Morphology("data/pia.asc");
+    std::vector<morphio::Property::Marker> markers = morph.markers();
+    REQUIRE(markers.at(0)._label == "pia");
+}
+
+TEST_CASE("throws", "[immutableMorphology]") {
+    bool throwCorrectError = false;
+    try {
+        auto fail = morphio::Morphology("data");
+        FAIL();
+    } catch (morphio::UnknownFileType&) {
+        throwCorrectError = true;
+    }
+    REQUIRE(throwCorrectError);
+
+    try {
+        auto fail = morphio::Morphology("data/unknown.asc");
+        FAIL();
+    } catch (morphio::RawDataError&) {
+        throwCorrectError = true;
+    }
+    REQUIRE(throwCorrectError);
+
+    try {
+        auto fail = morphio::Morphology("data/simple.unknown");
+        FAIL();
+    } catch (morphio::UnknownFileType&) {
+        throwCorrectError = true;
+    }
+    REQUIRE(throwCorrectError);
+}
+
+TEST_CASE("annotations", "[immutableMorphology]") {
+    auto mutMorph = morphio::mut::Morphology("data/annotations.asc");
+    mutMorph.removeUnifurcations();
+    REQUIRE(mutMorph.annotations().size()==1);
+    auto morph =  morphio::Morphology(mutMorph);
+    REQUIRE(morph.annotations().size()==1);
+    auto annotation = morph.annotations().at(0);
+    REQUIRE(annotation._sectionId==1);
+    REQUIRE(annotation._type==morphio::SINGLE_CHILD);
 }

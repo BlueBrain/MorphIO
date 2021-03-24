@@ -1,6 +1,3 @@
-#include <cassert>
-#include <iostream>
-
 #include <fstream>
 #include <memory>
 #include <streambuf>
@@ -10,7 +7,6 @@
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
-#include <morphio/tools.h>
 
 #include <morphio/mut/morphology.h>
 
