@@ -198,13 +198,13 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
     REQUIRE(rootSection.id() == 0);
     auto diameters = rootSection.diameters();
     REQUIRE(std::vector<morphio::floatType>(diameters.begin(), diameters.end()) ==
-            std::vector<morphio::floatType>{10.f, 20.f});
+            std::vector<morphio::floatType>{10.0f, 20.0f});
     auto relativePathLength = rootSection.relativePathLengths();
     REQUIRE(std::vector<morphio::floatType>(relativePathLength.begin(), relativePathLength.end()) ==
             std::vector<morphio::floatType>{0.5f, 0.6f});
     auto neuriteSectionIds = rootSection.neuriteSectionIds();
     REQUIRE(std::vector<morphio::floatType>(neuriteSectionIds.begin(), neuriteSectionIds.end()) ==
-            std::vector<morphio::floatType>{0.f, 0.f});
+            std::vector<morphio::floatType>{0.0f, 0.0f});
     REQUIRE(rootSection.children().size() == 1);
 
     auto child = rootSection.children().at(0);
@@ -212,13 +212,13 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
 
     diameters = child.diameters();
     REQUIRE(std::vector<morphio::floatType>(diameters.begin(), diameters.end()) ==
-            std::vector<morphio::floatType>{20.f, 30.f, 40.f, 50.f});
+            std::vector<morphio::floatType>{20.0f, 30.0f, 40.0f, 50.0f});
     relativePathLength = child.relativePathLengths();
     REQUIRE(std::vector<morphio::floatType>(relativePathLength.begin(), relativePathLength.end()) ==
             std::vector<morphio::floatType>{0.6f, 0.7f, 0.8f, 0.9f});
     neuriteSectionIds = child.neuriteSectionIds();
     REQUIRE(std::vector<morphio::floatType>(neuriteSectionIds.begin(), neuriteSectionIds.end()) ==
-            std::vector<morphio::floatType>{3.f, 4.f, 4.f, 5.f});
+            std::vector<morphio::floatType>{3.0f, 4.0f, 4.0f, 5.0f});
 
     rootSection = mito.rootSections().at(1);
 
