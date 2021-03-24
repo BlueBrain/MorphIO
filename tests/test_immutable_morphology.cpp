@@ -35,10 +35,10 @@ TEST_CASE("fromMut", "[immutableMorphology]") {
         morphs.emplace_back(morphio::Morphology(mutMorph));
     }
     const auto& expectedMorphs = files.morphs();
-    for (size_t i = 0; i<expectedMorphs.size();++i){
-        REQUIRE(expectedMorphs.at(i).somaType()==morphs.at(i).somaType());
-        REQUIRE(expectedMorphs.at(i).sectionTypes()==morphs.at(i).sectionTypes());
-        REQUIRE(expectedMorphs.at(i).perimeters()==morphs.at(i).perimeters());
+    for (size_t i = 0; i < expectedMorphs.size(); ++i) {
+        REQUIRE(expectedMorphs.at(i).somaType() == morphs.at(i).somaType());
+        REQUIRE(expectedMorphs.at(i).sectionTypes() == morphs.at(i).sectionTypes());
+        REQUIRE(expectedMorphs.at(i).perimeters() == morphs.at(i).perimeters());
     }
 }
 
@@ -64,10 +64,10 @@ TEST_CASE("modifers", "[immutableMorphology]") {
         rootSectionTypesNoModifier.push_back(sectionNoMod.type());
     }
     REQUIRE(rootSectionTypesNoModifier == std::vector<morphio::SectionType>{
-        morphio::SECTION_APICAL_DENDRITE,
-        morphio::SECTION_DENDRITE,
-        morphio::SECTION_AXON,
-    });
+                                              morphio::SECTION_APICAL_DENDRITE,
+                                              morphio::SECTION_DENDRITE,
+                                              morphio::SECTION_AXON,
+                                          });
 
     morphio::Morphology morph = morphio::Morphology("data/reversed_NRN_neurite_order.swc",
                                                     morphio::Option::NRN_ORDER);
@@ -83,20 +83,19 @@ TEST_CASE("modifers", "[immutableMorphology]") {
                                               morphio::SECTION_APICAL_DENDRITE});
 
 
-    morphio::Morphology morphModifierh5 = morphio::Morphology(
-        "data/h5/v1/simple.h5", morphio::Option::NRN_ORDER);
+    morphio::Morphology morphModifierh5 = morphio::Morphology("data/h5/v1/simple.h5",
+                                                              morphio::Option::NRN_ORDER);
 
     std::vector<morphio::SectionType> rootSectionTypesH5;
     for (auto section : morphModifierh5.rootSections()) {
         rootSectionTypesH5.push_back(section.type());
     }
     // Should be inverted without the option
-    REQUIRE(rootSectionTypesH5 ==
-            std::vector<morphio::SectionType>{morphio::SECTION_AXON,
-                                              morphio::SECTION_DENDRITE,
-                                              });
+    REQUIRE(rootSectionTypesH5 == std::vector<morphio::SectionType>{
+                                      morphio::SECTION_AXON,
+                                      morphio::SECTION_DENDRITE,
+                                  });
 }
-
 
 
 TEST_CASE("distance", "[immutableMorphology]") {
@@ -301,10 +300,10 @@ TEST_CASE("throws", "[immutableMorphology]") {
 TEST_CASE("annotations", "[immutableMorphology]") {
     auto mutMorph = morphio::mut::Morphology("data/annotations.asc");
     mutMorph.removeUnifurcations();
-    REQUIRE(mutMorph.annotations().size()==1);
-    auto morph =  morphio::Morphology(mutMorph);
-    REQUIRE(morph.annotations().size()==1);
+    REQUIRE(mutMorph.annotations().size() == 1);
+    auto morph = morphio::Morphology(mutMorph);
+    REQUIRE(morph.annotations().size() == 1);
     auto annotation = morph.annotations().at(0);
-    REQUIRE(annotation._sectionId==1);
-    REQUIRE(annotation._type==morphio::SINGLE_CHILD);
+    REQUIRE(annotation._sectionId == 1);
+    REQUIRE(annotation._type == morphio::SINGLE_CHILD);
 }
