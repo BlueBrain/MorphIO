@@ -22,8 +22,8 @@ static bool almost_equal(morphio::floatType a, morphio::floatType b, double epsi
 }
 
 static bool array_almost_equal(const std::vector<morphio::floatType>& a,
-                        const std::vector<morphio::floatType>& b,
-                        double epsilon) {
+                               const std::vector<morphio::floatType>& b,
+                               double epsilon) {
     if (a.size() != b.size()) {
         return false;
     }
