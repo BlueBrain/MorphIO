@@ -13,7 +13,7 @@
 #include <morphio/soma.h>
 
 
-bool almost_equal(morphio::floatType a, morphio::floatType b, double epsilon) {
+static bool almost_equal(morphio::floatType a, morphio::floatType b, double epsilon) {
 #ifdef MORPHIO_USE_DOUBLE
     return a - b < epsilon;
 #else
@@ -21,7 +21,7 @@ bool almost_equal(morphio::floatType a, morphio::floatType b, double epsilon) {
 #endif
 }
 
-bool array_almost_equal(const std::vector<morphio::floatType>& a,
+static bool array_almost_equal(const std::vector<morphio::floatType>& a,
                         const std::vector<morphio::floatType>& b,
                         double epsilon) {
     if (a.size() != b.size()) {
