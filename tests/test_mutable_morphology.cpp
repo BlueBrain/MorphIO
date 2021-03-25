@@ -1,11 +1,15 @@
 #include "contrib/catch.hpp"
-#if defined(__APPLE__)
-#define _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM
-#endif
-#include <experimental/filesystem>
+
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 
+#if defined(__APPLE__)
+#include <filesystem>
+namespace fs = std::filesystem;
+#else
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#endif
 
 TEST_CASE("RemoveRootsection", "[mutableMorphology]") {
     // this test verifies we can delete a root section with recursive at false from a morphology
@@ -40,7 +44,7 @@ TEST_CASE("mutableConnectivity", "[mutableMorphology]") {
 
 TEST_CASE("writing", "[mutableMorphology]") {
     morphio::mut::Morphology morph("data/simple.asc");
-    std::experimental::filesystem::create_directories("tmp_files");
+    fs::create_directories("tmp_files");
     morph.write("tmp_files/simple.asc");
     morph.write("tmp_files/simple.h5");
     morph.write("tmp_files/simple.swc");
@@ -50,5 +54,5 @@ TEST_CASE("writing", "[mutableMorphology]") {
     REQUIRE(savedMorphAsc.rootSections().size() == 2);
     REQUIRE(savedMorphH5.rootSections().size() == 2);
     REQUIRE(savedMorphSwc.rootSections().size() == 2);
-    std::experimental::filesystem::remove_all("tmp_files");
+    fs::remove_all("tmp_files");
 }

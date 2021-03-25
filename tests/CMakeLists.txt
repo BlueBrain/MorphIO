@@ -4,7 +4,7 @@ set(TESTS_SRC
         test_immutable_morphology.cpp
         test_mutable_morphology.cpp
         )
-set(TESTS_LINK_LIBRAIRIES morphio_static HighFive  PUBLIC stdc++fs)
+set(TESTS_LINK_LIBRAIRIES morphio_static HighFive PUBLIC stdc++fs)
 
 add_executable(unittests ${TESTS_SRC})
 
