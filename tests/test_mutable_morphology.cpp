@@ -1,7 +1,7 @@
 #include "contrib/catch.hpp"
-#include <morphio/mut/morphology.h>
-#include <morphio/morphology.h>
 #include <experimental/filesystem>
+#include <morphio/morphology.h>
+#include <morphio/mut/morphology.h>
 
 
 TEST_CASE("RemoveRootsection", "[mutableMorphology]") {
@@ -35,7 +35,7 @@ TEST_CASE("mutableConnectivity", "[mutableMorphology]") {
 }
 
 
-TEST_CASE("writing", "[mutableMorphology]"){
+TEST_CASE("writing", "[mutableMorphology]") {
     morphio::mut::Morphology morph("data/simple.asc");
     std::experimental::filesystem::create_directories("tmp_files");
     morph.write("tmp_files/simple.asc");
@@ -44,8 +44,8 @@ TEST_CASE("writing", "[mutableMorphology]"){
     morphio::Morphology savedMorphAsc("tmp_files/simple.asc");
     morphio::Morphology savedMorphH5("tmp_files/simple.h5");
     morphio::Morphology savedMorphSwc("tmp_files/simple.swc");
-    REQUIRE(savedMorphAsc.rootSections().size()==2);
-    REQUIRE(savedMorphH5.rootSections().size()==2);
-    REQUIRE(savedMorphSwc.rootSections().size()==2);
+    REQUIRE(savedMorphAsc.rootSections().size() == 2);
+    REQUIRE(savedMorphH5.rootSections().size() == 2);
+    REQUIRE(savedMorphSwc.rootSections().size() == 2);
     std::experimental::filesystem::remove_all("tmp_files");
 }
