@@ -37,6 +37,9 @@ TEST_CASE("mutableConnectivity", "[mutableMorphology]") {
 
 TEST_CASE("writing", "[mutableMorphology]") {
     morphio::mut::Morphology morph("data/simple.asc");
+#if __APPLE__
+#define _LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM
+#endif
     std::experimental::filesystem::create_directories("tmp_files");
     morph.write("tmp_files/simple.asc");
     morph.write("tmp_files/simple.h5");
