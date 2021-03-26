@@ -4,8 +4,7 @@
 #include <morphio/mut/morphology.h>
 
 #if defined(__APPLE__)
-#define DISABLE_WARNING_DEPRECATED_DECLARATION \
-    _Pragma(R"(GCC diagnostic ignored "-Wdeprecated-declarations")")
+_LIBCPP_NO_EXPERIMENTAL_DEPRECATION_WARNING_FILESYSTEM
 #endif
 
 #include <experimental/filesystem>
