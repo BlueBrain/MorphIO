@@ -4,12 +4,13 @@
 #include <morphio/mut/morphology.h>
 
 #if defined(__APPLE__)
-#include <filesystem>
-namespace fs = std::filesystem;
-#else
+#define DISABLE_WARNING_DEPRECATED_DECLARATION \
+    _Pragma(R"(GCC diagnostic ignored "-Wdeprecated-declarations")")
+#endif
+
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
-#endif
+
 
 TEST_CASE("RemoveRootsection", "[mutableMorphology]") {
     // this test verifies we can delete a root section with recursive at false from a morphology
