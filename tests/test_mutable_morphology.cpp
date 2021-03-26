@@ -4,6 +4,7 @@
 #include <morphio/mut/morphology.h>
 
 #if defined(__APPLE__)
+// cannot use experimental with mac and Werror
 _Pragma(R"(GCC diagnostic ignored "-Wdeprecated-declarations")")
 #endif
 
