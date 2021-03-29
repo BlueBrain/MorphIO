@@ -12,6 +12,12 @@ else
   EXTRA_OPTIONS=""
 fi
 
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  # to use filesystem on macOS:
+  # https://stackoverflow.com/questions/57197132/how-to-enable-filesystem-h-or-fix-experimental-filesystem
+  EXTRA_OPTIONS="${EXTRA_OPTIONS} -DLIBCXX_INSTALL_FILESYSTEM_LIBRARY=YES"
+fi
+
 rm -rf build
 mkdir build
 pushd build
