@@ -3,13 +3,10 @@
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 
-#if defined(__APPLE__)
-// cannot use experimental with mac and Werror
-_Pragma(R"(GCC diagnostic ignored "-Wdeprecated-declarations")")
-#endif
-
-#include <experimental/filesystem>
-    namespace fs = std::experimental::filesystem;
+#include <filesystem>
+// keep it as a namespace for simplicity because the filesystem is not really stable for all
+// compiler/OS versions. This allows room for further improvements.
+namespace fs = std::filesystem;
 
 
 TEST_CASE("RemoveRootsection", "[mutableMorphology]") {
