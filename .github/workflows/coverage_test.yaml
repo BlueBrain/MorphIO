@@ -19,7 +19,17 @@ jobs:
             - name: Get submodules
               run: git submodule update --init --force --recursive
             - name: Install packages
-              run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev lcov
+              run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev
+            - name: Install lcov
+              run: |
+                VERSION="1.15"
+                wget "https://github.com/linux-test-project/lcov/releases/download/v${VERSION}/lcov-${VERSION}.tar.gz"
+                tar -xzf "lcov-${VERSION}.tar.gz"
+                cd lcov-${VERSION}
+                sudo make install
+                cd ..
+            - name: Install gcov
+              run: gcov --version
             - name: Build and run unittests
               run: ci/coverage_test.sh
             - name: Upload Coverage to Coveralls

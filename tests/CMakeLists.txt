@@ -7,8 +7,9 @@ set(TESTS_SRC
 set(TESTS_LINK_LIBRAIRIES morphio_static HighFive)
 
 if(APPLE)
-  add_compile_options(-stdlib=libc++)
-  set(TESTS_LINK_LIBRAIRIES ${TESTS_LINK_LIBRAIRIES} PUBLIC c++fs)
+  add_definitions("-DLIBCXX_INSTALL_FILESYSTEM_LIBRARY=YES")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -stdlib=libc++ ")
+  set(TESTS_LINK_LIBRAIRIES ${TESTS_LINK_LIBRAIRIES}  PUBLIC c++fs)
 else()
   set(TESTS_LINK_LIBRAIRIES ${TESTS_LINK_LIBRAIRIES} PUBLIC stdc++fs)
 endif()
