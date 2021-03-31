@@ -4,8 +4,6 @@
 #include <morphio/mut/morphology.h>
 
 #include <filesystem>
-// keep it as a namespace for simplicity because the filesystem is not really stable for all
-// compiler/OS versions. This allows room for further improvements.
 namespace fs = std::filesystem;
 
 
@@ -42,13 +40,13 @@ TEST_CASE("mutableConnectivity", "[mutableMorphology]") {
 
 TEST_CASE("writing", "[mutableMorphology]") {
     morphio::mut::Morphology morph("data/simple.asc");
-    fs::create_directories("tmp_files");
-    morph.write("tmp_files/simple.asc");
-    morph.write("tmp_files/simple.h5");
-    morph.write("tmp_files/simple.swc");
-    morphio::Morphology savedMorphAsc("tmp_files/simple.asc");
-    morphio::Morphology savedMorphH5("tmp_files/simple.h5");
-    morphio::Morphology savedMorphSwc("tmp_files/simple.swc");
+    auto tmpDirectory = std::filesystem::temp_directory_path();
+    morph.write(tmpDirectory / "simple.asc");
+    morph.write(tmpDirectory / "simple.h5");
+    morph.write(tmpDirectory / "simple.swc");
+    morphio::Morphology savedMorphAsc(tmpDirectory / "simple.asc");
+    morphio::Morphology savedMorphH5(tmpDirectory / "simple.h5");
+    morphio::Morphology savedMorphSwc(tmpDirectory / "simple.swc");
     REQUIRE(savedMorphAsc.rootSections().size() == 2);
     REQUIRE(savedMorphH5.rootSections().size() == 2);
     REQUIRE(savedMorphSwc.rootSections().size() == 2);

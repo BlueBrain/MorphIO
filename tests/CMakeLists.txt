@@ -15,6 +15,7 @@ endif()
 
 add_executable(unittests ${TESTS_SRC})
 
+# Using c++17 for the tests only. This "unlocks" an easy <filesystem> usage.
 set_target_properties(unittests
   PROPERTIES
   CXX_STANDARD 17

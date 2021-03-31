@@ -1,6 +1,4 @@
 #include "contrib/catch.hpp"
-#include <cmath>
-#include <gsl/gsl>
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/glial_cell.h>
