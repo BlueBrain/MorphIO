@@ -1,4 +1,5 @@
 #include "contrib/catch.hpp"
+#include <cmath>
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/glial_cell.h>
@@ -13,9 +14,9 @@
 
 static bool almost_equal(morphio::floatType a, morphio::floatType b, double epsilon) {
 #ifdef MORPHIO_USE_DOUBLE
-    return a - b < epsilon;
+    return fabs(a - b) < epsilon;
 #else
-    return static_cast<double>(a) - static_cast<double>(b) < epsilon;
+    return fabs(static_cast<double>(a) - static_cast<double>(b)) < epsilon;
 #endif
 }
 
