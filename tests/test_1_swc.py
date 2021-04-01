@@ -77,12 +77,15 @@ def test_read_simple():
 
 
 def test_raise_warnings():
-    raise_warnings(True)
-    with assert_raises(MorphioError) as e:
-        Morphology(os.path.join(_path, 'disconnected_neurite.swc'))
-    assert_substring(
-        'Warning: found a disconnected neurite',
-        strip_color_codes(str(e.exception)))
+    try:
+        raise_warnings(True)
+        with assert_raises(MorphioError) as e:
+            Morphology(os.path.join(_path, 'disconnected_neurite.swc'))
+        assert_substring(
+            'Warning: found a disconnected neurite',
+            strip_color_codes(str(e.exception)))
+    finally:
+        raise_warnings(False)
 
 
 def test_repeated_id():
