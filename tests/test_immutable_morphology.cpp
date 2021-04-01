@@ -12,18 +12,23 @@
 #include <morphio/soma.h>
 
 
-static bool almost_equal(double a, double b, double epsilon) {
-    return std::fabs(a - b) < epsilon;
+namespace {
+bool almost_equal(morphio::floatType a, double expected, double epsilon) {
+#ifdef MORPHIO_USE_DOUBLE
+    return std::abs(a - expected) < epsilon;
+#else
+    return std::abs(static_cast<double>(a) - expected) < epsilon;
+#endif
 }
 
-static bool array_almost_equal(const std::vector<morphio::floatType>& a,
-                               const std::vector<morphio::floatType>& b,
-                               double epsilon) {
-    if (a.size() != b.size()) {
+bool array_almost_equal(const std::vector<morphio::floatType>& a,
+                        const std::vector<double>& expected,
+                        double epsilon) {
+    if (a.size() != expected.size()) {
         return false;
     }
     for (size_t i = 0; i < a.size(); i++) {
-        if (!almost_equal(a.at(i), b.at(i), epsilon)) {
+        if (!almost_equal(a.at(i), expected.at(i), epsilon)) {
             return false;
         }
     }
@@ -45,6 +50,7 @@ class Files
         return res;
     }
 };
+} // anonymous namespace
 
 TEST_CASE("fromMut", "[immutableMorphology]") {
     Files files;
@@ -217,7 +223,7 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
     REQUIRE(rootSection.id() == 0);
     auto diameters = rootSection.diameters();
     REQUIRE(array_almost_equal(std::vector<morphio::floatType>(diameters.begin(), diameters.end()),
-                               std::vector<morphio::floatType>{10.0, 20.0},
+                               std::vector<double>{10.0, 20.0},
                                0.01));
     auto relativePathLength = rootSection.relativePathLengths();
     auto res = std::vector<morphio::floatType>(relativePathLength.begin(),
@@ -229,7 +235,7 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
     auto neuriteSectionIds = rootSection.neuriteSectionIds();
     REQUIRE(array_almost_equal(std::vector<morphio::floatType>(neuriteSectionIds.begin(),
                                                                neuriteSectionIds.end()),
-                               std::vector<morphio::floatType>{0.0, 0.0},
+                               std::vector<double>{0.0, 0.0},
                                0.01));
     REQUIRE(rootSection.children().size() == 1);
 
@@ -238,36 +244,36 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
 
     diameters = child.diameters();
     REQUIRE(array_almost_equal(std::vector<morphio::floatType>(diameters.begin(), diameters.end()),
-                               std::vector<morphio::floatType>{20.0, 30.0, 40.0, 50.0},
+                               std::vector<double>{20.0, 30.0, 40.0, 50.0},
                                0.01));
     relativePathLength = child.relativePathLengths();
 
     REQUIRE(array_almost_equal(std::vector<morphio::floatType>(relativePathLength.begin(),
                                                                relativePathLength.end()),
-                               std::vector<morphio::floatType>{0.6, 0.7, 0.8, 0.9},
+                               std::vector<double>{0.6, 0.7, 0.8, 0.9},
                                0.01));
 
     neuriteSectionIds = child.neuriteSectionIds();
     REQUIRE(array_almost_equal(std::vector<morphio::floatType>(neuriteSectionIds.begin(),
                                                                neuriteSectionIds.end()),
-                               std::vector<morphio::floatType>{3.0, 4.0, 4.0, 5.0},
+                               std::vector<double>{3.0, 4.0, 4.0, 5.0},
                                0.01));
     rootSection = mito.rootSections().at(1);
     diameters = rootSection.diameters();
     REQUIRE(array_almost_equal(std::vector<morphio::floatType>(diameters.begin(), diameters.end()),
-                               std::vector<morphio::floatType>{5.0, 6.0, 7.0, 8.0},
+                               std::vector<double>{5.0, 6.0, 7.0, 8.0},
                                0.01));
     relativePathLength = rootSection.relativePathLengths();
 
     REQUIRE(array_almost_equal(std::vector<morphio::floatType>(relativePathLength.begin(),
                                                                relativePathLength.end()),
-                               std::vector<morphio::floatType>{0.6, 0.7, 0.8, 0.9},
+                               std::vector<double>{0.6, 0.7, 0.8, 0.9},
                                0.01));
 
     neuriteSectionIds = rootSection.neuriteSectionIds();
     REQUIRE(array_almost_equal(std::vector<morphio::floatType>(neuriteSectionIds.begin(),
                                                                neuriteSectionIds.end()),
-                               std::vector<morphio::floatType>{0.0, 1.0, 1.0, 2.0},
+                               std::vector<double>{0.0, 1.0, 1.0, 2.0},
                                0.01));
     REQUIRE(rootSection.children().empty());
 }
@@ -281,7 +287,7 @@ TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
     REQUIRE(almost_equal(er.volumes().at(1), 47.1199989319, 0.001));
     REQUIRE(almost_equal(er.volumes().at(2), 0.8299999833, 0.001));
     REQUIRE(array_almost_equal(er.surfaceAreas(),
-                               std::vector<morphio::floatType>{111.24, 87.44, 0.11},
+                               std::vector<double>{111.24, 87.44, 0.11},
                                0.001));
     REQUIRE(er.filamentCounts() == std::vector<uint32_t>{12, 42, 8});
 }
