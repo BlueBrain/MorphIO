@@ -50,7 +50,7 @@ class Files
         return res;
     }
 };
-} // anonymous namespace
+}  // anonymous namespace
 
 TEST_CASE("fromMut", "[immutableMorphology]") {
     Files files;
@@ -286,9 +286,7 @@ TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
     REQUIRE(almost_equal(er.volumes().at(0), 10.5500001907, 0.001));
     REQUIRE(almost_equal(er.volumes().at(1), 47.1199989319, 0.001));
     REQUIRE(almost_equal(er.volumes().at(2), 0.8299999833, 0.001));
-    REQUIRE(array_almost_equal(er.surfaceAreas(),
-                               std::vector<double>{111.24, 87.44, 0.11},
-                               0.001));
+    REQUIRE(array_almost_equal(er.surfaceAreas(), std::vector<double>{111.24, 87.44, 0.11}, 0.001));
     REQUIRE(er.filamentCounts() == std::vector<uint32_t>{12, 42, 8});
 }
 
