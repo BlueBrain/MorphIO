@@ -20,23 +20,6 @@ jobs:
               run: git submodule update --init --force --recursive
             - name: Install packages
               run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev lcov
-              #- name: Install lcov
-              #  # we cannot use the default lcov due to compatibility problems with g++>7 (can't read the gcno files)
-              #  # and g++>7 is needed for the tests due to <filesystem>.
-              #  # see : https://github.com/linux-test-project/lcov/issues/38 for more information.
-              #  run: |
-              #    VERSION="1.15"
-              #    wget "https://github.com/linux-test-project/lcov/releases/download/v${VERSION}/lcov-${VERSION}.tar.gz"
-              #    tar -xzf "lcov-${VERSION}.tar.gz"
-              #    cd lcov-${VERSION}
-              #    sudo make install
-              #    cd ..
-              #    lcov --version
-              #- name: Setup gcov
-              #  run: |
-              #    sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-9 20
-              #    sudo update-alternatives --set gcov /usr/bin/gcov-9
-              #    gcov --version
             - name: Build and run unittests
               run: ci/coverage_test.sh
             - name: Upload Coverage to Coveralls

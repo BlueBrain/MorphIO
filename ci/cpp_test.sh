@@ -6,16 +6,18 @@
 
 set -euxo pipefail
 
+BUILD_DIR=build/cpp_test
+
 if [ $# -ge 1 ]; then
   EXTRA_OPTIONS=$1
 else
   EXTRA_OPTIONS=""
 fi
 
-rm -rf build
-mkdir build
-pushd build
-cmake -DMorphIO_CXX_WARNINGS=ON -G "${CMAKE_GENERATOR:-Unix Makefiles}" ${EXTRA_OPTIONS} ..
+rm -rf $BUILD_DIR
+mkdir -p $BUILD_DIR
+pushd $BUILD_DIR
+cmake -DMorphIO_CXX_WARNINGS=ON -G "${CMAKE_GENERATOR:-Unix Makefiles}" ${EXTRA_OPTIONS} ../..
 cmake --build .
 ctest -VV
 popd
