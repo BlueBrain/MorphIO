@@ -58,8 +58,9 @@ bool compare(const std::vector<T>& vec1,
 
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR)
-            throw MorphioError("Error comparing " + name + ", size differs: " +
-                               std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()))
+            throw MorphioError("Error comparing " + name +
+                               ", size differs: " + std::to_string(vec1.size()) + " vs " +
+                                   std::to_string(vec2.size()));
         return false;
     }
 

@@ -95,7 +95,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 
     const bool emptySection = ptr->points().empty();
     if (emptySection)
-        throw SectionBuilderError(_err.WARNING_APPENDING_EMPTY_SECTION(ptr))
+        throw SectionBuilderError(_err.WARNING_APPENDING_EMPTY_SECTION(ptr));
 
     if (recursive) {
         for (const auto& child : section_.children()) {
