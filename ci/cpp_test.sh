@@ -16,6 +16,6 @@ rm -rf build
 mkdir build
 pushd build
 cmake -DMorphIO_CXX_WARNINGS=ON -G "${CMAKE_GENERATOR:-Unix Makefiles}" ${EXTRA_OPTIONS} ..
-cmake --build .
+cmake --build . -j
 ctest -VV
 popd
