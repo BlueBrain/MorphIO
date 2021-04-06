@@ -42,6 +42,7 @@ Table of content
 -  `Tips <#tips>`__
 
    -  `Maximum number of warnings <#maximum-number-of-warnings>`__
+   -  `Raise warnings as errors <#raise-warnings>`__
 
 -  `Specification <#specification>`__
 
@@ -682,6 +683,15 @@ On can control the maximum number of warnings using the command:
 
    # Warnings won't be displayed
    morphio.set_maximum_warnings(0)
+
+Raise warnings
+~~~~~~~~~~~~~~
+Because MorphIO warning is just output to stdout/stderr, one can switch to raise warnings as errors, so they can be
+caught programmatically:
+
+.. code-block:: python
+
+   morphio.set_raise_warnings(True)
 
 
 Specification
