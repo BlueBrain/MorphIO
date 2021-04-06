@@ -43,3 +43,7 @@ MorphIO.egg-info/
 .tags
 build/
 .*.swp
+*.idea
+ci/venv*
+cmake-build*
+env*
