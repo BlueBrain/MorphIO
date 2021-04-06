@@ -5,8 +5,8 @@ from nose import tools as nt
 from nose.tools import assert_equal, assert_raises
 from numpy.testing import assert_array_equal
 
-from morphio import (Morphology, RawDataError, SectionType, SomaError, SomaType,
-                     ostream_redirect, set_maximum_warnings, set_ignored_warning, Warning)
+from morphio import (Morphology, RawDataError, SectionType, SomaError, MorphioError, SomaType,
+                     ostream_redirect, set_maximum_warnings, set_raise_warnings, set_ignored_warning, Warning)
 from . utils import (_test_swc_exception, assert_substring, assert_string_equal, captured_output,
                    strip_color_codes, tmp_swc_file, ignored_warning)
 
@@ -74,6 +74,18 @@ def test_read_simple():
     assert_equal(simple.root_sections[0].children[1].id, 2)
     assert_array_equal(simple.root_sections[0].children[0].points, [[0, 5, 0], [-5, 5, 0]])
     assert_array_equal(simple.root_sections[1].points, [[0, 0, 0], [0, -4, 0]])
+
+
+def test_set_raise_warnings():
+    try:
+        set_raise_warnings(True)
+        with assert_raises(MorphioError) as e:
+            Morphology(os.path.join(_path, 'disconnected_neurite.swc'))
+        assert_substring(
+            'Warning: found a disconnected neurite',
+            strip_color_codes(str(e.exception)))
+    finally:
+        set_raise_warnings(False)
 
 
 def test_repeated_id():

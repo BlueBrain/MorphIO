@@ -20,6 +20,7 @@ void bind_misc(py::module& m) {
           "Set the maximum number of warnings to be printed on screen\n"
           "0 will print no warning\n"
           "-1 will print them all");
+    m.def("set_raise_warnings", &morphio::set_raise_warnings, "Whether to raise warning as errors");
     m.def("set_ignored_warning",
           static_cast<void (*)(morphio::Warning, bool)>(&morphio::set_ignored_warning),
           "Ignore/Unignore a specific warning message",

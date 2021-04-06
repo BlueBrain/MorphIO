@@ -4,6 +4,7 @@
 
 namespace morphio {
 static int MORPHIO_MAX_N_WARNINGS = 100;
+static bool MORPHIO_RAISE_WARNINGS = false;
 
 /**
    Controls the maximum number of warning to be printed on screen
@@ -12,6 +13,13 @@ static int MORPHIO_MAX_N_WARNINGS = 100;
 **/
 void set_maximum_warnings(int n_warnings) {
     MORPHIO_MAX_N_WARNINGS = n_warnings;
+}
+
+/**
+   Whether to raise warning as errors
+**/
+void set_raise_warnings(bool is_raise) {
+    MORPHIO_RAISE_WARNINGS = is_raise;
 }
 
 void set_ignored_warning(Warning warning, bool ignore) {
@@ -28,6 +36,9 @@ void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
 
 void printError(Warning warning, const std::string& msg) {
     static int error = 0;
+    if (MORPHIO_RAISE_WARNINGS)
+        throw MorphioError(msg);
+
     if (readers::ErrorMessages::isIgnored(warning) || MORPHIO_MAX_N_WARNINGS == 0)
         return;
 
