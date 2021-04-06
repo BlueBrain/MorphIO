@@ -2,7 +2,6 @@
 #include <cmath>
 
 #include <morphio/errorMessages.h>
-#include <morphio/exceptions.h>
 #include <morphio/properties.h>
 #include <morphio/vector_types.h>
 
@@ -58,8 +57,9 @@ bool compare(const std::vector<T>& vec1,
 
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR)
-            throw MorphioError("Error comparing " + name + ", size differs: " +
-                               std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+            printError(Warning::UNDEFINED,
+                       "Error comparing " + name + ", size differs: " +
+                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
         return false;
     }
 

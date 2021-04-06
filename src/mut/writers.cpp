@@ -72,7 +72,9 @@ void swc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     const auto& soma_points = soma->points();
     if (soma_points.empty() && morphology.rootSections().empty()) {
-        throw WriterError(readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
+                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+        return;
     }
 
     if (hasPerimeterData(morphology)) {
