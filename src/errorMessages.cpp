@@ -326,7 +326,8 @@ std::string ErrorMessages::WARNING_SOMA_SWC_2POINT(const morphio::Points& points
     std::stringstream ss;
     ss << "Warning: SWC soma has 2 points. Implicitly 3-points and 1-point SWC somas\n"
           "are cylinders. 2-points SWC soma has no implicit well-established meaning.\n"
-          << points[0] << "\n" << points[1];
+       << points[0] << "\n"
+       << points[1];
     return errorMsg(0, ErrorLevel::WARNING, ss.str());
 }
 
