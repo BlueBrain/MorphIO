@@ -223,6 +223,8 @@ class SWCBuilder
             return SOMA_SINGLE_POINT;
         }
         case 2: {
+            printError(Warning::SOMA_NON_CONFORM,
+                       err.WARNING_SOMA_SWC_2POINT(morph.soma()->points()));
             return SOMA_UNDEFINED;
         }
         // NeuroMorpho format is characterized by a 3 points soma
