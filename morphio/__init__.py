@@ -35,7 +35,7 @@ from ._morphio import (
     mut,
     ostream_redirect,
     set_ignored_warning,
-    raise_warnings,
+    set_raise_warnings,
     set_maximum_warnings,
     vasculature,
     version,

@@ -18,7 +18,7 @@ void set_maximum_warnings(int n_warnings) {
 /**
    Whether to raise warning as errors
 **/
-void raise_warnings(bool is_raise) {
+void set_raise_warnings(bool is_raise) {
     MORPHIO_RAISE_WARNINGS = is_raise;
 }
 

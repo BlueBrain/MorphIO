@@ -13,7 +13,7 @@ namespace morphio {
    Set the maximum number of warnings to be printed on screen
 **/
 void set_maximum_warnings(int n_warnings);
-void raise_warnings(bool is_raise);
+void set_raise_warnings(bool is_raise);
 void set_ignored_warning(Warning warning, bool ignore = true);
 void set_ignored_warning(const std::vector<Warning>& warning, bool ignore = true);
 
