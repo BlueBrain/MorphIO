@@ -115,8 +115,8 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
         const auto metadata = _group.getGroup(_g_metadata);
         const auto attr = metadata.getAttribute(_a_version);
 
-        uint32_t versions[2];
-        attr.read(&versions);
+        std::array<uint32_t, 2> versions;
+        attr.read(versions);
         std::get<1>(_properties._cellLevel._version) = versions[0];
         std::get<2>(_properties._cellLevel._version) = versions[1];
         const auto majorVersion = _properties._cellLevel.majorVersion();
