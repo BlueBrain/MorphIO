@@ -36,11 +36,12 @@ void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
 
 void printError(Warning warning, const std::string& msg) {
     static int error = 0;
-    if (MORPHIO_RAISE_WARNINGS)
-        throw MorphioError(msg);
 
     if (readers::ErrorMessages::isIgnored(warning) || MORPHIO_MAX_N_WARNINGS == 0)
         return;
+
+    if (MORPHIO_RAISE_WARNINGS)
+        throw MorphioError(msg);
 
     if (MORPHIO_MAX_N_WARNINGS < 0 || error <= MORPHIO_MAX_N_WARNINGS) {
         std::cerr << msg << '\n';
