@@ -199,6 +199,7 @@ class ErrorMessages
     std::string WARNING_ONLY_CHILD(const DebugInfo& info,
                                    unsigned int parentId,
                                    unsigned int childId) const;
+    std::string WARNING_SOMA_SWC_2POINT(const morphio::Points& points);
 
     std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& root,
                                                      const Sample& child1,

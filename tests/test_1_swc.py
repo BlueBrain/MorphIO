@@ -244,10 +244,19 @@ def test_soma_type():
                      SomaType.SOMA_SINGLE_POINT)
 
     # 2 point soma
-    with tmp_swc_file('''1 1 0 0 0 3.0 -1
-                         2 1 0 0 0 3.0  1''') as tmp_file:
-        assert_equal(Morphology(tmp_file.name).soma_type,
-                     SomaType.SOMA_UNDEFINED)
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            with tmp_swc_file('''1 1 0 0 0 3.0 -1
+                                 2 1 0 0 0 3.0  1''') as tmp_file:
+                assert_equal(Morphology(tmp_file.name).soma_type,
+                             SomaType.SOMA_UNDEFINED)
+                assert_string_equal(
+                    '''{}:0:warning
+                       Warning: SWC soma has 2 points. Implicitly 3-points and 1-point SWC somas
+                       are cylinders. 2-points SWC soma has no implicit well-established meaning.
+                       0 0 0
+                       0 0 0
+                    '''.format(tmp_file.name), err.getvalue())
 
     # > 3 points soma
     with tmp_swc_file('''1 1 0 0 0 3.0 -1
