@@ -40,9 +40,10 @@ void printError(Warning warning, const std::string& msg) {
     if (readers::ErrorMessages::isIgnored(warning) || MORPHIO_MAX_N_WARNINGS == 0)
         return;
 
+    if (MORPHIO_RAISE_WARNINGS)
+        throw MorphioError(msg);
+
     if (MORPHIO_MAX_N_WARNINGS < 0 || error <= MORPHIO_MAX_N_WARNINGS) {
-        if (MORPHIO_RAISE_WARNINGS)
-            throw MorphioError(msg);
         std::cerr << msg << '\n';
         if (error == MORPHIO_MAX_N_WARNINGS) {
             std::cerr << "Maximum number of warning reached. Next warnings "
