@@ -65,7 +65,7 @@ class SWCBuilder
             if (!sample.valid)
                 throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
 
-            if (sample.type >= SECTION_CUSTOM_START || sample.type <= 0)
+            if (sample.type >= SECTION_OUT_OF_RANGE_START || sample.type <= 0)
                 throw morphio::RawDataError(
                     err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type));
 

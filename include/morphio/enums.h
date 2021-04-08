@@ -61,9 +61,15 @@ enum SectionType {
     SECTION_GLIA_PROCESS = 2,     // TODO: nasty overload there
     SECTION_GLIA_ENDFOOT = 3,
 
-    // All section types equal or above this number are custom types according
+    SECTION_CUSTOM_5 = 5,
+    SECTION_CUSTOM_6 = 6,
+    SECTION_CUSTOM_7 = 7,
+    SECTION_CUSTOM_8 = 8,
+    SECTION_CUSTOM_9 = 9,
+    SECTION_CUSTOM_10 = 10,
+    // All section types equal or above this number are invalid custom types according
     // to neuromorpho.org standard (http://neuromorpho.org/StdSwc1.21.jsp)
-    SECTION_CUSTOM_START = 11,
+    SECTION_OUT_OF_RANGE_START = 11,
 
     // CNIC defined types
     // It defines too extra types SWC_SECTION_FORK_POINT and
