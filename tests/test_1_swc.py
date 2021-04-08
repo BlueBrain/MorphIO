@@ -408,7 +408,7 @@ def test_read_duplicate():
 def test_unsupported_section_type():
     with tmp_swc_file('''1 1 0 4 0 3.0 -1
                          2 3 0 0 2 0.5 1
-                         3 5 0 0 3 0.5 2  # <-- 5 is unsupported section type
+                         3 -1 0 0 3 0.5 2  # <-- -1 is unsupported section type
                          ''') as tmp_file:
 
         with assert_raises(RawDataError) as obj:
@@ -418,7 +418,21 @@ def test_unsupported_section_type():
         strip_color_codes(str(obj.exception)))
 
     assert_substring(
-        'Unsupported section type: 5',
+        'Unsupported section type: -1',
+        strip_color_codes(str(obj.exception)))
+    with tmp_swc_file('''1 1 0 4 0 3.0 -1
+                         2 3 0 0 2 0.5 1
+                         3 11 0 0 3 0.5 2  # <-- 11 is unsupported section type
+                         ''') as tmp_file:
+
+        with assert_raises(RawDataError) as obj:
+            Morphology(tmp_file.name)
+    assert_substring(
+        '.swc:3:error',
+        strip_color_codes(str(obj.exception)))
+
+    assert_substring(
+        'Unsupported section type: 11',
         strip_color_codes(str(obj.exception)))
 
 def test_root_node_split():

@@ -62,8 +62,8 @@ enum SectionType {
     SECTION_GLIA_ENDFOOT = 3,
 
     // All section types equal or above this number are custom types according
-    // to neuromorpho.org standard
-    SECTION_CUSTOM_START = 5,
+    // to neuromorpho.org standard (http://neuromorpho.org/StdSwc1.21.jsp)
+    SECTION_CUSTOM_START = 11,
 
     // CNIC defined types
     // It defines too extra types SWC_SECTION_FORK_POINT and
