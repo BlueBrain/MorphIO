@@ -206,6 +206,14 @@ class SWCBuilder
         const Sample& child1 = _children[0];
         const Sample& child2 = _children[1];
 
+        bool isSuited = std::fabs(child1.diameter - d) < morphio::epsilon &&
+                        std::fabs(child2.diameter - d) < morphio::epsilon &&
+                        std::fabs(child1.point[0] - x) < morphio::epsilon &&
+                        std::fabs(child2.point[0] - x) < morphio::epsilon &&
+                        std::fabs(child1.point[2] - z) < morphio::epsilon &&
+                        std::fabs(child2.point[2] - z) < morphio::epsilon;
+        if (!isSuited)
+            return;
         if (child1.point[0] != x || child2.point[0] != x || child1.point[1] != y - r ||
             child2.point[1] != y + r || child1.point[2] != z || child2.point[2] != z ||
             child1.diameter != d || child2.diameter != d) {

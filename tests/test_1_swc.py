@@ -271,9 +271,17 @@ def test_soma_type():
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-
             with tmp_swc_file('''1 1 0  0 0 3.0 -1
                                  2 1 1 -3 0 3.0  1
+                                 3 1 0  0 0 3.0  1 # PID is 1''') as tmp_file:
+                assert_equal(Morphology(tmp_file.name).soma_type,
+                             SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+                assert_string_equal('', err.getvalue())
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            with tmp_swc_file('''1 1 0  0 0 3.0 -1
+                                 2 1 0 -3 0 3.0  1
                                  3 1 0  0 0 3.0  1 # PID is 1''') as tmp_file:
                 assert_equal(Morphology(tmp_file.name).soma_type,
                              SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
@@ -287,7 +295,7 @@ def test_soma_type():
 
                        Got:
                        1 1 0 0 0 3 -1
-                       2 1 1.000000 (exp. 0.000000) -3.000000 0.000000 3.000000 1
+                       2 1 0.000000 -3.000000 0.000000 3.000000 1
                        3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1'''.format(tmp_file.name),
                     err.getvalue(),
 				)
