@@ -61,6 +61,7 @@ enum SectionType {
     SECTION_GLIA_PROCESS = 2,     // TODO: nasty overload there
     SECTION_GLIA_ENDFOOT = 3,
 
+    // unnamed custom section types
     SECTION_CUSTOM_5 = 5,
     SECTION_CUSTOM_6 = 6,
     SECTION_CUSTOM_7 = 7,
