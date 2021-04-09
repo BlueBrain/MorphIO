@@ -698,7 +698,7 @@ caught programmatically:
 Specification
 =============
 
-See https://morphio.readthedocs.io/en/latest/specification.html
+See :ref:`spec`.
 
 H5v2
 ====
