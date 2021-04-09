@@ -8,6 +8,7 @@
 #include <morphio/types.h>
 #include <morphio/version.h>
 
+#include "../../include/morphio/enums.h"
 #include "bind_enums.h"
 
 namespace py = pybind11;
@@ -56,6 +57,12 @@ void bind_misc(py::module& m) {
         .value("axon", morphio::enums::SectionType::SECTION_AXON)
         .value("basal_dendrite", morphio::enums::SectionType::SECTION_DENDRITE)
         .value("apical_dendrite", morphio::enums::SectionType::SECTION_APICAL_DENDRITE)
+        .value("custom5", morphio::enums::SectionType::SECTION_CUSTOM_5)
+        .value("custom6", morphio::enums::SectionType::SECTION_CUSTOM_6)
+        .value("custom7", morphio::enums::SectionType::SECTION_CUSTOM_7)
+        .value("custom8", morphio::enums::SectionType::SECTION_CUSTOM_8)
+        .value("custom9", morphio::enums::SectionType::SECTION_CUSTOM_9)
+        .value("custom10", morphio::enums::SectionType::SECTION_CUSTOM_10)
         // .value("glia_process", morphio::enums::SectionType::SECTION_GLIA_PROCESS)
         // .value("glia_endfoot", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
         .export_values();

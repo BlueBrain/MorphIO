@@ -50,7 +50,7 @@ def test_v1():
 def test_wrong_section_type():
     with assert_raises(RawDataError) as cm:
         Morphology(H5V1_PATH / 'simple-broken-section-type.h5')
-    assert_equal(str(cm.exception).strip(), 'Unsupported section type: 9')
+    assert_equal(str(cm.exception).strip(), 'Unsupported section type: 12')
 
     with assert_raises(RawDataError) as cm:
         Morphology(H5V1_PATH / 'simple-negative-section-type.h5')
