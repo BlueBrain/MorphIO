@@ -7,9 +7,41 @@
 
 
 TEST_CASE("LoadH5Morphology", "[morphology]") {
-    const morphio::Morphology m("data/h5/v1/Neuron.h5");
+    {
+        const morphio::Morphology m("data/h5/v1/Neuron.h5");
+        REQUIRE(m.diameters().size() == 924);
+    }
 
-    REQUIRE(m.diameters().size() == 924);
+    {  // file is an not a valid h5 file
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/non-valid.h5"), morphio::RawDataError);
+    }
+
+    {  // h5v2 is not supported
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v2/Neuron.h5"), morphio::RawDataError);
+    }
+
+    {  // empty h5 file doesn't have /points or /structure
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/empty.h5"), morphio::RawDataError);
+    }
+
+    {  // empty metadata group
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/metadata_group_only.h5"),
+                        morphio::RawDataError);
+    }
+
+    {  // unsupported version number
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/h5v1.3.h5"), morphio::RawDataError);
+    }
+
+    {  // incorrect points shape
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/incorrect_point_columns.h5"),
+                        morphio::RawDataError);
+    }
+
+    {  // incorrect structure shape
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/incorrect_structure_columns.h5"),
+                        morphio::RawDataError);
+    }
 }
 
 TEST_CASE("LoadSWCMorphology", "[morphology]") {
