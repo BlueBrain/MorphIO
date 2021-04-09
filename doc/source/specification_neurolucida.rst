@@ -1,4 +1,4 @@
-.. _neurolucida-spec:
+.. _specification-neurolucida:
 
 Specification Neurolucida
 =========================

@@ -1,4 +1,4 @@
-.. _spec:
+.. _specification:
 
 Specification
 =============
@@ -135,7 +135,7 @@ Format specific specifications
 * H5:
   `See the Human Brain Project page <https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html>`_
 * ASC:
-  :ref:`neurolucida-spec`.
+  :ref:`specification-neurolucida`.
 * SWC:
   The file format specification if available on `http://www.neuronland.org <http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html>`_.
   Here we will discuss, what does MorphIO support and does not.

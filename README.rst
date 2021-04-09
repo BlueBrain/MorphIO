@@ -698,7 +698,7 @@ caught programmatically:
 Specification
 =============
 
-See :ref:`spec`.
+See :ref:`specification`.
 
 H5v2
 ====
