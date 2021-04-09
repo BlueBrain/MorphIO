@@ -409,7 +409,7 @@ Python:
 Glia
 ^^^^
 MorphIO also support reading and writing glia (such as astrocytes) from/to disk according to the
-`H5 specification <https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html>`__
+`H5 specification <https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/latest/h5v1.html>`__
 
 .. code-block:: python
 
@@ -422,6 +422,7 @@ MorphIO also support reading and writing glia (such as astrocytes) from/to disk 
     empty_glia = morphio.mut.GlialCell()
     mutable_glia = morphio.mut.GlialCell("astrocyte.h5")
 
+.. _mitochondria-readme:
 
 Mitochondria
 ^^^^^^^^^^^^
@@ -493,7 +494,7 @@ Reading mithochondria from H5 files:
 Endoplasmic reticulum
 ^^^^^^^^^^^^^^^^^^^^^
 Endoplasmic reticulum can also be stored and written to H5 file. The specification is part of the
-`BBP morphology documentation <https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html>`__
+`BBP morphology documentation <https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/latest/h5v1.html>`__
 There is one endoplasmic reticulum object per morphology. It contains 4 attributes. Each attribute
 is an array and each line refers to the value of the attribute for a specific neuronal section.
 
@@ -697,7 +698,7 @@ caught programmatically:
 Specification
 =============
 
-See https://github.com/BlueBrain/MorphIO/blob/master/doc/specification.md
+See :ref:`specification`.
 
 H5v2
 ====
@@ -722,7 +723,8 @@ and then:
 Contributing
 ============
 If you want to improve the project or you see any issue, every contribution is welcome.
-Please check the `contribution guidelines <CONTRIBUTING.md>`_ for more information.
+Please check the `contribution guidelines <https://github.com/BlueBrain/morphio/blob/master/CONTRIBUTING.md>`_ for more
+information.
 
 Acknowledgements
 ================

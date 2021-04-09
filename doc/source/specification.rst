@@ -1,3 +1,5 @@
+.. _specification:
+
 Specification
 =============
 
@@ -78,7 +80,7 @@ spines data are not handled by MorphIO and spine information will be lost when w
 Mitochondria
 ************
 SWC and ASC do not support mitochondria. Mitochondria can be read and written to disk using the H5
-format. See `README.md <https://github.com/BlueBrain/MorphIO/blob/master/README.md#mitochondria>`_
+format. See :ref:`mitochondria-readme`.
 for more details about the mitochondria API.
 `Unit test <https://github.com/BlueBrain/MorphIO/blob/a60b52dfe403ef289455ee2221c1b4fce6418978/tests/test_immut.py#L43>`_
 
@@ -133,7 +135,7 @@ Format specific specifications
 * H5:
   `See the Human Brain Project page <https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html>`_
 * ASC:
-  `doc/specification_neurolucida.md <https://github.com/BlueBrain/MorphIO/blob/master/doc/specification_neurolucida.md>`_
+  :ref:`specification-neurolucida`.
 * SWC:
   The file format specification if available on `http://www.neuronland.org <http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html>`_.
   Here we will discuss, what does MorphIO support and does not.
