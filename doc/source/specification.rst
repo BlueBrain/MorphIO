@@ -39,7 +39,8 @@ Soma single point
    :scale: 100 %
    :alt: soma single point
 
-A single point sphere soma is interpreted as a cylinder of equivalent area.
+For H5 and ASC format this single point denotes a sphere. For SWC the single point is interpreted as a cylinder. The
+area of this cylinder is equivalent to the area of a sphere as like this sphere was defined for H5 and ASC format.
 
 Soma two point
 ~~~~~~~~~~~~~~
@@ -47,7 +48,8 @@ Soma two point
    :scale: 100 %
    :alt: soma two point
 
-Soma is a cylinder with those two points as centers of the cylinder's bases.
+Soma is a cylinder with those two points as centers of the cylinder's bases. A point in this case defines a circle for
+the cylinder's base.
 
 Soma three point Neuromorpho
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
