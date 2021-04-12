@@ -23,9 +23,9 @@ does not make any sense in any of the other soma formats.
 Soma single point SOMA_SINGLE_POINT
 ***********************************
 
-If a soma is made of only one point it will be treated as a "single point soma" regardless of the
-morphology file format. The single point soma is represented as a sphere whose coordinate and
-radius are given by the soma point.
+If a soma is made of only one point it will be treated as a "single point soma" for H5 and ASC formats.
+The single point soma is represented as a sphere whose coordinate and radius are given by the soma point.
+SWC interprets such soma differently.
 
 Morphology file dependent soma type:
 ************************************
@@ -33,21 +33,56 @@ Morphology file dependent soma type:
 SWC
 ^^^
 
-`SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS <https://github.com/BlueBrain/MorphIO/blob/a60b52dfe403ef289455ee2221c1b4fce6418978/src/plugin/morphologySWC.cpp#L206>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-SWC files with a soma made of 3 points will have a soma of type 3-points soma. A 3-points soma is
+Soma single point
+~~~~~~~~~~~~~~~~~
+.. image:: images/swc/single.svg
+   :scale: 100 %
+   :alt: soma single point
+
+For H5 and ASC format this single point denotes a sphere. For SWC the single point is interpreted as a cylinder. The
+area of this cylinder is equivalent to the area of a sphere as like this sphere was defined for H5 and ASC format.
+
+Soma two point
+~~~~~~~~~~~~~~
+.. image:: images/swc/two_pt.svg
+   :scale: 100 %
+   :alt: soma two point
+
+Soma is a cylinder with those two points as centers of the cylinder's bases. A point in this case defines a circle for
+the cylinder's base.
+
+Soma three point Neuromorpho
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. image:: images/swc/neuromorpho.svg
+   :scale: 100 %
+   :alt: soma two point
+
+
+If soma is made of 3 points, where all points have almost the same X,Z coordinates and diameter, then the soma is
+expected to follow the Neuromorpho standard. In this standard A 3-points soma is
 represented as a cylinder along the Y-axis. The first point describe the coordinate of the cylinder
 center. Its radius represent the length AND radius of the cylinder. X and Z coordinates of
 second and third points must be identical to those of first point. Y coordinate of second (resp.
 third) point represents the bottom (resp. top) of the cylinder. Thus, it must have the value Y-R
 (resp. Y+R) where Y is the Y coordinate of first point and R the radius.
 
-`SOMA_CYLINDERS <https://github.com/BlueBrain/MorphIO/blob/a60b52dfe403ef289455ee2221c1b4fce6418978/src/plugin/morphologySWC.cpp#L211>`_
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Soma sequential cylinders
+~~~~~~~~~~~~~~~~~~~~~~~~~
+.. image:: images/swc/sequential.svg
+   :scale: 100 %
+   :alt: soma two point
 
-SWC files with more than 3 points are treated as a stack of consecutive `conical frustums
+SWC files with more than 2 points are treated as a stack of consecutive `conical frustums
 <http://mathworld.wolfram.com/ConicalFrustum.html>`_. Each point describes coordinates and radius
 of a disk. Each frustums is formed by 2 consecutive disks.
+
+Soma bifurcating
+~~~~~~~~~~~~~~~~
+.. image:: images/swc/split.svg
+   :scale: 100 %
+   :alt: soma two point
+
+An exceptional case of allowed bifurcating soma. TODO this needs clarifying on when such is possible.
 
 H5, ASC
 ^^^^^^^
