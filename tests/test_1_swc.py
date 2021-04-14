@@ -247,7 +247,7 @@ def test_soma_type():
     with tmp_swc_file('''1 1 0 0 0 3.0 -1
                          2 1 0 0 0 3.0  1''') as tmp_file:
         assert_equal(Morphology(tmp_file.name).soma_type,
-                     SomaType.SOMA_UNDEFINED)
+                     SomaType.SOMA_CYLINDERS)
 
     # > 3 points soma
     with tmp_swc_file('''1 1 0 0 0 3.0 -1

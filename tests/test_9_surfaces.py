@@ -52,10 +52,11 @@ def test_contour_surface():
     assert_almost_equal(Morphology(os.path.join(_path, "soma_cylinders.swc")).soma.surface,
                         2 * np.pi * 40 * 3, places=2)
 
-    # SWC single frustum
     with assert_raises(SomaError):
-        _ = Morphology(os.path.join(_path, "soma_single_frustum.swc")).soma.surface
+        _ = Morphology(os.path.join(_path, "no_soma.swc")).soma.surface
 
+    assert_almost_equal(Morphology(os.path.join(_path, "soma_single_frustum.swc")).soma.surface,
+                        1201.428, places=3)
     # SWC multiple frustums
     assert_almost_equal(ImmutMorphology(os.path.join(_path, "soma_multiple_frustums.swc")).soma.surface,
                         4164.610254415956, places=3)

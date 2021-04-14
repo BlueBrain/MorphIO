@@ -20,8 +20,6 @@ floatType _somaSurface(const SomaType type,
                        const ContainerDiameters& diameters,
                        const ContainerPoints& points) {
     size_t size = points.size();
-    if (size == 0)
-        return 0.;
 
     switch (type) {
     case SOMA_SINGLE_POINT: {
