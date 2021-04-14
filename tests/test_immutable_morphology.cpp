@@ -293,22 +293,9 @@ TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
 TEST_CASE("glia", "[immutableMorphology]") {
     morphio::GlialCell glial = morphio::GlialCell("data/astrocyte.h5");
     REQUIRE(glial.cellFamily() == morphio::CellFamily::GLIA);
-    bool throwCorrectError = false;
-    try {
-        auto fail = morphio::GlialCell("data/simple.swc");
-        FAIL();
-    } catch (morphio::RawDataError&) {
-        throwCorrectError = true;
-    }
-    REQUIRE(throwCorrectError);
-    throwCorrectError = false;
-    try {
-        auto fail = morphio::GlialCell("data/h5/v1/simple.h5");
-        FAIL();
-    } catch (morphio::RawDataError&) {
-        throwCorrectError = true;
-    }
-    REQUIRE(throwCorrectError);
+
+    CHECK_THROWS_AS(morphio::GlialCell("data/simple.swc"), morphio::RawDataError);
+    CHECK_THROWS_AS(morphio::GlialCell("data/h5/v1/simple.h5"), morphio::RawDataError);
 }
 
 TEST_CASE("markers", "[immutableMorphology]") {
@@ -318,38 +305,19 @@ TEST_CASE("markers", "[immutableMorphology]") {
 }
 
 TEST_CASE("throws", "[immutableMorphology]") {
-    bool throwCorrectError = false;
-    try {
-        auto fail = morphio::Morphology("data");
-        FAIL();
-    } catch (morphio::UnknownFileType&) {
-        throwCorrectError = true;
-    }
-    REQUIRE(throwCorrectError);
-
-    try {
-        auto fail = morphio::Morphology("data/unknown.asc");
-        FAIL();
-    } catch (morphio::RawDataError&) {
-        throwCorrectError = true;
-    }
-    REQUIRE(throwCorrectError);
-
-    try {
-        auto fail = morphio::Morphology("data/simple.unknown");
-        FAIL();
-    } catch (morphio::UnknownFileType&) {
-        throwCorrectError = true;
-    }
-    REQUIRE(throwCorrectError);
+    CHECK_THROWS_AS(morphio::Morphology("data"), morphio::UnknownFileType);
+    CHECK_THROWS_AS(morphio::Morphology("data/unknown.asc"), morphio::RawDataError);
+    CHECK_THROWS_AS(morphio::Morphology("data/simple.unknown"), morphio::UnknownFileType);
 }
 
 TEST_CASE("annotations", "[immutableMorphology]") {
     auto mutMorph = morphio::mut::Morphology("data/annotations.asc");
     mutMorph.removeUnifurcations();
     REQUIRE(mutMorph.annotations().size() == 1);
+
     auto morph = morphio::Morphology(mutMorph);
     REQUIRE(morph.annotations().size() == 1);
+
     auto annotation = morph.annotations().at(0);
     REQUIRE(annotation._sectionId == 1);
     REQUIRE(annotation._type == morphio::SINGLE_CHILD);
