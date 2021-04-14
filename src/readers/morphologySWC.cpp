@@ -231,9 +231,6 @@ class SWCBuilder
         case 1: {
             return SOMA_SINGLE_POINT;
         }
-        case 2: {
-            return SOMA_UNDEFINED;
-        }
         // NeuroMorpho format is characterized by a 3 points soma
         // with a bifurcation at soma root
         case 3: {
