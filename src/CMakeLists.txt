@@ -109,6 +109,13 @@ foreach(TARGET morphio_shared morphio_static)
      $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
      )
   target_link_libraries(${TARGET} PUBLIC gsl-lite PRIVATE HighFive lexertl)
+
+  if (MORPHIO_ENABLE_COVERAGE)
+     target_link_libraries(${TARGET}
+     PUBLIC gcov
+     )
+  endif()
+
 endforeach(TARGET)
 
 install(
