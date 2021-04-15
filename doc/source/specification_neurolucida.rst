@@ -1,7 +1,10 @@
-.. _specification-neurolucida:
-
 Specification Neurolucida
 =========================
+
+.. _specification-neurolucida:
+
+Because there is no official Neurolucida specification, this page aims to fill this gap, and provides a subjective
+specification of the format.
 
 Soma
 ----
