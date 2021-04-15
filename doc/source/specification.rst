@@ -1,7 +1,7 @@
-.. _specification:
-
 Specification
 =============
+
+Description of how MorphIO sees morphologies.
 
 Formats:
 --------

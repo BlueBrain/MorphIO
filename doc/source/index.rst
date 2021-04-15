@@ -4,7 +4,14 @@
    :hidden:
 
    Home <self>
-   api
+   install
+   morphology
+   glia
+   mitochondria
+   reticulum
+   markers
+   warnings
+   python
    cpp
    specification
    specification_neurolucida
