@@ -85,3 +85,9 @@ def test_single_children():
         with ostream_redirect(stdout=True, stderr=True):
             neuron = Morphology(H5V1_PATH / 'two_child_unmerged.h5')
     assert_equal(len(list(neuron.iter())), 8)
+
+
+def test_single_neurite():
+    n = Morphology(H5V1_PATH / 'single-neurite.h5')
+    assert_equal(len(n.soma.points), 0)
+    assert_equal(len(n.points), 3)
