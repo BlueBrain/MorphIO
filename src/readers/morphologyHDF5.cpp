@@ -181,8 +181,8 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     auto& somaDiameters = _properties._somaLevel._diameters;
 
     if (hasSoma) {
-        somaPoints.resize(somaPoints.size() + section_offset);
-        somaDiameters.resize(somaDiameters.size() + section_offset);
+        somaPoints.resize(section_offset);
+        somaDiameters.resize(section_offset);
 
         for (size_t i = 0; i < section_offset; ++i) {
             const auto& p = hd5fData[i];
@@ -195,7 +195,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     auto& diameters = _properties.get<Property::Diameter>();
 
     if (hasNeurites) {
-        const size_t size = (points.size() + hd5fData.size() - section_offset);
+        const size_t size = (hd5fData.size() - section_offset);
         points.resize(size);
         diameters.resize(size);
         for (size_t i = section_offset; i < hd5fData.size(); ++i) {
