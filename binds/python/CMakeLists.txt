@@ -16,3 +16,10 @@ target_include_directories(_morphio
 target_link_libraries(_morphio
     PRIVATE
     morphio_static)
+
+find_package (Python3)
+
+install(
+  TARGETS _morphio
+  LIBRARY DESTINATION ${Python3_SITEARCH}/morphio/
+)
