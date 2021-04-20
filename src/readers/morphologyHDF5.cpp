@@ -19,7 +19,6 @@
  */
 
 #include "morphologyHDF5.h"
-#include <cassert>
 
 #include "utilsHDF5.h"
 
