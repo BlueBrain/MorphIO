@@ -230,8 +230,24 @@ int MorphologyHDF5::_readSections() {
     if (vec.empty()) {
         throw(RawDataError("Error reading morphologies " + _uri + " empty 'structure' dataspace"));
     }
+
+    // check soma section validity
+    std::vector<size_t> soma_sections;
+    for (size_t i = 0; i < vec.size(); i++) {
+        if (vec[i][1] == 1) {
+            soma_sections.push_back(i);
+        }
+    }
+    if (soma_sections.size() >= 2) {
+        throw(RawDataError("Error reading morphologies " + _uri + " multiple sections soma."));
+    }
+    if (soma_sections.size() == 1 && soma_sections[0] != 0) {
+        throw(
+            RawDataError("Error reading morphologies " + _uri + " soma is not the first section."));
+    }
+
     // If the morphology has a soma, it is the first section
-    bool hasSoma = vec[0][1] == 1;
+    bool hasSoma = !soma_sections.empty();
     if (hasSoma && vec.size() < 2) {
         return SOMA_ONLY;
     }

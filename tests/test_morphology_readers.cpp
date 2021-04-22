@@ -54,6 +54,11 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
         CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/incorrect_structure_columns.h5"),
                         morphio::RawDataError);
     }
+
+    {  // incorrect soma section structure
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/three-point-soma-two-offset.h5"),
+                        morphio::RawDataError);
+    }
 }
 TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {
     {
