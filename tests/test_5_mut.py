@@ -9,8 +9,8 @@ from morphio import CellFamily, IterType, MitochondriaPointLevel, MorphioError
 from morphio import Morphology as ImmutableMorphology
 from morphio import PointLevel, RawDataError, SectionBuilderError, SectionType, ostream_redirect
 from morphio.mut import GlialCell, Morphology
-from nose.tools import assert_dict_equal, assert_raises, ok_
-from numpy.testing import assert_array_equal, assert_equal
+import pytest
+from numpy.testing import assert_array_equal
 
 from .utils import assert_substring, captured_output, setup_tempdir, tmp_asc_file
 
@@ -21,26 +21,20 @@ SIMPLE = Morphology(Path(DATA_DIR, "simple.swc"))
 
 def test_point_level():
     a = PointLevel([[1, 2, 3]], [2], [])
-    assert_equal(a.points, [[1, 2, 3]])
-    assert_equal(a.diameters, [2])
+    assert a.points == [[1, 2, 3]]
+    assert a.diameters == [2]
 
-    with assert_raises(SectionBuilderError) as obj:
-        a = PointLevel([[1, 2, 3],
-                        [1, 2, 3]],
-                       [2],
-                       [])
+    with pytest.raises(SectionBuilderError, match='Point vector have size: 2 while Diameter vector has size: 1'):
+        PointLevel([[1, 2, 3],
+                    [1, 2, 3]],
+                   [2],
+                   [])
 
-    assert_substring("Point vector have size: 2 while Diameter vector has size: 1",
-                     str(obj.exception))
-
-    with assert_raises(SectionBuilderError) as obj:
-        a = PointLevel([[1, 2, 3],
-                        [1, 2, 3]],
-                       [2, 3],
-                       [4])
-
-    assert_substring("Point vector have size: 2 while Perimeter vector has size: 1",
-                     str(obj.exception))
+    with pytest.raises(SectionBuilderError, match='Point vector have size: 2 while Perimeter vector has size: 1'):
+        PointLevel([[1, 2, 3],
+                    [1, 2, 3]],
+                   [2, 3],
+                   [4])
 
 
 def test_connectivity():
@@ -51,7 +45,7 @@ def test_connectivity():
     })
 
     for cell in cells:
-        assert_dict_equal(cells[cell].connectivity, {-1: [0, 3], 0: [1, 2], 3: [4, 5]})
+        assert cells[cell].connectivity == {-1: [0, 3], 0: [1, 2], 3: [4, 5]}
 
 
 def test_empty_neurite():
@@ -59,17 +53,17 @@ def test_empty_neurite():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             root = m.append_root_section(PointLevel(), SectionType.axon)
-            assert_equal(err.getvalue().strip(),
+            assert (err.getvalue().strip() ==
                          'Warning: appending empty section with id: 0')
 
-    assert_equal(len(m.root_sections), 1)
-    assert_equal(m.root_sections[0].type,
+    assert len(m.root_sections) == 1
+    assert (m.root_sections[0].type ==
                  SectionType.axon)
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             root.append_section(PointLevel(), SectionType.axon)
-            assert_equal(err.getvalue().strip(),
+            assert (err.getvalue().strip() ==
                          'Warning: appending empty section with id: 1')
 
 def test_single_neurite():
@@ -79,9 +73,9 @@ def test_single_neurite():
 
     assert_array_equal(m.root_sections[0].points,
                        [[1, 2, 3]])
-    assert_equal(m.root_sections[0].diameters,
+    assert (m.root_sections[0].diameters ==
                  [2])
-    assert_equal(m.root_sections[0].perimeters,
+    assert (m.root_sections[0].perimeters ==
                  [20])
 
     m.root_sections[0].points = [[10, 20, 30]]
@@ -91,14 +85,12 @@ def test_single_neurite():
 
     m.root_sections[0].diameters = [7]
 
-    assert_equal(m.root_sections[0].diameters,
-                 [7],
-                 'Diameter array should have been mutated')
+    assert (m.root_sections[0].diameters ==
+                 [7]), 'Diameter array should have been mutated'
 
     m.root_sections[0].perimeters = [27]
-    assert_equal(m.root_sections[0].perimeters,
-                 [27],
-                 'Perimeter array should have been mutated')
+    assert (m.root_sections[0].perimeters ==
+                 [27]), 'Perimeter array should have been mutated'
 
 
 def test_child_section():
@@ -106,7 +98,7 @@ def test_child_section():
     section = m.append_root_section(PointLevel([[1, 2, 3]], [2], [20]),
                                     SectionType.axon)
 
-    ok_(section.is_root)
+    assert section.is_root
 
     section.append_section(PointLevel([[1, 2, 3], [4, 5, 6]],
                                       [2, 3],
@@ -114,7 +106,7 @@ def test_child_section():
 
     children = m.root_sections[0].children
 
-    assert_equal(len(children),
+    assert (len(children) ==
                  1)
 
     assert_array_equal(children[0].points,
@@ -137,7 +129,7 @@ def test_append_no_duplicate():
                                                [2, 2],
                                                [20, 20]),
                                     SectionType.axon)
-    assert_equal(section.id, 0)
+    assert section.id == 0
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
@@ -146,7 +138,7 @@ def test_append_no_duplicate():
                              PointLevel([[400, 5, 6], [7, 8, 9]],
                                         [2, 3],
                                         [20, 30]))
-            assert_equal(err.getvalue().strip(),
+            assert (err.getvalue().strip() ==
                          'Warning: while appending section: 1 to parent: 0\n'
                          'The section first point should be parent section last point: \n'
                          '        : X Y Z Diameter\n'
@@ -156,7 +148,7 @@ def test_append_no_duplicate():
 
 def test_mut_copy_ctor():
     simple = Morphology(Path(DATA_DIR, "simple.swc"))
-    assert_equal([sec.id for sec in simple.iter()],
+    assert ([sec.id for sec in simple.iter()] ==
                  [0, 1, 2, 3, 4, 5])
     copy = Morphology(simple)
     copy.append_root_section(PointLevel([[1, 2, 3], [4, 5, 6]],
@@ -165,10 +157,10 @@ def test_mut_copy_ctor():
                              SectionType.axon)
 
     # test that first object has not been mutated
-    assert_equal([sec.id for sec in simple.iter()],
+    assert ([sec.id for sec in simple.iter()] ==
                  [0, 1, 2, 3, 4, 5])
 
-    assert_equal([sec.id for sec in copy.iter()],
+    assert ([sec.id for sec in copy.iter()] ==
                  [0, 1, 2, 3, 4, 5, 6])
 
 
@@ -194,7 +186,7 @@ def test_build_read_only():
     immutable_morphology = ImmutableMorphology(m)
 
     sections = list(immutable_morphology.iter())
-    assert_equal(len(sections), 3)
+    assert len(sections) == 3
 
     assert_array_equal(immutable_morphology.soma.points,
                        [[-1, - 2, -3]])
@@ -208,7 +200,7 @@ def test_build_read_only():
     assert_array_equal(immutable_morphology.section(0).perimeters,
                        [20, 20])
 
-    assert_equal(len(immutable_morphology.section(0).children), 2)
+    assert len(immutable_morphology.section(0).children) == 2
 
     child = immutable_morphology.section(0).children[0]
     assert_array_equal(child.points,
@@ -236,7 +228,7 @@ def test_mitochondria_read():
     """Read a H5 file with a mitochondria"""
     morpho = Morphology(DATA_DIR / "h5/v1/mitochondria.h5")
     mito = morpho.mitochondria
-    assert_equal(len(mito.root_sections), 2)
+    assert len(mito.root_sections) == 2
 
     mitochondria = mito.root_sections
 
@@ -247,9 +239,9 @@ def test_mitochondria_read():
     assert_array_equal(mitochondria[0].neurite_section_ids,
                        np.array([0., 0.], dtype=np.float32))
 
-    assert_equal(len(mito.children(mito.root_sections[0])), 1)
+    assert len(mito.children(mito.root_sections[0])) == 1
 
-    assert_equal(mito.parent(mito.children(mitochondria[0])[0]),
+    assert (mito.parent(mito.children(mitochondria[0])[0]) ==
                  mitochondria[0])
 
     assert_array_equal(mitochondria[1].diameters,
@@ -259,7 +251,7 @@ def test_mitochondria_read():
     assert_array_equal(mitochondria[1].neurite_section_ids,
                        np.array([0, 1, 1, 2], dtype=np.float32))
 
-    assert_equal(len(mito.children(mito.root_sections[1])), 0)
+    assert len(mito.children(mito.root_sections[1])) == 0
 
 
 def test_sections_are_not_dereferenced():
@@ -271,7 +263,7 @@ def test_sections_are_not_dereferenced():
     # This lines used to cause a bug
     morpho.mitochondria.sections  # pylint: disable=pointless-statement
 
-    ok_(all(section is not None for section in morpho.mitochondria.sections.values()))
+    assert all(section is not None for section in morpho.mitochondria.sections.values())
 
 
 def test_append_mutable_section():
@@ -279,7 +271,7 @@ def test_append_mutable_section():
     second_children_first_root = SIMPLE.root_sections[0].children[1]
 
     morpho.append_root_section(second_children_first_root)
-    assert_equal(len(morpho.root_sections), 1)
+    assert len(morpho.root_sections) == 1
 
     assert_array_equal(morpho.root_sections[0].points,
                        second_children_first_root.points)
@@ -309,10 +301,10 @@ def test_mitochondria():
                                                                 [0.6, 0.7, 0.8, 0.9],
                                                                 [5, 6, 7, 8]))
 
-    assert_equal(mito.is_root(first_mito_id), True)
-    assert_equal(mito.children(first_mito_id), [first_child])
-    assert_equal(mito.parent(first_child), first_mito_id)
-    assert_equal(mito.root_sections, [first_mito_id, second_mito_id])
+    assert mito.is_root(first_mito_id) == True
+    assert mito.children(first_mito_id) == [first_child]
+    assert mito.parent(first_child) == first_mito_id
+    assert mito.root_sections == [first_mito_id, second_mito_id]
 
     assert_array_equal(first_child.diameters,
                        [20, 30, 40, 50])
@@ -359,11 +351,8 @@ def test_non_C_nparray():
     section.points = points
     assert_array_equal(section.points, points)
 
-    with assert_raises(MorphioError) as obj:
+    with pytest.raises(MorphioError, match=r'Wrong array shape. Expected: \(X, 3\), got: \(3, 2\)'):
         section.points = points.T
-
-    assert_substring("Wrong array shape. Expected: (X, 3), got: (3, 2)",
-                     str(obj.exception))
 
     non_standard_stride = np.asfortranarray(points)
     section.points = non_standard_stride
@@ -389,9 +378,9 @@ def test_annotation():
                 cell.remove_unifurcations()
 
     for n in (cell, cell.as_immutable(), cell.as_immutable().as_mutable()):
-        assert_equal(len(n.annotations), 1)
+        assert len(n.annotations) == 1
         annotation = n.annotations[0]
-        assert_equal(annotation.type, morphio.AnnotationType.single_child)
+        assert annotation.type == morphio.AnnotationType.single_child
 
 def test_empty_sibling():
     '''The empty sibling will be removed and the single child will be merged
@@ -418,7 +407,7 @@ def test_empty_sibling():
                 assert_substring('It will be merged with the parent section',
                                  err.getvalue().strip())
 
-    assert_equal(len(n.root_sections), 1)
+    assert len(n.root_sections) == 1
     assert_array_equal(n.root_sections[0].points,
                        np.array([[3, -4, 0],
                                  [3, -6, 0],
@@ -430,10 +419,10 @@ def test_empty_sibling():
     assert_array_equal(n.root_sections[0].diameters,
                        np.array([10, 9, 8, 7, 5, 4], dtype=np.float32))
 
-    assert_equal(len(n.annotations), 1)
+    assert len(n.annotations) == 1
     annotation = n.annotations[0]
-    assert_equal(annotation.type, morphio.AnnotationType.single_child)
-    assert_equal(annotation.line_number, -1)
+    assert annotation.type == morphio.AnnotationType.single_child
+    assert annotation.line_number == -1
     assert_array_equal(annotation.points, [[3, -10, 0], [0, -10, 0], [-3, -10, 0]])
     assert_array_equal(annotation.diameters, [6, 5, 4])
 
@@ -453,32 +442,32 @@ def test_nested_single_child():
 
 
 def test_section___str__():
-    assert_equal(str(SIMPLE.root_sections[0]),
+    assert (str(SIMPLE.root_sections[0]) ==
                  'Section(id=0, points=[(0 0 0),..., (0 5 0)])')
 
 
 def test_from_pathlib():
     neuron = Morphology(DATA_DIR / "simple.asc")
-    assert_equal(len(neuron.root_sections), 2)
+    assert len(neuron.root_sections) == 2
 
 
 def test_endoplasmic_reticulum():
     neuron = Morphology(DATA_DIR / "simple.asc")
     reticulum = neuron.endoplasmic_reticulum
-    assert_equal(reticulum.section_indices, [])
-    assert_equal(reticulum.volumes, [])
-    assert_equal(reticulum.surface_areas, [])
-    assert_equal(reticulum.filament_counts, [])
+    assert len(reticulum.section_indices) == 0
+    assert len(reticulum.volumes) == 0
+    assert len(reticulum.surface_areas) == 0
+    assert len(reticulum.filament_counts) == 0
 
     reticulum.section_indices = [1, 1]
     reticulum.volumes = [2, 2]
     reticulum.surface_areas = [3, 3]
     reticulum.filament_counts = [4, 4]
 
-    assert_equal(reticulum.section_indices, [1, 1])
-    assert_equal(reticulum.volumes, [2, 2])
-    assert_equal(reticulum.surface_areas, [3, 3])
-    assert_equal(reticulum.filament_counts, [4, 4])
+    assert_array_equal(reticulum.section_indices, [1, 1])
+    assert_array_equal(reticulum.volumes, [2, 2])
+    assert_array_equal(reticulum.surface_areas, [3, 3])
+    assert_array_equal(reticulum.filament_counts, [4, 4])
 
     with setup_tempdir('test-endoplasmic-reticulum') as folder:
         path = Path(folder, 'with-reticulum.h5')
@@ -486,10 +475,10 @@ def test_endoplasmic_reticulum():
 
         neuron = Morphology(path)
     reticulum = neuron.endoplasmic_reticulum
-    assert_equal(reticulum.section_indices, [1, 1])
-    assert_equal(reticulum.volumes, [2, 2])
-    assert_equal(reticulum.surface_areas, [3, 3])
-    assert_equal(reticulum.filament_counts, [4, 4])
+    assert_array_equal(reticulum.section_indices, [1, 1])
+    assert_array_equal(reticulum.volumes, [2, 2])
+    assert_array_equal(reticulum.surface_areas, [3, 3])
+    assert_array_equal(reticulum.filament_counts, [4, 4])
 
 
 def test_remove_unifurcations():
@@ -502,8 +491,8 @@ def test_remove_unifurcations():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             m.remove_unifurcations()
-            assert_equal(len(list(m.iter())), 1)
-            assert_equal(err.getvalue().strip(),
+            assert len(list(m.iter())) == 1
+            assert (err.getvalue().strip() ==
                          'Warning: section 1 is the only child of section: 0\nIt will be merged '
                          'with the parent section')
 
@@ -521,43 +510,45 @@ def test_remove_unifurcations():
     with captured_output() as (_, err):
         with ostream_redirect():
             m.remove_unifurcations()
-            assert_equal(err.getvalue().strip(),
+            assert (err.getvalue().strip() ==
                          'Warning: while appending section: 2 to parent: 0\nThe section first point should be parent section last point: \n        : X Y Z Diameter\nparent last point :[2.000000, 0.000000, 0.000000, 2.000000]\nchild first point :[2.000000, 1.000000, 0.000000, 2.000000]')
 
 
 def test_remove_rootsection():
     morpho = Morphology(DATA_DIR / 'single_point_root.asc')
-    assert_equal(len(morpho.root_sections), 1)
+    assert len(morpho.root_sections) == 1
     to_remove = []
     for root in morpho.root_sections:
         if len(root.points) == 1:
             to_remove.append(root)
     for root in to_remove:
         morpho.delete_section(root, False)
-    assert_equal(len(morpho.root_sections), 2)
+    assert len(morpho.root_sections) == 2
 
 
 def test_remove_rootsection_in_loop():
     morpho = Morphology(DATA_DIR / 'single_point_root.asc')
-    assert_equal(len(morpho.root_sections), 1)
+    assert len(morpho.root_sections) == 1
     for root in morpho.root_sections:
         if len(root.points) == 1:
             morpho.delete_section(root, False)
-    assert_equal(len(morpho.root_sections), 2)
+    assert len(morpho.root_sections) == 2
 
 
 def test_glia():
     g = GlialCell()
-    assert_equal(g.cell_family, CellFamily.GLIA)
+    assert g.cell_family == CellFamily.GLIA
 
     g = GlialCell(Path(DATA_DIR, 'astrocyte.h5'))
-    assert_equal(g.cell_family, CellFamily.GLIA)
+    assert g.cell_family == CellFamily.GLIA
 
     g = GlialCell(DATA_DIR / 'astrocyte.h5')
-    assert_equal(g.cell_family, CellFamily.GLIA)
+    assert g.cell_family == CellFamily.GLIA
 
-    assert_raises(RawDataError, GlialCell, DATA_DIR / 'simple.swc')
-    assert_raises(RawDataError, GlialCell, DATA_DIR / 'h5/v1/simple.h5')
+    with pytest.raises(RawDataError):
+        GlialCell(DATA_DIR / 'simple.swc')
+    with pytest.raises(RawDataError):
+        GlialCell(DATA_DIR / 'h5/v1/simple.h5')
 
 
 def test_glia_round_trip():
@@ -566,7 +557,7 @@ def test_glia_round_trip():
         filename = Path(folder, 'glial-cell.h5')
         g.write(filename)
         g2 = GlialCell(filename)
-        assert_equal(len(g.sections), len(g2.sections))
+        assert len(g.sections) == len(g2.sections)
 
 
 def _get_section():
@@ -583,7 +574,7 @@ def test_lifetime_destroyed_morphology():
 
     del m  # ~mut.Morphology() called
 
-    with assert_raises(RuntimeError):
+    with pytest.raises(RuntimeError):
         s.children
 
 
@@ -596,7 +587,7 @@ def test_lifetime_access_properties_no_morphology():
                        np.array([[0., 0., 0.],
                                  [0., 5., 0.]], dtype=np.float32))
 
-    with assert_raises(RuntimeError):
+    with pytest.raises(RuntimeError):
         section.children
 
 
@@ -606,13 +597,13 @@ def test_lifetime_copy_single_section():
     section = _get_section()
 
     # Proof that the morphology has really been destroyed
-    with assert_raises(RuntimeError):
+    with pytest.raises(RuntimeError):
         section.children
 
     morph = Morphology()
     morph.append_root_section(section)
     del section
-    assert_equal(len(morph.root_sections), 1)
+    assert len(morph.root_sections) == 1
     assert_array_equal(morph.root_sections[0].points,
                        np.array([[0., 0., 0.],
                                  [0., 5., 0.]], dtype=np.float32))
@@ -621,5 +612,5 @@ def test_lifetime_copy_single_section():
 def test_lifetime_iteration_fails_with_orphan_section():
     section = _get_section()
     for iter_type in IterType.depth_first, IterType.breadth_first, IterType.upstream:
-        with assert_raises(RuntimeError):
+        with pytest.raises(RuntimeError):
             section.iter(iter_type)

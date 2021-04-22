@@ -6,8 +6,8 @@ from morphio import MitochondriaPointLevel
 from morphio import Morphology as ImmutMorphology
 from morphio import PointLevel, SectionBuilderError, SectionType, WriterError, ostream_redirect
 from morphio.mut import Morphology
-from nose.tools import ok_
-from numpy.testing import assert_array_equal, assert_equal, assert_raises
+import pytest
+from numpy.testing import assert_array_equal
 
 from .utils import assert_string_equal, captured_output, setup_tempdir, assert_substring
 
@@ -20,7 +20,7 @@ def test_write_empty_file():
                 for ext in ['asc', 'swc', 'h5']:
                     outname = Path(tmp_folder, 'empty.' + ext)
                     Morphology().write(outname)
-                    ok_(not os.path.exists(outname))
+                    assert not os.path.exists(outname)
 
 
 def test_write_soma_basic():
@@ -31,7 +31,7 @@ def test_write_soma_basic():
     with setup_tempdir('test_write_soma_basic') as tmp_folder:
         morpho.write(Path(tmp_folder, "test_write.swc"))
         morpho.write(Path(tmp_folder, "test_write_pathlib.swc"))
-        assert_equal(len(os.listdir(tmp_folder)), 2)
+        assert len(os.listdir(tmp_folder)) == 2
 
 
 def test_write_basic():
@@ -72,11 +72,11 @@ def test_write_basic():
         assert_array_equal(ImmutMorphology(Path(tmp_folder, "test_write.swc")).points, expected)
         h5_morph = ImmutMorphology(Path(tmp_folder, "test_write.h5"))
         assert_array_equal(h5_morph.points, expected)
-        assert_equal(h5_morph.version, ('h5', 1, 2))
+        assert h5_morph.version == ('h5', 1, 2)
 
         import h5py
         with h5py.File(h5_out, 'r') as h5_file:
-            ok_('/perimeters' not in h5_file.keys())
+            assert '/perimeters' not in h5_file.keys()
 
 
 def test_write_merge_only_child_asc_h5():
@@ -110,7 +110,7 @@ def test_write_merge_only_child_asc_h5():
             assert_array_equal(root.points,
                                [[0, 0, 0],
                                 [0, 5, 0]])
-            assert_equal(len(root.children), 1)
+            assert len(root.children) == 1
 
 
 def test_write_merge_only_child_swc():
@@ -128,12 +128,10 @@ def test_write_merge_only_child_swc():
                                  SectionType.basal_dendrite)
     child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
 
-    with assert_raises(WriterError) as obj:
+    with pytest.raises(WriterError, match="Section 0 has a single child section\. "
+                                          "Single child section are not allowed when writing to SWC format\. "
+                                          "Please sanitize the morphology first\."):
        morpho.write('/tmp/bla.swc')  # the path does not need to exists since it will fail before
-    assert_substring("Section 0 has a single child section. "
-                     "Single child section are not allowed when writing to SWC format. "
-                     "Please sanitize the morphology first.",
-                     str(obj.exception),)
 
 
 
@@ -171,7 +169,8 @@ def test_write_perimeter():
         # Cannot right a morph with perimeter data to ASC and SWC
         for ext in ['swc', 'asc']:
             out_path = Path(tmp_folder, "test_write_perimeter." + ext)
-            assert_raises(WriterError, morpho.write, out_path)
+            with pytest.raises(WriterError):
+                morpho.write(out_path)
 
 
 def test_write_no_soma():
@@ -193,13 +192,13 @@ def test_write_no_soma():
                 with ostream_redirect(stdout=True, stderr=True):
                     outfile = Path(tmp_folder, 'tmp.' + ext)
                     morpho.write(outfile)
-                    assert_equal(err.getvalue().strip(),
+                    assert (err.getvalue().strip() ==
                                  'Warning: writing file without a soma')
 
                     read = Morphology(outfile)
 
-            assert_equal(len(read.soma.points), 0)
-            assert_equal(len(read.root_sections), 2)
+            assert len(read.soma.points) == 0
+            assert len(read.root_sections) == 2
             assert_array_equal(read.root_sections[0].points, [[0, 0, 0], [0, 5, 0]])
             assert_array_equal(read.root_sections[1].points, [[0, 1, 0], [0, 7, 0]])
 
@@ -246,11 +245,11 @@ def test_mitochondria():
         assert_array_equal(mito.root_sections[0].relative_path_lengths,
                            relative_pathlengths)
 
-        assert_equal(len(mito.root_sections), 1)
+        assert len(mito.root_sections) == 1
 
         mito = Morphology(Path(tmp_folder, 'test.h5')).mitochondria
-        assert_equal(len(mito.root_sections), 1)
-        assert_equal(mito.root_sections[0].neurite_section_ids, neuronal_section_ids)
+        assert len(mito.root_sections) == 1
+        assert mito.root_sections[0].neurite_section_ids == neuronal_section_ids
         assert_array_equal(mito.section(0).diameters,
                            diameters)
 
@@ -281,7 +280,7 @@ def test_duplicate_different_diameter():
 
                     read = Morphology(outfile)
 
-            assert_equal(len(read.root_sections[0].children), 2)
+            assert len(read.root_sections[0].children) == 2
             child1, child2 = read.root_sections[0].children
             assert_array_equal(child1.points, [[3, 3, 3], [4, 4, 4]])
             assert_array_equal(child2.points, [[3, 3, 3], [5, 5, 5]])
@@ -300,7 +299,8 @@ def test_single_point_root_section():
             m.append_root_section(PointLevel(points, diameters), SectionType(2))
 
             with setup_tempdir('test_single_point_root_section', no_cleanup=True) as tmp_folder:
-                assert_raises(SectionBuilderError, m.write, Path(tmp_folder, "h5/empty_vasculature.h5"))
+                with pytest.raises(SectionBuilderError):
+                    m.write(Path(tmp_folder, "h5/empty_vasculature.h5"))
 
     m = Morphology()
     points = [[1., 1., 1.]]
@@ -308,4 +308,5 @@ def test_single_point_root_section():
     m.append_root_section(PointLevel(points, diameters), SectionType(2))
 
     with setup_tempdir('test_single_point_root_section', no_cleanup=True) as tmp_folder:
-        assert_raises(SectionBuilderError, m.write, Path(tmp_folder, "h5/empty_vasculature.h5"))
+        with pytest.raises(SectionBuilderError):
+            m.write(Path(tmp_folder, "h5/empty_vasculature.h5"))

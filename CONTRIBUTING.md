@@ -130,7 +130,7 @@ Run the following command to build incrementally the project: `pip install -e .`
 
 ## Test
 
-Run the following command to run the Python unit-tests: `nosetests`
+Run the following command to run the Python unit-tests: `pytest tests`
 
 ## Coding conventions
 
