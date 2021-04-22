@@ -58,8 +58,9 @@ enum SectionType {
     SECTION_AXON = 2,
     SECTION_DENDRITE = 3,         //!< general or basal dendrite (near to soma)
     SECTION_APICAL_DENDRITE = 4,  //!< apical dendrite (far from soma)
-    SECTION_GLIA_PROCESS = 2,     // TODO: nasty overload there
-    SECTION_GLIA_ENDFOOT = 3,
+
+    SECTION_GLIA_PERIVASCULAR_PROCESS = 2,
+    SECTION_GLIA_PROCESS = 3,  // TODO: nasty overload there
 
     // unnamed custom section types
     SECTION_CUSTOM_5 = 5,
