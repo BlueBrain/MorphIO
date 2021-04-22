@@ -9,7 +9,7 @@ from functools import partial
 from io import StringIO
 from pprint import pformat
 
-from nose.tools import assert_raises, ok_
+import pytest
 
 from morphio import Morphology, set_ignored_warning
 
@@ -61,7 +61,7 @@ def strip_all(string):
 
 def assert_substring(substring, string):
     sep = ['\n' + 80 * '>' + '\n', '\n' + 80 * '<' + '\n']
-    ok_(substring in string, "{}\n NOT IN \n{}".format(substring.join(sep), string.join(sep)))
+    assert substring in string, "{}\n NOT IN \n{}".format(substring.join(sep), string.join(sep))
 
 
 def assert_string_equal(str1, str2):
@@ -74,10 +74,10 @@ def assert_string_equal(str1, str2):
 def _test_exception(content, exception, str1, str2, extension):
     '''Create tempfile with given content and check that the exception is raised'''
     with _tmp_file(content, extension) as tmp_file:
-        with assert_raises(exception) as obj:
+        with pytest.raises(exception) as obj:
             Morphology(tmp_file.name)
-        assert_substring(str1, str(obj.exception))
-        assert_substring(str2, str(obj.exception))
+        assert obj.match(str1)
+        assert obj.match(str2)
 
 
 _test_asc_exception = partial(_test_exception, extension='asc')

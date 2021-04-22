@@ -1,4 +1,3 @@
-from nose.tools import ok_, assert_equal
 import morphio
 
 
@@ -22,8 +21,8 @@ def test_doc_exists():
     for cls in classes:
         public_methods = (method for method in dir(cls) if not method[:2] == '__')
         for method in public_methods:
-            ok_(getattr(cls, method).__doc__,
-                'Public method {} of class {} is not documented !'.format(method, cls))
+            assert getattr(cls, method).__doc__, \
+                'Public method {} of class {} is not documented !'.format(method, cls)
 
 def test_mut_immut_have_same_methods():
     '''Both modules morphio and morphio.mut should expose the same API'''
@@ -34,17 +33,17 @@ def test_mut_immut_have_same_methods():
                      'as_mutable'}
     only_in_mut = {'remove_unifurcations', 'write', 'append_root_section', 'delete_section', 'build_read_only',
                    'as_immutable'}
-    assert_equal(methods(morphio.Morphology) - only_in_immut,
+    assert (methods(morphio.Morphology) - only_in_immut ==
                  methods(morphio.mut.Morphology) - only_in_mut)
 
-    assert_equal(methods(morphio.Section),
+    assert (methods(morphio.Section) ==
                  methods(morphio.mut.Section) - {'append_section'})
 
-    assert_equal(methods(morphio.Soma),
+    assert (methods(morphio.Soma) ==
                  methods(morphio.mut.Soma))
 
-    assert_equal(methods(morphio.EndoplasmicReticulum),
+    assert (methods(morphio.EndoplasmicReticulum) ==
                  methods(morphio.mut.EndoplasmicReticulum))
 
-    # assert_equal(methods(morphio.Mitochondria),
+    # assert (methods(morphio.Mitochondria),
     #              methods(morphio.mut.Mitochondria))

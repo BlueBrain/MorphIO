@@ -3,10 +3,9 @@ import os
 import numpy as np
 from morphio import Morphology, Option, SectionType, ostream_redirect
 from morphio.mut import Morphology as MutableMorphology
-from nose.tools import assert_equal
 from numpy.testing import assert_array_equal
 
-from .utils import captured_output
+from utils import captured_output
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 SIMPLE = os.path.join(_path, 'simple.swc')
@@ -20,21 +19,21 @@ def test_nrn_order():
     filename = os.path.join(_path, 'reversed_NRN_neurite_order.swc')
 
     m = Morphology(filename, options=Option.nrn_order)
-    assert_equal([section.type for section in m.root_sections],
+    assert ([section.type for section in m.root_sections] ==
                  [SectionType.axon,
                   SectionType.basal_dendrite,
                   SectionType.apical_dendrite])
 
     normal = Morphology(filename)
     m = MutableMorphology(normal, options=Option.nrn_order)
-    assert_equal([section.type for section in m.root_sections],
+    assert ([section.type for section in m.root_sections] ==
                  [SectionType.axon,
                   SectionType.basal_dendrite,
                   SectionType.apical_dendrite])
 
     normal = MutableMorphology(filename)
     m = MutableMorphology(normal, options=Option.nrn_order)
-    assert_equal([section.type for section in m.root_sections],
+    assert ([section.type for section in m.root_sections] ==
                  [SectionType.axon,
                   SectionType.basal_dendrite,
                   SectionType.apical_dendrite])

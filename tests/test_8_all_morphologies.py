@@ -1,4 +1,4 @@
-from nose.tools import ok_, nottest
+import pytest
 import subprocess
 
 from morphio import Morphology, SomaError, RawDataError, MorphioError
@@ -45,7 +45,7 @@ def _is_good_file(filename):
     return filename not in bad_files.keys() and filename.lower().endswith('.asc')
 
 
-@nottest
+@pytest.mark.skip('backward compatible with nottest by nose')
 def test_all():
     try:
         subprocess.call(['git', 'clone', 'ssh://bbpcode.epfl.ch/experiment/MorphologyRepository'])

@@ -2,7 +2,7 @@ import os
 from collections import OrderedDict
 
 import numpy as np
-from nose.tools import assert_dict_equal, assert_equal, ok_, assert_raises
+import pytest
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from pathlib import Path
 
@@ -21,15 +21,15 @@ CELLS = OrderedDict({
 
 def test_is_root():
     for _, cell in CELLS.items():
-        ok_(all(section.is_root for section in cell.root_sections))
-        ok_(all(not child.is_root
+        assert all(section.is_root for section in cell.root_sections)
+        assert all(not child.is_root
                 for section in cell.root_sections
-                for child in section.children))
+                for child in section.children)
 
 
 def test_distance():
     for _, cell in CELLS.items():
-        ok_(cell.soma.max_distance == 0.)
+        assert cell.soma.max_distance == 0.
 
 
 def test_iter():
@@ -63,14 +63,14 @@ def test_section_offsets():
 
 def test_connectivity():
     for cell in CELLS:
-        assert_dict_equal(CELLS[cell].connectivity, {-1: [0, 3], 0: [1, 2], 3: [4, 5]})
+        assert CELLS[cell].connectivity == {-1: [0, 3], 0: [1, 2], 3: [4, 5]}
 
 
 def test_mitochondria():
     morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
     mito = morpho.mitochondria
-    assert_equal(len(mito.root_sections), 2)
-    assert_equal(mito.root_sections[0].id, 0)
+    assert len(mito.root_sections) == 2
+    assert mito.root_sections[0].id == 0
     mito_root = mito.root_sections
 
     assert_array_equal(mito_root[0].diameters,
@@ -80,9 +80,9 @@ def test_mitochondria():
     assert_array_equal(mito_root[0].neurite_section_ids,
                        np.array([0., 0.], dtype=np.float32))
 
-    assert_equal(len(mito_root[0].children), 1)
+    assert len(mito_root[0].children) == 1
     mito_child = mito_root[0].children[0]
-    assert_equal(mito_child.parent.id,
+    assert (mito_child.parent.id ==
                  mito_root[0].id)
 
     assert_array_equal(mito_child.diameters,
@@ -99,7 +99,7 @@ def test_mitochondria():
     assert_array_equal(mito_root[1].neurite_section_ids,
                        np.array([0, 1, 1, 2], dtype=np.float32))
 
-    assert_equal(len(mito_root[1].children), 0)
+    assert len(mito_root[1].children) == 0
 
 
 def test_endoplasmic_reticulum():
@@ -112,13 +112,13 @@ def test_endoplasmic_reticulum():
 
 
 def test_section___str__():
-    assert_equal(str(CELLS['asc'].root_sections[0]),
+    assert (str(CELLS['asc'].root_sections[0]) ==
                  'Section(id=0, points=[(0 0 0),..., (0 5 0)])')
 
 
 def test_from_pathlib():
     neuron = Morphology(Path(_path, "simple.asc"))
-    assert_equal(len(neuron.root_sections), 2)
+    assert len(neuron.root_sections) == 2
 
 
 def test_more_iter():
@@ -140,10 +140,12 @@ def test_more_iter():
 
 def test_glia():
     g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
-    assert_equal(g.cell_family, CellFamily.GLIA)
+    assert g.cell_family == CellFamily.GLIA
 
     g = GlialCell(Path(_path, 'astrocyte.h5'))
-    assert_equal(g.cell_family, CellFamily.GLIA)
+    assert g.cell_family == CellFamily.GLIA
 
-    assert_raises(RawDataError, GlialCell, Path(_path, 'simple.swc'))
-    assert_raises(RawDataError, GlialCell, Path(_path, 'h5/v1/simple.h5'))
+    with pytest.raises(RawDataError):
+        GlialCell(Path(_path, 'simple.swc'))
+    with pytest.raises(RawDataError):
+        GlialCell(Path(_path, 'h5/v1/simple.h5'))
