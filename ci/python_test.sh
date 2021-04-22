@@ -20,7 +20,4 @@ fi
 pip install .
 pip install -r tests/requirement_tests.txt
 
-CURRENT=$(pwd)
-
-cd ..
-python -m pytest ${CURRENT}/tests
+python -m pytest tests
