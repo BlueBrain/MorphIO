@@ -63,6 +63,7 @@ void bind_misc(py::module& m) {
         .value("custom8", morphio::enums::SectionType::SECTION_CUSTOM_8)
         .value("custom9", morphio::enums::SectionType::SECTION_CUSTOM_9)
         .value("custom10", morphio::enums::SectionType::SECTION_CUSTOM_10)
+        .value("all", morphio::enums::SectionType::SECTION_ALL)
         // .value("glia_process", morphio::enums::SectionType::SECTION_GLIA_PROCESS)
         // .value("glia_endfoot", morphio::enums::SectionType::SECTION_GLIA_ENDFOOT)
         .export_values();
