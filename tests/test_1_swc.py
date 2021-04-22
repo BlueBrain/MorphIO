@@ -346,7 +346,7 @@ def test_neurite_wrong_root_point():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             n = Morphology(os.path.join(_path, 'soma_cylinders.swc'))
-            assert '' == err.getvalue().strip()
+            assert err.getvalue().strip() == ''
         assert len(n.root_sections) == 1
 
     with captured_output() as (_, err):
@@ -367,7 +367,7 @@ def test_neurite_wrong_root_point():
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
                 n = Morphology(os.path.join(_path, 'neurite_wrong_root_point.swc'))
-                assert '' == err.getvalue().strip()
+                assert err.getvalue().strip() == ''
 
 
 def test_read_duplicate():
