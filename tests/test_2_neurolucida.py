@@ -5,7 +5,7 @@ import numpy as np
 from morphio import Morphology, RawDataError, SomaError, ostream_redirect
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
-from .utils import _test_asc_exception, tmp_asc_file
+from utils import _test_asc_exception, tmp_asc_file
 
 DATA_DIR = Path(__file__).parent / 'data'
 

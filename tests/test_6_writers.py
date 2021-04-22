@@ -9,7 +9,7 @@ from morphio.mut import Morphology
 import pytest
 from numpy.testing import assert_array_equal
 
-from .utils import assert_string_equal, captured_output, setup_tempdir, assert_substring
+from utils import assert_string_equal, captured_output, setup_tempdir
 
 
 def test_write_empty_file():

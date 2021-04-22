@@ -12,7 +12,7 @@ from morphio.mut import GlialCell, Morphology
 import pytest
 from numpy.testing import assert_array_equal
 
-from .utils import assert_substring, captured_output, setup_tempdir, tmp_asc_file
+from utils import assert_substring, captured_output, setup_tempdir, tmp_asc_file
 
 DATA_DIR = Path(__file__).parent / "data"
 
