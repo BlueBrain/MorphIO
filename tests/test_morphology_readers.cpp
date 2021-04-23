@@ -22,6 +22,26 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
         REQUIRE(m.soma().points().size() == 3);
         REQUIRE(m.diameters().size() == 924);
         REQUIRE(m.points().size() == 924);
+        // 3 point soma
+        REQUIRE(m.somaType() == morphio::SomaType::SOMA_SIMPLE_CONTOUR);
+    }
+
+    {
+        const morphio::Morphology m("data/h5/v1/simple.h5");
+        REQUIRE(m.soma().points().size() == 1);
+        REQUIRE(m.diameters().size() == 12);
+        REQUIRE(m.points().size() == 12);
+        // 1 point soma
+        REQUIRE(m.somaType() == morphio::SomaType::SOMA_SINGLE_POINT);
+    }
+
+    {
+        const morphio::Morphology m("data/h5/v1/simple-two-point-soma.h5");
+        REQUIRE(m.soma().points().size() == 2);
+        REQUIRE(m.diameters().size() == 12);
+        REQUIRE(m.points().size() == 12);
+        // 2 point soma
+        REQUIRE(m.somaType() == morphio::SomaType::SOMA_UNDEFINED);
     }
 
     {  // file is an not a valid h5 file
@@ -60,6 +80,7 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
                         morphio::RawDataError);
     }
 }
+
 TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {
     {
         const morphio::Morphology m("data/h5/v1/single-neurite.h5");
