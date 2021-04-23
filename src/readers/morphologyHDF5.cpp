@@ -19,7 +19,6 @@
  */
 
 #include "morphologyHDF5.h"
-#include <cassert>
 
 #include "utilsHDF5.h"
 
@@ -173,26 +172,29 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
         pointsDataSet.read(hd5fData.front().data());
     }
 
+    const bool hasSoma = size_t(firstSectionOffset) != 0;
     const bool hasNeurites = size_t(firstSectionOffset) < numberPoints;
     const size_t section_offset = hasNeurites ? size_t(firstSectionOffset) : hd5fData.size();
 
     auto& somaPoints = _properties._somaLevel._points;
     auto& somaDiameters = _properties._somaLevel._diameters;
 
-    somaPoints.resize(somaPoints.size() + section_offset);
-    somaDiameters.resize(somaDiameters.size() + section_offset);
+    if (hasSoma) {
+        somaPoints.resize(section_offset);
+        somaDiameters.resize(section_offset);
 
-    for (size_t i = 0; i < section_offset; ++i) {
-        const auto& p = hd5fData[i];
-        somaPoints[i] = {p[0], p[1], p[2]};
-        somaDiameters[i] = p[3];
+        for (size_t i = 0; i < section_offset; ++i) {
+            const auto& p = hd5fData[i];
+            somaPoints[i] = {p[0], p[1], p[2]};
+            somaDiameters[i] = p[3];
+        }
     }
 
     auto& points = _properties.get<Property::Point>();
     auto& diameters = _properties.get<Property::Diameter>();
 
     if (hasNeurites) {
-        const size_t size = (points.size() + hd5fData.size() - section_offset);
+        const size_t size = (hd5fData.size() - section_offset);
         points.resize(size);
         diameters.resize(size);
         for (size_t i = section_offset; i < hd5fData.size(); ++i) {
@@ -224,12 +226,33 @@ int MorphologyHDF5::_readSections() {
         structure.read(vec.front().data());
     }
 
-    // XXX: what if there is no soma? and a single neurite???
-    if (vec.size() < 2) {
-        return SOMA_ONLY;
+
+    if (vec.empty()) {
+        throw(RawDataError("Error reading morphologies " + _uri + " empty 'structure' dataspace"));
     }
 
-    const int firstSectionOffset = vec[1][0];
+    // check soma section validity
+    std::vector<size_t> soma_sections;
+    for (size_t i = 0; i < vec.size(); i++) {
+        if (vec[i][1] == 1) {
+            soma_sections.push_back(i);
+        }
+    }
+    if (soma_sections.size() >= 2) {
+        throw(RawDataError("Error reading morphologies " + _uri + " multiple sections soma."));
+    }
+    if (soma_sections.size() == 1 && soma_sections[0] != 0) {
+        throw(
+            RawDataError("Error reading morphologies " + _uri + " soma is not the first section."));
+    }
+
+    // If the morphology has a soma, it is the first section
+    bool hasSoma = !soma_sections.empty();
+    if (hasSoma && vec.size() < 2) {
+        return SOMA_ONLY;
+    }
+    const size_t firstSection = hasSoma ? 1 : 0;
+    const int firstSectionOffset = vec[firstSection][0];
 
     auto& sections = _properties.get<Property::Section>();
     sections.reserve(sections.size() + vec.size() - 1);
@@ -237,8 +260,8 @@ int MorphologyHDF5::_readSections() {
     auto& types = _properties.get<Property::SectionType>();
     types.reserve(vec.size() - 1);  // remove soma type
 
-    // The first contains soma related value so it is skipped
-    for (size_t i = 1; i < vec.size(); ++i) {
+    // The first section is skipped if it corresponds to a soma
+    for (size_t i = firstSection; i < vec.size(); ++i) {
         const auto& p = vec[i];
         const int& type = p[1];  // Explicit int for Clang (<0 comparison)
 

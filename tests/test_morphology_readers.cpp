@@ -4,12 +4,24 @@
 #include <highfive/H5File.hpp>
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
+#include <morphio/soma.h>
 
+namespace {
+bool almost_equal(morphio::floatType a, double expected, double epsilon) {
+#ifdef MORPHIO_USE_DOUBLE
+    return std::abs(a - expected) < epsilon;
+#else
+    return std::abs(static_cast<double>(a) - expected) < epsilon;
+#endif
+}
+}  // namespace
 
 TEST_CASE("LoadH5Morphology", "[morphology]") {
     {
         const morphio::Morphology m("data/h5/v1/Neuron.h5");
+        REQUIRE(m.soma().points().size() == 3);
         REQUIRE(m.diameters().size() == 924);
+        REQUIRE(m.points().size() == 924);
     }
 
     {  // file is an not a valid h5 file
@@ -41,6 +53,19 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
     {  // incorrect structure shape
         CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/incorrect_structure_columns.h5"),
                         morphio::RawDataError);
+    }
+
+    {  // incorrect soma section structure
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/three-point-soma-two-offset.h5"),
+                        morphio::RawDataError);
+    }
+}
+TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {
+    {
+        const morphio::Morphology m("data/h5/v1/single-neurite.h5");
+        REQUIRE(m.soma().points().empty());
+        REQUIRE(m.points().size() == 3);
+        REQUIRE(almost_equal(m.points()[0][0], 4., 0.001));
     }
 }
 
