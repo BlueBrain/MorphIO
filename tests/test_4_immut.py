@@ -147,7 +147,7 @@ def test_glia():
     g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
     assert g.cell_family == CellFamily.GLIA
     assert g.sections[100].type == SectionType.glia_perivascular_process
-    assert g,sections[1000].type == SectionType.glia_process
+    assert g.sections[1000].type == SectionType.glia_process
 
     g = GlialCell(Path(_path, 'astrocyte.h5'))
     assert g.cell_family == CellFamily.GLIA
