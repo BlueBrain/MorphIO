@@ -3,10 +3,10 @@ from collections import OrderedDict
 
 import numpy as np
 import pytest
-from numpy.testing import assert_array_almost_equal, assert_array_equal
+from numpy.testing import assert_array_almost_equal, assert_array_equal, assert_equal
 from pathlib import Path
 
-from morphio import IterType, Morphology, GlialCell, CellFamily, RawDataError
+from morphio import SectionType, IterType, Morphology, GlialCell, CellFamily, RawDataError
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -139,8 +139,15 @@ def test_more_iter():
 
 
 def test_glia():
+
+    # check the glia section types
+    assert_equal(int(SectionType.glia_perivascular_process), 2)
+    assert_equal(int(SectionType.glia_process), 3)
+
     g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
     assert g.cell_family == CellFamily.GLIA
+    assert g.sections[100].type == SectionType.glia_perivascular_process
+    assert g.sections[1000].type == SectionType.glia_process
 
     g = GlialCell(Path(_path, 'astrocyte.h5'))
     assert g.cell_family == CellFamily.GLIA

@@ -294,6 +294,23 @@ TEST_CASE("glia", "[immutableMorphology]") {
     morphio::GlialCell glial = morphio::GlialCell("data/astrocyte.h5");
     REQUIRE(glial.cellFamily() == morphio::CellFamily::GLIA);
 
+    auto section_types = glial.sectionTypes();
+
+    size_t count_processes = 0;
+    size_t count_perivascular_processes = 0;
+
+    for (const auto type : section_types) {
+        if (type == morphio::SECTION_GLIA_PERIVASCULAR_PROCESS)
+            ++count_perivascular_processes;
+        else if (type == morphio::SECTION_GLIA_PROCESS)
+            ++count_processes;
+        else
+            REQUIRE(false);
+    }
+
+    REQUIRE(count_perivascular_processes == 452);
+    REQUIRE(count_processes == 863);
+
     CHECK_THROWS_AS(morphio::GlialCell("data/simple.swc"), morphio::RawDataError);
     CHECK_THROWS_AS(morphio::GlialCell("data/h5/v1/simple.h5"), morphio::RawDataError);
 }
