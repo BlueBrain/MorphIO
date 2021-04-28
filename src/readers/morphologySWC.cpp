@@ -132,8 +132,14 @@ class SWCBuilder
         if (somata.size() > 1)
             throw morphio::SomaError(err.ERROR_MULTIPLE_SOMATA(somata));
 
-        if (somata.empty())
+        if (somata.empty()) {
             printError(Warning::NO_SOMA_FOUND, err.WARNING_NO_SOMA_FOUND());
+        } else {
+            for (const auto& sample_pair : samples) {
+                const auto& sample = sample_pair.second;
+                warnIfDisconnectedNeurite(sample);
+            }
+        }
     }
 
     void raiseIfNoParent(const Sample& sample) {
@@ -195,7 +201,6 @@ class SWCBuilder
         raiseIfBrokenSoma(sample);
         raiseIfNoParent(sample);
         warnIfZeroDiameter(sample);
-        warnIfDisconnectedNeurite(sample);
     }
 
     void _checkNeuroMorphoSoma(const Sample& root, const std::vector<Sample>& _children) {
