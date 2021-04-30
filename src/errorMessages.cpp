@@ -253,6 +253,10 @@ std::string ErrorMessages::WARNING_NO_SOMA_FOUND() const {
     return errorMsg(0, ErrorLevel::WARNING, "Warning: no soma found in file");
 }
 
+std::string ErrorMessages::WARNING_ZERO_DIAMETER(const Sample& sample) const {
+    return errorMsg(sample.lineNumber, ErrorLevel::WARNING, "Warning: zero diameter in file");
+}
+
 std::string ErrorMessages::WARNING_DISCONNECTED_NEURITE(const Sample& sample) const {
     return errorMsg(sample.lineNumber,
                     ErrorLevel::WARNING,
