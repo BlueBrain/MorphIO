@@ -486,3 +486,14 @@ def test_zero_diameter():
 def test_version():
     assert_array_equal(Morphology(os.path.join(_path, 'simple.swc')).version,
                        ('swc', 1, 0))
+
+
+def test_no_soma():
+    swc_content = '''1 2 0 0 0 3.0 -1
+                     2 2 0 0 0 3.0  1
+                     3 2 0 0 0 3.0  2'''
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True), tmp_swc_file(swc_content) as tmp_file:
+            n = Morphology(tmp_file.name)
+            assert ('{}:0:warning\nWarning: no soma found in file'.format(tmp_file.name) ==
+                    strip_color_codes(err.getvalue().strip()))
