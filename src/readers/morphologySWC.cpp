@@ -141,6 +141,11 @@ class SWCBuilder
             throw morphio::MissingParentError(err.ERROR_MISSING_PARENT(sample));
     }
 
+    void warnIfZeroDiameter(const Sample& sample) {
+        if (sample.diameter < morphio::epsilon)
+            printError(Warning::ZERO_DIAMETER, err.WARNING_ZERO_DIAMETER(sample));
+    }
+
     /**
        A neurite which is not attached to the soma
     **/
@@ -189,6 +194,7 @@ class SWCBuilder
         raiseIfSelfParent(sample);
         raiseIfBrokenSoma(sample);
         raiseIfNoParent(sample);
+        warnIfZeroDiameter(sample);
         warnIfDisconnectedNeurite(sample);
     }
 

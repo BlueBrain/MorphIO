@@ -467,6 +467,22 @@ def test_three_point_soma():
     assert n.soma_type == SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
 
 
+def test_zero_diameter():
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True),\
+                tmp_swc_file('''1 1 1 0 0 3.0 -1
+                                2 1 2 0 0 3.0  1
+                                3 1 3 0 0 3.0  2
+                                4 3 4 0 0 0.0  1
+                                5 3 5 0 0 3.0  4
+                         ''') as tmp_file:
+            Morphology(tmp_file.name)
+            assert_string_equal(
+                f'{tmp_file.name}:4:warning\nWarning: zero diameter in file\n',
+                err.getvalue())
+
+
+
 def test_version():
     assert_array_equal(Morphology(os.path.join(_path, 'simple.swc')).version,
                        ('swc', 1, 0))
