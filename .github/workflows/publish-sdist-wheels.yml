@@ -13,7 +13,7 @@ env:
   CIBW_BUILD: 'cp3?-*'
   CIBW_SKIP: 'cp35-* cp39-* *-manylinux_i686'
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
-  CIBW_TEST_COMMAND: nosetests -s -v -P {project}/tests
+  CIBW_TEST_COMMAND: pytest -s -v {project}/tests
 
 jobs:
   build_wheels:
@@ -78,7 +78,7 @@ jobs:
           sudo apt install -y libhdf5-dev
           pip install -r tests/requirement_tests.txt
           pip install dist/*
-          nosetests -s -v -P tests
+          pytest -s -v tests
       - name: Store sdist as artifact
         uses: actions/upload-artifact@v2
         with:
