@@ -35,6 +35,8 @@ static const char *__doc_morphio_enums_Warning_WRONG_DUPLICATE = R"doc()doc";
 
 static const char *__doc_morphio_enums_Warning_WRONG_ROOT_POINT = R"doc()doc";
 
+static const char *__doc_morphio_enums_Warning_ZERO_DIAMETER = R"doc()doc";
+
 static const char *__doc_morphio_enums_operator_lshift = R"doc()doc";
 
 static const char *__doc_morphio_getMajor = R"doc()doc";
