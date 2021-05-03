@@ -108,7 +108,7 @@ void bind_misc(py::module& m) {
         .value("wrong_duplicate", morphio::enums::WRONG_DUPLICATE)
         .value("appending_empty_section", morphio::enums::APPENDING_EMPTY_SECTION)
         .value("wrong_root_point", morphio::enums::Warning::WRONG_ROOT_POINT)
-        .value("only_child", morphio::enums::Warning::ONLY_CHILD);
+        .value("only_child", morphio::enums::Warning::ONLY_CHILD)
         .value("zero_diameter", morphio::enums::Warning::ZERO_DIAMETER);
 
     py::enum_<morphio::enums::AccessMode>(m, "AccessMode")
