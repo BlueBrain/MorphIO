@@ -79,6 +79,43 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
         CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/three-point-soma-two-offset.h5"),
                         morphio::RawDataError);
     }
+
+    {  // incorrect type in /structure
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/unknown_section_type_structure.h5"),
+                        morphio::RawDataError);
+    }
+
+    {  // soma after dendrite
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/soma_after_dendrite.h5"),
+                        morphio::RawDataError);
+    }
+}
+
+
+TEST_CASE("LoadH5Glia", "[morphology]") {
+    {
+        const morphio::Morphology m("data/h5/v1/glia.h5");
+        REQUIRE(m.soma().points().size() == 2);
+        REQUIRE(m.points().size() == 2);
+        REQUIRE(m.perimeters().size() == 2);
+    }
+
+    {
+        const morphio::Morphology m("data/h5/v1/glia_soma_only.h5");
+        REQUIRE(m.soma().points().size() == 1);
+        REQUIRE(m.points().size() == 0);
+        REQUIRE(m.perimeters().size() == 0);
+    }
+
+    {  // empty perimeters
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/glia_empty_perimeters.h5"),
+                        morphio::RawDataError);
+    }
+
+    {  // wrong sized perimeters
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/glia_wrong_sized_perimeters.h5"),
+                        morphio::RawDataError);
+    }
 }
 
 TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {
@@ -87,6 +124,7 @@ TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {
         REQUIRE(m.soma().points().empty());
         REQUIRE(m.points().size() == 3);
         REQUIRE(almost_equal(m.points()[0][0], 4., 0.001));
+        REQUIRE(almost_equal(0., 0., 0.1));
     }
 }
 

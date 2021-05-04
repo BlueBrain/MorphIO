@@ -26,9 +26,9 @@ class MorphologyHDF5
   private:
     void _checkVersion(const std::string& source);
     void _readMetadata(const std::string& source);
-    void _readPoints(int firstSectionOffset);
+    void _readPoints(int);
     int _readSections();
-    void _readPerimeters(int firstSectionOffset);
+    void _readPerimeters(int);
     void _readMitochondria();
     void _readEndoplasmicReticulum();
 
