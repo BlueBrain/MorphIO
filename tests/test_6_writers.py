@@ -128,9 +128,9 @@ def test_write_merge_only_child_swc():
                                  SectionType.basal_dendrite)
     child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
 
-    with pytest.raises(WriterError, match="Section 0 has a single child section\. "
-                                          "Single child section are not allowed when writing to SWC format\. "
-                                          "Please sanitize the morphology first\."):
+    with pytest.raises(WriterError, match=r"Section 0 has a single child section\. "
+                                          r"Single child section are not allowed when writing to SWC format\. "
+                                          r"Please sanitize the morphology first\."):
        morpho.write('/tmp/bla.swc')  # the path does not need to exists since it will fail before
 
 
