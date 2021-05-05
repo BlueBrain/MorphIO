@@ -35,6 +35,12 @@ SWC
 Soma is a cylinder with those two points as centers of the cylinder's bases. A point in this case defines a circle for
 the cylinder's base. The type of such soma is ``SOMA_CYLINDERS``.
 
+H5, ASC
+^^^^^^^
+MorphIO does not raise an exception when reading two point Soma. However accessing ``.surface`` property of such soma
+will raise an exception. It's up to the user to define the meaning of such soma. The type of such soma is
+``SOMA_UNDEFINED``.
+
 
 Three point Soma
 ****************
@@ -97,7 +103,8 @@ H5, ASC
 ^^^^^^^
 ASC and H5 being the text and binary representation of the same format, they obey to the same specification.
 Such soma is represented as a soma contour. The type of it is ``SOMA_SIMPLE_CONTOUR``.
-Even if it is almost never the case in practice, contours are meant to be in the XY plane.
+Even if it is almost never the case in practice, contours are meant to be in the XY plane. Accessing ``.surface``
+property of such soma type will raise an exception. It's up to the user to define surface of such somas.
 
 In ASC, soma points are characterized by an S-expression starting with the tag "CellBody". In H5, soma points
 are characterized by "structure" with type equal 1.
