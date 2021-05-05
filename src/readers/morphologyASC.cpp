@@ -40,6 +40,18 @@ bool is_neurite_type(Token id) {
             id == Token::CELLBODY);
 }
 
+std::string as_token_text(const std::string& text) {
+    std::string upp_text = text;
+    std::transform(text.begin(), text.end(), upp_text.begin(), ::toupper);
+    std::string::iterator end_pos = std::remove(upp_text.begin(), upp_text.end(), ' ');
+    upp_text.erase(end_pos, upp_text.end());
+    return upp_text;
+}
+
+bool is_neurite_text(const std::string& text) {
+    return NeuriteStringTokenMap.find(as_token_text(text)) != NeuriteStringTokenMap.end();
+}
+
 bool is_end_of_section(Token id) {
     return (id == Token::RPAREN || id == Token::PIPE);
 }
@@ -235,6 +247,9 @@ class NeurolucidaParser
                 header.label = lex_.current()->str();
                 // Get rid of quotes
                 header.label = header.label.substr(1, header.label.size() - 2);
+                if (is_neurite_text(header.label)) {
+                    header.token = NeuriteStringTokenMap.at(as_token_text(header.label));
+                }
                 lex_.consume();
             } else if (id == Token::RPAREN) {
                 return header;

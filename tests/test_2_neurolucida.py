@@ -45,21 +45,51 @@ NEUROLUCIDA_MARKERS = [
  ]
 
 def test_soma():
-    with tmp_asc_file('''("CellBody"
-                         (Color Red)
-                         (CellBody)
-                         (1 1 0 1 S1)
-                         (-1 1 0 1 S2)
-                         (-1 -1 0 2 S3)
-                         )''') as tmp_file:
+    soma_content = '''
+        (1 1 0 1 S1)
+        (-1 1 0 1 S2)
+        (-1 -1 0 2 S3)
+        )
+    '''
+    expected_points = [[1, 1, 0],
+                       [-1, 1, 0],
+                       [-1, -1, 0]]
 
+    # token as token
+    with tmp_asc_file('''
+        ((CellBody)
+    ''' + soma_content) as tmp_file:
         n = Morphology(tmp_file.name)
+        assert_array_equal(n.soma.points, expected_points)
+        assert len(n.root_sections) == 0
 
-        assert_array_equal(n.soma.points,
-                           [[1, 1, 0],
-                            [-1, 1, 0],
-                            [-1, -1, 0]])
+    # token as text
+    with tmp_asc_file('''
+        ("CellBody"
+        (Color Red)
+    ''' + soma_content) as tmp_file:
+        n = Morphology(tmp_file.name)
+        assert_array_equal(n.soma.points, expected_points)
+        assert len(n.root_sections) == 0
 
+    # both text and token
+    with tmp_asc_file('''
+        ("CellBody"
+        (Color Red)
+        (CellBody)
+    ''' + soma_content) as tmp_file:
+        n = Morphology(tmp_file.name)
+        assert_array_equal(n.soma.points, expected_points)
+        assert len(n.root_sections) == 0
+
+    # both token and text
+    with tmp_asc_file('''
+        ((CellBody)
+        (Color Red)
+        "CellBody"
+    ''' + soma_content) as tmp_file:
+        n = Morphology(tmp_file.name)
+        assert_array_equal(n.soma.points, expected_points)
         assert len(n.root_sections) == 0
 
 
@@ -545,7 +575,7 @@ def test_neurolucida_markers():
   (   81.58   -77.98   -20.32     0.50)  ; 1
 )  ;  End of markers
 
-("CellBody"
+(
  (Color Red)
  (CellBody)
  (0 0 0 2)

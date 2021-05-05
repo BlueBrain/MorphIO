@@ -104,6 +104,13 @@ constexpr std::size_t operator+(Token type) {
     return static_cast<std::size_t>(type);
 }
 
+const std::map<std::string, Token> NeuriteStringTokenMap{
+    {to_string(Token::AXON), Token::AXON},
+    {to_string(Token::CELLBODY), Token::CELLBODY},
+    {to_string(Token::APICAL), Token::APICAL},
+    {to_string(Token::DENDRITE), Token::DENDRITE}
+};
+
 class NeurolucidaLexer
 {
   private:
