@@ -51,7 +51,7 @@ bool skip_sexp(size_t id) {
 }
 }  // namespace
 
-bool throw_if_multiple_soma_z(std::vector<Point>& points, unsigned int line) {
+bool throw_if_multiple_soma_z(std::vector<Point>& points, long unsigned int line) {
     for (size_t i = 0; i < points.size() - 1; ++i) {
         if (points[i][2] != points[i + 1][2])
             throw RawDataError("Stack of multiple soma on line " + std::to_string(line) +
