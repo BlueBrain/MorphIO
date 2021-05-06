@@ -75,6 +75,7 @@ struct PointLevel {
     PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
     PointLevel& operator=(const PointLevel& other);
+    void append(const PointLevel& other);
 };
 
 struct SectionLevel {
