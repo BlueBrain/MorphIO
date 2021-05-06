@@ -49,7 +49,6 @@ bool skip_sexp(size_t id) {
             id == +Token::HIGH || id == +Token::INCOMPLETE || id == +Token::LOW ||
             id == +Token::NORMAL || id == +Token::FONT);
 }
-}  // namespace
 
 void throw_if_multiple_soma_z(std::vector<Point>& points, long unsigned int line) {
     for (size_t i = 0; i < points.size() - 1; ++i) {
@@ -59,6 +58,7 @@ void throw_if_multiple_soma_z(std::vector<Point>& points, long unsigned int line
                                ", " + dumpPoint(points[i + 1]));
     }
 }
+}  // namespace
 
 class NeurolucidaParser
 {
