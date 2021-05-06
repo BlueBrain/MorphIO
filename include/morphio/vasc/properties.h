@@ -8,6 +8,7 @@
 namespace morphio {
 namespace vasculature {
 namespace property {
+
 struct VascSection {
     // offset
     // refers to the index in the points vector from which the section begins
@@ -90,18 +91,24 @@ inline const std::map<uint32_t, std::vector<uint32_t>>& Properties::successors()
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const VascPointLevel& pointLevel);
 
-template <>
-std::vector<Point::Type>& Properties::get<Point>() noexcept;
-template <>
-std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept;
-template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept;
-template <>
-std::vector<VascSection::Type>& Properties::get<VascSection>() noexcept;
-template <>
-const std::vector<VascSection::Type>& Properties::get<VascSection>() const noexcept;
-template <>
-std::vector<Connection::Type>& Properties::get<Connection>() noexcept;
+#define INSTANTIATE_TEMPLATE_GET(T, M)                                       \
+    template <>                                                              \
+    inline std::vector<T::Type>& Properties::get<T>() noexcept {             \
+        return M;                                                            \
+    }                                                                        \
+    template <>                                                              \
+    inline const std::vector<T::Type>& Properties::get<T>() const noexcept { \
+        return M;                                                            \
+    }
+
+INSTANTIATE_TEMPLATE_GET(VascSection, _sectionLevel._sections)
+INSTANTIATE_TEMPLATE_GET(Point, _pointLevel._points)
+INSTANTIATE_TEMPLATE_GET(Connection, _connectivity)
+INSTANTIATE_TEMPLATE_GET(SectionType, _sectionLevel._sectionTypes)
+INSTANTIATE_TEMPLATE_GET(Diameter, _pointLevel._diameters)
+
+#undef INSTANTIATE_TEMPLATE_GET
+
 
 }  // namespace property
 }  // namespace vasculature
