@@ -69,7 +69,7 @@ struct Properties {
     std::vector<Connection::Type> _connectivity;
 
     template <typename T>
-    std::vector<typename T::Type>& get() noexcept;
+    std::vector<typename T::Type>& get_mut() noexcept;
 
     template <typename T>
     const std::vector<typename T::Type>& get() const noexcept;
@@ -93,7 +93,7 @@ std::ostream& operator<<(std::ostream& os, const VascPointLevel& pointLevel);
 
 #define INSTANTIATE_TEMPLATE_GET(T, M)                                       \
     template <>                                                              \
-    inline std::vector<T::Type>& Properties::get<T>() noexcept {             \
+    inline std::vector<T::Type>& Properties::get_mut<T>() noexcept {         \
         return M;                                                            \
     }                                                                        \
     template <>                                                              \
