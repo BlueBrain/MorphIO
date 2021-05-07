@@ -10,9 +10,24 @@ Soma
 ----
 
 * Files without a soma are valid.
-* Multiple soma
-  ASC files with *multiple* CellBody tags will raise an error.
-  `Unit test <https://github.com/BlueBrain/MorphIO/blob/5e111f3141f7a1ee72e0260111ce569741d80acb/tests/test_neurolucida.py#L58>`_
+* Multiple soma is supported via multiple CellBody S-exps, with each of them being the soma contour at a given Z
+  altitude. A single CellBody in this definition is called a soma stack. All Z coordinates within a soma stack must
+  be the same. Z coordinates among different soma stacks must be different. An example.
+
+  .. code-block:: lisp
+
+      (
+        (CellBody) ; <- first soma stack
+        (    5.88     0.84    1.0     2.35)
+        (    6.05     2.53    1.0     2.35)
+        (    6.39     4.38    1.0     2.35)
+      )
+      (
+        (CellBody) ; <- second soma stack
+        (    1.85     0.67   2.0     1.35)
+        (    0.84     1.52   2.0     1.35)
+        (   -4.54     2.36   2.0     1.35)
+      )
 
 Duplicate points
 ----------------
