@@ -196,8 +196,8 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
         }
     }
 
-    auto& points = _properties.get<Property::Point>();
-    auto& diameters = _properties.get<Property::Diameter>();
+    auto& points = _properties.get_mut<Property::Point>();
+    auto& diameters = _properties.get_mut<Property::Diameter>();
 
     if (hasNeurites) {
         const size_t size = (hd5fData.size() - somaPointCount);
@@ -246,10 +246,10 @@ int MorphologyHDF5::_readSections() {
     const size_t firstSection = hasSoma ? 1 : 0;
     const int firstSectionOffset = vec[firstSection][SECTION_START_OFFSET];
 
-    auto& sections = _properties.get<Property::Section>();
+    auto& sections = _properties.get_mut<Property::Section>();
     sections.reserve(vec.size() - firstSection);
 
-    auto& types = _properties.get<Property::SectionType>();
+    auto& types = _properties.get_mut<Property::SectionType>();
     types.reserve(vec.size() - firstSection);
 
     // The first section is skipped if it corresponds to a soma
@@ -294,7 +294,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
         return;
     }
 
-    auto& perimeters = _properties.get<Property::Perimeter>();
+    auto& perimeters = _properties.get_mut<Property::Perimeter>();
     _read("/", _d_perimeters, 1, perimeters);
     perimeters.erase(perimeters.begin(), perimeters.begin() + firstSectionOffset);
 }
@@ -356,14 +356,14 @@ void MorphologyHDF5::_readMitochondria() {
     std::vector<std::vector<floatType>> points;
     _read(_g_mitochondria, _d_points, 2, points);
 
-    auto& mitoSectionId = _properties.get<Property::MitoNeuriteSectionId>();
-    auto& pathlength = _properties.get<Property::MitoPathLength>();
-    auto& diameters = _properties.get<Property::MitoDiameter>();
+    auto& mitoSectionId = _properties.get_mut<Property::MitoNeuriteSectionId>();
+    auto& pathlength = _properties.get_mut<Property::MitoPathLength>();
+    auto& diameters = _properties.get_mut<Property::MitoDiameter>();
     mitoSectionId.reserve(mitoSectionId.size() + points.size());
     pathlength.reserve(pathlength.size() + points.size());
     diameters.reserve(diameters.size() + points.size());
     for (const auto& p : points) {
-        mitoSectionId.push_back(static_cast<uint32_t>(p[0]));
+        mitoSectionId.push_back(static_cast<Property::MitoNeuriteSectionId::Type>(p[0]));
         pathlength.push_back(p[1]);
         diameters.push_back(p[2]);
     }
@@ -371,7 +371,7 @@ void MorphologyHDF5::_readMitochondria() {
     std::vector<std::vector<int32_t>> structure;
     _read(_g_mitochondria, _d_structure, 2, structure);
 
-    auto& mitoSection = _properties.get<Property::MitoSection>();
+    auto& mitoSection = _properties.get_mut<Property::MitoSection>();
     mitoSection.reserve(mitoSection.size() + structure.size());
     for (auto& s : structure)
         mitoSection.emplace_back(Property::MitoSection::Type{s[0], s[1]});

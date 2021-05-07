@@ -204,51 +204,6 @@ bool Properties::operator!=(const Properties& other) const {
     return !this->operator==(other);
 }
 
-template <>
-std::vector<VascSection::Type>& Properties::get<VascSection>() noexcept {
-    return _sectionLevel._sections;
-}
-
-template <>
-const std::vector<VascSection::Type>& Properties::get<VascSection>() const noexcept {
-    return _sectionLevel._sections;
-}
-
-template <>
-std::vector<Point::Type>& Properties::get<Point>() noexcept {
-    return _pointLevel._points;
-}
-
-template <>
-const std::vector<Point::Type>& Properties::get<Point>() const noexcept {
-    return _pointLevel._points;
-}
-
-template <>
-std::vector<Connection::Type>& Properties::get<Connection>() noexcept {
-    return _connectivity;
-}
-
-template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept {
-    return _sectionLevel._sectionTypes;
-}
-
-template <>
-const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept {
-    return _sectionLevel._sectionTypes;
-}
-
-template <>
-std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept {
-    return _pointLevel._diameters;
-}
-
-template <>
-const std::vector<Diameter::Type>& Properties::get<Diameter>() const noexcept {
-    return _pointLevel._diameters;
-}
-
 std::ostream& operator<<(std::ostream& os, const VascPointLevel& prop) {
     os << "Point level properties:\n";
     os << "Point diameter"
