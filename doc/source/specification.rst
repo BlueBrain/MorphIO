@@ -156,13 +156,13 @@ The final order is the following:
 
 Section with only one child section
 ***********************************
-Up to version 3.0.0 when a section had a single child section (aka unifurcation), the child section would be merged
+Prior to version 3.0.0, when a section had a single child section (aka unifurcation), the child section would be merged
 with its parent when reading or writing the file. Since version 3.0.0, merging does not happen when reading. Yet
 writing of such sections is not allowed.
 
 SWC IDs ordering
 ****************
-There is no special constraint about the IDs as long as the parent ID of each points is defined. IDs don't need to be
+There is no special constraint about the IDs as long as the parent ID of each point is defined. IDs don't need to be
 consecutive nor sorted, and the soma does not need to be the first point.
 
 
@@ -170,4 +170,3 @@ consecutive nor sorted, and the soma does not need to be the first point.
 .. _`.swc`: http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
 .. _`NeuroMorpho`: http://neuromorpho.org/SomaFormat.html
 .. _`conical frustums`: http://mathworld.wolfram.com/ConicalFrustum.html
-
