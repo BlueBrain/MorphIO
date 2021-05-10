@@ -1,0 +1,27 @@
+name: Check that `sdist` builds and installs
+on: [pull_request, push]
+
+jobs:
+  build_sdist:
+    name: Build sdist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'true'
+
+      - name: Set up Python 3.6
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.6
+
+      - name: Build a source tarball
+        run:
+          python setup.py sdist
+
+      - name: Test tarball
+        run: |
+          sudo apt install -y libhdf5-dev
+          pip install -r tests/requirement_tests.txt
+          pip install dist/*
+          pytest -s -v tests

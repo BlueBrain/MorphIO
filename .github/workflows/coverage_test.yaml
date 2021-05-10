@@ -1,5 +1,6 @@
 name: coverage-test
 on: [pull_request, push]
+
 env:
   CC: gcc-9
   CXX: g++-9
