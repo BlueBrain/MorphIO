@@ -208,48 +208,48 @@ would look like'''
     with tmp_asc_file(with_duplicate) as tmp_file:
         n = Morphology(tmp_file.name)
 
-    assert len(n.root_sections) == 1
+        assert len(n.root_sections) == 1
 
-    assert_array_equal(n.root_sections[0].points,
-                       [[3, -4, 0],
-                        [3, -6, 0],
-                        [3, -8, 0],
-                        [3, -10, 0],
-                        ])
+        assert_array_equal(n.root_sections[0].points,
+                           [[3, -4, 0],
+                            [3, -6, 0],
+                            [3, -8, 0],
+                            [3, -10, 0],
+                            ])
 
-    assert_array_equal(n.root_sections[0].children[0].points,
-                       [[3, -10, 0],
-                        [0, -10, 0],
-                        [-3, -10, 0]])
-    assert_array_equal(n.root_sections[0].children[0].diameters,
-                       np.array([2, 2, 0.3], dtype=np.float32))
+        assert_array_equal(n.root_sections[0].children[0].points,
+                           [[3, -10, 0],
+                            [0, -10, 0],
+                            [-3, -10, 0]])
+        assert_array_equal(n.root_sections[0].children[0].diameters,
+                           np.array([2, 2, 0.3], dtype=np.float32))
 
-    assert_array_equal(n.root_sections[0].children[1].points,
-                       [[3, -10, 0],
-                        [6, -10, 0],
-                        [9, -10, 0]])
-    assert_array_equal(n.root_sections[0].children[1].diameters,
-                       np.array([2, 2, 0.3], dtype=np.float32))
+        assert_array_equal(n.root_sections[0].children[1].points,
+                           [[3, -10, 0],
+                            [6, -10, 0],
+                            [9, -10, 0]])
+        assert_array_equal(n.root_sections[0].children[1].diameters,
+                           np.array([2, 2, 0.3], dtype=np.float32))
 
 
 def test_read_without_duplicates():
     with tmp_asc_file(with_duplicate) as tmp_file:
         n_with_duplicate = Morphology(tmp_file.name)
 
-    with tmp_asc_file(without_duplicate) as tmp_file:
-        n_without_duplicate = Morphology(tmp_file.name)
+        with tmp_asc_file(without_duplicate) as tmp_file:
+            n_without_duplicate = Morphology(tmp_file.name)
 
-    assert_array_equal(n_with_duplicate.root_sections[0].children[0].points,
-                       n_without_duplicate.root_sections[0].children[0].points)
+        assert_array_equal(n_with_duplicate.root_sections[0].children[0].points,
+                           n_without_duplicate.root_sections[0].children[0].points)
 
-    assert_array_equal(n_with_duplicate.root_sections[0].points,
-                       n_without_duplicate.root_sections[0].points)
+        assert_array_equal(n_with_duplicate.root_sections[0].points,
+                           n_without_duplicate.root_sections[0].points)
 
-    assert_array_equal(n_with_duplicate.root_sections[0].children[0].diameters,
-                       n_without_duplicate.root_sections[0].children[0].diameters)
+        assert_array_equal(n_with_duplicate.root_sections[0].children[0].diameters,
+                           n_without_duplicate.root_sections[0].children[0].diameters)
 
-    assert_array_equal(n_with_duplicate.root_sections[0].diameters,
-                       n_without_duplicate.root_sections[0].diameters)
+        assert_array_equal(n_with_duplicate.root_sections[0].diameters,
+                           n_without_duplicate.root_sections[0].diameters)
 
 
 def test_explicit_duplicates_with_arbitrary_diameter():
@@ -391,10 +391,9 @@ def test_single_point_section_duplicate_parent():
                      )''') as tmp_file:
 
         neuron = Morphology(tmp_file.name)
-
-    assert_array_equal(neuron.root_sections[0].points, [[  3.,  -4.,   0.],
-                                                        [  3., -10.,   0.]])
-    assert_array_equal(neuron.root_sections[0].diameters, np.array([2, 2], dtype=np.float32))
+        assert_array_equal(neuron.root_sections[0].points, [[  3.,  -4.,   0.],
+                                                            [  3., -10.,   0.]])
+        assert_array_equal(neuron.root_sections[0].diameters, np.array([2, 2], dtype=np.float32))
 
 
 def test_single_point_section_duplicate_parent_complex():
@@ -601,17 +600,17 @@ def test_neurolucida_markers():
                          )''') as tmp_file:
             neuron = Morphology(tmp_file.name)
 
-        assert_array_equal(neuron.points, SIMPLE.points)
-        assert len(neuron.markers) == 2
-        assert_array_almost_equal(neuron.markers[0].points,
-                                  np.array([[81.58, -77.98, -20.32]], dtype=np.float32))
-        assert_array_almost_equal(neuron.markers[0].diameters,
-                                  np.array([0.5], dtype=np.float32))
-        assert_array_almost_equal(neuron.markers[1].points,
-                                  np.array([[51.580002, -77.779999, -24.32]],
-                                           dtype=np.float32))
-        assert_array_almost_equal(neuron.markers[1].diameters,
-                                  np.array([0.52], dtype=np.float32))
+            assert_array_equal(neuron.points, SIMPLE.points)
+            assert len(neuron.markers) == 2
+            assert_array_almost_equal(neuron.markers[0].points,
+                                      np.array([[81.58, -77.98, -20.32]], dtype=np.float32))
+            assert_array_almost_equal(neuron.markers[0].diameters,
+                                      np.array([0.5], dtype=np.float32))
+            assert_array_almost_equal(neuron.markers[1].points,
+                                      np.array([[51.580002, -77.779999, -24.32]],
+                                               dtype=np.float32))
+            assert_array_almost_equal(neuron.markers[1].diameters,
+                                      np.array([0.52], dtype=np.float32))
 
 def test_skip_font():
     assert_array_equal(Morphology(DATA_DIR / 'simple-with-font.asc').points,
