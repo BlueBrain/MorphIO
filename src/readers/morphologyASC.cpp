@@ -40,16 +40,12 @@ bool is_neurite_type(Token id) {
             id == Token::CELLBODY);
 }
 
-std::string as_token_text(const std::string& text) {
+std::string text_to_uppercase_token_string(const std::string& text) {
     std::string upp_text = text;
     std::transform(text.begin(), text.end(), upp_text.begin(), ::toupper);
-    std::string::iterator end_pos = std::remove(upp_text.begin(), upp_text.end(), ' ');
+    const auto end_pos = std::remove(upp_text.begin(), upp_text.end(), ' ');
     upp_text.erase(end_pos, upp_text.end());
     return upp_text;
-}
-
-bool is_neurite_text(const std::string& text) {
-    return NeuriteStringTokenMap.find(as_token_text(text)) != NeuriteStringTokenMap.end();
 }
 
 bool is_end_of_section(Token id) {
@@ -230,6 +226,12 @@ class NeurolucidaParser
        Parse the root sexp until finding the first sexp containing numbers
     **/
     Header parse_root_sexp_header() {
+        static const std::map<std::string, Token> NeuriteStringTokenMap{
+            {to_string(Token::AXON), Token::AXON},
+            {to_string(Token::CELLBODY), Token::CELLBODY},
+            {to_string(Token::APICAL), Token::APICAL},
+            {to_string(Token::DENDRITE), Token::DENDRITE}};
+
         Header header;
 
         while (true) {
@@ -247,8 +249,9 @@ class NeurolucidaParser
                 header.label = lex_.current()->str();
                 // Get rid of quotes
                 header.label = header.label.substr(1, header.label.size() - 2);
-                if (is_neurite_text(header.label)) {
-                    header.token = NeuriteStringTokenMap.at(as_token_text(header.label));
+                const std::string uppercase_label = text_to_uppercase_token_string(header.label);
+                if (NeuriteStringTokenMap.count(uppercase_label) > 0) {
+                    header.token = NeuriteStringTokenMap.at(uppercase_label);
                 }
                 lex_.consume();
             } else if (id == Token::RPAREN) {
