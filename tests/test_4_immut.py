@@ -6,7 +6,8 @@ import pytest
 from numpy.testing import assert_array_almost_equal, assert_array_equal, assert_equal
 from pathlib import Path
 
-from morphio import SectionType, IterType, Morphology, GlialCell, CellFamily, RawDataError
+import morphio
+from morphio import SectionType, IterType, Morphology, GlialCell, CellFamily, RawDataError, DendriticSpine
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -139,7 +140,6 @@ def test_more_iter():
 
 
 def test_glia():
-
     # check the glia section types
     assert_equal(int(SectionType.glia_perivascular_process), 2)
     assert_equal(int(SectionType.glia_process), 3)
@@ -156,3 +156,27 @@ def test_glia():
         GlialCell(Path(_path, 'simple.swc'))
     with pytest.raises(RawDataError):
         GlialCell(Path(_path, 'h5/v1/simple.h5'))
+
+def test_dendritic_spine():
+    assert_equal(int(SectionType.spine_head), 2)
+    assert_equal(int(SectionType.spine_neck), 3)
+
+    spine_path = os.path.join(_path, 'h5/v1/simple-dendritric-spine.h5')
+    d = DendriticSpine(spine_path)
+    assert d.cell_family == CellFamily.SPINE
+    assert d.sections[0].type == SectionType.spine_head
+    assert d.sections[1].type == SectionType.spine_neck
+
+    assert len(d.post_synaptic_density) == 2
+    assert d.post_synaptic_density[0].section_id == 1
+    assert d.post_synaptic_density[0].segment_id == 0
+    assert d.post_synaptic_density[0].offset == pytest.approx(0.8525)
+
+    d = DendriticSpine(Path(spine_path))
+    assert d.cell_family == CellFamily.SPINE
+
+    with pytest.raises(RawDataError):
+        DendriticSpine(Path(_path, 'simple.swc'))
+
+    with pytest.raises(RawDataError):
+        DendriticSpine(Path(_path, 'h5/v1/simple.h5'))

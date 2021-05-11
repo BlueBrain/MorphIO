@@ -56,6 +56,16 @@ const std::string _d_surface_area("surface_area");
 const std::string _d_filament_count("filament_count");
 // } v1.2
 
+//{ v1.3
+
+// Dendritic Spine
+const std::string _g_postsynaptic_density("organelles/postsynaptic_density");
+const std::string _d_dendritic_spine_section_id("section_id");
+const std::string _d_dendritic_spine_segment_id("segment_id");
+const std::string _d_dendritic_spine_offset("offset");
+
+//}
+
 // } v1
 
 //{ v2
@@ -101,6 +111,11 @@ Property::Properties MorphologyHDF5::load() {
             _readMitochondria();
             _readEndoplasmicReticulum();
         }
+
+        if (_properties._cellLevel.minorVersion() >= 3 &&
+            _properties._cellLevel._cellFamily == CellFamily::SPINE) {
+            _readDendriticSpinePostSynapticDensity();
+        }
     }
 
     return _properties;
@@ -134,7 +149,8 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
             majorVersion = versions[0];
             minorVersion = versions[1];
 
-            if (majorVersion == 1 && (minorVersion == 1 || minorVersion == 2)) {
+            if (majorVersion == 1 &&
+                (minorVersion == 1 || minorVersion == 2 || minorVersion == 3)) {
                 uint32_t family;
                 metadata.getAttribute(_a_family).read(family);
                 _properties._cellLevel._cellFamily = static_cast<CellFamily>(family);
@@ -142,7 +158,7 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
                 throw RawDataError("Error in " + source +
                                    "\nUnsupported h5 version: " + std::to_string(majorVersion) +
                                    "." + std::to_string(minorVersion) +
-                                   "See "
+                                   " See "
                                    "https://bbpteam.epfl.ch/documentation/projects/"
                                    "Morphology%20Documentation/latest/"
                                    "index.html for the list of supported versions.");
@@ -321,12 +337,36 @@ void MorphologyHDF5::_read(const std::string& groupName,
     dataset.read(data);
 }
 
+void MorphologyHDF5::_readDendriticSpinePostSynapticDensity() {
+    std::vector<morphio::Property::DendriticSpine::SectionId_t> sectionIds;
+    _read(_g_postsynaptic_density, _d_dendritic_spine_section_id, 1, sectionIds);
+
+    std::vector<morphio::Property::DendriticSpine::SegmentId_t> segmentIds;
+    _read(_g_postsynaptic_density, _d_dendritic_spine_segment_id, 1, segmentIds);
+
+    std::vector<morphio::Property::DendriticSpine::Offset_t> offsets;
+    _read(_g_postsynaptic_density, _d_dendritic_spine_offset, 1, offsets);
+
+    if (sectionIds.size() != segmentIds.size() || offsets.size() != segmentIds.size()) {
+        throw(RawDataError(
+            "Dendritic datasets must match in size:"
+            " sectionIds: " +
+            std::to_string(sectionIds.size()) + " segmentIds: " +
+            std::to_string(segmentIds.size()) + " offsets: " + std::to_string(offsets.size())));
+    }
+
+    auto& properties = _properties._dendriticSpineLevel._post_synaptic_density;
+
+    properties.reserve(sectionIds.size());
+    for (size_t i = 0; i < sectionIds.size(); ++i) {
+        properties.push_back({sectionIds[i], segmentIds[i], offsets[i]});
+    }
+}
+
 void MorphologyHDF5::_readEndoplasmicReticulum() {
     if (!_group.exist(_g_endoplasmic_reticulum)) {
         return;
     }
-
-    const auto group = _group.getGroup(_g_endoplasmic_reticulum);
 
     _read(_g_endoplasmic_reticulum,
           _d_section_index,
@@ -350,8 +390,6 @@ void MorphologyHDF5::_readMitochondria() {
     if (!_group.exist(_g_mitochondria)) {
         return;
     }
-
-    const auto group = _group.getGroup(_g_mitochondria);
 
     std::vector<std::vector<floatType>> points;
     _read(_g_mitochondria, _d_points, 2, points);

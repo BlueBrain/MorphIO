@@ -1,4 +1,5 @@
 set(MORPHIO_SOURCES
+    dendritic_spine.cpp
     endoplasmic_reticulum.cpp
     enums.cpp
     errorMessages.cpp
@@ -7,6 +8,7 @@ set(MORPHIO_SOURCES
     mitochondria.cpp
     morphology.cpp
     morphology.cpp
+    mut/dendritic_spine.cpp
     mut/endoplasmic_reticulum.cpp
     mut/glial_cell.cpp
     mut/mito_section.cpp

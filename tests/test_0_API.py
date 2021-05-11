@@ -45,5 +45,5 @@ def test_mut_immut_have_same_methods():
     assert (methods(morphio.EndoplasmicReticulum) ==
                  methods(morphio.mut.EndoplasmicReticulum))
 
-    # assert (methods(morphio.Mitochondria),
-    #              methods(morphio.mut.Mitochondria))
+    assert (methods(morphio.Mitochondria),
+                 methods(morphio.mut.Mitochondria))
