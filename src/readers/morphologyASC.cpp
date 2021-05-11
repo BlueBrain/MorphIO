@@ -226,12 +226,6 @@ class NeurolucidaParser
        Parse the root sexp until finding the first sexp containing numbers
     **/
     Header parse_root_sexp_header() {
-        static const std::map<std::string, Token> NeuriteStringTokenMap{
-            {to_string(Token::AXON), Token::AXON},
-            {to_string(Token::CELLBODY), Token::CELLBODY},
-            {to_string(Token::APICAL), Token::APICAL},
-            {to_string(Token::DENDRITE), Token::DENDRITE}};
-
         Header header;
 
         while (true) {
@@ -249,10 +243,14 @@ class NeurolucidaParser
                 header.label = lex_.current()->str();
                 // Get rid of quotes
                 header.label = header.label.substr(1, header.label.size() - 2);
+
+                // Early NeuroLucida files contained the soma in a named String
+                // s-exp: https://github.com/BlueBrain/MorphIO/issues/300
                 const std::string uppercase_label = text_to_uppercase_token_string(header.label);
-                if (NeuriteStringTokenMap.count(uppercase_label) > 0) {
-                    header.token = NeuriteStringTokenMap.at(uppercase_label);
+                if (uppercase_label == "CELLBODY") {
+                    header.token = Token::CELLBODY;
                 }
+
                 lex_.consume();
             } else if (id == Token::RPAREN) {
                 return header;
