@@ -282,7 +282,7 @@ class NeurolucidaParser
     }
 
 
-    bool parse_neurite_section(Header header) {
+    bool parse_neurite_section(const Header& header) {
         Points points;
         std::vector<morphio::floatType> diameters;
         auto section_id = static_cast<int>(nb_.sections().size());
@@ -348,7 +348,7 @@ class NeurolucidaParser
         while (!lex_.ended()) {
             if (static_cast<Token>(lex_.current()->id) == Token::LPAREN) {
                 lex_.consume();
-                Header header = parse_root_sexp_header();
+                const Header header = parse_root_sexp_header();
                 if (lex_.current()->id != +Token::RPAREN) {
                     parse_neurite_section(header);
                 }
