@@ -40,7 +40,8 @@ TEST_CASE("mutableConnectivity", "[mutableMorphology]") {
 
 TEST_CASE("writing", "[mutableMorphology]") {
     morphio::mut::Morphology morph("data/simple.asc");
-    auto tmpDirectory = std::filesystem::temp_directory_path();
+    auto tmpDirectory = std::filesystem::temp_directory_path() / "test_mutable_morphology.cpp";
+    std::filesystem::create_directories(tmpDirectory);
     morph.write(tmpDirectory / "simple.asc");
     morph.write(tmpDirectory / "simple.h5");
     morph.write(tmpDirectory / "simple.swc");
@@ -50,5 +51,5 @@ TEST_CASE("writing", "[mutableMorphology]") {
     REQUIRE(savedMorphAsc.rootSections().size() == 2);
     REQUIRE(savedMorphH5.rootSections().size() == 2);
     REQUIRE(savedMorphSwc.rootSections().size() == 2);
-    fs::remove_all("tmp_files");
+    fs::remove_all(tmpDirectory);
 }

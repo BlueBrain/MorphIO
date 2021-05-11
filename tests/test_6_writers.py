@@ -16,7 +16,7 @@ def test_write_empty_file():
     '''Check that empty morphology are not written to disk'''
     with captured_output() as (_, _):
         with ostream_redirect(stdout=True, stderr=True):
-            with setup_tempdir('test_write_empty_file', no_cleanup=True) as tmp_folder:
+            with setup_tempdir('test_write_empty_file') as tmp_folder:
                 for ext in ['asc', 'swc', 'h5']:
                     outname = Path(tmp_folder, 'empty.' + ext)
                     Morphology().write(outname)
@@ -271,7 +271,7 @@ def test_duplicate_different_diameter():
     section.append_section(PointLevel([[3, 3, 3], [5, 5, 5]], [11, 12]))
 
 
-    with setup_tempdir('test_write_duplicate_different_diameter', no_cleanup=True) as tmp_folder:
+    with setup_tempdir('test_write_duplicate_different_diameter') as tmp_folder:
         for ext in ['asc', 'h5', 'swc']:
             with captured_output() as (_, err):
                 with ostream_redirect(stdout=True, stderr=True):
@@ -298,7 +298,7 @@ def test_single_point_root_section():
         with ostream_redirect(stdout=True, stderr=True):
             m.append_root_section(PointLevel(points, diameters), SectionType(2))
 
-            with setup_tempdir('test_single_point_root_section', no_cleanup=True) as tmp_folder:
+            with setup_tempdir('test_single_point_root_section') as tmp_folder:
                 with pytest.raises(SectionBuilderError):
                     m.write(Path(tmp_folder, "h5/empty_vasculature.h5"))
 
@@ -307,6 +307,6 @@ def test_single_point_root_section():
     diameters = [2.]
     m.append_root_section(PointLevel(points, diameters), SectionType(2))
 
-    with setup_tempdir('test_single_point_root_section', no_cleanup=True) as tmp_folder:
+    with setup_tempdir('test_single_point_root_section') as tmp_folder:
         with pytest.raises(SectionBuilderError):
             m.write(Path(tmp_folder, "h5/empty_vasculature.h5"))
