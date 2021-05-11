@@ -157,6 +157,7 @@ def test_glia():
     with pytest.raises(RawDataError):
         GlialCell(Path(_path, 'h5/v1/simple.h5'))
 
+
 def test_dendritic_spine():
     assert_equal(int(SectionType.spine_head), 2)
     assert_equal(int(SectionType.spine_neck), 3)

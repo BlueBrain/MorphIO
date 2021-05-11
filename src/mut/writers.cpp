@@ -290,6 +290,8 @@ static void endoplasmicReticulumH5(HighFive::File& h5_file, const EndoplasmicRet
 static void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
                                                 const Property::DendriticSpine::Level& l) {
     const auto& psd = l._post_synaptic_density;
+    if (psd.empty())  // XXX: nocheckin check what happens w/ empty dendrite morph
+        return;
 
     HighFive::Group g_organelles = h5_file.createGroup("organelles");
     HighFive::Group g_postsynaptic_density = g_organelles.createGroup("postsynaptic_density");
@@ -409,7 +411,6 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
     mitochondriaH5(h5_file, morpho.mitochondria());
     endoplasmicReticulumH5(h5_file, morpho.endoplasmicReticulum());
-
     if (morpho.cellFamily() == SPINE) {
         dendriticSpinePostSynapticDensityH5(h5_file, morpho._dendriticSpineLevel);
     }
