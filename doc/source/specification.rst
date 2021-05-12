@@ -1,11 +1,57 @@
 Specification
 =============
 Description of how MorphIO sees morphologies. MorphIO supports :ref:`.asc <specification-neurolucida>` (Neurolucida),
-`.h5`_ (H5 version 1) and `.swc`_ extensions.
+`.h5`_ (H5 version 1) and `.swc`_ extensions. A morphology is represented as a soma with neurites. Either soma or
+neurites can be absent. Neurite is a tree of sections. Section is composed of segments where segment is made of points.
+Lets start describing them from the smallest to the biggest entity.
 
-Soma formats:
--------------
-MorphIO implements Soma specification from `NeuroMorpho`_, and recognizes several kinds of soma format.
+
+Point
+-----
+A point is a ``numpy`` array of three numbers **[X, Y, Z]** where X, Y, Z are Cartesian coordinates of position.
+A point always has a diameter associated with it.
+
+
+Segment
+-------
+A segment consists of two consecutive points(`Point`_) belonging to the same section(`Section`_). It is represented as
+a tuple or a ``numpy`` array of two `points<point-label>`.
+
+.. image:: images/swc/two_pt.svg
+   :scale: 100 %
+   :alt: segment
+
+
+Section
+-------
+
+A section is a series of two or more points. Each section has a type associated with it. The type shows what part of
+the neuron a section represents. The type can be the axon, the soma, and so on.
+`Section API <cpp/doxygen_Section.html>`_.
+
+.. image:: images/section.svg
+   :scale: 100 %
+   :alt: section
+
+The first and the last point of section must be of the following combinations:
+
+1. first non-soma point, forking point
+2. forking point, forking point
+3. forking point, end point
+4. first non-soma point, end point
+
+First non-soma point is the first point of a root section. Forking point is the last point of a section that has
+multiple children. End point is the last point of a section without children. For more details on the root section and
+children see `Neurite`_. The above combinations are marked with their corresponding number at the image below.
+
+.. image:: images/section_segment.svg
+   :scale: 100 %
+   :alt: section variants
+
+Soma
+----
+A soma is a series of one or more points. MorphIO implements Soma specification from `NeuroMorpho`_, and recognizes
+several kinds of soma format. `Soma API <cpp/doxygen_Soma.html>`_.
 
 No Soma
 *******
@@ -115,28 +161,17 @@ are characterized by "structure" with type equal 1.
         "structure" entries with type equal 1. Simply saying soma that is split among multiple sections is not supported
         in those formats.
 
+Neurite
+-------
 
-Sub-cellular structures
------------------------
-SWC does not support any sub-cellular structures. H5 and ASC support some, please see the following
-for more details.
+A neurite is essentially a tree of sections(`Section`_). The tree structure implies the following:
 
-Spines
-******
-SWC and H5 do not support spines. ASC files containing files will be read correctly. However
-spines data are not handled by MorphIO and spine information will be lost when writing to disk.
+* Section can have only one parent (another section).
+* Section can have an arbitrary number of children (other sections).
+* No loops are present in the structure.
 
-Mitochondria
-************
-SWC and ASC do not support mitochondria. Mitochondria can be read and written to disk using the H5
-format. See :ref:`mitochondria-readme` for more details about the mitochondria API.
-
-Custom annotations
-******************
-Custom annotations are not supported.
-
-Sections
---------
+A section without parent is called a root section. A section with parent must have its first point to be a duplicate
+of the last point of its parent.
 
 Section ordering
 ****************
@@ -164,6 +199,25 @@ SWC IDs ordering
 ****************
 There is no special constraint about the IDs as long as the parent ID of each point is defined. IDs don't need to be
 consecutive nor sorted, and the soma does not need to be the first point.
+
+Sub-cellular structures
+-----------------------
+SWC does not support any sub-cellular structures. H5 and ASC support some, please see the following
+for more details.
+
+Spines
+******
+SWC and H5 do not support spines. ASC files containing files will be read correctly. However
+spines data are not handled by MorphIO and spine information will be lost when writing to disk.
+
+Mitochondria
+************
+SWC and ASC do not support mitochondria. Mitochondria can be read and written to disk using the H5
+format. See :ref:`mitochondria-readme` for more details about the mitochondria API.
+
+Custom annotations
+******************
+Custom annotations are not supported.
 
 
 .. _`.h5`: https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html
