@@ -5,11 +5,35 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="61.894516mm"
    height="30.077768mm"
    viewBox="0 0 61.894516 30.077768"
    version="1.1"
-   id="svg8">
+   id="svg8"
+   sodipodi:docname="sequential.svg"
+   inkscape:version="1.0.2 (e86c8708, 2021-01-15)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1440"
+     inkscape:window-height="775"
+     id="namedview72"
+     showgrid="false"
+     inkscape:zoom="1.1723491"
+     inkscape:cx="116.96601"
+     inkscape:cy="56.839877"
+     inkscape:window-x="0"
+     inkscape:window-y="23"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
   <defs
      id="defs2">
     <marker
@@ -153,7 +177,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -244,89 +268,5 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#0000ff;stroke-width:0.264583">P<tspan
    style="font-size:65%;baseline-shift:sub"
    id="tspan2663">3</tspan></tspan></text>
-    <ellipse
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="path1099-9"
-       cx="265.74158"
-       cy="116.28599"
-       rx="2.500385"
-       ry="7.3463135"
-       transform="rotate(-0.79298152)" />
-    <ellipse
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="path1099-6-23"
-       cx="314.84781"
-       cy="8.5387344"
-       rx="2.500385"
-       ry="7.3463135"
-       transform="rotate(19.516525)" />
-    <ellipse
-       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.300163;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       id="path1099-6-2-1"
-       cx="317.13242"
-       cy="-108.83678"
-       rx="1.848047"
-       ry="5.4797349"
-       transform="matrix(0.75385844,0.65703687,-0.69148506,0.72239077,0,0)" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 267.2149,105.25027 28.89257,1.00781"
-       id="path1188-8" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 267.4097,119.94283 24.04198,0.21316"
-       id="path1190-7" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 296.68099,106.50535 21.4411,19.28163"
-       id="path1192-4" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 291.4518,120.15614 310.54374,133.704"
-       id="path1194-1" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.29855;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Lend-7)"
-       d="m 267.38987,112.62766 26.1313,0.50529"
-       id="path1820-6" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.298635;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker2456-8)"
-       d="m 294.09503,113.13354 20.3169,16.60129"
-       id="path1836-3" />
-    <text
-       xml:space="preserve"
-       style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-       x="257.9491"
-       y="114.73248"
-       id="text2532-8"><tspan
-         id="tspan2530-5"
-         x="257.9491"
-         y="114.73248"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#0000ff;stroke-width:0.264583">P<tspan
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:65%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';baseline-shift:sub;fill:#0000ff"
-   id="tspan2590-5">1</tspan></tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-       x="294.35544"
-       y="112.37151"
-       id="text2532-6-0"><tspan
-         id="tspan2530-9-1"
-         x="294.35544"
-         y="112.37151"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#0000ff;stroke-width:0.264583">P<tspan
-   style="font-size:65%;baseline-shift:sub"
-   id="tspan2620-2">2</tspan></tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-       x="314.65662"
-       y="133.96344"
-       id="text2532-6-1-6"><tspan
-         id="tspan2530-9-2-4"
-         x="314.65662"
-         y="133.96344"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#0000ff;stroke-width:0.264583">P<tspan
-   style="font-size:65%;baseline-shift:sub"
-   id="tspan2663-8">3</tspan></tspan></text>
   </g>
 </svg>

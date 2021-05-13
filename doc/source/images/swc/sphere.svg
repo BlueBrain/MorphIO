@@ -27,13 +27,14 @@
      inkscape:window-height="775"
      id="namedview114"
      showgrid="false"
-     inkscape:zoom="4.665804"
-     inkscape:cx="115.84284"
-     inkscape:cy="45.236468"
+     inkscape:zoom="0.5832255"
+     inkscape:cx="35.256515"
+     inkscape:cy="286.99544"
      inkscape:window-x="0"
      inkscape:window-y="23"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg8" />
+     inkscape:current-layer="svg8"
+     inkscape:document-rotation="0" />
   <defs
      id="defs2">
     <marker
@@ -273,94 +274,10 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <ellipse
-     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-9"
-     cx="40.08712"
-     cy="130.16792"
-     rx="2.500385"
-     ry="7.3463135"
-     transform="rotate(-0.79298152)" />
-  <ellipse
-     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-6-23"
-     cx="108.04028"
-     cy="99.880341"
-     rx="2.500385"
-     ry="7.3463135"
-     transform="rotate(19.516525)" />
-  <ellipse
-     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.300163;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-6-2-1"
-     cx="165.86922"
-     cy="52.279762"
-     rx="1.848047"
-     ry="5.4797349"
-     transform="matrix(0.75385844,0.65703687,-0.69148506,0.72239077,0,0)" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 41.774179,122.25387 28.89257,1.00781"
-     id="path1188-8" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 41.968979,136.94643 24.04198,0.21316"
-     id="path1190-7" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 71.240269,123.50895 21.441099,19.28163"
-     id="path1192-4" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 66.011079,137.15974 85.103017,150.7076"
-     id="path1194-1" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.297431;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker2456-8)"
-     d="m 68.42802,130.13512 20.142927,16.45914"
-     id="path1836-3" />
-  <text
-     xml:space="preserve"
-     style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-     x="68.921822"
-     y="128.70952"
-     id="text2532-8"><tspan
-       id="tspan2530-5"
-       x="68.921822"
-       y="128.70952"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#0000ff;stroke-width:0.264583">P<tspan
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:65%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';baseline-shift:sub;fill:#0000ff"
-   id="tspan2590-5">1</tspan></tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-     x="32.55143"
-     y="130.67561"
-     id="text2532-6-0"><tspan
-       id="tspan2530-9-1"
-       x="32.55143"
-       y="130.67561"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#0000ff;stroke-width:0.264583">P<tspan
-   style="font-size:65%;baseline-shift:sub"
-   id="tspan2620-2">2</tspan></tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-     x="89.215904"
-     y="150.96704"
-     id="text2532-6-1-6"><tspan
-       id="tspan2530-9-2-4"
-       x="89.215904"
-       y="150.96704"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#0000ff;stroke-width:0.264583">P<tspan
-   style="font-size:65%;baseline-shift:sub"
-   id="tspan2663-8">3</tspan></tspan></text>
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.298836;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker2456)"
-     d="m 68.649249,130.13946 -26.16288,-0.79761"
-     id="path3197" />
   <ellipse
      style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      id="path1099-9-6-2"
@@ -393,182 +310,4 @@
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#0000ff;stroke-width:0.264583">P<tspan
    style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:65%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';baseline-shift:sub;fill:#0000ff"
    id="tspan2590-5-1">1</tspan></tspan></text>
-  <ellipse
-     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-9-6-26"
-     cx="176.42021"
-     cy="54.84634"
-     rx="2.500385"
-     ry="7.3463135"
-     transform="rotate(-0.79298152)" />
-  <ellipse
-     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-9-6-2-9"
-     cx="201.28856"
-     cy="55.190578"
-     rx="2.500385"
-     ry="7.3463135"
-     transform="rotate(-0.79298152)" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 177.06069,45.053878 24.87074,3.5e-5"
-     id="path3391-4" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 177.26404,59.745098 24.87072,3.5e-5"
-     id="path3393-4" />
-  <circle
-     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0201455;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path3417-2-6"
-     cx="177.22462"
-     cy="52.462608"
-     r="0.3698529" />
-  <circle
-     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0201455;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path3417-2-6-0"
-     cx="202.09512"
-     cy="52.462608"
-     r="0.3698529" />
-  <text
-     xml:space="preserve"
-     style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-     x="167.92053"
-     y="54.391251"
-     id="text2532-8-6-7"><tspan
-       id="tspan2530-5-9-4"
-       x="167.92053"
-       y="54.391251"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#0000ff;stroke-width:0.264583">P<tspan
-   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:65%;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';baseline-shift:sub;fill:#0000ff"
-   id="tspan2590-5-1-3">1</tspan></tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-     x="192.74925"
-     y="54.425926"
-     id="text2532-8-6-7-7"><tspan
-       id="tspan2530-5-9-4-9"
-       x="192.74925"
-       y="54.425926"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#0000ff;stroke-width:0.264583">P<tspan
-   style="font-size:65%;baseline-shift:sub"
-   id="tspan3819">2</tspan></tspan></text>
-  <ellipse
-     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-9-6-0"
-     cx="72.100899"
-     cy="-138.31566"
-     rx="4.0899792"
-     ry="12.016657"
-     transform="rotate(89.207018)" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 151.31578,70.013432 V 82.355087"
-     id="path3841" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="M 127.28476,70.346044 V 82.687697"
-     id="path3841-2" />
-  <ellipse
-     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-9-6-0-2"
-     cx="84.441368"
-     cy="-138.14485"
-     rx="4.0899792"
-     ry="12.016657"
-     transform="rotate(89.207018)" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 151.31578,82.355087 v 12.34166"
-     id="path3841-6" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     d="m 127.28476,82.687697 v 12.34166"
-     id="path3841-6-9" />
-  <ellipse
-     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-9-6-0-2-0"
-     cx="96.781853"
-     cy="-137.97406"
-     rx="4.0899792"
-     ry="12.016657"
-     transform="rotate(89.207018)" />
-  <ellipse
-     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-9-6-0-2-3"
-     cx="84.441368"
-     cy="-138.14485"
-     rx="4.0899792"
-     ry="12.016657"
-     transform="rotate(89.207018)" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.325;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)"
-     d="m 96.454478,91.127527 c 0,-11.31639 0,-11.31639 0,-11.31639"
-     id="path4415" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.325;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend-7)"
-     d="m 96.454478,91.127527 c 11.316392,0 11.316392,0 11.316392,0"
-     id="path4415-7" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.325;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend-7-0)"
-     d="m 96.476968,91.105037 c -6.08094,6.08094 -6.08094,6.08094 -6.08094,6.08094"
-     id="path4415-7-0" />
-  <text
-     xml:space="preserve"
-     style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-     x="91.56028"
-     y="81.806808"
-     id="text2532-6-0-4"><tspan
-       id="tspan2530-9-1-1"
-       x="91.56028"
-       y="81.806808"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#000000;stroke-width:0.264583">y</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-     x="105.60327"
-     y="95.98864"
-     id="text2532-6-0-4-0"><tspan
-       id="tspan2530-9-1-1-2"
-       x="105.60327"
-       y="95.98864"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#000000;stroke-width:0.264583">z</tspan></text>
-  <text
-     xml:space="preserve"
-     style="font-size:5.64444px;line-height:0.65;font-family:sans-serif;stroke-width:0.264583"
-     x="86.383919"
-     y="101.36414"
-     id="text2532-6-0-4-9"><tspan
-       id="tspan2530-9-1-1-6"
-       x="86.383919"
-       y="101.36414"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#000000;stroke-width:0.264583">x</tspan><tspan
-       x="86.383919"
-       y="105.03303"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.64444px;font-family:'Liberation Sans';-inkscape-font-specification:'Liberation Sans';fill:#000000;stroke-width:0.264583"
-       id="tspan5339" /></text>
-  <ellipse
-     style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.0194223;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-9-6-0-2-3-0"
-     cx="84.441368"
-     cy="-138.14485"
-     rx="0.1985922"
-     ry="0.58347839"
-     transform="rotate(89.207018)" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.293872;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker5927)"
-     d="M 139.30244,82.652497 139.29844,70.7265"
-     id="path5401" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:0.293872;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#marker5927-6)"
-     d="m 139.3064,82.105317 -0.004,11.926"
-     id="path5401-3" />
-  <ellipse
-     style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.0255647;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-     id="path1099-6-23-1"
-     cx="108.04028"
-     cy="99.880341"
-     rx="0.15980406"
-     ry="0.46951595"
-     transform="rotate(19.516525)" />
 </svg>
