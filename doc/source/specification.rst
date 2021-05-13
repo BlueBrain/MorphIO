@@ -29,22 +29,22 @@ A section is a series of two or more points. Each section has a type associated 
 the neuron a section represents. The type can be the axon, the soma, and so on.
 `Section API <cpp/doxygen_Section.html>`_.
 
-.. image:: images/section.svg
+.. image:: images/section_segment.svg
    :scale: 100 %
    :alt: section
 
 The first and the last point of section must be of the following combinations:
 
 1. first non-soma point, forking point
-2. forking point, forking point
-3. forking point, end point
+2. forking point, end point
+3. forking point, forking point
 4. first non-soma point, end point
 
 First non-soma point is the first point of a root section. Forking point is the last point of a section that has
 multiple children. End point is the last point of a section without children. For more details on the root section and
 children see `Neurite`_. The above combinations are marked with their corresponding number at the image below.
 
-.. image:: images/section_segment.svg
+.. image:: images/sections.svg
    :scale: 100 %
    :alt: section variants
 
