@@ -25,7 +25,7 @@ a tuple or a ``numpy`` array of two `points<point-label>`.
 Section
 -------
 
-A section is a series of two or more points. Each section has a type associated with it. The type shows what part of
+A section is a series of one or more segments. Each section has a type associated with it. The type shows what part of
 the neuron a section represents. The type can be the axon, the soma, and so on.
 `Section API <cpp/doxygen_Section.html>`_.
 
@@ -35,23 +35,63 @@ the neuron a section represents. The type can be the axon, the soma, and so on.
 
 The first and the last point of section must be of the following combinations:
 
-1. first non-soma point, forking point
+1. starting point, forking point
 2. forking point, end point
 3. forking point, forking point
-4. first non-soma point, end point
+4. starting point, end point
 
-First non-soma point is the first point of a root section. Forking point is the last point of a section that has
-multiple children. End point is the last point of a section without children. For more details on the root section and
+Starting point is the first point of a section without parent. Forking point is the last point of a section that has
+multiple children. End point is the last point of a section without children. For more details on section's parent and
 children see `Neurite`_. The above combinations are marked with their corresponding number at the image below.
 
 .. image:: images/sections.svg
    :scale: 100 %
    :alt: section variants
 
+Neurite
+-------
+
+A neurite is essentially a tree of sections(`Section`_). The tree structure implies the following:
+
+* Section can have only one parent (another section).
+* Section can have an arbitrary number of children (other sections).
+* No loops are present in the structure.
+
+A section without parent is called a root section. A section with parent must have its first point to be a duplicate
+of the last point of its parent.
+
+Section ordering
+****************
+In MorphIO each section is identified by an ID. By default, the section IDs will correspond to
+the order of section appearance while performing a depth-first traversal on every neurites. The
+neurite order is the order of appearance in the file. Alternatively, the NRN simulator way of
+ordering section can be used by specifying the flag ``morphio::Option::NRN_ID`` when opening
+the file. In the NRN simulator, the soma which is considered as a section (contrary to MorphIO)
+is placed first and then neurites are sorted according to their type.
+
+The final order is the following:
+
+0. Soma
+1. Axon
+2. Basal
+3. Apical
+
+Section with only one child section
+***********************************
+Prior to version 3.0.0, when a section had a single child section (aka unifurcation), the child section would be merged
+with its parent when reading or writing the file. Since version 3.0.0, merging does not happen when reading. Yet
+writing of such sections is not allowed.
+
+SWC IDs ordering
+****************
+There is no special constraint about the IDs as long as the parent ID of each point is defined. IDs don't need to be
+consecutive nor sorted, and the soma does not need to be the first point.
+
 Soma
 ----
-A soma is a series of one or more points. MorphIO implements Soma specification from `NeuroMorpho`_, and recognizes
-several kinds of soma format. `Soma API <cpp/doxygen_Soma.html>`_.
+Soma is not a neurite. However it is also a tree of sections but most of the time it is a single section. MorphIO
+implements Soma specification from `NeuroMorpho`_, and recognizes several kinds of soma format.
+`Soma API <cpp/doxygen_Soma.html>`_.
 
 No Soma
 *******
@@ -160,45 +200,6 @@ are characterized by "structure" with type equal 1.
    :warning: MorphIO does not support ASC files with multiple CellBody tags. MorphIO does not support H5 with multiple
         "structure" entries with type equal 1. Simply saying soma that is split among multiple sections is not supported
         in those formats.
-
-Neurite
--------
-
-A neurite is essentially a tree of sections(`Section`_). The tree structure implies the following:
-
-* Section can have only one parent (another section).
-* Section can have an arbitrary number of children (other sections).
-* No loops are present in the structure.
-
-A section without parent is called a root section. A section with parent must have its first point to be a duplicate
-of the last point of its parent.
-
-Section ordering
-****************
-In MorphIO each section is identified by an ID. By default, the section IDs will correspond to
-the order of section appearance while performing a depth-first traversal on every neurites. The
-neurite order is the order of appearance in the file. Alternatively, the NRN simulator way of
-ordering section can be used by specifying the flag ``morphio::Option::NRN_ID`` when opening
-the file. In the NRN simulator, the soma which is considered as a section (contrary to MorphIO)
-is placed first and then neurites are sorted according to their type.
-
-The final order is the following:
-
-0. Soma
-1. Axon
-2. Basal
-3. Apical
-
-Section with only one child section
-***********************************
-Prior to version 3.0.0, when a section had a single child section (aka unifurcation), the child section would be merged
-with its parent when reading or writing the file. Since version 3.0.0, merging does not happen when reading. Yet
-writing of such sections is not allowed.
-
-SWC IDs ordering
-****************
-There is no special constraint about the IDs as long as the parent ID of each point is defined. IDs don't need to be
-consecutive nor sorted, and the soma does not need to be the first point.
 
 Sub-cellular structures
 -----------------------
