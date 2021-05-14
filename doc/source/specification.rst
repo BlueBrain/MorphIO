@@ -8,14 +8,13 @@ Lets start describing them from the smallest to the biggest entity.
 
 Point
 -----
-A point is a ``numpy`` array of three numbers **[X, Y, Z]** where X, Y, Z are Cartesian coordinates of position.
+A point is an array of three numbers **[X, Y, Z]** where X, Y, Z are Cartesian coordinates of position.
 A point always has a diameter associated with it.
 
 
 Segment
 -------
-A segment consists of two consecutive points(`Point`_) belonging to the same section(`Section`_). It is represented as
-a tuple or a ``numpy`` array of two `points<point-label>`.
+A segment consists of two consecutive points(`Point`_) belonging to the same section(`Section`_).
 
 .. image:: images/swc/two_pt.svg
    :scale: 100 %
