@@ -88,9 +88,8 @@ consecutive nor sorted, and the soma does not need to be the first point.
 
 Soma
 ----
-Soma is not a neurite. However it is also a tree of sections but most of the time it is a single section. MorphIO
-implements Soma specification from `NeuroMorpho`_, and recognizes several kinds of soma format.
-`Soma API <cpp/doxygen_Soma.html>`_.
+Soma is a series of one or more points. Soma is not a neurite. MorphIO implements Soma specification from
+`NeuroMorpho`_, and recognizes several kinds of soma format. `Soma API <cpp/doxygen_Soma.html>`_.
 
 No Soma
 *******
