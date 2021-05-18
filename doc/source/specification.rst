@@ -25,8 +25,8 @@ Section
 -------
 
 A section is a series of one or more segments. Each section has a type associated with it. The type shows what part of
-the neuron a section represents. The type can be the axon, the soma, and so on.
-`Section API <cpp/doxygen_Section.html>`_.
+the neuron a section represents. The type can of the following: axon, soma, basal dendrite, apical dendrite or
+custom dendrite. `Section API <cpp/doxygen_Section.html>`_.
 
 .. image:: images/section_segment.svg
    :scale: 100 %
@@ -50,7 +50,7 @@ children see `Neurite`_. The above combinations are marked with their correspond
 Neurite
 -------
 
-A neurite is essentially a tree of sections(`Section`_). The tree structure implies the following:
+A neurite is a tree of sections(`Section`_). The tree structure implies the following:
 
 * Section can have only one parent (another section).
 * Section can have an arbitrary number of children (other sections).
@@ -64,11 +64,11 @@ Section ordering
 In MorphIO each section is identified by an ID. By default, the section IDs will correspond to
 the order of section appearance while performing a depth-first traversal on every neurites. The
 neurite order is the order of appearance in the file. Alternatively, the NRN simulator way of
-ordering section can be used by specifying the flag ``morphio::Option::NRN_ID`` when opening
+ordering section can be used by specifying the flag ``morphio::Option::NRN_ORDER`` when opening
 the file. In the NRN simulator, the soma which is considered as a section (contrary to MorphIO)
 is placed first and then neurites are sorted according to their type.
 
-The final order is the following:
+The order is the following:
 
 0. Soma
 1. Axon
@@ -79,7 +79,8 @@ Section with only one child section
 ***********************************
 Prior to version 3.0.0, when a section had a single child section (aka unifurcation), the child section would be merged
 with its parent when reading or writing the file. Since version 3.0.0, merging does not happen when reading. Yet
-writing of such sections is not allowed.
+writing of such sections is not allowed for SWC, and will cause an exception because SWC does not support single child
+sections. Call ``removeUnifurcations`` method of `mut::Morphology <cpp/doxygen_mut::Morphology.html>`_ to merge them.
 
 SWC IDs ordering
 ****************
