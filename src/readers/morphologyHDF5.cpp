@@ -270,7 +270,7 @@ int MorphologyHDF5::_readSections() {
 
         sections.emplace_back(
             Property::Section::Type{section[SECTION_START_OFFSET] - firstSectionOffset,
-                                    section[SECTION_PARENT_OFFSET] - 1});
+                                    section[SECTION_PARENT_OFFSET] - (hasSoma ? 1 : 0)});
         types.emplace_back(type);
     }
 
