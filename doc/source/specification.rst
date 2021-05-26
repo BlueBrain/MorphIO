@@ -1,11 +1,98 @@
 Specification
 =============
 Description of how MorphIO sees morphologies. MorphIO supports :ref:`.asc <specification-neurolucida>` (Neurolucida),
-`.h5`_ (H5 version 1) and `.swc`_ extensions.
+`.h5`_ (H5 version 1) and `.swc`_ extensions. A morphology is represented as a soma with neurites. Either soma or
+neurites can be absent. Neurite is a tree of sections. Section is composed of segments where segment is made of points.
+Lets start describing them from the smallest to the biggest entity.
 
-Soma formats:
--------------
-MorphIO implements Soma specification from `NeuroMorpho`_, and recognizes several kinds of soma format.
+
+Point
+-----
+A point is an array of three numbers **[X, Y, Z]** where X, Y, Z are Cartesian coordinates of position.
+A point always has a diameter associated with it.
+
+
+Segment
+-------
+A segment consists of two consecutive points(`Point`_) belonging to the same section(`Section`_).
+
+.. image:: images/swc/two_pt.svg
+   :scale: 100 %
+   :alt: segment
+
+
+Section
+-------
+
+A section is a series of one or more segments. Each section has a type associated with it. The type shows what part of
+the neuron a section represents. The type can of the following: axon, soma, basal dendrite, apical dendrite or
+custom dendrite. `Section API <cpp/doxygen_Section.html>`_.
+
+.. image:: images/section_segment.svg
+   :scale: 100 %
+   :alt: section
+
+The first and the last point of section must be of the following combinations:
+
+1. starting point, forking point
+2. forking point, end point
+3. forking point, forking point
+4. starting point, end point
+
+Starting point is the first point of a section without parent inside the section. Forking point is the last point of a section that has
+multiple children. End point is the last point of a section without children. For more details on section's parent and
+children see `Neurite`_. The above combinations are marked with their corresponding number at the image below.
+
+.. image:: images/sections.svg
+   :scale: 100 %
+   :alt: section variants
+
+Neurite
+-------
+
+A neurite is an out-tree of sections(`Section`_). The tree structure implies the following:
+
+* Section can have only one parent (another section).
+* Section can have an arbitrary number of children (other sections).
+* It exists a root section for the neurite.
+* The structure is oriented : all its edges point away from the root.
+* No cycles are present in the structure.
+
+A section without parent is called a root section. A section with parent must have its first point to be a duplicate
+of the last point of its parent.
+
+Section ordering
+****************
+In MorphIO each section is identified by an ID. By default, the section IDs will correspond to
+the order of section appearance while performing a depth-first traversal on every neurites. The
+neurite order is the order of appearance in the file. Alternatively, the NRN simulator way of
+ordering section can be used by specifying the flag ``morphio::Option::NRN_ORDER`` when opening
+the file. In the NRN simulator, the soma which is considered as a section (contrary to MorphIO)
+is placed first and then neurites are sorted according to their type.
+
+The order is the following:
+
+0. Soma
+1. Axon
+2. Basal
+3. Apical
+
+Section with only one child section
+***********************************
+Prior to version 3.0.0, when a section had a single child section (aka unifurcation), the child section would be merged
+with its parent when reading or writing the file. Since version 3.0.0, merging does not happen when reading. Yet
+writing of such sections is not allowed for SWC, and will cause an exception because SWC does not support single child
+sections. Call ``removeUnifurcations`` method of `mut::Morphology <cpp/doxygen_mut::Morphology.html>`_ to merge them.
+
+SWC IDs ordering
+****************
+There is no special constraint about the IDs as long as the parent ID of each point is defined. IDs don't need to be
+consecutive nor sorted, and the soma does not need to be the first point.
+
+Soma
+----
+Soma is a series of one or more points. Soma is not a neurite. MorphIO implements Soma specification from
+`NeuroMorpho`_, and recognizes several kinds of soma format. `Soma API <cpp/doxygen_Soma.html>`_.
 
 No Soma
 *******
@@ -115,7 +202,6 @@ are characterized by "structure" with type equal 1.
         "structure" entries with type equal 1. Simply saying soma that is split among multiple sections is not supported
         in those formats.
 
-
 Sub-cellular structures
 -----------------------
 SWC does not support any sub-cellular structures. H5 and ASC support some, please see the following
@@ -134,36 +220,6 @@ format. See :ref:`mitochondria-readme` for more details about the mitochondria A
 Custom annotations
 ******************
 Custom annotations are not supported.
-
-Sections
---------
-
-Section ordering
-****************
-In MorphIO each section is identified by an ID. By default, the section IDs will correspond to
-the order of section appearance while performing a depth-first traversal on every neurites. The
-neurite order is the order of appearance in the file. Alternatively, the NRN simulator way of
-ordering section can be used by specifying the flag ``morphio::Option::NRN_ID`` when opening
-the file. In the NRN simulator, the soma which is considered as a section (contrary to MorphIO)
-is placed first and then neurites are sorted according to their type.
-
-The final order is the following:
-
-0. Soma
-1. Axon
-2. Basal
-3. Apical
-
-Section with only one child section
-***********************************
-Prior to version 3.0.0, when a section had a single child section (aka unifurcation), the child section would be merged
-with its parent when reading or writing the file. Since version 3.0.0, merging does not happen when reading. Yet
-writing of such sections is not allowed.
-
-SWC IDs ordering
-****************
-There is no special constraint about the IDs as long as the parent ID of each point is defined. IDs don't need to be
-consecutive nor sorted, and the soma does not need to be the first point.
 
 
 .. _`.h5`: https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html
