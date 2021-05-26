@@ -39,7 +39,7 @@ The first and the last point of section must be of the following combinations:
 3. forking point, forking point
 4. starting point, end point
 
-Starting point is the first point of a section without parent. Forking point is the last point of a section that has
+Starting point is the first point of a section without parent inside the section. Forking point is the last point of a section that has
 multiple children. End point is the last point of a section without children. For more details on section's parent and
 children see `Neurite`_. The above combinations are marked with their corresponding number at the image below.
 
@@ -50,11 +50,13 @@ children see `Neurite`_. The above combinations are marked with their correspond
 Neurite
 -------
 
-A neurite is a tree of sections(`Section`_). The tree structure implies the following:
+A neurite is an out-tree of sections(`Section`_). The tree structure implies the following:
 
 * Section can have only one parent (another section).
 * Section can have an arbitrary number of children (other sections).
-* No loops are present in the structure.
+* It exists a root section for the neurite.
+* The structure is oriented : all its edges point away from the root.
+* No cycles are present in the structure.
 
 A section without parent is called a root section. A section with parent must have its first point to be a duplicate
 of the last point of its parent.
