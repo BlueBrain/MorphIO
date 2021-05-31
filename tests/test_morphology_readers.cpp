@@ -27,6 +27,13 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
     }
 
     {
+        const morphio::Morphology m("data/h5/v1/Neuron-no-soma.h5");
+        REQUIRE(m.diameters().size() == 924);
+        REQUIRE(m.points().size() == 924);
+        REQUIRE(m.somaType() == morphio::SomaType::SOMA_UNDEFINED);
+    }
+
+    {
         const morphio::Morphology m("data/h5/v1/simple.h5");
         REQUIRE(m.soma().points().size() == 1);
         REQUIRE(m.diameters().size() == 12);
