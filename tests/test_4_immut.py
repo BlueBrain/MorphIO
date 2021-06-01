@@ -180,3 +180,31 @@ def test_dendritic_spine():
 
     with pytest.raises(RawDataError):
         DendriticSpine(Path(_path, 'h5/v1/simple.h5'))
+
+
+def test_dendritic_spine_add_root_section():
+    # PointLevel + diameters parameters for append_root_section
+    spine_morph = morphio.mut.DendriticSpine()
+    spine_morph.append_root_section(
+        morphio.PointLevel([[1.1, 2.1, 3.1], [4.1, 5.1, 6.1]],
+                           [2.1, 3.1]),
+        morphio.SectionType.spine_head)
+
+    assert spine_morph.root_sections[0].type == morphio.SectionType.spine_head
+
+    assert_array_almost_equal(spine_morph.root_sections[0].points,
+                                  [[1.1, 2.1, 3.1], [4.1, 5.1, 6.1]])
+    assert_array_almost_equal(spine_morph.root_sections[0].diameters,
+                                  [2.1, 3.1])
+
+    # Section parameter for append_root_section
+    spine_morph = morphio.mut.DendriticSpine()
+    spine_path = os.path.join(_path, 'h5/v1/simple-dendritric-spine.h5')
+    input_spine = morphio.DendriticSpine(spine_path)
+    spine_morph.append_root_section(input_spine.root_sections[0])
+    assert_array_almost_equal(spine_morph.root_sections[0].points,
+                                  [[0., 5., 0.], [2.4, 9.1, 0.],
+                                   [0., 13.2, 0.]])
+    assert spine_morph.root_sections[0].type == morphio.SectionType.spine_head
+    assert_array_almost_equal(spine_morph.root_sections[0].diameters,
+                                  [0.1, 0.2, 0.15])
