@@ -555,17 +555,17 @@ void bind_mutable_module(py::module& m) {
              static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::DendriticSpine::*)(
                  const morphio::Property::PointLevel&, morphio::SectionType)>(
                  &morphio::mut::Morphology::appendRootSection),
-                             "Append a root Section\n",
-                        "point_level_properties"_a,
-                        "section_type"_a)
+             "Append a root Section\n",
+             "point_level_properties"_a,
+             "section_type"_a)
         .def("append_root_section",
              static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::DendriticSpine::*)(
                  const morphio::Section&, bool)>(&morphio::mut::Morphology::appendRootSection),
-                        "Append the existing immutable Section as a root section\n"
-                        "If recursive == true, all descendent will be appended as "
-                        "well",
-                        "immutable_section"_a,
-                        "recursive"_a = false)
+             "Append the existing immutable Section as a root section\n"
+             "If recursive == true, all descendent will be appended as "
+             "well",
+             "immutable_section"_a,
+             "recursive"_a = false)
 
         .def_property(
             "post_synaptic_density",
