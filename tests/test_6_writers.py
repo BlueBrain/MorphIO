@@ -72,7 +72,7 @@ def test_write_basic():
         assert_array_equal(ImmutMorphology(Path(tmp_folder, "test_write.swc")).points, expected)
         h5_morph = ImmutMorphology(Path(tmp_folder, "test_write.h5"))
         assert_array_equal(h5_morph.points, expected)
-        assert h5_morph.version == ('h5', 1, 2)
+        assert h5_morph.version == ('h5', 1, 3)
 
         import h5py
         with h5py.File(h5_out, 'r') as h5_file:
