@@ -455,7 +455,6 @@ void bind_immutable_module(py::module& m) {
             "can be passed:\n"
             "- morphio.IterType.depth_first (default)\n"
             "- morphio.IterType.breadth_first (default)\n"
-            "iter_type"_a = IterType::DEPTH_FIRST);
-
+            "iter_type"_a = IterType::DEPTH_FIRST)
     ;
 }

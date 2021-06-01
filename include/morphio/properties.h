@@ -179,13 +179,13 @@ struct CellLevel {
 
     std::string fileFormat() const {
         return std::get<0>(_version);
-    };
+    }
     uint32_t majorVersion() {
         return std::get<1>(_version);
-    };
+    }
     uint32_t minorVersion() {
         return std::get<2>(_version);
-    };
+    }
 };
 
 // The lowest level data blob
