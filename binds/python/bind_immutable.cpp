@@ -1,8 +1,8 @@
 #include "bind_immutable.h"
 
+#include <pybind11/iostream.h>  // py::add_ostream_redirect
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <pybind11/iostream.h>  // py::add_ostream_redirect
 
 #include <morphio/dendritic_spine.h>
 #include <morphio/endoplasmic_reticulum.h>
@@ -279,8 +279,9 @@ void bind_immutable_module(py::module& m) {
                 case IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
                 default:
-                    throw morphio::MorphioError("Only iteration types depth_first, breadth_first and "
-                                              "upstream are supported");
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first, breadth_first and "
+                        "upstream are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -347,8 +348,9 @@ void bind_immutable_module(py::module& m) {
                 case IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
                 default:
-                    throw morphio::MorphioError("Only iteration types depth_first, breadth_first and "
-                                                "upstream are supported");
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first, breadth_first and "
+                        "upstream are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
