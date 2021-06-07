@@ -360,7 +360,7 @@ void bind_immutable_module(py::module& m) {
             "at each root section",
             "iter_type"_a = IterType::DEPTH_FIRST);
 
-    py::class_<morphio::DendriticSpine>(m, "DendriticSpine")
+    py::class_<morphio::DendriticSpine, morphio::Morphology>(m, "DendriticSpine")
         .def(py::init([](py::object arg) {
                  return std::make_unique<morphio::DendriticSpine>(py::str(arg));
              }),

@@ -535,7 +535,7 @@ void bind_mutable_module(py::module& m) {
             },
             "Returns the number of filaments for each neuronal section");
 
-    py::class_<morphio::mut::DendriticSpine>(m, "DendriticSpine")
+    py::class_<morphio::mut::DendriticSpine, morphio::mut::Morphology>(m, "DendriticSpine")
         .def(py::init<>())
         .def(py::init([](py::object arg) {
                  return std::make_unique<morphio::mut::DendriticSpine>(py::str(arg));
