@@ -575,6 +575,7 @@ def test_dendritic_spine():
 
     with pytest.raises(RawDataError):
         DendriticSpine(DATA_DIR / 'simple.swc')
+
     with pytest.raises(RawDataError):
         DendriticSpine(DATA_DIR / 'h5/v1/simple.h5')
 
@@ -606,6 +607,19 @@ def test_dendritic_spine_round_trip():
         assert psd[-1].segment_id == 2
         assert psd[-1].offset == pytest.approx(3.3)
 
+def test_dendritic_spine_round_trip_empty_postsynaptic_density():
+    h5v1 = DATA_DIR / "h5/v1/"
+    with TemporaryDirectory() as folder:
+        d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
+        assert d.cell_family == CellFamily.SPINE
+
+        d.post_synaptic_density = []
+
+        filename = Path(folder, 'test-empty-spine.h5')
+        d.write(filename)
+
+        d2 = DendriticSpine(filename)
+        assert d.post_synaptic_density == d2.post_synaptic_density
 
 def _get_section():
     """This is used so that the reference to m is destroyed."""

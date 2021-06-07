@@ -321,10 +321,16 @@ void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& datasetName,
                            unsigned int expectedDimension,
                            T& data) {
-    assert(_group.exist(groupName));
+    if (!_group.exist(groupName)) {
+        throw(
+            RawDataError("Reading morphology '" + _uri + "': Missing required group " + groupName));
+    }
     const auto group = _group.getGroup(groupName);
 
-    assert(group.exist(datasetName));
+    if (!_group.exist(groupName)) {
+        throw(RawDataError("Reading morphology '" + _uri + "': Missing required dataset " +
+                           datasetName));
+    }
     const HighFive::DataSet dataset = group.getDataSet(datasetName);
 
     const auto dims = dataset.getSpace().getDimensions();
