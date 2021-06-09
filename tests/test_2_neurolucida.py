@@ -442,14 +442,6 @@ def test_spine():
                                  [13.75,    -5.96,   150.00]], dtype=np.float32))
 
 
-def _print_markers(title, m):
-    print(f'\n@@@@@@ {title}')
-    for marker in m.markers:
-        print(f'\t {marker.label}')
-    for a in m.annotations:
-        print(f'\t {a}')
-
-
 def test_markers():
     '''Test that markers do not prevent file from being read correctly'''
 
@@ -560,7 +552,6 @@ def test_markers():
 
 def test_string_markers():
     cell = Morphology(DATA_DIR / 'pia.asc')
-    _print_markers('\n@@@@@@ test_string_markers', cell)
 
     # The for loop tests that the various constructors keep the markers alive
     for m in (cell, cell.as_mutable(), cell.as_mutable().as_immutable()):
@@ -633,7 +624,6 @@ def test_neurolucida_markers():
   )
                          )''') as tmp_file:
             neuron = Morphology(tmp_file.name)
-            _print_markers('\n@@@@@@ test_neurolucida_markers', neuron)
 
             assert_array_equal(neuron.points, SIMPLE.points)
             assert len(neuron.markers) == 2
