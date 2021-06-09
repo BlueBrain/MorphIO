@@ -291,7 +291,7 @@ class NeurolucidaParser
                 lex_.consume_until_balanced_paren();
             } else if (id == Token::LPAREN) {
                 if (skip_sexp(peek_id)) {
-                    // skip words/strings/markers
+                    // skip words/strings
                     lex_.consume_until_balanced_paren();
                 } else if (peek_id == +Token::MARKER) {
                     Header marker_header;
