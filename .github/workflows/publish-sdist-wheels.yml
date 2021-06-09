@@ -47,7 +47,7 @@ jobs:
         env:
           CIBW_BEFORE_BUILD: |
             brew update
-            brew unlink gcc@8 gcc@9
+            brew --version
             brew install cmake
             brew install hdf5
         run: |
