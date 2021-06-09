@@ -442,6 +442,14 @@ def test_spine():
                                  [13.75,    -5.96,   150.00]], dtype=np.float32))
 
 
+def _print_markers(title, m):
+    print(f'\n@@@@@@ {title}')
+    for marker in m.markers:
+        print(f'\t {marker.label}')
+    for a in m.annotations:
+        print(f'\t {a}')
+
+
 def test_markers():
     '''Test that markers do not prevent file from being read correctly'''
 
@@ -491,6 +499,31 @@ def test_markers():
 
         n = Morphology(tmp_file.name)
 
+        assert len(n.markers) == 3
+        assert_array_equal(n.markers[0].points,
+                           np.array([[-271.87, -121.14, -16.27],
+                                     [-269.34, -122.29, -15.48]],
+                                    dtype=np.float32))
+        assert_array_equal(n.markers[0].diameters,
+                           np.array([0.69, 0.69], dtype=np.float32))
+        assert n.markers[0].label == 'Cross'
+
+        assert_array_equal(n.markers[1].points,
+                           np.array([[-279.41, -119.99, -18.00],
+                                     [-272.98, -126.60, -21.22]],
+                                    dtype=np.float32))
+        assert_array_equal(n.markers[1].diameters,
+                           np.array([0.46, 0.92], dtype=np.float32))
+        assert n.markers[1].label == 'Cross'
+
+        assert_array_equal(n.markers[2].points,
+                           np.array([[-223.67, -157.92, -42.45],
+                                     [-222.76, -154.18, -39.90]],
+                                    dtype=np.float32))
+        assert_array_equal(n.markers[2].diameters,
+                           np.array([0.69, 0.69], dtype=np.float32))
+        assert n.markers[2].label == 'Cross'
+
         assert len(n.root_sections) == 1
 
         assert_array_equal(n.root_sections[0].points,
@@ -527,6 +560,7 @@ def test_markers():
 
 def test_string_markers():
     cell = Morphology(DATA_DIR / 'pia.asc')
+    _print_markers('\n@@@@@@ test_string_markers', cell)
 
     # The for loop tests that the various constructors keep the markers alive
     for m in (cell, cell.as_mutable(), cell.as_mutable().as_immutable()):
@@ -599,6 +633,7 @@ def test_neurolucida_markers():
   )
                          )''') as tmp_file:
             neuron = Morphology(tmp_file.name)
+            _print_markers('\n@@@@@@ test_neurolucida_markers', neuron)
 
             assert_array_equal(neuron.points, SIMPLE.points)
             assert len(neuron.markers) == 2
