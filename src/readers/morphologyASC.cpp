@@ -287,8 +287,6 @@ class NeurolucidaParser
                     lex_.consume();
                 }
                 lex_.consume(Token::RSPINE, "Must be end of spine");
-            } else if (skip_sexp(+id)) {
-                lex_.consume_until_balanced_paren();
             } else if (id == Token::LPAREN) {
                 if (skip_sexp(peek_id)) {
                     // skip words/strings
@@ -299,7 +297,8 @@ class NeurolucidaParser
                     marker_header.token = Token::STRING;
                     marker_header.label = lex_.peek()->str();
                     lex_.consume_until(Token::LPAREN);
-                    parse_neurite_branch(marker_header);
+                    parse_neurite_section(marker_header);
+                    lex_.consume(Token::RPAREN, "Marker should end with RPAREN");
                 } else if (peek_id == +Token::NUMBER) {
                     Point point;
                     floatType radius;
