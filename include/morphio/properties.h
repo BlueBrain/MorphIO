@@ -146,7 +146,7 @@ struct Annotation {
 struct Marker {
     PointLevel _pointLevel;
     std::string _label;
-    uint32_t _parentId;  // id of parent section
+    int32_t _parentId;  // id of parent section
 };
 
 struct CellLevel {
