@@ -147,6 +147,12 @@ TEST_CASE("LoadNeurolucidaMorphology", "[morphology]") {
     REQUIRE(m.diameters().size() == 14);
 }
 
+TEST_CASE("LoadNeurolucidaMorphologyMarkers", "[morphology]") {
+    const morphio::Morphology m("data/markers.asc");
+
+    REQUIRE(m.markers().size() == 3);
+}
+
 TEST_CASE("LoadBadDimensionMorphology", "[morphology]") {
     REQUIRE_THROWS(morphio::Morphology("data/h5/v1/monodim.h5"));
 }

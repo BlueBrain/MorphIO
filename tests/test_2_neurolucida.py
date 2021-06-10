@@ -445,109 +445,65 @@ def test_spine():
 def test_markers():
     '''Test that markers do not prevent file from being read correctly'''
 
-    with tmp_asc_file('''
-( (Color White)  ; [10,1]
-  (Dendrite)
-  ( -290.87  -113.09   -16.32     2.06)  ; Root
-  ( -290.87  -113.09   -16.32     2.06)  ; R, 1
-  (
-    ( -277.14  -119.13   -18.02     0.69)  ; R-1, 1
-    ( -275.54  -119.99   -16.67     0.69)  ; R-1, 2
-    (Cross  ;  [3,3]
-      (Color Orange)
-      (Name "Marker 3")
-      ( -271.87  -121.14   -16.27     0.69)  ; 1
-      ( -269.34  -122.29   -15.48     0.69)  ; 2
-    )  ;  End of markers
-     Normal
-  |
-    ( -277.80  -120.28   -19.48     0.92)  ; R-2, 1
-    ( -276.65  -121.14   -20.20     0.92)  ; R-2, 2
-    (Cross  ;  [3,3]
-      (Color Orange)
-      (Name "Marker 3")
-      ( -279.41  -119.99   -18.00     0.46)  ; 1
-      ( -272.98  -126.60   -21.22     0.92)  ; 2
-    )  ;  End of markers
-    (
-      ( -267.94  -128.61   -22.57     0.69)  ; R-2-1, 1
-      ( -204.90  -157.63   -42.45     0.69)  ; R-2-1, 34
-      (Cross  ;  [3,3]
-        (Color Orange)
-        (Name "Marker 3")
-        ( -223.67  -157.92   -42.45     0.69)  ; 1
-        ( -222.76  -154.18   -39.90     0.69)  ; 2
-      )  ;  End of markers
-       Incomplete
-    |
-      ( -269.77  -129.47   -22.57     0.92)  ; R-2-2, 1
-      ( -268.17  -130.62   -24.75     0.92)  ; R-2-2, 2
-      ( -266.79  -131.77   -26.13     0.92)  ; R-2-2, 3
-       Incomplete
-    )  ;  End of split
-  )  ;  End of split
-)
-''') as tmp_file:
+    n = Morphology(DATA_DIR / 'markers.asc')
 
-        n = Morphology(tmp_file.name)
+    assert len(n.markers) == 3
+    assert_array_equal(n.markers[0].points,
+                       np.array([[-271.87, -121.14, -16.27],
+                                 [-269.34, -122.29, -15.48]],
+                                dtype=np.float32))
+    assert_array_equal(n.markers[0].diameters,
+                       np.array([0.69, 0.69], dtype=np.float32))
+    assert n.markers[0].label == 'Cross'
 
-        assert len(n.markers) == 3
-        assert_array_equal(n.markers[0].points,
-                           np.array([[-271.87, -121.14, -16.27],
-                                     [-269.34, -122.29, -15.48]],
-                                    dtype=np.float32))
-        assert_array_equal(n.markers[0].diameters,
-                           np.array([0.69, 0.69], dtype=np.float32))
-        assert n.markers[0].label == 'Cross'
+    assert_array_equal(n.markers[1].points,
+                       np.array([[-279.41, -119.99, -18.00],
+                                 [-272.98, -126.60, -21.22]],
+                                dtype=np.float32))
+    assert_array_equal(n.markers[1].diameters,
+                       np.array([0.46, 0.92], dtype=np.float32))
+    assert n.markers[1].label == 'Cross'
 
-        assert_array_equal(n.markers[1].points,
-                           np.array([[-279.41, -119.99, -18.00],
-                                     [-272.98, -126.60, -21.22]],
-                                    dtype=np.float32))
-        assert_array_equal(n.markers[1].diameters,
-                           np.array([0.46, 0.92], dtype=np.float32))
-        assert n.markers[1].label == 'Cross'
+    assert_array_equal(n.markers[2].points,
+                       np.array([[-223.67, -157.92, -42.45],
+                                 [-222.76, -154.18, -39.90]],
+                                dtype=np.float32))
+    assert_array_equal(n.markers[2].diameters,
+                       np.array([0.69, 0.69], dtype=np.float32))
+    assert n.markers[2].label == 'Cross'
 
-        assert_array_equal(n.markers[2].points,
-                           np.array([[-223.67, -157.92, -42.45],
-                                     [-222.76, -154.18, -39.90]],
-                                    dtype=np.float32))
-        assert_array_equal(n.markers[2].diameters,
-                           np.array([0.69, 0.69], dtype=np.float32))
-        assert n.markers[2].label == 'Cross'
+    assert len(n.root_sections) == 1
 
-        assert len(n.root_sections) == 1
+    assert_array_equal(n.root_sections[0].points,
+                       np.array([[-290.87,  -113.09,   -16.32],
+                                 [-290.87,  -113.09,   -16.32],
+                                 ],
+                                dtype=np.float32))
 
-        assert_array_equal(n.root_sections[0].points,
-                           np.array([[-290.87,  -113.09,   -16.32],
-                                     [-290.87,  -113.09,   -16.32],
-                                     ],
-                                    dtype=np.float32))
+    assert_array_equal(n.root_sections[0].children[0].points,
+                       np.array([[-290.87,  -113.09,   -16.32],
+                                 [-277.14,  -119.13,   -18.02],
+                                 [-275.54,  -119.99,   -16.67]],
+                                dtype=np.float32))
 
-        assert_array_equal(n.root_sections[0].children[0].points,
-                           np.array([[-290.87,  -113.09,   -16.32],
-                                     [-277.14,  -119.13,   -18.02],
-                                     [-275.54,  -119.99,   -16.67]],
-                                    dtype=np.float32))
+    assert_array_equal(n.root_sections[0].children[1].points,
+                       np.array([[-290.87,  -113.09,   -16.32],
+                                 [-277.80,  -120.28,   -19.48],
+                                 [-276.65,  -121.14,   -20.20]],
+                                dtype=np.float32))
 
-        assert_array_equal(n.root_sections[0].children[1].points,
-                           np.array([[-290.87,  -113.09,   -16.32],
-                                     [-277.80,  -120.28,   -19.48],
-                                     [-276.65,  -121.14,   -20.20]],
-                                    dtype=np.float32))
+    assert_array_equal(n.root_sections[0].children[1].children[0].points,
+                       np.array([[-276.65,  -121.14,   -20.20],
+                                 [-267.94,  -128.61,   -22.57],
+                                 [-204.90,  -157.63,   -42.45]],
+                                dtype=np.float32))
 
-        assert_array_equal(n.root_sections[0].children[1].children[0].points,
-                           np.array([[-276.65,  -121.14,   -20.20],
-                                     [-267.94,  -128.61,   -22.57],
-                                     [-204.90,  -157.63,   -42.45]],
-                                    dtype=np.float32))
-
-        assert_array_equal(n.root_sections[0].children[1].children[1].points,
-                           np.array([[-276.65,  -121.14,   -20.20],
-                                     [-269.77,  -129.47,   -22.57],
-                                     [-268.17,  -130.62,   -24.75],
-                                     [-266.79,  -131.77,   -26.13]],
-                                    dtype=np.float32))
+    assert_array_equal(n.root_sections[0].children[1].children[1].points,
+                       np.array([[-276.65,  -121.14,   -20.20],
+                                 [-269.77,  -129.47,   -22.57],
+                                 [-268.17,  -130.62,   -24.75],
+                                 [-266.79,  -131.77,   -26.13]],
+                                dtype=np.float32))
 
 
 def test_string_markers():
