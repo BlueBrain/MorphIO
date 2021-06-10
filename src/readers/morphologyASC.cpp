@@ -137,6 +137,7 @@ class NeurolucidaParser
             Property::Marker marker;
             marker._pointLevel = properties;
             marker._label = header.label;
+            marker._parentId = header.parent_id;
             nb_.addMarker(marker);
             return_id = -1;
         } else if (header.token == Token::CELLBODY) {
