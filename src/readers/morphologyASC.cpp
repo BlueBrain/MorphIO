@@ -47,7 +47,7 @@ bool is_end_of_section(Token id) {
 bool skip_sexp(size_t id) {
     return (id == +Token::WORD || id == +Token::COLOR || id == +Token::GENERATED ||
             id == +Token::HIGH || id == +Token::INCOMPLETE || id == +Token::LOW ||
-            id == +Token::NORMAL || id == +Token::FONT || id == +Token::MARKER);
+            id == +Token::NORMAL || id == +Token::FONT);
 }
 }  // namespace
 
@@ -137,6 +137,7 @@ class NeurolucidaParser
             Property::Marker marker;
             marker._pointLevel = properties;
             marker._label = header.label;
+            marker._parentId = header.parent_id;
             nb_.addMarker(marker);
             return_id = -1;
         } else if (header.token == Token::CELLBODY) {
@@ -289,8 +290,16 @@ class NeurolucidaParser
                 lex_.consume(Token::RSPINE, "Must be end of spine");
             } else if (id == Token::LPAREN) {
                 if (skip_sexp(peek_id)) {
-                    // skip words/strings/markers
+                    // skip words/strings
                     lex_.consume_until_balanced_paren();
+                } else if (peek_id == +Token::MARKER) {
+                    Header marker_header;
+                    marker_header.parent_id = section_id;
+                    marker_header.token = Token::STRING;
+                    marker_header.label = lex_.peek()->str();
+                    lex_.consume_until(Token::LPAREN);
+                    parse_neurite_section(marker_header);
+                    lex_.consume(Token::RPAREN, "Marker should end with RPAREN");
                 } else if (peek_id == +Token::NUMBER) {
                     Point point;
                     floatType radius;
