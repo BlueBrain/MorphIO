@@ -262,7 +262,11 @@ void bind_misc(py::module& m) {
         .def_property_readonly(
             "diameters",
             [](morphio::Property::Marker* marker) { return marker->_pointLevel._diameters; },
-            "Returns the list of diameters of the marker points");
+            "Returns the list of diameters of the marker points")
+        .def_property_readonly(
+            "parent_id",
+            [](morphio::Property::Marker* marker) { return marker->_parentId; },
+            "Returns the id of parent section");
 
     py::class_<morphio::Property::MitochondriaPointLevel>(
         m,
