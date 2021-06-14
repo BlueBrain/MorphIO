@@ -447,7 +447,7 @@ def test_markers():
 
     n = Morphology(DATA_DIR / 'markers.asc')
 
-    assert len(n.markers) == 3
+    assert len(n.markers) == 5
     assert_array_equal(n.markers[0].points,
                        np.array([[-271.87, -121.14, -16.27],
                                  [-269.34, -122.29, -15.48]],
@@ -471,6 +471,11 @@ def test_markers():
     assert_array_equal(n.markers[2].diameters,
                        np.array([0.69, 0.69], dtype=np.float32))
     assert n.markers[2].label == 'Cross'
+    assert n.markers[3].label == 'INCOMPLETE'
+    assert n.markers[3].parent_id == 3
+    assert n.markers[4].label == 'INCOMPLETE'
+    assert n.markers[4].parent_id == 4
+
 
     assert len(n.root_sections) == 1
 

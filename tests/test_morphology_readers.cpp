@@ -150,7 +150,7 @@ TEST_CASE("LoadNeurolucidaMorphology", "[morphology]") {
 TEST_CASE("LoadNeurolucidaMorphologyMarkers", "[morphology]") {
     const morphio::Morphology m("data/markers.asc");
 
-    REQUIRE(m.markers().size() == 3);
+    REQUIRE(m.markers().size() == 5);
 }
 
 TEST_CASE("LoadBadDimensionMorphology", "[morphology]") {

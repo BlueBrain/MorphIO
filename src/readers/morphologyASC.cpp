@@ -281,6 +281,12 @@ class NeurolucidaParser
                 }
                 return true;
             } else if (is_end_of_branch(id)) {
+                if (id == Token::INCOMPLETE) {
+                    Property::Marker marker;
+                    marker._label = to_string(Token::INCOMPLETE);
+                    marker._parentId = section_id;
+                    nb_.addMarker(marker);
+                }
                 lex_.consume();
             } else if (id == Token::LSPINE) {
                 // skip spines
