@@ -5,6 +5,8 @@ import numpy as np
 from morphio import Morphology, RawDataError, SomaError, ostream_redirect
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
+import pytest
+
 from utils import _test_asc_exception, tmp_asc_file
 
 DATA_DIR = Path(__file__).parent / 'data'
@@ -597,6 +599,13 @@ def test_neurolucida_markers():
                                                dtype=np.float32))
             assert_array_almost_equal(neuron.markers[1].diameters,
                                       np.array([0.52], dtype=np.float32))
+
+
+def test_invalid_incomplete():
+    '''Test that any data after Incomplete is invalid.'''
+    with pytest.raises(RawDataError, match='Incomplete'):
+        Morphology(DATA_DIR / 'invalid-incomplete.asc')
+
 
 def test_skip_font():
     assert_array_equal(Morphology(DATA_DIR / 'simple-with-font.asc').points,
