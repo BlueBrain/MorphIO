@@ -287,10 +287,11 @@ class NeurolucidaParser
                     marker._parentId = section_id;
                     nb_.addMarker(marker);
                     if (!is_end_of_section(Token(peek_id))) {
-                        throw RawDataError(
-                            err_.ERROR_UNEXPECTED_TOKEN(
-                                lex_.line_num(), lex_.peek()->str(), lex_.current()->str(),
-                                "'Incomplete' tag must finish the branch."));
+                        throw RawDataError(err_.ERROR_UNEXPECTED_TOKEN(
+                            lex_.line_num(),
+                            lex_.peek()->str(),
+                            lex_.current()->str(),
+                            "'Incomplete' tag must finish the branch."));
                     }
                 }
                 lex_.consume();

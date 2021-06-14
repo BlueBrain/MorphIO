@@ -153,8 +153,7 @@ TEST_CASE("LoadNeurolucidaMorphologyMarkers", "[morphology]") {
     REQUIRE(m.markers().size() == 5);
 
     {  // file is an not a valid h5 file
-        CHECK_THROWS_AS(morphio::Morphology("data/invalid-incomplete.asc"),
-                        morphio::RawDataError);
+        CHECK_THROWS_AS(morphio::Morphology("data/invalid-incomplete.asc"), morphio::RawDataError);
     }
 }
 
