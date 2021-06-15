@@ -137,7 +137,7 @@ class NeurolucidaParser
             Property::Marker marker;
             marker._pointLevel = properties;
             marker._label = header.label;
-            marker._parentId = header.parent_id;
+            marker._sectionId = header.parent_id;
             nb_.addMarker(marker);
             return_id = -1;
         } else if (header.token == Token::CELLBODY) {
@@ -284,7 +284,7 @@ class NeurolucidaParser
                 if (id == Token::INCOMPLETE) {
                     Property::Marker marker;
                     marker._label = to_string(Token::INCOMPLETE);
-                    marker._parentId = section_id;
+                    marker._sectionId = section_id;
                     nb_.addMarker(marker);
                     if (!is_end_of_section(Token(peek_id))) {
                         throw RawDataError(err_.ERROR_UNEXPECTED_TOKEN(
