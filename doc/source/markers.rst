@@ -1,29 +1,38 @@
 NeuroLucida markers
 ===================
 
-A marker is an `s-expression <https://en.wikipedia.org/wiki/S-expression>`__ at the top level of the
+Specification
+*************
+A marker is an `s-expression <https://en.wikipedia.org/wiki/S-expression>`__ of the
 Neurolucida file that contains additional information about the morphology. For example:
 
 .. code-block:: lisp
 
-  ("pia"
+  ("pia" ;  String-named marker starts. Such marker can exist only at the top level.
     (Closed)
     (MBFObjectType 5)
     (0 1 2 3)
     (3 4 5 4)
     (6 7 8 5)
     (9 10 11 6)
-   )
+   ) ;  marker ends
 
-This PR adds a `Morphology.markers` attribute that stores the markers found in the file. A Marker
-object has 3 attributes:
-- label
-- points
-- diameters.
+or
 
-**Specification**
+.. code-block:: lisp
 
-The following s-expressions are parsed:
+    ; ...
+    ( -277.14  -119.13   -18.02     0.69)
+    ( -275.54  -119.99   -16.67     0.69)  ; some section point
+    (Cross  ;  common marker starts
+      (Color Orange)
+      (Name "Marker 3") ; this name will be ignored. 'Cross' will be used as the marker's label.
+      ( -271.87  -121.14   -16.27     0.69)  ; 1
+      ( -269.34  -122.29   -15.48     0.69)  ; 2
+    )  ;  marker ends
+    ; ...
+
+The following s-expressions are parsed as markers:
 
 * Any s-exp with a top level string. Like:
 
@@ -38,7 +47,7 @@ The following s-expressions are parsed:
       (9 10 11 6)
       )
 
-* An sexp with one of the following top level regular expression:
+* An sexp with one of the following regular expression:
 
     - Dot[0-9]*
     - Plus[0-9]*
@@ -84,17 +93,44 @@ The following s-expressions are parsed:
         ( -189.59    55.67    28.68     0.12)  ; 1
         )  ;  End of markers
 
-ℹ️ Markers can may have only `(X Y Z)` specified instead of the more common `(X Y Z D)`. In this case, diameters are set to 0.
+* An 'Incomplete' sexp. Despite it's not the part of the known Neurolucida format, this tag is parsed as marker.
 
-**Usage**
+    Example:
 
-.. code-block::python
+    .. code-block:: lisp
+
+        : ...
+        ( -269.77  -129.47   -22.57     0.92)  ;
+        ( -268.17  -130.62   -24.75     0.92)  ;
+        ( -266.79  -131.77   -26.13     0.92)  ; last point before 'Incomplete' happens
+         Incomplete
+      ) ; end of branch
+
+.. note::
+    Markers may have only `(X Y Z)` specified instead of the more common `(X Y Z D)`. In this case,
+    diameters are set to 0.
+
+Usage
+*****
+
+An instance of morphology has `markers` list attribute that keeps the markers found in the file. A single marker
+object within this list is represented as an object with attributes:
+
+- ``parent_id``, the id of the section that contains the marker, ``-1`` if there is no section
+- ``label``, the text label of the marker
+- ``points``, the marker points
+- ``diameters``, the marker diameters
+
+.. code-block:: python
+
     cell = Morphology(os.path.join(_path, 'pia.asc'))
     all_markers = cell.markers
     pia = m.markers[0]
 
     # fetch the label marker with the `label` attribute
     assert_equal(pia.label, 'pia')
+    # fetch the marker's section id
+    assert_equal(pia.parent_id, -1)
 
     # fetch the points with the `points` attribute
     assert_array_equal(pia.points,
@@ -106,22 +142,5 @@ The following s-expressions are parsed:
     # fetch the diameters with the `diameters` attribute
     assert_array_equal(pia.diameters, [3, 4, 5, 6])
 
-⚠️ Only top level markers are currently supported. This means the following nested marker won't be available the the MorphIO API.
-
-.. code-block:: lisp
-
-  ( (Color White)  ; [10,1]
-    (Dendrite)
-    ( -290.87  -113.09   -16.32     2.06)  ; Root
-    ( -290.87  -113.09   -16.32     2.06)  ; R, 1
-    (
-      ( -277.14  -119.13   -18.02     0.69)  ; R-1, 1
-      ( -275.54  -119.99   -16.67     0.69)  ; R-1, 2
-      (Cross  ;  [3,3]
-        (Color Orange)
-        (Name "Marker 3")
-        ( -271.87  -121.14   -16.27     0.69)  ; 1
-        ( -269.34  -122.29   -15.48     0.69)  ; 2
-      )  ;  End of markers
-    )
-   )
+.. warning::
+    Markers with string names are supported only at the top level. Other markers can be presented at any level.
