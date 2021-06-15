@@ -474,9 +474,9 @@ def test_markers():
                        np.array([0.69, 0.69], dtype=np.float32))
     assert n.markers[2].label == 'Cross'
     assert n.markers[3].label == 'INCOMPLETE'
-    assert n.markers[3].parent_id == 3
+    assert n.markers[3].section_id == 3
     assert n.markers[4].label == 'INCOMPLETE'
-    assert n.markers[4].parent_id == 4
+    assert n.markers[4].section_id == 4
 
 
     assert len(n.root_sections) == 1
