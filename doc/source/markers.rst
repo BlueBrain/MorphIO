@@ -116,7 +116,7 @@ Usage
 An instance of morphology has `markers` list attribute that keeps the markers found in the file. A single marker
 object within this list is represented as an object with attributes:
 
-- ``parent_id``, the id of the section that contains the marker, ``-1`` if there is no section
+- ``section_id``, the id of the section that contains the marker, ``-1`` if there is no section
 - ``label``, the text label of the marker
 - ``points``, the marker points
 - ``diameters``, the marker diameters
@@ -130,7 +130,7 @@ object within this list is represented as an object with attributes:
     # fetch the label marker with the `label` attribute
     assert_equal(pia.label, 'pia')
     # fetch the marker's section id
-    assert_equal(pia.parent_id, -1)
+    assert_equal(pia.section_id, -1)
 
     # fetch the points with the `points` attribute
     assert_array_equal(pia.points,
