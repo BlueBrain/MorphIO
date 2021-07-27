@@ -98,17 +98,5 @@ enum VascularSectionType {
     SECTION_CUSTOM = 8
 };
 
-/**
- * Specify the access mode of data.
- * @version 1.4
- */
-enum AccessMode {
-    MODE_READ = 0x00000001,
-    MODE_WRITE = 0x00000002,
-    MODE_OVERWRITE = 0x00000004 | MODE_WRITE,
-    MODE_READWRITE = MODE_READ | MODE_WRITE,
-    MODE_READOVERWRITE = MODE_READ | MODE_OVERWRITE
-};
-
 }  // namespace enums
 }  // namespace morphio

@@ -111,14 +111,6 @@ void bind_misc(py::module& m) {
         .value("only_child", morphio::enums::Warning::ONLY_CHILD)
         .value("zero_diameter", morphio::enums::Warning::ZERO_DIAMETER);
 
-    py::enum_<morphio::enums::AccessMode>(m, "AccessMode")
-        .value("MODE_READ", morphio::enums::AccessMode::MODE_READ)
-        .value("MODE_WRITE", morphio::enums::AccessMode::MODE_WRITE)
-        .value("MODE_OVERWRITE", morphio::enums::AccessMode::MODE_OVERWRITE)
-        .value("MODE_READWRITE", morphio::enums::AccessMode::MODE_READWRITE)
-        .value("MODE_READOVERWRITE", morphio::enums::AccessMode::MODE_READOVERWRITE)
-        .export_values();
-
     py::enum_<morphio::enums::SomaType>(m, "SomaType", py::arithmetic())
         .value("SOMA_UNDEFINED", morphio::enums::SomaType::SOMA_UNDEFINED)
         .value("SOMA_SINGLE_POINT", morphio::enums::SomaType::SOMA_SINGLE_POINT)
