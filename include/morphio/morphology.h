@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>  //std::unique_ptr
-
 #include <highfive/H5Group.hpp>
 #include <morphio/properties.h>
 #include <morphio/section_iterators.hpp>

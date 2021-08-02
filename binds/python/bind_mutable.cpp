@@ -12,6 +12,7 @@
 #include <morphio/mut/morphology.h>
 
 #include <array>
+#include <memory>  // std::make_unique
 
 #include "bind_enums.h"
 #include "bindings_utils.h"
@@ -33,8 +34,8 @@ void bind_mutable_module(py::module& m) {
              "morphology"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
         .def(py::init([](py::object arg, unsigned int options) {
-                 return std::unique_ptr<morphio::mut::Morphology>(
-                     new morphio::mut::Morphology(py::str(arg), options));
+                 return std::make_unique<morphio::mut::Morphology>(
+                     py::str(arg), options);
              }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER,
@@ -180,8 +181,7 @@ void bind_mutable_module(py::module& m) {
     py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(m, "GlialCell")
         .def(py::init<>())
         .def(py::init([](py::object arg) {
-                 return std::unique_ptr<morphio::mut::GlialCell>(
-                     new morphio::mut::GlialCell(py::str(arg)));
+                 return std::make_unique<morphio::mut::GlialCell>(py::str(arg));
              }),
              "filename"_a,
              "Additional Ctor that accepts as filename any python "

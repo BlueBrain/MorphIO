@@ -13,6 +13,8 @@
 #include <morphio/soma.h>
 #include <morphio/types.h>
 
+#include <memory>  // std::make_unique
+
 #include "bind_enums.h"
 #include "bindings_utils.h"
 
