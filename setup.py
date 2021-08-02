@@ -67,6 +67,7 @@ class CMakeBuild(build_ext):
             os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
                       '-DMORPHIO_VERSION_STRING=' + self.distribution.get_version(),
+                      '-DMORPHIO_TESTS=OFF',
                       '-DPYTHON_EXECUTABLE=' + sys.executable,
                       '-DHIGHFIVE_EXAMPLES=OFF',
                       '-DHIGHFIVE_UNIT_TESTS=OFF',
