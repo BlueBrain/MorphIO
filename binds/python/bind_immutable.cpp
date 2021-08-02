@@ -11,6 +11,8 @@
 #include <morphio/soma.h>
 #include <morphio/types.h>
 
+#include <memory>  // std::make_unique
+
 #include "bind_enums.h"
 #include "bindings_utils.h"
 
@@ -28,8 +30,7 @@ void bind_immutable_module(py::module& m) {
              "options"_a = morphio::enums::Option::NO_MODIFIER)
         .def(py::init<morphio::mut::Morphology&>())
         .def(py::init([](py::object arg, unsigned int options) {
-                 return std::unique_ptr<morphio::Morphology>(
-                     new morphio::Morphology(py::str(arg), options));
+                 return std::make_unique<morphio::Morphology>(py::str(arg), options);
              }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER,
@@ -151,9 +152,8 @@ void bind_immutable_module(py::module& m) {
 
     py::class_<morphio::GlialCell, morphio::Morphology>(m, "GlialCell")
         .def(py::init<const std::string&>())
-        .def(py::init([](py::object arg) {
-                 return std::unique_ptr<morphio::GlialCell>(new morphio::GlialCell(py::str(arg)));
-             }),
+        .def(py::init(
+                 [](py::object arg) { return std::make_unique<morphio::GlialCell>(py::str(arg)); }),
              "filename"_a,
              "Additional Ctor that accepts as filename any python object that implements __repr__ "
              "or __str__");
