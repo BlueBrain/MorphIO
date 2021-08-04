@@ -49,6 +49,15 @@ bool skip_sexp(size_t id) {
             id == +Token::HIGH || id == +Token::INCOMPLETE || id == +Token::LOW ||
             id == +Token::NORMAL || id == +Token::FONT);
 }
+
+void throw_if_multiple_soma_z(std::vector<Point>& points, long unsigned int line) {
+    for (size_t i = 0; i < points.size() - 1; ++i) {
+        if (points[i][2] != points[i + 1][2])
+            throw RawDataError("Stack of multiple soma on line " + std::to_string(line) +
+                               " has multiple Z levels between points: " + dumpPoint(points[i]) +
+                               ", " + dumpPoint(points[i + 1]));
+    }
+}
 }  // namespace
 
 class NeurolucidaParser
@@ -141,9 +150,23 @@ class NeurolucidaParser
             nb_.addMarker(marker);
             return_id = -1;
         } else if (header.token == Token::CELLBODY) {
-            if (!nb_.soma()->points().empty())
-                throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
-            nb_.soma()->properties() = properties;
+            const auto& soma = nb_.soma();
+            if (!soma->points().empty()) {
+                if (!is_multiple_soma_) {
+                    is_multiple_soma_ = true;
+                    throw_if_multiple_soma_z(soma->points(), 1);
+                }
+                throw_if_multiple_soma_z(properties._points, lex_.line_num());
+                for (const Point& point : soma->points()) {
+                    if (point[2] == properties._points[0][2])
+                        throw RawDataError(
+                            "Stack of multiple soma on line " + std::to_string(lex_.line_num()) +
+                            " has the same Z level as a previous point: " + dumpPoint(point));
+                }
+                soma->properties().append(properties);
+            } else {
+                soma->properties() = properties;
+            }
             return_id = -1;
         } else {
             SectionType section_type = TokenSectionTypeMap.at(header.token);
@@ -364,6 +387,7 @@ class NeurolucidaParser
 
   private:
     ErrorMessages err_;
+    bool is_multiple_soma_ = false;
 };
 
 Property::Properties load(const std::string& uri, unsigned int options) {

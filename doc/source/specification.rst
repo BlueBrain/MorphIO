@@ -177,7 +177,7 @@ The only allowed bifurcation point in Soma is its root point. An error is thrown
 
 Multiple Soma
 *************
-Multiple somas are not supported
+Multiple somas are supported only for ASC. See :ref:`its specification <specification-neurolucida>`.
 
 Soma with 4 and more points
 ***************************

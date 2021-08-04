@@ -47,6 +47,12 @@ PointLevel& PointLevel::operator=(const PointLevel& other) {
     return *this;
 }
 
+void PointLevel::append(const PointLevel& other) {
+    _appendVector(this->_points, other._points, 0);
+    _appendVector(this->_diameters, other._diameters, 0);
+    _appendVector(this->_perimeters, other._perimeters, 0);
+}
+
 template <typename T>
 bool compare(const std::vector<T>& vec1,
              const std::vector<T>& vec2,

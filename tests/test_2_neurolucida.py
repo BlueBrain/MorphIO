@@ -104,24 +104,67 @@ def test_unfinished_point():
                         ':4:error')
 
 
-def test_multiple_soma():
+def test_multiple_soma_stack():
     _test_asc_exception('''
-                             ("CellBody"
-                             (Color Red)
-                             (CellBody)
-                             (1 1 0 1 S1)
-                             (-1 1 0 1 S2)
-                             )
+                            (
+                              (CellBody)
+                              (    5.55     5.05    1.0     2.35)
+                              (    2.86     5.72    1.0     2.35)
+                            )
+                            (
+                              (CellBody)
+                              (    0.84     1.52   2.0     2.35)
+                              (   -4.54     2.36   2.0     2.35)
+                              (   -6.55     0.17   10.0     2.35) ; Wrong Z
+                            )
+                        ''',
+                        RawDataError,
+                        'Stack of multiple soma on line 12 has multiple Z levels between points',
+                        '-4.54 2.36 2, -6.55 0.17 10')
 
-                            ("CellBody"
-                             (Color Red)
-                             (CellBody)
-                             (1 1 0 1 S1)
-                             (-1 1 0 1 S2)
-                             )''',
-                        SomaError,
-                        'A soma is already defined',
-                        ':14:error')
+    _test_asc_exception('''
+                        (
+                          (CellBody)
+                          (    5.88     0.84    1.0     2.35)
+                          (    6.05     2.53    1.0     2.35)
+                          (    6.39     4.38    1.0     2.35)
+                        )
+                        (
+                          (CellBody)
+                          (    1.85     0.67   1.0     2.35)
+                          (    0.84     1.52   1.0     2.35)
+                          (   -4.54     2.36   1.0     2.35)
+                        )
+                        ''',
+                        RawDataError,
+                        'Stack of multiple soma on line 13 has the same Z level as a previous point',
+                        '5.88 0.84 1',
+                        )
+
+    with tmp_asc_file('''
+        (
+          (CellBody)
+          (    5.88     0.84    1.0     2.35)
+          (    6.05     2.53    1.0     2.35)
+          (    6.39     4.38    1.0     2.35)
+        )
+        (
+          (CellBody)
+          (    1.85     0.67   2.0     2.35)
+          (    0.84     1.52   2.0     2.35)
+          (   -4.54     2.36   2.0     2.35)
+        )
+    ''') as tmp_file:
+        m = Morphology(tmp_file.name)
+        assert_array_equal(m.soma.points,
+                           np.array([[5.88, 0.84, 1.],
+                                     [6.05, 2.53, 1.],
+                                     [6.39, 4.38, 1.],
+                                     [1.85, 0.67, 2.],
+                                     [0.84, 1.52, 2.],
+                                     [-4.54, 2.36, 2.]],
+                                    dtype=np.float32))
+        assert_array_equal(m.soma.diameters, np.array([2.35] * 6, dtype=np.float32))
 
 
 def test_single_neurite_no_soma():
