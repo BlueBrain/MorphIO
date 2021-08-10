@@ -367,11 +367,7 @@ void bind_immutable_module(py::module& m) {
             "at each root section",
             "iter_type"_a = IterType::DEPTH_FIRST);
 
-<<<<<<< HEAD
     py::class_<morphio::DendriticSpine, morphio::Morphology>(m, "DendriticSpine")
-=======
-    py::class_<morphio::DendriticSpine>(m, "DendriticSpine")
->>>>>>> restore correct bind_immutable.cpp
         .def(py::init([](py::object arg) {
                  return std::make_unique<morphio::DendriticSpine>(py::str(arg));
              }),
@@ -465,16 +461,10 @@ void bind_immutable_module(py::module& m) {
             "iter_type controls the order of iteration on sections of a given neurite. 2 values "
             "can be passed:\n"
             "- morphio.IterType.depth_first (default)\n"
-            "- morphio.IterType.breadth_first (default)\n"
-<<<<<<< HEAD
+            "- morphio.IterType.breadth_first (default)\n",
             "iter_type"_a = IterType::DEPTH_FIRST)
         .def(
             "write",
             [](morphio::mut::DendriticSpine* morph, py::object arg) { morph->write(py::str(arg)); },
             "filename"_a);
-=======
-            "iter_type"_a = IterType::DEPTH_FIRST);
-
-    ;
->>>>>>> restore correct bind_immutable.cpp
 }
