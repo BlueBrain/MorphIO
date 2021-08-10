@@ -1,5 +1,4 @@
 from ._morphio import (
-    AccessMode,
     Annotation,
     AnnotationType,
     CellFamily,

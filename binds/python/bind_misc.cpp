@@ -34,12 +34,12 @@ void bind_misc(py::module& m) {
           "warning"_a,
           "ignore"_a = true);
 
-    py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType")
+    py::enum_<morphio::enums::AnnotationType>(m, "AnnotationType", py::arithmetic())
         .value("single_child",
                morphio::enums::AnnotationType::SINGLE_CHILD,
                "Indicates that a section has only one child");
 
-    py::enum_<IterType>(m, "IterType")
+    py::enum_<IterType>(m, "IterType", py::arithmetic())
         .value("depth_first", IterType::DEPTH_FIRST)
         .value("breadth_first", IterType::BREADTH_FIRST)
         .value("upstream", IterType::UPSTREAM)
@@ -51,7 +51,7 @@ void bind_misc(py::module& m) {
         .value("info", morphio::enums::LogLevel::INFO)
         .value("debug", morphio::enums::LogLevel::DEBUG);
 
-    py::enum_<morphio::enums::SectionType>(m, "SectionType")
+    py::enum_<morphio::enums::SectionType>(m, "SectionType", py::arithmetic())
         .value("undefined", morphio::enums::SectionType::SECTION_UNDEFINED)
         .value("soma", morphio::enums::SectionType::SECTION_SOMA)
         .value("axon", morphio::enums::SectionType::SECTION_AXON)
@@ -69,7 +69,7 @@ void bind_misc(py::module& m) {
         .value("all", morphio::enums::SectionType::SECTION_ALL)
         .export_values();
 
-    py::enum_<morphio::enums::VascularSectionType>(m, "VasculatureSectionType")
+    py::enum_<morphio::enums::VascularSectionType>(m, "VasculatureSectionType", py::arithmetic())
         .value("undefined", morphio::enums::VascularSectionType::SECTION_NOT_DEFINED)
         .value("vein", morphio::enums::VascularSectionType::SECTION_VEIN)
         .value("artery", morphio::enums::VascularSectionType::SECTION_ARTERY)
@@ -90,7 +90,7 @@ void bind_misc(py::module& m) {
         .export_values();
 
 
-    py::enum_<morphio::enums::CellFamily>(m, "CellFamily")
+    py::enum_<morphio::enums::CellFamily>(m, "CellFamily", py::arithmetic())
         .value("NEURON", morphio::enums::CellFamily::NEURON)
         .value("GLIA", morphio::enums::CellFamily::GLIA)
         .export_values();
@@ -111,16 +111,7 @@ void bind_misc(py::module& m) {
         .value("only_child", morphio::enums::Warning::ONLY_CHILD)
         .value("zero_diameter", morphio::enums::Warning::ZERO_DIAMETER);
 
-    py::enum_<morphio::enums::AccessMode>(m, "AccessMode")
-        .value("MODE_READ", morphio::enums::AccessMode::MODE_READ)
-        .value("MODE_WRITE", morphio::enums::AccessMode::MODE_WRITE)
-        .value("MODE_OVERWRITE", morphio::enums::AccessMode::MODE_OVERWRITE)
-        .value("MODE_READWRITE", morphio::enums::AccessMode::MODE_READWRITE)
-        .value("MODE_READOVERWRITE", morphio::enums::AccessMode::MODE_READOVERWRITE)
-        .export_values();
-
-
-    py::enum_<morphio::enums::SomaType>(m, "SomaType")
+    py::enum_<morphio::enums::SomaType>(m, "SomaType", py::arithmetic())
         .value("SOMA_UNDEFINED", morphio::enums::SomaType::SOMA_UNDEFINED)
         .value("SOMA_SINGLE_POINT", morphio::enums::SomaType::SOMA_SINGLE_POINT)
         .value("SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS",
@@ -264,9 +255,9 @@ void bind_misc(py::module& m) {
             [](morphio::Property::Marker* marker) { return marker->_pointLevel._diameters; },
             "Returns the list of diameters of the marker points")
         .def_property_readonly(
-            "parent_id",
-            [](morphio::Property::Marker* marker) { return marker->_parentId; },
-            "Returns the id of parent section");
+            "section_id",
+            [](morphio::Property::Marker* marker) { return marker->_sectionId; },
+            "Returns the id of section that contains the marker");
 
     py::class_<morphio::Property::MitochondriaPointLevel>(
         m,
