@@ -14,7 +14,13 @@ env:
   CIBW_BEFORE_BUILD: pip install ninja cmake
 
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
-  CIBW_TEST_COMMAND: cd {project}\tests && dir && nosetests -s -v .
+  CIBW_TEST_COMMAND: |
+    dir %cd%
+    cd {project}\tests
+    dir
+    pytest -s -v .
+
+  VCVARS: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat
 
 jobs:
   build:
@@ -30,11 +36,13 @@ jobs:
       - name: check and install HDF5
         shell: cmd
         run: |
-          python -m pip install h5py
-          python -c "import h5py; v='1.12.0'; assert v == h5py.version.hdf5_version, f'{v} != {h5py.version.hdf5_version}'"
+          rem python -m pip install h5py
+          rem python -c "import h5py; v='1.12.0'; assert v == h5py.version.hdf5_version, f'{v} != {h5py.version.hdf5_version}'"
+
           curl -O https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/bin/hdf5-1.12.0-Std-win10_64-vs16.zip
           C:\windows\system32\tar.exe xf hdf5-1.12.0-Std-win10_64-vs16.zip
           start /wait msiexec /a "%cd%\hdf\HDF5-1.12.0-win64.msi" /qn TARGETDIR="c:\hdf5\"
+          dir C:\hdf5\HDF_Group\HDF5\1.12.0\cmake
 
       - uses: actions/checkout@v2
         with:
@@ -47,7 +55,7 @@ jobs:
       - name: Build wheels windows
         shell: cmd
         run: |
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          call "%VCVARS%"
           set HDF5_DIR=C:\hdf5\HDF_Group\HDF5\1.12.0\cmake
           python -m cibuildwheel --output-dir dist
 
