@@ -1,14 +1,6 @@
 # Taken from https://github.com/BlueBrain/hpc-coding-conventions/blob/master/cpp/cmake/bob.cmake#L192-L255
 if (WIN32)
-  #set(FLAGS "${FLAGS} /DH5_BUILT_AS_DYNAMIC_LIB /EHsc /D_USE_MATH_DEFINES")
-
-  # HACK: Disable use of __CxxFrameHandler4 on VS 16.3+ (x64 only)
-  # See https://developercommunity.visualstudio.com/content/problem/746534/visual-c-163-runtime-uses-an-unsupported-api-for-u.html
-  if(ARCH STREQUAL "amd64" AND MSVC_VERSION GREATER 1922)
-    set(FLAGS "${FLAGS} /d2FH4-")
-      #add_compile_flags("/d2FH4-")
-      #add_link_options("/d2:-FH4-")
-  endif()
+  set(FLAGS "${FLAGS} /DH5_BUILT_AS_DYNAMIC_LIB /EHsc /D_USE_MATH_DEFINES")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if(${PROJECT_NAME}_CXX_WARNINGS)
     set(FLAGS "${FLAGS} -Werror -Weverything")

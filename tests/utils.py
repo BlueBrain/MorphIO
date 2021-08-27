@@ -25,14 +25,12 @@ def ignored_warning(warning):
         set_ignored_warning(warning, False)
 
 
-_tmp_folder = tempfile.TemporaryDirectory('morphio_tests_tmp_folder')
-
 @contextmanager
-def _tmp_file(content, extension):
+def _tmp_file(tmp_folder, content, extension):
     suffix = '.' + extension
     with tempfile.NamedTemporaryFile(suffix=suffix,
                                      mode='w',
-                                     dir=_tmp_folder.name,
+                                     dir=tmp_folder,
                                      delete=False) as tmp_file:
         tmp_file.write(content)
     yield tmp_file
@@ -66,9 +64,9 @@ def assert_string_equal(str1, str2):
 		raise AssertionError('Strings does not match:\n\n' + pformat(diff))
 
 
-def _assert_exception(content, exception, str1, str2, extension):
+def _assert_exception(tmp_path, content, exception, str1, str2, extension):
     '''Create tempfile with given content and check that the exception is raised'''
-    with _tmp_file(content, extension) as tmp_file:
+    with _tmp_file(tmp_path, content, extension) as tmp_file:
         with pytest.raises(exception) as obj:
             Morphology(tmp_file.name)
         assert obj.match(str1)
