@@ -7,7 +7,7 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 import pytest
 
-from utils import _test_asc_exception, tmp_asc_file
+from utils import assert_asc_exception, tmp_asc_file
 
 DATA_DIR = Path(__file__).parent / 'data'
 
@@ -81,31 +81,31 @@ def test_parse_number_with_plus_symbol():
 
 
 def test_unknown_token():
-    _test_asc_exception('''
-                   ("CellBody"
-                   (Color Red)
-                   (CellBody)
-                   (1 1 0 1 S1)
-                   (Z 1 0 1 S2) ; <-- Z is a BAD token
-                   (-1 -1 0 2 S3)
-                   )''',
-                        RawDataError,
-                        "Unexpected token: Z",
-                        ":6:error")
+    assert_asc_exception('''
+                         ("CellBody"
+                         (Color Red)
+                         (CellBody)
+                         (1 1 0 1 S1)
+                         (Z 1 0 1 S2) ; <-- Z is a BAD token
+                         (-1 -1 0 2 S3)
+                         )''',
+                         RawDataError,
+                         "Unexpected token: Z",
+                         ":6:error")
 
 
 def test_unfinished_point():
-    _test_asc_exception('''("CellBody"
-                         (Color Red)
-                         (CellBody)
-                         (1 1''',
-                        RawDataError,
-                        'Error converting: "" to float',
-                        ':4:error')
+    assert_asc_exception('''("CellBody"
+                            (Color Red)
+                            (CellBody)
+                            (1 1''',
+                         RawDataError,
+                         'Error converting: "" to float',
+                         ':4:error')
 
 
 def test_multiple_soma():
-    _test_asc_exception('''
+    assert_asc_exception('''
                              ("CellBody"
                              (Color Red)
                              (CellBody)
@@ -119,9 +119,9 @@ def test_multiple_soma():
                              (1 1 0 1 S1)
                              (-1 1 0 1 S2)
                              )''',
-                        SomaError,
-                        'A soma is already defined',
-                        ':14:error')
+                         SomaError,
+                         'A soma is already defined',
+                         ':14:error')
 
 
 def test_single_neurite_no_soma():
@@ -279,21 +279,21 @@ def test_explicit_duplicates_with_arbitrary_diameter():
 
 
 def test_unfinished_file():
-    _test_asc_exception('''
-                     ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
-                      (
-                        (3 -10 0 2)
-                        (0 -10 0 2)
-                        (-3 -10 0 2)
-                        |
-                     ''',
-                        RawDataError,
-                        "Hit end of file while consuming a neurite",
-                        ":12:error")
+    assert_asc_exception('''
+                         ((Dendrite)
+                          (3 -4 0 2)
+                          (3 -6 0 2)
+                          (3 -8 0 2)
+                          (3 -10 0 2)
+                          (
+                            (3 -10 0 2)
+                            (0 -10 0 2)
+                            (-3 -10 0 2)
+                            |
+                         ''',
+                         RawDataError,
+                         "Hit end of file while consuming a neurite",
+                         ":12:error")
 
 def test_section_single_point():
     '''Test single point section.

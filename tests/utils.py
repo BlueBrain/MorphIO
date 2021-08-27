@@ -25,13 +25,17 @@ def ignored_warning(warning):
         set_ignored_warning(warning, False)
 
 
+_tmp_folder = tempfile.TemporaryDirectory('morphio_tests_tmp_folder')
+
 @contextmanager
 def _tmp_file(content, extension):
-    with tempfile.TemporaryDirectory('_tmp_file') as tmp_folder:
-        suffix = '.' + extension
-        with tempfile.NamedTemporaryFile(suffix=suffix, mode='w', delete=False) as tmp_file:
-            tmp_file.write(content)
-        yield tmp_file
+    suffix = '.' + extension
+    with tempfile.NamedTemporaryFile(suffix=suffix,
+                                     mode='w',
+                                     dir=_tmp_folder.name,
+                                     delete=False) as tmp_file:
+        tmp_file.write(content)
+    yield tmp_file
 
 
 tmp_asc_file = partial(_tmp_file, extension='asc')
@@ -62,7 +66,7 @@ def assert_string_equal(str1, str2):
 		raise AssertionError('Strings does not match:\n\n' + pformat(diff))
 
 
-def _test_exception(content, exception, str1, str2, extension):
+def _assert_exception(content, exception, str1, str2, extension):
     '''Create tempfile with given content and check that the exception is raised'''
     with _tmp_file(content, extension) as tmp_file:
         with pytest.raises(exception) as obj:
@@ -71,8 +75,8 @@ def _test_exception(content, exception, str1, str2, extension):
         assert obj.match(str2)
 
 
-_test_asc_exception = partial(_test_exception, extension='asc')
-_test_swc_exception = partial(_test_exception, extension='swc')
+assert_asc_exception = partial(_assert_exception, extension='asc')
+assert_swc_exception = partial(_assert_exception, extension='swc')
 
 
 @contextmanager

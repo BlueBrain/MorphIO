@@ -6,7 +6,7 @@ from numpy.testing import assert_array_equal
 
 from morphio import (Morphology, RawDataError, SectionType, SomaError, MorphioError, SomaType,
                      ostream_redirect, set_maximum_warnings, set_raise_warnings, set_ignored_warning, Warning)
-from utils import (_test_swc_exception, assert_string_equal, captured_output,
+from utils import (assert_swc_exception, assert_string_equal, captured_output,
                    strip_color_codes, tmp_swc_file, ignored_warning)
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -85,33 +85,33 @@ def test_set_raise_warnings():
 
 
 def test_repeated_id():
-    _test_swc_exception('''# A simple neuron with a repeated id
-                       1 1 0 0 1 0.5 -1
-                       2 3 0 0 2 0.5 1
-                       3 3 0 0 3 0.5 2
-                       4 3 0 0 4 0.5 3
-                       4 3 0 0 4 0.5 3 # <-- repeated id
-                       5 3 0 0 5 0.5 4
-                       ''',
-                        RawDataError,
-                        'Repeated ID: 4\nID already appears here:',
-                        ':6:warning')
+    assert_swc_exception('''# A simple neuron with a repeated id
+                         1 1 0 0 1 0.5 -1
+                         2 3 0 0 2 0.5 1
+                         3 3 0 0 3 0.5 2
+                         4 3 0 0 4 0.5 3
+                         4 3 0 0 4 0.5 3 # <-- repeated id
+                         5 3 0 0 5 0.5 4
+                         ''',
+                         RawDataError,
+                         'Repeated ID: 4\nID already appears here:',
+                         ':6:warning')
 
 
 def test_neurite_followed_by_soma():
     # Capturing the output to keep the unit test suite stdout clean
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            _test_swc_exception('''# An orphan neurite with a soma child
-                           1 3 0 0 1 0.5 -1
-                           2 3 0 0 2 0.5 1
-                           3 3 0 0 3 0.5 2
-                           4 3 0 0 4 0.5 3
-                           5 3 0 0 5 0.5 4
-                           6 1 0 0 0 3.0 5 # <-- soma child''',
-                                SomaError,
-                                'Found a soma point with a neurite as parent',
-                                ':7:error')
+            assert_swc_exception('''# An orphan neurite with a soma child
+                                 1 3 0 0 1 0.5 -1
+                                 2 3 0 0 2 0.5 1
+                                 3 3 0 0 3 0.5 2
+                                 4 3 0 0 4 0.5 3
+                                 5 3 0 0 5 0.5 4
+                                 6 1 0 0 0 3.0 5 # <-- soma child''',
+                                 SomaError,
+                                 'Found a soma point with a neurite as parent',
+                                 ':7:error')
 
 
 def test_read_split_soma():
@@ -188,18 +188,19 @@ def test_weird_indent():
 
 
 def test_cyclic():
-    _test_swc_exception("""1 1  0  0 0 1. -1
-                           2 3  0  0 0 1.  1
-                           3 3  0  5 0 1.  2
-                           4 3 -5  5 0 0.  3
-                           5 3  6  5 0 0.  3
-                           6 2  0  0 0 1.  6  # <-- cyclic point
-                           7 2  0 -4 0 1.  6
-                           8 2  6 -4 0 0.  7
-                           9 2 -5 -4 0 0.  7""",
-                        RawDataError,
-                        'Parent ID can not be itself',
-                        ':6:error')
+    assert_swc_exception("""1 1  0  0 0 1. -1
+                            2 3  0  0 0 1.  1
+                            3 3  0  5 0 1.  2
+                            4 3 -5  5 0 0.  3
+                            5 3  6  5 0 0.  3
+                            6 2  0  0 0 1.  6  # <-- cyclic point
+                            7 2  0 -4 0 1.  6
+                            8 2  6 -4 0 0.  7
+                            9 2 -5 -4 0 0.  7
+                         """,
+                         RawDataError,
+                         'Parent ID can not be itself',
+                         ':6:error')
 
 
 def test_simple_reversed():
