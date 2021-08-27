@@ -12,7 +12,7 @@ from morphio.mut import GlialCell, Morphology
 import pytest
 from numpy.testing import assert_array_equal
 
-from utils import assert_substring, captured_output, setup_tempdir, tmp_asc_file
+from utils import assert_substring, captured_output, tmp_asc_file
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -469,7 +469,7 @@ def test_endoplasmic_reticulum():
     assert_array_equal(reticulum.surface_areas, [3, 3])
     assert_array_equal(reticulum.filament_counts, [4, 4])
 
-    with setup_tempdir('test-endoplasmic-reticulum') as folder:
+    with TemporaryDirectory('test-endoplasmic-reticulum') as folder:
         path = Path(folder, 'with-reticulum.h5')
         neuron.write(path)
 

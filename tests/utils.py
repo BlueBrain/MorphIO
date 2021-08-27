@@ -3,6 +3,7 @@ import re
 import shutil
 import sys
 import tempfile
+
 from contextlib import contextmanager
 from difflib import Differ
 from functools import partial
@@ -15,16 +16,6 @@ from morphio import Morphology, set_ignored_warning
 
 
 @contextmanager
-def setup_tempdir(prefix, no_cleanup=False):
-    '''Context manager returning a temporary directory'''
-    temp_dir = tempfile.mkdtemp(prefix=prefix)
-    try:
-        yield temp_dir
-    finally:
-        if not no_cleanup:
-            shutil.rmtree(temp_dir)
-
-@contextmanager
 def ignored_warning(warning):
     '''Context manager during which a warning is ignored'''
     try:
@@ -33,16 +24,14 @@ def ignored_warning(warning):
     finally:
         set_ignored_warning(warning, False)
 
+
 @contextmanager
 def _tmp_file(content, extension):
-    with tempfile.NamedTemporaryFile(suffix='.' + extension, mode='w') as tmp_file:
-        tmp_file.write(content)
-        tmp_file.flush()
-        tmp_file.seek(0)
-
+    with tempfile.TemporaryDirectory('_tmp_file') as tmp_folder:
+        suffix = '.' + extension
+        with tempfile.NamedTemporaryFile(suffix=suffix, mode='w', delete=False) as tmp_file:
+            tmp_file.write(content)
         yield tmp_file
-
-        tmp_file.close()
 
 
 tmp_asc_file = partial(_tmp_file, extension='asc')
