@@ -1,7 +1,20 @@
-# Taken from https://github.com/BlueBrain/hpc-coding-conventions/blob/master/cpp/cmake/bob.cmake#L192-L255
 if (WIN32)
-  set(FLAGS "${FLAGS} /DH5_BUILT_AS_DYNAMIC_LIB /EHsc /D_USE_MATH_DEFINES")
+  set(FLAGS "${FLAGS} /DH5_BUILT_AS_DYNAMIC_LIB")
+
+  # Exception handling
+  # s: Enables standard C++ stack unwinding.
+  # c: [assume] functions declared as extern "C" never throw a C++ exception.
+  set(FLAGS "${FLAGS} /EHsc")
+
+  # get access to M_PI
+  set(FLAGS "${FLAGS} /D_USE_MATH_DEFINES")
+
+  # to avoid needing VCRUNTIME140_1.dll;
+  # https://packaging.python.org/guides/packaging-binary-extensions/#binary-extensions-for-windows
+  set(FLAGS "${FLAGS} /d2FH4-")
+
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # Taken from https://github.com/BlueBrain/hpc-coding-conventions/blob/master/cpp/cmake/bob.cmake#L192-L255
   if(${PROJECT_NAME}_CXX_WARNINGS)
     set(FLAGS "${FLAGS} -Werror -Weverything")
     # Using std=c++11, no need for 98 compat
