@@ -27,6 +27,12 @@ def ignored_warning(warning):
 
 @contextmanager
 def _tmp_file(tmp_folder, content, extension):
+    '''create temp file in `tmp_folder` with `content` and `extension`'''
+    # Note: the file isn't cleaned up until the tmp_folder is deleted;
+    # this should aide in debugging, and is cross-platform an auto-deleting
+    # NamedTemporaryFile doesn't allow Windows to use the temporary file per
+    # https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile:
+    #   "(it can be so used on Unix; it cannot on Windows NT or later)"
     suffix = '.' + extension
     with tempfile.NamedTemporaryFile(suffix=suffix,
                                      mode='w',
