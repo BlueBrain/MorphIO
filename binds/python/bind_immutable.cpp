@@ -6,13 +6,12 @@
 
 #include <morphio/dendritic_spine.h>
 #include <morphio/endoplasmic_reticulum.h>
-#include <morphio/dendritic_spine.h>
+#include <morphio/enums.h>
+#include <morphio/glial_cell.h>
 #include <morphio/mut/dendritic_spine.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/glial_cell.h>
 #include <morphio/mut/mitochondria.h>
-#include <morphio/enums.h>
-#include <morphio/glial_cell.h>
 //#include <morphio/mut/dendritic_spine.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
