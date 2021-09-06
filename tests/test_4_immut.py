@@ -159,8 +159,8 @@ def test_glia():
 
 
 def test_dendritic_spine():
-    assert_equal(int(SectionType.spine_head), 2)
-    assert_equal(int(SectionType.spine_neck), 3)
+    assert_equal(int(SectionType.spine_neck), 2)
+    assert_equal(int(SectionType.spine_head), 3)
 
     spine_path = os.path.join(_path, 'h5/v1/simple-dendritric-spine.h5')
     d = DendriticSpine(spine_path)
