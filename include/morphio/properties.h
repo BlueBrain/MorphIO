@@ -117,6 +117,24 @@ struct MitochondriaSectionLevel {
     bool operator!=(const MitochondriaSectionLevel& other) const;
 };
 
+namespace DendriticSpine {
+
+using SectionId_t = int32_t;
+using SegmentId_t = int32_t;
+using Offset_t = floatType;
+
+struct PostSynapticDensity {
+    SectionId_t sectionId;
+    SegmentId_t segmentId;
+    Offset_t offset;
+};
+
+struct Level {
+    std::vector<PostSynapticDensity> _post_synaptic_density;
+};
+
+}  // namespace DendriticSpine
+
 struct EndoplasmicReticulumLevel {
     std::vector<uint32_t> _sectionIndices;
     std::vector<morphio::floatType> _volumes;
@@ -159,9 +177,16 @@ struct CellLevel {
     bool diff(const CellLevel& other, LogLevel logLevel) const;
     bool operator==(const CellLevel& other) const;
     bool operator!=(const CellLevel& other) const;
-    std::string fileFormat() const;
-    uint32_t majorVersion();
-    uint32_t minorVersion();
+
+    std::string fileFormat() const {
+        return std::get<0>(_version);
+    }
+    uint32_t majorVersion() {
+        return std::get<1>(_version);
+    }
+    uint32_t minorVersion() {
+        return std::get<2>(_version);
+    }
 };
 
 // The lowest level data blob
@@ -175,6 +200,8 @@ struct Properties {
     MitochondriaSectionLevel _mitochondriaSectionLevel;
 
     EndoplasmicReticulumLevel _endoplasmicReticulumLevel;
+
+    DendriticSpine::Level _dendriticSpineLevel;
 
     template <typename T>
     std::vector<typename T::Type>& get_mut() noexcept;
@@ -194,6 +221,7 @@ struct Properties {
     template <typename T>
     const std::map<int32_t, std::vector<uint32_t>>& children() const noexcept;
 };
+
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);

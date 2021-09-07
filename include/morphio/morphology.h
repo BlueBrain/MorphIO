@@ -123,7 +123,6 @@ class Morphology
      **/
     const std::map<int, std::vector<unsigned int>>& connectivity() const;
 
-
     /**
        Depth first iterator starting at a given section id
 

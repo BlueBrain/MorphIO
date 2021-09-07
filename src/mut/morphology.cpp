@@ -26,9 +26,9 @@ Morphology::Morphology(const std::string& uri, unsigned int options)
 Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int options)
     : _counter(0)
     , _soma(std::make_shared<Soma>(*morphology.soma()))
-    , _endoplasmicReticulum(morphology.endoplasmicReticulum()) {
-    _cellProperties = std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties);
-
+    , _cellProperties(std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties))
+    , _endoplasmicReticulum(morphology.endoplasmicReticulum())
+    , _dendriticSpineLevel(morphology._dendriticSpineLevel) {
     for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -43,10 +43,10 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
 Morphology::Morphology(const morphio::Morphology& morphology, unsigned int options)
     : _counter(0)
     , _soma(std::make_shared<Soma>(morphology.soma()))
-    , _endoplasmicReticulum(morphology.endoplasmicReticulum()) {
-    _cellProperties = std::make_shared<morphio::Property::CellLevel>(
-        morphology._properties->_cellLevel);
-
+    , _cellProperties(
+          std::make_shared<morphio::Property::CellLevel>(morphology._properties->_cellLevel))
+    , _endoplasmicReticulum(morphology.endoplasmicReticulum())
+    , _dendriticSpineLevel(morphology._properties->_dendriticSpineLevel) {
     for (const morphio::Section& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -64,14 +64,13 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
 bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
                           const std::shared_ptr<Section>& current) {
     // Weird edge case where parent is empty: skipping it
-    if (parent->points().empty())
+    if (parent->points().empty()) {
         return true;
-
-    if (current->points().empty())
+    } else if (current->points().empty()) {
         return false;
-
-    if (parent->points().back() != current->points().front())
+    } else if (parent->points().back() != current->points().front()) {
         return false;
+    }
 
     // // As perimeter is optional, it must either be defined for parent and
     // current
@@ -142,7 +141,6 @@ uint32_t Morphology::_register(const std::shared_ptr<Section>& section_) {
     if (_sections.count(section_->id()))
         throw SectionBuilderError("Section already exists");
     _counter = std::max(_counter, section_->id()) + 1;
-
     _sections[section_->id()] = section_;
     return section_->id();
 }
@@ -279,7 +277,6 @@ void Morphology::_raiseIfUnifurcations() {
 }
 
 Property::Properties Morphology::buildReadOnly() const {
-    using std::setw;
     int sectionIdOnDisk = 0;
     std::map<uint32_t, int32_t> newIds;
     Property::Properties properties{};
@@ -302,6 +299,8 @@ Property::Properties Morphology::buildReadOnly() const {
 
     mitochondria()._buildMitochondria(properties);
     properties._endoplasmicReticulumLevel = endoplasmicReticulum().buildReadOnly();
+    properties._dendriticSpineLevel = _dendriticSpineLevel;
+
     return properties;
 }
 

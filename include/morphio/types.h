@@ -14,13 +14,16 @@
 namespace morphio {
 
 using namespace enums;
+class DendriticSpine;
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
 class Morphology;
 class Section;
+
 template <class T>
 class SectionBase;
+
 class Soma;
 
 namespace Property {
@@ -38,6 +41,7 @@ class ErrorMessages;
 }  // namespace readers
 
 namespace mut {
+class DendriticSpine;
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;

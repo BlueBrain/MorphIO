@@ -7,9 +7,9 @@ namespace morphio {
  * The entry-point class to access mitochondrial data
  *
  * By design, it is the equivalent of the Morphology class but at the
- *mitochondrial level. As the Morphology class, it implements a section accessor
- *and a root section accessor returning views on the Properties object for the
- *queried mitochondrial section.
+ * mitochondrial level. As the Morphology class, it implements a section accessor
+ * and a root section accessor returning views on the Properties object for the
+ * queried mitochondrial section.
  **/
 class Mitochondria
 {
