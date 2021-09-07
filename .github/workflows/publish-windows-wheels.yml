@@ -55,7 +55,7 @@ jobs:
       - name: Build wheels windows
         shell: cmd
         run: |
-          call "%VCVARS%"
+          call "%VCVARS%" -vcvars_ver=14.0
           set HDF5_DIR=C:\hdf5\HDF_Group\HDF5\1.12.0\cmake
           python -m cibuildwheel --output-dir dist
 
