@@ -66,6 +66,8 @@ void bind_misc(py::module& m) {
         .value("glia_perivascular_process",
                morphio::enums::SectionType::SECTION_GLIA_PERIVASCULAR_PROCESS)
         .value("glia_process", morphio::enums::SectionType::SECTION_GLIA_PROCESS)
+        .value("spine_head", morphio::enums::SectionType::SECTION_SPINE_HEAD)
+        .value("spine_neck", morphio::enums::SectionType::SECTION_SPINE_NECK)
         .value("all", morphio::enums::SectionType::SECTION_ALL)
         .export_values();
 
@@ -93,6 +95,7 @@ void bind_misc(py::module& m) {
     py::enum_<morphio::enums::CellFamily>(m, "CellFamily", py::arithmetic())
         .value("NEURON", morphio::enums::CellFamily::NEURON)
         .value("GLIA", morphio::enums::CellFamily::GLIA)
+        .value("SPINE", morphio::enums::CellFamily::SPINE)
         .export_values();
 
 
@@ -271,4 +274,23 @@ void bind_misc(py::module& m) {
              "neuronal_section_ids"_a,
              "distances_to_section_start"_a,
              "diameters"_a);
+
+    py::class_<morphio::Property::DendriticSpine::PostSynapticDensity>(
+        m, "PostSynapticDensity", "DendriticSpine post-synaptic density")
+        .def(py::init<>())
+        .def(py::init<morphio::Property::DendriticSpine::SectionId_t,
+                      morphio::Property::DendriticSpine::SegmentId_t,
+                      morphio::Property::DendriticSpine::Offset_t>(),
+             "section_id"_a,
+             "segment_id"_a,
+             "offset"_a)
+        .def_readonly("section_id",
+                      &morphio::Property::DendriticSpine::PostSynapticDensity::sectionId,
+                      "Returns `sectionId` of post-synaptic density")
+        .def_readonly("segment_id",
+                      &morphio::Property::DendriticSpine::PostSynapticDensity::segmentId,
+                      "Returns `segmentId` of post-synaptic density")
+        .def_readonly("offset",
+                      &morphio::Property::DendriticSpine::PostSynapticDensity::offset,
+                      "Returns `offset` of post-synaptic density");
 }

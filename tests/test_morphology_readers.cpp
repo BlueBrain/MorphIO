@@ -2,6 +2,7 @@
 #include "contrib/catch.hpp"
 
 #include <highfive/H5File.hpp>
+#include <morphio/dendritic_spine.h>
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
@@ -69,7 +70,7 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
     }
 
     {  // unsupported version number
-        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/h5v1.3.h5"), morphio::RawDataError);
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/h5v1.4.h5"), morphio::RawDataError);
     }
 
     {  // incorrect points shape
@@ -123,6 +124,32 @@ TEST_CASE("LoadH5Glia", "[morphology]") {
         CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/glia_wrong_sized_perimeters.h5"),
                         morphio::RawDataError);
     }
+}
+
+TEST_CASE("LoadH5DendriticSpine", "[DendriticSpine]") {
+    {
+        const morphio::DendriticSpine d("data/h5/v1/simple-dendritric-spine.h5");
+        REQUIRE(d.points().size() == 8);
+        REQUIRE(d.postSynapticDensity().size() == 2);
+    }
+#if 0
+    {
+        const morphio::Morphology m("data/h5/v1/glia_soma_only.h5");
+        REQUIRE(m.soma().points().size() == 1);
+        REQUIRE(m.points().size() == 0);
+        REQUIRE(m.perimeters().size() == 0);
+    }
+
+    {  // empty perimeters
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/glia_empty_perimeters.h5"),
+                        morphio::RawDataError);
+    }
+
+    {  // wrong sized perimeters
+        CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/glia_wrong_sized_perimeters.h5"),
+                        morphio::RawDataError);
+    }
+#endif
 }
 
 TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {

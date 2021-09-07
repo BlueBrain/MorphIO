@@ -40,7 +40,6 @@ void writeLine(std::ofstream& myfile,
                morphio::floatType diameter) {
     using std::setw;
 
-
     myfile << std::to_string(id) << setw(12) << std::to_string(type) << ' ' << setw(12);
     myfile << std::fixed
 #if !defined(MORPHIO_USE_DOUBLE)
@@ -288,6 +287,30 @@ static void endoplasmicReticulumH5(HighFive::File& h5_file, const EndoplasmicRet
     write_dataset(g_reticulum, "surface_area", reticulum.surfaceAreas());
 }
 
+static void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
+                                                const Property::DendriticSpine::Level& l) {
+    const auto& psd = l._post_synaptic_density;
+
+    HighFive::Group g_organelles = h5_file.createGroup("organelles");
+    HighFive::Group g_postsynaptic_density = g_organelles.createGroup("postsynaptic_density");
+
+    std::vector<morphio::Property::DendriticSpine::SectionId_t> sectionIds;
+    sectionIds.reserve(psd.size());
+    std::vector<morphio::Property::DendriticSpine::SegmentId_t> segmentIds;
+    segmentIds.reserve(psd.size());
+    std::vector<morphio::Property::DendriticSpine::Offset_t> offsets;
+    offsets.reserve(psd.size());
+
+    for (const auto& v : psd) {
+        sectionIds.push_back(v.sectionId);
+        segmentIds.push_back(v.segmentId);
+        offsets.push_back(v.offset);
+    }
+    write_dataset(g_postsynaptic_density, "section_id", sectionIds);
+    write_dataset(g_postsynaptic_density, "segment_id", segmentIds);
+    write_dataset(g_postsynaptic_density, "offset", offsets);
+}
+
 
 void h5(const Morphology& morpho, const std::string& filename) {
     const auto& somaPoints = morpho.soma()->points();
@@ -374,7 +397,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
     HighFive::Group g_metadata = h5_file.createGroup("metadata");
 
-    write_attribute(g_metadata, "version", std::vector<uint32_t>{1, 2});
+    write_attribute(g_metadata, "version", std::array<uint32_t, 2>{1, 3});
     write_attribute(g_metadata,
                     "cell_family",
                     std::vector<uint32_t>{static_cast<uint32_t>(morpho.cellFamily())});
@@ -386,6 +409,9 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
     mitochondriaH5(h5_file, morpho.mitochondria());
     endoplasmicReticulumH5(h5_file, morpho.endoplasmicReticulum());
+    if (morpho.cellFamily() == SPINE) {
+        dendriticSpinePostSynapticDensityH5(h5_file, morpho._dendriticSpineLevel);
+    }
 }
 
 }  // end namespace writer

@@ -233,8 +233,10 @@ class Morphology
     std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     std::vector<std::shared_ptr<Section>> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
+
     Mitochondria _mitochondria;
     EndoplasmicReticulum _endoplasmicReticulum;
+    morphio::Property::DendriticSpine::Level _dendriticSpineLevel;
 
     std::map<uint32_t, uint32_t> _parent;
     std::map<uint32_t, std::vector<std::shared_ptr<Section>>> _children;

@@ -56,6 +56,7 @@ class SectionBase
 
   protected:
     SectionBase(uint32_t id, const std::shared_ptr<Property::Properties>& properties);
+
     template <typename Property>
     range<const typename Property::Type> get() const;
 

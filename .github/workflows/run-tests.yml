@@ -6,6 +6,9 @@ jobs:
     name: Run tests on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
+    # Run on external PRs, but not internal PRs as they'll be run by the push
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
