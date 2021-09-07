@@ -9,9 +9,11 @@ if (WIN32)
   # get access to M_PI
   set(FLAGS "${FLAGS} /D_USE_MATH_DEFINES")
 
-  # to avoid needing VCRUNTIME140_1.dll;
+  # to avoid needing VCRUNTIME140_1.dll:_cxxframehandler4 isn't needed;
   # https://packaging.python.org/guides/packaging-binary-extensions/#binary-extensions-for-windows
   set(FLAGS "${FLAGS} /d2FH4-")
+
+  set(LINK_FLAGS "${FLAGS} -d2:-FH4-")
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Taken from https://github.com/BlueBrain/hpc-coding-conventions/blob/master/cpp/cmake/bob.cmake#L192-L255
