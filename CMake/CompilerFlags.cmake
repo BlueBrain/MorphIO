@@ -6,14 +6,8 @@ if (WIN32)
   # c: [assume] functions declared as extern "C" never throw a C++ exception.
   set(FLAGS "${FLAGS} /EHsc")
 
-  # get access to M_PI
+  # get access to M_PI constant
   set(FLAGS "${FLAGS} /D_USE_MATH_DEFINES")
-
-  # to avoid needing VCRUNTIME140_1.dll:_cxxframehandler4 isn't needed;
-  # https://packaging.python.org/guides/packaging-binary-extensions/#binary-extensions-for-windows
-  #set(FLAGS "${FLAGS} /d2FH4-")
-
-  #set(LINK_FLAGS "${FLAGS} -d2:-FH4-")
 
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # Taken from https://github.com/BlueBrain/hpc-coding-conventions/blob/master/cpp/cmake/bob.cmake#L192-L255
@@ -48,6 +42,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
       set(FLAGS "${FLAGS} -fcomment-block-commands=file")
     endif()
   endif()
+
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   if(${PROJECT_NAME}_CXX_WARNINGS)
     set(FLAGS "${FLAGS} -Wall")

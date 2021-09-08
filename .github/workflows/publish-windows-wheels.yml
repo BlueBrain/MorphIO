@@ -7,8 +7,7 @@ on:
 
 env:
   CIBW_BUILD_VERBOSITY: 3
-  CIBW_BUILD: 'cp38-win_amd64' #XXX
-  #CIBW_BUILD: 'cp3?-win_amd64'
+  CIBW_BUILD: 'cp3?-win_amd64'
   CIBW_SKIP: 'cp35-*'
 
   CIBW_BEFORE_BUILD: pip install ninja cmake
@@ -55,6 +54,12 @@ jobs:
       - name: Build wheels windows
         shell: cmd
         run: |
+          # the v140 toolchain is used, so that fewer vc_redist installs are required
+          # some of the information is available here:
+          # https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line
+          # but tracking down the 14.0 magic number (and especially newer ones isn't always easy)
+          # this has a partial table:
+          # https://devblogs.microsoft.com/cppblog/side-by-side-minor-version-msvc-toolsets-in-visual-studio-2017/
           call "%VCVARS%" -vcvars_ver=14.0
           set HDF5_DIR=C:\hdf5\HDF_Group\HDF5\1.12.0\cmake
           python -m cibuildwheel --output-dir dist
