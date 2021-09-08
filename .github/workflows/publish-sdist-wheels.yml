@@ -33,9 +33,9 @@ jobs:
         with:
           python-version: '3.7'
 
-      - name: Install cibuildwheel
+      - name: Install cibuildwheel, cmake, ninja
         run: |
-          python -m pip install cibuildwheel
+          python -m pip install cibuildwheel cmake ninja
 
       - name: Build wheels on Linux
         if: runner.os == 'Linux'
@@ -50,7 +50,6 @@ jobs:
           CIBW_BEFORE_BUILD: |
             brew update
             brew --version
-            brew install cmake
             brew install hdf5
         run: |
           python -m cibuildwheel --output-dir dist
@@ -69,8 +68,6 @@ jobs:
           C:\windows\system32\tar.exe xf hdf5-1.12.0-Std-win10_64-vs16.zip
           start /wait msiexec /a "%cd%\hdf\HDF5-1.12.0-win64.msi" /qn TARGETDIR="c:\hdf5\"
 
-          python -m pip install ninja cmake
-          
           call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat" -vcvars_ver=14.0
 
           set HDF5_DIR=C:\hdf5\HDF_Group\HDF5\1.12.0\cmake
