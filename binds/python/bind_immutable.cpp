@@ -1,12 +1,18 @@
 #include "bind_immutable.h"
 
+#include <pybind11/iostream.h>  // py::add_ostream_redirect
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <pybind11/iostream.h>  // py::add_ostream_redirect
 
+#include <morphio/dendritic_spine.h>
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/enums.h>
 #include <morphio/glial_cell.h>
+#include <morphio/mut/dendritic_spine.h>
+#include <morphio/mut/endoplasmic_reticulum.h>
+#include <morphio/mut/glial_cell.h>
+#include <morphio/mut/mitochondria.h>
+//#include <morphio/mut/dendritic_spine.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
 #include <morphio/types.h>
@@ -279,8 +285,9 @@ void bind_immutable_module(py::module& m) {
                 case IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
                 default:
-                    throw morphio::MorphioError("Only iteration types depth_first, breadth_first and "
-                                              "upstream are supported");
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first, breadth_first and "
+                        "upstream are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -347,8 +354,9 @@ void bind_immutable_module(py::module& m) {
                 case IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
                 default:
-                    throw morphio::MorphioError("Only iteration types depth_first, breadth_first and "
-                                                "upstream are supported");
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first, breadth_first and "
+                        "upstream are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -357,4 +365,105 @@ void bind_immutable_module(py::module& m) {
             "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
             "iter_type"_a = IterType::DEPTH_FIRST);
+
+    py::class_<morphio::DendriticSpine, morphio::Morphology>(m, "DendriticSpine")
+        .def(py::init([](py::object arg) {
+                 return std::make_unique<morphio::DendriticSpine>(py::str(arg));
+             }),
+             "filename"_a)
+        .def_property_readonly("root_sections",
+                               &morphio::DendriticSpine::rootSections,
+                               "Returns a list of all root sections "
+                               "(sections whose parent ID are -1)")
+        .def_property_readonly("sections",
+                               &morphio::DendriticSpine::sections,
+                               "Returns a vector containing all sections objects\n\n"
+                               "Notes:\n"
+                               "- Soma is not included\n"
+                               "- First section ID is 1 (0 is reserved for the soma)\n"
+                               "- To select sections by ID use: DendriticSpine::section(id)")
+
+        .def("section",
+             &morphio::DendriticSpine::section,
+             "Returns the Section with the given id\n"
+             "throw RawDataError if the id is out of range",
+             "section_id"_a)
+
+        // Property accessors
+        .def_property_readonly(
+            "points",
+            [](morphio::DendriticSpine* morpho) {
+                const auto& data = morpho->points();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            },
+            "Returns a list with all points from all sections\n"
+            "Note: points belonging to the n'th section are located at indices:\n"
+            "[DendriticSpine.sectionOffsets(n), DendriticSpine.sectionOffsets(n+1)[")
+        .def_property_readonly(
+            "diameters",
+            [](const morphio::DendriticSpine& morpho) {
+                const auto& data = morpho.diameters();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            },
+            "Returns a list with all diameters from all sections\n"
+            "Note: diameters belonging to the n'th section are located at indices:\n"
+            "[DendriticSpine.sectionOffsets(n), DendriticSpine.sectionOffsets(n+1)[")
+        .def_property_readonly(
+            "section_offsets",
+            [](const morphio::DendriticSpine& morpho) {
+                return as_pyarray(morpho.sectionOffsets());
+            },
+            "Returns a list with offsets to access data of a specific section in the points\n"
+            "and diameters arrays.\n"
+            "\n"
+            "Example: accessing diameters of n'th section will be located in the DIAMETERS\n"
+            "array from DIAMETERS[sectionOffsets(n)] to DIAMETERS[sectionOffsets(n+1)-1]\n"
+            "\n"
+            "Note: for convenience, the last point of this array is the points array size\n"
+            "so that the above example works also for the last section.")
+        .def_property_readonly(
+            "section_types",
+            [](const morphio::DendriticSpine& morph) {
+                const auto& data = morph.sectionTypes();
+                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            },
+            "Returns a vector with the section type of every section")
+        .def_property_readonly("connectivity",
+                               &morphio::DendriticSpine::connectivity,
+                               "Return the graph connectivity of the DendriticSpine "
+                               "where each section is seen as a node\nNote: -1 is the soma node")
+        .def_property_readonly("cell_family",
+                               &morphio::DendriticSpine::cellFamily,
+                               "Returns the cell family (neuron or glia)")
+        .def_property_readonly("post_synaptic_density",
+                               &morphio::DendriticSpine::postSynapticDensity,
+                               "Returns the post synaptic density values")
+        .def_property_readonly("version", &morphio::DendriticSpine::version, "Returns the version")
+
+        // Iterators
+        .def(
+            "iter",
+            [](morphio::DendriticSpine* morpho, IterType type) {
+                switch (type) {
+                case IterType::DEPTH_FIRST:
+                    return py::make_iterator(morpho->depth_begin(), morpho->depth_end());
+                case IterType::BREADTH_FIRST:
+                    return py::make_iterator(morpho->breadth_begin(), morpho->breadth_end());
+                case IterType::UPSTREAM:
+                default:
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first and breadth_first are supported");
+                }
+            },
+            py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
+            "Section iterator that runs successively on every neurite\n"
+            "iter_type controls the order of iteration on sections of a given neurite. 2 values "
+            "can be passed:\n"
+            "- morphio.IterType.depth_first (default)\n"
+            "- morphio.IterType.breadth_first (default)\n",
+            "iter_type"_a = IterType::DEPTH_FIRST)
+        .def(
+            "write",
+            [](morphio::mut::DendriticSpine* morph, py::object arg) { morph->write(py::str(arg)); },
+            "filename"_a);
 }

@@ -41,7 +41,7 @@ enum AnnotationType {
 };
 
 /** The cell family represented by morphio::Morphology. */
-enum CellFamily { NEURON = 0, GLIA = 1 };
+enum CellFamily { NEURON = 0, GLIA = 1, SPINE = 2 };
 
 enum SomaType {
     SOMA_UNDEFINED = 0,
@@ -60,8 +60,11 @@ enum SectionType {
     SECTION_DENDRITE = 3,         //!< general or basal dendrite (near to soma)
     SECTION_APICAL_DENDRITE = 4,  //!< apical dendrite (far from soma)
 
-    SECTION_GLIA_PERIVASCULAR_PROCESS = 2,
-    SECTION_GLIA_PROCESS = 3,  // TODO: nasty overload there
+    SECTION_GLIA_PERIVASCULAR_PROCESS = 2,  // Note: overlaps with SECTION_AXON
+    SECTION_GLIA_PROCESS = 3,               // Note: overlaps with SECTION_DENDRITE
+
+    SECTION_SPINE_NECK = 2,  // Note: overlaps with SECTION_AXON
+    SECTION_SPINE_HEAD = 3,  // Note: overlaps with SECTION_DENDRITE
 
     // unnamed custom section types
     SECTION_CUSTOM_5 = 5,

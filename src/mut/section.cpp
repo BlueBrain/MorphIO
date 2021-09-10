@@ -151,6 +151,7 @@ std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> origina
 std::shared_ptr<Section> Section::appendSection(const morphio::Section& section, bool recursive) {
     Morphology* morphology = getOwningMorphologyOrThrow();
     const std::shared_ptr<Section> ptr(new Section(morphology, morphology->_counter, section));
+    // const auto ptr = std::make_shared<Section>(morphology, morphology->_counter, section);
     unsigned int parentId = id();
     uint32_t childId = morphology->_register(ptr);
     auto& _sections = morphology->_sections;
@@ -161,10 +162,11 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
                    morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
-        !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
+        !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
         printError(Warning::WRONG_DUPLICATE,
                    morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
                                                             _sections.at(parentId)));
+    }
 
     morphology->_parent[childId] = parentId;
     morphology->_children[parentId].push_back(ptr);

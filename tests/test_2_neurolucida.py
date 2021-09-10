@@ -7,7 +7,7 @@ from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 import pytest
 
-from utils import _test_asc_exception, tmp_asc_file
+from utils import assert_asc_exception, tmp_asc_file
 
 DATA_DIR = Path(__file__).parent / 'data'
 
@@ -45,6 +45,7 @@ NEUROLUCIDA_MARKERS = [
  'OpenDownTriangle',
  'FilledDownTriangle',
  ]
+
 
 def test_soma():
     soma_content = '''
@@ -95,8 +96,9 @@ def test_soma():
         assert len(n.root_sections) == 0
 
 
-def test_parse_number_with_plus_symbol():
-    with tmp_asc_file('''("CellBody"
+def test_parse_number_with_plus_symbol(tmp_path):
+    with tmp_asc_file(tmp_path,
+                      '''("CellBody"
                          (Color Red)
                          (CellBody)
                          (1  1 0 1 S1)
@@ -110,32 +112,35 @@ def test_parse_number_with_plus_symbol():
                             [1, 1, 0]])
 
 
-def test_unknown_token():
-    _test_asc_exception('''
-                   ("CellBody"
-                   (Color Red)
-                   (CellBody)
-                   (1 1 0 1 S1)
-                   (Z 1 0 1 S2) ; <-- Z is a BAD token
-                   (-1 -1 0 2 S3)
-                   )''',
-                        RawDataError,
-                        "Unexpected token: Z",
-                        ":6:error")
-
-
-def test_unfinished_point():
-    _test_asc_exception('''("CellBody"
+def test_unknown_token(tmp_path):
+    assert_asc_exception(tmp_path,
+                         '''
+                         ("CellBody"
                          (Color Red)
                          (CellBody)
-                         (1 1''',
-                        RawDataError,
-                        'Error converting: "" to float',
-                        ':4:error')
+                         (1 1 0 1 S1)
+                         (Z 1 0 1 S2) ; <-- Z is a BAD token
+                         (-1 -1 0 2 S3)
+                         )''',
+                         RawDataError,
+                         "Unexpected token: Z",
+                         ":6:error")
 
 
-def test_multiple_soma():
-    _test_asc_exception('''
+def test_unfinished_point(tmp_path):
+    assert_asc_exception(tmp_path,
+                         '''("CellBody"
+                            (Color Red)
+                            (CellBody)
+                            (1 1''',
+                         RawDataError,
+                         'Error converting: "" to float',
+                         ':4:error')
+
+
+def test_multiple_soma(tmp_path):
+    assert_asc_exception(tmp_path,
+                         '''
                              ("CellBody"
                              (Color Red)
                              (CellBody)
@@ -149,13 +154,14 @@ def test_multiple_soma():
                              (1 1 0 1 S1)
                              (-1 1 0 1 S2)
                              )''',
-                        SomaError,
-                        'A soma is already defined',
-                        ':14:error')
+                         SomaError,
+                         'A soma is already defined',
+                         ':14:error')
 
 
-def test_single_neurite_no_soma():
-    with tmp_asc_file('''
+def test_single_neurite_no_soma(tmp_path):
+    with tmp_asc_file(tmp_path,
+                      '''
                       ( (Color Yellow)
                          (Axon)
                          (Set "axons")
@@ -174,9 +180,10 @@ def test_single_neurite_no_soma():
                            np.array([13., 13.], dtype=np.float32))
 
 
-def test_skip_header():
+def test_skip_header(tmp_path):
     '''Test that the header does not cause any issue'''
-    with tmp_asc_file('''(FilledCircle
+    with tmp_asc_file(tmp_path,
+                      '''(FilledCircle
                          (Color RGB (64, 0, 128))
                          (Name "Marker 11")
                          (Set "axons")
@@ -231,13 +238,13 @@ with_duplicate = '''
                       )
                      '''
 
-def test_read_with_duplicates():
+def test_read_with_duplicates(tmp_path):
     '''Section points are duplicated in the file
 what I think the
 https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html
 would look like'''
 
-    with tmp_asc_file(with_duplicate) as tmp_file:
+    with tmp_asc_file(tmp_path, with_duplicate) as tmp_file:
         n = Morphology(tmp_file.name)
 
         assert len(n.root_sections) == 1
@@ -264,11 +271,11 @@ would look like'''
                            np.array([2, 2, 0.3], dtype=np.float32))
 
 
-def test_read_without_duplicates():
-    with tmp_asc_file(with_duplicate) as tmp_file:
+def test_read_without_duplicates(tmp_path):
+    with tmp_asc_file(tmp_path, with_duplicate) as tmp_file:
         n_with_duplicate = Morphology(tmp_file.name)
 
-        with tmp_asc_file(without_duplicate) as tmp_file:
+        with tmp_asc_file(tmp_path, without_duplicate) as tmp_file:
             n_without_duplicate = Morphology(tmp_file.name)
 
         assert_array_equal(n_with_duplicate.root_sections[0].children[0].points,
@@ -284,65 +291,68 @@ def test_read_without_duplicates():
                            n_without_duplicate.root_sections[0].diameters)
 
 
-def test_explicit_duplicates_with_arbitrary_diameter():
+def test_explicit_duplicates_with_arbitrary_diameter(tmp_path):
     '''If the duplicate is already in the file with an arbitrary diameter, it should be preserved'''
-    with tmp_asc_file('''
-                     ((Dendrite)
-                      (3 -4 0 5)
-                      (3 -6 0 5)
-                      (3 -8 0 5)
-                      (3 -10 0 5)
-                      (
-                        (3 -10 0 20) ; duplicate
-                        (0 -10 0 2)
-                        (-3 -10 0 0.3)
-                        |
-                        (3 -10 0 2)
-                        (6 -10 0 2)
-                        (9 -10 0 0.3)
-                      )
-                      )
-                     ''') as tmp_file:
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ((Dendrite)
+                       (3 -4 0 5)
+                       (3 -6 0 5)
+                       (3 -8 0 5)
+                       (3 -10 0 5)
+                       (
+                         (3 -10 0 20) ; duplicate
+                         (0 -10 0 2)
+                         (-3 -10 0 0.3)
+                         |
+                         (3 -10 0 2)
+                         (6 -10 0 2)
+                         (9 -10 0 0.3)
+                       )
+                       )
+                      ''') as tmp_file:
         n = Morphology(tmp_file.name)
         assert_array_equal(n.root_sections[0].children[0].diameters,
                            np.array([20, 2, 0.3], dtype=np.float32))
 
 
-def test_unfinished_file():
-    _test_asc_exception('''
-                     ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
-                      (
-                        (3 -10 0 2)
-                        (0 -10 0 2)
-                        (-3 -10 0 2)
-                        |
-                     ''',
-                        RawDataError,
-                        "Hit end of file while consuming a neurite",
-                        ":12:error")
+def test_unfinished_file(tmp_path):
+    assert_asc_exception(tmp_path,
+                         '''
+                         ((Dendrite)
+                          (3 -4 0 2)
+                          (3 -6 0 2)
+                          (3 -8 0 2)
+                          (3 -10 0 2)
+                          (
+                            (3 -10 0 2)
+                            (0 -10 0 2)
+                            (-3 -10 0 2)
+                            |
+                         ''',
+                         RawDataError,
+                         "Hit end of file while consuming a neurite",
+                         ":12:error")
 
-def test_section_single_point():
+def test_section_single_point(tmp_path):
     '''Test single point section.
     The parent section last point will be duplicated
     '''
-    with tmp_asc_file('''
-                     ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
-                      (
-                        (3 -10 2 4)  ; single point section without duplicate
-                       |
-                        (3 -10 0 2)  ; normal section with duplicate
-                        (3 -10 1 2)
-                        (3 -10 2 2)
-                      )
-                     )''') as tmp_file:
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ((Dendrite)
+                       (3 -4 0 2)
+                       (3 -6 0 2)
+                       (3 -8 0 2)
+                       (3 -10 0 2)
+                       (
+                         (3 -10 2 4)  ; single point section without duplicate
+                        |
+                         (3 -10 0 2)  ; normal section with duplicate
+                         (3 -10 1 2)
+                         (3 -10 2 2)
+                       )
+                      )''') as tmp_file:
 
         n = Morphology(tmp_file.name)
         assert len(n.root_sections) == 1
@@ -359,30 +369,31 @@ def test_section_single_point():
                                      [3, -10, 2]], dtype=np.float32))
 
 
-def test_single_children():
+def test_single_children(tmp_path):
     '''Single children are no longer (starting at v2.8) merged with their parent
 
     They used to be until the decision in:
     https://github.com/BlueBrain/MorphIO/issues/235
     '''
-    with tmp_asc_file('''
-                     ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
-                      (
-                        (3 -10 0 4)
-                        (0 -10 0 4)
-                        (-3 -10 0 3)
-                        (
-                          (-5 -5 5 5)
-                          |
-                          (-6 -6 6 6)
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ((Dendrite)
+                       (3 -4 0 2)
+                       (3 -6 0 2)
+                       (3 -8 0 2)
+                       (3 -10 0 2)
+                       (
+                         (3 -10 0 4)
+                         (0 -10 0 4)
+                         (-3 -10 0 3)
+                         (
+                           (-5 -5 5 5)
+                           |
+                           (-6 -6 6 6)
+                         )
                         )
                        )
-                      )
-                 ''') as tmp_file:
+                       ''') as tmp_file:
 
         n = Morphology(tmp_file.name)
 
@@ -411,16 +422,17 @@ def test_spine():
                                  [13.75,    -5.96,   150.00]], dtype=np.float32))
 
 
-def test_single_point_section_duplicate_parent():
+def test_single_point_section_duplicate_parent(tmp_path):
     '''Section is made only of the duplicate point'''
-    with tmp_asc_file('''
-                     ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -10 0 2)
-                      (
-                        (3 -10 0 4)  ; duplicate point
-                      )
-                     )''') as tmp_file:
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ((Dendrite)
+                       (3 -4 0 2)
+                       (3 -10 0 2)
+                       (
+                         (3 -10 0 4)  ; duplicate point
+                       )
+                      )''') as tmp_file:
 
         neuron = Morphology(tmp_file.name)
         assert_array_equal(neuron.root_sections[0].points, [[  3.,  -4.,   0.],
@@ -428,14 +440,15 @@ def test_single_point_section_duplicate_parent():
         assert_array_equal(neuron.root_sections[0].diameters, np.array([2, 2], dtype=np.float32))
 
 
-def test_single_point_section_duplicate_parent_complex():
+def test_single_point_section_duplicate_parent_complex(tmp_path):
     '''The following neuron represents a malformed tri-furcation. It is (badly) represented
     as a bifurcation of a bifurcation
 
     This is a simplification of the problem at:
     MorphologyRepository/Ani_Gupta/C030796A/C030796A-P2.asc:5915
     '''
-    with tmp_asc_file('''
+    with tmp_asc_file(tmp_path,
+'''
 ((Color Blue)
  (Axon)
     (1 0 0 1)
@@ -571,11 +584,12 @@ def test_string_markers():
                                      [1192.31, 420.35, -0.19]], dtype=np.float32))
         assert_array_equal(m.markers[1].diameters, np.array([0.15, 0.15], dtype=np.float32))
 
-def test_neurolucida_markers():
+def test_neurolucida_markers(tmp_path):
     SIMPLE = Morphology(DATA_DIR / 'simple.asc')
     for marker, suffix in product(NEUROLUCIDA_MARKERS, ['', '7', '123']):
         marker += suffix
-        with tmp_asc_file(f'''
+        with tmp_asc_file(tmp_path,
+f'''
 ({marker}
   (Color White)
   (Name "fat end")
