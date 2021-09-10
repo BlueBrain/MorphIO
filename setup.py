@@ -49,10 +49,6 @@ class CMakeBuild(build_ext):
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
 
-        #if platform.system() == "Windows":
-        #    cmake_args += ['-G', os.getenv('MORPHIO_CMAKE_GENERATOR', 'Ninja'),
-        #                   ]
-
         cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
                        '-DMorphIO_CXX_WARNINGS=OFF',
                        '-GNinja',
@@ -63,9 +59,6 @@ class CMakeBuild(build_ext):
 
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp)
         subprocess.check_call(['cmake', '--build', '.', '--target', '_morphio'] + build_args, cwd=self.build_temp)
-
-#XXX
-long_description = 'f.read()'
 
 install_requires = ['numpy>=1.14.1',
                     ]
@@ -92,16 +85,17 @@ setup(
     cmdclass=dict(build_ext=CMakeBuild),
     packages=['morphio', 'morphio.mut', 'morphio.vasculature'],
     license="LGPLv3",
-    keywords=('computational neuroscience',
+    keywords=['computational neuroscience',
               'morphology',
               'neuron'
               'neurolucida'
-              'neuromorphology'),
+              'neuromorphology',
+              ],
     zip_safe=False,
     classifiers=[
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     ],
     use_scm_version=True,
-    setup_requires=('setuptools_scm',
-                    )
+    setup_requires=['setuptools_scm',
+                    ]
 )
