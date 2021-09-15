@@ -87,8 +87,6 @@ setup(
     ],
     use_scm_version=True,
     setup_requires=[
-        'cmake',
-        'ninja',
         'setuptools_scm',
         ],
 )
