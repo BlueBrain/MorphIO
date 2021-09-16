@@ -1,9 +1,7 @@
-name: Publish sdist and wheels for macos, manylinux, and windows
+name: Publish sdist and wheels for macos, manylinux, and windows, publish to pypi if a release
 on: [pull_request, push]
 
 env:
-  CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-  MACOSX_DEPLOYMENT_TARGET: '10.13'
   CIBW_BUILD_VERBOSITY: 3
   CIBW_BUILD: 'cp3?-*'
   CIBW_SKIP: 'cp35-* cp36-* *-manylinux_i686 *-win32'
@@ -13,6 +11,7 @@ env:
 jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
+
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
 
     runs-on: ${{ matrix.os }}
@@ -37,6 +36,7 @@ jobs:
       - name: Build wheels on Linux
         if: runner.os == 'Linux'
         env:
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BEFORE_BUILD: 'yum update -y; yum -y install hdf5-devel'
         run: |
           python -m cibuildwheel --output-dir dist
@@ -44,6 +44,7 @@ jobs:
       - name: Build wheels Mac OS
         if: runner.os == 'macOS'
         env:
+          MACOSX_DEPLOYMENT_TARGET: '10.13'
           CIBW_BEFORE_BUILD: |
             brew update
             brew --version
@@ -87,28 +88,30 @@ jobs:
         with:
           submodules: 'true'
 
-      - name: Set up Python 3.6
+      - name: Set up Python 3.7
         uses: actions/setup-python@v2
         with:
-          python-version: 3.6
+          python-version: 3.7
+
       - name: Build a source tarball
         run:
           python setup.py sdist
+
       - name: Test tarball
         run: |
           sudo apt install -y libhdf5-dev
           pip install -r tests/requirement_tests.txt
           pip install dist/*
           pytest -s -v tests
+
       - name: Store sdist as artifact
         uses: actions/upload-artifact@v2
         with:
           name: dist
           path: dist/*.tar.gz
 
-  upload_wheels:
+  upload_artifacts:
     name: Upload wheels to PyPI
-
     if: github.event_name == 'release' && github.event.action == 'published'
 
     runs-on: ubuntu-latest
@@ -119,7 +122,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: dist
-          path: dist
+          path: dist/
 
       - name: Display structure of downloaded files
         run: ls -R

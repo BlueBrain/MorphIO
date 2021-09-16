@@ -1,13 +1,7 @@
-'''morphio setup.py
-
-It is more or less a wrapper to call 'cmake' and 'cmake --build'
-'''
+'''morphio setup.py'''
 import os
-import platform
-import re
 import subprocess
 import sys
-from distutils.version import LooseVersion
 
 from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
@@ -47,6 +41,7 @@ class CMakeBuild(build_ext):
             cmake_args += ["-D" + opt for opt in self.cmake_defs.split(",")]
 
         cfg = 'Debug' if self.debug else 'Release'
+
         build_args = ['--config', cfg]
 
         cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
@@ -63,7 +58,7 @@ class CMakeBuild(build_ext):
 install_requires = ['numpy>=1.14.1',
                     ]
 
-with open('README.rst', encoding='utf-8') as f:
+with open('README.rst', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 if platform.system() == 'Windows':
@@ -81,14 +76,16 @@ setup(
         'docs': ['sphinx-bluebrain-theme'],
     },
     url='https://github.com/BlueBrain/MorphIO/',
-    ext_modules=[CMakeExtension('morphio._morphio')],
-    cmdclass=dict(build_ext=CMakeBuild),
+    ext_modules=[CMakeExtension('morphio._morphio'),
+                 ],
+    cmdclass={'build_ext': CMakeBuild,
+              },
     packages=['morphio', 'morphio.mut', 'morphio.vasculature'],
     license="LGPLv3",
     keywords=['computational neuroscience',
               'morphology',
-              'neuron'
-              'neurolucida'
+              'neuron',
+              'neurolucida',
               'neuromorphology',
               ],
     zip_safe=False,
@@ -96,6 +93,7 @@ setup(
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     ],
     use_scm_version=True,
-    setup_requires=['setuptools_scm',
-                    ]
+    setup_requires=[
+        'setuptools_scm',
+        ],
 )
