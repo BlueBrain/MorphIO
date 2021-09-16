@@ -1,5 +1,6 @@
 '''morphio setup.py'''
 import os
+import platform
 import subprocess
 import sys
 
