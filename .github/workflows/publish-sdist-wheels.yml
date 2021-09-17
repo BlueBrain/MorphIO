@@ -1,12 +1,10 @@
-name: Build sdist and wheels macos and manylinux, publish to pypi if a release
-
-on:
-  [pull_request, push]
+name: Publish sdist and wheels for macos, manylinux, and windows, publish to pypi if a release
+on: [pull_request, push]
 
 env:
   CIBW_BUILD_VERBOSITY: 3
   CIBW_BUILD: 'cp3?-*'
-  CIBW_SKIP: 'cp35-* cp36-* *-manylinux_i686'
+  CIBW_SKIP: 'cp35-* cp36-* *-manylinux_i686 *-win32'
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
   CIBW_TEST_COMMAND: pytest -s -v {project}/tests
 
@@ -19,7 +17,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-latest]
+        os: [ubuntu-20.04, macos-latest, windows-latest]
 
     steps:
       - uses: actions/checkout@v2
@@ -50,9 +48,28 @@ jobs:
           CIBW_BEFORE_BUILD: |
             brew update
             brew --version
-            brew install cmake
             brew install hdf5
         run: |
+          python -m cibuildwheel --output-dir dist
+
+      - name: Build wheels Windows
+        if: runner.os == 'Windows'
+        shell: cmd
+        # the v140 toolchain is used, so that fewer vc_redist installs are required
+        # some of the information is available here:
+        # https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line
+        # but tracking down the 14.0 magic number (and especially newer ones isn't always easy)
+        # this has a partial table:
+        # https://devblogs.microsoft.com/cppblog/side-by-side-minor-version-msvc-toolsets-in-visual-studio-2017/
+        run: |
+          curl -O https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/bin/hdf5-1.12.0-Std-win10_64-vs16.zip
+          C:\windows\system32\tar.exe xf hdf5-1.12.0-Std-win10_64-vs16.zip
+          start /wait msiexec /a "%cd%\hdf\HDF5-1.12.0-win64.msi" /qn TARGETDIR="c:\hdf5\"
+
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat" -vcvars_ver=14.0
+
+          set HDF5_DIR=C:\hdf5\HDF_Group\HDF5\1.12.0\cmake
+
           python -m cibuildwheel --output-dir dist
 
       - name: Store wheel as artifact
@@ -63,6 +80,8 @@ jobs:
 
   build_sdist:
     name: Build sdist
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -89,9 +108,9 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: dist
-          path: dist/*.whl
+          path: dist/*.tar.gz
 
-  upload_wheels:
+  upload_artifacts:
     name: Upload wheels to PyPI
     if: github.event_name == 'release' && github.event.action == 'published'
 

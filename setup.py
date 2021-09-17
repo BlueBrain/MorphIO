@@ -1,5 +1,6 @@
 '''morphio setup.py'''
 import os
+import platform
 import subprocess
 import sys
 
@@ -55,16 +56,23 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp)
         subprocess.check_call(['cmake', '--build', '.', '--target', '_morphio'] + build_args, cwd=self.build_temp)
 
+install_requires = ['numpy>=1.14.1',
+                    ]
+
 with open('README.rst', 'r', encoding='utf-8') as f:
     long_description = f.read()
+
+if platform.system() == 'Windows':
+    install_requires += ['h5py>=3,<4',   # use h5py's hdf5 install so we don't have to redistribute hdf5
+                         ]
 
 setup(
     name='MorphIO',
     author='Blue Brain Project, EPFL',
     description='A neuron morphology IO library',
     long_description=long_description,
-    long_description_content_type='text/x-rst',
-    install_requires=['numpy>=1.14.1'],
+    long_description_content_type="text/markdown",
+    install_requires=install_requires,
     extras_require={
         'docs': ['sphinx-bluebrain-theme'],
     },
