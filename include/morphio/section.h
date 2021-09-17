@@ -91,9 +91,6 @@ class Section: public SectionBase<Section>
         : SectionBase(id_, properties) {}
 };
 
-// explicit instanciation
-template class SectionBase<Section>;
-
 }  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);

@@ -157,10 +157,10 @@ class NeurolucidaLexer
         rules_.push("Color", +Token::COLOR);
         rules_.push("Font", +Token::FONT);
 
-        rules_.push("Axon", +Token::AXON);
-        rules_.push("Apical", +Token::APICAL);
-        rules_.push("Dendrite", +Token::DENDRITE);
-        rules_.push("CellBody", +Token::CELLBODY);
+        rules_.push("[Aa]xon", +Token::AXON);
+        rules_.push("[Aa]pical", +Token::APICAL);
+        rules_.push("[Dd]endrite", +Token::DENDRITE);
+        rules_.push("[Cc]ell ?[Bb]ody", +Token::CELLBODY);
 
         // The code snippet used to infer the marker list is available at:
         // https://github.com/BlueBrain/MorphIO/pull/229

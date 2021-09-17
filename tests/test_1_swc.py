@@ -6,16 +6,17 @@ from numpy.testing import assert_array_equal
 
 from morphio import (Morphology, RawDataError, SectionType, SomaError, MorphioError, SomaType,
                      ostream_redirect, set_maximum_warnings, set_raise_warnings, set_ignored_warning, Warning)
-from utils import (_test_swc_exception, assert_string_equal, captured_output,
+from utils import (assert_swc_exception, assert_string_equal, captured_output,
                    strip_color_codes, tmp_swc_file, ignored_warning)
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
-def test_read_single_neurite():
+def test_read_single_neurite(tmp_path):
     '''Test reading a simple neuron consisting of a point soma
     and a single branch neurite.'''
-    with tmp_swc_file('''1 1 0 4 0 3.0 -1
+    with tmp_swc_file(tmp_path,
+                      '''1 1 0 4 0 3.0 -1
                          2 3 0 0 2 0.5 1
                          3 3 0 0 3 0.5 2
                          4 3 0 0 4 0.5 3
@@ -35,9 +36,10 @@ def test_read_single_neurite():
     assert_array_equal(n.section_offsets, [0, 4])
 
 
-def test_skip_comments():
+def test_skip_comments(tmp_path):
     '''Test skipping comments'''
-    with tmp_swc_file(('#a comment\n'
+    with tmp_swc_file(tmp_path,
+                      ('#a comment\n'
                        '# a comment\n'
                        ' # a comment\n'
                        '  #  a comment\n'
@@ -84,38 +86,41 @@ def test_set_raise_warnings():
         set_raise_warnings(False)
 
 
-def test_repeated_id():
-    _test_swc_exception('''# A simple neuron with a repeated id
-                       1 1 0 0 1 0.5 -1
-                       2 3 0 0 2 0.5 1
-                       3 3 0 0 3 0.5 2
-                       4 3 0 0 4 0.5 3
-                       4 3 0 0 4 0.5 3 # <-- repeated id
-                       5 3 0 0 5 0.5 4
-                       ''',
-                        RawDataError,
-                        'Repeated ID: 4\nID already appears here:',
-                        ':6:warning')
+def test_repeated_id(tmp_path):
+    assert_swc_exception(tmp_path,
+                         '''# A simple neuron with a repeated id
+                         1 1 0 0 1 0.5 -1
+                         2 3 0 0 2 0.5 1
+                         3 3 0 0 3 0.5 2
+                         4 3 0 0 4 0.5 3
+                         4 3 0 0 4 0.5 3 # <-- repeated id
+                         5 3 0 0 5 0.5 4
+                         ''',
+                         RawDataError,
+                         'Repeated ID: 4\nID already appears here:',
+                         ':6:warning')
 
 
-def test_neurite_followed_by_soma():
+def test_neurite_followed_by_soma(tmp_path):
     # Capturing the output to keep the unit test suite stdout clean
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            _test_swc_exception('''# An orphan neurite with a soma child
-                           1 3 0 0 1 0.5 -1
-                           2 3 0 0 2 0.5 1
-                           3 3 0 0 3 0.5 2
-                           4 3 0 0 4 0.5 3
-                           5 3 0 0 5 0.5 4
-                           6 1 0 0 0 3.0 5 # <-- soma child''',
-                                SomaError,
-                                'Found a soma point with a neurite as parent',
-                                ':7:error')
+            assert_swc_exception(tmp_path,
+                                 '''# An orphan neurite with a soma child
+                                 1 3 0 0 1 0.5 -1
+                                 2 3 0 0 2 0.5 1
+                                 3 3 0 0 3 0.5 2
+                                 4 3 0 0 4 0.5 3
+                                 5 3 0 0 5 0.5 4
+                                 6 1 0 0 0 3.0 5 # <-- soma child''',
+                                 SomaError,
+                                 'Found a soma point with a neurite as parent',
+                                 ':7:error')
 
 
-def test_read_split_soma():
-    with tmp_swc_file('''# A simple neuron consisting of a two-branch soma
+def test_read_split_soma(tmp_path):
+    with tmp_swc_file(tmp_path,
+                      '''# A simple neuron consisting of a two-branch soma
                          # with a single branch neurite on each branch.
                          #
                          # initial soma point
@@ -157,9 +162,9 @@ def test_read_split_soma():
     assert len(list(n.iter())) == 2
 
 
-def test_weird_indent():
-
-    with tmp_swc_file("""
+def test_weird_indent(tmp_path):
+    with tmp_swc_file(tmp_path,
+                      """
 
                  # this is the same as simple.swc
 
@@ -187,23 +192,26 @@ def test_weird_indent():
                        n.points)
 
 
-def test_cyclic():
-    _test_swc_exception("""1 1  0  0 0 1. -1
-                           2 3  0  0 0 1.  1
-                           3 3  0  5 0 1.  2
-                           4 3 -5  5 0 0.  3
-                           5 3  6  5 0 0.  3
-                           6 2  0  0 0 1.  6  # <-- cyclic point
-                           7 2  0 -4 0 1.  6
-                           8 2  6 -4 0 0.  7
-                           9 2 -5 -4 0 0.  7""",
-                        RawDataError,
-                        'Parent ID can not be itself',
-                        ':6:error')
+def test_cyclic(tmp_path):
+    assert_swc_exception(tmp_path,
+                         """1 1  0  0 0 1. -1
+                            2 3  0  0 0 1.  1
+                            3 3  0  5 0 1.  2
+                            4 3 -5  5 0 0.  3
+                            5 3  6  5 0 0.  3
+                            6 2  0  0 0 1.  6  # <-- cyclic point
+                            7 2  0 -4 0 1.  6
+                            8 2  6 -4 0 0.  7
+                            9 2 -5 -4 0 0.  7
+                         """,
+                         RawDataError,
+                         'Parent ID can not be itself',
+                         ':6:error')
 
 
-def test_simple_reversed():
-    with tmp_swc_file('''# This is the same as 'simple.swc',
+def test_simple_reversed(tmp_path):
+    with tmp_swc_file(tmp_path,
+                      '''# This is the same as 'simple.swc',
                          # except w/ leaf nodes before their parents
                          1 1  0  0 0 1. -1
                          2 3 -5  5 0 0.  7
@@ -232,21 +240,23 @@ def test_simple_reversed():
                         [-5, -4, 0]])
 
 
-def test_soma_type():
+def test_soma_type(tmp_path):
     '''The ordering of IDs is not required'''
     # 1 point soma
-    with tmp_swc_file('''1 1 0 0 0 3.0 -1''') as tmp_file:
+    with tmp_swc_file(tmp_path, '''1 1 0 0 0 3.0 -1''') as tmp_file:
         assert (Morphology(tmp_file.name).soma_type ==
                      SomaType.SOMA_SINGLE_POINT)
 
     # 2 point soma
-    with tmp_swc_file('''1 1 0 0 0 3.0 -1
+    with tmp_swc_file(tmp_path,
+                      '''1 1 0 0 0 3.0 -1
                          2 1 0 0 0 3.0  1''') as tmp_file:
         assert (Morphology(tmp_file.name).soma_type ==
                      SomaType.SOMA_CYLINDERS)
 
     # > 3 points soma
-    with tmp_swc_file('''1 1 0 0 0 3.0 -1
+    with tmp_swc_file(tmp_path,
+                      '''1 1 0 0 0 3.0 -1
                          2 1 0 0 0 3.0  1
                          3 1 0 0 0 3.0  2
                          4 1 0 0 0 3.0  3
@@ -259,15 +269,17 @@ def test_soma_type():
 
     # SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS are characterized by
     # one soma point with 2 children
-    with tmp_swc_file('''1 1 0  0 0 3.0 -1
-    2 1 0 -3 0 3.0  1
-    3 1 0  3 0 3.0  1 # PID is 1''') as tmp_file:
+    with tmp_swc_file(tmp_path,
+                      '''1 1 0  0 0 3.0 -1
+                         2 1 0 -3 0 3.0  1
+                         3 1 0  3 0 3.0  1 # PID is 1''') as tmp_file:
         assert (Morphology(tmp_file.name).soma_type ==
                      SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            with tmp_swc_file('''1 1 0  0 0 3.0 -1
+            with tmp_swc_file(tmp_path,
+                              '''1 1 0  0 0 3.0 -1
                                  2 1 1 -3 0 3.0  1
                                  3 1 0  0 0 3.0  1 # PID is 1''') as tmp_file:
                 assert (Morphology(tmp_file.name).soma_type ==
@@ -276,7 +288,8 @@ def test_soma_type():
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            with tmp_swc_file('''1 1 0  0 0 3.0 -1
+            with tmp_swc_file(tmp_path,
+                              '''1 1 0  0 0 3.0 -1
                                  2 1 0 -3 0 3.0  1
                                  3 1 0  0 0 3.0  1 # PID is 1''') as tmp_file:
                 assert (Morphology(tmp_file.name).soma_type ==
@@ -297,16 +310,18 @@ def test_soma_type():
 				)
 
 # If this configuration is not respected -> SOMA_CYLINDERS
-    with tmp_swc_file('''1 1 0 0 0 3.0 -1
+    with tmp_swc_file(tmp_path,
+                      '''1 1 0 0 0 3.0 -1
                          2 1 0 0 0 3.0  1
                          3 1 0 0 0 3.0  2 # PID is 2''') as tmp_file:
         assert (Morphology(tmp_file.name).soma_type ==
                      SomaType.SOMA_CYLINDERS)
 
 
-def test_read_weird_ids():
+def test_read_weird_ids(tmp_path):
     '''The ordering of IDs is not required'''
-    with tmp_swc_file('''10000 3 0 0 5 0.5 100 # neurite 4th point
+    with tmp_swc_file(tmp_path,
+                      '''10000 3 0 0 5 0.5 100 # neurite 4th point
                          3 3 0 0 3 0.5 47      # neurite 2nd point
                          10 1 0 0 0 3.0 -1     # soma
                          47 3 0 0 2 0.5 10     # neurite 1st point
@@ -370,10 +385,11 @@ def test_neurite_wrong_root_point():
                 assert err.getvalue().strip() == ''
 
 
-def test_read_duplicate():
+def test_read_duplicate(tmp_path):
     '''Test reading a simple neuron consisting of a point soma
     and a single branch neurite.'''
-    with tmp_swc_file('''# A simple neuron with a duplicate point
+    with tmp_swc_file(tmp_path,
+                      '''# A simple neuron with a duplicate point
                          # at the bifurcation
                          #
                          # soma point
@@ -407,8 +423,9 @@ def test_read_duplicate():
     assert_array_equal(child3.diameters, np.array([1, 4.6, 7], dtype=np.float32))
 
 
-def test_unsupported_section_type():
-    with tmp_swc_file('''1 1 0 4 0 3.0 -1
+def test_unsupported_section_type(tmp_path):
+    with tmp_swc_file(tmp_path,
+                      '''1 1 0 4 0 3.0 -1
                          2 3 0 0 2 0.5 1
                          3 -1 0 0 3 0.5 2  # <-- -1 is unsupported section type
                          ''') as tmp_file:
@@ -417,7 +434,8 @@ def test_unsupported_section_type():
             Morphology(tmp_file.name)
         assert obj.match('Unsupported section type: -1')
 
-    with tmp_swc_file('''1 1 0 4 0 3.0 -1
+    with tmp_swc_file(tmp_path,
+                      '''1 1 0 4 0 3.0 -1
                          2 3 0 0 2 0.5 1
                          3 11 0 0 3 0.5 2  # <-- 11 is unsupported section type
                          ''') as tmp_file:
@@ -427,11 +445,12 @@ def test_unsupported_section_type():
         assert obj.match('Unsupported section type: 11')
 
 
-def test_root_node_split():
+def test_root_node_split(tmp_path):
     '''Test that a bifurcation at the root point produces
     two root sections
     '''
-    with tmp_swc_file('''1	1	0 0 0 1	-1
+    with tmp_swc_file(tmp_path,
+                      '''1	1	0 0 0 1	-1
                          2	3	1 0 0 1  1
                          3	3	1 1 0 1  2
                          4	3	1 0 1 1  2
@@ -444,7 +463,8 @@ def test_root_node_split():
                            [[1, 0, 0], [1, 0, 1]])
 
     # Normal bifurcation
-    with tmp_swc_file('''1	1	0 0 0 1	-1
+    with tmp_swc_file(tmp_path,
+                      '''1	1	0 0 0 1	-1
                          2	3	1 0 0 1  1
                          3	3	2 1 0 1  2
                          4	3	1 1 0 1  3
@@ -467,6 +487,35 @@ def test_three_point_soma():
     assert n.soma_type == SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
 
 
+def test_zero_diameter(tmp_path):
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True),\
+                tmp_swc_file(tmp_path,
+                             '''1 1 1 0 0 3.0 -1
+                                2 1 2 0 0 3.0  1
+                                3 1 3 0 0 3.0  2
+                                4 3 4 0 0 0.0  1
+                                5 3 5 0 0 3.0  4
+                         ''') as tmp_file:
+            Morphology(tmp_file.name)
+            assert_string_equal(
+                f'{tmp_file.name}:4:warning\nWarning: zero diameter in file\n',
+                err.getvalue())
+
+
+
 def test_version():
     assert_array_equal(Morphology(os.path.join(_path, 'simple.swc')).version,
                        ('swc', 1, 0))
+
+
+def test_no_soma(tmp_path):
+    swc_content = '''1 2 0 0 0 3.0 -1
+                     2 2 0 0 0 3.0  1
+                     3 2 0 0 0 3.0  2'''
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True),\
+                tmp_swc_file(tmp_path, swc_content) as tmp_file:
+            n = Morphology(tmp_file.name)
+            assert ('{}:0:warning\nWarning: no soma found in file'.format(tmp_file.name) ==
+                    strip_color_codes(err.getvalue().strip()))

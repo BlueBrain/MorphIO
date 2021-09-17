@@ -86,3 +86,4 @@ std::vector<T> SectionBase<T>::children() const {
 }
 
 }  // namespace morphio
+// vim: ft=cpp

@@ -5,7 +5,9 @@ import numpy as np
 from morphio import Morphology, RawDataError, SomaError, ostream_redirect
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 
-from utils import _test_asc_exception, tmp_asc_file
+import pytest
+
+from utils import assert_asc_exception, tmp_asc_file
 
 DATA_DIR = Path(__file__).parent / 'data'
 
@@ -44,27 +46,63 @@ NEUROLUCIDA_MARKERS = [
  'FilledDownTriangle',
  ]
 
-def test_soma():
-    with tmp_asc_file('''("CellBody"
-                         (Color Red)
-                         (CellBody)
-                         (1 1 0 1 S1)
-                         (-1 1 0 1 S2)
-                         (-1 -1 0 2 S3)
-                         )''') as tmp_file:
 
+def test_soma(tmp_path):
+    soma_content = '''
+        (1 1 0 1 S1)
+        (-1 1 0 1 S2)
+        (-1 -1 0 2 S3)
+        )
+    '''
+    expected_points = [[1, 1, 0],
+                       [-1, 1, 0],
+                       [-1, -1, 0]]
+
+    # token as token
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ((CellBody)
+                      ''' + soma_content) as tmp_file:
         n = Morphology(tmp_file.name)
+        assert_array_equal(n.soma.points, expected_points)
+        assert len(n.root_sections) == 0
 
-        assert_array_equal(n.soma.points,
-                           [[1, 1, 0],
-                            [-1, 1, 0],
-                            [-1, -1, 0]])
+    # token as text
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ("CellBody"
+                      (Color Red)
+                      ''' + soma_content) as tmp_file:
+        n = Morphology(tmp_file.name)
+        assert_array_equal(n.soma.points, expected_points)
+        assert len(n.root_sections) == 0
 
+    # both text and token
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ("CellBody"
+                      (Color Red)
+                      (CellBody)
+                      ''' + soma_content) as tmp_file:
+        n = Morphology(tmp_file.name)
+        assert_array_equal(n.soma.points, expected_points)
+        assert len(n.root_sections) == 0
+
+    # both token and text
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ((CellBody)
+                      (Color Red)
+                      "CellBody"
+                      ''' + soma_content) as tmp_file:
+        n = Morphology(tmp_file.name)
+        assert_array_equal(n.soma.points, expected_points)
         assert len(n.root_sections) == 0
 
 
-def test_parse_number_with_plus_symbol():
-    with tmp_asc_file('''("CellBody"
+def test_parse_number_with_plus_symbol(tmp_path):
+    with tmp_asc_file(tmp_path,
+                      '''("CellBody"
                          (Color Red)
                          (CellBody)
                          (1  1 0 1 S1)
@@ -78,32 +116,35 @@ def test_parse_number_with_plus_symbol():
                             [1, 1, 0]])
 
 
-def test_unknown_token():
-    _test_asc_exception('''
-                   ("CellBody"
-                   (Color Red)
-                   (CellBody)
-                   (1 1 0 1 S1)
-                   (Z 1 0 1 S2) ; <-- Z is a BAD token
-                   (-1 -1 0 2 S3)
-                   )''',
-                        RawDataError,
-                        "Unexpected token: Z",
-                        ":6:error")
-
-
-def test_unfinished_point():
-    _test_asc_exception('''("CellBody"
+def test_unknown_token(tmp_path):
+    assert_asc_exception(tmp_path,
+                         '''
+                         ("CellBody"
                          (Color Red)
                          (CellBody)
-                         (1 1''',
-                        RawDataError,
-                        'Error converting: "" to float',
-                        ':4:error')
+                         (1 1 0 1 S1)
+                         (Z 1 0 1 S2) ; <-- Z is a BAD token
+                         (-1 -1 0 2 S3)
+                         )''',
+                         RawDataError,
+                         "Unexpected token: Z",
+                         ":6:error")
 
 
-def test_multiple_soma():
-    _test_asc_exception('''
+def test_unfinished_point(tmp_path):
+    assert_asc_exception(tmp_path,
+                         '''("CellBody"
+                            (Color Red)
+                            (CellBody)
+                            (1 1''',
+                         RawDataError,
+                         'Error converting: "" to float',
+                         ':4:error')
+
+
+def test_multiple_soma(tmp_path):
+    assert_asc_exception(tmp_path,
+                         '''
                              ("CellBody"
                              (Color Red)
                              (CellBody)
@@ -117,13 +158,14 @@ def test_multiple_soma():
                              (1 1 0 1 S1)
                              (-1 1 0 1 S2)
                              )''',
-                        SomaError,
-                        'A soma is already defined',
-                        ':14:error')
+                         SomaError,
+                         'A soma is already defined',
+                         ':14:error')
 
 
-def test_single_neurite_no_soma():
-    with tmp_asc_file('''
+def test_single_neurite_no_soma(tmp_path):
+    with tmp_asc_file(tmp_path,
+                      '''
                       ( (Color Yellow)
                          (Axon)
                          (Set "axons")
@@ -142,9 +184,10 @@ def test_single_neurite_no_soma():
                            np.array([13., 13.], dtype=np.float32))
 
 
-def test_skip_header():
+def test_skip_header(tmp_path):
     '''Test that the header does not cause any issue'''
-    with tmp_asc_file('''(FilledCircle
+    with tmp_asc_file(tmp_path,
+                      '''(FilledCircle
                          (Color RGB (64, 0, 128))
                          (Name "Marker 11")
                          (Set "axons")
@@ -199,118 +242,121 @@ with_duplicate = '''
                       )
                      '''
 
-def test_read_with_duplicates():
+def test_read_with_duplicates(tmp_path):
     '''Section points are duplicated in the file
 what I think the
 https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html
 would look like'''
 
-    with tmp_asc_file(with_duplicate) as tmp_file:
+    with tmp_asc_file(tmp_path, with_duplicate) as tmp_file:
         n = Morphology(tmp_file.name)
 
-    assert len(n.root_sections) == 1
+        assert len(n.root_sections) == 1
 
-    assert_array_equal(n.root_sections[0].points,
-                       [[3, -4, 0],
-                        [3, -6, 0],
-                        [3, -8, 0],
-                        [3, -10, 0],
-                        ])
+        assert_array_equal(n.root_sections[0].points,
+                           [[3, -4, 0],
+                            [3, -6, 0],
+                            [3, -8, 0],
+                            [3, -10, 0],
+                            ])
 
-    assert_array_equal(n.root_sections[0].children[0].points,
-                       [[3, -10, 0],
-                        [0, -10, 0],
-                        [-3, -10, 0]])
-    assert_array_equal(n.root_sections[0].children[0].diameters,
-                       np.array([2, 2, 0.3], dtype=np.float32))
+        assert_array_equal(n.root_sections[0].children[0].points,
+                           [[3, -10, 0],
+                            [0, -10, 0],
+                            [-3, -10, 0]])
+        assert_array_equal(n.root_sections[0].children[0].diameters,
+                           np.array([2, 2, 0.3], dtype=np.float32))
 
-    assert_array_equal(n.root_sections[0].children[1].points,
-                       [[3, -10, 0],
-                        [6, -10, 0],
-                        [9, -10, 0]])
-    assert_array_equal(n.root_sections[0].children[1].diameters,
-                       np.array([2, 2, 0.3], dtype=np.float32))
+        assert_array_equal(n.root_sections[0].children[1].points,
+                           [[3, -10, 0],
+                            [6, -10, 0],
+                            [9, -10, 0]])
+        assert_array_equal(n.root_sections[0].children[1].diameters,
+                           np.array([2, 2, 0.3], dtype=np.float32))
 
 
-def test_read_without_duplicates():
-    with tmp_asc_file(with_duplicate) as tmp_file:
+def test_read_without_duplicates(tmp_path):
+    with tmp_asc_file(tmp_path, with_duplicate) as tmp_file:
         n_with_duplicate = Morphology(tmp_file.name)
 
-    with tmp_asc_file(without_duplicate) as tmp_file:
-        n_without_duplicate = Morphology(tmp_file.name)
+        with tmp_asc_file(tmp_path, without_duplicate) as tmp_file:
+            n_without_duplicate = Morphology(tmp_file.name)
 
-    assert_array_equal(n_with_duplicate.root_sections[0].children[0].points,
-                       n_without_duplicate.root_sections[0].children[0].points)
+        assert_array_equal(n_with_duplicate.root_sections[0].children[0].points,
+                           n_without_duplicate.root_sections[0].children[0].points)
 
-    assert_array_equal(n_with_duplicate.root_sections[0].points,
-                       n_without_duplicate.root_sections[0].points)
+        assert_array_equal(n_with_duplicate.root_sections[0].points,
+                           n_without_duplicate.root_sections[0].points)
 
-    assert_array_equal(n_with_duplicate.root_sections[0].children[0].diameters,
-                       n_without_duplicate.root_sections[0].children[0].diameters)
+        assert_array_equal(n_with_duplicate.root_sections[0].children[0].diameters,
+                           n_without_duplicate.root_sections[0].children[0].diameters)
 
-    assert_array_equal(n_with_duplicate.root_sections[0].diameters,
-                       n_without_duplicate.root_sections[0].diameters)
+        assert_array_equal(n_with_duplicate.root_sections[0].diameters,
+                           n_without_duplicate.root_sections[0].diameters)
 
 
-def test_explicit_duplicates_with_arbitrary_diameter():
+def test_explicit_duplicates_with_arbitrary_diameter(tmp_path):
     '''If the duplicate is already in the file with an arbitrary diameter, it should be preserved'''
-    with tmp_asc_file('''
-                     ((Dendrite)
-                      (3 -4 0 5)
-                      (3 -6 0 5)
-                      (3 -8 0 5)
-                      (3 -10 0 5)
-                      (
-                        (3 -10 0 20) ; duplicate
-                        (0 -10 0 2)
-                        (-3 -10 0 0.3)
-                        |
-                        (3 -10 0 2)
-                        (6 -10 0 2)
-                        (9 -10 0 0.3)
-                      )
-                      )
-                     ''') as tmp_file:
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ((Dendrite)
+                       (3 -4 0 5)
+                       (3 -6 0 5)
+                       (3 -8 0 5)
+                       (3 -10 0 5)
+                       (
+                         (3 -10 0 20) ; duplicate
+                         (0 -10 0 2)
+                         (-3 -10 0 0.3)
+                         |
+                         (3 -10 0 2)
+                         (6 -10 0 2)
+                         (9 -10 0 0.3)
+                       )
+                       )
+                      ''') as tmp_file:
         n = Morphology(tmp_file.name)
         assert_array_equal(n.root_sections[0].children[0].diameters,
                            np.array([20, 2, 0.3], dtype=np.float32))
 
 
-def test_unfinished_file():
-    _test_asc_exception('''
-                     ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
-                      (
-                        (3 -10 0 2)
-                        (0 -10 0 2)
-                        (-3 -10 0 2)
-                        |
-                     ''',
-                        RawDataError,
-                        "Hit end of file while consuming a neurite",
-                        ":12:error")
+def test_unfinished_file(tmp_path):
+    assert_asc_exception(tmp_path,
+                         '''
+                         ((Dendrite)
+                          (3 -4 0 2)
+                          (3 -6 0 2)
+                          (3 -8 0 2)
+                          (3 -10 0 2)
+                          (
+                            (3 -10 0 2)
+                            (0 -10 0 2)
+                            (-3 -10 0 2)
+                            |
+                         ''',
+                         RawDataError,
+                         "Hit end of file while consuming a neurite",
+                         ":12:error")
 
-def test_section_single_point():
+def test_section_single_point(tmp_path):
     '''Test single point section.
     The parent section last point will be duplicated
     '''
-    with tmp_asc_file('''
-                     ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
-                      (
-                        (3 -10 2 4)  ; single point section without duplicate
-                       |
-                        (3 -10 0 2)  ; normal section with duplicate
-                        (3 -10 1 2)
-                        (3 -10 2 2)
-                      )
-                     )''') as tmp_file:
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ((Dendrite)
+                       (3 -4 0 2)
+                       (3 -6 0 2)
+                       (3 -8 0 2)
+                       (3 -10 0 2)
+                       (
+                         (3 -10 2 4)  ; single point section without duplicate
+                        |
+                         (3 -10 0 2)  ; normal section with duplicate
+                         (3 -10 1 2)
+                         (3 -10 2 2)
+                       )
+                      )''') as tmp_file:
 
         n = Morphology(tmp_file.name)
         assert len(n.root_sections) == 1
@@ -327,30 +373,31 @@ def test_section_single_point():
                                      [3, -10, 2]], dtype=np.float32))
 
 
-def test_single_children():
+def test_single_children(tmp_path):
     '''Single children are no longer (starting at v2.8) merged with their parent
 
     They used to be until the decision in:
     https://github.com/BlueBrain/MorphIO/issues/235
     '''
-    with tmp_asc_file('''
-                     ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
-                      (
-                        (3 -10 0 4)
-                        (0 -10 0 4)
-                        (-3 -10 0 3)
-                        (
-                          (-5 -5 5 5)
-                          |
-                          (-6 -6 6 6)
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ((Dendrite)
+                       (3 -4 0 2)
+                       (3 -6 0 2)
+                       (3 -8 0 2)
+                       (3 -10 0 2)
+                       (
+                         (3 -10 0 4)
+                         (0 -10 0 4)
+                         (-3 -10 0 3)
+                         (
+                           (-5 -5 5 5)
+                           |
+                           (-6 -6 6 6)
+                         )
                         )
                        )
-                      )
-                 ''') as tmp_file:
+                       ''') as tmp_file:
 
         n = Morphology(tmp_file.name)
 
@@ -379,32 +426,33 @@ def test_spine():
                                  [13.75,    -5.96,   150.00]], dtype=np.float32))
 
 
-def test_single_point_section_duplicate_parent():
+def test_single_point_section_duplicate_parent(tmp_path):
     '''Section is made only of the duplicate point'''
-    with tmp_asc_file('''
-                     ((Dendrite)
-                      (3 -4 0 2)
-                      (3 -10 0 2)
-                      (
-                        (3 -10 0 4)  ; duplicate point
-                      )
-                     )''') as tmp_file:
+    with tmp_asc_file(tmp_path,
+                      '''
+                      ((Dendrite)
+                       (3 -4 0 2)
+                       (3 -10 0 2)
+                       (
+                         (3 -10 0 4)  ; duplicate point
+                       )
+                      )''') as tmp_file:
 
         neuron = Morphology(tmp_file.name)
+        assert_array_equal(neuron.root_sections[0].points, [[  3.,  -4.,   0.],
+                                                            [  3., -10.,   0.]])
+        assert_array_equal(neuron.root_sections[0].diameters, np.array([2, 2], dtype=np.float32))
 
-    assert_array_equal(neuron.root_sections[0].points, [[  3.,  -4.,   0.],
-                                                        [  3., -10.,   0.]])
-    assert_array_equal(neuron.root_sections[0].diameters, np.array([2, 2], dtype=np.float32))
 
-
-def test_single_point_section_duplicate_parent_complex():
+def test_single_point_section_duplicate_parent_complex(tmp_path):
     '''The following neuron represents a malformed tri-furcation. It is (badly) represented
     as a bifurcation of a bifurcation
 
     This is a simplification of the problem at:
     MorphologyRepository/Ani_Gupta/C030796A/C030796A-P2.asc:5915
     '''
-    with tmp_asc_file('''
+    with tmp_asc_file(tmp_path,
+'''
 ((Color Blue)
  (Axon)
     (1 0 0 1)
@@ -446,84 +494,70 @@ def test_spine():
 def test_markers():
     '''Test that markers do not prevent file from being read correctly'''
 
-    with tmp_asc_file('''
-( (Color White)  ; [10,1]
-  (Dendrite)
-  ( -290.87  -113.09   -16.32     2.06)  ; Root
-  ( -290.87  -113.09   -16.32     2.06)  ; R, 1
-  (
-    ( -277.14  -119.13   -18.02     0.69)  ; R-1, 1
-    ( -275.54  -119.99   -16.67     0.69)  ; R-1, 2
-    (Cross  ;  [3,3]
-      (Color Orange)
-      (Name "Marker 3")
-      ( -271.87  -121.14   -16.27     0.69)  ; 1
-      ( -269.34  -122.29   -15.48     0.69)  ; 2
-    )  ;  End of markers
-     Normal
-  |
-    ( -277.80  -120.28   -19.48     0.92)  ; R-2, 1
-    ( -276.65  -121.14   -20.20     0.92)  ; R-2, 2
-    (Cross  ;  [3,3]
-      (Color Orange)
-      (Name "Marker 3")
-      ( -279.41  -119.99   -18.00     0.46)  ; 1
-      ( -272.98  -126.60   -21.22     0.92)  ; 2
-    )  ;  End of markers
-    (
-      ( -267.94  -128.61   -22.57     0.69)  ; R-2-1, 1
-      ( -204.90  -157.63   -42.45     0.69)  ; R-2-1, 34
-      (Cross  ;  [3,3]
-        (Color Orange)
-        (Name "Marker 3")
-        ( -223.67  -157.92   -42.45     0.69)  ; 1
-        ( -222.76  -154.18   -39.90     0.69)  ; 2
-      )  ;  End of markers
-       Incomplete
-    |
-      ( -269.77  -129.47   -22.57     0.92)  ; R-2-2, 1
-      ( -268.17  -130.62   -24.75     0.92)  ; R-2-2, 2
-      ( -266.79  -131.77   -26.13     0.92)  ; R-2-2, 3
-       Incomplete
-    )  ;  End of split
-  )  ;  End of split
-)
-''') as tmp_file:
+    n = Morphology(DATA_DIR / 'markers.asc')
 
-        n = Morphology(tmp_file.name)
+    assert len(n.markers) == 5
+    assert_array_equal(n.markers[0].points,
+                       np.array([[-271.87, -121.14, -16.27],
+                                 [-269.34, -122.29, -15.48]],
+                                dtype=np.float32))
+    assert_array_equal(n.markers[0].diameters,
+                       np.array([0.69, 0.69], dtype=np.float32))
+    assert n.markers[0].label == 'Cross'
 
-        assert len(n.root_sections) == 1
+    assert_array_equal(n.markers[1].points,
+                       np.array([[-279.41, -119.99, -18.00],
+                                 [-272.98, -126.60, -21.22]],
+                                dtype=np.float32))
+    assert_array_equal(n.markers[1].diameters,
+                       np.array([0.46, 0.92], dtype=np.float32))
+    assert n.markers[1].label == 'Cross'
 
-        assert_array_equal(n.root_sections[0].points,
-                           np.array([[-290.87,  -113.09,   -16.32],
-                                     [-290.87,  -113.09,   -16.32],
-                                     ],
-                                    dtype=np.float32))
+    assert_array_equal(n.markers[2].points,
+                       np.array([[-223.67, -157.92, -42.45],
+                                 [-222.76, -154.18, -39.90]],
+                                dtype=np.float32))
+    assert_array_equal(n.markers[2].diameters,
+                       np.array([0.69, 0.69], dtype=np.float32))
+    assert n.markers[2].label == 'Cross'
+    assert n.markers[3].label == 'INCOMPLETE'
+    assert n.markers[3].section_id == 3
+    assert n.markers[4].label == 'INCOMPLETE'
+    assert n.markers[4].section_id == 4
 
-        assert_array_equal(n.root_sections[0].children[0].points,
-                           np.array([[-290.87,  -113.09,   -16.32],
-                                     [-277.14,  -119.13,   -18.02],
-                                     [-275.54,  -119.99,   -16.67]],
-                                    dtype=np.float32))
 
-        assert_array_equal(n.root_sections[0].children[1].points,
-                           np.array([[-290.87,  -113.09,   -16.32],
-                                     [-277.80,  -120.28,   -19.48],
-                                     [-276.65,  -121.14,   -20.20]],
-                                    dtype=np.float32))
+    assert len(n.root_sections) == 1
 
-        assert_array_equal(n.root_sections[0].children[1].children[0].points,
-                           np.array([[-276.65,  -121.14,   -20.20],
-                                     [-267.94,  -128.61,   -22.57],
-                                     [-204.90,  -157.63,   -42.45]],
-                                    dtype=np.float32))
+    assert_array_equal(n.root_sections[0].points,
+                       np.array([[-290.87,  -113.09,   -16.32],
+                                 [-290.87,  -113.09,   -16.32],
+                                 ],
+                                dtype=np.float32))
 
-        assert_array_equal(n.root_sections[0].children[1].children[1].points,
-                           np.array([[-276.65,  -121.14,   -20.20],
-                                     [-269.77,  -129.47,   -22.57],
-                                     [-268.17,  -130.62,   -24.75],
-                                     [-266.79,  -131.77,   -26.13]],
-                                    dtype=np.float32))
+    assert_array_equal(n.root_sections[0].children[0].points,
+                       np.array([[-290.87,  -113.09,   -16.32],
+                                 [-277.14,  -119.13,   -18.02],
+                                 [-275.54,  -119.99,   -16.67]],
+                                dtype=np.float32))
+
+    assert_array_equal(n.root_sections[0].children[1].points,
+                       np.array([[-290.87,  -113.09,   -16.32],
+                                 [-277.80,  -120.28,   -19.48],
+                                 [-276.65,  -121.14,   -20.20]],
+                                dtype=np.float32))
+
+    assert_array_equal(n.root_sections[0].children[1].children[0].points,
+                       np.array([[-276.65,  -121.14,   -20.20],
+                                 [-267.94,  -128.61,   -22.57],
+                                 [-204.90,  -157.63,   -42.45]],
+                                dtype=np.float32))
+
+    assert_array_equal(n.root_sections[0].children[1].children[1].points,
+                       np.array([[-276.65,  -121.14,   -20.20],
+                                 [-269.77,  -129.47,   -22.57],
+                                 [-268.17,  -130.62,   -24.75],
+                                 [-266.79,  -131.77,   -26.13]],
+                                dtype=np.float32))
 
 
 def test_string_markers():
@@ -554,18 +588,19 @@ def test_string_markers():
                                      [1192.31, 420.35, -0.19]], dtype=np.float32))
         assert_array_equal(m.markers[1].diameters, np.array([0.15, 0.15], dtype=np.float32))
 
-def test_neurolucida_markers():
+def test_neurolucida_markers(tmp_path):
     SIMPLE = Morphology(DATA_DIR / 'simple.asc')
     for marker, suffix in product(NEUROLUCIDA_MARKERS, ['', '7', '123']):
         marker += suffix
-        with tmp_asc_file(f'''
+        with tmp_asc_file(tmp_path,
+f'''
 ({marker}
   (Color White)
   (Name "fat end")
   (   81.58   -77.98   -20.32     0.50)  ; 1
 )  ;  End of markers
 
-("CellBody"
+(
  (Color Red)
  (CellBody)
  (0 0 0 2)
@@ -601,17 +636,24 @@ def test_neurolucida_markers():
                          )''') as tmp_file:
             neuron = Morphology(tmp_file.name)
 
-        assert_array_equal(neuron.points, SIMPLE.points)
-        assert len(neuron.markers) == 2
-        assert_array_almost_equal(neuron.markers[0].points,
-                                  np.array([[81.58, -77.98, -20.32]], dtype=np.float32))
-        assert_array_almost_equal(neuron.markers[0].diameters,
-                                  np.array([0.5], dtype=np.float32))
-        assert_array_almost_equal(neuron.markers[1].points,
-                                  np.array([[51.580002, -77.779999, -24.32]],
-                                           dtype=np.float32))
-        assert_array_almost_equal(neuron.markers[1].diameters,
-                                  np.array([0.52], dtype=np.float32))
+            assert_array_equal(neuron.points, SIMPLE.points)
+            assert len(neuron.markers) == 2
+            assert_array_almost_equal(neuron.markers[0].points,
+                                      np.array([[81.58, -77.98, -20.32]], dtype=np.float32))
+            assert_array_almost_equal(neuron.markers[0].diameters,
+                                      np.array([0.5], dtype=np.float32))
+            assert_array_almost_equal(neuron.markers[1].points,
+                                      np.array([[51.580002, -77.779999, -24.32]],
+                                               dtype=np.float32))
+            assert_array_almost_equal(neuron.markers[1].diameters,
+                                      np.array([0.52], dtype=np.float32))
+
+
+def test_invalid_incomplete():
+    '''Test that any data after Incomplete is invalid.'''
+    with pytest.raises(RawDataError, match='Incomplete'):
+        Morphology(DATA_DIR / 'invalid-incomplete.asc')
+
 
 def test_skip_font():
     assert_array_equal(Morphology(DATA_DIR / 'simple-with-font.asc').points,

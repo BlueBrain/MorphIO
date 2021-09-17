@@ -7,12 +7,12 @@ from tempfile import TemporaryDirectory
 import morphio
 from morphio import CellFamily, IterType, MitochondriaPointLevel, MorphioError
 from morphio import Morphology as ImmutableMorphology
-from morphio import PointLevel, RawDataError, SectionBuilderError, SectionType, ostream_redirect
-from morphio.mut import GlialCell, Morphology
+from morphio import PointLevel, RawDataError, SectionBuilderError, SectionType, ostream_redirect, PostSynapticDensity
+from morphio.mut import GlialCell, Morphology, DendriticSpine
 import pytest
 from numpy.testing import assert_array_equal
 
-from utils import assert_substring, captured_output, setup_tempdir, tmp_asc_file
+from utils import assert_substring, captured_output, tmp_asc_file
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -358,22 +358,24 @@ def test_non_C_nparray():
     section.points = non_standard_stride
     assert_array_equal(section.points, points)
 
-def test_annotation():
+
+def test_annotation(tmp_path):
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            with tmp_asc_file("""((Dendrite)
-                      (3 -4 0 2)
-                      (3 -6 0 2)
-                      (3 -8 0 2)
-                      (3 -10 0 2)
-                      (
-                        (3 -10 0 2)
-                        (0 -10 0 2)
-                        (-3 -10 0 2)
-                        |       ; <-- empty sibling but still works !
-                       )
-                      )
-                 """) as tmp_file:
+            with tmp_asc_file(tmp_path,
+                              """((Dendrite)
+                                   (3 -4 0 2)
+                                   (3 -6 0 2)
+                                   (3 -8 0 2)
+                                   (3 -10 0 2)
+                                   (
+                                     (3 -10 0 2)
+                                     (0 -10 0 2)
+                                     (-3 -10 0 2)
+                                     |       ; <-- empty sibling but still works !
+                                    )
+                                   )
+                              """) as tmp_file:
                 cell = Morphology(tmp_file.name)
                 cell.remove_unifurcations()
 
@@ -382,12 +384,13 @@ def test_annotation():
         annotation = n.annotations[0]
         assert annotation.type == morphio.AnnotationType.single_child
 
-def test_empty_sibling():
+def test_empty_sibling(tmp_path):
     '''The empty sibling will be removed and the single child will be merged
     with its parent'''
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            with tmp_asc_file('''((Dendrite)
+            with tmp_asc_file(tmp_path,
+                '''((Dendrite)
                       (3 -4 0 10)
                       (3 -6 0 9)
                       (3 -8 0 8)
@@ -469,7 +472,7 @@ def test_endoplasmic_reticulum():
     assert_array_equal(reticulum.surface_areas, [3, 3])
     assert_array_equal(reticulum.filament_counts, [4, 4])
 
-    with setup_tempdir('test-endoplasmic-reticulum') as folder:
+    with TemporaryDirectory('test-endoplasmic-reticulum') as folder:
         path = Path(folder, 'with-reticulum.h5')
         neuron.write(path)
 
@@ -558,6 +561,69 @@ def test_glia_round_trip():
         g.write(filename)
         g2 = GlialCell(filename)
         assert len(g.sections) == len(g2.sections)
+
+def test_dendritic_spine():
+    d = DendriticSpine()
+    assert d.cell_family == CellFamily.SPINE
+
+    h5v1 = DATA_DIR / "h5/v1/"
+    d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
+    assert d.cell_family == CellFamily.SPINE
+
+    psd = d.post_synaptic_density
+    assert len(psd) == 2
+    assert psd[0].section_id == 1
+    assert psd[0].segment_id == 0
+    assert psd[0].offset == pytest.approx(0.8525)
+
+    with pytest.raises(RawDataError):
+        DendriticSpine(DATA_DIR / 'simple.swc')
+
+    with pytest.raises(RawDataError):
+        DendriticSpine(DATA_DIR / 'h5/v1/simple.h5')
+
+
+def test_dendritic_spine_round_trip():
+    with TemporaryDirectory() as folder:
+        h5v1 = DATA_DIR / "h5/v1/"
+        d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
+        filename = Path(folder, 'test-dendritic-spine.h5')
+        d.write(filename)
+        d2 = DendriticSpine(filename)
+
+        assert len(d.sections) == len(d2.sections)
+        assert len(d.post_synaptic_density) == len(d2.post_synaptic_density)
+
+        d2 = DendriticSpine(filename)
+        d2.post_synaptic_density = (d2.post_synaptic_density +
+                                    d2.post_synaptic_density +
+                                    [PostSynapticDensity(1, 2, 3.3)])
+        d2.write(filename)
+
+        d3 = DendriticSpine(filename)
+        assert len(d2.sections) == len(d3.sections)
+        assert len(d2.post_synaptic_density) == len(d3.post_synaptic_density)
+
+        psd = d3.post_synaptic_density
+        assert len(psd) == 2 + 2 + 1
+        assert psd[-1].section_id == 1
+        assert psd[-1].segment_id == 2
+        assert psd[-1].offset == pytest.approx(3.3)
+
+
+def test_dendritic_spine_round_trip_empty_postsynaptic_density():
+    h5v1 = DATA_DIR / "h5/v1/"
+    with TemporaryDirectory() as folder:
+        d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
+        assert d.cell_family == CellFamily.SPINE
+
+        d.post_synaptic_density = []
+
+        filename = Path(folder, 'test-empty-spine.h5')
+        d.write(filename)
+
+        d2 = DendriticSpine(filename)
+        assert d.post_synaptic_density == d2.post_synaptic_density
 
 
 def _get_section():

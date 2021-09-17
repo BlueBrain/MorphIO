@@ -75,8 +75,6 @@ struct PointLevel {
     PointLevel(const PointLevel& data);
     PointLevel(const PointLevel& data, SectionRange range);
     PointLevel& operator=(const PointLevel& other);
-    // bool operator==(const PointLevel& other) const;
-    // bool operator!=(const PointLevel& other) const;
 };
 
 struct SectionLevel {
@@ -86,14 +84,9 @@ struct SectionLevel {
 
     bool operator==(const SectionLevel& other) const;
     bool operator!=(const SectionLevel& other) const;
-    /**
-       Like operator!= but with logLevel argument
-    **/
-    bool diff(const SectionLevel& other, LogLevel logLevel) const;
-};
 
-struct SomaLevel {
-    Section::Type _sections;
+    // Like operator!= but with logLevel argument
+    bool diff(const SectionLevel& other, LogLevel logLevel) const;
 };
 
 struct MitochondriaPointLevel {
@@ -124,6 +117,24 @@ struct MitochondriaSectionLevel {
     bool operator!=(const MitochondriaSectionLevel& other) const;
 };
 
+namespace DendriticSpine {
+
+using SectionId_t = int32_t;
+using SegmentId_t = int32_t;
+using Offset_t = floatType;
+
+struct PostSynapticDensity {
+    SectionId_t sectionId;
+    SegmentId_t segmentId;
+    Offset_t offset;
+};
+
+struct Level {
+    std::vector<PostSynapticDensity> _post_synaptic_density;
+};
+
+}  // namespace DendriticSpine
+
 struct EndoplasmicReticulumLevel {
     std::vector<uint32_t> _sectionIndices;
     std::vector<morphio::floatType> _volumes;
@@ -136,45 +147,50 @@ struct Annotation {
                uint32_t sectionId,
                PointLevel points,
                std::string details,
-               int32_t lineNumber);
+               int32_t lineNumber)
+        : _type(type)
+        , _sectionId(sectionId)
+        , _points(std::move(points))
+        , _details(std::move(details))
+        , _lineNumber(lineNumber) {}
 
     AnnotationType _type;
     uint32_t _sectionId;
     PointLevel _points;
-    int32_t _lineNumber;
     std::string _details;
+    int32_t _lineNumber;
 };
 
 struct Marker {
     PointLevel _pointLevel;
     std::string _label;
+    int32_t _sectionId;  // id of section that contains the marker
 };
 
 struct CellLevel {
-    CellLevel()
-        : _version({"undefined", 0, 0}) {}
-
-    // A tuple (file format (std::string), major version, minor version)
-    MorphologyVersion _version;
-    morphio::CellFamily _cellFamily;
-    SomaType _somaType;
+    MorphologyVersion _version = {"undefined", 0, 0};
+    morphio::CellFamily _cellFamily = NEURON;
+    SomaType _somaType = SOMA_UNDEFINED;
     std::vector<Annotation> _annotations;
     std::vector<Marker> _markers;
 
     bool diff(const CellLevel& other, LogLevel logLevel) const;
     bool operator==(const CellLevel& other) const;
     bool operator!=(const CellLevel& other) const;
-    std::string fileFormat() const;
-    uint32_t majorVersion();
-    uint32_t minorVersion();
+
+    std::string fileFormat() const {
+        return std::get<0>(_version);
+    }
+    uint32_t majorVersion() {
+        return std::get<1>(_version);
+    }
+    uint32_t minorVersion() {
+        return std::get<2>(_version);
+    }
 };
 
 // The lowest level data blob
 struct Properties {
-    ////////////////////////////////////////////////////////////////////////////////
-    // Data stuctures
-    ////////////////////////////////////////////////////////////////////////////////
-
     PointLevel _pointLevel;
     SectionLevel _sectionLevel;
     CellLevel _cellLevel;
@@ -185,11 +201,11 @@ struct Properties {
 
     EndoplasmicReticulumLevel _endoplasmicReticulumLevel;
 
-    ////////////////////////////////////////////////////////////////////////////////
-    // Functions
-    ////////////////////////////////////////////////////////////////////////////////
+    DendriticSpine::Level _dendriticSpineLevel;
+
     template <typename T>
-    std::vector<typename T::Type>& get() noexcept;
+    std::vector<typename T::Type>& get_mut() noexcept;
+
     template <typename T>
     const std::vector<typename T::Type>& get() const noexcept;
 
@@ -206,59 +222,43 @@ struct Properties {
     const std::map<int32_t, std::vector<uint32_t>>& children() const noexcept;
 };
 
-template <>
-const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>() const noexcept;
-template <>
-const std::map<int32_t, std::vector<uint32_t>>& Properties::children<MitoSection>() const noexcept;
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel);
 
-template <>
-const std::vector<Point::Type>& Properties::get<Point>() const noexcept;
-template <>
-std::vector<Point::Type>& Properties::get<Point>() noexcept;
+#define INSTANTIATE_TEMPLATE_GET(T, M)                                       \
+    template <>                                                              \
+    inline std::vector<T::Type>& Properties::get_mut<T>() noexcept {         \
+        return M;                                                            \
+    }                                                                        \
+    template <>                                                              \
+    inline const std::vector<T::Type>& Properties::get<T>() const noexcept { \
+        return M;                                                            \
+    }
+
+INSTANTIATE_TEMPLATE_GET(Point, _pointLevel._points)
+INSTANTIATE_TEMPLATE_GET(Perimeter, _pointLevel._perimeters)
+INSTANTIATE_TEMPLATE_GET(Diameter, _pointLevel._diameters)
+INSTANTIATE_TEMPLATE_GET(MitoSection, _mitochondriaSectionLevel._sections)
+INSTANTIATE_TEMPLATE_GET(MitoPathLength, _mitochondriaPointLevel._relativePathLengths)
+INSTANTIATE_TEMPLATE_GET(MitoNeuriteSectionId, _mitochondriaPointLevel._sectionIds)
+INSTANTIATE_TEMPLATE_GET(MitoDiameter, _mitochondriaPointLevel._diameters)
+INSTANTIATE_TEMPLATE_GET(Section, _sectionLevel._sections)
+INSTANTIATE_TEMPLATE_GET(SectionType, _sectionLevel._sectionTypes)
+
+#undef INSTANTIATE_TEMPLATE_GET
 
 template <>
-const std::vector<Perimeter::Type>& Properties::get<Perimeter>() const noexcept;
-template <>
-std::vector<Perimeter::Type>& Properties::get<Perimeter>() noexcept;
+inline const std::map<int32_t, std::vector<uint32_t>>& Properties::children<Section>() const
+    noexcept {
+    return _sectionLevel._children;
+}
 
 template <>
-const std::vector<Diameter::Type>& Properties::get<Diameter>() const noexcept;
-template <>
-std::vector<Diameter::Type>& Properties::get<Diameter>() noexcept;
-
-template <>
-const std::vector<MitoSection::Type>& Properties::get<MitoSection>() const noexcept;
-template <>
-std::vector<MitoSection::Type>& Properties::get<MitoSection>() noexcept;
-
-template <>
-const std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() const noexcept;
-template <>
-std::vector<MitoPathLength::Type>& Properties::get<MitoPathLength>() noexcept;
-
-template <>
-const std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>() const
-    noexcept;
-template <>
-std::vector<MitoNeuriteSectionId::Type>& Properties::get<MitoNeuriteSectionId>() noexcept;
-
-template <>
-const std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() const noexcept;
-template <>
-std::vector<MitoDiameter::Type>& Properties::get<MitoDiameter>() noexcept;
-
-template <>
-const std::vector<Section::Type>& Properties::get<Section>() const noexcept;
-template <>
-std::vector<Section::Type>& Properties::get<Section>() noexcept;
-
-template <>
-const std::vector<SectionType::Type>& Properties::get<SectionType>() const noexcept;
-template <>
-std::vector<SectionType::Type>& Properties::get<SectionType>() noexcept;
+inline const std::map<int32_t, std::vector<uint32_t>>& Properties::children<MitoSection>() const
+    noexcept {
+    return _mitochondriaSectionLevel._children;
+}
 
 }  // namespace Property
 }  // namespace morphio

@@ -5,12 +5,14 @@
 #include <pybind11/pybind11.h>
 
 #include <morphio/endoplasmic_reticulum.h>
+#include <morphio/mut/dendritic_spine.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/glial_cell.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 
 #include <array>
+#include <memory>  // std::make_unique
 
 #include "bind_enums.h"
 #include "bindings_utils.h"
@@ -19,7 +21,6 @@ namespace py = pybind11;
 
 void bind_mutable_module(py::module& m) {
     using namespace py::literals;
-
 
     py::class_<morphio::mut::Morphology>(m, "Morphology")
         .def(py::init<>())
@@ -33,8 +34,8 @@ void bind_mutable_module(py::module& m) {
              "morphology"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
         .def(py::init([](py::object arg, unsigned int options) {
-                 return std::unique_ptr<morphio::mut::Morphology>(
-                     new morphio::mut::Morphology(py::str(arg), options));
+                 return std::make_unique<morphio::mut::Morphology>(
+                     py::str(arg), options);
              }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER,
@@ -104,8 +105,7 @@ void bind_mutable_module(py::module& m) {
              &morphio::mut::Morphology::deleteSection,
              "Delete the given section\n"
              "\n"
-             "Will silently fail if the section is not part of the "
-             "tree\n"
+             "Will silently fail if the section is not part of the tree\n"
              "\n"
              "If recursive == true, all descendent sections will be "
              "deleted as well\n"
@@ -180,10 +180,8 @@ void bind_mutable_module(py::module& m) {
 
     py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(m, "GlialCell")
         .def(py::init<>())
-        .def(py::init<const std::string&>())
         .def(py::init([](py::object arg) {
-                 return std::unique_ptr<morphio::mut::GlialCell>(
-                     new morphio::mut::GlialCell(py::str(arg)));
+                 return std::make_unique<morphio::mut::GlialCell>(py::str(arg));
              }),
              "filename"_a,
              "Additional Ctor that accepts as filename any python "
@@ -273,19 +271,14 @@ void bind_mutable_module(py::module& m) {
                 return py::make_iterator(morph->upstream_begin(section), morph->upstream_end());
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
-            "Upstream iterator starting at a given section id\n"
-            "\n"
-            "If id == -1, the iteration will be successively performed "
-            "starting\n"
+            "Upstream iterator starting at a given section id\n\n"
+            "If id == -1, the iteration will be successively performed starting\n"
             "at each root section",
             "section_id"_a = -1);
 
     using mitosection_floats_f = std::vector<morphio::floatType>& (morphio::mut::MitoSection::*) ();
     using mitosection_ints_f = std::vector<uint32_t>& (morphio::mut::MitoSection::*) ();
 
-    // py::nodelete needed because morphio::mut::MitoSection has a private
-    // destructor
-    // http://pybind11.readthedocs.io/en/stable/advanced/classes.html?highlight=private%20destructor#non-public-destructors
     py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(m,
                                                                                       "MitoSection")
         .def_property_readonly("id", &morphio::mut::MitoSection::id, "Return the section ID")
@@ -541,4 +534,55 @@ void bind_mutable_module(py::module& m) {
                 reticulum->filamentCounts() = counts.cast<std::vector<uint32_t>>();
             },
             "Returns the number of filaments for each neuronal section");
+
+    py::class_<morphio::mut::DendriticSpine, morphio::mut::Morphology>(m, "DendriticSpine")
+        .def(py::init<>())
+        .def(py::init([](py::object arg) {
+                 return std::make_unique<morphio::mut::DendriticSpine>(py::str(arg));
+             }),
+             "filename"_a,
+             "Additional Ctor that accepts as filename any python "
+             "object that implements __repr__ or __str__")
+        .def_property_readonly("sections",
+                               &morphio::mut::DendriticSpine::sections,
+                               "Returns a list containing IDs of all sections.")
+        .def_property_readonly("root_sections",
+                               &morphio::mut::DendriticSpine::rootSections,
+                               "Returns a list of all root sections IDs "
+                               "(sections whose parent ID are -1)",
+                               py::return_value_policy::reference)
+        .def("append_root_section",
+             static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::DendriticSpine::*)(
+                 const morphio::Property::PointLevel&, morphio::SectionType)>(
+                 &morphio::mut::Morphology::appendRootSection),
+             "Append a root Section\n",
+             "point_level_properties"_a,
+             "section_type"_a)
+        .def("append_root_section",
+             static_cast<std::shared_ptr<morphio::mut::Section> (morphio::mut::DendriticSpine::*)(
+                 const morphio::Section&, bool)>(&morphio::mut::Morphology::appendRootSection),
+             "Append the existing immutable Section as a root section\n"
+             "If recursive == true, all descendent will be appended as "
+             "well",
+             "immutable_section"_a,
+             "recursive"_a = false)
+
+        .def_property(
+            "post_synaptic_density",
+
+            [](const morphio::mut::DendriticSpine& dendritic_spine) {
+                return dendritic_spine.postSynapticDensity();
+            },
+            [](morphio::mut::DendriticSpine* dendritic_spine,
+               const std::vector<morphio::Property::DendriticSpine::PostSynapticDensity>& psds) {
+                dendritic_spine->postSynapticDensity() = psds;
+            },
+            "Returns the post synaptic density values")
+        .def_property_readonly("cell_family",
+                               &morphio::mut::DendriticSpine::cellFamily,
+                               "Returns the cell family")
+        .def(
+            "write",
+            [](morphio::mut::DendriticSpine* morph, py::object arg) { morph->write(py::str(arg)); },
+            "filename"_a);
 }

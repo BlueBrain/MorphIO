@@ -3,10 +3,11 @@ from collections import OrderedDict
 
 import numpy as np
 import pytest
-from numpy.testing import assert_array_almost_equal, assert_array_equal
+from numpy.testing import assert_array_almost_equal, assert_array_equal, assert_equal
 from pathlib import Path
 
-from morphio import IterType, Morphology, GlialCell, CellFamily, RawDataError
+import morphio
+from morphio import SectionType, IterType, Morphology, GlialCell, CellFamily, RawDataError, DendriticSpine
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
@@ -139,8 +140,14 @@ def test_more_iter():
 
 
 def test_glia():
+    # check the glia section types
+    assert_equal(int(SectionType.glia_perivascular_process), 2)
+    assert_equal(int(SectionType.glia_process), 3)
+
     g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
     assert g.cell_family == CellFamily.GLIA
+    assert g.sections[100].type == SectionType.glia_perivascular_process
+    assert g.sections[1000].type == SectionType.glia_process
 
     g = GlialCell(Path(_path, 'astrocyte.h5'))
     assert g.cell_family == CellFamily.GLIA
@@ -149,3 +156,56 @@ def test_glia():
         GlialCell(Path(_path, 'simple.swc'))
     with pytest.raises(RawDataError):
         GlialCell(Path(_path, 'h5/v1/simple.h5'))
+
+
+def test_dendritic_spine():
+    assert_equal(int(SectionType.spine_neck), 2)
+    assert_equal(int(SectionType.spine_head), 3)
+
+    spine_path = os.path.join(_path, 'h5/v1/simple-dendritric-spine.h5')
+    d = DendriticSpine(spine_path)
+    assert d.cell_family == CellFamily.SPINE
+    assert d.sections[0].type == SectionType.spine_head
+    assert d.sections[1].type == SectionType.spine_neck
+
+    assert len(d.post_synaptic_density) == 2
+    assert d.post_synaptic_density[0].section_id == 1
+    assert d.post_synaptic_density[0].segment_id == 0
+    assert d.post_synaptic_density[0].offset == pytest.approx(0.8525)
+
+    d = DendriticSpine(Path(spine_path))
+    assert d.cell_family == CellFamily.SPINE
+
+    with pytest.raises(RawDataError):
+        DendriticSpine(Path(_path, 'simple.swc'))
+
+    with pytest.raises(RawDataError):
+        DendriticSpine(Path(_path, 'h5/v1/simple.h5'))
+
+
+def test_dendritic_spine_add_root_section():
+    # PointLevel + diameters parameters for append_root_section
+    spine_morph = morphio.mut.DendriticSpine()
+    spine_morph.append_root_section(
+        morphio.PointLevel([[1.1, 2.1, 3.1], [4.1, 5.1, 6.1]],
+                           [2.1, 3.1]),
+        morphio.SectionType.spine_head)
+
+    assert spine_morph.root_sections[0].type == morphio.SectionType.spine_head
+
+    assert_array_almost_equal(spine_morph.root_sections[0].points,
+                                  [[1.1, 2.1, 3.1], [4.1, 5.1, 6.1]])
+    assert_array_almost_equal(spine_morph.root_sections[0].diameters,
+                                  [2.1, 3.1])
+
+    # Section parameter for append_root_section
+    spine_morph = morphio.mut.DendriticSpine()
+    spine_path = os.path.join(_path, 'h5/v1/simple-dendritric-spine.h5')
+    input_spine = morphio.DendriticSpine(spine_path)
+    spine_morph.append_root_section(input_spine.root_sections[0])
+    assert_array_almost_equal(spine_morph.root_sections[0].points,
+                                  [[0., 5., 0.], [2.4, 9.1, 0.],
+                                   [0., 13.2, 0.]])
+    assert spine_morph.root_sections[0].type == morphio.SectionType.spine_head
+    assert_array_almost_equal(spine_morph.root_sections[0].diameters,
+                                  [0.1, 0.2, 0.15])

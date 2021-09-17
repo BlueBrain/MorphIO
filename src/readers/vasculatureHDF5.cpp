@@ -52,8 +52,8 @@ void VasculatureHDF5::_readDatasets() {
 }
 
 void VasculatureHDF5::_readPoints() {
-    auto& points = _properties.get<vasculature::property::Point>();
-    auto& diameters = _properties.get<vasculature::property::Diameter>();
+    auto& points = _properties.get_mut<vasculature::property::Point>();
+    auto& diameters = _properties.get_mut<vasculature::property::Diameter>();
 
     std::vector<std::vector<morphio::floatType>> vec;
     vec.resize(_pointsDims[0]);
@@ -65,7 +65,7 @@ void VasculatureHDF5::_readPoints() {
 }
 
 void VasculatureHDF5::_readSections() {
-    auto& sections = _properties.get<vasculature::property::VascSection>();
+    auto& sections = _properties.get_mut<vasculature::property::VascSection>();
     auto selection = _sections->select({0, 0}, {_sectionsDims[0], 1});
 
     std::vector<unsigned int> vec;
@@ -78,7 +78,7 @@ void VasculatureHDF5::_readSections() {
 }
 
 void VasculatureHDF5::_readSectionTypes() {
-    std::vector<VascularSectionType>& types = _properties.get<vasculature::property::SectionType>();
+    auto& types = _properties.get_mut<vasculature::property::SectionType>();
 
     auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
     types.resize(_sectionsDims[0]);

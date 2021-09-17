@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>  //std::unique_ptr
-
 #include <highfive/H5Group.hpp>
 #include <morphio/properties.h>
 #include <morphio/section_iterators.hpp>
@@ -124,7 +122,6 @@ class Morphology
      * Note: -1 is the soma node
      **/
     const std::map<int, std::vector<unsigned int>>& connectivity() const;
-
 
     /**
        Depth first iterator starting at a given section id

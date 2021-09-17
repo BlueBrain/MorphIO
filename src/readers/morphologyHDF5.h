@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>  // std::unique_ptr
 #include <string>  // std::string
 #include <vector>  // std::vector
 
@@ -25,14 +24,13 @@ class MorphologyHDF5
 
   private:
     void _checkVersion(const std::string& source);
-    void _resolveV1();
     void _readMetadata(const std::string& source);
-    HighFive::DataSet _getStructureDataSet(size_t nSections);
     void _readPoints(int);
     int _readSections();
     void _readPerimeters(int);
     void _readMitochondria();
     void _readEndoplasmicReticulum();
+    void _readDendriticSpinePostSynapticDensity();
 
     template <typename T>
     void _read(const std::string& group,
@@ -41,14 +39,7 @@ class MorphologyHDF5
                T& data);
 
     HighFive::Group _group;
-
-    std::unique_ptr<HighFive::DataSet> _points;
-    std::vector<size_t> _pointsDims;
-
-    std::unique_ptr<HighFive::DataSet> _sections;
-
     Property::Properties _properties;
-    ErrorMessages _err;
     std::string _uri;
 };
 }  // namespace h5

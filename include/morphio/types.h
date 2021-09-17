@@ -14,13 +14,16 @@
 namespace morphio {
 
 using namespace enums;
+class DendriticSpine;
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
 class Morphology;
 class Section;
+
 template <class T>
 class SectionBase;
+
 class Soma;
 
 namespace Property {
@@ -38,6 +41,7 @@ class ErrorMessages;
 }  // namespace readers
 
 namespace mut {
+class DendriticSpine;
 class EndoplasmicReticulum;
 class MitoSection;
 class Mitochondria;
@@ -47,6 +51,8 @@ class Soma;
 }  // namespace mut
 
 using SectionRange = std::pair<size_t, size_t>;
+
+// A tuple (file format (std::string), major version, minor version)
 using MorphologyVersion = std::tuple<std::string, uint32_t, uint32_t>;
 
 template <typename T>

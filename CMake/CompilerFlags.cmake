@@ -1,7 +1,16 @@
-# Taken from https://github.com/BlueBrain/hpc-coding-conventions/blob/master/cpp/cmake/bob.cmake#L192-L255
 if (WIN32)
-  set(FLAGS "${FLAGS} /DH5_BUILT_AS_DYNAMIC_LIB /EHsc /D_USE_MATH_DEFINES")
+  set(FLAGS "${FLAGS} /DH5_BUILT_AS_DYNAMIC_LIB")
+
+  # Exception handling
+  # s: Enables standard C++ stack unwinding.
+  # c: [assume] functions declared as extern "C" never throw a C++ exception.
+  set(FLAGS "${FLAGS} /EHsc")
+
+  # get access to M_PI constant
+  set(FLAGS "${FLAGS} /D_USE_MATH_DEFINES")
+
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # Taken from https://github.com/BlueBrain/hpc-coding-conventions/blob/master/cpp/cmake/bob.cmake#L192-L255
   if(${PROJECT_NAME}_CXX_WARNINGS)
     set(FLAGS "${FLAGS} -Werror -Weverything")
     # Using std=c++11, no need for 98 compat
@@ -33,6 +42,7 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
       set(FLAGS "${FLAGS} -fcomment-block-commands=file")
     endif()
   endif()
+
 elseif(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   if(${PROJECT_NAME}_CXX_WARNINGS)
     set(FLAGS "${FLAGS} -Wall")

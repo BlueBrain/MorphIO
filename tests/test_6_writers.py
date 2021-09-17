@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import numpy as np
 from morphio import MitochondriaPointLevel
@@ -9,14 +10,14 @@ from morphio.mut import Morphology
 import pytest
 from numpy.testing import assert_array_equal
 
-from utils import assert_string_equal, captured_output, setup_tempdir
+from utils import assert_string_equal, captured_output
 
 
 def test_write_empty_file():
     '''Check that empty morphology are not written to disk'''
     with captured_output() as (_, _):
         with ostream_redirect(stdout=True, stderr=True):
-            with setup_tempdir('test_write_empty_file', no_cleanup=True) as tmp_folder:
+            with TemporaryDirectory('test_write_empty_file') as tmp_folder:
                 for ext in ['asc', 'swc', 'h5']:
                     outname = Path(tmp_folder, 'empty.' + ext)
                     Morphology().write(outname)
@@ -28,7 +29,7 @@ def test_write_soma_basic():
     morpho.soma.points = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
     morpho.soma.diameters = [2, 3, 3]
 
-    with setup_tempdir('test_write_soma_basic') as tmp_folder:
+    with TemporaryDirectory('test_write_soma_basic') as tmp_folder:
         morpho.write(Path(tmp_folder, "test_write.swc"))
         morpho.write(Path(tmp_folder, "test_write_pathlib.swc"))
         assert len(os.listdir(tmp_folder)) == 2
@@ -59,7 +60,7 @@ def test_write_basic():
                                              [-5, -4, 0]],
                                             [2, 4]))
 
-    with setup_tempdir('test_write_basic') as tmp_folder:
+    with TemporaryDirectory('test_write_basic') as tmp_folder:
         morpho.write(Path(tmp_folder, "test_write.asc"))
         morpho.write(Path(tmp_folder, "test_write.swc"))
         h5_out = Path(tmp_folder, "test_write.h5")
@@ -72,7 +73,7 @@ def test_write_basic():
         assert_array_equal(ImmutMorphology(Path(tmp_folder, "test_write.swc")).points, expected)
         h5_morph = ImmutMorphology(Path(tmp_folder, "test_write.h5"))
         assert_array_equal(h5_morph.points, expected)
-        assert h5_morph.version == ('h5', 1, 2)
+        assert h5_morph.version == ('h5', 1, 3)
 
         import h5py
         with h5py.File(h5_out, 'r') as h5_file:
@@ -97,7 +98,7 @@ def test_write_merge_only_child_asc_h5():
                                             [2, 2]),
                                  SectionType.basal_dendrite)
     child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
-    with setup_tempdir('test_write_merge_only_child') as tmp_folder:
+    with TemporaryDirectory('test_write_merge_only_child') as tmp_folder:
         for extension in ['asc', 'h5']:
             with captured_output() as (_, err):
                 with ostream_redirect(stdout=True, stderr=True):
@@ -128,9 +129,9 @@ def test_write_merge_only_child_swc():
                                  SectionType.basal_dendrite)
     child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
 
-    with pytest.raises(WriterError, match="Section 0 has a single child section\. "
-                                          "Single child section are not allowed when writing to SWC format\. "
-                                          "Please sanitize the morphology first\."):
+    with pytest.raises(WriterError, match=r"Section 0 has a single child section\. "
+                                          r"Single child section are not allowed when writing to SWC format\. "
+                                          r"Please sanitize the morphology first\."):
        morpho.write('/tmp/bla.swc')  # the path does not need to exists since it will fail before
 
 
@@ -159,7 +160,7 @@ def test_write_perimeter():
                                      [2, 3],
                                      [6, 8]))
 
-    with setup_tempdir('test_write_perimeter') as tmp_folder:
+    with TemporaryDirectory('test_write_perimeter') as tmp_folder:
         h5_out = Path(tmp_folder, "test_write.h5")
         morpho.write(h5_out)
 
@@ -186,7 +187,7 @@ def test_write_no_soma():
                                                 [2, 2]),
                                      SectionType.basal_dendrite)
 
-    with setup_tempdir('test_write_no_soma') as tmp_folder:
+    with TemporaryDirectory('test_write_no_soma') as tmp_folder:
         for ext in ['asc', 'h5', 'swc']:
             with captured_output() as (_, err):
                 with ostream_redirect(stdout=True, stderr=True):
@@ -220,7 +221,7 @@ def test_mitochondria():
         MitochondriaPointLevel([0, 0, 0, 0],
                                         [0.6, 0.7, 0.8, 0.9],
                                         [20, 30, 40, 50]))
-    with setup_tempdir('test_mitochondria') as tmp_folder:
+    with TemporaryDirectory('test_mitochondria') as tmp_folder:
         morpho.write(Path(tmp_folder, "test.h5"))
 
         with captured_output() as (_, err):
@@ -271,7 +272,7 @@ def test_duplicate_different_diameter():
     section.append_section(PointLevel([[3, 3, 3], [5, 5, 5]], [11, 12]))
 
 
-    with setup_tempdir('test_write_duplicate_different_diameter', no_cleanup=True) as tmp_folder:
+    with TemporaryDirectory('test_write_duplicate_different_diameter') as tmp_folder:
         for ext in ['asc', 'h5', 'swc']:
             with captured_output() as (_, err):
                 with ostream_redirect(stdout=True, stderr=True):
@@ -298,7 +299,7 @@ def test_single_point_root_section():
         with ostream_redirect(stdout=True, stderr=True):
             m.append_root_section(PointLevel(points, diameters), SectionType(2))
 
-            with setup_tempdir('test_single_point_root_section', no_cleanup=True) as tmp_folder:
+            with TemporaryDirectory('test_single_point_root_section') as tmp_folder:
                 with pytest.raises(SectionBuilderError):
                     m.write(Path(tmp_folder, "h5/empty_vasculature.h5"))
 
@@ -307,6 +308,6 @@ def test_single_point_root_section():
     diameters = [2.]
     m.append_root_section(PointLevel(points, diameters), SectionType(2))
 
-    with setup_tempdir('test_single_point_root_section', no_cleanup=True) as tmp_folder:
+    with TemporaryDirectory('test_single_point_root_section') as tmp_folder:
         with pytest.raises(SectionBuilderError):
             m.write(Path(tmp_folder, "h5/empty_vasculature.h5"))

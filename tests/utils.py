@@ -3,6 +3,7 @@ import re
 import shutil
 import sys
 import tempfile
+
 from contextlib import contextmanager
 from difflib import Differ
 from functools import partial
@@ -15,16 +16,6 @@ from morphio import Morphology, set_ignored_warning
 
 
 @contextmanager
-def setup_tempdir(prefix, no_cleanup=False):
-    '''Context manager returning a temporary directory'''
-    temp_dir = tempfile.mkdtemp(prefix=prefix)
-    try:
-        yield temp_dir
-    finally:
-        if not no_cleanup:
-            shutil.rmtree(temp_dir)
-
-@contextmanager
 def ignored_warning(warning):
     '''Context manager during which a warning is ignored'''
     try:
@@ -33,14 +24,22 @@ def ignored_warning(warning):
     finally:
         set_ignored_warning(warning, False)
 
-@contextmanager
-def _tmp_file(content, extension):
-    with tempfile.NamedTemporaryFile(suffix='.' + extension, mode='w', delete=False) as tmp_file:
-        tmp_file.write(content)
-        tmp_file.seek(0)
-        tmp_file.close()
 
-        yield tmp_file
+@contextmanager
+def _tmp_file(tmp_folder, content, extension):
+    '''create temp file in `tmp_folder` with `content` and `extension`'''
+    # Note: the file isn't cleaned up until the tmp_folder is deleted;
+    # this should aide in debugging, and is cross-platform an auto-deleting
+    # NamedTemporaryFile doesn't allow Windows to use the temporary file per
+    # https://docs.python.org/3/library/tempfile.html#tempfile.NamedTemporaryFile:
+    #   "(it can be so used on Unix; it cannot on Windows NT or later)"
+    suffix = '.' + extension
+    with tempfile.NamedTemporaryFile(suffix=suffix,
+                                     mode='w',
+                                     dir=tmp_folder,
+                                     delete=False) as tmp_file:
+        tmp_file.write(content)
+    yield tmp_file
 
 
 tmp_asc_file = partial(_tmp_file, extension='asc')
@@ -71,17 +70,17 @@ def assert_string_equal(str1, str2):
 		raise AssertionError('Strings does not match:\n\n' + pformat(diff))
 
 
-def _test_exception(content, exception, str1, str2, extension):
+def _assert_exception(tmp_path, content, exception, str1, str2, extension):
     '''Create tempfile with given content and check that the exception is raised'''
-    with _tmp_file(content, extension) as tmp_file:
+    with _tmp_file(tmp_path, content, extension) as tmp_file:
         with pytest.raises(exception) as obj:
             Morphology(tmp_file.name)
         assert obj.match(str1)
         assert obj.match(str2)
 
 
-_test_asc_exception = partial(_test_exception, extension='asc')
-_test_swc_exception = partial(_test_exception, extension='swc')
+assert_asc_exception = partial(_assert_exception, extension='asc')
+assert_swc_exception = partial(_assert_exception, extension='swc')
 
 
 @contextmanager

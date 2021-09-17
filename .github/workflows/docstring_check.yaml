@@ -1,22 +1,25 @@
 name: docstring-check
-on:
-    push:
+on: [pull_request, push]
 
 jobs:
   build:
     name: docstring-check
     runs-on: ubuntu-18.04
-    steps:
-        - name: Fetch repository
-          uses: actions/checkout@v2
-          with:
-            submodules: recursive
-        - name: Install packages
-          run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev python3-venv libclang1-9
-        - name: Check docstrings
-          run: |
-            export LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu/libclang-9.so.1
-            ci/check_generated_docstrings.sh || true
 
-            export LIBCLANG_PATH=libLLVM-10.so.1
-            ci/check_generated_docstrings.sh || true
+    # Run on external PRs, but not internal PRs as they'll be run by the push
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+
+    steps:
+      - name: Fetch repository
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Install packages
+        run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev python3-venv libclang1-9
+      - name: Check docstrings
+        run: |
+          export LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu/libclang-9.so.1
+          ci/check_generated_docstrings.sh || true
+
+          export LIBCLANG_PATH=libLLVM-10.so.1
+          ci/check_generated_docstrings.sh || true

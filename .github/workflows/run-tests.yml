@@ -1,11 +1,13 @@
 name: Run tests
-on:
-    pull_request:
+on: [pull_request, push]
 
 jobs:
   build:
     name: Run tests on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+
+    # Run on external PRs, but not internal PRs as they'll be run by the push
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
 
     strategy:
       matrix:
@@ -30,7 +32,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
             brew update
-            brew unlink gcc@8 gcc@9  # work around for https://github.com/actions/virtual-environments/issues/2391
+            brew --version
             brew install cmake || true  # macos image has cmake installed, but a new version may exist; ignore it if so
             brew install hdf5
 

@@ -1,4 +1,5 @@
 set(MORPHIO_SOURCES
+    dendritic_spine.cpp
     endoplasmic_reticulum.cpp
     enums.cpp
     errorMessages.cpp
@@ -7,6 +8,7 @@ set(MORPHIO_SOURCES
     mitochondria.cpp
     morphology.cpp
     morphology.cpp
+    mut/dendritic_spine.cpp
     mut/endoplasmic_reticulum.cpp
     mut/glial_cell.cpp
     mut/mito_section.cpp
@@ -67,7 +69,7 @@ target_include_directories(morphio_obj
 
 set_target_properties(morphio_obj
   PROPERTIES
-  CXX_STANDARD 11
+  CXX_STANDARD 14
   CXX_STANDARD_REQUIRED YES
   CXX_EXTENSIONS NO
   )

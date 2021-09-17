@@ -192,6 +192,7 @@ class ErrorMessages
     std::string WARNING_WRITE_NO_SOMA() const;
     std::string WARNING_WRITE_EMPTY_MORPHOLOGY() const;
     std::string WARNING_NO_SOMA_FOUND() const;
+    std::string WARNING_ZERO_DIAMETER(const Sample& sample) const;
     std::string WARNING_DISCONNECTED_NEURITE(const Sample& sample) const;
     std::string WARNING_WRONG_DUPLICATE(const std::shared_ptr<morphio::mut::Section>& current,
                                         const std::shared_ptr<morphio::mut::Section>& parent) const;

@@ -3,6 +3,14 @@
 MorphIO
 =======
 
+Documentation
+-------------
+
+MorphIO documentation is built and hosted on `readthedocs <http://morphio.readthedocs.org/>`.
+
+* `latest snapshot <http://morphio.readthedocs.org/en/latest/>`_
+* `latest release <http://morphio.readthedocs.org/en/stable/>`_
+
 Introduction
 ------------
 
@@ -55,14 +63,16 @@ information.
 
 Acknowledgements
 ================
-This research was supported by the EBRAINS research infrastructure, funded from the European
-Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant
-Agreement No. 945539 (Human Brain Project SGA3).
+The development of this software was supported by funding to the Blue Brain Project, a research center of the École polytechnique fédérale de Lausanne (EPFL), from the Swiss government’s ETH Board of the Swiss Federal Institutes of Technology.
+
+This research was supported by the EBRAINS research infrastructure, funded from the European Union’s Horizon 2020 Framework Programme for Research and Innovation under the Specific Grant Agreement No. 945539 (Human Brain Project SGA3).
 
 License
 =======
 MorphIO is licensed under the terms of the GNU Lesser General Public License version 3. Refer to
 COPYING.LESSER and COPYING for details.
+
+Copyright (c) 2013-2021 Blue Brain Project/EPFL
 
 .. |license| image:: https://img.shields.io/pypi/l/morphio
                 :target: https://github.com/BlueBrain/morphio/blob/master/COPYING.LESSER

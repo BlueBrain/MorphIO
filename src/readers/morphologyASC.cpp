@@ -40,6 +40,14 @@ bool is_neurite_type(Token id) {
             id == Token::CELLBODY);
 }
 
+std::string text_to_uppercase_token_string(const std::string& text) {
+    std::string upp_text = text;
+    std::transform(text.begin(), text.end(), upp_text.begin(), ::toupper);
+    const auto end_pos = std::remove(upp_text.begin(), upp_text.end(), ' ');
+    upp_text.erase(end_pos, upp_text.end());
+    return upp_text;
+}
+
 bool is_end_of_section(Token id) {
     return (id == Token::RPAREN || id == Token::PIPE);
 }
@@ -47,7 +55,7 @@ bool is_end_of_section(Token id) {
 bool skip_sexp(size_t id) {
     return (id == +Token::WORD || id == +Token::COLOR || id == +Token::GENERATED ||
             id == +Token::HIGH || id == +Token::INCOMPLETE || id == +Token::LOW ||
-            id == +Token::NORMAL || id == +Token::FONT || id == +Token::MARKER);
+            id == +Token::NORMAL || id == +Token::FONT);
 }
 }  // namespace
 
@@ -137,6 +145,7 @@ class NeurolucidaParser
             Property::Marker marker;
             marker._pointLevel = properties;
             marker._label = header.label;
+            marker._sectionId = header.parent_id;
             nb_.addMarker(marker);
             return_id = -1;
         } else if (header.token == Token::CELLBODY) {
@@ -234,6 +243,14 @@ class NeurolucidaParser
                 header.label = lex_.current()->str();
                 // Get rid of quotes
                 header.label = header.label.substr(1, header.label.size() - 2);
+
+                // Early NeuroLucida files contained the soma in a named String
+                // s-exp: https://github.com/BlueBrain/MorphIO/issues/300
+                const std::string uppercase_label = text_to_uppercase_token_string(header.label);
+                if (uppercase_label == "CELLBODY") {
+                    header.token = Token::CELLBODY;
+                }
+
                 lex_.consume();
             } else if (id == Token::RPAREN) {
                 return header;
@@ -263,7 +280,7 @@ class NeurolucidaParser
     }
 
 
-    bool parse_neurite_section(Header header) {
+    bool parse_neurite_section(const Header& header) {
         Points points;
         std::vector<morphio::floatType> diameters;
         auto section_id = static_cast<int>(nb_.sections().size());
@@ -280,6 +297,19 @@ class NeurolucidaParser
                 }
                 return true;
             } else if (is_end_of_branch(id)) {
+                if (id == Token::INCOMPLETE) {
+                    Property::Marker marker;
+                    marker._label = to_string(Token::INCOMPLETE);
+                    marker._sectionId = section_id;
+                    nb_.addMarker(marker);
+                    if (!is_end_of_section(Token(peek_id))) {
+                        throw RawDataError(err_.ERROR_UNEXPECTED_TOKEN(
+                            lex_.line_num(),
+                            lex_.peek()->str(),
+                            lex_.current()->str(),
+                            "'Incomplete' tag must finish the branch."));
+                    }
+                }
                 lex_.consume();
             } else if (id == Token::LSPINE) {
                 // skip spines
@@ -289,8 +319,16 @@ class NeurolucidaParser
                 lex_.consume(Token::RSPINE, "Must be end of spine");
             } else if (id == Token::LPAREN) {
                 if (skip_sexp(peek_id)) {
-                    // skip words/strings/markers
+                    // skip words/strings
                     lex_.consume_until_balanced_paren();
+                } else if (peek_id == +Token::MARKER) {
+                    Header marker_header;
+                    marker_header.parent_id = section_id;
+                    marker_header.token = Token::STRING;
+                    marker_header.label = lex_.peek()->str();
+                    lex_.consume_until(Token::LPAREN);
+                    parse_neurite_section(marker_header);
+                    lex_.consume(Token::RPAREN, "Marker should end with RPAREN");
                 } else if (peek_id == +Token::NUMBER) {
                     Point point;
                     floatType radius;
@@ -321,7 +359,7 @@ class NeurolucidaParser
         while (!lex_.ended()) {
             if (static_cast<Token>(lex_.current()->id) == Token::LPAREN) {
                 lex_.consume();
-                Header header = parse_root_sexp_header();
+                const Header header = parse_root_sexp_header();
                 if (lex_.current()->id != +Token::RPAREN) {
                     parse_neurite_section(header);
                 }

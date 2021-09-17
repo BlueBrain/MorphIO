@@ -32,7 +32,8 @@ enum Warning {
     APPENDING_EMPTY_SECTION,
     WRONG_ROOT_POINT,
     ONLY_CHILD,
-    WRITE_EMPTY_MORPHOLOGY
+    WRITE_EMPTY_MORPHOLOGY,
+    ZERO_DIAMETER
 };
 
 enum AnnotationType {
@@ -40,7 +41,7 @@ enum AnnotationType {
 };
 
 /** The cell family represented by morphio::Morphology. */
-enum CellFamily { NEURON = 0, GLIA = 1 };
+enum CellFamily { NEURON = 0, GLIA = 1, SPINE = 2 };
 
 enum SomaType {
     SOMA_UNDEFINED = 0,
@@ -58,8 +59,12 @@ enum SectionType {
     SECTION_AXON = 2,
     SECTION_DENDRITE = 3,         //!< general or basal dendrite (near to soma)
     SECTION_APICAL_DENDRITE = 4,  //!< apical dendrite (far from soma)
-    SECTION_GLIA_PROCESS = 2,     // TODO: nasty overload there
-    SECTION_GLIA_ENDFOOT = 3,
+
+    SECTION_GLIA_PERIVASCULAR_PROCESS = 2,  // Note: overlaps with SECTION_AXON
+    SECTION_GLIA_PROCESS = 3,               // Note: overlaps with SECTION_DENDRITE
+
+    SECTION_SPINE_NECK = 2,  // Note: overlaps with SECTION_AXON
+    SECTION_SPINE_HEAD = 3,  // Note: overlaps with SECTION_DENDRITE
 
     // unnamed custom section types
     SECTION_CUSTOM_5 = 5,
@@ -94,18 +99,6 @@ enum VascularSectionType {
     SECTION_ARTERIAL_CAPILLARY = 6,
     SECTION_TRANSITIONAL = 7,
     SECTION_CUSTOM = 8
-};
-
-/**
- * Specify the access mode of data.
- * @version 1.4
- */
-enum AccessMode {
-    MODE_READ = 0x00000001,
-    MODE_WRITE = 0x00000002,
-    MODE_OVERWRITE = 0x00000004 | MODE_WRITE,
-    MODE_READWRITE = MODE_READ | MODE_WRITE,
-    MODE_READOVERWRITE = MODE_READ | MODE_OVERWRITE
 };
 
 }  // namespace enums
