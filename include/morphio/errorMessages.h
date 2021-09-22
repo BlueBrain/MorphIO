@@ -24,9 +24,9 @@ namespace readers {
 
 /** Level of error reporting **/
 enum ErrorLevel {
-    INFO, //!< Info
+    INFO,     //!< Info
     WARNING,  //!< Warning
-    ERROR  //!< Error
+    ERROR     //!< Error
 };
 
 /** Debug info for error messages **/
@@ -94,7 +94,7 @@ struct Sample {
 
     floatType diameter;
     bool valid;
-    Point point; //!< x, y, z and diameter
+    Point point;  //!< x, y, z and diameter
     SectionType type;
     int parentId;
     unsigned int id;

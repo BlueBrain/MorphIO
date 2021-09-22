@@ -170,7 +170,7 @@ struct Annotation {
 struct Marker {
     PointLevel _pointLevel;
     std::string _label;
-    int32_t _sectionId; //!< id of section that contains the marker
+    int32_t _sectionId;  //!< id of section that contains the marker
 };
 
 /**
