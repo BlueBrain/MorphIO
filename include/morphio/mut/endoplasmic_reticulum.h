@@ -5,11 +5,7 @@
 
 namespace morphio {
 namespace mut {
-/**
- * The entry-point class to access endoplasmic reticulum data
- *
- * Spec https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
- **/
+/** Mutable(editable) morphio::EndoplasmicReticulum */
 class EndoplasmicReticulum
 {
   public:

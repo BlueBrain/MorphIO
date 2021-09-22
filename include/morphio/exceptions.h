@@ -2,9 +2,8 @@
 #include <stdexcept>
 
 namespace morphio {
-/**
-   Base class of all morphio errors
- **/
+
+/** Base class of all morphio errors */
 class MorphioError: public std::runtime_error
 {
   public:

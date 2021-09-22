@@ -1,28 +1,16 @@
-/**
-   The property namespace is the core of MorphIO as it is where all the
-   internal data are stored.
-
-   The higher level container structure is Property::Properties.
-
-   It contains low-lever structure that stores information at various levels:
-       - PointLevel: information that is available at the point level (point
- coordinate, diameter, perimeter)
-       - SectionLevel: information that is available at the section level
- (section type, parent section)
-       - CellLevel: information that is available at the cell level (cell type,
- file version, soma type)
-       - MitochondriaPointLevel: information that is available at the
- mitochondrial point level (enclosing neuronal section, relative distance to
- start of neuronal section, diameter)
-       - MitochondriaSectionLevel: information that is available at the
- mitochondrial section level (parent section)
- **/
 #pragma once
 
 #include <map>
 #include <morphio/types.h>
 
 namespace morphio {
+/**
+   The property namespace is the core of MorphIO as it is where all the
+   internal data are stored. The higher level container structure is Property::Properties.
+
+   It contains low-lever structure that stores information at various levels:
+   PointLevel, SectionLevel, CellLevel, etc.
+ **/
 namespace Property {
 
 struct Section {
@@ -63,6 +51,7 @@ struct MitoNeuriteSectionId {
     using Type = uint32_t;
 };
 
+/** Information that is available at the point level (point coordinate, diameter, perimeter) */
 struct PointLevel {
     std::vector<Point::Type> _points;
     std::vector<Diameter::Type> _diameters;
@@ -77,6 +66,7 @@ struct PointLevel {
     PointLevel& operator=(const PointLevel& other);
 };
 
+/** Information that is available at the section level (section type, parent section) */
 struct SectionLevel {
     std::vector<Section::Type> _sections;
     std::vector<SectionType::Type> _sectionTypes;
@@ -89,6 +79,10 @@ struct SectionLevel {
     bool diff(const SectionLevel& other, LogLevel logLevel) const;
 };
 
+/**
+ Information that is available at the mitochondrial point level (enclosing neuronal section,
+ relative distance to start of neuronal section, diameter)
+ */
 struct MitochondriaPointLevel {
     std::vector<MitoNeuriteSectionId::Type> _sectionIds;
     std::vector<MitoPathLength::Type> _relativePathLengths;
@@ -108,6 +102,7 @@ struct MitochondriaPointLevel {
     bool operator!=(const MitochondriaPointLevel& other) const;
 };
 
+/** Information that is available at the mitochondrial section level (parent section) */
 struct MitochondriaSectionLevel {
     std::vector<Section::Type> _sections;
     std::map<int, std::vector<unsigned int>> _children;
@@ -117,6 +112,7 @@ struct MitochondriaSectionLevel {
     bool operator!=(const MitochondriaSectionLevel& other) const;
 };
 
+/** Properties that are available for morphio::DendriticSpine */
 namespace DendriticSpine {
 
 using SectionId_t = int32_t;
@@ -135,6 +131,10 @@ struct Level {
 
 }  // namespace DendriticSpine
 
+/**
+ Information that is available at the endoplasmic reticulum end level (section indices,
+ volumes, surface areas, filament counts)
+ */
 struct EndoplasmicReticulumLevel {
     std::vector<uint32_t> _sectionIndices;
     std::vector<morphio::floatType> _volumes;
@@ -142,6 +142,7 @@ struct EndoplasmicReticulumLevel {
     std::vector<uint32_t> _filamentCounts;
 };
 
+/** Class that holds service information about a warning. */
 struct Annotation {
     Annotation(AnnotationType type,
                uint32_t sectionId,
@@ -161,12 +162,21 @@ struct Annotation {
     int32_t _lineNumber;
 };
 
+
+/**
+ A marker within the morphology. It is used in ASC only and stores some additional info about
+ a morphology point.
+ */
 struct Marker {
     PointLevel _pointLevel;
     std::string _label;
-    int32_t _sectionId;  // id of section that contains the marker
+    int32_t _sectionId; //!< id of section that contains the marker
 };
 
+/**
+ Service information that is available at the Morphology level (morphology version, morphology
+ family, soma type, etc.)
+ */
 struct CellLevel {
     MorphologyVersion _version = {"undefined", 0, 0};
     morphio::CellFamily _cellFamily = NEURON;
@@ -189,7 +199,7 @@ struct CellLevel {
     }
 };
 
-// The lowest level data blob
+/** The lowest level data blob */
 struct Properties {
     PointLevel _pointLevel;
     SectionLevel _sectionLevel;
