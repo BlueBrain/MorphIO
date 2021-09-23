@@ -62,9 +62,9 @@ class Vasculature
      **/
     inline const std::vector<property::SectionType::Type>& sectionTypes() const noexcept;
 
-    /** graph iterator from the begin */
+    /** graph iterator pointing to the begin */
     graph_iterator begin() const;
-    /** graph iterator from the end */
+    /** graph iterator pointing to the end */
     graph_iterator end() const;
 
   private:

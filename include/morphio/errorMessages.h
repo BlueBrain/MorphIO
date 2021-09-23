@@ -17,7 +17,7 @@ void set_raise_warnings(bool is_raise);
 void set_ignored_warning(Warning warning, bool ignore = true);
 /** Set an array of warnings to ignore **/
 void set_ignored_warning(const std::vector<Warning>& warning, bool ignore = true);
-/** print a warning **/
+/** Print a warning. Raises an error if  `set_raise_warnings` was set to `true`. **/
 void printError(Warning warning, const std::string& msg);
 
 namespace readers {
@@ -39,12 +39,12 @@ struct DebugInfo {
     DebugInfo(std::string filename = "")
         : _filename(filename) {}
 
-    /** Set line number within morphology file */
+    /** Stores section's line number within morphology file */
     void setLineNumber(uint32_t sectionId, unsigned int line) {
         _lineNumbers[sectionId] = static_cast<int>(line);
     }
 
-    /** Get line number within morphology file */
+    /** Get section's line number within morphology file */
     int32_t getLineNumber(uint32_t sectionId) const {
         try {
             return _lineNumbers.at(sectionId);
