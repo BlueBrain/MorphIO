@@ -39,12 +39,12 @@ struct DebugInfo {
     DebugInfo(std::string filename = "")
         : _filename(filename) {}
 
-    /** Set line number of morphology file */
+    /** Set line number within morphology file */
     void setLineNumber(uint32_t sectionId, unsigned int line) {
         _lineNumbers[sectionId] = static_cast<int>(line);
     }
 
-    /** Get line number of morphology file */
+    /** Get line number within morphology file */
     int32_t getLineNumber(uint32_t sectionId) const {
         try {
             return _lineNumbers.at(sectionId);
@@ -101,7 +101,7 @@ struct Sample {
     unsigned int lineNumber;
 };
 
-/** Class that holds can generate error messages and holds a collection of predefined error
+/** Class that can generate error messages and holds a collection of predefined errors
     messages **/
 class ErrorMessages
 {
