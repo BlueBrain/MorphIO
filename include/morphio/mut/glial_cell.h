@@ -6,6 +6,7 @@
 namespace morphio {
 namespace mut {
 
+/** Mutable(editable) morphio::GlialCell */
 class GlialCell: public Morphology
 {
   public:

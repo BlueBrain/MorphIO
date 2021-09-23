@@ -17,14 +17,7 @@ using mito_breadth_iterator =
     morphio::breadth_iterator_t<std::shared_ptr<MitoSection>, Mitochondria>;
 using mito_depth_iterator = morphio::depth_iterator_t<std::shared_ptr<MitoSection>, Mitochondria>;
 
-/**
- * The entry-point class to access mitochondrial data
- *
- * By design, it is the equivalent of the Morphology class but at the
- *mitochondrial level. As the Morphology class, it implements a section accessor
- *and a root section accessor returning views on the Properties object for the
- *queried mitochondrial section.
- **/
+/** Mutable(editable) morphio::Mitochondria */
 class Mitochondria
 {
     using MitoSectionP = std::shared_ptr<MitoSection>;

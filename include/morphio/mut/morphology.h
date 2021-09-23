@@ -23,6 +23,7 @@ namespace mut {
 bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
                           const std::shared_ptr<Section>& current);
 
+/** Mutable(editable) morphio::Morphology */
 class Morphology
 {
   public:

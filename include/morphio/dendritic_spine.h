@@ -8,6 +8,7 @@
 
 namespace morphio {
 
+/** Class to represent morphologies of dendritic spines */
 class DendriticSpine: public Morphology
 {
   public:

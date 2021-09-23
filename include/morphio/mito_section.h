@@ -10,6 +10,7 @@ using mito_upstream_iterator = upstream_iterator_t<MitoSection>;
 using mito_breadth_iterator = morphio::breadth_iterator_t<MitoSection, Mitochondria>;
 using mito_depth_iterator = morphio::depth_iterator_t<MitoSection, Mitochondria>;
 
+/** Mitochondria section */
 class MitoSection: public SectionBase<MitoSection>
 {
     using SectionId = Property::MitoSection;

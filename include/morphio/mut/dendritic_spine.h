@@ -6,6 +6,7 @@
 namespace morphio {
 namespace mut {
 
+/** Mutable(editable) morphio::DendriticSpine */
 class DendriticSpine: public Morphology
 {
   public:

@@ -4,6 +4,8 @@
 #include <morphio/types.h>
 
 namespace morphio {
+
+/** Class to represent morphologies of glial cells */
 class GlialCell: public Morphology
 {
   public:

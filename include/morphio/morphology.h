@@ -6,12 +6,13 @@
 #include <morphio/types.h>
 
 namespace morphio {
-enum SomaClasses { SOMA_CONTOUR, SOMA_CYLINDER };
 
+/** Morphology breadth iterator */
 using breadth_iterator = breadth_iterator_t<Section, Morphology>;
+/** Morphology depth iterator */
 using depth_iterator = depth_iterator_t<Section, Morphology>;
 
-/** Read access a Morphology file.
+/** Class that gives read access to a Morphology file.
  *
  * Following RAII, this class is ready to use after the creation and will ensure
  * release of resources upon destruction.
@@ -26,42 +27,36 @@ class Morphology
     Morphology& operator=(Morphology&&) noexcept;
 
     /** @name Read API */
-    //@{
+
     /** Open the given source to a morphology file and parse it.
 
-        options is the modifier flags to be applied. All flags are defined in
-       their enum: morphio::enum::Option and can be composed.
+       \param source path to a source file.
+       \param options is the modifier flags to be applied. All flags are defined in
+         their corresponding morphio.enums.Option and can be composed.
 
         Example:
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
     explicit Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
+
+    /** Constructor from an already parsed file */
     explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+    /** Constructor from an instance of morphio::mut::Morphology */
     explicit Morphology(mut::Morphology);
 
-    /**
-     * Return the soma object
-     **/
+    /** Return the soma object */
     Soma soma() const;
 
-    /**
-     * Return the mitochondria object
-     **/
+    /** Return the mitochondria object */
     Mitochondria mitochondria() const;
 
-    /**
-     * Return the endoplasmic reticulum object
-     **/
+    /** Return the endoplasmic reticulum object */
     const EndoplasmicReticulum endoplasmicReticulum() const;
 
-    /**
-     * Return the annotation object
-     **/
+    /** Return the annotation object */
     const std::vector<Property::Annotation>& annotations() const;
 
-    /**
-     * Return the markers
-     **/
+    /** Return the markers */
     const std::vector<Property::Marker>& markers() const;
 
     /**
@@ -70,9 +65,7 @@ class Morphology
      **/
     std::vector<Section> rootSections() const;
 
-    /**
-     * Return a vector containing all section objects.
-     **/
+    /** Return a vector containing all section objects */
     std::vector<Section> sections() const;
 
     /**
@@ -92,8 +85,8 @@ class Morphology
      * Returns a list with offsets to access data of a specific section in the points
      * and diameters arrays.
      *
-     * Example: accessing diameters of n'th section will be located in the DIAMETERS
-     * array from DIAMETERS[sectionOffsets(n)] to DIAMETERS[sectionOffsets(n+1)-1]
+     * Example: accessing diameters of n'th section will be located in the Morphology::diameters
+     * array from diameters[sectionOffsets(n)] to diameters[sectionOffsets(n+1)-1]
      *
      * Note: for convenience, the last point of this array is the points() array size
      * so that the above example works also for the last section.
@@ -106,14 +99,10 @@ class Morphology
      **/
     const std::vector<morphio::floatType>& diameters() const;
 
-    /**
-     * Return a vector with all perimeters from all sections
-     **/
+    /** Return a vector with all perimeters from all sections */
     const std::vector<morphio::floatType>& perimeters() const;
 
-    /**
-     * Return a vector with the section type of every section
-     **/
+    /** Return a vector with the section type of every section */
     const std::vector<SectionType>& sectionTypes() const;
 
     /**
@@ -129,6 +118,7 @@ class Morphology
        If id == -1, the iteration will start at each root section, successively
     **/
     depth_iterator depth_begin() const;
+    /** depth end iterator */
     depth_iterator depth_end() const;
 
     /**
@@ -138,21 +128,16 @@ class Morphology
        at each root section
     **/
     breadth_iterator breadth_begin() const;
+    /** breadth end iterator */
     breadth_iterator breadth_end() const;
 
-    /**
-     * Return the soma type
-     **/
+    /** Return the soma type */
     const SomaType& somaType() const;
 
-    /**
-     * Return the cell family (neuron or glia)
-     **/
+    /** Return the cell family (neuron or glia) */
     const CellFamily& cellFamily() const;
 
-    /**
-     * Return the version
-     **/
+    /** Return the version */
     const MorphologyVersion& version() const;
 
   protected:

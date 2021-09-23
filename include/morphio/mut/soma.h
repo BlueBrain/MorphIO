@@ -4,6 +4,7 @@
 
 namespace morphio {
 namespace mut {
+/** Mutable(editable) morphio::Soma */
 class Soma
 {
   public:

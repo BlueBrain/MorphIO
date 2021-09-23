@@ -8,6 +8,7 @@
 
 namespace morphio {
 namespace vasculature {
+/** Vasculature section */
 class Section
 {
     using SectionId = property::VascSection;

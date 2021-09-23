@@ -30,16 +30,19 @@ namespace Property {
 struct Properties;
 }
 
+/** Functionality for vasculature (blood)  **/
 namespace vasculature {
 class Section;
 class Vasculature;
 }  // namespace vasculature
 
+/** Functionality for reading of morphologies from files  **/
 namespace readers {
 struct DebugInfo;
 class ErrorMessages;
 }  // namespace readers
 
+/** Functionality for mutating(editing) of morphologies  **/
 namespace mut {
 class DendriticSpine;
 class EndoplasmicReticulum;

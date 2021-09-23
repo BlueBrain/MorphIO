@@ -13,6 +13,14 @@ namespace vasculature {
 
 using graph_iterator = graph_iterator_t<Section, Vasculature>;
 
+/**
+ * The entry-point class to access vasculature(blood) data
+ *
+ * By design, it is the equivalent of the Morphology class but at the
+ * vasculature level. As the Morphology class, it implements a section accessor
+ * and a root section accessor returning views on the Properties object for the
+ * queried vasculature section.
+ **/
 class Vasculature
 {
   public:
@@ -54,10 +62,9 @@ class Vasculature
      **/
     inline const std::vector<property::SectionType::Type>& sectionTypes() const noexcept;
 
-    /**
-     * graph iterators
-     **/
+    /** graph iterator pointing to the begin */
     graph_iterator begin() const;
+    /** graph iterator pointing to the end */
     graph_iterator end() const;
 
   private:

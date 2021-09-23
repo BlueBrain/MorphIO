@@ -7,6 +7,7 @@
 namespace morphio {
 namespace mut {
 
+/** Mutable(editable) morphio::MitoSection */
 class MitoSection
 {
   public:
