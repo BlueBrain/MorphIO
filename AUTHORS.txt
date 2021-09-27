@@ -1,0 +1,28 @@
+Adrien Devresse
+Ahmet Bilgili
+Aleksei Sanin
+Alexander Dietz
+Alexandru Săvulescu
+Andrew Hale
+Antonio Bellotta
+Arseny V. Povolotsky
+Ben Beasley
+Benoît Coste
+Chevtchenko Grigori
+Cyrille Favreau
+Daniel Nachbaur
+Eleftherios Zisis
+Fernando Pereira
+Jafet Villafranca
+Jean-Denis Courcol
+Juan Hernando Vieites
+Matthias Wolf
+Mike Gevaert (maintainer)
+Mohamed-Ghaith Kaabi
+Nicolas Cornu
+Pablo Toharia
+Raphael Dumusc
+Snigda Dagar
+Stefan Eilemann
+Thomas Delemontex
+Tristan Carel
