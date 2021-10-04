@@ -3,7 +3,6 @@ channels:
   - defaults
 dependencies:
   - python=3.6
-  - hdf5
-  - cmake
+  - pip
   - pip:
     - ..[docs]
