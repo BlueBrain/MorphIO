@@ -9,5 +9,13 @@ submodules:
   include: all
   recursive: true
 
+# it appears that the conda `cmake` finds `conda` installed packages
+# fine, but if cmake is installed through `pyproject.toml`, that CMake
+# doesn't find HDF5, if the hdf5 headers are available by the system, then
+# it works
+build:
+  apt_packages:
+    - libhdf5-dev
+
 conda:
   environment: doc/environment.yml
