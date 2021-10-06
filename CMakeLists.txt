@@ -7,7 +7,8 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 option(BUILD_BINDINGS "Build the python bindings" ON)
 option(MorphIO_CXX_WARNINGS "Compile C++ with warnings" ON)
-option(EXTERNAL_HIGHFIVE "Use HighFive from external source" OFF)
+option(EXTERNAL_HIGHFIVE "Use HighFive from external source" ON)
+option(EXTERNAL_PYBIND11 "Use pybind11 from external source" ON)
 option(MORPHIO_TESTS "Build tests" ON)
 option(MORPHIO_USE_DOUBLE "Use doubles instead of floats" OFF)
 
@@ -32,6 +33,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (EXTERNAL_HIGHFIVE)
   find_package(HighFive REQUIRED)
+endif()
+if (EXTERNAL_PYBIND11)
+  find_package(pybind11 REQUIRED CONFIG)
 endif()
 set(MORPHIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/)
 

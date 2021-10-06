@@ -14,3 +14,11 @@ target_include_directories(gsl-lite SYSTEM INTERFACE)
 
 add_library(lexertl INTERFACE)
 target_include_directories(lexertl SYSTEM INTERFACE lexertl14/include)
+
+if(BUILD_BINDINGS)
+  if (NOT EXTERNAL_PYBIND11)
+    add_subdirectory(pybind11)
+    target_include_directories(pybind11 SYSTEM INTERFACE
+      pybind11)
+  endif()
+endif()
