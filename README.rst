@@ -6,7 +6,7 @@ MorphIO
 Documentation
 -------------
 
-MorphIO documentation is built and hosted on `readthedocs <http://morphio.readthedocs.org/>`.
+MorphIO documentation is built and hosted on `readthedocs <http://morphio.readthedocs.org/>`_.
 
 * `latest snapshot <http://morphio.readthedocs.org/en/latest/>`_
 * `latest release <http://morphio.readthedocs.org/en/stable/>`_
