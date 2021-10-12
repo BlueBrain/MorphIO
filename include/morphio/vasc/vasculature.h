@@ -48,6 +48,18 @@ class Vasculature
     Section section(const uint32_t& id) const;
 
     /**
+     * Returns a list with offsets to access data of a specific section in the points
+     * and diameters arrays.
+     p
+     * Example: accessing diameters of n'th section will be located in the Vasculature::diameters
+     * array from diameters[sectionOffsets(n)] to diameters[sectionOffsets(n+1)-1]
+     *
+     * Note: for convenience, the last point of this array is the points() array size
+     * so that the above example works also for the last section.
+     */
+    const std::vector<uint32_t> sectionOffsets() const noexcept;
+
+    /**
      * Return a vector with all points from all sections
      **/
     inline const Points& points() const noexcept;

@@ -1,6 +1,7 @@
 import os
 
 import numpy as np
+from numpy import testing as npt
 import pytest
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from pathlib import Path
@@ -61,6 +62,20 @@ def test_section_types():
 
     with pytest.raises(RawDataError):
         vasculature.Vasculature(os.path.join(_path, "h5/vasculature-broken-section-type.h5"))
+
+
+def test_section_offsets():
+    morphology = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
+
+    offset = 0
+    expected_offsets = [offset]
+
+    for sec in morphology.sections:
+
+        offset += len(sec.points)
+        expected_offsets.append(offset)
+
+    npt.assert_allclose(morphology.section_offsets, expected_offsets)
 
 
 def test_iterators_vasculature():

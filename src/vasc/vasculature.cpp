@@ -55,6 +55,22 @@ std::vector<Section> Vasculature::sections() const {
     return sections_;
 }
 
+const std::vector<uint32_t> Vasculature::sectionOffsets() const noexcept {
+
+    // Vasculature section property is a single value representing the offset
+    const auto& offsets = _properties->get<property::VascSection>();
+
+    const auto size = offsets.size();
+    std::vector<uint32_t> indices(size + 1);
+
+    std::copy(offsets.begin(), offsets.end(), indices.begin());
+
+    indices[size] = static_cast<uint32_t>(this->points().size());
+
+    return indices;
+}
+
+
 graph_iterator Vasculature::begin() const {
     return graph_iterator(*this);
 }
