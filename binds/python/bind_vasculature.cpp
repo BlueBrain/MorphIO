@@ -39,8 +39,9 @@ void bind_vasculature(py::module& m) {
 
         .def_property_readonly(
             "section_offsets",
-            [](morphio::vasculature::Vasculature& vasculature)
-                { return as_pyarray(vasculature.sectionOffsets()); },
+            [](morphio::vasculature::Vasculature& vasculature) {
+                return as_pyarray(vasculature.sectionOffsets());
+            },
             "Returns a list with offsets to access data of a specific section in the points\n"
             "and diameters arrays.\n"
             "\n"

@@ -56,7 +56,6 @@ std::vector<Section> Vasculature::sections() const {
 }
 
 const std::vector<uint32_t> Vasculature::sectionOffsets() const noexcept {
-
     // Vasculature section property is a single value representing the offset
     const auto& offsets = _properties->get<property::VascSection>();
 
