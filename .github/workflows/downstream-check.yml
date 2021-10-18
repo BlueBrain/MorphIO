@@ -1,0 +1,16 @@
+name: Check downstream builds
+# on:
+#   push:
+#     branches: [master]
+
+jobs:
+  build:
+    name: Trigger morpho-kit build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger job
+        uses: appleboy/gitlab-ci-action@master
+        with:
+          host: "https://bbpgitlab.epfl.ch"
+          token: ${{ secrets.GITLAB_MORPHOKIT_TRIGGER_TOKEN }}
+          project_id: 903
