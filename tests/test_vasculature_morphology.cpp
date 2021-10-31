@@ -60,5 +60,4 @@ TEST_CASE("vasculature_section_connectivity", "[vasculature]") {
     dset.read(expected_connectivity.front().data());
 
     REQUIRE(section_connectivity == expected_connectivity);
-
 }
