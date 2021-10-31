@@ -69,7 +69,8 @@ const std::vector<uint32_t> Vasculature::sectionOffsets() const noexcept {
     return indices;
 }
 
-const std::vector<morphio::vasculature::property::Connection::Type>& Vasculature::sectionConnectivity() const noexcept{
+const std::vector<morphio::vasculature::property::Connection::Type>&
+Vasculature::sectionConnectivity() const noexcept {
     return _properties->get<property::Connection>();
 }
 
