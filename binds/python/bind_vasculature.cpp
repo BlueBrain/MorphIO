@@ -74,6 +74,14 @@ void bind_vasculature(py::module& m) {
             },
             "Returns a vector with the section type of every section")
 
+        .def_property_readonly(
+            "section_connectivity",
+            [](morphio::vasculature::Vasculature* morpho) {
+                return py::array(static_cast<py::ssize_t>(morpho->sectionConnectivity().size()),
+                                 morpho->sectionConnectivity().data());
+            },
+            "Returns a 2D array of the section connectivity")
+
         // Iterators
         .def(
             "iter",

@@ -1,4 +1,5 @@
 import os
+import h5py
 
 import numpy as np
 from numpy import testing as npt
@@ -76,6 +77,20 @@ def test_section_offsets():
         expected_offsets.append(offset)
 
     npt.assert_allclose(morphology.section_offsets, expected_offsets)
+
+
+def test_section_connectivity():
+
+    path = os.path.join(_path, "h5/vasculature1.h5")
+    morphology = vasculature.Vasculature(path)
+
+    with h5py.File(path, 'r') as fd:
+        expected_connectivity = fd['connectivity'][:]
+
+    assert_array_almost_equal(
+        morphology.section_connectivity,
+        expected_connectivity
+    )
 
 
 def test_iterators_vasculature():

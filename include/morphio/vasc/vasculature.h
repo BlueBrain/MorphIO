@@ -74,6 +74,12 @@ class Vasculature
      **/
     inline const std::vector<property::SectionType::Type>& sectionTypes() const noexcept;
 
+    /**
+     * Return a vector with all the connections between sections
+    **/
+    const std::vector<morphio::vasculature::property::Connection::Type>& sectionConnectivity() const noexcept;
+
+
     /** graph iterator pointing to the begin */
     graph_iterator begin() const;
     /** graph iterator pointing to the end */
