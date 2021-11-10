@@ -8,6 +8,10 @@ from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
 
+if sys.version_info[:2] < (3, 7):
+    raise RuntimeError("Python version >= 3.7 required.")
+
+
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
         Extension.__init__(self, name, sources=[])
