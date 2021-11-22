@@ -1,2 +1,2 @@
 [build-system]
-equires = ["setuptools>=24.2.0", "wheel", "cmake", "ninja"]
+requires = ["setuptools>=24.2.0", "wheel", "cmake", "ninja"]
