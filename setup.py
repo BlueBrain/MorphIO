@@ -96,5 +96,6 @@ setup(
     use_scm_version=True,
     setup_requires=[
         'setuptools_scm',
-        ],
+    ],
+    python_requires=">=3.7",
 )
