@@ -97,5 +97,5 @@ setup(
     setup_requires=[
         'setuptools_scm',
     ],
-    python_requires=">=3.7"
+    python_requires=">=3.7",
 )
