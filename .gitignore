@@ -47,3 +47,4 @@ build/
 ci/venv*
 cmake-build*
 env*
+venv-clang-format/
