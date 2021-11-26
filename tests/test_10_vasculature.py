@@ -1,6 +1,8 @@
 import os
+import h5py
 
 import numpy as np
+from numpy import testing as npt
 import pytest
 from numpy.testing import assert_array_almost_equal, assert_array_equal
 from pathlib import Path
@@ -61,6 +63,65 @@ def test_section_types():
 
     with pytest.raises(RawDataError):
         vasculature.Vasculature(os.path.join(_path, "h5/vasculature-broken-section-type.h5"))
+
+
+def test_section_offsets():
+    """
+    Example:
+
+    Array of points (listing ids instead of coordinates)
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    And three sections:
+
+    S1: [0, 1, 2]
+    S2: [3, 4, 5]
+    S3: [6, 7, 8, 9]
+
+    The offsets will be:
+    [0, 3, 6, 10]
+
+    So the last entry is equal to the size of the points dataset. This allows for applying a diff
+    for instance to calculate the section length (in terms of points) for each section without
+    having to allocate an extra array to add that extra value.
+    """
+    morphology = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
+
+    offset = 0
+    expected_offsets = [offset]
+    expected_lengths = []
+
+    for sec in morphology.sections:
+
+        ps = sec.points
+        offset += len(ps)
+        expected_lengths.append(len(ps))
+        expected_offsets.append(offset)
+
+    actual_section_offsets = morphology.section_offsets
+    npt.assert_allclose(actual_section_offsets, expected_offsets)
+
+    # last entry in the section offsets should be equal to the total
+    # number of points`
+    npt.assert_equal(actual_section_offsets[-1], len(morphology.points))
+
+    # and from the offsets we calculate the number of points per section
+    section_lengths = np.diff(actual_section_offsets)
+    npt.assert_allclose(section_lengths, expected_lengths)
+
+
+def test_section_connectivity():
+
+    path = os.path.join(_path, "h5/vasculature1.h5")
+    morphology = vasculature.Vasculature(path)
+
+    with h5py.File(path, 'r') as fd:
+        expected_connectivity = fd['connectivity'][:]
+
+    assert_array_almost_equal(
+        morphology.section_connectivity,
+        expected_connectivity
+    )
 
 
 def test_iterators_vasculature():
