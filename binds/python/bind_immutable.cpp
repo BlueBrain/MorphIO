@@ -87,6 +87,12 @@ void bind_immutable_module(py::module& m) {
             "Returns a list with all points from all sections (soma points are not included)\n"
             "Note: points belonging to the n'th section are located at indices:\n"
             "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
+
+        .def_property_readonly(
+            "n_points",
+            [](const morphio::Morphology& obj) { return obj.points().size(); },
+            "Returns the number of points from all sections (soma points are not included)")
+
         .def_property_readonly(
             "diameters",
             [](const morphio::Morphology& morpho) {
@@ -264,6 +270,12 @@ void bind_immutable_module(py::module& m) {
             "points",
             [](morphio::Section* section) { return span_array_to_ndarray(section->points()); },
             "Returns list of section's point coordinates")
+
+        .def_property_readonly(
+            "n_points",
+            [](const morphio::Section& section) { return section.points().size(); },
+            "Returns the number of points in section")
+
         .def_property_readonly(
             "diameters",
             [](morphio::Section* section) { return span_to_ndarray(section->diameters()); },
