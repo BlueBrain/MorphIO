@@ -59,6 +59,12 @@ void bind_vasculature(py::module& m) {
                                  morpho->points().data());
             },
             "Returns a list with all points from all sections")
+
+        .def_property_readonly(
+            "n_points",
+            [](const morphio::vasculature::Vasculature& obj) { return obj.points().size(); },
+            "Returns the number of points from all sections")
+
         .def_property_readonly(
             "diameters",
             [](morphio::vasculature::Vasculature* morpho) {
@@ -119,6 +125,12 @@ void bind_vasculature(py::module& m) {
                 return span_array_to_ndarray(section->points());
             },
             "Returns list of section's point coordinates")
+
+        .def_property_readonly(
+            "n_points",
+            [](const morphio::vasculature::Section& section) { return section.points().size(); },
+            "Returns the number of point in section")
+
         .def_property_readonly(
             "diameters",
             [](morphio::vasculature::Section* section) {

@@ -20,6 +20,12 @@ CELLS = OrderedDict({
 })
 
 
+def test_components():
+    for cell in CELLS.values():
+        assert cell.n_points == len(cell.points)
+        assert cell.section(0).n_points == len(cell.section(0).points)
+
+
 def test_is_root():
     for _, cell in CELLS.items():
         assert all(section.is_root for section in cell.root_sections)
