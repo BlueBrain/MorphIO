@@ -82,6 +82,12 @@ class Section: public SectionBase<Section>
      * Return the morphological type of this section (dendrite, axon, ...)
      */
     SectionType type() const;
+
+    /**
+     * Return the morphological type of this section (dendrite, axon, ...)
+     */
+    bool is_heterogeneous(bool downstream = false) const;
+
     friend class mut::Section;
     friend Section Morphology::section(uint32_t) const;
     friend class SectionBase<Section>;

@@ -81,6 +81,13 @@ TEST_CASE("sections", "[immutableMorphology]") {
     }
 }
 
+TEST_CASE("heterogeneous-sections", "[immutableMorphology]") {
+    auto morph = morphio::Morphology("data/simple-heterogeneous-neurite.swc");
+    for (const auto& section : morph.rootSections()) {
+        REQUIRE(section.is_heterogeneous());
+    }
+}
+
 TEST_CASE("modifers", "[immutableMorphology]") {
     morphio::Morphology morphNoModifier = morphio::Morphology(
         "data/reversed_NRN_neurite_order.swc");
