@@ -392,6 +392,14 @@ void bind_mutable_module(py::module& m) {
         .def_property_readonly("children",
                                &morphio::mut::Section::children,
                                "Returns a list of children IDs")
+        .def(
+            "is_heterogeneous",
+            &morphio::mut::Section::is_heterogeneous,
+            "Returns true if the tree downtream (downstream = true) or upstream (downstream = false)\n"
+            "has the same type as the current section.",
+            py::arg("downstream") = true
+        )
+
         // Iterators
         .def(
             "iter",

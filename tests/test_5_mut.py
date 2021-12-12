@@ -19,6 +19,28 @@ DATA_DIR = Path(__file__).parent / "data"
 SIMPLE = Morphology(Path(DATA_DIR, "simple.swc"))
 
 
+def test_heterogeneous_sections():
+
+    morph = morphio.mut.Morphology(Path(DATA_DIR, "simple-heterogeneous-neurite.swc"))
+
+    for root_section in morph.root_sections:
+
+        assert root_section.is_heterogeneous()
+        assert root_section.is_heterogeneous(True)
+        assert root_section.is_heterogeneous(downstream=True)
+        assert not root_section.is_heterogeneous(False)
+        assert not root_section.is_heterogeneous(downstream=False)
+
+        for section in root_section.children:
+            assert not section.is_heterogeneous(downstream=True)
+            assert section.is_heterogeneous(downstream=False)
+
+    # check a homogeneous morphology
+    for section in SIMPLE.iter():
+        assert not section.is_heterogeneous(downstream=True)
+        assert not section.is_heterogeneous(downstream=False)
+
+
 def test_point_level():
     a = PointLevel([[1, 2, 3]], [2], [])
     assert a.points == [[1, 2, 3]]

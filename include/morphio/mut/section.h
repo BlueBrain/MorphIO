@@ -79,6 +79,12 @@ class Section: public std::enable_shared_from_this<Section>
     bool isRoot() const;
 
     /**
+     * Return true if the sections of the tree downstream (downstream = true) or upstream (donwstream = false)
+     * have the same section type as the current section.
+     */
+    bool is_heterogeneous(bool downstream = true) const;
+
+    /**
        Return a vector of children IDs
     **/
     const std::vector<std::shared_ptr<Section>>& children() const;
