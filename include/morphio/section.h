@@ -84,8 +84,8 @@ class Section: public SectionBase<Section>
     SectionType type() const;
 
     /**
-     * Return true if the sections of the tree downstream (downstream = true) or upstream (donwstream = false)
-     * have the same section type as the current section.
+     * Return true if the sections of the tree downstream (downstream = true) or upstream
+     * (donwstream = false) have the same section type as the current section.
      */
     bool is_heterogeneous(bool downstream = true) const;
 

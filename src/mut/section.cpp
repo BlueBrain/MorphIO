@@ -1,5 +1,5 @@
+#include <algorithm>  // any_of
 #include <stack>
-#include <algorithm> // any_of
 
 #include <morphio/errorMessages.h>
 #include <morphio/mut/morphology.h>
@@ -61,7 +61,6 @@ bool Section::isRoot() const {
 }
 
 bool Section::is_heterogeneous(bool downstream) const {
-
     auto p = [&](const std::shared_ptr<Section>& s) { return type() != s->type(); };
 
     if (downstream) {
