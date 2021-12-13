@@ -1,6 +1,5 @@
 add_subdirectory(pybind11 EXCLUDE_FROM_ALL)
 
-# see CMakeBuild's self.target in setup.py
 pybind11_add_module(_morphio SYSTEM
     morphio.cpp
     bind_immutable.cpp
