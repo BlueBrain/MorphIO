@@ -12,7 +12,5 @@ pybind11_add_module(_morphio SYSTEM
 
 target_link_libraries(_morphio
     PRIVATE morphio_static
-    PRIVATE HighFive
-    PRIVATE gsl-lite
     PRIVATE pybind11::module
 )
