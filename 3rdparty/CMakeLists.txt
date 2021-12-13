@@ -17,6 +17,4 @@ target_include_directories(lexertl SYSTEM INTERFACE lexertl14/include)
 
 if(BUILD_BINDINGS)
   add_subdirectory(pybind11)
-  target_include_directories(pybind11 SYSTEM INTERFACE
-    pybind11)
 endif()
