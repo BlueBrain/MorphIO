@@ -1,4 +1,17 @@
+v3.3.2
+======
+
+New Features
+    * n_points method for immutable Morphology and Vasculature (#359)
+    * Vasculature section_offsets & section_connectivity (#352)
+
+Fixes:
+    * Updated pybind11 submodule to v2.8.1 (#362)
+    * Python version check >=3.7 (#356)
+    * Fixed documentation links (#350)
+
 v3.3.1
+======
 
 New Features:
     * Dendritic spine (#321)

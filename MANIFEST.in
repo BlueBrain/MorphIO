@@ -17,5 +17,8 @@ include 3rdparty/pybind11/CMakeLists.txt
 include 3rdparty/lexertl14/CMakeLists.txt
 recursive-include 3rdparty/lexertl14/include/lexertl/ *
 
-recursive-include 3rdparty/pybind11/tools/ *
-include CMakeLists.txt
+# pybind11
+recursive-include binds/python/pybind11/include *
+recursive-include binds/python/pybind11/tools *.cmake
+include binds/python/pybind11/CMakeLists.txt
+include binds/python/pybind11/LICENSE
