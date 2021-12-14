@@ -21,3 +21,12 @@ recursive-include binds/python/pybind11/include *
 recursive-include binds/python/pybind11/tools *.cmake
 include binds/python/pybind11/CMakeLists.txt
 include binds/python/pybind11/LICENSE
+
+# setuptools_scm forces all SCM files to be packaged into sdist
+# we need to manually exclude them to prevent their inclusion
+# see https://github.com/pypa/setuptools_scm/issues/190
+prune ci
+prune doc
+prune tests
+prune scripts
+prune examples
