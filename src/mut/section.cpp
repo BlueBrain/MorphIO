@@ -1,3 +1,4 @@
+#include <algorithm>  // any_of
 #include <stack>
 
 #include <morphio/errorMessages.h>
@@ -57,6 +58,16 @@ bool Section::isRoot() const {
         return morphology->_sections.find(parentId->second) == morphology->_sections.end();
     }
     return true;
+}
+
+bool Section::is_heterogeneous(bool downstream) const {
+    auto predicate = [&](const std::shared_ptr<Section>& s) { return type() != s->type(); };
+
+    if (downstream) {
+        return std::any_of(breadth_begin(), breadth_end(), predicate);
+    }
+
+    return std::any_of(upstream_begin(), upstream_end(), predicate);
 }
 
 const std::vector<std::shared_ptr<Section>>& Section::children() const {

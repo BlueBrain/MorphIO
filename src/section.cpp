@@ -1,9 +1,19 @@
+#include <algorithm>  // all_of
+
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/tools.h>
 #include <morphio/vector_types.h>
 
 namespace morphio {
+
+bool Section::is_heterogeneous(bool downstream) const {
+    auto predicate = [&](const Section& s) { return type() != s.type(); };
+    if (downstream) {
+        return std::any_of(breadth_begin(), breadth_end(), predicate);
+    }
+    return std::any_of(upstream_begin(), upstream_end(), predicate);
+}
 
 SectionType Section::type() const {
     auto val = _properties->get<Property::SectionType>()[_id];

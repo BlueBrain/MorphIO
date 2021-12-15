@@ -20,6 +20,28 @@ CELLS = OrderedDict({
 })
 
 
+def test_heterogeneous_sections():
+
+    morph = Morphology(os.path.join(_path, "simple-heterogeneous-neurite.swc"))
+
+    for root_section in morph.root_sections:
+
+        assert root_section.is_heterogeneous()
+        assert root_section.is_heterogeneous(True)
+        assert root_section.is_heterogeneous(downstream=True)
+        assert not root_section.is_heterogeneous(False)
+        assert not root_section.is_heterogeneous(downstream=False)
+
+        for section in root_section.children:
+            assert not section.is_heterogeneous(downstream=True)
+            assert section.is_heterogeneous(downstream=False)
+
+    # check a homogeneous morphology
+    for section in CELLS['swc'].iter():
+        assert not section.is_heterogeneous(downstream=True)
+        assert not section.is_heterogeneous(downstream=False)
+
+
 def test_components():
     for cell in CELLS.values():
         assert cell.n_points == len(cell.points)

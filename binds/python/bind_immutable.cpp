@@ -285,6 +285,13 @@ void bind_immutable_module(py::module& m) {
             [](morphio::Section* section) { return span_to_ndarray(section->perimeters()); },
             "Returns list of section's point perimeters")
 
+        .def("is_heterogeneous",
+             &morphio::Section::is_heterogeneous,
+             "Returns true if the tree downtream (downstream = true) or upstream (downstream = "
+             "false)\n"
+             "has the same type as the current section.",
+             py::arg("downstream") = true)
+
         // Iterators
         .def(
             "iter",

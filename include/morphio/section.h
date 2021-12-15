@@ -82,6 +82,13 @@ class Section: public SectionBase<Section>
      * Return the morphological type of this section (dendrite, axon, ...)
      */
     SectionType type() const;
+
+    /**
+     * Return true if the sections of the tree downstream (downstream = true) or upstream
+     * (donwstream = false) have the same section type as the current section.
+     */
+    bool is_heterogeneous(bool downstream = true) const;
+
     friend class mut::Section;
     friend Section Morphology::section(uint32_t) const;
     friend class SectionBase<Section>;
