@@ -27,6 +27,9 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake)
 include(CompilerFlags)
 set(CMAKE_CXX_FLAGS "${FLAGS}")
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 if (EXTERNAL_HIGHFIVE)
   find_package(HighFive REQUIRED)
 endif()
