@@ -8,11 +8,11 @@
 namespace morphio {
 
 bool Section::is_heterogeneous(bool downstream) const {
-    auto p = [&](const Section& s) { return type() != s.type(); };
+    auto predicate = [&](const Section& s) { return type() != s.type(); };
     if (downstream) {
-        return std::any_of(breadth_begin(), breadth_end(), p);
+        return std::any_of(breadth_begin(), breadth_end(), predicate);
     }
-    return std::any_of(upstream_begin(), upstream_end(), p);
+    return std::any_of(upstream_begin(), upstream_end(), predicate);
 }
 
 SectionType Section::type() const {
