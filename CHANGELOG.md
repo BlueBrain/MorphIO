@@ -4,7 +4,7 @@ v3.3.3
 New Features
     * Vasculature section_offsets & section_connectivity (#352)
     * n_points method for immutable Morphology and Vasculature (#359)
-    * is_heterogeneous method for checking downstream/upstream type homogeneity (#360)
+    * is_heterogeneous method for checking downstream/upstream section type homogeneity (#360)
 
 Fixes:
     * Fixed documentation links (#350)
