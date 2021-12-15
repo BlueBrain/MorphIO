@@ -61,7 +61,7 @@ bool Section::isRoot() const {
 }
 
 bool Section::is_heterogeneous(bool downstream) const {
-    auto p = [&](const std::shared_ptr<Section>& s) { return type() != s->type(); };
+    auto predicate = [&](const std::shared_ptr<Section>& s) { return type() != s->type(); };
 
     if (downstream) {
         return std::any_of(breadth_begin(), breadth_end(), p);
