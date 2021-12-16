@@ -1,5 +1,6 @@
 #include <cassert>
 #include <fstream>
+#include <iomanip>  // std::fixed, std::setw
 
 #include <morphio/errorMessages.h>
 #include <morphio/mut/mitochondria.h>

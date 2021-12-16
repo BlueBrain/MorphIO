@@ -2,12 +2,17 @@
 
 #include <array>
 #include <cmath>
-#include <iostream>
-#include <sstream>
+#include <iosfwd>  // std::ostream
 #include <string>  // std::string
 #include <vector>
 
+#include <gsl/gsl>
+
 namespace morphio {
+
+template <typename T>
+using range = gsl::span<T>;
+
 #ifdef MORPHIO_USE_DOUBLE
 using floatType = double;
 constexpr floatType epsilon = 1e-6;
@@ -51,8 +56,8 @@ extern template Point centerOfGravity(const Points&);
 extern template floatType maxDistanceToCenterOfGravity(const Points&);
 
 std::string dumpPoint(const Point& point);
-std::string dumpPoints(const Points& point);
-
+std::string dumpPoints(const Points& points);
+std::string dumpPoints(const morphio::range<const morphio::Point>& points);
 
 char my_tolower(char ch);
 
@@ -61,9 +66,8 @@ char my_tolower(char ch);
 **/
 floatType distance(const Point& left, const Point& right);
 
-std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
-std::ostream& operator<<(std::ostream& os, const Points& points);
-
 }  // namespace morphio
+
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point);
 std::ostream& operator<<(std::ostream& os, const morphio::Points& points);
+std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);

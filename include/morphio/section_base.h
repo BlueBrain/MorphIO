@@ -7,6 +7,7 @@
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
+#include <morphio/vector_types.h>
 
 namespace morphio {
 /**
@@ -81,8 +82,5 @@ inline uint32_t SectionBase<T>::id() const noexcept {
 }
 
 }  // namespace morphio
-
-std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
-std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);
 
 #include "section_base.tpp"

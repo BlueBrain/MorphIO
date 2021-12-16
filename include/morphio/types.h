@@ -4,7 +4,6 @@
 #include <string>  // std::string
 #include <vector>  // std::vector
 
-#include <gsl/gsl>
 #include <morphio/enums.h>
 #include <morphio/exceptions.h>
 #include <morphio/vector_types.h>
@@ -57,8 +56,5 @@ using SectionRange = std::pair<size_t, size_t>;
 
 // A tuple (file format (std::string), major version, minor version)
 using MorphologyVersion = std::tuple<std::string, uint32_t, uint32_t>;
-
-template <typename T>
-using range = gsl::span<T>;
 
 }  // namespace morphio

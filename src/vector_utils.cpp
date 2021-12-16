@@ -1,8 +1,9 @@
 #include <algorithm>  // std::max
+#include <cctype>     // std::tolower
 #include <cmath>      // std::sqrt
 #include <numeric>    // std::accumulate
+#include <sstream>    // ostringstream
 #include <string>     // std::string
-#include <cctype>     // std::tolower
 
 #include <morphio/types.h>
 
@@ -87,6 +88,14 @@ std::string dumpPoints(const Points& points) {
     return oss.str();
 }
 
+std::string dumpPoints(const morphio::range<const morphio::Point>& points) {
+    std::ostringstream oss;
+    for (const auto& point : points) {
+        oss << dumpPoint(point) << '\n';
+    }
+    return oss.str();
+}
+
 template <typename T>
 Point centerOfGravity(const T& points) {
     Point::value_type x = 0, y = 0, z = 0;
@@ -107,7 +116,7 @@ floatType maxDistanceToCenterOfGravity(const T& points) {
     return std::accumulate(std::begin(points),
                            std::end(points),
                            floatType{0},
-                           [&](morphio::floatType a, const Point& b) {
+                           [&](floatType a, const Point& b) {
                                return std::max(a, distance(c, b));
                            });
 }
@@ -122,40 +131,36 @@ Point operator*(const Point& from, T factor) {
     return ret;
 }
 template Point operator*<int>(const Point& from, int factor);
-template Point operator*<morphio::floatType>(const Point& from, floatType factor);
+template Point operator*<floatType>(const Point& from, floatType factor);
 
 template <typename T>
 Point operator*(T factor, const Point& from) {
     return from * factor;
 }
 template Point operator*<int>(int factor, const Point& from);
-template Point operator*<morphio::floatType>(morphio::floatType factor, const Point& from);
+template Point operator*<floatType>(floatType factor, const Point& from);
 
 template <typename T>
 Point operator/(const Point& from, T factor) {
-    return from * (1 / static_cast<morphio::floatType>(factor));
+    return from * (1 / static_cast<floatType>(factor));
 }
 template Point operator/(const Point& from, int factor);
 template Point operator/(const Point& from, floatType factor);
-
-std::ostream& operator<<(std::ostream& os, const Points& points) {
-    return os << morphio::dumpPoints(points);
-}
-
-std::ostream& operator<<(std::ostream& os, const morphio::Point& point) {
-    return os << morphio::dumpPoint(point);
-}
 
 // Like std::tolower but accepts char
 char my_tolower(char ch) {
     return static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
 }
-
 }  // namespace morphio
+
+std::ostream& operator<<(std::ostream& os, const morphio::Point& point) {
+    return os << morphio::dumpPoint(point);
+}
 
 std::ostream& operator<<(std::ostream& os, const morphio::Points& points) {
     return os << morphio::dumpPoints(points);
 }
-std::ostream& operator<<(std::ostream& os, const morphio::Point& point) {
-    return os << morphio::dumpPoint(point);
+
+std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points) {
+    return os << morphio::dumpPoints(points);
 }

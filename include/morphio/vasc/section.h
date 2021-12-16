@@ -1,4 +1,6 @@
 #pragma once
+
+#include <iosfwd>  // std::ostream
 #include <memory>  // std::shared_ptr
 #include <vector>  // std::vector
 
@@ -83,4 +85,3 @@ class Section
 }  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::vasculature::Section& section);
-std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);

@@ -5,6 +5,7 @@
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/tools.h>
+#include <morphio/vector_types.h>
 
 namespace morphio {
 namespace mut {
@@ -111,6 +112,7 @@ upstream_iterator Section::upstream_end() const {
     return upstream_iterator();
 }
 
+/*
 static std::ostream& operator<<(std::ostream& os, const Section& section) {
     ::operator<<(os, section);
     return os;
@@ -120,6 +122,7 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section>& secti
     os << *sectionPtr;
     return os;
 }
+*/
 
 std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> original_section,
                                                 bool recursive) {
@@ -228,12 +231,12 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
 }  // end namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::mut::Section& section) {
-    auto points = section.points();
+    const auto& points = section.points();
     if (points.empty()) {
         os << "Section(id=" << section.id() << ", points=[])";
     } else {
-        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
-        os << points[points.size() - 1] << ")])";
+        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., ("
+           << points[points.size() - 1] << ")])";
     }
 
     return os;
