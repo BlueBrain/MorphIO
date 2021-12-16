@@ -101,4 +101,3 @@ class Section: public SectionBase<Section>
 }  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
-std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);

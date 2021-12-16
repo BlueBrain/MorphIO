@@ -63,16 +63,8 @@ std::ostream& operator<<(std::ostream& os, const morphio::Section& section) {
     if (points.empty()) {
         os << "Section(id=" << section.id() << ", points=[])";
     } else {
-        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
-        os << points[points.size() - 1] << ")])";
-    }
-    return os;
-}
-
-// operator<< must be defined in the global namespace to be usable there
-std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points) {
-    for (const auto& point : points) {
-        os << point[0] << ' ' << point[1] << ' ' << point[2] << '\n';
+        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., ("
+           << points[points.size() - 1] << ")])";
     }
     return os;
 }

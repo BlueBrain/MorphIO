@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <morphio/vasc/section.h>
 
 namespace morphio {
@@ -19,9 +21,11 @@ Section::Section(const uint32_t id_, const std::shared_ptr<property::Properties>
                                                    : sections[id_ + 1];
     _range = std::make_pair(start, end_);
 
-    if (_range.second <= _range.first)
+    if (_range.second <= _range.first) {
+        // TODO: shouldn't print to std::cerr
         std::cerr << "Dereferencing broken properties section " << _id
                   << "\nSection range: " << _range.first << " -> " << _range.second << '\n';
+    }
 }
 
 Section& Section::operator=(const Section& section) {
@@ -122,3 +126,14 @@ graph_iterator Section::end() const {
 }
 }  // namespace vasculature
 }  // namespace morphio
+
+std::ostream& operator<<(std::ostream& os, const morphio::vasculature::Section& section) {
+    const auto& points = section.points();
+    if (points.empty()) {
+        os << "Section(id=" << section.id() << ", points=[])";
+    } else {
+        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., ("
+           << points[points.size() - 1] << ")])";
+    }
+    return os;
+}

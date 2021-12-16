@@ -99,6 +99,13 @@ void bind_vasculature(py::module& m) {
 
 
     py::class_<morphio::vasculature::Section>(m, "Section")
+        .def("__str__",
+             [](const morphio::vasculature::Section& section) {
+                 std::stringstream ss;
+                 ss << section;
+                 return ss.str();
+             })
+
         // Topology-related member functions
         .def_property_readonly("predecessors",
                                &morphio::vasculature::Section::predecessors,

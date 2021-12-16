@@ -139,3 +139,8 @@ def test_iterators_vasculature():
 def test_from_pathlib():
     vasc = vasculature.Vasculature(Path(_path, "h5/vasculature1.h5"))
     assert len(vasc.sections) == 3080
+
+def test_section___str__():
+    morphology = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
+    assert (str(morphology.section(0)) ==
+                 'Section(id=0, points=[(1265.47 335.424 1869.19),..., (1274 336.7 1876)])')
