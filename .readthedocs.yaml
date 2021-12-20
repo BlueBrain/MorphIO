@@ -14,8 +14,10 @@ submodules:
 # doesn't find HDF5, if the hdf5 headers are available by the system, then
 # it works
 build:
+  os: "ubuntu-20.04"
   apt_packages:
     - libhdf5-dev
+  tools: "mambaforge-4.10"
 
 conda:
   environment: doc/environment.yml
