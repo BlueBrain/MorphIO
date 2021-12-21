@@ -20,11 +20,10 @@ build:
   tools:
     python: "3.9"
 
-python:
-  install:
-    - method: pip
-    - path: .
-
 sphinx:
   configuration: docs/source/conf.py
 
+python:
+  install:
+    - method: pip
+      path: .
