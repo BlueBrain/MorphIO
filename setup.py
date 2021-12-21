@@ -98,7 +98,4 @@ setup(
         'setuptools_scm',
     ],
     python_requires=">=3.7",
-    extras_require={
-        'docs': ['sphinx-bluebrain-theme>=0.2.5']
-    }
 )
