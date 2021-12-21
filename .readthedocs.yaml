@@ -18,7 +18,13 @@ build:
   apt_packages:
     - libhdf5-dev
   tools:
-    python: "mambaforge-4.10"
+    python: "3.9"
 
-conda:
-  environment: doc/environment.yml
+python:
+  install:
+    - method: pip
+    - path: .
+
+sphinx:
+  configuration: docs/source/conf.py
+
