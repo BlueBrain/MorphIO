@@ -46,6 +46,7 @@ def test_components():
     for cell in CELLS.values():
         assert cell.n_points == len(cell.points)
         assert cell.section(0).n_points == len(cell.section(0).points)
+        assert not cell.points.flags.writeable
 
 
 def test_is_root():

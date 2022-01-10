@@ -80,9 +80,13 @@ void bind_immutable_module(py::module& m) {
         // Property accessors
         .def_property_readonly(
             "points",
-            [](morphio::Morphology* morpho) {
-                const auto& data = morpho->points();
-                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            [](const morphio::Morphology& morpho) {
+                const auto& data = morpho.points();
+                auto res =
+                    py::array(static_cast<py::ssize_t>(data.size()), data.data(), py::none());
+                py::detail::array_proxy(res.ptr())->flags &=
+                    ~py::detail::npy_api::NPY_ARRAY_WRITEABLE_;
+                return res;
             },
             "Returns a list with all points from all sections (soma points are not included)\n"
             "Note: points belonging to the n'th section are located at indices:\n"
