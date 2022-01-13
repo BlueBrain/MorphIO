@@ -63,16 +63,12 @@ static std::set<Warning> _ignoredWarnings;
 
 /** A sample of section for error reporting, includes its position (line) within the file. **/
 struct Sample {
-    Sample()
-        : valid(false)
-        , type(SECTION_UNDEFINED)
-        , parentId(-1)
-        , lineNumber(0) {}
+    Sample() = default;
 
     explicit Sample(const char* line, unsigned int lineNumber_)
         : lineNumber(lineNumber_) {
-        floatType radius;
-        int int_type;
+        floatType radius = -1.f;
+        int int_type = -1;
 #ifdef MORPHIO_USE_DOUBLE
         const auto format = "%20u%20d%20lg%20lg%20lg%20lg%20d";
 #else
@@ -92,13 +88,13 @@ struct Sample {
         diameter = radius * 2;  // The point array stores diameters.
     }
 
-    floatType diameter;
-    bool valid;
-    Point point;  //!< x, y, z and diameter
-    SectionType type;
-    int parentId;
-    unsigned int id;
-    unsigned int lineNumber;
+    floatType diameter = -1;
+    bool valid = false;
+    Point point;
+    SectionType type = SECTION_UNDEFINED;
+    int parentId = -1;
+    unsigned int id = 0;
+    unsigned int lineNumber = 0;
 };
 
 /** Class that can generate error messages and holds a collection of predefined errors
@@ -106,8 +102,8 @@ struct Sample {
 class ErrorMessages
 {
   public:
-    /** Constructor **/
-    ErrorMessages() {}
+    ErrorMessages() = default;
+
     /** Constructor.
 
        \param uri path to a morphology file.

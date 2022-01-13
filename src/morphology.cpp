@@ -49,11 +49,6 @@ Morphology::Morphology(mut::Morphology morphology) {
     buildChildren(_properties);
 }
 
-Morphology::Morphology(Morphology&&) noexcept = default;
-Morphology& Morphology::operator=(Morphology&&) noexcept = default;
-
-Morphology::~Morphology() = default;
-
 Soma Morphology::soma() const {
     return Soma(_properties);
 }

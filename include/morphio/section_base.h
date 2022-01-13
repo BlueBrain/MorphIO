@@ -25,8 +25,7 @@ template <typename T>
 class SectionBase
 {
   public:
-    SectionBase()
-        : _id(0) {}
+    SectionBase() = default;
 
     SectionBase(const SectionBase& section);
 
@@ -61,7 +60,7 @@ class SectionBase
     template <typename Property>
     range<const typename Property::Type> get() const;
 
-    uint32_t _id;
+    uint32_t _id = 0;
     SectionRange _range;
     std::shared_ptr<Property::Properties> _properties;
 };

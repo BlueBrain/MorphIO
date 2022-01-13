@@ -8,11 +8,10 @@ namespace mut {
 class Soma
 {
   public:
-    Soma()
-        : _somaType(SOMA_UNDEFINED) {}
+    Soma() = default;
+    Soma(const Soma& soma) = default;
 
     explicit Soma(const Property::PointLevel& pointProperties);
-    Soma(const Soma& soma);
     explicit Soma(const morphio::Soma& soma);
 
     /** @{
@@ -55,7 +54,8 @@ class Soma
 
   private:
     friend class Morphology;
-    SomaType _somaType;
+
+    SomaType _somaType = SOMA_UNDEFINED;
     Property::PointLevel _pointProperties;
 };
 

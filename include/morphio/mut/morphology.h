@@ -25,8 +25,7 @@ class Morphology
 {
   public:
     Morphology()
-        : _counter(0)
-        , _soma(std::make_shared<Soma>())
+        : _soma(std::make_shared<Soma>())
         , _cellProperties(
               std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())) {}
 
@@ -226,7 +225,7 @@ class Morphology
 
     uint32_t _register(const std::shared_ptr<Section>&);
 
-    uint32_t _counter;
+    uint32_t _counter = 0;
     std::shared_ptr<Soma> _soma;
     std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     std::vector<std::shared_ptr<Section>> _rootSections;
