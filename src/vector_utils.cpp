@@ -1,5 +1,4 @@
 #include <algorithm>  // std::max
-#include <cctype>     // std::tolower
 #include <cmath>      // std::sqrt
 #include <numeric>    // std::accumulate
 #include <sstream>    // ostringstream

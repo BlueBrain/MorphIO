@@ -1,5 +1,5 @@
 #include <cassert>
-
+#include <cctype>  // std::tolower
 #include <sstream>
 #include <string>
 
