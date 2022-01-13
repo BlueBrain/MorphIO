@@ -11,9 +11,9 @@ class Soma
     Soma()
         : _somaType(SOMA_UNDEFINED) {}
 
-    Soma(const Property::PointLevel& pointProperties);
+    explicit Soma(const Property::PointLevel& pointProperties);
     Soma(const Soma& soma);
-    Soma(const morphio::Soma& soma);
+    explicit Soma(const morphio::Soma& soma);
 
     /** @{
        Return the coordinates (x,y,z) of all soma point

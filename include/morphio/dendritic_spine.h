@@ -12,14 +12,14 @@ namespace morphio {
 class DendriticSpine: public Morphology
 {
   public:
-    DendriticSpine(const std::string& source);
+    explicit DendriticSpine(const std::string& source);
 
     const std::vector<Property::DendriticSpine::PostSynapticDensity>& postSynapticDensity() const
         noexcept;
 
   protected:
     friend class mut::DendriticSpine;
-    DendriticSpine(const Property::Properties& properties);
+    explicit DendriticSpine(const Property::Properties& properties);
 
   private:
     Soma soma() const;

@@ -39,7 +39,7 @@ class Morphology
        Example:
            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
     **/
-    Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
 
     /**
        Build a mutable Morphology from a mutable morphology
@@ -49,7 +49,7 @@ class Morphology
     /**
        Build a mutable Morphology from a read-only morphology
     **/
-    Morphology(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
     virtual ~Morphology();
 

@@ -11,7 +11,7 @@ class DendriticSpine: public Morphology
 {
   public:
     DendriticSpine();
-    DendriticSpine(const std::string& source);
+    explicit DendriticSpine(const std::string& source);
 
     std::vector<Property::DendriticSpine::PostSynapticDensity>& postSynapticDensity() noexcept;
     const std::vector<Property::DendriticSpine::PostSynapticDensity>& postSynapticDensity() const

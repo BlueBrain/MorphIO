@@ -11,7 +11,7 @@ class GlialCell: public Morphology
 {
   public:
     GlialCell();
-    GlialCell(const std::string& source);
+    explicit GlialCell(const std::string& source);
 };
 
 }  // namespace mut

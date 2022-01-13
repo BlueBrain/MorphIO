@@ -36,7 +36,7 @@ struct DebugInfo {
 
         \param filename morphology filename.
      */
-    DebugInfo(std::string filename = "")
+    explicit DebugInfo(std::string filename = "")
         : _filename(filename) {}
 
     /** Stores section's line number within morphology file */
@@ -112,7 +112,7 @@ class ErrorMessages
 
        \param uri path to a morphology file.
      */
-    ErrorMessages(const std::string& uri)
+    explicit ErrorMessages(const std::string& uri)
         : _uri(uri) {}
 
     /** Is the output of the warning ignored */
