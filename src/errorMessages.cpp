@@ -23,25 +23,29 @@ void set_raise_warnings(bool is_raise) {
 }
 
 void set_ignored_warning(Warning warning, bool ignore) {
-    if (ignore)
+    if (ignore) {
         readers::_ignoredWarnings.insert(warning);
-    else
+    } else {
         readers::_ignoredWarnings.erase(warning);
+    }
 }
 
 void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
-    for (auto warning : warnings)
+    for (auto warning : warnings) {
         set_ignored_warning(warning, ignore);
+    }
 }
 
 void printError(Warning warning, const std::string& msg) {
     static int error = 0;
 
-    if (readers::ErrorMessages::isIgnored(warning) || MORPHIO_MAX_N_WARNINGS == 0)
+    if (readers::ErrorMessages::isIgnored(warning) || MORPHIO_MAX_N_WARNINGS == 0) {
         return;
+    }
 
-    if (MORPHIO_RAISE_WARNINGS)
+    if (MORPHIO_RAISE_WARNINGS) {
         throw MorphioError(msg);
+    }
 
     if (MORPHIO_MAX_N_WARNINGS < 0 || error <= MORPHIO_MAX_N_WARNINGS) {
         std::cerr << msg << '\n';
@@ -96,8 +100,9 @@ std::string ErrorMessages::ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(
 
 std::string ErrorMessages::ERROR_MULTIPLE_SOMATA(const std::vector<Sample>& somata) const {
     std::string msg("Multiple somata found: ");
-    for (auto soma : somata)
+    for (auto soma : somata) {
         msg += "\n" + errorMsg(soma.lineNumber, ErrorLevel::ERROR);
+    }
     return msg;
 }
 
@@ -112,8 +117,9 @@ std::string ErrorMessages::ERROR_SOMA_BIFURCATION(const Sample& sample,
                                                   const std::vector<Sample>& children) const {
     std::string msg = errorMsg(sample.lineNumber, ErrorLevel::ERROR, "Found soma bifurcation\n");
     msg += "The following children have been found:";
-    for (auto child : children)
+    for (auto child : children) {
         msg += errorMsg(child.lineNumber, ErrorLevel::WARNING, "");
+    }
     return msg;
 }
 
@@ -150,8 +156,9 @@ std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(int mitoParentId) const {
 **/
 static std::string _col(morphio::floatType val1, morphio::floatType val2) {
     bool is_ok = std::fabs(val1 - val2) < morphio::epsilon;
-    if (is_ok)
+    if (is_ok) {
         return std::to_string(val1);
+    }
     return "\033[1;33m" + std::to_string(val1) + " (exp. " + std::to_string(val2) + ")\033[0m";
 }
 
@@ -217,8 +224,9 @@ std::string ErrorMessages::ERROR_VECTOR_LENGTH_MISMATCH(const std::string& vec1,
                                                         size_t length2) const {
     std::string msg("Vector length mismatch: \nLength " + vec1 + ": " + std::to_string(length1) +
                     "\nLength " + vec2 + ": " + std::to_string(length2));
-    if (length1 == 0 || length2 == 0)
+    if (length1 == 0 || length2 == 0) {
         msg += "\nTip: Did you forget to fill vector: " + (length1 == 0 ? vec1 : vec2) + " ?";
+    }
 
     return msg;
 }
@@ -278,16 +286,18 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
     std::string msg("Warning: while appending section: " + std::to_string(current->id()) +
                     " to parent: " + std::to_string(parent->id()));
 
-    if (parent->points().empty())
+    if (parent->points().empty()) {
         return errorMsg(0, ErrorLevel::WARNING, msg + "\nThe parent section is empty.");
+    }
 
-    if (current->points().empty())
+    if (current->points().empty()) {
         return errorMsg(0,
                         ErrorLevel::WARNING,
                         msg +
                             "\nThe current section has no points. It should at "
                             "least contains "
                             "parent section last point");
+    }
 
     auto p0 = parent->points()[parent->points().size() - 1];
     auto p1 = current->points()[0];
@@ -311,7 +321,9 @@ std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info,
                                               unsigned int childId) const {
     int parentLine = info.getLineNumber(parentId);
     int childLine = info.getLineNumber(childId);
-    std::string parentMsg, childMsg;
+    std::string parentMsg;
+    std::string childMsg;
+
     if (parentLine > -1 && childLine > -1) {
         parentMsg = " starting at:\n" +
                     errorLink(static_cast<size_t>(parentLine), ErrorLevel::INFO) + "\n";

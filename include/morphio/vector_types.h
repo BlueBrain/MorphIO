@@ -59,8 +59,6 @@ std::string dumpPoint(const Point& point);
 std::string dumpPoints(const Points& points);
 std::string dumpPoints(const morphio::range<const morphio::Point>& points);
 
-char my_tolower(char ch);
-
 /**
    Euclidian distance between two points
 **/

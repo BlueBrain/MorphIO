@@ -10,58 +10,67 @@
 namespace morphio {
 Point operator+(const Point& left, const Point& right) {
     Point ret;
-    for (size_t i = 0; i < ret.size(); ++i)
+    for (size_t i = 0; i < ret.size(); ++i) {
         ret[i] = left[i] + right[i];
+    }
     return ret;
 }
 
 Point operator-(const Point& left, const Point& right) {
     Point ret;
-    for (size_t i = 0; i < ret.size(); ++i)
+    for (size_t i = 0; i < ret.size(); ++i) {
         ret[i] = left[i] - right[i];
+    }
     return ret;
 }
 
 Point operator+=(Point& left, const Point& right) {
-    for (size_t i = 0; i < left.size(); ++i)
+    for (size_t i = 0; i < left.size(); ++i) {
         left[i] += right[i];
+    }
     return left;
 }
 
 Point operator-=(Point& left, const Point& right) {
-    for (size_t i = 0; i < left.size(); ++i)
+    for (size_t i = 0; i < left.size(); ++i) {
         left[i] -= right[i];
+    }
     return left;
 }
 
 Point operator/=(Point& left, floatType factor) {
-    for (size_t i = 0; i < left.size(); ++i)
+    for (size_t i = 0; i < left.size(); ++i) {
         left[i] /= factor;
+    }
     return left;
 }
 
 Points operator+(const Points& points, const Point& right) {
     Points result;
-    for (auto& p : points)
+    for (auto& p : points) {
         result.push_back(p + right);
+    }
     return result;
 }
 Points operator-(const Points& points, const Point& right) {
     Points result;
-    for (auto& p : points)
+    for (auto& p : points) {
         result.push_back(p - right);
+    }
     return result;
 }
 
 Points operator+=(Points& points, const Point& right) {
-    for (auto& p : points)
+    for (auto& p : points) {
         p += right;
+    }
     return points;
 }
 
 Points operator-=(Points& points, const Point& right) {
-    for (auto& p : points)
+    for (auto& p : points) {
         p -= right;
+    }
     return points;
 }
 
@@ -98,14 +107,16 @@ std::string dumpPoints(const morphio::range<const morphio::Point>& points) {
 
 template <typename T>
 Point centerOfGravity(const T& points) {
-    Point::value_type x = 0, y = 0, z = 0;
-    const auto size = static_cast<Point::value_type>(points.size());
+    Point::value_type x = 0;
+    Point::value_type y = 0;
+    Point::value_type z = 0;
+    const auto count = static_cast<Point::value_type>(points.size());
     for (const auto& point : points) {
         x += point[0];
         y += point[1];
         z += point[2];
     }
-    return Point({x / size, y / size, z / size});
+    return Point({x / count, y / count, z / count});
 }
 template Point centerOfGravity(const range<const Point>& points);
 template Point centerOfGravity(const Points& points);
@@ -147,10 +158,6 @@ Point operator/(const Point& from, T factor) {
 template Point operator/(const Point& from, int factor);
 template Point operator/(const Point& from, floatType factor);
 
-// Like std::tolower but accepts char
-char my_tolower(char ch) {
-    return static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
-}
 }  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point) {

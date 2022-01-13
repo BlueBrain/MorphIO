@@ -24,8 +24,7 @@ Morphology::Morphology(const std::string& uri, unsigned int options)
     : Morphology(morphio::Morphology(uri, options)) {}
 
 Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int options)
-    : _counter(0)
-    , _soma(std::make_shared<Soma>(*morphology.soma()))
+    : _soma(std::make_shared<Soma>(*morphology.soma()))
     , _cellProperties(std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
     , _dendriticSpineLevel(morphology._dendriticSpineLevel) {
@@ -41,8 +40,7 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
 }
 
 Morphology::Morphology(const morphio::Morphology& morphology, unsigned int options)
-    : _counter(0)
-    , _soma(std::make_shared<Soma>(morphology.soma()))
+    : _soma(std::make_shared<Soma>(morphology.soma()))
     , _cellProperties(
           std::make_shared<morphio::Property::CellLevel>(morphology._properties->_cellLevel))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
@@ -88,13 +86,14 @@ bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
 
 std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& section_,
                                                        bool recursive) {
-    const std::shared_ptr<Section> ptr(new Section(this, _counter, section_));
+    std::shared_ptr<Section> ptr(new Section(this, _counter, section_));
     _register(ptr);
     _rootSections.push_back(ptr);
 
     const bool emptySection = ptr->points().empty();
-    if (emptySection)
+    if (emptySection) {
         printError(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+    }
 
     if (recursive) {
         for (const auto& child : section_.children()) {
@@ -107,13 +106,14 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 
 std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Section>& section_,
                                                        bool recursive) {
-    const std::shared_ptr<Section> section_copy(new Section(this, _counter, *section_));
+    std::shared_ptr<Section> section_copy(new Section(this, _counter, *section_));
     _register(section_copy);
     _rootSections.push_back(section_copy);
     const bool emptySection = section_copy->points().empty();
-    if (emptySection)
+    if (emptySection) {
         printError(Warning::APPENDING_EMPTY_SECTION,
                    _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
+    }
 
     if (recursive) {
         for (const auto& child : section_->children()) {
@@ -126,20 +126,22 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
 
 std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLevel& pointProperties,
                                                        SectionType type) {
-    const std::shared_ptr<Section> ptr(new Section(this, _counter, type, pointProperties));
+    std::shared_ptr<Section> ptr(new Section(this, _counter, type, pointProperties));
     _register(ptr);
     _rootSections.push_back(ptr);
 
     bool emptySection = ptr->points().empty();
-    if (emptySection)
+    if (emptySection) {
         printError(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+    }
 
     return ptr;
 }
 
 uint32_t Morphology::_register(const std::shared_ptr<Section>& section_) {
-    if (_sections.count(section_->id()))
+    if (_sections.count(section_->id())) {
         throw SectionBuilderError("Section already exists");
+    }
     _counter = std::max(_counter, section_->id()) + 1;
     _sections[section_->id()] = section_;
     return section_->id();
@@ -162,8 +164,9 @@ void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
 }
 
 void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive) {
-    if (!section_)
+    if (!section_) {
         return;
+    }
 
     unsigned int id = section_->id();
 
@@ -201,8 +204,9 @@ void _appendProperties(Property::PointLevel& to, const Property::PointLevel& fro
     _appendVector(to._points, from._points, offset);
     _appendVector(to._diameters, from._diameters, offset);
 
-    if (!from._perimeters.empty())
+    if (!from._perimeters.empty()) {
         _appendVector(to._perimeters, from._perimeters, offset);
+    }
 }
 
 void Morphology::removeUnifurcations() {
@@ -220,15 +224,17 @@ void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInf
         ++it;
         unsigned int sectionId = section_->id();
 
-        if (section_->isRoot())
+        if (section_->isRoot()) {
             continue;
+        }
 
         unsigned int parentId = section_->parent()->id();
 
         if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
-            !_checkDuplicatePoint(section_->parent(), section_))
+            !_checkDuplicatePoint(section_->parent(), section_)) {
             printError(Warning::WRONG_DUPLICATE,
                        err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
+        }
 
         auto parent = section_->parent();
         bool isUnifurcation = parent->children().size() == 1;
@@ -249,10 +255,11 @@ void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInf
 
             morphio::_appendVector(parent->diameters(), section_->diameters(), duplicate ? 1 : 0);
 
-            if (!parent->perimeters().empty())
+            if (!parent->perimeters().empty()) {
                 morphio::_appendVector(parent->perimeters(),
                                        section_->perimeters(),
                                        duplicate ? 1 : 0);
+            }
 
             deleteSection(section_, false);
         }
@@ -262,8 +269,9 @@ void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInf
 void Morphology::_raiseIfUnifurcations() {
     for (auto it = depth_begin(); it != depth_end(); ++it) {
         std::shared_ptr<Section> section_ = *it;
-        if (section_->isRoot())
+        if (section_->isRoot()) {
             continue;
+        }
 
         unsigned int parentId = section_->parent()->id();
 
@@ -321,21 +329,26 @@ breadth_iterator Morphology::breadth_end() const {
 }
 
 void Morphology::applyModifiers(unsigned int modifierFlags) {
-    if (modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS)
+    if (modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS) {
         throw SectionBuilderError(
             _err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
+    }
 
-    if (modifierFlags & SOMA_SPHERE)
+    if (modifierFlags & SOMA_SPHERE) {
         modifiers::soma_sphere(*this);
+    }
 
-    if (modifierFlags & NO_DUPLICATES)
+    if (modifierFlags & NO_DUPLICATES) {
         modifiers::no_duplicate_point(*this);
+    }
 
-    if (modifierFlags & TWO_POINTS_SECTIONS)
+    if (modifierFlags & TWO_POINTS_SECTIONS) {
         modifiers::two_points_sections(*this);
+    }
 
-    if (modifierFlags & NRN_ORDER)
+    if (modifierFlags & NRN_ORDER) {
         modifiers::nrn_order(*this);
+    }
 }
 
 std::unordered_map<int, std::vector<unsigned int>> Morphology::connectivity() {
@@ -360,7 +373,6 @@ std::unordered_map<int, std::vector<unsigned int>> Morphology::connectivity() {
     return connectivity;
 }
 
-
 void Morphology::write(const std::string& filename) {
     const size_t pos = filename.find_last_of(".");
     assert(pos != std::string::npos);
@@ -368,22 +380,25 @@ void Morphology::write(const std::string& filename) {
     std::string extension;
 
     for (const auto& root : rootSections()) {
-        if (root->points().size() < 2)
+        if (root->points().size() < 2) {
             throw morphio::SectionBuilderError("Root sections must have at least 2 points");
+        }
     }
 
-    for (char c : filename.substr(pos))
-        extension += my_tolower(c);
+    for (char c : filename.substr(pos)) {
+        extension += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    }
 
-    if (extension == ".h5")
+    if (extension == ".h5") {
         writer::h5(*this, filename);
-    else if (extension == ".asc")
+    } else if (extension == ".asc") {
         writer::asc(*this, filename);
-    else if (extension == ".swc") {
+    } else if (extension == ".swc") {
         _raiseIfUnifurcations();
         writer::swc(*this, filename);
-    } else
+    } else {
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
+    }
 }
 
 }  // end namespace mut

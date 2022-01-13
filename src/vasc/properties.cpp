@@ -17,10 +17,11 @@ VascPointLevel::VascPointLevel(const std::vector<Point::Type>& points,
                                const std::vector<Diameter::Type>& diameters)
     : _points(points)
     , _diameters(diameters) {
-    if (_points.size() != _diameters.size())
+    if (_points.size() != _diameters.size()) {
         throw SectionBuilderError(
             "Point vector have size: " + std::to_string(_points.size()) +
             "while Diameter vector has size: " + std::to_string(_diameters.size()));
+    }
 }
 
 VascPointLevel::VascPointLevel(const VascPointLevel& data)
@@ -36,14 +37,16 @@ bool compare(const std::vector<T>& vec1,
              const std::vector<T>& vec2,
              const std::string& name,
              bool verbose_) {
-    if (vec1 == vec2)
+    if (vec1 == vec2) {
         return true;
+    }
 
     if (vec1.size() != vec2.size()) {
-        if (verbose_)
+        if (verbose_) {
             printError(Warning::UNDEFINED,
                        "Error comparing " + name + ", size differs: " +
                            std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
         return false;
     }
 
@@ -64,10 +67,11 @@ static bool compare_section_structure(const std::vector<VascSection::Type>& vec1
                                       const std::string& name,
                                       bool verbose_) {
     if (vec1.size() != vec2.size()) {
-        if (verbose_)
+        if (verbose_) {
             printError(Warning::UNDEFINED,
                        "Error comparing " + name + ", size differs: " +
                            std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
         return false;
     }
 
@@ -91,10 +95,11 @@ bool compare(const morphio::range<T>& vec1,
              const std::string& name,
              bool verbose_) {
     if (vec1.size() != vec2.size()) {
-        if (verbose_)
+        if (verbose_) {
             printError(Warning::UNDEFINED,
                        "Error comparing " + name + ", size differs: " +
                            std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
         return false;
     }
 
@@ -116,10 +121,11 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
              const std::string& name,
              bool verbose_) {
     if (vec1.size() != vec2.size()) {
-        if (verbose_)
+        if (verbose_) {
             printError(Warning::UNDEFINED,
                        "Error comparing " + name + ", size differs: " +
                            std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
         return false;
     }
 
@@ -142,8 +148,9 @@ bool compare(const std::map<T, U>& vec1,
              const std::map<T, U>& vec2,
              const std::string& name,
              bool verbose_) {
-    if (vec1 == vec2)
+    if (vec1 == vec2) {
         return true;
+    }
     if (verbose_) {
         if (vec1.size() != vec2.size()) {
             printError(Warning::UNDEFINED,
@@ -156,11 +163,13 @@ bool compare(const std::map<T, U>& vec1,
 
 template <typename T>
 bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_) {
-    if (el1 == el2)
+    if (el1 == el2) {
         return true;
+    }
 
-    if (verbose_)
+    if (verbose_) {
         printError(Warning::UNDEFINED, name + " differs");
+    }
     return false;
 }
 
@@ -168,14 +177,16 @@ static bool compare(const VascPointLevel& el1,
                     const VascPointLevel& el2,
                     const std::string& name,
                     bool verbose_) {
-    if (&el1 == &el2)
+    if (&el1 == &el2) {
         return true;
+    }
 
     bool result = (compare(el1._points, el2._points, "_points", verbose_) &&
                    compare(el1._diameters, el2._diameters, "_diameters", verbose_));
 
-    if (!result && verbose_)
+    if (!result && verbose_) {
         printError(Warning::UNDEFINED, "Error comparing " + name);
+    }
 
     return result;
 }
@@ -193,8 +204,9 @@ bool VascSectionLevel::operator!=(const VascSectionLevel& other) const {
 }
 
 bool Properties::operator==(const Properties& other) const {
-    if (this == &other)
+    if (this == &other) {
         return true;
+    }
 
     return (compare(this->_pointLevel, other._pointLevel, "_pointLevel", verbose) &&
             compare(this->_sectionLevel, other._sectionLevel, "_sectionLevel", verbose));
