@@ -3,8 +3,9 @@
 #include <string>
 #include <vector>
 
-#include <morphio/morphology.h>
-#include <morphio/types.h>
+#include <morphio/enums.h>       // SomaType
+#include <morphio/morphology.h>  // Morphology
+#include <morphio/types.h>       // EndoplasmicReticulum, Mitochondria
 
 namespace morphio {
 

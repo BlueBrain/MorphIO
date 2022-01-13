@@ -22,9 +22,9 @@
 
 #include "morphologyHDF5.h"
 
-#include "utilsHDF5.h"
-
 #include <highfive/H5Utility.hpp>  // HighFive::SilenceHDF5
+
+#include <morphio/errorMessages.h>
 
 namespace {
 

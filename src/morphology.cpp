@@ -1,6 +1,5 @@
 #include <fstream>
 #include <memory>
-#include <streambuf>
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mitochondria.h>

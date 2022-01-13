@@ -1,7 +1,6 @@
 #include <queue>  // std::queue
 
 #include <morphio/mut/mitochondria.h>
-#include <morphio/mut/writers.h>
 
 
 #include "../shared_utils.hpp"

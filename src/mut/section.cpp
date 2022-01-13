@@ -1,5 +1,4 @@
 #include <algorithm>  // any_of
-#include <stack>
 
 #include <morphio/errorMessages.h>
 #include <morphio/mut/morphology.h>

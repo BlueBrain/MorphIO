@@ -1,5 +1,6 @@
 #pragma once
-#include <iosfwd>
+
+#include <iosfwd>  // std::ostream
 
 namespace morphio {
 /** A collection of enums for different util purposes **/

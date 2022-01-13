@@ -1,6 +1,10 @@
-#include <cmath>
+//#include <cmath>
+#include <iostream>  // std::cerr
+#include <sstream>   // std::ostringstream
+#include <string>
+#include <vector>
+
 #include <morphio/errorMessages.h>
-#include <sstream>
 
 namespace morphio {
 static int MORPHIO_MAX_N_WARNINGS = 100;

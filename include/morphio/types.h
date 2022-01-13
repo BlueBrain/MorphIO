@@ -1,15 +1,11 @@
 #pragma once
 
-#include <memory>  // std::shared_ptr
-#include <string>  // std::string
-#include <vector>  // std::vector
+#include <utility>  // std::pair
 
 #include <morphio/enums.h>
 #include <morphio/exceptions.h>
 #include <morphio/vector_types.h>
 
-
-/** @namespace morphio Blue Brain File IO classes */
 namespace morphio {
 
 using namespace enums;
@@ -27,7 +23,7 @@ class Soma;
 
 namespace Property {
 struct Properties;
-}
+}  // namespace Property
 
 /** Functionality for vasculature (blood)  **/
 namespace vasculature {
@@ -53,8 +49,5 @@ class Soma;
 }  // namespace mut
 
 using SectionRange = std::pair<size_t, size_t>;
-
-// A tuple (file format (std::string), major version, minor version)
-using MorphologyVersion = std::tuple<std::string, uint32_t, uint32_t>;
 
 }  // namespace morphio

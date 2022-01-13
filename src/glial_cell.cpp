@@ -1,3 +1,4 @@
+#include <morphio/exceptions.h>  // for RawDataError
 #include <morphio/glial_cell.h>
 
 namespace morphio {

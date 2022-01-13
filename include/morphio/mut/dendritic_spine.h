@@ -1,7 +1,10 @@
 #pragma once
 
-#include <morphio/mut/morphology.h>
-#include <morphio/types.h>
+#include <string>
+#include <vector>
+
+#include <morphio/mut/morphology.h>  // mut::Morphology
+#include <morphio/properties.h>      // Property
 
 namespace morphio {
 namespace mut {

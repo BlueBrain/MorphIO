@@ -1,12 +1,14 @@
 #pragma once
 
-#include <map>     // std::map
-#include <memory>  // std::shared_ptr
-#include <set>     // std::set
-#include <string>  // std::string
+#include <map>        // std::map
+#include <memory>     // std::shared_ptr
+#include <set>        // std::set
+#include <stdexcept>  // std::out_of_range
+#include <string>     // std::string
+#include <vector>     // std::vector
 
-#include <morphio/mut/modifiers.h>
-#include <morphio/mut/section.h>
+#include <morphio/enums.h>        // Warning, Option
+#include <morphio/mut/section.h>  // Warning, Option
 
 namespace morphio {
 /** Set the maximum number of warnings to be printed on screen **/
@@ -59,6 +61,7 @@ struct DebugInfo {
     std::map<unsigned int, int> _lineNumbers;
 };
 
+// TODO: this shouldn't be global static
 static std::set<Warning> _ignoredWarnings;
 
 /** A sample of section for error reporting, includes its position (line) within the file. **/

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <cmath>
+#include <cmath>  // M_PI
 #include <iosfwd>  // std::ostream
 #include <string>  // std::string
 #include <vector>

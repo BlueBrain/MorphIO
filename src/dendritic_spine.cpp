@@ -1,3 +1,6 @@
+#include <morphio/exceptions.h>  // RawDataError
+#include <morphio/properties.h>  // Property
+
 #include <morphio/dendritic_spine.h>
 
 namespace morphio {

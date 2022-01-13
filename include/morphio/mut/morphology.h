@@ -1,22 +1,22 @@
 #pragma once
 
-#include <cstdint>
+#include <map>
 #include <memory>
 #include <unordered_map>
-
-#include <functional>
+#include <vector>
 
 #include <morphio/errorMessages.h>
 #include <morphio/exceptions.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/mitochondria.h>
+#include <morphio/mut/modifiers.h>
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
-#include <morphio/section.h>
 #include <morphio/types.h>
 
 namespace morphio {
 namespace mut {
+// TODO: not sure why this is here
 bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
                           const std::shared_ptr<Section>& current);
 
@@ -201,7 +201,6 @@ class Morphology
      * Note: -1 is the soma node
      **/
     std::unordered_map<int, std::vector<unsigned int>> connectivity();
-
 
     /**
        Fixes the morphology single child sections and issues warnings

@@ -1,6 +1,13 @@
 #pragma once
 
-#include <morphio/types.h>
+#include <morphio/types.h>  // floatType
+
+#include <cstdint>  // uint32_t
+#include <memory>   // std::shared_ptr
+#include <utility>  // std::move
+#include <vector>   // std::vector
+
+#include <morphio/properties.h>  // Property
 
 namespace morphio {
 /**

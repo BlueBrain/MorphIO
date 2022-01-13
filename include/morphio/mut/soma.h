@@ -1,6 +1,7 @@
 #pragma once
 
-#include <morphio/properties.h>
+#include <morphio/properties.h>  // Property
+#include <morphio/soma.h>        // morphio::soma
 
 namespace morphio {
 namespace mut {

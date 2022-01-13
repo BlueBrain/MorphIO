@@ -1,16 +1,15 @@
-#include <assert.h>
+#include <cassert>
 
 #include <sstream>
 #include <string>
 
 #include <morphio/endoplasmic_reticulum.h>
-#include <morphio/mito_section.h>
 #include <morphio/mitochondria.h>
+#include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 #include <morphio/soma.h>
-#include <morphio/tools.h>
 
 #include "../shared_utils.hpp"
 

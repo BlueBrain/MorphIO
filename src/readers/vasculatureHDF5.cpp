@@ -1,8 +1,14 @@
 #include "vasculatureHDF5.h"
 
+#include <highfive/H5DataType.hpp>  // for HighFive::SilenceHDF5
 #include <highfive/H5Utility.hpp>  // for HighFive::SilenceHDF5
 
-#include "utilsHDF5.h"
+namespace HighFive {
+template <>
+inline AtomicType<morphio::VascularSectionType>::AtomicType() {
+    _hid = H5Tcopy(H5T_NATIVE_INT);
+}
+}  // namespace HighFive
 
 namespace morphio {
 namespace readers {
