@@ -70,7 +70,7 @@ struct Sample {
 
     explicit Sample(const char* line, unsigned int lineNumber_)
         : lineNumber(lineNumber_) {
-        floatType radius = -1.f;
+        floatType radius = -1.;
         int int_type = -1;
 #ifdef MORPHIO_USE_DOUBLE
         const auto format = "%20u%20d%20lg%20lg%20lg%20lg%20d";
