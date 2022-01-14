@@ -91,7 +91,7 @@ struct Sample {
         diameter = radius * 2;  // The point array stores diameters.
     }
 
-    floatType diameter = -1;
+    floatType diameter = -1.;
     bool valid = false;
     Point point;
     SectionType type = SECTION_UNDEFINED;

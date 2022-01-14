@@ -3,7 +3,7 @@ on: [pull_request, push]
 
 jobs:
   build:
-    name: Run tests on ${{ matrix.os }}
+    name: Run tests on ${{ matrix.os }}.${{ matrix.compiler.CC }}
     runs-on: ${{ matrix.os }}
 
     # Run on external PRs, but not internal PRs as they'll be run by the push
@@ -13,10 +13,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
         compiler:
-          - CC: clang
-            CXX: clang++
-          - CC: gcc
-            CXX: g++
+          - {CC: clang, CXX: clang++}
+          - {CC: gcc, CXX: g++}
+        exclude:
+          - os: macos-latest
+            compiler: {CC: gcc, CXX: g++}
 
     steps:
       - name: Checkout repository
