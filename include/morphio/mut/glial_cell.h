@@ -1,7 +1,8 @@
 #pragma once
 
-#include <morphio/mut/morphology.h>
-#include <morphio/types.h>
+#include <string>  // std::string
+
+#include <morphio/mut/morphology.h>  // mut::Morphology
 
 namespace morphio {
 namespace mut {
@@ -11,7 +12,7 @@ class GlialCell: public Morphology
 {
   public:
     GlialCell();
-    GlialCell(const std::string& source);
+    explicit GlialCell(const std::string& source);
 };
 
 }  // namespace mut

@@ -1,7 +1,6 @@
 #include <queue>  // std::queue
 
 #include <morphio/mut/mitochondria.h>
-#include <morphio/mut/writers.h>
 
 
 #include "../shared_utils.hpp"
@@ -103,8 +102,9 @@ void Mitochondria::_buildMitochondria(Property::Properties& properties) const {
 
             newIds[section_->id()] = counter++;
 
-            for (auto child : children(section_))
+            for (auto child : children(section_)) {
                 q.push(child);
+            }
         }
     }
 }
@@ -138,8 +138,9 @@ mito_upstream_iterator Mitochondria::upstream_end() const {
 }
 
 uint32_t Mitochondria::_register(const MitoSectionP& section_) {
-    if (_sections.count(section_->id()))
+    if (_sections.count(section_->id())) {
         throw SectionBuilderError("Section already exists");
+    }
     _counter = std::max(_counter, section_->id()) + 1;
 
     _sections[section_->id()] = section_;

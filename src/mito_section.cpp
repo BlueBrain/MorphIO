@@ -1,6 +1,4 @@
 #include <morphio/mito_section.h>
-#include <morphio/mitochondria.h>
-#include <morphio/morphology.h>
 
 namespace morphio {
 

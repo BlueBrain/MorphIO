@@ -1,6 +1,7 @@
 #pragma once
 
-#include <morphio/properties.h>
+#include <morphio/properties.h>  // Property
+#include <morphio/soma.h>        // morphio::soma
 
 namespace morphio {
 namespace mut {
@@ -8,12 +9,11 @@ namespace mut {
 class Soma
 {
   public:
-    Soma()
-        : _somaType(SOMA_UNDEFINED) {}
+    Soma() = default;
+    Soma(const Soma& soma) = default;
 
-    Soma(const Property::PointLevel& pointProperties);
-    Soma(const Soma& soma);
-    Soma(const morphio::Soma& soma);
+    explicit Soma(const Property::PointLevel& pointProperties);
+    explicit Soma(const morphio::Soma& soma);
 
     /** @{
        Return the coordinates (x,y,z) of all soma point
@@ -55,7 +55,8 @@ class Soma
 
   private:
     friend class Morphology;
-    SomaType _somaType;
+
+    SomaType _somaType = SOMA_UNDEFINED;
     Property::PointLevel _pointProperties;
 };
 

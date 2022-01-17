@@ -1,6 +1,5 @@
 #include <fstream>
 #include <memory>
-#include <streambuf>
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mitochondria.h>
@@ -23,8 +22,9 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
     : _properties(std::make_shared<Property::Properties>(properties)) {
     buildChildren(_properties);
 
-    if (_properties->_cellLevel.fileFormat() != "swc")
+    if (_properties->_cellLevel.fileFormat() != "swc") {
         _properties->_cellLevel._somaType = getSomaType(soma().points().size());
+    }
 
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders
@@ -48,11 +48,6 @@ Morphology::Morphology(mut::Morphology morphology) {
     _properties = std::make_shared<Property::Properties>(morphology.buildReadOnly());
     buildChildren(_properties);
 }
-
-Morphology::Morphology(Morphology&&) noexcept = default;
-Morphology& Morphology::operator=(Morphology&&) noexcept = default;
-
-Morphology::~Morphology() = default;
 
 Soma Morphology::soma() const {
     return Soma(_properties);
@@ -205,8 +200,9 @@ void buildChildren(std::shared_ptr<Property::Properties> properties) {
 
 Property::Properties loadURI(const std::string& source, unsigned int options) {
     const size_t pos = source.find_last_of(".");
-    if (pos == std::string::npos)
+    if (pos == std::string::npos) {
         throw(UnknownFileType("File has no extension"));
+    }
 
     // Cross-platform check of file existance
     std::ifstream file(source.c_str());
@@ -217,12 +213,15 @@ Property::Properties loadURI(const std::string& source, unsigned int options) {
     std::string extension = source.substr(pos);
 
     auto loader = [&source, &options, &extension]() {
-        if (extension == ".h5" || extension == ".H5")
+        if (extension == ".h5" || extension == ".H5") {
             return readers::h5::load(source);
-        if (extension == ".asc" || extension == ".ASC")
+        }
+        if (extension == ".asc" || extension == ".ASC") {
             return readers::asc::load(source, options);
-        if (extension == ".swc" || extension == ".SWC")
+        }
+        if (extension == ".swc" || extension == ".SWC") {
             return readers::swc::load(source, options);
+        }
         throw(UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported"));
     };
 

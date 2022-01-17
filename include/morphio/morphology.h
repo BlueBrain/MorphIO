@@ -20,11 +20,12 @@ using depth_iterator = depth_iterator_t<Section, Morphology>;
 class Morphology
 {
   public:
-    virtual ~Morphology();
+    virtual ~Morphology() = default;
 
-    Morphology& operator=(const Morphology&);
-    Morphology(Morphology&&) noexcept;
-    Morphology& operator=(Morphology&&) noexcept;
+    Morphology(Morphology&) noexcept = default;
+    Morphology& operator=(const Morphology&) noexcept = default;
+    Morphology(Morphology&&) noexcept = default;
+    Morphology& operator=(Morphology&&) noexcept = default;
 
     /** @name Read API */
 

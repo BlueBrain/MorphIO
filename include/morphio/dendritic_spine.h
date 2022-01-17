@@ -3,8 +3,9 @@
 #include <string>
 #include <vector>
 
-#include <morphio/morphology.h>
-#include <morphio/types.h>
+#include <morphio/enums.h>       // SomaType
+#include <morphio/morphology.h>  // Morphology
+#include <morphio/types.h>       // EndoplasmicReticulum, Mitochondria
 
 namespace morphio {
 
@@ -12,14 +13,14 @@ namespace morphio {
 class DendriticSpine: public Morphology
 {
   public:
-    DendriticSpine(const std::string& source);
+    explicit DendriticSpine(const std::string& source);
 
     const std::vector<Property::DendriticSpine::PostSynapticDensity>& postSynapticDensity() const
         noexcept;
 
   protected:
     friend class mut::DendriticSpine;
-    DendriticSpine(const Property::Properties& properties);
+    explicit DendriticSpine(const Property::Properties& properties);
 
   private:
     Soma soma() const;

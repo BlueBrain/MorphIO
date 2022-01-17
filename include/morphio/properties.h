@@ -1,7 +1,14 @@
 #pragma once
 
+#include <cstdint>  // uint32_t
+
+#include <array>
 #include <map>
+#include <vector>
+
 #include <morphio/types.h>
+#include <morphio/vector_types.h>
+#include <morphio/version.h>
 
 namespace morphio {
 /**

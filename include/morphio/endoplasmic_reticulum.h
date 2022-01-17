@@ -1,6 +1,13 @@
 #pragma once
 
-#include <morphio/types.h>
+#include <morphio/types.h>  // floatType
+
+#include <cstdint>  // uint32_t
+#include <memory>   // std::shared_ptr
+#include <utility>  // std::move
+#include <vector>   // std::vector
+
+#include <morphio/properties.h>  // Property
 
 namespace morphio {
 /**
@@ -32,7 +39,7 @@ class EndoplasmicReticulum
     const std::vector<uint32_t>& filamentCounts() const;
 
   private:
-    EndoplasmicReticulum(std::shared_ptr<Property::Properties> properties)
+    explicit EndoplasmicReticulum(std::shared_ptr<Property::Properties> properties)
         : _properties(std::move(properties)) {}
     std::shared_ptr<Property::Properties> _properties;
 

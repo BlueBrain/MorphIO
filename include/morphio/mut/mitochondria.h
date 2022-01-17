@@ -23,8 +23,7 @@ class Mitochondria
     using MitoSectionP = std::shared_ptr<MitoSection>;
 
   public:
-    Mitochondria()
-        : _counter(0) {}
+    Mitochondria() = default;
 
     const std::vector<MitoSectionP>& children(const MitoSectionP&) const;
     const MitoSectionP& section(uint32_t id) const;
@@ -101,7 +100,7 @@ class Mitochondria
 
     uint32_t _register(const MitoSectionP& section);
 
-    uint32_t _counter;
+    uint32_t _counter = 0;
     std::map<uint32_t, std::vector<MitoSectionP>> _children;
     std::map<uint32_t, uint32_t> _parent;
     std::vector<MitoSectionP> _rootSections;

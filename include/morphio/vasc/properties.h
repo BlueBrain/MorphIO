@@ -1,9 +1,10 @@
 #pragma once
 
 #include <map>
-#include <morphio/types.h>
 #include <string>  // std::string
 #include <vector>  // std::vector
+
+#include <morphio/types.h>
 
 namespace morphio {
 namespace vasculature {

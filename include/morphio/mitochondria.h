@@ -1,6 +1,10 @@
 #pragma once
 
-#include <morphio/types.h>
+#include <memory>
+#include <vector>
+
+#include <morphio/morphology.h>  // Morphology
+#include <morphio/properties.h>  // Property
 
 namespace morphio {
 /**

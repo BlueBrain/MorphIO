@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <cmath>
 
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
@@ -17,15 +16,17 @@ PointLevel::PointLevel(std::vector<Point::Type> points,
     : _points(std::move(points))
     , _diameters(std::move(diameters))
     , _perimeters(std::move(perimeters)) {
-    if (_points.size() != _diameters.size())
+    if (_points.size() != _diameters.size()) {
         throw SectionBuilderError(
             "Point vector have size: " + std::to_string(_points.size()) +
             " while Diameter vector has size: " + std::to_string(_diameters.size()));
+    }
 
-    if (_perimeters.size() > 0 && _points.size() != _perimeters.size())
+    if (!_perimeters.empty() && _points.size() != _perimeters.size()) {
         throw SectionBuilderError(
             "Point vector have size: " + std::to_string(_points.size()) +
             " while Perimeter vector has size: " + std::to_string(_perimeters.size()));
+    }
 }
 
 PointLevel::PointLevel(const PointLevel& data)
@@ -38,8 +39,9 @@ PointLevel::PointLevel(const PointLevel& data, SectionRange range) {
 }
 
 PointLevel& PointLevel::operator=(const PointLevel& other) {
-    if (&other == this)
+    if (&other == this) {
         return *this;
+    }
 
     this->_points = other._points;
     this->_diameters = other._diameters;
@@ -52,14 +54,16 @@ bool compare(const std::vector<T>& vec1,
              const std::vector<T>& vec2,
              const std::string& name,
              LogLevel logLevel) {
-    if (vec1 == vec2)
+    if (vec1 == vec2) {
         return true;
+    }
 
     if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR)
+        if (logLevel > LogLevel::ERROR) {
             printError(Warning::UNDEFINED,
                        "Error comparing " + name + ", size differs: " +
                            std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
         return false;
     }
 
@@ -81,10 +85,11 @@ static bool compare_section_structure(const std::vector<Section::Type>& vec1,
                                       const std::string& name,
                                       LogLevel logLevel) {
     if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR)
+        if (logLevel > LogLevel::ERROR) {
             printError(Warning::UNDEFINED,
                        "Error comparing " + name + ", size differs: " +
                            std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
         return false;
     }
 
@@ -111,10 +116,11 @@ bool compare(const morphio::range<T>& vec1,
              const std::string& name,
              LogLevel logLevel) {
     if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR)
+        if (logLevel > LogLevel::ERROR) {
             printError(Warning::UNDEFINED,
                        "Error comparing " + name + ", size differs: " +
                            std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
         return false;
     }
 
@@ -136,10 +142,11 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
              const std::string& name,
              LogLevel logLevel) {
     if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR)
+        if (logLevel > LogLevel::ERROR) {
             printError(Warning::UNDEFINED,
                        "Error comparing " + name + ", size differs: " +
                            std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
         return false;
     }
 
@@ -162,8 +169,9 @@ bool compare(const std::map<T, U>& vec1,
              const std::map<T, U>& vec2,
              const std::string& name,
              LogLevel logLevel) {
-    if (vec1 == vec2)
+    if (vec1 == vec2) {
         return true;
+    }
     if (logLevel > LogLevel::ERROR) {
         if (vec1.size() != vec2.size()) {
             printError(Warning::UNDEFINED,
@@ -177,11 +185,13 @@ bool compare(const std::map<T, U>& vec1,
 
 template <typename T>
 bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLevel) {
-    if (el1 == el2)
+    if (el1 == el2) {
         return true;
+    }
 
-    if (logLevel > LogLevel::ERROR)
+    if (logLevel > LogLevel::ERROR) {
         printError(Warning::UNDEFINED, name + " differs");
+    }
     return false;
 }
 
@@ -232,19 +242,21 @@ MitochondriaPointLevel::MitochondriaPointLevel(
     : _sectionIds(std::move(sectionIds))
     , _relativePathLengths(std::move(relativePathLengths))
     , _diameters(std::move(diameters)) {
-    if (_sectionIds.size() != _relativePathLengths.size())
+    if (_sectionIds.size() != _relativePathLengths.size()) {
         throw SectionBuilderError(
             "While building MitochondriaPointLevel:\n"
             "section IDs vector have size: " +
             std::to_string(_sectionIds.size()) + " while relative path length vector has size: " +
             std::to_string(_relativePathLengths.size()));
+    }
 
-    if (_sectionIds.size() != _diameters.size())
+    if (_sectionIds.size() != _diameters.size()) {
         throw SectionBuilderError(
             "While building MitochondriaPointLevel:\n"
             "section IDs vector have size: " +
             std::to_string(_sectionIds.size()) +
             " while diameter vector has size: " + std::to_string(_diameters.size()));
+    }
 }
 
 bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other,
@@ -286,8 +298,9 @@ std::ostream& operator<<(std::ostream& os, const PointLevel& prop) {
        << (prop._perimeters.size() == prop._points.size() ? " Perimeter\n" : "\n");
     for (unsigned int i = 0; i < prop._points.size(); ++i) {
         os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i];
-        if (prop._perimeters.size() == prop._points.size())
+        if (prop._perimeters.size() == prop._points.size()) {
             os << ' ' << prop._perimeters[i];
+        }
         os << '\n';
     }
     return os;

@@ -1,9 +1,10 @@
 #pragma once
 
-#include <morphio/types.h>
-
 namespace morphio {
 namespace mut {
+
+class Morphology;
+
 namespace modifiers {
 /**
    Only the first and last points of each sections are kept

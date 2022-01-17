@@ -29,8 +29,9 @@ Section::Section(const uint32_t id_, const std::shared_ptr<property::Properties>
 }
 
 Section& Section::operator=(const Section& section) {
-    if (&section == this)
+    if (&section == this) {
         return *this;
+    }
     _id = section._id;
     _range = section._range;
     _properties = section._properties;
@@ -98,8 +99,9 @@ VascularSectionType Section::type() const {
 
 floatType Section::length() const {
     const auto& points_ = this->points();
-    if (points_.size() < 2)
+    if (points_.size() < 2) {
         return 0;
+    }
 
     size_t last = points_.size() - 1;
     return distance(points_[0], points_[last]);

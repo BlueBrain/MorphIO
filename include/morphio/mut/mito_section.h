@@ -1,8 +1,10 @@
 #pragma once
 
-#include <morphio/mito_section.h>
-#include <morphio/properties.h>
-#include <morphio/types.h>
+#include <cstdint>  // uint32_t
+#include <memory>   // std::shared_ptr
+#include <vector>   // std::vector
+
+#include <morphio/properties.h>  // Property
 
 namespace morphio {
 namespace mut {

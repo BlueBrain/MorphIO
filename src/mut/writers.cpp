@@ -1,6 +1,6 @@
 #include <cassert>
 #include <fstream>
-#include <iomanip>  // std::fixed, std::setw
+#include <iomanip>  // std::fixed, std::setw, std::setprecision
 
 #include <morphio/errorMessages.h>
 #include <morphio/mut/mitochondria.h>
@@ -91,14 +91,16 @@ void swc(const Morphology& morphology, const std::string& filename) {
     int segmentIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
 
-    if (!morphology.mitochondria().rootSections().empty())
+    if (!morphology.mitochondria().rootSections().empty()) {
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                    readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+    }
 
     const auto& soma_diameters = soma->diameters();
 
-    if (soma_points.empty())
+    if (soma_points.empty()) {
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    }
 
     for (unsigned int i = 0; i < soma_points.size(); ++i) {
         writeLine(myfile,
@@ -122,9 +124,9 @@ void swc(const Morphology& morphology, const std::string& filename) {
         unsigned int firstPoint = ((isRootSection || !_skipDuplicate(section)) ? 0 : 1);
         for (unsigned int i = firstPoint; i < points.size(); ++i) {
             int parentIdOnDisk;
-            if (i > firstPoint)
+            if (i > firstPoint) {
                 parentIdOnDisk = segmentIdOnDisk - 1;
-            else {
+            } else {
                 parentIdOnDisk = (isRootSection ? (soma->points().empty() ? -1 : 1)
                                                 : newIds[section->parent()->id()]);
             }
@@ -181,9 +183,10 @@ void asc(const Morphology& morphology, const std::string& filename) {
 
     std::ofstream myfile(filename);
 
-    if (!morphology.mitochondria().rootSections().empty())
+    if (!morphology.mitochondria().rootSections().empty()) {
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                    readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+    }
 
     std::map<morphio::SectionType, std::string> header;
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
@@ -244,8 +247,9 @@ void write_dataset(HighFive::Group& file, const std::string& name, const T& raw)
 }
 
 static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria) {
-    if (mitochondria.rootSections().empty())
+    if (mitochondria.rootSections().empty()) {
         return;
+    }
 
     Property::Properties properties;
     mitochondria._buildMitochondria(properties);
@@ -276,8 +280,9 @@ static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochon
 
 
 static void endoplasmicReticulumH5(HighFive::File& h5_file, const EndoplasmicReticulum& reticulum) {
-    if (reticulum.sectionIndices().empty())
+    if (reticulum.sectionIndices().empty()) {
         return;
+    }
 
     HighFive::Group g_organelles = h5_file.createGroup("organelles");
     HighFive::Group g_reticulum = g_organelles.createGroup("endoplasmic_reticulum");
@@ -343,9 +348,10 @@ void h5(const Morphology& morpho, const std::string& filename) {
     const auto numberOfSomaDiameters = somaDiameters.size();
 
 
-    if (numberOfSomaPoints != numberOfSomaDiameters)
+    if (numberOfSomaPoints != numberOfSomaDiameters) {
         throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
             "soma points", numberOfSomaPoints, "soma diameters", numberOfSomaDiameters));
+    }
 
 
     bool hasPerimeterData_ = hasPerimeterData(morpho);
@@ -378,15 +384,18 @@ void h5(const Morphology& morpho, const std::string& filename) {
         const auto numberOfPerimeters = perimeters.size();
         raw_structure.push_back({static_cast<int>(offset), section->type(), parentOnDisk});
 
-        for (unsigned int i = 0; i < numberOfPoints; ++i)
+        for (unsigned int i = 0; i < numberOfPoints; ++i) {
             raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
+        }
 
         if (numberOfPerimeters > 0) {
-            if (numberOfPerimeters != numberOfPoints)
+            if (numberOfPerimeters != numberOfPoints) {
                 throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
                     "points", numberOfPoints, "perimeters", numberOfPerimeters));
-            for (unsigned int i = 0; i < numberOfPerimeters; ++i)
+            }
+            for (unsigned int i = 0; i < numberOfPerimeters; ++i) {
                 raw_perimeters.push_back(perimeters[i]);
+            }
         }
 
         newIds[section->id()] = sectionIdOnDisk++;

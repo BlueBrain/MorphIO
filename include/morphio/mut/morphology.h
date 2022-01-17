@@ -1,22 +1,22 @@
 #pragma once
 
-#include <cstdint>
+#include <map>
 #include <memory>
 #include <unordered_map>
-
-#include <functional>
+#include <vector>
 
 #include <morphio/errorMessages.h>
 #include <morphio/exceptions.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/mitochondria.h>
+#include <morphio/mut/modifiers.h>
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
-#include <morphio/section.h>
 #include <morphio/types.h>
 
 namespace morphio {
 namespace mut {
+// TODO: not sure why this is here
 bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
                           const std::shared_ptr<Section>& current);
 
@@ -25,8 +25,7 @@ class Morphology
 {
   public:
     Morphology()
-        : _counter(0)
-        , _soma(std::make_shared<Soma>())
+        : _soma(std::make_shared<Soma>())
         , _cellProperties(
               std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())) {}
 
@@ -39,7 +38,7 @@ class Morphology
        Example:
            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
     **/
-    Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
 
     /**
        Build a mutable Morphology from a mutable morphology
@@ -49,7 +48,7 @@ class Morphology
     /**
        Build a mutable Morphology from a read-only morphology
     **/
-    Morphology(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
     virtual ~Morphology();
 
@@ -203,7 +202,6 @@ class Morphology
      **/
     std::unordered_map<int, std::vector<unsigned int>> connectivity();
 
-
     /**
        Fixes the morphology single child sections and issues warnings
        if the section starts and ends are inconsistent
@@ -226,7 +224,7 @@ class Morphology
 
     uint32_t _register(const std::shared_ptr<Section>&);
 
-    uint32_t _counter;
+    uint32_t _counter = 0;
     std::shared_ptr<Soma> _soma;
     std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     std::vector<std::shared_ptr<Section>> _rootSections;

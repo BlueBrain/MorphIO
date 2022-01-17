@@ -1,7 +1,7 @@
 #pragma once
 
 #include <array>
-#include <cmath>
+#include <cmath>  // M_PI
 #include <iosfwd>  // std::ostream
 #include <string>  // std::string
 #include <vector>
@@ -58,8 +58,6 @@ extern template floatType maxDistanceToCenterOfGravity(const Points&);
 std::string dumpPoint(const Point& point);
 std::string dumpPoints(const Points& points);
 std::string dumpPoints(const morphio::range<const morphio::Point>& points);
-
-char my_tolower(char ch);
 
 /**
    Euclidian distance between two points
