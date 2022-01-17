@@ -10,8 +10,12 @@
 #include <morphio/exceptions.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/mitochondria.h>
+<<<<<<< HEAD
 #include <morphio/mut/modifiers.h>
 #include <morphio/mut/soma.h>
+=======
+#include <morphio/soma.h>
+>>>>>>> Merge mut/readonly somata.
 #include <morphio/properties.h>
 #include <morphio/types.h>
 

@@ -16,7 +16,6 @@ set(MORPHIO_SOURCES
     mut/modifiers.cpp
     mut/morphology.cpp
     mut/section.cpp
-    mut/soma.cpp
     mut/writers.cpp
     point_utils.cpp
     properties.cpp

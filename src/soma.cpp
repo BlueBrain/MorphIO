@@ -6,15 +6,24 @@
 #include "shared_utils.hpp"
 
 namespace morphio {
-Soma::Soma(const std::shared_ptr<Property::Properties>& properties)
-    : properties_(properties) {}
+
+
+Soma::Soma(const Property::Properties& properties)
+    : soma_type_(properties._cellLevel._somaType)
+    , properties_(properties._somaLevel) {}
+
+
+Soma::Soma(const Property::PointLevel& point_properties)
+    : properties_(point_properties) {}
+
 
 Point Soma::center() const {
-    return centerOfGravity(properties_->_somaLevel._points);
+    return centerOfGravity(points());
 }
 
+
 floatType Soma::volume() const {
-    switch (properties_->_cellLevel._somaType) {
+    switch (soma_type_) {
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: {
         floatType radius = diameters()[0] / 2;
         return 4 * morphio::PI * radius * radius;
@@ -29,12 +38,27 @@ floatType Soma::volume() const {
     }
 }
 
+
 floatType Soma::surface() const {
-    return _somaSurface(type(), diameters(), points());
+    return _somaSurface<std::vector<morphio::floatType>, std::vector<Point>>(type(),
+                                                                             diameters(),
+                                                                             points());
 }
+
 
 floatType Soma::maxDistance() const {
-    return maxDistanceToCenterOfGravity(properties_->_somaLevel._points);
+    return maxDistanceToCenterOfGravity(properties_._points);
 }
 
+
+std::ostream& operator<<(std::ostream& os, const Soma& soma) {
+    os << dumpPoints(soma.points());
+    return os;
+}
+
+
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& soma) {
+    os << *soma;
+    return os;
+}
 }  // namespace morphio

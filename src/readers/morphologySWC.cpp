@@ -10,7 +10,6 @@
 #include <morphio/errorMessages.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
-#include <morphio/mut/soma.h>
 #include <morphio/properties.h>
 
 namespace {
