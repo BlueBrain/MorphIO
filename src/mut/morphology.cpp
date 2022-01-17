@@ -290,7 +290,7 @@ Property::Properties Morphology::buildReadOnly() const {
 
     properties._cellLevel = *_cellProperties;
     properties._cellLevel._somaType = _soma->type();
-    _appendProperties(properties._somaLevel, _soma->_pointProperties);
+    _appendProperties(properties._somaLevel, _soma->point_properties_);
 
     for (auto it = depth_begin(); it != depth_end(); ++it) {
         const std::shared_ptr<Section>& section_ = *it;
