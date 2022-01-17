@@ -12,11 +12,12 @@ class EndoplasmicReticulum
     EndoplasmicReticulum() = default;
     EndoplasmicReticulum(const EndoplasmicReticulum& endoplasmicReticulum) = default;
 
-    EndoplasmicReticulum(const std::vector<uint32_t>& sectionIndices,
+    EndoplasmicReticulum(const std::vector<uint32_t>& section_indices,
                          const std::vector<morphio::floatType>& volumes,
-                         const std::vector<morphio::floatType>& surfaceAreas,
-                         const std::vector<uint32_t>& filamentCounts);
-    explicit EndoplasmicReticulum(const morphio::EndoplasmicReticulum& endoplasmicReticulum);
+                         const std::vector<morphio::floatType>& surface_areas,
+                         const std::vector<uint32_t>& filament_counts);
+
+    explicit EndoplasmicReticulum(const morphio::EndoplasmicReticulum& endoplasmic_reticulum);
 
 
     /**
@@ -50,7 +51,7 @@ class EndoplasmicReticulum
     Property::EndoplasmicReticulumLevel buildReadOnly() const noexcept;
 
   private:
-    morphio::Property::EndoplasmicReticulumLevel _properties;
+    morphio::Property::EndoplasmicReticulumLevel properties_;
     explicit EndoplasmicReticulum(const morphio::Property::EndoplasmicReticulumLevel&);
 };
 }  // namespace mut

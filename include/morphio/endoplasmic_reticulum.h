@@ -40,8 +40,8 @@ class EndoplasmicReticulum
 
   private:
     explicit EndoplasmicReticulum(std::shared_ptr<Property::Properties> properties)
-        : _properties(std::move(properties)) {}
-    std::shared_ptr<Property::Properties> _properties;
+        : properties_(std::move(properties)) {}
+    std::shared_ptr<Property::Properties> properties_;
 
     friend class Morphology;
     friend class morphio::mut::EndoplasmicReticulum;
