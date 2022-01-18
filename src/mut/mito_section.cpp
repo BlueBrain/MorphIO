@@ -18,7 +18,9 @@ MitoSection::MitoSection(Mitochondria* mitochondria,
                   Property::MitochondriaPointLevel(section.properties_->_mitochondriaPointLevel,
                                                    section._range)) {}
 
-MitoSection::MitoSection(Mitochondria* mitochondria, unsigned int section_id, const MitoSection& section)
+MitoSection::MitoSection(Mitochondria* mitochondria,
+                         unsigned int section_id,
+                         const MitoSection& section)
     : id_(section_id)
     , mitochondria_(mitochondria)
     , _mitoPoints(section._mitoPoints) {}
