@@ -120,60 +120,60 @@ class Section: public std::enable_shared_from_this<Section>
     void throwIfNoOwningMorphology() const;
 
     /**
-      Getter for _morphology; checks the pointer is non-null, throws otherwise
+      Getter for morphology_; checks the pointer is non-null, throws otherwise
     **/
     Morphology* getOwningMorphologyOrThrow() const;
 
-    Morphology* _morphology;
-    Property::PointLevel _pointProperties;
-    uint32_t _id;
-    SectionType _sectionType;
+    Morphology* morphology_;
+    Property::PointLevel point_properties_;
+    uint32_t id_;
+    SectionType section_type_;
 };
 
 std::ostream& operator<<(std::ostream&, const std::shared_ptr<Section>&);
 
 inline uint32_t Section::id() const noexcept {
-    return _id;
+    return id_;
 }
 
 inline SectionType& Section::type() noexcept {
-    return _sectionType;
+    return section_type_;
 }
 
 inline const SectionType& Section::type() const noexcept {
-    return _sectionType;
+    return section_type_;
 }
 
 inline std::vector<Point>& Section::points() noexcept {
-    return _pointProperties._points;
+    return point_properties_._points;
 }
 
 inline const std::vector<Point>& Section::points() const noexcept {
-    return _pointProperties._points;
+    return point_properties_._points;
 }
 
 inline std::vector<morphio::floatType>& Section::diameters() noexcept {
-    return _pointProperties._diameters;
+    return point_properties_._diameters;
 }
 
 inline const std::vector<morphio::floatType>& Section::diameters() const noexcept {
-    return _pointProperties._diameters;
+    return point_properties_._diameters;
 }
 
 inline std::vector<morphio::floatType>& Section::perimeters() noexcept {
-    return _pointProperties._perimeters;
+    return point_properties_._perimeters;
 }
 
 inline const std::vector<morphio::floatType>& Section::perimeters() const noexcept {
-    return _pointProperties._perimeters;
+    return point_properties_._perimeters;
 }
 
 inline Property::PointLevel& Section::properties() noexcept {
-    return _pointProperties;
+    return point_properties_;
 }
 
 inline const Property::PointLevel& Section::properties() const noexcept {
-    return _pointProperties;
+    return point_properties_;
 }
 
 }  // namespace mut

@@ -56,12 +56,12 @@ class SectionBase
 
     uint32_t _id = 0;
     SectionRange _range;
-    std::shared_ptr<Property::Properties> _properties;
+    std::shared_ptr<Property::Properties> properties_;
 };
 
 template <typename T>
 inline bool SectionBase<T>::operator==(const SectionBase& other) const noexcept {
-    return other._id == _id && other._properties == _properties;
+    return other._id == _id && other.properties_ == properties_;
 }
 
 template <typename T>
@@ -78,7 +78,7 @@ template <typename T>
 SectionBase<T>::SectionBase(const uint32_t id_,
                             const std::shared_ptr<Property::Properties>& properties)
     : _id(id_)
-    , _properties(properties) {
+    , properties_(properties) {
     const auto& sections = properties->get<typename T::SectionId>();
     if (_id >= sections.size()) {
         throw RawDataError(
@@ -102,7 +102,7 @@ SectionBase<T>::SectionBase(const uint32_t id_,
 template <typename T>
 template <typename TProperty>
 range<const typename TProperty::Type> SectionBase<T>::get() const {
-    const auto& data = _properties->get<TProperty>();
+    const auto& data = properties_->get<TProperty>();
     if (data.empty()) {
         return {};
     }
@@ -113,7 +113,7 @@ range<const typename TProperty::Type> SectionBase<T>::get() const {
 
 template <typename T>
 bool SectionBase<T>::isRoot() const {
-    return _properties->get<typename T::SectionId>()[_id][1] == -1;
+    return properties_->get<typename T::SectionId>()[_id][1] == -1;
 }
 
 template <typename T>
@@ -124,19 +124,19 @@ T SectionBase<T>::parent() const {
     }
 
     const auto _parent = static_cast<unsigned int>(
-        _properties->get<typename T::SectionId>()[_id][1]);
-    return {_parent, _properties};
+        properties_->get<typename T::SectionId>()[_id][1]);
+    return {_parent, properties_};
 }
 
 template <typename T>
 std::vector<T> SectionBase<T>::children() const {
     std::vector<T> result;
     try {
-        const std::vector<uint32_t>& _children = _properties->children<typename T::SectionId>().at(
+        const std::vector<uint32_t>& _children = properties_->children<typename T::SectionId>().at(
             static_cast<int>(_id));
         result.reserve(_children.size());
         for (const uint32_t id_ : _children) {
-            result.push_back(T(id_, _properties));
+            result.push_back(T(id_, properties_));
         }
 
         return result;
@@ -144,5 +144,6 @@ std::vector<T> SectionBase<T>::children() const {
         return result;
     }
 }
+
 
 }  // namespace morphio

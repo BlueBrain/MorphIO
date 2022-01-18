@@ -145,7 +145,7 @@ class Morphology
     friend class mut::Morphology;
     Morphology(const Property::Properties& properties, unsigned int options);
 
-    std::shared_ptr<Property::Properties> _properties;
+    std::shared_ptr<Property::Properties> properties_;
 
     template <typename Property>
     const std::vector<typename Property::Type>& get() const;

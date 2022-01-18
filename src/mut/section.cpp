@@ -15,35 +15,35 @@ static inline bool _emptySection(const std::shared_ptr<Section>& section) {
 }
 
 Section::Section(Morphology* morphology,
-                 unsigned int id_,
-                 SectionType type_,
+                 unsigned int id,
+                 SectionType type,
                  const Property::PointLevel& pointProperties)
-    : _morphology(morphology)
-    , _pointProperties(pointProperties)
-    , _id(id_)
-    , _sectionType(type_) {}
+    : morphology_(morphology)
+    , point_properties_(pointProperties)
+    , id_(id)
+    , section_type_(type) {}
 
-Section::Section(Morphology* morphology, unsigned int id_, const morphio::Section& section_)
+Section::Section(Morphology* morphology, unsigned int id, const morphio::Section& section)
     : Section(morphology,
-              id_,
-              section_.type(),
-              Property::PointLevel(section_._properties->_pointLevel, section_._range)) {}
+              id,
+              section.type(),
+              Property::PointLevel(section.properties_->_pointLevel, section._range)) {}
 
-Section::Section(Morphology* morphology, unsigned int id_, const Section& section_)
-    : _morphology(morphology)
-    , _pointProperties(section_._pointProperties)
-    , _id(id_)
-    , _sectionType(section_._sectionType) {}
+Section::Section(Morphology* morphology, unsigned int id, const Section& section)
+    : morphology_(morphology)
+    , point_properties_(section.point_properties_)
+    , id_(id)
+    , section_type_(section.section_type_) {}
 
 void Section::throwIfNoOwningMorphology() const {
-    if (!_morphology) {
+    if (!morphology_) {
         throw std::runtime_error("Section does not belong to a morphology, impossible operation");
     }
 }
 
 Morphology* Section::getOwningMorphologyOrThrow() const {
     throwIfNoOwningMorphology();
-    return _morphology;
+    return morphology_;
 }
 
 const std::shared_ptr<Section>& Section::parent() const {

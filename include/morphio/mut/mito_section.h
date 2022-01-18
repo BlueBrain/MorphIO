@@ -59,9 +59,9 @@ class MitoSection
     /** @} */
 
   private:
-    uint32_t _id;
+    uint32_t id_;
 
-    Mitochondria* _mitochondria;
+    Mitochondria* mitochondria_;
 
   public:
     // TODO: make private
@@ -69,7 +69,7 @@ class MitoSection
 };
 
 inline uint32_t MitoSection::id() const noexcept {
-    return _id;
+    return id_;
 }
 
 inline const std::vector<morphio::floatType>& MitoSection::diameters() const noexcept {
