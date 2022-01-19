@@ -76,9 +76,9 @@ class Section
     template <typename Property>
     range<const typename Property::Type> get() const;
 
-    uint32_t _id;
-    SectionRange _range;
-    std::shared_ptr<property::Properties> _properties;
+    uint32_t id_;
+    SectionRange range_;
+    std::shared_ptr<property::Properties> properties_;
 };
 
 }  // namespace vasculature
