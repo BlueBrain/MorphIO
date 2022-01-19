@@ -45,7 +45,7 @@ class Vasculature
      *
      * @throw RawDataError if the id is out of range
      */
-    Section section(const uint32_t& id) const;
+    Section section(uint32_t id) const;
 
     /**
      * Returns a list with offsets to access data of a specific section in the points
@@ -87,7 +87,7 @@ class Vasculature
     graph_iterator end() const;
 
   private:
-    std::shared_ptr<property::Properties> _properties;
+    std::shared_ptr<property::Properties> properties_;
 
     template <typename Property>
     inline const std::vector<typename Property::Type>& get() const noexcept;
@@ -95,7 +95,7 @@ class Vasculature
 
 template <typename Property>
 inline const std::vector<typename Property::Type>& Vasculature::get() const noexcept {
-    return _properties->get<Property>();
+    return properties_->get<Property>();
 }
 
 inline const Points& Vasculature::points() const noexcept {
