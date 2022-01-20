@@ -75,8 +75,7 @@ inline uint32_t SectionBase<T>::id() const noexcept {
 }
 
 template <typename T>
-SectionBase<T>::SectionBase(uint32_t id,
-                            const std::shared_ptr<Property::Properties>& properties)
+SectionBase<T>::SectionBase(uint32_t id, const std::shared_ptr<Property::Properties>& properties)
     : id_(id)
     , properties_(properties) {
     const auto& sections = properties->get<typename T::SectionId>();
