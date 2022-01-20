@@ -16,7 +16,7 @@ MitoSection::MitoSection(Mitochondria* mitochondria,
     : MitoSection(mitochondria,
                   section_id,
                   Property::MitochondriaPointLevel(section.properties_->_mitochondriaPointLevel,
-                                                   section._range)) {}
+                                                   section.range_)) {}
 
 MitoSection::MitoSection(Mitochondria* mitochondria,
                          unsigned int section_id,

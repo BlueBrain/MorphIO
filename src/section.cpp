@@ -16,8 +16,7 @@ bool Section::is_heterogeneous(bool downstream) const {
 }
 
 SectionType Section::type() const {
-    auto val = properties_->get<Property::SectionType>()[_id];
-    return val;
+    return properties_->get<Property::SectionType>()[id_];
 }
 
 depth_iterator Section::depth_begin() const {

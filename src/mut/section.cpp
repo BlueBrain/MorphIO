@@ -27,7 +27,7 @@ Section::Section(Morphology* morphology, unsigned int id, const morphio::Section
     : Section(morphology,
               id,
               section.type(),
-              Property::PointLevel(section.properties_->_pointLevel, section._range)) {}
+              Property::PointLevel(section.properties_->_pointLevel, section.range_)) {}
 
 Section::Section(Morphology* morphology, unsigned int id, const Section& section)
     : morphology_(morphology)

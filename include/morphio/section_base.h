@@ -54,14 +54,14 @@ class SectionBase
     template <typename Property>
     range<const typename Property::Type> get() const;
 
-    uint32_t _id = 0;
-    SectionRange _range;
+    uint32_t id_ = 0;
+    SectionRange range_;
     std::shared_ptr<Property::Properties> properties_;
 };
 
 template <typename T>
 inline bool SectionBase<T>::operator==(const SectionBase& other) const noexcept {
-    return other._id == _id && other.properties_ == properties_;
+    return other.id_ == id_ && other.properties_ == properties_;
 }
 
 template <typename T>
@@ -71,31 +71,31 @@ inline bool SectionBase<T>::operator!=(const SectionBase& other) const noexcept 
 
 template <typename T>
 inline uint32_t SectionBase<T>::id() const noexcept {
-    return _id;
+    return id_;
 }
 
 template <typename T>
-SectionBase<T>::SectionBase(const uint32_t id_,
+SectionBase<T>::SectionBase(uint32_t id,
                             const std::shared_ptr<Property::Properties>& properties)
-    : _id(id_)
+    : id_(id)
     , properties_(properties) {
     const auto& sections = properties->get<typename T::SectionId>();
-    if (_id >= sections.size()) {
+    if (id_ >= sections.size()) {
         throw RawDataError(
-            "Requested section ID (" + std::to_string(_id) +
+            "Requested section ID (" + std::to_string(id_) +
             ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")");
     }
 
-    const auto start = static_cast<size_t>(sections[_id][0]);
-    const size_t end = _id == sections.size() - 1
+    const auto start = static_cast<size_t>(sections[id_][0]);
+    const size_t end = id_ == sections.size() - 1
                            ? properties->get<typename T::PointAttribute>().size()
-                           : static_cast<size_t>(sections[_id + 1][0]);
+                           : static_cast<size_t>(sections[id_ + 1][0]);
 
-    _range = std::make_pair(start, end);
+    range_ = std::make_pair(start, end);
 
-    if (_range.second <= _range.first) {
-        std::cerr << "Dereferencing broken properties section " << _id
-                  << "\nSection range: " << _range.first << " -> " << _range.second << '\n';
+    if (range_.second <= range_.first) {
+        std::cerr << "Dereferencing broken properties section " << id_
+                  << "\nSection range: " << range_.first << " -> " << range_.second << '\n';
     }
 }
 
@@ -107,24 +107,24 @@ range<const typename TProperty::Type> SectionBase<T>::get() const {
         return {};
     }
 
-    auto ptr_start = data.data() + _range.first;
-    return {ptr_start, _range.second - _range.first};
+    auto ptr_start = data.data() + range_.first;
+    return {ptr_start, range_.second - range_.first};
 }
 
 template <typename T>
 bool SectionBase<T>::isRoot() const {
-    return properties_->get<typename T::SectionId>()[_id][1] == -1;
+    return properties_->get<typename T::SectionId>()[id_][1] == -1;
 }
 
 template <typename T>
 T SectionBase<T>::parent() const {
     if (isRoot()) {
         throw MissingParentError("Cannot call Section::parent() on a root node (section id=" +
-                                 std::to_string(_id) + ").");
+                                 std::to_string(id_) + ").");
     }
 
     const auto _parent = static_cast<unsigned int>(
-        properties_->get<typename T::SectionId>()[_id][1]);
+        properties_->get<typename T::SectionId>()[id_][1]);
     return {_parent, properties_};
 }
 
@@ -133,10 +133,10 @@ std::vector<T> SectionBase<T>::children() const {
     std::vector<T> result;
     try {
         const std::vector<uint32_t>& _children = properties_->children<typename T::SectionId>().at(
-            static_cast<int>(_id));
+            static_cast<int>(id_));
         result.reserve(_children.size());
-        for (const uint32_t id_ : _children) {
-            result.push_back(T(id_, properties_));
+        for (uint32_t id : _children) {
+            result.push_back(T(id, properties_));
         }
 
         return result;

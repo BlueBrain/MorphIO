@@ -94,8 +94,8 @@ class Section: public SectionBase<Section>
     friend class SectionBase<Section>;
 
   protected:
-    Section(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
-        : SectionBase(id_, properties) {}
+    Section(uint32_t id, const std::shared_ptr<Property::Properties>& properties)
+        : SectionBase(id, properties) {}
 };
 
 }  // namespace morphio
