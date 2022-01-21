@@ -156,7 +156,6 @@ static void _write_asc_section(std::ofstream& myfile,
                                const std::shared_ptr<Section>& section,
                                const std::map<morphio::SectionType, std::string>& header,
                                size_t indentLevel) {
-
     // allowed types are only the ones available in the header
     if (header.count(section->type()) == 0) {
         throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
@@ -209,10 +208,10 @@ void asc(const Morphology& morphology, const std::string& filename) {
     }
 
     for (const auto& section : morphology.rootSections()) {
-
         // allowed types are only the ones available in the header
         if (header.count(section->type()) == 0) {
-            throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
+            throw WriterError(
+                readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
         }
         myfile << header.at(section->type());
         _write_asc_section(myfile, morphology, section, header, 2);
