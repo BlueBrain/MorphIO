@@ -48,3 +48,24 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence&& seq) {
                      capsule           // numpy array references this parent
     );
 }
+
+/**
+ * @brief Exposes an internal vector (not temporary) as a non-writeable numpy array.
+ */
+template <typename Sequence, typename Parent>
+inline py::array internal_vector_as_readonly_array(
+    const Sequence& seq, const Parent& parent) {
+
+    // The correct base must be used here so that refcounting is done correctly on the python
+    // sire. The parent that holds that returned data should be passed as a base. See:
+    // https://github.com/pybind/pybind11/issues/2271#issuecomment-650740842
+    auto res = py::array(static_cast<py::ssize_t>(seq.size()), seq.data(), py::cast(parent));
+
+    // pybind11 casts away const-ness in return values. Thus, we need to explicitly set the
+    // numpy array flag to not writeable to prevent mutating the unerlying data. See limitations:
+    // https://pybind11.readthedocs.io/en/stable/limitations.html
+    py::detail::array_proxy(res.ptr())->flags &= ~py::detail::npy_api::NPY_ARRAY_WRITEABLE_;
+
+    return res;
+
+}

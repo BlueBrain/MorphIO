@@ -19,6 +19,63 @@ CELLS = OrderedDict({
     'h5': Morphology(os.path.join(_path, "h5/v1/simple.h5")),
 })
 
+import gc, sys
+
+def test_points_immutability():
+
+    def assert_refcount(obj, expected_refcount):
+        assert sys.getrefcount(obj) - 3 == expected_refcount
+
+    morph = Morphology(os.path.join(_path, "simple-heterogeneous-neurite.swc"))
+
+    assert_refcount(morph, 1)
+
+    points_copy = morph.points.copy()
+
+    # we copy the points, morph refcount should not change
+    assert_refcount(morph, 1)
+
+    # sanity check
+    assert_array_almost_equal(points_copy, morph.points)
+
+    # ensure we cannot overwrite the points
+    with pytest.raises(AttributeError):
+        morph.points = np.ones(points_copy.shape)
+
+    # ensure we cannot change points data
+    with pytest.raises(ValueError):
+        morph.points[:] = np.ones(points_copy.shape)
+
+    # check if flag set correctly
+    assert not morph.points.flags["WRITEABLE"]
+
+    # check that the parent of the array is the morphology
+    assert morph.points.base is morph
+
+    # make hte same checks when the data is assigned to a new variable
+    points = morph.points
+    assert_refcount(points, 1)
+    assert points.base is morph
+    assert points.flags["WRITEABLE"] == False
+
+    # sanity check
+    new_points = points + np.random.random(points.shape)
+    assert new_points.flags["WRITEABLE"]
+
+    # morph refcount should have increased by 1
+    assert_refcount(morph, 2)
+
+    # removing the points, should decrease morph refcount back to 1
+    del points
+    assert_refcount(morph, 1)
+
+    # morphology should not be released if it's del/outscoped in python
+    points = morph.points
+
+    del morph
+    assert_refcount(points, 1)
+    assert_array_almost_equal(points_copy, points)
+
 
 def test_heterogeneous_sections():
 
