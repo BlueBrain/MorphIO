@@ -53,9 +53,7 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence&& seq) {
  * @brief Exposes an internal vector (not temporary) as a non-writeable numpy array.
  */
 template <typename Sequence, typename Parent>
-inline py::array internal_vector_as_readonly_array(
-    const Sequence& seq, const Parent& parent) {
-
+inline py::array internal_vector_as_readonly_array(const Sequence& seq, const Parent& parent) {
     // The correct base must be used here so that refcounting is done correctly on the python
     // sire. The parent that holds that returned data should be passed as a base. See:
     // https://github.com/pybind/pybind11/issues/2271#issuecomment-650740842
@@ -67,5 +65,4 @@ inline py::array internal_vector_as_readonly_array(
     py::detail::array_proxy(res.ptr())->flags &= ~py::detail::npy_api::NPY_ARRAY_WRITEABLE_;
 
     return res;
-
 }
