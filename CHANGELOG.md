@@ -10,6 +10,7 @@ Fixes:
 * Fixed documentation links (#350)
 * Python version check >=3.7 (#356)
 * Updated pybind11 submodule to v2.8.1 (#362)
+* Added exception for attempting to write unsupported section types into ascii (#370)
 
 v3.3.2
 ======

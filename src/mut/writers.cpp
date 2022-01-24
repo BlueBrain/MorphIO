@@ -207,7 +207,7 @@ void asc(const Morphology& morphology, const std::string& filename) {
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
-    for (const auto& section : morphology.rootSections()) {
+    for (const std::shared_ptr<Section>& section : morphology.rootSections()) {
         // allowed types are only the ones available in the header
         if (header.count(section->type()) == 0) {
             throw WriterError(
