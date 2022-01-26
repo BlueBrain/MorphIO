@@ -41,9 +41,9 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
 Morphology::Morphology(const morphio::Morphology& morphology, unsigned int options)
     : _soma(std::make_shared<Soma>(morphology.soma()))
     , _cellProperties(
-          std::make_shared<morphio::Property::CellLevel>(morphology._properties->_cellLevel))
+          std::make_shared<morphio::Property::CellLevel>(morphology.properties_->_cellLevel))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
-    , _dendriticSpineLevel(morphology._properties->_dendriticSpineLevel) {
+    , _dendriticSpineLevel(morphology.properties_->_dendriticSpineLevel) {
     for (const morphio::Section& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -155,9 +155,9 @@ Morphology::~Morphology() {
 
 void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
                               const std::shared_ptr<Section> section) {
-    if (section->_morphology == this) {
-        section->_morphology = nullptr;
-        section->_id = 0xffffffff;
+    if (section->morphology_ == this) {
+        section->morphology_ = nullptr;
+        section->id_ = 0xffffffff;
     }
     vec.erase(std::remove(vec.begin(), vec.end(), section), vec.end());
 }
@@ -290,18 +290,18 @@ Property::Properties Morphology::buildReadOnly() const {
 
     properties._cellLevel = *_cellProperties;
     properties._cellLevel._somaType = _soma->type();
-    _appendProperties(properties._somaLevel, _soma->_pointProperties);
+    _appendProperties(properties._somaLevel, _soma->point_properties_);
 
     for (auto it = depth_begin(); it != depth_end(); ++it) {
-        const std::shared_ptr<Section>& section_ = *it;
-        unsigned int sectionId = section_->id();
-        int parentOnDisk = (section_->isRoot() ? -1 : newIds[section_->parent()->id()]);
+        const std::shared_ptr<Section>& section = *it;
+        unsigned int sectionId = section->id();
+        int parentOnDisk = (section->isRoot() ? -1 : newIds[section->parent()->id()]);
 
         auto start = static_cast<int>(properties._pointLevel._points.size());
         properties._sectionLevel._sections.push_back({start, parentOnDisk});
-        properties._sectionLevel._sectionTypes.push_back(section_->type());
+        properties._sectionLevel._sectionTypes.push_back(section->type());
         newIds[sectionId] = sectionIdOnDisk++;
-        _appendProperties(properties._pointLevel, section_->_pointProperties);
+        _appendProperties(properties._pointLevel, section->point_properties_);
     }
 
     mitochondria()._buildMitochondria(properties);

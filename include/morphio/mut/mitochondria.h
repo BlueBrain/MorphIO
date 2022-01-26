@@ -101,19 +101,19 @@ class Mitochondria
     uint32_t _register(const MitoSectionP& section);
 
     uint32_t _counter = 0;
-    std::map<uint32_t, std::vector<MitoSectionP>> _children;
-    std::map<uint32_t, uint32_t> _parent;
-    std::vector<MitoSectionP> _rootSections;
-    std::map<uint32_t, MitoSectionP> _sections;
+    std::map<uint32_t, std::vector<MitoSectionP>> children_;
+    std::map<uint32_t, uint32_t> parent_;
+    std::vector<MitoSectionP> root_sections_;
+    std::map<uint32_t, MitoSectionP> sections_;
 };
 
 inline const std::map<uint32_t, Mitochondria::MitoSectionP>& Mitochondria::sections() const
     noexcept {
-    return _sections;
+    return sections_;
 }
 
 inline const std::vector<Mitochondria::MitoSectionP>& Mitochondria::rootSections() const noexcept {
-    return _rootSections;
+    return root_sections_;
 }
 
 }  // namespace mut

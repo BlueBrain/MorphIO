@@ -5,12 +5,12 @@
 
 namespace morphio {
 namespace mut {
-Soma::Soma(const Property::PointLevel& pointProperties)
-    : _pointProperties(pointProperties) {}
+Soma::Soma(const Property::PointLevel& point_properties)
+    : point_properties_(point_properties) {}
 
 Soma::Soma(const morphio::Soma& soma)
-    : _somaType(soma.type())
-    , _pointProperties(soma._properties->_somaLevel) {}
+    : soma_type_(soma.type())
+    , point_properties_(soma.properties_->_somaLevel) {}
 
 Point Soma::center() const {
     return centerOfGravity(points());
@@ -23,7 +23,7 @@ floatType Soma::surface() const {
 }
 
 floatType Soma::maxDistance() const {
-    return maxDistanceToCenterOfGravity(_pointProperties._points);
+    return maxDistanceToCenterOfGravity(point_properties_._points);
 }
 
 std::ostream& operator<<(std::ostream& os, const Soma& soma) {
@@ -31,8 +31,8 @@ std::ostream& operator<<(std::ostream& os, const Soma& soma) {
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& somaPtr) {
-    os << *somaPtr;
+std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& soma) {
+    os << *soma;
     return os;
 }
 
