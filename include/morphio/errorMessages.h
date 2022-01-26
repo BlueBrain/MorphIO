@@ -215,6 +215,9 @@ class ErrorMessages
     //              WRITERS
     ////////////////////////////////////////////////////////////////////////////////
 
+    /** Unsupported morphology section type error message */
+    std::string ERROR_UNSUPPORTED_SECTION_TYPE(const SectionType& type) const;
+
     /** Wrong morphology file extension error message */
     std::string ERROR_WRONG_EXTENSION(const std::string& filename) const;
 

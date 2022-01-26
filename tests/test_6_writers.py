@@ -311,3 +311,41 @@ def test_single_point_root_section():
     with TemporaryDirectory('test_single_point_root_section') as tmp_folder:
         with pytest.raises(SectionBuilderError):
             m.write(Path(tmp_folder, "h5/empty_vasculature.h5"))
+
+
+def test_write_custom_property__throws():
+
+    morpho = Morphology()
+    morpho.soma.points = [[0, 0, 0]]
+    morpho.soma.diameters = [2]
+
+    custom = morpho.append_root_section(
+        PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
+        SectionType.custom5
+    )
+
+    with TemporaryDirectory('test_write_basic') as tmp_folder:
+        with pytest.raises(WriterError):
+            morpho.write(Path(tmp_folder, "test_write.asc"))
+
+    morpho = Morphology()
+    morpho.soma.points = [[0, 0, 0]]
+    morpho.soma.diameters = [2]
+
+    custom = morpho.append_root_section(
+        PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
+        SectionType.custom5
+    )
+
+    dendrite = morpho.append_root_section(PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
+                                          SectionType.basal_dendrite)
+
+    dendrite.append_section(PointLevel([[0, 5, 0], [-5, 5, 0]], [2, 3]), SectionType.custom5)
+
+    with TemporaryDirectory('test_write_basic') as tmp_folder:
+        with pytest.raises(WriterError):
+            morpho.write(Path(tmp_folder, "test_write.asc"))
+
+
+
+

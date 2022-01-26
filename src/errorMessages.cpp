@@ -218,6 +218,12 @@ std::string ErrorMessages::ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
 //              WRITERS
 ////////////////////////////////////////////////////////////////////////////////
 
+std::string ErrorMessages::ERROR_UNSUPPORTED_SECTION_TYPE(const SectionType& type) const {
+    return ("Attempted to write unsupported section type: " + std::to_string(type) +
+            ".\n"
+            "Please try writing to a different format that supports the section type.");
+}
+
 std::string ErrorMessages::ERROR_WRONG_EXTENSION(const std::string& filename) const {
     return "Filename: " + filename + " must have one of the following extensions: swc, asc or h5";
 }
