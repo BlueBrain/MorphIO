@@ -31,50 +31,74 @@ def test_points_immutability():
     assert_refcount(morph, 1)
 
     points_copy = morph.points.copy()
+    diameters_copy = morph.diameters.copy()
 
     # we copy the points, morph refcount should not change
     assert_refcount(morph, 1)
 
     # sanity check
     assert_array_almost_equal(points_copy, morph.points)
+    assert_array_almost_equal(diameters_copy, morph.diameters)
 
     # ensure we cannot overwrite the points
     with pytest.raises(AttributeError):
         morph.points = np.ones(points_copy.shape)
 
+    with pytest.raises(AttributeError):
+        morph.diameters = np.ones(diameters_copy.shape)
+
     # ensure we cannot change points data
     with pytest.raises(ValueError):
         morph.points[:] = np.ones(points_copy.shape)
 
+    with pytest.raises(ValueError):
+        morph.diameters[:] = np.ones(diameters_copy.shape)
+
     # check if flag set correctly
     assert not morph.points.flags["WRITEABLE"]
+    assert not morph.diameters.flags["WRITEABLE"]
 
     # check that the parent of the array is the morphology
     assert morph.points.base is morph
+    assert morph.diameters.base is morph
 
     # make hte same checks when the data is assigned to a new variable
     points = morph.points
     assert_refcount(points, 1)
     assert points.base is morph
     assert points.flags["WRITEABLE"] == False
+    diameters = morph.diameters
+    assert_refcount(diameters, 1)
+    assert diameters.base is morph
+    assert diameters.flags["WRITEABLE"] == False
 
     # sanity check
     new_points = points + np.random.random(points.shape)
+    new_diameters = diameters + np.random.random(diameters.shape)
     assert new_points.flags["WRITEABLE"]
+    assert new_diameters.flags["WRITEABLE"]
 
-    # morph refcount should have increased by 1
-    assert_refcount(morph, 2)
+    # morph refcount should have increased by 2
+    assert_refcount(morph, 3)
 
     # removing the points, should decrease morph refcount back to 1
     del points
+    assert_refcount(morph, 2)
+
+    # removing the diameters, should decrease morph refcount back to 1
+    del diameters
     assert_refcount(morph, 1)
 
     # morphology should not be released if it's del/outscoped in python
     points = morph.points
+    diameters = morph.diameters
 
     del morph
     assert_refcount(points, 1)
     assert_array_almost_equal(points_copy, points)
+
+    assert_refcount(diameters, 1)
+    assert_array_almost_equal(diameters_copy, diameters)
 
 
 def test_heterogeneous_sections():

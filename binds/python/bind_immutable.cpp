@@ -95,17 +95,15 @@ void bind_immutable_module(py::module& m) {
         .def_property_readonly(
             "diameters",
             [](const morphio::Morphology& morpho) {
-                const auto& data = morpho.diameters();
-                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+                return internal_vector_as_readonly_array(morpho.diameters(), morpho);
             },
             "Returns a list with all diameters from all sections (soma points are not included)\n"
             "Note: diameters belonging to the n'th section are located at indices:\n"
             "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
         .def_property_readonly(
             "perimeters",
-            [](const morphio::Morphology& obj) {
-                const auto& data = obj.perimeters();
-                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            [](const morphio::Morphology& morpho) {
+                return internal_vector_as_readonly_array(morpho.perimeters(), morpho);
             },
             "Returns a list with all perimeters from all sections (soma points are not included)\n"
             "Note: perimeters belonging to the n'th section are located at indices:\n"
