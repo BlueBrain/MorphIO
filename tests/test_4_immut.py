@@ -19,15 +19,20 @@ CELLS = OrderedDict({
     'h5': Morphology(os.path.join(_path, "h5/v1/simple.h5")),
 })
 
-import gc, sys
+import sys
 
-def test_points_immutability():
+def test_data_immutability():
+    """Readonly Morphology returns readonly numpy views (not copies) to its internal
+    points, diameters and perimeters datasets. Here it is ensures that refcounting
+    of the Morphology is increased when these views are available on the python side.
+    Morphology can be released only when all references to itself and its views are
+    freed.
+    """
 
     def assert_refcount(obj, expected_refcount):
         assert sys.getrefcount(obj) - 3 == expected_refcount
 
     morph = Morphology(os.path.join(_path, "simple-heterogeneous-neurite.swc"))
-
     assert_refcount(morph, 1)
 
     points_copy = morph.points.copy()
