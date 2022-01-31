@@ -122,8 +122,7 @@ void bind_immutable_module(py::module& m) {
         .def_property_readonly(
             "section_types",
             [](const morphio::Morphology& morph) {
-                const auto& data = morph.sectionTypes();
-                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+                return internal_vector_as_readonly_array(morph.sectionTypes(), morph);
             },
             "Returns a vector with the section type of every section")
         .def_property_readonly("connectivity",
@@ -265,7 +264,9 @@ void bind_immutable_module(py::module& m) {
                                "(dendrite, axon, ...)")
         .def_property_readonly(
             "points",
-            [](morphio::Section* section) { return span_array_to_ndarray(section->points()); },
+            [](const morphio::Section& self) {
+                return internal_vector_as_readonly_array(self.points(), self);
+            },
             "Returns list of section's point coordinates")
 
         .def_property_readonly(
@@ -275,11 +276,15 @@ void bind_immutable_module(py::module& m) {
 
         .def_property_readonly(
             "diameters",
-            [](morphio::Section* section) { return span_to_ndarray(section->diameters()); },
+            [](const morphio::Section& self) {
+                return internal_vector_as_readonly_array(self.diameters(), self);
+            },
             "Returns list of section's point diameters")
         .def_property_readonly(
             "perimeters",
-            [](morphio::Section* section) { return span_to_ndarray(section->perimeters()); },
+            [](const morphio::Section& self) {
+                return internal_vector_as_readonly_array(self.perimeters(), self);
+            },
             "Returns list of section's point perimeters")
 
         .def("is_heterogeneous",
@@ -408,18 +413,16 @@ void bind_immutable_module(py::module& m) {
         // Property accessors
         .def_property_readonly(
             "points",
-            [](morphio::DendriticSpine* morpho) {
-                const auto& data = morpho->points();
-                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            [](const morphio::DendriticSpine& morph) {
+                return internal_vector_as_readonly_array(morph.points(), morph);
             },
             "Returns a list with all points from all sections\n"
             "Note: points belonging to the n'th section are located at indices:\n"
             "[DendriticSpine.sectionOffsets(n), DendriticSpine.sectionOffsets(n+1)[")
         .def_property_readonly(
             "diameters",
-            [](const morphio::DendriticSpine& morpho) {
-                const auto& data = morpho.diameters();
-                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            [](const morphio::DendriticSpine& morph) {
+                return internal_vector_as_readonly_array(morph.diameters(), morph);
             },
             "Returns a list with all diameters from all sections\n"
             "Note: diameters belonging to the n'th section are located at indices:\n"
@@ -440,8 +443,7 @@ void bind_immutable_module(py::module& m) {
         .def_property_readonly(
             "section_types",
             [](const morphio::DendriticSpine& morph) {
-                const auto& data = morph.sectionTypes();
-                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+                return internal_vector_as_readonly_array(morph.diameters(), morph);
             },
             "Returns a vector with the section type of every section")
         .def_property_readonly("connectivity",
