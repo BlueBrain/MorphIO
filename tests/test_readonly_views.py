@@ -27,9 +27,15 @@ READONLY_CLASSES_PATHS = [
 
 
 def _assert_refcount(obj, expected_refcount):
+    """Check that refcount of the obj has the expected value. An object
+    passed in _assert_refcount has 3 extra refcounts:
+        - From the obj variable
+        - From passing in _assert_refcount
+        - From passing in sys.getrefcount
+    """
     actual_refcount = sys.getrefcount(obj) - 3
     assert actual_refcount == expected_refcount, (
-        f"\nActual: {actual_refcount}\n"
+        f"\nActual:   {actual_refcount}\n"
         f"Expected: {expected_refcount}"
     )
 
@@ -85,9 +91,9 @@ def test_morphology_level_immutability(MorphologyClass, path):
     assert section_types.base is morph
     assert section_types.flags["WRITEABLE"] == False
 
-import gc
+
 @pytest.mark.parametrize("MorphologyClass, path", READONLY_CLASSES_PATHS)
-def test_section_level_immutability(MorphologyClass, path):
+def test_section_level_immutability__iter(MorphologyClass, path):
 
     morph = MorphologyClass(path)
     _assert_refcount(morph, 1)
@@ -95,6 +101,7 @@ def test_section_level_immutability(MorphologyClass, path):
     for section in morph.iter():
 
         _assert_refcount(section, 1)
+        # 1 (morph) + 1 (iter())
         _assert_refcount(morph, 2)
 
         points = section.points
@@ -107,6 +114,34 @@ def test_section_level_immutability(MorphologyClass, path):
         _assert_refcount(section, 3)
         _assert_refcount(morph, 2)
 
+        #del points, diameters
+        #_assert_refcount(section, 1)
+
+
+@pytest.mark.parametrize("MorphologyClass, path", READONLY_CLASSES_PATHS)
+def test_section_level_immutability__sections(MorphologyClass, path):
+
+    morph = MorphologyClass(path)
+    _assert_refcount(morph, 1)
+
+    for section in morph.sections:
+
+        # 1 (section) and 1 (morph.sections container)
+        _assert_refcount(section, 2)
+        _assert_refcount(morph, 1)
+
+        points = section.points
+        assert points.base is section
+        _assert_refcount(section, 3)
+        _assert_refcount(morph, 1)
+
+        diameters = section.diameters
+        assert diameters.base is section
+        _assert_refcount(section, 4)
+        _assert_refcount(morph, 1)
+
+        del points, diameters
+        _assert_refcount(section, 2)
 
 @pytest.mark.parametrize("MorphologyClass, path", READONLY_CLASSES_PATHS)
 def test_copies_mutability(MorphologyClass, path):
