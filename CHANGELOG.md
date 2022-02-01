@@ -22,7 +22,7 @@ v3.3.1
 ======
 
 New Features:
-* Dendritic spine (#321)
+* Dendritic spine. Morphology format spec changed from 1.2 to 1.3 (#321)
 
 Fixes:
 * Imbue enums with numeric operations (#330)
