@@ -9,8 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger job
-        uses: appleboy/gitlab-ci-action@master
-        with:
-          host: "https://bbpgitlab.epfl.ch"
-          token: ${{ secrets.GITLAB_MORPHOKIT_TRIGGER_TOKEN }}
-          project_id: 903
+        run: |
+          hostname
+          curl --request POST \
+              --form token=${{ secrets.GITLAB_MORPHOKIT_TRIGGER_TOKEN }} \
+              --form ref=main \
+              "https://bbpgitlab.epfl.ch/api/v4/projects/903/trigger/pipeline"
