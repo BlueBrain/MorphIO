@@ -1,7 +1,7 @@
 name: Check downstream builds
-# on:
-#   push:
-#     branches: [master]
+on:
+  push:
+    branches: [master, trigger-downstream-morphokit]
 
 jobs:
   build:
