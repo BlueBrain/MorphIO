@@ -1,3 +1,6 @@
+.. image:: doc/source/logo/BBP-MorphIO.jpg
+
+
 |license| |build| |docs|
 
 MorphIO
