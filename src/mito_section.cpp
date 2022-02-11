@@ -38,4 +38,8 @@ range<const floatType> MitoSection::relativePathLengths() const {
     return get<Property::MitoPathLength>();
 }
 
+bool MitoSection::hasSameShape(const MitoSection& other) const noexcept {
+    return (other.neuriteSectionIds() == neuriteSectionIds() && other.diameters() == diameters() &&
+            other.relativePathLengths() == relativePathLengths());
+}
 }  // namespace morphio

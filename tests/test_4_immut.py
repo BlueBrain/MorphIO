@@ -145,6 +145,13 @@ def test_section___str__():
                  'Section(id=0, points=[(0 0 0),..., (0 5 0)])')
 
 
+def test_section___eq__():
+    m0 = Morphology(os.path.join(_path, "simple.asc"))
+    m1 = Morphology(os.path.join(_path, "simple.asc"))
+    assert m0.root_sections[0] == m1.root_sections[0]
+    assert m0.root_sections[0] != m1.root_sections[1]
+
+
 def test_from_pathlib():
     neuron = Morphology(Path(_path, "simple.asc"))
     assert len(neuron.root_sections) == 2

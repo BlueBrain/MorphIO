@@ -55,6 +55,11 @@ range<const floatType> Section::perimeters() const {
     return get<Property::Perimeter>();
 }
 
+bool Section::hasSameShape(const Section& other) const noexcept {
+    return (other.type() == type() && other.diameters() == diameters() &&
+            other.points() == points() && other.perimeters() == perimeters());
+}
+
 }  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section) {

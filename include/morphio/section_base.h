@@ -46,7 +46,7 @@ class SectionBase
     std::vector<T> children() const;
 
     /** Return the ID of this section. */
-    inline uint32_t id() const noexcept;
+    uint32_t id() const noexcept { return id_; }
 
   protected:
     SectionBase(uint32_t id, const std::shared_ptr<Property::Properties>& properties);
@@ -58,21 +58,6 @@ class SectionBase
     SectionRange range_;
     std::shared_ptr<Property::Properties> properties_;
 };
-
-template <typename T>
-inline bool SectionBase<T>::operator==(const SectionBase& other) const noexcept {
-    return other.id_ == id_ && other.properties_ == properties_;
-}
-
-template <typename T>
-inline bool SectionBase<T>::operator!=(const SectionBase& other) const noexcept {
-    return !(*this == other);
-}
-
-template <typename T>
-inline uint32_t SectionBase<T>::id() const noexcept {
-    return id_;
-}
 
 template <typename T>
 SectionBase<T>::SectionBase(uint32_t id, const std::shared_ptr<Property::Properties>& properties)
@@ -96,6 +81,16 @@ SectionBase<T>::SectionBase(uint32_t id, const std::shared_ptr<Property::Propert
         std::cerr << "Dereferencing broken properties section " << id_
                   << "\nSection range: " << range_.first << " -> " << range_.second << '\n';
     }
+}
+
+template <typename T>
+inline bool SectionBase<T>::operator==(const SectionBase& other) const noexcept {
+    return other.id_ == id_ && other.properties_ == properties_;
+}
+
+template <typename T>
+inline bool SectionBase<T>::operator!=(const SectionBase& other) const noexcept {
+    return !(*this == other);
 }
 
 template <typename T>
