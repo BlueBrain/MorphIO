@@ -56,8 +56,15 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', ext.sourcedir] + cmake_args, cwd=self.build_temp)
         subprocess.check_call(['cmake', '--build', '.', '--target', '_morphio'] + build_args, cwd=self.build_temp)
 
-install_requires = ['numpy>=1.14.1',
-                    ]
+# nearly verbatim from how h5py handles is
+install_requires = [
+    # We only really aim to support NumPy & Python combinations for which
+    # there are wheels on PyPI (e.g. NumPy >=1.17.5 for Python 3.8).
+    # But we don't want to duplicate the information in oldest-supported-numpy
+    # here, and if you can build an older NumPy on a newer Python
+    # NumPy 1.14.5 is the first with wheels for Python 3.7, our minimum Python.
+    "numpy >=1.14.5",
+]
 
 with open('README.rst', 'r', encoding='utf-8') as f:
     long_description = f.read()
