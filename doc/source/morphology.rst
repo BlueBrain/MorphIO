@@ -91,8 +91,7 @@ Example of morphology analysis with Immutable API:
 Mutable API
 -----------
 
-This API can be as well used for reading morphologies but the main usage of it is creating morphologies
-or editing them.
+This API can be as well used for reading morphologies but the main usage of it is creating morphologies or editing them.
 
 Example of creating morphologies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -112,15 +111,13 @@ Example of creating morphologies
        auto section = morpho.appendRootSection(
            morphio::Property::PointLevel(
                {{2, 2, 2}, {3, 3, 3}}, // x,y,z coordinates of each point
-               {4, 4}, // diameter of each point
-               {5, 5}),
+               {4, 4}), // diameter of each point
            morphio::SectionType::SECTION_AXON); // (optional) perimeter of each point
 
        auto childSection = section->appendSection(
            morphio::Property::PointLevel(
                {{3, 3, 3}, {4, 4, 4}},
-               {4, 4},
-               {5, 5}),
+               {4, 4}),
            morphio::SectionType::SECTION_AXON);
 
        // Writing the file in the 3 formats
@@ -143,14 +140,17 @@ Example of creating morphologies
    section = morpho.append_root_section(
        PointLevel(
            [[2, 2, 2], [3, 3, 3]],  # x, y, z coordinates of each point
-           [4, 4],  # diameter of each point
-           [5, 5]),
+           [4, 4]),  # diameter of each point
        SectionType.axon)  # (optional) perimeter of each point
 
-   child_section = section.append_section(
+   child_section0 = section.append_section(
        PointLevel(
            [[3, 3, 3], [4, 4, 4]],
-           [4, 4],
+           [4, 4])) # section type is omitted -> parent section type will be used
+
+   child_section1 = section.append_section(
+       PointLevel(
+           [[3, 3, 3], [5, 5, 5]],
            [5, 5])) # section type is omitted -> parent section type will be used
 
    morpho.write("outfile.asc")
