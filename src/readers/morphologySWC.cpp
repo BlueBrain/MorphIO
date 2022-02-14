@@ -13,36 +13,43 @@
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
 
+//XXX nochecking
+#include <sstream>
+
 namespace {
+// It's not clear if -1 is the only way of identifying a root section.
+const int SWC_UNDEFINED_PARENT = -1;
+
 bool _ignoreLine(const std::string& line) {
     std::size_t pos = line.find_first_not_of("\n\r\t ");
     return pos == std::string::npos || line[pos] == '#';
 }
 
-morphio::readers::Sample readSample(const char* line, unsigned int lineNumber_) {
-#ifdef MORPHIO_USE_DOUBLE
-    const char* const format = "%u%d%lg%lg%lg%lg%d";
-#else
-    const char* const format = "%u%d%f%f%f%f%d";
-#endif
+morphio::readers::Sample readSWCLine(const char* line,
+                                     unsigned int lineNumber,
+                                     const morphio::readers::ErrorMessages& err) {
+    std::istringstream ss(line);
 
+    unsigned int id = 0;
+    int int_type = SWC_UNDEFINED_PARENT;
+    morphio::Point point;
+    int parentId = -1;
     morphio::floatType radius = -1.;
-    int int_type = -1;
-    morphio::readers::Sample sample;
-    sample.valid = sscanf(line,
-                          format,
-                          &sample.id,
-                          &int_type,
-                          &sample.point[0],
-                          &sample.point[1],
-                          &sample.point[2],
-                          &radius,
-                          &sample.parentId) == 7;
 
-    sample.type = static_cast<morphio::SectionType>(int_type);
-    sample.diameter = radius * 2;  // The point array stores diameters.
-    sample.lineNumber = lineNumber_;
-    return sample;
+    ss >> id;
+    ss >> int_type;
+    ss >> point[0] >> point[1] >> point[2];
+    ss >> radius;
+    ss >> parentId;
+    ss.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+    if (!ss.eof()) {
+        throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
+    }
+
+    auto type = static_cast<morphio::SectionType>(int_type);
+    morphio::floatType diameter = radius * 2;
+    return {diameter, point, type, parentId, id, lineNumber};
 }
 
 }  // unnamed namespace
@@ -50,8 +57,6 @@ morphio::readers::Sample readSample(const char* line, unsigned int lineNumber_) 
 namespace morphio {
 namespace readers {
 namespace swc {
-// It's not clear if -1 is the only way of identifying a root section.
-const int SWC_UNDEFINED_PARENT = -1;
 
 /**
    Parsing SWC according to this specification:
@@ -75,11 +80,7 @@ class SWCBuilder
                 continue;
             }
 
-            const auto& sample = readSample(line.data(), lineNumber);
-
-            if (!sample.valid) {
-                throw RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
-            }
+            const auto sample = readSWCLine(line.data(), lineNumber, err);
 
             if (sample.type >= SECTION_OUT_OF_RANGE_START || sample.type <= 0) {
                 throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type));
@@ -315,7 +316,7 @@ class SWCBuilder
         }
 
         checkSoma();
-
+        //
         // The process might occasionally creates empty section before
         // filling them so the warning is ignored
         bool originalIsIgnored = err.isIgnored(morphio::Warning::APPENDING_EMPTY_SECTION);

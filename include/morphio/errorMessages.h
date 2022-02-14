@@ -69,7 +69,6 @@ struct Sample {
     Sample() = default;
 
     floatType diameter = -1.;
-    bool valid = false;
     Point point{};
     SectionType type = SECTION_UNDEFINED;
     int parentId = -1;
