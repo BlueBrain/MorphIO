@@ -31,6 +31,11 @@ class MitoSection
     const std::vector<std::shared_ptr<MitoSection>>& children() const;
 
     /**
+     * Return true if the both sections have the same points, diameters and perimeters
+     */
+    bool hasSameShape(const MitoSection& other) const noexcept;
+
+    /**
      * Return the section id
      **/
     inline uint32_t id() const noexcept;

@@ -90,6 +90,11 @@ bool MitoSection::isRoot() const {
     }
 }
 
+bool MitoSection::hasSameShape(const MitoSection& other) const noexcept {
+    return (other.neuriteSectionIds() == neuriteSectionIds() && other.diameters() == diameters() &&
+            other.pathLengths() == pathLengths());
+}
+
 const std::vector<std::shared_ptr<MitoSection>>& MitoSection::children() const {
     const auto& children = mitochondria_->children_;
     const auto it = children.find(id());

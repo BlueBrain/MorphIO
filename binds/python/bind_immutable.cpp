@@ -364,8 +364,8 @@ void bind_immutable_module(py::module& m) {
             "      - a relative distance of 1 means the mitochondrial point is at the "
             "end of the neuronal section\n")
 
-        .def("has_same_shape",
-            &morphio::MitoSection::hasSameShape)
+        .def("has_same_shape", &morphio::MitoSection::hasSameShape)
+
         // Iterators
         .def(
             "iter",

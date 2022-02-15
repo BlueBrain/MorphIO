@@ -85,6 +85,11 @@ class Section: public std::enable_shared_from_this<Section>
     bool is_heterogeneous(bool downstream = true) const;
 
     /**
+     * Return true if the both sections have the same points, diameters and perimeters
+     */
+    bool hasSameShape(const Section& other) const noexcept;
+
+    /**
        Return a vector of children IDs
     **/
     const std::vector<std::shared_ptr<Section>>& children() const;

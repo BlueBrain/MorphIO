@@ -130,6 +130,12 @@ def test_mitochondria():
 
     assert len(mito_root[1].children) == 0
 
+    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    m0 = morpho.mitochondria
+    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    m1 = morpho.mitochondria
+    assert m0.root_sections[0].has_same_shape(m1.root_sections[0])
+
 
 def test_endoplasmic_reticulum():
     morpho = Morphology(os.path.join(_path, "h5/v1/endoplasmic-reticulum.h5"))
@@ -145,11 +151,11 @@ def test_section___str__():
                  'Section(id=0, points=[(0 0 0),..., (0 5 0)])')
 
 
-def test_section___eq__():
+def test_section_has_same_shape():
     m0 = Morphology(os.path.join(_path, "simple.asc"))
     m1 = Morphology(os.path.join(_path, "simple.asc"))
-    assert m0.root_sections[0] == m1.root_sections[0]
-    assert m0.root_sections[0] != m1.root_sections[1]
+    assert m0.root_sections[0].has_same_shape(m1.root_sections[0])
+    assert not m0.root_sections[0].has_same_shape(m1.root_sections[1])
 
 
 def test_from_pathlib():
