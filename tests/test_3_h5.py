@@ -2,7 +2,6 @@ import os
 from itertools import chain, repeat
 from pathlib import Path
 
-import requests
 from morphio import CellFamily, Morphology, RawDataError, SectionType, ostream_redirect
 import pytest
 from numpy.testing import assert_array_equal
@@ -54,13 +53,11 @@ def test_wrong_section_type():
     with pytest.raises(RawDataError, match='Unsupported section type: -2'):
         Morphology(H5V1_PATH / 'simple-negative-section-type.h5')
 
+
 def test_v2():
     with pytest.raises(RawDataError,
                        match='h5v2 is no longer supported, see: https://github.com/BlueBrain/MorphIO#H5v2'):
         Morphology(H5V2_PATH / 'Neuron.h5')
-
-    request = requests.get('https://github.com/BlueBrain/MorphIO#H5v2')
-    assert request.status_code == 200, 'The exception message points to a dead link'
 
 
 def test_soma_no_neurite():
