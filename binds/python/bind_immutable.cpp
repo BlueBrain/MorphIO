@@ -292,8 +292,7 @@ void bind_immutable_module(py::module& m) {
              "has the same type as the current section.",
              py::arg("downstream") = true)
 
-        .def("has_same_shape",
-            &morphio::Section::hasSameShape)
+        .def("has_same_shape", &morphio::Section::hasSameShape)
 
         // Iterators
         .def(
