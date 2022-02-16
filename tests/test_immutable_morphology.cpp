@@ -105,15 +105,15 @@ TEST_CASE("heterogeneous-sections", "[immutableMorphology]") {
         // We expect the root section to be heterogeneous downstream because
         // of their children of different type and homogeneous upstream because
         // there are no other sections.
-        REQUIRE(root_section.is_heterogeneous(true));       // downstream = true
-        REQUIRE(not root_section.is_heterogeneous(false));  // downstream = false
+        REQUIRE(root_section.isHeterogeneous(true));       // downstream = true
+        REQUIRE(not root_section.isHeterogeneous(false));  // downstream = false
 
         // We expect the two children for each root section, which have a different
         // type to be homogeneous downstream as leaves and inhomogeneous upstream because
         // of the root section parent of different type.
         for (const auto& section : root_section.children()) {
-            REQUIRE(not section.is_heterogeneous(true));  // downstream = true
-            REQUIRE(section.is_heterogeneous(false));     // downstream = false
+            REQUIRE(not section.isHeterogeneous(true));  // downstream = true
+            REQUIRE(section.isHeterogeneous(false));     // downstream = false
         }
     }
 }

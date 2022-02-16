@@ -395,7 +395,7 @@ void bind_mutable_module(py::module& m) {
                                &morphio::mut::Section::children,
                                "Returns a list of children IDs")
         .def("is_heterogeneous",
-             &morphio::mut::Section::is_heterogeneous,
+             &morphio::mut::Section::isHeterogeneous,
              "Returns true if the tree downtream (downstream = true) or upstream (downstream = "
              "false)\n"
              "has the same type as the current section.",

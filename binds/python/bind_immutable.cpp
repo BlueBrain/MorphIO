@@ -286,14 +286,13 @@ void bind_immutable_module(py::module& m) {
             "Returns list of section's point perimeters")
 
         .def("is_heterogeneous",
-             &morphio::Section::is_heterogeneous,
+             &morphio::Section::isHeterogeneous,
              "Returns true if the tree downtream (downstream = true) or upstream (downstream = "
              "false)\n"
              "has the same type as the current section.",
              py::arg("downstream") = true)
 
-        .def("has_same_shape",
-            &morphio::Section::hasSameShape)
+        .def("has_same_shape", &morphio::Section::hasSameShape)
 
         // Iterators
         .def(
