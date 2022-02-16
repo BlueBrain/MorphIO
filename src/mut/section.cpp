@@ -60,6 +60,11 @@ bool Section::isRoot() const {
     return true;
 }
 
+bool Section::hasSameShape(const Section& other) const noexcept {
+    return (other.type() == type() && other.diameters() == diameters() &&
+            other.points() == points() && other.perimeters() == perimeters());
+}
+
 bool Section::is_heterogeneous(bool downstream) const {
     auto predicate = [&](const std::shared_ptr<Section>& s) { return type() != s->type(); };
 

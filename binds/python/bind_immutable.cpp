@@ -292,6 +292,9 @@ void bind_immutable_module(py::module& m) {
              "has the same type as the current section.",
              py::arg("downstream") = true)
 
+        .def("has_same_shape",
+            &morphio::Section::hasSameShape)
+
         // Iterators
         .def(
             "iter",
@@ -360,6 +363,8 @@ void bind_immutable_module(py::module& m) {
             "beginning of the neuronal section\n"
             "      - a relative distance of 1 means the mitochondrial point is at the "
             "end of the neuronal section\n")
+
+        .def("has_same_shape", &morphio::MitoSection::hasSameShape)
 
         // Iterators
         .def(

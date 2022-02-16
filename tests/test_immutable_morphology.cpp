@@ -87,6 +87,12 @@ TEST_CASE("sections", "[immutableMorphology]") {
         auto sections = morph.sections();
         REQUIRE(sections.size() == 6);
     }
+    {
+        morphio::Morphology morph0 = morphio::Morphology("data/h5/v1/simple.h5");
+        morphio::Morphology morph1 = morphio::Morphology("data/h5/v1/simple.h5");
+        REQUIRE(morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(0)));
+        REQUIRE(!morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(1)));
+    }
 }
 
 TEST_CASE("heterogeneous-sections", "[immutableMorphology]") {
@@ -307,6 +313,12 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
                                std::vector<double>{0.0, 1.0, 1.0, 2.0},
                                0.01));
     REQUIRE(rootSection.children().empty());
+
+    {
+        morphio::Morphology morph0 = morphio::Morphology("data/h5/v1/mitochondria.h5");
+        morphio::Morphology morph1 = morphio::Morphology("data/h5/v1/mitochondria.h5");
+        REQUIRE(morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(0)));
+    }
 }
 
 

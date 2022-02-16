@@ -89,6 +89,11 @@ class Section: public SectionBase<Section>
      */
     bool is_heterogeneous(bool downstream = true) const;
 
+    /**
+     * Return true if the both sections have the same points, diameters and perimeters
+     */
+    bool hasSameShape(const Section& other) const noexcept;
+
     friend class mut::Section;
     friend Section Morphology::section(uint32_t) const;
     friend class SectionBase<Section>;
