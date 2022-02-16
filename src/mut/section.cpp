@@ -65,7 +65,7 @@ bool Section::hasSameShape(const Section& other) const noexcept {
             other.points() == points() && other.perimeters() == perimeters());
 }
 
-bool Section::is_heterogeneous(bool downstream) const {
+bool Section::isHeterogeneous(bool downstream) const {
     auto predicate = [&](const std::shared_ptr<Section>& s) { return type() != s->type(); };
 
     if (downstream) {

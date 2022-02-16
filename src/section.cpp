@@ -7,7 +7,7 @@
 
 namespace morphio {
 
-bool Section::is_heterogeneous(bool downstream) const {
+bool Section::isHeterogeneous(bool downstream) const {
     auto predicate = [&](const Section& s) { return type() != s.type(); };
     if (downstream) {
         return std::any_of(breadth_begin(), breadth_end(), predicate);
