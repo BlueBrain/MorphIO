@@ -55,7 +55,7 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence&& seq) {
 template <typename Sequence, typename Parent>
 inline py::array internal_vector_as_readonly_array(const Sequence& seq, const Parent& parent) {
     // The correct base must be used here so that refcounting is done correctly on the python
-    // sire. The parent that holds that returned data should be passed as a base. See:
+    // side. The parent that holds that returned data should be passed as a base. See:
     // https://github.com/pybind/pybind11/issues/2271#issuecomment-650740842
     auto res = py::array(static_cast<py::ssize_t>(seq.size()), seq.data(), py::cast(parent));
 
