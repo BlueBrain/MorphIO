@@ -62,6 +62,15 @@ bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
     return section->diameters().front() == section->parent()->diameters().back();
 }
 
+static void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma) {
+    const size_t n_points = soma.points().size();
+    const size_t n_diameters = soma.diameters().size();
+
+    if (n_points != n_diameters) {
+        throw morphio::WriterError(morphio::readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+            "soma points", n_points, "soma diameters", n_diameters));
+    }
+}
 }  // anonymous namespace
 
 namespace morphio {
@@ -76,6 +85,8 @@ void swc(const Morphology& morphology, const std::string& filename) {
                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
+
+    checkSomaHasSameNumberPointsDiameters(*soma);
 
     if (hasPerimeterData(morphology)) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
@@ -182,6 +193,8 @@ void asc(const Morphology& morphology, const std::string& filename) {
                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     }
+
+    checkSomaHasSameNumberPointsDiameters(*soma);
 
     if (hasPerimeterData(morphology)) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
@@ -330,7 +343,8 @@ static void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 
 
 void h5(const Morphology& morpho, const std::string& filename) {
-    const auto& somaPoints = morpho.soma()->points();
+    const auto& soma = morpho.soma();
+    const auto& somaPoints = soma->points();
     const auto numberOfSomaPoints = somaPoints.size();
 
     if (numberOfSomaPoints < 1) {
@@ -342,6 +356,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
+    checkSomaHasSameNumberPointsDiameters(*soma);
 
     HighFive::File h5_file(filename,
                            HighFive::File::ReadWrite | HighFive::File::Create |
@@ -354,16 +369,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
     std::vector<std::vector<int32_t>> raw_structure;
     std::vector<morphio::floatType> raw_perimeters;
 
-    const auto& somaDiameters = morpho.soma()->diameters();
-
-    const auto numberOfSomaDiameters = somaDiameters.size();
-
-
-    if (numberOfSomaPoints != numberOfSomaDiameters) {
-        throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
-            "soma points", numberOfSomaPoints, "soma diameters", numberOfSomaDiameters));
-    }
-
+    const auto& somaDiameters = soma->diameters();
 
     bool hasPerimeterData_ = hasPerimeterData(morpho);
 
