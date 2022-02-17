@@ -1,4 +1,6 @@
-add_subdirectory(pybind11 EXCLUDE_FROM_ALL)
+if (NOT EXTERNAL_PYBIND11)
+    add_subdirectory(pybind11 EXCLUDE_FROM_ALL)
+endif()
 
 pybind11_add_module(_morphio SYSTEM
     morphio.cpp
