@@ -60,7 +60,7 @@ inline py::array internal_vector_as_readonly_array(const Sequence& seq, const Pa
     auto res = py::array(static_cast<py::ssize_t>(seq.size()), seq.data(), py::cast(parent));
 
     // pybind11 casts away const-ness in return values. Thus, we need to explicitly set the
-    // numpy array flag to not writeable to prevent mutating the unerlying data. See limitations:
+    // numpy array flag to not writeable to prevent mutating the underlying data. See limitations:
     // https://pybind11.readthedocs.io/en/stable/limitations.html
     py::detail::array_proxy(res.ptr())->flags &= ~py::detail::npy_api::NPY_ARRAY_WRITEABLE_;
 
