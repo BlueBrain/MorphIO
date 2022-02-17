@@ -1,6 +1,6 @@
 """
 Readonly Morphology returns readonly numpy views (not copies) to its internal
-points, diameters and perimeters datasets. Here it is ensures that refcounting
+points, diameters and perimeters datasets. Here it is ensured that refcounting
 of the Morphology is increased when these views are available on the python side.
 Morphology can be released only when all references to itself and its views are
 freed. The standard datasets of all the readonly morphologies are:
