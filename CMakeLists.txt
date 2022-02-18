@@ -7,6 +7,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 option(BUILD_BINDINGS "Build the python bindings" ON)
 option(MorphIO_CXX_WARNINGS "Compile C++ with warnings" ON)
+option(EXTERNAL_CATCH2 "Use Catch2 from external source" OFF)
 option(EXTERNAL_HIGHFIVE "Use HighFive from external source" OFF)
 option(EXTERNAL_PYBIND11 "Use pybind11 from external source" OFF)
 option(MORPHIO_TESTS "Build tests" ON)
@@ -65,5 +66,10 @@ install(
 
 if (MORPHIO_TESTS)
   enable_testing()
+  if (EXTERNAL_CATCH2)
+    find_package(Catch2 REQUIRED)
+  else()
+    add_subdirectory(3rdparty/Catch2)
+  endif()
   add_subdirectory(tests)
 endif()
