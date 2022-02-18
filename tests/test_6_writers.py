@@ -204,6 +204,18 @@ def test_write_no_soma():
             assert_array_equal(read.root_sections[1].points, [[0, 1, 0], [0, 7, 0]])
 
 
+def test_write_soma__points_no_diameters():
+
+    morph = Morphology()
+    morph.soma.points = [[0., 0., 0.]]
+
+    with TemporaryDirectory("test_write_soma__points_no_diameters") as tmp_folder:
+
+        for ext in ["asc", "h5", "swc"]:
+            with pytest.raises(WriterError):
+                morph.write(Path(tmp_folder, f"tmp.{ext}"))
+
+
 def test_mitochondria():
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
