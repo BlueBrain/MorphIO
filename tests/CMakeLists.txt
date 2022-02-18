@@ -36,7 +36,8 @@ if (MORPHIO_ENABLE_COVERAGE)
 endif()
 
 target_link_libraries(unittests
-  PRIVATE SYSTEM ${TESTS_LINK_LIBRAIRIES}
+  PRIVATE 
+  ${TESTS_LINK_LIBRAIRIES}
 )
 
 add_test(NAME unittests
