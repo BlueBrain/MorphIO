@@ -2,7 +2,7 @@
 #include <limits>
 #include <sstream>
 
-#include "contrib/catch.hpp"
+#include <catch2/catch.hpp>
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/glial_cell.h>

@@ -1,4 +1,4 @@
-#include "contrib/catch.hpp"
+#include <catch2/catch.hpp>
 
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>

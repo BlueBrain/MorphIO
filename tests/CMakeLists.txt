@@ -5,7 +5,7 @@ set(TESTS_SRC
         test_mutable_morphology.cpp
         test_vasculature_morphology.cpp
         )
-set(TESTS_LINK_LIBRAIRIES morphio_static HighFive)
+set(TESTS_LINK_LIBRAIRIES morphio_static HighFive Catch2::Catch2)
 
 if(APPLE)
   add_definitions("-DLIBCXX_INSTALL_FILESYSTEM_LIBRARY=YES")
@@ -36,10 +36,17 @@ if (MORPHIO_ENABLE_COVERAGE)
 endif()
 
 target_link_libraries(unittests
-    PRIVATE ${TESTS_LINK_LIBRAIRIES}
+  PRIVATE 
+  ${TESTS_LINK_LIBRAIRIES}
 )
 
 add_test(NAME unittests
          COMMAND unittests
          WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
          )
+
+if (NOT EXTERNAL_CATCH2)
+  catch_discover_tests( unittests
+      WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+      )
+endif()

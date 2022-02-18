@@ -10,3 +10,6 @@
 [submodule "3rdparty/lexertl14"]
 	path = 3rdparty/lexertl14
 	url = https://github.com/BenHanson/lexertl14
+[submodule "3rdparty/Catch2"]
+	path = 3rdparty/Catch2
+	url = https://github.com/catchorg/Catch2.git
