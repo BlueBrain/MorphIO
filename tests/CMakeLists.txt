@@ -44,3 +44,9 @@ add_test(NAME unittests
          COMMAND unittests
          WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
          )
+
+if (NOT EXTERNAL_CATCH2)
+  catch_discover_tests( unittests
+      WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+      )
+endif()
