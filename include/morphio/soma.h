@@ -66,7 +66,7 @@ class Soma
     floatType maxDistance() const;
 
   private:
-    explicit Soma(const std::shared_ptr<Property::Properties>&);
+    explicit Soma(const std::shared_ptr<Property::Properties>& properties);
     // TODO: find out why the following line does not work
     // when friend class Morphology; is removed
     // template <typename Property>
@@ -74,19 +74,19 @@ class Soma
     friend class Morphology;
     friend class mut::Soma;
 
-    std::shared_ptr<Property::Properties> _properties;
+    std::shared_ptr<Property::Properties> properties_;
 };
 
 inline range<const Point> Soma::points() const noexcept {
-    return _properties->_somaLevel._points;
+    return properties_->_somaLevel._points;
 }
 
 inline range<const floatType> Soma::diameters() const noexcept {
-    return _properties->_somaLevel._diameters;
+    return properties_->_somaLevel._diameters;
 }
 
 inline SomaType Soma::type() const noexcept {
-    return _properties->_cellLevel._somaType;
+    return properties_->_cellLevel._somaType;
 }
 
 }  // namespace morphio

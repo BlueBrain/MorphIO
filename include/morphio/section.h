@@ -9,6 +9,11 @@
 #include <morphio/types.h>
 
 namespace morphio {
+
+using upstream_iterator = upstream_iterator_t<Section>;
+using breadth_iterator = breadth_iterator_t<Section, Morphology>;
+using depth_iterator = depth_iterator_t<Section, Morphology>;
+
 /**
  * A class to represent a morphological section.
  *
@@ -28,11 +33,6 @@ namespace morphio {
  * has been deallocated. The morphological data will be kept as long as there
  * is a Section referring to it.
  */
-
-using upstream_iterator = upstream_iterator_t<Section>;
-using breadth_iterator = breadth_iterator_t<Section, Morphology>;
-using depth_iterator = depth_iterator_t<Section, Morphology>;
-
 class Section: public SectionBase<Section>
 {
     using SectionId = Property::Section;
@@ -82,16 +82,27 @@ class Section: public SectionBase<Section>
      * Return the morphological type of this section (dendrite, axon, ...)
      */
     SectionType type() const;
+
+    /**
+     * Return true if the sections of the tree downstream (downstream = true) or upstream
+     * (donwstream = false) have the same section type as the current section.
+     */
+    bool isHeterogeneous(bool downstream = true) const;
+
+    /**
+     * Return true if the both sections have the same points, diameters and perimeters
+     */
+    bool hasSameShape(const Section& other) const noexcept;
+
     friend class mut::Section;
     friend Section Morphology::section(uint32_t) const;
     friend class SectionBase<Section>;
 
   protected:
-    Section(uint32_t id_, const std::shared_ptr<Property::Properties>& properties)
-        : SectionBase(id_, properties) {}
+    Section(uint32_t id, const std::shared_ptr<Property::Properties>& properties)
+        : SectionBase(id, properties) {}
 };
 
 }  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
-std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);

@@ -36,23 +36,42 @@ Vasculature::Vasculature(const std::string& source) {
         throw UnknownFileType("File: " + source + " does not end with the .h5 extension");
     }
 
-    _properties = std::make_shared<property::Properties>(loader);
+    properties_ = std::make_shared<property::Properties>(loader);
 
-    buildConnectivity(_properties);
+    buildConnectivity(properties_);
 }
 
-Section Vasculature::section(const uint32_t& id) const {
-    return {id, _properties};
+Section Vasculature::section(uint32_t id) const {
+    return {id, properties_};
 }
 
 std::vector<Section> Vasculature::sections() const {
     std::vector<Section> sections_;
-    const auto& vasc_sections = _properties->get<property::VascSection>();
+    const auto& vasc_sections = properties_->get<property::VascSection>();
     sections_.reserve(vasc_sections.size());
-    for (size_t i = 0; i < vasc_sections.size(); ++i) {
-        sections_.emplace_back(static_cast<uint32_t>(i), _properties);
+    for (uint32_t i = 0; i < vasc_sections.size(); ++i) {
+        sections_.emplace_back(i, properties_);
     }
     return sections_;
+}
+
+const std::vector<uint32_t> Vasculature::sectionOffsets() const noexcept {
+    // Vasculature section property is a single value representing the offset
+    const auto& offsets = properties_->get<property::VascSection>();
+
+    const auto size = offsets.size();
+    std::vector<uint32_t> indices(size + 1);
+
+    std::copy(offsets.begin(), offsets.end(), indices.begin());
+
+    indices[size] = static_cast<uint32_t>(this->points().size());
+
+    return indices;
+}
+
+const std::vector<morphio::vasculature::property::Connection::Type>&
+Vasculature::sectionConnectivity() const noexcept {
+    return properties_->get<property::Connection>();
 }
 
 graph_iterator Vasculature::begin() const {

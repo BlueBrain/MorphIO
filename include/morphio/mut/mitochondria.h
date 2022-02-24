@@ -17,21 +17,13 @@ using mito_breadth_iterator =
     morphio::breadth_iterator_t<std::shared_ptr<MitoSection>, Mitochondria>;
 using mito_depth_iterator = morphio::depth_iterator_t<std::shared_ptr<MitoSection>, Mitochondria>;
 
-/**
- * The entry-point class to access mitochondrial data
- *
- * By design, it is the equivalent of the Morphology class but at the
- *mitochondrial level. As the Morphology class, it implements a section accessor
- *and a root section accessor returning views on the Properties object for the
- *queried mitochondrial section.
- **/
+/** Mutable(editable) morphio::Mitochondria */
 class Mitochondria
 {
     using MitoSectionP = std::shared_ptr<MitoSection>;
 
   public:
-    Mitochondria()
-        : _counter(0) {}
+    Mitochondria() = default;
 
     const std::vector<MitoSectionP>& children(const MitoSectionP&) const;
     const MitoSectionP& section(uint32_t id) const;
@@ -108,20 +100,20 @@ class Mitochondria
 
     uint32_t _register(const MitoSectionP& section);
 
-    uint32_t _counter;
-    std::map<uint32_t, std::vector<MitoSectionP>> _children;
-    std::map<uint32_t, uint32_t> _parent;
-    std::vector<MitoSectionP> _rootSections;
-    std::map<uint32_t, MitoSectionP> _sections;
+    uint32_t _counter = 0;
+    std::map<uint32_t, std::vector<MitoSectionP>> children_;
+    std::map<uint32_t, uint32_t> parent_;
+    std::vector<MitoSectionP> root_sections_;
+    std::map<uint32_t, MitoSectionP> sections_;
 };
 
 inline const std::map<uint32_t, Mitochondria::MitoSectionP>& Mitochondria::sections() const
     noexcept {
-    return _sections;
+    return sections_;
 }
 
 inline const std::vector<Mitochondria::MitoSectionP>& Mitochondria::rootSections() const noexcept {
-    return _rootSections;
+    return root_sections_;
 }
 
 }  // namespace mut

@@ -36,6 +36,21 @@ void bind_vasculature(py::module& m) {
              "throw RawDataError if the id is out of range",
              "section_id"_a)
 
+
+        .def_property_readonly(
+            "section_offsets",
+            [](morphio::vasculature::Vasculature& vasculature) {
+                return as_pyarray(vasculature.sectionOffsets());
+            },
+            "Returns a list with offsets to access data of a specific section in the points\n"
+            "and diameters arrays.\n"
+            "\n"
+            "Example: accessing diameters of n'th section will be located in the DIAMETERS\n"
+            "array from DIAMETERS[sectionOffsets(n)] to DIAMETERS[sectionOffsets(n+1)-1]\n"
+            "\n"
+            "Note: for convenience, the last point of this array is the points array size\n"
+            "so that the above example works also for the last section.")
+
         // Property accessors
         .def_property_readonly(
             "points",
@@ -44,6 +59,12 @@ void bind_vasculature(py::module& m) {
                                  morpho->points().data());
             },
             "Returns a list with all points from all sections")
+
+        .def_property_readonly(
+            "n_points",
+            [](const morphio::vasculature::Vasculature& obj) { return obj.points().size(); },
+            "Returns the number of points from all sections")
+
         .def_property_readonly(
             "diameters",
             [](morphio::vasculature::Vasculature* morpho) {
@@ -59,6 +80,14 @@ void bind_vasculature(py::module& m) {
             },
             "Returns a vector with the section type of every section")
 
+        .def_property_readonly(
+            "section_connectivity",
+            [](morphio::vasculature::Vasculature* morpho) {
+                return py::array(static_cast<py::ssize_t>(morpho->sectionConnectivity().size()),
+                                 morpho->sectionConnectivity().data());
+            },
+            "Returns a 2D array of the section connectivity")
+
         // Iterators
         .def(
             "iter",
@@ -70,6 +99,13 @@ void bind_vasculature(py::module& m) {
 
 
     py::class_<morphio::vasculature::Section>(m, "Section")
+        .def("__str__",
+             [](const morphio::vasculature::Section& section) {
+                 std::stringstream ss;
+                 ss << section;
+                 return ss.str();
+             })
+
         // Topology-related member functions
         .def_property_readonly("predecessors",
                                &morphio::vasculature::Section::predecessors,
@@ -96,6 +132,12 @@ void bind_vasculature(py::module& m) {
                 return span_array_to_ndarray(section->points());
             },
             "Returns list of section's point coordinates")
+
+        .def_property_readonly(
+            "n_points",
+            [](const morphio::vasculature::Section& section) { return section.points().size(); },
+            "Returns the number of point in section")
+
         .def_property_readonly(
             "diameters",
             [](morphio::vasculature::Section* section) {

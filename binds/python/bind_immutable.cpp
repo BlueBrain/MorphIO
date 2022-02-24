@@ -87,6 +87,12 @@ void bind_immutable_module(py::module& m) {
             "Returns a list with all points from all sections (soma points are not included)\n"
             "Note: points belonging to the n'th section are located at indices:\n"
             "[Morphology.sectionOffsets(n), Morphology.sectionOffsets(n+1)[")
+
+        .def_property_readonly(
+            "n_points",
+            [](const morphio::Morphology& obj) { return obj.points().size(); },
+            "Returns the number of points from all sections (soma points are not included)")
+
         .def_property_readonly(
             "diameters",
             [](const morphio::Morphology& morpho) {
@@ -108,14 +114,14 @@ void bind_immutable_module(py::module& m) {
         .def_property_readonly(
             "section_offsets",
             [](const morphio::Morphology& morpho) { return as_pyarray(morpho.sectionOffsets()); },
-            "Returns a list with offsets to access data of a specific section in the points\n"
-            "and diameters arrays.\n"
+            "Returns a list with N+1 offsets to access data of a specific section in the points\n"
+            "and diameters arrays (size N).\n"
             "\n"
-            "Example: accessing diameters of n'th section will be located in the DIAMETERS\n"
-            "array from DIAMETERS[sectionOffsets(n)] to DIAMETERS[sectionOffsets(n+1)-1]\n"
+            "Example: accessing diameters of n'th section will be located in the diameters\n"
+            "array: diameters[section_offsets[n]: section_offsets[n + 1]]\n"
             "\n"
-            "Note: for convenience, the last point of this array is the points array size\n"
-            "so that the above example works also for the last section.")
+            "Note: for convenience, the last element of this array is equal to the length of the\n"
+            "points/diameters arrays so that the above example works also for the last section.")
         .def_property_readonly(
             "section_types",
             [](const morphio::Morphology& morph) {
@@ -264,6 +270,12 @@ void bind_immutable_module(py::module& m) {
             "points",
             [](morphio::Section* section) { return span_array_to_ndarray(section->points()); },
             "Returns list of section's point coordinates")
+
+        .def_property_readonly(
+            "n_points",
+            [](const morphio::Section& section) { return section.points().size(); },
+            "Returns the number of points in section")
+
         .def_property_readonly(
             "diameters",
             [](morphio::Section* section) { return span_to_ndarray(section->diameters()); },
@@ -272,6 +284,15 @@ void bind_immutable_module(py::module& m) {
             "perimeters",
             [](morphio::Section* section) { return span_to_ndarray(section->perimeters()); },
             "Returns list of section's point perimeters")
+
+        .def("is_heterogeneous",
+             &morphio::Section::isHeterogeneous,
+             "Returns true if the tree downtream (downstream = true) or upstream (downstream = "
+             "false)\n"
+             "has the same type as the current section.",
+             py::arg("downstream") = true)
+
+        .def("has_same_shape", &morphio::Section::hasSameShape)
 
         // Iterators
         .def(
@@ -341,6 +362,8 @@ void bind_immutable_module(py::module& m) {
             "beginning of the neuronal section\n"
             "      - a relative distance of 1 means the mitochondrial point is at the "
             "end of the neuronal section\n")
+
+        .def("has_same_shape", &morphio::MitoSection::hasSameShape)
 
         // Iterators
         .def(

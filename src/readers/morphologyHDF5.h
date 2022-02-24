@@ -1,12 +1,8 @@
 #pragma once
 #include <string>  // std::string
-#include <vector>  // std::vector
 
-#include <morphio/errorMessages.h>
 #include <morphio/properties.h>
-#include <morphio/types.h>
 
-#include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 
 namespace morphio {

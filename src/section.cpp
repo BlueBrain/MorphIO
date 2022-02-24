@@ -1,3 +1,5 @@
+#include <algorithm>  // all_of
+
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/tools.h>
@@ -5,9 +7,16 @@
 
 namespace morphio {
 
+bool Section::isHeterogeneous(bool downstream) const {
+    auto predicate = [&](const Section& s) { return type() != s.type(); };
+    if (downstream) {
+        return std::any_of(breadth_begin(), breadth_end(), predicate);
+    }
+    return std::any_of(upstream_begin(), upstream_end(), predicate);
+}
+
 SectionType Section::type() const {
-    auto val = _properties->get<Property::SectionType>()[_id];
-    return val;
+    return properties_->get<Property::SectionType>()[id_];
 }
 
 depth_iterator Section::depth_begin() const {
@@ -46,6 +55,11 @@ range<const floatType> Section::perimeters() const {
     return get<Property::Perimeter>();
 }
 
+bool Section::hasSameShape(const Section& other) const noexcept {
+    return (other.type() == type() && other.diameters() == diameters() &&
+            other.points() == points() && other.perimeters() == perimeters());
+}
+
 }  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Section& section) {
@@ -53,16 +67,8 @@ std::ostream& operator<<(std::ostream& os, const morphio::Section& section) {
     if (points.empty()) {
         os << "Section(id=" << section.id() << ", points=[])";
     } else {
-        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
-        os << points[points.size() - 1] << ")])";
-    }
-    return os;
-}
-
-// operator<< must be defined in the global namespace to be usable there
-std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points) {
-    for (const auto& point : points) {
-        os << point[0] << ' ' << point[1] << ' ' << point[2] << '\n';
+        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., ("
+           << points[points.size() - 1] << ")])";
     }
     return os;
 }

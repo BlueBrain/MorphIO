@@ -1,4 +1,6 @@
 #pragma once
+
+#include <iosfwd>  // std::ostream
 #include <memory>  // std::shared_ptr
 #include <vector>  // std::vector
 
@@ -8,6 +10,7 @@
 
 namespace morphio {
 namespace vasculature {
+/** Vasculature section */
 class Section
 {
     using SectionId = property::VascSection;
@@ -73,13 +76,12 @@ class Section
     template <typename Property>
     range<const typename Property::Type> get() const;
 
-    uint32_t _id;
-    SectionRange _range;
-    std::shared_ptr<property::Properties> _properties;
+    uint32_t id_;
+    SectionRange range_;
+    std::shared_ptr<property::Properties> properties_;
 };
 
 }  // namespace vasculature
 }  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::vasculature::Section& section);
-std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);

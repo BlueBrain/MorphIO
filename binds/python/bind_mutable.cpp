@@ -309,6 +309,8 @@ void bind_mutable_module(py::module& m) {
             },
             "Returns the neurite section Ids of all points of this section")
 
+        .def("has_same_shape", &morphio::mut::MitoSection::hasSameShape)
+
         .def("append_section",
              static_cast<std::shared_ptr<morphio::mut::MitoSection> (morphio::mut::MitoSection::*)(
                  const morphio::Property::MitochondriaPointLevel&)>(
@@ -392,6 +394,14 @@ void bind_mutable_module(py::module& m) {
         .def_property_readonly("children",
                                &morphio::mut::Section::children,
                                "Returns a list of children IDs")
+        .def("is_heterogeneous",
+             &morphio::mut::Section::isHeterogeneous,
+             "Returns true if the tree downtream (downstream = true) or upstream (downstream = "
+             "false)\n"
+             "has the same type as the current section.",
+             py::arg("downstream") = true)
+        .def("has_same_shape", &morphio::mut::Section::hasSameShape)
+
         // Iterators
         .def(
             "iter",

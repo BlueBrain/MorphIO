@@ -7,6 +7,7 @@
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
+#include <morphio/vector_types.h>
 
 namespace morphio {
 /**
@@ -24,13 +25,6 @@ template <typename T>
 class SectionBase
 {
   public:
-    SectionBase()
-        : _id(0) {}
-
-    SectionBase(const SectionBase& section);
-
-    SectionBase& operator=(const SectionBase& other);
-
     inline bool operator==(const SectionBase& other) const noexcept;
     inline bool operator!=(const SectionBase& other) const noexcept;
 
@@ -52,7 +46,7 @@ class SectionBase
     std::vector<T> children() const;
 
     /** Return the ID of this section. */
-    inline uint32_t id() const noexcept;
+    uint32_t id() const noexcept { return id_; }
 
   protected:
     SectionBase(uint32_t id, const std::shared_ptr<Property::Properties>& properties);
@@ -60,14 +54,38 @@ class SectionBase
     template <typename Property>
     range<const typename Property::Type> get() const;
 
-    uint32_t _id;
-    SectionRange _range;
-    std::shared_ptr<Property::Properties> _properties;
+    uint32_t id_ = 0;
+    SectionRange range_;
+    std::shared_ptr<Property::Properties> properties_;
 };
 
 template <typename T>
+SectionBase<T>::SectionBase(uint32_t id, const std::shared_ptr<Property::Properties>& properties)
+    : id_(id)
+    , properties_(properties) {
+    const auto& sections = properties->get<typename T::SectionId>();
+    if (id_ >= sections.size()) {
+        throw RawDataError(
+            "Requested section ID (" + std::to_string(id_) +
+            ") is out of array bounds (array size = " + std::to_string(sections.size()) + ")");
+    }
+
+    const auto start = static_cast<size_t>(sections[id_][0]);
+    const size_t end = id_ == sections.size() - 1
+                           ? properties->get<typename T::PointAttribute>().size()
+                           : static_cast<size_t>(sections[id_ + 1][0]);
+
+    range_ = std::make_pair(start, end);
+
+    if (range_.second <= range_.first) {
+        std::cerr << "Dereferencing broken properties section " << id_
+                  << "\nSection range: " << range_.first << " -> " << range_.second << '\n';
+    }
+}
+
+template <typename T>
 inline bool SectionBase<T>::operator==(const SectionBase& other) const noexcept {
-    return other._id == _id && other._properties == _properties;
+    return other.id_ == id_ && other.properties_ == properties_;
 }
 
 template <typename T>
@@ -76,13 +94,50 @@ inline bool SectionBase<T>::operator!=(const SectionBase& other) const noexcept 
 }
 
 template <typename T>
-inline uint32_t SectionBase<T>::id() const noexcept {
-    return _id;
+template <typename TProperty>
+range<const typename TProperty::Type> SectionBase<T>::get() const {
+    const auto& data = properties_->get<TProperty>();
+    if (data.empty()) {
+        return {};
+    }
+
+    auto ptr_start = data.data() + range_.first;
+    return {ptr_start, range_.second - range_.first};
 }
 
+template <typename T>
+bool SectionBase<T>::isRoot() const {
+    return properties_->get<typename T::SectionId>()[id_][1] == -1;
+}
+
+template <typename T>
+T SectionBase<T>::parent() const {
+    if (isRoot()) {
+        throw MissingParentError("Cannot call Section::parent() on a root node (section id=" +
+                                 std::to_string(id_) + ").");
+    }
+
+    const auto _parent = static_cast<unsigned int>(
+        properties_->get<typename T::SectionId>()[id_][1]);
+    return {_parent, properties_};
+}
+
+template <typename T>
+std::vector<T> SectionBase<T>::children() const {
+    std::vector<T> result;
+    try {
+        const std::vector<uint32_t>& _children = properties_->children<typename T::SectionId>().at(
+            static_cast<int>(id_));
+        result.reserve(_children.size());
+        for (uint32_t id : _children) {
+            result.push_back(T(id, properties_));
+        }
+
+        return result;
+    } catch (const std::out_of_range&) {
+        return result;
+    }
+}
+
+
 }  // namespace morphio
-
-std::ostream& operator<<(std::ostream& os, const morphio::Section& section);
-std::ostream& operator<<(std::ostream& os, const morphio::range<const morphio::Point>& points);
-
-#include "section_base.tpp"

@@ -204,6 +204,18 @@ def test_write_no_soma():
             assert_array_equal(read.root_sections[1].points, [[0, 1, 0], [0, 7, 0]])
 
 
+def test_write_soma__points_no_diameters():
+
+    morph = Morphology()
+    morph.soma.points = [[0., 0., 0.]]
+
+    with TemporaryDirectory("test_write_soma__points_no_diameters") as tmp_folder:
+
+        for ext in ["asc", "h5", "swc"]:
+            with pytest.raises(WriterError):
+                morph.write(Path(tmp_folder, f"tmp.{ext}"))
+
+
 def test_mitochondria():
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
@@ -311,3 +323,41 @@ def test_single_point_root_section():
     with TemporaryDirectory('test_single_point_root_section') as tmp_folder:
         with pytest.raises(SectionBuilderError):
             m.write(Path(tmp_folder, "h5/empty_vasculature.h5"))
+
+
+def test_write_custom_property__throws():
+
+    morpho = Morphology()
+    morpho.soma.points = [[0, 0, 0]]
+    morpho.soma.diameters = [2]
+
+    custom = morpho.append_root_section(
+        PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
+        SectionType.custom5
+    )
+
+    with TemporaryDirectory('test_write_basic') as tmp_folder:
+        with pytest.raises(WriterError):
+            morpho.write(Path(tmp_folder, "test_write.asc"))
+
+    morpho = Morphology()
+    morpho.soma.points = [[0, 0, 0]]
+    morpho.soma.diameters = [2]
+
+    custom = morpho.append_root_section(
+        PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
+        SectionType.custom5
+    )
+
+    dendrite = morpho.append_root_section(PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
+                                          SectionType.basal_dendrite)
+
+    dendrite.append_section(PointLevel([[0, 5, 0], [-5, 5, 0]], [2, 3]), SectionType.custom5)
+
+    with TemporaryDirectory('test_write_basic') as tmp_folder:
+        with pytest.raises(WriterError):
+            morpho.write(Path(tmp_folder, "test_write.asc"))
+
+
+
+

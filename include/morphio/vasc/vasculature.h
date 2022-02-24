@@ -13,6 +13,14 @@ namespace vasculature {
 
 using graph_iterator = graph_iterator_t<Section, Vasculature>;
 
+/**
+ * The entry-point class to access vasculature(blood) data
+ *
+ * By design, it is the equivalent of the Morphology class but at the
+ * vasculature level. As the Morphology class, it implements a section accessor
+ * and a root section accessor returning views on the Properties object for the
+ * queried vasculature section.
+ **/
 class Vasculature
 {
   public:
@@ -37,7 +45,19 @@ class Vasculature
      *
      * @throw RawDataError if the id is out of range
      */
-    Section section(const uint32_t& id) const;
+    Section section(uint32_t id) const;
+
+    /**
+     * Returns a list with offsets to access data of a specific section in the points
+     * and diameters arrays.
+     p
+     * Example: accessing diameters of n'th section will be located in the Vasculature::diameters
+     * array from diameters[sectionOffsets(n)] to diameters[sectionOffsets(n+1)-1]
+     *
+     * Note: for convenience, the last point of this array is the points() array size
+     * so that the above example works also for the last section.
+     */
+    const std::vector<uint32_t> sectionOffsets() const noexcept;
 
     /**
      * Return a vector with all points from all sections
@@ -55,13 +75,19 @@ class Vasculature
     inline const std::vector<property::SectionType::Type>& sectionTypes() const noexcept;
 
     /**
-     * graph iterators
+     * Return a vector with all the connections between sections
      **/
+    const std::vector<morphio::vasculature::property::Connection::Type>& sectionConnectivity() const
+        noexcept;
+
+
+    /** graph iterator pointing to the begin */
     graph_iterator begin() const;
+    /** graph iterator pointing to the end */
     graph_iterator end() const;
 
   private:
-    std::shared_ptr<property::Properties> _properties;
+    std::shared_ptr<property::Properties> properties_;
 
     template <typename Property>
     inline const std::vector<typename Property::Type>& get() const noexcept;
@@ -69,7 +95,7 @@ class Vasculature
 
 template <typename Property>
 inline const std::vector<typename Property::Type>& Vasculature::get() const noexcept {
-    return _properties->get<Property>();
+    return properties_->get<Property>();
 }
 
 inline const Points& Vasculature::points() const noexcept {

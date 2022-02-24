@@ -138,7 +138,7 @@ class upstream_iterator_t
         char unused;
         SectionT current;
     };
-    bool end;
+    bool end = false;
 };
 
 // breath_iterator_t class definition
@@ -264,8 +264,7 @@ inline upstream_iterator_t<SectionT>::upstream_iterator_t()
 
 template <typename SectionT>
 inline upstream_iterator_t<SectionT>::upstream_iterator_t(const SectionT& section)
-    : current(section)
-    , end(false) {}
+    : current(section) {}
 
 template <typename SectionT>
 inline upstream_iterator_t<SectionT>::upstream_iterator_t(const upstream_iterator_t& other) {

@@ -6,14 +6,14 @@
 
 namespace morphio {
 Soma::Soma(const std::shared_ptr<Property::Properties>& properties)
-    : _properties(properties) {}
+    : properties_(properties) {}
 
 Point Soma::center() const {
-    return centerOfGravity(_properties->_somaLevel._points);
+    return centerOfGravity(properties_->_somaLevel._points);
 }
 
 floatType Soma::volume() const {
-    switch (_properties->_cellLevel._somaType) {
+    switch (properties_->_cellLevel._somaType) {
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: {
         floatType radius = diameters()[0] / 2;
         return 4 * morphio::PI * radius * radius;
@@ -33,7 +33,7 @@ floatType Soma::surface() const {
 }
 
 floatType Soma::maxDistance() const {
-    return maxDistanceToCenterOfGravity(_properties->_somaLevel._points);
+    return maxDistanceToCenterOfGravity(properties_->_somaLevel._points);
 }
 
 }  // namespace morphio

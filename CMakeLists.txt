@@ -7,7 +7,9 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 option(BUILD_BINDINGS "Build the python bindings" ON)
 option(MorphIO_CXX_WARNINGS "Compile C++ with warnings" ON)
+option(EXTERNAL_CATCH2 "Use Catch2 from external source" OFF)
 option(EXTERNAL_HIGHFIVE "Use HighFive from external source" OFF)
+option(EXTERNAL_PYBIND11 "Use pybind11 from external source" OFF)
 option(MORPHIO_TESTS "Build tests" ON)
 option(MORPHIO_USE_DOUBLE "Use doubles instead of floats" OFF)
 
@@ -27,8 +29,14 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake)
 include(CompilerFlags)
 set(CMAKE_CXX_FLAGS "${FLAGS}")
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 if (EXTERNAL_HIGHFIVE)
   find_package(HighFive REQUIRED)
+endif()
+if (EXTERNAL_PYBIND11)
+  find_package(pybind11 REQUIRED CONFIG)
 endif()
 set(MORPHIO_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/include/)
 
@@ -60,5 +68,11 @@ install(
 
 if (MORPHIO_TESTS)
   enable_testing()
+  if (EXTERNAL_CATCH2)
+    find_package(Catch2 REQUIRED)
+  else()
+    add_subdirectory(3rdparty/Catch2)
+    include(3rdparty/Catch2/contrib/Catch.cmake)
+  endif()
   add_subdirectory(tests)
 endif()

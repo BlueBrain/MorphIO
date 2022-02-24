@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstdint>  // uint32_t
+#include <memory>   // std::shared_ptr
+
 #include <morphio/mitochondria.h>
 #include <morphio/properties.h>
 #include <morphio/section_base.h>
@@ -10,6 +13,7 @@ using mito_upstream_iterator = upstream_iterator_t<MitoSection>;
 using mito_breadth_iterator = morphio::breadth_iterator_t<MitoSection, Mitochondria>;
 using mito_depth_iterator = morphio::depth_iterator_t<MitoSection, Mitochondria>;
 
+/** Mitochondria section */
 class MitoSection: public SectionBase<MitoSection>
 {
     using SectionId = Property::MitoSection;
@@ -54,9 +58,14 @@ class MitoSection: public SectionBase<MitoSection>
      **/
     range<const floatType> relativePathLengths() const;
 
+    /**
+     * Return true if the both sections have the same neuriteSectionIds, diameters and relativePathLengths
+     */
+    bool hasSameShape(const MitoSection& other) const noexcept;
+
   protected:
-    MitoSection(uint32_t id_, const std::shared_ptr<Property::Properties>& morphology)
-        : SectionBase(id_, morphology) {}
+    MitoSection(uint32_t id, const std::shared_ptr<Property::Properties>& morphology)
+        : SectionBase(id, morphology) {}
     friend MitoSection Mitochondria::section(uint32_t) const;
     friend class SectionBase<MitoSection>;
     friend class mut::MitoSection;

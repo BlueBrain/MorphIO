@@ -1,5 +1,8 @@
-#include "contrib/catch.hpp"
 #include <cmath>
+#include <limits>
+#include <sstream>
+
+#include <catch2/catch.hpp>
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/glial_cell.h>
@@ -15,10 +18,15 @@
 namespace {
 bool almost_equal(morphio::floatType a, double expected, double epsilon) {
 #ifdef MORPHIO_USE_DOUBLE
-    return std::abs(a - expected) < epsilon;
+    bool res = std::abs(a - expected) < epsilon;
 #else
-    return std::abs(static_cast<double>(a) - expected) < epsilon;
+    bool res = std::abs(static_cast<double>(a) - expected) < epsilon;
 #endif
+    if (!res) {
+        std::cerr << "Failed almost equal: " << a << " != " << expected
+                  << " (expected) with epsilon of " << epsilon << '\n';
+    }
+    return res;
 }
 
 bool array_almost_equal(const std::vector<morphio::floatType>& a,
@@ -78,6 +86,35 @@ TEST_CASE("sections", "[immutableMorphology]") {
         }
         auto sections = morph.sections();
         REQUIRE(sections.size() == 6);
+    }
+    {
+        morphio::Morphology morph0 = morphio::Morphology("data/h5/v1/simple.h5");
+        morphio::Morphology morph1 = morphio::Morphology("data/h5/v1/simple.h5");
+        REQUIRE(morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(0)));
+        REQUIRE(!morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(1)));
+    }
+}
+
+TEST_CASE("heterogeneous-sections", "[immutableMorphology]") {
+    auto morph = morphio::Morphology("data/simple-heterogeneous-neurite.swc");
+
+    /** The morphology consists of two trees, with one bifurcation each. The root
+     * sections had a different type than their respective children.
+     */
+    for (const auto& root_section : morph.rootSections()) {
+        // We expect the root section to be heterogeneous downstream because
+        // of their children of different type and homogeneous upstream because
+        // there are no other sections.
+        REQUIRE(root_section.isHeterogeneous(true));       // downstream = true
+        REQUIRE(not root_section.isHeterogeneous(false));  // downstream = false
+
+        // We expect the two children for each root section, which have a different
+        // type to be homogeneous downstream as leaves and inhomogeneous upstream because
+        // of the root section parent of different type.
+        for (const auto& section : root_section.children()) {
+            REQUIRE(not section.isHeterogeneous(true));  // downstream = true
+            REQUIRE(section.isHeterogeneous(false));     // downstream = false
+        }
     }
 }
 
@@ -148,8 +185,8 @@ TEST_CASE("properties", "[immutableMorphology]") {
                                                   morphio::SECTION_AXON});
     }
     std::string text;
-    uint32_t major;
-    uint32_t minor;
+    uint32_t major = std::numeric_limits<uint32_t>::max();
+    uint32_t minor = std::numeric_limits<uint32_t>::max();
     std::tie(text, major, minor) = files.morphs().at(0).version();
     REQUIRE(text == "asc");
     REQUIRE(major == 1);
@@ -276,6 +313,12 @@ TEST_CASE("mitochondria", "[immutableMorphology]") {
                                std::vector<double>{0.0, 1.0, 1.0, 2.0},
                                0.01));
     REQUIRE(rootSection.children().empty());
+
+    {
+        morphio::Morphology morph0 = morphio::Morphology("data/h5/v1/mitochondria.h5");
+        morphio::Morphology morph1 = morphio::Morphology("data/h5/v1/mitochondria.h5");
+        REQUIRE(morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(0)));
+    }
 }
 
 
@@ -311,6 +354,14 @@ TEST_CASE("glia", "[immutableMorphology]") {
     REQUIRE(count_perivascular_processes == 452);
     REQUIRE(count_processes == 863);
 
+    const auto section = glial.rootSections()[0];
+    REQUIRE(almost_equal(section.diameters().at(0), 2.03101, 0.001));
+    REQUIRE(almost_equal(section.diameters().at(1), 1.86179, 0.001));
+
+    REQUIRE(almost_equal(section.perimeters().at(0), 5.79899, 0.001));
+    REQUIRE(almost_equal(section.perimeters().at(1), 7.98946, 0.001));
+
+
     CHECK_THROWS_AS(morphio::GlialCell("data/simple.swc"), morphio::RawDataError);
     CHECK_THROWS_AS(morphio::GlialCell("data/h5/v1/simple.h5"), morphio::RawDataError);
 }
@@ -338,4 +389,14 @@ TEST_CASE("annotations", "[immutableMorphology]") {
     auto annotation = morph.annotations().at(0);
     REQUIRE(annotation._sectionId == 1);
     REQUIRE(annotation._type == morphio::SINGLE_CHILD);
+}
+
+TEST_CASE("operator<<", "[immutableMorphology]") {
+    // TODO: make this more comprehensive
+    morphio::GlialCell glial = morphio::GlialCell("data/astrocyte.h5");
+    const auto section = glial.rootSections()[0];
+
+    std::stringstream ss;
+
+    ss << section;
 }

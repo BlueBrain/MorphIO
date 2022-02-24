@@ -1,5 +1,5 @@
 #include "../src/readers/morphologyHDF5.h"
-#include "contrib/catch.hpp"
+#include <catch2/catch.hpp>
 
 #include <highfive/H5File.hpp>
 #include <morphio/dendritic_spine.h>

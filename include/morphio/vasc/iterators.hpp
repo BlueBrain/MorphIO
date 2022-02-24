@@ -71,11 +71,12 @@ graph_iterator_t<SectionT, VasculatureT>::operator++() {
     const auto& section = *(*this);
     container.pop();
     const auto& neighbors = section.neighbors();
-    for (auto it = neighbors.rbegin(); it != neighbors.rend(); ++it)
+    for (auto it = neighbors.rbegin(); it != neighbors.rend(); ++it) {
         if (visited.find(*it) == visited.end()) {
             container.push(*it);
             visited.insert(*it);
         }
+    }
     return *this;
 }
 

@@ -5,21 +5,19 @@
 
 namespace morphio {
 namespace mut {
-/**
- * The entry-point class to access endoplasmic reticulum data
- *
- * Spec https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/h5v1.html
- **/
+/** Mutable(editable) morphio::EndoplasmicReticulum */
 class EndoplasmicReticulum
 {
   public:
     EndoplasmicReticulum() = default;
-    EndoplasmicReticulum(const std::vector<uint32_t>& sectionIndices,
+    EndoplasmicReticulum(const EndoplasmicReticulum& endoplasmicReticulum) = default;
+
+    EndoplasmicReticulum(const std::vector<uint32_t>& section_indices,
                          const std::vector<morphio::floatType>& volumes,
-                         const std::vector<morphio::floatType>& surfaceAreas,
-                         const std::vector<uint32_t>& filamentCounts);
-    EndoplasmicReticulum(const EndoplasmicReticulum& endoplasmicReticulum);
-    EndoplasmicReticulum(const morphio::EndoplasmicReticulum& endoplasmicReticulum);
+                         const std::vector<morphio::floatType>& surface_areas,
+                         const std::vector<uint32_t>& filament_counts);
+
+    explicit EndoplasmicReticulum(const morphio::EndoplasmicReticulum& endoplasmic_reticulum);
 
 
     /**
@@ -53,8 +51,8 @@ class EndoplasmicReticulum
     Property::EndoplasmicReticulumLevel buildReadOnly() const noexcept;
 
   private:
-    morphio::Property::EndoplasmicReticulumLevel _properties;
-    EndoplasmicReticulum(const morphio::Property::EndoplasmicReticulumLevel&);
+    morphio::Property::EndoplasmicReticulumLevel properties_;
+    explicit EndoplasmicReticulum(const morphio::Property::EndoplasmicReticulumLevel&);
 };
 }  // namespace mut
 }  // namespace morphio

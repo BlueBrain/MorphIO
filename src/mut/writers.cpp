@@ -1,5 +1,6 @@
 #include <cassert>
 #include <fstream>
+#include <iomanip>  // std::fixed, std::setw, std::setprecision
 
 #include <morphio/errorMessages.h>
 #include <morphio/mut/mitochondria.h>
@@ -61,6 +62,15 @@ bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
     return section->diameters().front() == section->parent()->diameters().back();
 }
 
+static void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma) {
+    const size_t n_points = soma.points().size();
+    const size_t n_diameters = soma.diameters().size();
+
+    if (n_points != n_diameters) {
+        throw morphio::WriterError(morphio::readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+            "soma points", n_points, "soma diameters", n_diameters));
+    }
+}
 }  // anonymous namespace
 
 namespace morphio {
@@ -76,6 +86,8 @@ void swc(const Morphology& morphology, const std::string& filename) {
         return;
     }
 
+    checkSomaHasSameNumberPointsDiameters(*soma);
+
     if (hasPerimeterData(morphology)) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
@@ -90,14 +102,16 @@ void swc(const Morphology& morphology, const std::string& filename) {
     int segmentIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
 
-    if (!morphology.mitochondria().rootSections().empty())
+    if (!morphology.mitochondria().rootSections().empty()) {
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                    readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+    }
 
     const auto& soma_diameters = soma->diameters();
 
-    if (soma_points.empty())
+    if (soma_points.empty()) {
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    }
 
     for (unsigned int i = 0; i < soma_points.size(); ++i) {
         writeLine(myfile,
@@ -121,9 +135,9 @@ void swc(const Morphology& morphology, const std::string& filename) {
         unsigned int firstPoint = ((isRootSection || !_skipDuplicate(section)) ? 0 : 1);
         for (unsigned int i = firstPoint; i < points.size(); ++i) {
             int parentIdOnDisk;
-            if (i > firstPoint)
+            if (i > firstPoint) {
                 parentIdOnDisk = segmentIdOnDisk - 1;
-            else {
+            } else {
                 parentIdOnDisk = (isRootSection ? (soma->points().empty() ? -1 : 1)
                                                 : newIds[section->parent()->id()]);
             }
@@ -151,7 +165,13 @@ static void _write_asc_points(std::ofstream& myfile,
 static void _write_asc_section(std::ofstream& myfile,
                                const Morphology& morpho,
                                const std::shared_ptr<Section>& section,
+                               const std::map<morphio::SectionType, std::string>& header,
                                size_t indentLevel) {
+    // allowed types are only the ones available in the header
+    if (header.count(section->type()) == 0) {
+        throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
+    }
+
     std::string indent(indentLevel, ' ');
     _write_asc_points(myfile, section->points(), section->diameters(), indentLevel);
 
@@ -160,7 +180,7 @@ static void _write_asc_section(std::ofstream& myfile,
         size_t nChildren = children.size();
         for (unsigned int i = 0; i < nChildren; ++i) {
             myfile << indent << (i == 0 ? "(\n" : "|\n");
-            _write_asc_section(myfile, morpho, children[i], indentLevel + 2);
+            _write_asc_section(myfile, morpho, children[i], header, indentLevel + 2);
         }
         myfile << indent << ")\n";
     }
@@ -174,15 +194,18 @@ void asc(const Morphology& morphology, const std::string& filename) {
         return;
     }
 
+    checkSomaHasSameNumberPointsDiameters(*soma);
+
     if (hasPerimeterData(morphology)) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
 
     std::ofstream myfile(filename);
 
-    if (!morphology.mitochondria().rootSections().empty())
+    if (!morphology.mitochondria().rootSections().empty()) {
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                    readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+    }
 
     std::map<morphio::SectionType, std::string> header;
     header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
@@ -197,9 +220,14 @@ void asc(const Morphology& morphology, const std::string& filename) {
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
-    for (const auto& section : morphology.rootSections()) {
+    for (const std::shared_ptr<Section>& section : morphology.rootSections()) {
+        // allowed types are only the ones available in the header
+        if (header.count(section->type()) == 0) {
+            throw WriterError(
+                readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
+        }
         myfile << header.at(section->type());
-        _write_asc_section(myfile, morphology, section, 2);
+        _write_asc_section(myfile, morphology, section, header, 2);
         myfile << ")\n\n";
     }
 
@@ -243,8 +271,9 @@ void write_dataset(HighFive::Group& file, const std::string& name, const T& raw)
 }
 
 static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria) {
-    if (mitochondria.rootSections().empty())
+    if (mitochondria.rootSections().empty()) {
         return;
+    }
 
     Property::Properties properties;
     mitochondria._buildMitochondria(properties);
@@ -275,8 +304,9 @@ static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochon
 
 
 static void endoplasmicReticulumH5(HighFive::File& h5_file, const EndoplasmicReticulum& reticulum) {
-    if (reticulum.sectionIndices().empty())
+    if (reticulum.sectionIndices().empty()) {
         return;
+    }
 
     HighFive::Group g_organelles = h5_file.createGroup("organelles");
     HighFive::Group g_reticulum = g_organelles.createGroup("endoplasmic_reticulum");
@@ -313,7 +343,8 @@ static void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 
 
 void h5(const Morphology& morpho, const std::string& filename) {
-    const auto& somaPoints = morpho.soma()->points();
+    const auto& soma = morpho.soma();
+    const auto& somaPoints = soma->points();
     const auto numberOfSomaPoints = somaPoints.size();
 
     if (numberOfSomaPoints < 1) {
@@ -325,6 +356,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
+    checkSomaHasSameNumberPointsDiameters(*soma);
 
     HighFive::File h5_file(filename,
                            HighFive::File::ReadWrite | HighFive::File::Create |
@@ -337,15 +369,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
     std::vector<std::vector<int32_t>> raw_structure;
     std::vector<morphio::floatType> raw_perimeters;
 
-    const auto& somaDiameters = morpho.soma()->diameters();
-
-    const auto numberOfSomaDiameters = somaDiameters.size();
-
-
-    if (numberOfSomaPoints != numberOfSomaDiameters)
-        throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
-            "soma points", numberOfSomaPoints, "soma diameters", numberOfSomaDiameters));
-
+    const auto& somaDiameters = soma->diameters();
 
     bool hasPerimeterData_ = hasPerimeterData(morpho);
 
@@ -377,15 +401,18 @@ void h5(const Morphology& morpho, const std::string& filename) {
         const auto numberOfPerimeters = perimeters.size();
         raw_structure.push_back({static_cast<int>(offset), section->type(), parentOnDisk});
 
-        for (unsigned int i = 0; i < numberOfPoints; ++i)
+        for (unsigned int i = 0; i < numberOfPoints; ++i) {
             raw_points.push_back({points[i][0], points[i][1], points[i][2], diameters[i]});
+        }
 
         if (numberOfPerimeters > 0) {
-            if (numberOfPerimeters != numberOfPoints)
+            if (numberOfPerimeters != numberOfPoints) {
                 throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
                     "points", numberOfPoints, "perimeters", numberOfPerimeters));
-            for (unsigned int i = 0; i < numberOfPerimeters; ++i)
+            }
+            for (unsigned int i = 0; i < numberOfPerimeters; ++i) {
                 raw_perimeters.push_back(perimeters[i]);
+            }
         }
 
         newIds[section->id()] = sectionIdOnDisk++;

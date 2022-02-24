@@ -1,9 +1,10 @@
-#include <stack>
+#include <algorithm>  // any_of
 
 #include <morphio/errorMessages.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/tools.h>
+#include <morphio/vector_types.h>
 
 namespace morphio {
 namespace mut {
@@ -14,35 +15,35 @@ static inline bool _emptySection(const std::shared_ptr<Section>& section) {
 }
 
 Section::Section(Morphology* morphology,
-                 unsigned int id_,
-                 SectionType type_,
+                 unsigned int id,
+                 SectionType type,
                  const Property::PointLevel& pointProperties)
-    : _morphology(morphology)
-    , _pointProperties(pointProperties)
-    , _id(id_)
-    , _sectionType(type_) {}
+    : morphology_(morphology)
+    , point_properties_(pointProperties)
+    , id_(id)
+    , section_type_(type) {}
 
-Section::Section(Morphology* morphology, unsigned int id_, const morphio::Section& section_)
+Section::Section(Morphology* morphology, unsigned int id, const morphio::Section& section)
     : Section(morphology,
-              id_,
-              section_.type(),
-              Property::PointLevel(section_._properties->_pointLevel, section_._range)) {}
+              id,
+              section.type(),
+              Property::PointLevel(section.properties_->_pointLevel, section.range_)) {}
 
-Section::Section(Morphology* morphology, unsigned int id_, const Section& section_)
-    : _morphology(morphology)
-    , _pointProperties(section_._pointProperties)
-    , _id(id_)
-    , _sectionType(section_._sectionType) {}
+Section::Section(Morphology* morphology, unsigned int id, const Section& section)
+    : morphology_(morphology)
+    , point_properties_(section.point_properties_)
+    , id_(id)
+    , section_type_(section.section_type_) {}
 
 void Section::throwIfNoOwningMorphology() const {
-    if (!_morphology) {
+    if (!morphology_) {
         throw std::runtime_error("Section does not belong to a morphology, impossible operation");
     }
 }
 
 Morphology* Section::getOwningMorphologyOrThrow() const {
     throwIfNoOwningMorphology();
-    return _morphology;
+    return morphology_;
 }
 
 const std::shared_ptr<Section>& Section::parent() const {
@@ -57,6 +58,21 @@ bool Section::isRoot() const {
         return morphology->_sections.find(parentId->second) == morphology->_sections.end();
     }
     return true;
+}
+
+bool Section::hasSameShape(const Section& other) const noexcept {
+    return (other.type() == type() && other.diameters() == diameters() &&
+            other.points() == points() && other.perimeters() == perimeters());
+}
+
+bool Section::isHeterogeneous(bool downstream) const {
+    auto predicate = [&](const std::shared_ptr<Section>& s) { return type() != s->type(); };
+
+    if (downstream) {
+        return std::any_of(breadth_begin(), breadth_end(), predicate);
+    }
+
+    return std::any_of(upstream_begin(), upstream_end(), predicate);
 }
 
 const std::vector<std::shared_ptr<Section>>& Section::children() const {
@@ -100,6 +116,7 @@ upstream_iterator Section::upstream_end() const {
     return upstream_iterator();
 }
 
+/*
 static std::ostream& operator<<(std::ostream& os, const Section& section) {
     ::operator<<(os, section);
     return os;
@@ -109,6 +126,7 @@ std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Section>& secti
     os << *sectionPtr;
     return os;
 }
+*/
 
 std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> original_section,
                                                 bool recursive) {
@@ -121,9 +139,10 @@ std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> origina
     auto& _sections = morphology->_sections;
 
     bool emptySection = _emptySection(_sections[childId]);
-    if (emptySection)
+    if (emptySection) {
         printError(Warning::APPENDING_EMPTY_SECTION,
                    morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+    }
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
@@ -157,9 +176,10 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
     auto& _sections = morphology->_sections;
 
     bool emptySection = _emptySection(_sections[childId]);
-    if (emptySection)
+    if (emptySection) {
         printError(Warning::APPENDING_EMPTY_SECTION,
                    morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+    }
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
         !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
@@ -186,11 +206,13 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
     unsigned int parentId = id();
 
     auto& _sections = morphology->_sections;
-    if (sectionType == SectionType::SECTION_UNDEFINED)
+    if (sectionType == SectionType::SECTION_UNDEFINED) {
         sectionType = type();
+    }
 
-    if (sectionType == SECTION_SOMA)
+    if (sectionType == SECTION_SOMA) {
         throw morphio::SectionBuilderError("Cannot create section with type soma");
+    }
 
     std::shared_ptr<Section> ptr(
         new Section(morphology, morphology->_counter, sectionType, pointProperties));
@@ -198,15 +220,17 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
     uint32_t childId = morphology->_register(ptr);
 
     bool emptySection = _emptySection(_sections[childId]);
-    if (emptySection)
+    if (emptySection) {
         printError(Warning::APPENDING_EMPTY_SECTION,
                    morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+    }
 
     if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) && !emptySection &&
-        !_checkDuplicatePoint(_sections[parentId], _sections[childId]))
+        !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
         printError(Warning::WRONG_DUPLICATE,
                    morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
                                                             _sections[parentId]));
+    }
 
     morphology->_parent[childId] = parentId;
     morphology->_children[parentId].push_back(ptr);
@@ -217,12 +241,12 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
 }  // end namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::mut::Section& section) {
-    auto points = section.points();
+    const auto& points = section.points();
     if (points.empty()) {
         os << "Section(id=" << section.id() << ", points=[])";
     } else {
-        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., (";
-        os << points[points.size() - 1] << ")])";
+        os << "Section(id=" << section.id() << ", points=[(" << points[0] << "),..., ("
+           << points[points.size() - 1] << ")])";
     }
 
     return os;

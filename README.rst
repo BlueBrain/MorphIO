@@ -1,3 +1,6 @@
+.. image:: doc/source/logo/BBP-MorphIO.jpg
+
+
 |license| |build| |docs|
 
 MorphIO
@@ -6,7 +9,7 @@ MorphIO
 Documentation
 -------------
 
-MorphIO documentation is built and hosted on `readthedocs <http://morphio.readthedocs.org/>`.
+MorphIO documentation is built and hosted on `readthedocs <http://morphio.readthedocs.org/>`_.
 
 * `latest snapshot <http://morphio.readthedocs.org/en/latest/>`_
 * `latest release <http://morphio.readthedocs.org/en/stable/>`_

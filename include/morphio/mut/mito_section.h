@@ -1,12 +1,15 @@
 #pragma once
 
-#include <morphio/mito_section.h>
-#include <morphio/properties.h>
-#include <morphio/types.h>
+#include <cstdint>  // uint32_t
+#include <memory>   // std::shared_ptr
+#include <vector>   // std::vector
+
+#include <morphio/properties.h>  // Property
 
 namespace morphio {
 namespace mut {
 
+/** Mutable(editable) morphio::MitoSection */
 class MitoSection
 {
   public:
@@ -26,6 +29,11 @@ class MitoSection
     std::shared_ptr<MitoSection> parent() const;
     bool isRoot() const;
     const std::vector<std::shared_ptr<MitoSection>>& children() const;
+
+    /**
+     * Return true if the both sections have the same neuriteSectionIds, diameters and pathLengths
+     */
+    bool hasSameShape(const MitoSection& other) const noexcept;
 
     /**
      * Return the section id
@@ -56,9 +64,9 @@ class MitoSection
     /** @} */
 
   private:
-    uint32_t _id;
+    uint32_t id_;
 
-    Mitochondria* _mitochondria;
+    Mitochondria* mitochondria_;
 
   public:
     // TODO: make private
@@ -66,7 +74,7 @@ class MitoSection
 };
 
 inline uint32_t MitoSection::id() const noexcept {
-    return _id;
+    return id_;
 }
 
 inline const std::vector<morphio::floatType>& MitoSection::diameters() const noexcept {

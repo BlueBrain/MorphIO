@@ -1,6 +1,5 @@
 #include <fstream>
 #include <memory>
-#include <streambuf>
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mitochondria.h>
@@ -16,15 +15,16 @@
 
 namespace morphio {
 void buildChildren(std::shared_ptr<Property::Properties> properties);
-SomaType getSomaType(long unsigned int nSomaPoints);
+SomaType getSomaType(long unsigned int num_soma_point);
 Property::Properties loadURI(const std::string& source, unsigned int options);
 
 Morphology::Morphology(const Property::Properties& properties, unsigned int options)
-    : _properties(std::make_shared<Property::Properties>(properties)) {
-    buildChildren(_properties);
+    : properties_(std::make_shared<Property::Properties>(properties)) {
+    buildChildren(properties_);
 
-    if (_properties->_cellLevel.fileFormat() != "swc")
-        _properties->_cellLevel._somaType = getSomaType(soma().points().size());
+    if (properties_->_cellLevel.fileFormat() != "swc") {
+        properties_->_cellLevel._somaType = getSomaType(soma().points().size());
+    }
 
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders
@@ -33,8 +33,8 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
         if (options) {
             mutable_morph.applyModifiers(options);
         }
-        _properties = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
-        buildChildren(_properties);
+        properties_ = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
+        buildChildren(properties_);
     }
 }
 
@@ -45,44 +45,39 @@ Morphology::Morphology(const std::string& source, unsigned int options)
     : Morphology(loadURI(source, options), options) {}
 
 Morphology::Morphology(mut::Morphology morphology) {
-    _properties = std::make_shared<Property::Properties>(morphology.buildReadOnly());
-    buildChildren(_properties);
+    properties_ = std::make_shared<Property::Properties>(morphology.buildReadOnly());
+    buildChildren(properties_);
 }
 
-Morphology::Morphology(Morphology&&) noexcept = default;
-Morphology& Morphology::operator=(Morphology&&) noexcept = default;
-
-Morphology::~Morphology() = default;
-
 Soma Morphology::soma() const {
-    return Soma(_properties);
+    return Soma(properties_);
 }
 
 Mitochondria Morphology::mitochondria() const {
-    return Mitochondria(_properties);
+    return Mitochondria(properties_);
 }
 
 const EndoplasmicReticulum Morphology::endoplasmicReticulum() const {
-    return EndoplasmicReticulum(_properties);
+    return EndoplasmicReticulum(properties_);
 }
 
 const std::vector<Property::Annotation>& Morphology::annotations() const {
-    return _properties->_cellLevel._annotations;
+    return properties_->_cellLevel._annotations;
 }
 
 const std::vector<Property::Marker>& Morphology::markers() const {
-    return _properties->_cellLevel._markers;
+    return properties_->_cellLevel._markers;
 }
 
 Section Morphology::section(uint32_t id) const {
-    return {id, _properties};
+    return {id, properties_};
 }
 
 std::vector<Section> Morphology::rootSections() const {
     std::vector<Section> result;
     try {
         const std::vector<uint32_t>& children =
-            _properties->children<morphio::Property::Section>().at(-1);
+            properties_->children<morphio::Property::Section>().at(-1);
         result.reserve(children.size());
         for (auto id : children) {
             result.push_back(section(id));
@@ -97,7 +92,7 @@ std::vector<Section> Morphology::rootSections() const {
 std::vector<Section> Morphology::sections() const {
     // TODO: Make this more performant when needed
     std::vector<Section> sections_;
-    auto count = _properties->get<morphio::Property::Section>().size();
+    auto count = properties_->get<morphio::Property::Section>().size();
     sections_.reserve(count);
     for (unsigned int i = 0; i < count; ++i) {
         sections_.emplace_back(section(i));
@@ -107,7 +102,7 @@ std::vector<Section> Morphology::sections() const {
 
 template <typename Property>
 const std::vector<typename Property::Type>& Morphology::get() const {
-    return _properties->get<Property>();
+    return properties_->get<Property>();
 }
 
 const Points& Morphology::points() const noexcept {
@@ -139,19 +134,19 @@ const std::vector<SectionType>& Morphology::sectionTypes() const {
 }
 
 const CellFamily& Morphology::cellFamily() const {
-    return _properties->cellFamily();
+    return properties_->cellFamily();
 }
 
 const SomaType& Morphology::somaType() const {
-    return _properties->somaType();
+    return properties_->somaType();
 }
 
 const std::map<int, std::vector<unsigned int>>& Morphology::connectivity() const {
-    return _properties->children<Property::Section>();
+    return properties_->children<Property::Section>();
 }
 
 const MorphologyVersion& Morphology::version() const {
-    return _properties->version();
+    return properties_->version();
 }
 
 depth_iterator Morphology::depth_begin() const {
@@ -170,12 +165,12 @@ breadth_iterator Morphology::breadth_end() const {
     return breadth_iterator();
 }
 
-SomaType getSomaType(long unsigned int nSomaPoints) {
+SomaType getSomaType(long unsigned int num_soma_points) {
     try {
         return std::map<long unsigned int, SomaType>{{0, SOMA_UNDEFINED},
                                                      {1, SOMA_SINGLE_POINT},
                                                      {2, SOMA_UNDEFINED}}
-            .at(nSomaPoints);
+            .at(num_soma_points);
     } catch (const std::out_of_range&) {
         return SOMA_SIMPLE_CONTOUR;
     }
@@ -205,8 +200,9 @@ void buildChildren(std::shared_ptr<Property::Properties> properties) {
 
 Property::Properties loadURI(const std::string& source, unsigned int options) {
     const size_t pos = source.find_last_of(".");
-    if (pos == std::string::npos)
+    if (pos == std::string::npos) {
         throw(UnknownFileType("File has no extension"));
+    }
 
     // Cross-platform check of file existance
     std::ifstream file(source.c_str());
@@ -217,12 +213,15 @@ Property::Properties loadURI(const std::string& source, unsigned int options) {
     std::string extension = source.substr(pos);
 
     auto loader = [&source, &options, &extension]() {
-        if (extension == ".h5" || extension == ".H5")
+        if (extension == ".h5" || extension == ".H5") {
             return readers::h5::load(source);
-        if (extension == ".asc" || extension == ".ASC")
+        }
+        if (extension == ".asc" || extension == ".ASC") {
             return readers::asc::load(source, options);
-        if (extension == ".swc" || extension == ".SWC")
+        }
+        if (extension == ".swc" || extension == ".SWC") {
             return readers::swc::load(source, options);
+        }
         throw(UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported"));
     };
 

@@ -1,18 +1,19 @@
 #pragma once
 
-#include <morphio/properties.h>
+#include <morphio/properties.h>  // Property
+#include <morphio/soma.h>        // morphio::soma
 
 namespace morphio {
 namespace mut {
+/** Mutable(editable) morphio::Soma */
 class Soma
 {
   public:
-    Soma()
-        : _somaType(SOMA_UNDEFINED) {}
+    Soma() = default;
+    Soma(const Soma& soma) = default;
 
-    Soma(const Property::PointLevel& pointProperties);
-    Soma(const Soma& soma);
-    Soma(const morphio::Soma& soma);
+    explicit Soma(const Property::PointLevel& pointProperties);
+    explicit Soma(const morphio::Soma& soma);
 
     /** @{
        Return the coordinates (x,y,z) of all soma point
@@ -54,36 +55,37 @@ class Soma
 
   private:
     friend class Morphology;
-    SomaType _somaType;
-    Property::PointLevel _pointProperties;
+
+    SomaType soma_type_ = SOMA_UNDEFINED;
+    Property::PointLevel point_properties_;
 };
 
 inline std::vector<Point>& Soma::points() noexcept {
-    return _pointProperties._points;
+    return point_properties_._points;
 }
 
 const std::vector<Point>& Soma::points() const noexcept {
-    return _pointProperties._points;
+    return point_properties_._points;
 }
 
 inline std::vector<morphio::floatType>& Soma::diameters() noexcept {
-    return _pointProperties._diameters;
+    return point_properties_._diameters;
 }
 
 const std::vector<morphio::floatType>& Soma::diameters() const noexcept {
-    return _pointProperties._diameters;
+    return point_properties_._diameters;
 }
 
 inline SomaType Soma::type() const noexcept {
-    return _somaType;
+    return soma_type_;
 }
 
 inline Property::PointLevel& Soma::properties() noexcept {
-    return _pointProperties;
+    return point_properties_;
 }
 
 inline const Property::PointLevel& Soma::properties() const noexcept {
-    return _pointProperties;
+    return point_properties_;
 }
 
 std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& sectionPtr);

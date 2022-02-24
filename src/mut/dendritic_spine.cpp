@@ -11,10 +11,11 @@ DendriticSpine::DendriticSpine()
 
 DendriticSpine::DendriticSpine(const std::string& source)
     : Morphology(source) {
-    if (_cellProperties->_cellFamily != CellFamily::SPINE)
+    if (_cellProperties->_cellFamily != CellFamily::SPINE) {
         throw(RawDataError(
             "File: " + source +
             " is not a DendriticSpine file. It should be a H5 file the cell type SPINE."));
+    }
 }
 
 std::vector<Property::DendriticSpine::PostSynapticDensity>&

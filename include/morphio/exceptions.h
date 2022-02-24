@@ -1,10 +1,9 @@
 #pragma once
-#include <stdexcept>
+#include <stdexcept>  // std::runtime_error
 
 namespace morphio {
-/**
-   Base class of all morphio errors
- **/
+
+/** Base class of all morphio errors */
 class MorphioError: public std::runtime_error
 {
   public:

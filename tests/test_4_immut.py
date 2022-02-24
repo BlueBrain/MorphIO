@@ -20,6 +20,34 @@ CELLS = OrderedDict({
 })
 
 
+def test_heterogeneous_sections():
+
+    morph = Morphology(os.path.join(_path, "simple-heterogeneous-neurite.swc"))
+
+    for root_section in morph.root_sections:
+
+        assert root_section.is_heterogeneous()
+        assert root_section.is_heterogeneous(True)
+        assert root_section.is_heterogeneous(downstream=True)
+        assert not root_section.is_heterogeneous(False)
+        assert not root_section.is_heterogeneous(downstream=False)
+
+        for section in root_section.children:
+            assert not section.is_heterogeneous(downstream=True)
+            assert section.is_heterogeneous(downstream=False)
+
+    # check a homogeneous morphology
+    for section in CELLS['swc'].iter():
+        assert not section.is_heterogeneous(downstream=True)
+        assert not section.is_heterogeneous(downstream=False)
+
+
+def test_components():
+    for cell in CELLS.values():
+        assert cell.n_points == len(cell.points)
+        assert cell.section(0).n_points == len(cell.section(0).points)
+
+
 def test_is_root():
     for _, cell in CELLS.items():
         assert all(section.is_root for section in cell.root_sections)
@@ -102,6 +130,12 @@ def test_mitochondria():
 
     assert len(mito_root[1].children) == 0
 
+    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    m0 = morpho.mitochondria
+    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    m1 = morpho.mitochondria
+    assert m0.root_sections[0].has_same_shape(m1.root_sections[0])
+
 
 def test_endoplasmic_reticulum():
     morpho = Morphology(os.path.join(_path, "h5/v1/endoplasmic-reticulum.h5"))
@@ -115,6 +149,13 @@ def test_endoplasmic_reticulum():
 def test_section___str__():
     assert (str(CELLS['asc'].root_sections[0]) ==
                  'Section(id=0, points=[(0 0 0),..., (0 5 0)])')
+
+
+def test_section_has_same_shape():
+    m0 = Morphology(os.path.join(_path, "simple.asc"))
+    m1 = Morphology(os.path.join(_path, "simple.asc"))
+    assert m0.root_sections[0].has_same_shape(m1.root_sections[0])
+    assert not m0.root_sections[0].has_same_shape(m1.root_sections[1])
 
 
 def test_from_pathlib():

@@ -1,7 +1,9 @@
-recursive-include src *
-recursive-include binds *
-recursive-include include *
+# MorphIO c++
+graft src
+graft include
+include CMakeLists.txt
 
+# MorphIO submodule dependencies
 include 3rdparty/GSL_LITE/CMakeLists.txt 3rdparty/GSL_LITE/gsl-lite.natvis
 recursive-include 3rdparty/GSL_LITE/cmake/ *
 recursive-include 3rdparty/GSL_LITE/include/ *
@@ -11,11 +13,20 @@ recursive-include 3rdparty/HighFive/include/ *
 recursive-include 3rdparty/HighFive/CMake/ *
 recursive-include 3rdparty/HighFive/doc/ *
 
-recursive-include 3rdparty/pybind11/include/ *
-include 3rdparty/pybind11/CMakeLists.txt
-
 include 3rdparty/lexertl14/CMakeLists.txt
 recursive-include 3rdparty/lexertl14/include/lexertl/ *
 
-recursive-include 3rdparty/pybind11/tools/ *
-include CMakeLists.txt
+# pybind11 for python bindings
+recursive-include binds/python/pybind11/include *
+recursive-include binds/python/pybind11/tools *.cmake
+include binds/python/pybind11/CMakeLists.txt
+include binds/python/pybind11/LICENSE
+
+# setuptools_scm forces all SCM files to be packaged into sdist
+# we need to manually exclude them to prevent their inclusion
+# see https://github.com/pypa/setuptools_scm/issues/190
+prune ci
+prune doc
+prune tests
+prune scripts
+prune examples

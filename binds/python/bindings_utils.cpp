@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>  // std::move
 
-#include <morphio/enums.h>
+#include <morphio/exceptions.h>  // morphio::MorphioError
 #include <morphio/types.h>
 
 namespace py = pybind11;
@@ -21,8 +21,9 @@ void _raise_if_wrong_shape(const py::buffer_info& info) {
         std::string shape_str;
         for (unsigned int i = 0; i < shape.size(); ++i) {
             shape_str += std::to_string(shape[i]);
-            if (i != shape.size() - 1)
+            if (i != shape.size() - 1) {
                 shape_str += ", ";
+            }
         }
         throw morphio::MorphioError("Wrong array shape. Expected: (X, 3), got: (" + shape_str +
                                     ")");

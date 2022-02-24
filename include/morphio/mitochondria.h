@@ -1,6 +1,10 @@
 #pragma once
 
-#include <morphio/types.h>
+#include <memory>
+#include <vector>
+
+#include <morphio/morphology.h>  // Morphology
+#include <morphio/properties.h>  // Property
 
 namespace morphio {
 /**
@@ -20,8 +24,8 @@ class Mitochondria
 
   private:
     explicit Mitochondria(const std::shared_ptr<Property::Properties>& properties)
-        : _properties(properties) {}
-    std::shared_ptr<Property::Properties> _properties;
+        : properties_(properties) {}
+    std::shared_ptr<Property::Properties> properties_;
 
     friend class Morphology;
 };

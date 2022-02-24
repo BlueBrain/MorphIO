@@ -1,9 +1,10 @@
 #pragma once
 
 #include <map>
-#include <morphio/types.h>
 #include <string>  // std::string
 #include <vector>  // std::vector
+
+#include <morphio/types.h>
 
 namespace morphio {
 namespace vasculature {
@@ -27,15 +28,16 @@ struct Diameter {
     using Type = floatType;
 };
 
+/**
+   Stores the graph connectivity between the sections. If section1 is connected to section2,
+   then the last point of section1 and the first point of section2 must be equal.
+ */
 struct Connection {
-    // stores the graph connectivity between the sections
-    // If section1 is connected to section2, then the last point of section1
-    // and the first point of section2 must be equal.
     using Type = std::array<unsigned int, 2>;
 };
 
+/** Stores point level information. Similar to morphio::PointLevel */
 struct VascPointLevel {
-    // stores point level information
     std::vector<Point::Type> _points;
     std::vector<Diameter::Type> _diameters;
 
@@ -47,13 +49,13 @@ struct VascPointLevel {
     VascPointLevel& operator=(const VascPointLevel&) = default;
 };
 
+/** Stores edge level information */
 struct VascEdgeLevel {
-    // stores edge level information, more attributes can be added later
     std::vector<morphio::floatType> leakiness;
 };
 
+/** stores section level information */
 struct VascSectionLevel {
-    // stores section level information
     std::vector<VascSection::Type> _sections;
     std::vector<SectionType::Type> _sectionTypes;
     std::map<uint32_t, std::vector<uint32_t>> _predecessors;
@@ -62,6 +64,7 @@ struct VascSectionLevel {
     bool operator!=(const VascSectionLevel& other) const;
 };
 
+/** Class that holds all other levels(point, edge, etc.) information */
 struct Properties {
     VascPointLevel _pointLevel;
     VascEdgeLevel _edgeLevel;

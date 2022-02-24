@@ -2,7 +2,7 @@
 	path = 3rdparty/HighFive
 	url = https://github.com/BlueBrain/HighFive.git
 [submodule "3rdparty/pybind11"]
-	path = 3rdparty/pybind11
+	path = binds/python/pybind11
 	url = https://github.com/pybind/pybind11.git
 [submodule "3rdparty/GSL_LITE"]
 	path = 3rdparty/GSL_LITE
@@ -10,3 +10,6 @@
 [submodule "3rdparty/lexertl14"]
 	path = 3rdparty/lexertl14
 	url = https://github.com/BenHanson/lexertl14
+[submodule "3rdparty/Catch2"]
+	path = 3rdparty/Catch2
+	url = https://github.com/catchorg/Catch2.git
