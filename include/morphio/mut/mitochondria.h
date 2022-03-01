@@ -77,7 +77,7 @@ class Mitochondria
     /**
        Append a new root MitoSection
     **/
-    MitoSectionP appendRootSection(const Property::MitochondriaPointLevel& points);
+    MitoSectionP appendRootSection(const Property::MitochondriaPointLevel& pointProperties);
 
     /**
        Append a root MitoSection

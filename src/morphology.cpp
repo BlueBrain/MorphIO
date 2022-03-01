@@ -13,10 +13,72 @@
 #include "readers/morphologyHDF5.h"
 #include "readers/morphologySWC.h"
 
+namespace {
+
+void buildChildren(const std::shared_ptr<morphio::Property::Properties> properties) {
+    {
+        const auto& sections = properties->get<morphio::Property::Section>();
+        auto& children = properties->_sectionLevel._children;
+
+        for (unsigned int i = 0; i < sections.size(); ++i) {
+            const int32_t parent = sections[i][1];
+            children[parent].push_back(i);
+        }
+    }
+
+    {
+        const auto& sections = properties->get<morphio::Property::MitoSection>();
+        auto& children = properties->_mitochondriaSectionLevel._children;
+
+        for (unsigned int i = 0; i < sections.size(); ++i) {
+            const int32_t parent = sections[i][1];
+            children[parent].push_back(i);
+        }
+    }
+}
+
+morphio::SomaType getSomaType(long unsigned int num_soma_points) {
+    switch (num_soma_points) {
+    case 0:
+        return morphio::SOMA_UNDEFINED;
+    case 1:
+        return morphio::SOMA_SINGLE_POINT;
+    case 2:
+        return morphio::SOMA_UNDEFINED;
+    default:;
+    }
+    return morphio::SOMA_SIMPLE_CONTOUR;
+}
+
+morphio::Property::Properties loadURI(const std::string& source, unsigned int options) {
+    const size_t pos = source.find_last_of('.');
+    if (pos == std::string::npos) {
+        throw(morphio::UnknownFileType("File has no extension"));
+    }
+
+    // Cross-platform check of file existance
+    std::ifstream file(source.c_str());
+    if (!file) {
+        throw(morphio::RawDataError("File: " + source + " does not exist."));
+    }
+
+    std::string extension = source.substr(pos);
+
+    if (extension == ".h5" || extension == ".H5") {
+        return morphio::readers::h5::load(source);
+    } else if (extension == ".asc" || extension == ".ASC") {
+        return morphio::readers::asc::load(source, options);
+    } else if (extension == ".swc" || extension == ".SWC") {
+        return morphio::readers::swc::load(source, options);
+    }
+
+    throw(morphio::UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported"));
+}
+
+
+}  // namespace
+
 namespace morphio {
-void buildChildren(std::shared_ptr<Property::Properties> properties);
-SomaType getSomaType(long unsigned int num_soma_point);
-Property::Properties loadURI(const std::string& source, unsigned int options);
 
 Morphology::Morphology(const Property::Properties& properties, unsigned int options)
     : properties_(std::make_shared<Property::Properties>(properties)) {
@@ -74,19 +136,21 @@ Section Morphology::section(uint32_t id) const {
 }
 
 std::vector<Section> Morphology::rootSections() const {
-    std::vector<Section> result;
-    try {
-        const std::vector<uint32_t>& children =
-            properties_->children<morphio::Property::Section>().at(-1);
-        result.reserve(children.size());
-        for (auto id : children) {
-            result.push_back(section(id));
-        }
+    const auto sections = properties_->children<morphio::Property::Section>();
 
-        return result;
-    } catch (const std::out_of_range&) {
-        return result;
+    if (sections.empty()) {
+        return {};
     }
+
+    std::vector<Section> result;
+
+    const std::vector<uint32_t>& children = sections.at(-1);
+    result.reserve(children.size());
+    for (auto id : children) {
+        result.push_back(section(id));
+    }
+
+    return result;
 }
 
 std::vector<Section> Morphology::sections() const {
@@ -163,69 +227,6 @@ breadth_iterator Morphology::breadth_begin() const {
 
 breadth_iterator Morphology::breadth_end() const {
     return breadth_iterator();
-}
-
-SomaType getSomaType(long unsigned int num_soma_points) {
-    try {
-        return std::map<long unsigned int, SomaType>{{0, SOMA_UNDEFINED},
-                                                     {1, SOMA_SINGLE_POINT},
-                                                     {2, SOMA_UNDEFINED}}
-            .at(num_soma_points);
-    } catch (const std::out_of_range&) {
-        return SOMA_SIMPLE_CONTOUR;
-    }
-}
-
-void buildChildren(std::shared_ptr<Property::Properties> properties) {
-    {
-        const auto& sections = properties->get<Property::Section>();
-        auto& children = properties->_sectionLevel._children;
-
-        for (unsigned int i = 0; i < sections.size(); ++i) {
-            const int32_t parent = sections[i][1];
-            children[parent].push_back(i);
-        }
-    }
-
-    {
-        const auto& sections = properties->get<Property::MitoSection>();
-        auto& children = properties->_mitochondriaSectionLevel._children;
-
-        for (unsigned int i = 0; i < sections.size(); ++i) {
-            const int32_t parent = sections[i][1];
-            children[parent].push_back(i);
-        }
-    }
-}
-
-Property::Properties loadURI(const std::string& source, unsigned int options) {
-    const size_t pos = source.find_last_of(".");
-    if (pos == std::string::npos) {
-        throw(UnknownFileType("File has no extension"));
-    }
-
-    // Cross-platform check of file existance
-    std::ifstream file(source.c_str());
-    if (!file) {
-        throw(RawDataError("File: " + source + " does not exist."));
-    }
-
-    std::string extension = source.substr(pos);
-
-    auto loader = [&source, &options, &extension]() {
-        if (extension == ".h5" || extension == ".H5") {
-            return readers::h5::load(source);
-        }
-        if (extension == ".asc" || extension == ".ASC") {
-            return readers::asc::load(source, options);
-        }
-        if (extension == ".swc" || extension == ".SWC") {
-            return readers::swc::load(source, options);
-        }
-        throw(UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported"));
-    };
-
-    return loader();
 }
 
 }  // namespace morphio

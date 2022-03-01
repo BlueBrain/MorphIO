@@ -111,8 +111,8 @@ TEST_CASE("LoadH5Glia", "[morphology]") {
     {
         const morphio::Morphology m("data/h5/v1/glia_soma_only.h5");
         REQUIRE(m.soma().points().size() == 1);
-        REQUIRE(m.points().size() == 0);
-        REQUIRE(m.perimeters().size() == 0);
+        REQUIRE(m.points().empty());
+        REQUIRE(m.perimeters().empty());
     }
 
     {  // empty perimeters

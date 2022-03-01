@@ -68,7 +68,7 @@ def test_soma_no_neurite():
                         [ 1.,  0.,  0.],
                         [ 0., 25.,  0.]])
     assert_array_equal(n.soma.diameters,
-                       [6,6,15])
+                       [6, 6, 15])
 
     assert len(n.root_sections) == 0
 

@@ -82,12 +82,7 @@ std::shared_ptr<MitoSection> MitoSection::parent() const {
 }
 
 bool MitoSection::isRoot() const {
-    try {
-        parent();
-        return false;
-    } catch (const std::out_of_range&) {
-        return true;
-    }
+    return mitochondria_->parent_.count(id()) == 0;
 }
 
 bool MitoSection::hasSameShape(const MitoSection& other) const noexcept {
