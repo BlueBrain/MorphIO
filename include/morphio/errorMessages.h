@@ -48,11 +48,11 @@ struct DebugInfo {
 
     /** Get section's line number within morphology file */
     int32_t getLineNumber(uint32_t sectionId) const {
-        try {
-            return _lineNumbers.at(sectionId);
-        } catch (const std::out_of_range&) {
+        const auto it = _lineNumbers.find(sectionId);
+        if (it == _lineNumbers.end()) {
             return -1;
         }
+        return it->second;
     }
     /** Morphology filename */
     std::string _filename;
