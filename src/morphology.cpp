@@ -28,11 +28,9 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
 
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders
-    if (properties._cellLevel.fileFormat() == "h5") {
+    if (properties._cellLevel.fileFormat() == "h5" && options) {
         mut::Morphology mutable_morph(*this);
-        if (options) {
-            mutable_morph.applyModifiers(options);
-        }
+        mutable_morph.applyModifiers(options);
         properties_ = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
         buildChildren(properties_);
     }
