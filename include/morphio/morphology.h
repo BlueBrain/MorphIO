@@ -43,7 +43,7 @@ class Morphology
     /** Constructor from an already parsed file */
     explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
     /** Constructor from an instance of morphio::mut::Morphology */
-    explicit Morphology(mut::Morphology);
+    explicit Morphology(const mut::Morphology&);
 
     /** Return the soma object */
     Soma soma() const;
@@ -52,7 +52,7 @@ class Morphology
     Mitochondria mitochondria() const;
 
     /** Return the endoplasmic reticulum object */
-    const EndoplasmicReticulum endoplasmicReticulum() const;
+    EndoplasmicReticulum endoplasmicReticulum() const;
 
     /** Return the annotation object */
     const std::vector<Property::Annotation>& annotations() const;

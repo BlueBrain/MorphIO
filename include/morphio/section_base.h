@@ -124,7 +124,7 @@ T SectionBase<T>::parent() const {
 
 template <typename T>
 std::vector<T> SectionBase<T>::children() const {
-    const auto section_children = properties_->children<typename T::SectionId>();
+    const auto& section_children = properties_->children<typename T::SectionId>();
 
     if (section_children.empty()) {
         return {};

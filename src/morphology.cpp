@@ -106,7 +106,7 @@ Morphology::Morphology(const HighFive::Group& group, unsigned int options)
 Morphology::Morphology(const std::string& source, unsigned int options)
     : Morphology(loadURI(source, options), options) {}
 
-Morphology::Morphology(mut::Morphology morphology) {
+Morphology::Morphology(const mut::Morphology& morphology) {
     properties_ = std::make_shared<Property::Properties>(morphology.buildReadOnly());
     buildChildren(properties_);
 }
@@ -119,7 +119,7 @@ Mitochondria Morphology::mitochondria() const {
     return Mitochondria(properties_);
 }
 
-const EndoplasmicReticulum Morphology::endoplasmicReticulum() const {
+EndoplasmicReticulum Morphology::endoplasmicReticulum() const {
     return EndoplasmicReticulum(properties_);
 }
 
@@ -136,7 +136,7 @@ Section Morphology::section(uint32_t id) const {
 }
 
 std::vector<Section> Morphology::rootSections() const {
-    const auto sections = properties_->children<morphio::Property::Section>();
+    const auto& sections = properties_->children<morphio::Property::Section>();
 
     if (sections.empty()) {
         return {};
