@@ -45,7 +45,8 @@ morphio::SomaType getSomaType(long unsigned int num_soma_points) {
         return morphio::SOMA_SINGLE_POINT;
     case 2:
         return morphio::SOMA_UNDEFINED;
-    default:;
+    default:
+        break;
     }
     return morphio::SOMA_SIMPLE_CONTOUR;
 }
