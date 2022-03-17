@@ -229,10 +229,10 @@ TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
     morphio::Morphology morph = morphio::Morphology("data/h5/v1/endoplasmic-reticulum.h5");
     morphio::EndoplasmicReticulum er = morph.endoplasmicReticulum();
     REQUIRE(er.sectionIndices() == std::vector<uint32_t>{1, 4, 5});
-    REQUIRE(almost_equal(er.volumes().at(0), 10.5500001907, 0.001));
-    REQUIRE(almost_equal(er.volumes().at(1), 47.1199989319, 0.001));
-    REQUIRE(almost_equal(er.volumes().at(2), 0.8299999833, 0.001));
-    REQUIRE(array_almost_equal(er.surfaceAreas(), std::vector<double>{111.24, 87.44, 0.11}, 0.001));
+    REQUIRE_THAT(er.volumes().at(0), Catch::WithinAbs(10.5500001907, 0.01));
+    REQUIRE_THAT(er.volumes().at(1), Catch::WithinAbs(47.1199989319, 0.01));
+    REQUIRE_THAT(er.volumes().at(2), Catch::WithinAbs(0.8299999833, 0.01));
+    REQUIRE_THAT(er.surfaceAreas(), Catch::Approx(std::vector<morphio::floatType>{111.24, 87.44, 0.11}));
     REQUIRE(er.filamentCounts() == std::vector<uint32_t>{12, 42, 8});
 }
 
@@ -258,11 +258,11 @@ TEST_CASE("glia", "[immutableMorphology]") {
     REQUIRE(count_processes == 863);
 
     const auto section = glial.rootSections()[0];
-    REQUIRE(almost_equal(section.diameters().at(0), 2.03101, 0.001));
-    REQUIRE(almost_equal(section.diameters().at(1), 1.86179, 0.001));
+    REQUIRE_THAT(section.diameters().at(0), Catch::WithinAbs(2.03101, 0.001));
+    REQUIRE_THAT(section.diameters().at(1), Catch::WithinAbs(1.86179, 0.001));
 
-    REQUIRE(almost_equal(section.perimeters().at(0), 5.79899, 0.001));
-    REQUIRE(almost_equal(section.perimeters().at(1), 7.98946, 0.001));
+    REQUIRE_THAT(section.perimeters().at(0), Catch::WithinAbs(5.79899, 0.001));
+    REQUIRE_THAT(section.perimeters().at(1), Catch::WithinAbs(7.98946, 0.001));
 
 
     CHECK_THROWS_AS(morphio::GlialCell("data/simple.swc"), morphio::RawDataError);
