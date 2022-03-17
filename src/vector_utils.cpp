@@ -44,35 +44,6 @@ Point operator/=(Point& left, floatType factor) {
     return left;
 }
 
-Points operator+(const Points& points, const Point& right) {
-    Points result;
-    for (auto& p : points) {
-        result.push_back(p + right);
-    }
-    return result;
-}
-Points operator-(const Points& points, const Point& right) {
-    Points result;
-    for (auto& p : points) {
-        result.push_back(p - right);
-    }
-    return result;
-}
-
-Points operator+=(Points& points, const Point& right) {
-    for (auto& p : points) {
-        p += right;
-    }
-    return points;
-}
-
-Points operator-=(Points& points, const Point& right) {
-    for (auto& p : points) {
-        p -= right;
-    }
-    return points;
-}
-
 /**
    Euclidian distance between two points
 **/

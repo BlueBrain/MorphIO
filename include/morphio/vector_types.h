@@ -36,11 +36,6 @@ Point operator+=(Point& left, const Point& right);
 Point operator-=(Point& left, const Point& right);
 Point operator/=(Point& left, const floatType factor);
 
-Points operator+(const Points& points, const Point& right);
-Points operator-(const Points& points, const Point& right);
-Points operator+=(Points& points, const Point& right);
-Points operator-=(Points& points, const Point& right);
-
 template <typename T>
 Point operator*(const Point& from, T factor);
 template <typename T>
