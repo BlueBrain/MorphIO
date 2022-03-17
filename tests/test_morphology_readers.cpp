@@ -7,16 +7,6 @@
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
 
-namespace {
-bool almost_equal(morphio::floatType a, double expected, double epsilon) {
-#ifdef MORPHIO_USE_DOUBLE
-    return std::abs(a - expected) < epsilon;
-#else
-    return std::abs(static_cast<double>(a) - expected) < epsilon;
-#endif
-}
-}  // namespace
-
 TEST_CASE("LoadH5Morphology", "[morphology]") {
     {
         const morphio::Morphology m("data/h5/v1/Neuron.h5");
@@ -157,8 +147,7 @@ TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {
         const morphio::Morphology m("data/h5/v1/single-neurite.h5");
         REQUIRE(m.soma().points().empty());
         REQUIRE(m.points().size() == 3);
-        REQUIRE(almost_equal(m.points()[0][0], 4., 0.001));
-        REQUIRE(almost_equal(0., 0., 0.1));
+        REQUIRE_THAT(m.points()[0][0], Catch::WithinAbs(4., 0.0001));
     }
 }
 

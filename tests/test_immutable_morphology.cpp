@@ -11,10 +11,10 @@
 #include <morphio/properties.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
-
-#include "test_helpers.h"
+#include <morphio/vector_types.h>
 
 namespace {
+
 class Files
 {
   public:
@@ -131,11 +131,20 @@ TEST_CASE("modifers", "[immutableMorphology]") {
 }
 
 
-TEST_CASE("distance", "[immutableMorphology]") {
+TEST_CASE("immutableMorphologySoma", "[immutableMorphology]") {
     Files files;
     for (const auto& morph : files.morphs()) {
         REQUIRE(morph.soma().maxDistance() == 0);
     }
+
+    const auto morph = morphio::Morphology("data/soma_three_points_cylinder.swc");
+    const auto& soma = morph.soma();
+
+    REQUIRE_THAT(soma.center()[0], Catch::WithinAbs(0, 0.001));
+    REQUIRE_THAT(soma.center()[1], Catch::WithinAbs(0, 0.001));
+    REQUIRE_THAT(soma.center()[2], Catch::WithinAbs(0, 0.001));
+
+    REQUIRE_THAT(soma.surface(), Catch::WithinAbs(1017.87604, 0.001));
 }
 
 TEST_CASE("properties", "[immutableMorphology]") {
@@ -222,8 +231,6 @@ TEST_CASE("connectivity", "[immutableMorphology]") {
         REQUIRE(morph.connectivity() == expectedConnectivity);
     }
 }
-
-
 
 TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
     morphio::Morphology morph = morphio::Morphology("data/h5/v1/endoplasmic-reticulum.h5");
