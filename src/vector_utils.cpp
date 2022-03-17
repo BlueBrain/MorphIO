@@ -103,31 +103,6 @@ floatType maxDistanceToCenterOfGravity(const T& points) {
 }
 template floatType maxDistanceToCenterOfGravity(const Points& points);
 
-template <typename T>
-Point operator*(const Point& from, T factor) {
-    Point ret;
-    for (size_t i = 0; i < ret.size(); ++i) {
-        ret[i] = from[i] * static_cast<Point::value_type>(factor);
-    }
-    return ret;
-}
-template Point operator*<int>(const Point& from, int factor);
-template Point operator*<floatType>(const Point& from, floatType factor);
-
-template <typename T>
-Point operator*(T factor, const Point& from) {
-    return from * factor;
-}
-template Point operator*<int>(int factor, const Point& from);
-template Point operator*<floatType>(floatType factor, const Point& from);
-
-template <typename T>
-Point operator/(const Point& from, T factor) {
-    return from * (1 / static_cast<floatType>(factor));
-}
-template Point operator/(const Point& from, int factor);
-template Point operator/(const Point& from, floatType factor);
-
 }  // namespace morphio
 
 std::ostream& operator<<(std::ostream& os, const morphio::Point& point) {

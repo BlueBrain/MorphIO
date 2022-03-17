@@ -37,13 +37,8 @@ Point operator-=(Point& left, const Point& right);
 Point operator/=(Point& left, const floatType factor);
 
 template <typename T>
-Point operator*(const Point& from, T factor);
-template <typename T>
-Point operator*(T factor, const Point& from);
-template <typename T>
-Point operator/(const Point& from, T factor);
-template <typename T>
 Point centerOfGravity(const T& points);
+
 template <typename T>
 floatType maxDistanceToCenterOfGravity(const T& points);
 
