@@ -152,7 +152,7 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
     }
 
     for (unsigned int i = 0; i < vec1.size(); ++i) {
-        if (std::fabs(distance(vec1[i], vec2[i])) > morphio::epsilon) {
+        if (std::fabs(euclidean_distance(vec1[i], vec2[i])) > morphio::epsilon) {
             if (logLevel > LogLevel::ERROR) {
                 printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 printError(Warning::UNDEFINED,

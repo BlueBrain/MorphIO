@@ -17,10 +17,7 @@ Point subtract(const Point& left, const Point& right) {
     return ret;
 }
 
-/**
-   Euclidian distance between two points
-**/
-floatType distance(const Point& left, const Point& right) {
+floatType euclidean_distance(const Point& left, const Point& right) {
     return std::sqrt((left[0] - right[0]) * (left[0] - right[0]) +
                      (left[1] - right[1]) * (left[1] - right[1]) +
                      (left[2] - right[2]) * (left[2] - right[2]));
@@ -59,7 +56,7 @@ floatType maxDistanceToCenterOfGravity(const Points& points) {
                            std::end(points),
                            floatType{0},
                            [&](floatType a, const Point& b) {
-                               return std::max(a, distance(c, b));
+                               return std::max(a, euclidean_distance(c, b));
                            });
 }
 

@@ -105,7 +105,7 @@ floatType Section::length() const {
     }
 
     size_t last = points_.size() - 1;
-    return distance(points_[0], points_[last]);
+    return euclidean_distance(points_[0], points_[last]);
 }
 
 range<const Point> Section::points() const {

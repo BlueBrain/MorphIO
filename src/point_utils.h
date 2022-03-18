@@ -14,10 +14,7 @@ floatType maxDistanceToCenterOfGravity(const Points& points);
 std::string dumpPoint(const Point& point);
 std::string dumpPoints(const range<const Point>& points);
 
-/**
-   Euclidian distance between two points
-**/
-floatType distance(const Point& left, const Point& right);
+floatType euclidean_distance(const Point& left, const Point& right);
 
 }  // namespace morphio
 

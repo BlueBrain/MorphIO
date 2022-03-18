@@ -1,6 +1,8 @@
 #include <morphio/errorMessages.h>
 #include <morphio/types.h>
 
+#include "point_utils.h"
+
 
 namespace morphio {
 
@@ -34,7 +36,7 @@ inline floatType _somaSurface(const SomaType type,
         for (unsigned int i = 0; i < size - 1; ++i) {
             floatType r0 = static_cast<morphio::floatType>(diameters[i]) * floatType{0.5};
             floatType r1 = static_cast<morphio::floatType>(diameters[i + 1]) * floatType{0.5};
-            floatType h2 = distance(points[i], points[i + 1]);
+            floatType h2 = euclidean_distance(points[i], points[i + 1]);
             auto s = morphio::PI * (r0 + r1) * std::sqrt((r0 - r1) * (r0 - r1) + h2 * h2);
             surface += s;
         }
