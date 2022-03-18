@@ -129,7 +129,7 @@ bool compare(const morphio::range<T>& vec1,
             printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
             printError(Warning::UNDEFINED,
                        valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
-            printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
+            printError(Warning::UNDEFINED, valueToString(subtract(vec2[i], vec1[i])));
             return false;
         }
     }
@@ -156,7 +156,7 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
                 printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 printError(Warning::UNDEFINED,
                            valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
-                printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
+                printError(Warning::UNDEFINED, valueToString(subtract(vec2[i], vec1[i])));
             }
             return false;
         }

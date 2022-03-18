@@ -30,11 +30,7 @@ using Point = std::array<morphio::floatType, 3>;
 /** An array of points */
 using Points = std::vector<Point>;
 
-Point operator+(const Point& left, const Point& right);
-Point operator-(const Point& left, const Point& right);
-Point operator+=(Point& left, const Point& right);
-Point operator-=(Point& left, const Point& right);
-Point operator/=(Point& left, const floatType factor);
+Point subtract(const Point& left, const Point& right);
 
 template <typename T>
 Point centerOfGravity(const T& points);

@@ -7,41 +7,12 @@
 #include <morphio/types.h>
 
 namespace morphio {
-Point operator+(const Point& left, const Point& right) {
-    Point ret;
-    for (size_t i = 0; i < ret.size(); ++i) {
-        ret[i] = left[i] + right[i];
-    }
-    return ret;
-}
-
-Point operator-(const Point& left, const Point& right) {
+Point subtract(const Point& left, const Point& right) {
     Point ret;
     for (size_t i = 0; i < ret.size(); ++i) {
         ret[i] = left[i] - right[i];
     }
     return ret;
-}
-
-Point operator+=(Point& left, const Point& right) {
-    for (size_t i = 0; i < left.size(); ++i) {
-        left[i] += right[i];
-    }
-    return left;
-}
-
-Point operator-=(Point& left, const Point& right) {
-    for (size_t i = 0; i < left.size(); ++i) {
-        left[i] -= right[i];
-    }
-    return left;
-}
-
-Point operator/=(Point& left, floatType factor) {
-    for (size_t i = 0; i < left.size(); ++i) {
-        left[i] /= factor;
-    }
-    return left;
 }
 
 /**
