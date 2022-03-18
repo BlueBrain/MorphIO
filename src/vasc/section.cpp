@@ -2,6 +2,8 @@
 
 #include <morphio/vasc/section.h>
 
+#include "../point_utils.h"
+
 namespace morphio {
 namespace vasculature {
 

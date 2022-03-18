@@ -5,6 +5,7 @@
 #include <morphio/properties.h>
 #include <morphio/vasc/properties.h>
 
+#include "../point_utils.h"
 #include "../shared_utils.hpp"
 
 namespace morphio {

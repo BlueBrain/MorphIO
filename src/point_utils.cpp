@@ -4,6 +4,8 @@
 #include <sstream>    // ostringstream
 #include <string>     // std::string
 
+#include "point_utils.h"
+
 #include <morphio/types.h>
 
 namespace morphio {
@@ -30,7 +32,7 @@ std::string dumpPoint(const Point& point) {
     return oss.str();
 }
 
-std::string dumpPoints(const Points& points) {
+std::string dumpPoints(const range<const Point>& points) {
     std::ostringstream oss;
     for (const auto& point : points) {
         oss << dumpPoint(point) << '\n';
@@ -38,16 +40,7 @@ std::string dumpPoints(const Points& points) {
     return oss.str();
 }
 
-std::string dumpPoints(const morphio::range<const morphio::Point>& points) {
-    std::ostringstream oss;
-    for (const auto& point : points) {
-        oss << dumpPoint(point) << '\n';
-    }
-    return oss.str();
-}
-
-template <typename T>
-Point centerOfGravity(const T& points) {
+Point centerOfGravity(const range<const Point>& points) {
     Point::value_type x = 0;
     Point::value_type y = 0;
     Point::value_type z = 0;
@@ -59,11 +52,8 @@ Point centerOfGravity(const T& points) {
     }
     return Point({x / count, y / count, z / count});
 }
-template Point centerOfGravity(const range<const Point>& points);
-template Point centerOfGravity(const Points& points);
 
-template <typename T>
-floatType maxDistanceToCenterOfGravity(const T& points) {
+floatType maxDistanceToCenterOfGravity(const Points& points) {
     const auto c = centerOfGravity(points);
     return std::accumulate(std::begin(points),
                            std::end(points),
@@ -72,7 +62,6 @@ floatType maxDistanceToCenterOfGravity(const T& points) {
                                return std::max(a, distance(c, b));
                            });
 }
-template floatType maxDistanceToCenterOfGravity(const Points& points);
 
 }  // namespace morphio
 

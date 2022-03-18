@@ -5,6 +5,8 @@
 #include <morphio/tools.h>
 #include <morphio/vector_types.h>
 
+#include "point_utils.h"
+
 namespace morphio {
 
 bool Section::isHeterogeneous(bool downstream) const {
