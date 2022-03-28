@@ -16,7 +16,7 @@ TEST_CASE("mitochondria", "[mitochondria]") {
 
     REQUIRE(mito.rootSections().size() == 2);
 
-    auto rootSection = mito.rootSections().at(0);
+    auto rootSection = mito.rootSections()[0];
     REQUIRE(rootSection.id() == 0);
 
     auto diameters = rootSection.diameters();
@@ -27,8 +27,8 @@ TEST_CASE("mitochondria", "[mitochondria]") {
     auto res = std::vector<morphio::floatType>(relativePathLength.begin(),
                                                relativePathLength.end());
 
-    REQUIRE(almost_equal(res.at(0), 0.5, 0.001));
-    REQUIRE(almost_equal(res.at(1), 0.6000000238, 0.001));
+    REQUIRE(almost_equal(res[0], 0.5, 0.001));
+    REQUIRE(almost_equal(res[1], 0.6000000238, 0.001));
 
     auto neuriteSectionIds = rootSection.neuriteSectionIds();
     REQUIRE(array_almost_equal(std::vector<morphio::floatType>(neuriteSectionIds.begin(),
@@ -37,7 +37,7 @@ TEST_CASE("mitochondria", "[mitochondria]") {
                                0.01));
     REQUIRE(rootSection.children().size() == 1);
 
-    auto child = rootSection.children().at(0);
+    auto child = rootSection.children()[0];
     REQUIRE(child.parent().id() == rootSection.id());
 
     diameters = child.diameters();
@@ -56,7 +56,7 @@ TEST_CASE("mitochondria", "[mitochondria]") {
                                                                neuriteSectionIds.end()),
                                std::vector<double>{3.0, 4.0, 4.0, 5.0},
                                0.01));
-    rootSection = mito.rootSections().at(1);
+    rootSection = mito.rootSections()[1];
     diameters = rootSection.diameters();
     REQUIRE(array_almost_equal(std::vector<morphio::floatType>(diameters.begin(), diameters.end()),
                                std::vector<double>{5.0, 6.0, 7.0, 8.0},
@@ -91,7 +91,7 @@ TEST_CASE("mitochondria.sections", "[mitochondria]") {
 TEST_CASE("mitochondria.iteration", "[mitochondria]") {
     const auto mito = morphio::Morphology("data/h5/v1/mitochondria.h5").mitochondria();
 
-    const auto rootSection = mito.rootSections().at(0);
+    const auto rootSection = mito.rootSections()[0];
 
     std::vector<std::size_t> res;
     std::transform(rootSection.depth_begin(),
@@ -118,5 +118,5 @@ TEST_CASE("mitochondria.iteration", "[mitochondria]") {
 TEST_CASE("mitochondria.hasSameShape", "[mitochondria]") {
     morphio::Morphology morph0 = morphio::Morphology("data/h5/v1/mitochondria.h5");
     morphio::Morphology morph1 = morphio::Morphology("data/h5/v1/mitochondria.h5");
-    REQUIRE(morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(0)));
+    REQUIRE(morph0.rootSections()[0].hasSameShape(morph1.rootSections()[0]));
 }
