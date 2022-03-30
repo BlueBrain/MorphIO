@@ -265,11 +265,11 @@ TEST_CASE("glia", "[immutableMorphology]") {
     REQUIRE(count_processes == 863);
 
     const auto section = glial.rootSections()[0];
-    REQUIRE_THAT(section.diameters().at(0), Catch::WithinAbs(2.03101, 0.001));
-    REQUIRE_THAT(section.diameters().at(1), Catch::WithinAbs(1.86179, 0.001));
+    REQUIRE_THAT(section.diameters()[0], Catch::WithinAbs(2.03101, 0.001));
+    REQUIRE_THAT(section.diameters()[1], Catch::WithinAbs(1.86179, 0.001));
 
-    REQUIRE_THAT(section.perimeters().at(0), Catch::WithinAbs(5.79899, 0.001));
-    REQUIRE_THAT(section.perimeters().at(1), Catch::WithinAbs(7.98946, 0.001));
+    REQUIRE_THAT(section.perimeters()[0], Catch::WithinAbs(5.79899, 0.001));
+    REQUIRE_THAT(section.perimeters()[1], Catch::WithinAbs(7.98946, 0.001));
 
     CHECK_THROWS_AS(morphio::GlialCell("data/simple.swc"), morphio::RawDataError);
     CHECK_THROWS_AS(morphio::GlialCell("data/h5/v1/simple.h5"), morphio::RawDataError);

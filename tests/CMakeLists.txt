@@ -25,11 +25,11 @@ set_target_properties(unittests
   CXX_EXTENSIONS NO
   )
 
-target_compile_options(unittests
-  PRIVATE
-  # don't warn about mixing floats and doubles in the tests, we since we test both for
-  # morphio::floatType = {float, double}, we have to cast floating point number
-  -Wno-implicit-float-conversion
+target_compile_options(unittests PRIVATE
+  $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:
+      # don't warn about mixing floats and doubles in the tests, we since we test both for
+      # morphio::floatType = {float, double}, we have to cast floating point number
+      -Wno-implicit-float-conversion>
   )
 
 if (MORPHIO_ENABLE_COVERAGE)
