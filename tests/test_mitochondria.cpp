@@ -10,7 +10,7 @@
 
 namespace {
 using floatTypes = std::vector<morphio::floatType>;
-}
+}  // namespace
 
 TEST_CASE("mitochondria", "[mitochondria]") {
     morphio::Morphology morph = morphio::Morphology("data/h5/v1/mitochondria.h5");

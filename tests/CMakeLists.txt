@@ -25,6 +25,13 @@ set_target_properties(unittests
   CXX_EXTENSIONS NO
   )
 
+target_compile_options(unittests
+  PRIVATE
+  # don't warn about mixing floats and doubles in the tests, we since we test both for
+  # morphio::floatType = {float, double}, we have to cast floating point number
+  -Wno-implicit-float-conversion
+  )
+
 if (MORPHIO_ENABLE_COVERAGE)
   include(CodeCoverage)
   set(COVERAGE_LCOV_EXCLUDES '/usr/*' '${PROJECT_SOURCE_DIR}/include/*' '${PROJECT_SOURCE_DIR}/3rdparty/*')
