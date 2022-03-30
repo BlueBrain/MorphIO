@@ -6,7 +6,7 @@
 #include <string>  // std::string
 #include <vector>
 
-#include <gsl/gsl>
+#include <gsl/gsl-lite.hpp>
 
 namespace morphio {
 

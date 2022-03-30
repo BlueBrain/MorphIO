@@ -34,15 +34,15 @@ TEST_CASE("hasSameShape", "[mutableMorphology]") {
         std::string path = "data/simple.asc";
         auto morph0 = morphio::mut::Morphology(path);
         auto morph1 = morphio::mut::Morphology(path);
-        REQUIRE(morph0.rootSections().at(0)->hasSameShape(*morph1.rootSections().at(0)));
-        REQUIRE(!morph0.rootSections().at(0)->hasSameShape(*morph1.rootSections().at(1)));
+        REQUIRE(morph0.rootSections()[0]->hasSameShape(*morph1.rootSections()[0]));
+        REQUIRE(!morph0.rootSections()[0]->hasSameShape(*morph1.rootSections()[1]));
     }
     {
         std::string path = "data/h5/v1/mitochondria.h5";
         auto morph0 = morphio::mut::Morphology(path);
         auto morph1 = morphio::mut::Morphology(path);
-        REQUIRE(morph0.mitochondria().rootSections().at(0)->hasSameShape(
-            *morph1.mitochondria().rootSections().at(0)));
+        REQUIRE(morph0.mitochondria().rootSections()[0]->hasSameShape(
+            *morph1.mitochondria().rootSections()[0]));
     }
 }
 
