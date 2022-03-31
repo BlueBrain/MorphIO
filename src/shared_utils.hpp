@@ -10,23 +10,19 @@ std::string valueToString(const std::array<T, N>& a) {
     std::copy(a.begin(), a.end(), std::ostream_iterator<T>(oss, ", "));
     return oss.str();
 }
+
 template <typename T>
 std::string valueToString(const T a) {
     return std::to_string(a);
 }
 
-template <typename ContainerDiameters, typename ContainerPoints>
-floatType _somaSurface(const SomaType type,
-                       const ContainerDiameters& diameters,
-                       const ContainerPoints& points) {
+inline floatType _somaSurface(const SomaType type,
+                              const range<const floatType>& diameters,
+                              const range<const Point>& points) {
     size_t size = points.size();
 
     switch (type) {
-    case SOMA_SINGLE_POINT: {
-        floatType radius = diameters[0] / 2;
-        return 4 * morphio::PI * radius * radius;
-    }
-
+    case SOMA_SINGLE_POINT:
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: {
         floatType radius = diameters[0] / 2;
         return 4 * morphio::PI * radius * radius;
@@ -54,6 +50,7 @@ floatType _somaSurface(const SomaType type,
     }
     }
 }
+
 template <typename T>
 void _appendVector(std::vector<T>& to, const std::vector<T>& from, int offset) {
     to.insert(to.end(), from.begin() + offset, from.end());

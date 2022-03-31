@@ -11,10 +11,10 @@
 #include <morphio/properties.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
-
-#include "test_helpers.h"
+#include <morphio/vector_types.h>
 
 namespace {
+
 class Files
 {
   public:
@@ -131,11 +131,20 @@ TEST_CASE("modifers", "[immutableMorphology]") {
 }
 
 
-TEST_CASE("distance", "[immutableMorphology]") {
+TEST_CASE("immutableMorphologySoma", "[immutableMorphology]") {
     Files files;
     for (const auto& morph : files.morphs()) {
         REQUIRE(morph.soma().maxDistance() == 0);
     }
+
+    const auto morph = morphio::Morphology("data/soma_three_points_cylinder.swc");
+    const auto& soma = morph.soma();
+
+    REQUIRE_THAT(soma.center()[0], Catch::WithinAbs(0, 0.001));
+    REQUIRE_THAT(soma.center()[1], Catch::WithinAbs(0, 0.001));
+    REQUIRE_THAT(soma.center()[2], Catch::WithinAbs(0, 0.001));
+
+    REQUIRE_THAT(soma.surface(), Catch::WithinAbs(1017.87604, 0.001));
 }
 
 TEST_CASE("properties", "[immutableMorphology]") {
@@ -223,16 +232,14 @@ TEST_CASE("connectivity", "[immutableMorphology]") {
     }
 }
 
-
-
 TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
     morphio::Morphology morph = morphio::Morphology("data/h5/v1/endoplasmic-reticulum.h5");
     morphio::EndoplasmicReticulum er = morph.endoplasmicReticulum();
     REQUIRE(er.sectionIndices() == std::vector<uint32_t>{1, 4, 5});
-    REQUIRE(almost_equal(er.volumes()[0], 10.5500001907, 0.001));
-    REQUIRE(almost_equal(er.volumes()[1], 47.1199989319, 0.001));
-    REQUIRE(almost_equal(er.volumes()[2], 0.8299999833, 0.001));
-    REQUIRE(array_almost_equal(er.surfaceAreas(), std::vector<double>{111.24, 87.44, 0.11}, 0.001));
+    REQUIRE_THAT(er.volumes().at(0), Catch::WithinAbs(10.5500001907, 0.01));
+    REQUIRE_THAT(er.volumes().at(1), Catch::WithinAbs(47.1199989319, 0.01));
+    REQUIRE_THAT(er.volumes().at(2), Catch::WithinAbs(0.8299999833, 0.01));
+    REQUIRE_THAT(er.surfaceAreas(), Catch::Approx(std::vector<morphio::floatType>{111.24, 87.44, 0.11}));
     REQUIRE(er.filamentCounts() == std::vector<uint32_t>{12, 42, 8});
 }
 
@@ -258,12 +265,11 @@ TEST_CASE("glia", "[immutableMorphology]") {
     REQUIRE(count_processes == 863);
 
     const auto section = glial.rootSections()[0];
-    REQUIRE(almost_equal(section.diameters()[0], 2.03101, 0.001));
-    REQUIRE(almost_equal(section.diameters()[1], 1.86179, 0.001));
+    REQUIRE_THAT(section.diameters()[0], Catch::WithinAbs(2.03101, 0.001));
+    REQUIRE_THAT(section.diameters()[1], Catch::WithinAbs(1.86179, 0.001));
 
-    REQUIRE(almost_equal(section.perimeters()[0], 5.79899, 0.001));
-    REQUIRE(almost_equal(section.perimeters()[1], 7.98946, 0.001));
-
+    REQUIRE_THAT(section.perimeters()[0], Catch::WithinAbs(5.79899, 0.001));
+    REQUIRE_THAT(section.perimeters()[1], Catch::WithinAbs(7.98946, 0.001));
 
     CHECK_THROWS_AS(morphio::GlialCell("data/simple.swc"), morphio::RawDataError);
     CHECK_THROWS_AS(morphio::GlialCell("data/h5/v1/simple.h5"), morphio::RawDataError);

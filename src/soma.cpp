@@ -29,7 +29,7 @@ floatType Soma::volume() const {
 }
 
 floatType Soma::surface() const {
-    return _somaSurface<range<const floatType>, range<const Point>>(type(), diameters(), points());
+    return _somaSurface(type(), diameters(), points());
 }
 
 floatType Soma::maxDistance() const {
