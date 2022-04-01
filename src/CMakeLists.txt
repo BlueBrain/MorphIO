@@ -18,6 +18,7 @@ set(MORPHIO_SOURCES
     mut/section.cpp
     mut/soma.cpp
     mut/writers.cpp
+    point_utils.cpp
     properties.cpp
     readers/morphologyASC.cpp
     readers/morphologyHDF5.cpp
@@ -28,7 +29,6 @@ set(MORPHIO_SOURCES
     vasc/properties.cpp
     vasc/section.cpp
     vasc/vasculature.cpp
-    vector_utils.cpp
     version.cpp
     )
 

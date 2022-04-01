@@ -2,6 +2,7 @@
 #include <morphio/soma.h>
 #include <morphio/vector_types.h>
 
+#include "point_utils.h"
 #include "shared_utils.hpp"
 
 namespace morphio {

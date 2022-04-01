@@ -4,6 +4,7 @@
 #include <morphio/properties.h>
 #include <morphio/vector_types.h>
 
+#include "point_utils.h"
 #include "shared_utils.hpp"
 
 
@@ -129,7 +130,7 @@ bool compare(const morphio::range<T>& vec1,
             printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
             printError(Warning::UNDEFINED,
                        valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
-            printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
+            printError(Warning::UNDEFINED, valueToString(subtract(vec2[i], vec1[i])));
             return false;
         }
     }
@@ -151,12 +152,12 @@ bool compare(const morphio::range<const morphio::Point>& vec1,
     }
 
     for (unsigned int i = 0; i < vec1.size(); ++i) {
-        if (std::fabs(distance(vec1[i], vec2[i])) > morphio::epsilon) {
+        if (std::fabs(euclidean_distance(vec1[i], vec2[i])) > morphio::epsilon) {
             if (logLevel > LogLevel::ERROR) {
                 printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 printError(Warning::UNDEFINED,
                            valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
-                printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
+                printError(Warning::UNDEFINED, valueToString(subtract(vec2[i], vec1[i])));
             }
             return false;
         }
