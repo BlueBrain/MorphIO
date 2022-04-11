@@ -187,16 +187,16 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
                            "': incorrect number of columns for points");
     }
 
-    std::vector<std::array<floatType, pointColumns>> hd5fData(numberPoints);
+    std::vector<std::array<floatType, pointColumns>> hdf5Data(numberPoints);
 
-    if (!hd5fData.empty()) {
-        pointsDataSet.read(hd5fData.front().data());
+    if (!hdf5Data.empty()) {
+        pointsDataSet.read(hdf5Data.front().data());
     }
 
     const bool hasSoma = firstSectionOffset != 0;
     const bool hasNeurites = static_cast<size_t>(firstSectionOffset) < numberPoints;
     const size_t somaPointCount = hasNeurites ? static_cast<size_t>(firstSectionOffset)
-                                              : hd5fData.size();
+                                              : hdf5Data.size();
 
     auto& somaPoints = _properties._somaLevel._points;
     auto& somaDiameters = _properties._somaLevel._diameters;
@@ -206,7 +206,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
         somaDiameters.resize(somaPointCount);
 
         for (size_t i = 0; i < somaPointCount; ++i) {
-            const auto& p = hd5fData[i];
+            const auto& p = hdf5Data[i];
             somaPoints[i] = {p[0], p[1], p[2]};
             somaDiameters[i] = p[3];
         }
@@ -216,11 +216,11 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     auto& diameters = _properties.get_mut<Property::Diameter>();
 
     if (hasNeurites) {
-        const size_t size = (hd5fData.size() - somaPointCount);
+        const size_t size = (hdf5Data.size() - somaPointCount);
         points.resize(size);
         diameters.resize(size);
-        for (size_t i = somaPointCount; i < hd5fData.size(); ++i) {
-            const auto& p = hd5fData[i];
+        for (size_t i = somaPointCount; i < hdf5Data.size(); ++i) {
+            const auto& p = hdf5Data[i];
             const size_t section = i - somaPointCount;
             points[section] = {p[0], p[1], p[2]};
             diameters[section] = p[3];
