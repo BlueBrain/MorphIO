@@ -19,7 +19,7 @@ namespace {
 struct Header {
     Header()
         : token(static_cast<Token>(+Token::STRING))
-        , parent_id(-1) {}
+        , parent_id(-1) { }
     Token token;
     std::string label;
     int32_t parent_id;
@@ -66,15 +66,19 @@ class NeurolucidaParser
         : uri_(uri)
         , lex_(uri, false)
         , debugInfo_(uri)
-        , err_(uri) {}
+        , err_(uri) { }
 
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
     morphio::mut::Morphology& parse() {
-        std::ifstream ifs(uri_);
-        std::string input((std::istreambuf_iterator<char>(ifs)),
-                          (std::istreambuf_iterator<char>()));
+        std::ifstream ifs(uri_, std::ios::ate);
+        const auto size = ifs.tellg();
+        ifs.seekg(0);
+        std::string input;
+        input.resize(static_cast<size_t>(size));
+        ifs.read(&input[0], size);
+        ifs.close();
 
         lex_.start_parse(input);
 
