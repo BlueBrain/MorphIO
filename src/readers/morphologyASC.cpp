@@ -19,7 +19,7 @@ namespace {
 struct Header {
     Header()
         : token(static_cast<Token>(+Token::STRING))
-        , parent_id(-1) { }
+        , parent_id(-1) {}
     Token token;
     std::string label;
     int32_t parent_id;
@@ -66,7 +66,7 @@ class NeurolucidaParser
         : uri_(uri)
         , lex_(uri, false)
         , debugInfo_(uri)
-        , err_(uri) { }
+        , err_(uri) {}
 
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
