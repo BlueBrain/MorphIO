@@ -22,8 +22,7 @@ function create_venv()
 
 # in tree install
 create_venv
-# https://github.com/pypa/pip/issues/7555
-pip install --use-feature=in-tree-build .
+pip install .
 pip install -r tests/requirement_tests.txt
 
 CURRENT=$(pwd)
