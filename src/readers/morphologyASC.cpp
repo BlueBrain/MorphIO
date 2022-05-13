@@ -72,6 +72,11 @@ class NeurolucidaParser
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
     morphio::mut::Morphology& parse() {
+#ifdef _WIN32
+        std::ifstream ifs(uri_);
+        std::string input((std::istreambuf_iterator<char>(ifs)),
+                          (std::istreambuf_iterator<char>()));
+#else
         std::ifstream ifs(uri_, std::ios::ate);
         const auto size = ifs.tellg();
         ifs.seekg(0);
@@ -79,6 +84,7 @@ class NeurolucidaParser
         input.resize(static_cast<size_t>(size));
         ifs.read(&input[0], size);
         ifs.close();
+#endif
 
         lex_.start_parse(input);
 
