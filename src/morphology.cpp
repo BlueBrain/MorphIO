@@ -51,14 +51,14 @@ morphio::SomaType getSomaType(long unsigned int num_soma_points) {
     return morphio::SOMA_SIMPLE_CONTOUR;
 }
 
-morphio::Property::Properties loadURI(const std::string& source, unsigned int options) {
+morphio::Property::Properties loadFile(const std::string& source, unsigned int options) {
     const size_t pos = source.find_last_of('.');
     if (pos == std::string::npos) {
         throw(morphio::UnknownFileType("File has no extension"));
     }
 
     // Cross-platform check of file existance
-    std::ifstream file(source.c_str());
+    std::ifstream file(source);
     if (!file) {
         throw(morphio::RawDataError("File: " + source + " does not exist."));
     }
@@ -76,6 +76,20 @@ morphio::Property::Properties loadURI(const std::string& source, unsigned int op
     throw(morphio::UnknownFileType("Unhandled file type: only SWC, ASC and H5 are supported"));
 }
 
+
+/*
+morphio::Property::Properties loadStream(const std::istream& stream,
+                                         const std::string& extension,
+                                         unsigned int options) {
+    if (extension == ".asc" || extension == ".ASC") {
+        return morphio::readers::asc::load(stream, options);
+    } else if (extension == ".swc" || extension == ".SWC") {
+        //return morphio::readers::swc::load(stream, options);
+    }
+
+    throw(morphio::UnknownFileType("Unhandled file type: only SWC and ASC are supported"));
+}
+*/
 
 }  // namespace
 
@@ -103,13 +117,17 @@ Morphology::Morphology(const HighFive::Group& group, unsigned int options)
     : Morphology(readers::h5::load(group), options) {}
 
 Morphology::Morphology(const std::string& source, unsigned int options)
-    : Morphology(loadURI(source, options), options) {}
+    : Morphology(loadFile(source, options), options) {}
 
 Morphology::Morphology(const mut::Morphology& morphology) {
     properties_ = std::make_shared<Property::Properties>(morphology.buildReadOnly());
     buildChildren(properties_);
 }
 
+/*
+Morphology::Morphology(const std::istream& stream, const std::string& extension, unsigned int options)
+    : Morphology(loadStream(stream, extension, options), options) {}
+*/
 Soma Morphology::soma() const {
     return Soma(properties_);
 }

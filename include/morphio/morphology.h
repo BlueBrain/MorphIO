@@ -42,8 +42,12 @@ class Morphology
 
     /** Constructor from an already parsed file */
     explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+
     /** Constructor from an instance of morphio::mut::Morphology */
     explicit Morphology(const mut::Morphology&);
+
+    /**  */
+    //explicit Morphology(const std::istream& stream, const std::string& extension);
 
     /** Return the soma object */
     Soma soma() const;

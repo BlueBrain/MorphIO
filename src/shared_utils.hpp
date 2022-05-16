@@ -68,4 +68,11 @@ std::vector<typename T::Type> copySpan(const std::vector<typename T::Type>& data
             data.begin() + static_cast<long int>(range.second)};
 }
 
+inline std::string readFile(const std::string& path) {
+    std::ifstream ifs(path);
+    std::ostringstream oss;
+    oss << ifs.rdbuf();
+    return oss.str();
+}
+
 }  // namespace morphio
