@@ -1,9 +1,9 @@
 #include "morphologySWC.h"
 
 #include <cstdint>  // uint32_t
-#include <fstream>
 #include <map>     // std::map
 #include <memory>  // std::shared_ptr
+#include <sstream>  // std::stringstream
 #include <string>  // std::string
 #include <vector>  // std::vector
 
@@ -34,11 +34,11 @@ const int SWC_UNDEFINED_PARENT = -1;
 class SWCBuilder
 {
   public:
-    explicit SWCBuilder(const std::string& _uri)
-        : uri(_uri)
-        , err(_uri)
-        , debugInfo(_uri) {
-        _readSamples();
+    explicit SWCBuilder(const std::string& path, const std::string& contents)
+        : uri(path)
+        , err(path)
+        , debugInfo(path) {
+        _readSamples(contents);
 
         for (const auto& sample_pair : samples) {
             const auto& sample = sample_pair.second;
@@ -48,14 +48,11 @@ class SWCBuilder
         checkSoma();
     }
 
-    void _readSamples() {
-        std::ifstream file(uri.c_str());
-        if (file.fail())
-            throw morphio::RawDataError(err.ERROR_OPENING_FILE());
-
+    void _readSamples(const std::string& contents) {
+        std::stringstream stream{contents};
         unsigned int lineNumber = 0;
         std::string line;
-        while (!std::getline(file, line).fail()) {
+        while (!std::getline(stream, line).fail()) {
             ++lineNumber;
 
             if (line.empty() || _ignoreLine(line))
@@ -276,7 +273,7 @@ class SWCBuilder
         }
     }
 
-    Property::Properties _buildProperties(unsigned int options) {
+    Property::Properties buildProperties(unsigned int options) {
         // The process might occasionally creates empty section before
         // filling them so the warning is ignored
         bool originalIsIgnored = err.isIgnored(morphio::Warning::APPENDING_EMPTY_SECTION);
@@ -369,8 +366,11 @@ class SWCBuilder
     DebugInfo debugInfo;
 };
 
-Property::Properties load(const std::string& uri, unsigned int options) {
-    auto properties = SWCBuilder(uri)._buildProperties(options);
+Property::Properties load(const std::string& path,
+                          const std::string& contents,
+                          unsigned int options) {
+    auto properties = SWCBuilder(path, contents).buildProperties(options);
+
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"swc", 1, 0};
     return properties;

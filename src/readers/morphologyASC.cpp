@@ -1,7 +1,5 @@
 #include "morphologyASC.h"
 
-#include <fstream>
-
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 
@@ -69,15 +67,9 @@ class NeurolucidaParser
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
-    morphio::mut::Morphology& parse() {
-        std::ifstream ifs(uri_);
-        std::string input((std::istreambuf_iterator<char>(ifs)),
-                          (std::istreambuf_iterator<char>()));
-
+    morphio::mut::Morphology& parse(const std::string& input) {
         lex_.start_parse(input);
-
         parse_root_sexps();
-
         return nb_;
     }
 
@@ -376,10 +368,12 @@ class NeurolucidaParser
 
 }  // namespace
 
-Property::Properties load(const std::string& uri, unsigned int options) {
-    NeurolucidaParser parser(uri);
+Property::Properties load(const std::string& path,
+                          const std::string& contents,
+                          unsigned int options) {
+    NeurolucidaParser parser(path);
 
-    morphio::mut::Morphology& nb_ = parser.parse();
+    morphio::mut::Morphology& nb_ = parser.parse(contents);
     nb_.applyModifiers(options);
 
     Property::Properties properties = nb_.buildReadOnly();
