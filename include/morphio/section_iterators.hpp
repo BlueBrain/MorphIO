@@ -66,6 +66,7 @@ class breadth_iterator_t
     inline breadth_iterator_t(const breadth_iterator_t& other);
 
     inline SectionT operator*() const;
+    inline SectionT const* operator->() const;
 
     inline breadth_iterator_t& operator++();
     inline breadth_iterator_t operator++(int);
@@ -94,6 +95,7 @@ class depth_iterator_t
     inline depth_iterator_t(const depth_iterator_t& other);
 
     inline SectionT operator*() const;
+    inline SectionT const* operator->() const;
 
     inline depth_iterator_t& operator++();
     inline depth_iterator_t operator++(int);
@@ -121,6 +123,7 @@ class upstream_iterator_t
     inline ~upstream_iterator_t();
 
     inline SectionT operator*() const;
+    inline SectionT const* operator->() const;
 
     inline upstream_iterator_t& operator++();
     inline upstream_iterator_t operator++(int);
@@ -163,6 +166,11 @@ inline breadth_iterator_t<SectionT, MorphologyT>::breadth_iterator_t(
 template <typename SectionT, typename MorphologyT>
 inline SectionT breadth_iterator_t<SectionT, MorphologyT>::operator*() const {
     return deque_.front();
+}
+
+template <typename SectionT, typename MorphologyT>
+inline SectionT const* breadth_iterator_t<SectionT, MorphologyT>::operator->() const {
+    return &deque_.front();
 }
 
 template <typename SectionT, typename MorphologyT>
@@ -219,6 +227,11 @@ inline depth_iterator_t<SectionT, MorphologyT>::depth_iterator_t(const depth_ite
 template <typename SectionT, typename MorphologyT>
 inline SectionT depth_iterator_t<SectionT, MorphologyT>::operator*() const {
     return deque_.front();
+}
+
+template <typename SectionT, typename MorphologyT>
+inline SectionT const* depth_iterator_t<SectionT, MorphologyT>::operator->() const {
+    return &deque_.front();
 }
 
 template <typename SectionT, typename MorphologyT>
@@ -284,6 +297,11 @@ inline upstream_iterator_t<SectionT>::~upstream_iterator_t() {
 template <typename SectionT>
 inline SectionT upstream_iterator_t<SectionT>::operator*() const {
     return current;
+}
+
+template <typename SectionT>
+inline SectionT const* upstream_iterator_t<SectionT>::operator->() const {
+    return &current;
 }
 
 template <typename SectionT>

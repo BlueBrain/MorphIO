@@ -179,24 +179,24 @@ TEST_CASE("iter", "[immutableMorphology]") {
     auto rootSection = iterMorph.rootSections()[0];
     size_t count = 0;
     for (auto iter = rootSection.depth_begin(); iter != rootSection.depth_end(); iter++) {
-        REQUIRE((*iter).id() == count++);
+        REQUIRE(iter->id() == count++);
     }
     std::vector<size_t> expectedRootSectionId = {0, 1, 4, 2, 3, 5, 6};
     count = 0;
     for (auto iter = rootSection.breadth_begin(); iter != rootSection.breadth_end(); iter++) {
-        REQUIRE((*iter).id() == expectedRootSectionId[count++]);
+        REQUIRE(iter->id() == expectedRootSectionId[count++]);
     }
     std::vector<size_t> expectedMorphSectionId = {0, 7, 1, 4, 8, 9, 2, 3, 5, 6};
     count = 0;
     for (auto iter = iterMorph.breadth_begin(); iter != iterMorph.breadth_end(); iter++) {
-        REQUIRE((*iter).id() == expectedMorphSectionId[count++]);
+        REQUIRE(iter->id() == expectedMorphSectionId[count++]);
     }
 
     Files files;
     for (const auto& morph : files.morphs()) {
         count = 0;
         for (auto iter = morph.depth_begin(); iter != morph.depth_end(); iter++) {
-            REQUIRE((*iter).id() == count++);
+            REQUIRE(iter->id() == count++);
         }
         auto testedSection = morph.rootSections()[0].children()[0];
         std::vector<morphio::Point> expectedPoints = {{0., 5., 0.},
@@ -206,7 +206,7 @@ TEST_CASE("iter", "[immutableMorphology]") {
         count = 0;
         for (auto iter = testedSection.upstream_begin(); iter != testedSection.upstream_end();
              iter++) {
-            auto points = (*iter).points();
+            auto points = iter->points();
             for (auto point : points) {
                 REQUIRE(point == expectedPoints[count++]);
             }
