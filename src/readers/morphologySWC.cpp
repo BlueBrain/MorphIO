@@ -1,11 +1,11 @@
 #include "morphologySWC.h"
 
-#include <cstdint>  // uint32_t
-#include <map>     // std::map
-#include <memory>  // std::shared_ptr
-#include <sstream>  // std::stringstream
-#include <string>  // std::string
-#include <vector>  // std::vector
+#include <cstdint>        // uint32_t
+#include <memory>         // std::shared_ptr
+#include <sstream>        // std::stringstream
+#include <string>         // std::string
+#include <unordered_map>  // std::unordered_map
+#include <vector>         // std::vector
 
 #include <morphio/errorMessages.h>
 #include <morphio/mut/morphology.h>
@@ -351,15 +351,15 @@ class SWCBuilder
 
   private:
     // Dictionary: SWC Id of the last point of a section to morphio::mut::Section ID
-    std::map<uint32_t, uint32_t> swcIdToSectionId;
+    std::unordered_map<uint32_t, uint32_t> swcIdToSectionId;
 
     // Neurite that do not have parent ID = 1, allowed for soma contour, not
     // 3-pts soma
     std::vector<Sample> neurite_wrong_root;
 
     int lastSomaPoint = -1;
-    std::map<int32_t, std::vector<uint32_t>> children;
-    std::map<uint32_t, Sample> samples;
+    std::unordered_map<int32_t, std::vector<uint32_t>> children;
+    std::unordered_map<uint32_t, Sample> samples;
     mut::Morphology morph;
     std::string uri;
     ErrorMessages err;
