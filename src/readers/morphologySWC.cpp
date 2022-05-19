@@ -36,8 +36,7 @@ class SWCBuilder
   public:
     explicit SWCBuilder(const std::string& path, const std::string& contents)
         : uri(path)
-        , err(path)
-        , debugInfo(path) {
+        , err(path) {
         _readSamples(contents);
 
         for (const auto& sample_pair : samples) {
@@ -59,6 +58,7 @@ class SWCBuilder
                 continue;
 
             const auto& sample = Sample(line.data(), lineNumber);
+
             if (!sample.valid)
                 throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
 
@@ -181,7 +181,6 @@ class SWCBuilder
 
     template <typename T>
     void appendSample(const std::shared_ptr<T>& somaOrSection, const Sample& sample) {
-        debugInfo.setLineNumber(sample.id, sample.lineNumber);
         somaOrSection->points().push_back(sample.point);
         somaOrSection->diameters().push_back(sample.diameter);
     }
@@ -363,7 +362,6 @@ class SWCBuilder
     mut::Morphology morph;
     std::string uri;
     ErrorMessages err;
-    DebugInfo debugInfo;
 };
 
 Property::Properties load(const std::string& path,
