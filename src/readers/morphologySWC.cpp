@@ -19,6 +19,32 @@ bool _ignoreLine(const std::string& line) {
     return pos == std::string::npos || line[pos] == '#';
 }
 
+morphio::readers::Sample readSample(const char* line, unsigned int lineNumber_) {
+#ifdef MORPHIO_USE_DOUBLE
+    const char *const format = "%20u%20d%20lg%20lg%20lg%20lg%20d";
+#else
+    const char *const format = "%20u%20d%20f%20f%20f%20f%20d";
+#endif
+
+    morphio::floatType radius = -1.;
+    int int_type = -1;
+    morphio::readers::Sample sample;
+    sample.valid = sscanf(line,
+                          format,
+                          &sample.id,
+                          &int_type,
+                          &sample.point[0],
+                          &sample.point[1],
+                          &sample.point[2],
+                          &radius,
+                          &sample.parentId) == 7;
+
+    sample.type = static_cast<morphio::SectionType>(int_type);
+    sample.diameter = radius * 2;  // The point array stores diameters.
+    sample.lineNumber = lineNumber_;
+    return sample;
+}
+
 }  // unnamed namespace
 
 namespace morphio {
@@ -34,16 +60,8 @@ const int SWC_UNDEFINED_PARENT = -1;
 class SWCBuilder
 {
   public:
-    explicit SWCBuilder(const std::string& path, const std::string& contents)
+    explicit SWCBuilder(const std::string& path)
         : err(path) {
-        _readSamples(contents);
-
-        for (const auto& sample_pair : samples) {
-            const auto& sample = sample_pair.second;
-            raiseIfNonConform(sample);
-        }
-
-        checkSoma();
     }
 
     void _readSamples(const std::string& contents) {
@@ -57,7 +75,8 @@ class SWCBuilder
                 continue;
             }
 
-            const auto& sample = Sample(line.data(), lineNumber);
+            const auto& sample = readSample(line.data(), lineNumber);
+
             if (!sample.valid) {
                 throw RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
             }
@@ -287,7 +306,16 @@ class SWCBuilder
         }
     }
 
-    Property::Properties buildProperties(unsigned int options) {
+    Property::Properties buildProperties(const std::string& contents, unsigned int options) {
+        _readSamples(contents);
+
+        for (const auto& sample_pair : samples) {
+            const auto& sample = sample_pair.second;
+            raiseIfNonConform(sample);
+        }
+
+        checkSoma();
+
         // The process might occasionally creates empty section before
         // filling them so the warning is ignored
         bool originalIsIgnored = err.isIgnored(morphio::Warning::APPENDING_EMPTY_SECTION);
@@ -382,7 +410,7 @@ class SWCBuilder
 Property::Properties load(const std::string& path,
                           const std::string& contents,
                           unsigned int options) {
-    auto properties = SWCBuilder(path, contents).buildProperties(options);
+    auto properties = SWCBuilder(path).buildProperties(contents, options);
 
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"swc", 1, 0};
