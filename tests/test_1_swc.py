@@ -12,6 +12,26 @@ from utils import (assert_swc_exception, assert_string_equal, captured_output,
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
+def test_build_from_string():
+    contents =('''1 1 0 4 0 3.0 -1
+                  2 3 0 0 2 0.5 1
+                  3 3 0 0 3 0.5 2
+                  4 3 0 0 4 0.5 3
+                  5 3 0 0 5 0.5 4''')
+    n = Morphology(contents, "swc")
+    assert_array_equal(n.soma.points, [[0, 4, 0]])
+    assert_array_equal(n.soma.diameters, [6.0])
+    assert len(n.root_sections) == 1
+    assert n.root_sections[0].id == 0
+    assert len(n.root_sections) == 1
+    assert_array_equal(n.root_sections[0].points,
+                       np.array([[0, 0, 2],
+                                 [0, 0, 3],
+                                 [0, 0, 4],
+                                 [0, 0, 5]]))
+    assert_array_equal(n.section_offsets, [0, 4])
+
+
 def test_read_single_neurite(tmp_path):
     '''Test reading a simple neuron consisting of a point soma
     and a single branch neurite.'''

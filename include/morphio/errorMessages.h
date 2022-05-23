@@ -68,32 +68,9 @@ static std::set<Warning> _ignoredWarnings;
 struct Sample {
     Sample() = default;
 
-    explicit Sample(const char* line, unsigned int lineNumber_)
-        : lineNumber(lineNumber_) {
-        floatType radius = -1.;
-        int int_type = -1;
-#ifdef MORPHIO_USE_DOUBLE
-        const auto format = "%20u%20d%20lg%20lg%20lg%20lg%20d";
-#else
-        const auto format = "%20u%20d%20f%20f%20f%20f%20d";
-#endif
-        valid = sscanf(line,
-                       format,
-                       &id,
-                       &int_type,
-                       &point[0],
-                       &point[1],
-                       &point[2],
-                       &radius,
-                       &parentId) == 7;
-
-        type = static_cast<SectionType>(int_type);
-        diameter = radius * 2;  // The point array stores diameters.
-    }
-
     floatType diameter = -1.;
     bool valid = false;
-    Point point;
+    Point point{};
     SectionType type = SECTION_UNDEFINED;
     int parentId = -1;
     unsigned int id = 0;

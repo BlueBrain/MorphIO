@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cctype>  // std::tolower
+#include <iterator>  // std::back_inserter
 #include <sstream>
 #include <string>
 

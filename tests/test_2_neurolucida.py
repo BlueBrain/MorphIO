@@ -673,3 +673,11 @@ def test_marker_with_string():
                                                      dtype=np.float32))
 def test_version():
     assert_array_equal(Morphology(DATA_DIR / 'simple.asc').version, ('asc', 1, 0))
+
+def test_load_from_string(tmp_path):
+    SIMPLE = Morphology(DATA_DIR / 'simple.asc')
+    with open(DATA_DIR / 'simple.asc', 'r') as fd:
+        contents = fd.read()
+    from_string = Morphology(contents, "asc")
+
+    assert_array_equal(from_string.points, SIMPLE.points)

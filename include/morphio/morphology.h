@@ -38,12 +38,18 @@ class Morphology
         Example:
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const std::string& path, unsigned int options = NO_MODIFIER);
 
     /** Constructor from an already parsed file */
     explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+
     /** Constructor from an instance of morphio::mut::Morphology */
     explicit Morphology(const mut::Morphology&);
+
+    /** Load a morphology from a string */
+    explicit Morphology(const std::string& contents,
+                        const std::string& extension,
+                        unsigned int options = NO_MODIFIER);
 
     /** Return the soma object */
     Soma soma() const;
