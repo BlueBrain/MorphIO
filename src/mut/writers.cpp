@@ -187,13 +187,7 @@ static void _write_asc_points(std::ofstream& myfile,
 static void _write_asc_section(std::ofstream& myfile,
                                const Morphology& morpho,
                                const std::shared_ptr<Section>& section,
-                               const std::map<morphio::SectionType, std::string>& header,
                                size_t indentLevel) {
-    // allowed types are only the ones available in the header
-    if (header.count(section->type()) == 0) {
-        throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
-    }
-
     std::string indent(indentLevel, ' ');
     _write_asc_points(myfile, section->points(), section->diameters(), indentLevel);
 
@@ -202,7 +196,7 @@ static void _write_asc_section(std::ofstream& myfile,
         size_t nChildren = children.size();
         for (unsigned int i = 0; i < nChildren; ++i) {
             myfile << indent << (i == 0 ? "(\n" : "|\n");
-            _write_asc_section(myfile, morpho, children[i], header, indentLevel + 2);
+            _write_asc_section(myfile, morpho, children[i], indentLevel + 2);
         }
         myfile << indent << ")\n";
     }
@@ -210,10 +204,14 @@ static void _write_asc_section(std::ofstream& myfile,
 
 void asc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
-    if (soma->points().empty() && morphology.rootSections().empty()) {
-        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
-        return;
+    if (soma->points().empty()) {
+        if (morphology.rootSections().empty()) {
+            printError(Warning::WRITE_EMPTY_MORPHOLOGY,
+                       readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+            return;
+        } else {
+            printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+        }
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
@@ -222,34 +220,29 @@ void asc(const Morphology& morphology, const std::string& filename) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
 
-    std::ofstream myfile(filename);
-
     if (!morphology.mitochondria().rootSections().empty()) {
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                    readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
     }
 
-    std::map<morphio::SectionType, std::string> header;
-    header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
-    header[SECTION_DENDRITE] = "( (Color Red)\n  (Dendrite)\n";
-    header[SECTION_APICAL_DENDRITE] = "( (Color Red)\n  (Apical)\n";
+    std::ofstream myfile(filename);
 
-    if (!soma->points().empty()) {
-        myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
-        _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
-        myfile << ")\n\n";
-    } else {
-        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
-    }
+    myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
+    _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
+    myfile << ")\n\n";
 
     for (const std::shared_ptr<Section>& section : morphology.rootSections()) {
-        // allowed types are only the ones available in the header
-        if (header.count(section->type()) == 0) {
-            throw WriterError(
-                readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
+        const auto type = section->type();
+        if (type == SECTION_AXON) {
+            myfile << "( (Color Cyan)\n  (Axon)\n";
+        } else if (type == SECTION_DENDRITE) {
+            myfile << "( (Color Red)\n  (Dendrite)\n";
+        } else if (type == SECTION_APICAL_DENDRITE) {
+            myfile << "( (Color Red)\n  (Apical)\n";
+        } else {
+            throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(type));
         }
-        myfile << header.at(section->type());
-        _write_asc_section(myfile, morphology, section, header, 2);
+        _write_asc_section(myfile, morphology, section, 2);
         myfile << ")\n\n";
     }
 
