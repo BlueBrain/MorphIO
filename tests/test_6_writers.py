@@ -57,26 +57,30 @@ def test_write_basic():
                                      [2, 4]))
 
     axon = axon.append_section(PointLevel([[0, -4, 0],
-                                             [-5, -4, 0]],
-                                            [2, 4]))
+                                           [-5, -4, 0]],
+                                          [2, 4]))
 
     with TemporaryDirectory('test_write_basic') as tmp_folder:
-        morpho.write(Path(tmp_folder, "test_write.asc"))
-        morpho.write(Path(tmp_folder, "test_write.swc"))
-        h5_out = Path(tmp_folder, "test_write.h5")
-        morpho.write(h5_out)
-
         expected = [[0., 0., 0.], [0., 5., 0.], [0., 5., 0.], [-5., 5., 0.],
                     [0., 5., 0.], [6., 5., 0.], [0., 0., 0.], [0., -4., 0.],
                     [0., -4., 0.], [6., -4., 0.], [0., -4., 0.], [-5., -4., 0.]]
-        assert_array_equal(ImmutMorphology(Path(tmp_folder, "test_write.asc")).points, expected)
-        assert_array_equal(ImmutMorphology(Path(tmp_folder, "test_write.swc")).points, expected)
-        h5_morph = ImmutMorphology(Path(tmp_folder, "test_write.h5"))
-        assert_array_equal(h5_morph.points, expected)
-        assert h5_morph.version == ('h5', 1, 3)
+
+        for ext in ("asc", "swc", "h5"):
+            morpho.write(Path(tmp_folder, f"test_write.{ext}"))
+            loaded_morph = ImmutMorphology(Path(tmp_folder, f"test_write.{ext}"))
+            assert_array_equal(loaded_morph.points, expected)
+
+            assert_array_equal(loaded_morph.soma.points, [[0, 0, 0]])
+            assert_array_equal(loaded_morph.soma.diameters, [2])
+
+            assert len(loaded_morph.root_sections) == 2
+            assert [SectionType.basal_dendrite, SectionType.axon] == \
+                [s.type for s in loaded_morph.root_sections]
 
         import h5py
-        with h5py.File(h5_out, 'r') as h5_file:
+        h5_path = Path(tmp_folder, "test_write.h5")
+        assert ImmutMorphology(h5_path).version == ('h5', 1, 3)
+        with h5py.File(h5_path, 'r') as h5_file:
             assert '/perimeters' not in h5_file.keys()
 
 
@@ -357,7 +361,3 @@ def test_write_custom_property__throws():
     with TemporaryDirectory('test_write_basic') as tmp_folder:
         with pytest.raises(WriterError):
             morpho.write(Path(tmp_folder, "test_write.asc"))
-
-
-
-
