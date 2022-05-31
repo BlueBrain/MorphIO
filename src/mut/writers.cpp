@@ -72,7 +72,6 @@ void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma) {
     }
 }
 
-
 void raiseIfUnifurcations(const morphio::mut::Morphology& morph) {
     for (auto it = morph.depth_begin(); it != morph.depth_end(); ++it) {
         std::shared_ptr<morphio::mut::Section> section_ = *it;
@@ -89,6 +88,34 @@ void raiseIfUnifurcations(const morphio::mut::Morphology& morph) {
             throw morphio::WriterError(
                 morphio::readers::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(parentId));
         }
+    }
+}
+
+void _write_asc_points(std::ofstream& myfile,
+                       const morphio::Points& points,
+                       const std::vector<morphio::floatType>& diameters,
+                       size_t indentLevel) {
+    for (unsigned int i = 0; i < points.size(); ++i) {
+        myfile << std::fixed << std::setprecision(FLOAT_PRECISION_PRINT)
+               << std::string(indentLevel, ' ') << '(' << points[i][0] << ' ' << points[i][1] << ' '
+               << points[i][2] << ' ' << diameters[i] << ")\n";
+    }
+}
+
+void _write_asc_section(std::ofstream& myfile,
+                        const std::shared_ptr<morphio::mut::Section>& section,
+                        size_t indentLevel) {
+    std::string indent(indentLevel, ' ');
+    _write_asc_points(myfile, section->points(), section->diameters(), indentLevel);
+
+    if (!section->children().empty()) {
+        auto children = section->children();
+        size_t nChildren = children.size();
+        for (unsigned int i = 0; i < nChildren; ++i) {
+            myfile << indent << (i == 0 ? "(\n" : "|\n");
+            _write_asc_section(myfile, children[i], indentLevel + 2);
+        }
+        myfile << indent << ")\n";
     }
 }
 }  // anonymous namespace
@@ -173,35 +200,6 @@ void swc(const Morphology& morphology, const std::string& filename) {
     }
 }
 
-static void _write_asc_points(std::ofstream& myfile,
-                              const Points& points,
-                              const std::vector<morphio::floatType>& diameters,
-                              size_t indentLevel) {
-    for (unsigned int i = 0; i < points.size(); ++i) {
-        myfile << std::fixed << std::setprecision(FLOAT_PRECISION_PRINT)
-               << std::string(indentLevel, ' ') << '(' << points[i][0] << ' ' << points[i][1] << ' '
-               << points[i][2] << ' ' << diameters[i] << ")\n";
-    }
-}
-
-static void _write_asc_section(std::ofstream& myfile,
-                               const Morphology& morpho,
-                               const std::shared_ptr<Section>& section,
-                               size_t indentLevel) {
-    std::string indent(indentLevel, ' ');
-    _write_asc_points(myfile, section->points(), section->diameters(), indentLevel);
-
-    if (!section->children().empty()) {
-        auto children = section->children();
-        size_t nChildren = children.size();
-        for (unsigned int i = 0; i < nChildren; ++i) {
-            myfile << indent << (i == 0 ? "(\n" : "|\n");
-            _write_asc_section(myfile, morpho, children[i], indentLevel + 2);
-        }
-        myfile << indent << ")\n";
-    }
-}
-
 void asc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     if (soma->points().empty()) {
@@ -242,7 +240,7 @@ void asc(const Morphology& morphology, const std::string& filename) {
         } else {
             throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(type));
         }
-        _write_asc_section(myfile, morphology, section, 2);
+        _write_asc_section(myfile, section, 2);
         myfile << ")\n\n";
     }
 
