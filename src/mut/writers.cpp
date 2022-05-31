@@ -141,6 +141,11 @@ void swc(const Morphology& morphology, const std::string& filename) {
 
     raiseIfUnifurcations(morphology);
 
+    if (!morphology.mitochondria().rootSections().empty()) {
+        printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
+                   readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+    }
+
     std::ofstream myfile(filename);
     using std::setw;
 
@@ -150,11 +155,6 @@ void swc(const Morphology& morphology, const std::string& filename) {
 
     int segmentIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
-
-    if (!morphology.mitochondria().rootSections().empty()) {
-        printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-                   readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
-    }
 
     const auto& soma_diameters = soma->diameters();
 
@@ -247,40 +247,22 @@ void asc(const Morphology& morphology, const std::string& filename) {
     myfile << "; " << version_string() << '\n';
 }
 
-template <typename T>
-HighFive::Attribute write_attribute(HighFive::File& file,
+template <typename H5Type, typename T>
+HighFive::Attribute write_attribute(H5Type& file,
                                     const std::string& name,
                                     const T& version) {
-    HighFive::Attribute a_version =
-        file.createAttribute<typename T::value_type>(name, HighFive::DataSpace::From(version));
-    a_version.write(version);
-    return a_version;
+    HighFive::Attribute attribute =
+        file.template createAttribute<typename T::value_type>(name, HighFive::DataSpace::From(version));
+    attribute.write(version);
+    return attribute;
 }
 
-template <typename T>
-HighFive::Attribute write_attribute(HighFive::Group& group,
-                                    const std::string& name,
-                                    const T& version) {
-    HighFive::Attribute a_version =
-        group.createAttribute<typename T::value_type>(name, HighFive::DataSpace::From(version));
-    a_version.write(version);
-    return a_version;
-}
+template <typename H5Type, typename T>
+void write_dataset(H5Type& h5type, const std::string& name, const T& raw) {
+    auto dataset =
+        h5type.template createDataSet<typename base_type<T>::type>(name, HighFive::DataSpace::From(raw));
 
-template <typename T>
-void write_dataset(HighFive::File& file, const std::string& name, const T& raw) {
-    HighFive::DataSet dpoints =
-        file.createDataSet<typename base_type<T>::type>(name, HighFive::DataSpace::From(raw));
-
-    dpoints.write(raw);
-}
-
-template <typename T>
-void write_dataset(HighFive::Group& file, const std::string& name, const T& raw) {
-    HighFive::DataSet dpoints =
-        file.createDataSet<typename base_type<T>::type>(name, HighFive::DataSpace::From(raw));
-
-    dpoints.write(raw);
+    dataset.write(raw);
 }
 
 static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria) {
@@ -384,8 +366,6 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
     const auto& somaDiameters = soma->diameters();
 
-    bool hasPerimeterData_ = hasPerimeterData(morpho);
-
     for (unsigned int i = 0; i < numberOfSomaPoints; ++i) {
         raw_points.push_back(
             {somaPoints[i][0], somaPoints[i][1], somaPoints[i][2], somaDiameters[i]});
@@ -393,7 +373,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
         // If the morphology has some perimeter data, we need to fill some
         // perimeter dummy value in the soma range of the data structure to keep
         // the length matching
-        if (hasPerimeterData_) {
+        if (hasPerimeterData(morpho)) {
             raw_perimeters.push_back(0);
         }
     }
@@ -443,7 +423,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
                     std::vector<uint32_t>{static_cast<uint32_t>(morpho.cellFamily())});
     write_attribute(h5_file, "comment", std::vector<std::string>{version_string()});
 
-    if (hasPerimeterData_) {
+    if (hasPerimeterData(morpho)) {
         write_dataset(h5_file, "/perimeters", raw_perimeters);
     }
 
