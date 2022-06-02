@@ -77,17 +77,34 @@ TEST_CASE("mutableConnectivity", "[mutableMorphology]") {
 }
 
 TEST_CASE("writing", "[mutableMorphology]") {
-    morphio::mut::Morphology morph("data/simple.asc");
     auto tmpDirectory = std::filesystem::temp_directory_path() / "test_mutable_morphology.cpp";
     std::filesystem::create_directories(tmpDirectory);
-    morph.write(tmpDirectory / "simple.asc");
-    morph.write(tmpDirectory / "simple.h5");
-    morph.write(tmpDirectory / "simple.swc");
-    morphio::Morphology savedMorphAsc(tmpDirectory / "simple.asc");
-    morphio::Morphology savedMorphH5(tmpDirectory / "simple.h5");
-    morphio::Morphology savedMorphSwc(tmpDirectory / "simple.swc");
-    REQUIRE(savedMorphAsc.rootSections().size() == 2);
-    REQUIRE(savedMorphH5.rootSections().size() == 2);
-    REQUIRE(savedMorphSwc.rootSections().size() == 2);
+
+    {
+        morphio::mut::Morphology morph("data/simple.asc");
+        morph.write(tmpDirectory / "simple.asc");
+        morph.write(tmpDirectory / "simple.h5");
+
+        morphio::Morphology savedMorphAsc(tmpDirectory / "simple.asc");
+        morphio::Morphology savedMorphH5(tmpDirectory / "simple.h5");
+
+        REQUIRE(savedMorphAsc.rootSections().size() == 2);
+        REQUIRE(savedMorphH5.rootSections().size() == 2);
+
+        // swc should raise when writing a contour soma
+        CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.swc"), morphio::WriterError);
+    }
+
+    {
+        morphio::mut::Morphology morph("data/simple.swc");
+        morph.write(tmpDirectory / "simple.swc");
+        morphio::Morphology savedMorphSwc(tmpDirectory / "simple.swc");
+        REQUIRE(savedMorphSwc.rootSections().size() == 2);
+
+        // asc/h5 should raise when writing a non-contour soma
+        CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.asc"), morphio::WriterError);
+        CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.h5"), morphio::WriterError);
+    }
+
     fs::remove_all(tmpDirectory);
 }

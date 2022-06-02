@@ -142,6 +142,7 @@ class NeurolucidaParser
             if (!nb_.soma()->points().empty())
                 throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
             nb_.soma()->properties() = properties;
+            // nb_.soma()->type() = SOMA_SIMPLE_CONTOUR;
             return_id = -1;
         } else {
             SectionType section_type = TokenToSectionType(header.token);
@@ -377,6 +378,13 @@ Property::Properties load(const std::string& path,
     nb_.applyModifiers(options);
 
     Property::Properties properties = nb_.buildReadOnly();
+
+    if (properties._somaLevel._points.size() == 1) {
+        throw RawDataError("Morphology contour with only a single point is not valid: " + path);
+    } else if (!properties._somaLevel._points.empty()) {
+        properties._cellLevel._somaType = SOMA_SIMPLE_CONTOUR;
+    }
+
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"asc", 1, 0};
     return properties;

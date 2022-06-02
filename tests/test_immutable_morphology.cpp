@@ -1,6 +1,5 @@
 #include <cmath>
 #include <limits>
-#include <sstream>
 
 #include <catch2/catch.hpp>
 
@@ -133,8 +132,10 @@ TEST_CASE("modifers", "[immutableMorphology]") {
 
 TEST_CASE("immutableMorphologySoma", "[immutableMorphology]") {
     Files files;
-    for (const auto& morph : files.morphs()) {
-        REQUIRE(morph.soma().maxDistance() == 0);
+    for (const auto& f : files.fileNames) {
+        const auto morph = morphio::Morphology{f};
+        double distance = morph.soma().type() == morphio::enums::SOMA_SIMPLE_CONTOUR ? 0.00141 : 0.;
+        REQUIRE_THAT(morph.soma().maxDistance(), Catch::WithinAbs(distance, 0.00001));
     }
 
     const auto morph = morphio::Morphology("data/soma_three_points_cylinder.swc");
@@ -150,7 +151,6 @@ TEST_CASE("immutableMorphologySoma", "[immutableMorphology]") {
 TEST_CASE("properties", "[immutableMorphology]") {
     Files files;
     for (const auto& morph : files.morphs()) {
-        REQUIRE(morph.somaType() == morphio::enums::SomaType::SOMA_SINGLE_POINT);
         auto perimeters = morph.perimeters();
         REQUIRE(std::vector<morphio::floatType>(perimeters.begin(), perimeters.end())
                     .empty());  // empty

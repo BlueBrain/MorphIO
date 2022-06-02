@@ -78,15 +78,15 @@ namespace morphio {
 namespace readers {
 namespace h5 {
 
-MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group)
+MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group, const std::string& uri)
     : _group(group)
-    , _uri("HDF5 Group") {}
+    , _uri(uri) {}
 
 Property::Properties load(const std::string& uri) {
     try {
         HighFive::SilenceHDF5 silence;
         auto file = HighFive::File(uri, HighFive::File::ReadOnly);
-        return MorphologyHDF5(file.getGroup("/")).load();
+        return MorphologyHDF5(file.getGroup("/"), uri).load();
 
     } catch (const HighFive::FileException& exc) {
         throw RawDataError("Could not open morphology file " + uri + ": " + exc.what());
@@ -98,7 +98,7 @@ Property::Properties load(const HighFive::Group& group) {
 }
 
 Property::Properties MorphologyHDF5::load() {
-    _readMetadata(_uri);
+    _readMetadata();
 
     int firstSectionOffset = _readSections();
 
@@ -118,10 +118,16 @@ Property::Properties MorphologyHDF5::load() {
         }
     }
 
+    if (_properties._somaLevel._points.size() == 1) {
+        throw RawDataError("Morphology contour with only a single point is not valid: " + _uri);
+    } else if (!_properties._somaLevel._points.empty()) {
+        _properties._cellLevel._somaType = SOMA_SIMPLE_CONTOUR;
+    }
+
     return _properties;
 }
 
-void MorphologyHDF5::_readMetadata(const std::string& source) {
+void MorphologyHDF5::_readMetadata() {
     // default to h5v1.0
     uint32_t majorVersion = 1;
     uint32_t minorVersion = 0;
@@ -131,7 +137,7 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
         // h5v2 is deprecated, but it can be detected, throw a custom error messages if it is
         if (_group.exist(_g_v2root)) {
             throw RawDataError(
-                "Error in " + source +
+                "Error in " + _uri +
                 "\nh5v2 is no longer supported, see: https://github.com/BlueBrain/MorphIO#H5v2");
         }
         throw RawDataError("Missing " + _d_points + " or " + _d_structure +
@@ -155,7 +161,7 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
                 metadata.getAttribute(_a_family).read(family);
                 _properties._cellLevel._cellFamily = static_cast<CellFamily>(family);
             } else {
-                throw RawDataError("Error in " + source +
+                throw RawDataError("Error in " + _uri +
                                    "\nUnsupported h5 version: " + std::to_string(majorVersion) +
                                    "." + std::to_string(minorVersion) +
                                    " See "

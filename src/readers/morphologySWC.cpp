@@ -359,11 +359,10 @@ class SWCBuilder
         return properties;
     }
 
-    /**
-       - Append last point of previous section if current section is not a root
-    section
-       - Update the parent ID of the new section
-    **/
+    /*
+    Append last point of previous section if current section is not a root section
+    Update the parent ID of the new section
+    */
     void _processSectionStart(const Sample& sample) {
         Property::PointLevel properties;
 

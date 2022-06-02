@@ -119,9 +119,6 @@ class ErrorMessages
     //              ERRORS
     ////////////////////////////////////////////////////////////////////////////////
 
-    /** Opening file error message */
-    std::string ERROR_OPENING_FILE() const;
-
     /** Non parsable line error message */
     std::string ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const;
 
@@ -204,10 +201,12 @@ class ErrorMessages
                                              const std::string& vec2,
                                              size_t length2) const;
 
-    /** Cant write perimeter data to SWC,ASC error message */
+    /** Can't write perimeter data to SWC, ASC error message */
     std::string ERROR_PERIMETER_DATA_NOT_WRITABLE();
     /** Single section child SWC error message */
     std::string ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const;
+    /** Incorrect Soma type */
+    std::string ERROR_UNSUPPORTED_SOMA_TYPE(const std::string& supported) const;
 
 
     ////////////////////////////////////////////////////////////////////////////////

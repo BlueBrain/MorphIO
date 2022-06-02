@@ -133,6 +133,12 @@ void swc(const Morphology& morphology, const std::string& filename) {
         return;
     }
 
+    if (soma->type() != SOMA_SINGLE_POINT && soma->type() != SOMA_CYLINDERS &&
+        soma->type() != SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS) {
+        throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE(
+            "SOMA_SINGLE_POINT, SOMA_CYLINDERS, SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS"));
+    }
+
     checkSomaHasSameNumberPointsDiameters(*soma);
 
     if (hasPerimeterData(morphology)) {
@@ -210,6 +216,11 @@ void asc(const Morphology& morphology, const std::string& filename) {
         } else {
             printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
         }
+    }
+
+    if (soma->type() != SOMA_SIMPLE_CONTOUR) {
+        throw WriterError(
+            readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE("SOMA_SIMPLE_CONTOUR"));
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
@@ -349,6 +360,11 @@ void h5(const Morphology& morpho, const std::string& filename) {
             return;
         }
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    }
+
+    if (soma->type() != SOMA_SIMPLE_CONTOUR) {
+        throw WriterError(
+            readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE("SOMA_SIMPLE_CONTOUR"));
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
