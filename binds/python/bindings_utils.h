@@ -7,7 +7,7 @@
 
 namespace py = pybind11;
 
-morphio::Points array_to_points(py::array_t<morphio::floatType>& buf);
+morphio::Points array_to_points(const py::array_t<morphio::floatType>& buf);
 py::array_t<morphio::floatType> span_array_to_ndarray(
     const morphio::range<const morphio::Point>& span);
 

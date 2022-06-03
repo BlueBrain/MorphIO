@@ -32,6 +32,7 @@ class Soma
     /**
        Return the soma type
     **/
+    inline SomaType& type() noexcept;
     inline SomaType type() const noexcept;
     /**
      * Return the center of gravity of the soma points
@@ -74,6 +75,10 @@ inline std::vector<morphio::floatType>& Soma::diameters() noexcept {
 
 const std::vector<morphio::floatType>& Soma::diameters() const noexcept {
     return point_properties_._diameters;
+}
+
+inline SomaType& Soma::type() noexcept {
+    return soma_type_;
 }
 
 inline SomaType Soma::type() const noexcept {

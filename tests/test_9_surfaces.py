@@ -10,34 +10,10 @@ _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
 
 def test_contour_surface():
-    # # circle contour
-    # assert_almost_equal(ImmutMorphology(os.path.join(_path, "circle_contour.asc")).soma.surface,
-    #                     np.pi, decimal=2)
-    # assert_almost_equal(Morphology(os.path.join(_path, "circle_contour.asc")).soma.surface,
-    #                     np.pi, decimal=2)
-
-    # # triangular contour
-    # assert_almost_equal(ImmutMorphology(os.path.join(_path, "h5/v1/Neuron.h5")).soma.surface,
-    #                     0.01, decimal=5)
-    # assert_almost_equal(Morphology(os.path.join(_path, "h5/v1/Neuron.h5")).soma.surface,
-    #                     0.01, decimal=5)
-
-    # # single point ASC
-    # assert_almost_equal(ImmutMorphology(os.path.join(_path, "simple.asc")).soma.surface,
-    #                     4 * np.pi, decimal=2)
-    # assert_almost_equal(Morphology(os.path.join(_path, "simple.asc")).soma.surface,
-    #                     4 * np.pi, decimal=2)
-
     # single point SWC
     assert_almost_equal(ImmutMorphology(os.path.join(_path, "simple.swc")).soma.surface,
                         4 * np.pi, decimal=2)
     assert_almost_equal(Morphology(os.path.join(_path, "simple.swc")).soma.surface,
-                        4 * np.pi, decimal=2)
-
-    # single point H5
-    assert_almost_equal(ImmutMorphology(os.path.join(_path, "h5/v1/simple.h5")).soma.surface,
-                        4 * np.pi, decimal=2)
-    assert_almost_equal(Morphology(os.path.join(_path, "h5/v1/simple.h5")).soma.surface,
                         4 * np.pi, decimal=2)
 
     # SWC three points cylinder

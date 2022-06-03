@@ -360,7 +360,7 @@ void bind_mutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(section->points().size()),
                                  section->points().data());
             },
-            [](morphio::mut::Section* section, py::array_t<morphio::floatType> _points) {
+            [](morphio::mut::Section* section, const py::array_t<morphio::floatType>& _points) {
                 section->points() = array_to_points(_points);
             },
             "Returns the coordinates (x,y,z) of all points of this section")
@@ -463,7 +463,7 @@ void bind_mutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(soma->points().size()),
                                  soma->points().data());
             },
-            [](morphio::mut::Soma* soma, py::array_t<morphio::floatType> _points) {
+            [](morphio::mut::Soma* soma, const py::array_t<morphio::floatType>& _points) {
                 soma->points() = array_to_points(_points);
             },
             "Returns the coordinates (x,y,z) of all soma point")
@@ -473,11 +473,15 @@ void bind_mutable_module(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(soma->diameters().size()),
                                  soma->diameters().data());
             },
-            [](morphio::mut::Soma* soma, py::array_t<morphio::floatType> _diameters) {
+            [](morphio::mut::Soma* soma, const py::array_t<morphio::floatType>& _diameters) {
                 soma->diameters() = _diameters.cast<std::vector<morphio::floatType>>();
             },
             "Returns the diameters of all soma points")
-        .def_property_readonly("type", &morphio::mut::Soma::type, "Returns the soma type")
+        .def_property(
+            "type",
+            [](morphio::mut::Soma* soma) { return soma->type(); },
+            [](morphio::mut::Soma* soma, morphio::SomaType type) { soma->type() = type; },
+            "Returns the soma type")
         .def_property_readonly("surface",
                                &morphio::mut::Soma::surface,
                                "Returns the soma surface\n\n"

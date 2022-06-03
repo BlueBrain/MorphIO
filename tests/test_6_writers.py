@@ -3,12 +3,13 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import numpy as np
+import morphio
 from morphio import MitochondriaPointLevel
 from morphio import Morphology as ImmutMorphology
 from morphio import PointLevel, SectionBuilderError, SectionType, WriterError, ostream_redirect
 from morphio.mut import Morphology
 import pytest
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_almost_equal
 
 from utils import assert_string_equal, captured_output
 
@@ -24,10 +25,11 @@ def test_write_empty_file():
                     assert not os.path.exists(outname)
 
 
-def test_write_soma_basic():
+def test_write_soma_basic_swc():
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    morpho.soma.points = [[-1, 0, 0], [0, 0, 0], [1, 0, 0]]
     morpho.soma.diameters = [2, 3, 3]
+    morpho.soma.type = morphio.SomaType.SOMA_CYLINDERS
 
     with TemporaryDirectory('test_write_soma_basic') as tmp_folder:
         morpho.write(Path(tmp_folder, "test_write.swc"))
@@ -37,8 +39,8 @@ def test_write_soma_basic():
 
 def test_write_basic():
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0]]
-    morpho.soma.diameters = [2]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
 
     dendrite = morpho.append_root_section(PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
                                           SectionType.basal_dendrite)
@@ -66,12 +68,15 @@ def test_write_basic():
                     [0., -4., 0.], [6., -4., 0.], [0., -4., 0.], [-5., -4., 0.]]
 
         for ext in ("asc", "swc", "h5"):
+            morpho.soma.type = (morphio.SomaType.SOMA_CYLINDERS
+                                if ext == 'swc' else morphio.SomaType.SOMA_SIMPLE_CONTOUR)
             morpho.write(Path(tmp_folder, f"test_write.{ext}"))
             loaded_morph = ImmutMorphology(Path(tmp_folder, f"test_write.{ext}"))
             assert_array_equal(loaded_morph.points, expected)
 
-            assert_array_equal(loaded_morph.soma.points, [[0, 0, 0]])
-            assert_array_equal(loaded_morph.soma.diameters, [2])
+            assert_almost_equal(loaded_morph.soma.points,
+                                [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]])
+            assert_almost_equal(loaded_morph.soma.diameters, [0.17, 0.17, 0.17, 0.17,])
 
             assert len(loaded_morph.root_sections) == 2
             assert [SectionType.basal_dendrite, SectionType.axon] == \
@@ -93,8 +98,9 @@ def test_write_merge_only_child_asc_h5():
     '''
 
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0]]
-    morpho.soma.diameters = [2]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
+    morpho.soma.type = morphio.SomaType.SOMA_SIMPLE_CONTOUR
 
     root = morpho.append_root_section(
                                  PointLevel([[0, 0, 0],
@@ -142,8 +148,9 @@ def test_write_merge_only_child_swc():
 
 def test_write_perimeter():
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0]]
-    morpho.soma.diameters = [2]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
+    morpho.soma.type = morphio.SomaType.SOMA_SIMPLE_CONTOUR
 
     dendrite = morpho.append_root_section(
                                      PointLevel([[0, 0, 0],
@@ -171,7 +178,7 @@ def test_write_perimeter():
         assert_array_equal(ImmutMorphology(h5_out).perimeters,
                            [5., 6., 6., 7., 6., 8.])
 
-        # Cannot right a morph with perimeter data to ASC and SWC
+        # Cannot write a morph with perimeter data to ASC and SWC
         for ext in ['swc', 'asc']:
             out_path = Path(tmp_folder, "test_write_perimeter." + ext)
             with pytest.raises(WriterError):
@@ -214,7 +221,6 @@ def test_write_soma__points_no_diameters():
     morph.soma.points = [[0., 0., 0.]]
 
     with TemporaryDirectory("test_write_soma__points_no_diameters") as tmp_folder:
-
         for ext in ["asc", "h5", "swc"]:
             with pytest.raises(WriterError):
                 morph.write(Path(tmp_folder, f"tmp.{ext}"))
@@ -222,8 +228,9 @@ def test_write_soma__points_no_diameters():
 
 def test_mitochondria():
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
-    morpho.soma.diameters = [1, 1]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
+    morpho.soma.type = morphio.SomaType.SOMA_SIMPLE_CONTOUR
 
     neuronal_section_ids = [0, 0]
     relative_pathlengths = np.array([0.5, 0.6], dtype=np.float32)
@@ -235,21 +242,22 @@ def test_mitochondria():
 
     mito_id.append_section(
         MitochondriaPointLevel([0, 0, 0, 0],
-                                        [0.6, 0.7, 0.8, 0.9],
-                                        [20, 30, 40, 50]))
+                               [0.6, 0.7, 0.8, 0.9],
+                               [20, 30, 40, 50]))
     with TemporaryDirectory('test_mitochondria') as tmp_folder:
         morpho.write(Path(tmp_folder, "test.h5"))
 
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
-                morpho.write(Path(tmp_folder, "test.swc"))
+                morpho.write(Path(tmp_folder, "test.asc"))
                 assert_string_equal(err.getvalue(),
                                     "Warning: this cell has mitochondria, they cannot be saved in "
                                     " ASC or SWC format. Please use H5 if you want to save them.")
 
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
-                morpho.write(Path(tmp_folder, "test.asc"))
+                morpho.soma.type = morphio.SomaType.SOMA_CYLINDERS
+                morpho.write(Path(tmp_folder, "test.swc"))
                 assert_string_equal(err.getvalue(),
                                     "Warning: this cell has mitochondria, they cannot be saved in "
                                     " ASC or SWC format. Please use H5 if you want to save them.")
@@ -293,6 +301,8 @@ def test_duplicate_different_diameter():
             with captured_output() as (_, err):
                 with ostream_redirect(stdout=True, stderr=True):
                     outfile = Path(tmp_folder, 'tmp.' + ext)
+                    morpho.soma.type = (morphio.SomaType.SOMA_CYLINDERS
+                                        if ext == 'swc' else morphio.SomaType.SOMA_SIMPLE_CONTOUR)
                     morpho.write(outfile)
 
                     read = Morphology(outfile)
@@ -332,8 +342,8 @@ def test_single_point_root_section():
 def test_write_custom_property__throws():
 
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0]]
-    morpho.soma.diameters = [2]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
 
     custom = morpho.append_root_section(
         PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
@@ -345,8 +355,8 @@ def test_write_custom_property__throws():
             morpho.write(Path(tmp_folder, "test_write.asc"))
 
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0]]
-    morpho.soma.diameters = [2]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
 
     custom = morpho.append_root_section(
         PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),

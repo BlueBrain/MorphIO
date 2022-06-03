@@ -133,8 +133,8 @@ void swc(const Morphology& morphology, const std::string& filename) {
         return;
     }
 
-    if (soma->type() != SOMA_SINGLE_POINT && soma->type() != SOMA_CYLINDERS &&
-        soma->type() != SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS) {
+    if (!soma_points.empty() && soma->type() != SOMA_SINGLE_POINT &&
+        soma->type() != SOMA_CYLINDERS && soma->type() != SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS) {
         throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE(
             "SOMA_SINGLE_POINT, SOMA_CYLINDERS, SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS"));
     }
@@ -216,9 +216,7 @@ void asc(const Morphology& morphology, const std::string& filename) {
         } else {
             printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
         }
-    }
-
-    if (soma->type() != SOMA_SIMPLE_CONTOUR) {
+    } else if (soma->type() != SOMA_SIMPLE_CONTOUR) {
         throw WriterError(
             readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE("SOMA_SIMPLE_CONTOUR"));
     }
@@ -351,18 +349,15 @@ static void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 void h5(const Morphology& morpho, const std::string& filename) {
     const auto& soma = morpho.soma();
     const auto& somaPoints = soma->points();
-    const auto numberOfSomaPoints = somaPoints.size();
 
-    if (numberOfSomaPoints < 1) {
+    if (somaPoints.empty()) {
         if (morpho.rootSections().empty()) {
             printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                        readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
             return;
         }
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
-    }
-
-    if (soma->type() != SOMA_SIMPLE_CONTOUR) {
+    } else if (soma->type() != SOMA_SIMPLE_CONTOUR) {
         throw WriterError(
             readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE("SOMA_SIMPLE_CONTOUR"));
     }
@@ -382,7 +377,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
     const auto& somaDiameters = soma->diameters();
 
-    for (unsigned int i = 0; i < numberOfSomaPoints; ++i) {
+    for (unsigned int i = 0; i < somaPoints.size(); ++i) {
         raw_points.push_back(
             {somaPoints[i][0], somaPoints[i][1], somaPoints[i][2], somaDiameters[i]});
 
