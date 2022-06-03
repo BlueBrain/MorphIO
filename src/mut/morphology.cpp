@@ -14,10 +14,22 @@
 
 #include "../shared_utils.hpp"
 
+namespace {
+void _appendProperties(morphio::Property::PointLevel& to,
+                       const morphio::Property::PointLevel& from,
+                       int offset = 0) {
+    morphio::_appendVector(to._points, from._points, offset);
+    morphio::_appendVector(to._diameters, from._diameters, offset);
+
+    if (!from._perimeters.empty()) {
+        morphio::_appendVector(to._perimeters, from._perimeters, offset);
+    }
+}
+}  // namespace
+
+
 namespace morphio {
 namespace mut {
-
-void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset);
 
 using morphio::readers::ErrorMessages;
 Morphology::Morphology(const std::string& uri, unsigned int options)
@@ -199,16 +211,6 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
     }
 }
 
-
-void _appendProperties(Property::PointLevel& to, const Property::PointLevel& from, int offset = 0) {
-    _appendVector(to._points, from._points, offset);
-    _appendVector(to._diameters, from._diameters, offset);
-
-    if (!from._perimeters.empty()) {
-        _appendVector(to._perimeters, from._perimeters, offset);
-    }
-}
-
 void Morphology::removeUnifurcations() {
     removeUnifurcations(morphio::readers::DebugInfo());
 }
@@ -262,24 +264,6 @@ void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInf
             }
 
             deleteSection(section_, false);
-        }
-    }
-}
-
-void Morphology::_raiseIfUnifurcations() {
-    for (auto it = depth_begin(); it != depth_end(); ++it) {
-        std::shared_ptr<Section> section_ = *it;
-        if (section_->isRoot()) {
-            continue;
-        }
-
-        unsigned int parentId = section_->parent()->id();
-
-        auto parent = section_->parent();
-        bool isUnifurcation = parent->children().size() == 1;
-
-        if (isUnifurcation) {
-            throw WriterError(readers::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(parentId));
         }
     }
 }
@@ -374,17 +358,16 @@ std::unordered_map<int, std::vector<unsigned int>> Morphology::connectivity() {
 }
 
 void Morphology::write(const std::string& filename) {
-    const size_t pos = filename.find_last_of(".");
-    assert(pos != std::string::npos);
-
-    std::string extension;
-
     for (const auto& root : rootSections()) {
         if (root->points().size() < 2) {
             throw morphio::SectionBuilderError("Root sections must have at least 2 points");
         }
     }
 
+    std::string extension;
+
+    const size_t pos = filename.find_last_of(".");
+    assert(pos != std::string::npos);
     for (char c : filename.substr(pos)) {
         extension += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
@@ -394,7 +377,6 @@ void Morphology::write(const std::string& filename) {
     } else if (extension == ".asc") {
         writer::asc(*this, filename);
     } else if (extension == ".swc") {
-        _raiseIfUnifurcations();
         writer::swc(*this, filename);
     } else {
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
