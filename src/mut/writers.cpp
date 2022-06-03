@@ -127,16 +127,23 @@ namespace writer {
 void swc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     const auto& soma_points = soma->points();
-    if (soma_points.empty() && morphology.rootSections().empty()) {
-        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
-        return;
-    }
 
-    if (!soma_points.empty() && soma->type() != SOMA_SINGLE_POINT &&
-        soma->type() != SOMA_CYLINDERS && soma->type() != SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS) {
-        throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE(
-            "SOMA_SINGLE_POINT, SOMA_CYLINDERS, SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS"));
+    if (soma_points.empty()) {
+        if (morphology.rootSections().empty()) {
+            printError(Warning::WRITE_EMPTY_MORPHOLOGY,
+                       readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+            return;
+        }
+        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    } else {
+        if (soma->type() == SOMA_UNDEFINED) {
+            printError(Warning::WRITE_UNDEFINED_SOMA,
+                       readers::ErrorMessages().WARNING_UNDEFINED_SOMA());
+        } else if (soma->type() != SOMA_SINGLE_POINT && soma->type() != SOMA_CYLINDERS &&
+                   soma->type() != SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS) {
+            throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE(
+                "SOMA_SINGLE_POINT, SOMA_CYLINDERS, SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS"));
+        }
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
@@ -163,10 +170,6 @@ void swc(const Morphology& morphology, const std::string& filename) {
     std::map<uint32_t, int32_t> newIds;
 
     const auto& soma_diameters = soma->diameters();
-
-    if (soma_points.empty()) {
-        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
-    }
 
     for (unsigned int i = 0; i < soma_points.size(); ++i) {
         writeLine(myfile,
@@ -208,7 +211,8 @@ void swc(const Morphology& morphology, const std::string& filename) {
 
 void asc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
-    if (soma->points().empty()) {
+    const auto& soma_points = soma->points();
+    if (soma_points.empty()) {
         if (morphology.rootSections().empty()) {
             printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                        readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
@@ -216,9 +220,14 @@ void asc(const Morphology& morphology, const std::string& filename) {
         } else {
             printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
         }
-    } else if (soma->type() != SOMA_SIMPLE_CONTOUR) {
-        throw WriterError(
-            readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE("SOMA_SIMPLE_CONTOUR"));
+    } else {
+        if (soma->type() == SOMA_UNDEFINED) {
+            printError(Warning::WRITE_UNDEFINED_SOMA,
+                       readers::ErrorMessages().WARNING_UNDEFINED_SOMA());
+        } else if (soma->type() != SOMA_SIMPLE_CONTOUR) {
+            throw WriterError(
+                readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE("SOMA_SIMPLE_CONTOUR"));
+        }
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
@@ -235,7 +244,7 @@ void asc(const Morphology& morphology, const std::string& filename) {
     std::ofstream myfile(filename);
 
     myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
-    _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
+    _write_asc_points(myfile, soma_points, soma->diameters(), 2);
     myfile << ")\n\n";
 
     for (const std::shared_ptr<Section>& section : morphology.rootSections()) {
@@ -348,15 +357,18 @@ static void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 
 void h5(const Morphology& morpho, const std::string& filename) {
     const auto& soma = morpho.soma();
-    const auto& somaPoints = soma->points();
+    const auto& soma_points = soma->points();
 
-    if (somaPoints.empty()) {
+    if (soma_points.empty()) {
         if (morpho.rootSections().empty()) {
             printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                        readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
             return;
         }
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    } else if (soma->type() == SOMA_UNDEFINED) {
+        printError(Warning::WRITE_UNDEFINED_SOMA,
+                   readers::ErrorMessages().WARNING_UNDEFINED_SOMA());
     } else if (soma->type() != SOMA_SIMPLE_CONTOUR) {
         throw WriterError(
             readers::ErrorMessages().ERROR_UNSUPPORTED_SOMA_TYPE("SOMA_SIMPLE_CONTOUR"));
@@ -377,9 +389,9 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
     const auto& somaDiameters = soma->diameters();
 
-    for (unsigned int i = 0; i < somaPoints.size(); ++i) {
+    for (unsigned int i = 0; i < soma_points.size(); ++i) {
         raw_points.push_back(
-            {somaPoints[i][0], somaPoints[i][1], somaPoints[i][2], somaDiameters[i]});
+            {soma_points[i][0], soma_points[i][1], soma_points[i][2], somaDiameters[i]});
 
         // If the morphology has some perimeter data, we need to fill some
         // perimeter dummy value in the soma range of the data structure to keep

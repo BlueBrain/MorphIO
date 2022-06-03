@@ -243,6 +243,9 @@ class ErrorMessages
     /** Wrong root point warning message */
     std::string WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const;
 
+    /** Soma is undefined*/
+    std::string WARNING_UNDEFINED_SOMA() const;
+
   private:
     std::string _uri;
 };

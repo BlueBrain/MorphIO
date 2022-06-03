@@ -393,6 +393,10 @@ std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& c
     return oss.str();
 }
 
+std::string ErrorMessages::WARNING_UNDEFINED_SOMA() const {
+    return errorMsg(0, ErrorLevel::WARNING, "Warning: writing soma set to SOMA_UNDEFINED");
+}
+
 }  // namespace readers
 
 }  // namespace morphio

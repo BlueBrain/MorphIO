@@ -27,7 +27,6 @@ void _appendProperties(morphio::Property::PointLevel& to,
 }
 }  // namespace
 
-
 namespace morphio {
 namespace mut {
 

@@ -34,7 +34,8 @@ enum Warning {
     WRONG_ROOT_POINT,         //!< A wrong root point of a neurite in the case of 3 points soma
     ONLY_CHILD,               //!< Single child sections are not allowed in SWC format
     WRITE_EMPTY_MORPHOLOGY,   //!< Writing empty morphology
-    ZERO_DIAMETER             //!< Zero section diameter
+    ZERO_DIAMETER,            //!< Zero section diameter
+    WRITE_UNDEFINED_SOMA,     //!< Soma is UNDEFINED
 };
 
 enum AnnotationType {

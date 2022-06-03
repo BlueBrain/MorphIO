@@ -16,13 +16,29 @@ from utils import assert_string_equal, captured_output
 
 def test_write_empty_file():
     '''Check that empty morphology are not written to disk'''
-    with captured_output() as (_, _):
+    with captured_output():
         with ostream_redirect(stdout=True, stderr=True):
             with TemporaryDirectory('test_write_empty_file') as tmp_folder:
                 for ext in ['asc', 'swc', 'h5']:
                     outname = Path(tmp_folder, 'empty.' + ext)
                     Morphology().write(outname)
                     assert not os.path.exists(outname)
+
+
+def test_write_undefined_soma():
+    '''Check that we can write undefined soma, as long as it has at least two points'''
+    morph = Morphology()
+    morph.soma.points = [[-1, 0, 0], [0, 0, 0], [1, 0, 0]]
+    morph.soma.diameters = [2, 3, 3]
+
+    for ext in ('asc', 'swc', 'h5', ):
+        with captured_output() as (stdout, stderr):
+            with ostream_redirect(stdout=True, stderr=True):
+                with TemporaryDirectory('test_write_undefined_soma') as tmp_folder:
+                    outname = Path(tmp_folder, 'undefined_soma.' + ext)
+                    morph.write(outname)
+                    assert stderr.getvalue() == \
+                            '\nWarning: writing soma set to SOMA_UNDEFINED\n'
 
 
 def test_write_soma_basic_swc():
@@ -205,7 +221,7 @@ def test_write_no_soma():
                     outfile = Path(tmp_folder, 'tmp.' + ext)
                     morpho.write(outfile)
                     assert (err.getvalue().strip() ==
-                                 'Warning: writing file without a soma')
+                            'Warning: writing file without a soma')
 
                     read = Morphology(outfile)
 
