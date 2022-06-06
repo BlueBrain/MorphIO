@@ -192,17 +192,37 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
             deleteSection(*it, false);
         }
     } else {
+
         // Careful not to use a reference here or you will face reference invalidation problem
         // with vector resize
-        for (auto child : section_->children()) {
-            if (section_->isRoot()) {
-                _rootSections.push_back(child);
-            } else {
-                // Re-link children to their "grand-parent"
-                _children[_parent[id]].push_back(child);
-                _parent[child->id()] = _parent[id];
+        auto children = section_->children();
+
+        if (section_->isRoot()) {
+            // put root section's children in its place
+            for (auto it = _rootSections.begin(); it != _rootSections.end(); ++it) {
+                if ((*it)->id() == id) {
+                    _rootSections.insert(it, children.begin(), children.end());
+                    break;
+                }
+            }
+        } else {
+
+            // set grandparent as section children's parent
+            for (auto child: children) {
+                 _parent[child->id()] = _parent[id];
+            }
+
+            // put grandchildren at the position of the deleted section
+            auto& parent_children = _children[_parent[id]];
+
+            for ( auto it = parent_children.begin(); it != parent_children.end(); ++it) {
+                if ((*it)->id() == id) {
+                    parent_children.insert(it, children.begin(), children.end());
+                    break;
+                }
             }
         }
+
         eraseByValue(_rootSections, section_);
         eraseByValue(_children[_parent[id]], section_);
         _children.erase(id);

@@ -1,8 +1,9 @@
+import tempfile
 from collections import OrderedDict
 
 import numpy as np
+from numpy import testing as npt
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 import morphio
 from morphio import CellFamily, IterType, MitochondriaPointLevel, MorphioError
@@ -494,7 +495,7 @@ def test_endoplasmic_reticulum():
     assert_array_equal(reticulum.surface_areas, [3, 3])
     assert_array_equal(reticulum.filament_counts, [4, 4])
 
-    with TemporaryDirectory('test-endoplasmic-reticulum') as folder:
+    with tempfile.TemporaryDirectory('test-endoplasmic-reticulum') as folder:
         path = Path(folder, 'with-reticulum.h5')
         neuron.write(path)
 
@@ -577,7 +578,7 @@ def test_glia():
 
 
 def test_glia_round_trip():
-    with TemporaryDirectory() as folder:
+    with tempfile.TemporaryDirectory() as folder:
         g = GlialCell(Path(DATA_DIR, 'astrocyte.h5'))
         filename = Path(folder, 'glial-cell.h5')
         g.write(filename)
@@ -606,7 +607,7 @@ def test_dendritic_spine():
 
 
 def test_dendritic_spine_round_trip():
-    with TemporaryDirectory() as folder:
+    with tempfile.TemporaryDirectory() as folder:
         h5v1 = DATA_DIR / "h5/v1/"
         d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
         filename = Path(folder, 'test-dendritic-spine.h5')
@@ -635,7 +636,7 @@ def test_dendritic_spine_round_trip():
 
 def test_dendritic_spine_round_trip_empty_postsynaptic_density():
     h5v1 = DATA_DIR / "h5/v1/"
-    with TemporaryDirectory() as folder:
+    with tempfile.TemporaryDirectory() as folder:
         d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
         assert d.cell_family == CellFamily.SPINE
 
@@ -702,3 +703,207 @@ def test_lifetime_iteration_fails_with_orphan_section():
     for iter_type in IterType.depth_first, IterType.breadth_first, IterType.upstream:
         with pytest.raises(RuntimeError):
             section.iter(iter_type)
+
+
+def _assert_sections_equal(morph1, morph2, section_ids):
+
+    for section_id in section_ids:
+
+        s1 = morph1.section(section_id)
+        s2 = morph2.section(section_id)
+
+        assert s1.type == s2.type
+        npt.assert_array_equal(s1.points, s2.points)
+        npt.assert_array_equal(s1.diameters, s2.diameters)
+
+
+def test_delete_section__maintain_children_order_non_root_section():
+    with tempfile.NamedTemporaryFile(suffix=".asc") as tfile:
+        filepath = tfile.name
+        with open(filepath, "w") as f:
+            f.write(
+                """
+                ("CellBody"
+                  (Color Red)
+                  (CellBody)
+                  ( 0.1  0.1 0.0 0.1)
+                  ( 0.1 -0.1 0.0 0.1)
+                )
+
+                ( (Color Cyan)
+                  (Axon)
+                  (0.0  0.0 0.0 2.0) ; section 0
+                  (0.0 -4.0 1.0 2.0)
+                  (
+                    (0.0 -4.0 1.0 4.0) ; section 1
+                    (0.0 -4.0 2.0 4.0)
+                    (0.0 -4.0 3.0 4.0)
+                    (
+                        (6.0 -4.0 0.0 4.0) ; section 2
+                        (7.0 -5.0 0.0 4.0)
+                    |
+                        (6.0 -4.0 0.0 4.0) ; section 3
+                        (8.0 -4.0 0.0 4.0)
+                    )
+                  |
+                    ( 0.0 -4.0 1.0 4.0) ; section 4
+                    (-5.0 -4.0 0.0 4.0)
+                  )
+                )
+                """
+            )
+
+        # make copy to compare afterwards
+        morph = Morphology(filepath)
+
+        axon = morph.root_sections[0]
+        to_be_removed_section = axon.children[0]
+        morph.delete_section(to_be_removed_section, recursive=False)
+
+        assert [s.id for s in morph.iter()] == [0, 2, 3, 4]
+
+        # a trifurcation is made
+        assert [s.id for s in axon.children] == [2, 3, 4]
+
+        # ensure nothing has been added to the leaves
+        for child in axon.children:
+            assert child.children == []
+
+        # check that data has not been messed up
+        original = Morphology(filepath)
+        _assert_sections_equal(morph, original, [0, 2, 3, 4])
+
+
+def test_delete_section__maintain_children_order_non_root_section_multiple():
+    with tempfile.NamedTemporaryFile(suffix=".asc") as tfile:
+        filepath = tfile.name
+        with open(filepath, "w") as f:
+            f.write(
+                """
+                ("CellBody"
+                  (Color Red)
+                  (CellBody)
+                  ( 0.1  0.1 0.0 0.1)
+                  ( 0.1 -0.1 0.0 0.1)
+                )
+
+                ( (Color Cyan)
+                  (Axon)
+                  (0.0  0.0 0.0 2.0) ; section 0
+                  (0.0 -4.0 1.0 2.0)
+                  (
+                    (0.0 -4.0 1.0 4.0) ; section 1
+                    (0.0 -4.0 2.0 4.0)
+                    (0.0 -4.0 3.0 4.0)
+                    (
+                        (6.0 -4.0 0.0 4.0) ; section 2
+                        (7.0 -5.0 0.0 4.0)
+                        (
+                            (8.0 -4.0 0.0 4.0) ; section 3
+                            (8.0 -5.0 0.0 4.0)
+                        |
+                            (8.0 -4.0 0.0 4.0) ; section 4
+                            (8.0 -5.0 0.0 4.0)
+                        )
+                    |
+                        (6.0 -4.0 0.0 4.0) ; section 5
+                        (8.0 -4.0 0.0 4.0)
+                    )
+                  |
+                    ( 0.0 -4.0 1.0 4.0) ; section 6
+                    (-5.0 -4.0 0.0 4.0)
+                    (
+                        (3.0 2.0 1.0 4.0) ; section 7
+                        (3.0 2.0 0.0 4.0)
+                    |
+                        (2.0 3.0 1.0 4.0) ; section 8
+                        (2.0 3.0 0.0 4.0)
+                    )
+                  )
+                )
+                """
+            )
+        morph = Morphology(filepath)
+
+        morph.delete_section(morph.section(0), recursive=False)
+        morph.delete_section(morph.section(1), recursive=False)
+        morph.delete_section(morph.section(4), recursive=False)
+        morph.delete_section(morph.section(7), recursive=False)
+
+        assert [s.id for s in morph.iter()] == [2, 3, 5, 6, 8]
+        assert [s.id for s in morph.root_sections] == [2, 5, 6]
+
+        # made unifurcations
+        assert [s.id for s in morph.section(2).children] == [3]
+        assert [s.id for s in morph.section(6).children] == [8]
+
+        # ensure nothing has been added to the leaves
+        for leaf_id in [3, 5, 8]:
+            assert morph.section(leaf_id).children == []
+
+        # check that data has not been messed up
+        original = Morphology(filepath)
+        _assert_sections_equal(morph, original, [2, 3, 5, 6, 8])
+
+
+def test_delete_section__maintain_children_order_root_section():
+    with tempfile.NamedTemporaryFile(suffix=".asc") as tfile:
+        filepath = tfile.name
+        with open(filepath, "w") as f:
+            f.write(
+                """
+                ("CellBody"
+                  (Color Red)
+                  (CellBody)
+                  ( 0.1  0.1 0.0 0.1)
+                  ( 0.1 -0.1 0.0 0.1)
+                )
+
+                ( (Color Cyan)
+                  (Axon)
+                  (0.0  0.0 0.0 2.0) ; section 0
+                  (0.0 -4.0 1.0 2.0)
+                  (
+                    (0.0 -4.0 1.0 4.0) ; section 1
+                    (0.0 -4.0 2.0 4.0)
+                    (0.0 -4.0 3.0 4.0)
+                    (
+                        (6.0 -4.0 0.0 4.0) ; section 2
+                        (7.0 -5.0 0.0 4.0)
+                    |
+                        (6.0 -4.0 0.0 4.0) ; section 3
+                        (8.0 -4.0 0.0 4.0)
+                    )
+                  |
+                    ( 0.0 -4.0 1.0 4.0) ; section 4
+                    (-5.0 -4.0 0.0 4.0)
+                  )
+                )
+
+                ( (Color Cyan)
+                  (Dendrite)
+                  (1.0  1.0 1.0 2.0) ; section 5
+                  (1.0  1.0 2.0 2.0)
+                )
+                """
+            )
+        morph = Morphology(filepath)
+
+        root = morph.root_sections[0]
+        morph.delete_section(root, recursive=False)
+
+        assert [s.id for s in morph.iter()] == [1, 2, 3, 4, 5]
+
+        # the children of root 0 are put in its place
+        assert [s.id for s in morph.root_sections] == [1, 4, 5]
+        assert [s.id for s in morph.root_sections[0].children] == [2, 3]
+        assert [s.id for s in morph.root_sections[1].children] == []
+        assert [s.id for s in morph.root_sections[2].children] == []
+
+        # check that nothing has been added to the leaves
+        for section_id in [2, 3, 4, 5]:
+            assert morph.section(section_id).children == []
+
+        # check that data has not been messed up
+        original = Morphology(filepath)
+        _assert_sections_equal(morph, original, [1, 2, 3, 4, 5])
