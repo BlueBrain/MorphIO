@@ -176,7 +176,7 @@ void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
 }
 
 
-void inline insertSectionsInPlaceOfSection(
+void inline insertSectionsBeforeSection(
     std::vector<std::shared_ptr<Section>>& sections_to_update,
     const std::vector<std::shared_ptr<Section>> sections,
     uint32_t section_id) {
@@ -213,14 +213,14 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
 
         if (section_->isRoot()) {
             // put root section's children in its place
-            insertSectionsInPlaceOfSection(_rootSections, children, id);
+            insertSectionsBeforeSection(_rootSections, children, id);
         } else {
             // set grandparent as section children's parent
             for (auto child : children) {
                 _parent[child->id()] = _parent[id];
             }
             // put grandchildren at the position of the deleted section
-            insertSectionsInPlaceOfSection(_children[_parent[id]], children, id);
+            insertSectionsBeforeSection(_children[_parent[id]], children, id);
         }
 
         eraseByValue(_rootSections, section_);
