@@ -717,41 +717,42 @@ def _assert_sections_equal(morph1, morph2, section_ids):
         npt.assert_array_equal(s1.diameters, s2.diameters)
 
 
-def test_delete_section__maintain_children_order_non_root_section():
-    with tempfile.NamedTemporaryFile(suffix=".asc") as tfile:
-        filepath = tfile.name
-        with open(filepath, "w") as f:
-            f.write(
-                """
-                ("CellBody"
-                  (Color Red)
-                  (CellBody)
-                  ( 0.1  0.1 0.0 0.1)
-                  ( 0.1 -0.1 0.0 0.1)
-                )
+def test_delete_section__maintain_children_order_non_root_section(tmp_path):
 
-                ( (Color Cyan)
-                  (Axon)
-                  (0.0  0.0 0.0 2.0) ; section 0
-                  (0.0 -4.0 1.0 2.0)
-                  (
-                    (0.0 -4.0 1.0 4.0) ; section 1
-                    (0.0 -4.0 2.0 4.0)
-                    (0.0 -4.0 3.0 4.0)
-                    (
-                        (6.0 -4.0 0.0 4.0) ; section 2
-                        (7.0 -5.0 0.0 4.0)
-                    |
-                        (6.0 -4.0 0.0 4.0) ; section 3
-                        (8.0 -4.0 0.0 4.0)
-                    )
-                  |
-                    ( 0.0 -4.0 1.0 4.0) ; section 4
-                    (-5.0 -4.0 0.0 4.0)
-                  )
-                )
-                """
+    with tmp_asc_file(
+        tmp_path,
+        """
+        ("CellBody"
+          (Color Red)
+          (CellBody)
+          ( 0.1  0.1 0.0 0.1)
+          ( 0.1 -0.1 0.0 0.1)
+        )
+
+        ( (Color Cyan)
+          (Axon)
+          (0.0  0.0 0.0 2.0) ; section 0
+          (0.0 -4.0 1.0 2.0)
+          (
+            (0.0 -4.0 1.0 4.0) ; section 1
+            (0.0 -4.0 2.0 4.0)
+            (0.0 -4.0 3.0 4.0)
+            (
+                (6.0 -4.0 0.0 4.0) ; section 2
+                (7.0 -5.0 0.0 4.0)
+            |
+                (6.0 -4.0 0.0 4.0) ; section 3
+                (8.0 -4.0 0.0 4.0)
             )
+          |
+            ( 0.0 -4.0 1.0 4.0) ; section 4
+            (-5.0 -4.0 0.0 4.0)
+          )
+        )
+        """
+    ) as tfile:
+
+        filepath = tfile.name
 
         # make copy to compare afterwards
         morph = Morphology(filepath)
@@ -774,55 +775,56 @@ def test_delete_section__maintain_children_order_non_root_section():
         _assert_sections_equal(morph, original, [0, 2, 3, 4])
 
 
-def test_delete_section__maintain_children_order_non_root_section_multiple():
-    with tempfile.NamedTemporaryFile(suffix=".asc") as tfile:
-        filepath = tfile.name
-        with open(filepath, "w") as f:
-            f.write(
-                """
-                ("CellBody"
-                  (Color Red)
-                  (CellBody)
-                  ( 0.1  0.1 0.0 0.1)
-                  ( 0.1 -0.1 0.0 0.1)
-                )
+def test_delete_section__maintain_children_order_non_root_section_multiple(tmp_path):
+    with tmp_asc_file(
+        tmp_path,
+        """
+        ("CellBody"
+          (Color Red)
+          (CellBody)
+          ( 0.1  0.1 0.0 0.1)
+          ( 0.1 -0.1 0.0 0.1)
+        )
 
-                ( (Color Cyan)
-                  (Axon)
-                  (0.0  0.0 0.0 2.0) ; section 0
-                  (0.0 -4.0 1.0 2.0)
-                  (
-                    (0.0 -4.0 1.0 4.0) ; section 1
-                    (0.0 -4.0 2.0 4.0)
-                    (0.0 -4.0 3.0 4.0)
-                    (
-                        (6.0 -4.0 0.0 4.0) ; section 2
-                        (7.0 -5.0 0.0 4.0)
-                        (
-                            (8.0 -4.0 0.0 4.0) ; section 3
-                            (8.0 -5.0 0.0 4.0)
-                        |
-                            (8.0 -4.0 0.0 4.0) ; section 4
-                            (8.0 -5.0 0.0 4.0)
-                        )
-                    |
-                        (6.0 -4.0 0.0 4.0) ; section 5
-                        (8.0 -4.0 0.0 4.0)
-                    )
-                  |
-                    ( 0.0 -4.0 1.0 4.0) ; section 6
-                    (-5.0 -4.0 0.0 4.0)
-                    (
-                        (3.0 2.0 1.0 4.0) ; section 7
-                        (3.0 2.0 0.0 4.0)
-                    |
-                        (2.0 3.0 1.0 4.0) ; section 8
-                        (2.0 3.0 0.0 4.0)
-                    )
-                  )
+        ( (Color Cyan)
+          (Axon)
+          (0.0  0.0 0.0 2.0) ; section 0
+          (0.0 -4.0 1.0 2.0)
+          (
+            (0.0 -4.0 1.0 4.0) ; section 1
+            (0.0 -4.0 2.0 4.0)
+            (0.0 -4.0 3.0 4.0)
+            (
+                (6.0 -4.0 0.0 4.0) ; section 2
+                (7.0 -5.0 0.0 4.0)
+                (
+                    (8.0 -4.0 0.0 4.0) ; section 3
+                    (8.0 -5.0 0.0 4.0)
+                |
+                    (8.0 -4.0 0.0 4.0) ; section 4
+                    (8.0 -5.0 0.0 4.0)
                 )
-                """
+            |
+                (6.0 -4.0 0.0 4.0) ; section 5
+                (8.0 -4.0 0.0 4.0)
             )
+          |
+            ( 0.0 -4.0 1.0 4.0) ; section 6
+            (-5.0 -4.0 0.0 4.0)
+            (
+                (3.0 2.0 1.0 4.0) ; section 7
+                (3.0 2.0 0.0 4.0)
+            |
+                (2.0 3.0 1.0 4.0) ; section 8
+                (2.0 3.0 0.0 4.0)
+            )
+          )
+        )
+        """
+    ) as tfile:
+
+        filepath = tfile.name
+
         morph = Morphology(filepath)
 
         morph.delete_section(morph.section(0), recursive=False)
@@ -846,47 +848,48 @@ def test_delete_section__maintain_children_order_non_root_section_multiple():
         _assert_sections_equal(morph, original, [2, 3, 5, 6, 8])
 
 
-def test_delete_section__maintain_children_order_root_section():
-    with tempfile.NamedTemporaryFile(suffix=".asc") as tfile:
-        filepath = tfile.name
-        with open(filepath, "w") as f:
-            f.write(
-                """
-                ("CellBody"
-                  (Color Red)
-                  (CellBody)
-                  ( 0.1  0.1 0.0 0.1)
-                  ( 0.1 -0.1 0.0 0.1)
-                )
+def test_delete_section__maintain_children_order_root_section(tmp_path):
+    with tmp_asc_file(
+        tmp_path,
+        """
+        ("CellBody"
+          (Color Red)
+          (CellBody)
+          ( 0.1  0.1 0.0 0.1)
+          ( 0.1 -0.1 0.0 0.1)
+        )
 
-                ( (Color Cyan)
-                  (Axon)
-                  (0.0  0.0 0.0 2.0) ; section 0
-                  (0.0 -4.0 1.0 2.0)
-                  (
-                    (0.0 -4.0 1.0 4.0) ; section 1
-                    (0.0 -4.0 2.0 4.0)
-                    (0.0 -4.0 3.0 4.0)
-                    (
-                        (6.0 -4.0 0.0 4.0) ; section 2
-                        (7.0 -5.0 0.0 4.0)
-                    |
-                        (6.0 -4.0 0.0 4.0) ; section 3
-                        (8.0 -4.0 0.0 4.0)
-                    )
-                  |
-                    ( 0.0 -4.0 1.0 4.0) ; section 4
-                    (-5.0 -4.0 0.0 4.0)
-                  )
-                )
-
-                ( (Color Cyan)
-                  (Dendrite)
-                  (1.0  1.0 1.0 2.0) ; section 5
-                  (1.0  1.0 2.0 2.0)
-                )
-                """
+        ( (Color Cyan)
+          (Axon)
+          (0.0  0.0 0.0 2.0) ; section 0
+          (0.0 -4.0 1.0 2.0)
+          (
+            (0.0 -4.0 1.0 4.0) ; section 1
+            (0.0 -4.0 2.0 4.0)
+            (0.0 -4.0 3.0 4.0)
+            (
+                (6.0 -4.0 0.0 4.0) ; section 2
+                (7.0 -5.0 0.0 4.0)
+            |
+                (6.0 -4.0 0.0 4.0) ; section 3
+                (8.0 -4.0 0.0 4.0)
             )
+          |
+            ( 0.0 -4.0 1.0 4.0) ; section 4
+            (-5.0 -4.0 0.0 4.0)
+          )
+        )
+
+        ( (Color Cyan)
+          (Dendrite)
+          (1.0  1.0 1.0 2.0) ; section 5
+          (1.0  1.0 2.0 2.0)
+        )
+        """
+    ) as tfile:
+
+        filepath = tfile.name
+
         morph = Morphology(filepath)
 
         root = morph.root_sections[0]
