@@ -176,10 +176,9 @@ void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
 }
 
 
-void inline insertSectionsBeforeSection(
-    std::vector<std::shared_ptr<Section>>& sections_to_update,
-    const std::vector<std::shared_ptr<Section>> sections,
-    uint32_t section_id) {
+void inline insertSectionsBeforeSection(std::vector<std::shared_ptr<Section>>& sections_to_update,
+                                        const std::vector<std::shared_ptr<Section>> sections,
+                                        uint32_t section_id) {
     // find where the section_id is located in sections_to_update and insert the sections
     // before that. Note that the section with section_id is not removed at this step
     for (auto it = sections_to_update.begin(); it != sections_to_update.end(); ++it) {
