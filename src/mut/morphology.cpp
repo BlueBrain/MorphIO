@@ -175,6 +175,21 @@ void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
     vec.erase(std::remove(vec.begin(), vec.end(), section), vec.end());
 }
 
+
+void inline insertSectionsInPlaceOfSection(
+    std::vector<std::shared_ptr<Section>>& sections_to_update,
+    const std::vector<std::shared_ptr<Section>> sections,
+    uint32_t section_id) {
+    // find where the section_id is located in sections_to_update and insert the sections
+    // before that. Note that the section with section_id is not removed at this step
+    for (auto it = sections_to_update.begin(); it != sections_to_update.end(); ++it) {
+        if ((*it)->id() == section_id) {
+            sections_to_update.insert(it, sections.begin(), sections.end());
+            break;
+        }
+    }
+}
+
 void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive) {
     if (!section_) {
         return;
@@ -198,27 +213,14 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
 
         if (section_->isRoot()) {
             // put root section's children in its place
-            for (auto it = _rootSections.begin(); it != _rootSections.end(); ++it) {
-                if ((*it)->id() == id) {
-                    _rootSections.insert(it, children.begin(), children.end());
-                    break;
-                }
-            }
+            insertSectionsInPlaceOfSection(_rootSections, children, id);
         } else {
             // set grandparent as section children's parent
             for (auto child : children) {
                 _parent[child->id()] = _parent[id];
             }
-
             // put grandchildren at the position of the deleted section
-            auto& parent_children = _children[_parent[id]];
-
-            for (auto it = parent_children.begin(); it != parent_children.end(); ++it) {
-                if ((*it)->id() == id) {
-                    parent_children.insert(it, children.begin(), children.end());
-                    break;
-                }
-            }
+            insertSectionsInPlaceOfSection(_children[_parent[id]], children, id);
         }
 
         eraseByValue(_rootSections, section_);
