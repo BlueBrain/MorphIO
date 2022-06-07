@@ -2,7 +2,7 @@
 
 #include <morphio/section.h>
 
-#include "point_utils.h" // operator<<
+#include "point_utils.h"  // operator<<
 
 namespace morphio {
 
