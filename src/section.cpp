@@ -1,11 +1,8 @@
 #include <algorithm>  // all_of
 
-#include <morphio/morphology.h>
 #include <morphio/section.h>
-#include <morphio/tools.h>
-#include <morphio/vector_types.h>
 
-#include "point_utils.h"
+#include "point_utils.h" // operator<<
 
 namespace morphio {
 
