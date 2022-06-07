@@ -1,4 +1,4 @@
-#include <algorithm>  // all_of
+#include <algorithm>  // any_of
 
 #include <morphio/section.h>
 
