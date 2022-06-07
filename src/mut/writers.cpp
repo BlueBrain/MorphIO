@@ -62,13 +62,33 @@ bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
     return section->diameters().front() == section->parent()->diameters().back();
 }
 
-static void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma) {
+void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma) {
     const size_t n_points = soma.points().size();
     const size_t n_diameters = soma.diameters().size();
 
     if (n_points != n_diameters) {
         throw morphio::WriterError(morphio::readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
             "soma points", n_points, "soma diameters", n_diameters));
+    }
+}
+
+
+void raiseIfUnifurcations(const morphio::mut::Morphology& morph) {
+    for (auto it = morph.depth_begin(); it != morph.depth_end(); ++it) {
+        std::shared_ptr<morphio::mut::Section> section_ = *it;
+        if (section_->isRoot()) {
+            continue;
+        }
+
+        unsigned int parentId = section_->parent()->id();
+
+        auto parent = section_->parent();
+        bool isUnifurcation = parent->children().size() == 1;
+
+        if (isUnifurcation) {
+            throw morphio::WriterError(
+                morphio::readers::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(parentId));
+        }
     }
 }
 }  // anonymous namespace
@@ -91,6 +111,8 @@ void swc(const Morphology& morphology, const std::string& filename) {
     if (hasPerimeterData(morphology)) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
+
+    raiseIfUnifurcations(morphology);
 
     std::ofstream myfile(filename);
     using std::setw;
