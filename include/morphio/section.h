@@ -83,7 +83,7 @@ class Section: public SectionBase<Section>
     (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point diameters
     **/
-    range <const floatType> diameters() const {
+    range<const floatType> diameters() const {
         return get<Property::Diameter>();
     }
 
