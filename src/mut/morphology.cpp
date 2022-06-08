@@ -213,17 +213,21 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
         if (section_->isRoot()) {
             // put root section's children in its place
             insertSectionsBeforeSection(_rootSections, children, id);
+            eraseByValue(_rootSections, section_);
         } else {
             // set grandparent as section children's parent
             for (auto child : children) {
                 _parent[child->id()] = _parent[id];
             }
+
+            auto& children_of_parent = _children[_parent[id]];
+
             // put grandchildren at the position of the deleted section
-            insertSectionsBeforeSection(_children[_parent[id]], children, id);
+            insertSectionsBeforeSection(children_of_parent, children, id);
+            eraseByValue(children_of_parent, section_);
         }
 
-        eraseByValue(_rootSections, section_);
-        eraseByValue(_children[_parent[id]], section_);
+        // remove section id from connectivity and section lists
         _children.erase(id);
         _parent.erase(id);
         _sections.erase(id);
