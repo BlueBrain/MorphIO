@@ -39,7 +39,7 @@ class Section: public SectionBase<Section>
     using PointAttribute = Property::Point;
 
   public:
-    /// Depth firt search iterator
+    /// Depth first iterator
     depth_iterator depth_begin() const {
         return depth_iterator(*this);
     }
@@ -47,7 +47,7 @@ class Section: public SectionBase<Section>
         return depth_iterator();
     }
 
-    /// Breadth first search iterator
+    /// Breadth first iterator
     breadth_iterator breadth_begin() const {
         return breadth_iterator(*this);
     }
@@ -55,7 +55,7 @@ class Section: public SectionBase<Section>
         return breadth_iterator();
     }
 
-    /// Upstream first search iterator
+    /// Upstream iterator
     upstream_iterator upstream_begin() const {
         return upstream_iterator(*this);
     }
