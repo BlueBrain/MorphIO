@@ -39,9 +39,7 @@ class Section: public SectionBase<Section>
     using PointAttribute = Property::Point;
 
   public:
-    /**
-       Depth first search iterator
-    **/
+    /// Depth firt search iterator
     depth_iterator depth_begin() const {
         return depth_iterator(*this);
     }
@@ -49,9 +47,7 @@ class Section: public SectionBase<Section>
         return depth_iterator();
     }
 
-    /**
-       Breadth first search iterator
-    **/
+    /// Breadth first search iterator
     breadth_iterator breadth_begin() const {
         return breadth_iterator(*this);
     }
@@ -59,9 +55,7 @@ class Section: public SectionBase<Section>
         return breadth_iterator();
     }
 
-    /**
-       Upstream first search iterator
-    **/
+    /// Upstream first search iterator
     upstream_iterator upstream_begin() const {
         return upstream_iterator(*this);
     }
@@ -96,9 +90,7 @@ class Section: public SectionBase<Section>
         return get<Property::Perimeter>();
     }
 
-    /**
-     * Return the morphological type of this section (dendrite, axon, ...)
-     */
+    /// Return the morphological type of this section (dendrite, axon, ...)
     SectionType type() const {
         return properties_->get<Property::SectionType>()[id_];
     }
@@ -109,9 +101,7 @@ class Section: public SectionBase<Section>
      */
     bool isHeterogeneous(bool downstream = true) const;
 
-    /**
-     * Return true if the both sections have the same points, diameters and perimeters
-     */
+    /// Return true if the both sections have the same points, diameters and perimeters
     bool hasSameShape(const Section& other) const noexcept;
 
     friend class mut::Section;
