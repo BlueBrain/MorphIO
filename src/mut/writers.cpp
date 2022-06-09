@@ -62,7 +62,7 @@ bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
     return section->diameters().front() == section->parent()->diameters().back();
 }
 
-void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma) {
+void checkSomaHasSameNumberPointsDiameters(const morphio::Soma& soma) {
     const size_t n_points = soma.points().size();
     const size_t n_diameters = soma.diameters().size();
 

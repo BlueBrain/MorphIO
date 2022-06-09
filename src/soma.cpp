@@ -40,9 +40,7 @@ floatType Soma::volume() const {
 
 
 floatType Soma::surface() const {
-    return _somaSurface<std::vector<morphio::floatType>, std::vector<Point>>(type(),
-                                                                             diameters(),
-                                                                             points());
+    return _somaSurface(type(), diameters(), points());
 }
 
 

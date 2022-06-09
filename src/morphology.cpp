@@ -151,7 +151,7 @@ Morphology::Morphology(const std::string& contents,
     : Morphology(loadString(contents, extension, options), options) {}
 
 Soma Morphology::soma() const {
-    return Soma(*_properties);
+    return Soma(*properties_);
 }
 
 Mitochondria Morphology::mitochondria() const {
