@@ -39,49 +39,61 @@ class Section: public SectionBase<Section>
     using PointAttribute = Property::Point;
 
   public:
-    /**
-       Depth first search iterator
-    **/
-    depth_iterator depth_begin() const;
-    depth_iterator depth_end() const;
+    /// Depth first iterator
+    depth_iterator depth_begin() const {
+        return depth_iterator(*this);
+    }
+    depth_iterator depth_end() const {
+        return depth_iterator();
+    }
 
-    /**
-       Breadth first search iterator
-    **/
-    breadth_iterator breadth_begin() const;
-    breadth_iterator breadth_end() const;
+    /// Breadth first iterator
+    breadth_iterator breadth_begin() const {
+        return breadth_iterator(*this);
+    }
+    breadth_iterator breadth_end() const {
+        return breadth_iterator();
+    }
 
-    /**
-       Upstream first search iterator
-    **/
-    upstream_iterator upstream_begin() const;
-    upstream_iterator upstream_end() const;
+    /// Upstream iterator
+    upstream_iterator upstream_begin() const {
+        return upstream_iterator(*this);
+    }
+    upstream_iterator upstream_end() const {
+        return upstream_iterator();
+    }
 
     /**
      * Return a view
     (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point coordinates
     **/
-    range<const Point> points() const;
+    range<const Point> points() const {
+        return get<Property::Point>();
+    }
 
     /**
      * Return a view
     (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point diameters
     **/
-    range<const floatType> diameters() const;
+    range<const floatType> diameters() const {
+        return get<Property::Diameter>();
+    }
 
     /**
      * Return a view
      (https://github.com/isocpp/CppCoreGuidelines/blob/master/docs/gsl-intro.md#gslspan-what-is-gslspan-and-what-is-it-for)
      to this section's point perimeters
      **/
-    range<const floatType> perimeters() const;
+    range<const floatType> perimeters() const {
+        return get<Property::Perimeter>();
+    }
 
-    /**
-     * Return the morphological type of this section (dendrite, axon, ...)
-     */
-    SectionType type() const;
+    /// Return the morphological type of this section (dendrite, axon, ...)
+    SectionType type() const {
+        return properties_->get<Property::SectionType>()[id_];
+    }
 
     /**
      * Return true if the sections of the tree downstream (downstream = true) or upstream
@@ -89,9 +101,7 @@ class Section: public SectionBase<Section>
      */
     bool isHeterogeneous(bool downstream = true) const;
 
-    /**
-     * Return true if the both sections have the same points, diameters and perimeters
-     */
+    /// Return true if the both sections have the same points, diameters and perimeters
     bool hasSameShape(const Section& other) const noexcept;
 
     friend class mut::Section;
