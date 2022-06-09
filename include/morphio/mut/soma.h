@@ -15,7 +15,7 @@ class Soma
     explicit Soma(const Property::PointLevel& pointProperties);
     explicit Soma(const morphio::Soma& soma);
 
-    /// Return the coordinates (x,y,z) of all soma point
+    /// Return the coordinates (x,y,z) of all soma points
     inline std::vector<Point>& points() noexcept {
         return point_properties_._points;
     }
