@@ -54,7 +54,7 @@ void bind_mutable_module(py::module& m) {
                                py::return_value_policy::reference)
         .def_property_readonly(
             "soma",
-            [](const morphio::mut::Morphology& self){ return self.soma(); },
+            [](const morphio::mut::Morphology& self) { return self.soma(); },
             "Returns a reference to the soma object\n\n"
             "Note: multiple morphologies can share the same Soma "
             "instance")
@@ -131,7 +131,7 @@ void bind_mutable_module(py::module& m) {
         .def_property_readonly("version", &morphio::mut::Morphology::version, "Returns the version")
 
         .def("remove_unifurcations",
-             static_cast<void (morphio::mut::Morphology::*) ()>(
+             static_cast<void (morphio::mut::Morphology::*)()>(
                  &morphio::mut::Morphology::removeUnifurcations),
              "Fixes the morphology single child sections and issues warnings"
              "if the section starts and ends are inconsistent")
