@@ -16,23 +16,23 @@ class Soma
     explicit Soma(const morphio::Soma& soma);
 
     /// Return the coordinates (x,y,z) of all soma points
-    inline std::vector<Point>& points() noexcept {
+    std::vector<Point>& points() noexcept {
         return point_properties_._points;
     }
-    inline const std::vector<Point>& points() const noexcept {
+    const std::vector<Point>& points() const noexcept {
         return point_properties_._points;
     }
 
     /// Return the diameters of all soma points
-    inline std::vector<morphio::floatType>& diameters() noexcept {
+    std::vector<morphio::floatType>& diameters() noexcept {
         return point_properties_._diameters;
     }
-    inline const std::vector<morphio::floatType>& diameters() const noexcept {
+    const std::vector<morphio::floatType>& diameters() const noexcept {
         return point_properties_._diameters;
     }
 
     /// Return the soma type
-    inline SomaType type() const noexcept {
+    SomaType type() const noexcept {
         return soma_type_;
     }
     /**
