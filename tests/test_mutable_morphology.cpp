@@ -6,6 +6,17 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
+TEST_CASE("soma", "[mutableMorphology]") {
+
+    auto morph = morphio::mut::Morphology("data/simple-heterogeneous-neurite.swc");
+
+    morph.soma();
+    morph.soma()->points();
+    morph.soma()->diameters();
+
+    morph.soma()->diameters() = {2., 3., 4.};
+}
+
 TEST_CASE("isHeterogeneous", "[mutableMorphology]") {
     auto morph = morphio::mut::Morphology("data/simple-heterogeneous-neurite.swc");
 
