@@ -47,16 +47,4 @@ floatType Soma::surface() const {
 floatType Soma::maxDistance() const {
     return maxDistanceToCenterOfGravity(properties_._points);
 }
-
-
-std::ostream& operator<<(std::ostream& os, const Soma& soma) {
-    os << dumpPoints(soma.points());
-    return os;
-}
-
-
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& soma) {
-    os << *soma;
-    return os;
-}
 }  // namespace morphio

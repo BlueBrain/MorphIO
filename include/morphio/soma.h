@@ -90,7 +90,4 @@ struct Soma
     Property::PointLevel properties_;
 };
 
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& soma);
-std::ostream& operator<<(std::ostream& os, const Soma& soma);
-
 }  // namespace morphio
