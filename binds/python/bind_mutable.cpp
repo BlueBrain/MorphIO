@@ -54,8 +54,7 @@ void bind_mutable_module(py::module& m) {
                                py::return_value_policy::reference)
         .def_property_readonly(
             "soma",
-            static_cast<std::shared_ptr<morphio::Soma> (morphio::mut::Morphology::*) ()>(
-             &morphio::mut::Morphology::soma),
+            [](const morphio::mut::Morphology& self){ return self.soma(); },
             "Returns a reference to the soma object\n\n"
             "Note: multiple morphologies can share the same Soma "
             "instance")

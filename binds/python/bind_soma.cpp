@@ -1,4 +1,5 @@
 
+#include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 
@@ -15,14 +16,16 @@ void bind_soma_module(py::module& m) {
     py::class_<morphio::Soma, std::shared_ptr<morphio::Soma>>(m, "Soma")
         .def(py::init<const morphio::Soma&>())
 
+        .def(py::init<const morphio::Property::PointLevel&>())
+
         .def_property(
             "points",
             [](morphio::Soma* soma) {
                 return py::array(static_cast<py::ssize_t>(soma->points().size()),
                                  soma->points().data());
             },
-            [](morphio::Soma* soma, py::array_t<morphio::floatType> _points) {
-                soma->points() = array_to_points(_points);
+            [](morphio::Soma* soma, py::array_t<morphio::floatType> points) {
+                soma->points() = array_to_points(points);
             },
             "Returns the coordinates (x,y,z) of all soma point"
         )
@@ -34,6 +37,7 @@ void bind_soma_module(py::module& m) {
                                  soma->diameters().data());
             },
             [](morphio::Soma* soma, py::array_t<morphio::floatType> _diameters) {
+
                 soma->diameters() = _diameters.cast<std::vector<morphio::floatType>>();
             },
             "Returns the diameters of all soma points"
