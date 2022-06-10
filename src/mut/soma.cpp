@@ -1,8 +1,8 @@
 #include <morphio/mut/soma.h>
 #include <morphio/soma.h>
 
-#include "../point_utils.h"
-#include "../shared_utils.hpp"
+#include "../point_utils.h"     // centerOfGRavity, maxDistanceToCenterOfGravity
+#include "../shared_utils.hpp"  // _somaSurface
 
 namespace morphio {
 namespace mut {
@@ -23,16 +23,6 @@ floatType Soma::surface() const {
 
 floatType Soma::maxDistance() const {
     return maxDistanceToCenterOfGravity(point_properties_._points);
-}
-
-std::ostream& operator<<(std::ostream& os, const Soma& soma) {
-    os << dumpPoints(soma.points());
-    return os;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& soma) {
-    os << *soma;
-    return os;
 }
 
 }  // end namespace mut
