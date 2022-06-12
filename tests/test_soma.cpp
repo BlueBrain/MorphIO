@@ -102,12 +102,12 @@ TEST_CASE("soma-immutable-morphology-constructor", "[soma]") {
 
     REQUIRE(soma.type() == morphio::SomaType::SOMA_SIMPLE_CONTOUR);
 
-    std::vector<morphio::Point> expected_soma_points = {{0.0f, 0.0f, 0.0f},
-                                                        {0.0f, 0.2f, 0.0f},
-                                                        {0.1f, 0.1f, 0.0f}};
+    std::vector<morphio::Point> expected_soma_points = {{0.0, 0.0, 0.0},
+                                                        {0.0, 0.2, 0.0},
+                                                        {0.1, 0.1, 0.0}};
     REQUIRE(soma.points() == expected_soma_points);
 
-    std::vector<morphio::floatType> expected_soma_diameters = {0.2f, 0.2f, 0.2f};
+    std::vector<morphio::floatType> expected_soma_diameters = {0.2, 0.2, 0.2};
     REQUIRE(soma.diameters() == expected_soma_diameters);
 }
 
@@ -119,12 +119,12 @@ TEST_CASE("soma-mutable-morphology-constructor", "[soma]") {
 
     REQUIRE(soma.type() == morphio::SomaType::SOMA_SIMPLE_CONTOUR);
 
-    std::vector<morphio::Point> expected_soma_points = {{0.0f, 0.0f, 0.0f},
-                                                        {0.0f, 0.2f, 0.0f},
-                                                        {0.1f, 0.1f, 0.0f}};
+    std::vector<morphio::Point> expected_soma_points = {{0.0, 0.0, 0.0},
+                                                        {0.0, 0.2, 0.0},
+                                                        {0.1, 0.1, 0.0}};
     REQUIRE(soma.points() == expected_soma_points);
 
-    std::vector<morphio::floatType> expected_soma_diameters = {0.2f, 0.2f, 0.2f};
+    std::vector<morphio::floatType> expected_soma_diameters = {0.2, 0.2, 0.2};
     REQUIRE(soma.diameters() == expected_soma_diameters);
 }
 
@@ -132,11 +132,11 @@ TEST_CASE("soma-mutable-morphology-constructor", "[soma]") {
 TEST_CASE("soma-mutable-morphology-mutation", "[soma]") {
     auto morph = morphio::mut::Morphology("data/h5/v1/Neuron.h5");
 
-    std::vector<morphio::Point> expected_soma_points = {{0.1f, 0.1f, 0.0f}};
+    std::vector<morphio::Point> expected_soma_points = {{0.1, 0.1, 0.0}};
     morph.soma()->points() = expected_soma_points;
     REQUIRE(morph.soma()->points() == expected_soma_points);
 
-    std::vector<morphio::floatType> expected_soma_diameters = {3.0f};
+    std::vector<morphio::floatType> expected_soma_diameters = {3.0};
     morph.soma()->diameters() = expected_soma_diameters;
     REQUIRE(morph.soma()->diameters() == expected_soma_diameters);
 }
