@@ -5,6 +5,7 @@
 #include <morphio/enums.h>
 #include <morphio/soma.h>
 
+#include <morphio/errorMessages.h>
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 
@@ -25,9 +26,11 @@ TEST_CASE("soma-default-constructor", "[soma]") {
     REQUIRE(std::isnan(center[0]));
     REQUIRE(std::isnan(center[1]));
     REQUIRE(std::isnan(center[2]));
-    REQUIRE(std::isnan(soma.surface()));
-    REQUIRE(std::isnan(soma.volume()));
-    REQUIRE(std::isnan(soma.maxDistance()));
+
+    REQUIRE_THROWS_AS(soma.surface(), morphio::SomaError);
+    REQUIRE_THROWS_AS(soma.volume(), morphio::SomaError);
+
+    REQUIRE(soma.maxDistance() == 0);
 }
 
 
