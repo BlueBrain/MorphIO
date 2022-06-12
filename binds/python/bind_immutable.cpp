@@ -213,33 +213,6 @@ void bind_immutable_module(py::module& m) {
                                &morphio::EndoplasmicReticulum::filamentCounts,
                                "Returns the number of filaments for each neuronal section");
 
-
-    py::class_<morphio::Soma>(m, "Soma")
-        .def(py::init<const morphio::Soma&>())
-        .def_property_readonly(
-            "points",
-            [](morphio::Soma* soma) { return span_array_to_ndarray(soma->points()); },
-            "Returns the coordinates (x,y,z) of all soma point")
-        .def_property_readonly(
-            "diameters",
-            [](morphio::Soma* soma) { return span_to_ndarray(soma->diameters()); },
-            "Returns the diameters of all soma points")
-
-        .def_property_readonly(
-            "center",
-            [](morphio::Soma* soma) { return py::array(3, soma->center().data()); },
-            "Returns the center of gravity of the soma points")
-        .def_property_readonly("max_distance",
-                               &morphio::Soma::maxDistance,
-                               "Return the maximum distance between the center of gravity "
-                               "and any of the soma points")
-        .def_property_readonly("type", &morphio::Soma::type, "Returns the soma type")
-
-        .def_property_readonly("surface",
-                               &morphio::Soma::surface,
-                               "Returns the soma surface\n\n"
-                               "Note: the soma surface computation depends on the soma type");
-
     py::class_<morphio::Section>(m, "Section")
         .def("__str__",
              [](const morphio::Section& section) {

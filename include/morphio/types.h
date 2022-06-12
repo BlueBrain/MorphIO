@@ -19,7 +19,7 @@ class Section;
 template <class T>
 class SectionBase;
 
-class Soma;
+struct Soma;
 
 namespace Property {
 struct Properties;
@@ -45,7 +45,6 @@ class MitoSection;
 class Mitochondria;
 class Morphology;
 class Section;
-class Soma;
 }  // namespace mut
 
 using SectionRange = std::pair<size_t, size_t>;

@@ -54,8 +54,7 @@ void bind_mutable_module(py::module& m) {
                                py::return_value_policy::reference)
         .def_property_readonly(
             "soma",
-            static_cast<std::shared_ptr<morphio::mut::Soma>& (morphio::mut::Morphology::*) ()>(
-                &morphio::mut::Morphology::soma),
+            [](const morphio::mut::Morphology& self) { return self.soma(); },
             "Returns a reference to the soma object\n\n"
             "Note: multiple morphologies can share the same Soma "
             "instance")
@@ -132,7 +131,7 @@ void bind_mutable_module(py::module& m) {
         .def_property_readonly("version", &morphio::mut::Morphology::version, "Returns the version")
 
         .def("remove_unifurcations",
-             static_cast<void (morphio::mut::Morphology::*) ()>(
+             static_cast<void (morphio::mut::Morphology::*)()>(
                  &morphio::mut::Morphology::removeUnifurcations),
              "Fixes the morphology single child sections and issues warnings"
              "if the section starts and ends are inconsistent")
@@ -454,42 +453,6 @@ void bind_mutable_module(py::module& m) {
              " the type of the parent section will be used",
              "point_level_properties"_a,
              "section_type"_a = morphio::SectionType::SECTION_UNDEFINED);
-
-    py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>>(m, "Soma")
-        .def(py::init<const morphio::Property::PointLevel&>())
-        .def_property(
-            "points",
-            [](morphio::mut::Soma* soma) {
-                return py::array(static_cast<py::ssize_t>(soma->points().size()),
-                                 soma->points().data());
-            },
-            [](morphio::mut::Soma* soma, py::array_t<morphio::floatType> _points) {
-                soma->points() = array_to_points(_points);
-            },
-            "Returns the coordinates (x,y,z) of all soma point")
-        .def_property(
-            "diameters",
-            [](morphio::mut::Soma* soma) {
-                return py::array(static_cast<py::ssize_t>(soma->diameters().size()),
-                                 soma->diameters().data());
-            },
-            [](morphio::mut::Soma* soma, py::array_t<morphio::floatType> _diameters) {
-                soma->diameters() = _diameters.cast<std::vector<morphio::floatType>>();
-            },
-            "Returns the diameters of all soma points")
-        .def_property_readonly("type", &morphio::mut::Soma::type, "Returns the soma type")
-        .def_property_readonly("surface",
-                               &morphio::mut::Soma::surface,
-                               "Returns the soma surface\n\n"
-                               "Note: the soma surface computation depends on the soma type")
-        .def_property_readonly("max_distance",
-                               &morphio::mut::Soma::maxDistance,
-                               "Return the maximum distance between the center of gravity "
-                               "and any of the soma points")
-        .def_property_readonly(
-            "center",
-            [](morphio::mut::Soma* soma) { return py::array(3, soma->center().data()); },
-            "Returns the center of gravity of the soma points");
 
     py::class_<morphio::mut::EndoplasmicReticulum>(m, "EndoplasmicReticulum")
         .def(py::init<>())

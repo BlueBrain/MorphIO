@@ -1,5 +1,6 @@
 #pragma once
 
+#include <morphio/properties.h>
 #include <morphio/morphology.h>
 #include <morphio/types.h>
 
@@ -25,22 +26,33 @@ namespace morphio {
  *
  * @version unstable
  */
-class Soma
+struct Soma
 {
-  public:
+    Soma() = default;
+    Soma(const Soma& soma) = default;
+
+    explicit Soma(const Property::Properties& properties);
+    explicit Soma(const Property::PointLevel& point_properties);
+
     /// Return the  coordinates (x,y,z) of all soma points
-    range<const Point> points() const noexcept {
-        return properties_->_somaLevel._points;
+    std::vector<Point>& points() noexcept {
+        return properties_._points;
+    }
+    const std::vector<Point>& points() const noexcept {
+        return properties_._points;
     }
 
     /// Return the diameters of all soma points
-    range<const floatType> diameters() const noexcept {
-        return properties_->_somaLevel._diameters;
+    std::vector<morphio::floatType>& diameters() noexcept {
+        return properties_._diameters;
+    }
+    const std::vector<morphio::floatType>& diameters() const noexcept {
+        return properties_._diameters;
     }
 
     /// Return the soma type
     SomaType type() const noexcept {
-        return properties_->_cellLevel._somaType;
+        return soma_type_;
     }
 
     /// Return the center of gravity of the soma points
@@ -64,16 +76,18 @@ class Soma
      */
     floatType maxDistance() const;
 
-  private:
-    explicit Soma(const std::shared_ptr<Property::Properties>& properties);
-    // TODO: find out why the following line does not work
-    // when friend class Morphology; is removed
-    // template <typename Property>
-    // friend const morphio::Soma morphio::Morphology::soma() const;
-    friend class Morphology;
-    friend class mut::Soma;
+    /// Return soma properties
+    Property::PointLevel& properties() noexcept {
+        return properties_;
+    }
+    const Property::PointLevel& properties() const noexcept {
+        return properties_;
+    }
 
-    std::shared_ptr<Property::Properties> properties_;
+  private:
+
+    SomaType soma_type_ = SOMA_UNDEFINED;
+    Property::PointLevel properties_;
 };
 
 }  // namespace morphio

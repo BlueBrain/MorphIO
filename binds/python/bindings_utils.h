@@ -28,7 +28,6 @@ py::array_t<morphio::floatType> span_to_ndarray(const morphio::range<const T>& s
     return py::array(buffer_info);
 }
 
-
 /**
  * @brief "Casts" a Cpp sequence to a python array (no memory copies)
  *  Python capsule handles void pointers to objects and makes sure

@@ -8,7 +8,6 @@
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
-
 #include <morphio/mut/morphology.h>
 
 #include "readers/morphologyASC.h"
@@ -151,7 +150,7 @@ Morphology::Morphology(const std::string& contents,
     : Morphology(loadString(contents, extension, options), options) {}
 
 Soma Morphology::soma() const {
-    return Soma(properties_);
+    return Soma(*properties_);
 }
 
 Mitochondria Morphology::mitochondria() const {

@@ -10,8 +10,9 @@
 #include <morphio/exceptions.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/mitochondria.h>
+
 #include <morphio/mut/modifiers.h>
-#include <morphio/mut/soma.h>
+#include <morphio/soma.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
 
