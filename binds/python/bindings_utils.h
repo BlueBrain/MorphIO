@@ -28,24 +28,6 @@ py::array_t<morphio::floatType> span_to_ndarray(const morphio::range<const T>& s
     return py::array(buffer_info);
 }
 
-
-template <typename T>
-py::array_t<morphio::floatType> vector_to_ndarray(const std::vector<T>& span) {
-    const void* ptr = static_cast<const void*>(span.data());
-    const auto buffer_info = py::buffer_info(
-        // Cast from (const void*) to (void*) for function signature matching
-        const_cast<void*>(ptr),             /* Pointer to buffer */
-        sizeof(T),                          /* Size of one scalar */
-        py::format_descriptor<T>::format(), /* Python struct-style format descriptor */
-        1,                                  /* Number of dimensions */
-
-        // Forced cast to prevent error:
-        // template argument deduction/substitution failed */
-        {static_cast<int>(span.size())}, /* buffer dimentions */
-        {sizeof(T)});                    /* Strides (in bytes) for each index */
-    return py::array(buffer_info);
-}
-
 /**
  * @brief "Casts" a Cpp sequence to a python array (no memory copies)
  *  Python capsule handles void pointers to objects and makes sure
