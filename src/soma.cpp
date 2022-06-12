@@ -1,3 +1,5 @@
+#include <limits>
+
 #include <morphio/section.h>
 #include <morphio/soma.h>
 #include <morphio/vector_types.h>
@@ -7,6 +9,7 @@
 
 namespace morphio {
 
+const floatType NaN = std::numeric_limits<floatType>::quiet_NaN();
 
 Soma::Soma(const Property::Properties& properties)
     : soma_type_(properties._cellLevel._somaType)
@@ -18,11 +21,20 @@ Soma::Soma(const Property::PointLevel& point_properties)
 
 
 Point Soma::center() const {
+
+    if (points().empty()) {
+        return {NaN, NaN, NaN};
+    }
     return centerOfGravity(points());
 }
 
 
 floatType Soma::volume() const {
+
+    if (diameters().empty()) {
+        return NaN;
+    }
+
     switch (soma_type_) {
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: {
         floatType radius = diameters()[0] / 2;
@@ -40,11 +52,17 @@ floatType Soma::volume() const {
 
 
 floatType Soma::surface() const {
+    if (points().empty()) {
+        return NaN;
+    }
     return _somaSurface(type(), diameters(), points());
 }
 
 
 floatType Soma::maxDistance() const {
-    return maxDistanceToCenterOfGravity(properties_._points);
+    if (points().empty()) {
+        return NaN;
+    }
+    return maxDistanceToCenterOfGravity(points());
 }
 }  // namespace morphio
