@@ -1,4 +1,4 @@
-#include <algorithm>
+#include <algorithm>  // std::find_if
 #include <cassert>
 #include <cctype>    // std::tolower
 #include <iterator>  // std::back_inserter
