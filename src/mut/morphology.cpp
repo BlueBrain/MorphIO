@@ -208,7 +208,7 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
     } else {
         // Careful not to use a reference here or you will face reference invalidation problem
         // with vector resize
-        auto children = section_->children();
+        const auto children = section_->children();
 
         if (section_->isRoot()) {
             // put root section's children in its place
