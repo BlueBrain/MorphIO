@@ -188,7 +188,7 @@ void inline insertSectionsBeforeSection(std::vector<std::shared_ptr<Section>>& s
     // get the iterator to the section with section_id in sections_to_update
     auto it = std::find_if(sections_to_update.begin(), sections_to_update.end(), equals_section_id);
 
-    // Insert the sections at this poisition
+    // Insert the sections at this position
     // Note that the section with section_id is not removed at this step
     sections_to_update.insert(it, sections.begin(), sections.end());
 }
