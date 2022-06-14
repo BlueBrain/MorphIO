@@ -718,195 +718,175 @@ def _assert_sections_equal(morph1, morph2, section_ids):
 
 
 def test_delete_section__maintain_children_order_non_root_section(tmp_path):
+    string = """
+    ("CellBody"
+      (Color Red)
+      (CellBody)
+      ( 0.1  0.1 0.0 0.1)
+      ( 0.1 -0.1 0.0 0.1)
+    )
 
-    with tmp_asc_file(
-        tmp_path,
-        """
-        ("CellBody"
-          (Color Red)
-          (CellBody)
-          ( 0.1  0.1 0.0 0.1)
-          ( 0.1 -0.1 0.0 0.1)
+    ( (Color Cyan)
+      (Axon)
+      (0.0  0.0 0.0 2.0) ; section 0
+      (0.0 -4.0 1.0 2.0)
+      (
+        (0.0 -4.0 1.0 4.0) ; section 1
+        (0.0 -4.0 2.0 4.0)
+        (0.0 -4.0 3.0 4.0)
+        (
+            (6.0 -4.0 0.0 4.0) ; section 2
+            (7.0 -5.0 0.0 4.0)
+        |
+            (6.0 -4.0 0.0 4.0) ; section 3
+            (8.0 -4.0 0.0 4.0)
         )
+      |
+        ( 0.0 -4.0 1.0 4.0) ; section 4
+        (-5.0 -4.0 0.0 4.0)
+      )
+    )
+    """
+    morph = ImmutableMorphology(string, "asc").as_mutable()
 
-        ( (Color Cyan)
-          (Axon)
-          (0.0  0.0 0.0 2.0) ; section 0
-          (0.0 -4.0 1.0 2.0)
-          (
-            (0.0 -4.0 1.0 4.0) ; section 1
-            (0.0 -4.0 2.0 4.0)
-            (0.0 -4.0 3.0 4.0)
-            (
-                (6.0 -4.0 0.0 4.0) ; section 2
-                (7.0 -5.0 0.0 4.0)
-            |
-                (6.0 -4.0 0.0 4.0) ; section 3
-                (8.0 -4.0 0.0 4.0)
-            )
-          |
-            ( 0.0 -4.0 1.0 4.0) ; section 4
-            (-5.0 -4.0 0.0 4.0)
-          )
-        )
-        """
-    ) as tfile:
+    axon = morph.root_sections[0]
+    to_be_removed_section = axon.children[0]
+    morph.delete_section(to_be_removed_section, recursive=False)
 
-        filepath = tfile.name
+    assert [s.id for s in morph.iter()] == [0, 2, 3, 4]
 
-        # make copy to compare afterwards
-        morph = Morphology(filepath)
+    # a trifurcation is made
+    assert [s.id for s in axon.children] == [2, 3, 4]
 
-        axon = morph.root_sections[0]
-        to_be_removed_section = axon.children[0]
-        morph.delete_section(to_be_removed_section, recursive=False)
+    # ensure nothing has been added to the leaves
+    for child in axon.children:
+        assert child.children == []
 
-        assert [s.id for s in morph.iter()] == [0, 2, 3, 4]
-
-        # a trifurcation is made
-        assert [s.id for s in axon.children] == [2, 3, 4]
-
-        # ensure nothing has been added to the leaves
-        for child in axon.children:
-            assert child.children == []
-
-        # check that data has not been messed up
-        original = Morphology(filepath)
-        _assert_sections_equal(morph, original, [0, 2, 3, 4])
+    # check that data has not been messed up
+    original = ImmutableMorphology(string, "asc").as_mutable()
+    _assert_sections_equal(morph, original, [0, 2, 3, 4])
 
 
 def test_delete_section__maintain_children_order_non_root_section_multiple(tmp_path):
-    with tmp_asc_file(
-        tmp_path,
-        """
-        ("CellBody"
-          (Color Red)
-          (CellBody)
-          ( 0.1  0.1 0.0 0.1)
-          ( 0.1 -0.1 0.0 0.1)
-        )
+    string = """
+    ("CellBody"
+      (Color Red)
+      (CellBody)
+      ( 0.1  0.1 0.0 0.1)
+      ( 0.1 -0.1 0.0 0.1)
+    )
 
-        ( (Color Cyan)
-          (Axon)
-          (0.0  0.0 0.0 2.0) ; section 0
-          (0.0 -4.0 1.0 2.0)
-          (
-            (0.0 -4.0 1.0 4.0) ; section 1
-            (0.0 -4.0 2.0 4.0)
-            (0.0 -4.0 3.0 4.0)
+    ( (Color Cyan)
+      (Axon)
+      (0.0  0.0 0.0 2.0) ; section 0
+      (0.0 -4.0 1.0 2.0)
+      (
+        (0.0 -4.0 1.0 4.0) ; section 1
+        (0.0 -4.0 2.0 4.0)
+        (0.0 -4.0 3.0 4.0)
+        (
+            (6.0 -4.0 0.0 4.0) ; section 2
+            (7.0 -5.0 0.0 4.0)
             (
-                (6.0 -4.0 0.0 4.0) ; section 2
-                (7.0 -5.0 0.0 4.0)
-                (
-                    (8.0 -4.0 0.0 4.0) ; section 3
-                    (8.0 -5.0 0.0 4.0)
-                |
-                    (8.0 -4.0 0.0 4.0) ; section 4
-                    (8.0 -5.0 0.0 4.0)
-                )
+                (8.0 -4.0 0.0 4.0) ; section 3
+                (8.0 -5.0 0.0 4.0)
             |
-                (6.0 -4.0 0.0 4.0) ; section 5
-                (8.0 -4.0 0.0 4.0)
+                (8.0 -4.0 0.0 4.0) ; section 4
+                (8.0 -5.0 0.0 4.0)
             )
-          |
-            ( 0.0 -4.0 1.0 4.0) ; section 6
-            (-5.0 -4.0 0.0 4.0)
-            (
-                (3.0 2.0 1.0 4.0) ; section 7
-                (3.0 2.0 0.0 4.0)
-            |
-                (2.0 3.0 1.0 4.0) ; section 8
-                (2.0 3.0 0.0 4.0)
-            )
-          )
+        |
+            (6.0 -4.0 0.0 4.0) ; section 5
+            (8.0 -4.0 0.0 4.0)
         )
-        """
-    ) as tfile:
+      |
+        ( 0.0 -4.0 1.0 4.0) ; section 6
+        (-5.0 -4.0 0.0 4.0)
+        (
+            (3.0 2.0 1.0 4.0) ; section 7
+            (3.0 2.0 0.0 4.0)
+        |
+            (2.0 3.0 1.0 4.0) ; section 8
+            (2.0 3.0 0.0 4.0)
+        )
+      )
+    )
+    """
+    morph = ImmutableMorphology(string, "asc").as_mutable()
 
-        filepath = tfile.name
+    morph.delete_section(morph.section(0), recursive=False)
+    morph.delete_section(morph.section(1), recursive=False)
+    morph.delete_section(morph.section(4), recursive=False)
+    morph.delete_section(morph.section(7), recursive=False)
 
-        morph = Morphology(filepath)
+    assert [s.id for s in morph.iter()] == [2, 3, 5, 6, 8]
+    assert [s.id for s in morph.root_sections] == [2, 5, 6]
 
-        morph.delete_section(morph.section(0), recursive=False)
-        morph.delete_section(morph.section(1), recursive=False)
-        morph.delete_section(morph.section(4), recursive=False)
-        morph.delete_section(morph.section(7), recursive=False)
+    # made unifurcations
+    assert [s.id for s in morph.section(2).children] == [3]
+    assert [s.id for s in morph.section(6).children] == [8]
 
-        assert [s.id for s in morph.iter()] == [2, 3, 5, 6, 8]
-        assert [s.id for s in morph.root_sections] == [2, 5, 6]
+    # ensure nothing has been added to the leaves
+    for leaf_id in [3, 5, 8]:
+        assert morph.section(leaf_id).children == []
 
-        # made unifurcations
-        assert [s.id for s in morph.section(2).children] == [3]
-        assert [s.id for s in morph.section(6).children] == [8]
-
-        # ensure nothing has been added to the leaves
-        for leaf_id in [3, 5, 8]:
-            assert morph.section(leaf_id).children == []
-
-        # check that data has not been messed up
-        original = Morphology(filepath)
-        _assert_sections_equal(morph, original, [2, 3, 5, 6, 8])
+    # check that data has not been messed up
+    original = ImmutableMorphology(string, "asc").as_mutable()
+    _assert_sections_equal(morph, original, [2, 3, 5, 6, 8])
 
 
 def test_delete_section__maintain_children_order_root_section(tmp_path):
-    with tmp_asc_file(
-        tmp_path,
-        """
-        ("CellBody"
-          (Color Red)
-          (CellBody)
-          ( 0.1  0.1 0.0 0.1)
-          ( 0.1 -0.1 0.0 0.1)
+    string = """
+    ("CellBody"
+      (Color Red)
+      (CellBody)
+      ( 0.1  0.1 0.0 0.1)
+      ( 0.1 -0.1 0.0 0.1)
+    )
+
+    ( (Color Cyan)
+      (Axon)
+      (0.0  0.0 0.0 2.0) ; section 0
+      (0.0 -4.0 1.0 2.0)
+      (
+        (0.0 -4.0 1.0 4.0) ; section 1
+        (0.0 -4.0 2.0 4.0)
+        (0.0 -4.0 3.0 4.0)
+        (
+            (6.0 -4.0 0.0 4.0) ; section 2
+            (7.0 -5.0 0.0 4.0)
+        |
+            (6.0 -4.0 0.0 4.0) ; section 3
+            (8.0 -4.0 0.0 4.0)
         )
+      |
+        ( 0.0 -4.0 1.0 4.0) ; section 4
+        (-5.0 -4.0 0.0 4.0)
+      )
+    )
 
-        ( (Color Cyan)
-          (Axon)
-          (0.0  0.0 0.0 2.0) ; section 0
-          (0.0 -4.0 1.0 2.0)
-          (
-            (0.0 -4.0 1.0 4.0) ; section 1
-            (0.0 -4.0 2.0 4.0)
-            (0.0 -4.0 3.0 4.0)
-            (
-                (6.0 -4.0 0.0 4.0) ; section 2
-                (7.0 -5.0 0.0 4.0)
-            |
-                (6.0 -4.0 0.0 4.0) ; section 3
-                (8.0 -4.0 0.0 4.0)
-            )
-          |
-            ( 0.0 -4.0 1.0 4.0) ; section 4
-            (-5.0 -4.0 0.0 4.0)
-          )
-        )
+    ( (Color Cyan)
+      (Dendrite)
+      (1.0  1.0 1.0 2.0) ; section 5
+      (1.0  1.0 2.0 2.0)
+    )
+    """
+    morph = ImmutableMorphology(string, "asc").as_mutable()
 
-        ( (Color Cyan)
-          (Dendrite)
-          (1.0  1.0 1.0 2.0) ; section 5
-          (1.0  1.0 2.0 2.0)
-        )
-        """
-    ) as tfile:
+    root = morph.root_sections[0]
+    morph.delete_section(root, recursive=False)
 
-        filepath = tfile.name
+    assert [s.id for s in morph.iter()] == [1, 2, 3, 4, 5]
 
-        morph = Morphology(filepath)
+    # the children of root 0 are put in its place
+    assert [s.id for s in morph.root_sections] == [1, 4, 5]
+    assert [s.id for s in morph.root_sections[0].children] == [2, 3]
+    assert [s.id for s in morph.root_sections[1].children] == []
+    assert [s.id for s in morph.root_sections[2].children] == []
 
-        root = morph.root_sections[0]
-        morph.delete_section(root, recursive=False)
+    # check that nothing has been added to the leaves
+    for section_id in [2, 3, 4, 5]:
+        assert morph.section(section_id).children == []
 
-        assert [s.id for s in morph.iter()] == [1, 2, 3, 4, 5]
-
-        # the children of root 0 are put in its place
-        assert [s.id for s in morph.root_sections] == [1, 4, 5]
-        assert [s.id for s in morph.root_sections[0].children] == [2, 3]
-        assert [s.id for s in morph.root_sections[1].children] == []
-        assert [s.id for s in morph.root_sections[2].children] == []
-
-        # check that nothing has been added to the leaves
-        for section_id in [2, 3, 4, 5]:
-            assert morph.section(section_id).children == []
-
-        # check that data has not been messed up
-        original = Morphology(filepath)
-        _assert_sections_equal(morph, original, [1, 2, 3, 4, 5])
+    # check that data has not been messed up
+    original = ImmutableMorphology(string, "asc").as_mutable()
+    _assert_sections_equal(morph, original, [1, 2, 3, 4, 5])
