@@ -1,5 +1,6 @@
+#include <algorithm>
 #include <cassert>
-#include <cctype>  // std::tolower
+#include <cctype>    // std::tolower
 #include <iterator>  // std::back_inserter
 #include <sstream>
 #include <string>
@@ -179,14 +180,17 @@ void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
 void inline insertSectionsBeforeSection(std::vector<std::shared_ptr<Section>>& sections_to_update,
                                         const std::vector<std::shared_ptr<Section>>& sections,
                                         uint32_t section_id) {
-    // find where the section_id is located in sections_to_update and insert the sections
-    // before that. Note that the section with section_id is not removed at this step
-    for (auto it = sections_to_update.begin(); it != sections_to_update.end(); ++it) {
-        if ((*it)->id() == section_id) {
-            sections_to_update.insert(it, sections.begin(), sections.end());
-            break;
-        }
-    }
+    // lambda to check if a section has the given id
+    auto equals_section_id = [section_id](const std::shared_ptr<Section>& section) {
+        return section->id() == section_id;
+    };
+
+    // get the iterator to the section with section_id in sections_to_update
+    auto it = std::find_if(sections_to_update.begin(), sections_to_update.end(), equals_section_id);
+
+    // Insert the sections at this poisition
+    // Note that the section with section_id is not removed at this step
+    sections_to_update.insert(it, sections.begin(), sections.end());
 }
 
 void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive) {
