@@ -179,10 +179,10 @@ void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
 
 void inline insertSectionsBeforeSection(std::vector<std::shared_ptr<Section>>& sections_to_update,
                                         const std::vector<std::shared_ptr<Section>>& sections,
-                                        uint32_t section_id) {
+                                        const std::shared_ptr<Section>& target_section) {
     // lambda to check if a section has the given id
-    auto equals_section_id = [section_id](const std::shared_ptr<Section>& section) {
-        return section->id() == section_id;
+    auto equals_section_id = [&target_section](const std::shared_ptr<Section>& section) {
+        return (section->id() == target_section->id()) && section->hasSameShape(*target_section);
     };
 
     // get the iterator to the section with section_id in sections_to_update
@@ -216,7 +216,7 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
 
         if (section_->isRoot()) {
             // put root section's children in its place
-            insertSectionsBeforeSection(_rootSections, children, id);
+            insertSectionsBeforeSection(_rootSections, children, section_);
             eraseByValue(_rootSections, section_);
         } else {
             // set grandparent as section children's parent
@@ -227,7 +227,7 @@ void Morphology::deleteSection(std::shared_ptr<Section> section_, bool recursive
             auto& children_of_parent = _children[_parent[id]];
 
             // put grandchildren at the position of the deleted section
-            insertSectionsBeforeSection(children_of_parent, children, id);
+            insertSectionsBeforeSection(children_of_parent, children, section_);
             eraseByValue(children_of_parent, section_);
         }
 
