@@ -717,7 +717,7 @@ def _assert_sections_equal(morph1, morph2, section_ids):
         npt.assert_array_equal(s1.diameters, s2.diameters)
 
 
-def test_delete_section__maintain_children_order_non_root_section(tmp_path):
+def test_delete_section__maintain_children_order_non_root_section():
     string = """
     ("CellBody"
       (Color Red)
@@ -767,7 +767,7 @@ def test_delete_section__maintain_children_order_non_root_section(tmp_path):
     _assert_sections_equal(morph, original, [0, 2, 3, 4])
 
 
-def test_delete_section__maintain_children_order_non_root_section_multiple(tmp_path):
+def test_delete_section__maintain_children_order_non_root_section_multiple():
     string = """
     ("CellBody"
       (Color Red)
@@ -813,12 +813,17 @@ def test_delete_section__maintain_children_order_non_root_section_multiple(tmp_p
     """
     morph = ImmutableMorphology(string, "asc").as_mutable()
 
+    # for reference and sanity
+    assert [s.id for s in morph.iter(iter_type=morphio.IterType.depth_first)] == [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    assert [s.id for s in morph.iter(iter_type=morphio.IterType.breadth_first)] == [0, 1, 6, 2, 5, 7, 8, 3, 4]
+
     morph.delete_section(morph.section(0), recursive=False)
     morph.delete_section(morph.section(1), recursive=False)
     morph.delete_section(morph.section(4), recursive=False)
     morph.delete_section(morph.section(7), recursive=False)
 
     assert [s.id for s in morph.iter()] == [2, 3, 5, 6, 8]
+    #assert [s.id for s in morph.iter(iter_type=morphio.IterType.breadth_first)] == [6, 2, 5, 8, 3]
     assert [s.id for s in morph.root_sections] == [2, 5, 6]
 
     # made unifurcations
@@ -834,7 +839,7 @@ def test_delete_section__maintain_children_order_non_root_section_multiple(tmp_p
     _assert_sections_equal(morph, original, [2, 3, 5, 6, 8])
 
 
-def test_delete_section__maintain_children_order_root_section(tmp_path):
+def test_delete_section__maintain_children_order_root_section():
     string = """
     ("CellBody"
       (Color Red)
@@ -890,3 +895,100 @@ def test_delete_section__maintain_children_order_root_section(tmp_path):
     # check that data has not been messed up
     original = ImmutableMorphology(string, "asc").as_mutable()
     _assert_sections_equal(morph, original, [1, 2, 3, 4, 5])
+
+
+def test_delete_section__unifurcation_bridge():
+    pl = morphio.PointLevel(
+        [[1., 2., 3.], [1., 2., 3.]],
+        [0.1, 0.1],
+    )
+
+    basal = morphio.SectionType.basal_dendrite
+    axon =  morphio.SectionType.axon
+
+    morph = morphio.mut.Morphology()
+
+    s0 = morph.append_root_section(pl, basal) # 0
+    s1 = morph.append_root_section(pl, axon) # 1
+    s2 = morph.append_root_section(pl, basal) # 2
+
+    # a unifurcation, only one child
+    s3 = s1.append_section(pl, axon) # 3
+    s4 = s3.append_section(pl, axon) # 4
+
+    s4.append_section(pl, axon) # 5
+    s4.append_section(pl, axon) # 6
+
+    assert [s.id for s in morph.iter()] == [0, 1, 3, 4, 5, 6, 2]
+
+    morph.delete_section(s3, recursive=False)
+
+    assert [s.id for s in morph.iter()] == [0, 1, 4, 5, 6, 2]
+    assert [s.parent.id for s in s1.children] == [1]
+    assert [s.id for s in s1.children] == [4]
+
+    morph.delete_section(s4, recursive=False)
+
+    assert [s.id for s in morph.iter()] == [0, 1, 5, 6, 2]
+    assert [s.parent.id for s in s1.children] == [1, 1]
+    assert [s.id for s in s1.children] == [5, 6]
+
+
+def test_delete_section__remove_all_children():
+
+    pl = morphio.PointLevel(
+        [[1., 2., 3.], [1., 2., 3.]],
+        [0.1, 0.1],
+    )
+
+    basal = morphio.SectionType.basal_dendrite
+
+    morph = morphio.mut.Morphology()
+
+    s0 = morph.append_root_section(pl, basal) # 0
+    s1 = s0.append_section(pl, basal) # 1
+    s2 = s0.append_section(pl, basal) # 2
+
+    morph.delete_section(s1, recursive=False)
+    morph.delete_section(s2, recursive=False)
+
+    assert [s.id for s in morph.iter()] == [0]
+    assert not s0.children
+
+    s3 = s0.append_section(pl, basal) # 3
+    s4 = s0.append_section(pl, basal) # 4
+
+    assert [s.id for s in morph.iter()] == [0, 3, 4]
+    assert [s.id for s in s0.children] == [3, 4]
+
+
+def test_delete_section__append_delete():
+
+    pl = morphio.PointLevel(
+        [[1., 2., 3.], [1., 2., 3.]],
+        [0.1, 0.1],
+    )
+
+    basal = morphio.SectionType.basal_dendrite
+    axon =  morphio.SectionType.axon
+
+    morph = morphio.mut.Morphology()
+
+    s0 = morph.append_root_section(pl, basal) # 0
+    s1 = morph.append_root_section(pl, axon) # 1
+    s2 = s1.append_section(pl, axon) # 2
+
+    s3 = s1.append_section(pl, axon) # 3
+
+    s4 = s3.append_section(pl, axon) # 4
+    s5 = s3.append_section(pl, axon) # 5
+    s6 = s3.append_section(pl, axon) # 6
+
+    morph.delete_section(s4, recursive=False)
+    s3.append_section(pl, axon) # 7
+    morph.delete_section(s3, recursive=False)
+
+    assert [s.id for s in morph.iter()] == [0, 1, 2, 5, 6, 7]
+
+    assert [s.parent.id for s in s1.children] == [1, 1, 1, 1]
+    assert [s.id for s in s1.children] == [2, 5, 6, 7]
