@@ -992,3 +992,67 @@ def test_delete_section__append_delete():
 
     assert [s.parent.id for s in s1.children] == [1, 1, 1, 1]
     assert [s.id for s in s1.children] == [2, 5, 6, 7]
+
+
+def test_delete_section__traversals():
+    string = """
+    ("CellBody"
+      (Color Red)
+      (CellBody)
+      ( 0.1  0.1 0.0 0.1)
+      ( 0.1 -0.1 0.0 0.1)
+    )
+
+    ( (Color Cyan)
+      (Axon)
+      (0.0  0.0 0.0 2.0) ; section 0
+      (0.0 -4.0 1.0 2.0)
+      (
+        (0.0 -4.0 1.0 4.0) ; section 1
+        (0.0 -4.0 2.0 4.0)
+        (0.0 -4.0 3.0 4.0)
+        (
+            (6.0 -4.0 0.0 4.0) ; section 2
+            (7.0 -5.0 0.0 4.0)
+        |
+            (6.0 -4.0 0.0 4.0) ; section 3
+            (8.0 -4.0 0.0 4.0)
+        )
+      |
+        ( 0.0 -4.0 1.0 4.0) ; section 4
+        (-5.0 -4.0 0.0 4.0)
+      )
+    )
+
+    ( (Color Cyan)
+      (Dendrite)
+      (1.0  1.0 1.0 2.0) ; section 5
+      (1.0  1.0 2.0 2.0)
+    )
+    """
+    morph = ImmutableMorphology(string, "asc").as_mutable()
+
+    assert [s.id for s in morph.iter(morphio.IterType.depth_first)] == [0, 1, 2, 3, 4, 5]
+    assert [s.id for s in morph.iter(morphio.IterType.breadth_first)] == [0, 5, 1, 4, 2, 3]
+    assert [s.id for s in morph.section(3).iter(morphio.IterType.upstream)] == [3, 1, 0]
+
+    morph.delete_section(morph.section(1), recursive=False)
+
+    assert [s.id for s in morph.iter(morphio.IterType.depth_first)] == [0, 2, 3, 4, 5]
+    assert [s.id for s in morph.iter(morphio.IterType.breadth_first)] == [0, 5, 2, 3, 4]
+    assert [s.id for s in morph.section(3).iter(morphio.IterType.upstream)] == [3, 0]
+
+    morph.delete_section(morph.section(3), recursive=False)
+
+    assert [s.id for s in morph.iter(morphio.IterType.depth_first)] == [0, 2, 4, 5]
+    assert [s.id for s in morph.iter(morphio.IterType.breadth_first)] == [0, 5, 2, 4]
+
+    morph.delete_section(morph.section(0), recursive=False)
+
+    assert [s.id for s in morph.iter(morphio.IterType.depth_first)] == [2, 4, 5]
+    assert [s.id for s in morph.iter(morphio.IterType.breadth_first)] == [2, 4, 5]
+
+    morph.delete_section(morph.section(4), recursive=False)
+
+    assert [s.id for s in morph.iter(morphio.IterType.depth_first)] == [2, 5]
+    assert [s.id for s in morph.iter(morphio.IterType.breadth_first)] == [2, 5]
