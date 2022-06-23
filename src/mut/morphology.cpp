@@ -180,15 +180,13 @@ void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
 void inline insertSectionsBeforeSection(std::vector<std::shared_ptr<Section>>& sections_to_update,
                                         const std::vector<std::shared_ptr<Section>>& sections,
                                         const std::shared_ptr<Section>& target_section) {
-    // lambda to check if a section has the given id
+
     auto is_equal = [&target_section](const std::shared_ptr<Section>& section) {
         return (section->id() == target_section->id()) && section->hasSameShape(*target_section);
     };
 
-    // get the iterator to the section with section_id in sections_to_update
     auto it = std::find_if(sections_to_update.begin(), sections_to_update.end(), is_equal);
 
-    // Insert the sections at this position
     // Note that the section with section_id is not removed at this step
     sections_to_update.insert(it, sections.begin(), sections.end());
 }
