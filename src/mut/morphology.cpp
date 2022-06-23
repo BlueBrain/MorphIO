@@ -180,7 +180,6 @@ void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
 void inline insertSectionsBeforeSection(std::vector<std::shared_ptr<Section>>& sections_to_update,
                                         const std::vector<std::shared_ptr<Section>>& sections,
                                         const std::shared_ptr<Section>& target_section) {
-
     auto is_equal = [&target_section](const std::shared_ptr<Section>& section) {
         return (section->id() == target_section->id()) && section->hasSameShape(*target_section);
     };
