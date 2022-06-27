@@ -180,7 +180,7 @@ class Morphology
     }
 
     /// Write file to H5, SWC, ASC format depending on filename extension
-    void write(const std::string& filename);
+    void write(const std::string& filename) const;
 
     void addAnnotation(const morphio::Property::Annotation& annotation) {
         _cellProperties->_annotations.push_back(annotation);
