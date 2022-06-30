@@ -122,12 +122,11 @@ TEST_CASE("LoadH5DendriticSpine", "[DendriticSpine]") {
         REQUIRE(d.points().size() == 8);
         REQUIRE(d.postSynapticDensity().size() == 2);
     }
-#if 0
     {
         const morphio::Morphology m("data/h5/v1/glia_soma_only.h5");
         REQUIRE(m.soma().points().size() == 1);
-        REQUIRE(m.points().size() == 0);
-        REQUIRE(m.perimeters().size() == 0);
+        REQUIRE(m.points().empty());
+        REQUIRE(m.perimeters().empty());
     }
 
     {  // empty perimeters
@@ -139,7 +138,6 @@ TEST_CASE("LoadH5DendriticSpine", "[DendriticSpine]") {
         CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/glia_wrong_sized_perimeters.h5"),
                         morphio::RawDataError);
     }
-#endif
 }
 
 TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {
