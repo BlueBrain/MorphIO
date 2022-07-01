@@ -3,6 +3,7 @@
 
 #include <highfive/H5File.hpp>
 #include <morphio/dendritic_spine.h>
+#include <morphio/enums.h>
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
@@ -40,6 +41,15 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
         REQUIRE(m.points().size() == 12);
         // 2 point soma
         REQUIRE(m.somaType() == morphio::SomaType::SOMA_UNDEFINED);
+    }
+
+    {
+        // This is to cover the appendProperties perimeters line in mut/morphology.cpp,
+        // which is triggered if modifiers are used in a morphology that has perimeters
+        const morphio::Morphology m("data/h5/v1/glia.h5", morphio::enums::Option::NRN_ORDER);
+        REQUIRE(m.soma().points().size() == 2);
+        REQUIRE(m.points().size() == 2);
+        REQUIRE(m.perimeters().size() == 2);
     }
 
     {  // file is an not a valid h5 file
@@ -89,7 +99,6 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
     }
 }
 
-
 TEST_CASE("LoadH5Glia", "[morphology]") {
     {
         const morphio::Morphology m("data/h5/v1/glia.h5");
@@ -97,7 +106,6 @@ TEST_CASE("LoadH5Glia", "[morphology]") {
         REQUIRE(m.points().size() == 2);
         REQUIRE(m.perimeters().size() == 2);
     }
-
     {
         const morphio::Morphology m("data/h5/v1/glia_soma_only.h5");
         REQUIRE(m.soma().points().size() == 1);

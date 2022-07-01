@@ -1,3 +1,9 @@
+v3.3.4
+======
+
+Fixes:
+* Fix wrong section order when section is deleted (#412)
+
 v3.3.3
 ======
 
