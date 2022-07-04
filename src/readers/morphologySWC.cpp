@@ -330,9 +330,7 @@ class SWCBuilder
                 //  somas into their custom 'Three-point soma representation':
                 //   http://neuromorpho.org/SomaFormat.html
 
-                if (!ErrorMessages::isIgnored(Warning::SOMA_NON_CONFORM)) {
-                    _checkNeuroMorphoSoma(this->samples[somaRootId], children_soma_points);
-                }
+                _checkNeuroMorphoSoma(this->samples[somaRootId], children_soma_points);
 
                 return SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
             }

@@ -11,6 +11,7 @@
 #include <morphio/mut/section.h>  // Warning, Option
 
 namespace morphio {
+
 /** Set the maximum number of warnings to be printed on screen **/
 void set_maximum_warnings(int n_warnings);
 /** Set whether to interpet warning as errors **/
@@ -61,9 +62,6 @@ struct DebugInfo {
     std::map<unsigned int, int> _lineNumbers;
 };
 
-// TODO: this shouldn't be global static
-static std::set<Warning> _ignoredWarnings;
-
 /** Class that can generate error messages and holds a collection of predefined errors
     messages **/
 class ErrorMessages
@@ -79,7 +77,7 @@ class ErrorMessages
         : _uri(uri) {}
 
     /** Is the output of the warning ignored */
-    static bool isIgnored(Warning warning);
+    static bool isIgnored(const Warning& warning);
 
     /** Returns a link to a line number within the morphology file **/
     std::string errorLink(long unsigned int lineNumber, ErrorLevel errorLevel) const {
