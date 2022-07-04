@@ -67,11 +67,6 @@ static std::set<Warning> _ignoredWarnings;
 /** A sample of section for error reporting, includes its position (line) within the file. **/
 struct Sample {
     Sample() = default;
-
-    floatType diameter = -1.;
-    bool valid = false;
-    Point point{};
-    SectionType type = SECTION_UNDEFINED;
     int parentId = -1;
     unsigned int id = 0;
     unsigned int lineNumber = 0;
@@ -134,23 +129,23 @@ class ErrorMessages
                                                            const VascularSectionType& type) const;
 
     /** Multiple somas error message */
-    std::string ERROR_MULTIPLE_SOMATA(const std::vector<Sample>& somata) const;
+    std::string ERROR_MULTIPLE_SOMATA(const std::vector<unsigned int>& lineNumbers) const;
 
     /** Missing section parent error message */
     std::string ERROR_MISSING_PARENT(const Sample& sample) const;
 
     /** Bifurcating soma error message */
-    std::string ERROR_SOMA_BIFURCATION(const Sample& sample,
-                                       const std::vector<Sample>& children) const;
+    std::string ERROR_SOMA_BIFURCATION(unsigned int sampleLineNumber,
+                                       const std::vector<unsigned int>& childrenLineNumbers) const;
 
     /** Soma with neurite parent error message */
-    std::string ERROR_SOMA_WITH_NEURITE_PARENT(const Sample& sample) const;
+    std::string ERROR_SOMA_WITH_NEURITE_PARENT(unsigned int lineNumber) const;
 
     /** Repeated section id error message */
     std::string ERROR_REPEATED_ID(const Sample& originalSample, const Sample& newSample) const;
 
     /** Section self parent error message */
-    std::string ERROR_SELF_PARENT(const Sample& sample) const;
+    std::string ERROR_SELF_PARENT(unsigned int lineNumber) const;
 
     /** Undefined soma error message */
     std::string ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std::string&) const;
@@ -232,9 +227,9 @@ class ErrorMessages
     /** Soma not found warning message */
     std::string WARNING_NO_SOMA_FOUND() const;
     /** Writing zero diameter warning message */
-    std::string WARNING_ZERO_DIAMETER(const Sample& sample) const;
+    std::string WARNING_ZERO_DIAMETER(long unsigned int lineNumber) const;
     /** Writing disconnected neurite warning message */
-    std::string WARNING_DISCONNECTED_NEURITE(const Sample& sample) const;
+    std::string WARNING_DISCONNECTED_NEURITE(long unsigned int lineNumber) const;
     /** Writing wrong duplicate warning message */
     std::string WARNING_WRONG_DUPLICATE(const std::shared_ptr<morphio::mut::Section>& current,
                                         const std::shared_ptr<morphio::mut::Section>& parent) const;
@@ -246,12 +241,16 @@ class ErrorMessages
                                    unsigned int childId) const;
 
     /** Soma does not conform NeuroMorpho warning message */
-    std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& root,
-                                                     const Sample& child1,
-                                                     const Sample& child2);
+    std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Point& rootPoint,
+                                                     floatType rootDiameter,
+                                                     const Point& child1Point,
+                                                     floatType child1Diameter,
+                                                     const Point& child2Point,
+                                                     floatType child2Diameter);
 
     /** Wrong root point warning message */
-    std::string WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const;
+    std::string WARNING_WRONG_ROOT_POINT(
+        const std::vector<unsigned int>& childrenLineNumbers) const;
 
     /**  Soma must be a contour for ASC and H5 */
     std::string WARNING_SOMA_NON_CONTOUR() const;
