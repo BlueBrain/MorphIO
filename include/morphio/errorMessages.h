@@ -64,14 +64,6 @@ struct DebugInfo {
 // TODO: this shouldn't be global static
 static std::set<Warning> _ignoredWarnings;
 
-/** A sample of section for error reporting, includes its position (line) within the file. **/
-struct Sample {
-    Sample() = default;
-    int parentId = -1;
-    unsigned int id = 0;
-    unsigned int lineNumber = 0;
-};
-
 /** Class that can generate error messages and holds a collection of predefined errors
     messages **/
 class ErrorMessages
@@ -132,7 +124,9 @@ class ErrorMessages
     std::string ERROR_MULTIPLE_SOMATA(const std::vector<unsigned int>& lineNumbers) const;
 
     /** Missing section parent error message */
-    std::string ERROR_MISSING_PARENT(const Sample& sample) const;
+    std::string ERROR_MISSING_PARENT(unsigned int id,
+                                     int parentId,
+                                     unsigned int lineNumber) const;
 
     /** Bifurcating soma error message */
     std::string ERROR_SOMA_BIFURCATION(unsigned int sampleLineNumber,
@@ -142,7 +136,9 @@ class ErrorMessages
     std::string ERROR_SOMA_WITH_NEURITE_PARENT(unsigned int lineNumber) const;
 
     /** Repeated section id error message */
-    std::string ERROR_REPEATED_ID(const Sample& originalSample, const Sample& newSample) const;
+    std::string ERROR_REPEATED_ID(unsigned int originalId,
+                                  unsigned int originalLineNumber,
+                                  unsigned int newLineNumber) const;
 
     /** Section self parent error message */
     std::string ERROR_SELF_PARENT(unsigned int lineNumber) const;

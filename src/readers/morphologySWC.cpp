@@ -27,13 +27,6 @@ struct SWCSample {
     unsigned int id = 0;
     unsigned int lineNumber = 0;
 
-    morphio::readers::Sample toSample() const {
-        morphio::readers::Sample sample;
-        sample.parentId = parentId;
-        sample.id = id;
-        sample.lineNumber = lineNumber;
-        return sample;
-    }
 };
 
 std::vector<unsigned int> gatherLineNumbers(const std::vector<SWCSample>& samples) {
@@ -117,8 +110,9 @@ class SWCBuilder
             }
 
             if (samples.count(sample.id) > 0) {
+                auto original = samples[sample.id];
                 throw RawDataError(
-                    err.ERROR_REPEATED_ID(samples[sample.id].toSample(), sample.toSample()));
+                    err.ERROR_REPEATED_ID(original.id, original.lineNumber, sample.lineNumber));
             }
 
             samples[sample.id] = sample;
@@ -206,7 +200,9 @@ class SWCBuilder
     void raiseIfNoParent(const SWCSample& sample) {
         if (sample.parentId > -1 &&
             samples.count(static_cast<unsigned int>(sample.parentId)) == 0) {
-            throw morphio::MissingParentError(err.ERROR_MISSING_PARENT(sample.toSample()));
+            throw morphio::MissingParentError(err.ERROR_MISSING_PARENT(sample.id,
+                                                                       sample.parentId,
+                                                                       sample.lineNumber));
         }
     }
 

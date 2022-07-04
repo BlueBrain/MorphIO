@@ -112,11 +112,13 @@ std::string ErrorMessages::ERROR_MULTIPLE_SOMATA(
     return msg;
 }
 
-std::string ErrorMessages::ERROR_MISSING_PARENT(const Sample& sample) const {
-    return errorMsg(sample.lineNumber,
+std::string ErrorMessages::ERROR_MISSING_PARENT(const unsigned int id,
+                                                const int parentId,
+                                                const unsigned int lineNumber) const {
+    return errorMsg(lineNumber,
                     ErrorLevel::ERROR,
-                    "Sample id: " + std::to_string(sample.id) +
-                        " refers to non-existant parent ID: " + std::to_string(sample.parentId));
+                    "Sample id: " + std::to_string(id) +
+                        " refers to non-existant parent ID: " + std::to_string(parentId));
 }
 
 std::string ErrorMessages::ERROR_SOMA_BIFURCATION(
@@ -134,12 +136,13 @@ std::string ErrorMessages::ERROR_SOMA_WITH_NEURITE_PARENT(const unsigned int lin
     return errorMsg(lineNumber, ErrorLevel::ERROR, "Found a soma point with a neurite as parent");
 }
 
-std::string ErrorMessages::ERROR_REPEATED_ID(const Sample& originalSample,
-                                             const Sample& newSample) const {
-    return errorMsg(newSample.lineNumber,
+std::string ErrorMessages::ERROR_REPEATED_ID(const unsigned int originalId,
+                                             const unsigned int originalLineNumber,
+                                             const unsigned int newLineNumber) const {
+    return errorMsg(newLineNumber,
                     ErrorLevel::WARNING,
-                    "Repeated ID: " + std::to_string(originalSample.id)) +
-           "\nID already appears here: \n" + errorLink(originalSample.lineNumber, ErrorLevel::INFO);
+                    "Repeated ID: " + std::to_string(originalId)) +
+           "\nID already appears here: \n" + errorLink(originalLineNumber, ErrorLevel::INFO);
 }
 
 std::string ErrorMessages::ERROR_SELF_PARENT(const unsigned int lineNumber) const {
