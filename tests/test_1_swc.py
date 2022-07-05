@@ -1,4 +1,5 @@
 import os
+import inspect
 
 import numpy as np
 import pytest
@@ -6,7 +7,7 @@ from numpy.testing import assert_array_equal
 
 from morphio import (Morphology, RawDataError, SectionType, SomaError, MorphioError, SomaType,
                      ostream_redirect, set_maximum_warnings, set_raise_warnings, set_ignored_warning, Warning)
-from utils import (assert_swc_exception, assert_string_equal, captured_output,
+from utils import (assert_swc_exception, captured_output,
                    strip_color_codes, tmp_swc_file, ignored_warning)
 
 _path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
@@ -304,7 +305,7 @@ def test_soma_type(tmp_path):
                                  3 1 0  0 0 3.0  1 # PID is 1''') as tmp_file:
                 assert (Morphology(tmp_file.name).soma_type ==
                              SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-                assert_string_equal('', err.getvalue())
+                assert len(err.getvalue()) == 0
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
@@ -314,7 +315,7 @@ def test_soma_type(tmp_path):
                                  3 1 0  0 0 3.0  1 # PID is 1''') as tmp_file:
                 assert (Morphology(tmp_file.name).soma_type ==
                              SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-                assert_string_equal(
+                assert strip_color_codes(err.getvalue()).strip() == inspect.cleandoc(
                     '''{}:0:warning
                        Warning: the soma does not conform the three point soma spec
                        The only valid neuro-morpho soma is:
@@ -325,9 +326,7 @@ def test_soma_type(tmp_path):
                        Got:
                        1 1 0 0 0 3 -1
                        2 1 0.000000 -3.000000 0.000000 3.000000 1
-                       3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1'''.format(tmp_file.name),
-                    err.getvalue(),
-				)
+                       3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1'''.format(tmp_file.name))
 
 # If this configuration is not respected -> SOMA_CYLINDERS
     with tmp_swc_file(tmp_path,
@@ -388,12 +387,11 @@ def test_neurite_wrong_root_point():
         with ostream_redirect(stdout=True, stderr=True):
             path = os.path.join(_path, 'neurite_wrong_root_point.swc')
             n = Morphology(path)
-            assert_string_equal(
+            assert strip_color_codes(err.getvalue().strip()) == \
 '''Warning: with a 3 points soma, neurites must be connected to the first soma point:
 {}:4:warning
 
-{}:6:warning'''.format(path, path),
-                err.getvalue())
+{}:6:warning'''.format(path, path)
     assert len(n.root_sections) == 2
     assert_array_equal(n.root_sections[0].points,
                        [[0,0,0], [0,0,1]])
@@ -518,11 +516,8 @@ def test_zero_diameter(tmp_path):
                                 5 3 5 0 0 3.0  4
                          ''') as tmp_file:
             Morphology(tmp_file.name)
-            assert_string_equal(
-                f'{tmp_file.name}:4:warning\nWarning: zero diameter in file\n',
-                err.getvalue())
-
-
+            assert strip_color_codes(err.getvalue().strip()) == \
+                f'{tmp_file.name}:4:warning\nWarning: zero diameter in file'
 
 def test_version():
     assert_array_equal(Morphology(os.path.join(_path, 'simple.swc')).version,

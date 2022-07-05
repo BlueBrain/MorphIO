@@ -10,7 +10,7 @@ from morphio.mut import Morphology
 import pytest
 from numpy.testing import assert_array_equal
 
-from utils import assert_string_equal, captured_output
+from utils import captured_output
 
 
 def test_write_empty_file():
@@ -231,24 +231,24 @@ def test_mitochondria():
 
     mito_id.append_section(
         MitochondriaPointLevel([0, 0, 0, 0],
-                                        [0.6, 0.7, 0.8, 0.9],
-                                        [20, 30, 40, 50]))
+                               [0.6, 0.7, 0.8, 0.9],
+                               [20, 30, 40, 50]))
     with TemporaryDirectory('test_mitochondria') as tmp_folder:
         morpho.write(Path(tmp_folder, "test.h5"))
 
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
                 morpho.write(Path(tmp_folder, "test.swc"))
-                assert_string_equal(err.getvalue(),
-                                    "Warning: this cell has mitochondria, they cannot be saved in "
-                                    " ASC or SWC format. Please use H5 if you want to save them.")
+                assert err.getvalue().strip() == (
+                    "Warning: this cell has mitochondria, they cannot be saved in "
+                    " ASC or SWC format. Please use H5 if you want to save them.")
 
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
                 morpho.write(Path(tmp_folder, "test.asc"))
-                assert_string_equal(err.getvalue(),
-                                    "Warning: this cell has mitochondria, they cannot be saved in "
-                                    " ASC or SWC format. Please use H5 if you want to save them.")
+                assert err.getvalue().strip() == (
+                    "Warning: this cell has mitochondria, they cannot be saved in "
+                    " ASC or SWC format. Please use H5 if you want to save them.")
 
         mito = ImmutMorphology(Path(tmp_folder, 'test.h5')).mitochondria
         assert_array_equal(mito.root_sections[0].diameters,

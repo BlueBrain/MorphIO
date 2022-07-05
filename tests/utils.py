@@ -52,24 +52,6 @@ def strip_color_codes(string):
     return ansi_escape.sub('', string)
 
 
-def strip_all(string):
-    '''Strip color code and whitespace at the beginning end of each line'''
-    lines = (strip_color_codes(line).strip() for line in string.splitlines())
-    return list(filter(None, lines))
-
-
-def assert_substring(substring, string):
-    sep = ['\n' + 80 * '>' + '\n', '\n' + 80 * '<' + '\n']
-    assert substring in string, "{}\n NOT IN \n{}".format(substring.join(sep), string.join(sep))
-
-
-def assert_string_equal(str1, str2):
-	str1, str2 = strip_all(str1), strip_all(str2)
-	diff = list(Differ().compare(str1, str2))
-	if '\n'.join(str1) != '\n'.join(str2):
-		raise AssertionError('Strings does not match:\n\n' + pformat(diff))
-
-
 def _assert_exception(tmp_path, content, exception, str1, str2, extension):
     '''Create tempfile with given content and check that the exception is raised'''
     with _tmp_file(tmp_path, content, extension) as tmp_file:

@@ -13,7 +13,7 @@ from morphio.mut import GlialCell, Morphology, DendriticSpine
 import pytest
 from numpy.testing import assert_array_equal
 
-from utils import assert_substring, captured_output, tmp_asc_file
+from utils import captured_output, tmp_asc_file
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -428,10 +428,8 @@ def test_empty_sibling(tmp_path):
                  ''') as tmp_file:
                 n = Morphology(tmp_file.name)
                 n.remove_unifurcations()
-                assert_substring('is the only child of section: 0',
-                                 err.getvalue().strip())
-                assert_substring('It will be merged with the parent section',
-                                 err.getvalue().strip())
+                assert 'is the only child of section: 0' in err.getvalue()
+                assert 'It will be merged with the parent section' in err.getvalue()
 
     assert len(n.root_sections) == 1
     assert_array_equal(n.root_sections[0].points,
