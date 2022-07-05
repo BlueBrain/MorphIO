@@ -13,7 +13,7 @@ from morphio.mut import GlialCell, Morphology, DendriticSpine
 import pytest
 from numpy.testing import assert_array_equal
 
-from utils import captured_output, tmp_asc_file
+from utils import captured_output
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -385,51 +385,50 @@ def test_non_C_nparray():
 def test_annotation(tmp_path):
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            with tmp_asc_file(tmp_path,
-                              """((Dendrite)
-                                   (3 -4 0 2)
-                                   (3 -6 0 2)
-                                   (3 -8 0 2)
-                                   (3 -10 0 2)
-                                   (
-                                     (3 -10 0 2)
-                                     (0 -10 0 2)
-                                     (-3 -10 0 2)
-                                     |       ; <-- empty sibling but still works !
-                                    )
-                                   )
-                              """) as tmp_file:
-                cell = Morphology(tmp_file.name)
-                cell.remove_unifurcations()
+            content = ("""((Dendrite)
+                            (3 -4 0 2)
+                            (3 -6 0 2)
+                            (3 -8 0 2)
+                            (3 -10 0 2)
+                            (
+                              (3 -10 0 2)
+                              (0 -10 0 2)
+                              (-3 -10 0 2)
+                              |       ; <-- empty sibling but still works !
+                             )
+                            )
+                       """)
+            cell = ImmutableMorphology(content, extension='asc').as_mutable()
+            cell.remove_unifurcations()
 
     for n in (cell, cell.as_immutable(), cell.as_immutable().as_mutable()):
         assert len(n.annotations) == 1
         annotation = n.annotations[0]
         assert annotation.type == morphio.AnnotationType.single_child
 
+
 def test_empty_sibling(tmp_path):
     '''The empty sibling will be removed and the single child will be merged
     with its parent'''
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            with tmp_asc_file(tmp_path,
-                '''((Dendrite)
-                      (3 -4 0 10)
-                      (3 -6 0 9)
-                      (3 -8 0 8)
-                      (3 -10 0 7)
-                      (
-                        (3 -10 0 6)
-                        (0 -10 0 5)
-                        (-3 -10 0 4)
-                        |       ; <-- empty sibling but still works !
-                       )
-                      )
-                 ''') as tmp_file:
-                n = Morphology(tmp_file.name)
-                n.remove_unifurcations()
-                assert 'is the only child of section: 0' in err.getvalue()
-                assert 'It will be merged with the parent section' in err.getvalue()
+            content = ('''((Dendrite)
+                            (3 -4 0 10)
+                            (3 -6 0 9)
+                            (3 -8 0 8)
+                            (3 -10 0 7)
+                            (
+                              (3 -10 0 6)
+                              (0 -10 0 5)
+                              (-3 -10 0 4)
+                              |       ; <-- empty sibling but still works !
+                             )
+                            )
+                       ''')
+            n = ImmutableMorphology(content, extension='asc').as_mutable()
+            n.remove_unifurcations()
+            assert 'is the only child of section: 0' in err.getvalue()
+            assert 'It will be merged with the parent section' in err.getvalue()
 
     assert len(n.root_sections) == 1
     assert_array_equal(n.root_sections[0].points,
