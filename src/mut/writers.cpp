@@ -58,22 +58,24 @@ std::string version_string() {
 /**
    Only skip duplicate if it has the same diameter
  **/
-bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
+bool skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
     return section->diameters().front() == section->parent()->diameters().back();
 }
 
-void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma) {
+void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma,
+                                           const morphio::readers::ErrorMessages& err) {
     const size_t n_points = soma.points().size();
     const size_t n_diameters = soma.diameters().size();
 
     if (n_points != n_diameters) {
-        throw morphio::WriterError(morphio::readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+        throw morphio::WriterError(err.ERROR_VECTOR_LENGTH_MISMATCH(
             "soma points", n_points, "soma diameters", n_diameters));
     }
 }
 
 
-void raiseIfUnifurcations(const morphio::mut::Morphology& morph) {
+void raiseIfUnifurcations(const morphio::mut::Morphology& morph,
+                          const morphio::readers::ErrorMessages& err) {
     for (auto it = morph.depth_begin(); it != morph.depth_end(); ++it) {
         std::shared_ptr<morphio::mut::Section> section_ = *it;
         if (section_->isRoot()) {
@@ -86,8 +88,7 @@ void raiseIfUnifurcations(const morphio::mut::Morphology& morph) {
         bool isUnifurcation = parent->children().size() == 1;
 
         if (isUnifurcation) {
-            throw morphio::WriterError(
-                morphio::readers::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(parentId));
+            throw morphio::WriterError(err.ERROR_ONLY_CHILD_SWC_WRITER(parentId));
         }
     }
 }
@@ -98,11 +99,11 @@ namespace mut {
 namespace writer {
 
 void swc(const Morphology& morphology, const std::string& filename) {
+    auto err = readers::ErrorMessages(filename);
     const auto& soma = morphology.soma();
     const auto& soma_points = soma->points();
     if (soma_points.empty() && morphology.rootSections().empty()) {
-        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+        printError(Warning::WRITE_EMPTY_MORPHOLOGY, err.WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     } else if (!(soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
                  soma->type() == SomaType::SOMA_CYLINDERS ||
@@ -116,13 +117,13 @@ void swc(const Morphology& morphology, const std::string& filename) {
         throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_THREE_POINT_CYLINDER());
     }
 
-    checkSomaHasSameNumberPointsDiameters(*soma);
+    checkSomaHasSameNumberPointsDiameters(*soma, err);
 
     if (hasPerimeterData(morphology)) {
-        throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
+        throw WriterError(err.ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
 
-    raiseIfUnifurcations(morphology);
+    raiseIfUnifurcations(morphology, err);
 
     std::ofstream myfile(filename);
     using std::setw;
@@ -136,13 +137,13 @@ void swc(const Morphology& morphology, const std::string& filename) {
 
     if (!morphology.mitochondria().rootSections().empty()) {
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-                   readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+                   err.WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
     }
 
     const auto& soma_diameters = soma->diameters();
 
     if (soma_points.empty()) {
-        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+        printError(Warning::WRITE_NO_SOMA, err.WARNING_WRITE_NO_SOMA());
     }
 
     for (unsigned int i = 0; i < soma_points.size(); ++i) {
@@ -164,7 +165,7 @@ void swc(const Morphology& morphology, const std::string& filename) {
         bool isRootSection = section->isRoot();
 
         // skips duplicate point for non-root sections
-        unsigned int firstPoint = ((isRootSection || !_skipDuplicate(section)) ? 0 : 1);
+        unsigned int firstPoint = ((isRootSection || !skipDuplicate(section)) ? 0 : 1);
         for (unsigned int i = firstPoint; i < points.size(); ++i) {
             int parentIdOnDisk;
             if (i > firstPoint) {
@@ -196,12 +197,13 @@ static void _write_asc_points(std::ofstream& myfile,
 
 static void _write_asc_section(std::ofstream& myfile,
                                const Morphology& morpho,
+                               const morphio::readers::ErrorMessages& err,
                                const std::shared_ptr<Section>& section,
                                const std::map<morphio::SectionType, std::string>& header,
                                size_t indentLevel) {
     // allowed types are only the ones available in the header
     if (header.count(section->type()) == 0) {
-        throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
+        throw WriterError(err.ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
     }
 
     std::string indent(indentLevel, ' ');
@@ -212,19 +214,20 @@ static void _write_asc_section(std::ofstream& myfile,
         size_t nChildren = children.size();
         for (unsigned int i = 0; i < nChildren; ++i) {
             myfile << indent << (i == 0 ? "(\n" : "|\n");
-            _write_asc_section(myfile, morpho, children[i], header, indentLevel + 2);
+            _write_asc_section(myfile, morpho, err, children[i], header, indentLevel + 2);
         }
         myfile << indent << ")\n";
     }
 }
 
 void asc(const Morphology& morphology, const std::string& filename) {
+    auto err = readers::ErrorMessages(filename);
+
     const auto& soma = morphology.soma();
     const auto& somaPoints = soma->points();
 
     if (soma->points().empty() && morphology.rootSections().empty()) {
-        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+        printError(Warning::WRITE_EMPTY_MORPHOLOGY, err.WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
     } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
         printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
@@ -234,17 +237,17 @@ void asc(const Morphology& morphology, const std::string& filename) {
         throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
     }
 
-    checkSomaHasSameNumberPointsDiameters(*soma);
+    checkSomaHasSameNumberPointsDiameters(*soma, err);
 
     if (hasPerimeterData(morphology)) {
-        throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
+        throw WriterError(err.ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
 
     std::ofstream myfile(filename);
 
     if (!morphology.mitochondria().rootSections().empty()) {
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-                   readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+                   err.WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
     }
 
     std::map<morphio::SectionType, std::string> header;
@@ -256,16 +259,17 @@ void asc(const Morphology& morphology, const std::string& filename) {
         myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
         _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
         myfile << ")\n\n";
+    } else {
+        printError(Warning::WRITE_NO_SOMA, err.WARNING_WRITE_NO_SOMA());
     }
 
     for (const std::shared_ptr<Section>& section : morphology.rootSections()) {
         // allowed types are only the ones available in the header
         if (header.count(section->type()) == 0) {
-            throw WriterError(
-                readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
+            throw WriterError(err.ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
         }
         myfile << header.at(section->type());
-        _write_asc_section(myfile, morphology, section, header, 2);
+        _write_asc_section(myfile, morphology, err, section, header, 2);
         myfile << ")\n\n";
     }
 
@@ -381,23 +385,24 @@ static void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 
 
 void h5(const Morphology& morpho, const std::string& filename) {
+    auto err = readers::ErrorMessages(filename);
+
     const auto& soma = morpho.soma();
     const auto& somaPoints = soma->points();
 
     if (somaPoints.empty()) {
         if (morpho.rootSections().empty()) {
-            printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                       readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+            printError(Warning::WRITE_EMPTY_MORPHOLOGY, err.WARNING_WRITE_EMPTY_MORPHOLOGY());
             return;
         }
-        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+        printError(Warning::WRITE_NO_SOMA, err.WARNING_WRITE_NO_SOMA());
     } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
-        printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
+        printError(Warning::SOMA_NON_CONTOUR, err.WARNING_SOMA_NON_CONTOUR());
     } else if (somaPoints.size() < 3) {
         throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
     }
 
-    checkSomaHasSameNumberPointsDiameters(*soma);
+    checkSomaHasSameNumberPointsDiameters(*soma, err);
 
     HighFive::File h5_file(filename,
                            HighFive::File::ReadWrite | HighFive::File::Create |
@@ -448,7 +453,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
         if (numberOfPerimeters > 0) {
             if (numberOfPerimeters != numberOfPoints) {
-                throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+                throw WriterError(err.ERROR_VECTOR_LENGTH_MISMATCH(
                     "points", numberOfPoints, "perimeters", numberOfPerimeters));
             }
             for (unsigned int i = 0; i < numberOfPerimeters; ++i) {

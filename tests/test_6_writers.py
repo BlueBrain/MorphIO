@@ -236,7 +236,6 @@ def test_mitochondria(tmp_path):
     assert mito.root_sections[0].neurite_section_ids == neuronal_section_ids
     assert_array_equal(mito.section(0).diameters,
                        diameters)
-
     assert_array_equal(mito.section(0).neurite_section_ids,
                        neuronal_section_ids)
 
