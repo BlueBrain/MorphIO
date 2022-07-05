@@ -21,9 +21,9 @@ bool _ignoreLine(const std::string& line) {
 
 morphio::readers::Sample readSample(const char* line, unsigned int lineNumber_) {
 #ifdef MORPHIO_USE_DOUBLE
-    const char *const format = "%20u%20d%20lg%20lg%20lg%20lg%20d";
+    const char* const format = "%u%d%lg%lg%lg%lg%d";
 #else
-    const char *const format = "%20u%20d%20f%20f%20f%20f%20d";
+    const char* const format = "%u%d%f%f%f%f%d";
 #endif
 
     morphio::floatType radius = -1.;
