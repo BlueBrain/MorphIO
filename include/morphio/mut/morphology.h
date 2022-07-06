@@ -208,7 +208,6 @@ class Morphology
        if the section starts and ends are inconsistent
      **/
     void removeUnifurcations();
-    void removeUnifurcations(const morphio::readers::DebugInfo& debugInfo);
 
     std::shared_ptr<Soma> _soma;
     std::shared_ptr<morphio::Property::CellLevel> _cellProperties;

@@ -32,36 +32,6 @@ enum ErrorLevel {
     ERROR     //!< Error
 };
 
-/** Debug info for error messages **/
-struct DebugInfo {
-  public:
-    /** Constructor
-
-        \param filename morphology filename.
-     */
-    explicit DebugInfo(std::string filename = "")
-        : _filename(filename) {}
-
-    /** Stores section's line number within morphology file */
-    void setLineNumber(uint32_t sectionId, unsigned int line) {
-        _lineNumbers[sectionId] = static_cast<int>(line);
-    }
-
-    /** Get section's line number within morphology file */
-    int32_t getLineNumber(uint32_t sectionId) const {
-        const auto it = _lineNumbers.find(sectionId);
-        if (it == _lineNumbers.end()) {
-            return -1;
-        }
-        return it->second;
-    }
-    /** Morphology filename */
-    std::string _filename;
-
-  private:
-    std::map<unsigned int, int> _lineNumbers;
-};
-
 /** Class that can generate error messages and holds a collection of predefined errors
     messages **/
 class ErrorMessages
@@ -230,9 +200,7 @@ class ErrorMessages
     /** Writing empty section warning message */
     std::string WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morphio::mut::Section>);
     /** Writing single child section warning message */
-    std::string WARNING_ONLY_CHILD(const DebugInfo& info,
-                                   unsigned int parentId,
-                                   unsigned int childId) const;
+    std::string WARNING_ONLY_CHILD(unsigned int parentId, unsigned int childId) const;
 
     /** Soma does not conform NeuroMorpho warning message */
     std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Point& rootPoint,

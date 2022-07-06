@@ -239,11 +239,7 @@ void Morphology::deleteSection(const std::shared_ptr<Section> section_, bool rec
 }
 
 void Morphology::removeUnifurcations() {
-    removeUnifurcations(morphio::readers::DebugInfo());
-}
-
-void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInfo) {
-    morphio::readers::ErrorMessages err(debugInfo._filename);
+    morphio::readers::ErrorMessages err;
 
     auto it = depth_begin();
     while (it != depth_end()) {
@@ -270,23 +266,21 @@ void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInf
         // This "if" condition ensures that "unifurcations" (ie. successive
         // sections with only 1 child) get merged together into a bigger section
         if (isUnifurcation) {
-            printError(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
+            printError(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(parentId, sectionId));
             bool duplicate = _checkDuplicatePoint(section_->parent(), section_);
 
-            addAnnotation(morphio::Property::Annotation(morphio::AnnotationType::SINGLE_CHILD,
-                                                        sectionId,
-                                                        section_->properties(),
-                                                        "",
-                                                        debugInfo.getLineNumber(parentId)));
+            addAnnotation(Property::Annotation(AnnotationType::SINGLE_CHILD,
+                                               sectionId,
+                                               section_->properties(),
+                                               "SingleChild",
+                                               -1));
 
-            morphio::_appendVector(parent->points(), section_->points(), duplicate ? 1 : 0);
+            _appendVector(parent->points(), section_->points(), duplicate ? 1 : 0);
 
-            morphio::_appendVector(parent->diameters(), section_->diameters(), duplicate ? 1 : 0);
+            _appendVector(parent->diameters(), section_->diameters(), duplicate ? 1 : 0);
 
             if (!parent->perimeters().empty()) {
-                morphio::_appendVector(parent->perimeters(),
-                                       section_->perimeters(),
-                                       duplicate ? 1 : 0);
+                _appendVector(parent->perimeters(), section_->perimeters(), duplicate ? 1 : 0);
             }
 
             deleteSection(section_, false);

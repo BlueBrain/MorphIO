@@ -182,8 +182,7 @@ def test_write_no_soma(tmp_path):
             with ostream_redirect(stdout=True, stderr=True):
                 outfile = tmp_path / f'tmp.{ext}'
                 morpho.write(outfile)
-                assert (err.getvalue().strip() ==
-                             'Warning: writing file without a soma')
+                assert 'Warning: writing file without a soma' in err.getvalue()
                 read = Morphology(outfile)
 
         assert len(read.soma.points) == 0
@@ -242,18 +241,17 @@ def test_mitochondria(tmp_path):
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             morpho.write(tmp_path / "test.asc")
-            assert err.getvalue().strip() == (
-                "Warning: this cell has mitochondria, they cannot be saved in "
-                " ASC or SWC format. Please use H5 if you want to save them.")
+            assert ("Warning: this cell has mitochondria, they cannot be saved in "
+                    " ASC or SWC format. Please use H5 if you want to save them." in
+                    err.getvalue().strip())
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             morpho.soma.type = SomaType.SOMA_CYLINDERS
             morpho.write(tmp_path / "test.swc")
-            assert err.getvalue().strip() == (
-                "Warning: this cell has mitochondria, they cannot be saved in "
-                " ASC or SWC format. Please use H5 if you want to save them.")
-
+            assert ("Warning: this cell has mitochondria, they cannot be saved in "
+                    " ASC or SWC format. Please use H5 if you want to save them." in
+                    err.getvalue().strip())
 
 
 def test_duplicate_different_diameter(tmp_path):
@@ -354,9 +352,9 @@ def test_write_soma_types(tmp_path):
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             morph.write(tmp_path / "SOMA_UNDEFINED.h5")
-    assert err.getvalue().strip() == (
-        'Soma must be a contour for ASC and H5: '
-        'see https://github.com/BlueBrain/MorphIO/issues/457')
+
+    assert ('Soma must be a contour for ASC and H5: '
+            'see https://github.com/BlueBrain/MorphIO/issues/457') in err.getvalue()
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):

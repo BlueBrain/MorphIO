@@ -154,8 +154,7 @@ void bind_mutable_methods(mutable_binding_classes& mutable_classes) {
         .def_property_readonly("version", &morphio::mut::Morphology::version, "Returns the version")
 
         .def("remove_unifurcations",
-             static_cast<void (morphio::mut::Morphology::*)()>(
-                 &morphio::mut::Morphology::removeUnifurcations),
+             &morphio::mut::Morphology::removeUnifurcations,
              "Fixes the morphology single child sections and issues warnings"
              "if the section starts and ends are inconsistent")
 

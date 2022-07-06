@@ -33,7 +33,6 @@ class Vasculature;
 
 /** Functionality for reading of morphologies from files  **/
 namespace readers {
-struct DebugInfo;
 class ErrorMessages;
 }  // namespace readers
 

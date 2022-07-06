@@ -7,7 +7,7 @@
 
 namespace {
 
-struct ErrorHandler{
+struct ErrorHandler {
     int MORPHIO_MAX_N_WARNINGS = 100;
     bool MORPHIO_RAISE_WARNINGS = false;
     int errorCount = 0;
@@ -361,20 +361,9 @@ std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
     return errorMsg(0, ErrorLevel::WARNING, oss.str());
 }
 
-std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info,
-                                              unsigned int parentId,
-                                              unsigned int childId) const {
-    int parentLine = info.getLineNumber(parentId);
-    int childLine = info.getLineNumber(childId);
+std::string ErrorMessages::WARNING_ONLY_CHILD(unsigned int parentId, unsigned int childId) const {
     std::string parentMsg;
     std::string childMsg;
-
-    if (parentLine > -1 && childLine > -1) {
-        parentMsg = " starting at:\n" +
-                    errorLink(static_cast<size_t>(parentLine), ErrorLevel::INFO) + "\n";
-        childMsg = " starting at:\n" +
-                   errorLink(static_cast<size_t>(childLine), ErrorLevel::WARNING) + "\n";
-    }
 
     std::ostringstream oss;
     oss << "Warning: section " << childId << childMsg << " is the only child of "
