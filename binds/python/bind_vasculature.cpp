@@ -54,9 +54,8 @@ void bind_vasculature(py::module& m) {
         // Property accessors
         .def_property_readonly(
             "points",
-            [](morphio::vasculature::Vasculature* morpho) {
-                return py::array(static_cast<py::ssize_t>(morpho->points().size()),
-                                 morpho->points().data());
+            [](const morphio::vasculature::Vasculature& self) {
+                return internal_vector_as_readonly_array(self.points(), self);
             },
             "Returns a list with all points from all sections")
 
@@ -67,24 +66,21 @@ void bind_vasculature(py::module& m) {
 
         .def_property_readonly(
             "diameters",
-            [](morphio::vasculature::Vasculature* morpho) {
-                auto diameters = morpho->diameters();
-                return py::array(static_cast<py::ssize_t>(diameters.size()), diameters.data());
+            [](const morphio::vasculature::Vasculature& self) {
+                return internal_vector_as_readonly_array(self.diameters(), self);
             },
             "Returns a list with all diameters from all sections")
         .def_property_readonly(
             "section_types",
-            [](morphio::vasculature::Vasculature* obj) {
-                auto data = obj->sectionTypes();
-                return py::array(static_cast<py::ssize_t>(data.size()), data.data());
+            [](const morphio::vasculature::Vasculature& self) {
+                return internal_vector_as_readonly_array(self.sectionTypes(), self);
             },
             "Returns a vector with the section type of every section")
 
         .def_property_readonly(
             "section_connectivity",
-            [](morphio::vasculature::Vasculature* morpho) {
-                return py::array(static_cast<py::ssize_t>(morpho->sectionConnectivity().size()),
-                                 morpho->sectionConnectivity().data());
+            [](const morphio::vasculature::Vasculature& self) {
+                return internal_vector_as_readonly_array(self.sectionConnectivity(), self);
             },
             "Returns a 2D array of the section connectivity")
 
@@ -128,8 +124,8 @@ void bind_vasculature(py::module& m) {
                                "Returns the morphological type of this section")
         .def_property_readonly(
             "points",
-            [](morphio::vasculature::Section* section) {
-                return span_array_to_ndarray(section->points());
+            [](const morphio::vasculature::Section& self) {
+                return internal_vector_as_readonly_array(self.points(), self);
             },
             "Returns list of section's point coordinates")
 
@@ -140,8 +136,8 @@ void bind_vasculature(py::module& m) {
 
         .def_property_readonly(
             "diameters",
-            [](morphio::vasculature::Section* section) {
-                return span_to_ndarray(section->diameters());
+            [](const morphio::vasculature::Section& self) {
+                return internal_vector_as_readonly_array(self.points(), self);
             },
             "Returns list of section's point diameters")
 
