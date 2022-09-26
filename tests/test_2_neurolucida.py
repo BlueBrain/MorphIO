@@ -235,7 +235,7 @@ with_duplicate = '''
 def test_read_with_duplicates():
     '''Section points are duplicated in the file
 what I think the
-https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html
+https://morphology-documentation.readthedocs.io/en/latest/h5v1.html
 would look like'''
 
     n = Morphology(with_duplicate, extension='asc')

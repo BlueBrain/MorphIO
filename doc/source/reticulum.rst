@@ -2,7 +2,7 @@ Endoplasmic reticulum
 =====================
 
 Endoplasmic reticulum can also be stored and written to H5 file. The specification is part of the
-`BBP morphology documentation <https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/latest/h5v1.html>`__
+`BBP morphology documentation <https://morphology-documentation.readthedocs.io/en/latest/h5v1.html>`__
 There is one endoplasmic reticulum object per morphology. It contains 4 attributes. Each attribute
 is an array and each line refers to the value of the attribute for a specific neuronal section.
 
