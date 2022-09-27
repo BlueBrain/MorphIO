@@ -155,13 +155,10 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
                 metadata.getAttribute(_a_family).read(family);
                 _properties._cellLevel._cellFamily = static_cast<CellFamily>(family);
             } else {
-                throw RawDataError("Error in " + source +
-                                   "\nUnsupported h5 version: " + std::to_string(majorVersion) +
-                                   "." + std::to_string(minorVersion) +
-                                   " See "
-                                   "https://bbpteam.epfl.ch/documentation/projects/"
-                                   "Morphology%20Documentation/latest/"
-                                   "index.html for the list of supported versions.");
+                std::string msg = "Error in " + source +
+                                  "\nUnsupported h5 version: " + std::to_string(majorVersion) +
+                                  "." + std::to_string(minorVersion);
+                throw RawDataError(msg);
             }
         } else {
             throw RawDataError("Missing " + _a_version +
