@@ -284,6 +284,14 @@ std::string ErrorMessages::WARNING_WRITE_NO_SOMA() const {
     return errorMsg(0, ErrorLevel::WARNING, "Warning: writing file without a soma");
 }
 
+std::string ErrorMessages::WARNING_SOMA_BIFURCATION() const {
+    return errorMsg(0, ErrorLevel::WARNING, "Warning: found soma bifurcation");
+}
+
+std::string ErrorMessages::WARNING_MULTIPLE_SOMATA() const {
+    return errorMsg(0, ErrorLevel::WARNING, "Warning: found multiple somata");
+}
+
 std::string ErrorMessages::WARNING_WRITE_EMPTY_MORPHOLOGY() const {
     return errorMsg(0,
                     ErrorLevel::WARNING,
@@ -307,10 +315,24 @@ std::string ErrorMessages::WARNING_DISCONNECTED_NEURITE(const Sample& sample) co
 }
 
 std::string ErrorMessages::WARNING_APPENDING_EMPTY_SECTION(
-    std::shared_ptr<morphio::mut::Section> section) {
+    const std::shared_ptr<morphio::mut::Section>& section) const {
     return errorMsg(0,
                     ErrorLevel::WARNING,
                     "Warning: appending empty section with id: " + std::to_string(section->id()));
+}
+
+std::string ErrorMessages::WARNING_CUSTOM_ROOT_ID(const Sample& sample) const {
+    return errorMsg(sample.lineNumber,
+                    ErrorLevel::WARNING,
+                    "Warning: root id changed from " + std::to_string(sample.parentId) +
+                        " to -1 for point with id: " + std::to_string(sample.id));
+}
+
+std::string ErrorMessages::WARNING_ROOT_BIFURCATION(const Sample& sample) const {
+    return errorMsg(sample.lineNumber,
+                    ErrorLevel::WARNING,
+                    "Warning: root bifurcation kept for point with id: " +
+                        std::to_string(sample.id));
 }
 
 std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
@@ -374,7 +396,7 @@ std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info,
 
 std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& root,
                                                                 const Sample& child1,
-                                                                const Sample& child2) {
+                                                                const Sample& child2) const {
     floatType x = root.point[0], y = root.point[1], z = root.point[2], r = root.diameter / 2;
     std::stringstream ss;
     ss << "Warning: the soma does not conform the three point soma spec\n"

@@ -72,9 +72,9 @@ class NeurolucidaParser
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
-    morphio::mut::Morphology& parse(const std::string& input) {
+    morphio::mut::Morphology& parse(const std::string& input, unsigned int& options) {
         lex_.start_parse(input);
-        parse_root_sexps();
+        parse_root_sexps(options);
         return nb_;
     }
 
@@ -112,12 +112,12 @@ class NeurolucidaParser
         return {{point[0], point[1], point[2]}, point[3]};
     }
 
-    bool parse_neurite_branch(Header& header) {
+    bool parse_neurite_branch(Header& header, unsigned int& options) {
         lex_.consume(Token::LPAREN, "New branch should start with LPAREN");
 
         bool ret = true;
         while (true) {
-            ret &= parse_neurite_section(header);
+            ret &= parse_neurite_section(header, options);
             if (lex_.ended() ||
                 (lex_.current()->id != +Token::PIPE && lex_.current()->id != +Token::LPAREN)) {
                 break;
@@ -130,7 +130,8 @@ class NeurolucidaParser
 
     int32_t _create_soma_or_section(const Header& header,
                                     std::vector<Point>& points,
-                                    std::vector<morphio::floatType>& diameters) {
+                                    std::vector<morphio::floatType>& diameters,
+                                    unsigned int& options) {
         int32_t return_id = -1;
         morphio::Property::PointLevel properties;
         properties._points = points;
@@ -144,9 +145,24 @@ class NeurolucidaParser
             nb_.addMarker(marker);
             return_id = -1;
         } else if (header.token == Token::CELLBODY) {
-            if (!nb_.soma()->points().empty())
-                throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
-            nb_.soma()->properties() = properties;
+            if (!nb_.soma()->points().empty()) {
+                if (options & ALLOW_SOMA_BIFURCATIONS) {
+                    printError(Warning::SOMA_BIFURCATION, err_.WARNING_SOMA_BIFURCATION());
+                } else if (options & ALLOW_MULTIPLE_SOMATA) {
+                    printError(Warning::MULTIPLE_SOMATA, err_.WARNING_MULTIPLE_SOMATA());
+                } else {
+                    throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
+                }
+                nb_.soma()->properties()._points.insert(nb_.soma()->properties()._points.end(),
+                                                        properties._points.begin(),
+                                                        properties._points.end());
+                nb_.soma()->properties()._diameters.insert(
+                    nb_.soma()->properties()._diameters.end(),
+                    properties._diameters.begin(),
+                    properties._diameters.end());
+            } else {
+                nb_.soma()->properties() = properties;
+            }
             return_id = -1;
         } else {
             SectionType section_type = TokenToSectionType(header.token);
@@ -273,7 +289,7 @@ class NeurolucidaParser
     }
 
 
-    bool parse_neurite_section(const Header& header) {
+    bool parse_neurite_section(const Header& header, unsigned int& options) {
         Points points;
         std::vector<morphio::floatType> diameters;
         auto section_id = static_cast<int>(nb_.sections().size());
@@ -286,7 +302,7 @@ class NeurolucidaParser
                 throw RawDataError(err_.ERROR_EOF_IN_NEURITE(lex_.line_num()));
             } else if (is_end_of_section(id)) {
                 if (!points.empty()) {
-                    _create_soma_or_section(header, points, diameters);
+                    _create_soma_or_section(header, points, diameters, options);
                 }
                 return true;
             } else if (is_end_of_branch(id)) {
@@ -320,7 +336,7 @@ class NeurolucidaParser
                     marker_header.token = Token::STRING;
                     marker_header.label = lex_.peek()->str();
                     lex_.consume_until(Token::LPAREN);
-                    parse_neurite_section(marker_header);
+                    parse_neurite_section(marker_header, options);
                     lex_.consume(Token::RPAREN, "Marker should end with RPAREN");
                 } else if (peek_id == +Token::NUMBER) {
                     Point point;
@@ -330,11 +346,11 @@ class NeurolucidaParser
                     diameters.push_back(radius);
                 } else if (peek_id == +Token::LPAREN) {
                     if (!points.empty()) {
-                        section_id = _create_soma_or_section(header, points, diameters);
+                        section_id = _create_soma_or_section(header, points, diameters, options);
                     }
                     Header child_header = header;
                     child_header.parent_id = section_id;
-                    parse_neurite_branch(child_header);
+                    parse_neurite_branch(child_header, options);
                 } else {
                     throw RawDataError(
                         err_.ERROR_UNKNOWN_TOKEN(lex_.line_num(), lex_.peek()->str()));
@@ -347,14 +363,14 @@ class NeurolucidaParser
         }
     }
 
-    void parse_root_sexps() {
+    void parse_root_sexps(unsigned int& options) {
         // parse the top level blocks, and if they are a neurite, otherwise skip
         while (!lex_.ended()) {
             if (static_cast<Token>(lex_.current()->id) == Token::LPAREN) {
                 lex_.consume();
                 const Header header = parse_root_sexp_header();
                 if (lex_.current()->id != +Token::RPAREN) {
-                    parse_neurite_section(header);
+                    parse_neurite_section(header, options);
                 }
             }
 
@@ -378,7 +394,7 @@ Property::Properties load(const std::string& path,
                           unsigned int options) {
     NeurolucidaParser parser(path);
 
-    morphio::mut::Morphology& nb_ = parser.parse(contents);
+    morphio::mut::Morphology& nb_ = parser.parse(contents, options);
     nb_.applyModifiers(options);
 
     Property::Properties properties = nb_.buildReadOnly();

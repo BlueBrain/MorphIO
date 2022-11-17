@@ -133,7 +133,7 @@ class SWCBuilder
         return somata;
     }
 
-    void raiseIfBrokenSoma(const Sample& sample) {
+    void raiseIfBrokenSoma(const Sample& sample, const unsigned int& options) {
         if (sample.type != SECTION_SOMA) {
             return;
         }
@@ -149,7 +149,11 @@ class SWCBuilder
             }
 
             if (soma_bifurcations.size() > 1) {
-                throw morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample, soma_bifurcations));
+                if (options & ALLOW_SOMA_BIFURCATIONS) {
+                    printError(Warning::SOMA_BIFURCATION, err.WARNING_SOMA_BIFURCATION());
+                } else {
+                    throw morphio::SomaError(err.ERROR_SOMA_BIFURCATION(sample, soma_bifurcations));
+                }
             }
         }
 
@@ -171,11 +175,15 @@ class SWCBuilder
         }
     }
 
-    void checkSoma() {
+    void checkSoma(const unsigned int& options) {
         auto somata = _potentialSomata();
 
         if (somata.size() > 1) {
-            throw morphio::SomaError(err.ERROR_MULTIPLE_SOMATA(somata));
+            if (options & ALLOW_MULTIPLE_SOMATA) {
+                printError(Warning::MULTIPLE_SOMATA, err.WARNING_MULTIPLE_SOMATA());
+            } else {
+                throw morphio::SomaError(err.ERROR_MULTIPLE_SOMATA(somata));
+            }
         }
 
         if (somata.empty()) {
@@ -241,9 +249,9 @@ class SWCBuilder
         return ret;
     }
 
-    void raiseIfNonConform(const Sample& sample) {
+    void raiseIfNonConform(const Sample& sample, const unsigned int& options) {
         raiseIfSelfParent(sample);
-        raiseIfBrokenSoma(sample);
+        raiseIfBrokenSoma(sample, options);
         raiseIfNoParent(sample);
         warnIfZeroDiameter(sample);
     }
@@ -327,12 +335,29 @@ class SWCBuilder
     Property::Properties buildProperties(const std::string& contents, unsigned int options) {
         _readSamples(contents);
 
-        for (const auto& sample_pair : samples) {
-            const auto& sample = sample_pair.second;
-            raiseIfNonConform(sample);
+        if (options & ALLOW_CUSTOM_ROOT_ID) {
+            for (auto& sample_pair : samples) {
+                auto& sample = sample_pair.second;
+                if (sample.parentId != SWC_ROOT && samples.count(sample.parentId) == 0) {
+                    printError(Warning::CUSTOM_ROOT_ID, err.WARNING_CUSTOM_ROOT_ID(sample));
+                    // Remove the sample from the children
+                    children[sample.parentId].erase(std::remove(children[sample.parentId].begin(),
+                                                                children[sample.parentId].end(),
+                                                                sample.id),
+                                                    children[sample.parentId].end());
+                    // Update the sample and add it to the proper children
+                    sample.parentId = SWC_ROOT;
+                    children[SWC_ROOT].push_back(sample.id);
+                }
+            }
         }
 
-        checkSoma();
+        for (const auto& sample_pair : samples) {
+            const auto& sample = sample_pair.second;
+            raiseIfNonConform(sample, options);
+        }
+
+        checkSoma(options);
 
         // The process might occasionally creates empty section before
         // filling them so the warning is ignored
@@ -345,7 +370,11 @@ class SWCBuilder
 
             // Bifurcation right at the start
             if (isRootPoint(sample) && isSectionEnd(sample)) {
-                continue;
+                if (options & ALLOW_ROOT_BIFURCATIONS) {
+                    printError(Warning::ROOT_BIFURCATION, err.WARNING_ROOT_BIFURCATION(sample));
+                } else {
+                    continue;
+                }
             }
 
             if (isSectionStart(sample)) {

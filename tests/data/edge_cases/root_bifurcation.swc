@@ -1,0 +1,10 @@
+# The axon and the basal dendrite have root sections with only one point
+1 1 0 0 0 6 -1
+2 2 3 4 5 6 1  # one-point section
+3 3 4 5 6 6 1  # one-point section
+4 4 5 6 7 6 1
+5 4 6 6 7 6 4
+6 4 7 6 7 6 5
+7 4 8 6 7 6 6  # one-point section
+8 4 9 6 7 6 6
+9 4 10 6 7 6 8
