@@ -27,7 +27,7 @@ jobs:
       - uses: actions/setup-python@v2
         name: Install Python
         with:
-          python-version: '3.9'
+          python-version: '3.7'
 
       - name: Install cibuildwheel
         run: |
@@ -83,11 +83,11 @@ jobs:
           CIBW_BEFORE_BUILD: |
             brew update
             brew --version
+            brew install cmake
             brew install hdf5
-          CIBW_ENVIRONMENT: PIP_NO_BINARY="h5py" PIP_NO_CACHE_DIR="off"
         run: |
           export HDF5_DIR=$(brew --prefix hdf5)
-
+          echo $HDF5_DIR
           python -m cibuildwheel --output-dir dist
 
       - name: Build wheels Windows
