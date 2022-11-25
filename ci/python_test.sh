@@ -13,17 +13,20 @@ function create_venv()
         set +u  # ignore errors in virtualenv's activate
         source "$VENV/bin/activate"
         set -u
-
-        which pip
-
-        pip install --upgrade pip setuptools wheel
     fi
 }
 
 # in tree install
 create_venv
-pip install .
-pip install -r tests/requirement_tests.txt
+
+BIN=$VENV/bin/
+
+$BIN/pip -v install .
+
+which $BIN/pip
+
+$BIN/pip install --upgrade pip setuptools wheel
+$BIN/pip install -r tests/requirement_tests.txt
 
 CURRENT=$(pwd)
 (cd .. && pytest ${CURRENT}/tests)
@@ -34,8 +37,8 @@ DIST_DIR="$VENV/dist"
 mkdir -p "$DIST_DIR"
 create_venv
 python3 setup.py sdist --dist-dir "$DIST_DIR"
-pip install "$DIST_DIR"/MorphIO*.tar.gz
-pip install -r tests/requirement_tests.txt
+$BIN/pip install "$DIST_DIR"/MorphIO*.tar.gz
+$BIN/pip install -r tests/requirement_tests.txt
 
 CURRENT=$(pwd)
 (cd .. && pytest ${CURRENT}/tests)
