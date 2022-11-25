@@ -84,7 +84,7 @@ jobs:
             brew update
             brew --version
             brew install hdf5
-          CIBW_ENVIRONMENT: PIP_NO_BINARY=h5py PIP_NO_CACHE_DIR=off
+          CIBW_ENVIRONMENT: PIP_NO_BINARY="h5py" PIP_NO_CACHE_DIR="off"
         run: |
           export HDF5_DIR=$(brew --prefix hdf5)
 
