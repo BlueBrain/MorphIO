@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 
 set -euxo pipefail
 
@@ -36,6 +35,7 @@ deactivate
 DIST_DIR="$VENV/dist"
 mkdir -p "$DIST_DIR"
 create_venv
+$BIN/pip install --no-binary h5py h5py
 python3 setup.py sdist --dist-dir "$DIST_DIR"
 $BIN/pip install "$DIST_DIR"/MorphIO*.tar.gz
 $BIN/pip install -r tests/requirement_tests.txt
