@@ -11,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-11.7.0]
         compiler:
           - {CC: clang, CXX: clang++}
           - {CC: gcc, CXX: g++}
@@ -36,7 +36,6 @@ jobs:
             brew --version
             brew install cmake || true  # macos image has cmake installed, but a new version may exist; ignore it if so
             brew install hdf5
-            brew install pkg-config
 
       - name: Build and run unittests
         env:
