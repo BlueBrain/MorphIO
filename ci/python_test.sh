@@ -15,8 +15,6 @@ function create_venv()
         set -u
 
         $VENV/bin/pip install --upgrade pip setuptools wheel
-
-        which $VENV/bin/pip
     fi
 }
 
