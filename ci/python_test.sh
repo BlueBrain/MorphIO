@@ -40,6 +40,7 @@ create_venv
 
 python3 setup.py sdist --dist-dir "$DIST_DIR"
 python3 -mpip install "$DIST_DIR"/MorphIO*.tar.gz
+python3 -mpip install --no-binary h5py h5py
 python3 -mpip install -r tests/requirement_tests.txt
 
 pushd $(pwd)/tests
