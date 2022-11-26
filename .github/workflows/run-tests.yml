@@ -1,7 +1,6 @@
 name: Run tests
 on: [pull_request, push]
 
-
 jobs:
   build:
     name: Run tests on ${{ matrix.os }}.${{ matrix.compiler.CC }}

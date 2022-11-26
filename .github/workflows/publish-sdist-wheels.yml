@@ -83,9 +83,7 @@ jobs:
           CIBW_BEFORE_BUILD: |
             brew update
             brew --version
-            brew install cmake
             brew install hdf5
-            HDF5_DIR=$(brew --prefix hdf5) python -m pip install --no-binary h5py h5py
         run: |
           python -m cibuildwheel --output-dir dist
 
