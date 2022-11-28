@@ -1,8 +1,32 @@
 v3.3.4
 ======
 
+New Features:
+* Add operator-> for iterators, for better ergonomics (#408)
+* Allow SWC and ASC morphologies to be built from strings (#407)
+
 Fixes:
+* Fallback to using python 3.10 for ci tests (#430)
+* Fix sscanf clammping of allowed inputs (#420)
+* Fix section order after deleting section in mut morphology (#412)
+* Enable test mistakenly disabled (#418)
+* Freeze wheel build os versions (#391)
 * Fix wrong section order when section is deleted (#412)
+
+Improvements:
+* Remove travis configuration and badge (#428)
+* Update links to morphology documentation (#424)
+* Update pybind11 to v2.10.0 release (#425)
+* Cleanup tests (#421)
+* Cleanup mutable morphology and soma (#413, #414, #415)
+* Cleanup ascii reader (#405)
+* Use Catch2 builtins to approximate comparisons (#394)
+* Update lexertl14 to latest commit cd5a1f1 (#397)
+* Update HighFive to v2.4.1 (#406)
+* Update gsl-lite submodule to v0.40.0 (#395)
+* Use non-exceptional methods wherever possible (#389)*
+* Rebuild morphologies only when modifiers are passed (#392)
+
 
 v3.3.3
 ======
