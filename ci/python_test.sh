@@ -36,9 +36,10 @@ DIST_DIR="$VENV/dist"
 mkdir -p "$DIST_DIR"
 create_venv
 
-python3 setup.py sdist --dist-dir "$DIST_DIR"
-python3 -mpip install "$DIST_DIR"/MorphIO*.tar.gz
-python3 -mpip install -r tests/requirement_tests.txt
+python3 -m pip install build
+python3 -m build . --outdir "$DIST_DIR"
+python3 -m pip install "$DIST_DIR"/MorphIO*.tar.gz
+python3 -m pip install -r tests/requirement_tests.txt
 
 pushd $(pwd)/tests
 pytest .
