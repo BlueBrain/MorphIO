@@ -71,7 +71,7 @@ setup(
     author='Blue Brain Project, EPFL',
     description='A neuron morphology IO library',
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     install_requires=install_requires,
     extras_require={
         'docs': ['sphinx-bluebrain-theme'],
