@@ -37,9 +37,11 @@ jobs:
       - name: Install packages on MacOS
         if: runner.os == 'macOS'
         run: |
+            # { work around https://github.com/actions/setup-python/issues/577
             #brew update
             #brew --version
             export HOMEBREW_NO_AUTO_UPDATE=1
+            # }
             brew install cmake || true  # macos image has cmake installed, but a new version may exist; ignore it if so
             brew install hdf5
 
