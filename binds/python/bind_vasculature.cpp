@@ -15,7 +15,7 @@ namespace py = pybind11;
 void bind_vasculature(py::module& m) {
     using namespace py::literals;
 
-    py::class_<morphio::vasculature::Vasculature>(m, "Vasculature")
+    py::class_<morphio::vasculature::Vasculature>(m, "Vasculature", "Class representing a Vasculature")
         .def(py::init<const std::string&>(), "filename"_a)
         .def(py::init([](py::object arg) {
                  return std::make_unique<morphio::vasculature::Vasculature>(py::str(arg));
@@ -35,7 +35,6 @@ void bind_vasculature(py::module& m) {
              "Returns the Section with the given id\n"
              "throw RawDataError if the id is out of range",
              "section_id"_a)
-
 
         .def_property_readonly(
             "section_offsets",
@@ -98,7 +97,7 @@ void bind_vasculature(py::module& m) {
             "Iterate on all sections of the graph");
 
 
-    py::class_<morphio::vasculature::Section>(m, "Section")
+    py::class_<morphio::vasculature::Section>(m, "Section", "Class representing a mutable Vasculature Section")
         .def("__str__",
              [](const morphio::vasculature::Section& section) {
                  std::stringstream ss;
