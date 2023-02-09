@@ -4,8 +4,10 @@ endif()
 
 pybind11_add_module(_morphio SYSTEM
     morphio.cpp
+    bind_immutable.cpp
     bindings_utils.cpp
     bind_misc.cpp
+    bind_mutable.cpp
     bind_vasculature.cpp
 )
 
