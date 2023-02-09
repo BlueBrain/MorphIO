@@ -3,20 +3,20 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include <morphio/enums.h>
 #include <morphio/dendritic_spine.h>
 #include <morphio/endoplasmic_reticulum.h>
+#include <morphio/enums.h>
 #include <morphio/glial_cell.h>
 #include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
-#include <morphio/soma.h>
-#include <morphio/types.h>
 #include <morphio/mut/dendritic_spine.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/glial_cell.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/soma.h>
+#include <morphio/soma.h>
+#include <morphio/types.h>
 
 #include <array>
 #include <memory>  // std::make_unique
@@ -40,8 +40,10 @@ PYBIND11_MODULE(_morphio, m) {
     // ############################
     // # Define immutable classes #
     // ############################
-    auto Morphology_class = py::class_<morphio::Morphology>(m, "Morphology", "Class representing a complete morphology");
-    auto GlialCell_class = py::class_<morphio::GlialCell, morphio::Morphology>(m, "GlialCell", "Class representing a Glial Cell");
+    auto Morphology_class = py::class_<morphio::Morphology>(
+        m, "Morphology", "Class representing a complete morphology");
+    auto GlialCell_class = py::class_<morphio::GlialCell, morphio::Morphology>(
+        m, "GlialCell", "Class representing a Glial Cell");
     auto Mitochondria_class = py::class_<morphio::Mitochondria>(
         m,
         "Mitochondria",
@@ -58,8 +60,10 @@ PYBIND11_MODULE(_morphio, m) {
         "h5v1.html");
     auto Soma_class = py::class_<morphio::Soma>(m, "Soma", "Class representing a Soma");
     auto Section_class = py::class_<morphio::Section>(m, "Section", "Class representing a Section");
-    auto MitoSection_class = py::class_<morphio::MitoSection>(m, "MitoSection", "Class representing a Mitochondrial Section");
-    auto DendriticSpine_class = py::class_<morphio::DendriticSpine, morphio::Morphology>(m, "DendriticSpine", "Class representing a Dendritic Spine");
+    auto MitoSection_class = py::class_<morphio::MitoSection>(
+        m, "MitoSection", "Class representing a Mitochondrial Section");
+    auto DendriticSpine_class = py::class_<morphio::DendriticSpine, morphio::Morphology>(
+        m, "DendriticSpine", "Class representing a Dendritic Spine");
 
     // ###########################################
     // # Define 'mut' module for mutable classes #
@@ -69,19 +73,31 @@ PYBIND11_MODULE(_morphio, m) {
     // ##########################
     // # Define mutable classes #
     // ##########################
-    auto Morphology_mut_class = py::class_<morphio::mut::Morphology>(mut_module, "Morphology", "Class representing a mutable Morphology");
-    auto GlialCell_mut_class = py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(mut_module, "GlialCell", "Class representing a mutable Glial Cell");
-    auto Mitochondria_mut_class = py::class_<morphio::mut::Mitochondria>(mut_module, "Mitochondria", "Class representing a mutable Mitochondria");
-    auto MitoSection_mut_class = py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(mut_module, "MitoSection", "Class representing a mutable Mitochondrial Section");
-    auto Section_mut_class = py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(mut_module, "Section", "Class representing a mutable Section");
-    auto Soma_mut_class = py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>>(mut_module, "Soma", "Class representing a mutable Soma");
-    auto EndoplasmicReticulum_mut_class = py::class_<morphio::mut::EndoplasmicReticulum>(mut_module, "EndoplasmicReticulum", "Class representing a mutable Endoplasmic Reticulum");
-    auto DendriticSpine_mut_class = py::class_<morphio::mut::DendriticSpine, morphio::mut::Morphology>(mut_module, "DendriticSpine", "Class representing a mutable Dendritic Spine");
+    auto Morphology_mut_class = py::class_<morphio::mut::Morphology>(
+        mut_module, "Morphology", "Class representing a mutable Morphology");
+    auto GlialCell_mut_class = py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(
+        mut_module, "GlialCell", "Class representing a mutable Glial Cell");
+    auto Mitochondria_mut_class = py::class_<morphio::mut::Mitochondria>(
+        mut_module, "Mitochondria", "Class representing a mutable Mitochondria");
+    auto MitoSection_mut_class =
+        py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(
+            mut_module, "MitoSection", "Class representing a mutable Mitochondrial Section");
+    auto Section_mut_class =
+        py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(
+            mut_module, "Section", "Class representing a mutable Section");
+    auto Soma_mut_class = py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>>(
+        mut_module, "Soma", "Class representing a mutable Soma");
+    auto EndoplasmicReticulum_mut_class = py::class_<morphio::mut::EndoplasmicReticulum>(
+        mut_module, "EndoplasmicReticulum", "Class representing a mutable Endoplasmic Reticulum");
+    auto DendriticSpine_mut_class =
+        py::class_<morphio::mut::DendriticSpine, morphio::mut::Morphology>(
+            mut_module, "DendriticSpine", "Class representing a mutable Dendritic Spine");
 
     // ######################################
     // Define methods for immutable classes #
     // ######################################
-    Morphology_class.def(py::init<const std::string&, unsigned int>(),
+    Morphology_class
+        .def(py::init<const std::string&, unsigned int>(),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
         .def(py::init<const std::string&, const std::string&, unsigned int>(),
@@ -225,7 +241,8 @@ PYBIND11_MODULE(_morphio, m) {
              "Additional Ctor that accepts as filename any python object that implements __repr__ "
              "or __str__");
 
-    Mitochondria_class.def("section",
+    Mitochondria_class
+        .def("section",
              &morphio::Mitochondria::section,
              "Returns the mithochondrial section with the given ID",
              "section_id"_a)
@@ -237,7 +254,8 @@ PYBIND11_MODULE(_morphio, m) {
             &morphio::Mitochondria::rootSections,
             "Returns a list of all root sections (section whose parent ID is -1)");
 
-    EndoplasmicReticulum_class.def_property_readonly("section_indices",
+    EndoplasmicReticulum_class
+        .def_property_readonly("section_indices",
                                &morphio::EndoplasmicReticulum::sectionIndices,
                                "Returns the list of neuronal section indices")
         .def_property_readonly("volumes",
@@ -275,7 +293,8 @@ PYBIND11_MODULE(_morphio, m) {
                                "Returns the soma surface\n\n"
                                "Note: the soma surface computation depends on the soma type");
 
-    Section_class.def("__str__",
+    Section_class
+        .def("__str__",
              [](const morphio::Section& section) {
                  std::stringstream ss;
                  ss << section;
@@ -361,7 +380,8 @@ PYBIND11_MODULE(_morphio, m) {
 
 
     // Topology-related member functions
-    MitoSection_class.def_property_readonly("parent",
+    MitoSection_class
+        .def_property_readonly("parent",
                                &morphio::MitoSection::parent,
                                "Returns the parent mitochondrial section of this section\n"
                                "throw MissingParentError is the section doesn't have a parent")
@@ -427,7 +447,8 @@ PYBIND11_MODULE(_morphio, m) {
             "at each root section",
             "iter_type"_a = IterType::DEPTH_FIRST);
 
-    DendriticSpine_class.def(py::init([](py::object arg) {
+    DendriticSpine_class
+        .def(py::init([](py::object arg) {
                  return std::make_unique<morphio::DendriticSpine>(py::str(arg));
              }),
              "filename"_a)
@@ -532,8 +553,7 @@ PYBIND11_MODULE(_morphio, m) {
     // ######################################
     // # Define methods for mutable classes #
     // ######################################
-    Morphology_mut_class
-        .def(py::init<>())
+    Morphology_mut_class.def(py::init<>())
         .def(py::init<const std::string&, unsigned int>(),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
@@ -544,8 +564,7 @@ PYBIND11_MODULE(_morphio, m) {
              "morphology"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
         .def(py::init([](py::object arg, unsigned int options) {
-                 return std::make_unique<morphio::mut::Morphology>(
-                     py::str(arg), options);
+                 return std::make_unique<morphio::mut::Morphology>(py::str(arg), options);
              }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER,
@@ -642,7 +661,7 @@ PYBIND11_MODULE(_morphio, m) {
         .def_property_readonly("version", &morphio::mut::Morphology::version, "Returns the version")
 
         .def("remove_unifurcations",
-             static_cast<void (morphio::mut::Morphology::*) ()>(
+             static_cast<void (morphio::mut::Morphology::*)()>(
                  &morphio::mut::Morphology::removeUnifurcations),
              "Fixes the morphology single child sections and issues warnings"
              "if the section starts and ends are inconsistent")
@@ -665,8 +684,9 @@ PYBIND11_MODULE(_morphio, m) {
                     return py::make_iterator(morph->breadth_begin(), morph->breadth_end());
                 case IterType::UPSTREAM:
                 default:
-                    throw morphio::MorphioError("Only iteration types depth_first and "
-                                                "breadth_first are supported");
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first and "
+                        "breadth_first are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive
@@ -690,8 +710,7 @@ PYBIND11_MODULE(_morphio, m) {
              "mutable_section"_a,
              "recursive"_a = false);
 
-    GlialCell_mut_class
-        .def(py::init<>())
+    GlialCell_mut_class.def(py::init<>())
         .def(py::init([](py::object arg) {
                  return std::make_unique<morphio::mut::GlialCell>(py::str(arg));
              }),
@@ -700,8 +719,7 @@ PYBIND11_MODULE(_morphio, m) {
              "object that implements __repr__ or __str__");
 
 
-    Mitochondria_mut_class
-        .def(py::init<>())
+    Mitochondria_mut_class.def(py::init<>())
         .def_property_readonly("root_sections",
                                &morphio::mut::Mitochondria::rootSections,
                                "Returns a list of all root sections IDs "
@@ -925,8 +943,9 @@ PYBIND11_MODULE(_morphio, m) {
                 case IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
                 default:
-                    throw morphio::MorphioError("Only iteration types depth_first, breadth_first and "
-                                                "upstream are supported");
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first, breadth_first and "
+                        "upstream are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
@@ -967,8 +986,7 @@ PYBIND11_MODULE(_morphio, m) {
              "point_level_properties"_a,
              "section_type"_a = morphio::SectionType::SECTION_UNDEFINED);
 
-    Soma_mut_class
-        .def(py::init<const morphio::Property::PointLevel&>())
+    Soma_mut_class.def(py::init<const morphio::Property::PointLevel&>())
         .def_property(
             "points",
             [](morphio::mut::Soma* soma) {
@@ -1003,8 +1021,7 @@ PYBIND11_MODULE(_morphio, m) {
             [](morphio::mut::Soma* soma) { return py::array(3, soma->center().data()); },
             "Returns the center of gravity of the soma points");
 
-    EndoplasmicReticulum_mut_class
-        .def(py::init<>())
+    EndoplasmicReticulum_mut_class.def(py::init<>())
         .def(py::init<const std::vector<uint32_t>&,
                       const std::vector<morphio::floatType>&,
                       const std::vector<morphio::floatType>&,
@@ -1057,8 +1074,7 @@ PYBIND11_MODULE(_morphio, m) {
             },
             "Returns the number of filaments for each neuronal section");
 
-    DendriticSpine_mut_class
-        .def(py::init<>())
+    DendriticSpine_mut_class.def(py::init<>())
         .def(py::init([](py::object arg) {
                  return std::make_unique<morphio::mut::DendriticSpine>(py::str(arg));
              }),
