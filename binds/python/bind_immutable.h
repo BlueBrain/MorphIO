@@ -16,6 +16,6 @@
 
 #include "bindings_utils.h"
 
-_immutable_binding_classes bind_immutable_classes(pybind11::module& m);
+immutable_binding_classes bind_immutable_classes(pybind11::module& m);
 
-void bind_immutable_methods(pybind11::module& m, _immutable_binding_classes& immutable_classes);
+void bind_immutable_methods(immutable_binding_classes& immutable_classes);

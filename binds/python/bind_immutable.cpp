@@ -23,13 +23,13 @@
 
 namespace py = pybind11;
 
-_immutable_binding_classes bind_immutable_classes(py::module& m) {
+immutable_binding_classes bind_immutable_classes(py::module& m) {
     using namespace py::literals;
 
     // http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight=iostream#capturing-standard-output-from-ostream
     py::add_ostream_redirect(m, "ostream_redirect");
 
-    return _immutable_binding_classes{
+    return immutable_binding_classes{
         py::class_<morphio::Morphology>(m,
                                         "Morphology",
                                         "Class representing a complete morphology"),
@@ -61,7 +61,7 @@ _immutable_binding_classes bind_immutable_classes(py::module& m) {
             m, "DendriticSpine", "Class representing a Dendritic Spine")};
 }
 
-void bind_immutable_methods(py::module& m, _immutable_binding_classes& immutable_classes) {
+void bind_immutable_methods(immutable_binding_classes& immutable_classes) {
     using namespace py::literals;
 
     immutable_classes.Morphology_class

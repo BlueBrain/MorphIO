@@ -19,10 +19,10 @@
 
 namespace py = pybind11;
 
-_mutable_binding_classes bind_mutable_classes(py::module& m) {
+mutable_binding_classes bind_mutable_classes(py::module& m) {
     using namespace py::literals;
 
-    return _mutable_binding_classes{
+    return mutable_binding_classes{
         py::class_<morphio::mut::Morphology>(m,
                                              "Morphology",
                                              "Class representing a mutable Morphology"),
@@ -43,7 +43,7 @@ _mutable_binding_classes bind_mutable_classes(py::module& m) {
             m, "DendriticSpine", "Class representing a mutable Dendritic Spine")};
 }
 
-void bind_mutable_methods(py::module& m, _mutable_binding_classes& mutable_classes) {
+void bind_mutable_methods(mutable_binding_classes& mutable_classes) {
     using namespace py::literals;
 
     mutable_classes.Morphology_mut_class.def(py::init<>())

@@ -63,7 +63,7 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence&& seq) {
     );
 }
 
-struct _immutable_binding_classes {
+struct immutable_binding_classes {
     // Immutable classes
     py::class_<morphio::Morphology> Morphology_class;
     py::class_<morphio::GlialCell, morphio::Morphology> GlialCell_class;
@@ -75,7 +75,7 @@ struct _immutable_binding_classes {
     py::class_<morphio::DendriticSpine, morphio::Morphology> DendriticSpine_class;
 };
 
-struct _mutable_binding_classes {
+struct mutable_binding_classes {
     // Mutable classes
     py::class_<morphio::mut::Morphology> Morphology_mut_class;
     py::class_<morphio::mut::GlialCell, morphio::mut::Morphology> GlialCell_mut_class;
