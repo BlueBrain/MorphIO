@@ -48,13 +48,10 @@ def test_mut_immut_have_same_methods():
     only_in_mut_mitochondria = {
         'append_root_section',
         'breadth_begin',
-        'breadth_begin',
         'breadth_end',
         'children',
         'depth_begin',
         'is_root',
-        'is_root',
-        'parent',
         'parent',
         'upstream_begin',
     }
