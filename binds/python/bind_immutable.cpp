@@ -12,7 +12,6 @@
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/glial_cell.h>
 #include <morphio/mut/mitochondria.h>
-//#include <morphio/mut/dendritic_spine.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
 #include <morphio/types.h>
@@ -24,13 +23,48 @@
 
 namespace py = pybind11;
 
-void bind_immutable_module(py::module& m) {
+immutable_binding_classes bind_immutable_classes(py::module& m) {
     using namespace py::literals;
 
     // http://pybind11.readthedocs.io/en/stable/advanced/pycpp/utilities.html?highlight=iostream#capturing-standard-output-from-ostream
     py::add_ostream_redirect(m, "ostream_redirect");
 
-    py::class_<morphio::Morphology>(m, "Morphology")
+    return immutable_binding_classes{
+        py::class_<morphio::Morphology>(m,
+                                        "Morphology",
+                                        "Class representing a complete morphology"),
+        py::class_<morphio::GlialCell, morphio::Morphology>(m,
+                                                            "GlialCell",
+                                                            "Class representing a Glial Cell"),
+        py::class_<morphio::Mitochondria>(
+            m,
+            "Mitochondria",
+            "The entry-point class to access mitochondrial data\n"
+            "By design, it is the equivalent of the Morphology class but at the mitochondrial "
+            "level\n"
+            "As the Morphology class, it implements a section accessor and a root section "
+            "accessor\n"
+            "returning views on the Properties object for the queried mitochondrial section"),
+        py::class_<morphio::EndoplasmicReticulum>(
+            m,
+            "EndoplasmicReticulum",
+            "The entry-point class to access endoplasmic reticulum data\n"
+            "Spec "
+            "https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/"
+            "h5v1.html"),
+        py::class_<morphio::Soma>(m, "Soma", "Class representing a Soma"),
+        py::class_<morphio::Section>(m, "Section", "Class representing a Section"),
+        py::class_<morphio::MitoSection>(m,
+                                         "MitoSection",
+                                         "Class representing a Mitochondrial Section"),
+        py::class_<morphio::DendriticSpine, morphio::Morphology>(
+            m, "DendriticSpine", "Class representing a Dendritic Spine")};
+}
+
+void bind_immutable_methods(immutable_binding_classes& immutable_classes) {
+    using namespace py::literals;
+
+    immutable_classes.Morphology_class
         .def(py::init<const std::string&, unsigned int>(),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
@@ -160,27 +194,22 @@ void bind_immutable_module(py::module& m) {
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Section iterator that runs successively on every neurite\n"
+            "\n"
             "iter_type controls the order of iteration on sections of a given neurite. 2 values "
             "can be passed:\n"
-            "- morphio.IterType.depth_first (default)\n"
-            "- morphio.IterType.breadth_first (default)\n"
+            "\n"
+            "- ``morphio.IterType.depth_first`` (default)\n"
+            "- ``morphio.IterType.breadth_first``\n",
             "iter_type"_a = IterType::DEPTH_FIRST);
 
-    py::class_<morphio::GlialCell, morphio::Morphology>(m, "GlialCell")
-        .def(py::init<const std::string&>())
+    immutable_classes.GlialCell_class.def(py::init<const std::string&>())
         .def(py::init(
                  [](py::object arg) { return std::make_unique<morphio::GlialCell>(py::str(arg)); }),
              "filename"_a,
              "Additional Ctor that accepts as filename any python object that implements __repr__ "
              "or __str__");
 
-    py::class_<morphio::Mitochondria>(
-        m,
-        "Mitochondria",
-        "The entry-point class to access mitochondrial data\n"
-        "By design, it is the equivalent of the Morphology class but at the mitochondrial level\n"
-        "As the Morphology class, it implements a section accessor and a root section accessor\n"
-        "returning views on the Properties object for the queried mitochondrial section")
+    immutable_classes.Mitochondria_class
         .def("section",
              &morphio::Mitochondria::section,
              "Returns the mithochondrial section with the given ID",
@@ -193,13 +222,7 @@ void bind_immutable_module(py::module& m) {
             &morphio::Mitochondria::rootSections,
             "Returns a list of all root sections (section whose parent ID is -1)");
 
-    py::class_<morphio::EndoplasmicReticulum>(
-        m,
-        "EndoplasmicReticulum",
-        "The entry-point class to access endoplasmic reticulum data\n"
-        "Spec "
-        "https://bbpteam.epfl.ch/documentation/projects/Morphology%20Documentation/latest/"
-        "h5v1.html")
+    immutable_classes.EndoplasmicReticulum_class
         .def_property_readonly("section_indices",
                                &morphio::EndoplasmicReticulum::sectionIndices,
                                "Returns the list of neuronal section indices")
@@ -213,9 +236,7 @@ void bind_immutable_module(py::module& m) {
                                &morphio::EndoplasmicReticulum::filamentCounts,
                                "Returns the number of filaments for each neuronal section");
 
-
-    py::class_<morphio::Soma>(m, "Soma")
-        .def(py::init<const morphio::Soma&>())
+    immutable_classes.Soma_class.def(py::init<const morphio::Soma&>())
         .def_property_readonly(
             "points",
             [](morphio::Soma* soma) { return span_array_to_ndarray(soma->points()); },
@@ -240,7 +261,7 @@ void bind_immutable_module(py::module& m) {
                                "Returns the soma surface\n\n"
                                "Note: the soma surface computation depends on the soma type");
 
-    py::class_<morphio::Section>(m, "Section")
+    immutable_classes.Section_class
         .def("__str__",
              [](const morphio::Section& section) {
                  std::stringstream ss;
@@ -319,14 +340,15 @@ void bind_immutable_module(py::module& m) {
             "Section iterator\n"
             "\n"
             "iter_type controls the iteration order. 3 values can be passed:\n"
-            "- morphio.IterType.depth_first (default)\n"
-            "- morphio.IterType.breadth_first\n"
-            "- morphio.IterType.upstream\n",
+            "\n"
+            "- ``morphio.IterType.depth_first`` (default)\n"
+            "- ``morphio.IterType.breadth_first``\n"
+            "- ``morphio.IterType.upstream``\n",
             "iter_type"_a = IterType::DEPTH_FIRST);
 
 
-    py::class_<morphio::MitoSection>(m, "MitoSection")
-        // Topology-related member functions
+    // Topology-related member functions
+    immutable_classes.MitoSection_class
         .def_property_readonly("parent",
                                &morphio::MitoSection::parent,
                                "Returns the parent mitochondrial section of this section\n"
@@ -393,7 +415,7 @@ void bind_immutable_module(py::module& m) {
             "at each root section",
             "iter_type"_a = IterType::DEPTH_FIRST);
 
-    py::class_<morphio::DendriticSpine, morphio::Morphology>(m, "DendriticSpine")
+    immutable_classes.DendriticSpine_class
         .def(py::init([](py::object arg) {
                  return std::make_unique<morphio::DendriticSpine>(py::str(arg));
              }),
@@ -484,10 +506,12 @@ void bind_immutable_module(py::module& m) {
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Section iterator that runs successively on every neurite\n"
+            "\n"
             "iter_type controls the order of iteration on sections of a given neurite. 2 values "
             "can be passed:\n"
-            "- morphio.IterType.depth_first (default)\n"
-            "- morphio.IterType.breadth_first (default)\n",
+            "\n"
+            "- ``morphio.IterType.depth_first`` (default)\n"
+            "- ``morphio.IterType.breadth_first``\n",
             "iter_type"_a = IterType::DEPTH_FIRST)
         .def(
             "write",

@@ -11,6 +11,7 @@ BUILDDIR      = build
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+# 	@source/build_intersphinx_objects.sh
 
 .PHONY: help Makefile
 

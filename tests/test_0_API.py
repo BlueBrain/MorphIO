@@ -45,5 +45,15 @@ def test_mut_immut_have_same_methods():
     assert (methods(morphio.EndoplasmicReticulum) ==
                  methods(morphio.mut.EndoplasmicReticulum))
 
-    assert (methods(morphio.Mitochondria),
-                 methods(morphio.mut.Mitochondria))
+    only_in_mut_mitochondria = {
+        'append_root_section',
+        'breadth_begin',
+        'breadth_end',
+        'children',
+        'depth_begin',
+        'is_root',
+        'parent',
+        'upstream_begin',
+    }
+    assert (methods(morphio.Mitochondria) ==
+                 methods(morphio.mut.Mitochondria) - only_in_mut_mitochondria)

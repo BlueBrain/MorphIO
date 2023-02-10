@@ -1,8 +1,8 @@
 #include "bind_mutable.h"
 
-#include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/mut/dendritic_spine.h>
@@ -19,11 +19,34 @@
 
 namespace py = pybind11;
 
-void bind_mutable_module(py::module& m) {
+mutable_binding_classes bind_mutable_classes(py::module& m) {
     using namespace py::literals;
 
-    py::class_<morphio::mut::Morphology>(m, "Morphology")
-        .def(py::init<>())
+    return mutable_binding_classes{
+        py::class_<morphio::mut::Morphology>(m,
+                                             "Morphology",
+                                             "Class representing a mutable Morphology"),
+        py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(
+            m, "GlialCell", "Class representing a mutable Glial Cell"),
+        py::class_<morphio::mut::Mitochondria>(m,
+                                               "Mitochondria",
+                                               "Class representing a mutable Mitochondria"),
+        py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(
+            m, "MitoSection", "Class representing a mutable Mitochondrial Section"),
+        py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(
+            m, "Section", "Class representing a mutable Section"),
+        py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>>(
+            m, "Soma", "Class representing a mutable Soma"),
+        py::class_<morphio::mut::EndoplasmicReticulum>(
+            m, "EndoplasmicReticulum", "Class representing a mutable Endoplasmic Reticulum"),
+        py::class_<morphio::mut::DendriticSpine, morphio::mut::Morphology>(
+            m, "DendriticSpine", "Class representing a mutable Dendritic Spine")};
+}
+
+void bind_mutable_methods(mutable_binding_classes& mutable_classes) {
+    using namespace py::literals;
+
+    mutable_classes.Morphology_mut_class.def(py::init<>())
         .def(py::init<const std::string&, unsigned int>(),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
@@ -34,8 +57,7 @@ void bind_mutable_module(py::module& m) {
              "morphology"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
         .def(py::init([](py::object arg, unsigned int options) {
-                 return std::make_unique<morphio::mut::Morphology>(
-                     py::str(arg), options);
+                 return std::make_unique<morphio::mut::Morphology>(py::str(arg), options);
              }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER,
@@ -132,7 +154,7 @@ void bind_mutable_module(py::module& m) {
         .def_property_readonly("version", &morphio::mut::Morphology::version, "Returns the version")
 
         .def("remove_unifurcations",
-             static_cast<void (morphio::mut::Morphology::*) ()>(
+             static_cast<void (morphio::mut::Morphology::*)()>(
                  &morphio::mut::Morphology::removeUnifurcations),
              "Fixes the morphology single child sections and issues warnings"
              "if the section starts and ends are inconsistent")
@@ -155,8 +177,9 @@ void bind_mutable_module(py::module& m) {
                     return py::make_iterator(morph->breadth_begin(), morph->breadth_end());
                 case IterType::UPSTREAM:
                 default:
-                    throw morphio::MorphioError("Only iteration types depth_first and "
-                                                "breadth_first are supported");
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first and "
+                        "breadth_first are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive
@@ -164,10 +187,12 @@ void bind_mutable_module(py::module& m) {
             ,
             "Section iterator that runs successively on every "
             "neurite\n"
+            "\n"
             "iter_type controls the order of iteration on sections of "
             "a given neurite. 2 values can be passed:\n"
-            "- morphio.IterType.depth_first (default)\n"
-            "- morphio.IterType.breadth_first",
+            "\n"
+            "- ``morphio.IterType.depth_first`` (default)\n"
+            "- ``morphio.IterType.breadth_first``\n",
             "iter_type"_a = IterType::DEPTH_FIRST)
         .def("append_root_section",
              static_cast<std::shared_ptr<morphio::mut::Section> (
@@ -178,8 +203,7 @@ void bind_mutable_module(py::module& m) {
              "mutable_section"_a,
              "recursive"_a = false);
 
-    py::class_<morphio::mut::GlialCell, morphio::mut::Morphology>(m, "GlialCell")
-        .def(py::init<>())
+    mutable_classes.GlialCell_mut_class.def(py::init<>())
         .def(py::init([](py::object arg) {
                  return std::make_unique<morphio::mut::GlialCell>(py::str(arg));
              }),
@@ -188,8 +212,7 @@ void bind_mutable_module(py::module& m) {
              "object that implements __repr__ or __str__");
 
 
-    py::class_<morphio::mut::Mitochondria>(m, "Mitochondria")
-        .def(py::init<>())
+    mutable_classes.Mitochondria_mut_class.def(py::init<>())
         .def_property_readonly("root_sections",
                                &morphio::mut::Mitochondria::rootSections,
                                "Returns a list of all root sections IDs "
@@ -279,8 +302,7 @@ void bind_mutable_module(py::module& m) {
     using mitosection_floats_f = std::vector<morphio::floatType>& (morphio::mut::MitoSection::*) ();
     using mitosection_ints_f = std::vector<uint32_t>& (morphio::mut::MitoSection::*) ();
 
-    py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>(m,
-                                                                                      "MitoSection")
+    mutable_classes.MitoSection_mut_class
         .def_property_readonly("id", &morphio::mut::MitoSection::id, "Return the section ID")
         .def_property(
             "diameters",
@@ -336,7 +358,7 @@ void bind_mutable_module(py::module& m) {
              "recursive"_a = false);
 
 
-    py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>>(m, "Section")
+    mutable_classes.Section_mut_class
         .def("__str__",
              [](const morphio::mut::Section& section) {
                  std::stringstream ss;
@@ -414,17 +436,19 @@ void bind_mutable_module(py::module& m) {
                 case IterType::UPSTREAM:
                     return py::make_iterator(section->upstream_begin(), section->upstream_end());
                 default:
-                    throw morphio::MorphioError("Only iteration types depth_first, breadth_first and "
-                                                "upstream are supported");
+                    throw morphio::MorphioError(
+                        "Only iteration types depth_first, breadth_first and "
+                        "upstream are supported");
                 }
             },
             py::keep_alive<0, 1>() /* Essential: keep object alive while iterator exists */,
             "Section iterator\n"
             "\n"
             "iter_type controls the iteration order. 3 values can be passed:\n"
-            "- morphio.IterType.depth_first (default)\n"
-            "- morphio.IterType.breadth_first\n"
-            "- morphio.IterType.upstream\n",
+            "\n"
+            "- ``morphio.IterType.depth_first`` (default)\n"
+            "- ``morphio.IterType.breadth_first``\n"
+            "- ``morphio.IterType.upstream``\n",
             "iter_type"_a = IterType::DEPTH_FIRST)
 
         // Editing
@@ -455,8 +479,7 @@ void bind_mutable_module(py::module& m) {
              "point_level_properties"_a,
              "section_type"_a = morphio::SectionType::SECTION_UNDEFINED);
 
-    py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>>(m, "Soma")
-        .def(py::init<const morphio::Property::PointLevel&>())
+    mutable_classes.Soma_mut_class.def(py::init<const morphio::Property::PointLevel&>())
         .def_property(
             "points",
             [](morphio::mut::Soma* soma) {
@@ -491,8 +514,7 @@ void bind_mutable_module(py::module& m) {
             [](morphio::mut::Soma* soma) { return py::array(3, soma->center().data()); },
             "Returns the center of gravity of the soma points");
 
-    py::class_<morphio::mut::EndoplasmicReticulum>(m, "EndoplasmicReticulum")
-        .def(py::init<>())
+    mutable_classes.EndoplasmicReticulum_mut_class.def(py::init<>())
         .def(py::init<const std::vector<uint32_t>&,
                       const std::vector<morphio::floatType>&,
                       const std::vector<morphio::floatType>&,
@@ -545,8 +567,7 @@ void bind_mutable_module(py::module& m) {
             },
             "Returns the number of filaments for each neuronal section");
 
-    py::class_<morphio::mut::DendriticSpine, morphio::mut::Morphology>(m, "DendriticSpine")
-        .def(py::init<>())
+    mutable_classes.DendriticSpine_mut_class.def(py::init<>())
         .def(py::init([](py::object arg) {
                  return std::make_unique<morphio::mut::DendriticSpine>(py::str(arg));
              }),
