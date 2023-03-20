@@ -108,88 +108,94 @@ constexpr std::size_t operator+(Token type) {
 }
 
 namespace {
-const lexertl::state_machine& build_lexer() {
-    static lexertl::state_machine sm;
-    if (!sm.empty()) {
+class StateMachineBuilder 
+{
+public:
+    static lexertl::state_machine build() {
+        lexertl::rules rules_;
+        rules_.push("\n", +Token::NEWLINE);
+        rules_.push("[ \t\r]+", +Token::WS);
+        rules_.push(";[^\n]*", +Token::COMMENT);
+
+        rules_.push("\\(", +Token::LPAREN);
+        rules_.push("\\)", +Token::RPAREN);
+
+        rules_.push("<[ \t\r]*\\(", +Token::LSPINE);
+        rules_.push("\\)>", +Token::RSPINE);
+
+        rules_.push(",", +Token::COMMA);
+        rules_.push("\\|", +Token::PIPE);
+
+        rules_.push("Color", +Token::COLOR);
+        rules_.push("Font", +Token::FONT);
+
+        rules_.push("[Aa]xon", +Token::AXON);
+        rules_.push("[Aa]pical", +Token::APICAL);
+        rules_.push("[Dd]endrite", +Token::DENDRITE);
+        rules_.push("[Cc]ell ?[Bb]ody", +Token::CELLBODY);
+
+        // The code snippet used to infer the marker list is available at:
+        // https://github.com/BlueBrain/MorphIO/pull/229
+        rules_.push("Dot[0-9]*", +Token::MARKER);
+        rules_.push("Plus[0-9]*", +Token::MARKER);
+        rules_.push("Cross[0-9]*", +Token::MARKER);
+        rules_.push("Splat[0-9]*", +Token::MARKER);
+        rules_.push("Flower[0-9]*", +Token::MARKER);
+        rules_.push("Circle[0-9]*", +Token::MARKER);
+        rules_.push("Flower[0-9]*", +Token::MARKER);
+        rules_.push("TriStar[0-9]*", +Token::MARKER);
+        rules_.push("OpenStar[0-9]*", +Token::MARKER);
+        rules_.push("Asterisk[0-9]*", +Token::MARKER);
+        rules_.push("SnowFlake[0-9]*", +Token::MARKER);
+        rules_.push("OpenCircle[0-9]*", +Token::MARKER);
+        rules_.push("ShadedStar[0-9]*", +Token::MARKER);
+        rules_.push("FilledStar[0-9]*", +Token::MARKER);
+        rules_.push("TexacoStar[0-9]*", +Token::MARKER);
+        rules_.push("MoneyGreen[0-9]*", +Token::MARKER);
+        rules_.push("DarkYellow[0-9]*", +Token::MARKER);
+        rules_.push("OpenSquare[0-9]*", +Token::MARKER);
+        rules_.push("OpenDiamond[0-9]*", +Token::MARKER);
+        rules_.push("CircleArrow[0-9]*", +Token::MARKER);
+        rules_.push("CircleCross[0-9]*", +Token::MARKER);
+        rules_.push("OpenQuadStar[0-9]*", +Token::MARKER);
+        rules_.push("DoubleCircle[0-9]*", +Token::MARKER);
+        rules_.push("FilledSquare[0-9]*", +Token::MARKER);
+        rules_.push("MalteseCross[0-9]*", +Token::MARKER);
+        rules_.push("FilledCircle[0-9]*", +Token::MARKER);
+        rules_.push("FilledDiamond[0-9]*", +Token::MARKER);
+        rules_.push("FilledQuadStar[0-9]*", +Token::MARKER);
+        rules_.push("OpenUpTriangle[0-9]*", +Token::MARKER);
+        rules_.push("FilledUpTriangle[0-9]*", +Token::MARKER);
+        rules_.push("OpenDownTriangle[0-9]*", +Token::MARKER);
+        rules_.push("FilledDownTriangle[0-9]*", +Token::MARKER);
+
+        rules_.push("Generated", +Token::GENERATED);
+        rules_.push("High", +Token::HIGH);
+        rules_.push("Incomplete", +Token::INCOMPLETE);
+        rules_.push("Low", +Token::LOW);
+        rules_.push("Normal", +Token::NORMAL);
+        rules_.push("Midpoint", +Token::MIDPOINT);
+        rules_.push("Origin", +Token::ORIGIN);
+
+        rules_.push(R"(\"[^"]*\")", +Token::STRING);
+
+        rules_.push(R"([+-]?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?)", +Token::NUMBER);
+        rules_.push("[a-zA-Z][0-9a-zA-Z]+", +Token::WORD);
+
+        lexertl::state_machine sm;
+
+        lexertl::generator::build(rules_, sm);
+        sm.minimise();
+
+        // useful to debug
+        // lexertl::debug::dump(sm, std::cout);
+
         return sm;
     }
+};
 
-    lexertl::rules rules_;
-    rules_.push("\n", +Token::NEWLINE);
-    rules_.push("[ \t\r]+", +Token::WS);
-    rules_.push(";[^\n]*", +Token::COMMENT);
-
-    rules_.push("\\(", +Token::LPAREN);
-    rules_.push("\\)", +Token::RPAREN);
-
-    rules_.push("<[ \t\r]*\\(", +Token::LSPINE);
-    rules_.push("\\)>", +Token::RSPINE);
-
-    rules_.push(",", +Token::COMMA);
-    rules_.push("\\|", +Token::PIPE);
-
-    rules_.push("Color", +Token::COLOR);
-    rules_.push("Font", +Token::FONT);
-
-    rules_.push("[Aa]xon", +Token::AXON);
-    rules_.push("[Aa]pical", +Token::APICAL);
-    rules_.push("[Dd]endrite", +Token::DENDRITE);
-    rules_.push("[Cc]ell ?[Bb]ody", +Token::CELLBODY);
-
-    // The code snippet used to infer the marker list is available at:
-    // https://github.com/BlueBrain/MorphIO/pull/229
-    rules_.push("Dot[0-9]*", +Token::MARKER);
-    rules_.push("Plus[0-9]*", +Token::MARKER);
-    rules_.push("Cross[0-9]*", +Token::MARKER);
-    rules_.push("Splat[0-9]*", +Token::MARKER);
-    rules_.push("Flower[0-9]*", +Token::MARKER);
-    rules_.push("Circle[0-9]*", +Token::MARKER);
-    rules_.push("Flower[0-9]*", +Token::MARKER);
-    rules_.push("TriStar[0-9]*", +Token::MARKER);
-    rules_.push("OpenStar[0-9]*", +Token::MARKER);
-    rules_.push("Asterisk[0-9]*", +Token::MARKER);
-    rules_.push("SnowFlake[0-9]*", +Token::MARKER);
-    rules_.push("OpenCircle[0-9]*", +Token::MARKER);
-    rules_.push("ShadedStar[0-9]*", +Token::MARKER);
-    rules_.push("FilledStar[0-9]*", +Token::MARKER);
-    rules_.push("TexacoStar[0-9]*", +Token::MARKER);
-    rules_.push("MoneyGreen[0-9]*", +Token::MARKER);
-    rules_.push("DarkYellow[0-9]*", +Token::MARKER);
-    rules_.push("OpenSquare[0-9]*", +Token::MARKER);
-    rules_.push("OpenDiamond[0-9]*", +Token::MARKER);
-    rules_.push("CircleArrow[0-9]*", +Token::MARKER);
-    rules_.push("CircleCross[0-9]*", +Token::MARKER);
-    rules_.push("OpenQuadStar[0-9]*", +Token::MARKER);
-    rules_.push("DoubleCircle[0-9]*", +Token::MARKER);
-    rules_.push("FilledSquare[0-9]*", +Token::MARKER);
-    rules_.push("MalteseCross[0-9]*", +Token::MARKER);
-    rules_.push("FilledCircle[0-9]*", +Token::MARKER);
-    rules_.push("FilledDiamond[0-9]*", +Token::MARKER);
-    rules_.push("FilledQuadStar[0-9]*", +Token::MARKER);
-    rules_.push("OpenUpTriangle[0-9]*", +Token::MARKER);
-    rules_.push("FilledUpTriangle[0-9]*", +Token::MARKER);
-    rules_.push("OpenDownTriangle[0-9]*", +Token::MARKER);
-    rules_.push("FilledDownTriangle[0-9]*", +Token::MARKER);
-
-    rules_.push("Generated", +Token::GENERATED);
-    rules_.push("High", +Token::HIGH);
-    rules_.push("Incomplete", +Token::INCOMPLETE);
-    rules_.push("Low", +Token::LOW);
-    rules_.push("Normal", +Token::NORMAL);
-    rules_.push("Midpoint", +Token::MIDPOINT);
-    rules_.push("Origin", +Token::ORIGIN);
-
-    rules_.push(R"(\"[^"]*\")", +Token::STRING);
-
-    rules_.push(R"([+-]?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?)", +Token::NUMBER);
-    rules_.push("[a-zA-Z][0-9a-zA-Z]+", +Token::WORD);
-
-    lexertl::generator::build(rules_, sm);
-    sm.minimise();
-
-    // useful to debug
-    // lexertl::debug::dump(sm, std::cout);
-
+const lexertl::state_machine& lexer_singleton() {
+    static lexertl::state_machine sm = StateMachineBuilder::build();
     return sm;
 }
 
@@ -214,7 +220,7 @@ class NeurolucidaLexer
         , err_(path) {}
 
     void start_parse(const std::string& input) {
-        const auto& sm = build_lexer();
+        const auto& sm = lexer_singleton();
         current_ = next_ = lexertl::siterator(input.begin(), input.end(), sm);
 
         // will set the above, current_ to next_, AND consume whitespace
