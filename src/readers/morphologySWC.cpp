@@ -1,6 +1,8 @@
 #include "morphologySWC.h"
 
 #include <cstdint>        // uint32_t
+#include <cstdio>         // sscanf
+#include <locale>         // std::locale
 #include <memory>         // std::shared_ptr
 #include <sstream>        // std::stringstream
 #include <string>         // std::string
@@ -29,6 +31,9 @@ morphio::readers::Sample readSample(const char* line, unsigned int lineNumber_) 
     morphio::floatType radius = -1.;
     int int_type = -1;
     morphio::readers::Sample sample;
+
+    // Set local to classic in order to ensure that dots are recognized as decimal points by sscanf
+    std::locale prev_locale = std::locale::global(std::locale::classic());
     sample.valid = sscanf(line,
                           format,
                           &sample.id,
@@ -38,6 +43,9 @@ morphio::readers::Sample readSample(const char* line, unsigned int lineNumber_) 
                           &sample.point[2],
                           &radius,
                           &sample.parentId) == 7;
+
+    // Restore locale
+    std::locale::global(prev_locale);
 
     sample.type = static_cast<morphio::SectionType>(int_type);
     sample.diameter = radius * 2;  // The point array stores diameters.
