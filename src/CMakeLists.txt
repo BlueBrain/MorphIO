@@ -25,6 +25,7 @@ set(MORPHIO_SOURCES
     readers/morphologySWC.cpp
     readers/vasculatureHDF5.cpp
     section.cpp
+    shared_utils.cpp
     soma.cpp
     vasc/properties.cpp
     vasc/section.cpp

@@ -16,6 +16,9 @@ recursive-include 3rdparty/HighFive/doc *
 include 3rdparty/lexertl14/CMakeLists.txt
 recursive-include 3rdparty/lexertl14/include/lexertl *
 
+# ghc::filesystem
+include 3rdparty/filesystem.hpp
+
 # pybind11 for python bindings
 recursive-include binds/python/pybind11/include *
 recursive-include binds/python/pybind11/tools *.cmake

@@ -4,6 +4,7 @@ set(TESTS_SRC
         test_mitochondria.cpp
         test_morphology_readers.cpp
         test_mutable_morphology.cpp
+        test_utilities.cpp
         test_vasculature_morphology.cpp
         )
 set(TESTS_LINK_LIBRAIRIES morphio_static HighFive Catch2::Catch2)
