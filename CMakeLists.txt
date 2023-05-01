@@ -7,6 +7,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 option(BUILD_BINDINGS "Build the python bindings" ON)
 option(MorphIO_CXX_WARNINGS "Compile C++ with warnings" ON)
+option(MorphIO_WERROR "If compiled with warnings, additionally activate '-Werror'" OFF)
 option(EXTERNAL_CATCH2 "Use Catch2 from external source" OFF)
 option(EXTERNAL_HIGHFIVE "Use HighFive from external source" OFF)
 option(EXTERNAL_PYBIND11 "Use pybind11 from external source" OFF)
