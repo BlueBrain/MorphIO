@@ -324,7 +324,7 @@ void MorphologyHDF5::_read(const std::string& groupName,
     }
     const auto group = _group.getGroup(groupName);
 
-    if (!_group.exist(groupName)) {
+    if (!group.exist(datasetName)) {
         throw(RawDataError("Reading morphology '" + _uri + "': Missing required dataset " +
                            datasetName));
     }
