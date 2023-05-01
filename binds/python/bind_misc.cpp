@@ -3,6 +3,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <morphio/collection.h>
 #include <morphio/enums.h>
 #include <morphio/errorMessages.h>
 #include <morphio/types.h>
@@ -293,4 +294,37 @@ void bind_misc(py::module& m) {
         .def_readonly("offset",
                       &morphio::Property::DendriticSpine::PostSynapticDensity::offset,
                       "Returns `offset` of post-synaptic density");
+
+    py::class_<morphio::Collection>(m, "Collection", "A collection of morphologies")
+        .def(py::init<std::string>(), "collection_path"_a)
+        .def(py::init([](py::object arg) { return morphio::Collection(py::str(arg)); }),
+             "collection_path"_a,
+             "Create a collection from a Path-like object.")
+        .def(py::init([](py::object arg, std::vector<std::string> extensions) {
+                 return morphio::Collection(py::str(arg), std::move(extensions));
+             }),
+             "collection_path"_a,
+             "extensions"_a,
+             "Create a collection from a Path-like object.")
+        .def(
+            "load",
+            [](morphio::Collection* collection,
+               const std::string& morph_name,
+               bool is_mutable) -> py::object {
+                if (is_mutable) {
+                    return py::cast(collection->load<morphio::mut::Morphology>(morph_name));
+                } else {
+                    return py::cast(collection->load<morphio::Morphology>(morph_name));
+                }
+            },
+            "morph_name"_a,
+            "mutable"_a = false,
+            "Load the morphology named 'morph_name' form the collection.")
+        .def("__enter__", [](morphio::Collection* collection) { return collection; })
+        .def("__exit__",
+             [](morphio::Collection* collection,
+                const py::object&,
+                const py::object&,
+                const py::object&) { collection->close(); })
+        .def("close", &morphio::Collection::close);
 }

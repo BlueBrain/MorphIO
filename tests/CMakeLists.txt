@@ -1,5 +1,6 @@
 set(TESTS_SRC
         main.cpp
+        test_collection.cpp
         test_immutable_morphology.cpp
         test_mitochondria.cpp
         test_morphology_readers.cpp

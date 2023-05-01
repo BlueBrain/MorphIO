@@ -51,8 +51,8 @@ using morphio::readers::ErrorMessages;
 Morphology::Morphology(const std::string& uri, unsigned int options)
     : Morphology(morphio::Morphology(uri, options)) {}
 
-Morphology::Morphology(const HighFive::File& file, unsigned int options)
-    : Morphology(morphio::Morphology(file, options)) {}
+Morphology::Morphology(const HighFive::Group& group, unsigned int options)
+    : Morphology(morphio::Morphology(group, options)) {}
 
 Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int options)
     : _soma(std::make_shared<Soma>(*morphology.soma()))

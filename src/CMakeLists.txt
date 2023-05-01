@@ -1,4 +1,5 @@
 set(MORPHIO_SOURCES
+    collection.cpp
     dendritic_spine.cpp
     endoplasmic_reticulum.cpp
     enums.cpp
