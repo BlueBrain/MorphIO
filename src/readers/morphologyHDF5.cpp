@@ -97,25 +97,25 @@ void MergedReader::read_impl(const std::string& groupName,
                              std::vector<size_t> expectedDimensions,
                              T& data) const {
     if (groupName != "" && !_group.exist(groupName)) {
-        throw(RawDataError("Missing required group " + groupName));
+        throw RawDataError("Missing required group " + groupName);
     }
     const auto group = groupName == "" ? _group : _group.getGroup(groupName);
 
     if (!group.exist(datasetName)) {
-        throw(RawDataError("Missing required dataset " + datasetName));
+        throw RawDataError("Missing required dataset " + datasetName);
     }
     const HighFive::DataSet dataset = group.getDataSet(datasetName);
 
     const auto dims = dataset.getSpace().getDimensions();
     if (dims.size() != expectedDimensions.size()) {
-        throw(RawDataError("bad number of dimensions in " + datasetName));
+        throw RawDataError("bad number of dimensions in " + datasetName);
     }
 
     for (size_t k = 0; k < dims.size(); ++k) {
         if (expectedDimensions[k] != size_t(-1) && expectedDimensions[k] != dims[k]) {
-            throw(RawDataError("dimension mismatch, dims[" + std::to_string(k) +
+            throw RawDataError("dimension mismatch, dims[" + std::to_string(k) +
                                "] == " + std::to_string(dims[k]) +
-                               " != " + std::to_string(expectedDimensions[k])));
+                               " != " + std::to_string(expectedDimensions[k]));
         }
     }
 
@@ -301,11 +301,11 @@ int MorphologyHDF5::_readSections() {
             ErrorMessages err;
             throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(0, type));
         } else if (!hasSoma && type == SECTION_SOMA) {
-            throw(RawDataError("Error reading morphology " + _uri +
-                               ": it has soma section that doesn't come first"));
+            throw RawDataError("Error reading morphology " + _uri +
+                               ": it has soma section that doesn't come first");
         } else if (hasSoma && type == SECTION_SOMA) {
-            throw(RawDataError("Error reading morphology " + _uri +
-                               ": it has multiple soma sections"));
+            throw RawDataError("Error reading morphology " + _uri +
+                               ": it has multiple soma sections");
         }
 
         sections.emplace_back(
@@ -371,11 +371,11 @@ void MorphologyHDF5::_readDendriticSpinePostSynapticDensity() {
     _read(_g_postsynaptic_density, _d_dendritic_spine_offset, 1, offsets);
 
     if (sectionIds.size() != segmentIds.size() || offsets.size() != segmentIds.size()) {
-        throw(RawDataError(
+        throw RawDataError(
             "Dendritic datasets must match in size:"
             " sectionIds: " +
             std::to_string(sectionIds.size()) + " segmentIds: " +
-            std::to_string(segmentIds.size()) + " offsets: " + std::to_string(offsets.size())));
+            std::to_string(segmentIds.size()) + " offsets: " + std::to_string(offsets.size()));
     }
 
     auto& properties = _properties._dendriticSpineLevel._post_synaptic_density;
