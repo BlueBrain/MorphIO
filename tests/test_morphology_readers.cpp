@@ -1,3 +1,5 @@
+#include <locale>
+
 #include "../src/readers/morphologyHDF5.h"
 #include <catch2/catch.hpp>
 
@@ -161,6 +163,30 @@ TEST_CASE("LoadSWCMorphology", "[morphology]") {
     const morphio::Morphology m("data/simple.swc");
 
     REQUIRE(m.diameters().size() == 12);
+}
+
+class LocaleGuard {
+public:
+    explicit LocaleGuard(const std::locale& newLocale)
+        : previousLocale(std::locale())
+    {
+        previousLocale = std::locale::global(newLocale);
+    }
+
+    ~LocaleGuard() {
+        std::locale::global(previousLocale);
+    }
+
+private:
+    std::locale previousLocale;
+};
+
+TEST_CASE("LoadSWCMorphologyLocale", "[morphology]") {
+    {
+        const auto locale = LocaleGuard(std::locale("de_DE.UTF-8"));
+        const morphio::Morphology m("data/simple.swc");
+        REQUIRE(m.diameters().size() == 12);
+    }
 }
 
 TEST_CASE("LoadNeurolucidaMorphology", "[morphology]") {

@@ -13,9 +13,6 @@
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
 
-//XXX nochecking
-#include <sstream>
-
 namespace {
 // It's not clear if -1 is the only way of identifying a root section.
 const int SWC_UNDEFINED_PARENT = -1;
@@ -139,11 +136,7 @@ class SWCBuilder
     }
 
     void raiseIfSelfParent(const Sample& sample) {
-<<<<<<< HEAD
         if (sample.parentId == static_cast<int>(sample.id)) {
-=======
-        if (sample.parentId == static_cast<int>(sample.id)) {
->>>>>>> 849da3a (use braces in `if`s)
             throw morphio::RawDataError(err.ERROR_SELF_PARENT(sample));
         }
     }
@@ -172,13 +165,8 @@ class SWCBuilder
     }
 
     void raiseIfNoParent(const Sample& sample) {
-<<<<<<< HEAD
         if (sample.parentId > -1 &&
             samples.count(static_cast<unsigned int>(sample.parentId)) == 0) {
-=======
-        if (sample.parentId > -1 &&
-            samples.count(static_cast<unsigned int>(sample.parentId)) == 0) {
->>>>>>> 849da3a (use braces in `if`s)
             throw morphio::MissingParentError(err.ERROR_MISSING_PARENT(sample));
         }
     }
@@ -290,11 +278,7 @@ class SWCBuilder
 
             std::vector<Sample> children_soma_points;
             for (auto child : somaChildren) {
-<<<<<<< HEAD
                 if (this->samples[child].type == SECTION_SOMA) {
-=======
-                if (this->samples[child].type == SECTION_SOMA) {
->>>>>>> 849da3a (use braces in `if`s)
                     children_soma_points.push_back(this->samples[child]);
                 }
             }
@@ -306,11 +290,7 @@ class SWCBuilder
                 //  somas into their custom 'Three-point soma representation':
                 //   http://neuromorpho.org/SomaFormat.html
 
-<<<<<<< HEAD
                 if (!ErrorMessages::isIgnored(Warning::SOMA_NON_CONFORM)) {
-=======
-                if (!ErrorMessages::isIgnored(Warning::SOMA_NON_CONFORM)) {
->>>>>>> 849da3a (use braces in `if`s)
                     _checkNeuroMorphoSoma(this->samples[somaRootId], children_soma_points);
                 }
 
@@ -409,13 +389,8 @@ class SWCBuilder
     }
 
   private:
-<<<<<<< HEAD
-    // Dictionary: SWC Id of the last point of a section to morphio::mut::Section ID
-    std::unordered_map<uint32_t, uint32_t> swcIdToSectionId;
-=======
     // SWC Id of the last point of a section to morphio::mut::Section ID
-    std::map<uint32_t, uint32_t> swcIdToSectionId;
->>>>>>> 849da3a (use braces in `if`s)
+    std::unordered_map<uint32_t, uint32_t> swcIdToSectionId;
 
     // Neurite that do not have parent ID = 1, allowed for soma contour, not
     // 3-pts soma
