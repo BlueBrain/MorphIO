@@ -78,9 +78,49 @@ namespace morphio {
 namespace readers {
 namespace h5 {
 
+
+namespace detail {
+
+template <class Derived>
+template <typename T>
+void DataSetReader<Derived>::read(const std::string& groupName,
+                                  const std::string& datasetName,
+                                  std::vector<size_t> expectedDimensions,
+                                  T& data) const {
+    auto derived = static_cast<const Derived&>(*this);
+    derived.template read_impl(groupName, datasetName, expectedDimensions, data);
+}
+
+template <typename T>
+void MergedReader::read_impl(const std::string& groupName,
+                             const std::string& datasetName,
+                             std::vector<size_t> expectedDimensions,
+                             T& data) const {
+    if (groupName != "" && !_group.exist(groupName)) {
+        throw(RawDataError("Missing required group " + groupName));
+    }
+    const auto group = groupName == "" ? _group : _group.getGroup(groupName);
+
+    if (!group.exist(datasetName)) {
+        throw(RawDataError("Missing required dataset " + datasetName));
+    }
+    const HighFive::DataSet dataset = group.getDataSet(datasetName);
+
+    const auto dims = dataset.getSpace().getDimensions();
+    if (dims.size() != expectedDimensions.size()) {
+        throw(RawDataError("bad number of dimensions in " + datasetName));
+    }
+
+    data.resize(dims[0]);
+    dataset.read(data);
+}
+}  // namespace detail
+
+
 MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group)
     : _group(group)
-    , _uri("HDF5 Group") {}
+    , _uri("HDF5 Group")
+    , _merged_reader(_group) {}
 
 Property::Properties load(const std::string& uri) {
     try {
@@ -320,26 +360,12 @@ void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& datasetName,
                            unsigned int expectedDimension,
                            T& data) {
-    if (groupName != "" && !_group.exist(groupName)) {
-        throw(
-            RawDataError("Reading morphology '" + _uri + "': Missing required group " + groupName));
+    auto expectedDimensions = std::vector<size_t>(expectedDimension, size_t(-1));
+    try {
+        _merged_reader.read(groupName, datasetName, expectedDimensions, data);
+    } catch (const RawDataError& err) {
+        throw RawDataError("Reading morphology '" + _uri + "': " + err.what());
     }
-    const auto group = groupName == "" ? _group : _group.getGroup(groupName);
-
-    if (!group.exist(datasetName)) {
-        throw(RawDataError("Reading morphology '" + _uri + "': Missing required dataset " +
-                           datasetName));
-    }
-    const HighFive::DataSet dataset = group.getDataSet(datasetName);
-
-    const auto dims = dataset.getSpace().getDimensions();
-    if (dims.size() != expectedDimension) {
-        throw(RawDataError("Reading morphology '" + _uri + "': bad number of dimensions in " +
-                           datasetName));
-    }
-
-    data.resize(dims[0]);
-    dataset.read(data);
 }
 
 void MorphologyHDF5::_readDendriticSpinePostSynapticDensity() {
