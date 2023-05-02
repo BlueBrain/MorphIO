@@ -271,18 +271,8 @@ int MorphologyHDF5::_readSections() {
 
     constexpr size_t structureV1Columns = 3;
 
-    const auto structure = _group.getDataSet(_d_structure);
-    const auto dims = structure.getSpace().getDimensions();
-
-    if (dims.size() != 2 || dims[1] != structureV1Columns) {
-        throw(RawDataError("Error reading morphologies " + _uri +
-                           " bad number of dimensions in 'structure' dataspace"));
-    }
-
-    std::vector<std::array<int, structureV1Columns>> vec(dims[0]);
-    if (dims[0] > 0) {
-        structure.read(vec.front().data());
-    }
+    std::vector<std::array<int, structureV1Columns>> vec;
+    _read("", _d_structure, std::vector<size_t>{size_t(-1), structureV1Columns}, vec);
 
     assert(!vec.empty());
 
