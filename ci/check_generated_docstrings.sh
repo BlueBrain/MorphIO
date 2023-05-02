@@ -21,7 +21,7 @@ if [[ -z $LIBCLANG_PATH ]]; then
     exit -1
 fi
 
-PACKAGE=git+git://github.com/pybind/pybind11_mkdoc.git@master
+PACKAGE=git+https://github.com/pybind/pybind11_mkdoc.git@master
 
 VENV=build/venv-docstrings
 if [[ ! -d $VENV ]]; then
