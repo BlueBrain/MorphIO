@@ -111,6 +111,14 @@ void MergedReader::read_impl(const std::string& groupName,
         throw(RawDataError("bad number of dimensions in " + datasetName));
     }
 
+    for (size_t k = 0; k < dims.size(); ++k) {
+        if (expectedDimensions[k] != size_t(-1) && expectedDimensions[k] != dims[k]) {
+            throw(RawDataError("dimension mismatch, dims[" + std::to_string(k) +
+                               "] == " + std::to_string(dims[k]) +
+                               " != " + std::to_string(expectedDimensions[k])));
+        }
+    }
+
     data.resize(dims[0]);
     dataset.read(data);
 }

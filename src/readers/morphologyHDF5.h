@@ -96,6 +96,12 @@ class MorphologyHDF5
                unsigned int expectedDimension,
                T& data);
 
+    template <typename T>
+    void _read(const std::string& group,
+               const std::string& _dataset,
+               const std::vector<size_t>& expectedDimensions,
+               T& data);
+
     HighFive::Group _group;
     Property::Properties _properties;
     std::string _uri;
