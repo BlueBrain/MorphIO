@@ -4,7 +4,7 @@ on: [pull_request, push]
 jobs:
   build:
     name: docstring-check
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
 
     # Run on external PRs, but not internal PRs as they'll be run by the push
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
