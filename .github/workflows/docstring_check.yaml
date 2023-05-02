@@ -15,11 +15,8 @@ jobs:
         with:
           submodules: recursive
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev python3-venv libclang-14-dev
+        run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev python3-venv libclang-12
       - name: Check docstrings
         run: |
-          export LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu/libclang-14.so
-          ci/check_generated_docstrings.sh || true
-
-          export LIBCLANG_PATH=libLLVM-10.so.1
+          export LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu/libclang-12.so
           ci/check_generated_docstrings.sh || true
