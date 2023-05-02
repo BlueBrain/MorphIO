@@ -354,13 +354,20 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
     perimeters.erase(perimeters.begin(), perimeters.begin() + firstSectionOffset);
 }
 
-
 template <typename T>
 void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& datasetName,
                            unsigned int expectedDimension,
                            T& data) {
     auto expectedDimensions = std::vector<size_t>(expectedDimension, size_t(-1));
+    _read(groupName, datasetName, expectedDimensions, data);
+}
+
+template <typename T>
+void MorphologyHDF5::_read(const std::string& groupName,
+                           const std::string& datasetName,
+                           const std::vector<size_t>& expectedDimensions,
+                           T& data) {
     try {
         _merged_reader.read(groupName, datasetName, expectedDimensions, data);
     } catch (const RawDataError& err) {
