@@ -222,23 +222,10 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
 void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     constexpr size_t pointColumns = 4;
 
-    const auto pointsDataSet = _group.getDataSet(_d_points);
-    const auto pointsDims = pointsDataSet.getSpace().getDimensions();
-    const size_t numberPoints = pointsDims[0];
+    std::vector<std::array<floatType, pointColumns>> hdf5Data;
+    _read("", _d_points, std::vector<size_t>{size_t(-1), pointColumns}, hdf5Data);
 
-    if (pointsDims.size() != 2) {
-        throw RawDataError("Opening morphology '" + _uri +
-                           "': incorrect number of dimensions in 'points'.");
-    } else if (pointsDims[1] != pointColumns) {
-        throw RawDataError("Opening morphology '" + _uri +
-                           "': incorrect number of columns for points");
-    }
-
-    std::vector<std::array<floatType, pointColumns>> hdf5Data(numberPoints);
-
-    if (!hdf5Data.empty()) {
-        pointsDataSet.read(hdf5Data.front().data());
-    }
+    const size_t numberPoints = hdf5Data.size();
 
     const bool hasSoma = firstSectionOffset != 0;
     const bool hasNeurites = static_cast<size_t>(firstSectionOffset) < numberPoints;
