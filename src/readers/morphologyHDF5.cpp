@@ -105,8 +105,9 @@ void MergedReader::read_impl(const std::string& groupName,
         throw RawDataError("Missing required dataset " + datasetName);
     }
     const HighFive::DataSet dataset = group.getDataSet(datasetName);
+    const HighFive::DataSpace dataspace = dataset.getSpace();
 
-    const auto dims = dataset.getSpace().getDimensions();
+    const auto dims = dataspace.getDimensions();
     if (dims.size() != expectedDimensions.size()) {
         throw RawDataError("bad number of dimensions in " + datasetName);
     }
@@ -119,8 +120,15 @@ void MergedReader::read_impl(const std::string& groupName,
         }
     }
 
-    data.resize(dims[0]);
-    dataset.read(data);
+    if (dataspace.getElementCount() > 0) {
+        // Guards against a bug in HighFive (fixed in 2.7.0) related to
+        // empty datasets.
+        dataset.read(data);
+    } else {
+        // If the dataset is empty, the vector should be too. In all other
+        // cases HighFive will allocate as appropriate.
+        data.resize(0);
+    }
 }
 }  // namespace detail
 
