@@ -4,7 +4,7 @@ on: [pull_request, push]
 jobs:
   build:
     name: docstring-check
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
 
     # Run on external PRs, but not internal PRs as they'll be run by the push
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
@@ -15,7 +15,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev python3-venv libclang-12
+        run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev python3-venv libclang1-12
       - name: Check docstrings
         run: |
           export LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu/libclang-12.so
