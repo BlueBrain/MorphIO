@@ -8,14 +8,7 @@
 
 namespace morphio {
 
-class CollectionImpl
-{
-  public:
-    virtual ~CollectionImpl() = default;
-
-    virtual Morphology load(const std::string& morph_name) const = 0;
-    virtual mut::Morphology load_mut(const std::string& morph_name) const = 0;
-};
+class CollectionImpl;
 
 class Collection
 {
@@ -41,26 +34,14 @@ class Collection
      */
     template <class M>
     typename std::enable_if<std::is_same<M, Morphology>::value, M>::type load(
-        const std::string& morph_name) const {
-        if (_collection != nullptr) {
-            return _collection->load(morph_name);
-        }
-
-        throw std::runtime_error("The collection has been closed.");
-    }
+        const std::string& morph_name) const;
 
     /**
      * Load the morphology as a mutable morphology.
      */
     template <class M>
     typename std::enable_if<std::is_same<M, mut::Morphology>::value, M>::type load(
-        const std::string& morph_name) const {
-        if (_collection != nullptr) {
-            return _collection->load_mut(morph_name);
-        }
-
-        throw std::runtime_error("The collection has been closed.");
-    }
+        const std::string& morph_name) const;
 
     /**
      * Close the collection.
@@ -78,5 +59,10 @@ class Collection
   private:
     std::shared_ptr<CollectionImpl> _collection;
 };
+
+extern template mut::Morphology Collection::load<mut::Morphology>(
+    const std::string& morph_name) const;
+
+extern template Morphology Collection::load<Morphology>(const std::string& morph_name) const;
 
 }  // namespace morphio

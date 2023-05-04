@@ -5,6 +5,15 @@
 
 namespace morphio {
 
+class CollectionImpl
+{
+  public:
+    virtual ~CollectionImpl() = default;
+
+    virtual Morphology load(const std::string& morph_name) const = 0;
+    virtual mut::Morphology load_mut(const std::string& morph_name) const = 0;
+};
+
 namespace detail {
 template <class Derived>
 class CollectionImpl: public morphio::CollectionImpl
@@ -118,6 +127,35 @@ Collection::Collection(std::shared_ptr<CollectionImpl> collection)
 
 Collection::Collection(std::string collection_path, std::vector<std::string> extensions)
     : Collection(detail::open_collection(std::move(collection_path), std::move(extensions))) {}
+
+
+template <class M>
+typename std::enable_if<std::is_same<M, Morphology>::value, M>::type Collection::load(
+    const std::string& morph_name) const {
+    if (_collection != nullptr) {
+        return _collection->load(morph_name);
+    }
+
+    throw std::runtime_error("The collection has been closed.");
+}
+
+template <class M>
+typename std::enable_if<std::is_same<M, mut::Morphology>::value, M>::type Collection::load(
+    const std::string& morph_name) const {
+    if (_collection != nullptr) {
+        return _collection->load_mut(morph_name);
+    }
+
+    throw std::runtime_error("The collection has been closed.");
+}
+
+
+template typename std::enable_if<std::is_same<mut::Morphology, mut::Morphology>::value,
+                                 mut::Morphology>::type
+Collection::load<mut::Morphology>(const std::string& morph_name) const;
+
+template typename std::enable_if<std::is_same<Morphology, Morphology>::value, Morphology>::type
+Collection::load<Morphology>(const std::string& morph_name) const;
 
 void Collection::close() {
     _collection = nullptr;
