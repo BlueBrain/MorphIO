@@ -64,7 +64,7 @@ class DirectoryCollection: public morphio::detail::CollectionImpl<DirectoryColle
     std::vector<std::string> _extensions;
 };
 
-class ContainerCollection: public morphio::detail::CollectionImpl<ContainerCollection>
+class HDF5ContainerCollection: public morphio::detail::CollectionImpl<HDF5ContainerCollection>
 {
   public:
     /**
@@ -73,17 +73,17 @@ class ContainerCollection: public morphio::detail::CollectionImpl<ContainerColle
      * This provides a way for C++ applications to inject specifics about how
      * to open the container.
      */
-    ContainerCollection(const HighFive::File& file)
+    HDF5ContainerCollection(const HighFive::File& file)
         : _file(file) {}
 
     /**
      * Create the collection from a path.
      */
-    ContainerCollection(const std::string& collection_path)
-        : ContainerCollection(default_open_file(collection_path)) {}
+    HDF5ContainerCollection(const std::string& collection_path)
+        : HDF5ContainerCollection(default_open_file(collection_path)) {}
 
   protected:
-    friend morphio::detail::CollectionImpl<ContainerCollection>;
+    friend morphio::detail::CollectionImpl<HDF5ContainerCollection>;
 
     template <class M>
     M load_impl(const std::string& morph_name) const {
@@ -111,7 +111,7 @@ std::shared_ptr<morphio::CollectionImpl> open_collection(std::string collection_
 
     if (morphio::is_regular_file(collection_path)) {
         // Prepare to load from containers.
-        return std::make_shared<ContainerCollection>(collection_path);
+        return std::make_shared<HDF5ContainerCollection>(collection_path);
     }
 
     throw std::invalid_argument("Invalid path: " + collection_path);
