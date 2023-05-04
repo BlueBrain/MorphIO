@@ -28,11 +28,11 @@ class DataSetReader
      *
      * Arguments:
      *   @param groupName The datasets of a morphology are organized in
-     *   subgroups, e.g. `organelled`. The `groupName` refers to the group
-     *   name relative to the morphology group, which is the root group for
-     *   single files or some other group for merged containers. Note, that
-     *   `groupName == ""` for datasets stored in the morphology directly
-     *   group, e.g. `points` and `structure`.
+     *   subgroups, e.g. `organelles/mitochondria`. The `groupName` refers to
+     *   the group name relative to the morphology group, which is the root
+     *   group for single files or some other group for merged containers.
+     *   Note, that `groupName == ""` for datasets stored in the morphology
+     *   directly group, e.g. `points` and `structure`.
      *
      *   @param dataSetName The name of the dataset to read, relative to
      *   `groupName`.
