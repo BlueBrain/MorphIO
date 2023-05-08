@@ -100,8 +100,8 @@ class HDF5ContainerCollection: public morphio::detail::CollectionImpl<HDF5Contai
 };
 
 namespace detail {
-std::shared_ptr<morphio::CollectionImpl> open_collection(std::string collection_path,
-                                                         std::vector<std::string> extensions) {
+static std::shared_ptr<morphio::CollectionImpl> open_collection(
+    std::string collection_path, std::vector<std::string> extensions) {
     if (morphio::is_directory(collection_path)) {
         // Triggers loading SWC, ASC, H5, etc. morphologies that are stored as
         // separate files in one directory.
