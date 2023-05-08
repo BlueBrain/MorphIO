@@ -30,7 +30,9 @@ class SymlinkFixture: TemporaryDirectoryFixture
         , dirname(tmpDirectory / "dir")
         , symlinkDirname(tmpDirectory / "dir.symlink")
         , filename(tmpDirectory / "file")
-        , symlinkFilename(tmpDirectory / "file.symlink") {
+        , symlinkFilename(tmpDirectory / "file.symlink")
+        , doesntExist(tmpDirectory / "doesnt_exist")
+        , symlinkDoesntExist(tmpDirectory / "doesnt_exist.symlink") {
         fs::create_directories(dirname);
         fs::create_directory_symlink(dirname, symlinkDirname);
 
@@ -39,6 +41,7 @@ class SymlinkFixture: TemporaryDirectoryFixture
             f << "foo";
         }
         fs::create_symlink(filename, symlinkFilename);
+        fs::create_symlink(doesntExist, symlinkDoesntExist);
     }
 
     fs::path dirname;
@@ -46,6 +49,9 @@ class SymlinkFixture: TemporaryDirectoryFixture
 
     fs::path filename;
     fs::path symlinkFilename;
+
+    fs::path doesntExist;
+    fs::path symlinkDoesntExist;
 };
 
 
@@ -56,6 +62,8 @@ TEST_CASE("morphio::is_regular_file", "[filesystem]") {
     REQUIRE(!morphio::is_regular_file(fixture.symlinkDirname.string()));
     REQUIRE(morphio::is_regular_file(fixture.filename.string()));
     REQUIRE(morphio::is_regular_file(fixture.symlinkFilename.string()));
+    REQUIRE(!morphio::is_directory(fixture.doesntExist.string()));
+    REQUIRE(!morphio::is_directory(fixture.symlinkDoesntExist.string()));
 }
 
 
@@ -66,6 +74,8 @@ TEST_CASE("morphio::is_directory", "[filesystem]") {
     REQUIRE(morphio::is_directory(fixture.symlinkDirname.string()));
     REQUIRE(!morphio::is_directory(fixture.filename.string()));
     REQUIRE(!morphio::is_directory(fixture.symlinkFilename.string()));
+    REQUIRE(!morphio::is_directory(fixture.doesntExist.string()));
+    REQUIRE(!morphio::is_directory(fixture.symlinkDoesntExist.string()));
 }
 
 
