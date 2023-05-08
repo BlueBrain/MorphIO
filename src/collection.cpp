@@ -58,7 +58,7 @@ class DirectoryCollection: public morphio::detail::CollectionImpl<DirectoryColle
             }
         }
 
-        throw std::runtime_error("Morpholgy '" + morph_name + "' not found in: " + _dirname);
+        throw MorphioError("Morpholgy '" + morph_name + "' not found in: " + _dirname);
     }
 
   private:
