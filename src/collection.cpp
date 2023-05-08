@@ -50,7 +50,7 @@ class DirectoryCollection: public morphio::detail::CollectionImpl<DirectoryColle
 
     std::string morphology_path(const std::string& morph_name) const {
         for (const auto& ext : _extensions) {
-            auto path = morphio::join_path(_dirname, morph_name + "." + ext);
+            auto path = morphio::join_path(_dirname, morph_name + ext);
             if (morphio::is_regular_file(path)) {
                 return path;
             }

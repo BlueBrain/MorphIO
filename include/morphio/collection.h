@@ -27,7 +27,8 @@ class Collection
      * and in which order the morphologies are searched.
      */
     Collection(std::string collection_path,
-               std::vector<std::string> extensions = std::vector<std::string>{"h5", "swc", "asc"});
+               std::vector<std::string> extensions =
+                   std::vector<std::string>{".h5", ".H5", ".asc", ".ASC", ".swc", ".SWC"});
 
     /**
      * Load the morphology as an immutable morphology.
