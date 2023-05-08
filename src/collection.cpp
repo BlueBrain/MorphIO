@@ -75,7 +75,8 @@ class HDF5ContainerCollection: public morphio::detail::CollectionImpl<HDF5Contai
      * This provides a way for C++ applications to inject specifics about how
      * to open the container.
      */
-    HDF5ContainerCollection(HighFive::File file) : _file(file) {}
+    HDF5ContainerCollection(HighFive::File file)
+        : _file(std::move(file)) {}
 
     /**
      * Create the collection from a path.
@@ -120,7 +121,7 @@ static std::shared_ptr<morphio::CollectionImpl> open_collection(
 
     if (morphio::is_regular_file(collection_path)) {
         // Prepare to load from containers.
-        return std::make_shared<HDF5ContainerCollection>(collection_path);
+        return std::make_shared<HDF5ContainerCollection>(std::move(collection_path));
     }
 
     throw std::invalid_argument("Invalid path: " + collection_path);
