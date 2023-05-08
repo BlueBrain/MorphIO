@@ -40,7 +40,7 @@ class DirectoryCollection: public morphio::detail::CollectionImpl<DirectoryColle
   public:
     DirectoryCollection(std::string collection_path, std::vector<std::string> extensions)
         : _dirname(std::move(collection_path))
-        , _extensions(extensions) {}
+        , _extensions(std::move(extensions)) {}
 
   protected:
     friend morphio::detail::CollectionImpl<DirectoryCollection>;
