@@ -3,6 +3,8 @@
 #include "shared_utils.hpp"
 #include <highfive/H5File.hpp>
 
+#include "readers/morphologyHDF5.h"
+
 namespace morphio {
 
 class CollectionImpl
@@ -73,8 +75,7 @@ class HDF5ContainerCollection: public morphio::detail::CollectionImpl<HDF5Contai
      * This provides a way for C++ applications to inject specifics about how
      * to open the container.
      */
-    HDF5ContainerCollection(const HighFive::File& file)
-        : _file(file) {}
+    HDF5ContainerCollection(HighFive::File file) : _file(file) {}
 
     /**
      * Create the collection from a path.
@@ -82,16 +83,24 @@ class HDF5ContainerCollection: public morphio::detail::CollectionImpl<HDF5Contai
     HDF5ContainerCollection(const std::string& collection_path)
         : HDF5ContainerCollection(default_open_file(collection_path)) {}
 
+    HDF5ContainerCollection(HDF5ContainerCollection&&) = delete;
+    HDF5ContainerCollection(const HDF5ContainerCollection&) = delete;
+
+    HDF5ContainerCollection& operator=(const HDF5ContainerCollection&) = delete;
+    HDF5ContainerCollection& operator=(HDF5ContainerCollection&&) = delete;
+
   protected:
     friend morphio::detail::CollectionImpl<HDF5ContainerCollection>;
 
     template <class M>
     M load_impl(const std::string& morph_name) const {
+        std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
         return M(_file.getGroup(morph_name));
     }
 
   protected:
     static HighFive::File default_open_file(const std::string& container_path) {
+        std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
         return HighFive::File(container_path, HighFive::File::ReadOnly);
     }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <string>  // std::string
+#include <mutex>
 
 #include <morphio/properties.h>
 
@@ -38,6 +39,12 @@ class MorphologyHDF5
     Property::Properties _properties;
     std::string _uri;
 };
+
+inline std::recursive_mutex& global_hdf5_mutex() {
+    static std::recursive_mutex _mutex;
+    return _mutex;
+}
+
 }  // namespace h5
 }  // namespace readers
 }  // namespace morphio

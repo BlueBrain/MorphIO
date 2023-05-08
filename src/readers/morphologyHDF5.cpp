@@ -84,6 +84,7 @@ MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group)
 
 Property::Properties load(const std::string& uri) {
     try {
+        std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
         HighFive::SilenceHDF5 silence;
         auto file = HighFive::File(uri, HighFive::File::ReadOnly);
         return MorphologyHDF5(file.getGroup("/")).load();
@@ -94,6 +95,7 @@ Property::Properties load(const std::string& uri) {
 }
 
 Property::Properties load(const HighFive::Group& group) {
+    std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
     return MorphologyHDF5(group).load();
 }
 
