@@ -1,6 +1,6 @@
 #include "shared_utils.hpp"
 
-#include "../3rdparty/filesystem.hpp"
+#include <ghc/filesystem.hpp>
 
 namespace morphio {
 

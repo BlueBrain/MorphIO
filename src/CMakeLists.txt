@@ -67,6 +67,8 @@ target_include_directories(morphio_obj
    $<TARGET_PROPERTY:gsl-lite,INTERFACE_INCLUDE_DIRECTORIES>
    $<TARGET_PROPERTY:HighFive,INTERFACE_INCLUDE_DIRECTORIES>
    $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
+  PRIVATE
+   $<TARGET_PROPERTY:ghc_filesystem,INTERFACE_INCLUDE_DIRECTORIES>
   )
 
 set_target_properties(morphio_obj

@@ -17,7 +17,10 @@ include 3rdparty/lexertl14/CMakeLists.txt
 recursive-include 3rdparty/lexertl14/include/lexertl *
 
 # ghc::filesystem
-include 3rdparty/filesystem.hpp
+recursive-include 3rdparty/ghc_filesystem/include *
+recursive-include 3rdparty/ghc_filesystem/cmake *
+include 3rdparty/ghc_filesystem/CMakeLists.txt
+include 3rdparty/ghc_filesystem/LICENSE
 
 # pybind11 for python bindings
 recursive-include binds/python/pybind11/include *
