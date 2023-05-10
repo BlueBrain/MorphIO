@@ -14,3 +14,6 @@ target_include_directories(gsl-lite SYSTEM INTERFACE)
 
 add_library(lexertl INTERFACE)
 target_include_directories(lexertl SYSTEM INTERFACE lexertl14/include)
+
+add_subdirectory(ghc_filesystem)
+

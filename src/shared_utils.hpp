@@ -68,4 +68,27 @@ std::vector<typename T::Type> copySpan(const std::vector<typename T::Type>& data
             data.begin() + static_cast<long int>(range.second)};
 }
 
+/**
+ * Is `path` a directory?
+ *
+ * Symlinks to directories are considered directories.
+ */
+bool is_directory(const std::string& path);
+
+/**
+ * Is `path` a regular file?
+ *
+ * Symlinks to regular files are considered files.
+ */
+bool is_regular_file(const std::string& path);
+
+/**
+ * Join `dirname` and `filename` into one path.
+ *
+ * This follows the Python `os.path.join` semantics, i.e.,
+ *   - join_path("", "foo") == "foo" (not "/foo")
+ *   - join_path("/usr", "/home/foo") == "/home/foo" (not "/usr/home/foo")
+ */
+std::string join_path(const std::string& dirname, const std::string& filename);
+
 }  // namespace morphio
