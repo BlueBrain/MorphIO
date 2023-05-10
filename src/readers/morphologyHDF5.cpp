@@ -88,7 +88,7 @@ void DataSetReader<Derived>::read(const std::string& groupName,
                                   std::vector<size_t> expectedDimensions,
                                   T& data) const {
     auto derived = static_cast<const Derived&>(*this);
-    derived.template read_impl(groupName, datasetName, expectedDimensions, data);
+    derived.read_impl(groupName, datasetName, expectedDimensions, data);
 }
 
 template <typename T>
@@ -130,13 +130,88 @@ void MergedReader::read_impl(const std::string& groupName,
         data.resize(0);
     }
 }
+
+
+template <typename T>
+void UnifiedReader::read_impl(const std::string& groupName,
+                              const std::string& datasetName,
+                              std::vector<size_t> expectedDimensions,
+                              T& data) const {
+    auto make_hyperslab = [](const std::pair<size_t, size_t>& range,
+                             const std::vector<size_t>& global_dims) {
+        auto rank = global_dims.size();
+        if (rank == 0) {
+            throw std::invalid_argument("'global_dims' must not be empty.");
+        }
+
+        auto begin = range.first;
+        auto end = range.second;
+
+        auto h5_offset = std::vector<size_t>(rank, 0ul);
+        h5_offset[0] = begin;
+
+        auto h5_count = std::vector<size_t>(rank, 1ul);
+        auto h5_stride = std::vector<size_t>(rank, 1ul);
+
+        auto h5_block = global_dims;
+        h5_block[0] = end - begin;
+
+        return HighFive::RegularHyperSlab(h5_offset, h5_count, h5_stride, h5_block);
+    };
+
+    auto fetch_dataset = [this](const std::string& unifiedName) -> const HighFive::DataSet& {
+        auto it = _datasets.find(unifiedName);
+        if (it != _datasets.end()) {
+            return it->second;
+        } else {
+            return _datasets[unifiedName] = _group.getFile().getDataSet(".raw/" + unifiedName +
+                                                                        "/values");
+        }
+    };
+
+    auto fetch_global_dims =
+        [this, fetch_dataset](const std::string& unifiedName) -> const std::vector<size_t>& {
+        auto it = _global_dims.find(unifiedName);
+        if (it != _global_dims.end()) {
+            return it->second;
+        } else {
+            auto ds = fetch_dataset(unifiedName);
+            return _global_dims[unifiedName] = ds.getDimensions();
+        }
+    };
+
+    auto unifiedName = groupName + (groupName == "" ? "" : "/") + datasetName;
+
+    auto range =
+        std::pair<size_t, size_t>{_group.getAttribute(unifiedName + "_begin").read<size_t>(),
+                                  _group.getAttribute(unifiedName + "_end").read<size_t>()};
+
+    auto& dataset = fetch_dataset(unifiedName);
+    auto hyperslab = make_hyperslab(range, fetch_global_dims(unifiedName));
+    auto memspace = HighFive::DataSpace(hyperslab.block);
+
+    dataset.select(HighFive::HyperSlab(hyperslab), memspace).read(data);
+}
+
 }  // namespace detail
 
 
 MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group)
     : _group(group)
     , _uri("HDF5 Group")
-    , _merged_reader(_group) {}
+    , _file_version(-1)
+    , _merged_reader(_group)
+    , _unified_reader(_group) {
+    auto file = _group.getFile();
+    auto version_exists = H5Aexists(file.getId(), "version");
+    if (version_exists < 0) {
+        throw RawDataError("H5Aexists failed");
+    }
+
+    if (version_exists > 0) {
+        _file_version = file.getAttribute("version").read<int>();
+    }
+}
 
 Property::Properties load(const std::string& uri) {
     try {
@@ -362,7 +437,11 @@ void MorphologyHDF5::_read(const std::string& groupName,
                            const std::vector<size_t>& expectedDimensions,
                            T& data) {
     try {
-        _merged_reader.read(groupName, datasetName, expectedDimensions, data);
+        if (_file_version <= 3) {
+            _merged_reader.read(groupName, datasetName, expectedDimensions, data);
+        } else {
+            _unified_reader.read(groupName, datasetName, expectedDimensions, data);
+        }
     } catch (const RawDataError& err) {
         throw RawDataError("Reading morphology '" + _uri + "': " + err.what());
     }

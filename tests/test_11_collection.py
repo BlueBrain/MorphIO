@@ -41,7 +41,12 @@ def test_directory_collection():
     check_load_from_collection_with_context(collection_path)
     check_load_from_collection_without_context(collection_path)
 
-def test_container_collection():
+def test_merged_container_collection():
     collection_path = DATA_DIR / "h5/v1/merged.h5"
+    check_load_from_collection_with_context(collection_path)
+    check_load_from_collection_without_context(collection_path)
+
+def test_unified_container_collection():
+    collection_path = DATA_DIR / "h5/v1/unified.h5"
     check_load_from_collection_with_context(collection_path)
     check_load_from_collection_without_context(collection_path)

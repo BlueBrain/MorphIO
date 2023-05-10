@@ -56,11 +56,12 @@ void check_directory_vs_single_file(const std::string& collection_dir,
 
 template <class M>
 void check_container_vs_single_file(const std::string& collection_dir,
+                                    const std::string& container_name,
                                     const std::string& morph_name,
                                     const std::string& reference_path) {
-    SECTION("merged: " + mutability_label<M>() + ": " + morph_name) {
-        auto collection = morphio::Collection(fs::path(collection_dir) / "merged.h5");
-        check_collection_vs_single_file<M>(collection, morph_name, reference_path);
+    SECTION(container_name + ": " + mutability_label<M>() + ": " + morph_name) {
+        auto collection = morphio::Collection(fs::path(collection_dir) / container_name);
+        check_collection_vs_single_file<M>(collection, collection_dir, morph_name, reference_path);
     }
 }
 
@@ -69,7 +70,8 @@ void check_vs_single_file(const std::string& collection_dir,
                           const std::string& morph_name,
                           const std::string& reference_path) {
     check_directory_vs_single_file<M>(collection_dir, morph_name, reference_path);
-    check_container_vs_single_file<M>(collection_dir, morph_name, reference_path);
+    check_container_vs_single_file<M>(collection_dir, "merged.h5", morph_name, reference_path);
+    check_container_vs_single_file<M>(collection_dir, "unified.h5", morph_name, reference_path);
 }
 
 TEST_CASE("Collection", "[collection]") {

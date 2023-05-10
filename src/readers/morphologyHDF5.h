@@ -71,6 +71,31 @@ class MergedReader: public DataSetReader<MergedReader>
   private:
     HighFive::Group _group;
 };
+
+/**
+ * The implementation for reading from unified containers.
+ */
+class UnifiedReader: public DataSetReader<UnifiedReader>
+{
+  public:
+    UnifiedReader(const HighFive::Group& group)
+        : _group(group) {}
+
+  protected:
+    friend DataSetReader<UnifiedReader>;
+
+    template <class T>
+    void read_impl(const std::string& groupName,
+                   const std::string& dataSetName,
+                   const std::vector<size_t> expectedDimensions,
+                   T& out) const;
+
+  private:
+    HighFive::Group _group;
+
+    mutable std::map<std::string, HighFive::DataSet> _datasets;
+    mutable std::map<std::string, std::vector<size_t>> _global_dims;
+};
 }  // namespace detail
 
 class MorphologyHDF5
@@ -106,7 +131,9 @@ class MorphologyHDF5
     Property::Properties _properties;
     std::string _uri;
 
+    int _file_version;
     detail::MergedReader _merged_reader;
+    detail::UnifiedReader _unified_reader;
 };
 
 inline std::recursive_mutex& global_hdf5_mutex() {
