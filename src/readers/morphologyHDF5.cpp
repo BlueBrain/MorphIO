@@ -81,6 +81,38 @@ namespace h5 {
 
 namespace detail {
 
+// Note, that `hsize_t` might be `uint64_t` which could with `uint64_t` or
+// `unsigned long long` depending on the HDF5 version and platform. Foremost,
+// this is an issue with code not compiling, e.g. if one defines one overload
+// for both `size_t` and `hsize_t` then this will break on platforms where they
+// are the same; if one doesn't it'll break on platforms were it isn't. To
+// avoid going into template metaprogramming, this function allows copying to
+// the right type. Usually `sizes` is small, i.e. 1-2 elements small.
+static std::vector<size_t> convert_to_size_t(const std::vector<hsize_t>& sizes) {
+    return std::vector<size_t>(sizes.begin(), sizes.end());
+}
+
+static void check_dimensions_match(const std::vector<size_t>& actualDimensions,
+                                   const std::vector<size_t>& expectedDimensions,
+                                   const std::string& datasetName) {
+    if (actualDimensions.size() != expectedDimensions.size()) {
+        throw RawDataError("dataset: " + datasetName + ": bad number of dimensions.");
+    }
+
+    for (size_t k = 0; k < actualDimensions.size(); ++k) {
+        size_t expected = expectedDimensions[k];
+        size_t actual = size_t(actualDimensions[k]);
+
+        if (expected != size_t(-1) && expected != actual) {
+            throw RawDataError("dataset: " + datasetName +
+                               ": dimension mismatch, actualDimensions[" + std::to_string(k) +
+                               "] == " + std::to_string(actual) +
+                               " != " + std::to_string(expected));
+        }
+    }
+}
+
+
 template <class Derived>
 template <typename T>
 void DataSetReader<Derived>::read(const std::string& groupName,
@@ -108,17 +140,7 @@ void MergedReader::read_impl(const std::string& groupName,
     const HighFive::DataSpace dataspace = dataset.getSpace();
 
     const auto dims = dataspace.getDimensions();
-    if (dims.size() != expectedDimensions.size()) {
-        throw RawDataError("bad number of dimensions in " + datasetName);
-    }
-
-    for (size_t k = 0; k < dims.size(); ++k) {
-        if (expectedDimensions[k] != size_t(-1) && expectedDimensions[k] != dims[k]) {
-            throw RawDataError("dimension mismatch, dims[" + std::to_string(k) +
-                               "] == " + std::to_string(dims[k]) +
-                               " != " + std::to_string(expectedDimensions[k]));
-        }
-    }
+    check_dimensions_match(dims, expectedDimensions, datasetName);
 
     if (dataspace.getElementCount() > 0) {
         // Guards against a bug in HighFive (fixed in 2.7.0) related to
@@ -188,7 +210,10 @@ void UnifiedReader::read_impl(const std::string& groupName,
 
     auto& dataset = fetch_dataset(unifiedName);
     auto hyperslab = make_hyperslab(range, fetch_global_dims(unifiedName));
-    auto memspace = HighFive::DataSpace(hyperslab.block);
+    auto dims = convert_to_size_t(hyperslab.block);
+    auto memspace = HighFive::DataSpace(dims);
+
+    check_dimensions_match(dims, expectedDimensions, datasetName);
 
     dataset.select(HighFive::HyperSlab(hyperslab), memspace).read(data);
 }

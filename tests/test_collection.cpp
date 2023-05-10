@@ -61,7 +61,7 @@ void check_container_vs_single_file(const std::string& collection_dir,
                                     const std::string& reference_path) {
     SECTION(container_name + ": " + mutability_label<M>() + ": " + morph_name) {
         auto collection = morphio::Collection(fs::path(collection_dir) / container_name);
-        check_collection_vs_single_file<M>(collection, collection_dir, morph_name, reference_path);
+        check_collection_vs_single_file<M>(collection, morph_name, reference_path);
     }
 }
 
