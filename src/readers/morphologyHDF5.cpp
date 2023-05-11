@@ -293,9 +293,10 @@ int MorphologyHDF5::_readSections() {
 }
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
-    assert(_properties._cellLevel.majorVersion() == 1 &&
-           _properties._cellLevel.minorVersion() > 0 &&
-           "Perimeter information is available starting at v1.1");
+    if (!(_properties._cellLevel.majorVersion() == 1 &&
+          _properties._cellLevel.minorVersion() > 0)) {
+        throw RawDataError("Perimeter information is available starting at v1.1");
+    }
 
     // soma only, won't have perimeters
     if (firstSectionOffset == SOMA_ONLY) {
