@@ -10,7 +10,8 @@ def check_load_from_collection(collection):
         "simple",
         "glia",
         "mitochondria",
-        "endoplasmic-reticulum"
+        "endoplasmic-reticulum",
+        "simple-dendritric-spine"
     ]
     for morph_name in morphology_names:
         morph = collection.load(morph_name)

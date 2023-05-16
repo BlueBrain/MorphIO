@@ -1,7 +1,7 @@
 import os
 
 import numpy as np
-from morphio import Morphology, Option, SectionType, ostream_redirect
+from morphio import Morphology, Collection, Option, SectionType, ostream_redirect
 from morphio.mut import Morphology as MutableMorphology
 from numpy.testing import assert_array_equal
 
@@ -15,28 +15,31 @@ SIMPLE_NO_MODIFIER = Morphology(SIMPLE)
 def test_no_modifier():
     assert_array_equal(SIMPLE_NO_MODIFIER.points, Morphology(SIMPLE, options=Option.no_modifier).points)
 
-def test_nrn_order():
-    filename = os.path.join(_path, 'reversed_NRN_neurite_order.swc')
-
-    m = Morphology(filename, options=Option.nrn_order)
+def check_nrn_order(m):
     assert ([section.type for section in m.root_sections] ==
                  [SectionType.axon,
                   SectionType.basal_dendrite,
                   SectionType.apical_dendrite])
+
+
+def test_nrn_order():
+    morph_name = 'reversed_NRN_neurite_order'
+    filename = os.path.join(_path, f'{morph_name}.swc')
+
+    check_nrn_order(Morphology(filename, options=Option.nrn_order))
 
     normal = Morphology(filename)
-    m = MutableMorphology(normal, options=Option.nrn_order)
-    assert ([section.type for section in m.root_sections] ==
-                 [SectionType.axon,
-                  SectionType.basal_dendrite,
-                  SectionType.apical_dendrite])
+    check_nrn_order(MutableMorphology(normal, options=Option.nrn_order))
 
     normal = MutableMorphology(filename)
-    m = MutableMorphology(normal, options=Option.nrn_order)
-    assert ([section.type for section in m.root_sections] ==
-                 [SectionType.axon,
-                  SectionType.basal_dendrite,
-                  SectionType.apical_dendrite])
+    check_nrn_order(MutableMorphology(normal, options=Option.nrn_order))
+
+    collection_relpaths = ["h5/v1", "h5/v1/merged.h5"]
+    for collection_relpath in collection_relpaths:
+        collection = Collection(os.path.join(_path, collection_relpath))
+
+        check_nrn_order(collection.load(morph_name, options=Option.nrn_order))
+        check_nrn_order(collection.load(morph_name, options=Option.nrn_order, mutable=True))
 
 
 def test_nrn_order_stability():

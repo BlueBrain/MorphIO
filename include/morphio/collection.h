@@ -35,14 +35,14 @@ class Collection
      */
     template <class M>
     typename std::enable_if<std::is_same<M, Morphology>::value, M>::type load(
-        const std::string& morph_name) const;
+        const std::string& morph_name, unsigned int options = NO_MODIFIER) const;
 
     /**
      * Load the morphology as a mutable morphology.
      */
     template <class M>
     typename std::enable_if<std::is_same<M, mut::Morphology>::value, M>::type load(
-        const std::string& morph_name) const;
+        const std::string& morph_name, unsigned int options = NO_MODIFIER) const;
 
     /**
      * Close the collection.
@@ -61,9 +61,10 @@ class Collection
     std::shared_ptr<CollectionImpl> _collection;
 };
 
-extern template mut::Morphology Collection::load<mut::Morphology>(
-    const std::string& morph_name) const;
+extern template mut::Morphology Collection::load<mut::Morphology>(const std::string& morph_name,
+                                                                  unsigned int options) const;
 
-extern template Morphology Collection::load<Morphology>(const std::string& morph_name) const;
+extern template Morphology Collection::load<Morphology>(const std::string& morph_name,
+                                                        unsigned int options) const;
 
 }  // namespace morphio

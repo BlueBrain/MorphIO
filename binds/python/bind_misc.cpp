@@ -310,14 +310,17 @@ void bind_misc(py::module& m) {
             "load",
             [](morphio::Collection* collection,
                const std::string& morph_name,
+               unsigned int options,
                bool is_mutable) -> py::object {
                 if (is_mutable) {
-                    return py::cast(collection->load<morphio::mut::Morphology>(morph_name));
+                    return py::cast(
+                        collection->load<morphio::mut::Morphology>(morph_name, options));
                 } else {
-                    return py::cast(collection->load<morphio::Morphology>(morph_name));
+                    return py::cast(collection->load<morphio::Morphology>(morph_name, options));
                 }
             },
             "morph_name"_a,
+            "options"_a = morphio::enums::Option::NO_MODIFIER,
             "mutable"_a = false,
             "Load the morphology named 'morph_name' form the collection.")
         .def("__enter__", [](morphio::Collection* collection) { return collection; })
