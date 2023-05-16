@@ -101,7 +101,7 @@ static void check_dimensions_match(const std::vector<size_t>& actualDimensions,
 
     for (size_t k = 0; k < actualDimensions.size(); ++k) {
         size_t expected = expectedDimensions[k];
-        size_t actual = size_t(actualDimensions[k]);
+        size_t actual = actualDimensions[k];
 
         if (expected != size_t(-1) && expected != actual) {
             throw RawDataError("dataset: " + datasetName +
