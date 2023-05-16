@@ -73,8 +73,8 @@ void check_vs_single_file(const std::string& collection_dir,
 }
 
 TEST_CASE("Collection", "[collection]") {
-    auto morphology_names =
-        std::vector<std::string>{"simple", "glia", "mitochondria", "endoplasmic-reticulum"};
+    auto morphology_names = std::vector<std::string>{
+        "simple", "glia", "mitochondria", "endoplasmic-reticulum", "simple-dendritric-spine"};
     auto collection_dir = std::string("data/h5/v1");
 
     for (const auto& morph_name : morphology_names) {
