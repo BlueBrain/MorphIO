@@ -1,6 +1,6 @@
 #pragma once
-#include <string>  // std::string
 #include <mutex>
+#include <string>  // std::string
 
 #include <morphio/properties.h>
 
