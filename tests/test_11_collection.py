@@ -1,9 +1,11 @@
 from pathlib import Path
+import pytest
 
 import morphio
 from morphio import Collection
 
 DATA_DIR = Path(__file__).parent / "data"
+COLLECTION_PATHS = [DATA_DIR / "h5/v1/merged.h5", DATA_DIR / "h5/v1"]
 
 def check_load_from_collection(collection):
     morphology_names = [
@@ -24,25 +26,16 @@ def check_load_from_collection(collection):
         assert isinstance(morph, morphio.mut.Morphology)
 
 
-def check_load_from_collection_with_context(collection_path):
+@pytest.mark.parametrize("collection_path", COLLECTION_PATHS)
+def test_load_from_collection_with_context(collection_path):
     with morphio.Collection(collection_path) as collection:
         check_load_from_collection(collection)
 
 
-def check_load_from_collection_without_context(collection_path):
+@pytest.mark.parametrize("collection_path", COLLECTION_PATHS)
+def test_load_from_collection_without_context(collection_path):
     collection = morphio.Collection(collection_path)
 
     check_load_from_collection(collection)
 
     collection.close()
-
-
-def test_directory_collection():
-    collection_path = DATA_DIR / "h5/v1"
-    check_load_from_collection_with_context(collection_path)
-    check_load_from_collection_without_context(collection_path)
-
-def test_container_collection():
-    collection_path = DATA_DIR / "h5/v1/merged.h5"
-    check_load_from_collection_with_context(collection_path)
-    check_load_from_collection_without_context(collection_path)
