@@ -141,8 +141,8 @@ Collection::Collection(std::string collection_path, std::vector<std::string> ext
 
 
 template <class M>
-typename std::enable_if<std::is_same<M, Morphology>::value, M>::type Collection::load(
-    const std::string& morph_name, unsigned int options) const {
+typename enable_if_immutable<M, M>::type Collection::load(const std::string& morph_name,
+                                                          unsigned int options) const {
     if (_collection != nullptr) {
         return _collection->load(morph_name, options);
     }
@@ -151,8 +151,8 @@ typename std::enable_if<std::is_same<M, Morphology>::value, M>::type Collection:
 }
 
 template <class M>
-typename std::enable_if<std::is_same<M, mut::Morphology>::value, M>::type Collection::load(
-    const std::string& morph_name, unsigned int options) const {
+typename enable_if_mutable<M, M>::type Collection::load(const std::string& morph_name,
+                                                        unsigned int options) const {
     if (_collection != nullptr) {
         return _collection->load_mut(morph_name, options);
     }
@@ -161,12 +161,11 @@ typename std::enable_if<std::is_same<M, mut::Morphology>::value, M>::type Collec
 }
 
 
-template typename std::enable_if<std::is_same<mut::Morphology, mut::Morphology>::value,
-                                 mut::Morphology>::type
-Collection::load<mut::Morphology>(const std::string& morph_name, unsigned int options) const;
+template mut::Morphology Collection::load<mut::Morphology>(const std::string& morph_name,
+                                                           unsigned int options) const;
 
-template typename std::enable_if<std::is_same<Morphology, Morphology>::value, Morphology>::type
-Collection::load<Morphology>(const std::string& morph_name, unsigned int options) const;
+template Morphology Collection::load<Morphology>(const std::string& morph_name,
+                                                 unsigned int options) const;
 
 void Collection::close() {
     _collection = nullptr;

@@ -10,6 +10,18 @@ namespace morphio {
 
 class CollectionImpl;
 
+/**
+ * Enable if `T` is a immutable morphology.
+ */
+template <class T, class U = void>
+struct enable_if_immutable: public std::enable_if<std::is_same<T, Morphology>::value, U> {};
+
+/**
+ * Enable if `T` is a mutable morphology.
+ */
+template <class T, class U = void>
+struct enable_if_mutable: public std::enable_if<std::is_same<T, mut::Morphology>::value, U> {};
+
 class Collection
 {
   public:
@@ -34,15 +46,15 @@ class Collection
      * Load the morphology as an immutable morphology.
      */
     template <class M>
-    typename std::enable_if<std::is_same<M, Morphology>::value, M>::type load(
-        const std::string& morph_name, unsigned int options = NO_MODIFIER) const;
+    typename enable_if_mutable<M, M>::type load(const std::string& morph_name,
+                                                unsigned int options = NO_MODIFIER) const;
 
     /**
      * Load the morphology as a mutable morphology.
      */
     template <class M>
-    typename std::enable_if<std::is_same<M, mut::Morphology>::value, M>::type load(
-        const std::string& morph_name, unsigned int options = NO_MODIFIER) const;
+    typename enable_if_immutable<M, M>::type load(const std::string& morph_name,
+                                                  unsigned int options = NO_MODIFIER) const;
 
     /**
      * Close the collection.
