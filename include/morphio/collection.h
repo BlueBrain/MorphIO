@@ -10,6 +10,9 @@ namespace morphio {
 
 class CollectionImpl;
 
+template <class M>
+class LoadUnordered;
+
 /**
  * Enable if `T` is a immutable morphology.
  */
@@ -57,6 +60,15 @@ class Collection
                                                   unsigned int options = NO_MODIFIER) const;
 
     /**
+     * Returns an iterable of loop index, morphology pairs.
+     *
+     * See `LoadUnordered` for details.
+     */
+    template <class M>
+    LoadUnordered<M> load_unordered(std::vector<std::string> morphology_names,
+                                    unsigned int options = NO_MODIFIER) const;
+
+    /**
      * Close the collection.
      *
      * Note that `morphio::Collection` uses RAII. Therefore, the usual
@@ -73,10 +85,94 @@ class Collection
     std::shared_ptr<CollectionImpl> _collection;
 };
 
-extern template mut::Morphology Collection::load<mut::Morphology>(const std::string& morph_name,
-                                                                  unsigned int options) const;
+class LoadUnorderedImpl;
+class LoadUnorderedIteratorImpl;
 
-extern template Morphology Collection::load<Morphology>(const std::string& morph_name,
-                                                        unsigned int options) const;
+/**
+ * An iterable of loop index and morphologies.
+ *
+ * When reading from containers, the order in which morphologies are read can
+ * have a large impact on the overall time to load those morphologies.
+ *
+ * This iterator provides means of reordering loops to optimize the access
+ * pattern. Loops such as the following
+ *
+ *     for(size_t k = 0; k < morphology_names.size; ++k) {
+ *       auto morph = collection.load<M>(morphology_names[k]);
+ *       f(k, morph);
+ *     }
+ *
+ * can be replaced with
+ *
+ *     for(auto [k, morph] : collection.load_unordered<M>(morphology_names)) {
+ *       assert(collection.load<M>(morphology_names[k]) == morph);
+ *       f(k, morph);
+ *     }
+ *
+ * The order in which the morphologies are returned in unspecified, but the
+ * loop index `k` can be used to retrieve the correct state corresponding to
+ * iteration `k` of the original loop.
+ *
+ * Note, that it is safe for an `LoadUnordered` object to outlive its
+ * `collection`. Internally a shallow copy of the original `collection` is
+ * stored inside of and kept alive for the life time of the `LoadUnordered`
+ * object.
+ */
+template <class M>
+class LoadUnordered
+{
+  protected:
+    class Iterator
+    {
+      public:
+        Iterator(std::shared_ptr<LoadUnorderedIteratorImpl> it);
+
+        template <class U = M>
+        typename enable_if_immutable<U, std::pair<size_t, M>>::type operator*() const;
+
+        template <class U = M>
+        typename enable_if_mutable<U, std::pair<size_t, M>>::type operator*() const;
+
+        void operator++() const;
+
+        bool operator==(const Iterator& other) const;
+        bool operator!=(const Iterator& other) const;
+
+      private:
+        std::shared_ptr<LoadUnorderedIteratorImpl> _it;
+    };
+
+  public:
+    LoadUnordered(std::shared_ptr<LoadUnorderedImpl> load_unordered);
+
+    Iterator begin() const;
+    Iterator end() const;
+
+  protected:
+    std::shared_ptr<LoadUnorderedImpl> _load_unordered;
+};
+
+template class LoadUnordered<morphio::Morphology>;
+
+template class LoadUnordered<morphio::mut::Morphology>;
+
+extern template typename enable_if_immutable<Morphology, std::pair<size_t, Morphology>>::type
+    LoadUnordered<Morphology>::Iterator::operator*<Morphology>() const;
+
+extern template
+    typename enable_if_mutable<mut::Morphology, std::pair<size_t, mut::Morphology>>::type
+        LoadUnordered<mut::Morphology>::Iterator::operator*<mut::Morphology>() const;
+
+extern template typename enable_if_mutable<mut::Morphology, mut::Morphology>::type
+Collection::load<mut::Morphology>(const std::string& morph_name, unsigned int options) const;
+
+extern template typename enable_if_immutable<Morphology, Morphology>::type
+Collection::load<Morphology>(const std::string& morph_name, unsigned int options) const;
+
+extern template LoadUnordered<Morphology> Collection::load_unordered<Morphology>(
+    std::vector<std::string> morphology_names, unsigned int options) const;
+
+extern template LoadUnordered<mut::Morphology> Collection::load_unordered<mut::Morphology>(
+    std::vector<std::string> morphology_names, unsigned int options) const;
 
 }  // namespace morphio

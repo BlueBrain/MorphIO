@@ -4,6 +4,7 @@
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 
+#include <algorithm>
 #include <filesystem>
 namespace fs = std::filesystem;
 
@@ -86,6 +87,47 @@ TEST_CASE("Collection", "[collection]") {
                                                        morph_name,
                                                        reference_path.string());
     }
+}
+
+static void check_loop_indices(std::vector<size_t>& loop_indices, size_t n) {
+    REQUIRE(loop_indices.size() == n);
+    std::sort(loop_indices.begin(), loop_indices.end());
+    for (size_t i = 0; i < loop_indices.size(); ++i) {
+        REQUIRE(loop_indices[i] == i);
+    }
+}
+
+static void check_collection_load_unordered(const std::string& collection_dir) {
+    morphio::Collection collection(collection_dir);
+
+    auto morphology_names = std::vector<std::string>{
+        "simple", "glia", "mitochondria", "endoplasmic-reticulum", "simple-dendritric-spine"};
+
+    SECTION("modern") {
+        std::vector<size_t> loop_indices;
+        for (auto [k, morph] : collection.load_unordered<morphio::Morphology>(morphology_names)) {
+            loop_indices.push_back(k);
+        }
+        check_loop_indices(loop_indices, morphology_names.size());
+    }
+
+    SECTION("classical") {
+        std::vector<size_t> loop_indices;
+        auto unordered_access = collection.load_unordered<morphio::Morphology>(morphology_names);
+        for (auto it = unordered_access.begin(); it != unordered_access.end(); ++it) {
+            auto [k, morph] = *it;
+            loop_indices.push_back(k);
+        }
+        check_loop_indices(loop_indices, morphology_names.size());
+    }
+}
+
+TEST_CASE("Collection::load_unordered directory", "[collection]") {
+    check_collection_load_unordered("data/h5/v1");
+}
+
+TEST_CASE("Collection::load_unordered merged", "[collection]") {
+    check_collection_load_unordered("data/h5/v1/merged.h5");
 }
 
 TEST_CASE("CollectionMissingExtensions", "[collection]") {

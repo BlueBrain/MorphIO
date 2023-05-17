@@ -4,17 +4,24 @@ import pytest
 import morphio
 from morphio import Collection
 
+import numpy as np
+
 DATA_DIR = Path(__file__).parent / "data"
 COLLECTION_PATHS = [DATA_DIR / "h5/v1/merged.h5", DATA_DIR / "h5/v1"]
 
-def check_load_from_collection(collection):
-    morphology_names = [
+def available_morphologies():
+    return [
         "simple",
         "glia",
         "mitochondria",
         "endoplasmic-reticulum",
         "simple-dendritric-spine"
     ]
+
+
+def check_load_from_collection(collection):
+    morphology_names = available_morphologies()
+
     for morph_name in morphology_names:
         morph = collection.load(morph_name)
         assert isinstance(morph, morphio.Morphology)
@@ -39,3 +46,19 @@ def test_load_from_collection_without_context(collection_path):
     check_load_from_collection(collection)
 
     collection.close()
+
+
+@pytest.mark.parametrize("collection_path", COLLECTION_PATHS)
+def test_container_unordered(collection_path):
+    with morphio.Collection(collection_path) as collection:
+        morphology_names = available_morphologies()
+        morphology_names = morphology_names[1:]
+
+        loop_indices = []
+        for k, morph in collection.load_unordered(morphology_names):
+            loop_indices.append(k)
+
+        np.testing.assert_array_equal(
+            sorted(loop_indices),
+            np.arange(len(morphology_names))
+        )

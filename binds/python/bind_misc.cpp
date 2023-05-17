@@ -323,6 +323,50 @@ void bind_misc(py::module& m) {
             "options"_a = morphio::enums::Option::NO_MODIFIER,
             "mutable"_a = false,
             "Load the morphology named 'morph_name' form the collection.")
+        .def(
+            "load_unordered",
+            [](morphio::Collection* collection,
+               std::vector<std::string> morphology_names,
+               unsigned int options,
+               bool is_mutable) -> py::object {
+                if (is_mutable) {
+                    return py::cast(
+                        collection->load_unordered<morphio::mut::Morphology>(morphology_names,
+                                                                             options));
+                } else {
+                    return py::cast(
+                        collection->load_unordered<morphio::Morphology>(morphology_names, options));
+                }
+            },
+            "morphology_names"_a,
+            "options"_a = morphio::enums::Option::NO_MODIFIER,
+            "mutable"_a = false,
+            R"(Create an iterable of loop index and morphology.
+
+When reading from containers, the order in which morphologies are read can
+have a large impact on the overall time to load those morphologies.
+
+This iterator provides means of reordering loops to optimize the access
+pattern. Loops such as the following
+
+    for k, morph_name in enumerate(morphology_names):
+        morph = collection.load(morphology_names[k])
+        f(k, morph)
+
+can be replaced with
+
+    for k, morph in collection.load_unordered(morphology_names):
+      assert collection.load(morphology_names[k]) == morph
+      f(k, morph)
+
+The order in which the morphologies are returned in unspecified, but the
+loop index `k` can be used to retrieve the correct state corresponding to
+iteration `k` of the original loop.
+
+The iterable returned by `Collection.load_unordered` should only be used while
+`collection` is valid, e.g. within its context or before calling
+`Collection.close`.
+)")
         .def("__enter__", [](morphio::Collection* collection) { return collection; })
         .def("__exit__",
              [](morphio::Collection* collection,
@@ -330,4 +374,26 @@ void bind_misc(py::module& m) {
                 const py::object&,
                 const py::object&) { collection->close(); })
         .def("close", &morphio::Collection::close);
+
+    py::class_<morphio::LoadUnordered<morphio::Morphology>>(
+        m, "LoadImmutableUnordered", "An iterable of immutable morphologies.")
+        .def(
+            "__iter__",
+            [](const morphio::LoadUnordered<morphio::Morphology>& iterable) {
+                return py::make_iterator(iterable.begin(), iterable.end());
+            },
+            // Bind the lifetime of the `morphio::LoadUnordered` (1) to the
+            // lifetime of the returned iterator (0).
+            py::keep_alive<0, 1>());
+
+    py::class_<morphio::LoadUnordered<morphio::mut::Morphology>>(
+        m, "LoadMutableUnordered", "An iterable of mutable morphologies.")
+        .def(
+            "__iter__",
+            [](const morphio::LoadUnordered<morphio::mut::Morphology>& iterable) {
+                return py::make_iterator(iterable.begin(), iterable.end());
+            },
+            // Bind the lifetime of the `morphio::LoadUnordered` (1) to the
+            // lifetime of the returned iterator (0).
+            py::keep_alive<0, 1>());
 }

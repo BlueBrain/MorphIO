@@ -41,6 +41,12 @@ def test_nrn_order():
         check_nrn_order(collection.load(morph_name, options=Option.nrn_order))
         check_nrn_order(collection.load(morph_name, options=Option.nrn_order, mutable=True))
 
+        for _, morph in collection.load_unordered([morph_name], options=Option.nrn_order):
+            check_nrn_order(morph)
+
+        for _, morph in collection.load_unordered([morph_name], options=Option.nrn_order, mutable=True):
+            check_nrn_order(morph)
+
 
 def test_nrn_order_stability():
     m = Morphology(os.path.join(_path, 'mono-type.asc'), Option.nrn_order)
