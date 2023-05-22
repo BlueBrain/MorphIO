@@ -22,7 +22,7 @@ class Morphology
   public:
     virtual ~Morphology() = default;
 
-    Morphology(Morphology&) noexcept = default;
+    Morphology(const Morphology&) noexcept = default;
     Morphology& operator=(const Morphology&) noexcept = default;
     Morphology(Morphology&&) noexcept = default;
     Morphology& operator=(Morphology&&) noexcept = default;
