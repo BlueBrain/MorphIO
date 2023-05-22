@@ -1,6 +1,7 @@
 #include "morphologySWC.h"
 
 #include <cstdint>        // uint32_t
+#include <locale>         // std::locale
 #include <memory>         // std::shared_ptr
 #include <sstream>        // std::stringstream
 #include <string>         // std::string
@@ -26,6 +27,7 @@ morphio::readers::Sample readSWCLine(const char* line,
                                      unsigned int lineNumber,
                                      const morphio::readers::ErrorMessages& err) {
     std::istringstream ss(line);
+    ss.imbue(std::locale(""));
 
     unsigned int id = 0;
     int int_type = SWC_UNDEFINED_PARENT;
