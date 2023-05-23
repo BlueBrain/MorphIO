@@ -158,6 +158,12 @@ class ErrorMessages
     std::string ERROR_MISSING_MITO_PARENT(int mitoParentId) const;
 
     ////////////////////////////////////////////////////////////////////////////////
+    //             SWC
+    ////////////////////////////////////////////////////////////////////////////////
+    /** A negative ID is used in SWC */
+    std::string ERROR_NEGATIVE_ID(long unsigned int lineNumber) const;
+
+    ////////////////////////////////////////////////////////////////////////////////
     //             NEUROLUCIDA
     ////////////////////////////////////////////////////////////////////////////////
     /** Already defined soma error message */
@@ -203,11 +209,11 @@ class ErrorMessages
                                              const std::string& vec2,
                                              size_t length2) const;
 
-    /** Cant write perimeter data to SWC,ASC error message */
+    /** Cant write perimeter data to SWC, ASC error message */
     std::string ERROR_PERIMETER_DATA_NOT_WRITABLE();
+
     /** Single section child SWC error message */
     std::string ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const;
-
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS

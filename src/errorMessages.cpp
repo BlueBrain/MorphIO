@@ -155,6 +155,10 @@ std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(int mitoParentId) const {
            std::to_string(mitoParentId) + " does not exist.";
 }
 
+std::string ErrorMessages::ERROR_NEGATIVE_ID(long unsigned int lineNumber) const {
+    return errorMsg(lineNumber, ErrorLevel::WARNING, "The ID assigned to this line is negative");
+}
+
 /**
    Return val1 and highlight it with some color if val1 != val2
 **/

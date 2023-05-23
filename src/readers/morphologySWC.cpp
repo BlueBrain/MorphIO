@@ -1,9 +1,13 @@
 #include "morphologySWC.h"
 
+#include <clocale>  // newlocale
+#include <cstdlib>
+
+#include <cctype>         // std::isspace
 #include <cstdint>        // uint32_t
-#include <locale>         // std::locale
 #include <memory>         // std::shared_ptr
 #include <sstream>        // std::stringstream
+#include <stdexcept>
 #include <string>         // std::string
 #include <unordered_map>  // std::unordered_map
 #include <vector>         // std::vector
@@ -23,31 +27,82 @@ bool _ignoreLine(const std::string& line) {
     return pos == std::string::npos || line[pos] == '#';
 }
 
-morphio::readers::Sample readSWCLine(const char* line,
+morphio::readers::Sample readSWCLine(const std::string& line,
                                      unsigned int lineNumber,
                                      const morphio::readers::ErrorMessages& err) {
-    std::istringstream ss(line);
-    ss.imbue(std::locale(""));
+    using morphio::floatType;
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+    _locale_t locale = _create_locale(LC_ALL, "C");
+#else
+    locale_t locale = newlocale(LC_ALL, "C", nullptr);
+#endif
 
-    unsigned int id = 0;
-    int int_type = SWC_UNDEFINED_PARENT;
-    morphio::Point point;
-    int parentId = -1;
-    morphio::floatType radius = -1.;
+    morphio::readers::Sample ret;
+    ret.lineNumber = lineNumber;
 
-    ss >> id;
-    ss >> int_type;
-    ss >> point[0] >> point[1] >> point[2];
-    ss >> radius;
-    ss >> parentId;
-    ss.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    const char* pos = line.data();
+    const char* const endpos = &pos[line.size()];
+    const char* new_endpos = nullptr;
 
-    if (!ss.eof()) {
+    auto read_int =
+        [&pos, &new_endpos, endpos, lineNumber, &err, &locale](bool advanced = true,
+                                                               bool check_end = true) -> int64_t {
+        const int base = 10;
+        if (advanced) {
+            pos = new_endpos;
+        }
+        new_endpos = endpos;
+        int64_t v = strtol_l(pos, const_cast<char**>(&new_endpos), base, locale);
+        if (check_end && new_endpos == endpos) {
+            throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
+        }
+        return v;
+    };
+    auto read_float = [&pos, &new_endpos, endpos, lineNumber, &err, &locale]() -> floatType {
+        pos = new_endpos;
+        new_endpos = endpos;
+#ifdef MORPHIO_USE_DOUBLE
+        floatType v = strtod_l(pos, const_cast<char**>(&new_endpos), locale);
+#else
+        floatType v = strtof_l(pos, const_cast<char**>(&new_endpos), locale);
+#endif
+        if (new_endpos == endpos) {
+            throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
+        }
+        return v;
+    };
+
+    int64_t id = read_int(/*advanced*/ false);
+    if (id < 0) {
+        throw morphio::RawDataError(err.ERROR_NEGATIVE_ID(lineNumber));
+    }
+    ret.id = static_cast<unsigned int>(id);
+
+    ret.type = static_cast<morphio::SectionType>(read_int());
+
+    for (auto& point : ret.point) {
+        point = read_float();
+    }
+
+    ret.diameter = 2.f * read_float();
+
+    ret.parentId = static_cast<int>(read_int(true, false));
+
+    while (new_endpos <= endpos && static_cast<bool>(::isspace(*new_endpos))) {
+        new_endpos++;
+    }
+
+    if (new_endpos != endpos && *new_endpos != '#') {
         throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
     }
 
-    auto type = static_cast<morphio::SectionType>(int_type);
-    return {/* diameter */ radius * 2, point, type, parentId, id, lineNumber};
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+    _free_locale(locale);
+#else
+    freelocale(locale);
+#endif
+
+    return ret;
 }
 
 }  // unnamed namespace
@@ -68,7 +123,7 @@ class SWCBuilder
     }
 
     void _readSamples(const std::string& contents) {
-        std::stringstream stream{contents};
+        std::istringstream stream{contents};
         unsigned int lineNumber = 0;
         std::string line;
         while (!std::getline(stream, line).fail()) {
@@ -78,7 +133,7 @@ class SWCBuilder
                 continue;
             }
 
-            const auto sample = readSWCLine(line.data(), lineNumber, err);
+            const auto sample = readSWCLine(line, lineNumber, err);
 
             if (sample.type >= SECTION_OUT_OF_RANGE_START || sample.type <= 0) {
                 throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type));

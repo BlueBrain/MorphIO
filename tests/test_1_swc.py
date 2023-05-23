@@ -514,3 +514,10 @@ def test_no_soma():
             n = Morphology(content, extension='swc')
             assert ('$STRING$:0:warning\nWarning: no soma found in file' ==
                     strip_color_codes(err.getvalue().strip()))
+
+def test_throw_on_negative_id():
+    content = '''1 2 0 0 0 3.0 -1
+                 -2 2 0 0 0 3.0  1
+                 3 2 0 0 0 3.0  2'''
+    with pytest.raises(RawDataError, match='The ID assigned to this line is negative'):
+        Morphology(content, extension='swc')
