@@ -1,4 +1,5 @@
 #include "morphologyASC.h"
+#include "utils.h"
 
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
@@ -77,15 +78,15 @@ class NeurolucidaParser
     std::tuple<Point, floatType> parse_point(NeurolucidaLexer& lex, bool is_marker) {
         lex.expect(Token::LPAREN, "Point should start in LPAREN");
         std::array<morphio::floatType, 4> point{};  // X,Y,Z,D
+        const auto& stn = morphio::getStringToNumber();
+
         for (unsigned int i = 0; i < 4; i++) {
+            const std::string s = lex.consume()->str();
             try {
-#ifdef MORPHIO_USE_DOUBLE
-                point[i] = std::stod(lex.consume()->str());
-#else
-                point[i] = std::stof(lex.consume()->str());
-#endif
+                const char * endpos = &s.data()[s.size()];
+                point[i] = stn.toFloat(s.data(), &endpos);
             } catch (const std::invalid_argument&) {
-                throw RawDataError(err_.ERROR_PARSING_POINT(lex.line_num(), lex.current()->str()));
+                throw RawDataError(err_.ERROR_PARSING_POINT(lex.line_num(), s));
             }
 
             // Markers can have an s-exp (X Y Z) without diameter

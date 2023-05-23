@@ -1,10 +1,9 @@
 #pragma once
-#include <clocale>  // newlocale
+#include <clocale>  // locale_t
 
 #include <morphio/vector_types.h>  // floatType
 
 namespace morphio {
-using morphio::floatType;
 
 struct StringToNumber {
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
@@ -20,4 +19,5 @@ struct StringToNumber {
 };
 
 StringToNumber& getStringToNumber();
+
 }  // namespace morphio

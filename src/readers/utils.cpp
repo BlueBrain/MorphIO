@@ -13,7 +13,11 @@ int64_t StringToNumber::toInt(const char* pos, const char** endpos, int base) co
 }
 
 floatType StringToNumber::toFloat(const char* pos, const char** endpos) const {
-    return _strtof_l(pos, const_cast<char**>(endpos), locale);
+    floatType ret = _strtof_l(pos, const_cast<char**>(endpos), locale);
+    if(ret == 0 && pos == *endpos) {
+        throw std::invalid_argument("could not parse float");
+    }
+    return ret;
 }
 #else
 StringToNumber::StringToNumber()
@@ -28,7 +32,11 @@ int64_t StringToNumber::toInt(const char* pos, const char** endpos, int base) co
 }
 
 floatType StringToNumber::toFloat(const char* pos, const char** endpos) const {
-    return strtof_l(pos, const_cast<char**>(endpos), locale);
+    floatType ret = strtof_l(pos, const_cast<char**>(endpos), locale);
+    if(ret == 0 && pos == *endpos) {
+        throw std::invalid_argument("could not parse float");
+    }
+    return ret;
 }
 #endif
 
