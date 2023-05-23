@@ -78,9 +78,165 @@ namespace morphio {
 namespace readers {
 namespace h5 {
 
+
+namespace detail {
+
+// Note, that `hsize_t` might be `uint64_t` which could with `uint64_t` or
+// `unsigned long long` depending on the HDF5 version and platform. Foremost,
+// this is an issue with code not compiling, e.g. if one defines one overload
+// for both `size_t` and `hsize_t` then this will break on platforms where they
+// are the same; if one doesn't it'll break on platforms were it isn't. To
+// avoid going into template metaprogramming, this function allows copying to
+// the right type. Usually `sizes` is small, i.e. 1-2 elements small.
+static std::vector<size_t> convert_to_size_t(const std::vector<hsize_t>& sizes) {
+    return std::vector<size_t>(sizes.begin(), sizes.end());
+}
+
+static void check_dimensions_match(const std::vector<size_t>& actualDimensions,
+                                   const std::vector<size_t>& expectedDimensions,
+                                   const std::string& datasetName) {
+    if (actualDimensions.size() != expectedDimensions.size()) {
+        throw RawDataError("dataset: " + datasetName + ": bad number of dimensions.");
+    }
+
+    for (size_t k = 0; k < actualDimensions.size(); ++k) {
+        size_t expected = expectedDimensions[k];
+        size_t actual = actualDimensions[k];
+
+        if (expected != size_t(-1) && expected != actual) {
+            throw RawDataError("dataset: " + datasetName +
+                               ": dimension mismatch, actualDimensions[" + std::to_string(k) +
+                               "] == " + std::to_string(actual) +
+                               " != " + std::to_string(expected));
+        }
+    }
+}
+
+
+template <class Derived>
+template <typename T>
+void DataSetReader<Derived>::read(const std::string& groupName,
+                                  const std::string& datasetName,
+                                  std::vector<size_t> expectedDimensions,
+                                  T& data) const {
+    auto derived = static_cast<const Derived&>(*this);
+    derived.read_impl(groupName, datasetName, expectedDimensions, data);
+}
+
+template <typename T>
+void MergedReader::read_impl(const std::string& groupName,
+                             const std::string& datasetName,
+                             std::vector<size_t> expectedDimensions,
+                             T& data) const {
+    if (groupName != "" && !_group.exist(groupName)) {
+        throw RawDataError("Missing required group " + groupName);
+    }
+    const auto group = groupName == "" ? _group : _group.getGroup(groupName);
+
+    if (!group.exist(datasetName)) {
+        throw RawDataError("Missing required dataset " + datasetName);
+    }
+    const HighFive::DataSet dataset = group.getDataSet(datasetName);
+    const HighFive::DataSpace dataspace = dataset.getSpace();
+
+    const auto dims = dataspace.getDimensions();
+    check_dimensions_match(dims, expectedDimensions, datasetName);
+
+    if (dataspace.getElementCount() > 0) {
+        // Guards against a bug in HighFive (fixed in 2.7.0) related to
+        // empty datasets.
+        dataset.read(data);
+    } else {
+        // If the dataset is empty, the vector should be too. In all other
+        // cases HighFive will allocate as appropriate.
+        data.resize(0);
+    }
+}
+
+
+template <typename T>
+void UnifiedReader::read_impl(const std::string& groupName,
+                              const std::string& datasetName,
+                              std::vector<size_t> expectedDimensions,
+                              T& data) const {
+    auto make_hyperslab = [](const std::pair<size_t, size_t>& range,
+                             const std::vector<size_t>& global_dims) {
+        auto rank = global_dims.size();
+        if (rank == 0) {
+            throw std::invalid_argument("'global_dims' must not be empty.");
+        }
+
+        auto begin = range.first;
+        auto end = range.second;
+
+        auto h5_offset = std::vector<size_t>(rank, 0ul);
+        h5_offset[0] = begin;
+
+        auto h5_count = std::vector<size_t>(rank, 1ul);
+        auto h5_stride = std::vector<size_t>(rank, 1ul);
+
+        auto h5_block = global_dims;
+        h5_block[0] = end - begin;
+
+        return HighFive::RegularHyperSlab(h5_offset, h5_count, h5_stride, h5_block);
+    };
+
+    auto fetch_dataset = [this](const std::string& unifiedName) -> const HighFive::DataSet& {
+        auto it = _datasets.find(unifiedName);
+        if (it != _datasets.end()) {
+            return it->second;
+        } else {
+            return _datasets[unifiedName] = _group.getFile().getDataSet(".raw/" + unifiedName +
+                                                                        "/values");
+        }
+    };
+
+    auto fetch_global_dims =
+        [this, fetch_dataset](const std::string& unifiedName) -> const std::vector<size_t>& {
+        auto it = _global_dims.find(unifiedName);
+        if (it != _global_dims.end()) {
+            return it->second;
+        } else {
+            auto ds = fetch_dataset(unifiedName);
+            return _global_dims[unifiedName] = ds.getDimensions();
+        }
+    };
+
+    auto unifiedName = groupName + (groupName == "" ? "" : "/") + datasetName;
+
+    auto range =
+        std::pair<size_t, size_t>{_group.getAttribute(unifiedName + "_begin").read<size_t>(),
+                                  _group.getAttribute(unifiedName + "_end").read<size_t>()};
+
+    auto& dataset = fetch_dataset(unifiedName);
+    auto hyperslab = make_hyperslab(range, fetch_global_dims(unifiedName));
+    auto dims = convert_to_size_t(hyperslab.block);
+    auto memspace = HighFive::DataSpace(dims);
+
+    check_dimensions_match(dims, expectedDimensions, datasetName);
+
+    dataset.select(HighFive::HyperSlab(hyperslab), memspace).read(data);
+}
+
+}  // namespace detail
+
+
 MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group)
     : _group(group)
-    , _uri("HDF5 Group") {}
+    , _uri("HDF5 Group")
+    , _file_version(-1)
+    , _merged_reader(_group)
+    , _unified_reader(_group) {
+    auto file = _group.getFile();
+    auto version_exists = H5Aexists(file.getId(), "version");
+    if (version_exists < 0) {
+        throw RawDataError("H5Aexists failed");
+    }
+
+    if (version_exists > 0) {
+        _file_version = file.getAttribute("version").read<int>();
+    }
+}
 
 Property::Properties load(const std::string& uri) {
     try {
@@ -174,23 +330,10 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
 void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     constexpr size_t pointColumns = 4;
 
-    const auto pointsDataSet = _group.getDataSet(_d_points);
-    const auto pointsDims = pointsDataSet.getSpace().getDimensions();
-    const size_t numberPoints = pointsDims[0];
+    std::vector<std::array<floatType, pointColumns>> hdf5Data;
+    _read("", _d_points, std::vector<size_t>{size_t(-1), pointColumns}, hdf5Data);
 
-    if (pointsDims.size() != 2) {
-        throw RawDataError("Opening morphology '" + _uri +
-                           "': incorrect number of dimensions in 'points'.");
-    } else if (pointsDims[1] != pointColumns) {
-        throw RawDataError("Opening morphology '" + _uri +
-                           "': incorrect number of columns for points");
-    }
-
-    std::vector<std::array<floatType, pointColumns>> hdf5Data(numberPoints);
-
-    if (!hdf5Data.empty()) {
-        pointsDataSet.read(hdf5Data.front().data());
-    }
+    const size_t numberPoints = hdf5Data.size();
 
     const bool hasSoma = firstSectionOffset != 0;
     const bool hasNeurites = static_cast<size_t>(firstSectionOffset) < numberPoints;
@@ -236,18 +379,8 @@ int MorphologyHDF5::_readSections() {
 
     constexpr size_t structureV1Columns = 3;
 
-    const auto structure = _group.getDataSet(_d_structure);
-    const auto dims = structure.getSpace().getDimensions();
-
-    if (dims.size() != 2 || dims[1] != structureV1Columns) {
-        throw(RawDataError("Error reading morphologies " + _uri +
-                           " bad number of dimensions in 'structure' dataspace"));
-    }
-
-    std::vector<std::array<int, structureV1Columns>> vec(dims[0]);
-    if (dims[0] > 0) {
-        structure.read(vec.front().data());
-    }
+    std::vector<std::array<int, structureV1Columns>> vec;
+    _read("", _d_structure, std::vector<size_t>{size_t(-1), structureV1Columns}, vec);
 
     assert(!vec.empty());
 
@@ -276,11 +409,11 @@ int MorphologyHDF5::_readSections() {
             ErrorMessages err;
             throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(0, type));
         } else if (!hasSoma && type == SECTION_SOMA) {
-            throw(RawDataError("Error reading morphology " + _uri +
-                               ": it has soma section that doesn't come first"));
+            throw RawDataError("Error reading morphology " + _uri +
+                               ": it has soma section that doesn't come first");
         } else if (hasSoma && type == SECTION_SOMA) {
-            throw(RawDataError("Error reading morphology " + _uri +
-                               ": it has multiple soma sections"));
+            throw RawDataError("Error reading morphology " + _uri +
+                               ": it has multiple soma sections");
         }
 
         sections.emplace_back(
@@ -315,32 +448,29 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
     perimeters.erase(perimeters.begin(), perimeters.begin() + firstSectionOffset);
 }
 
-
 template <typename T>
 void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& datasetName,
                            unsigned int expectedDimension,
                            T& data) {
-    if (groupName != "" && !_group.exist(groupName)) {
-        throw(
-            RawDataError("Reading morphology '" + _uri + "': Missing required group " + groupName));
-    }
-    const auto group = groupName == "" ? _group : _group.getGroup(groupName);
+    auto expectedDimensions = std::vector<size_t>(expectedDimension, size_t(-1));
+    _read(groupName, datasetName, expectedDimensions, data);
+}
 
-    if (!group.exist(datasetName)) {
-        throw(RawDataError("Reading morphology '" + _uri + "': Missing required dataset " +
-                           datasetName));
+template <typename T>
+void MorphologyHDF5::_read(const std::string& groupName,
+                           const std::string& datasetName,
+                           const std::vector<size_t>& expectedDimensions,
+                           T& data) {
+    try {
+        if (_file_version <= 3) {
+            _merged_reader.read(groupName, datasetName, expectedDimensions, data);
+        } else {
+            _unified_reader.read(groupName, datasetName, expectedDimensions, data);
+        }
+    } catch (const RawDataError& err) {
+        throw RawDataError("Reading morphology '" + _uri + "': " + err.what());
     }
-    const HighFive::DataSet dataset = group.getDataSet(datasetName);
-
-    const auto dims = dataset.getSpace().getDimensions();
-    if (dims.size() != expectedDimension) {
-        throw(RawDataError("Reading morphology '" + _uri + "': bad number of dimensions in " +
-                           datasetName));
-    }
-
-    data.resize(dims[0]);
-    dataset.read(data);
 }
 
 void MorphologyHDF5::_readDendriticSpinePostSynapticDensity() {
@@ -354,11 +484,11 @@ void MorphologyHDF5::_readDendriticSpinePostSynapticDensity() {
     _read(_g_postsynaptic_density, _d_dendritic_spine_offset, 1, offsets);
 
     if (sectionIds.size() != segmentIds.size() || offsets.size() != segmentIds.size()) {
-        throw(RawDataError(
+        throw RawDataError(
             "Dendritic datasets must match in size:"
             " sectionIds: " +
             std::to_string(sectionIds.size()) + " segmentIds: " +
-            std::to_string(segmentIds.size()) + " offsets: " + std::to_string(offsets.size())));
+            std::to_string(segmentIds.size()) + " offsets: " + std::to_string(offsets.size()));
     }
 
     auto& properties = _properties._dendriticSpineLevel._post_synaptic_density;
