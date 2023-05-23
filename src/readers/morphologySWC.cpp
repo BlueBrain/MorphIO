@@ -32,13 +32,21 @@ morphio::readers::Sample readSWCLine(const std::string& line,
                                      const morphio::readers::ErrorMessages& err) {
     using morphio::floatType;
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
-#define STRTOD_L _strtod_l
+
+#ifdef MORPHIO_USE_DOUBLE
+#define STRTOF_L _strtod_l
+#else
 #define STRTOF_L _strtof_l
+#endif
+
 #define STRTOL_L _strtol_l
     _locale_t locale = _create_locale(LC_ALL, "C");
 #else
-#define STRTOD_L strtod_l
+#ifdef MORPHIO_USE_DOUBLE
+#define STRTOF_L strtod_l
+#else
 #define STRTOF_L strtof_l
+#endif
 #define STRTOL_L strtol_l
 
     locale_t locale = newlocale(LC_ALL, "C", nullptr);
@@ -63,11 +71,7 @@ morphio::readers::Sample readSWCLine(const std::string& line,
         return v;
     };
     auto read_float = [&pos, &new_endpos, endpos, lineNumber, &err, &locale]() -> floatType {
-#ifdef MORPHIO_USE_DOUBLE
-        floatType v = STRTOD_L(pos, const_cast<char**>(&new_endpos), locale);
-#else
         floatType v = STRTOF_L(pos, const_cast<char**>(&new_endpos), locale);
-#endif
         if (new_endpos == endpos) {
             throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
         }
@@ -106,7 +110,6 @@ morphio::readers::Sample readSWCLine(const std::string& line,
     freelocale(locale);
 #endif
 
-#undef STRTOD_L
 #undef STRTOF_L
 #undef STRTOL_L
 
