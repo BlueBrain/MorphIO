@@ -148,22 +148,6 @@ class CollectionImpl: public morphio::CollectionImpl
         const auto& derived = static_cast<const Derived&>(*this);
         return derived.template load_impl<mut::Morphology>(morph_name, options);
     }
-
-    std::shared_ptr<LoadUnorderedImpl> load_unordered(Collection collection,
-                                                      std::vector<std::string> morphology_names,
-                                                      unsigned int options) const override {
-        auto n_morphologies = morphology_names.size();
-        std::vector<size_t> loop_indices(n_morphologies);
-        for (size_t i = 0; i < n_morphologies; ++i) {
-            loop_indices[i] = i;
-        }
-
-        return std::make_shared<detail::LoadUnorderedFromLoopIndices>(std::move(collection),
-                                                                      std::move(loop_indices),
-                                                                      std::move(morphology_names),
-                                                                      options);
-    }
-
 };
 }  // namespace detail
 
@@ -191,6 +175,21 @@ class DirectoryCollection: public morphio::detail::CollectionImpl<DirectoryColle
         }
 
         throw MorphioError("Morphology '" + morph_name + "' not found in: " + _dirname);
+    }
+
+    std::shared_ptr<LoadUnorderedImpl> load_unordered(Collection collection,
+                                                      std::vector<std::string> morphology_names,
+                                                      unsigned int options) const override {
+        auto n_morphologies = morphology_names.size();
+        std::vector<size_t> loop_indices(n_morphologies);
+        for (size_t i = 0; i < n_morphologies; ++i) {
+            loop_indices[i] = i;
+        }
+
+        return std::make_shared<detail::LoadUnorderedFromLoopIndices>(std::move(collection),
+                                                                      std::move(loop_indices),
+                                                                      std::move(morphology_names),
+                                                                      options);
     }
 
   private:
@@ -221,6 +220,36 @@ class HDF5ContainerCollection: public morphio::detail::CollectionImpl<HDF5Contai
 
     HDF5ContainerCollection& operator=(const HDF5ContainerCollection&) = delete;
     HDF5ContainerCollection& operator=(HDF5ContainerCollection&&) = delete;
+
+    std::shared_ptr<LoadUnorderedImpl> load_unordered(Collection collection,
+                                                      std::vector<std::string> morphology_names,
+                                                      unsigned int options) const override {
+        auto n_morphologies = morphology_names.size();
+        std::vector<hsize_t> offsets(n_morphologies);
+        std::vector<size_t> loop_indices(n_morphologies);
+
+        for (size_t i = 0; i < n_morphologies; ++i) {
+            loop_indices[i] = i;
+
+            const auto& morph_name = morphology_names[i];
+
+            auto morph = _file.getGroup(morph_name.data());
+            auto points = morph.getDataSet("points");
+
+            auto dcpl = points.getCreatePropertyList();
+            auto layout = H5Pget_layout(dcpl.getId());
+            offsets[i] = layout == H5D_CONTIGUOUS ? points.getOffset() : size_t(-1);
+        }
+
+        std::sort(loop_indices.begin(), loop_indices.end(), [&offsets](size_t i, size_t j) {
+            return offsets[i] < offsets[j];
+        });
+
+        return std::make_shared<detail::LoadUnorderedFromLoopIndices>(std::move(collection),
+                                                                      std::move(loop_indices),
+                                                                      std::move(morphology_names),
+                                                                      options);
+    }
 
   protected:
     friend morphio::detail::CollectionImpl<HDF5ContainerCollection>;
