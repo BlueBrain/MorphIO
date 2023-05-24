@@ -183,7 +183,7 @@ private:
 
 TEST_CASE("LoadSWCMorphologyLocale", "[morphology]") {
     {
-        const auto locale = LocaleGuard(std::locale("de_DE.utf8"));
+        const auto locale = LocaleGuard(std::locale("de_CH.UTF8"));
         const morphio::Morphology m("data/simple.swc");
         REQUIRE(m.diameters().size() == 12);
     }
