@@ -160,3 +160,36 @@ TEST_CASE("CollectionMissingExtensions", "[collection]") {
                                                                           reference_path.string()));
     }
 }
+
+TEST_CASE("LoadUnordered::Iterator", "[collection]") {
+    auto collection = morphio::Collection("data/h5/v1/merged.h5");
+    auto morphology_names = std::vector<std::string>{
+        "simple", "glia", "mitochondria", "endoplasmic-reticulum", "simple-dendritric-spine"};
+
+    auto loader = collection.load_unordered<morphio::Morphology>(morphology_names);
+    auto begin = loader.begin();
+    auto k_begin = (*begin).first;
+
+    // Create a copy, and check they are at the same loop index.
+    auto it = begin;
+    REQUIRE((*it).first == (*begin).first);
+
+    // Increment the copy, postfix:
+    auto it2 = it++;
+    REQUIRE((*it2).first == (*begin).first);
+    REQUIRE((*it).first != k_begin);
+
+    // Increment a copy, prefix:
+    auto it3 = ++it2;
+    REQUIRE((*it2).first == (*it).first);
+    REQUIRE((*it2).first == (*it3).first);
+    REQUIRE((*it).first != k_begin);
+
+    // Now check that nothing incremented the original iterator `begin`.
+    REQUIRE((*begin).first == k_begin);
+
+    // Once more using assignment, not copy-construction:
+    it = begin;
+    REQUIRE((*begin).first == k_begin);
+    REQUIRE((*++it).first != k_begin);
+}

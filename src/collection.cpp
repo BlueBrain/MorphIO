@@ -7,30 +7,15 @@
 
 namespace morphio {
 
-class LoadUnorderedIteratorImpl
-{
-  public:
-    virtual ~LoadUnorderedIteratorImpl() = default;
-
-    virtual std::pair<size_t, Morphology> load() const = 0;
-    virtual std::pair<size_t, mut::Morphology> load_mut() const = 0;
-
-    virtual void advance() = 0;
-    virtual bool operator==(const LoadUnorderedIteratorImpl& other) const = 0;
-    bool operator!=(const LoadUnorderedIteratorImpl& other) const {
-        return !((*this) == other);
-    }
-};
-
 class LoadUnorderedImpl
 {
   public:
-    using Iterator = LoadUnorderedIteratorImpl;
-
     virtual ~LoadUnorderedImpl() = default;
 
-    virtual std::shared_ptr<Iterator> begin_as_shared() const = 0;
-    virtual std::shared_ptr<Iterator> end_as_shared() const = 0;
+    virtual Morphology load(size_t k) const = 0;
+    virtual mut::Morphology load_mut(size_t k) const = 0;
+
+    virtual size_t size() const = 0;
 };
 
 namespace detail {
@@ -47,49 +32,6 @@ namespace detail {
 class LoadUnorderedFromLoopIndices: public LoadUnorderedImpl
 {
   public:
-    class Iterator: public LoadUnorderedImpl::Iterator
-    {
-      public:
-        Iterator(size_t k, const LoadUnorderedFromLoopIndices& container)
-            : _k(k)
-            , _container(container) {}
-
-        std::pair<size_t, Morphology> load() const override {
-            return load_impl<Morphology>();
-        }
-
-        std::pair<size_t, mut::Morphology> load_mut() const override {
-            return load_impl<mut::Morphology>();
-        }
-
-        void advance() override {
-            ++_k;
-        }
-
-        bool operator==(const LoadUnorderedImpl::Iterator& any_other) const override {
-            if (dynamic_cast<const Iterator*>(&any_other) != nullptr) {
-                const Iterator& other = static_cast<const Iterator&>(any_other);
-                return (*this)._k == other._k;
-            }
-
-            return false;
-        }
-
-      protected:
-        template <class M>
-        std::pair<size_t, M> load_impl() const {
-            auto i = _container._loop_indices[_k];
-            const auto& morph_name = _container._morphology_names[i];
-            auto options = _container._options;
-            auto m = _container._collection.template load<M>(morph_name, options);
-            return {i, std::move(m)};
-        }
-
-      private:
-        size_t _k;
-        const LoadUnorderedFromLoopIndices& _container;
-    };
-
     LoadUnorderedFromLoopIndices(Collection collection,
                                  std::vector<size_t> loop_indices,
                                  std::vector<std::string> morphology_names,
@@ -99,12 +41,23 @@ class LoadUnorderedFromLoopIndices: public LoadUnorderedImpl
         , _morphology_names(std::move(morphology_names))
         , _options(options) {}
 
-    std::shared_ptr<LoadUnorderedImpl::Iterator> begin_as_shared() const override {
-        return std::make_shared<Iterator>(0, *this);
+    size_t size() const override {
+        return _morphology_names.size();
     }
 
-    std::shared_ptr<LoadUnorderedImpl::Iterator> end_as_shared() const override {
-        return std::make_shared<Iterator>(_morphology_names.size(), *this);
+    Morphology load(size_t k) const override {
+        return load_impl<Morphology>(k);
+    }
+
+    mut::Morphology load_mut(size_t k) const override {
+        return load_impl<mut::Morphology>(k);
+    }
+
+  protected:
+    template <class M>
+    M load_impl(size_t k) const {
+        auto i = _loop_indices[k];
+        return _collection.template load<M>(_morphology_names[i], _options);
     }
 
   private:
@@ -347,7 +300,7 @@ void Collection::close() {
 
 template <class M>
 typename LoadUnordered<M>::Iterator LoadUnordered<M>::begin() const {
-    return Iterator(_load_unordered->begin_as_shared());
+    return Iterator(_load_unordered_impl, 0);
 }
 
 template typename LoadUnordered<Morphology>::Iterator LoadUnordered<Morphology>::begin() const;
@@ -357,7 +310,7 @@ template typename LoadUnordered<mut::Morphology>::Iterator LoadUnordered<mut::Mo
 
 template <class M>
 typename LoadUnordered<M>::Iterator LoadUnordered<M>::end() const {
-    return Iterator(_load_unordered->end_as_shared());
+    return Iterator(_load_unordered_impl, _load_unordered_impl->size());
 }
 
 template typename LoadUnordered<Morphology>::Iterator LoadUnordered<Morphology>::end() const;
@@ -366,29 +319,31 @@ template typename LoadUnordered<mut::Morphology>::Iterator LoadUnordered<mut::Mo
     const;
 
 template <class M>
-LoadUnordered<M>::LoadUnordered(std::shared_ptr<LoadUnorderedImpl> load_unordered)
-    : _load_unordered(load_unordered) {}
+LoadUnordered<M>::LoadUnordered(std::shared_ptr<LoadUnorderedImpl> load_unordered_impl)
+    : _load_unordered_impl(load_unordered_impl) {}
 
 template LoadUnordered<Morphology>::LoadUnordered(
-    std::shared_ptr<LoadUnorderedImpl> load_unordered);
+    std::shared_ptr<LoadUnorderedImpl> load_unordered_impl);
 
 template LoadUnordered<mut::Morphology>::LoadUnordered(
-    std::shared_ptr<LoadUnorderedImpl> load_unordered);
+    std::shared_ptr<LoadUnorderedImpl> load_unordered_impl);
 
 template <class M>
-LoadUnordered<M>::Iterator::Iterator(std::shared_ptr<LoadUnorderedImpl::Iterator> it)
-    : _it(std::move(it)) {}
+LoadUnordered<M>::Iterator::Iterator(std::shared_ptr<LoadUnorderedImpl> load_unordered_impl,
+                                     size_t k)
+    : _k(k)
+    , _load_unordered_impl(std::move(load_unordered_impl)) {}
 
 template LoadUnordered<Morphology>::Iterator::Iterator(
-    std::shared_ptr<LoadUnorderedImpl::Iterator> it);
+    std::shared_ptr<LoadUnorderedImpl> load_unordered_impl, size_t k);
 
 template LoadUnordered<mut::Morphology>::Iterator::Iterator(
-    std::shared_ptr<LoadUnorderedImpl::Iterator> it);
+    std::shared_ptr<LoadUnorderedImpl> load_unordered_impl, size_t k);
 
 
 template <class M>
 bool LoadUnordered<M>::Iterator::operator==(const LoadUnordered::Iterator& other) const {
-    return *(*this)._it == *other._it;
+    return (*this)._k == other._k;
 }
 
 template bool LoadUnordered<Morphology>::Iterator::operator==(
@@ -409,27 +364,34 @@ template bool LoadUnordered<mut::Morphology>::Iterator::operator!=(
     const LoadUnordered::Iterator& other) const;
 
 template <class M>
-void LoadUnordered<M>::Iterator::operator++() const {
-    _it->advance();
+typename LoadUnordered<M>::Iterator& LoadUnordered<M>::Iterator::operator++() {
+    ++_k;
+    return *this;
 }
 
-template void LoadUnordered<Morphology>::Iterator::operator++() const;
+template <class M>
+typename LoadUnordered<M>::Iterator LoadUnordered<M>::Iterator::operator++(int) {
+    return LoadUnordered<M>::Iterator(_load_unordered_impl, _k++);
+}
 
-template void LoadUnordered<mut::Morphology>::Iterator::operator++() const;
+template typename LoadUnordered<Morphology>::Iterator
+LoadUnordered<Morphology>::Iterator::operator++(int);
+template typename LoadUnordered<mut::Morphology>::Iterator
+LoadUnordered<mut::Morphology>::Iterator::operator++(int);
 
 
 template <class M>
 template <class U>
 typename enable_if_mutable<U, std::pair<size_t, M>>::type LoadUnordered<M>::Iterator::operator*()
     const {
-    return _it->load_mut();
+    return {_k, std::move(_load_unordered_impl->load_mut(_k))};
 }
 
 template <class M>
 template <class U>
 typename enable_if_immutable<U, std::pair<size_t, M>>::type LoadUnordered<M>::Iterator::operator*()
     const {
-    return _it->load();
+    return {_k, std::move(_load_unordered_impl->load(_k))};
 }
 
 template typename enable_if_mutable<mut::Morphology, std::pair<size_t, mut::Morphology>>::type

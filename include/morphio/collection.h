@@ -86,7 +86,6 @@ class Collection
 };
 
 class LoadUnorderedImpl;
-class LoadUnorderedIteratorImpl;
 
 /**
  * An iterable of loop index and morphologies.
@@ -125,7 +124,7 @@ class LoadUnordered
     class Iterator
     {
       public:
-        Iterator(std::shared_ptr<LoadUnorderedIteratorImpl> it);
+        Iterator(std::shared_ptr<LoadUnorderedImpl> load_unordered_impl, size_t k);
 
         template <class U = M>
         typename enable_if_immutable<U, std::pair<size_t, M>>::type operator*() const;
@@ -133,23 +132,25 @@ class LoadUnordered
         template <class U = M>
         typename enable_if_mutable<U, std::pair<size_t, M>>::type operator*() const;
 
-        void operator++() const;
+        Iterator& operator++();
+        Iterator operator++(int);
 
         bool operator==(const Iterator& other) const;
         bool operator!=(const Iterator& other) const;
 
       private:
-        std::shared_ptr<LoadUnorderedIteratorImpl> _it;
+        size_t _k;
+        std::shared_ptr<LoadUnorderedImpl> _load_unordered_impl;
     };
 
   public:
-    LoadUnordered(std::shared_ptr<LoadUnorderedImpl> load_unordered);
+    LoadUnordered(std::shared_ptr<LoadUnorderedImpl> load_unordered_impl);
 
     Iterator begin() const;
     Iterator end() const;
 
   protected:
-    std::shared_ptr<LoadUnorderedImpl> _load_unordered;
+    std::shared_ptr<LoadUnorderedImpl> _load_unordered_impl;
 };
 
 template class LoadUnordered<morphio::Morphology>;
