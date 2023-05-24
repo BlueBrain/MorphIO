@@ -1,14 +1,11 @@
 #include "morphologySWC.h"
 #include "utils.h"
 
-#include <clocale>  // newlocale
 #include <cstdlib>
 
-#include <cctype>         // std::isspace
 #include <cstdint>        // uint32_t
 #include <memory>         // std::shared_ptr
 #include <sstream>        // std::stringstream
-#include <stdexcept>
 #include <string>         // std::string
 #include <unordered_map>  // std::unordered_map
 #include <vector>         // std::vector
