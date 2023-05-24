@@ -487,6 +487,11 @@ def test_three_point_soma():
     assert n.soma_type == SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
 
 
+def test_trailing_space():
+    n = Morphology(os.path.join(_path, 'simple-trailing-space.swc'))
+    assert n.points.shape == (3, 3)
+
+
 def test_zero_diameter():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
@@ -499,6 +504,7 @@ def test_zero_diameter():
             Morphology(content, extension='swc')
             assert strip_color_codes(err.getvalue().strip()) == \
                 '$STRING$:4:warning\nWarning: zero diameter in file'
+
 
 def test_version():
     assert_array_equal(Morphology(os.path.join(_path, 'simple.swc')).version,
@@ -521,3 +527,4 @@ def test_throw_on_negative_id():
                  3 2 0 0 0 3.0  2'''
     with pytest.raises(RawDataError, match='The ID assigned to this line is negative'):
         Morphology(content, extension='swc')
+
