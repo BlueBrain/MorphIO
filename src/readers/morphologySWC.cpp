@@ -75,7 +75,7 @@ morphio::readers::Sample readSWCLine(const std::string& line,
         point = read_float();
     }
 
-    ret.diameter = 2.f * read_float();
+    ret.diameter = 2 * read_float();
 
     ret.parentId = static_cast<int>(read_int(false));
 

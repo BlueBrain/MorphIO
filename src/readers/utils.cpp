@@ -2,26 +2,33 @@
 
 namespace morphio {
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
-StringToNumber::StringToNumber: locale(_create_locale(LC_ALL, "C")) {}
+#define freelocale _free_locale
+#define strtol_l _strtol_l
 
-StringToNumber::~StringToNumber() {
-    _free_locale(locale);
-}
+#ifdef MORPHIO_USE_DOUBLE
+#define strto_float _strtod_l
+#else
+#define strto_float _strtof_l
+#endif
 
-int64_t StringToNumber::toInt(const char* pos, const char** endpos, int base) const {
-    return _strtol_l(pos, const_cast<char**>(endpos), base, locale);
-}
+#else  // not WIN32
 
-floatType StringToNumber::toFloat(const char* pos, const char** endpos) const {
-    floatType ret = _strtof_l(pos, const_cast<char**>(endpos), locale);
-    if (ret == 0 && pos == *endpos) {
-        throw std::invalid_argument("could not parse float");
-    }
-    return ret;
+#ifdef MORPHIO_USE_DOUBLE
+#define strto_float strtod_l
+#else
+#define strto_float strtof_l
+#endif
+
+#endif
+
+StringToNumber::StringToNumber()
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+    : locale(_create_locale(LC_ALL, "C")) {
 }
 #else
-StringToNumber::StringToNumber()
-    : locale(newlocale(LC_ALL, "C", nullptr)) {}
+    : locale(newlocale(LC_ALL, "C", nullptr)) {
+}
+#endif
 
 StringToNumber::~StringToNumber() {
     freelocale(locale);
@@ -45,7 +52,7 @@ std::tuple<int64_t, size_t> StringToNumber::toInt(const std::string&s, size_t of
 std::tuple<floatType, size_t> StringToNumber::toFloat(const std::string&s, size_t offset) const {
     const char *pos = &s[offset];
     const char *endpos = &s[s.size()];
-    floatType ret = strtof_l(pos, const_cast<char**>(&endpos), locale);
+    floatType ret = strto_float(pos, const_cast<char**>(&endpos), locale);
 
     auto new_offset = static_cast<size_t>(endpos - s.data());
 
@@ -56,10 +63,16 @@ std::tuple<floatType, size_t> StringToNumber::toFloat(const std::string&s, size_
     return {ret, new_offset};
 }
 
-#endif
-
 StringToNumber& getStringToNumber() {
     static StringToNumber stn;
     return stn;
 }
+
+#if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+#undef freelocale
+#undef strtol_l
+#endif
+
+#undef strto_float
+
 }  // namespace morphio
