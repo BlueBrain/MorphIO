@@ -38,28 +38,28 @@ morphio::readers::Sample readSWCLine(const std::string& line,
     morphio::readers::Sample ret;
     ret.lineNumber = lineNumber;
 
-    const char* pos = line.data();
-    const char* const endpos = &pos[line.size()];
-    const char* new_endpos = endpos;
+    size_t pos = 0;
+    size_t endpos = 0;
 
     auto read_int =
-        [&pos, &new_endpos, endpos, lineNumber, &err, &stn](bool check_end = true) -> int64_t {
-        const int base = 10;
-        int64_t v = stn.toInt(pos, &new_endpos, base);
-        if (check_end && new_endpos == endpos) {
+        [&](bool check_end = true) -> int64_t {
+        auto parsed = stn.toInt(line, pos);
+        int64_t v = std::get<0>(parsed);
+        endpos = std::get<1>(parsed);
+        if (check_end && line.size() == endpos) {
             throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
         }
-        pos = new_endpos;
-        new_endpos = endpos;  // reset the end position to the end of the buffer
+        pos = endpos;
         return v;
     };
-    auto read_float = [&pos, &new_endpos, endpos, lineNumber, &err, &stn]() -> floatType {
-        floatType v = stn.toFloat(pos, &new_endpos);
-        if (new_endpos == endpos) {
+    auto read_float = [&]() -> floatType {
+        auto parsed = stn.toFloat(line, pos);
+        floatType v = std::get<0>(parsed);
+        endpos = std::get<1>(parsed);
+        if (line.size() == endpos) {
             throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
         }
-        pos = new_endpos;
-        new_endpos = endpos;  // reset the end position to the end of the buffer
+        pos = endpos;
         return v;
     };
 
@@ -79,11 +79,9 @@ morphio::readers::Sample readSWCLine(const std::string& line,
 
     ret.parentId = static_cast<int>(read_int(false));
 
-    while (new_endpos <= endpos && static_cast<bool>(::isspace(*new_endpos))) {
-        new_endpos++;
-    }
+    std::size_t end = line.find_first_not_of("\n\r\t ", pos);
 
-    if (new_endpos != endpos && *new_endpos != '#') {
+    if (end != std::string::npos && line[end] != '#') {
         throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
     }
 

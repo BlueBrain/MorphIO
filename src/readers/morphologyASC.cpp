@@ -83,8 +83,7 @@ class NeurolucidaParser
         for (unsigned int i = 0; i < 4; i++) {
             const std::string s = lex.consume()->str();
             try {
-                const char* endpos = &s.data()[s.size()];
-                point[i] = stn.toFloat(s.data(), &endpos);
+                point[i] = std::get<0>(stn.toFloat(s, 0));
             } catch (const std::invalid_argument&) {
                 throw RawDataError(err_.ERROR_PARSING_POINT(lex.line_num(), s));
             }
