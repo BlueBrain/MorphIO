@@ -26,7 +26,7 @@ StringToNumber::StringToNumber()
     : locale(_create_locale(LC_ALL, "C")) {
 }
 #else
-    : locale(newlocale(LC_ALL, "C", nullptr)) {
+    : locale(newlocale(LC_NUMERIC_MASK, "POSIX", nullptr)) {
 }
 #endif
 
