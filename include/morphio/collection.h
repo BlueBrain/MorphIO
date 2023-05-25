@@ -153,9 +153,11 @@ class LoadUnordered
     std::shared_ptr<LoadUnorderedImpl> _load_unordered_impl;
 };
 
-template class LoadUnordered<morphio::Morphology>;
+extern template class LoadUnordered<Morphology>;
+extern template class LoadUnordered<mut::Morphology>;
 
-template class LoadUnordered<morphio::mut::Morphology>;
+extern template class LoadUnordered<Morphology>::Iterator;
+extern template class LoadUnordered<mut::Morphology>::Iterator;
 
 extern template typename enable_if_immutable<Morphology, std::pair<size_t, Morphology>>::type
     LoadUnordered<Morphology>::Iterator::operator*<Morphology>() const;
