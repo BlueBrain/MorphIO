@@ -73,6 +73,8 @@ class Collection
      *
      * This is the suggested order in which one should load the morphologies to
      * minimize seeking within the file.
+     *
+     * Note: This API is 'experimental', meaning it might change in the future.
      */
     std::vector<size_t> argsort(const std::vector<std::string>& morphology_names) const;
 
@@ -124,6 +126,8 @@ class LoadUnorderedImpl;
  * `collection`. Internally a shallow copy of the original `collection` is
  * stored inside of and kept alive for the life time of the `LoadUnordered`
  * object.
+ *
+ * Note: This API is 'experimental', meaning it might change in the future.
  */
 template <class M>
 class LoadUnordered

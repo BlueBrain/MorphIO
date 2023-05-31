@@ -366,12 +366,17 @@ iteration `k` of the original loop.
 The iterable returned by `Collection.load_unordered` should only be used while
 `collection` is valid, e.g. within its context or before calling
 `Collection.close`.
+
+Note: This API is 'experimental', meaning it might change in the future.
 )")
 
         .def("argsort",
              &morphio::Collection::argsort,
              "morphology_names"_a,
-             "Argsort `morphology_names` by optimal access order.")
+             R"(Argsort `morphology_names` by optimal access order.
+
+Note: This API is 'experimental', meaning it might change in the future.
+)")
         .def("__enter__", [](morphio::Collection* collection) { return collection; })
         .def("__exit__",
              [](morphio::Collection* collection,
