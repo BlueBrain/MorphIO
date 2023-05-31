@@ -28,8 +28,6 @@ bool _ignoreLine(const std::string& line) {
 morphio::readers::Sample readSWCLine(const std::string& line,
                                      unsigned int lineNumber,
                                      const morphio::readers::ErrorMessages& err) {
-    using morphio::floatType;
-
     const auto& stn = morphio::getStringToNumber();
 
     morphio::readers::Sample ret;
@@ -49,9 +47,9 @@ morphio::readers::Sample readSWCLine(const std::string& line,
         pos = endpos;
         return v;
     };
-    auto read_float = [&]() -> floatType {
+    auto read_float = [&]() -> morphio::floatType {
         auto parsed = stn.toFloat(line, pos);
-        floatType v = std::get<0>(parsed);
+        morphio::floatType v = std::get<0>(parsed);
         endpos = std::get<1>(parsed);
         if (line.size() == endpos) {
             throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
@@ -64,6 +62,7 @@ morphio::readers::Sample readSWCLine(const std::string& line,
     if (id < 0) {
         throw morphio::RawDataError(err.ERROR_NEGATIVE_ID(lineNumber));
     }
+
     ret.id = static_cast<unsigned int>(id);
 
     ret.type = static_cast<morphio::SectionType>(read_int());
@@ -119,11 +118,10 @@ class SWCBuilder
                 throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type));
             }
 
-            if (samples.count(sample.id) > 0) {
+            if (!samples.insert({sample.id, sample}).second) {
                 throw RawDataError(err.ERROR_REPEATED_ID(samples[sample.id], sample));
             }
 
-            samples[sample.id] = sample;
             children[sample.parentId].push_back(sample.id);
 
             if (sample.type == SECTION_SOMA) {

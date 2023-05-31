@@ -16,12 +16,9 @@ namespace {
    Contain header info about the root S-exps
 **/
 struct Header {
-    Header()
-        : token(static_cast<Token>(+Token::STRING))
-        , parent_id(-1) {}
-    Token token;
+    Token token = static_cast<Token>(+Token::STRING);
     std::string label;
-    int32_t parent_id;
+    int32_t parent_id = -1;
 };
 
 bool is_eof(Token type) {
