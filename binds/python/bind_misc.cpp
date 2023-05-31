@@ -367,6 +367,11 @@ The iterable returned by `Collection.load_unordered` should only be used while
 `collection` is valid, e.g. within its context or before calling
 `Collection.close`.
 )")
+
+        .def("argsort",
+             &morphio::Collection::argsort,
+             "morphology_names"_a,
+             "Argsort `morphology_names` by optimal access order.")
         .def("__enter__", [](morphio::Collection* collection) { return collection; })
         .def("__exit__",
              [](morphio::Collection* collection,

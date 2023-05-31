@@ -69,6 +69,14 @@ class Collection
                                     unsigned int options = NO_MODIFIER) const;
 
     /**
+     * Returns the reordered loop indices.
+     *
+     * This is the suggested order in which one should load the morphologies to
+     * minimize seeking within the file.
+     */
+    std::vector<size_t> argsort(const std::vector<std::string>& morphology_names) const;
+
+    /**
      * Close the collection.
      *
      * Note that `morphio::Collection` uses RAII. Therefore, the usual

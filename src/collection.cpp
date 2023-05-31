@@ -82,6 +82,8 @@ class CollectionImpl
     virtual std::shared_ptr<LoadUnorderedImpl> load_unordered(Collection collection,
                                                               std::vector<std::string> morph_name,
                                                               unsigned int options) const = 0;
+
+    virtual std::vector<size_t> argsort(const std::vector<std::string>& morphology_names) const = 0;
 };
 
 namespace detail {
@@ -100,6 +102,16 @@ class CollectionImpl: public morphio::CollectionImpl
                                       unsigned int options) const override {
         const auto& derived = static_cast<const Derived&>(*this);
         return derived.template load_impl<mut::Morphology>(morph_name, options);
+    }
+
+    std::shared_ptr<LoadUnorderedImpl> load_unordered(Collection collection,
+                                                      std::vector<std::string> morphology_names,
+                                                      unsigned int options) const override {
+        auto loop_indices = argsort(morphology_names);
+        return std::make_shared<detail::LoadUnorderedFromLoopIndices>(std::move(collection),
+                                                                      std::move(loop_indices),
+                                                                      std::move(morphology_names),
+                                                                      options);
     }
 };
 }  // namespace detail
@@ -130,19 +142,14 @@ class DirectoryCollection: public morphio::detail::CollectionImpl<DirectoryColle
         throw MorphioError("Morphology '" + morph_name + "' not found in: " + _dirname);
     }
 
-    std::shared_ptr<LoadUnorderedImpl> load_unordered(Collection collection,
-                                                      std::vector<std::string> morphology_names,
-                                                      unsigned int options) const override {
+    std::vector<size_t> argsort(const std::vector<std::string>& morphology_names) const override {
         auto n_morphologies = morphology_names.size();
         std::vector<size_t> loop_indices(n_morphologies);
         for (size_t i = 0; i < n_morphologies; ++i) {
             loop_indices[i] = i;
         }
 
-        return std::make_shared<detail::LoadUnorderedFromLoopIndices>(std::move(collection),
-                                                                      std::move(loop_indices),
-                                                                      std::move(morphology_names),
-                                                                      options);
+        return loop_indices;
     }
 
   private:
@@ -174,9 +181,7 @@ class HDF5ContainerCollection: public morphio::detail::CollectionImpl<HDF5Contai
     HDF5ContainerCollection& operator=(const HDF5ContainerCollection&) = delete;
     HDF5ContainerCollection& operator=(HDF5ContainerCollection&&) = delete;
 
-    std::shared_ptr<LoadUnorderedImpl> load_unordered(Collection collection,
-                                                      std::vector<std::string> morphology_names,
-                                                      unsigned int options) const override {
+    std::vector<size_t> argsort(const std::vector<std::string>& morphology_names) const override {
         auto n_morphologies = morphology_names.size();
         std::vector<hsize_t> offsets(n_morphologies);
         std::vector<size_t> loop_indices(n_morphologies);
@@ -198,10 +203,7 @@ class HDF5ContainerCollection: public morphio::detail::CollectionImpl<HDF5Contai
             return offsets[i] < offsets[j];
         });
 
-        return std::make_shared<detail::LoadUnorderedFromLoopIndices>(std::move(collection),
-                                                                      std::move(loop_indices),
-                                                                      std::move(morphology_names),
-                                                                      options);
+        return loop_indices;
     }
 
   protected:
@@ -269,6 +271,14 @@ typename enable_if_mutable<M, M>::type Collection::load(const std::string& morph
                                                         unsigned int options) const {
     if (_collection != nullptr) {
         return _collection->load_mut(morph_name, options);
+    }
+
+    throw std::runtime_error("The collection has been closed.");
+}
+
+std::vector<size_t> Collection::argsort(const std::vector<std::string>& morphology_names) const {
+    if (_collection != nullptr) {
+        return _collection->argsort(morphology_names);
     }
 
     throw std::runtime_error("The collection has been closed.");

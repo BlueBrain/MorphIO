@@ -97,8 +97,8 @@ static void check_loop_indices(std::vector<size_t>& loop_indices, size_t n) {
     }
 }
 
-static void check_collection_load_unordered(const std::string& collection_dir) {
-    morphio::Collection collection(collection_dir);
+static void check_collection_load_unordered(const std::string& collection_path) {
+    morphio::Collection collection(collection_path);
 
     auto morphology_names = std::vector<std::string>{
         "simple", "glia", "mitochondria", "endoplasmic-reticulum", "simple-dendritric-spine"};
@@ -128,6 +128,26 @@ TEST_CASE("Collection::load_unordered directory", "[collection]") {
 
 TEST_CASE("Collection::load_unordered merged", "[collection]") {
     check_collection_load_unordered("data/h5/v1/merged.h5");
+}
+
+static void check_collection_argsort(const std::string& collection_path) {
+    morphio::Collection collection(collection_path);
+
+    auto morphology_names = std::vector<std::string>{"simple",
+                                                     "glia",
+                                                     "endoplasmic-reticulum",
+                                                     "simple-dendritric-spine"};
+
+    auto loop_indices = collection.argsort(morphology_names);
+    check_loop_indices(loop_indices, morphology_names.size());
+}
+
+TEST_CASE("Collection::argsort directory", "[collection]") {
+    check_collection_argsort("data/h5/v1");
+}
+
+TEST_CASE("Collection::argsort merged", "[collection]") {
+    check_collection_argsort("data/h5/v1/merged.h5");
 }
 
 TEST_CASE("CollectionMissingExtensions", "[collection]") {

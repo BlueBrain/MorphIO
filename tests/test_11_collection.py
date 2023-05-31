@@ -62,3 +62,16 @@ def test_container_unordered(collection_path):
             sorted(loop_indices),
             np.arange(len(morphology_names))
         )
+
+
+@pytest.mark.parametrize("collection_path", COLLECTION_PATHS)
+def test_container_unordered(collection_path):
+    with morphio.Collection(collection_path) as collection:
+        morphology_names = available_morphologies()
+        morphology_names = morphology_names[1:]
+
+        loop_indices = collection.argsort(morphology_names)
+        np.testing.assert_array_equal(
+            sorted(loop_indices),
+            np.arange(len(morphology_names))
+        )
