@@ -1,14 +1,11 @@
-import tempfile
-from collections import OrderedDict
-
 import numpy as np
 from numpy import testing as npt
 from pathlib import Path
 
 import morphio
-from morphio import CellFamily, IterType, MitochondriaPointLevel, MorphioError
+from morphio import CellFamily, IterType, MitochondriaPointLevel
 from morphio import Morphology as ImmutableMorphology
-from morphio import PointLevel, RawDataError, SectionBuilderError, SectionType, ostream_redirect, PostSynapticDensity
+from morphio import PointLevel, SectionType, ostream_redirect
 from morphio.mut import GlialCell, Morphology, DendriticSpine
 import pytest
 from numpy.testing import assert_array_equal
@@ -47,13 +44,15 @@ def test_point_level():
     assert a.points == [[1, 2, 3]]
     assert a.diameters == [2]
 
-    with pytest.raises(SectionBuilderError, match='Point vector have size: 2 while Diameter vector has size: 1'):
+    with pytest.raises(morphio.SectionBuilderError,
+                       match='Point vector have size: 2 while Diameter vector has size: 1'):
         PointLevel([[1, 2, 3],
                     [1, 2, 3]],
                    [2],
                    [])
 
-    with pytest.raises(SectionBuilderError, match='Point vector have size: 2 while Perimeter vector has size: 1'):
+    with pytest.raises(morphio.SectionBuilderError,
+                       match='Point vector have size: 2 while Perimeter vector has size: 1'):
         PointLevel([[1, 2, 3],
                     [1, 2, 3]],
                    [2, 3],
@@ -61,11 +60,11 @@ def test_point_level():
 
 
 def test_connectivity():
-    cells = OrderedDict({
+    cells = {
         'asc': Morphology(Path(DATA_DIR, "simple.asc")),
         'swc': Morphology(Path(DATA_DIR, "simple.swc")),
         'h5': Morphology(Path(DATA_DIR, "h5/v1/simple.h5")),
-    })
+    }
 
     for cell in cells:
         assert cells[cell].connectivity == {-1: [0, 3], 0: [1, 2], 3: [4, 5]}
@@ -374,7 +373,8 @@ def test_non_C_nparray():
     section.points = points
     assert_array_equal(section.points, points)
 
-    with pytest.raises(MorphioError, match=r'Wrong array shape. Expected: \(X, 3\), got: \(3, 2\)'):
+    with pytest.raises(morphio.MorphioError,
+                       match=r'Wrong array shape. Expected: \(X, 3\), got: \(3, 2\)'):
         section.points = points.T
 
     non_standard_stride = np.asfortranarray(points)
@@ -474,7 +474,7 @@ def test_from_pathlib():
     assert len(neuron.root_sections) == 2
 
 
-def test_endoplasmic_reticulum():
+def test_endoplasmic_reticulum(tmp_path):
     neuron = Morphology(DATA_DIR / "simple.asc")
     reticulum = neuron.endoplasmic_reticulum
     assert len(reticulum.section_indices) == 0
@@ -492,11 +492,10 @@ def test_endoplasmic_reticulum():
     assert_array_equal(reticulum.surface_areas, [3, 3])
     assert_array_equal(reticulum.filament_counts, [4, 4])
 
-    with tempfile.TemporaryDirectory('test-endoplasmic-reticulum') as folder:
-        path = Path(folder, 'with-reticulum.h5')
-        neuron.write(path)
+    path = tmp_path / 'with-reticulum.h5'
+    neuron.write(path)
+    neuron = Morphology(path)
 
-        neuron = Morphology(path)
     reticulum = neuron.endoplasmic_reticulum
     assert_array_equal(reticulum.section_indices, [1, 1])
     assert_array_equal(reticulum.volumes, [2, 2])
@@ -533,9 +532,12 @@ def test_remove_unifurcations():
     with captured_output() as (_, err):
         with ostream_redirect():
             m.remove_unifurcations()
-            assert (err.getvalue().strip() ==
-                         'Warning: while appending section: 2 to parent: 0\nThe section first point should be parent section last point: \n        : X Y Z Diameter\nparent last point :[2.000000, 0.000000, 0.000000, 2.000000]\nchild first point :[2.000000, 1.000000, 0.000000, 2.000000]')
-
+            assert err.getvalue().strip() == (
+                'Warning: while appending section: 2 to parent: 0\n'
+                'The section first point should be parent section last point: \n'
+                '        : X Y Z Diameter\n'
+                'parent last point :[2.000000, 0.000000, 0.000000, 2.000000]\n'
+                'child first point :[2.000000, 1.000000, 0.000000, 2.000000]')
 
 def test_remove_rootsection():
     morpho = Morphology(DATA_DIR / 'single_point_root.asc')
@@ -568,26 +570,24 @@ def test_glia():
     g = GlialCell(DATA_DIR / 'astrocyte.h5')
     assert g.cell_family == CellFamily.GLIA
 
-    with pytest.raises(RawDataError):
+    with pytest.raises(morphio.RawDataError):
         GlialCell(DATA_DIR / 'simple.swc')
-    with pytest.raises(RawDataError):
+    with pytest.raises(morphio.RawDataError):
         GlialCell(DATA_DIR / 'h5/v1/simple.h5')
 
 
-def test_glia_round_trip():
-    with tempfile.TemporaryDirectory() as folder:
-        g = GlialCell(Path(DATA_DIR, 'astrocyte.h5'))
-        filename = Path(folder, 'glial-cell.h5')
-        g.write(filename)
-        g2 = GlialCell(filename)
-        assert len(g.sections) == len(g2.sections)
+def test_glia_round_trip(tmp_path):
+    g = GlialCell(Path(DATA_DIR, 'astrocyte.h5'))
+    filename = tmp_path / 'glial-cell.h5'
+    g.write(filename)
+    g2 = GlialCell(filename)
+    assert len(g.sections) == len(g2.sections)
 
 def test_dendritic_spine():
     d = DendriticSpine()
     assert d.cell_family == CellFamily.SPINE
 
-    h5v1 = DATA_DIR / "h5/v1/"
-    d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
+    d = DendriticSpine(DATA_DIR / "h5/v1/" / 'simple-dendritric-spine.h5')
     assert d.cell_family == CellFamily.SPINE
 
     psd = d.post_synaptic_density
@@ -596,54 +596,50 @@ def test_dendritic_spine():
     assert psd[0].segment_id == 0
     assert psd[0].offset == pytest.approx(0.8525)
 
-    with pytest.raises(RawDataError):
+    with pytest.raises(morphio.RawDataError):
         DendriticSpine(DATA_DIR / 'simple.swc')
 
-    with pytest.raises(RawDataError):
+    with pytest.raises(morphio.RawDataError):
         DendriticSpine(DATA_DIR / 'h5/v1/simple.h5')
 
 
-def test_dendritic_spine_round_trip():
-    with tempfile.TemporaryDirectory() as folder:
-        h5v1 = DATA_DIR / "h5/v1/"
-        d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
-        filename = Path(folder, 'test-dendritic-spine.h5')
-        d.write(filename)
-        d2 = DendriticSpine(filename)
+def test_dendritic_spine_round_trip(tmp_path):
+    d = DendriticSpine(DATA_DIR / "h5/v1/" / 'simple-dendritric-spine.h5')
+    filename = tmp_path / 'test-dendritic-spine.h5'
+    d.write(filename)
+    d2 = DendriticSpine(filename)
 
-        assert len(d.sections) == len(d2.sections)
-        assert len(d.post_synaptic_density) == len(d2.post_synaptic_density)
+    assert len(d.sections) == len(d2.sections)
+    assert len(d.post_synaptic_density) == len(d2.post_synaptic_density)
 
-        d2 = DendriticSpine(filename)
-        d2.post_synaptic_density = (d2.post_synaptic_density +
-                                    d2.post_synaptic_density +
-                                    [PostSynapticDensity(1, 2, 3.3)])
-        d2.write(filename)
+    d2 = DendriticSpine(filename)
+    d2.post_synaptic_density = (d2.post_synaptic_density +
+                                d2.post_synaptic_density +
+                                [morphio.PostSynapticDensity(1, 2, 3.3)])
+    d2.write(filename)
 
-        d3 = DendriticSpine(filename)
-        assert len(d2.sections) == len(d3.sections)
-        assert len(d2.post_synaptic_density) == len(d3.post_synaptic_density)
+    d3 = DendriticSpine(filename)
+    assert len(d2.sections) == len(d3.sections)
+    assert len(d2.post_synaptic_density) == len(d3.post_synaptic_density)
 
-        psd = d3.post_synaptic_density
-        assert len(psd) == 2 + 2 + 1
-        assert psd[-1].section_id == 1
-        assert psd[-1].segment_id == 2
-        assert psd[-1].offset == pytest.approx(3.3)
+    psd = d3.post_synaptic_density
+    assert len(psd) == 2 + 2 + 1
+    assert psd[-1].section_id == 1
+    assert psd[-1].segment_id == 2
+    assert psd[-1].offset == pytest.approx(3.3)
 
 
-def test_dendritic_spine_round_trip_empty_postsynaptic_density():
-    h5v1 = DATA_DIR / "h5/v1/"
-    with tempfile.TemporaryDirectory() as folder:
-        d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
-        assert d.cell_family == CellFamily.SPINE
+def test_dendritic_spine_round_trip_empty_postsynaptic_density(tmp_path):
+    d = DendriticSpine(DATA_DIR / "h5/v1/" / 'simple-dendritric-spine.h5')
+    assert d.cell_family == CellFamily.SPINE
 
-        d.post_synaptic_density = []
+    d.post_synaptic_density = []
 
-        filename = Path(folder, 'test-empty-spine.h5')
-        d.write(filename)
+    filename = tmp_path / 'test-empty-spine.h5'
+    d.write(filename)
 
-        d2 = DendriticSpine(filename)
-        assert d.post_synaptic_density == d2.post_synaptic_density
+    d2 = DendriticSpine(filename)
+    assert d.post_synaptic_density == d2.post_synaptic_density
 
 
 def _get_section():
