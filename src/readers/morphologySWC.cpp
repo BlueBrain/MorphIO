@@ -29,6 +29,14 @@ public:
       (void) contents_.c_str();
   }
 
+  bool done() const noexcept {
+      return pos_ >= contents_.size();
+  }
+
+  size_t lineNumber() const noexcept {
+      return line_;
+  }
+
     void skip_to(char value){
         std::size_t pos = contents_.find_first_of(value, pos_);
         if(pos == std::string::npos) {
@@ -44,8 +52,6 @@ public:
         }
         pos_ = pos;
     }
-
-    size_t lineNumber() const noexcept {return line_;}
 
     void advance_to_number() {
         while (consume_line_and_trailing_comments()) {
@@ -77,12 +83,8 @@ public:
         return std::get<0>(parsed);
     }
 
-    bool done() const noexcept {
-        return pos_ >= contents_.size();
-    }
-
     bool consume_line_and_trailing_comments() {
-        bool ret = false;
+        bool found_newline = false;
 
         advance_to_non_whitespace();
         while(!done() && (contents_.at(pos_) == '#' || contents_.at(pos_) == '\n')){
@@ -93,12 +95,12 @@ public:
                 case '\n':
                     ++line_;
                     ++pos_;
-                    ret = true;
+                    found_newline = true;
                     break;
             }
             advance_to_non_whitespace();
         }
-        return ret || done();
+        return found_newline || done();
     }
 
 private:
@@ -191,9 +193,10 @@ class SWCBuilder
             return;
         }
 
-        if (sample.parentId != -1 && !children[static_cast<int>(sample.id)].empty()) {
+        int sample_id = static_cast<int>(sample.id) if (sample.parentId != -1 &&
+                                                        !children[sample_id].empty()) {
             std::vector<Sample> soma_bifurcations;
-            for (auto id : children[static_cast<int>(sample.id)]) {
+            for (auto id : children[sample_id]) {
                 if (samples[id].type == SECTION_SOMA) {
                     soma_bifurcations.push_back(samples[id]);
                 } else {
@@ -297,13 +300,6 @@ class SWCBuilder
         }
     }
 
-    void raiseIfNonConform(const Sample& sample) {
-        raiseIfSelfParent(sample);
-        raiseIfBrokenSoma(sample);
-        raiseIfNoParent(sample);
-        warnIfZeroDiameter(sample);
-    }
-
     void _checkNeuroMorphoSoma(const Sample& root, const std::vector<Sample>& _children) {
         floatType x = root.point[0];
         floatType y = root.point[1];
@@ -385,7 +381,10 @@ class SWCBuilder
 
         for (const auto& sample_pair : samples) {
             const auto& sample = sample_pair.second;
-            raiseIfNonConform(sample);
+            raiseIfSelfParent(sample);
+            raiseIfBrokenSoma(sample);
+            raiseIfNoParent(sample);
+            warnIfZeroDiameter(sample);
         }
 
         checkSoma();
