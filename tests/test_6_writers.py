@@ -1,18 +1,14 @@
 import h5py
 import numpy as np
 import pytest
-from morphio import (
-    MitochondriaPointLevel,
-    PointLevel,
-    SectionBuilderError,
-    SectionType,
-    WriterError,
-    ostream_redirect,
-)
-from morphio import Morphology as ImmutMorphology
-from morphio.mut import Morphology
 from numpy.testing import assert_array_equal
 from utils import captured_output
+
+from morphio import MitochondriaPointLevel
+from morphio import Morphology as ImmutMorphology
+from morphio import (PointLevel, SectionBuilderError, SectionType, WriterError,
+                     ostream_redirect)
+from morphio.mut import Morphology
 
 
 def test_write_empty_file(tmp_path):
@@ -336,3 +332,31 @@ def test_write_custom_property__throws(tmp_path):
 
     with pytest.raises(WriterError):
         morpho.write(tmp_path / "test_write.asc")
+
+
+def test_write_soma_types(tmp_path):
+    morph = Morphology()
+    morph.soma.points = [[0, 0, 0]]
+    morph.soma.diameters = [2]
+    # by default, soma start off as SomaType.SOMA_UNDEFINED
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            morph.write(tmp_path / "SOMA_UNDEFINED.asc")
+    assert err.getvalue().strip() == (
+        'Soma must be a contour for ASC and H5: '
+        'see https://github.com/BlueBrain/MorphIO/issues/457')
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            morph.write(tmp_path / "SOMA_UNDEFINED.h5")
+    assert err.getvalue().strip() == (
+        'Soma must be a contour for ASC and H5: '
+        'see https://github.com/BlueBrain/MorphIO/issues/457')
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            morph.write(tmp_path / "SOMA_UNDEFINED.swc")
+    assert err.getvalue().strip() == (
+        'Soma must be stacked cylinders or a point: '
+        'see https://github.com/BlueBrain/MorphIO/issues/457')

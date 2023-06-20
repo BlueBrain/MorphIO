@@ -244,6 +244,12 @@ class ErrorMessages
     /** Wrong root point warning message */
     std::string WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const;
 
+    /**  Soma must be a contour for ASC and H5 */
+    std::string WARNING_SOMA_NON_CONTOUR() const;
+
+    /* Soma must be stacked cylinders or a point */
+    std::string WARNING_SOMA_NON_CYLINDER_OR_POINT() const;
+
   private:
     std::string _uri;
 };

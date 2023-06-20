@@ -391,6 +391,20 @@ std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& c
     return oss.str();
 }
 
+std::string ErrorMessages::WARNING_SOMA_NON_CONTOUR() const {
+    return errorMsg(0,
+                    ErrorLevel::WARNING,
+                    "Soma must be a contour for ASC and H5: see "
+                    "https://github.com/BlueBrain/MorphIO/issues/457");
+}
+
+std::string ErrorMessages::WARNING_SOMA_NON_CYLINDER_OR_POINT() const {
+    return errorMsg(0,
+                    ErrorLevel::WARNING,
+                    "Soma must be stacked cylinders or a point: see "
+                    "https://github.com/BlueBrain/MorphIO/issues/457");
+}
+
 }  // namespace readers
 
 }  // namespace morphio

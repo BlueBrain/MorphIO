@@ -30,11 +30,13 @@ enum Warning {
     NO_SOMA_FOUND,         //!< No soma found in a file
     DISCONNECTED_NEURITE,  //!< Found a disconnected neurite in a morphology
     WRONG_DUPLICATE,       //!< A wrong duplicate point in a section
-    APPENDING_EMPTY_SECTION,  //!< Appending of an empty section
-    WRONG_ROOT_POINT,         //!< A wrong root point of a neurite in the case of 3 points soma
-    ONLY_CHILD,               //!< Single child sections are not allowed in SWC format
-    WRITE_EMPTY_MORPHOLOGY,   //!< Writing empty morphology
-    ZERO_DIAMETER             //!< Zero section diameter
+    APPENDING_EMPTY_SECTION,     //!< Appending of an empty section
+    WRONG_ROOT_POINT,            //!< A wrong root point of a neurite in the case of 3 points soma
+    ONLY_CHILD,                  //!< Single child sections are not allowed in SWC format
+    WRITE_EMPTY_MORPHOLOGY,      //!< Writing empty morphology
+    ZERO_DIAMETER,               //!< Zero section diameter
+    SOMA_NON_CONTOUR,            //!< Soma must be a contour for ASC and H5
+    SOMA_NON_CYLINDER_OR_POINT,  //!< Soma must be stacked cylinders or a point
 };
 
 enum AnnotationType {

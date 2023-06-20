@@ -104,6 +104,11 @@ void swc(const Morphology& morphology, const std::string& filename) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
+    } else if (soma->type() != SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
+               soma->type() != SomaType::SOMA_CYLINDERS ||
+               soma->type() != SomaType::SOMA_SINGLE_POINT) {
+        printError(Warning::SOMA_NON_CYLINDER_OR_POINT,
+                   readers::ErrorMessages().WARNING_SOMA_NON_CYLINDER_OR_POINT());
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
@@ -214,6 +219,8 @@ void asc(const Morphology& morphology, const std::string& filename) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
+    } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
+        printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
@@ -376,6 +383,8 @@ void h5(const Morphology& morpho, const std::string& filename) {
             return;
         }
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
+        printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
