@@ -500,7 +500,11 @@ void bind_mutable_methods(mutable_binding_classes& mutable_classes) {
                 soma->diameters() = _diameters.cast<std::vector<morphio::floatType>>();
             },
             "Returns the diameters of all soma points")
-        .def_property_readonly("type", &morphio::mut::Soma::type, "Returns the soma type")
+        .def_property(
+            "type",
+            [](morphio::mut::Soma* soma) { return soma->type(); },
+            [](morphio::mut::Soma* soma, morphio::SomaType type) { soma->type() = type; },
+            "Returns the soma type")
         .def_property_readonly("surface",
                                &morphio::mut::Soma::surface,
                                "Returns the soma surface\n\n"

@@ -104,9 +104,9 @@ void swc(const Morphology& morphology, const std::string& filename) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
-    } else if (soma->type() != SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
-               soma->type() != SomaType::SOMA_CYLINDERS ||
-               soma->type() != SomaType::SOMA_SINGLE_POINT) {
+    } else if (!(soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
+                 soma->type() == SomaType::SOMA_CYLINDERS ||
+                 soma->type() == SomaType::SOMA_SINGLE_POINT)) {
         printError(Warning::SOMA_NON_CYLINDER_OR_POINT,
                    readers::ErrorMessages().WARNING_SOMA_NON_CYLINDER_OR_POINT());
     }

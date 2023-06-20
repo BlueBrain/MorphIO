@@ -1384,6 +1384,8 @@ the soma type)doc";
 
 static const char *__doc_morphio_mut_Soma_type = R"doc(Return the soma type)doc";
 
+static const char *__doc_morphio_mut_Soma_type_2 = R"doc(Return the soma type)doc";
+
 static const char *__doc_morphio_mut_checkDuplicatePoint = R"doc()doc";
 
 static const char *__doc_morphio_mut_diameters = R"doc()doc";
