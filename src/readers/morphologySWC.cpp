@@ -388,7 +388,7 @@ class SWCBuilder
         }
 
         checkSoma();
-        //
+
         // The process might occasionally creates empty section before
         // filling them so the warning is ignored
         bool originalIsIgnored = err.isIgnored(morphio::Warning::APPENDING_EMPTY_SECTION);

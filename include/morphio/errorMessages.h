@@ -212,7 +212,7 @@ class ErrorMessages
                                              const std::string& vec2,
                                              size_t length2) const;
 
-    /** Cant write perimeter data to SWC, ASC error message */
+    /** Can't write perimeter data to SWC, ASC error message */
     std::string ERROR_PERIMETER_DATA_NOT_WRITABLE();
 
     /** Single section child SWC error message */

@@ -23,6 +23,40 @@
 #endif
 
 
+static const char *__doc_morphio_Collection = R"doc()doc";
+
+static const char *__doc_morphio_CollectionImpl = R"doc()doc";
+
+static const char *__doc_morphio_Collection_Collection = R"doc()doc";
+
+static const char *__doc_morphio_Collection_Collection_2 =
+R"doc(Create a collection from the given path.
+
+If `collection_path` points to an HDF5 file, then that file must be a
+container. Otherwise the `collection_path` should point to the
+directory containing the morphology files.
+
+If the collection path is a directory, the extension of the morphology
+file must be guessed. The optional argument `extensions` specifies
+which and in which order the morphologies are searched.)doc";
+
+static const char *__doc_morphio_Collection_close =
+R"doc(Close the collection.
+
+Note that `morphio::Collection` uses RAII. Therefore, the usual
+scoping rules should suffice. However, there are cases where one wants
+to close the collection explicitly, causing all resources held by the
+collection to be release. In the case of containers it ensures that
+the file is closed.
+
+The object should not be used after calling `close`.)doc";
+
+static const char *__doc_morphio_Collection_collection = R"doc()doc";
+
+static const char *__doc_morphio_Collection_load = R"doc(Load the morphology as an immutable morphology.)doc";
+
+static const char *__doc_morphio_Collection_load_2 = R"doc(Load the morphology as a mutable morphology.)doc";
+
 static const char *__doc_morphio_DendriticSpine = R"doc(Class to represent morphologies of dendritic spines)doc";
 
 static const char *__doc_morphio_DendriticSpine_2 = R"doc()doc";
@@ -983,9 +1017,11 @@ their enum: morphio::enum::Option and can be composed.
 
 Example: Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);)doc";
 
-static const char *__doc_morphio_mut_Morphology_Morphology_3 = R"doc(Build a mutable Morphology from a mutable morphology aaaaaa)doc";
+static const char *__doc_morphio_mut_Morphology_Morphology_3 = R"doc(Build a mutable Morphology from an HighFive::Group)doc";
 
-static const char *__doc_morphio_mut_Morphology_Morphology_4 = R"doc(Build a mutable Morphology from a read-only morphology)doc";
+static const char *__doc_morphio_mut_Morphology_Morphology_4 = R"doc(Build a mutable Morphology from a mutable morphology)doc";
+
+static const char *__doc_morphio_mut_Morphology_Morphology_5 = R"doc(Build a mutable Morphology from a read-only morphology)doc";
 
 static const char *__doc_morphio_mut_Morphology_addAnnotation = R"doc()doc";
 
@@ -1343,6 +1379,8 @@ predefined errors messages)doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_2 = R"doc()doc";
 
+static const char *__doc_morphio_readers_ErrorMessages_EARLY_END_OF_FILE = R"doc(The end of the file was reached before parsing finshed)doc";
+
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_EOF_IN_NEURITE = R"doc(ASC EOF reached in neurite error message)doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_EOF_REACHED = R"doc(ASC EOF reached error message)doc";
@@ -1357,6 +1395,8 @@ static const char *__doc_morphio_readers_ErrorMessages_ERROR_MISSING_PARENT = R"
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_MULTIPLE_SOMATA = R"doc(Multiple somas error message)doc";
 
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_NEGATIVE_ID = R"doc(A negative ID is used in SWC)doc";
+
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA = R"doc(Undefined soma error message)doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_ONLY_CHILD_SWC_WRITER = R"doc(Single section child SWC error message)doc";
@@ -1365,7 +1405,7 @@ static const char *__doc_morphio_readers_ErrorMessages_ERROR_OPENING_FILE = R"do
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_PARSING_POINT = R"doc(Parsing ASC points error message)doc";
 
-static const char *__doc_morphio_readers_ErrorMessages_ERROR_PERIMETER_DATA_NOT_WRITABLE = R"doc(Cant write perimeter data to SWC,ASC error message)doc";
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_PERIMETER_DATA_NOT_WRITABLE = R"doc(Can't write perimeter data to SWC, ASC error message)doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_REPEATED_ID = R"doc(Repeated section id error message)doc";
 
@@ -1448,8 +1488,6 @@ static const char *__doc_morphio_readers_Sample_parentId = R"doc()doc";
 static const char *__doc_morphio_readers_Sample_point = R"doc()doc";
 
 static const char *__doc_morphio_readers_Sample_type = R"doc()doc";
-
-static const char *__doc_morphio_readers_Sample_valid = R"doc()doc";
 
 static const char *__doc_morphio_set_ignored_warning = R"doc(Set a warning to ignore)doc";
 
