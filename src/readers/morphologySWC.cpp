@@ -19,23 +19,15 @@ namespace {
 // It's not clear if -1 is the only way of identifying a root section.
 const int SWC_UNDEFINED_PARENT = -1;
 
-struct Token
-{
-    enum class Kind {
-        NUMBER,
-        NEWLINE,
-        EOF_MARKER
-    };
-    Kind kind { Kind::EOF_MARKER };
-};
-
-class TokenStream
+class SWCStream
 {
 public:
-    explicit TokenStream(std::string contents) : contents_(std::move(contents)) {
-        // ensure null termination 
-        (void)contents_.c_str();
-    }
+  explicit SWCStream(std::string contents, const morphio::readers::ErrorMessages& err)
+      : contents_(std::move(contents))
+      , err_(err) {
+      // ensure null termination
+      (void) contents_.c_str();
+  }
 
     void skip_to(char value){
         std::size_t pos = contents_.find_first_of(value, pos_);
@@ -55,57 +47,31 @@ public:
 
     size_t lineNumber() const noexcept {return line_;}
 
-    Token next() {
-        while(!done()){
-            advance_to_non_whitespace();
-            if(done()) {
-                return Token {Token::Kind::EOF_MARKER};
-            }
-
-            switch(contents_.at(pos_)){
-                case '#':
-                    skip_to('\n');
-                    break;
-                case '\n':
-                    ++line_;
-                    ++pos_;
-                    return Token {Token::Kind::NEWLINE};
-                case '-':
-                case '+':
-                case '.':
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                        return Token{Token::Kind::NUMBER};
-                default:
-                    throw std::runtime_error("unknown SWC character");
-            }
+    void advance_to_number() {
+        while (consume_line_and_trailing_comments()) {
         }
-        return Token {Token::Kind::EOF_MARKER};
+
+        if (done()) {
+            throw morphio::RawDataError(err_.EARLY_END_OF_FILE(line_));
+        }
+
+        auto c = contents_.at(pos_);
+        if(std::isdigit(c) != 0 || c == '-' || c == '+' || c == '.'){
+            return;
+        }
+
+        throw morphio::RawDataError(err_.ERROR_LINE_NON_PARSABLE(line_));
     }
 
     int64_t read_int() {
-        Token tok = next();
-        if(tok.kind != Token::Kind::NUMBER) {
-            throw std::runtime_error("expected integer on line " + std::to_string(line_));
-        }
+        advance_to_number();
         auto parsed = stn_.toInt(contents_, pos_);
         pos_ = std::get<1>(parsed);
         return std::get<0>(parsed);
     }
 
     morphio::floatType read_float() {
-        Token tok = next();
-        if(tok.kind != Token::Kind::NUMBER) {
-            throw std::runtime_error("expected float at: " + std::to_string(line_));
-        }
+        advance_to_number();
         auto parsed = stn_.toFloat(contents_, pos_);
         pos_ = std::get<1>(parsed);
         return std::get<0>(parsed);
@@ -140,6 +106,7 @@ private:
     size_t line_ = 1;
     std::string contents_;
     morphio::StringToNumber stn_{};
+    morphio::readers::ErrorMessages err_;
 };
 
 }  // unnamed namespace
@@ -162,7 +129,7 @@ class SWCBuilder
     void _readSamples(const std::string& contents) {
         morphio::readers::Sample sample;
 
-        TokenStream ts{contents};
+        SWCStream ts{contents, err};
         ts.consume_line_and_trailing_comments();
 
         while (!ts.done()) {

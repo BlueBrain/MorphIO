@@ -151,6 +151,9 @@ class ErrorMessages
     /** Section self parent error message */
     std::string ERROR_SELF_PARENT(const Sample& sample) const;
 
+    /** The end of the file was reached before parsing finshed */
+    std::string EARLY_END_OF_FILE(long unsigned int lineNumber) const;
+
     /** Undefined soma error message */
     std::string ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std::string&) const;
 

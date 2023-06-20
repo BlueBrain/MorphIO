@@ -145,6 +145,13 @@ std::string ErrorMessages::ERROR_SELF_PARENT(const Sample& sample) const {
     return errorMsg(sample.lineNumber, ErrorLevel::ERROR, "Parent ID can not be itself");
 }
 
+std::string ErrorMessages::EARLY_END_OF_FILE(long unsigned int lineNumber) const {
+    return errorMsg(lineNumber,
+                    ErrorLevel::ERROR,
+                    "The end of the file was reached before parsing finshed");
+}
+
+
 std::string ErrorMessages::ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std::string& method) const {
     return "Cannot call: " + method + " on soma of type UNDEFINED";
 }
