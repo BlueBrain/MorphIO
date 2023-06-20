@@ -34,7 +34,7 @@ StringToNumber::~StringToNumber() {
     freelocale(locale);
 }
 
-std::tuple<int64_t, size_t> StringToNumber::toInt(const std::string&s, size_t offset) const {
+std::tuple<int64_t, size_t> StringToNumber::toInt(const std::string& s, size_t offset) const {
     const size_t base = 10;
     const char *pos = &s[offset];
     const char *endpos = &s[s.size()];
@@ -49,7 +49,7 @@ std::tuple<int64_t, size_t> StringToNumber::toInt(const std::string&s, size_t of
     return {ret, new_offset};
 }
 
-std::tuple<floatType, size_t> StringToNumber::toFloat(const std::string&s, size_t offset) const {
+std::tuple<floatType, size_t> StringToNumber::toFloat(const std::string& s, size_t offset) const {
     const char *pos = &s[offset];
     const char *endpos = &s[s.size()];
     floatType ret = strto_float(pos, const_cast<char**>(&endpos), locale);

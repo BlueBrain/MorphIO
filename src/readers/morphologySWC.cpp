@@ -5,7 +5,6 @@
 
 #include <cstdint>        // uint32_t
 #include <memory>         // std::shared_ptr
-#include <sstream>        // std::stringstream
 #include <string>         // std::string
 #include <unordered_map>  // std::unordered_map
 #include <vector>         // std::vector
@@ -20,69 +19,128 @@ namespace {
 // It's not clear if -1 is the only way of identifying a root section.
 const int SWC_UNDEFINED_PARENT = -1;
 
-bool _ignoreLine(const std::string& line) {
-    std::size_t pos = line.find_first_not_of("\n\r\t ");
-    return pos == std::string::npos || line[pos] == '#';
-}
-
-morphio::readers::Sample readSWCLine(const std::string& line,
-                                     unsigned int lineNumber,
-                                     const morphio::readers::ErrorMessages& err) {
-    const auto& stn = morphio::getStringToNumber();
-
-    morphio::readers::Sample ret;
-    ret.lineNumber = lineNumber;
-
-    size_t pos = 0;
-    size_t endpos = 0;
-
-    auto read_int =
-        [&](bool check_end = true) -> int64_t {
-        auto parsed = stn.toInt(line, pos);
-        int64_t v = std::get<0>(parsed);
-        endpos = std::get<1>(parsed);
-        if (check_end && line.size() == endpos) {
-            throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
-        }
-        pos = endpos;
-        return v;
+struct Token
+{
+    enum class Kind {
+        NUMBER,
+        NEWLINE,
+        EOF_MARKER
     };
-    auto read_float = [&]() -> morphio::floatType {
-        auto parsed = stn.toFloat(line, pos);
-        morphio::floatType v = std::get<0>(parsed);
-        endpos = std::get<1>(parsed);
-        if (line.size() == endpos) {
-            throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
+    Kind kind { Kind::EOF_MARKER };
+};
+
+class TokenStream
+{
+public:
+    explicit TokenStream(std::string contents) : contents_(std::move(contents)) {
+        // ensure null termination 
+        (void)contents_.c_str();
+    }
+
+    void skip_to(char value){
+        std::size_t pos = contents_.find_first_of(value, pos_);
+        if(pos == std::string::npos) {
+            pos_ = contents_.size();
         }
-        pos = endpos;
-        return v;
-    };
-
-    int64_t id = read_int();
-    if (id < 0) {
-        throw morphio::RawDataError(err.ERROR_NEGATIVE_ID(lineNumber));
+        pos_ = pos;
     }
 
-    ret.id = static_cast<unsigned int>(id);
-
-    ret.type = static_cast<morphio::SectionType>(read_int());
-
-    for (auto& point : ret.point) {
-        point = read_float();
+    void advance_to_non_whitespace() {
+        std::size_t pos = contents_.find_first_not_of(" \t", pos_);
+        if(pos == std::string::npos) {
+            pos_ = contents_.size();
+        }
+        pos_ = pos;
     }
 
-    ret.diameter = 2 * read_float();
+    size_t lineNumber() const noexcept {return line_;}
 
-    ret.parentId = static_cast<int>(read_int(false));
+    Token next() {
+        while(!done()){
+            advance_to_non_whitespace();
+            if(done()) {
+                return Token {Token::Kind::EOF_MARKER};
+            }
 
-    std::size_t end = line.find_first_not_of("\n\r\t ", pos);
-
-    if (end != std::string::npos && line[end] != '#') {
-        throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
+            switch(contents_.at(pos_)){
+                case '#':
+                    skip_to('\n');
+                    break;
+                case '\n':
+                    ++line_;
+                    ++pos_;
+                    return Token {Token::Kind::NEWLINE};
+                case '-':
+                case '+':
+                case '.':
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                        return Token{Token::Kind::NUMBER};
+                default:
+                    throw std::runtime_error("unknown SWC character");
+            }
+        }
+        return Token {Token::Kind::EOF_MARKER};
     }
 
-    return ret;
-}
+    int64_t read_int() {
+        Token tok = next();
+        if(tok.kind != Token::Kind::NUMBER) {
+            throw std::runtime_error("expected integer on line " + std::to_string(line_));
+        }
+        auto parsed = stn_.toInt(contents_, pos_);
+        pos_ = std::get<1>(parsed);
+        return std::get<0>(parsed);
+    }
+
+    morphio::floatType read_float() {
+        Token tok = next();
+        if(tok.kind != Token::Kind::NUMBER) {
+            throw std::runtime_error("expected float at: " + std::to_string(line_));
+        }
+        auto parsed = stn_.toFloat(contents_, pos_);
+        pos_ = std::get<1>(parsed);
+        return std::get<0>(parsed);
+    }
+
+    bool done() const noexcept {
+        return pos_ >= contents_.size();
+    }
+
+    bool consume_line_and_trailing_comments() {
+        bool ret = false;
+
+        advance_to_non_whitespace();
+        while(!done() && (contents_.at(pos_) == '#' || contents_.at(pos_) == '\n')){
+            switch(contents_.at(pos_)){
+                case '#':
+                    skip_to('\n');
+                    break;
+                case '\n':
+                    ++line_;
+                    ++pos_;
+                    ret = true;
+                    break;
+            }
+            advance_to_non_whitespace();
+        }
+        return ret || done();
+    }
+
+private:
+    size_t pos_ = 0;
+    size_t line_ = 1;
+    std::string contents_;
+    morphio::StringToNumber stn_{};
+};
 
 }  // unnamed namespace
 
@@ -102,20 +160,37 @@ class SWCBuilder
     }
 
     void _readSamples(const std::string& contents) {
-        std::istringstream stream{contents};
-        unsigned int lineNumber = 0;
-        std::string line;
-        while (!std::getline(stream, line).fail()) {
-            ++lineNumber;
+        morphio::readers::Sample sample;
 
-            if (line.empty() || _ignoreLine(line)) {
-                continue;
+        TokenStream ts{contents};
+        ts.consume_line_and_trailing_comments();
+
+        while (!ts.done()) {
+            sample.lineNumber = static_cast<unsigned int>(ts.lineNumber());
+
+            int64_t id = ts.read_int();
+            if (id < 0) {
+                throw morphio::RawDataError(err.ERROR_NEGATIVE_ID(sample.lineNumber));
             }
 
-            const auto sample = readSWCLine(line, lineNumber, err);
+            sample.id = static_cast<unsigned int>(id);
+
+            sample.type = static_cast<morphio::SectionType>(ts.read_int());
+
+            for (auto& point : sample.point) {
+                point = ts.read_float();
+            }
+
+            sample.diameter = 2 * ts.read_float();
+
+            sample.parentId = static_cast<int>(ts.read_int());
+
+            if (!ts.consume_line_and_trailing_comments()) {
+                throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(sample.lineNumber));
+            }
 
             if (sample.type >= SECTION_OUT_OF_RANGE_START || sample.type <= 0) {
-                throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type));
+                throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(sample.lineNumber, sample.type));
             }
 
             if (!samples.insert({sample.id, sample}).second) {
