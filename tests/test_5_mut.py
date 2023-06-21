@@ -323,7 +323,7 @@ def test_mitochondria():
                                                                 [0.6, 0.7, 0.8, 0.9],
                                                                 [5, 6, 7, 8]))
 
-    assert mito.is_root(first_mito_id) == True
+    assert mito.is_root(first_mito_id)
     assert mito.children(first_mito_id) == [first_child]
     assert mito.parent(first_child) == first_mito_id
     assert mito.root_sections == [first_mito_id, second_mito_id]
@@ -807,8 +807,10 @@ def test_delete_section__maintain_children_order_non_root_section_multiple():
     morph = ImmutableMorphology(string, "asc").as_mutable()
 
     # for reference and sanity
-    assert [s.id for s in morph.iter(iter_type=morphio.IterType.depth_first)] == [0, 1, 2, 3, 4, 5, 6, 7, 8]
-    assert [s.id for s in morph.iter(iter_type=morphio.IterType.breadth_first)] == [0, 1, 6, 2, 5, 7, 8, 3, 4]
+    assert([s.id for s in morph.iter(iter_type=morphio.IterType.depth_first)] ==
+           [0, 1, 2, 3, 4, 5, 6, 7, 8])
+    assert([s.id for s in morph.iter(iter_type=morphio.IterType.breadth_first)] ==
+           [0, 1, 6, 2, 5, 7, 8, 3, 4])
 
     morph.delete_section(morph.section(0), recursive=False)
     morph.delete_section(morph.section(1), recursive=False)

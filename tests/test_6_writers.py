@@ -1,13 +1,17 @@
 import h5py
-
 import numpy as np
-from morphio import MitochondriaPointLevel
-from morphio import Morphology as ImmutMorphology
-from morphio import PointLevel, SectionBuilderError, SectionType, WriterError, ostream_redirect
-from morphio.mut import Morphology
 import pytest
+from morphio import (
+    MitochondriaPointLevel,
+    PointLevel,
+    SectionBuilderError,
+    SectionType,
+    WriterError,
+    ostream_redirect,
+)
+from morphio import Morphology as ImmutMorphology
+from morphio.mut import Morphology
 from numpy.testing import assert_array_equal
-
 from utils import captured_output
 
 
@@ -108,9 +112,7 @@ def test_write_merge_only_child_asc_h5(tmp_path):
 
 
 def test_write_merge_only_child_swc():
-    '''Attempts to write a morphology with unifurcations with SWC should result
-    in an exception.
-    '''
+    '''Attempts to write a morphology with unifurcations with SWC should result in an exception.'''
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0]]
     morpho.soma.diameters = [2]
@@ -120,11 +122,12 @@ def test_write_merge_only_child_swc():
                                              [0, 5, 0]],
                                             [2, 2]),
                                  SectionType.basal_dendrite)
-    child = root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
+    root.append_section(PointLevel([[0, 5, 0], [0, 6, 0]], [2, 3]))
 
-    with pytest.raises(WriterError, match=r"Section 0 has a single child section\. "
-                                          r"Single child section are not allowed when writing to SWC format\. "
-                                          r"Please sanitize the morphology first\."):
+    with pytest.raises(WriterError,
+                       match=('Section 0 has a single child section. '
+                              'Single child section are not allowed when writing to SWC format. '
+                              'Please sanitize the morphology first.')):
        morpho.write('/tmp/bla.swc')  # the path does not need to exists since it will fail before
 
 
