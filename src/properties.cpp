@@ -7,9 +7,41 @@
 #include "point_utils.h"
 #include "shared_utils.hpp"
 
-
 namespace morphio {
 namespace Property {
+
+namespace details {
+static bool compare_section_structure(const std::vector<Section::Type>& vec1,
+                                      const std::vector<Section::Type>& vec2,
+                                      const std::string& name,
+                                      LogLevel logLevel) {
+    if (vec1.size() != vec2.size()) {
+        if (logLevel > LogLevel::ERROR) {
+            printError(Warning::UNDEFINED,
+                       "Error comparing " + name + ", size differs: " +
+                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
+        return false;
+    }
+
+    for (unsigned int i = 1; i < vec1.size(); ++i) {
+        if (vec1[i][0] - vec1[1][0] != vec2[i][0] - vec2[1][0] || vec1[i][1] != vec2[i][1]) {
+            if (logLevel > LogLevel::ERROR) {
+                printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
+                printError(Warning::UNDEFINED,
+                           std::to_string(vec1[i][0] - vec1[1][0]) + ", " +
+                               std::to_string(vec1[i][1]) + " <--> " +
+                               std::to_string(vec2[i][0] - vec2[1][0]) + ", " +
+                               std::to_string(vec2[i][1]));
+            }
+            return false;
+        }
+    }
+
+    return true;
+}
+
+} // namespace details
 
 PointLevel::PointLevel(std::vector<Point::Type> points,
                        std::vector<Diameter::Type> diameters,
@@ -44,9 +76,10 @@ PointLevel& PointLevel::operator=(const PointLevel& other) {
         return *this;
     }
 
-    this->_points = other._points;
-    this->_diameters = other._diameters;
-    this->_perimeters = other._perimeters;
+    _points = other._points;
+    _diameters = other._diameters;
+    _perimeters = other._perimeters;
+
     return *this;
 }
 
@@ -79,36 +112,6 @@ bool compare(const std::vector<T>& vec1,
     }
 
     return false;
-}
-
-static bool compare_section_structure(const std::vector<Section::Type>& vec1,
-                                      const std::vector<Section::Type>& vec2,
-                                      const std::string& name,
-                                      LogLevel logLevel) {
-    if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-        return false;
-    }
-
-    for (unsigned int i = 1; i < vec1.size(); ++i) {
-        if (vec1[i][0] - vec1[1][0] != vec2[i][0] - vec2[1][0] || vec1[i][1] != vec2[i][1]) {
-            if (logLevel > LogLevel::ERROR) {
-                printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-                printError(Warning::UNDEFINED,
-                           std::to_string(vec1[i][0] - vec1[1][0]) + ", " +
-                               std::to_string(vec1[i][1]) + " <--> " +
-                               std::to_string(vec2[i][0] - vec2[1][0]) + ", " +
-                               std::to_string(vec2[i][1]));
-            }
-            return false;
-        }
-    }
-
-    return true;
 }
 
 template <typename T>
@@ -198,7 +201,7 @@ bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLe
 
 bool SectionLevel::diff(const SectionLevel& other, LogLevel logLevel) const {
     return !(this == &other ||
-             (compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
+             (details::compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
               compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
               compare(this->_children, other._children, "_children", logLevel)));
 }
@@ -212,7 +215,7 @@ bool SectionLevel::operator!=(const SectionLevel& other) const {
 }
 
 bool CellLevel::diff(const CellLevel& other, LogLevel logLevel) const {
-    if (logLevel && this->_cellFamily != other._cellFamily) {
+    if (logLevel > 0 && this->_cellFamily != other._cellFamily) {
         std::cout << "this->_cellFamily: " << this->_cellFamily << '\n'
                   << "other._cellFamily: " << other._cellFamily << '\n';
     }
@@ -263,7 +266,7 @@ MitochondriaPointLevel::MitochondriaPointLevel(
 bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other,
                                     LogLevel logLevel) const {
     return !(this == &other ||
-             (compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
+             (details::compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
               compare(this->_children, other._children, "_children", logLevel)));
 }
 
@@ -293,14 +296,14 @@ bool MitochondriaPointLevel::operator!=(const MitochondriaPointLevel& other) con
     return diff(other, LogLevel::ERROR);
 }
 
-std::ostream& operator<<(std::ostream& os, const PointLevel& prop) {
+std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel) {
     os << "Point level properties:\n"
-       << "Point Diameter"
-       << (prop._perimeters.size() == prop._points.size() ? " Perimeter\n" : "\n");
-    for (unsigned int i = 0; i < prop._points.size(); ++i) {
-        os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i];
-        if (prop._perimeters.size() == prop._points.size()) {
-            os << ' ' << prop._perimeters[i];
+        << "Point Diameter"
+        << (pointLevel._perimeters.size() == pointLevel._points.size() ? " Perimeter\n" : "\n");
+    for (unsigned int i = 0; i < pointLevel._points.size(); ++i) {
+        os << dumpPoint(pointLevel._points[i]) << ' ' << pointLevel._diameters[i];
+        if (pointLevel._perimeters.size() == pointLevel._points.size()) {
+            os << ' ' << pointLevel._perimeters[i];
         }
         os << '\n';
     }
