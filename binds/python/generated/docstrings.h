@@ -1531,6 +1531,12 @@ static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_ALREADY_DEFINE
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_BIFURCATION = R"doc(Bifurcating soma error message)doc";
 
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_CONTOUR = R"doc(Contour soma must have at least 3 points.)doc";
+
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_SINGLE_POINT = R"doc(Single point soma must have one point)doc";
+
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_THREE_POINT_CYLINDER = R"doc(Multiple points for single point soma)doc";
+
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_WITH_NEURITE_PARENT = R"doc(Soma with neurite parent error message)doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_UNCOMPATIBLE_FLAGS = R"doc(Incompatible flags error message)doc";

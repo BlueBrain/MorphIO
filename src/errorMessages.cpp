@@ -253,6 +253,18 @@ std::string ErrorMessages::ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) co
             "Tip: you can use 'removeUnifurcations() (C++) / remove_unifurcations() (python)'");
 }
 
+std::string ErrorMessages::ERROR_SOMA_INVALID_SINGLE_POINT() const {
+    return "Single point soma must have one point";
+}
+
+std::string ErrorMessages::ERROR_SOMA_INVALID_THREE_POINT_CYLINDER() const {
+    return "Multiple points for single point soma";
+}
+
+std::string ErrorMessages::ERROR_SOMA_INVALID_CONTOUR() const {
+    return "Contour soma must have at least 3 points.";
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //              WARNINGS

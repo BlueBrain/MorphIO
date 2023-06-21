@@ -204,8 +204,8 @@ def test_write_soma__points_no_diameters(tmp_path):
 
 def test_mitochondria(tmp_path):
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
-    morpho.soma.diameters = [1, 1]
+    morpho.soma.points = [[0, 0, 0], [1, 1, 1], [0, 0, 0]]
+    morpho.soma.diameters = [1, 1, 1]
     morpho.soma.type = SomaType.SOMA_SIMPLE_CONTOUR
 
     neuronal_section_ids = [0, 0]
@@ -365,3 +365,15 @@ def test_write_soma_types(tmp_path):
     assert err.getvalue().strip() == (
         'Soma must be stacked cylinders or a point: '
         'see https://github.com/BlueBrain/MorphIO/issues/457')
+
+def test_write_soma_invariants(tmp_path):
+    morph = Morphology()
+    morph.soma.points = [[0, 0, 0]]
+    morph.soma.diameters = [2]
+    morph.soma.type = SomaType.SOMA_SIMPLE_CONTOUR
+
+    with pytest.raises(WriterError):
+        morph.write(tmp_path / "test_write.asc")
+
+    with pytest.raises(WriterError):
+        morph.write(tmp_path / "test_write.h5")

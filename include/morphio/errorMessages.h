@@ -209,6 +209,15 @@ class ErrorMessages
     /** Single section child SWC error message */
     std::string ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const;
 
+    /** Single point soma must have one point */
+    std::string ERROR_SOMA_INVALID_SINGLE_POINT() const;
+
+    /** Multiple points for single point soma */
+    std::string ERROR_SOMA_INVALID_THREE_POINT_CYLINDER() const;
+
+    /** Contour soma must have at least 3 points. */
+    std::string ERROR_SOMA_INVALID_CONTOUR() const;
+
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
