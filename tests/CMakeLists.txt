@@ -7,6 +7,7 @@ set(TESTS_SRC
         test_mutable_morphology.cpp
         test_point_utils.cpp
         test_properties.cpp
+        test_soma.cpp
         test_utilities.cpp
         test_vasculature_morphology.cpp
         )
