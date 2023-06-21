@@ -1,13 +1,14 @@
 from pathlib import Path
+
+import numpy as np
 import pytest
 
 import morphio
-from morphio import Collection
 
-import numpy as np
 
 DATA_DIR = Path(__file__).parent / "data"
 COLLECTION_PATHS = [DATA_DIR / "h5/v1/merged.h5", DATA_DIR / "h5/v1"]
+
 
 def available_morphologies():
     return [
@@ -65,7 +66,7 @@ def test_container_unordered(collection_path):
 
 
 @pytest.mark.parametrize("collection_path", COLLECTION_PATHS)
-def test_container_unordered(collection_path):
+def test_container_unordered1(collection_path):
     with morphio.Collection(collection_path) as collection:
         morphology_names = available_morphologies()
         morphology_names = morphology_names[1:]

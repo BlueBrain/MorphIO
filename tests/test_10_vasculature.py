@@ -1,25 +1,25 @@
-import os
-import h5py
-
-import numpy as np
-from numpy import testing as npt
-import pytest
-from numpy.testing import assert_array_almost_equal, assert_array_equal
 from pathlib import Path
+
+import h5py
+import numpy as np
+import pytest
+from numpy import testing as npt
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 
 import morphio.vasculature as vasculature
 from morphio import RawDataError, VasculatureSectionType
 
-_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
+DATA_DIR = Path(__file__).parent / "data"
 
 
 def test_empty_vasculature():
     with pytest.raises(RawDataError):
-        vasculature.Vasculature(os.path.join(_path, "h5/empty_vasculature.h5"))
+        vasculature.Vasculature(DATA_DIR /  "h5/empty_vasculature.h5")
 
 
 def test_components_vasculature():
-    morphology = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
+    morphology = vasculature.Vasculature(DATA_DIR /  "h5/vasculature1.h5")
     assert_array_almost_equal(morphology.section(0).points,
                               np.array([[1265.47399902,  335.42364502, 1869.19274902],
                                         [1266.26647949,  335.57000732, 1869.74914551],
@@ -43,8 +43,9 @@ def test_components_vasculature():
     assert len(morphology.points) == 55807
     assert morphology.n_points == len(morphology.points)
     assert len(morphology.diameters) == 55807
-    assert_array_almost_equal(morphology.diameters[-5:],
-                              np.array([0.78039801, 0.78039801, 0.78039801, 2.11725187, 2.11725187]))
+    assert_array_almost_equal(
+        morphology.diameters[-5:],
+        np.array([0.78039801, 0.78039801, 0.78039801, 2.11725187, 2.11725187]))
     assert len(morphology.section_types) == 3080
     assert morphology.section(0).n_points == len(morphology.section(0).points)
     assert len(morphology.section(0).predecessors) == 0
@@ -55,7 +56,7 @@ def test_components_vasculature():
 
 
 def test_section_types():
-    morphology = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
+    morphology = vasculature.Vasculature(DATA_DIR /  "h5/vasculature1.h5")
     assert morphology.section(0).type == VasculatureSectionType.vein
     assert morphology.section(1).type == VasculatureSectionType.artery
     assert morphology.section(2).type == VasculatureSectionType.venule
@@ -64,7 +65,7 @@ def test_section_types():
     assert morphology.section(5).type == VasculatureSectionType.arterial_capillary
 
     with pytest.raises(RawDataError):
-        vasculature.Vasculature(os.path.join(_path, "h5/vasculature-broken-section-type.h5"))
+        vasculature.Vasculature(DATA_DIR /  "h5/vasculature-broken-section-type.h5")
 
 
 def test_section_offsets():
@@ -87,7 +88,7 @@ def test_section_offsets():
     for instance to calculate the section length (in terms of points) for each section without
     having to allocate an extra array to add that extra value.
     """
-    morphology = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
+    morphology = vasculature.Vasculature(DATA_DIR /  "h5/vasculature1.h5")
 
     offset = 0
     expected_offsets = [offset]
@@ -114,7 +115,7 @@ def test_section_offsets():
 
 def test_section_connectivity():
 
-    path = os.path.join(_path, "h5/vasculature1.h5")
+    path = DATA_DIR /  "h5/vasculature1.h5"
     morphology = vasculature.Vasculature(path)
 
     with h5py.File(path, 'r') as fd:
@@ -127,7 +128,7 @@ def test_section_connectivity():
 
 
 def test_iterators_vasculature():
-    morphology = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
+    morphology = vasculature.Vasculature(DATA_DIR /  "h5/vasculature1.h5")
     assert_array_equal([sec.id for sec in morphology.sections], range(3080))
     assert len([section.id for section in morphology.iter()]) == 3080
     all_sections = set([sec.id for sec in morphology.sections])
@@ -137,10 +138,10 @@ def test_iterators_vasculature():
 
 
 def test_from_pathlib():
-    vasc = vasculature.Vasculature(Path(_path, "h5/vasculature1.h5"))
+    vasc = vasculature.Vasculature(DATA_DIR / "h5/vasculature1.h5")
     assert len(vasc.sections) == 3080
 
 def test_section___str__():
-    morphology = vasculature.Vasculature(os.path.join(_path, "h5/vasculature1.h5"))
+    morphology = vasculature.Vasculature(DATA_DIR /  "h5/vasculature1.h5")
     assert (str(morphology.section(0)) ==
                  'Section(id=0, points=[(1265.47 335.424 1869.19),..., (1274 336.7 1876)])')
