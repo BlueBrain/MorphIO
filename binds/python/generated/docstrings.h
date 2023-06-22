@@ -831,17 +831,35 @@ static const char *__doc_morphio_enums_SectionType_SECTION_AXON = R"doc(Axon sec
 
 static const char *__doc_morphio_enums_SectionType_SECTION_CNIC_CUSTOM_START = R"doc()doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_10 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_10 = R"doc(Custom section type 10)doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_5 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_11 = R"doc(Custom section type 11)doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_6 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_12 = R"doc(Custom section type 12)doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_7 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_13 = R"doc(Custom section type 13)doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_8 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_14 = R"doc(Custom section type 14)doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_9 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_15 = R"doc(Custom section type 15)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_16 = R"doc(Custom section type 16)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_17 = R"doc(Custom section type 17)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_18 = R"doc(Custom section type 18)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_19 = R"doc(Custom section type 19)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_5 = R"doc(Custom section type 5)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_6 = R"doc(Custom section type 6)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_7 = R"doc(Custom section type 7)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_8 = R"doc(Custom section type 8)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_9 = R"doc(Custom section type 9)doc";
 
 static const char *__doc_morphio_enums_SectionType_SECTION_DENDRITE = R"doc(General or basal dendrite (near to soma))doc";
 
