@@ -76,6 +76,8 @@ std::string ErrorMessages::errorMsg(long unsigned int lineNumber,
     return "\n" + (_uri.empty() ? "" : errorLink(lineNumber, errorLevel) + "\n") + msg;
 }
 
+// LCOV_EXCL_START {  all the error messages are excluded from coverage
+
 ////////////////////////////////////////////////////////////////////////////////
 //              ERRORS
 ////////////////////////////////////////////////////////////////////////////////
@@ -390,6 +392,8 @@ std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& c
     }
     return oss.str();
 }
+
+// LCOV_EXCL_STOP }
 
 }  // namespace readers
 
