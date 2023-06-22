@@ -1,18 +1,14 @@
 import h5py
 import numpy as np
 import pytest
-from morphio import (
-    MitochondriaPointLevel,
-    PointLevel,
-    SectionBuilderError,
-    SectionType,
-    WriterError,
-    ostream_redirect,
-)
-from morphio import Morphology as ImmutMorphology
-from morphio.mut import Morphology
 from numpy.testing import assert_array_equal
 from utils import captured_output
+
+from morphio import MitochondriaPointLevel
+from morphio import Morphology as ImmutMorphology
+from morphio import (PointLevel, SectionBuilderError, SectionType, WriterError,
+                     ostream_redirect, SomaType)
+from morphio.mut import Morphology
 
 
 def test_write_empty_file(tmp_path):
@@ -131,7 +127,6 @@ def test_write_merge_only_child_swc():
        morpho.write('/tmp/bla.swc')  # the path does not need to exists since it will fail before
 
 
-
 def test_write_perimeter(tmp_path):
     morpho = Morphology()
     morpho.soma.points = [[0, 0, 0]]
@@ -179,7 +174,10 @@ def test_write_no_soma(tmp_path):
                                           [2, 2]),
                                SectionType.basal_dendrite)
 
-    for ext in ['asc', 'h5', 'swc']:
+    for ext, soma_type in (('asc', SomaType.SOMA_SIMPLE_CONTOUR),
+                           ('h5', SomaType.SOMA_SIMPLE_CONTOUR),
+                           ('swc', SomaType.SOMA_CYLINDERS)):
+        morpho.soma.type = soma_type
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
                 outfile = tmp_path / f'tmp.{ext}'
@@ -206,8 +204,9 @@ def test_write_soma__points_no_diameters(tmp_path):
 
 def test_mitochondria(tmp_path):
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
-    morpho.soma.diameters = [1, 1]
+    morpho.soma.points = [[0, 0, 0], [1, 1, 1], [0, 0, 0]]
+    morpho.soma.diameters = [1, 1, 1]
+    morpho.soma.type = SomaType.SOMA_SIMPLE_CONTOUR
 
     neuronal_section_ids = [0, 0]
     relative_pathlengths = np.array([0.5, 0.6], dtype=np.float32)
@@ -223,20 +222,6 @@ def test_mitochondria(tmp_path):
                                [20, 30, 40, 50]))
     morpho.write(tmp_path / "test.h5")
 
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            morpho.write(tmp_path / "test.swc")
-            assert err.getvalue().strip() == (
-                "Warning: this cell has mitochondria, they cannot be saved in "
-                " ASC or SWC format. Please use H5 if you want to save them.")
-
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            morpho.write(tmp_path / "test.asc")
-            assert err.getvalue().strip() == (
-                "Warning: this cell has mitochondria, they cannot be saved in "
-                " ASC or SWC format. Please use H5 if you want to save them.")
-
     mito = ImmutMorphology(tmp_path / 'test.h5').mitochondria
     assert_array_equal(mito.root_sections[0].diameters,
                        diameters)
@@ -244,7 +229,6 @@ def test_mitochondria(tmp_path):
                        neuronal_section_ids)
     assert_array_equal(mito.root_sections[0].relative_path_lengths,
                        relative_pathlengths)
-
     assert len(mito.root_sections) == 1
 
     mito = Morphology(tmp_path / 'test.h5').mitochondria
@@ -255,6 +239,23 @@ def test_mitochondria(tmp_path):
 
     assert_array_equal(mito.section(0).neurite_section_ids,
                        neuronal_section_ids)
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            morpho.write(tmp_path / "test.asc")
+            assert err.getvalue().strip() == (
+                "Warning: this cell has mitochondria, they cannot be saved in "
+                " ASC or SWC format. Please use H5 if you want to save them.")
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            morpho.soma.type = SomaType.SOMA_CYLINDERS
+            morpho.write(tmp_path / "test.swc")
+            assert err.getvalue().strip() == (
+                "Warning: this cell has mitochondria, they cannot be saved in "
+                " ASC or SWC format. Please use H5 if you want to save them.")
+
+
 
 def test_duplicate_different_diameter(tmp_path):
     '''Test that starting a child section with a different diamete
@@ -336,3 +337,43 @@ def test_write_custom_property__throws(tmp_path):
 
     with pytest.raises(WriterError):
         morpho.write(tmp_path / "test_write.asc")
+
+
+def test_write_soma_types(tmp_path):
+    morph = Morphology()
+    morph.soma.points = [[0, 0, 0]]
+    morph.soma.diameters = [2]
+    # by default, soma start off as SomaType.SOMA_UNDEFINED
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            morph.write(tmp_path / "SOMA_UNDEFINED.asc")
+    assert err.getvalue().strip() == (
+        'Soma must be a contour for ASC and H5: '
+        'see https://github.com/BlueBrain/MorphIO/issues/457')
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            morph.write(tmp_path / "SOMA_UNDEFINED.h5")
+    assert err.getvalue().strip() == (
+        'Soma must be a contour for ASC and H5: '
+        'see https://github.com/BlueBrain/MorphIO/issues/457')
+
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            morph.write(tmp_path / "SOMA_UNDEFINED.swc")
+    assert err.getvalue().strip() == (
+        'Soma must be stacked cylinders or a point: '
+        'see https://github.com/BlueBrain/MorphIO/issues/457')
+
+def test_write_soma_invariants(tmp_path):
+    morph = Morphology()
+    morph.soma.points = [[0, 0, 0]]
+    morph.soma.diameters = [2]
+    morph.soma.type = SomaType.SOMA_SIMPLE_CONTOUR
+
+    with pytest.raises(WriterError):
+        morph.write(tmp_path / "test_write.asc")
+
+    with pytest.raises(WriterError):
+        morph.write(tmp_path / "test_write.h5")

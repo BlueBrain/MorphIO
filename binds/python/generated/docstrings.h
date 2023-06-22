@@ -911,6 +911,10 @@ static const char *__doc_morphio_enums_Warning_ONLY_CHILD = R"doc(Single child s
 
 static const char *__doc_morphio_enums_Warning_SOMA_NON_CONFORM = R"doc(Soma does not conform the three point soma spec from NeuroMorpho.org)doc";
 
+static const char *__doc_morphio_enums_Warning_SOMA_NON_CONTOUR = R"doc(Soma must be a contour for ASC and H5)doc";
+
+static const char *__doc_morphio_enums_Warning_SOMA_NON_CYLINDER_OR_POINT = R"doc(Soma must be stacked cylinders or a point)doc";
+
 static const char *__doc_morphio_enums_Warning_UNDEFINED = R"doc(undefined value)doc";
 
 static const char *__doc_morphio_enums_Warning_WRITE_EMPTY_MORPHOLOGY = R"doc(Writing empty morphology)doc";
@@ -1380,6 +1384,8 @@ the soma type)doc";
 
 static const char *__doc_morphio_mut_Soma_type = R"doc(Return the soma type)doc";
 
+static const char *__doc_morphio_mut_Soma_type_2 = R"doc(Return the soma type)doc";
+
 static const char *__doc_morphio_mut_checkDuplicatePoint = R"doc()doc";
 
 static const char *__doc_morphio_mut_diameters = R"doc()doc";
@@ -1525,6 +1531,12 @@ static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_ALREADY_DEFINE
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_BIFURCATION = R"doc(Bifurcating soma error message)doc";
 
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_CONTOUR = R"doc(Contour soma must have at least 3 points.)doc";
+
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_SINGLE_POINT = R"doc(Single point soma must have one point)doc";
+
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_THREE_POINT_CYLINDER = R"doc(Multiple points for single point soma)doc";
+
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_WITH_NEURITE_PARENT = R"doc(Soma with neurite parent error message)doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_UNCOMPATIBLE_FLAGS = R"doc(Incompatible flags error message)doc";
@@ -1562,6 +1574,10 @@ static const char *__doc_morphio_readers_ErrorMessages_WARNING_NEUROMORPHO_SOMA_
 static const char *__doc_morphio_readers_ErrorMessages_WARNING_NO_SOMA_FOUND = R"doc(Soma not found warning message)doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_WARNING_ONLY_CHILD = R"doc(Writing single child section warning message)doc";
+
+static const char *__doc_morphio_readers_ErrorMessages_WARNING_SOMA_NON_CONTOUR = R"doc(Soma must be a contour for ASC and H5)doc";
+
+static const char *__doc_morphio_readers_ErrorMessages_WARNING_SOMA_NON_CYLINDER_OR_POINT = R"doc()doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_WARNING_WRITE_EMPTY_MORPHOLOGY = R"doc(Writing empty morphology warning message)doc";
 

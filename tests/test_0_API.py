@@ -2,8 +2,6 @@ import morphio
 
 
 def test_doc_exists():
-    cls = morphio.Morphology
-
     classes = [
         morphio.EndoplasmicReticulum,
         morphio.MitoSection,
