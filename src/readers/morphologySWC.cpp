@@ -193,8 +193,8 @@ class SWCBuilder
             return;
         }
 
-        int sample_id = static_cast<int>(sample.id) if (sample.parentId != -1 &&
-                                                        !children[sample_id].empty()) {
+        int sample_id = static_cast<int>(sample.id);
+        if (sample.parentId != -1 && !children[sample_id].empty()) {
             std::vector<Sample> soma_bifurcations;
             for (auto id : children[sample_id]) {
                 if (samples[id].type == SECTION_SOMA) {

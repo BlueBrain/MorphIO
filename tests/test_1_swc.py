@@ -486,7 +486,7 @@ def test_three_point_soma():
 
 
 def test_trailing_space():
-    n = Morphology(os.path.join(_path, 'simple-trailing-space.swc'))
+    n = Morphology(DATA_DIR / 'simple-trailing-space.swc')
     assert n.points.shape == (3, 3)
 
 
