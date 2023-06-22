@@ -2,12 +2,11 @@ from itertools import product
 from pathlib import Path
 
 import numpy as np
-from morphio import Morphology, RawDataError, SomaError, ostream_redirect
-from numpy.testing import assert_array_almost_equal, assert_array_equal
-
 import pytest
-
+from morphio import Morphology, RawDataError, SomaError
+from numpy.testing import assert_array_almost_equal, assert_array_equal
 from utils import assert_asc_exception
+
 
 DATA_DIR = Path(__file__).parent / 'data'
 
@@ -459,7 +458,7 @@ def test_single_point_section_duplicate_parent_complex():
     assert_array_equal(children[2].points, [[2, 0, 0], [6, 0, 0]])
 
 
-def test_spine():
+def test_spine1():
     neuron = Morphology(DATA_DIR / 'spine.asc')
     assert len(neuron.root_sections) == 1
     assert_array_equal(neuron.root_sections[0].points,

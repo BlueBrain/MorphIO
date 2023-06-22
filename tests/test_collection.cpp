@@ -4,6 +4,7 @@
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 
+#include <algorithm>
 #include <filesystem>
 namespace fs = std::filesystem;
 
@@ -88,6 +89,67 @@ TEST_CASE("Collection", "[collection]") {
     }
 }
 
+static void check_loop_indices(std::vector<size_t>& loop_indices, size_t n) {
+    REQUIRE(loop_indices.size() == n);
+    std::sort(loop_indices.begin(), loop_indices.end());
+    for (size_t i = 0; i < loop_indices.size(); ++i) {
+        REQUIRE(loop_indices[i] == i);
+    }
+}
+
+static void check_collection_load_unordered(const std::string& collection_path) {
+    morphio::Collection collection(collection_path);
+
+    auto morphology_names = std::vector<std::string>{
+        "simple", "glia", "mitochondria", "endoplasmic-reticulum", "simple-dendritric-spine"};
+
+    SECTION("modern") {
+        std::vector<size_t> loop_indices;
+        for (auto [k, morph] : collection.load_unordered<morphio::Morphology>(morphology_names)) {
+            loop_indices.push_back(k);
+        }
+        check_loop_indices(loop_indices, morphology_names.size());
+    }
+
+    SECTION("classical") {
+        std::vector<size_t> loop_indices;
+        auto unordered_access = collection.load_unordered<morphio::Morphology>(morphology_names);
+        for (auto it = unordered_access.begin(); it != unordered_access.end(); ++it) {
+            auto [k, morph] = *it;
+            loop_indices.push_back(k);
+        }
+        check_loop_indices(loop_indices, morphology_names.size());
+    }
+}
+
+TEST_CASE("Collection::load_unordered directory", "[collection]") {
+    check_collection_load_unordered("data/h5/v1");
+}
+
+TEST_CASE("Collection::load_unordered merged", "[collection]") {
+    check_collection_load_unordered("data/h5/v1/merged.h5");
+}
+
+static void check_collection_argsort(const std::string& collection_path) {
+    morphio::Collection collection(collection_path);
+
+    auto morphology_names = std::vector<std::string>{"simple",
+                                                     "glia",
+                                                     "endoplasmic-reticulum",
+                                                     "simple-dendritric-spine"};
+
+    auto loop_indices = collection.argsort(morphology_names);
+    check_loop_indices(loop_indices, morphology_names.size());
+}
+
+TEST_CASE("Collection::argsort directory", "[collection]") {
+    check_collection_argsort("data/h5/v1");
+}
+
+TEST_CASE("Collection::argsort merged", "[collection]") {
+    check_collection_argsort("data/h5/v1/merged.h5");
+}
+
 TEST_CASE("CollectionMissingExtensions", "[collection]") {
     auto collection_dir = std::string("data");
 
@@ -117,4 +179,37 @@ TEST_CASE("CollectionMissingExtensions", "[collection]") {
                                                                           morph_name,
                                                                           reference_path.string()));
     }
+}
+
+TEST_CASE("LoadUnordered::Iterator", "[collection]") {
+    auto collection = morphio::Collection("data/h5/v1/merged.h5");
+    auto morphology_names = std::vector<std::string>{
+        "simple", "glia", "mitochondria", "endoplasmic-reticulum", "simple-dendritric-spine"};
+
+    auto loader = collection.load_unordered<morphio::Morphology>(morphology_names);
+    auto begin = loader.begin();
+    auto k_begin = (*begin).first;
+
+    // Create a copy, and check they are at the same loop index.
+    auto it = begin;
+    REQUIRE((*it).first == (*begin).first);
+
+    // Increment the copy, postfix:
+    auto it2 = it++;
+    REQUIRE((*it2).first == (*begin).first);
+    REQUIRE((*it).first != k_begin);
+
+    // Increment a copy, prefix:
+    auto it3 = ++it2;
+    REQUIRE((*it2).first == (*it).first);
+    REQUIRE((*it2).first == (*it3).first);
+    REQUIRE((*it).first != k_begin);
+
+    // Now check that nothing incremented the original iterator `begin`.
+    REQUIRE((*begin).first == k_begin);
+
+    // Once more using assignment, not copy-construction:
+    it = begin;
+    REQUIRE((*begin).first == k_begin);
+    REQUIRE((*++it).first != k_begin);
 }

@@ -1,16 +1,16 @@
-import os
-import inspect
+from pathlib import Path
 
 import numpy as np
 import pytest
 from numpy.testing import assert_array_equal
+from utils import (assert_swc_exception, captured_output, ignored_warning,
+                   strip_color_codes)
 
-from morphio import (Morphology, RawDataError, SectionType, SomaError, MorphioError, SomaType,
-                     ostream_redirect, set_maximum_warnings, set_raise_warnings, set_ignored_warning, Warning)
-from utils import (assert_swc_exception, captured_output,
-                   strip_color_codes, ignored_warning)
+from morphio import (MorphioError, Morphology, RawDataError, SomaError,
+                     SomaType, Warning, ostream_redirect, set_raise_warnings)
 
-_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
+
+DATA_DIR = Path(__file__).parent / "data"
 
 
 def test_build_from_string():
@@ -34,8 +34,7 @@ def test_build_from_string():
 
 
 def test_read_single_neurite():
-    '''Test reading a simple neuron consisting of a point soma
-    and a single branch neurite.'''
+    '''Test reading a simple neuron consisting of a point soma and a single branch neurite.'''
     content = ('''1 1 0 4 0 3.0 -1
                   2 3 0 0 2 0.5 1
                   3 3 0 0 3 0.5 2
@@ -82,7 +81,7 @@ def test_skip_comments():
                                  [0, 0, 5]]))
 
 def test_read_simple():
-    simple = Morphology(os.path.join(_path, 'simple.swc'))
+    simple = Morphology(DATA_DIR /  'simple.swc')
     assert len(simple.root_sections) == 2
     assert simple.root_sections[0].id == 0
     assert simple.root_sections[1].id == 3
@@ -100,7 +99,7 @@ def test_set_raise_warnings():
     try:
         set_raise_warnings(True)
         with pytest.raises(MorphioError, match='Warning: found a disconnected neurite'):
-            Morphology(os.path.join(_path, 'disconnected_neurite.swc'))
+            Morphology(DATA_DIR /  'disconnected_neurite.swc')
     finally:
         set_raise_warnings(False)
 
@@ -203,9 +202,8 @@ def test_weird_indent():
 """)
     n = Morphology(content, extension='swc')
 
-    simple = Morphology(os.path.join(_path, 'simple.swc'))
-    assert_array_equal(simple.points,
-                       n.points)
+    simple = Morphology(DATA_DIR /  'simple.swc')
+    assert_array_equal(simple.points, n.points)
 
 
 def test_cyclic():
@@ -262,9 +260,8 @@ def test_soma_type():
             SomaType.SOMA_SINGLE_POINT)
 
     # 2 point soma
-    content = (
-                      '''1 1 0 0 0 3.0 -1
-                         2 1 0 0 0 3.0  1''')
+    content = ('''1 1 0 0 0 3.0 -1
+                  2 1 0 0 0 3.0  1''')
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_CYLINDERS)
 
@@ -304,23 +301,23 @@ def test_soma_type():
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                          SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-            assert strip_color_codes(err.getvalue()).strip() == inspect.cleandoc(
-                '''$STRING$:0:warning
-                   Warning: the soma does not conform the three point soma spec
-                   The only valid neuro-morpho soma is:
-                   1 1 x   y   z r -1
-                   2 1 x (y-r) z r  1
-                   3 1 x (y+r) z r  1
+            assert strip_color_codes(err.getvalue()).strip() == ('''\
+$STRING$:0:warning
+Warning: the soma does not conform the three point soma spec
+The only valid neuro-morpho soma is:
+1 1 x   y   z r -1
+2 1 x (y-r) z r  1
+3 1 x (y+r) z r  1
 
-                   Got:
-                   1 1 0 0 0 3 -1
-                   2 1 0.000000 -3.000000 0.000000 3.000000 1
-                   3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1''')
+Got:
+1 1 0 0 0 3 -1
+2 1 0.000000 -3.000000 0.000000 3.000000 1
+3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1''')
 
     # If this configuration is not respected -> SOMA_CYLINDERS
     content = ( '''1 1 0 0 0 3.0 -1
-                  2 1 0 0 0 3.0  1
-                  3 1 0 0 0 3.0  2 # PID is 2''')
+                   2 1 0 0 0 3.0  1
+                   3 1 0 0 0 3.0  2 # PID is 2''')
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_CYLINDERS)
 
@@ -344,7 +341,7 @@ def test_read_weird_ids():
 
 def test_multiple_soma():
     with pytest.raises(SomaError, match='Multiple somata found') as e:
-        Morphology(os.path.join(_path, 'multiple_soma.swc'))
+        Morphology(DATA_DIR /  'multiple_soma.swc')
     assert e.match('multiple_soma.swc:2:error')
     assert e.match('multiple_soma.swc:11:error')
 
@@ -352,12 +349,13 @@ def test_multiple_soma():
 def test_disconnected_neurite():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            n = Morphology(os.path.join(_path, 'disconnected_neurite.swc'))
+            path = DATA_DIR /  'disconnected_neurite.swc'
+            Morphology(path)
             assert (
-                '''{}:10:warning
+                f'''{path}:10:warning
 Warning: found a disconnected neurite.
 Neurites are not supposed to have parentId: -1
-(although this is normal if this neuron has no soma)'''.format(os.path.join(_path, 'disconnected_neurite.swc')) ==
+(although this is normal if this neuron has no soma)''' ==
                 strip_color_codes(err.getvalue().strip()))
 
 def test_neurite_wrong_root_point():
@@ -366,19 +364,19 @@ def test_neurite_wrong_root_point():
     # Not 3-points soma --> OK
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            n = Morphology(os.path.join(_path, 'soma_cylinders.swc'))
+            n = Morphology(DATA_DIR /  'soma_cylinders.swc')
             assert err.getvalue().strip() == ''
         assert len(n.root_sections) == 1
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            path = os.path.join(_path, 'neurite_wrong_root_point.swc')
+            path = DATA_DIR /  'neurite_wrong_root_point.swc'
             n = Morphology(path)
-            assert strip_color_codes(err.getvalue().strip()) == \
-'''Warning: with a 3 points soma, neurites must be connected to the first soma point:
-{}:4:warning
+            assert strip_color_codes(err.getvalue().strip()) == f'''\
+Warning: with a 3 points soma, neurites must be connected to the first soma point:
+{path}:4:warning
 
-{}:6:warning'''.format(path, path)
+{path}:6:warning'''
     assert len(n.root_sections) == 2
     assert_array_equal(n.root_sections[0].points,
                        [[0,0,0], [0,0,1]])
@@ -386,7 +384,7 @@ def test_neurite_wrong_root_point():
     with ignored_warning(Warning.wrong_root_point):
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
-                n = Morphology(os.path.join(_path, 'neurite_wrong_root_point.swc'))
+                n = Morphology(DATA_DIR /  'neurite_wrong_root_point.swc')
                 assert err.getvalue().strip() == ''
 
 
@@ -483,7 +481,7 @@ def test_root_node_split():
 
 
 def test_three_point_soma():
-    n = Morphology(os.path.join(_path, 'three_point_soma.swc'))
+    n = Morphology(DATA_DIR /  'three_point_soma.swc')
     assert n.soma_type == SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
 
 
@@ -507,7 +505,7 @@ def test_zero_diameter():
 
 
 def test_version():
-    assert_array_equal(Morphology(os.path.join(_path, 'simple.swc')).version,
+    assert_array_equal(Morphology(DATA_DIR /  'simple.swc').version,
                        ('swc', 1, 0))
 
 
@@ -517,7 +515,7 @@ def test_no_soma():
                  3 2 0 0 0 3.0  2'''
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            n = Morphology(content, extension='swc')
+            Morphology(content, extension='swc')
             assert ('$STRING$:0:warning\nWarning: no soma found in file' ==
                     strip_color_codes(err.getvalue().strip()))
 

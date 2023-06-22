@@ -1,13 +1,11 @@
 '''Module providing utility functions for the tests'''
 import re
 import sys
-
 from contextlib import contextmanager
 from functools import partial
 from io import StringIO
 
 import pytest
-
 from morphio import Morphology, set_ignored_warning
 
 

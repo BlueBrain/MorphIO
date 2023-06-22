@@ -5,6 +5,9 @@ set(TESTS_SRC
         test_mitochondria.cpp
         test_morphology_readers.cpp
         test_mutable_morphology.cpp
+        test_point_utils.cpp
+        test_properties.cpp
+        test_soma.cpp
         test_utilities.cpp
         test_vasculature_morphology.cpp
         )

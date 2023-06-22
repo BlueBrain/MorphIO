@@ -32,9 +32,15 @@ class Soma
     }
 
     /// Return the soma type
-    SomaType type() const noexcept {
+    const SomaType& type() const noexcept {
         return soma_type_;
     }
+
+    /// Return the soma type
+    SomaType& type() noexcept {
+        return soma_type_;
+    }
+
     /**
      * Return the center of gravity of the soma points
      **/

@@ -1,3 +1,14 @@
+v3.3.5
+======
+New Features:
+* Abstraction for morphology collection. (#444)
+
+Improvements:
+* Don't ignore choice of `MORPHIO_ENABLE_COVERAGE`. (#452)
+* enable windows py311, since new h5py release has wheels (#441)
+* Update clang-format CI to 22.04. (#445)
+* Make neurolucida state machine thread-safe (#440)
+* Improve doc (#439)
 
 v3.3.4
 ======
