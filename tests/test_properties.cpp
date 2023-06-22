@@ -2,7 +2,6 @@
 
 #include <catch2/catch.hpp>
 #include <sstream>
-#include <sstream>
 
 
 TEST_CASE("morphio::PointLevel") {
