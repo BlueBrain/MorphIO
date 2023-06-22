@@ -1,8 +1,7 @@
 #include "morphologySWC.h"
 #include "utils.h"
 
-#include <cstdlib>
-
+#include <cctype>        // isdigit
 #include <cstdint>        // uint32_t
 #include <memory>         // std::shared_ptr
 #include <string>         // std::string
@@ -19,10 +18,15 @@ namespace {
 // It's not clear if -1 is the only way of identifying a root section.
 const int SWC_UNDEFINED_PARENT = -1;
 
-class SWCStream
+/* simple stream parser for SWC file format which is a line oriented format
+ *
+ * This parser advances across comments and blank lines, and allows the caller
+ * to get integers and floats
+ */
+class SWCTokenizer
 {
 public:
-  explicit SWCStream(std::string contents, const morphio::readers::ErrorMessages& err)
+  explicit SWCTokenizer(std::string contents, const morphio::readers::ErrorMessages& err)
       : contents_(std::move(contents))
       , err_(err) {
       // ensure null termination
@@ -131,30 +135,30 @@ class SWCBuilder
     void _readSamples(const std::string& contents) {
         morphio::readers::Sample sample;
 
-        SWCStream ts{contents, err};
-        ts.consume_line_and_trailing_comments();
+        SWCTokenizer tokenizer{contents, err};
+        tokenizer.consume_line_and_trailing_comments();
 
-        while (!ts.done()) {
-            sample.lineNumber = static_cast<unsigned int>(ts.lineNumber());
+        while (!tokenizer.done()) {
+            sample.lineNumber = static_cast<unsigned int>(tokenizer.lineNumber());
 
-            int64_t id = ts.read_int();
+            int64_t id = tokenizer.read_int();
             if (id < 0) {
                 throw morphio::RawDataError(err.ERROR_NEGATIVE_ID(sample.lineNumber));
             }
 
             sample.id = static_cast<unsigned int>(id);
 
-            sample.type = static_cast<morphio::SectionType>(ts.read_int());
+            sample.type = static_cast<morphio::SectionType>(tokenizer.read_int());
 
             for (auto& point : sample.point) {
-                point = ts.read_float();
+                point = tokenizer.read_float();
             }
 
-            sample.diameter = 2 * ts.read_float();
+            sample.diameter = 2 * tokenizer.read_float();
 
-            sample.parentId = static_cast<int>(ts.read_int());
+            sample.parentId = static_cast<int>(tokenizer.read_int());
 
-            if (!ts.consume_line_and_trailing_comments()) {
+            if (!tokenizer.consume_line_and_trailing_comments()) {
                 throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(sample.lineNumber));
             }
 
