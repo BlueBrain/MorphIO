@@ -76,6 +76,8 @@ std::string ErrorMessages::errorMsg(long unsigned int lineNumber,
     return "\n" + (_uri.empty() ? "" : errorLink(lineNumber, errorLevel) + "\n") + msg;
 }
 
+// LCOV_EXCL_START {  all the error messages are excluded from coverage
+
 ////////////////////////////////////////////////////////////////////////////////
 //              ERRORS
 ////////////////////////////////////////////////////////////////////////////////
@@ -416,6 +418,8 @@ std::string ErrorMessages::WARNING_SOMA_NON_CYLINDER_OR_POINT() const {
                     "Soma must be stacked cylinders or a point: see "
                     "https://github.com/BlueBrain/MorphIO/issues/457");
 }
+
+// LCOV_EXCL_STOP }
 
 }  // namespace readers
 
