@@ -7,23 +7,23 @@
 TEST_CASE("morphio::PointLevel") {
     using namespace morphio::Property;
 
-    SECTION("mismatch of points and diameters"){
+    SECTION("mismatch of points and diameters") {
         std::vector<Point::Type> points;
-        std::vector<Diameter::Type> diameters {1, 1};
+        std::vector<Diameter::Type> diameters{1, 1};
         std::vector<Perimeter::Type> perimeters;
 
         CHECK_THROWS(PointLevel(points, diameters, perimeters));
     }
 
-    SECTION("mismatch of perimeters"){
+    SECTION("mismatch of perimeters") {
         std::vector<Point::Type> points;
         std::vector<Diameter::Type> diameters;
-        std::vector<Perimeter::Type> perimeters {1, 1};
+        std::vector<Perimeter::Type> perimeters{1, 1};
 
         CHECK_THROWS(PointLevel(points, diameters, perimeters));
     }
 
-    SECTION("ostream"){
+    SECTION("ostream") {
         PointLevel p;
         PointLevel pl;
         p = pl;
