@@ -437,12 +437,12 @@ def test_unsupported_section_type():
 
     content = ('''1 1 0 4 0 3.0 -1
                   2 3 0 0 2 0.5 1
-                  3 11 0 0 3 0.5 2  # <-- 11 is unsupported section type
+                  3 20 0 0 3 0.5 2  # <-- 20 is unsupported section type
                   ''')
 
     with pytest.raises(RawDataError, match=':3:error') as obj:
         Morphology(content, extension='swc')
-    assert obj.match('Unsupported section type: 11')
+    assert obj.match('Unsupported section type: 20')
 
 
 def test_root_node_split():

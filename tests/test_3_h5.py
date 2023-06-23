@@ -46,7 +46,7 @@ def test_v1():
 
 
 def test_wrong_section_type():
-    with pytest.raises(RawDataError, match='Unsupported section type: 12'):
+    with pytest.raises(RawDataError, match='Unsupported section type: 20'):
         Morphology(H5V1_PATH / 'simple-broken-section-type.h5')
 
     with pytest.raises(RawDataError, match='Unsupported section type: -2'):

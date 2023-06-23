@@ -158,9 +158,30 @@ TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {
 }
 
 TEST_CASE("LoadSWCMorphology", "[morphology]") {
-    const morphio::Morphology m("data/simple.swc");
+    {
+        const morphio::Morphology m("data/simple.swc");
+        REQUIRE(m.diameters().size() == 12);
+    }
 
-    REQUIRE(m.diameters().size() == 12);
+    {
+        const morphio::Morphology all_types("data/simple-all-types.swc");
+        REQUIRE(all_types.diameters().size() == 30);
+        REQUIRE(all_types.rootSections()[0].type() == morphio::SECTION_CUSTOM_5);
+        REQUIRE(all_types.rootSections()[1].type() == morphio::SECTION_CUSTOM_6);
+        REQUIRE(all_types.rootSections()[2].type() == morphio::SECTION_CUSTOM_7);
+        REQUIRE(all_types.rootSections()[3].type() == morphio::SECTION_CUSTOM_8);
+        REQUIRE(all_types.rootSections()[4].type() == morphio::SECTION_CUSTOM_9);
+        REQUIRE(all_types.rootSections()[5].type() == morphio::SECTION_CUSTOM_10);
+        REQUIRE(all_types.rootSections()[6].type() == morphio::SECTION_CUSTOM_11);
+        REQUIRE(all_types.rootSections()[7].type() == morphio::SECTION_CUSTOM_12);
+        REQUIRE(all_types.rootSections()[8].type() == morphio::SECTION_CUSTOM_13);
+        REQUIRE(all_types.rootSections()[9].type() == morphio::SECTION_CUSTOM_14);
+        REQUIRE(all_types.rootSections()[10].type() == morphio::SECTION_CUSTOM_15);
+        REQUIRE(all_types.rootSections()[11].type() == morphio::SECTION_CUSTOM_16);
+        REQUIRE(all_types.rootSections()[12].type() == morphio::SECTION_CUSTOM_17);
+        REQUIRE(all_types.rootSections()[13].type() == morphio::SECTION_CUSTOM_18);
+        REQUIRE(all_types.rootSections()[14].type() == morphio::SECTION_CUSTOM_19);
+    }
 }
 
 TEST_CASE("LoadNeurolucidaMorphology", "[morphology]") {
