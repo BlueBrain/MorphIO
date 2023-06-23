@@ -41,7 +41,7 @@ static bool compare_section_structure(const std::vector<Section::Type>& vec1,
     return true;
 }
 
-} // namespace details
+}  // namespace details
 
 PointLevel::PointLevel(std::vector<Point::Type> points,
                        std::vector<Diameter::Type> diameters,
@@ -97,7 +97,8 @@ bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLe
 
 bool SectionLevel::diff(const SectionLevel& other, LogLevel logLevel) const {
     return !(this == &other ||
-             (details::compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
+             (details::compare_section_structure(
+                  this->_sections, other._sections, "_sections", logLevel) &&
               compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
               compare(this->_children, other._children, "_children", logLevel)));
 }
@@ -161,9 +162,9 @@ MitochondriaPointLevel::MitochondriaPointLevel(
 
 bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other,
                                     LogLevel logLevel) const {
-    return !(this == &other ||
-             (details::compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
-              compare(this->_children, other._children, "_children", logLevel)));
+    return !(this == &other || (details::compare_section_structure(
+                                    this->_sections, other._sections, "_sections", logLevel) &&
+                                compare(this->_children, other._children, "_children", logLevel)));
 }
 
 bool MitochondriaSectionLevel::operator==(const MitochondriaSectionLevel& other) const {
@@ -194,8 +195,8 @@ bool MitochondriaPointLevel::operator!=(const MitochondriaPointLevel& other) con
 
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel) {
     os << "Point level properties:\n"
-        << "Point Diameter"
-        << (pointLevel._perimeters.size() == pointLevel._points.size() ? " Perimeter\n" : "\n");
+       << "Point Diameter"
+       << (pointLevel._perimeters.size() == pointLevel._points.size() ? " Perimeter\n" : "\n");
     for (unsigned int i = 0; i < pointLevel._points.size(); ++i) {
         os << dumpPoint(pointLevel._points[i]) << ' ' << pointLevel._diameters[i];
         if (pointLevel._perimeters.size() == pointLevel._points.size()) {

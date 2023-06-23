@@ -1,7 +1,7 @@
 #include "../src/point_utils.h"
 
 #include <catch2/catch.hpp>
-#include <sstream>      // std::stringstream
+#include <sstream>  // std::stringstream
 
 
 TEST_CASE("morphio::Point") {
