@@ -16,6 +16,7 @@ from ._morphio import (
     AnnotationType,
     CellFamily,
     CellLevel,
+    Collection,
     DendriticSpine,
     EndoplasmicReticulum,
     GlialCell,

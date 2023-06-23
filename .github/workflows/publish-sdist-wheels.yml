@@ -4,7 +4,7 @@ on: [pull_request, push]
 env:
   CIBW_BUILD_VERBOSITY: 3
   CIBW_BUILD: 'cp*'
-  CIBW_SKIP: 'cp35-* cp36-* *-manylinux_i686 *-musllinux_* *-win32 cp311-win_amd64 cp311-macosx_x86_64'
+  CIBW_SKIP: 'cp35-* cp36-* *-manylinux_i686 *-musllinux_* *-win32 cp311-macosx_x86_64'
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
   CIBW_TEST_COMMAND: pytest -s -v {project}/tests
 

@@ -23,6 +23,54 @@
 #endif
 
 
+static const char *__doc_morphio_Collection = R"doc()doc";
+
+static const char *__doc_morphio_CollectionImpl = R"doc()doc";
+
+static const char *__doc_morphio_Collection_Collection = R"doc()doc";
+
+static const char *__doc_morphio_Collection_Collection_2 =
+R"doc(Create a collection from the given path.
+
+If `collection_path` points to an HDF5 file, then that file must be a
+container. Otherwise the `collection_path` should point to the
+directory containing the morphology files.
+
+If the collection path is a directory, the extension of the morphology
+file must be guessed. The optional argument `extensions` specifies
+which and in which order the morphologies are searched.)doc";
+
+static const char *__doc_morphio_Collection_argsort =
+R"doc(Returns the reordered loop indices.
+
+This is the suggested order in which one should load the morphologies
+to minimize seeking within the file.
+
+Note: This API is 'experimental', meaning it might change in the
+future.)doc";
+
+static const char *__doc_morphio_Collection_close =
+R"doc(Close the collection.
+
+Note that `morphio::Collection` uses RAII. Therefore, the usual
+scoping rules should suffice. However, there are cases where one wants
+to close the collection explicitly, causing all resources held by the
+collection to be release. In the case of containers it ensures that
+the file is closed.
+
+The object should not be used after calling `close`.)doc";
+
+static const char *__doc_morphio_Collection_collection = R"doc()doc";
+
+static const char *__doc_morphio_Collection_load = R"doc(Load the morphology as an immutable morphology.)doc";
+
+static const char *__doc_morphio_Collection_load_2 = R"doc(Load the morphology as a mutable morphology.)doc";
+
+static const char *__doc_morphio_Collection_load_unordered =
+R"doc(Returns an iterable of loop index, morphology pairs.
+
+See `LoadUnordered` for details.)doc";
+
 static const char *__doc_morphio_DendriticSpine = R"doc(Class to represent morphologies of dendritic spines)doc";
 
 static const char *__doc_morphio_DendriticSpine_2 = R"doc()doc";
@@ -74,6 +122,102 @@ static const char *__doc_morphio_GlialCell_soma = R"doc()doc";
 static const char *__doc_morphio_IDSequenceError = R"doc()doc";
 
 static const char *__doc_morphio_IDSequenceError_IDSequenceError = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered =
+R"doc(An iterable of loop index and morphologies.
+
+When reading from containers, the order in which morphologies are read
+can have a large impact on the overall time to load those
+morphologies.
+
+This iterator provides means of reordering loops to optimize the
+access pattern. Loops such as the following
+
+for(size_t k = 0; k < morphology_names.size; ++k) { auto morph =
+collection.load<M>(morphology_names[k]); f(k, morph); }
+
+can be replaced with
+
+for(auto [k, morph] : collection.load_unordered<M>(morphology_names))
+{ assert(collection.load<M>(morphology_names[k]) == morph); f(k,
+morph); }
+
+The order in which the morphologies are returned in unspecified, but
+the loop index `k` can be used to retrieve the correct state
+corresponding to iteration `k` of the original loop.
+
+Note, that it is safe for an `LoadUnordered` object to outlive its
+`collection`. Internally a shallow copy of the original `collection`
+is stored inside of and kept alive for the life time of the
+`LoadUnordered` object.
+
+Note: This API is 'experimental', meaning it might change in the
+future.)doc";
+
+static const char *__doc_morphio_LoadUnordered_2 =
+R"doc(An iterable of loop index and morphologies.
+
+When reading from containers, the order in which morphologies are read
+can have a large impact on the overall time to load those
+morphologies.
+
+This iterator provides means of reordering loops to optimize the
+access pattern. Loops such as the following
+
+for(size_t k = 0; k < morphology_names.size; ++k) { auto morph =
+collection.load<M>(morphology_names[k]); f(k, morph); }
+
+can be replaced with
+
+for(auto [k, morph] : collection.load_unordered<M>(morphology_names))
+{ assert(collection.load<M>(morphology_names[k]) == morph); f(k,
+morph); }
+
+The order in which the morphologies are returned in unspecified, but
+the loop index `k` can be used to retrieve the correct state
+corresponding to iteration `k` of the original loop.
+
+Note, that it is safe for an `LoadUnordered` object to outlive its
+`collection`. Internally a shallow copy of the original `collection`
+is stored inside of and kept alive for the life time of the
+`LoadUnordered` object.
+
+Note: This API is 'experimental', meaning it might change in the
+future.)doc";
+
+static const char *__doc_morphio_LoadUnordered_3 = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_4 = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnorderedImpl = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_Iterator = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_Iterator_Iterator = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_Iterator_k = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_Iterator_load_unordered_impl = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_Iterator_operator_eq = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_Iterator_operator_inc = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_Iterator_operator_inc_2 = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_Iterator_operator_mul = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_Iterator_operator_mul_2 = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_Iterator_operator_ne = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_LoadUnordered = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_begin = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_end = R"doc()doc";
+
+static const char *__doc_morphio_LoadUnordered_load_unordered_impl = R"doc()doc";
 
 static const char *__doc_morphio_MissingParentError = R"doc()doc";
 
@@ -637,6 +781,10 @@ static const char *__doc_morphio_diff = R"doc(Perform a diff on 2 morphologies, 
 
 static const char *__doc_morphio_diff_2 = R"doc(Perform a diff on 2 sections, returns True if items differ)doc";
 
+static const char *__doc_morphio_enable_if_immutable = R"doc(Enable if `T` is a immutable morphology.)doc";
+
+static const char *__doc_morphio_enable_if_mutable = R"doc(Enable if `T` is a mutable morphology.)doc";
+
 static const char *__doc_morphio_enums_AnnotationType = R"doc()doc";
 
 static const char *__doc_morphio_enums_AnnotationType_SINGLE_CHILD = R"doc()doc";
@@ -683,17 +831,35 @@ static const char *__doc_morphio_enums_SectionType_SECTION_AXON = R"doc(Axon sec
 
 static const char *__doc_morphio_enums_SectionType_SECTION_CNIC_CUSTOM_START = R"doc()doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_10 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_10 = R"doc(Custom section type 10)doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_5 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_11 = R"doc(Custom section type 11)doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_6 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_12 = R"doc(Custom section type 12)doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_7 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_13 = R"doc(Custom section type 13)doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_8 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_14 = R"doc(Custom section type 14)doc";
 
-static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_9 = R"doc(Custom section type)doc";
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_15 = R"doc(Custom section type 15)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_16 = R"doc(Custom section type 16)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_17 = R"doc(Custom section type 17)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_18 = R"doc(Custom section type 18)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_19 = R"doc(Custom section type 19)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_5 = R"doc(Custom section type 5)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_6 = R"doc(Custom section type 6)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_7 = R"doc(Custom section type 7)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_8 = R"doc(Custom section type 8)doc";
+
+static const char *__doc_morphio_enums_SectionType_SECTION_CUSTOM_9 = R"doc(Custom section type 9)doc";
 
 static const char *__doc_morphio_enums_SectionType_SECTION_DENDRITE = R"doc(General or basal dendrite (near to soma))doc";
 
@@ -762,6 +928,10 @@ static const char *__doc_morphio_enums_Warning_NO_SOMA_FOUND = R"doc(No soma fou
 static const char *__doc_morphio_enums_Warning_ONLY_CHILD = R"doc(Single child sections are not allowed in SWC format)doc";
 
 static const char *__doc_morphio_enums_Warning_SOMA_NON_CONFORM = R"doc(Soma does not conform the three point soma spec from NeuroMorpho.org)doc";
+
+static const char *__doc_morphio_enums_Warning_SOMA_NON_CONTOUR = R"doc(Soma must be a contour for ASC and H5)doc";
+
+static const char *__doc_morphio_enums_Warning_SOMA_NON_CYLINDER_OR_POINT = R"doc(Soma must be stacked cylinders or a point)doc";
 
 static const char *__doc_morphio_enums_Warning_UNDEFINED = R"doc(undefined value)doc";
 
@@ -983,9 +1153,11 @@ their enum: morphio::enum::Option and can be composed.
 
 Example: Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);)doc";
 
-static const char *__doc_morphio_mut_Morphology_Morphology_3 = R"doc(Build a mutable Morphology from a mutable morphology aaaaaa)doc";
+static const char *__doc_morphio_mut_Morphology_Morphology_3 = R"doc(Build a mutable Morphology from an HighFive::Group)doc";
 
-static const char *__doc_morphio_mut_Morphology_Morphology_4 = R"doc(Build a mutable Morphology from a read-only morphology)doc";
+static const char *__doc_morphio_mut_Morphology_Morphology_4 = R"doc(Build a mutable Morphology from a mutable morphology)doc";
+
+static const char *__doc_morphio_mut_Morphology_Morphology_5 = R"doc(Build a mutable Morphology from a read-only morphology)doc";
 
 static const char *__doc_morphio_mut_Morphology_addAnnotation = R"doc()doc";
 
@@ -1230,6 +1402,8 @@ the soma type)doc";
 
 static const char *__doc_morphio_mut_Soma_type = R"doc(Return the soma type)doc";
 
+static const char *__doc_morphio_mut_Soma_type_2 = R"doc(Return the soma type)doc";
+
 static const char *__doc_morphio_mut_checkDuplicatePoint = R"doc()doc";
 
 static const char *__doc_morphio_mut_diameters = R"doc()doc";
@@ -1375,6 +1549,12 @@ static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_ALREADY_DEFINE
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_BIFURCATION = R"doc(Bifurcating soma error message)doc";
 
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_CONTOUR = R"doc(Contour soma must have at least 3 points.)doc";
+
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_SINGLE_POINT = R"doc(Single point soma must have one point)doc";
+
+static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_THREE_POINT_CYLINDER = R"doc(Multiple points for single point soma)doc";
+
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_SOMA_WITH_NEURITE_PARENT = R"doc(Soma with neurite parent error message)doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_ERROR_UNCOMPATIBLE_FLAGS = R"doc(Incompatible flags error message)doc";
@@ -1412,6 +1592,10 @@ static const char *__doc_morphio_readers_ErrorMessages_WARNING_NEUROMORPHO_SOMA_
 static const char *__doc_morphio_readers_ErrorMessages_WARNING_NO_SOMA_FOUND = R"doc(Soma not found warning message)doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_WARNING_ONLY_CHILD = R"doc(Writing single child section warning message)doc";
+
+static const char *__doc_morphio_readers_ErrorMessages_WARNING_SOMA_NON_CONTOUR = R"doc(Soma must be a contour for ASC and H5)doc";
+
+static const char *__doc_morphio_readers_ErrorMessages_WARNING_SOMA_NON_CYLINDER_OR_POINT = R"doc()doc";
 
 static const char *__doc_morphio_readers_ErrorMessages_WARNING_WRITE_EMPTY_MORPHOLOGY = R"doc(Writing empty morphology warning message)doc";
 

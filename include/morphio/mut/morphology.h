@@ -41,7 +41,10 @@ class Morphology
     **/
     explicit Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
 
-    /// Build a mutable Morphology from a mutable morphology aaaaaa
+    /// Build a mutable Morphology from an HighFive::Group
+    explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+
+    /// Build a mutable Morphology from a mutable morphology
     Morphology(const morphio::mut::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
     /// Build a mutable Morphology from a read-only morphology

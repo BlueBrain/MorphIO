@@ -1,9 +1,14 @@
 set(TESTS_SRC
         main.cpp
+        test_collection.cpp
         test_immutable_morphology.cpp
         test_mitochondria.cpp
         test_morphology_readers.cpp
         test_mutable_morphology.cpp
+        test_point_utils.cpp
+        test_properties.cpp
+        test_soma.cpp
+        test_utilities.cpp
         test_vasculature_morphology.cpp
         )
 set(TESTS_LINK_LIBRAIRIES morphio_static HighFive Catch2::Catch2)

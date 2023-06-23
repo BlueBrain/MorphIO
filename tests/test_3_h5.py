@@ -1,15 +1,14 @@
-import os
 from itertools import chain, repeat
 from pathlib import Path
 
-from morphio import CellFamily, Morphology, RawDataError, SectionType, ostream_redirect
 import pytest
+from morphio import Morphology, RawDataError, SectionType, ostream_redirect
 from numpy.testing import assert_array_equal
-
 from utils import captured_output
 
-_path = Path(os.path.dirname(os.path.abspath(__file__)), "data")
-H5_PATH = Path(_path, 'h5')
+
+DATA_DIR = Path(__file__).parent / "data"
+H5_PATH = Path(DATA_DIR, 'h5')
 H5V1_PATH = Path(H5_PATH, 'v1')
 H5V2_PATH = Path(H5_PATH, 'v2')
 
@@ -47,7 +46,7 @@ def test_v1():
 
 
 def test_wrong_section_type():
-    with pytest.raises(RawDataError, match='Unsupported section type: 12'):
+    with pytest.raises(RawDataError, match='Unsupported section type: 20'):
         Morphology(H5V1_PATH / 'simple-broken-section-type.h5')
 
     with pytest.raises(RawDataError, match='Unsupported section type: -2'):
