@@ -1775,10 +1775,6 @@ static const char *__doc_morphio_vasculature_property_Properties_get = R"doc()do
 
 static const char *__doc_morphio_vasculature_property_Properties_get_mut = R"doc()doc";
 
-static const char *__doc_morphio_vasculature_property_Properties_operator_eq = R"doc()doc";
-
-static const char *__doc_morphio_vasculature_property_Properties_operator_ne = R"doc()doc";
-
 static const char *__doc_morphio_vasculature_property_Properties_pointLevel = R"doc()doc";
 
 static const char *__doc_morphio_vasculature_property_Properties_predecessors = R"doc()doc";
@@ -1813,6 +1809,8 @@ static const char *__doc_morphio_vasculature_property_VascSection = R"doc()doc";
 
 static const char *__doc_morphio_vasculature_property_VascSectionLevel = R"doc(stores section level information)doc";
 
+static const char *__doc_morphio_vasculature_property_VascSectionLevel_diff = R"doc()doc";
+
 static const char *__doc_morphio_vasculature_property_VascSectionLevel_operator_eq = R"doc()doc";
 
 static const char *__doc_morphio_vasculature_property_VascSectionLevel_operator_ne = R"doc()doc";
@@ -1832,10 +1830,6 @@ static const char *__doc_morphio_vasculature_property_get_mut = R"doc()doc";
 static const char *__doc_morphio_vasculature_property_operator_lshift = R"doc()doc";
 
 static const char *__doc_morphio_vasculature_property_operator_lshift_2 = R"doc()doc";
-
-static const char *__doc_morphio_vasculature_property_predecessors = R"doc()doc";
-
-static const char *__doc_morphio_vasculature_property_successors = R"doc()doc";
 
 static const char *__doc_morphio_vasculature_sectionTypes = R"doc()doc";
 
