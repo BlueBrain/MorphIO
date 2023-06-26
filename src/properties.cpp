@@ -11,10 +11,10 @@ namespace morphio {
 namespace Property {
 
 namespace details {
-static bool compare_section_structure(const std::vector<Section::Type>& vec1,
-                                      const std::vector<Section::Type>& vec2,
-                                      const std::string& name,
-                                      LogLevel logLevel) {
+bool compare_section_structure(const std::vector<Section::Type>& vec1,
+                               const std::vector<Section::Type>& vec2,
+                               const std::string& name,
+                               LogLevel logLevel) {
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR) {
             printError(Warning::UNDEFINED,
