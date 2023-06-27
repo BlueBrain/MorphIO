@@ -14,10 +14,11 @@ namespace vasculature {
 namespace property {
 
 namespace details {
-bool compare_section_structure(const std::vector<morphio::vasculature::property::VascSection::Type>& vec1,
-                               const std::vector<morphio::vasculature::property::VascSection::Type>& vec2,
-                               const std::string& name,
-                               LogLevel logLevel) {
+static bool compare_section_structure(
+    const std::vector<morphio::vasculature::property::VascSection::Type>& vec1,
+    const std::vector<morphio::vasculature::property::VascSection::Type>& vec2,
+    const std::string& name,
+    LogLevel logLevel) {
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR) {
             morphio::printError(morphio::Warning::UNDEFINED,
@@ -64,24 +65,16 @@ VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range) {
     _diameters = copySpan<property::Diameter>(data._diameters, range);
 }
 
-template <typename T>
-bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLevel) {
-    if (el1 == el2) {
-        return true;
-    }
-
-    if (logLevel > LogLevel::ERROR) {
-        printError(Warning::UNDEFINED, name + " differs");
-    }
-    return false;
-}
-
 bool VascSectionLevel::diff(const VascSectionLevel& other, LogLevel logLevel) const {
     return this == &other ||
-           (details::compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
-            compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
-            compare(this->_predecessors, other._predecessors, "_predecessors", logLevel) &&
-            compare(this->_successors, other._successors, "_successors", logLevel));
+           (details::compare_section_structure(
+                this->_sections, other._sections, "_sections", logLevel) &&
+            morphio::property::compare(
+                this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
+            morphio::property::compare(
+                this->_predecessors, other._predecessors, "_predecessors", logLevel) &&
+            morphio::property::compare(
+                this->_successors, other._successors, "_successors", logLevel));
 }
 
 bool VascSectionLevel::operator==(const VascSectionLevel& other) const {

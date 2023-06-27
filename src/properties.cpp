@@ -11,10 +11,10 @@ namespace morphio {
 namespace Property {
 
 namespace details {
-bool compare_section_structure(const std::vector<Section::Type>& vec1,
-                               const std::vector<Section::Type>& vec2,
-                               const std::string& name,
-                               LogLevel logLevel) {
+static bool compare_section_structure(const std::vector<Section::Type>& vec1,
+                                      const std::vector<Section::Type>& vec2,
+                                      const std::string& name,
+                                      LogLevel logLevel) {
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR) {
             printError(Warning::UNDEFINED,
@@ -83,24 +83,13 @@ PointLevel& PointLevel::operator=(const PointLevel& other) {
     return *this;
 }
 
-template <typename T>
-bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLevel) {
-    if (el1 == el2) {
-        return true;
-    }
-
-    if (logLevel > LogLevel::ERROR) {
-        printError(Warning::UNDEFINED, name + " differs");
-    }
-    return false;
-}
-
 bool SectionLevel::diff(const SectionLevel& other, LogLevel logLevel) const {
     return !(this == &other ||
              (details::compare_section_structure(
                   this->_sections, other._sections, "_sections", logLevel) &&
-              compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
-              compare(this->_children, other._children, "_children", logLevel)));
+              morphio::property::compare(
+                  this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
+              morphio::property::compare(this->_children, other._children, "_children", logLevel)));
 }
 
 bool SectionLevel::operator==(const SectionLevel& other) const {
@@ -162,9 +151,10 @@ MitochondriaPointLevel::MitochondriaPointLevel(
 
 bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other,
                                     LogLevel logLevel) const {
-    return !(this == &other || (details::compare_section_structure(
-                                    this->_sections, other._sections, "_sections", logLevel) &&
-                                compare(this->_children, other._children, "_children", logLevel)));
+    return !(this == &other ||
+             (details::compare_section_structure(
+                  this->_sections, other._sections, "_sections", logLevel) &&
+              morphio::property::compare(this->_children, other._children, "_children", logLevel)));
 }
 
 bool MitochondriaSectionLevel::operator==(const MitochondriaSectionLevel& other) const {
@@ -177,12 +167,14 @@ bool MitochondriaSectionLevel::operator!=(const MitochondriaSectionLevel& other)
 
 bool MitochondriaPointLevel::diff(const MitochondriaPointLevel& other, LogLevel logLevel) const {
     return !(this == &other ||
-             (compare(this->_sectionIds, other._sectionIds, "mito section ids", logLevel) &&
-              compare(this->_relativePathLengths,
-                      other._relativePathLengths,
-                      "mito relative pathlength",
-                      logLevel) &&
-              compare(this->_diameters, other._diameters, "mito section diameters", logLevel)));
+             (morphio::property::compare(
+                  this->_sectionIds, other._sectionIds, "mito section ids", logLevel) &&
+              morphio::property::compare(this->_relativePathLengths,
+                                         other._relativePathLengths,
+                                         "mito relative pathlength",
+                                         logLevel) &&
+              morphio::property::compare(
+                  this->_diameters, other._diameters, "mito section diameters", logLevel)));
 }
 
 bool MitochondriaPointLevel::operator==(const MitochondriaPointLevel& other) const {
