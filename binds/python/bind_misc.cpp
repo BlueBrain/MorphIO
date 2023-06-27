@@ -9,8 +9,9 @@
 #include <morphio/types.h>
 #include <morphio/version.h>
 
-#include "../../include/morphio/enums.h"
 #include "bind_enums.h"
+#include "generated/docstrings.h"
+
 
 namespace py = pybind11;
 
@@ -19,19 +20,17 @@ void bind_misc(py::module& m) {
 
     m.def("set_maximum_warnings",
           &morphio::set_maximum_warnings,
-          "Set the maximum number of warnings to be printed on screen\n"
-          "0 will print no warning\n"
-          "-1 will print them all");
-    m.def("set_raise_warnings", &morphio::set_raise_warnings, "Whether to raise warning as errors");
+          DOC(morphio, set_maximum_warnings));
+    m.def("set_raise_warnings", &morphio::set_raise_warnings, DOC(morphio, set_raise_warnings));
     m.def("set_ignored_warning",
           static_cast<void (*)(morphio::Warning, bool)>(&morphio::set_ignored_warning),
-          "Ignore/Unignore a specific warning message",
+          DOC(morphio, set_ignored_warning),
           "warning"_a,
           "ignore"_a = true);
     m.def("set_ignored_warning",
           static_cast<void (*)(const std::vector<morphio::Warning>&, bool)>(
               &morphio::set_ignored_warning),
-          "Ignore/Unignore a list of warnings",
+          DOC(morphio, set_ignored_warning),
           "warning"_a,
           "ignore"_a = true);
 
@@ -75,10 +74,7 @@ void bind_misc(py::module& m) {
                        &morphio::Property::Properties::_cellLevel,
                        "Returns the structure that stores information at the cell level");
 
-    py::class_<morphio::Property::PointLevel>(m,
-                                              "PointLevel",
-                                              "Container class for information available at the "
-                                              "point level (point coordinate, diameter, perimeter)")
+    py::class_<morphio::Property::PointLevel>(m, "PointLevel", DOC(morphio, Property, PointLevel))
         .def(py::init<>())
         .def(py::init<std::vector<morphio::Property::Point::Type>,
                       std::vector<morphio::Property::Diameter::Type>>(),
@@ -102,8 +98,7 @@ void bind_misc(py::module& m) {
 
     py::class_<morphio::Property::SectionLevel>(m,
                                                 "SectionLevel",
-                                                "Container class for information available at the "
-                                                "section level (section type, parent section)")
+                                                DOC(morphio, Property, SectionLevel))
         .def_readwrite("sections",
                        &morphio::Property::SectionLevel::_sections,
                        "Returns a list of [offset, parent section ID]")
@@ -115,10 +110,7 @@ void bind_misc(py::module& m) {
                        "Returns a dictionary where key is a section ID "
                        "and value is the list of children section IDs");
 
-    py::class_<morphio::Property::CellLevel>(m,
-                                             "CellLevel",
-                                             "Container class for information available at the "
-                                             "cell level (cell type, file version, soma type)")
+    py::class_<morphio::Property::CellLevel>(m, "CellLevel", DOC(morphio, Property, CellLevel))
         .def_readwrite("cell_family",
                        &morphio::Property::CellLevel::_cellFamily,
                        "Returns the cell family (neuron or glia)")
@@ -127,11 +119,7 @@ void bind_misc(py::module& m) {
                        "Returns the soma type")
         .def_readwrite("version", &morphio::Property::CellLevel::_version, "Returns the version");
 
-    py::class_<morphio::Property::Annotation>(
-        m,
-        "Annotation",
-        "Container class for information about anomalies detected while parsing the file (no soma, "
-        "section with a single child...)")
+    py::class_<morphio::Property::Annotation>(m, "Annotation", DOC(morphio, Property, Annotation))
         .def_readwrite("type", &morphio::Property::Annotation::_type, "Returns the type")
         .def_readwrite("section_id",
                        &morphio::Property::Annotation::_sectionId,
@@ -174,10 +162,7 @@ void bind_misc(py::module& m) {
             "Returns the id of section that contains the marker");
 
     py::class_<morphio::Property::MitochondriaPointLevel>(
-        m,
-        "MitochondriaPointLevel",
-        "Container class for the information available at the mitochondrial point level (enclosing "
-        "neuronal section, relative distance to start of neuronal section, diameter)")
+        m, "MitochondriaPointLevel", DOC(morphio, Property, MitochondriaPointLevel))
         .def(py::init<>())
         .def(py::init<std::vector<uint32_t>,
                       std::vector<morphio::floatType>,
@@ -187,7 +172,7 @@ void bind_misc(py::module& m) {
              "diameters"_a);
 
     py::class_<morphio::Property::DendriticSpine::PostSynapticDensity>(
-        m, "PostSynapticDensity", "DendriticSpine post-synaptic density")
+        m, "PostSynapticDensity", DOC(morphio, Property, DendriticSpine, PostSynapticDensity))
         .def(py::init<>())
         .def(py::init<morphio::Property::DendriticSpine::SectionId_t,
                       morphio::Property::DendriticSpine::SegmentId_t,

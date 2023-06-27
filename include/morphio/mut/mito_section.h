@@ -19,25 +19,37 @@ class MitoSection
     MitoSection(Mitochondria* mitochondria, unsigned int id, const morphio::MitoSection& section);
     MitoSection(Mitochondria* mitochondria, unsigned int id, const MitoSection& section);
 
+    /// Append a MitoSection
     std::shared_ptr<MitoSection> appendSection(const Property::MitochondriaPointLevel& points);
 
+    /**
+       Append a MitoSection
+
+       If recursive == true, all descendent mito sections will be appended as well
+    **/
     std::shared_ptr<MitoSection> appendSection(const std::shared_ptr<MitoSection>& original_section,
                                                bool recursive);
 
+    /**
+       Append a MitoSection
+
+       If recursive == true, all descendent mito sections will be appended as well
+    **/
     std::shared_ptr<MitoSection> appendSection(const morphio::MitoSection& section, bool recursive);
 
+    /// Get the Section parent
     std::shared_ptr<MitoSection> parent() const;
+
+    /// Return true if section is a root section
     bool isRoot() const;
+
+    /// Get the Section children
     const std::vector<std::shared_ptr<MitoSection>>& children() const;
 
-    /**
-     * Return true if the both sections have the same neuriteSectionIds, diameters and pathLengths
-     */
+    /// Return true if the both sections have the same neuriteSectionIds, diameters and pathLengths
     bool hasSameShape(const MitoSection& other) const noexcept;
 
-    /**
-     * Return the section id
-     **/
+    /// Return the section id
     inline uint32_t id() const noexcept;
 
     /** @{
