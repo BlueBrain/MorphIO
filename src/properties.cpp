@@ -101,13 +101,15 @@ bool SectionLevel::operator!=(const SectionLevel& other) const {
 }
 
 bool CellLevel::diff(const CellLevel& other, LogLevel logLevel) const {
+    if (this == &other) {
+        return false;
+    }
+
     if (logLevel > 0 && this->_cellFamily != other._cellFamily) {
         std::cout << "this->_cellFamily: " << this->_cellFamily << '\n'
                   << "other._cellFamily: " << other._cellFamily << '\n';
     }
-    return !(this == &other || (this->_cellFamily == other._cellFamily
-                                // this->_somaType == other._somaType
-                                ));
+    return !(this->_cellFamily == other._cellFamily && this->_somaType == other._somaType);
 }
 
 bool CellLevel::operator==(const CellLevel& other) const {

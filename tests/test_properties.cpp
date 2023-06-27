@@ -85,17 +85,12 @@ TEST_CASE("morphio::CellLevel::compare") {
         CHECK(!(cl0 != cl0));
     }
 
-    /* SECTION("different types") { */
-    /*     auto cl1 = CellLevel{{}, {}, sl0, {}, {}, {}, {}}; */
-    /*     CHECK(cl0 != cl1); */
-    /*     CHECK(cl0.diff(cl1, morphio::enums::LogLevel::DEBUG)); */
-    /* } */
-
-    /* SECTION("different lenghts") { */
-    /*     auto cl1 = CellLevel{{}, {}, {}, {}, {}, {}}; */
-    /*     CHECK(cl0 != cl1); */
-    /*     CHECK(cl0.diff(cl1, morphio::enums::LogLevel::DEBUG)); */
-    /* } */
+    SECTION("different types") {
+        auto cl1 =
+            CellLevel{{}, morphio::enums::NEURON, morphio::enums::SomaType::SOMA_CYLINDERS, {}, {}};
+        CHECK(cl0 != cl1);
+        CHECK(cl0.diff(cl1, morphio::enums::LogLevel::DEBUG));
+    }
 }
 
 
