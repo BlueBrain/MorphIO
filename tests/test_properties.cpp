@@ -26,8 +26,13 @@ TEST_CASE("morphio::PointLevel") {
     }
 
     SECTION("ostream") {
-        PointLevel p;
-        PointLevel pl;
+        std::vector<Point::Type> points{{0, 0, 0}, {1, 1, 1}};
+        std::vector<Diameter::Type> diameters{1, 1};
+        std::vector<Perimeter::Type> perimeters{1, 1};
+
+        PointLevel p{points, diameters, perimeters};
+        PointLevel pl{points, diameters, perimeters};
+
         p = pl;
 
         std::stringstream s0;
@@ -85,7 +90,14 @@ TEST_CASE("morphio::CellLevel::compare") {
         CHECK(!(cl0 != cl0));
     }
 
-    SECTION("different types") {
+    SECTION("different cell families") {
+        auto cl1 =
+            CellLevel{{}, morphio::enums::GLIA, {}, {}, {}};
+        CHECK(cl0 != cl1);
+        CHECK(cl0.diff(cl1, morphio::enums::LogLevel::DEBUG));
+    }
+
+    SECTION("different soma types") {
         auto cl1 =
             CellLevel{{}, morphio::enums::NEURON, morphio::enums::SomaType::SOMA_CYLINDERS, {}, {}};
         CHECK(cl0 != cl1);
