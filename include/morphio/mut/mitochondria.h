@@ -25,8 +25,17 @@ class Mitochondria
   public:
     Mitochondria() = default;
 
+    /// Get the Section children
     const std::vector<MitoSectionP>& children(const MitoSectionP&) const;
+
+    /**
+       Get the shared pointer for the given section
+
+       Note: multiple morphologies can share the same Section instances.
+    **/
     const MitoSectionP& section(uint32_t id) const;
+
+    /// Returns the dictionary id -> Section for this tree
     const std::map<uint32_t, MitoSectionP>& sections() const noexcept;
 
     /**

@@ -20,7 +20,7 @@ enum Option {
 
 /**
    All possible warnings that can be ignored by user. This enum should be kept in sync with the
-   warnings defined in morphio::ErrorMessages.
+   warnings defined in morphio::ErrorMessages and with binds/python/bind_misc.cpp
 **/
 enum Warning {
     UNDEFINED,                         //!< undefined value

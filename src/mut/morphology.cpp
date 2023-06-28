@@ -392,10 +392,12 @@ void Morphology::write(const std::string& filename) const {
         }
     }
 
-    std::string extension;
+    const size_t pos = filename.find_last_of('.');
+    if(pos == std::string::npos) {
+        throw UnknownFileType("Missing file extension.");
+    }
 
-    const size_t pos = filename.find_last_of(".");
-    assert(pos != std::string::npos);
+    std::string extension;
     for (char c : filename.substr(pos)) {
         extension += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }
