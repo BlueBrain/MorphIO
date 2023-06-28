@@ -79,12 +79,8 @@ set_target_properties(morphio_obj
   )
 
 if (MORPHIO_ENABLE_COVERAGE)
-  target_compile_options(morphio_obj
-    PUBLIC -g -O0 --coverage -fprofile-arcs -ftest-coverage
-    )
-  target_link_libraries(morphio_obj
-    PUBLIC gcov
-    )
+  include(CodeCoverage)
+  append_coverage_compiler_flags_to_target(morphio_obj)
 endif()
 
 
@@ -115,13 +111,6 @@ foreach(TARGET morphio_shared morphio_static)
      $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
      )
   target_link_libraries(${TARGET} PUBLIC gsl-lite PRIVATE HighFive lexertl)
-
-  if (MORPHIO_ENABLE_COVERAGE)
-     target_link_libraries(${TARGET}
-     PUBLIC gcov
-     )
-  endif()
-
 endforeach(TARGET)
 
 install(
