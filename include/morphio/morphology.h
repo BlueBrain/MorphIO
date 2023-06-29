@@ -72,7 +72,11 @@ class Morphology
      **/
     std::vector<Section> rootSections() const;
 
-    /** Return a vector containing all section objects */
+    /** Return a vector containing all section objects
+     *
+     * Notes:
+     * Soma is not included
+     **/
     std::vector<Section> sections() const;
 
     /**

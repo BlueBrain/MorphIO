@@ -17,6 +17,4 @@
 #include "bindings_utils.h"
 
 
-mutable_binding_classes bind_mutable_classes(pybind11::module& m);
-
-void bind_mutable_methods(mutable_binding_classes& mutable_classes);
+void bind_mutable(pybind11::module& m);

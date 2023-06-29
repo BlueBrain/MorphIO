@@ -21,7 +21,10 @@ if [[ -z $LIBCLANG_PATH ]]; then
     exit -1
 fi
 
-PACKAGE=git+https://github.com/pybind/pybind11_mkdoc.git@master
+
+VERSION=no-reserved
+PACKAGE=git+https://github.com/mgeplf/pybind11_mkdoc.git@$VERSION
+#PACKAGE=git+https://github.com/pybind/pybind11_mkdoc.git@master
 
 VENV=build/venv-docstrings
 if [[ ! -d $VENV ]]; then
@@ -40,6 +43,7 @@ $VENV/bin/python -m pybind11_mkdoc \
   -ferror-limit=100000 \
   -I/usr/include/hdf5/serial \
   -I./3rdparty/HighFive/include \
+  -I./3rdparty/GSL_LITE/include \
   -I./include \
   ./include/morphio/mut/*.h \
   ./include/morphio/vasc/*.h \

@@ -1,4 +1,3 @@
-//#include <cmath>
 #include <iostream>  // std::cerr
 #include <sstream>   // std::ostringstream
 #include <string>
@@ -11,21 +10,24 @@ static int MORPHIO_MAX_N_WARNINGS = 100;
 static bool MORPHIO_RAISE_WARNINGS = false;
 
 /**
-   Controls the maximum number of warning to be printed on screen
-   0 will print no warning
-   -1 will print them all
-**/
+ * Controls the maximum number of warning to be printed on screen.
+ * 0 will print no warning
+ * -1 will print them all
+ */
 void set_maximum_warnings(int n_warnings) {
     MORPHIO_MAX_N_WARNINGS = n_warnings;
 }
 
-/**
-   Whether to raise warning as errors
-**/
+/*
+ *   Whether to raise warning as errors
+ */
 void set_raise_warnings(bool is_raise) {
     MORPHIO_RAISE_WARNINGS = is_raise;
 }
 
+/**
+ *   Ignore/Unignore a specific warning message
+ */
 void set_ignored_warning(Warning warning, bool ignore) {
     if (ignore) {
         readers::_ignoredWarnings.insert(warning);
@@ -34,6 +36,9 @@ void set_ignored_warning(Warning warning, bool ignore) {
     }
 }
 
+/**
+ *   Ignore/Unignore a specific warning message
+ */
 void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
     for (auto warning : warnings) {
         set_ignored_warning(warning, ignore);

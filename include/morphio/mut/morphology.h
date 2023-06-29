@@ -100,7 +100,7 @@ class Morphology
         return _endoplasmicReticulum;
     }
 
-    /// Return the annotation object
+    /// Return the annotation objects
     const std::vector<Property::Annotation>& annotations() const noexcept {
         return _cellProperties->_annotations;
     }

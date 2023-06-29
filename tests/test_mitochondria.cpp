@@ -61,12 +61,6 @@ TEST_CASE("mitochondria", "[mitochondria]") {
     REQUIRE_THAT(floatTypes(neuriteSectionIds.begin(), neuriteSectionIds.end()),
                  Catch::Approx(floatTypes{0.0, 1.0, 1.0, 2.0}));
     REQUIRE(rootSection.children().empty());
-
-    {
-        morphio::Morphology morph0 = morphio::Morphology("data/h5/v1/mitochondria.h5");
-        morphio::Morphology morph1 = morphio::Morphology("data/h5/v1/mitochondria.h5");
-        REQUIRE(morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(0)));
-    }
 }
 
 TEST_CASE("mitochondria.sections", "[mitochondria]") {
@@ -108,8 +102,12 @@ TEST_CASE("mitochondria.iteration", "[mitochondria]") {
     REQUIRE(res == std::vector<size_t>{0});
 }
 
-TEST_CASE("mitochondria.hasSameShape", "[mitochondria]") {
-    morphio::Morphology morph0 = morphio::Morphology("data/h5/v1/mitochondria.h5");
-    morphio::Morphology morph1 = morphio::Morphology("data/h5/v1/mitochondria.h5");
-    REQUIRE(morph0.rootSections()[0].hasSameShape(morph1.rootSections()[0]));
+TEST_CASE("mitochondria.hasSameShape") {
+    const auto morph0 = morphio::Morphology("data/h5/v1/mitochondria.h5");
+    const auto morph1 = morphio::Morphology("data/h5/v1/mitochondria.h5");
+
+    morphio::Mitochondria mito0 = morph0.mitochondria();
+    morphio::Mitochondria mito1 = morph1.mitochondria();
+
+    CHECK(mito0.rootSections()[0].hasSameShape(mito1.rootSections()[0]) == true);
 }
