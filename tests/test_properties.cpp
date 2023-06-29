@@ -91,8 +91,7 @@ TEST_CASE("morphio::CellLevel::compare") {
     }
 
     SECTION("different cell families") {
-        auto cl1 =
-            CellLevel{{}, morphio::enums::GLIA, {}, {}, {}};
+        auto cl1 = CellLevel{{}, morphio::enums::GLIA, {}, {}, {}};
         CHECK(cl0 != cl1);
         CHECK(cl0.diff(cl1, morphio::enums::LogLevel::DEBUG));
     }

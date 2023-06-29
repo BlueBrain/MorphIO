@@ -41,78 +41,78 @@ public:
       return line_;
   }
 
-    void skip_to(char value){
-        std::size_t pos = contents_.find_first_of(value, pos_);
-        if(pos == std::string::npos) {
-            pos_ = contents_.size();
-        }
-        pos_ = pos;
-    }
+  void skip_to(char value) {
+      std::size_t pos = contents_.find_first_of(value, pos_);
+      if (pos == std::string::npos) {
+          pos_ = contents_.size();
+      }
+      pos_ = pos;
+  }
 
-    void advance_to_non_whitespace() {
-        std::size_t pos = contents_.find_first_not_of(" \t", pos_);
-        if(pos == std::string::npos) {
-            pos_ = contents_.size();
-        }
-        pos_ = pos;
-    }
+  void advance_to_non_whitespace() {
+      std::size_t pos = contents_.find_first_not_of(" \t", pos_);
+      if (pos == std::string::npos) {
+          pos_ = contents_.size();
+      }
+      pos_ = pos;
+  }
 
-    void advance_to_number() {
-        while (consume_line_and_trailing_comments()) {
-        }
+  void advance_to_number() {
+      while (consume_line_and_trailing_comments()) {
+      }
 
-        if (done()) {
-            throw morphio::RawDataError(err_.EARLY_END_OF_FILE(line_));
-        }
+      if (done()) {
+          throw morphio::RawDataError(err_.EARLY_END_OF_FILE(line_));
+      }
 
-        auto c = contents_.at(pos_);
-        if(std::isdigit(c) != 0 || c == '-' || c == '+' || c == '.'){
-            return;
-        }
+      auto c = contents_.at(pos_);
+      if (std::isdigit(c) != 0 || c == '-' || c == '+' || c == '.') {
+          return;
+      }
 
-        throw morphio::RawDataError(err_.ERROR_LINE_NON_PARSABLE(line_));
-    }
+      throw morphio::RawDataError(err_.ERROR_LINE_NON_PARSABLE(line_));
+  }
 
-    int64_t read_int() {
-        advance_to_number();
-        auto parsed = stn_.toInt(contents_, pos_);
-        pos_ = std::get<1>(parsed);
-        return std::get<0>(parsed);
-    }
+  int64_t read_int() {
+      advance_to_number();
+      auto parsed = stn_.toInt(contents_, pos_);
+      pos_ = std::get<1>(parsed);
+      return std::get<0>(parsed);
+  }
 
-    morphio::floatType read_float() {
-        advance_to_number();
-        auto parsed = stn_.toFloat(contents_, pos_);
-        pos_ = std::get<1>(parsed);
-        return std::get<0>(parsed);
-    }
+  morphio::floatType read_float() {
+      advance_to_number();
+      auto parsed = stn_.toFloat(contents_, pos_);
+      pos_ = std::get<1>(parsed);
+      return std::get<0>(parsed);
+  }
 
-    bool consume_line_and_trailing_comments() {
-        bool found_newline = false;
+  bool consume_line_and_trailing_comments() {
+      bool found_newline = false;
 
-        advance_to_non_whitespace();
-        while(!done() && (contents_.at(pos_) == '#' || contents_.at(pos_) == '\n')){
-            switch(contents_.at(pos_)){
-                case '#':
-                    skip_to('\n');
-                    break;
-                case '\n':
-                    ++line_;
-                    ++pos_;
-                    found_newline = true;
-                    break;
-            }
-            advance_to_non_whitespace();
-        }
-        return found_newline || done();
-    }
+      advance_to_non_whitespace();
+      while (!done() && (contents_.at(pos_) == '#' || contents_.at(pos_) == '\n')) {
+          switch (contents_.at(pos_)) {
+          case '#':
+              skip_to('\n');
+              break;
+          case '\n':
+              ++line_;
+              ++pos_;
+              found_newline = true;
+              break;
+          }
+          advance_to_non_whitespace();
+      }
+      return found_newline || done();
+  }
 
 private:
-    size_t pos_ = 0;
-    size_t line_ = 1;
-    std::string contents_;
-    morphio::StringToNumber stn_{};
-    morphio::readers::ErrorMessages err_;
+  size_t pos_ = 0;
+  size_t line_ = 1;
+  std::string contents_;
+  morphio::StringToNumber stn_{};
+  morphio::readers::ErrorMessages err_;
 };
 
 }  // unnamed namespace
@@ -122,15 +122,14 @@ namespace readers {
 namespace swc {
 
 /**
-   Parsing SWC according to this specification:
-   http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
-**/
+  Parsing SWC according to this specification:
+http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
+ **/
 class SWCBuilder
 {
   public:
     explicit SWCBuilder(const std::string& path)
-        : err(path) {
-    }
+        : err(path) {}
 
     void _readSamples(const std::string& contents) {
         morphio::readers::Sample sample;
@@ -163,7 +162,8 @@ class SWCBuilder
             }
 
             if (sample.type >= SECTION_OUT_OF_RANGE_START || sample.type <= 0) {
-                throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(sample.lineNumber, sample.type));
+                throw RawDataError(
+                    err.ERROR_UNSUPPORTED_SECTION_TYPE(sample.lineNumber, sample.type));
             }
 
             if (!samples.insert({sample.id, sample}).second) {
@@ -179,8 +179,8 @@ class SWCBuilder
     }
 
     /**
-       Are considered potential somata all sample
-       with parentId == -1 and sample.type == SECTION_SOMA
+      Are considered potential somata all sample
+      with parentId == -1 and sample.type == SECTION_SOMA
      **/
     std::vector<Sample> _potentialSomata() {
         std::vector<Sample> somata;
@@ -262,8 +262,8 @@ class SWCBuilder
     }
 
     /**
-       A neurite which is not attached to the soma
-    **/
+      A neurite which is not attached to the soma
+     **/
     bool isOrphanNeurite(const Sample& sample) {
         return (sample.parentId == SWC_UNDEFINED_PARENT && sample.type != SECTION_SOMA);
     }
@@ -347,8 +347,8 @@ class SWCBuilder
         case 2: {
             return SOMA_CYLINDERS;
         }
-        // NeuroMorpho format is characterized by a 3 points soma
-        // with a bifurcation at soma root
+            // NeuroMorpho format is characterized by a 3 points soma
+            // with a bifurcation at soma root
         case 3: {
             uint32_t somaRootId = children[-1][0];
             auto& somaChildren = children[static_cast<int>(somaRootId)];
@@ -437,9 +437,9 @@ class SWCBuilder
     }
 
     /**
-       - Append last point of previous section if current section is not a root section
-       - Update the parent ID of the new section
-    **/
+      - Append last point of previous section if current section is not a root section
+      - Update the parent ID of the new section
+     **/
     void _processSectionStart(const Sample& sample) {
         Property::PointLevel properties;
 
