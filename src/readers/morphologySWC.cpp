@@ -104,7 +104,7 @@ class SWCBuilder
      **/
     std::vector<Sample> _potentialSomata() {
         std::vector<Sample> somata;
-        for (auto id : children[-1]) {
+        for (auto id : children[SWC_UNDEFINED_PARENT]) {
             if (samples[id].type == SECTION_SOMA) {
                 somata.push_back(samples[id]);
             }
@@ -117,7 +117,8 @@ class SWCBuilder
             return;
         }
 
-        if (sample.parentId != -1 && !children[static_cast<int>(sample.id)].empty()) {
+        if (sample.parentId != SWC_UNDEFINED_PARENT &&
+            !children[static_cast<int>(sample.id)].empty()) {
             std::vector<Sample> soma_bifurcations;
             for (auto id : children[static_cast<int>(sample.id)]) {
                 if (samples[id].type == SECTION_SOMA) {
@@ -133,6 +134,7 @@ class SWCBuilder
         }
 
         if (sample.parentId != -1 &&
+            samples.count(static_cast<unsigned int>(sample.parentId)) > 0 &&
             samples[static_cast<unsigned int>(sample.parentId)].type != SECTION_SOMA) {
             throw morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample));
         }
