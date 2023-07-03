@@ -185,7 +185,7 @@ class SWCBuilder
     std::vector<Sample> _potentialSomata() {
         std::vector<Sample> somata;
         for (auto id : children[-1]) {
-            if (samples[id].type == SECTION_SOMA) {
+            if (samples.at(id).type == SECTION_SOMA) {
                 somata.push_back(samples[id]);
             }
         }
@@ -201,10 +201,11 @@ class SWCBuilder
         if (sample.parentId != -1 && !children[sample_id].empty()) {
             std::vector<Sample> soma_bifurcations;
             for (auto id : children[sample_id]) {
-                if (samples[id].type == SECTION_SOMA) {
-                    soma_bifurcations.push_back(samples[id]);
+                const auto& child_sample = samples.at(id);
+                if (child_sample.type == SECTION_SOMA) {
+                    soma_bifurcations.push_back(child_sample);
                 } else {
-                    neurite_wrong_root.push_back(samples[id]);
+                    neurite_wrong_root.push_back(child_sample);
                 }
             }
 
@@ -213,8 +214,9 @@ class SWCBuilder
             }
         }
 
-        if (sample.parentId != -1 &&
-            samples[static_cast<unsigned int>(sample.parentId)].type != SECTION_SOMA) {
+        auto parent_id = static_cast<unsigned int>(sample.parentId);
+        if (sample.parentId != -1 && samples.count(parent_id) > 0 &&
+            samples.at(parent_id).type != SECTION_SOMA) {
             throw morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample));
         }
     }
@@ -271,15 +273,15 @@ class SWCBuilder
     bool isRootPoint(const Sample& sample) {
         return isOrphanNeurite(sample) ||
                (sample.type != SECTION_SOMA &&
-                samples[static_cast<unsigned int>(sample.parentId)].type ==
+                samples.at(static_cast<unsigned int>(sample.parentId)).type ==
                     SECTION_SOMA);  // Exclude soma bifurcations
     }
 
     bool isSectionStart(const Sample& sample) {
         return (isRootPoint(sample) ||
                 (sample.parentId > -1 &&
-                 isSectionEnd(samples[static_cast<unsigned int>(sample.parentId)])));  // Standard
-                                                                                       // section
+                 isSectionEnd(samples.at(static_cast<unsigned int>(sample.parentId)))));  // Standard
+                                                                                          // section
     }
 
     bool isSectionEnd(const Sample& sample) {
@@ -355,8 +357,8 @@ class SWCBuilder
 
             std::vector<Sample> children_soma_points;
             for (auto child : somaChildren) {
-                if (this->samples[child].type == SECTION_SOMA) {
-                    children_soma_points.push_back(this->samples[child]);
+                if (samples.at(child).type == SECTION_SOMA) {
+                    children_soma_points.push_back(samples.at(child));
                 }
             }
 
@@ -368,7 +370,7 @@ class SWCBuilder
                 //   http://neuromorpho.org/SomaFormat.html
 
                 if (!ErrorMessages::isIgnored(Warning::SOMA_NON_CONFORM)) {
-                    _checkNeuroMorphoSoma(this->samples[somaRootId], children_soma_points);
+                    _checkNeuroMorphoSoma(samples.at(somaRootId), children_soma_points);
                 }
 
                 return SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
@@ -401,7 +403,7 @@ class SWCBuilder
         std::vector<unsigned int> depthFirstSamples;
         _pushChildren(depthFirstSamples, -1);
         for (const auto id : depthFirstSamples) {
-            const Sample& sample = samples[id];
+            const Sample& sample = samples.at(id);
 
             // Bifurcation right at the start
             if (isRootPoint(sample) && isSectionEnd(sample)) {
@@ -450,13 +452,13 @@ class SWCBuilder
         } else {
             // Duplicating last point of previous section if there is not already a duplicate
             auto parentId = static_cast<unsigned int>(sample.parentId);
-            if (sample.point != samples[parentId].point) {
-                properties._points.push_back(samples[parentId].point);
-                properties._diameters.push_back(samples[parentId].diameter);
+            if (sample.point != samples.at(parentId).point) {
+                properties._points.push_back(samples.at(parentId).point);
+                properties._diameters.push_back(samples.at(parentId).diameter);
             }
 
             // Handle the case, bifurcatation at root point
-            if (isRootPoint(samples[parentId])) {
+            if (isRootPoint(samples.at(parentId))) {
                 id = morph.appendRootSection(properties, sample.type)->id();
             } else {
                 id = morph.section(swcIdToSectionId[parentId])
