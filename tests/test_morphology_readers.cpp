@@ -1,3 +1,5 @@
+#include <locale>
+
 #include "../src/readers/morphologyHDF5.h"
 #include <catch2/catch.hpp>
 
@@ -181,6 +183,34 @@ TEST_CASE("LoadSWCMorphology", "[morphology]") {
         REQUIRE(all_types.rootSections()[12].type() == morphio::SECTION_CUSTOM_17);
         REQUIRE(all_types.rootSections()[13].type() == morphio::SECTION_CUSTOM_18);
         REQUIRE(all_types.rootSections()[14].type() == morphio::SECTION_CUSTOM_19);
+    }
+}
+
+class LocaleGuard {
+public:
+    explicit LocaleGuard(const std::locale& newLocale)
+        : previousLocale(std::locale())
+    {
+        previousLocale = std::locale::global(newLocale);
+    }
+
+    ~LocaleGuard() {
+        std::locale::global(previousLocale);
+    }
+
+private:
+    std::locale previousLocale;
+};
+
+TEST_CASE("LoadSWCMorphologyLocale", "[morphology]") {
+    {
+#ifdef __APPLE__
+        const auto locale = LocaleGuard(std::locale("de_CH.UTF-8"));
+#else
+        const auto locale = LocaleGuard(std::locale("de_CH.UTF8"));
+#endif
+        const morphio::Morphology m("data/simple.swc");
+        REQUIRE(m.diameters().size() == 12);
     }
 }
 

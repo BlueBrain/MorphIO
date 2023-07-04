@@ -4,7 +4,7 @@
 namespace morphio {
 namespace enums {
 
-/** Output stream formatter for MorphologyVersion */
+/** Output stream formatter for SomaType */
 std::ostream& operator<<(std::ostream& os, const SomaType v) {
     switch (v) {
     case SOMA_SINGLE_POINT:

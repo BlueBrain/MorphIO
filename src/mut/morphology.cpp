@@ -393,7 +393,7 @@ void Morphology::write(const std::string& filename) const {
     }
 
     const size_t pos = filename.find_last_of('.');
-    if(pos == std::string::npos) {
+    if (pos == std::string::npos) {
         throw UnknownFileType("Missing file extension.");
     }
 

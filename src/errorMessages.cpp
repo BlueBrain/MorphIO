@@ -152,6 +152,13 @@ std::string ErrorMessages::ERROR_SELF_PARENT(const Sample& sample) const {
     return errorMsg(sample.lineNumber, ErrorLevel::ERROR, "Parent ID can not be itself");
 }
 
+std::string ErrorMessages::EARLY_END_OF_FILE(long unsigned int lineNumber) const {
+    return errorMsg(lineNumber,
+                    ErrorLevel::ERROR,
+                    "The end of the file was reached before parsing finshed");
+}
+
+
 std::string ErrorMessages::ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std::string& method) const {
     return "Cannot call: " + method + " on soma of type UNDEFINED";
 }
@@ -160,6 +167,10 @@ std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(int mitoParentId) const {
     return "While trying to append new mitochondria section.\n"
            "Mitochondrial parent section: " +
            std::to_string(mitoParentId) + " does not exist.";
+}
+
+std::string ErrorMessages::ERROR_NEGATIVE_ID(long unsigned int lineNumber) const {
+    return errorMsg(lineNumber, ErrorLevel::WARNING, "The ID assigned to this line is negative");
 }
 
 /**
