@@ -66,13 +66,14 @@ static std::set<Warning> _ignoredWarnings;
 
 /** A sample of section for error reporting, includes its position (line) within the file. **/
 struct Sample {
+    enum : unsigned int { UNKNOWN_ID = 0xFFFFFFFE };
     Sample() = default;
 
     floatType diameter = -1.;
     Point point{};
     SectionType type = SECTION_UNDEFINED;
-    int parentId = -1;
-    unsigned int id = 0;
+    unsigned int parentId = UNKNOWN_ID;
+    unsigned int id = UNKNOWN_ID;
     unsigned int lineNumber = 0;
 };
 
