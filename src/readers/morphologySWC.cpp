@@ -116,6 +116,49 @@ private:
   morphio::readers::ErrorMessages err_;
 };
 
+std::vector<morphio::readers::Sample> readSamples(const std::string& contents,
+                                                  const morphio::readers::ErrorMessages& err) {
+    std::vector<morphio::readers::Sample> samples;
+    morphio::readers::Sample sample;
+
+    SWCTokenizer tokenizer{contents, err};
+    tokenizer.consume_line_and_trailing_comments();
+
+    while (!tokenizer.done()) {
+        sample.lineNumber = static_cast<unsigned int>(tokenizer.lineNumber());
+
+        int64_t id = tokenizer.read_int();
+        if (id < 0) {
+            throw morphio::RawDataError(err.ERROR_NEGATIVE_ID(sample.lineNumber));
+        }
+
+        sample.id = static_cast<unsigned int>(id);
+
+        sample.type = static_cast<morphio::SectionType>(tokenizer.read_int());
+
+        for (auto& point : sample.point) {
+            point = tokenizer.read_float();
+        }
+
+        sample.diameter = 2 * tokenizer.read_float();
+
+        int64_t parentId = tokenizer.read_int();
+        if (parentId < -1) {
+            throw morphio::RawDataError(err.ERROR_NEGATIVE_ID(sample.lineNumber));
+        } else if (parentId == SWC_UNDEFINED_PARENT) {
+            sample.parentId = SWC_ROOT;
+        } else {
+            sample.parentId = static_cast<unsigned int>(parentId);
+        }
+
+        if (!tokenizer.consume_line_and_trailing_comments()) {
+            throw morphio::RawDataError(err.ERROR_LINE_NON_PARSABLE(sample.lineNumber));
+        }
+        samples.push_back(sample);
+    }
+    return samples;
+}
+
 }  // unnamed namespace
 
 namespace morphio {
