@@ -1,3 +1,19 @@
+v3.3.6
+======
+Improvements:
+* don't allow negative IDs in SWC, except for the special parent == -1, for the first sample (#466)
+* Bump HighFive to v2.7.1 (#449)
+* Increase allowed section type to 19 (#462)
+* Have warnings for incompatible soma-types (#458):
+    * SWC files should have soma that are either a point, or a set of stacked cylinders.
+    * H5 & ASC consider the soma to be a contour
+    * allow assignment of soma type for mutable soma
+    * add errors for soma access / write if wrong size
+     - ERROR_SOMA_INVALID_SINGLE_POINT
+     - ERROR_SOMA_INVALID_THREE_POINT_CYLINDER
+     - ERROR_SOMA_INVALID_CONTOUR
+* increased test coverage and cleanup
+
 v3.3.5
 ======
 New Features:
