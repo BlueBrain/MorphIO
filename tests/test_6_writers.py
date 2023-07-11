@@ -1,3 +1,5 @@
+# Copyright (c) 2013-2023, EPFL/Blue Brain Project
+# SPDX-License-Identifier: Apache-2.0
 import h5py
 import numpy as np
 import pytest

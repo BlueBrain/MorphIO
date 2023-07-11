@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/soma.h>
