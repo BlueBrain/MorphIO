@@ -1,3 +1,5 @@
+# Copyright (c) 2013-2023, EPFL/Blue Brain Project
+# SPDX-License-Identifier: Apache-2.0
 import numpy as np
 from numpy import testing as npt
 from pathlib import Path

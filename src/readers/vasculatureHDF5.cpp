@@ -1,3 +1,8 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 #include "vasculatureHDF5.h"
 
 #include <highfive/H5DataType.hpp>  // for HighFive::SilenceHDF5
