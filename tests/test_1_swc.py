@@ -288,7 +288,7 @@ def test_soma_type():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             content = ('''1 1 0  0 0 3.0 -1
-                          2 1 1 -3 0 3.0  1
+                          2 1 1 -3 0 3.0  1 # <- note y is 1 instead of 0
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                     SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
@@ -297,7 +297,7 @@ def test_soma_type():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             content = ('''1 1 0  0 0 3.0 -1
-                          2 1 0 -3 0 3.0  1
+                          2 1 0 -3 0 3.0  1 # <- note z is -3 instead of 0
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                          SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)

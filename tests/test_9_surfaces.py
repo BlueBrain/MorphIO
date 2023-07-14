@@ -59,6 +59,7 @@ def test_contour_surface():
 
     assert_almost_equal(Morphology(DATA_DIR /  "soma_single_frustum.swc").soma.surface,
                         1201.428, decimal=3)
+
     # SWC multiple frustums
     assert_almost_equal(ImmutMorphology(DATA_DIR /  "soma_multiple_frustums.swc").soma.surface,
                         4164.610254415956, decimal=3)
