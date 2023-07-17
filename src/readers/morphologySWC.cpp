@@ -330,32 +330,25 @@ class SWCBuilder
 
         std::unordered_map<DeclaredID, std::shared_ptr<morphio::mut::Section>> declared_to_swc;
         declared_to_swc.reserve(samples.size());
-        for (const Sample& soma_sample : soma_samples) {
-            if (children_.count(soma_sample.id) == 0) {
-                continue;
-            }
-            for (unsigned int id : children_.at(soma_sample.id)) {
-                if (samples_.at(id).type != SECTION_SOMA) {
-                    assembleSections(id,
-                                     DeclaredID(soma_sample.id),
-                                     declared_to_swc,
-                                     morph1_.soma()->points()[0],
-                                     morph1_.soma()->diameters()[0],
-                                     true);
-                }
-            }
-        }
+
         for (const Sample& root_sample : root_samples) {
             if (children_.count(root_sample.id) == 0) {
                 continue;
             }
+            bool is_soma_sample = root_sample.type == SECTION_SOMA;
             for (unsigned int id : children_.at(root_sample.id)) {
                 if (samples_.at(id).type != SECTION_SOMA) {
+                    Point start_point = is_soma_sample
+                        ? morph1_.soma()->points()[0]
+                        : root_sample.point;
+                    floatType diameter = is_soma_sample
+                        ? morph1_.soma()->diameters()[0]
+                        : root_sample.diameter;
                     assembleSections(id,
                                      DeclaredID(root_sample.id),
                                      declared_to_swc,
-                                     root_sample.point,
-                                     root_sample.diameter,
+                                     start_point,
+                                     diameter,
                                      true);
                 }
             }
