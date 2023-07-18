@@ -362,14 +362,12 @@ class SWCBuilder
         const Point& start_point,
         floatType start_diameter,
         bool is_root) {
+
         morphio::Property::PointLevel properties;
         auto& points = properties._points;
         auto& diameters = properties._diameters;
 
-        const Sample* sample = &samples_.at(id);
-        auto starting_section_type = sample->type;
-
-        auto appendSection = [&](DeclaredID section_id_, DeclaredID parent_id_) {
+        auto appendSection = [&](DeclaredID section_id_, DeclaredID parent_id_, SectionType starting_section_type) {
             std::shared_ptr<morphio::mut::Section> new_section;
             if (is_root) {
                 new_section = morph1_.appendRootSection(properties, starting_section_type);
@@ -384,6 +382,7 @@ class SWCBuilder
             return children_.count(child_id) == 0 ? 0 : children_.at(child_id).size();
         };
 
+        const Sample* sample = &samples_.at(id);
         // create duplicate point if needed
         if (!is_root && sample->point != start_point /*|| sample->diameter != start_diameter */) {
             points.push_back(start_point);
@@ -394,7 +393,7 @@ class SWCBuilder
         if (children_count == 0) {
             points.push_back(sample->point);
             diameters.push_back(sample->diameter);
-            appendSection(DeclaredID(id), parent_id);
+            appendSection(DeclaredID(id), parent_id, sample->type);
         } else if (children_count == 1) {
             // try and combine as many single samples into a single section as possible
             do {
@@ -412,7 +411,7 @@ class SWCBuilder
             const Point& new_start_point = properties._points[offset];
             floatType new_start_diameter = properties._diameters[offset];
 
-            appendSection(DeclaredID(id), parent_id);
+            appendSection(DeclaredID(id), parent_id, sample->type);
 
             if (children_count == 1) {
                 // section_type changed
@@ -432,7 +431,7 @@ class SWCBuilder
         } else {
             points.push_back(sample->point);
             diameters.push_back(sample->diameter);
-            appendSection(DeclaredID(id), parent_id);
+            appendSection(DeclaredID(id), parent_id, sample->type);
 
             size_t offset = properties._points.size() - 1;
             const Point& new_start_point = properties._points[offset];
