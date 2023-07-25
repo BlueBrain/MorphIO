@@ -383,56 +383,39 @@ class SWCBuilder
         };
 
         const Sample* sample = &samples_.at(id);
+
         // create duplicate point if needed
         if (!is_root && sample->point != start_point /*|| sample->diameter != start_diameter */) {
             points.push_back(start_point);
             diameters.push_back(start_diameter);
         }
 
+        // try and combine as many single samples into a single section as possible
         size_t children_count = get_child_count(id);
-        if (children_count == 0) {
-            points.push_back(sample->point);
-            diameters.push_back(sample->diameter);
-            appendSection(DeclaredID(id), parent_id, sample->type);
-        } else if (children_count == 1) {
-            // try and combine as many single samples into a single section as possible
-            do {
-                sample = &samples_.at(id);
-                points.push_back(sample->point);
-                diameters.push_back(sample->diameter);
-                id = children_.at(id)[0];
-                children_count = get_child_count(id);
-            } while (children_count == 1);
+        while (children_count == 1) {
             sample = &samples_.at(id);
+            if(sample->type != samples_.at(children_.at(id)[0]).type){
+                break;
+            }
             points.push_back(sample->point);
             diameters.push_back(sample->diameter);
+            id = children_.at(id)[0];
+            children_count = get_child_count(id);
+        }
+        sample = &samples_.at(id);
+        points.push_back(sample->point);
+        diameters.push_back(sample->diameter);
+        appendSection(DeclaredID(id), parent_id, sample->type);
 
+        if (children_count == 0) {
+            // section was already appended above, nothing to do
+        } else if (children_count == 1) {
+            // section_type changed
             size_t offset = properties._points.size() - 1;
             const Point& new_start_point = properties._points[offset];
             floatType new_start_diameter = properties._diameters[offset];
-
-            appendSection(DeclaredID(id), parent_id, sample->type);
-
-            if (children_count == 1) {
-                // section_type changed
-                // WE DON'T HAVE TESTS FOR THIS????
-                // TODO: assembleSections(child_id, DeclaredID(id), declared_to_swc,
-                // new_start_point, new_start_diameter, false);
-            } else if (children_count > 1) {
-                for (unsigned int child_id : children_.at(id)) {
-                    assembleSections(child_id,
-                                     DeclaredID(id),
-                                     declared_to_swc,
-                                     new_start_point,
-                                     new_start_diameter,
-                                     false);
-                }
-            }
+            assembleSections(children_.at(id)[0], DeclaredID(id), declared_to_swc, new_start_point, new_start_diameter, false);
         } else {
-            points.push_back(sample->point);
-            diameters.push_back(sample->diameter);
-            appendSection(DeclaredID(id), parent_id, sample->type);
-
             size_t offset = properties._points.size() - 1;
             const Point& new_start_point = properties._points[offset];
             floatType new_start_diameter = properties._diameters[offset];

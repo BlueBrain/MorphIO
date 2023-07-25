@@ -24,7 +24,6 @@ def test_build_from_string():
     assert_array_equal(n.soma.diameters, [6.0])
     assert len(n.root_sections) == 1
     assert n.root_sections[0].id == 0
-    assert len(n.root_sections) == 1
     assert_array_equal(n.root_sections[0].points,
                        np.array([[0, 0, 2],
                                  [0, 0, 3],
@@ -46,7 +45,6 @@ def test_read_single_neurite():
     assert_array_equal(n.soma.diameters, [6.0])
     assert len(n.root_sections) == 1
     assert n.root_sections[0].id == 0
-    assert len(n.root_sections) == 1
     assert_array_equal(n.root_sections[0].points,
                        np.array([[0, 0, 2],
                                  [0, 0, 3],
@@ -526,3 +524,19 @@ def test_throw_on_negative_id():
     with pytest.raises(RawDataError, match='The ID assigned to this line is negative'):
         Morphology(content, extension='swc')
 
+
+def test_multi_type_section():
+    contents =('''1 1 0 4 0 3.0 -1
+                  2 6 0 0 2 0.5 1        # <- type 6
+                  3 7 0 0 3 0.5 2        # <- type 7
+                  4 8 0 0 4 0.5 3        # <- type 8
+                  5 9 0 0 5 0.5 4''')    # <- type 9
+    n = Morphology(contents, "swc")
+    assert_array_equal(n.soma.points, [[0, 4, 0]])
+    assert_array_equal(n.soma.diameters, [6.0])
+    assert len(n.root_sections) == 1
+    assert n.root_sections[0].id == 0
+    assert_array_equal(n.root_sections[0].points,
+                       np.array([[0, 0, 2], ]))
+    assert len(n.sections) == 4
+    assert_array_equal(n.section_offsets, [0, 1, 3, 5, 7])
