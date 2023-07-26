@@ -250,20 +250,20 @@ def test_simple_reversed():
                         [-5, -4, 0]])
 
 
-def test_soma_type():
-    '''The ordering of IDs is not required'''
-    # 1 point soma
+def test_soma_type_1_point():
     content = '''1 1 0 0 0 3.0 -1'''
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_SINGLE_POINT)
 
-    # 2 point soma
+
+def test_soma_type_2_point():
     content = ('''1 1 0 0 0 3.0 -1
                   2 1 0 0 0 3.0  1''')
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_CYLINDERS)
 
-    # > 3 points soma
+
+def test_soma_type_more_than_3_point():
     content = ('''1 1 0 0 0 3.0 -1
                   2 1 0 0 0 3.0  1
                   3 1 0 0 0 3.0  2
@@ -272,6 +272,7 @@ def test_soma_type():
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_CYLINDERS)
 
+def test_soma_type_3_point_neuromorpho():
     # 3 points soma can be of type SOMA_CYLINDERS or SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
     # depending on the point layout
 
@@ -312,6 +313,7 @@ Got:
 2 1 0.000000 -3.000000 0.000000 3.000000 1
 3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1''')
 
+def test_soma_type_3_point():
     # If this configuration is not respected -> SOMA_CYLINDERS
     content = ( '''1 1 0 0 0 3.0 -1
                    2 1 0 0 0 3.0  1
@@ -516,6 +518,7 @@ def test_no_soma():
             Morphology(content, extension='swc')
             assert ('$STRING$:0:warning\nWarning: no soma found in file' ==
                     strip_color_codes(err.getvalue().strip()))
+
 
 def test_throw_on_negative_id():
     content = '''1 2 0 0 0 3.0 -1
