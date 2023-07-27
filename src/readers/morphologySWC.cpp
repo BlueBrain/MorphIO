@@ -179,7 +179,6 @@ class SWCBuilder
     using PhysicalID = size_t;
     using Samples = std::vector<Sample>;
 
-
   public:
     explicit SWCBuilder(const std::string& path)
         : err_(path) {}
@@ -187,8 +186,8 @@ class SWCBuilder
     Property::Properties buildProperties(const std::string& contents, unsigned int options) {
         const Samples samples = readSamples(contents, err_);
         buildSWC(samples);
-        morph1_.applyModifiers(options);
-        return morph1_.buildReadOnly();
+        morph_.applyModifiers(options);
+        return morph_.buildReadOnly();
     }
 
   private:
@@ -224,7 +223,7 @@ class SWCBuilder
     }
 
     void build_soma(const Samples& soma_samples) {
-        auto& soma = morph1_.soma();
+        auto& soma = morph_.soma();
 
         if (soma_samples.empty()) {
             soma->type() = SOMA_UNDEFINED;
@@ -258,8 +257,8 @@ class SWCBuilder
 
         // a "normal" SWC soma
         soma->type() = SOMA_CYLINDERS;
-        std::vector<morphio::Point> points;
-        std::vector<morphio::floatType> diameters;
+        auto& points = soma->points();
+        auto& diameters = soma->diameters();
         points.reserve(soma_samples.size());
         diameters.reserve(soma_samples.size());
 
@@ -291,9 +290,6 @@ class SWCBuilder
         if (parent_count > 1) {
             throw morphio::SomaError(err_.ERROR_MULTIPLE_SOMATA(soma_samples));
         }
-
-        soma->points() = points;
-        soma->diameters() = diameters;
     }
 
     void buildSWC(const Samples& samples) {
@@ -360,8 +356,8 @@ class SWCBuilder
                     assembleSections(child_id,
                                      DeclaredID(root_sample.id),
                                      declared_to_swc,
-                                     morph1_.soma()->points()[0],
-                                     morph1_.soma()->diameters()[0],
+                                     morph_.soma()->points()[0],
+                                     morph_.soma()->diameters()[0],
                                      true);
                 } else {
                     // this is neurite as the start
@@ -392,7 +388,7 @@ class SWCBuilder
         auto appendSection = [&](DeclaredID section_id_, DeclaredID parent_id_, SectionType starting_section_type) {
             std::shared_ptr<morphio::mut::Section> new_section;
             if (is_root) {
-                new_section = morph1_.appendRootSection(properties, starting_section_type);
+                new_section = morph_.appendRootSection(properties, starting_section_type);
             } else {
                 new_section = declared_to_swc.at(parent_id_)
                                   ->appendSection(properties, starting_section_type);
@@ -455,7 +451,7 @@ class SWCBuilder
 
     std::unordered_map<unsigned int, std::vector<unsigned int>> children_;
     std::unordered_map<unsigned int, Sample> samples_;
-    mut::Morphology morph1_;
+    mut::Morphology morph_;
     ErrorMessages err_;
 };
 
