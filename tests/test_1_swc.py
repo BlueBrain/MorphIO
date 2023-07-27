@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import numpy as np
+import morphio
 import pytest
 from numpy.testing import assert_array_equal
 from utils import (assert_swc_exception, captured_output, ignored_warning,
@@ -519,7 +520,6 @@ def test_no_soma():
             assert ('$STRING$:0:warning\nWarning: no soma found in file' ==
                     strip_color_codes(err.getvalue().strip()))
 
-
 def test_throw_on_negative_id():
     content = '''1 2 0 0 0 3.0 -1
                  -2 2 0 0 0 3.0  1
@@ -543,3 +543,13 @@ def test_multi_type_section():
                        np.array([[0, 0, 2], ]))
     assert len(n.sections) == 4
     assert_array_equal(n.section_offsets, [0, 1, 3, 5, 7])
+
+def test_missing_parent():
+    contents =('''
+1 1  0  0 0 10 -1
+2 2 -2 -6 0 10  1
+3 2  2  6 0 10  2
+4 2  2  6 0 10  10
+''')
+    with pytest.raises(morphio.MissingParentError, match='Sample id: 4 refers to non-existant parent ID: 10'):
+        n = Morphology(contents, "swc")
