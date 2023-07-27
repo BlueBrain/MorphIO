@@ -192,8 +192,7 @@ class SWCBuilder
     }
 
   private:
-    void _checkAndFillNeuromorph3PointSoma(const Samples& soma_samples, std::shared_ptr<morphio::mut::Soma>& soma){
-        // check for SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
+    void _checkNeuromorph3PointSoma(const Samples& soma_samples){
         // First point is the 'center'; has 2 children
         const Sample& center = soma_samples[0];
         const Sample& child1 = soma_samples[1];
@@ -202,30 +201,25 @@ class SWCBuilder
         floatType x = center.point[0];
         floatType z = center.point[2];
         floatType d = center.diameter;
-
-        soma->type() = SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
-        soma->points() = {center.point, child1.point, child2.point};
-        soma->diameters() = {center.diameter, child1.diameter, child2.diameter};
+        floatType r = center.diameter / 2;
+        floatType y = center.point[1];
 
         // whether the soma should be checked for the special case of 3 point soma
         // for details see https://github.com/BlueBrain/MorphIO/issues/273
-        bool isLikelyThreepoint = std::fabs(child1.diameter - d) < morphio::epsilon &&
-                                  std::fabs(child2.diameter - d) < morphio::epsilon &&
-                                  std::fabs(child1.point[0] - x) < morphio::epsilon &&
-                                  std::fabs(child2.point[0] - x) < morphio::epsilon &&
-                                  std::fabs(child1.point[2] - z) < morphio::epsilon &&
-                                  std::fabs(child2.point[2] - z) < morphio::epsilon;
-        if (isLikelyThreepoint) {
-            floatType r = center.diameter / 2;
-            floatType y = center.point[1];
-            // If the 2nd and the 3rd point have the same x,z,d values then the only valid soma
-            // is: 1 1 x   y   z r -1 2 1 x (y-r) z r  1 3 1 x (y+r) z r  1
-            if (child1.point[0] != x || child2.point[0] != x || child1.point[1] != y - r ||
-                child2.point[1] != y + r || child1.point[2] != z || child2.point[2] != z ||
-                child1.diameter != d || child2.diameter != d) {
-                printError(Warning::SOMA_NON_CONFORM,
-                           err_.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(center, child1, child2));
-            }
+        // If the 2nd and the 3rd point have the same x, z, d values then the only valid soma
+        // is: 1 1 x   y   z r -1 2 1 x (y-r) z r  1 3 1 x (y+r) z r  1
+        if ((child1.point[0] != x || child2.point[0] != x || child1.point[1] != y - r ||
+             child2.point[1] != y + r || child1.point[2] != z || child2.point[2] != z ||
+             child1.diameter != d || child2.diameter != d) &&
+            std::fabs(child1.diameter - d) < morphio::epsilon &&
+            std::fabs(child2.diameter - d) < morphio::epsilon &&
+            std::fabs(child1.point[0] - x) < morphio::epsilon &&
+            std::fabs(child2.point[0] - x) < morphio::epsilon &&
+            std::fabs(child1.point[2] - z) < morphio::epsilon &&
+            std::fabs(child2.point[2] - z) < morphio::epsilon
+            ) {
+            printError(Warning::SOMA_NON_CONFORM,
+                       err_.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(center, child1, child2));
         }
     }
 
@@ -250,8 +244,13 @@ class SWCBuilder
             const Sample& center = soma_samples[0];
             const Sample& child1 = soma_samples[1];
             const Sample& child2 = soma_samples[2];
+            // All soma that bifurcate with the first parent having two children are considered
+            // SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
             if(center.id == child1.parentId && center.id == child2.parentId){
-                _checkAndFillNeuromorph3PointSoma(soma_samples, soma);
+                soma->type() = SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
+                soma->points() = {center.point, child1.point, child2.point};
+                soma->diameters() = {center.diameter, child1.diameter, child2.diameter};
+                _checkNeuromorph3PointSoma(soma_samples);
                return;
            }
         }
@@ -324,6 +323,7 @@ class SWCBuilder
             if (sample.type == SECTION_SOMA) {
                 soma_samples.push_back(sample);
             }
+
             if (sample.parentId == SWC_ROOT || sample.type == SECTION_SOMA) {
                 root_samples.push_back(sample);
             }
@@ -333,6 +333,14 @@ class SWCBuilder
             }
 
             children_[sample.parentId].push_back(sample.id);
+        }
+
+        // can only check for missing parents once all samples are loaded
+        // since it's possible there may be forward references
+        for (const auto& sample: samples) {
+            if(sample.parentId != SWC_ROOT && samples_.count(sample.parentId) == 0){
+                throw morphio::MissingParentError(err_.ERROR_MISSING_PARENT(sample));
+            }
         }
 
         build_soma(soma_samples);
@@ -346,20 +354,21 @@ class SWCBuilder
             }
             bool is_soma_sample = root_sample.type == SECTION_SOMA;
             for (unsigned int id : children_.at(root_sample.id)) {
-                if (samples_.at(id).type != SECTION_SOMA) {
-                    Point start_point = is_soma_sample
-                        ? morph1_.soma()->points()[0]
-                        : root_sample.point;
-                    floatType diameter = is_soma_sample
-                        ? morph1_.soma()->diameters()[0]
-                        : root_sample.diameter;
-                    assembleSections(id,
-                                     DeclaredID(root_sample.id),
-                                     declared_to_swc,
-                                     start_point,
-                                     diameter,
-                                     true);
+                if (samples_.at(id).type == SECTION_SOMA) {
+                    continue;
                 }
+                Point start_point = is_soma_sample
+                    ? morph1_.soma()->points()[0]
+                    : root_sample.point;
+                floatType diameter = is_soma_sample
+                    ? morph1_.soma()->diameters()[0]
+                    : root_sample.diameter;
+                assembleSections(id,
+                                 DeclaredID(root_sample.id),
+                                 declared_to_swc,
+                                 start_point,
+                                 diameter,
+                                 true);
             }
         }
     }
