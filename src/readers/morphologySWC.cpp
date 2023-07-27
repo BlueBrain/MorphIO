@@ -356,7 +356,7 @@ class SWCBuilder
                 if (samples_.at(child_id).type == SECTION_SOMA) {
                     continue;
                 }
-                if(root_sample.type == SECTION_SOMA){
+                if (root_sample.type == SECTION_SOMA) {
                     assembleSections(child_id,
                                      DeclaredID(root_sample.id),
                                      declared_to_swc,
