@@ -222,7 +222,7 @@ Custom annotations
 Custom annotations are not supported.
 
 
-.. _`.h5`: https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html
+.. _`.h5`: https://morphology-documentation.readthedocs.io/en/latest/h5v1.html 
 .. _`.swc`: http://www.neuronland.org/NLMorphologyConverter/MorphologyFormats/SWC/Spec.html
 .. _`NeuroMorpho`: http://neuromorpho.org/SomaFormat.html
 .. _`conical frustums`: http://mathworld.wolfram.com/ConicalFrustum.html

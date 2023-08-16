@@ -1,17 +1,54 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <algorithm>
 #include <cmath>
 
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
 #include <morphio/vasc/properties.h>
+#include <string>
 
+#include "../point_utils.h"
 #include "../shared_utils.hpp"
 
 namespace morphio {
-
 namespace vasculature {
-static bool verbose = false;
 namespace property {
+
+namespace details {
+static bool compare_section_structure(
+    const std::vector<morphio::vasculature::property::VascSection::Type>& vec1,
+    const std::vector<morphio::vasculature::property::VascSection::Type>& vec2,
+    const std::string& name,
+    LogLevel logLevel) {
+    if (vec1.size() != vec2.size()) {
+        if (logLevel > LogLevel::ERROR) {
+            morphio::printError(morphio::Warning::UNDEFINED,
+                       "Error comparing " + name + ", size differs: " +
+                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
+        return false;
+    }
+
+    for (size_t i = 1; i < vec1.size(); ++i) {
+        if (vec1[i] - vec1[1] != vec2[i] - vec2[1]) {
+            if (logLevel > LogLevel::ERROR) {
+                morphio::printError(morphio::Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
+                morphio::printError(morphio::Warning::UNDEFINED,
+                           std::to_string(vec1[i] - vec1[1]) + " <--> " +
+                               std::to_string(vec2[i] - vec2[1]));
+            }
+            return false;
+        }
+    }
+    return true;
+}
+
+
+} // namespace details
+
 
 VascPointLevel::VascPointLevel(const std::vector<Point::Type>& points,
                                const std::vector<Diameter::Type>& diameters)
@@ -32,196 +69,32 @@ VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range) {
     _diameters = copySpan<property::Diameter>(data._diameters, range);
 }
 
-template <typename T>
-bool compare(const std::vector<T>& vec1,
-             const std::vector<T>& vec2,
-             const std::string& name,
-             bool verbose_) {
-    if (vec1 == vec2) {
-        return true;
-    }
-
-    if (vec1.size() != vec2.size()) {
-        if (verbose_) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-        return false;
-    }
-
-    if (verbose_) {
-        printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-        for (size_t i = 0; i < vec1.size(); ++i) {
-            if (vec1[i] != vec2[i]) {
-                printError(Warning::UNDEFINED,
-                           valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
-            }
-        }
-    }
-    return false;
-}
-
-static bool compare_section_structure(const std::vector<VascSection::Type>& vec1,
-                                      const std::vector<VascSection::Type>& vec2,
-                                      const std::string& name,
-                                      bool verbose_) {
-    if (vec1.size() != vec2.size()) {
-        if (verbose_) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-        return false;
-    }
-
-    for (size_t i = 1; i < vec1.size(); ++i) {
-        if (vec1[i] - vec1[1] != vec2[i] - vec2[1]) {
-            if (verbose_) {
-                printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-                printError(Warning::UNDEFINED,
-                           std::to_string(vec1[i] - vec1[1]) + " <--> " +
-                               std::to_string(vec2[i] - vec2[1]));
-            }
-            return false;
-        }
-    }
-    return true;
-}
-
-template <typename T>
-bool compare(const morphio::range<T>& vec1,
-             const morphio::range<T>& vec2,
-             const std::string& name,
-             bool verbose_) {
-    if (vec1.size() != vec2.size()) {
-        if (verbose_) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-        return false;
-    }
-
-    for (size_t i = 0; i < vec1.size(); ++i) {
-        if (std::fabs(vec1[i] - vec2[i]) > morphio::epsilon) {
-            printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-            printError(Warning::UNDEFINED,
-                       valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
-            printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
-            return false;
-        }
-    }
-    return true;
-}
-
-template <>
-bool compare(const morphio::range<const morphio::Point>& vec1,
-             const morphio::range<const morphio::Point>& vec2,
-             const std::string& name,
-             bool verbose_) {
-    if (vec1.size() != vec2.size()) {
-        if (verbose_) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-        return false;
-    }
-
-    for (size_t i = 0; i < vec1.size(); ++i) {
-        if (std::fabs(distance(vec1[i], vec2[i])) > morphio::epsilon) {
-            if (verbose_) {
-                printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-                printError(Warning::UNDEFINED,
-                           valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
-                printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
-            }
-            return false;
-        }
-    }
-    return true;
-}
-
-template <typename T, typename U>
-bool compare(const std::map<T, U>& vec1,
-             const std::map<T, U>& vec2,
-             const std::string& name,
-             bool verbose_) {
-    if (vec1 == vec2) {
-        return true;
-    }
-    if (verbose_) {
-        if (vec1.size() != vec2.size()) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-    }
-    return false;
-}
-
-template <typename T>
-bool compare(const T& el1, const T& el2, const std::string& name, bool verbose_) {
-    if (el1 == el2) {
-        return true;
-    }
-
-    if (verbose_) {
-        printError(Warning::UNDEFINED, name + " differs");
-    }
-    return false;
-}
-
-static bool compare(const VascPointLevel& el1,
-                    const VascPointLevel& el2,
-                    const std::string& name,
-                    bool verbose_) {
-    if (&el1 == &el2) {
-        return true;
-    }
-
-    bool result = (compare(el1._points, el2._points, "_points", verbose_) &&
-                   compare(el1._diameters, el2._diameters, "_diameters", verbose_));
-
-    if (!result && verbose_) {
-        printError(Warning::UNDEFINED, "Error comparing " + name);
-    }
-
-    return result;
+bool VascSectionLevel::diff(const VascSectionLevel& other, LogLevel logLevel) const {
+    return this == &other ||
+           (details::compare_section_structure(
+                this->_sections, other._sections, "_sections", logLevel) &&
+            morphio::property::compare(
+                this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
+            morphio::property::compare(
+                this->_predecessors, other._predecessors, "_predecessors", logLevel) &&
+            morphio::property::compare(
+                this->_successors, other._successors, "_successors", logLevel));
 }
 
 bool VascSectionLevel::operator==(const VascSectionLevel& other) const {
-    return this == &other ||
-           (compare_section_structure(this->_sections, other._sections, "_sections", verbose) &&
-            compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", verbose) &&
-            compare(this->_predecessors, other._predecessors, "_predecessors", verbose) &&
-            compare(this->_successors, other._successors, "_successors", verbose));
+    return !diff(other, LogLevel::ERROR);
 }
 
 bool VascSectionLevel::operator!=(const VascSectionLevel& other) const {
-    return !(this->operator==(other));
+    return diff(other, LogLevel::ERROR);
 }
 
-bool Properties::operator==(const Properties& other) const {
-    if (this == &other) {
-        return true;
-    }
-
-    return (compare(this->_pointLevel, other._pointLevel, "_pointLevel", verbose) &&
-            compare(this->_sectionLevel, other._sectionLevel, "_sectionLevel", verbose));
-}
-
-bool Properties::operator!=(const Properties& other) const {
-    return !this->operator==(other);
-}
-
-std::ostream& operator<<(std::ostream& os, const VascPointLevel& prop) {
+std::ostream& operator<<(std::ostream& os, const VascPointLevel& pointLevel) {
     os << "Point level properties:\n";
     os << "Point diameter"
-       << (prop._diameters.size() == prop._points.size() ? " Diameter\n" : "\n");
-    for (size_t i = 0; i < prop._points.size(); ++i) {
-        os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i] << '\n';
+       << (pointLevel._diameters.size() == pointLevel._points.size() ? " Diameter\n" : "\n");
+    for (size_t i = 0; i < pointLevel._points.size(); ++i) {
+        os << dumpPoint(pointLevel._points[i]) << ' ' << pointLevel._diameters[i] << '\n';
     }
     return os;
 }

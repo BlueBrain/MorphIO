@@ -1,14 +1,51 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <algorithm>
 
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
 #include <morphio/vector_types.h>
 
+#include "point_utils.h"
 #include "shared_utils.hpp"
-
 
 namespace morphio {
 namespace Property {
+
+namespace details {
+static bool compare_section_structure(const std::vector<Section::Type>& vec1,
+                                      const std::vector<Section::Type>& vec2,
+                                      const std::string& name,
+                                      LogLevel logLevel) {
+    if (vec1.size() != vec2.size()) {
+        if (logLevel > LogLevel::ERROR) {
+            printError(Warning::UNDEFINED,
+                       "Error comparing " + name + ", size differs: " +
+                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+        }
+        return false;
+    }
+
+    for (unsigned int i = 1; i < vec1.size(); ++i) {
+        if (vec1[i][0] - vec1[1][0] != vec2[i][0] - vec2[1][0] || vec1[i][1] != vec2[i][1]) {
+            if (logLevel > LogLevel::ERROR) {
+                printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
+                printError(Warning::UNDEFINED,
+                           std::to_string(vec1[i][0] - vec1[1][0]) + ", " +
+                               std::to_string(vec1[i][1]) + " <--> " +
+                               std::to_string(vec2[i][0] - vec2[1][0]) + ", " +
+                               std::to_string(vec2[i][1]));
+            }
+            return false;
+        }
+    }
+
+    return true;
+}
+
+}  // namespace details
 
 PointLevel::PointLevel(std::vector<Point::Type> points,
                        std::vector<Diameter::Type> diameters,
@@ -43,163 +80,20 @@ PointLevel& PointLevel::operator=(const PointLevel& other) {
         return *this;
     }
 
-    this->_points = other._points;
-    this->_diameters = other._diameters;
-    this->_perimeters = other._perimeters;
+    _points = other._points;
+    _diameters = other._diameters;
+    _perimeters = other._perimeters;
+
     return *this;
-}
-
-template <typename T>
-bool compare(const std::vector<T>& vec1,
-             const std::vector<T>& vec2,
-             const std::string& name,
-             LogLevel logLevel) {
-    if (vec1 == vec2) {
-        return true;
-    }
-
-    if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-        return false;
-    }
-
-    if (logLevel > LogLevel::ERROR) {
-        printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-        for (unsigned int i = 0; i < vec1.size(); ++i) {
-            if (vec1[i] != vec2[i]) {
-                printError(Warning::UNDEFINED,
-                           valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
-            }
-        }
-    }
-
-    return false;
-}
-
-static bool compare_section_structure(const std::vector<Section::Type>& vec1,
-                                      const std::vector<Section::Type>& vec2,
-                                      const std::string& name,
-                                      LogLevel logLevel) {
-    if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-        return false;
-    }
-
-    for (unsigned int i = 1; i < vec1.size(); ++i) {
-        if (vec1[i][0] - vec1[1][0] != vec2[i][0] - vec2[1][0] || vec1[i][1] != vec2[i][1]) {
-            if (logLevel > LogLevel::ERROR) {
-                printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-                printError(Warning::UNDEFINED,
-                           std::to_string(vec1[i][0] - vec1[1][0]) + ", " +
-                               std::to_string(vec1[i][1]) + " <--> " +
-                               std::to_string(vec2[i][0] - vec2[1][0]) + ", " +
-                               std::to_string(vec2[i][1]));
-            }
-            return false;
-        }
-    }
-
-    return true;
-}
-
-template <typename T>
-bool compare(const morphio::range<T>& vec1,
-             const morphio::range<T>& vec2,
-             const std::string& name,
-             LogLevel logLevel) {
-    if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-        return false;
-    }
-
-    for (unsigned int i = 0; i < vec1.size(); ++i) {
-        if (std::fabs(vec1[i] - vec2[i]) > morphio::epsilon) {
-            printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-            printError(Warning::UNDEFINED,
-                       valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
-            printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
-            return false;
-        }
-    }
-    return true;
-}
-
-template <>
-bool compare(const morphio::range<const morphio::Point>& vec1,
-             const morphio::range<const morphio::Point>& vec2,
-             const std::string& name,
-             LogLevel logLevel) {
-    if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-        return false;
-    }
-
-    for (unsigned int i = 0; i < vec1.size(); ++i) {
-        if (std::fabs(distance(vec1[i], vec2[i])) > morphio::epsilon) {
-            if (logLevel > LogLevel::ERROR) {
-                printError(Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
-                printError(Warning::UNDEFINED,
-                           valueToString(vec1[i]) + " <--> " + valueToString(vec2[i]));
-                printError(Warning::UNDEFINED, valueToString(vec2[i] - vec1[i]));
-            }
-            return false;
-        }
-    }
-    return true;
-}
-
-template <typename T, typename U>
-bool compare(const std::map<T, U>& vec1,
-             const std::map<T, U>& vec2,
-             const std::string& name,
-             LogLevel logLevel) {
-    if (vec1 == vec2) {
-        return true;
-    }
-    if (logLevel > LogLevel::ERROR) {
-        if (vec1.size() != vec2.size()) {
-            printError(Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
-        }
-    }
-
-    return false;
-}
-
-template <typename T>
-bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLevel) {
-    if (el1 == el2) {
-        return true;
-    }
-
-    if (logLevel > LogLevel::ERROR) {
-        printError(Warning::UNDEFINED, name + " differs");
-    }
-    return false;
 }
 
 bool SectionLevel::diff(const SectionLevel& other, LogLevel logLevel) const {
     return !(this == &other ||
-             (compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
-              compare(this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
-              compare(this->_children, other._children, "_children", logLevel)));
+             (details::compare_section_structure(
+                  this->_sections, other._sections, "_sections", logLevel) &&
+              morphio::property::compare(
+                  this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
+              morphio::property::compare(this->_children, other._children, "_children", logLevel)));
 }
 
 bool SectionLevel::operator==(const SectionLevel& other) const {
@@ -211,13 +105,15 @@ bool SectionLevel::operator!=(const SectionLevel& other) const {
 }
 
 bool CellLevel::diff(const CellLevel& other, LogLevel logLevel) const {
-    if (logLevel && this->_cellFamily != other._cellFamily) {
+    if (this == &other) {
+        return false;
+    }
+
+    if (logLevel > 0 && this->_cellFamily != other._cellFamily) {
         std::cout << "this->_cellFamily: " << this->_cellFamily << '\n'
                   << "other._cellFamily: " << other._cellFamily << '\n';
     }
-    return !(this == &other || (this->_cellFamily == other._cellFamily
-                                // this->_somaType == other._somaType
-                                ));
+    return !(this->_cellFamily == other._cellFamily && this->_somaType == other._somaType);
 }
 
 bool CellLevel::operator==(const CellLevel& other) const {
@@ -262,8 +158,9 @@ MitochondriaPointLevel::MitochondriaPointLevel(
 bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other,
                                     LogLevel logLevel) const {
     return !(this == &other ||
-             (compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
-              compare(this->_children, other._children, "_children", logLevel)));
+             (details::compare_section_structure(
+                  this->_sections, other._sections, "_sections", logLevel) &&
+              morphio::property::compare(this->_children, other._children, "_children", logLevel)));
 }
 
 bool MitochondriaSectionLevel::operator==(const MitochondriaSectionLevel& other) const {
@@ -276,12 +173,14 @@ bool MitochondriaSectionLevel::operator!=(const MitochondriaSectionLevel& other)
 
 bool MitochondriaPointLevel::diff(const MitochondriaPointLevel& other, LogLevel logLevel) const {
     return !(this == &other ||
-             (compare(this->_sectionIds, other._sectionIds, "mito section ids", logLevel) &&
-              compare(this->_relativePathLengths,
-                      other._relativePathLengths,
-                      "mito relative pathlength",
-                      logLevel) &&
-              compare(this->_diameters, other._diameters, "mito section diameters", logLevel)));
+             (morphio::property::compare(
+                  this->_sectionIds, other._sectionIds, "mito section ids", logLevel) &&
+              morphio::property::compare(this->_relativePathLengths,
+                                         other._relativePathLengths,
+                                         "mito relative pathlength",
+                                         logLevel) &&
+              morphio::property::compare(
+                  this->_diameters, other._diameters, "mito section diameters", logLevel)));
 }
 
 bool MitochondriaPointLevel::operator==(const MitochondriaPointLevel& other) const {
@@ -292,14 +191,14 @@ bool MitochondriaPointLevel::operator!=(const MitochondriaPointLevel& other) con
     return diff(other, LogLevel::ERROR);
 }
 
-std::ostream& operator<<(std::ostream& os, const PointLevel& prop) {
+std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel) {
     os << "Point level properties:\n"
        << "Point Diameter"
-       << (prop._perimeters.size() == prop._points.size() ? " Perimeter\n" : "\n");
-    for (unsigned int i = 0; i < prop._points.size(); ++i) {
-        os << dumpPoint(prop._points[i]) << ' ' << prop._diameters[i];
-        if (prop._perimeters.size() == prop._points.size()) {
-            os << ' ' << prop._perimeters[i];
+       << (pointLevel._perimeters.size() == pointLevel._points.size() ? " Perimeter\n" : "\n");
+    for (unsigned int i = 0; i < pointLevel._points.size(); ++i) {
+        os << dumpPoint(pointLevel._points[i]) << ' ' << pointLevel._diameters[i];
+        if (pointLevel._perimeters.size() == pointLevel._points.size()) {
+            os << ' ' << pointLevel._perimeters[i];
         }
         os << '\n';
     }

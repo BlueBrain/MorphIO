@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <algorithm>  // any_of
 
 #include <morphio/errorMessages.h>
@@ -5,6 +9,8 @@
 #include <morphio/mut/section.h>
 #include <morphio/tools.h>
 #include <morphio/vector_types.h>
+
+#include "../point_utils.h"
 
 namespace morphio {
 namespace mut {

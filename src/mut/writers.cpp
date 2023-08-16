@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <cassert>
 #include <fstream>
 #include <iomanip>  // std::fixed, std::setw, std::setprecision
@@ -62,13 +66,33 @@ bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
     return section->diameters().front() == section->parent()->diameters().back();
 }
 
-static void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma) {
+void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma) {
     const size_t n_points = soma.points().size();
     const size_t n_diameters = soma.diameters().size();
 
     if (n_points != n_diameters) {
         throw morphio::WriterError(morphio::readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
             "soma points", n_points, "soma diameters", n_diameters));
+    }
+}
+
+
+void raiseIfUnifurcations(const morphio::mut::Morphology& morph) {
+    for (auto it = morph.depth_begin(); it != morph.depth_end(); ++it) {
+        std::shared_ptr<morphio::mut::Section> section_ = *it;
+        if (section_->isRoot()) {
+            continue;
+        }
+
+        unsigned int parentId = section_->parent()->id();
+
+        auto parent = section_->parent();
+        bool isUnifurcation = parent->children().size() == 1;
+
+        if (isUnifurcation) {
+            throw morphio::WriterError(
+                morphio::readers::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(parentId));
+        }
     }
 }
 }  // anonymous namespace
@@ -84,6 +108,16 @@ void swc(const Morphology& morphology, const std::string& filename) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
+    } else if (!(soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
+                 soma->type() == SomaType::SOMA_CYLINDERS ||
+                 soma->type() == SomaType::SOMA_SINGLE_POINT)) {
+        printError(Warning::SOMA_NON_CYLINDER_OR_POINT,
+                   readers::ErrorMessages().WARNING_SOMA_NON_CYLINDER_OR_POINT());
+    } else if (soma->type() == SomaType::SOMA_SINGLE_POINT && soma_points.size() != 1) {
+        throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_SINGLE_POINT());
+    } else if (soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS &&
+               soma_points.size() != 3) {
+        throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_THREE_POINT_CYLINDER());
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
@@ -91,6 +125,8 @@ void swc(const Morphology& morphology, const std::string& filename) {
     if (hasPerimeterData(morphology)) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
+
+    raiseIfUnifurcations(morphology);
 
     std::ofstream myfile(filename);
     using std::setw;
@@ -188,10 +224,18 @@ static void _write_asc_section(std::ofstream& myfile,
 
 void asc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
+    const auto& somaPoints = soma->points();
+
     if (soma->points().empty() && morphology.rootSections().empty()) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
+    } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
+        printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
+    } else if (somaPoints.empty()) {
+        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    } else if (somaPoints.size() < 3) {
+        throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
@@ -216,8 +260,6 @@ void asc(const Morphology& morphology, const std::string& filename) {
         myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
         _write_asc_points(myfile, soma->points(), soma->diameters(), 2);
         myfile << ")\n\n";
-    } else {
-        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
     }
 
     for (const std::shared_ptr<Section>& section : morphology.rootSections()) {
@@ -345,15 +387,18 @@ static void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 void h5(const Morphology& morpho, const std::string& filename) {
     const auto& soma = morpho.soma();
     const auto& somaPoints = soma->points();
-    const auto numberOfSomaPoints = somaPoints.size();
 
-    if (numberOfSomaPoints < 1) {
+    if (somaPoints.empty()) {
         if (morpho.rootSections().empty()) {
             printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                        readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
             return;
         }
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
+        printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
+    } else if (somaPoints.size() < 3) {
+        throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
     }
 
     checkSomaHasSameNumberPointsDiameters(*soma);
@@ -373,7 +418,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
     bool hasPerimeterData_ = hasPerimeterData(morpho);
 
-    for (unsigned int i = 0; i < numberOfSomaPoints; ++i) {
+    for (unsigned int i = 0; i < somaPoints.size(); ++i) {
         raw_points.push_back(
             {somaPoints[i][0], somaPoints[i][1], somaPoints[i][2], somaDiameters[i]});
 

@@ -1,12 +1,15 @@
-#include "morphologyASC.h"
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-#include <fstream>
+#include "morphologyASC.h"
 
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 
 
-#include "lex.cpp"
+#include "NeurolucidaLexer.inc"
 
 namespace morphio {
 namespace readers {
@@ -57,7 +60,6 @@ bool skip_sexp(size_t id) {
             id == +Token::HIGH || id == +Token::INCOMPLETE || id == +Token::LOW ||
             id == +Token::NORMAL || id == +Token::FONT);
 }
-}  // namespace
 
 class NeurolucidaParser
 {
@@ -65,21 +67,14 @@ class NeurolucidaParser
     explicit NeurolucidaParser(const std::string& uri)
         : uri_(uri)
         , lex_(uri, false)
-        , debugInfo_(uri)
         , err_(uri) {}
 
     NeurolucidaParser(NeurolucidaParser const&) = delete;
     NeurolucidaParser& operator=(NeurolucidaParser const&) = delete;
 
-    morphio::mut::Morphology& parse() {
-        std::ifstream ifs(uri_);
-        std::string input((std::istreambuf_iterator<char>(ifs)),
-                          (std::istreambuf_iterator<char>()));
-
+    morphio::mut::Morphology& parse(const std::string& input) {
         lex_.start_parse(input);
-
         parse_root_sexps();
-
         return nb_;
     }
 
@@ -114,7 +109,7 @@ class NeurolucidaParser
 
         lex.consume(Token::RPAREN, "Point should end in RPAREN");
 
-        return std::tuple<Point, floatType>({point[0], point[1], point[2]}, point[3]);
+        return {{point[0], point[1], point[2]}, point[3]};
     }
 
     bool parse_neurite_branch(Header& header) {
@@ -136,11 +131,11 @@ class NeurolucidaParser
     int32_t _create_soma_or_section(const Header& header,
                                     std::vector<Point>& points,
                                     std::vector<morphio::floatType>& diameters) {
-        lex_.current_section_start_ = lex_.line_num();
-        int32_t return_id;
+        int32_t return_id = -1;
         morphio::Property::PointLevel properties;
         properties._points = points;
         properties._diameters = diameters;
+
         if (header.token == Token::STRING) {
             Property::Marker marker;
             marker._pointLevel = properties;
@@ -154,7 +149,7 @@ class NeurolucidaParser
             nb_.soma()->properties() = properties;
             return_id = -1;
         } else {
-            SectionType section_type = TokenSectionTypeMap.at(header.token);
+            SectionType section_type = TokenToSectionType(header.token);
             insertLastPointParentSection(header.parent_id, properties, diameters);
 
             // Condition to remove single point section that duplicate parent
@@ -170,8 +165,6 @@ class NeurolucidaParser
                 else
                     section = nb_.appendRootSection(properties, section_type);
                 return_id = static_cast<int>(section->id());
-                debugInfo_.setLineNumber(section->id(),
-                                         static_cast<unsigned int>(lex_.current_section_start_));
             }
         }
         points.clear();
@@ -375,17 +368,17 @@ class NeurolucidaParser
     std::string uri_;
     NeurolucidaLexer lex_;
 
-  public:
-    DebugInfo debugInfo_;
-
-  private:
     ErrorMessages err_;
 };
 
-Property::Properties load(const std::string& uri, unsigned int options) {
-    NeurolucidaParser parser(uri);
+}  // namespace
 
-    morphio::mut::Morphology& nb_ = parser.parse();
+Property::Properties load(const std::string& path,
+                          const std::string& contents,
+                          unsigned int options) {
+    NeurolucidaParser parser(path);
+
+    morphio::mut::Morphology& nb_ = parser.parse(contents);
     nb_.applyModifiers(options);
 
     Property::Properties properties = nb_.buildReadOnly();

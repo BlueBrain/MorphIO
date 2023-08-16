@@ -124,19 +124,25 @@ T SectionBase<T>::parent() const {
 
 template <typename T>
 std::vector<T> SectionBase<T>::children() const {
-    std::vector<T> result;
-    try {
-        const std::vector<uint32_t>& _children = properties_->children<typename T::SectionId>().at(
-            static_cast<int>(id_));
-        result.reserve(_children.size());
-        for (uint32_t id : _children) {
-            result.push_back(T(id, properties_));
-        }
+    const auto& section_children = properties_->children<typename T::SectionId>();
 
-        return result;
-    } catch (const std::out_of_range&) {
-        return result;
+    if (section_children.empty()) {
+        return {};
     }
+
+    const auto it = section_children.find(static_cast<int>(id_));
+    if (it == section_children.end()) {
+        return {};
+    }
+
+    std::vector<T> result;
+    const std::vector<uint32_t> children = it->second;
+    result.reserve(children.size());
+    for (uint32_t id : children) {
+        result.push_back(T(id, properties_));
+    }
+
+    return result;
 }
 
 

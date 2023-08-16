@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <morphio/mut/mito_section.h>
 #include <morphio/mut/mitochondria.h>
 
@@ -82,12 +86,7 @@ std::shared_ptr<MitoSection> MitoSection::parent() const {
 }
 
 bool MitoSection::isRoot() const {
-    try {
-        parent();
-        return false;
-    } catch (const std::out_of_range&) {
-        return true;
-    }
+    return mitochondria_->parent_.count(id()) == 0;
 }
 
 bool MitoSection::hasSameShape(const MitoSection& other) const noexcept {

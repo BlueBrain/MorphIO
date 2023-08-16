@@ -1,6 +1,12 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <iostream>
 
 #include <morphio/vasc/section.h>
+
+#include "../point_utils.h"
 
 namespace morphio {
 namespace vasculature {
@@ -103,7 +109,7 @@ floatType Section::length() const {
     }
 
     size_t last = points_.size() - 1;
-    return distance(points_[0], points_[last]);
+    return euclidean_distance(points_[0], points_[last]);
 }
 
 range<const Point> Section::points() const {

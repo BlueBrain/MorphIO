@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <highfive/H5Group.hpp>
@@ -22,7 +26,7 @@ class Morphology
   public:
     virtual ~Morphology() = default;
 
-    Morphology(Morphology&) noexcept = default;
+    Morphology(const Morphology&) noexcept = default;
     Morphology& operator=(const Morphology&) noexcept = default;
     Morphology(Morphology&&) noexcept = default;
     Morphology& operator=(Morphology&&) noexcept = default;
@@ -38,12 +42,18 @@ class Morphology
         Example:
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit Morphology(const std::string& source, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const std::string& path, unsigned int options = NO_MODIFIER);
 
     /** Constructor from an already parsed file */
     explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+
     /** Constructor from an instance of morphio::mut::Morphology */
-    explicit Morphology(mut::Morphology);
+    explicit Morphology(const mut::Morphology&);
+
+    /** Load a morphology from a string */
+    explicit Morphology(const std::string& contents,
+                        const std::string& extension,
+                        unsigned int options = NO_MODIFIER);
 
     /** Return the soma object */
     Soma soma() const;
@@ -52,7 +62,7 @@ class Morphology
     Mitochondria mitochondria() const;
 
     /** Return the endoplasmic reticulum object */
-    const EndoplasmicReticulum endoplasmicReticulum() const;
+    EndoplasmicReticulum endoplasmicReticulum() const;
 
     /** Return the annotation object */
     const std::vector<Property::Annotation>& annotations() const;
@@ -66,7 +76,11 @@ class Morphology
      **/
     std::vector<Section> rootSections() const;
 
-    /** Return a vector containing all section objects */
+    /** Return a vector containing all section objects
+     *
+     * Notes:
+     * Soma is not included
+     **/
     std::vector<Section> sections() const;
 
     /**

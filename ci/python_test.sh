@@ -14,29 +14,33 @@ function create_venv()
         source "$VENV/bin/activate"
         set -u
 
-        which pip
-
-        pip install --upgrade pip setuptools wheel
+        $VENV/bin/pip install --upgrade pip setuptools wheel
     fi
 }
 
 # in tree install
 create_venv
-# https://github.com/pypa/pip/issues/7555
-pip install --use-feature=in-tree-build .
-pip install -r tests/requirement_tests.txt
 
-CURRENT=$(pwd)
-(cd .. && pytest ${CURRENT}/tests)
+$VENV/bin/pip -v install --force .
+$VENV/bin/pip -v install -r tests/requirement_tests.txt
+
+
+pushd $(pwd)/tests
+pytest .
+popd
+
 deactivate
 
 # sdist install
 DIST_DIR="$VENV/dist"
 mkdir -p "$DIST_DIR"
 create_venv
-python3 setup.py sdist --dist-dir "$DIST_DIR"
-pip install "$DIST_DIR"/MorphIO*.tar.gz
-pip install -r tests/requirement_tests.txt
 
-CURRENT=$(pwd)
-(cd .. && pytest ${CURRENT}/tests)
+python3 -m pip install build
+python3 -m build . --outdir "$DIST_DIR"
+python3 -m pip install "$DIST_DIR"/MorphIO*.tar.gz
+python3 -m pip install -r tests/requirement_tests.txt
+
+pushd $(pwd)/tests
+pytest .
+popd

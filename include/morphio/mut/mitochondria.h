@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <map>
@@ -25,8 +29,17 @@ class Mitochondria
   public:
     Mitochondria() = default;
 
+    /// Get the Section children
     const std::vector<MitoSectionP>& children(const MitoSectionP&) const;
+
+    /**
+       Get the shared pointer for the given section
+
+       Note: multiple morphologies can share the same Section instances.
+    **/
     const MitoSectionP& section(uint32_t id) const;
+
+    /// Returns the dictionary id -> Section for this tree
     const std::map<uint32_t, MitoSectionP>& sections() const noexcept;
 
     /**
@@ -77,7 +90,7 @@ class Mitochondria
     /**
        Append a new root MitoSection
     **/
-    MitoSectionP appendRootSection(const Property::MitochondriaPointLevel& points);
+    MitoSectionP appendRootSection(const Property::MitochondriaPointLevel& pointProperties);
 
     /**
        Append a root MitoSection

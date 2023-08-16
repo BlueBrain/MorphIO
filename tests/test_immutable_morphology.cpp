@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <cmath>
 #include <limits>
 #include <sstream>
@@ -6,43 +10,14 @@
 
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/glial_cell.h>
-#include <morphio/mito_section.h>
-#include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
-
+#include <morphio/vector_types.h>
 
 namespace {
-bool almost_equal(morphio::floatType a, double expected, double epsilon) {
-#ifdef MORPHIO_USE_DOUBLE
-    bool res = std::abs(a - expected) < epsilon;
-#else
-    bool res = std::abs(static_cast<double>(a) - expected) < epsilon;
-#endif
-    if (!res) {
-        std::cerr << "Failed almost equal: " << a << " != " << expected
-                  << " (expected) with epsilon of " << epsilon << '\n';
-    }
-    return res;
-}
-
-bool array_almost_equal(const std::vector<morphio::floatType>& a,
-                        const std::vector<double>& expected,
-                        double epsilon) {
-    if (a.size() != expected.size()) {
-        return false;
-    }
-    for (size_t i = 0; i < a.size(); i++) {
-        if (!almost_equal(a.at(i), expected.at(i), epsilon)) {
-            return false;
-        }
-    }
-    return true;
-}
-
 
 class Files
 {
@@ -69,9 +44,9 @@ TEST_CASE("fromMut", "[immutableMorphology]") {
     }
     const auto& expectedMorphs = files.morphs();
     for (size_t i = 0; i < expectedMorphs.size(); ++i) {
-        REQUIRE(expectedMorphs.at(i).somaType() == morphs.at(i).somaType());
-        REQUIRE(expectedMorphs.at(i).sectionTypes() == morphs.at(i).sectionTypes());
-        REQUIRE(expectedMorphs.at(i).perimeters() == morphs.at(i).perimeters());
+        REQUIRE(expectedMorphs[i].somaType() == morphs[i].somaType());
+        REQUIRE(expectedMorphs[i].sectionTypes() == morphs[i].sectionTypes());
+        REQUIRE(expectedMorphs[i].perimeters() == morphs[i].perimeters());
     }
 }
 
@@ -90,8 +65,8 @@ TEST_CASE("sections", "[immutableMorphology]") {
     {
         morphio::Morphology morph0 = morphio::Morphology("data/h5/v1/simple.h5");
         morphio::Morphology morph1 = morphio::Morphology("data/h5/v1/simple.h5");
-        REQUIRE(morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(0)));
-        REQUIRE(!morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(1)));
+        REQUIRE(morph0.rootSections()[0].hasSameShape(morph1.rootSections()[0]));
+        REQUIRE(!morph0.rootSections()[0].hasSameShape(morph1.rootSections()[1]));
     }
 }
 
@@ -160,11 +135,20 @@ TEST_CASE("modifers", "[immutableMorphology]") {
 }
 
 
-TEST_CASE("distance", "[immutableMorphology]") {
+TEST_CASE("immutableMorphologySoma", "[immutableMorphology]") {
     Files files;
     for (const auto& morph : files.morphs()) {
         REQUIRE(morph.soma().maxDistance() == 0);
     }
+
+    const auto morph = morphio::Morphology("data/soma_three_points_cylinder.swc");
+    const auto& soma = morph.soma();
+
+    REQUIRE_THAT(soma.center()[0], Catch::WithinAbs(0, 0.001));
+    REQUIRE_THAT(soma.center()[1], Catch::WithinAbs(0, 0.001));
+    REQUIRE_THAT(soma.center()[2], Catch::WithinAbs(0, 0.001));
+
+    REQUIRE_THAT(soma.surface(), Catch::WithinAbs(1017.87604, 0.001));
 }
 
 TEST_CASE("properties", "[immutableMorphology]") {
@@ -187,7 +171,7 @@ TEST_CASE("properties", "[immutableMorphology]") {
     std::string text;
     uint32_t major = std::numeric_limits<uint32_t>::max();
     uint32_t minor = std::numeric_limits<uint32_t>::max();
-    std::tie(text, major, minor) = files.morphs().at(0).version();
+    std::tie(text, major, minor) = files.morphs()[0].version();
     REQUIRE(text == "asc");
     REQUIRE(major == 1);
     REQUIRE(minor == 0);
@@ -199,24 +183,24 @@ TEST_CASE("iter", "[immutableMorphology]") {
     auto rootSection = iterMorph.rootSections()[0];
     size_t count = 0;
     for (auto iter = rootSection.depth_begin(); iter != rootSection.depth_end(); iter++) {
-        REQUIRE((*iter).id() == count++);
+        REQUIRE(iter->id() == count++);
     }
     std::vector<size_t> expectedRootSectionId = {0, 1, 4, 2, 3, 5, 6};
     count = 0;
     for (auto iter = rootSection.breadth_begin(); iter != rootSection.breadth_end(); iter++) {
-        REQUIRE((*iter).id() == expectedRootSectionId.at(count++));
+        REQUIRE(iter->id() == expectedRootSectionId[count++]);
     }
     std::vector<size_t> expectedMorphSectionId = {0, 7, 1, 4, 8, 9, 2, 3, 5, 6};
     count = 0;
     for (auto iter = iterMorph.breadth_begin(); iter != iterMorph.breadth_end(); iter++) {
-        REQUIRE((*iter).id() == expectedMorphSectionId.at(count++));
+        REQUIRE(iter->id() == expectedMorphSectionId[count++]);
     }
 
     Files files;
     for (const auto& morph : files.morphs()) {
         count = 0;
         for (auto iter = morph.depth_begin(); iter != morph.depth_end(); iter++) {
-            REQUIRE((*iter).id() == count++);
+            REQUIRE(iter->id() == count++);
         }
         auto testedSection = morph.rootSections()[0].children()[0];
         std::vector<morphio::Point> expectedPoints = {{0., 5., 0.},
@@ -226,9 +210,9 @@ TEST_CASE("iter", "[immutableMorphology]") {
         count = 0;
         for (auto iter = testedSection.upstream_begin(); iter != testedSection.upstream_end();
              iter++) {
-            auto points = (*iter).points();
+            auto points = iter->points();
             for (auto point : points) {
-                REQUIRE(point == expectedPoints.at(count++));
+                REQUIRE(point == expectedPoints[count++]);
             }
         }
     }
@@ -252,84 +236,14 @@ TEST_CASE("connectivity", "[immutableMorphology]") {
     }
 }
 
-TEST_CASE("mitochondria", "[immutableMorphology]") {
-    morphio::Morphology morph = morphio::Morphology("data/h5/v1/mitochondria.h5");
-    morphio::Mitochondria mito = morph.mitochondria();
-    REQUIRE(mito.rootSections().size() == 2);
-    morphio::MitoSection rootSection = mito.rootSections().at(0);
-    REQUIRE(rootSection.id() == 0);
-    auto diameters = rootSection.diameters();
-    REQUIRE(array_almost_equal(std::vector<morphio::floatType>(diameters.begin(), diameters.end()),
-                               std::vector<double>{10.0, 20.0},
-                               0.01));
-    auto relativePathLength = rootSection.relativePathLengths();
-    auto res = std::vector<morphio::floatType>(relativePathLength.begin(),
-                                               relativePathLength.end());
-
-    REQUIRE(almost_equal(res.at(0), 0.5, 0.001));
-    REQUIRE(almost_equal(res.at(1), 0.6000000238, 0.001));
-
-    auto neuriteSectionIds = rootSection.neuriteSectionIds();
-    REQUIRE(array_almost_equal(std::vector<morphio::floatType>(neuriteSectionIds.begin(),
-                                                               neuriteSectionIds.end()),
-                               std::vector<double>{0.0, 0.0},
-                               0.01));
-    REQUIRE(rootSection.children().size() == 1);
-
-    auto child = rootSection.children().at(0);
-    REQUIRE(child.parent().id() == rootSection.id());
-
-    diameters = child.diameters();
-    REQUIRE(array_almost_equal(std::vector<morphio::floatType>(diameters.begin(), diameters.end()),
-                               std::vector<double>{20.0, 30.0, 40.0, 50.0},
-                               0.01));
-    relativePathLength = child.relativePathLengths();
-
-    REQUIRE(array_almost_equal(std::vector<morphio::floatType>(relativePathLength.begin(),
-                                                               relativePathLength.end()),
-                               std::vector<double>{0.6, 0.7, 0.8, 0.9},
-                               0.01));
-
-    neuriteSectionIds = child.neuriteSectionIds();
-    REQUIRE(array_almost_equal(std::vector<morphio::floatType>(neuriteSectionIds.begin(),
-                                                               neuriteSectionIds.end()),
-                               std::vector<double>{3.0, 4.0, 4.0, 5.0},
-                               0.01));
-    rootSection = mito.rootSections().at(1);
-    diameters = rootSection.diameters();
-    REQUIRE(array_almost_equal(std::vector<morphio::floatType>(diameters.begin(), diameters.end()),
-                               std::vector<double>{5.0, 6.0, 7.0, 8.0},
-                               0.01));
-    relativePathLength = rootSection.relativePathLengths();
-
-    REQUIRE(array_almost_equal(std::vector<morphio::floatType>(relativePathLength.begin(),
-                                                               relativePathLength.end()),
-                               std::vector<double>{0.6, 0.7, 0.8, 0.9},
-                               0.01));
-
-    neuriteSectionIds = rootSection.neuriteSectionIds();
-    REQUIRE(array_almost_equal(std::vector<morphio::floatType>(neuriteSectionIds.begin(),
-                                                               neuriteSectionIds.end()),
-                               std::vector<double>{0.0, 1.0, 1.0, 2.0},
-                               0.01));
-    REQUIRE(rootSection.children().empty());
-
-    {
-        morphio::Morphology morph0 = morphio::Morphology("data/h5/v1/mitochondria.h5");
-        morphio::Morphology morph1 = morphio::Morphology("data/h5/v1/mitochondria.h5");
-        REQUIRE(morph0.rootSections().at(0).hasSameShape(morph1.rootSections().at(0)));
-    }
-}
-
-
 TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
     morphio::Morphology morph = morphio::Morphology("data/h5/v1/endoplasmic-reticulum.h5");
     morphio::EndoplasmicReticulum er = morph.endoplasmicReticulum();
     REQUIRE(er.sectionIndices() == std::vector<uint32_t>{1, 4, 5});
-    REQUIRE(almost_equal(er.volumes().at(0), 10.5500001907, 0.001));
-    REQUIRE(almost_equal(er.volumes().at(1), 47.1199989319, 0.001));
-    REQUIRE(almost_equal(er.volumes().at(2), 0.8299999833, 0.001));
-    REQUIRE(array_almost_equal(er.surfaceAreas(), std::vector<double>{111.24, 87.44, 0.11}, 0.001));
+    REQUIRE_THAT(er.volumes().at(0), Catch::WithinAbs(10.5500001907, 0.01));
+    REQUIRE_THAT(er.volumes().at(1), Catch::WithinAbs(47.1199989319, 0.01));
+    REQUIRE_THAT(er.volumes().at(2), Catch::WithinAbs(0.8299999833, 0.01));
+    REQUIRE_THAT(er.surfaceAreas(), Catch::Approx(std::vector<morphio::floatType>{111.24, 87.44, 0.11}));
     REQUIRE(er.filamentCounts() == std::vector<uint32_t>{12, 42, 8});
 }
 
@@ -355,12 +269,11 @@ TEST_CASE("glia", "[immutableMorphology]") {
     REQUIRE(count_processes == 863);
 
     const auto section = glial.rootSections()[0];
-    REQUIRE(almost_equal(section.diameters().at(0), 2.03101, 0.001));
-    REQUIRE(almost_equal(section.diameters().at(1), 1.86179, 0.001));
+    REQUIRE_THAT(section.diameters()[0], Catch::WithinAbs(2.03101, 0.001));
+    REQUIRE_THAT(section.diameters()[1], Catch::WithinAbs(1.86179, 0.001));
 
-    REQUIRE(almost_equal(section.perimeters().at(0), 5.79899, 0.001));
-    REQUIRE(almost_equal(section.perimeters().at(1), 7.98946, 0.001));
-
+    REQUIRE_THAT(section.perimeters()[0], Catch::WithinAbs(5.79899, 0.001));
+    REQUIRE_THAT(section.perimeters()[1], Catch::WithinAbs(7.98946, 0.001));
 
     CHECK_THROWS_AS(morphio::GlialCell("data/simple.swc"), morphio::RawDataError);
     CHECK_THROWS_AS(morphio::GlialCell("data/h5/v1/simple.h5"), morphio::RawDataError);
@@ -369,7 +282,7 @@ TEST_CASE("glia", "[immutableMorphology]") {
 TEST_CASE("markers", "[immutableMorphology]") {
     morphio::Morphology morph = morphio::Morphology("data/pia.asc");
     std::vector<morphio::Property::Marker> markers = morph.markers();
-    REQUIRE(markers.at(0)._label == "pia");
+    REQUIRE(markers[0]._label == "pia");
 }
 
 TEST_CASE("throws", "[immutableMorphology]") {
@@ -386,7 +299,7 @@ TEST_CASE("annotations", "[immutableMorphology]") {
     auto morph = morphio::Morphology(mutMorph);
     REQUIRE(morph.annotations().size() == 1);
 
-    auto annotation = morph.annotations().at(0);
+    auto annotation = morph.annotations()[0];
     REQUIRE(annotation._sectionId == 1);
     REQUIRE(annotation._type == morphio::SINGLE_CHILD);
 }

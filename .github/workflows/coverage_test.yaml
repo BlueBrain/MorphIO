@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Fetch repository
         run: git fetch --prune --unshallow
       - name: Get submodules
@@ -28,4 +28,4 @@ jobs:
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          path-to-lcov: build/build-coverage/coverage.info.cleaned
+          path-to-lcov: build/build-coverage/coverage.info

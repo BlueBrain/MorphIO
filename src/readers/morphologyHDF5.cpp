@@ -1,21 +1,6 @@
-/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
- *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
- *                          Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
  *
- * This file is part of MorphIO <https://github.com/BlueBrain/MorphIO>
- *
- * This library is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License version 3.0 as published
- * by the Free Software Foundation.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <cassert>
@@ -84,6 +69,7 @@ MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group)
 
 Property::Properties load(const std::string& uri) {
     try {
+        std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
         HighFive::SilenceHDF5 silence;
         auto file = HighFive::File(uri, HighFive::File::ReadOnly);
         return MorphologyHDF5(file.getGroup("/")).load();
@@ -94,6 +80,7 @@ Property::Properties load(const std::string& uri) {
 }
 
 Property::Properties load(const HighFive::Group& group) {
+    std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
     return MorphologyHDF5(group).load();
 }
 
@@ -155,13 +142,10 @@ void MorphologyHDF5::_readMetadata(const std::string& source) {
                 metadata.getAttribute(_a_family).read(family);
                 _properties._cellLevel._cellFamily = static_cast<CellFamily>(family);
             } else {
-                throw RawDataError("Error in " + source +
-                                   "\nUnsupported h5 version: " + std::to_string(majorVersion) +
-                                   "." + std::to_string(minorVersion) +
-                                   " See "
-                                   "https://bbpteam.epfl.ch/documentation/projects/"
-                                   "Morphology%20Documentation/latest/"
-                                   "index.html for the list of supported versions.");
+                std::string msg = "Error in " + source +
+                                  "\nUnsupported h5 version: " + std::to_string(majorVersion) +
+                                  "." + std::to_string(minorVersion);
+                throw RawDataError(msg);
             }
         } else {
             throw RawDataError("Missing " + _a_version +
@@ -187,16 +171,16 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
                            "': incorrect number of columns for points");
     }
 
-    std::vector<std::array<floatType, pointColumns>> hd5fData(numberPoints);
+    std::vector<std::array<floatType, pointColumns>> hdf5Data(numberPoints);
 
-    if (!hd5fData.empty()) {
-        pointsDataSet.read(hd5fData.front().data());
+    if (!hdf5Data.empty()) {
+        pointsDataSet.read(hdf5Data.front().data());
     }
 
     const bool hasSoma = firstSectionOffset != 0;
     const bool hasNeurites = static_cast<size_t>(firstSectionOffset) < numberPoints;
     const size_t somaPointCount = hasNeurites ? static_cast<size_t>(firstSectionOffset)
-                                              : hd5fData.size();
+                                              : hdf5Data.size();
 
     auto& somaPoints = _properties._somaLevel._points;
     auto& somaDiameters = _properties._somaLevel._diameters;
@@ -206,7 +190,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
         somaDiameters.resize(somaPointCount);
 
         for (size_t i = 0; i < somaPointCount; ++i) {
-            const auto& p = hd5fData[i];
+            const auto& p = hdf5Data[i];
             somaPoints[i] = {p[0], p[1], p[2]};
             somaDiameters[i] = p[3];
         }
@@ -216,11 +200,11 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
     auto& diameters = _properties.get_mut<Property::Diameter>();
 
     if (hasNeurites) {
-        const size_t size = (hd5fData.size() - somaPointCount);
+        const size_t size = (hdf5Data.size() - somaPointCount);
         points.resize(size);
         diameters.resize(size);
-        for (size_t i = somaPointCount; i < hd5fData.size(); ++i) {
-            const auto& p = hd5fData[i];
+        for (size_t i = somaPointCount; i < hdf5Data.size(); ++i) {
+            const auto& p = hdf5Data[i];
             const size_t section = i - somaPointCount;
             points[section] = {p[0], p[1], p[2]};
             diameters[section] = p[3];
@@ -294,9 +278,10 @@ int MorphologyHDF5::_readSections() {
 }
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
-    assert(_properties._cellLevel.majorVersion() == 1 &&
-           _properties._cellLevel.minorVersion() > 0 &&
-           "Perimeter information is available starting at v1.1");
+    if (!(_properties._cellLevel.majorVersion() == 1 &&
+          _properties._cellLevel.minorVersion() > 0)) {
+        throw RawDataError("Perimeter information is available starting at v1.1");
+    }
 
     // soma only, won't have perimeters
     if (firstSectionOffset == SOMA_ONLY) {
@@ -311,7 +296,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
     }
 
     auto& perimeters = _properties.get_mut<Property::Perimeter>();
-    _read("/", _d_perimeters, 1, perimeters);
+    _read("", _d_perimeters, 1, perimeters);
     perimeters.erase(perimeters.begin(), perimeters.begin() + firstSectionOffset);
 }
 
@@ -321,13 +306,13 @@ void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& datasetName,
                            unsigned int expectedDimension,
                            T& data) {
-    if (!_group.exist(groupName)) {
+    if (groupName != "" && !_group.exist(groupName)) {
         throw(
             RawDataError("Reading morphology '" + _uri + "': Missing required group " + groupName));
     }
-    const auto group = _group.getGroup(groupName);
+    const auto group = groupName == "" ? _group : _group.getGroup(groupName);
 
-    if (!_group.exist(groupName)) {
+    if (!group.exist(datasetName)) {
         throw(RawDataError("Reading morphology '" + _uri + "': Missing required dataset " +
                            datasetName));
     }

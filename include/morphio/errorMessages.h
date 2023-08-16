@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <map>        // std::map
@@ -48,11 +52,11 @@ struct DebugInfo {
 
     /** Get section's line number within morphology file */
     int32_t getLineNumber(uint32_t sectionId) const {
-        try {
-            return _lineNumbers.at(sectionId);
-        } catch (const std::out_of_range&) {
+        const auto it = _lineNumbers.find(sectionId);
+        if (it == _lineNumbers.end()) {
             return -1;
         }
+        return it->second;
     }
     /** Morphology filename */
     std::string _filename;
@@ -66,37 +70,15 @@ static std::set<Warning> _ignoredWarnings;
 
 /** A sample of section for error reporting, includes its position (line) within the file. **/
 struct Sample {
+    enum : unsigned int { UNKNOWN_ID = 0xFFFFFFFE };
     Sample() = default;
-
-    explicit Sample(const char* line, unsigned int lineNumber_)
-        : lineNumber(lineNumber_) {
-        floatType radius = -1.;
-        int int_type = -1;
-#ifdef MORPHIO_USE_DOUBLE
-        const auto format = "%20u%20d%20lg%20lg%20lg%20lg%20d";
-#else
-        const auto format = "%20u%20d%20f%20f%20f%20f%20d";
-#endif
-        valid = sscanf(line,
-                       format,
-                       &id,
-                       &int_type,
-                       &point[0],
-                       &point[1],
-                       &point[2],
-                       &radius,
-                       &parentId) == 7;
-
-        type = static_cast<SectionType>(int_type);
-        diameter = radius * 2;  // The point array stores diameters.
-    }
 
     floatType diameter = -1.;
     bool valid = false;
-    Point point;
+    Point point{};
     SectionType type = SECTION_UNDEFINED;
-    int parentId = -1;
-    unsigned int id = 0;
+    unsigned int parentId = UNKNOWN_ID;
+    unsigned int id = UNKNOWN_ID;
     unsigned int lineNumber = 0;
 };
 
@@ -232,6 +214,15 @@ class ErrorMessages
     /** Single section child SWC error message */
     std::string ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const;
 
+    /** Single point soma must have one point */
+    std::string ERROR_SOMA_INVALID_SINGLE_POINT() const;
+
+    /** Multiple points for single point soma */
+    std::string ERROR_SOMA_INVALID_THREE_POINT_CYLINDER() const;
+
+    /** Contour soma must have at least 3 points. */
+    std::string ERROR_SOMA_INVALID_CONTOUR() const;
+
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
@@ -266,6 +257,12 @@ class ErrorMessages
 
     /** Wrong root point warning message */
     std::string WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const;
+
+    /**  Soma must be a contour for ASC and H5 */
+    std::string WARNING_SOMA_NON_CONTOUR() const;
+
+    /* Soma must be stacked cylinders or a point */
+    std::string WARNING_SOMA_NON_CYLINDER_OR_POINT() const;
 
   private:
     std::string _uri;

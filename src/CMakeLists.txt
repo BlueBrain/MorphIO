@@ -1,4 +1,5 @@
 set(MORPHIO_SOURCES
+    collection.cpp
     dendritic_spine.cpp
     endoplasmic_reticulum.cpp
     enums.cpp
@@ -18,17 +19,18 @@ set(MORPHIO_SOURCES
     mut/section.cpp
     mut/soma.cpp
     mut/writers.cpp
+    point_utils.cpp
     properties.cpp
     readers/morphologyASC.cpp
     readers/morphologyHDF5.cpp
     readers/morphologySWC.cpp
     readers/vasculatureHDF5.cpp
     section.cpp
+    shared_utils.cpp
     soma.cpp
     vasc/properties.cpp
     vasc/section.cpp
     vasc/vasculature.cpp
-    vector_utils.cpp
     version.cpp
     )
 
@@ -65,6 +67,8 @@ target_include_directories(morphio_obj
    $<TARGET_PROPERTY:gsl-lite,INTERFACE_INCLUDE_DIRECTORIES>
    $<TARGET_PROPERTY:HighFive,INTERFACE_INCLUDE_DIRECTORIES>
    $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
+  PRIVATE
+   $<TARGET_PROPERTY:ghc_filesystem,INTERFACE_INCLUDE_DIRECTORIES>
   )
 
 set_target_properties(morphio_obj
@@ -75,12 +79,8 @@ set_target_properties(morphio_obj
   )
 
 if (MORPHIO_ENABLE_COVERAGE)
-  target_compile_options(morphio_obj
-    PUBLIC -g -O0 --coverage -fprofile-arcs -ftest-coverage
-    )
-  target_link_libraries(morphio_obj
-    PUBLIC gcov
-    )
+  include(CodeCoverage)
+  append_coverage_compiler_flags_to_target(morphio_obj)
 endif()
 
 
@@ -112,13 +112,6 @@ foreach(TARGET morphio_shared morphio_static)
      $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
      )
   target_link_libraries(${TARGET} PUBLIC gsl-lite PRIVATE HighFive lexertl)
-
-  if (MORPHIO_ENABLE_COVERAGE)
-     target_link_libraries(${TARGET}
-     PUBLIC gcov
-     )
-  endif()
-
 endforeach(TARGET)
 
 install(
