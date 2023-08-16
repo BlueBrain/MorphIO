@@ -107,7 +107,7 @@ TEST_CASE("morphio::join_path", "[filesystem]") {
 TEST_CASE("morphio::shared_utils") {
     using namespace morphio;
 
-    SECTION("Errors"){
+    SECTION("Errors") {
         const std::vector<floatType> diameters;
         const range<const floatType> d(diameters);
 
@@ -120,7 +120,7 @@ TEST_CASE("morphio::shared_utils") {
         CHECK_THROWS(_somaSurface(SOMA_UNDEFINED, d, p));
     }
 
-    SECTION("SOMA_SINGLE_POINT"){
+    SECTION("SOMA_SINGLE_POINT") {
         const std::vector<Point> points = {{0, 0, 0}};
         const std::vector<floatType> diameters = {1};
         CHECK(centerOfGravity(points) == points[0]);
@@ -129,16 +129,17 @@ TEST_CASE("morphio::shared_utils") {
         CHECK(_somaSurface(SOMA_SINGLE_POINT, diameters, points) == Approx(morphio::PI));
     }
 
-    SECTION("SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS"){
+    SECTION("SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS") {
         const std::vector<Point> points = {{-1, -1, -1}, {0, 0, 0}, {1, 1, 1}};
         const std::vector<floatType> diameters = {0.5, 1.5, 2.5};
         Point expected{0, 0, 0};
         CHECK(centerOfGravity(points) == expected);
         CHECK(maxDistanceToCenterOfGravity(points) == Approx(std::sqrt(3.0)));
-        CHECK(_somaSurface(SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS, diameters, points) == Approx(0.7854));
+        CHECK(_somaSurface(SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS, diameters, points) ==
+              Approx(0.7854));
     }
 
-    SECTION("SOMA_CYLINDERS"){
+    SECTION("SOMA_CYLINDERS") {
         const std::vector<Point> points = {{0, 0, 0}, {1, 1, 1}, {2, 2, 2}};
         const std::vector<floatType> diameters = {0.5, 1.5, 2.5};
         Point expected{1, 1, 1};
@@ -150,10 +151,10 @@ TEST_CASE("morphio::shared_utils") {
     SECTION("SOMA_SIMPLE_CONTOUR") {
         const std::vector<Point> points = {{0, 0, 0}, {1, 1, 1}, {0, 1, 1}};
         const std::vector<floatType> diameters = {0.1, 0.1, 0.1};
-        Point expected{1/floatType{3}, 2/floatType{3}, 2/floatType{3}};
+        Point expected{1 / floatType{3}, 2 / floatType{3}, 2 / floatType{3}};
         CHECK(centerOfGravity(points) == expected);
         CHECK(maxDistanceToCenterOfGravity(points) == 1);
         CHECK_THROWS(_somaSurface(SOMA_SIMPLE_CONTOUR, diameters, points));
     }
-        /* CHECK(_somaSurface(SOMA_SINGLE_POINT, diameters, points) == Approx(0.0)); */
+    /* CHECK(_somaSurface(SOMA_SINGLE_POINT, diameters, points) == Approx(0.0)); */
 }
