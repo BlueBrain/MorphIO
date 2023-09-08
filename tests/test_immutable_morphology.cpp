@@ -243,7 +243,8 @@ TEST_CASE("endoplasmic_reticulum", "[immutableMorphology]") {
     REQUIRE_THAT(er.volumes().at(0), Catch::WithinAbs(10.5500001907, 0.01));
     REQUIRE_THAT(er.volumes().at(1), Catch::WithinAbs(47.1199989319, 0.01));
     REQUIRE_THAT(er.volumes().at(2), Catch::WithinAbs(0.8299999833, 0.01));
-    REQUIRE_THAT(er.surfaceAreas(), Catch::Approx(std::vector<morphio::floatType>{111.24, 87.44, 0.11}));
+    REQUIRE_THAT(er.surfaceAreas(),
+                 Catch::Approx(std::vector<morphio::floatType>{111.24, 87.44, 0.11}));
     REQUIRE(er.filamentCounts() == std::vector<uint32_t>{12, 42, 8});
 }
 

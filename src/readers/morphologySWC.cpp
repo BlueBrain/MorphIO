@@ -83,8 +83,7 @@ class SWCBuilder
 {
   public:
     explicit SWCBuilder(const std::string& path)
-        : err(path) {
-    }
+        : err(path) {}
 
     void _readSamples(const std::string& contents) {
         std::stringstream stream{contents};

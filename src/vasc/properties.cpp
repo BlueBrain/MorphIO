@@ -26,8 +26,9 @@ static bool compare_section_structure(
     if (vec1.size() != vec2.size()) {
         if (logLevel > LogLevel::ERROR) {
             morphio::printError(morphio::Warning::UNDEFINED,
-                       "Error comparing " + name + ", size differs: " +
-                           std::to_string(vec1.size()) + " vs " + std::to_string(vec2.size()));
+                                "Error comparing " + name +
+                                    ", size differs: " + std::to_string(vec1.size()) + " vs " +
+                                    std::to_string(vec2.size()));
         }
         return false;
     }
@@ -35,10 +36,11 @@ static bool compare_section_structure(
     for (size_t i = 1; i < vec1.size(); ++i) {
         if (vec1[i] - vec1[1] != vec2[i] - vec2[1]) {
             if (logLevel > LogLevel::ERROR) {
-                morphio::printError(morphio::Warning::UNDEFINED, "Error comparing " + name + ", elements differ:");
                 morphio::printError(morphio::Warning::UNDEFINED,
-                           std::to_string(vec1[i] - vec1[1]) + " <--> " +
-                               std::to_string(vec2[i] - vec2[1]));
+                                    "Error comparing " + name + ", elements differ:");
+                morphio::printError(morphio::Warning::UNDEFINED,
+                                    std::to_string(vec1[i] - vec1[1]) + " <--> " +
+                                        std::to_string(vec2[i] - vec2[1]));
             }
             return false;
         }
@@ -47,7 +49,7 @@ static bool compare_section_structure(
 }
 
 
-} // namespace details
+}  // namespace details
 
 
 VascPointLevel::VascPointLevel(const std::vector<Point::Type>& points,
