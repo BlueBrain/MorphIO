@@ -17,10 +17,3 @@ target_link_libraries(_morphio
     PRIVATE morphio_static
     PRIVATE pybind11::module
 )
-
-find_package (Python3)
-
-install(
-  TARGETS _morphio
-  LIBRARY DESTINATION ${Python3_SITEARCH}/morphio/
-)
