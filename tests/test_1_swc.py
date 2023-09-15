@@ -447,9 +447,7 @@ def test_unsupported_section_type():
 
 
 def test_root_node_split():
-    '''Test that a bifurcation at the root point produces
-    two root sections
-    '''
+    '''Test that a bifurcation at the root point produces two root sections'''
     content = ('''1	1	0 0 0 1	-1
                   2	3	1 0 0 1  1
                   3	3	1 1 0 1  2
@@ -544,6 +542,7 @@ def test_multi_type_section():
     assert len(n.sections) == 4
     assert_array_equal(n.section_offsets, [0, 1, 3, 5, 7])
 
+
 def test_missing_parent():
     contents =('''
 1 1  0  0 0 10 -1
@@ -553,3 +552,10 @@ def test_missing_parent():
 ''')
     with pytest.raises(morphio.MissingParentError, match='Sample id: 4 refers to non-existant parent ID: 10'):
         n = Morphology(contents, "swc")
+
+
+def test_read_simple_windows_eol():
+    simple = Morphology(DATA_DIR /  'simple-windows-eol.swc')
+    assert len(simple.root_sections) == 2
+    assert simple.root_sections[0].id == 0
+    assert simple.root_sections[1].id == 3

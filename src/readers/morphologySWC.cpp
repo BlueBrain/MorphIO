@@ -53,7 +53,7 @@ public:
   }
 
   void advance_to_non_whitespace() {
-      std::size_t pos = contents_.find_first_not_of(" \t", pos_);
+      std::size_t pos = contents_.find_first_not_of(" \t\r", pos_);
       if (pos == std::string::npos) {
           pos_ = contents_.size();
       }
