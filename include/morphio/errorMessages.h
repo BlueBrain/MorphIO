@@ -232,6 +232,14 @@ class ErrorMessages
     std::string WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const;
     /** Writing without soma warning message */
     std::string WARNING_WRITE_NO_SOMA() const;
+    /** Loading soma with a bifurcation */
+    std::string WARNING_SOMA_BIFURCATION() const;
+    /** Loading multiple somata */
+    std::string WARNING_MULTIPLE_SOMATA() const;
+    /** Loading point with root ID no equal to -1 */
+    std::string WARNING_CUSTOM_ROOT_ID(const Sample& sample) const;
+    /** Loading section with only one point */
+    std::string WARNING_ROOT_BIFURCATION(const Sample& sample) const;
     /** Writing empty morphology warning message */
     std::string WARNING_WRITE_EMPTY_MORPHOLOGY() const;
     /** Soma not found warning message */
@@ -244,7 +252,8 @@ class ErrorMessages
     std::string WARNING_WRONG_DUPLICATE(const std::shared_ptr<morphio::mut::Section>& current,
                                         const std::shared_ptr<morphio::mut::Section>& parent) const;
     /** Writing empty section warning message */
-    std::string WARNING_APPENDING_EMPTY_SECTION(std::shared_ptr<morphio::mut::Section>);
+    std::string WARNING_APPENDING_EMPTY_SECTION(
+        const std::shared_ptr<morphio::mut::Section>& section) const;
     /** Writing single child section warning message */
     std::string WARNING_ONLY_CHILD(const DebugInfo& info,
                                    unsigned int parentId,
@@ -253,7 +262,7 @@ class ErrorMessages
     /** Soma does not conform NeuroMorpho warning message */
     std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& root,
                                                      const Sample& child1,
-                                                     const Sample& child2);
+                                                     const Sample& child2) const;
 
     /** Wrong root point warning message */
     std::string WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const;

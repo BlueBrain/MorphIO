@@ -15,11 +15,15 @@ enum LogLevel { ERROR, WARNING, INFO, DEBUG };
 /** The list of modifier flags that can be passed when loading a morphology
  * See morphio::mut::modifiers for more information **/
 enum Option {
-    NO_MODIFIER = 0x00,          //!< Read morphology as is without any modification
-    TWO_POINTS_SECTIONS = 0x01,  //!< Read sections only with 2 or more points
-    SOMA_SPHERE = 0x02,          //!< Interpret morphology soma as a sphere
-    NO_DUPLICATES = 0x04,        //!< Skip duplicating points
-    NRN_ORDER = 0x08             //!< Order of neurites will be the same as in NEURON simulator
+    NO_MODIFIER = 0,               //!< Read morphology as is without any modification
+    TWO_POINTS_SECTIONS = 1 << 0,  //!< Keep only the first and last points of sections
+    SOMA_SPHERE = 1 << 1,          //!< Interpret morphology soma as a sphere
+    NO_DUPLICATES = 1 << 2,        //!< Skip duplicating points
+    NRN_ORDER = 1 << 3,            //!< Order of neurites will be the same as in NEURON simulator
+    ALLOW_ROOT_BIFURCATIONS = 1 << 4,  //!< Bifurcations at first point are allowed
+    ALLOW_SOMA_BIFURCATIONS = 1 << 5,  //!< Bifurcations in soma are allowed
+    ALLOW_MULTIPLE_SOMATA = 1 << 6,    //!< Multiple somata are allowed
+    ALLOW_CUSTOM_ROOT_ID = 1 << 7      //!< Custom root points are allowed
 };
 
 /**
@@ -41,6 +45,10 @@ enum Warning {
     ZERO_DIAMETER,               //!< Zero section diameter
     SOMA_NON_CONTOUR,            //!< Soma must be a contour for ASC and H5
     SOMA_NON_CYLINDER_OR_POINT,  //!< Soma must be stacked cylinders or a point
+    ROOT_BIFURCATION,            //!< Bifurcation at root point
+    SOMA_BIFURCATION,            //!< Bifurcation in soma
+    MULTIPLE_SOMATA,             //!< Multiple somata
+    CUSTOM_ROOT_ID,              //!< Custom root ID
 };
 
 enum AnnotationType {
