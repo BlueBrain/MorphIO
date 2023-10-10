@@ -518,7 +518,10 @@ def test_no_soma():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             Morphology(content, extension='swc')
-            assert ('$STRING$:0:warning\nWarning: no soma found in file' ==
+            assert ('''$STRING$:1:warning
+Warning: found a disconnected neurite.
+Neurites are not supposed to have parentId: -1
+(although this is normal if this neuron has no soma)''' ==
                     strip_color_codes(err.getvalue().strip()))
 
 def test_throw_on_negative_id():

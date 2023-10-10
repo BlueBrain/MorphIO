@@ -3,7 +3,7 @@ v3.4.0
 Improvements:
 * New SWC parser:
     * handles `locale` correctly, so decimal numbers using comma are allowed
-    * 
+    * ~800 line SWC parse time goes from 0.976 to 0.699
 
 v3.3.6
 ======
