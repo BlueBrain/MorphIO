@@ -91,7 +91,7 @@ setup(
               ],
     zip_safe=False,
     classifiers=[
-        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+        "License :: OSI Approved :: Apache Software License v2.0",
     ],
     use_scm_version=True,
     setup_requires=[

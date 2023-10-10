@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include "bind_misc.h"
 
 #include <pybind11/pybind11.h>

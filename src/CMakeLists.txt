@@ -99,7 +99,8 @@ add_library(morphio_static STATIC $<TARGET_OBJECTS:morphio_obj>)
 add_library(morphio_shared SHARED $<TARGET_OBJECTS:morphio_obj>)
 
 set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio"
-                                                EXPORT_NAME "morphio")
+                                                EXPORT_NAME "morphio"
+                                                SOVERSION "0.0.0")
 foreach(TARGET morphio_shared morphio_static)
   target_include_directories(${TARGET}
     SYSTEM
@@ -118,6 +119,6 @@ install(
   # DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   TARGETS morphio_shared
   EXPORT MorphIOTargets
-  LIBRARY DESTINATION lib
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION include
 )

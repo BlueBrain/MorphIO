@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <algorithm>  // std::find_if
 #include <cassert>
 #include <cctype>    // std::tolower

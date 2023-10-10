@@ -1,3 +1,5 @@
+# Copyright (c) 2013-2023, EPFL/Blue Brain Project
+# SPDX-License-Identifier: Apache-2.0
 '''Module providing utility functions for the tests'''
 import re
 import sys

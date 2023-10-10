@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <catch2/catch.hpp>
 #include <gsl/gsl-lite.hpp>
 
@@ -149,7 +153,7 @@ TEST_CASE("morphio::shared_utils") {
         const std::vector<floatType> diameters = {0.1, 0.1, 0.1};
         Point expected{1 / floatType{3}, 2 / floatType{3}, 2 / floatType{3}};
         CHECK(centerOfGravity(points) == expected);
-        CHECK(maxDistanceToCenterOfGravity(points) == 1);
+        CHECK(maxDistanceToCenterOfGravity(points) == Approx(1));
         CHECK_THROWS(_somaSurface(SOMA_SIMPLE_CONTOUR, diameters, points));
     }
     /* CHECK(_somaSurface(SOMA_SINGLE_POINT, diameters, points) == Approx(0.0)); */

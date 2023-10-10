@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include "bind_immutable.h"
 
 #include <pybind11/iostream.h>  // py::add_ostream_redirect

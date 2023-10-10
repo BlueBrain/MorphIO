@@ -1,7 +1,10 @@
-#include <locale>
-
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include "../src/readers/morphologyHDF5.h"
 #include <catch2/catch.hpp>
+#include <locale>
 
 #include <highfive/H5File.hpp>
 #include <morphio/dendritic_spine.h>
