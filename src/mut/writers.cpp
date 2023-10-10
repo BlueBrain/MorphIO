@@ -222,6 +222,13 @@ void asc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     const auto& somaPoints = soma->points();
 
+    for (const auto& root : morphology.rootSections()) {
+        if (root->points().size() < 2) {
+            throw morphio::SectionBuilderError("Root sections must have at least 2 points");
+        }
+    }
+
+
     if (soma->points().empty() && morphology.rootSections().empty()) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
@@ -383,6 +390,12 @@ static void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 void h5(const Morphology& morpho, const std::string& filename) {
     const auto& soma = morpho.soma();
     const auto& somaPoints = soma->points();
+
+    for (const auto& root : morpho.rootSections()) {
+        if (root->points().size() < 2) {
+            throw morphio::SectionBuilderError("Root sections must have at least 2 points");
+        }
+    }
 
     if (somaPoints.empty()) {
         if (morpho.rootSections().empty()) {

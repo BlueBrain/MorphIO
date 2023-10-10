@@ -386,12 +386,6 @@ std::unordered_map<int, std::vector<unsigned int>> Morphology::connectivity() {
 }
 
 void Morphology::write(const std::string& filename) const {
-    for (const auto& root : rootSections()) {
-        if (root->points().size() < 2) {
-            throw morphio::SectionBuilderError("Root sections must have at least 2 points");
-        }
-    }
-
     const size_t pos = filename.find_last_of('.');
     if (pos == std::string::npos) {
         throw UnknownFileType("Missing file extension.");

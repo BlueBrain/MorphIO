@@ -373,7 +373,8 @@ def test_neurite_wrong_root_point():
         with ostream_redirect(stdout=True, stderr=True):
             path = DATA_DIR /  'neurite_wrong_root_point.swc'
             n = Morphology(path)
-            assert strip_color_codes(err.getvalue().strip()) == f'''\
+    breakpoint() # XXX BREAKPOINT
+    assert strip_color_codes(err.getvalue().strip()) == f'''\
 Warning: with a 3 points soma, neurites must be connected to the first soma point:
 {path}:4:warning
 
