@@ -1,3 +1,10 @@
+v3.4.0
+======
+Improvements:
+* New SWC parser:
+    * handles `locale` correctly, so decimal numbers using comma are allowed
+    * 
+
 v3.3.6
 ======
 Improvements:
