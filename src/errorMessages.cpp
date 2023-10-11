@@ -415,13 +415,11 @@ std::string ErrorMessages::WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const {
                     " ASC or SWC format. Please use H5 if you want to save them.");
 }
 
-std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const {
+std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(const Sample& child) const {
     std::ostringstream oss;
     oss << "Warning: with a 3 points soma, neurites must be connected to the first soma "
            "point:";
-    for (const auto& child : children) {
-        oss << errorMsg(child.lineNumber, ErrorLevel::WARNING, "");
-    }
+    oss << errorMsg(child.lineNumber, ErrorLevel::WARNING, "");
     return oss.str();
 }
 

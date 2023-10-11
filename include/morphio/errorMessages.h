@@ -264,7 +264,7 @@ class ErrorMessages
                                                      const Sample& child2);
 
     /** Wrong root point warning message */
-    std::string WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const;
+    std::string WARNING_WRONG_ROOT_POINT(const Sample& children) const;
 
     /**  Soma must be a contour for ASC and H5 */
     std::string WARNING_SOMA_NON_CONTOUR() const;

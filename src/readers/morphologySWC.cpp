@@ -353,6 +353,16 @@ class SWCBuilder
             if (children_.count(root_sample.id) == 0) {
                 continue;
             }
+
+            // https://neuromorpho.org/SomaFormat.html
+            // "The second and third soma points, as well as all starting points
+            // (roots) of dendritic and axonal arbors have this first point as
+            // the parent (parent ID 1)."
+            if (morph_.soma()->type() == SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS &&
+                root_sample.type == SECTION_SOMA && root_sample.id != 1) {
+                printError(Warning::WRONG_ROOT_POINT, err_.WARNING_WRONG_ROOT_POINT(root_sample));
+            }
+
             for (unsigned int child_id : children_.at(root_sample.id)) {
                 if (samples_.at(child_id).type == SECTION_SOMA) {
                     continue;
