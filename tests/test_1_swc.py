@@ -454,11 +454,9 @@ def test_root_node_split():
                   4	3	1 0 1 1  2
                   ''')
     n = Morphology(content, extension='swc')
-    assert len(n.root_sections) == 2
+    assert len(n.root_sections) == 1
     assert_array_equal(n.root_sections[0].points,
-                       [[1, 0, 0], [1, 1, 0]])
-    assert_array_equal(n.root_sections[1].points,
-                       [[1, 0, 0], [1, 0, 1]])
+                       [[1, 0, 0], ])
 
     # Normal bifurcation
     content = ('''1	1	0 0 0 1	-1

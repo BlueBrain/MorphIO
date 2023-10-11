@@ -1680,6 +1680,8 @@ within the file.)doc";
 
 static const char *mkd_doc_morphio_readers_Sample_Sample = R"doc()doc";
 
+static const char *mkd_doc_morphio_readers_Sample_UNKNOWN_ID = R"doc()doc";
+
 static const char *mkd_doc_morphio_readers_Sample_diameter = R"doc()doc";
 
 static const char *mkd_doc_morphio_readers_Sample_id = R"doc()doc";
