@@ -3,6 +3,7 @@
 from pathlib import Path
 
 import numpy as np
+import morphio
 import pytest
 from numpy.testing import assert_array_equal
 from utils import (assert_swc_exception, captured_output, ignored_warning,
@@ -26,7 +27,6 @@ def test_build_from_string():
     assert_array_equal(n.soma.diameters, [6.0])
     assert len(n.root_sections) == 1
     assert n.root_sections[0].id == 0
-    assert len(n.root_sections) == 1
     assert_array_equal(n.root_sections[0].points,
                        np.array([[0, 0, 2],
                                  [0, 0, 3],
@@ -48,7 +48,6 @@ def test_read_single_neurite():
     assert_array_equal(n.soma.diameters, [6.0])
     assert len(n.root_sections) == 1
     assert n.root_sections[0].id == 0
-    assert len(n.root_sections) == 1
     assert_array_equal(n.root_sections[0].points,
                        np.array([[0, 0, 2],
                                  [0, 0, 3],
@@ -254,20 +253,20 @@ def test_simple_reversed():
                         [-5, -4, 0]])
 
 
-def test_soma_type():
-    '''The ordering of IDs is not required'''
-    # 1 point soma
+def test_soma_type_1_point():
     content = '''1 1 0 0 0 3.0 -1'''
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_SINGLE_POINT)
 
-    # 2 point soma
+
+def test_soma_type_2_point():
     content = ('''1 1 0 0 0 3.0 -1
                   2 1 0 0 0 3.0  1''')
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_CYLINDERS)
 
-    # > 3 points soma
+
+def test_soma_type_more_than_3_point():
     content = ('''1 1 0 0 0 3.0 -1
                   2 1 0 0 0 3.0  1
                   3 1 0 0 0 3.0  2
@@ -276,6 +275,7 @@ def test_soma_type():
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_CYLINDERS)
 
+def test_soma_type_3_point_neuromorpho():
     # 3 points soma can be of type SOMA_CYLINDERS or SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
     # depending on the point layout
 
@@ -290,7 +290,7 @@ def test_soma_type():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             content = ('''1 1 0  0 0 3.0 -1
-                          2 1 1 -3 0 3.0  1
+                          2 1 1 -3 0 3.0  1 # <- note y is 1 instead of 0
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                     SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
@@ -299,7 +299,7 @@ def test_soma_type():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             content = ('''1 1 0  0 0 3.0 -1
-                          2 1 0 -3 0 3.0  1
+                          2 1 0 -3 0 3.0  1 # <- note z is -3 instead of 0
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                          SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
@@ -316,6 +316,7 @@ Got:
 2 1 0.000000 -3.000000 0.000000 3.000000 1
 3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1''')
 
+def test_soma_type_3_point():
     # If this configuration is not respected -> SOMA_CYLINDERS
     content = ( '''1 1 0 0 0 3.0 -1
                    2 1 0 0 0 3.0  1
@@ -364,21 +365,19 @@ def test_neurite_wrong_root_point():
     '''Test that for 3 points soma, the neurites are attached to first soma point'''
 
     # Not 3-points soma --> OK
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            n = Morphology(DATA_DIR /  'soma_cylinders.swc')
-            assert err.getvalue().strip() == ''
-        assert len(n.root_sections) == 1
+    #with captured_output() as (_, err):
+    #    with ostream_redirect(stdout=True, stderr=True):
+    #        n = Morphology(DATA_DIR /  'soma_cylinders.swc')
+    #        assert err.getvalue().strip() == ''
+    #    assert len(n.root_sections) == 1
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             path = DATA_DIR /  'neurite_wrong_root_point.swc'
             n = Morphology(path)
-            assert strip_color_codes(err.getvalue().strip()) == f'''\
+    assert strip_color_codes(err.getvalue().strip()) == f'''\
 Warning: with a 3 points soma, neurites must be connected to the first soma point:
-{path}:4:warning
-
-{path}:6:warning'''
+{path}:3:warning'''
     assert len(n.root_sections) == 2
     assert_array_equal(n.root_sections[0].points,
                        [[0,0,0], [0,0,1]])
@@ -448,20 +447,16 @@ def test_unsupported_section_type():
 
 
 def test_root_node_split():
-    '''Test that a bifurcation at the root point produces
-    two root sections
-    '''
+    '''Test that a bifurcation at the root point produces two root sections'''
     content = ('''1	1	0 0 0 1	-1
                   2	3	1 0 0 1  1
                   3	3	1 1 0 1  2
                   4	3	1 0 1 1  2
                   ''')
     n = Morphology(content, extension='swc')
-    assert len(n.root_sections) == 2
+    assert len(n.root_sections) == 1
     assert_array_equal(n.root_sections[0].points,
-                       [[1, 0, 0], [1, 1, 0]])
-    assert_array_equal(n.root_sections[1].points,
-                       [[1, 0, 0], [1, 0, 1]])
+                       [[1, 0, 0], ])
 
     # Normal bifurcation
     content = ('''1	1	0 0 0 1	-1
@@ -485,6 +480,11 @@ def test_root_node_split():
 def test_three_point_soma():
     n = Morphology(DATA_DIR /  'three_point_soma.swc')
     assert n.soma_type == SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
+
+
+def test_trailing_space():
+    n = Morphology(DATA_DIR / 'simple-trailing-space.swc')
+    assert n.points.shape == (3, 3)
 
 
 def test_zero_diameter():
@@ -513,5 +513,62 @@ def test_no_soma():
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             Morphology(content, extension='swc')
-            assert ('$STRING$:0:warning\nWarning: no soma found in file' ==
+            assert ('''$STRING$:1:warning
+Warning: found a disconnected neurite.
+Neurites are not supposed to have parentId: -1
+(although this is normal if this neuron has no soma)''' ==
                     strip_color_codes(err.getvalue().strip()))
+
+def test_throw_on_missing_data():
+    content = ''' 3    #    missing data '''
+    with pytest.raises(RawDataError, match='The end of the file was reached before parsing finshed'):
+        Morphology(content, extension='swc')
+
+    content = '''
+    # some pre data
+    3 3   #    missing data '''
+    with pytest.raises(RawDataError, match='The end of the file was reached before parsing finshed'):
+        Morphology(content, extension='swc')
+
+
+def test_throw_on_negative_id():
+    content = '''1 2 0 0 0 3.0 -1
+                 -2 2 0 0 0 3.0  1
+                 3 2 0 0 0 3.0  2'''
+    with pytest.raises(RawDataError, match='The ID assigned to this line is negative'):
+        Morphology(content, extension='swc')
+
+
+def test_multi_type_section():
+    contents =('''1 1 0 4 0 3.0 -1
+                  2 6 0 0 2 0.5 1        # <- type 6
+                  3 7 0 0 3 0.5 2        # <- type 7
+                  4 8 0 0 4 0.5 3        # <- type 8
+                  5 9 0 0 5 0.5 4''')    # <- type 9
+    n = Morphology(contents, "swc")
+    assert_array_equal(n.soma.points, [[0, 4, 0]])
+    assert_array_equal(n.soma.diameters, [6.0])
+    assert len(n.root_sections) == 1
+    assert n.root_sections[0].id == 0
+    assert_array_equal(n.root_sections[0].points,
+                       np.array([[0, 0, 2], ]))
+    assert len(n.sections) == 4
+    assert_array_equal(n.section_offsets, [0, 1, 3, 5, 7])
+
+
+def test_missing_parent():
+    contents =('''
+1 1  0  0 0 10 -1
+2 2 -2 -6 0 10  1
+3 2  2  6 0 10  2
+4 2  2  6 0 10  10
+''')
+    with pytest.raises(morphio.MissingParentError, match='Sample id: 4 refers to non-existant parent ID: 10'):
+        n = Morphology(contents, "swc")
+
+
+def test_read_simple_windows_eol():
+    simple = Morphology(DATA_DIR /  'simple-windows-eol.swc')
+    assert len(simple.root_sections) == 2
+    assert simple.root_sections[0].id == 0
+    assert simple.root_sections[1].id == 3

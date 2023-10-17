@@ -1572,6 +1572,8 @@ predefined errors messages)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_2 = R"doc()doc";
 
+static const char *mkd_doc_morphio_readers_ErrorMessages_EARLY_END_OF_FILE = R"doc(The end of the file was reached before parsing finshed)doc";
+
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_EOF_IN_NEURITE = R"doc(ASC EOF reached in neurite error message)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_EOF_REACHED = R"doc(ASC EOF reached error message)doc";
@@ -1586,6 +1588,8 @@ static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_MISSING_PARENT = 
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_MULTIPLE_SOMATA = R"doc(Multiple somas error message)doc";
 
+static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_NEGATIVE_ID = R"doc(A negative ID is used in SWC)doc";
+
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA = R"doc(Undefined soma error message)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_ONLY_CHILD_SWC_WRITER = R"doc(Single section child SWC error message)doc";
@@ -1594,7 +1598,7 @@ static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_OPENING_FILE = R"
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_PARSING_POINT = R"doc(Parsing ASC points error message)doc";
 
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_PERIMETER_DATA_NOT_WRITABLE = R"doc(Cant write perimeter data to SWC,ASC error message)doc";
+static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_PERIMETER_DATA_NOT_WRITABLE = R"doc(Can't write perimeter data to SWC, ASC error message)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_REPEATED_ID = R"doc(Repeated section id error message)doc";
 
@@ -1676,6 +1680,8 @@ within the file.)doc";
 
 static const char *mkd_doc_morphio_readers_Sample_Sample = R"doc()doc";
 
+static const char *mkd_doc_morphio_readers_Sample_UNKNOWN_ID = R"doc()doc";
+
 static const char *mkd_doc_morphio_readers_Sample_diameter = R"doc()doc";
 
 static const char *mkd_doc_morphio_readers_Sample_id = R"doc()doc";
@@ -1687,8 +1693,6 @@ static const char *mkd_doc_morphio_readers_Sample_parentId = R"doc()doc";
 static const char *mkd_doc_morphio_readers_Sample_point = R"doc()doc";
 
 static const char *mkd_doc_morphio_readers_Sample_type = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_valid = R"doc()doc";
 
 static const char *mkd_doc_morphio_set_ignored_warning = R"doc(Set a warning to ignore)doc";
 

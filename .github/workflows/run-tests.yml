@@ -32,7 +32,7 @@ jobs:
 
       - name: Install packages on Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev
+        run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev language-pack-de
 
       - name: Install packages on MacOS
         if: runner.os == 'macOS'
@@ -50,6 +50,7 @@ jobs:
           CC: ${{ matrix.compiler.CC }}
           CXX: ${{ matrix.compiler.CXX }}
         run: |
+          locale -a
           ./ci/python_test.sh
           ./ci/cpp_test.sh
           ./ci/cpp_test.sh "-DMORPHIO_USE_DOUBLE=ON"

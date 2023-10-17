@@ -74,7 +74,6 @@ struct Sample {
     Sample() = default;
 
     floatType diameter = -1.;
-    bool valid = false;
     Point point{};
     SectionType type = SECTION_UNDEFINED;
     unsigned int parentId = UNKNOWN_ID;
@@ -157,11 +156,20 @@ class ErrorMessages
     /** Section self parent error message */
     std::string ERROR_SELF_PARENT(const Sample& sample) const;
 
+    /** The end of the file was reached before parsing finshed */
+    std::string EARLY_END_OF_FILE(long unsigned int lineNumber) const;
+
     /** Undefined soma error message */
     std::string ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std::string&) const;
 
     /** Missing mitochondria parent section error message */
     std::string ERROR_MISSING_MITO_PARENT(int mitoParentId) const;
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //             SWC
+    ////////////////////////////////////////////////////////////////////////////////
+    /** A negative ID is used in SWC */
+    std::string ERROR_NEGATIVE_ID(long unsigned int lineNumber) const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //             NEUROLUCIDA
@@ -209,8 +217,9 @@ class ErrorMessages
                                              const std::string& vec2,
                                              size_t length2) const;
 
-    /** Cant write perimeter data to SWC,ASC error message */
+    /** Can't write perimeter data to SWC, ASC error message */
     std::string ERROR_PERIMETER_DATA_NOT_WRITABLE();
+
     /** Single section child SWC error message */
     std::string ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const;
 
@@ -222,7 +231,6 @@ class ErrorMessages
 
     /** Contour soma must have at least 3 points. */
     std::string ERROR_SOMA_INVALID_CONTOUR() const;
-
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
@@ -256,7 +264,7 @@ class ErrorMessages
                                                      const Sample& child2);
 
     /** Wrong root point warning message */
-    std::string WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const;
+    std::string WARNING_WRONG_ROOT_POINT(const Sample& children) const;
 
     /**  Soma must be a contour for ASC and H5 */
     std::string WARNING_SOMA_NON_CONTOUR() const;
