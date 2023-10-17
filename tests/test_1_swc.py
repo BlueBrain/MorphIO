@@ -519,6 +519,18 @@ Neurites are not supposed to have parentId: -1
 (although this is normal if this neuron has no soma)''' ==
                     strip_color_codes(err.getvalue().strip()))
 
+def test_throw_on_missing_data():
+    content = ''' 3    #    missing data '''
+    with pytest.raises(RawDataError, match='The end of the file was reached before parsing finshed'):
+        Morphology(content, extension='swc')
+
+    content = '''
+    # some pre data
+    3 3   #    missing data '''
+    with pytest.raises(RawDataError, match='The end of the file was reached before parsing finshed'):
+        Morphology(content, extension='swc')
+
+
 def test_throw_on_negative_id():
     content = '''1 2 0 0 0 3.0 -1
                  -2 2 0 0 0 3.0  1

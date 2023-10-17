@@ -58,15 +58,19 @@ public:
   }
 
   void advance_to_non_whitespace() {
+      if (done()) {
+          return;
+      }
       std::size_t pos = contents_.find_first_not_of(" \t\r", pos_);
       if (pos == std::string::npos) {
           pos_ = contents_.size();
+          return;
       }
       pos_ = pos;
   }
 
   void advance_to_number() {
-      while (consume_line_and_trailing_comments()) {
+      while (!done() && consume_line_and_trailing_comments()) {
       }
 
       if (done()) {
@@ -174,9 +178,6 @@ using morphio::readers::ErrorMessages;
 using morphio::readers::Sample;
 
 enum class DeclaredID : unsigned int {};
-unsigned int operator+(DeclaredID type) {
-    return static_cast<unsigned int>(type);
-}
 
 class SWCBuilder
 {
