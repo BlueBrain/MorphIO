@@ -100,7 +100,7 @@ jobs:
           key: ${{ runner.os }}-build-${{ env.cache-name }}-1.14.2
 
       - name: Fill Windows Cache
-        if: runner.os == 'Windows' && ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        if: runner.os == 'Windows' && steps.cache-npm.outputs.cache-hit != 'true'
         continue-on-error: false
         shell: cmd
         run: |
