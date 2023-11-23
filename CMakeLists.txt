@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.2)
+# https://cliutils.gitlab.io/modern-cmake/chapters/intro/dodonot.html#selecting-a-minimum-in-2022
+cmake_minimum_required(VERSION 3.16)
 project(MorphIO VERSION 2.0.0)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
