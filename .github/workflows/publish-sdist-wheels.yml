@@ -3,10 +3,13 @@ on: [pull_request, push]
 
 env:
   CIBW_BUILD_VERBOSITY: 3
-  CIBW_BUILD: 'cp*'
+  CIBW_BUILD: 'cp310-*'
+  #CIBW_BUILD: 'cp*'
   CIBW_SKIP: 'cp35-* cp36-* cp37-* *-manylinux_i686 *-musllinux_* *-win32 cp311-macosx_x86_64'
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
   CIBW_TEST_COMMAND: pytest -s -v {project}/tests
+  UNIXY_AEC_VERSION: 1.0.4
+  UNIXY_HDF5_VERSION: 1.12.1
   WINDOWS_HDF5: 1.14.2
 
 jobs:
@@ -18,52 +21,73 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-11, windows-2022]
+        os: [ubuntu-20.04]
+        #os: [ubuntu-20.04, macos-11 ]
+        #os: [ubuntu-20.04, macos-11, windows-2022]
 
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: 'true'
 
-      - uses: actions/setup-python@v4
-        name: Install Python
+      - name: Install Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.7'
+          python-version: '3.8'
 
       - name: Install cibuildwheel
         run: |
           python -m pip install cibuildwheel
+
+      - name: Cache HDF5 On Linux/macOS
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+        uses: actions/cache@v3
+        id: cache-hdf5-posix
+        env:
+          cache-name: cache-hdf5-posix
+        with:
+          path: ${{env.GITHUB_WORKSPACE}}/src-cache/
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
+
+      - name: Fill HDF5 On Linux/macOS Cache
+        if: runner.os == 'Linux' || runner.os == 'macOS' && steps.cache-hdf5-posix.outputs.cache-hit != 'true'
+        continue-on-error: false
+        run: |
+          mkdir -p ${GITHUB_WORKSPACE}/src-cache/
+          cd ${GITHUB_WORKSPACE}/src-cache/
+
+          echo "Downloading & unpacking aec ${UNIXY_AEC_VERSION}"
+          curl -fsSLO https://gitlab.dkrz.de/k202009/libaec/uploads/ea0b7d197a950b0c110da8dfdecbb71f/libaec-${UNIXY_AEC_VERSION}.tar.gz
+          tar zxvf libaec-$UNIXY_AEC_VERSION.tar.gz
+
+          echo "Downloading & unpacking HDF5 ${UNIXY_HDF5_VERSION}"
+          curl -fsSLO "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-${UNIXY_HDF5_VERSION%.*}/hdf5-$UNIXY_HDF5_VERSION/src/hdf5-$UNIXY_HDF5_VERSION.tar.gz"
+          tar xzvf hdf5-$UNIXY_HDF5_VERSION.tar.gz
+
+          ls -al
+          pwd
 
       - name: Build wheels on Linux
         if: runner.os == 'Linux'
         env:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BEFORE_ALL: |
-            AEC_VERSION="1.0.4"
-            HDF5_VERSION="1.12.1"
+            #yum update -y
+            pwd
+            ls -al
 
-            yum update -y
             yum -y install zlib-devel
-            pushd /tmp
-
-            echo "Downloading & unpacking aec ${AEC_VERSION}"
-            curl -fsSLO https://gitlab.dkrz.de/k202009/libaec/uploads/ea0b7d197a950b0c110da8dfdecbb71f/libaec-${AEC_VERSION}.tar.gz
-            tar zxf libaec-$AEC_VERSION.tar.gz
 
             echo "Building & installing libaec"
-            pushd libaec-$AEC_VERSION
+            pushd src-cache/libaec-${{env.UNIXY_AEC_VERSION}}
             ./configure
             make -j 2
             make install
             ldconfig
             popd
 
-            echo "Downloading & unpacking HDF5 ${HDF5_VERSION}"
-            curl -fsSLO "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-${HDF5_VERSION%.*}/hdf5-$HDF5_VERSION/src/hdf5-$HDF5_VERSION.tar.gz"
-            tar -xzvf hdf5-$HDF5_VERSION.tar.gz
-
             echo "Building & installing HDF5"
-            pushd hdf5-$HDF5_VERSION
+            pushd src-cache/hdf5-${{env.UNIXY_HDF5_VERSION}}
             ./configure                      \
               --prefix=/usr                  \
               --enable-build-mode=production \
@@ -74,6 +98,7 @@ jobs:
             make install
             ldconfig
             popd
+
         run: |
           python -m cibuildwheel --output-dir dist
 
@@ -82,11 +107,26 @@ jobs:
         env:
           MACOSX_DEPLOYMENT_TARGET: '10.13'
           CIBW_BEFORE_BUILD: |
-            #brew update
-            #brew --version
-            export HOMEBREW_NO_AUTO_UPDATE=1
-            export HDF5_DIR="$(brew --prefix hdf5)";
-            brew install hdf5
+            cd ~/src-cache/
+
+            echo "Building & installing libaec"
+            pushd libaec-${{env.UNIXY_AEC_VERSION}}
+            ./configure
+            make -j 2
+            make install
+            popd
+
+            echo "Building & installing HDF5"
+            pushd hdf5-${{env.UNIXY_HDF5_VERSION}}
+            ./configure                      \
+              --prefix=/usr                  \
+              --enable-build-mode=production \
+              --with-szlib                   \
+              --enable-tools=no              \
+              --enable-tests=no
+            make -j 2
+            make install
+            popd
         run: |
           python -m cibuildwheel --output-dir dist
 
