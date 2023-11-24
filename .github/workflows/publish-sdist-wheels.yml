@@ -7,6 +7,7 @@ env:
   CIBW_SKIP: 'cp35-* cp36-* cp37-* *-manylinux_i686 *-musllinux_* *-win32 cp311-macosx_x86_64'
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
   CIBW_TEST_COMMAND: pytest -s -v {project}/tests
+  WINDOWS_HDF5: 1.14.2
 
 jobs:
   build_wheels:
@@ -17,7 +18,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-11, windows-2022]
+        os: [windows-2022]
+        #os: [ubuntu-20.04, macos-11, windows-2022]
 
     steps:
       - uses: actions/checkout@v3
@@ -96,16 +98,16 @@ jobs:
         env:
           cache-name: cache-hdf5-windows
         with:
-          path: C:\cache\hdf5-1.14.2
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-1.14.2
+          path: C:\cache\hdf5\${{ env.WINDOWS_HDF5 }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.WINDOWS_HDF5 }}
 
       - name: Fill Windows Cache
-        if: runner.os == 'Windows' && steps.cache-npm.outputs.cache-hit != 'true'
+        if: runner.os == 'Windows' && steps.cache-hdf5-windows.outputs.cache-hit != 'true'
         continue-on-error: false
         shell: cmd
         run: |
-          mkdir C:\cache\hdf5-1.14.2
-          curl -L -o C:\cache\hdf5-1.14.2\hdf5.zip https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.2/bin/windows/hdf5-1.14.2-Std-win10_64-vs16.zip
+          mkdir C:\cache\hdf5\${{ env.WINDOWS_HDF5 }}
+          curl -L -o C:\cache\hdf5\${{ env.WINDOWS_HDF5 }}\hdf5.zip https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.2/bin/windows/hdf5-1.14.2-Std-win10_64-vs16.zip
 
       - name: Build wheels Windows
         if: runner.os == 'Windows'
@@ -117,12 +119,12 @@ jobs:
         # this has a partial table:
         # https://devblogs.microsoft.com/cppblog/side-by-side-minor-version-msvc-toolsets-in-visual-studio-2017/
         run: |
-          C:\windows\system32\tar.exe xf C:\cache\hdf5-1.14.2\hdf5.zip
-          start /wait msiexec /a "%cd%\hdf\HDF5-1.14.2-win64.msi" /qn TARGETDIR="c:\hdf5\"
+          C:\windows\system32\tar.exe xf C:\cache\hdf5\${{ env.WINDOWS_HDF5 }}\hdf5.zip
+          start /wait msiexec /a "%cd%\hdf\HDF5-${{ env.WINDOWS_HDF5 }}-win64.msi" /qn TARGETDIR="c:\hdf5\"
 
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat" -vcvars_ver=14.1
 
-          set HDF5_DIR=C:\hdf5\HDF_Group\HDF5\1.14.2\cmake
+          set HDF5_DIR=C:\hdf5\HDF_Group\HDF5\${{ env.WINDOWS_HDF5 }}\cmake
 
           python -m cibuildwheel --output-dir dist
 
