@@ -9,7 +9,7 @@ env:
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
   CIBW_TEST_COMMAND: pytest -s -v {project}/tests
   UNIXY_AEC_VERSION: 1.0.4
-  UNIXY_HDF5_VERSION: 1.12.1
+  UNIXY_HDF5_VERSION: 1.14.2
   WINDOWS_HDF5: 1.14.2
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [macos-11 ]
         #os: [ubuntu-20.04, macos-11 ]
         #os: [ubuntu-20.04, macos-11, windows-2022]
 
@@ -46,88 +46,54 @@ jobs:
         env:
           cache-name: cache-hdf5-posix
         with:
-          path: ${{env.GITHUB_WORKSPACE}}/src-cache/
+          path: src-cache/
           key: ${{ runner.os }}-build-${{ env.cache-name }}
 
       - name: Fill HDF5 On Linux/macOS Cache
         if: runner.os == 'Linux' || runner.os == 'macOS' && steps.cache-hdf5-posix.outputs.cache-hit != 'true'
         continue-on-error: false
         run: |
-          mkdir -p ${GITHUB_WORKSPACE}/src-cache/
-          cd ${GITHUB_WORKSPACE}/src-cache/
-
-          echo "Downloading & unpacking aec ${UNIXY_AEC_VERSION}"
-          curl -fsSLO https://gitlab.dkrz.de/k202009/libaec/uploads/ea0b7d197a950b0c110da8dfdecbb71f/libaec-${UNIXY_AEC_VERSION}.tar.gz
-          tar zxvf libaec-$UNIXY_AEC_VERSION.tar.gz
-
-          echo "Downloading & unpacking HDF5 ${UNIXY_HDF5_VERSION}"
-          curl -fsSLO "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-${UNIXY_HDF5_VERSION%.*}/hdf5-$UNIXY_HDF5_VERSION/src/hdf5-$UNIXY_HDF5_VERSION.tar.gz"
-          tar xzvf hdf5-$UNIXY_HDF5_VERSION.tar.gz
-
-          ls -al
-          pwd
+          bash ci/hdf5-download.sh src-cache/
 
       - name: Build wheels on Linux
         if: runner.os == 'Linux'
         env:
           CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
           CIBW_BEFORE_ALL: |
-            #yum update -y
-            pwd
-            ls -al
-
             yum -y install zlib-devel
 
-            echo "Building & installing libaec"
-            pushd src-cache/libaec-${{env.UNIXY_AEC_VERSION}}
-            ./configure
-            make -j 2
-            make install
-            ldconfig
-            popd
+            export UNIXY_AEC_VERSION=${{env.UNIXY_AEC_VERSION}}
+            export UNIXY_HDF5_VERSION=${{env.UNIXY_HDF5_VERSION}}
+  
+            # CMake complains if the dependencies come from within the same tree
+            # as the source, so we'll just pretend they are elsewhere
+            ln -s $PWD/src-cache /opt/src-cache
 
-            echo "Building & installing HDF5"
-            pushd src-cache/hdf5-${{env.UNIXY_HDF5_VERSION}}
-            ./configure                      \
-              --prefix=/usr                  \
-              --enable-build-mode=production \
-              --with-szlib                   \
-              --enable-tools=no              \
-              --enable-tests=no
-            make -j 2
-            make install
-            ldconfig
-            popd
+            bash ci/hdf5-build.sh /opt/src-cache
 
         run: |
+          export HDF5_ROOT=/opt/src-cache/install
+          export CIBW_ENVIRONMENT_PASS=HDF5_ROOT
+
           python -m cibuildwheel --output-dir dist
 
       - name: Build wheels Mac OS
         if: runner.os == 'macOS'
         env:
           MACOSX_DEPLOYMENT_TARGET: '10.13'
+          CIBW_ENVIRONMENT_PASS: HDF5_ROOT
+          CIBW_ARCHS_MACOS: arm64
           CIBW_BEFORE_BUILD: |
-            cd ~/src-cache/
+            export UNIXY_AEC_VERSION=${{env.UNIXY_AEC_VERSION}}
+            export UNIXY_HDF5_VERSION=${{env.UNIXY_HDF5_VERSION}}
 
-            echo "Building & installing libaec"
-            pushd libaec-${{env.UNIXY_AEC_VERSION}}
-            ./configure
-            make -j 2
-            make install
-            popd
-
-            echo "Building & installing HDF5"
-            pushd hdf5-${{env.UNIXY_HDF5_VERSION}}
-            ./configure                      \
-              --prefix=/usr                  \
-              --enable-build-mode=production \
-              --with-szlib                   \
-              --enable-tools=no              \
-              --enable-tests=no
-            make -j 2
-            make install
-            popd
+            # CMake complains if the dependencies come from within the same tree
+            # as the source, so we'll just pretend they are elsewhere
+            ln -s $PWD/src-cache /Users/runner/work/src-cache
+  
+            bash ci/hdf5-build.sh /Users/runner/work/src-cache
         run: |
+          export HDF5_ROOT=/Users/runner/work/src-cache/install-$CIBW_ARCHS_MACOS
           python -m cibuildwheel --output-dir dist
 
       - name: Cache HDF5 On Windows
@@ -173,44 +139,45 @@ jobs:
           name: dist
           path: dist/*.whl
 
-  build_sdist:
-    name: Build sdist
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+  #build_sdist:
+  #  name: Build sdist
+  #  if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
 
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: 'true'
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - uses: actions/checkout@v3
+  #      with:
+  #        submodules: 'true'
 
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.8
+  #    - name: Set up Python 3.8
+  #      uses: actions/setup-python@v4
+  #      with:
+  #        python-version: 3.8
 
-      - name: Build a source tarball
-        run:
-          python setup.py sdist
+  #    - name: Build a source tarball
+  #      run:
+  #        python setup.py sdist
 
-      - name: Test tarball
-        run: |
-          sudo apt install -y libhdf5-dev
-          pip install -r tests/requirement_tests.txt
-          pip install dist/*
-          pytest -s -v tests
+  #    - name: Test tarball
+  #      run: |
+  #        sudo apt install -y libhdf5-dev
+  #        pip install -r tests/requirement_tests.txt
+  #        pip install dist/*
+  #        pytest -s -v tests
 
-      - name: Store sdist as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: dist
-          path: dist/*.tar.gz
+  #    - name: Store sdist as artifact
+  #      uses: actions/upload-artifact@v3
+  #      with:
+  #        name: dist
+  #        path: dist/*.tar.gz
 
   upload_artifacts:
     name: Upload wheels to PyPI
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
 
     runs-on: ubuntu-latest
-    needs: [build_wheels, build_sdist]
+    #needs: [build_wheels, build_sdist]
+    needs: [build_wheels]
 
     steps:
       - name: Download artifacts produced during the build_wheels and build_sdist jobs
