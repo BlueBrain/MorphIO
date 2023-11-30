@@ -61,7 +61,7 @@ jobs:
 
             export UNIXY_AEC_VERSION=${{env.UNIXY_AEC_VERSION}}
             export UNIXY_HDF5_VERSION=${{env.UNIXY_HDF5_VERSION}}
-  
+
             # CMake complains if the dependencies come from within the same tree
             # as the source, so we'll just pretend they are elsewhere
             ln -s $PWD/src-cache /opt/src-cache
@@ -86,7 +86,7 @@ jobs:
             # CMake complains if the dependencies come from within the same tree
             # as the source, so we'll just pretend they are elsewhere
             ln -s $PWD/src-cache /Users/runner/work/src-cache
-  
+
             bash ci/hdf5-build.sh /Users/runner/work/src-cache
         run: |
 

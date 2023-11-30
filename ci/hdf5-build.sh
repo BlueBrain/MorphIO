@@ -4,10 +4,6 @@ set -e -x
 export INPUT=$(cd $(dirname "$1") && pwd -P)/$(basename "$1")
 export OUTPUT="$INPUT/install-$CIBW_ARCHS_MACOS"
 
-env
-pwd
-ls -al
-
 if [[ "$OSTYPE" == "darwin"* ]]; then
     lib_name=libhdf5.dylib
     NPROC=$(sysctl -n hw.ncpu)
@@ -46,10 +42,10 @@ else
 
     echo "Building & installing libaec"
     pushd "$INPUT/libaec-$UNIXY_AEC_VERSION"
-    ./configure         \
-     --prefix="$OUTPUT" \
-     ${HOST_ARG}        \
-     --enable-static=no
+    ./configure            \
+        --prefix="$OUTPUT" \
+        ${HOST_ARG}        \
+        --enable-static=no
 
     make -j "$NPROC"
     make install
