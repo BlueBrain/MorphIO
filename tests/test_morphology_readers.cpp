@@ -1,8 +1,13 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include "../src/readers/morphologyHDF5.h"
 #include <catch2/catch.hpp>
 
 #include <highfive/H5File.hpp>
 #include <morphio/dendritic_spine.h>
+#include <morphio/enums.h>
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
@@ -45,6 +50,15 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
     {  // h5 file with a single point soma (ie: not a contour)
         CHECK_THROWS_AS(morphio::Morphology("data/h5/simple-single-point-soma.h5"),
                         morphio::RawDataError);
+    }
+
+    {
+        // This is to cover the appendProperties perimeters line in mut/morphology.cpp,
+        // which is triggered if modifiers are used in a morphology that has perimeters
+        const morphio::Morphology m("data/h5/v1/glia.h5", morphio::enums::Option::NRN_ORDER);
+        REQUIRE(m.soma().points().size() == 2);
+        REQUIRE(m.points().size() == 2);
+        REQUIRE(m.perimeters().size() == 2);
     }
 
     {  // file is an not a valid h5 file
@@ -94,7 +108,6 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
     }
 }
 
-
 TEST_CASE("LoadH5Glia", "[morphology]") {
     {
         const morphio::Morphology m("data/h5/v1/glia.h5");
@@ -102,7 +115,6 @@ TEST_CASE("LoadH5Glia", "[morphology]") {
         REQUIRE(m.points().size() == 2);
         REQUIRE(m.perimeters().size() == 2);
     }
-
     {
         const morphio::Morphology m("data/h5/v1/glia_soma_only.h5");
         REQUIRE(m.soma().points().size() == 4);
@@ -127,12 +139,11 @@ TEST_CASE("LoadH5DendriticSpine", "[DendriticSpine]") {
         REQUIRE(d.points().size() == 8);
         REQUIRE(d.postSynapticDensity().size() == 2);
     }
-#if 0
     {
         const morphio::Morphology m("data/h5/v1/glia_soma_only.h5");
-        REQUIRE(m.soma().points().size() == 1);
-        REQUIRE(m.points().size() == 0);
-        REQUIRE(m.perimeters().size() == 0);
+        REQUIRE(m.soma().points().size() == 4);
+        REQUIRE(m.points().empty());
+        REQUIRE(m.perimeters().empty());
     }
 
     {  // empty perimeters
@@ -144,7 +155,6 @@ TEST_CASE("LoadH5DendriticSpine", "[DendriticSpine]") {
         CHECK_THROWS_AS(morphio::Morphology("data/h5/v1/glia_wrong_sized_perimeters.h5"),
                         morphio::RawDataError);
     }
-#endif
 }
 
 TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {
@@ -157,9 +167,30 @@ TEST_CASE("LoadH5MorphologySingleNeurite", "[morphology]") {
 }
 
 TEST_CASE("LoadSWCMorphology", "[morphology]") {
-    const morphio::Morphology m("data/simple.swc");
+    {
+        const morphio::Morphology m("data/simple.swc");
+        REQUIRE(m.diameters().size() == 12);
+    }
 
-    REQUIRE(m.diameters().size() == 12);
+    {
+        const morphio::Morphology all_types("data/simple-all-types.swc");
+        REQUIRE(all_types.diameters().size() == 30);
+        REQUIRE(all_types.rootSections()[0].type() == morphio::SECTION_CUSTOM_5);
+        REQUIRE(all_types.rootSections()[1].type() == morphio::SECTION_CUSTOM_6);
+        REQUIRE(all_types.rootSections()[2].type() == morphio::SECTION_CUSTOM_7);
+        REQUIRE(all_types.rootSections()[3].type() == morphio::SECTION_CUSTOM_8);
+        REQUIRE(all_types.rootSections()[4].type() == morphio::SECTION_CUSTOM_9);
+        REQUIRE(all_types.rootSections()[5].type() == morphio::SECTION_CUSTOM_10);
+        REQUIRE(all_types.rootSections()[6].type() == morphio::SECTION_CUSTOM_11);
+        REQUIRE(all_types.rootSections()[7].type() == morphio::SECTION_CUSTOM_12);
+        REQUIRE(all_types.rootSections()[8].type() == morphio::SECTION_CUSTOM_13);
+        REQUIRE(all_types.rootSections()[9].type() == morphio::SECTION_CUSTOM_14);
+        REQUIRE(all_types.rootSections()[10].type() == morphio::SECTION_CUSTOM_15);
+        REQUIRE(all_types.rootSections()[11].type() == morphio::SECTION_CUSTOM_16);
+        REQUIRE(all_types.rootSections()[12].type() == morphio::SECTION_CUSTOM_17);
+        REQUIRE(all_types.rootSections()[13].type() == morphio::SECTION_CUSTOM_18);
+        REQUIRE(all_types.rootSections()[14].type() == morphio::SECTION_CUSTOM_19);
+    }
 }
 
 TEST_CASE("LoadNeurolucidaMorphology", "[morphology]") {

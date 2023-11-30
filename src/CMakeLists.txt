@@ -1,4 +1,5 @@
 set(MORPHIO_SOURCES
+    collection.cpp
     dendritic_spine.cpp
     endoplasmic_reticulum.cpp
     enums.cpp
@@ -25,6 +26,7 @@ set(MORPHIO_SOURCES
     readers/morphologySWC.cpp
     readers/vasculatureHDF5.cpp
     section.cpp
+    shared_utils.cpp
     soma.cpp
     vasc/properties.cpp
     vasc/section.cpp
@@ -65,6 +67,8 @@ target_include_directories(morphio_obj
    $<TARGET_PROPERTY:gsl-lite,INTERFACE_INCLUDE_DIRECTORIES>
    $<TARGET_PROPERTY:HighFive,INTERFACE_INCLUDE_DIRECTORIES>
    $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
+  PRIVATE
+   $<TARGET_PROPERTY:ghc_filesystem,INTERFACE_INCLUDE_DIRECTORIES>
   )
 
 set_target_properties(morphio_obj
@@ -75,12 +79,8 @@ set_target_properties(morphio_obj
   )
 
 if (MORPHIO_ENABLE_COVERAGE)
-  target_compile_options(morphio_obj
-    PUBLIC -g -O0 --coverage -fprofile-arcs -ftest-coverage
-    )
-  target_link_libraries(morphio_obj
-    PUBLIC gcov
-    )
+  include(CodeCoverage)
+  append_coverage_compiler_flags_to_target(morphio_obj)
 endif()
 
 
@@ -98,7 +98,8 @@ add_library(morphio_static STATIC $<TARGET_OBJECTS:morphio_obj>)
 add_library(morphio_shared SHARED $<TARGET_OBJECTS:morphio_obj>)
 
 set_target_properties(morphio_shared PROPERTIES OUTPUT_NAME "morphio"
-                                                EXPORT_NAME "morphio")
+                                                EXPORT_NAME "morphio"
+                                                SOVERSION "0.0.0")
 foreach(TARGET morphio_shared morphio_static)
   target_include_directories(${TARGET}
     SYSTEM
@@ -111,19 +112,12 @@ foreach(TARGET morphio_shared morphio_static)
      $<TARGET_PROPERTY:lexertl,INTERFACE_INCLUDE_DIRECTORIES>
      )
   target_link_libraries(${TARGET} PUBLIC gsl-lite PRIVATE HighFive lexertl)
-
-  if (MORPHIO_ENABLE_COVERAGE)
-     target_link_libraries(${TARGET}
-     PUBLIC gcov
-     )
-  endif()
-
 endforeach(TARGET)
 
 install(
   # DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   TARGETS morphio_shared
   EXPORT MorphIOTargets
-  LIBRARY DESTINATION lib
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   PUBLIC_HEADER DESTINATION include
 )

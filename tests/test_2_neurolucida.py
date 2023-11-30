@@ -1,13 +1,14 @@
+# Copyright (c) 2013-2023, EPFL/Blue Brain Project
+# SPDX-License-Identifier: Apache-2.0
 from itertools import product
 from pathlib import Path
 
 import numpy as np
-from morphio import Morphology, RawDataError, SomaError, ostream_redirect
-from numpy.testing import assert_array_almost_equal, assert_array_equal
-
 import pytest
+from morphio import Morphology, RawDataError, SomaError
+from numpy.testing import assert_array_almost_equal, assert_array_equal
+from utils import assert_asc_exception
 
-from utils import assert_asc_exception, tmp_asc_file
 
 DATA_DIR = Path(__file__).parent / 'data'
 
@@ -47,7 +48,7 @@ NEUROLUCIDA_MARKERS = [
  ]
 
 
-def test_soma(tmp_path):
+def test_soma():
     soma_content = '''
         (1 1 0 1 S1)
         (-1 1 0 1 S2)
@@ -59,66 +60,60 @@ def test_soma(tmp_path):
                        [-1, -1, 0]]
 
     # token as token
-    with tmp_asc_file(tmp_path,
-                      '''
-                      ((CellBody)
-                      ''' + soma_content) as tmp_file:
-        n = Morphology(tmp_file.name)
-        assert_array_equal(n.soma.points, expected_points)
-        assert len(n.root_sections) == 0
+    content = ('''
+               ((CellBody)
+               ''' + soma_content)
+    n = Morphology(content, extension='asc')
+    assert_array_equal(n.soma.points, expected_points)
+    assert len(n.root_sections) == 0
 
     # token as text
-    with tmp_asc_file(tmp_path,
-                      '''
-                      ("CellBody"
-                      (Color Red)
-                      ''' + soma_content) as tmp_file:
-        n = Morphology(tmp_file.name)
-        assert_array_equal(n.soma.points, expected_points)
-        assert len(n.root_sections) == 0
+    content = ('''
+               ("CellBody"
+               (Color Red)
+               ''' + soma_content)
+    n = Morphology(content, extension='asc')
+    assert_array_equal(n.soma.points, expected_points)
+    assert len(n.root_sections) == 0
 
     # both text and token
-    with tmp_asc_file(tmp_path,
-                      '''
-                      ("CellBody"
-                      (Color Red)
-                      (CellBody)
-                      ''' + soma_content) as tmp_file:
-        n = Morphology(tmp_file.name)
-        assert_array_equal(n.soma.points, expected_points)
-        assert len(n.root_sections) == 0
+    content = ('''
+               ("CellBody"
+               (Color Red)
+               (CellBody)
+               ''' + soma_content)
+    n = Morphology(content, extension='asc')
+    assert_array_equal(n.soma.points, expected_points)
+    assert len(n.root_sections) == 0
 
     # both token and text
-    with tmp_asc_file(tmp_path,
-                      '''
-                      ((CellBody)
-                      (Color Red)
-                      "CellBody"
-                      ''' + soma_content) as tmp_file:
-        n = Morphology(tmp_file.name)
-        assert_array_equal(n.soma.points, expected_points)
-        assert len(n.root_sections) == 0
+    content = ('''
+               ((CellBody)
+               (Color Red)
+               "CellBody"
+               ''' + soma_content)
+    n = Morphology(content, extension='asc')
+    assert_array_equal(n.soma.points, expected_points)
+    assert len(n.root_sections) == 0
 
 
-def test_parse_number_with_plus_symbol(tmp_path):
-    with tmp_asc_file(tmp_path,
-                      '''("CellBody"
-                         (Color Red)
-                         (CellBody)
-                         (1  1 0 1 S1)
-                         (1 +1 0 1 S2)  ; <- there is a '+' symbol
-                         (1  1 0 2 S3)
-                         )''') as tmp_file:
-        n = Morphology(tmp_file.name)
-        assert_array_equal(n.soma.points,
-                           [[1, 1, 0],
-                            [1, 1, 0],
-                            [1, 1, 0]])
+def test_parse_number_with_plus_symbol():
+    content = ('''("CellBody"
+                  (Color Red)
+                  (CellBody)
+                  (1  1 0 1 S1)
+                  (1 +1 0 1 S2)  ; <- there is a '+' symbol
+                  (1  1 0 2 S3)
+                  )''')
+    n = Morphology(content, extension='asc')
+    assert_array_equal(n.soma.points,
+                       [[1, 1, 0],
+                        [1, 1, 0],
+                        [1, 1, 0]])
 
 
-def test_unknown_token(tmp_path):
-    assert_asc_exception(tmp_path,
-                         '''
+def test_unknown_token():
+    assert_asc_exception('''
                          ("CellBody"
                          (Color Red)
                          (CellBody)
@@ -131,9 +126,8 @@ def test_unknown_token(tmp_path):
                          ":6:error")
 
 
-def test_unfinished_point(tmp_path):
-    assert_asc_exception(tmp_path,
-                         '''("CellBody"
+def test_unfinished_point():
+    assert_asc_exception('''("CellBody"
                             (Color Red)
                             (CellBody)
                             (1 1''',
@@ -142,9 +136,8 @@ def test_unfinished_point(tmp_path):
                          ':4:error')
 
 
-def test_multiple_soma(tmp_path):
-    assert_asc_exception(tmp_path,
-                         '''
+def test_multiple_soma():
+    assert_asc_exception('''
                              ("CellBody"
                              (Color Red)
                              (CellBody)
@@ -163,49 +156,47 @@ def test_multiple_soma(tmp_path):
                          ':14:error')
 
 
-def test_single_neurite_no_soma(tmp_path):
-    with tmp_asc_file(tmp_path,
-                      '''
-                      ( (Color Yellow)
-                         (Axon)
-                         (Set "axons")
-                         (  1.2  2.7   1.0     13)
-                         (  1.2  3.7   2.0     13)
-                      )''') as tmp_file:
-        n = Morphology(tmp_file.name)
+def test_single_neurite_no_soma():
+    content = ('''
+               ( (Color Yellow)
+                  (Axon)
+                  (Set "axons")
+                  (  1.2  2.7   1.0     13)
+                  (  1.2  3.7   2.0     13)
+               )''')
+    n = Morphology(content, extension='asc')
 
-        assert_array_equal(n.soma.points, np.empty((0, 3)))
-        assert len(n.root_sections) == 1
-        assert_array_equal(n.root_sections[0].points,
-                           np.array([[1.2, 2.7, 1.0],
-                                     [1.2, 3.7, 2.0]], dtype=np.float32))
+    assert_array_equal(n.soma.points, np.empty((0, 3)))
+    assert len(n.root_sections) == 1
+    assert_array_equal(n.root_sections[0].points,
+                       np.array([[1.2, 2.7, 1.0],
+                                 [1.2, 3.7, 2.0]], dtype=np.float32))
 
-        assert_array_equal(n.root_sections[0].diameters,
-                           np.array([13., 13.], dtype=np.float32))
+    assert_array_equal(n.root_sections[0].diameters,
+                       np.array([13., 13.], dtype=np.float32))
 
 
-def test_skip_header(tmp_path):
+def test_skip_header():
     '''Test that the header does not cause any issue'''
-    with tmp_asc_file(tmp_path,
-                      '''(FilledCircle
-                         (Color RGB (64, 0, 128))
-                         (Name "Marker 11")
-                         (Set "axons")
-                         ( -189.59    55.67    28.68     0.12)  ; 1
-                         )  ;  End of markers
+    content = ('''(FilledCircle
+                  (Color RGB (64, 0, 128))
+                  (Name "Marker 11")
+                  (Set "axons")
+                  ( -189.59    55.67    28.68     0.12)  ; 1
+                  )  ;  End of markers
 
-                         ((Color Yellow)
-                         (Axon)
-                         (Set "axons")
-                         (  1.2  2.7   1.0     13)
-                         (  1.2  3.7   2.0     13)
-                         )''') as tmp_file:
+                  ((Color Yellow)
+                  (Axon)
+                  (Set "axons")
+                  (  1.2  2.7   1.0     13)
+                  (  1.2  3.7   2.0     13)
+                  )''')
 
-        n = Morphology(tmp_file.name)
-        assert len(n.root_sections) == 1
-        assert_array_equal(n.root_sections[0].points,
-                           np.array([[1.2, 2.7, 1.0],
-                                     [1.2, 3.7, 2.0]], dtype=np.float32))
+    n = Morphology(content, extension='asc')
+    assert len(n.root_sections) == 1
+    assert_array_equal(n.root_sections[0].points,
+                       np.array([[1.2, 2.7, 1.0],
+                                 [1.2, 3.7, 2.0]], dtype=np.float32))
 
 
 without_duplicate = '''
@@ -242,87 +233,81 @@ with_duplicate = '''
                       )
                      '''
 
-def test_read_with_duplicates(tmp_path):
+def test_read_with_duplicates():
     '''Section points are duplicated in the file
 what I think the
-https://developer.humanbrainproject.eu/docs/projects/morphology-documentation/0.0.2/h5v1.html
+https://morphology-documentation.readthedocs.io/en/latest/h5v1.html
 would look like'''
 
-    with tmp_asc_file(tmp_path, with_duplicate) as tmp_file:
-        n = Morphology(tmp_file.name)
+    n = Morphology(with_duplicate, extension='asc')
 
-        assert len(n.root_sections) == 1
+    assert len(n.root_sections) == 1
 
-        assert_array_equal(n.root_sections[0].points,
-                           [[3, -4, 0],
-                            [3, -6, 0],
-                            [3, -8, 0],
-                            [3, -10, 0],
-                            ])
+    assert_array_equal(n.root_sections[0].points,
+                       [[3, -4, 0],
+                        [3, -6, 0],
+                        [3, -8, 0],
+                        [3, -10, 0],
+                        ])
 
-        assert_array_equal(n.root_sections[0].children[0].points,
-                           [[3, -10, 0],
-                            [0, -10, 0],
-                            [-3, -10, 0]])
-        assert_array_equal(n.root_sections[0].children[0].diameters,
-                           np.array([2, 2, 0.3], dtype=np.float32))
+    assert_array_equal(n.root_sections[0].children[0].points,
+                       [[3, -10, 0],
+                        [0, -10, 0],
+                        [-3, -10, 0]])
+    assert_array_equal(n.root_sections[0].children[0].diameters,
+                       np.array([2, 2, 0.3], dtype=np.float32))
 
-        assert_array_equal(n.root_sections[0].children[1].points,
-                           [[3, -10, 0],
-                            [6, -10, 0],
-                            [9, -10, 0]])
-        assert_array_equal(n.root_sections[0].children[1].diameters,
-                           np.array([2, 2, 0.3], dtype=np.float32))
-
-
-def test_read_without_duplicates(tmp_path):
-    with tmp_asc_file(tmp_path, with_duplicate) as tmp_file:
-        n_with_duplicate = Morphology(tmp_file.name)
-
-        with tmp_asc_file(tmp_path, without_duplicate) as tmp_file:
-            n_without_duplicate = Morphology(tmp_file.name)
-
-        assert_array_equal(n_with_duplicate.root_sections[0].children[0].points,
-                           n_without_duplicate.root_sections[0].children[0].points)
-
-        assert_array_equal(n_with_duplicate.root_sections[0].points,
-                           n_without_duplicate.root_sections[0].points)
-
-        assert_array_equal(n_with_duplicate.root_sections[0].children[0].diameters,
-                           n_without_duplicate.root_sections[0].children[0].diameters)
-
-        assert_array_equal(n_with_duplicate.root_sections[0].diameters,
-                           n_without_duplicate.root_sections[0].diameters)
+    assert_array_equal(n.root_sections[0].children[1].points,
+                       [[3, -10, 0],
+                        [6, -10, 0],
+                        [9, -10, 0]])
+    assert_array_equal(n.root_sections[0].children[1].diameters,
+                       np.array([2, 2, 0.3], dtype=np.float32))
 
 
-def test_explicit_duplicates_with_arbitrary_diameter(tmp_path):
+def test_read_without_duplicates():
+    n_with_duplicate = Morphology(with_duplicate, extension='asc')
+    n_without_duplicate = Morphology(without_duplicate, extension='asc')
+
+    assert_array_equal(n_with_duplicate.root_sections[0].children[0].points,
+                       n_without_duplicate.root_sections[0].children[0].points)
+
+    assert_array_equal(n_with_duplicate.root_sections[0].points,
+                       n_without_duplicate.root_sections[0].points)
+
+    assert_array_equal(n_with_duplicate.root_sections[0].children[0].diameters,
+                       n_without_duplicate.root_sections[0].children[0].diameters)
+
+    assert_array_equal(n_with_duplicate.root_sections[0].diameters,
+                       n_without_duplicate.root_sections[0].diameters)
+
+
+def test_explicit_duplicates_with_arbitrary_diameter():
     '''If the duplicate is already in the file with an arbitrary diameter, it should be preserved'''
-    with tmp_asc_file(tmp_path,
-                      '''
-                      ((Dendrite)
-                       (3 -4 0 5)
-                       (3 -6 0 5)
-                       (3 -8 0 5)
-                       (3 -10 0 5)
-                       (
-                         (3 -10 0 20) ; duplicate
-                         (0 -10 0 2)
-                         (-3 -10 0 0.3)
-                         |
-                         (3 -10 0 2)
-                         (6 -10 0 2)
-                         (9 -10 0 0.3)
-                       )
-                       )
-                      ''') as tmp_file:
-        n = Morphology(tmp_file.name)
-        assert_array_equal(n.root_sections[0].children[0].diameters,
-                           np.array([20, 2, 0.3], dtype=np.float32))
+    content = ( '''
+               ((Dendrite)
+                (3 -4 0 5)
+                (3 -6 0 5)
+                (3 -8 0 5)
+                (3 -10 0 5)
+                (
+                  (3 -10 0 20) ; duplicate
+                  (0 -10 0 2)
+                  (-3 -10 0 0.3)
+                  |
+                  (3 -10 0 2)
+                  (6 -10 0 2)
+                  (9 -10 0 0.3)
+                )
+                )
+               ''')
+    n = Morphology(content, extension='asc')
+    assert_array_equal(n.root_sections[0].children[0].diameters,
+                       np.array([20, 2, 0.3], dtype=np.float32))
 
 
-def test_unfinished_file(tmp_path):
-    assert_asc_exception(tmp_path,
-                         '''
+def test_unfinished_file():
+    assert_asc_exception('''
                          ((Dendrite)
                           (3 -4 0 2)
                           (3 -6 0 2)
@@ -338,79 +323,77 @@ def test_unfinished_file(tmp_path):
                          "Hit end of file while consuming a neurite",
                          ":12:error")
 
-def test_section_single_point(tmp_path):
+def test_section_single_point():
     '''Test single point section.
     The parent section last point will be duplicated
     '''
-    with tmp_asc_file(tmp_path,
-                      '''
-                      ((Dendrite)
-                       (3 -4 0 2)
-                       (3 -6 0 2)
-                       (3 -8 0 2)
-                       (3 -10 0 2)
-                       (
-                         (3 -10 2 4)  ; single point section without duplicate
-                        |
-                         (3 -10 0 2)  ; normal section with duplicate
-                         (3 -10 1 2)
-                         (3 -10 2 2)
-                       )
-                      )''') as tmp_file:
+    content = ('''
+               ((Dendrite)
+                (3 -4 0 2)
+                (3 -6 0 2)
+                (3 -8 0 2)
+                (3 -10 0 2)
+                (
+                  (3 -10 2 4)  ; single point section without duplicate
+                 |
+                  (3 -10 0 2)  ; normal section with duplicate
+                  (3 -10 1 2)
+                  (3 -10 2 2)
+                )
+               )''')
 
-        n = Morphology(tmp_file.name)
-        assert len(n.root_sections) == 1
-        assert len(n.root_sections[0].children) == 2
-        assert_array_equal(n.root_sections[0].children[0].points,
-                           np.array([[3, -10, 0],
-                                     [3, -10, 2]], dtype=np.float32))
-        assert_array_equal(n.root_sections[0].children[0].diameters,
-                           np.array([4, 4], dtype=np.float32))
+    n = Morphology(content, extension='asc')
+    assert len(n.root_sections) == 1
+    assert len(n.root_sections[0].children) == 2
+    assert_array_equal(n.root_sections[0].children[0].points,
+                       np.array([[3, -10, 0],
+                                 [3, -10, 2]], dtype=np.float32))
+    assert_array_equal(n.root_sections[0].children[0].diameters,
+                       np.array([4, 4], dtype=np.float32))
 
-        assert_array_equal(n.root_sections[0].children[1].points,
-                           np.array([[3, -10, 0],
-                                     [3, -10, 1],
-                                     [3, -10, 2]], dtype=np.float32))
+    assert_array_equal(n.root_sections[0].children[1].points,
+                       np.array([[3, -10, 0],
+                                 [3, -10, 1],
+                                 [3, -10, 2]], dtype=np.float32))
 
 
-def test_single_children(tmp_path):
+def test_single_children():
     '''Single children are no longer (starting at v2.8) merged with their parent
 
     They used to be until the decision in:
     https://github.com/BlueBrain/MorphIO/issues/235
     '''
-    with tmp_asc_file(tmp_path,
-                      '''
-                      ((Dendrite)
-                       (3 -4 0 2)
-                       (3 -6 0 2)
-                       (3 -8 0 2)
-                       (3 -10 0 2)
-                       (
-                         (3 -10 0 4)
-                         (0 -10 0 4)
-                         (-3 -10 0 3)
-                         (
-                           (-5 -5 5 5)
-                           |
-                           (-6 -6 6 6)
-                         )
-                        )
-                       )
-                       ''') as tmp_file:
+    content = ('''
+               ((Dendrite)
+                (3 -4 0 2)
+                (3 -6 0 2)
+                (3 -8 0 2)
+                (3 -10 0 2)
+                (
+                  (3 -10 0 4)
+                  (0 -10 0 4)
+                  (-3 -10 0 3)
+                  (
+                    (-5 -5 5 5)
+                    |
+                    (-6 -6 6 6)
+                  )
+                 )
+                )
+                ''')
 
-        n = Morphology(tmp_file.name)
+    n = Morphology(content, extension='asc')
 
-        assert len(n.soma.points) == 0
-        assert len(n.soma.points) == 0
-        assert len(n.root_sections) == 1
-        assert_array_equal(n.root_sections[0].points,
-                           np.array([[3, -4, 0],
-                                     [3, -6, 0],
-                                     [3, -8, 0],
-                                     [3, -10, 0]],
-                                    dtype=np.float32))
-        assert len(n.root_sections[0].children) == 1
+    assert len(n.soma.points) == 0
+    assert len(n.soma.points) == 0
+    assert len(n.root_sections) == 1
+    assert_array_equal(n.root_sections[0].points,
+                       np.array([[3, -4, 0],
+                                 [3, -6, 0],
+                                 [3, -8, 0],
+                                 [3, -10, 0]],
+                                dtype=np.float32))
+    assert len(n.root_sections[0].children) == 1
 
 
 def test_spine():
@@ -426,32 +409,31 @@ def test_spine():
                                  [13.75,    -5.96,   150.00]], dtype=np.float32))
 
 
-def test_single_point_section_duplicate_parent(tmp_path):
+def test_single_point_section_duplicate_parent():
     '''Section is made only of the duplicate point'''
-    with tmp_asc_file(tmp_path,
-                      '''
-                      ((Dendrite)
-                       (3 -4 0 2)
-                       (3 -10 0 2)
-                       (
-                         (3 -10 0 4)  ; duplicate point
-                       )
-                      )''') as tmp_file:
+    content = ('''
+               ((Dendrite)
+                (3 -4 0 2)
+                (3 -10 0 2)
+                (
+                  (3 -10 0 4)  ; duplicate point
+                )
+               )''')
 
-        neuron = Morphology(tmp_file.name)
-        assert_array_equal(neuron.root_sections[0].points, [[  3.,  -4.,   0.],
-                                                            [  3., -10.,   0.]])
-        assert_array_equal(neuron.root_sections[0].diameters, np.array([2, 2], dtype=np.float32))
+    neuron = Morphology(content, extension='asc')
+    assert_array_equal(neuron.root_sections[0].points, [[  3.,  -4.,   0.],
+                                                        [  3., -10.,   0.]])
+    assert_array_equal(neuron.root_sections[0].diameters, np.array([2, 2], dtype=np.float32))
 
 
-def test_single_point_section_duplicate_parent_complex(tmp_path):
+def test_single_point_section_duplicate_parent_complex():
     '''The following neuron represents a malformed tri-furcation. It is (badly) represented
     as a bifurcation of a bifurcation
 
     This is a simplification of the problem at:
     MorphologyRepository/Ani_Gupta/C030796A/C030796A-P2.asc:5915
     '''
-    with tmp_asc_file(tmp_path,
+    content = (
 '''
 ((Color Blue)
  (Axon)
@@ -468,8 +450,8 @@ def test_single_point_section_duplicate_parent_complex(tmp_path):
       (6 0 0 1)
   )
  )
-''') as bad_tmp_file:
-        neuron = Morphology(bad_tmp_file.name)
+''')
+    neuron = Morphology(content, extension='asc')
 
     children = neuron.root_sections[0].children
     assert len(children) == 3
@@ -478,7 +460,7 @@ def test_single_point_section_duplicate_parent_complex(tmp_path):
     assert_array_equal(children[2].points, [[2, 0, 0], [6, 0, 0]])
 
 
-def test_spine():
+def test_spine1():
     neuron = Morphology(DATA_DIR / 'spine.asc')
     assert len(neuron.root_sections) == 1
     assert_array_equal(neuron.root_sections[0].points,
@@ -588,11 +570,11 @@ def test_string_markers():
                                      [1192.31, 420.35, -0.19]], dtype=np.float32))
         assert_array_equal(m.markers[1].diameters, np.array([0.15, 0.15], dtype=np.float32))
 
-def test_neurolucida_markers(tmp_path):
+def test_neurolucida_markers():
     SIMPLE = Morphology(DATA_DIR / 'simple.asc')
     for marker, suffix in product(NEUROLUCIDA_MARKERS, ['', '7', '123']):
         marker += suffix
-        with tmp_asc_file(tmp_path,
+        content = (
 f'''
 ({marker}
   (Color White)
@@ -634,20 +616,20 @@ f'''
    (-5 -4 0 4)
    )
   )
-                         )''') as tmp_file:
-            neuron = Morphology(tmp_file.name)
+                         )''')
+        neuron = Morphology(content, extension='asc')
 
-            assert_array_equal(neuron.points, SIMPLE.points)
-            assert len(neuron.markers) == 2
-            assert_array_almost_equal(neuron.markers[0].points,
-                                      np.array([[81.58, -77.98, -20.32]], dtype=np.float32))
-            assert_array_almost_equal(neuron.markers[0].diameters,
-                                      np.array([0.5], dtype=np.float32))
-            assert_array_almost_equal(neuron.markers[1].points,
-                                      np.array([[51.580002, -77.779999, -24.32]],
-                                               dtype=np.float32))
-            assert_array_almost_equal(neuron.markers[1].diameters,
-                                      np.array([0.52], dtype=np.float32))
+        assert_array_equal(neuron.points, SIMPLE.points)
+        assert len(neuron.markers) == 2
+        assert_array_almost_equal(neuron.markers[0].points,
+                                  np.array([[81.58, -77.98, -20.32]], dtype=np.float32))
+        assert_array_almost_equal(neuron.markers[0].diameters,
+                                  np.array([0.5], dtype=np.float32))
+        assert_array_almost_equal(neuron.markers[1].points,
+                                  np.array([[51.580002, -77.779999, -24.32]],
+                                           dtype=np.float32))
+        assert_array_almost_equal(neuron.markers[1].diameters,
+                                  np.array([0.52], dtype=np.float32))
 
 
 def test_invalid_incomplete():
@@ -675,7 +657,7 @@ def test_marker_with_string():
 def test_version():
     assert_array_equal(Morphology(DATA_DIR / 'simple.asc').version, ('asc', 1, 0))
 
-def test_load_from_string(tmp_path):
+def test_load_from_string():
     SIMPLE = Morphology(DATA_DIR / 'simple.asc')
     with open(DATA_DIR / 'simple.asc', 'r') as fd:
         contents = fd.read()

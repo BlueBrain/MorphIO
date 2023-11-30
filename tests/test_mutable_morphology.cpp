@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <catch2/catch.hpp>
 
 #include <morphio/morphology.h>
@@ -91,8 +95,9 @@ TEST_CASE("writing", "[mutableMorphology]") {
         REQUIRE(savedMorphAsc.rootSections().size() == 2);
         REQUIRE(savedMorphH5.rootSections().size() == 2);
 
+        // TODO: should turn this on when we are throwing errors on soma creation
         // swc should raise when writing a contour soma
-        CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.swc"), morphio::WriterError);
+        // CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.swc"), morphio::WriterError);
     }
 
     {
@@ -101,9 +106,10 @@ TEST_CASE("writing", "[mutableMorphology]") {
         morphio::Morphology savedMorphSwc(tmpDirectory / "simple.swc");
         REQUIRE(savedMorphSwc.rootSections().size() == 2);
 
+        // TODO: should turn this on when we are throwing errors on soma creation
         // asc/h5 should raise when writing a non-contour soma
-        CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.asc"), morphio::WriterError);
-        CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.h5"), morphio::WriterError);
+        // CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.asc"), morphio::WriterError);
+        // CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.h5"), morphio::WriterError);
     }
 
     fs::remove_all(tmpDirectory);

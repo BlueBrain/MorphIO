@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <string>
@@ -16,7 +20,11 @@ class DendriticSpine: public Morphology
     DendriticSpine();
     explicit DendriticSpine(const std::string& source);
 
+
+    /// Returns the post synaptic density values
     std::vector<Property::DendriticSpine::PostSynapticDensity>& postSynapticDensity() noexcept;
+
+    /// Returns the post synaptic density values
     const std::vector<Property::DendriticSpine::PostSynapticDensity>& postSynapticDensity() const
         noexcept;
 };

@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <map>
@@ -62,6 +66,9 @@ struct VascSectionLevel {
     std::map<uint32_t, std::vector<uint32_t>> _successors;
     bool operator==(const VascSectionLevel& other) const;
     bool operator!=(const VascSectionLevel& other) const;
+
+    // Like operator!= but with logLevel argument
+    bool diff(const VascSectionLevel& other, LogLevel logLevel) const;
 };
 
 /** Class that holds all other levels(point, edge, etc.) information */
@@ -77,19 +84,13 @@ struct Properties {
     template <typename T>
     const std::vector<typename T::Type>& get() const noexcept;
 
-    inline const std::map<uint32_t, std::vector<uint32_t>>& predecessors() const noexcept;
-    inline const std::map<uint32_t, std::vector<uint32_t>>& successors() const noexcept;
-
-    bool operator==(const Properties& other) const;
-    bool operator!=(const Properties& other) const;
+    const std::map<uint32_t, std::vector<uint32_t>>& predecessors() const noexcept {
+        return _sectionLevel._predecessors;
+    }
+    const std::map<uint32_t, std::vector<uint32_t>>& successors() const noexcept {
+        return _sectionLevel._successors;
+    }
 };
-
-inline const std::map<uint32_t, std::vector<uint32_t>>& Properties::predecessors() const noexcept {
-    return _sectionLevel._predecessors;
-}
-inline const std::map<uint32_t, std::vector<uint32_t>>& Properties::successors() const noexcept {
-    return _sectionLevel._successors;
-}
 
 std::ostream& operator<<(std::ostream& os, const Properties& properties);
 std::ostream& operator<<(std::ostream& os, const VascPointLevel& pointLevel);

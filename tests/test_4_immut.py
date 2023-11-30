@@ -1,28 +1,30 @@
-import os
+# Copyright (c) 2013-2023, EPFL/Blue Brain Project
+# SPDX-License-Identifier: Apache-2.0
 from collections import OrderedDict
+from pathlib import Path
 
 import numpy as np
 import pytest
-from numpy.testing import assert_array_almost_equal, assert_array_equal, assert_equal
-from pathlib import Path
+from numpy.testing import (assert_array_almost_equal, assert_array_equal,
+                           assert_equal)
 
 import morphio
-from morphio import SectionType, IterType, Morphology, GlialCell, CellFamily, RawDataError, DendriticSpine
+from morphio import (CellFamily, DendriticSpine, GlialCell, IterType,
+                     Morphology, RawDataError, SectionType)
 
-_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data")
 
-
+DATA_DIR = Path(__file__).parent / "data"
 # These 3 cells are identical
 CELLS = OrderedDict({
-    'asc': Morphology(os.path.join(_path, "simple.asc")),
-    'swc': Morphology(os.path.join(_path, "simple.swc")),
-    'h5': Morphology(os.path.join(_path, "h5/v1/simple.h5")),
+    'asc': Morphology(DATA_DIR /  "simple.asc"),
+    'swc': Morphology(DATA_DIR /  "simple.swc"),
+    'h5': Morphology(DATA_DIR /  "h5/v1/simple.h5"),
 })
 
 
 def test_heterogeneous_sections():
 
-    morph = Morphology(os.path.join(_path, "simple-heterogeneous-neurite.swc"))
+    morph = Morphology(DATA_DIR /  "simple-heterogeneous-neurite.swc")
 
     for root_section in morph.root_sections:
 
@@ -63,7 +65,7 @@ def test_distance():
 
 
 def test_iter():
-    neuron = Morphology(os.path.join(_path, "iterators.asc"))
+    neuron = Morphology(DATA_DIR /  "iterators.asc")
     root = neuron.root_sections[0]
     assert_array_equal([section.id for section in root.iter(IterType.depth_first)],
                        [0, 1, 2, 3, 4, 5, 6])
@@ -97,7 +99,7 @@ def test_connectivity():
 
 
 def test_mitochondria():
-    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    morpho = Morphology(DATA_DIR /  "h5/v1/mitochondria.h5")
     mito = morpho.mitochondria
     assert len(mito.root_sections) == 2
     assert mito.root_sections[0].id == 0
@@ -131,15 +133,15 @@ def test_mitochondria():
 
     assert len(mito_root[1].children) == 0
 
-    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    morpho = Morphology(DATA_DIR /  "h5/v1/mitochondria.h5")
     m0 = morpho.mitochondria
-    morpho = Morphology(os.path.join(_path, "h5/v1/mitochondria.h5"))
+    morpho = Morphology(DATA_DIR /  "h5/v1/mitochondria.h5")
     m1 = morpho.mitochondria
     assert m0.root_sections[0].has_same_shape(m1.root_sections[0])
 
 
 def test_endoplasmic_reticulum():
-    morpho = Morphology(os.path.join(_path, "h5/v1/endoplasmic-reticulum.h5"))
+    morpho = Morphology(DATA_DIR /  "h5/v1/endoplasmic-reticulum.h5")
     er = morpho.endoplasmic_reticulum
     assert_array_equal(er.section_indices, [1, 4, 5])
     assert_array_almost_equal(er.volumes, [10.55, 47.12, 0.83])
@@ -153,20 +155,20 @@ def test_section___str__():
 
 
 def test_section_has_same_shape():
-    m0 = Morphology(os.path.join(_path, "simple.asc"))
-    m1 = Morphology(os.path.join(_path, "simple.asc"))
+    m0 = Morphology(DATA_DIR /  "simple.asc")
+    m1 = Morphology(DATA_DIR /  "simple.asc")
     assert m0.root_sections[0].has_same_shape(m1.root_sections[0])
     assert not m0.root_sections[0].has_same_shape(m1.root_sections[1])
 
 
 def test_from_pathlib():
-    neuron = Morphology(Path(_path, "simple.asc"))
+    neuron = Morphology(DATA_DIR / "simple.asc")
     assert len(neuron.root_sections) == 2
 
 
 def test_more_iter():
     '''This used to fail at commit f74ce1f56de805ebeb27584051bbbb3a65cd1213'''
-    m = Morphology(os.path.join(_path, 'simple.asc'))
+    m = Morphology(DATA_DIR /  'simple.asc')
 
     sections = list(m.iter())
     assert_array_equal([s1.id for s1 in sections],
@@ -186,25 +188,25 @@ def test_glia():
     assert_equal(int(SectionType.glia_perivascular_process), 2)
     assert_equal(int(SectionType.glia_process), 3)
 
-    g = GlialCell(os.path.join(_path, 'astrocyte.h5'))
+    g = GlialCell(DATA_DIR /  'astrocyte.h5')
     assert g.cell_family == CellFamily.GLIA
     assert g.sections[100].type == SectionType.glia_perivascular_process
     assert g.sections[1000].type == SectionType.glia_process
 
-    g = GlialCell(Path(_path, 'astrocyte.h5'))
+    g = GlialCell(DATA_DIR / 'astrocyte.h5')
     assert g.cell_family == CellFamily.GLIA
 
     with pytest.raises(RawDataError):
-        GlialCell(Path(_path, 'simple.swc'))
+        GlialCell(DATA_DIR / 'simple.swc')
     with pytest.raises(RawDataError):
-        GlialCell(Path(_path, 'h5/v1/simple.h5'))
+        GlialCell(DATA_DIR / 'h5/v1/simple.h5')
 
 
 def test_dendritic_spine():
     assert_equal(int(SectionType.spine_neck), 2)
     assert_equal(int(SectionType.spine_head), 3)
 
-    spine_path = os.path.join(_path, 'h5/v1/simple-dendritric-spine.h5')
+    spine_path = DATA_DIR /  'h5/v1/simple-dendritric-spine.h5'
     d = DendriticSpine(spine_path)
     assert d.cell_family == CellFamily.SPINE
     assert d.sections[0].type == SectionType.spine_head
@@ -219,10 +221,10 @@ def test_dendritic_spine():
     assert d.cell_family == CellFamily.SPINE
 
     with pytest.raises(RawDataError):
-        DendriticSpine(Path(_path, 'simple.swc'))
+        DendriticSpine(DATA_DIR / 'simple.swc')
 
     with pytest.raises(RawDataError):
-        DendriticSpine(Path(_path, 'h5/v1/simple.h5'))
+        DendriticSpine(DATA_DIR / 'h5/v1/simple.h5')
 
 
 def test_dendritic_spine_add_root_section():
@@ -236,18 +238,19 @@ def test_dendritic_spine_add_root_section():
     assert spine_morph.root_sections[0].type == morphio.SectionType.spine_head
 
     assert_array_almost_equal(spine_morph.root_sections[0].points,
-                                  [[1.1, 2.1, 3.1], [4.1, 5.1, 6.1]])
+                              [[1.1, 2.1, 3.1], [4.1, 5.1, 6.1]])
     assert_array_almost_equal(spine_morph.root_sections[0].diameters,
-                                  [2.1, 3.1])
+                              [2.1, 3.1])
 
     # Section parameter for append_root_section
     spine_morph = morphio.mut.DendriticSpine()
-    spine_path = os.path.join(_path, 'h5/v1/simple-dendritric-spine.h5')
+    spine_path = DATA_DIR /  'h5/v1/simple-dendritric-spine.h5'
     input_spine = morphio.DendriticSpine(spine_path)
     spine_morph.append_root_section(input_spine.root_sections[0])
     assert_array_almost_equal(spine_morph.root_sections[0].points,
-                                  [[0., 5., 0.], [2.4, 9.1, 0.],
-                                   [0., 13.2, 0.]])
+                              [[0., 5., 0.],
+                               [2.4, 9.1, 0.],
+                               [0., 13.2, 0.]])
     assert spine_morph.root_sections[0].type == morphio.SectionType.spine_head
     assert_array_almost_equal(spine_morph.root_sections[0].diameters,
-                                  [0.1, 0.2, 0.15])
+                              [0.1, 0.2, 0.15])

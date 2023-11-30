@@ -21,13 +21,16 @@ if [[ -z $LIBCLANG_PATH ]]; then
     exit -1
 fi
 
-PACKAGE=git+git://github.com/pybind/pybind11_mkdoc.git@master
+
+VERSION=no-reserved
+PACKAGE=git+https://github.com/mgeplf/pybind11_mkdoc.git@$VERSION
+#PACKAGE=git+https://github.com/pybind/pybind11_mkdoc.git@master
 
 VENV=build/venv-docstrings
 if [[ ! -d $VENV ]]; then
     python3 -mvenv "$VENV"
     $VENV/bin/pip install -U pip setuptools wheel
-    $VENV/bin/pip install 'clang==9'  # keep in sync w/ .github/workflows/docstring_check.yaml
+    $VENV/bin/pip install 'clang==12.0.1'  # keep in sync w/ .github/workflows/docstring_check.yaml
     $VENV/bin/python -m pip install $PACKAGE
 fi
 
@@ -36,14 +39,15 @@ rm -f $DOCSTRING_PATH
 
 $VENV/bin/python -m pybind11_mkdoc \
   -o $DOCSTRING_PATH \
-  ./include/morphio/mut/*.h \
-  ./include/morphio/vasc/*.h \
-  ./include/morphio/*.h \
   -Wno-pragma-once-outside-header \
   -ferror-limit=100000 \
   -I/usr/include/hdf5/serial \
-  -I./extlib/HighFive/include \
-  -I./include
+  -I./3rdparty/HighFive/include \
+  -I./3rdparty/GSL_LITE/include \
+  -I./include \
+  ./include/morphio/mut/*.h \
+  ./include/morphio/vasc/*.h \
+  ./include/morphio/*.h
 
 # fail if there are diffs in the generated docstrings
 git diff --exit-code -- ./binds/python/generated/docstrings.h

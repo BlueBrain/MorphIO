@@ -6,7 +6,7 @@ Specification
 A marker is an `s-expression <https://en.wikipedia.org/wiki/S-expression>`__ of the
 Neurolucida file that contains additional information about the morphology. For example:
 
-.. code-block:: lisp
+.. code-block:: hspec
 
   ("pia" ;  String-named marker starts. Such marker can exist only at the top level.
     (Closed)
@@ -19,7 +19,7 @@ Neurolucida file that contains additional information about the morphology. For 
 
 or
 
-.. code-block:: lisp
+.. code-block:: hspec
 
     ; ...
     ( -277.14  -119.13   -18.02     0.69)
@@ -36,7 +36,7 @@ The following s-expressions are parsed as markers:
 
 * Any s-exp with a top level string. Like:
 
-    .. code-block:: lisp
+    .. code-block:: hspec
 
       ("pia"
       (Closed)
@@ -84,7 +84,7 @@ The following s-expressions are parsed as markers:
 
     Example:
 
-    .. code-block:: lisp
+    .. code-block:: hspec
 
         (FilledCircle
         (Color RGB (64, 0, 128))
@@ -97,7 +97,7 @@ The following s-expressions are parsed as markers:
 
     Example:
 
-    .. code-block:: lisp
+    .. code-block:: hspec
 
         : ...
         ( -269.77  -129.47   -22.57     0.92)  ;

@@ -1,4 +1,7 @@
-//#include <cmath>
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <iostream>  // std::cerr
 #include <sstream>   // std::ostringstream
 #include <string>
@@ -11,21 +14,24 @@ static int MORPHIO_MAX_N_WARNINGS = 100;
 static bool MORPHIO_RAISE_WARNINGS = false;
 
 /**
-   Controls the maximum number of warning to be printed on screen
-   0 will print no warning
-   -1 will print them all
-**/
+ * Controls the maximum number of warning to be printed on screen.
+ * 0 will print no warning
+ * -1 will print them all
+ */
 void set_maximum_warnings(int n_warnings) {
     MORPHIO_MAX_N_WARNINGS = n_warnings;
 }
 
-/**
-   Whether to raise warning as errors
-**/
+/*
+ *   Whether to raise warning as errors
+ */
 void set_raise_warnings(bool is_raise) {
     MORPHIO_RAISE_WARNINGS = is_raise;
 }
 
+/**
+ *   Ignore/Unignore a specific warning message
+ */
 void set_ignored_warning(Warning warning, bool ignore) {
     if (ignore) {
         readers::_ignoredWarnings.insert(warning);
@@ -34,6 +40,9 @@ void set_ignored_warning(Warning warning, bool ignore) {
     }
 }
 
+/**
+ *   Ignore/Unignore a specific warning message
+ */
 void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
     for (auto warning : warnings) {
         set_ignored_warning(warning, ignore);
@@ -75,6 +84,8 @@ std::string ErrorMessages::errorMsg(long unsigned int lineNumber,
                                     std::string msg) const {
     return "\n" + (_uri.empty() ? "" : errorLink(lineNumber, errorLevel) + "\n") + msg;
 }
+
+// LCOV_EXCL_START {  all the error messages are excluded from coverage
 
 ////////////////////////////////////////////////////////////////////////////////
 //              ERRORS
@@ -255,6 +266,18 @@ std::string ErrorMessages::ERROR_UNSUPPORTED_SOMA_TYPE(const std::string& suppor
             supported);
 }
 
+std::string ErrorMessages::ERROR_SOMA_INVALID_SINGLE_POINT() const {
+    return "Single point soma must have one point";
+}
+
+std::string ErrorMessages::ERROR_SOMA_INVALID_THREE_POINT_CYLINDER() const {
+    return "Multiple points for single point soma";
+}
+
+std::string ErrorMessages::ERROR_SOMA_INVALID_CONTOUR() const {
+    return "Contour soma must have at least 3 points.";
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //              WARNINGS
@@ -396,6 +419,22 @@ std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& c
 std::string ErrorMessages::WARNING_UNDEFINED_SOMA() const {
     return errorMsg(0, ErrorLevel::WARNING, "Warning: writing soma set to SOMA_UNDEFINED");
 }
+
+std::string ErrorMessages::WARNING_SOMA_NON_CONTOUR() const {
+    return errorMsg(0,
+                    ErrorLevel::WARNING,
+                    "Soma must be a contour for ASC and H5: see "
+                    "https://github.com/BlueBrain/MorphIO/issues/457");
+}
+
+std::string ErrorMessages::WARNING_SOMA_NON_CYLINDER_OR_POINT() const {
+    return errorMsg(0,
+                    ErrorLevel::WARNING,
+                    "Soma must be stacked cylinders or a point: see "
+                    "https://github.com/BlueBrain/MorphIO/issues/457");
+}
+
+// LCOV_EXCL_STOP }
 
 }  // namespace readers
 

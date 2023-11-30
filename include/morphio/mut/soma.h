@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <morphio/properties.h>  // Property
@@ -15,25 +19,32 @@ class Soma
     explicit Soma(const Property::PointLevel& pointProperties);
     explicit Soma(const morphio::Soma& soma);
 
-    /** @{
-       Return the coordinates (x,y,z) of all soma point
-    **/
-    inline std::vector<Point>& points() noexcept;
-    inline const std::vector<Point>& points() const noexcept;
-    /** @} */
+    /// Return the coordinates (x,y,z) of all soma points
+    std::vector<Point>& points() noexcept {
+        return point_properties_._points;
+    }
+    const std::vector<Point>& points() const noexcept {
+        return point_properties_._points;
+    }
 
-    /**
-       Return the diameters of all soma points
-    **/
-    inline std::vector<morphio::floatType>& diameters() noexcept;
-    inline const std::vector<morphio::floatType>& diameters() const noexcept;
-    /** @} */
+    /// Return the diameters of all soma points
+    std::vector<morphio::floatType>& diameters() noexcept {
+        return point_properties_._diameters;
+    }
+    const std::vector<morphio::floatType>& diameters() const noexcept {
+        return point_properties_._diameters;
+    }
 
-    /**
-       Return the soma type
-    **/
-    inline SomaType& type() noexcept;
-    inline SomaType type() const noexcept;
+    /// Return the soma type
+    const SomaType& type() const noexcept {
+        return soma_type_;
+    }
+
+    /// Return the soma type
+    SomaType& type() noexcept {
+        return soma_type_;
+    }
+
     /**
      * Return the center of gravity of the soma points
      **/
@@ -51,8 +62,12 @@ class Soma
      */
     floatType maxDistance() const;
 
-    inline Property::PointLevel& properties() noexcept;
-    inline const Property::PointLevel& properties() const noexcept;
+    Property::PointLevel& properties() noexcept {
+        return point_properties_;
+    }
+    const Property::PointLevel& properties() const noexcept {
+        return point_properties_;
+    }
 
   private:
     friend class Morphology;
@@ -60,41 +75,6 @@ class Soma
     SomaType soma_type_ = SOMA_UNDEFINED;
     Property::PointLevel point_properties_;
 };
-
-inline std::vector<Point>& Soma::points() noexcept {
-    return point_properties_._points;
-}
-
-const std::vector<Point>& Soma::points() const noexcept {
-    return point_properties_._points;
-}
-
-inline std::vector<morphio::floatType>& Soma::diameters() noexcept {
-    return point_properties_._diameters;
-}
-
-const std::vector<morphio::floatType>& Soma::diameters() const noexcept {
-    return point_properties_._diameters;
-}
-
-inline SomaType& Soma::type() noexcept {
-    return soma_type_;
-}
-
-inline SomaType Soma::type() const noexcept {
-    return soma_type_;
-}
-
-inline Property::PointLevel& Soma::properties() noexcept {
-    return point_properties_;
-}
-
-inline const Property::PointLevel& Soma::properties() const noexcept {
-    return point_properties_;
-}
-
-std::ostream& operator<<(std::ostream& os, const std::shared_ptr<Soma>& sectionPtr);
-std::ostream& operator<<(std::ostream& os, const Soma& soma);
 
 }  // namespace mut
 }  // namespace morphio

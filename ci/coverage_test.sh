@@ -23,4 +23,5 @@ cmake                           \
     -G"Unix Makefiles"          \
     ${EXTRA_OPTIONS}            \
     ../..
+
 make -j all coverage

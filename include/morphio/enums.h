@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <iosfwd>  // std::ostream
@@ -20,7 +24,7 @@ enum Option {
 
 /**
    All possible warnings that can be ignored by user. This enum should be kept in sync with the
-   warnings defined in morphio::ErrorMessages.
+   warnings defined in morphio::ErrorMessages and with binds/python/bind_misc.cpp
 **/
 enum Warning {
     UNDEFINED,                         //!< undefined value
@@ -30,12 +34,14 @@ enum Warning {
     NO_SOMA_FOUND,         //!< No soma found in a file
     DISCONNECTED_NEURITE,  //!< Found a disconnected neurite in a morphology
     WRONG_DUPLICATE,       //!< A wrong duplicate point in a section
-    APPENDING_EMPTY_SECTION,  //!< Appending of an empty section
-    WRONG_ROOT_POINT,         //!< A wrong root point of a neurite in the case of 3 points soma
-    ONLY_CHILD,               //!< Single child sections are not allowed in SWC format
-    WRITE_EMPTY_MORPHOLOGY,   //!< Writing empty morphology
-    ZERO_DIAMETER,            //!< Zero section diameter
-    WRITE_UNDEFINED_SOMA,     //!< Soma is UNDEFINED
+    WRITE_UNDEFINED_SOMA,  //!< Soma is UNDEFINED
+    APPENDING_EMPTY_SECTION,     //!< Appending of an empty section
+    WRONG_ROOT_POINT,            //!< A wrong root point of a neurite in the case of 3 points soma
+    ONLY_CHILD,                  //!< Single child sections are not allowed in SWC format
+    WRITE_EMPTY_MORPHOLOGY,      //!< Writing empty morphology
+    ZERO_DIAMETER,               //!< Zero section diameter
+    SOMA_NON_CONTOUR,            //!< Soma must be a contour for ASC and H5
+    SOMA_NON_CYLINDER_OR_POINT,  //!< Soma must be stacked cylinders or a point
 };
 
 enum AnnotationType {
@@ -74,15 +80,30 @@ enum SectionType {
     SECTION_SPINE_HEAD = 3,  // Note: overlaps with SECTION_DENDRITE
 
     // unnamed custom section types
-    SECTION_CUSTOM_5 = 5,    //!< Custom section type
-    SECTION_CUSTOM_6 = 6,    //!< Custom section type
-    SECTION_CUSTOM_7 = 7,    //!< Custom section type
-    SECTION_CUSTOM_8 = 8,    //!< Custom section type
-    SECTION_CUSTOM_9 = 9,    //!< Custom section type
-    SECTION_CUSTOM_10 = 10,  //!< Custom section type
-    // All section types equal or above this number are invalid custom types according
-    // to neuromorpho.org standard (http://neuromorpho.org/StdSwc1.21.jsp)
-    SECTION_OUT_OF_RANGE_START = 11,
+    SECTION_CUSTOM_5 = 5,    //!< Custom section type 5
+    SECTION_CUSTOM_6 = 6,    //!< Custom section type 6
+    SECTION_CUSTOM_7 = 7,    //!< Custom section type 7
+    SECTION_CUSTOM_8 = 8,    //!< Custom section type 8
+    SECTION_CUSTOM_9 = 9,    //!< Custom section type 9
+    SECTION_CUSTOM_10 = 10,  //!< Custom section type 10
+    // according to neuromorpho.org standard (http://neuromorpho.org/StdSwc1.21.jsp)
+    // `Codes 5-10 signify custom tags, typically defined in the header of the swc file when used.`
+
+    // ... but;  we are a bit relaxed, since more is better:
+    // https://github.com/BlueBrain/MorphIO/issues/432
+    // https://github.com/BlueBrain/MorphIO/issues/456 (type 18 seen in the wild)
+    SECTION_CUSTOM_11 = 11,  //!< Custom section type 11
+    SECTION_CUSTOM_12 = 12,  //!< Custom section type 12
+    SECTION_CUSTOM_13 = 13,  //!< Custom section type 13
+    SECTION_CUSTOM_14 = 14,  //!< Custom section type 14
+    SECTION_CUSTOM_15 = 15,  //!< Custom section type 15
+    SECTION_CUSTOM_16 = 16,  //!< Custom section type 16
+    SECTION_CUSTOM_17 = 17,  //!< Custom section type 17
+    SECTION_CUSTOM_18 = 18,  //!< Custom section type 18
+    SECTION_CUSTOM_19 = 19,  //!< Custom section type 19
+
+    // All section types equal or above this number are invalid custom types
+    SECTION_OUT_OF_RANGE_START = 20,
 
     // CNIC defined types
     // It defines too extra types SWC_SECTION_FORK_POINT and

@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <memory>
@@ -18,8 +22,17 @@ namespace morphio {
 class Mitochondria
 {
   public:
+    /// Return the Section with the given id.
     MitoSection section(uint32_t id) const;
+
+    /// Return a vector of all root sections
     std::vector<MitoSection> rootSections() const;
+
+    /** Return a vector containing all section objects
+     *
+     * Notes:
+     * Soma is not included
+     **/
     std::vector<MitoSection> sections() const;
 
   private:

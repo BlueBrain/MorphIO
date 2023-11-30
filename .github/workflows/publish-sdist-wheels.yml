@@ -4,9 +4,10 @@ on: [pull_request, push]
 env:
   CIBW_BUILD_VERBOSITY: 3
   CIBW_BUILD: 'cp*'
-  CIBW_SKIP: 'cp35-* cp36-* *-manylinux_i686 *-musllinux_* *-win32'
+  CIBW_SKIP: 'cp35-* cp36-* cp37-* *-manylinux_i686 *-musllinux_* *-win32 cp311-macosx_x86_64'
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
   CIBW_TEST_COMMAND: pytest -s -v {project}/tests
+  WINDOWS_HDF5: 1.14.2
 
 jobs:
   build_wheels:
@@ -20,11 +21,11 @@ jobs:
         os: [ubuntu-20.04, macos-11, windows-2022]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'true'
 
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         name: Install Python
         with:
           python-version: '3.7'
@@ -81,11 +82,31 @@ jobs:
         env:
           MACOSX_DEPLOYMENT_TARGET: '10.13'
           CIBW_BEFORE_BUILD: |
-            brew update
-            brew --version
+            #brew update
+            #brew --version
+            export HOMEBREW_NO_AUTO_UPDATE=1
+            export HDF5_DIR="$(brew --prefix hdf5)";
             brew install hdf5
         run: |
           python -m cibuildwheel --output-dir dist
+
+      - name: Cache HDF5 On Windows
+        if: runner.os == 'Windows'
+        id: cache-hdf5-windows
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-hdf5-windows
+        with:
+          path: C:\cache\hdf5\${{ env.WINDOWS_HDF5 }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.WINDOWS_HDF5 }}
+
+      - name: Fill Windows Cache
+        if: runner.os == 'Windows' && steps.cache-hdf5-windows.outputs.cache-hit != 'true'
+        continue-on-error: false
+        shell: cmd
+        run: |
+          mkdir C:\cache\hdf5\${{ env.WINDOWS_HDF5 }}
+          curl -L -o C:\cache\hdf5\${{ env.WINDOWS_HDF5 }}\hdf5.zip https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.14/hdf5-1.14.2/bin/windows/hdf5-1.14.2-Std-win10_64-vs16.zip
 
       - name: Build wheels Windows
         if: runner.os == 'Windows'
@@ -97,18 +118,17 @@ jobs:
         # this has a partial table:
         # https://devblogs.microsoft.com/cppblog/side-by-side-minor-version-msvc-toolsets-in-visual-studio-2017/
         run: |
-          curl -O https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/bin/hdf5-1.12.0-Std-win10_64-vs16.zip
-          C:\windows\system32\tar.exe xf hdf5-1.12.0-Std-win10_64-vs16.zip
-          start /wait msiexec /a "%cd%\hdf\HDF5-1.12.0-win64.msi" /qn TARGETDIR="c:\hdf5\"
+          C:\windows\system32\tar.exe xf C:\cache\hdf5\${{ env.WINDOWS_HDF5 }}\hdf5.zip
+          start /wait msiexec /a "%cd%\hdf\HDF5-${{ env.WINDOWS_HDF5 }}-win64.msi" /qn TARGETDIR="c:\hdf5\"
 
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat" -vcvars_ver=14.1
 
-          set HDF5_DIR=C:\hdf5\HDF_Group\HDF5\1.12.0\cmake
+          set HDF5_DIR=C:\hdf5\HDF_Group\HDF5\${{ env.WINDOWS_HDF5 }}\cmake
 
           python -m cibuildwheel --output-dir dist
 
       - name: Store wheel as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: dist
           path: dist/*.whl
@@ -119,14 +139,14 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: 'true'
 
-      - name: Set up Python 3.7
-        uses: actions/setup-python@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: 3.8
 
       - name: Build a source tarball
         run:
@@ -140,7 +160,7 @@ jobs:
           pytest -s -v tests
 
       - name: Store sdist as artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: dist
           path: dist/*.tar.gz
@@ -154,7 +174,7 @@ jobs:
 
     steps:
       - name: Download artifacts produced during the build_wheels and build_sdist jobs
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: dist
           path: dist/

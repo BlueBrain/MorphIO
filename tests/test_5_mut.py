@@ -1,18 +1,18 @@
-from collections import OrderedDict
-
+# Copyright (c) 2013-2023, EPFL/Blue Brain Project
+# SPDX-License-Identifier: Apache-2.0
 import numpy as np
+from numpy import testing as npt
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 import morphio
-from morphio import CellFamily, IterType, MitochondriaPointLevel, MorphioError
+from morphio import CellFamily, IterType, MitochondriaPointLevel
 from morphio import Morphology as ImmutableMorphology
-from morphio import PointLevel, RawDataError, SectionBuilderError, SectionType, ostream_redirect, PostSynapticDensity
+from morphio import PointLevel, SectionType, ostream_redirect
 from morphio.mut import GlialCell, Morphology, DendriticSpine
 import pytest
 from numpy.testing import assert_array_equal
 
-from utils import assert_substring, captured_output, tmp_asc_file
+from utils import captured_output
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -46,13 +46,15 @@ def test_point_level():
     assert a.points == [[1, 2, 3]]
     assert a.diameters == [2]
 
-    with pytest.raises(SectionBuilderError, match='Point vector have size: 2 while Diameter vector has size: 1'):
+    with pytest.raises(morphio.SectionBuilderError,
+                       match='Point vector have size: 2 while Diameter vector has size: 1'):
         PointLevel([[1, 2, 3],
                     [1, 2, 3]],
                    [2],
                    [])
 
-    with pytest.raises(SectionBuilderError, match='Point vector have size: 2 while Perimeter vector has size: 1'):
+    with pytest.raises(morphio.SectionBuilderError,
+                       match='Point vector have size: 2 while Perimeter vector has size: 1'):
         PointLevel([[1, 2, 3],
                     [1, 2, 3]],
                    [2, 3],
@@ -60,11 +62,11 @@ def test_point_level():
 
 
 def test_connectivity():
-    cells = OrderedDict({
+    cells = {
         'asc': Morphology(Path(DATA_DIR, "simple.asc")),
         'swc': Morphology(Path(DATA_DIR, "simple.swc")),
         'h5': Morphology(Path(DATA_DIR, "h5/v1/simple.h5")),
-    })
+    }
 
     for cell in cells:
         assert cells[cell].connectivity == {-1: [0, 3], 0: [1, 2], 3: [4, 5]}
@@ -323,7 +325,7 @@ def test_mitochondria():
                                                                 [0.6, 0.7, 0.8, 0.9],
                                                                 [5, 6, 7, 8]))
 
-    assert mito.is_root(first_mito_id) == True
+    assert mito.is_root(first_mito_id)
     assert mito.children(first_mito_id) == [first_child]
     assert mito.parent(first_child) == first_mito_id
     assert mito.root_sections == [first_mito_id, second_mito_id]
@@ -373,7 +375,8 @@ def test_non_C_nparray():
     section.points = points
     assert_array_equal(section.points, points)
 
-    with pytest.raises(MorphioError, match=r'Wrong array shape. Expected: \(X, 3\), got: \(3, 2\)'):
+    with pytest.raises(morphio.MorphioError,
+                       match=r'Wrong array shape. Expected: \(X, 3\), got: \(3, 2\)'):
         section.points = points.T
 
     non_standard_stride = np.asfortranarray(points)
@@ -384,53 +387,50 @@ def test_non_C_nparray():
 def test_annotation(tmp_path):
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            with tmp_asc_file(tmp_path,
-                              """((Dendrite)
-                                   (3 -4 0 2)
-                                   (3 -6 0 2)
-                                   (3 -8 0 2)
-                                   (3 -10 0 2)
-                                   (
-                                     (3 -10 0 2)
-                                     (0 -10 0 2)
-                                     (-3 -10 0 2)
-                                     |       ; <-- empty sibling but still works !
-                                    )
-                                   )
-                              """) as tmp_file:
-                cell = Morphology(tmp_file.name)
-                cell.remove_unifurcations()
+            content = ("""((Dendrite)
+                            (3 -4 0 2)
+                            (3 -6 0 2)
+                            (3 -8 0 2)
+                            (3 -10 0 2)
+                            (
+                              (3 -10 0 2)
+                              (0 -10 0 2)
+                              (-3 -10 0 2)
+                              |       ; <-- empty sibling but still works !
+                             )
+                            )
+                       """)
+            cell = ImmutableMorphology(content, extension='asc').as_mutable()
+            cell.remove_unifurcations()
 
     for n in (cell, cell.as_immutable(), cell.as_immutable().as_mutable()):
         assert len(n.annotations) == 1
         annotation = n.annotations[0]
         assert annotation.type == morphio.AnnotationType.single_child
 
+
 def test_empty_sibling(tmp_path):
     '''The empty sibling will be removed and the single child will be merged
     with its parent'''
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
-            with tmp_asc_file(tmp_path,
-                '''((Dendrite)
-                      (3 -4 0 10)
-                      (3 -6 0 9)
-                      (3 -8 0 8)
-                      (3 -10 0 7)
-                      (
-                        (3 -10 0 6)
-                        (0 -10 0 5)
-                        (-3 -10 0 4)
-                        |       ; <-- empty sibling but still works !
-                       )
-                      )
-                 ''') as tmp_file:
-                n = Morphology(tmp_file.name)
-                n.remove_unifurcations()
-                assert_substring('is the only child of section: 0',
-                                 err.getvalue().strip())
-                assert_substring('It will be merged with the parent section',
-                                 err.getvalue().strip())
+            content = ('''((Dendrite)
+                            (3 -4 0 10)
+                            (3 -6 0 9)
+                            (3 -8 0 8)
+                            (3 -10 0 7)
+                            (
+                              (3 -10 0 6)
+                              (0 -10 0 5)
+                              (-3 -10 0 4)
+                              |       ; <-- empty sibling but still works !
+                             )
+                            )
+                       ''')
+            n = ImmutableMorphology(content, extension='asc').as_mutable()
+            n.remove_unifurcations()
+            assert 'is the only child of section: 0' in err.getvalue()
+            assert 'It will be merged with the parent section' in err.getvalue()
 
     assert len(n.root_sections) == 1
     assert_array_equal(n.root_sections[0].points,
@@ -476,7 +476,7 @@ def test_from_pathlib():
     assert len(neuron.root_sections) == 2
 
 
-def test_endoplasmic_reticulum():
+def test_endoplasmic_reticulum(tmp_path):
     neuron = Morphology(DATA_DIR / "simple.asc")
     reticulum = neuron.endoplasmic_reticulum
     assert len(reticulum.section_indices) == 0
@@ -494,11 +494,10 @@ def test_endoplasmic_reticulum():
     assert_array_equal(reticulum.surface_areas, [3, 3])
     assert_array_equal(reticulum.filament_counts, [4, 4])
 
-    with TemporaryDirectory('test-endoplasmic-reticulum') as folder:
-        path = Path(folder, 'with-reticulum.h5')
-        neuron.write(path)
+    path = tmp_path / 'with-reticulum.h5'
+    neuron.write(path)
+    neuron = Morphology(path)
 
-        neuron = Morphology(path)
     reticulum = neuron.endoplasmic_reticulum
     assert_array_equal(reticulum.section_indices, [1, 1])
     assert_array_equal(reticulum.volumes, [2, 2])
@@ -535,9 +534,12 @@ def test_remove_unifurcations():
     with captured_output() as (_, err):
         with ostream_redirect():
             m.remove_unifurcations()
-            assert (err.getvalue().strip() ==
-                         'Warning: while appending section: 2 to parent: 0\nThe section first point should be parent section last point: \n        : X Y Z Diameter\nparent last point :[2.000000, 0.000000, 0.000000, 2.000000]\nchild first point :[2.000000, 1.000000, 0.000000, 2.000000]')
-
+            assert err.getvalue().strip() == (
+                'Warning: while appending section: 2 to parent: 0\n'
+                'The section first point should be parent section last point: \n'
+                '        : X Y Z Diameter\n'
+                'parent last point :[2.000000, 0.000000, 0.000000, 2.000000]\n'
+                'child first point :[2.000000, 1.000000, 0.000000, 2.000000]')
 
 def test_remove_rootsection():
     morpho = Morphology(DATA_DIR / 'single_point_root.asc')
@@ -570,26 +572,24 @@ def test_glia():
     g = GlialCell(DATA_DIR / 'astrocyte.h5')
     assert g.cell_family == CellFamily.GLIA
 
-    with pytest.raises(RawDataError):
+    with pytest.raises(morphio.RawDataError):
         GlialCell(DATA_DIR / 'simple.swc')
-    with pytest.raises(RawDataError):
+    with pytest.raises(morphio.RawDataError):
         GlialCell(DATA_DIR / 'h5/v1/simple.h5')
 
 
-def test_glia_round_trip():
-    with TemporaryDirectory() as folder:
-        g = GlialCell(Path(DATA_DIR, 'astrocyte.h5'))
-        filename = Path(folder, 'glial-cell.h5')
-        g.write(filename)
-        g2 = GlialCell(filename)
-        assert len(g.sections) == len(g2.sections)
+def test_glia_round_trip(tmp_path):
+    g = GlialCell(Path(DATA_DIR, 'astrocyte.h5'))
+    filename = tmp_path / 'glial-cell.h5'
+    g.write(filename)
+    g2 = GlialCell(filename)
+    assert len(g.sections) == len(g2.sections)
 
 def test_dendritic_spine():
     d = DendriticSpine()
     assert d.cell_family == CellFamily.SPINE
 
-    h5v1 = DATA_DIR / "h5/v1/"
-    d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
+    d = DendriticSpine(DATA_DIR / "h5/v1/" / 'simple-dendritric-spine.h5')
     assert d.cell_family == CellFamily.SPINE
 
     psd = d.post_synaptic_density
@@ -598,54 +598,50 @@ def test_dendritic_spine():
     assert psd[0].segment_id == 0
     assert psd[0].offset == pytest.approx(0.8525)
 
-    with pytest.raises(RawDataError):
+    with pytest.raises(morphio.RawDataError):
         DendriticSpine(DATA_DIR / 'simple.swc')
 
-    with pytest.raises(RawDataError):
+    with pytest.raises(morphio.RawDataError):
         DendriticSpine(DATA_DIR / 'h5/v1/simple.h5')
 
 
-def test_dendritic_spine_round_trip():
-    with TemporaryDirectory() as folder:
-        h5v1 = DATA_DIR / "h5/v1/"
-        d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
-        filename = Path(folder, 'test-dendritic-spine.h5')
-        d.write(filename)
-        d2 = DendriticSpine(filename)
+def test_dendritic_spine_round_trip(tmp_path):
+    d = DendriticSpine(DATA_DIR / "h5/v1/" / 'simple-dendritric-spine.h5')
+    filename = tmp_path / 'test-dendritic-spine.h5'
+    d.write(filename)
+    d2 = DendriticSpine(filename)
 
-        assert len(d.sections) == len(d2.sections)
-        assert len(d.post_synaptic_density) == len(d2.post_synaptic_density)
+    assert len(d.sections) == len(d2.sections)
+    assert len(d.post_synaptic_density) == len(d2.post_synaptic_density)
 
-        d2 = DendriticSpine(filename)
-        d2.post_synaptic_density = (d2.post_synaptic_density +
-                                    d2.post_synaptic_density +
-                                    [PostSynapticDensity(1, 2, 3.3)])
-        d2.write(filename)
+    d2 = DendriticSpine(filename)
+    d2.post_synaptic_density = (d2.post_synaptic_density +
+                                d2.post_synaptic_density +
+                                [morphio.PostSynapticDensity(1, 2, 3.3)])
+    d2.write(filename)
 
-        d3 = DendriticSpine(filename)
-        assert len(d2.sections) == len(d3.sections)
-        assert len(d2.post_synaptic_density) == len(d3.post_synaptic_density)
+    d3 = DendriticSpine(filename)
+    assert len(d2.sections) == len(d3.sections)
+    assert len(d2.post_synaptic_density) == len(d3.post_synaptic_density)
 
-        psd = d3.post_synaptic_density
-        assert len(psd) == 2 + 2 + 1
-        assert psd[-1].section_id == 1
-        assert psd[-1].segment_id == 2
-        assert psd[-1].offset == pytest.approx(3.3)
+    psd = d3.post_synaptic_density
+    assert len(psd) == 2 + 2 + 1
+    assert psd[-1].section_id == 1
+    assert psd[-1].segment_id == 2
+    assert psd[-1].offset == pytest.approx(3.3)
 
 
-def test_dendritic_spine_round_trip_empty_postsynaptic_density():
-    h5v1 = DATA_DIR / "h5/v1/"
-    with TemporaryDirectory() as folder:
-        d = DendriticSpine(h5v1 / 'simple-dendritric-spine.h5')
-        assert d.cell_family == CellFamily.SPINE
+def test_dendritic_spine_round_trip_empty_postsynaptic_density(tmp_path):
+    d = DendriticSpine(DATA_DIR / "h5/v1/" / 'simple-dendritric-spine.h5')
+    assert d.cell_family == CellFamily.SPINE
 
-        d.post_synaptic_density = []
+    d.post_synaptic_density = []
 
-        filename = Path(folder, 'test-empty-spine.h5')
-        d.write(filename)
+    filename = tmp_path / 'test-empty-spine.h5'
+    d.write(filename)
 
-        d2 = DendriticSpine(filename)
-        assert d.post_synaptic_density == d2.post_synaptic_density
+    d2 = DendriticSpine(filename)
+    assert d.post_synaptic_density == d2.post_synaptic_density
 
 
 def _get_section():
@@ -702,3 +698,358 @@ def test_lifetime_iteration_fails_with_orphan_section():
     for iter_type in IterType.depth_first, IterType.breadth_first, IterType.upstream:
         with pytest.raises(RuntimeError):
             section.iter(iter_type)
+
+
+def _assert_sections_equal(morph1, morph2, section_ids):
+
+    for section_id in section_ids:
+
+        s1 = morph1.section(section_id)
+        s2 = morph2.section(section_id)
+
+        assert s1.type == s2.type
+        npt.assert_array_equal(s1.points, s2.points)
+        npt.assert_array_equal(s1.diameters, s2.diameters)
+
+
+def test_delete_section__maintain_children_order_non_root_section():
+    string = """
+    ("CellBody"
+      (Color Red)
+      (CellBody)
+      ( 0.1  0.1 0.0 0.1)
+      ( 0.1 -0.1 0.0 0.1)
+    )
+
+    ( (Color Cyan)
+      (Axon)
+      (0.0  0.0 0.0 2.0) ; section 0
+      (0.0 -4.0 1.0 2.0)
+      (
+        (0.0 -4.0 1.0 4.0) ; section 1
+        (0.0 -4.0 2.0 4.0)
+        (0.0 -4.0 3.0 4.0)
+        (
+            (6.0 -4.0 0.0 4.0) ; section 2
+            (7.0 -5.0 0.0 4.0)
+        |
+            (6.0 -4.0 0.0 4.0) ; section 3
+            (8.0 -4.0 0.0 4.0)
+        )
+      |
+        ( 0.0 -4.0 1.0 4.0) ; section 4
+        (-5.0 -4.0 0.0 4.0)
+      )
+    )
+    """
+    morph = ImmutableMorphology(string, "asc").as_mutable()
+
+    axon = morph.root_sections[0]
+    to_be_removed_section = axon.children[0]
+    morph.delete_section(to_be_removed_section, recursive=False)
+
+    assert [s.id for s in morph.iter()] == [0, 2, 3, 4]
+
+    # a trifurcation is made
+    assert [s.id for s in axon.children] == [2, 3, 4]
+
+    # ensure nothing has been added to the leaves
+    for child in axon.children:
+        assert child.children == []
+
+    # check that data has not been messed up
+    original = ImmutableMorphology(string, "asc").as_mutable()
+    _assert_sections_equal(morph, original, [0, 2, 3, 4])
+
+
+def test_delete_section__maintain_children_order_non_root_section_multiple():
+    string = """
+    ("CellBody"
+      (Color Red)
+      (CellBody)
+      ( 0.1  0.1 0.0 0.1)
+      ( 0.1 -0.1 0.0 0.1)
+    )
+
+    ( (Color Cyan)
+      (Axon)
+      (0.0  0.0 0.0 2.0) ; section 0
+      (0.0 -4.0 1.0 2.0)
+      (
+        (0.0 -4.0 1.0 4.0) ; section 1
+        (0.0 -4.0 2.0 4.0)
+        (0.0 -4.0 3.0 4.0)
+        (
+            (6.0 -4.0 0.0 4.0) ; section 2
+            (7.0 -5.0 0.0 4.0)
+            (
+                (8.0 -4.0 0.0 4.0) ; section 3
+                (8.0 -5.0 0.0 4.0)
+            |
+                (8.0 -4.0 0.0 4.0) ; section 4
+                (8.0 -5.0 0.0 4.0)
+            )
+        |
+            (6.0 -4.0 0.0 4.0) ; section 5
+            (8.0 -4.0 0.0 4.0)
+        )
+      |
+        ( 0.0 -4.0 1.0 4.0) ; section 6
+        (-5.0 -4.0 0.0 4.0)
+        (
+            (3.0 2.0 1.0 4.0) ; section 7
+            (3.0 2.0 0.0 4.0)
+        |
+            (2.0 3.0 1.0 4.0) ; section 8
+            (2.0 3.0 0.0 4.0)
+        )
+      )
+    )
+    """
+    morph = ImmutableMorphology(string, "asc").as_mutable()
+
+    # for reference and sanity
+    assert([s.id for s in morph.iter(iter_type=morphio.IterType.depth_first)] ==
+           [0, 1, 2, 3, 4, 5, 6, 7, 8])
+    assert([s.id for s in morph.iter(iter_type=morphio.IterType.breadth_first)] ==
+           [0, 1, 6, 2, 5, 7, 8, 3, 4])
+
+    morph.delete_section(morph.section(0), recursive=False)
+    morph.delete_section(morph.section(1), recursive=False)
+    morph.delete_section(morph.section(4), recursive=False)
+    morph.delete_section(morph.section(7), recursive=False)
+
+    assert [s.id for s in morph.iter()] == [2, 3, 5, 6, 8]
+    #assert [s.id for s in morph.iter(iter_type=morphio.IterType.breadth_first)] == [6, 2, 5, 8, 3]
+    assert [s.id for s in morph.root_sections] == [2, 5, 6]
+
+    # made unifurcations
+    assert [s.id for s in morph.section(2).children] == [3]
+    assert [s.id for s in morph.section(6).children] == [8]
+
+    # ensure nothing has been added to the leaves
+    for leaf_id in [3, 5, 8]:
+        assert morph.section(leaf_id).children == []
+
+    # check that data has not been messed up
+    original = ImmutableMorphology(string, "asc").as_mutable()
+    _assert_sections_equal(morph, original, [2, 3, 5, 6, 8])
+
+
+def test_delete_section__maintain_children_order_root_section():
+    string = """
+    ("CellBody"
+      (Color Red)
+      (CellBody)
+      ( 0.1  0.1 0.0 0.1)
+      ( 0.1 -0.1 0.0 0.1)
+    )
+
+    ( (Color Cyan)
+      (Axon)
+      (0.0  0.0 0.0 2.0) ; section 0
+      (0.0 -4.0 1.0 2.0)
+      (
+        (0.0 -4.0 1.0 4.0) ; section 1
+        (0.0 -4.0 2.0 4.0)
+        (0.0 -4.0 3.0 4.0)
+        (
+            (6.0 -4.0 0.0 4.0) ; section 2
+            (7.0 -5.0 0.0 4.0)
+        |
+            (6.0 -4.0 0.0 4.0) ; section 3
+            (8.0 -4.0 0.0 4.0)
+        )
+      |
+        ( 0.0 -4.0 1.0 4.0) ; section 4
+        (-5.0 -4.0 0.0 4.0)
+      )
+    )
+
+    ( (Color Cyan)
+      (Dendrite)
+      (1.0  1.0 1.0 2.0) ; section 5
+      (1.0  1.0 2.0 2.0)
+    )
+    """
+    morph = ImmutableMorphology(string, "asc").as_mutable()
+
+    root = morph.root_sections[0]
+    morph.delete_section(root, recursive=False)
+
+    assert [s.id for s in morph.iter()] == [1, 2, 3, 4, 5]
+
+    # the children of root 0 are put in its place
+    assert [s.id for s in morph.root_sections] == [1, 4, 5]
+    assert [s.id for s in morph.root_sections[0].children] == [2, 3]
+    assert [s.id for s in morph.root_sections[1].children] == []
+    assert [s.id for s in morph.root_sections[2].children] == []
+
+    # check that nothing has been added to the leaves
+    for section_id in [2, 3, 4, 5]:
+        assert morph.section(section_id).children == []
+
+    # check that data has not been messed up
+    original = ImmutableMorphology(string, "asc").as_mutable()
+    _assert_sections_equal(morph, original, [1, 2, 3, 4, 5])
+
+
+def test_delete_section__unifurcation_bridge():
+    pl = morphio.PointLevel(
+        [[1., 2., 3.], [1., 2., 3.]],
+        [0.1, 0.1],
+    )
+
+    basal = morphio.SectionType.basal_dendrite
+    axon =  morphio.SectionType.axon
+
+    morph = morphio.mut.Morphology()
+
+    s0 = morph.append_root_section(pl, basal) # 0
+    s1 = morph.append_root_section(pl, axon) # 1
+    s2 = morph.append_root_section(pl, basal) # 2
+
+    # a unifurcation, only one child
+    s3 = s1.append_section(pl, axon) # 3
+    s4 = s3.append_section(pl, axon) # 4
+
+    s4.append_section(pl, axon) # 5
+    s4.append_section(pl, axon) # 6
+
+    assert [s.id for s in morph.iter()] == [0, 1, 3, 4, 5, 6, 2]
+
+    morph.delete_section(s3, recursive=False)
+
+    assert [s.id for s in morph.iter()] == [0, 1, 4, 5, 6, 2]
+    assert [s.parent.id for s in s1.children] == [1]
+    assert [s.id for s in s1.children] == [4]
+
+    morph.delete_section(s4, recursive=False)
+
+    assert [s.id for s in morph.iter()] == [0, 1, 5, 6, 2]
+    assert [s.parent.id for s in s1.children] == [1, 1]
+    assert [s.id for s in s1.children] == [5, 6]
+
+
+def test_delete_section__remove_all_children():
+
+    pl = morphio.PointLevel(
+        [[1., 2., 3.], [1., 2., 3.]],
+        [0.1, 0.1],
+    )
+
+    basal = morphio.SectionType.basal_dendrite
+
+    morph = morphio.mut.Morphology()
+
+    s0 = morph.append_root_section(pl, basal) # 0
+    s1 = s0.append_section(pl, basal) # 1
+    s2 = s0.append_section(pl, basal) # 2
+
+    morph.delete_section(s1, recursive=False)
+    morph.delete_section(s2, recursive=False)
+
+    assert [s.id for s in morph.iter()] == [0]
+    assert not s0.children
+
+    s3 = s0.append_section(pl, basal) # 3
+    s4 = s0.append_section(pl, basal) # 4
+
+    assert [s.id for s in morph.iter()] == [0, 3, 4]
+    assert [s.id for s in s0.children] == [3, 4]
+
+
+def test_delete_section__append_delete():
+
+    pl = morphio.PointLevel(
+        [[1., 2., 3.], [1., 2., 3.]],
+        [0.1, 0.1],
+    )
+
+    basal = morphio.SectionType.basal_dendrite
+    axon =  morphio.SectionType.axon
+
+    morph = morphio.mut.Morphology()
+
+    s0 = morph.append_root_section(pl, basal) # 0
+    s1 = morph.append_root_section(pl, axon) # 1
+    s2 = s1.append_section(pl, axon) # 2
+
+    s3 = s1.append_section(pl, axon) # 3
+
+    s4 = s3.append_section(pl, axon) # 4
+    s5 = s3.append_section(pl, axon) # 5
+    s6 = s3.append_section(pl, axon) # 6
+
+    morph.delete_section(s4, recursive=False)
+    s3.append_section(pl, axon) # 7
+    morph.delete_section(s3, recursive=False)
+
+    assert [s.id for s in morph.iter()] == [0, 1, 2, 5, 6, 7]
+
+    assert [s.parent.id for s in s1.children] == [1, 1, 1, 1]
+    assert [s.id for s in s1.children] == [2, 5, 6, 7]
+
+
+def test_delete_section__traversals():
+    string = """
+    ("CellBody"
+      (Color Red)
+      (CellBody)
+      ( 0.1  0.1 0.0 0.1)
+      ( 0.1 -0.1 0.0 0.1)
+    )
+
+    ( (Color Cyan)
+      (Axon)
+      (0.0  0.0 0.0 2.0) ; section 0
+      (0.0 -4.0 1.0 2.0)
+      (
+        (0.0 -4.0 1.0 4.0) ; section 1
+        (0.0 -4.0 2.0 4.0)
+        (0.0 -4.0 3.0 4.0)
+        (
+            (6.0 -4.0 0.0 4.0) ; section 2
+            (7.0 -5.0 0.0 4.0)
+        |
+            (6.0 -4.0 0.0 4.0) ; section 3
+            (8.0 -4.0 0.0 4.0)
+        )
+      |
+        ( 0.0 -4.0 1.0 4.0) ; section 4
+        (-5.0 -4.0 0.0 4.0)
+      )
+    )
+
+    ( (Color Cyan)
+      (Dendrite)
+      (1.0  1.0 1.0 2.0) ; section 5
+      (1.0  1.0 2.0 2.0)
+    )
+    """
+    morph = ImmutableMorphology(string, "asc").as_mutable()
+
+    assert [s.id for s in morph.iter(morphio.IterType.depth_first)] == [0, 1, 2, 3, 4, 5]
+    assert [s.id for s in morph.iter(morphio.IterType.breadth_first)] == [0, 5, 1, 4, 2, 3]
+    assert [s.id for s in morph.section(3).iter(morphio.IterType.upstream)] == [3, 1, 0]
+
+    morph.delete_section(morph.section(1), recursive=False)
+
+    assert [s.id for s in morph.iter(morphio.IterType.depth_first)] == [0, 2, 3, 4, 5]
+    assert [s.id for s in morph.iter(morphio.IterType.breadth_first)] == [0, 5, 2, 3, 4]
+    assert [s.id for s in morph.section(3).iter(morphio.IterType.upstream)] == [3, 0]
+
+    morph.delete_section(morph.section(3), recursive=False)
+
+    assert [s.id for s in morph.iter(morphio.IterType.depth_first)] == [0, 2, 4, 5]
+    assert [s.id for s in morph.iter(morphio.IterType.breadth_first)] == [0, 5, 2, 4]
+
+    morph.delete_section(morph.section(0), recursive=False)
+
+    assert [s.id for s in morph.iter(morphio.IterType.depth_first)] == [2, 4, 5]
+    assert [s.id for s in morph.iter(morphio.IterType.breadth_first)] == [2, 4, 5]
+
+    morph.delete_section(morph.section(4), recursive=False)
+
+    assert [s.id for s in morph.iter(morphio.IterType.depth_first)] == [2, 5]
+    assert [s.id for s in morph.iter(morphio.IterType.breadth_first)] == [2, 5]

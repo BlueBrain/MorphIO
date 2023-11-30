@@ -1,9 +1,12 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <map>        // std::map
 #include <memory>     // std::shared_ptr
 #include <set>        // std::set
-#include <stdexcept>  // std::out_of_range
 #include <string>     // std::string
 #include <vector>     // std::vector
 
@@ -66,14 +69,15 @@ static std::set<Warning> _ignoredWarnings;
 
 /** A sample of section for error reporting, includes its position (line) within the file. **/
 struct Sample {
+    enum : unsigned int { UNKNOWN_ID = 0xFFFFFFFE };
     Sample() = default;
 
     floatType diameter = -1.;
     bool valid = false;
     Point point{};
     SectionType type = SECTION_UNDEFINED;
-    int parentId = -1;
-    unsigned int id = 0;
+    unsigned int parentId = UNKNOWN_ID;
+    unsigned int id = UNKNOWN_ID;
     unsigned int lineNumber = 0;
 };
 
@@ -208,6 +212,15 @@ class ErrorMessages
     /** Incorrect Soma type */
     std::string ERROR_UNSUPPORTED_SOMA_TYPE(const std::string& supported) const;
 
+    /** Single point soma must have one point */
+    std::string ERROR_SOMA_INVALID_SINGLE_POINT() const;
+
+    /** Multiple points for single point soma */
+    std::string ERROR_SOMA_INVALID_THREE_POINT_CYLINDER() const;
+
+    /** Contour soma must have at least 3 points. */
+    std::string ERROR_SOMA_INVALID_CONTOUR() const;
+
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WARNINGS
@@ -245,6 +258,12 @@ class ErrorMessages
 
     /** Soma is undefined*/
     std::string WARNING_UNDEFINED_SOMA() const;
+
+    /**  Soma must be a contour for ASC and H5 */
+    std::string WARNING_SOMA_NON_CONTOUR() const;
+
+    /* Soma must be stacked cylinders or a point */
+    std::string WARNING_SOMA_NON_CYLINDER_OR_POINT() const;
 
   private:
     std::string _uri;

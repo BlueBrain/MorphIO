@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <map>
@@ -41,7 +45,10 @@ class Morphology
     **/
     explicit Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
 
-    /// Build a mutable Morphology from a mutable morphology aaaaaa
+    /// Build a mutable Morphology from an HighFive::Group
+    explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+
+    /// Build a mutable Morphology from a mutable morphology
     Morphology(const morphio::mut::Morphology& morphology, unsigned int options = NO_MODIFIER);
 
     /// Build a mutable Morphology from a read-only morphology
@@ -97,7 +104,7 @@ class Morphology
         return _endoplasmicReticulum;
     }
 
-    /// Return the annotation object
+    /// Return the annotation objects
     const std::vector<Property::Annotation>& annotations() const noexcept {
         return _cellProperties->_annotations;
     }
@@ -180,7 +187,7 @@ class Morphology
     }
 
     /// Write file to H5, SWC, ASC format depending on filename extension
-    void write(const std::string& filename);
+    void write(const std::string& filename) const;
 
     void addAnnotation(const morphio::Property::Annotation& annotation) {
         _cellProperties->_annotations.push_back(annotation);

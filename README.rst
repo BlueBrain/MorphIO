@@ -1,7 +1,7 @@
 .. image:: doc/source/logo/BBP-MorphIO.jpg
 
 
-|license| |build| |docs|
+|license| |docs|
 
 MorphIO
 =======
@@ -72,17 +72,13 @@ This research was supported by the EBRAINS research infrastructure, funded from 
 
 License
 =======
-MorphIO is licensed under the terms of the GNU Lesser General Public License version 3. Refer to
-COPYING.LESSER and COPYING for details.
+MorphIO is licensed under the terms of the Apache License 2.0.
+See LICENSE.txt for further details.
 
-Copyright (c) 2013-2022 Blue Brain Project/EPFL
+Copyright (c) 2013-2023 Blue Brain Project/EPFL
 
 .. |license| image:: https://img.shields.io/pypi/l/morphio
                 :target: https://github.com/BlueBrain/morphio/blob/master/COPYING.LESSER
-
-.. |build| image:: https://travis-ci.com/BlueBrain/MorphIO.svg?token=KRP9rHiV52PC6mX3ACXp&branch=master
-                :target: https://travis-ci.com/BlueBrain/MorphIO
-                :alt: Build Status
 
 .. |docs| image:: https://readthedocs.org/projects/morphio/badge/?version=latest
              :target: https://morphio.readthedocs.io/

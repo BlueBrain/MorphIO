@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <highfive/H5Group.hpp>
@@ -22,7 +26,7 @@ class Morphology
   public:
     virtual ~Morphology() = default;
 
-    Morphology(Morphology&) noexcept = default;
+    Morphology(const Morphology&) noexcept = default;
     Morphology& operator=(const Morphology&) noexcept = default;
     Morphology(Morphology&&) noexcept = default;
     Morphology& operator=(Morphology&&) noexcept = default;
@@ -72,7 +76,11 @@ class Morphology
      **/
     std::vector<Section> rootSections() const;
 
-    /** Return a vector containing all section objects */
+    /** Return a vector containing all section objects
+     *
+     * Notes:
+     * Soma is not included
+     **/
     std::vector<Section> sections() const;
 
     /**

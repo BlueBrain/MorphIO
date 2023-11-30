@@ -1,6 +1,11 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <morphio/section.h>
 #include <morphio/soma.h>
 #include <morphio/vector_types.h>
+#include <stdexcept>
 
 #include "point_utils.h"
 #include "shared_utils.hpp"
@@ -25,7 +30,7 @@ floatType Soma::volume() const {
     case SOMA_SIMPLE_CONTOUR:
     case SOMA_UNDEFINED:
     default:
-        throw;
+        throw std::runtime_error("Volume is not supported");
     }
 }
 

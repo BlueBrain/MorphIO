@@ -1,21 +1,6 @@
-/* Copyright (c) 2013-2017, EPFL/Blue Brain Project
- *                          Daniel Nachbaur <daniel.nachbaur@epfl.ch>
- *                          Juan Hernando <jhernando@fi.upm.es>
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
  *
- * This file is part of MorphIO <https://github.com/BlueBrain/MorphIO>
- *
- * This library is free software; you can redistribute it and/or modify it under
- * the terms of the GNU Lesser General Public License version 3.0 as published
- * by the Free Software Foundation.
- *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more
- * details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this library; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ * SPDX-License-Identifier: Apache-2.0
  */
 
 #include <cassert>
@@ -84,6 +69,7 @@ MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group, const std::string& 
 
 Property::Properties load(const std::string& uri) {
     try {
+        std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
         HighFive::SilenceHDF5 silence;
         auto file = HighFive::File(uri, HighFive::File::ReadOnly);
         return MorphologyHDF5(file.getGroup("/"), uri).load();
@@ -94,6 +80,7 @@ Property::Properties load(const std::string& uri) {
 }
 
 Property::Properties load(const HighFive::Group& group) {
+    std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
     return MorphologyHDF5(group).load();
 }
 
@@ -300,9 +287,10 @@ int MorphologyHDF5::_readSections() {
 }
 
 void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
-    assert(_properties._cellLevel.majorVersion() == 1 &&
-           _properties._cellLevel.minorVersion() > 0 &&
-           "Perimeter information is available starting at v1.1");
+    if (!(_properties._cellLevel.majorVersion() == 1 &&
+          _properties._cellLevel.minorVersion() > 0)) {
+        throw RawDataError("Perimeter information is available starting at v1.1");
+    }
 
     // soma only, won't have perimeters
     if (firstSectionOffset == SOMA_ONLY) {
@@ -317,7 +305,7 @@ void MorphologyHDF5::_readPerimeters(int firstSectionOffset) {
     }
 
     auto& perimeters = _properties.get_mut<Property::Perimeter>();
-    _read("/", _d_perimeters, 1, perimeters);
+    _read("", _d_perimeters, 1, perimeters);
     perimeters.erase(perimeters.begin(), perimeters.begin() + firstSectionOffset);
 }
 
@@ -327,13 +315,13 @@ void MorphologyHDF5::_read(const std::string& groupName,
                            const std::string& datasetName,
                            unsigned int expectedDimension,
                            T& data) {
-    if (!_group.exist(groupName)) {
+    if (groupName != "" && !_group.exist(groupName)) {
         throw(
             RawDataError("Reading morphology '" + _uri + "': Missing required group " + groupName));
     }
-    const auto group = _group.getGroup(groupName);
+    const auto group = groupName == "" ? _group : _group.getGroup(groupName);
 
-    if (!_group.exist(groupName)) {
+    if (!group.exist(datasetName)) {
         throw(RawDataError("Reading morphology '" + _uri + "': Missing required dataset " +
                            datasetName));
     }

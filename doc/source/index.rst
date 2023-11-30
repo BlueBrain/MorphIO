@@ -1,4 +1,7 @@
+.. image:: logo/BBP-MorphIO.jpg
+
 .. include:: ../../README.rst
+    :start-line: 2
 
 .. toctree::
    :hidden:
