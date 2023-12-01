@@ -94,34 +94,6 @@ void raiseIfUnifurcations(const morphio::mut::Morphology& morph) {
         }
     }
 }
-
-void _write_asc_points(std::ofstream& myfile,
-                       const morphio::Points& points,
-                       const std::vector<morphio::floatType>& diameters,
-                       size_t indentLevel) {
-    for (unsigned int i = 0; i < points.size(); ++i) {
-        myfile << std::fixed << std::setprecision(FLOAT_PRECISION_PRINT)
-               << std::string(indentLevel, ' ') << '(' << points[i][0] << ' ' << points[i][1] << ' '
-               << points[i][2] << ' ' << diameters[i] << ")\n";
-    }
-}
-
-void _write_asc_section(std::ofstream& myfile,
-                        const std::shared_ptr<morphio::mut::Section>& section,
-                        size_t indentLevel) {
-    std::string indent(indentLevel, ' ');
-    _write_asc_points(myfile, section->points(), section->diameters(), indentLevel);
-
-    if (!section->children().empty()) {
-        auto children = section->children();
-        size_t nChildren = children.size();
-        for (unsigned int i = 0; i < nChildren; ++i) {
-            myfile << indent << (i == 0 ? "(\n" : "|\n");
-            _write_asc_section(myfile, children[i], indentLevel + 2);
-        }
-        myfile << indent << ")\n";
-    }
-}
 }  // anonymous namespace
 
 namespace morphio {
@@ -213,6 +185,34 @@ void swc(const Morphology& morphology, const std::string& filename) {
             ++segmentIdOnDisk;
         }
         newIds[section->id()] = segmentIdOnDisk - 1;
+    }
+}
+
+static void _write_asc_points(std::ofstream& myfile,
+                              const Points& points,
+                              const std::vector<morphio::floatType>& diameters,
+                              size_t indentLevel) {
+    for (unsigned int i = 0; i < points.size(); ++i) {
+        myfile << std::fixed << std::setprecision(FLOAT_PRECISION_PRINT)
+               << std::string(indentLevel, ' ') << '(' << points[i][0] << ' ' << points[i][1] << ' '
+               << points[i][2] << ' ' << diameters[i] << ")\n";
+    }
+}
+
+static void _write_asc_section(std::ofstream& myfile,
+                               const std::shared_ptr<Section>& section,
+                               size_t indentLevel) {
+    std::string indent(indentLevel, ' ');
+    _write_asc_points(myfile, section->points(), section->diameters(), indentLevel);
+
+    if (!section->children().empty()) {
+        auto children = section->children();
+        size_t nChildren = children.size();
+        for (unsigned int i = 0; i < nChildren; ++i) {
+            myfile << indent << (i == 0 ? "(\n" : "|\n");
+            _write_asc_section(myfile, children[i], indentLevel + 2);
+        }
+        myfile << indent << ")\n";
     }
 }
 
