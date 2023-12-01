@@ -272,22 +272,40 @@ void asc(const Morphology& morphology, const std::string& filename) {
     myfile << "; " << version_string() << '\n';
 }
 
-template <typename H5Type, typename T>
-HighFive::Attribute write_attribute(H5Type& file,
+template <typename T>
+HighFive::Attribute write_attribute(HighFive::File& file,
                                     const std::string& name,
                                     const T& version) {
-    HighFive::Attribute attribute =
-        file.template createAttribute<typename T::value_type>(name, HighFive::DataSpace::From(version));
-    attribute.write(version);
-    return attribute;
+    HighFive::Attribute a_version =
+        file.createAttribute<typename T::value_type>(name, HighFive::DataSpace::From(version));
+    a_version.write(version);
+    return a_version;
 }
 
-template <typename H5Type, typename T>
-void write_dataset(H5Type& h5type, const std::string& name, const T& raw) {
-    auto dataset =
-        h5type.template createDataSet<typename base_type<T>::type>(name, HighFive::DataSpace::From(raw));
+template <typename T>
+HighFive::Attribute write_attribute(HighFive::Group& group,
+                                    const std::string& name,
+                                    const T& version) {
+    HighFive::Attribute a_version =
+        group.createAttribute<typename T::value_type>(name, HighFive::DataSpace::From(version));
+    a_version.write(version);
+    return a_version;
+}
 
-    dataset.write(raw);
+template <typename T>
+void write_dataset(HighFive::File& file, const std::string& name, const T& raw) {
+    HighFive::DataSet dpoints =
+        file.createDataSet<typename base_type<T>::type>(name, HighFive::DataSpace::From(raw));
+
+    dpoints.write(raw);
+}
+
+template <typename T>
+void write_dataset(HighFive::Group& file, const std::string& name, const T& raw) {
+    HighFive::DataSet dpoints =
+        file.createDataSet<typename base_type<T>::type>(name, HighFive::DataSpace::From(raw));
+
+    dpoints.write(raw);
 }
 
 static void mitochondriaH5(HighFive::File& h5_file, const Mitochondria& mitochondria) {
