@@ -1,8 +1,40 @@
 #!/bin/bash
 set -e -x
 
+
 export INPUT=$(cd $(dirname "$1") && pwd -P)/$(basename "$1")
 export OUTPUT="$INPUT/install-$CIBW_ARCHS_MACOS"
+
+: "${ZLIB_VERSION:=1.3}"
+: "${UNIXY_AEC_VERSION:=1.0.4}"
+: "${UNIXY_HDF5_VERSION:=1.14.2}"
+
+function download_unpack_zlib {
+    pushd "$INPUT"
+    rm -rf "zlib-$ZLIB_VERSION"
+    echo "Downloading & unpacking ZLIB ${ZLIB_VERSION}"
+    curl -sLO https://zlib.net/fossils/zlib-$ZLIB_VERSION.tar.gz
+    tar xzf zlib-$ZLIB_VERSION.tar.gz
+    popd
+}
+
+function download_unpack_libaec {
+    pushd "$INPUT"
+    rm -rf "libaec-$UNIXY_AEC_VERSION"
+    echo "Downloading & unpacking aec ${UNIXY_AEC_VERSION}"
+    curl -fsSLO "https://gitlab.dkrz.de/k202009/libaec/uploads/ea0b7d197a950b0c110da8dfdecbb71f/libaec-${UNIXY_AEC_VERSION}.tar.gz"
+    tar zxf "libaec-$UNIXY_AEC_VERSION.tar.gz"
+    popd
+}
+
+function download_unpack_hdf5 {
+    pushd "$INPUT"
+    rm -rf hdf5-$UNIXY_HDF5_VERSION
+    echo "Downloading & unpacking HDF5 ${UNIXY_HDF5_VERSION}"
+    curl -fsSLO "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-${UNIXY_HDF5_VERSION%.*}/hdf5-$UNIXY_HDF5_VERSION/src/hdf5-$UNIXY_HDF5_VERSION.tar.gz"
+    tar xzf "hdf5-$UNIXY_HDF5_VERSION.tar.gz"
+    popd
+}
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     lib_name=libhdf5.dylib
@@ -22,25 +54,25 @@ else
         export CPPFLAGS="$CPPFLAGS -arch $CIBW_ARCHS_MACOS"
         export CXXFLAGS="$CXXFLAGS -arch $CIBW_ARCHS_MACOS"
 
-        ZLIB_VERSION="1.3"
+        download_unpack_zlib
 
-        pushd "$INPUT"
-        curl -sLO https://zlib.net/fossils/zlib-$ZLIB_VERSION.tar.gz
-        tar xzf zlib-$ZLIB_VERSION.tar.gz
-        cd zlib-$ZLIB_VERSION
-        ./configure \
+        pushd "$INPUT/zlib-$ZLIB_VERSION"
+        ./configure                             \
+            --archs="-arch $CIBW_ARCHS_MACOS"   \
             --prefix="$OUTPUT"
         make
         make install
         popd
 
         ZLIB_ARG="--with-zlib=$OUTPUT"
+
         if [[ "$CIBW_ARCHS_MACOS" = "arm64" ]]; then
             HOST_ARG="--host=aarch64-apple-darwin"
         fi
     fi
 
     echo "Building & installing libaec"
+    download_unpack_libaec
     pushd "$INPUT/libaec-$UNIXY_AEC_VERSION"
     ./configure            \
         --prefix="$OUTPUT" \
@@ -51,6 +83,8 @@ else
     make install
     popd
 
+    echo "Building & installing hdf5"
+    download_unpack_hdf5
     pushd "$INPUT/hdf5-$UNIXY_HDF5_VERSION"
     ./configure                        \
         --prefix="$OUTPUT"             \
