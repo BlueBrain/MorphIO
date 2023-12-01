@@ -34,6 +34,21 @@ class Files
 };
 }  // anonymous namespace
 
+TEST_CASE("correctSoma", "[immutableMorphology]") {
+    {
+        const auto m = morphio::Morphology("data/simple.asc");
+        CHECK(m.soma().type() == morphio::SomaType::SOMA_SIMPLE_CONTOUR);
+    }
+    {
+        const auto m = morphio::Morphology("data/simple.swc");
+        CHECK(m.soma().type() == morphio::SomaType::SOMA_SINGLE_POINT);
+    }
+    {
+        const auto m = morphio::Morphology("data/h5/v1/simple.h5");
+        CHECK(m.soma().type() == morphio::SomaType::SOMA_SIMPLE_CONTOUR);
+    }
+}
+
 TEST_CASE("fromMut", "[immutableMorphology]") {
     Files files;
     std::vector<morphio::Morphology> morphs;

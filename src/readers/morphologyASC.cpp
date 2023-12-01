@@ -144,10 +144,10 @@ class NeurolucidaParser
             nb_.addMarker(marker);
             return_id = -1;
         } else if (header.token == Token::CELLBODY) {
-            if (!nb_.soma()->points().empty())
+            if (!nb_.soma()->points().empty()) {
                 throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
+            }
             nb_.soma()->properties() = properties;
-            // nb_.soma()->type() = SOMA_SIMPLE_CONTOUR;
             return_id = -1;
         } else {
             SectionType section_type = TokenToSectionType(header.token);
@@ -160,11 +160,12 @@ class NeurolucidaParser
                 return_id = header.parent_id;
             } else {
                 std::shared_ptr<morphio::mut::Section> section;
-                if (header.parent_id > -1)
+                if (header.parent_id > -1) {
                     section = nb_.section(static_cast<unsigned int>(header.parent_id))
                                   ->appendSection(properties, section_type);
-                else
+                } else {
                     section = nb_.appendRootSection(properties, section_type);
+                }
                 return_id = static_cast<int>(section->id());
             }
         }
