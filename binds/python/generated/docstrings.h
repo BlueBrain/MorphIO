@@ -1616,8 +1616,6 @@ static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_UNSUPPORTED_SECTI
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_UNSUPPORTED_SECTION_TYPE_2 = R"doc(Unsupported morphology section type error message)doc";
 
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_UNSUPPORTED_SOMA_TYPE = R"doc(Incorrect Soma type)doc";
-
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE = R"doc(Unsupported vasculature section type error message)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_VECTOR_LENGTH_MISMATCH = R"doc(Vector length mismatch error message)doc";

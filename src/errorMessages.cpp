@@ -260,12 +260,6 @@ std::string ErrorMessages::ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) co
             "Tip: you can use 'removeUnifurcations() (C++) / remove_unifurcations() (python)'");
 }
 
-/** Incorrect Soma type */
-std::string ErrorMessages::ERROR_UNSUPPORTED_SOMA_TYPE(const std::string& supported) const {
-    return ("Attempt to write a morphology with an unsupported `SomaType`, can only use: " +
-            supported);
-}
-
 std::string ErrorMessages::ERROR_SOMA_INVALID_SINGLE_POINT() const {
     return "Single point soma must have one point";
 }

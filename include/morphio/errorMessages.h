@@ -209,8 +209,6 @@ class ErrorMessages
     std::string ERROR_PERIMETER_DATA_NOT_WRITABLE();
     /** Single section child SWC error message */
     std::string ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const;
-    /** Incorrect Soma type */
-    std::string ERROR_UNSUPPORTED_SOMA_TYPE(const std::string& supported) const;
 
     /** Single point soma must have one point */
     std::string ERROR_SOMA_INVALID_SINGLE_POINT() const;
