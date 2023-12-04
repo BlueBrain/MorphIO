@@ -17,6 +17,8 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5Object.hpp>
 
+#include "../shared_utils.hpp"
+
 namespace {
 
 /**
@@ -151,10 +153,24 @@ void swc(const Morphology& morphology, const std::string& filename) {
     const auto& soma_diameters = soma->diameters();
 
     if (soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS) {
-        throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_THREE_POINT_CYLINDER());
+        const std::array<Point, 3> points = {
+            soma_points[0],
+            soma_points[1],
+            soma_points[2],
+        };
+
+        const details::ThreePointSomaStatus status =
+            details::checkNeuroMorphoSoma(points, soma_diameters[0] / 2);
+
+        if (status != details::ThreePointSomaStatus::Conforms) {
+            std::stringstream stream;
+            stream << status;
+            printError(Warning::SOMA_NON_CONFORM,
+                       readers::ErrorMessages().WARNING_NEUROMORPHO_SOMA_NON_CONFORM(stream.str()));
+        }
 
         writeLine(myfile, 1, -1, SECTION_SOMA, soma_points[0], soma_diameters[0]);
-        writeLine(myfile, 2, 1, SECTION_SOMA, soma_points[2], soma_diameters[1]);
+        writeLine(myfile, 2, 1, SECTION_SOMA, soma_points[1], soma_diameters[1]);
         writeLine(myfile, 3, 1, SECTION_SOMA, soma_points[2], soma_diameters[2]);
         segmentIdOnDisk += 3;
     } else {

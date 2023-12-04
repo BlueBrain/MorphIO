@@ -103,7 +103,7 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
         column_mask[i] = (withinEpsilon(points[0][i], points[1][i]) &&
                           withinEpsilon(points[0][i], points[2][i]));
     }
-    printf("`%s` \n", column_mask.to_string().c_str());
+
     if (column_mask.none()) {
         return ZeroColumnsAreTheSame;
     } else if (column_mask.count() == 1) {

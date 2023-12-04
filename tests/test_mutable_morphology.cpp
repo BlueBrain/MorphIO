@@ -101,15 +101,26 @@ TEST_CASE("writing", "[mutableMorphology]") {
     }
 
     {
-        morphio::mut::Morphology morph("data/simple.swc");
-        morph.write(tmpDirectory / "simple.swc");
-        morphio::Morphology savedMorphSwc(tmpDirectory / "simple.swc");
-        REQUIRE(savedMorphSwc.rootSections().size() == 2);
+        {
+            morphio::mut::Morphology morph("data/simple.swc");
+            morph.write(tmpDirectory / "simple.swc");
+            morphio::Morphology savedMorphSwc(tmpDirectory / "simple.swc");
+            REQUIRE(savedMorphSwc.rootSections().size() == 2);
+            REQUIRE(savedMorphSwc.soma().type() == morphio::SomaType::SOMA_SINGLE_POINT);
 
-        // TODO: should turn this on when we are throwing errors on soma creation
-        // asc/h5 should raise when writing a non-contour soma
-        // CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.asc"), morphio::WriterError);
-        // CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.h5"), morphio::WriterError);
+            // TODO: should turn this on when we are throwing errors on soma creation
+            // asc/h5 should raise when writing a non-contour soma
+            // CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.asc"), morphio::WriterError);
+            // CHECK_THROWS_AS(morph.write(tmpDirectory / "simple.h5"), morphio::WriterError);
+        }
+
+        {
+            morphio::mut::Morphology morph("data/three_point_soma.swc");
+            morph.write(tmpDirectory / "three_point_soma.swc");
+            morphio::Morphology savedMorphSwc(tmpDirectory / "three_point_soma.swc");
+            REQUIRE(savedMorphSwc.soma().type() ==
+                    morphio::SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS);
+        }
     }
 
     fs::remove_all(tmpDirectory);

@@ -8,7 +8,7 @@ from numpy.testing import assert_array_equal
 from utils import (assert_swc_exception, captured_output, ignored_warning,
                    strip_color_codes)
 
-from morphio import (MorphioError, Morphology, RawDataError, SomaError,
+from morphio import (mut, MorphioError, Morphology, RawDataError, SomaError,
                      SomaType, Warning, ostream_redirect, set_raise_warnings)
 
 
@@ -280,7 +280,7 @@ def test_soma_type_many_point():
             SomaType.SOMA_CYLINDERS)
 
 
-def test_soma_type_3_point():
+def test_soma_type_3_point(tmp_path):
     # 3 points soma can be of type SOMA_CYLINDERS or SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
     # depending on the point layout
 
@@ -291,8 +291,13 @@ def test_soma_type_3_point():
             content = ('''1 1 0  0 0 3.0 -1
                           2 1 0 -3 0 3.0  1
                           3 1 0  3 0 3.0  1 # PID is 1''')
-            assert (Morphology(content, extension='swc').soma_type ==
+            m = Morphology(content, extension='swc')
+            assert (m.soma_type ==
                     SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+            assert len(err.getvalue()) == 0
+
+            m = m.as_mutable()
+            m.write(tmp_path / 'test_soma_type_3_point.swc')
             assert len(err.getvalue()) == 0
 
     with captured_output() as (_, err):
