@@ -371,7 +371,10 @@ std::string ErrorMessages::WARNING_ONLY_CHILD(const DebugInfo& info,
 std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& root,
                                                                 const Sample& child1,
                                                                 const Sample& child2) {
-    floatType x = root.point[0], y = root.point[1], z = root.point[2], r = root.diameter / 2;
+    floatType x = root.point[0];
+    floatType y = root.point[1];
+    floatType z = root.point[2];
+    floatType r = root.diameter / 2;
     std::stringstream ss;
     ss << "Warning: the soma does not conform the three point soma spec\n"
           "The only valid neuro-morpho soma is:\n"

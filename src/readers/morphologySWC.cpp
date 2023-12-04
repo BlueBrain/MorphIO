@@ -5,7 +5,6 @@
 
 #include "morphologySWC.h"
 
-#include <algorithm>
 #include <cstdint>        // uint32_t
 #include <memory>         // std::shared_ptr
 #include <sstream>        // std::stringstream
@@ -18,6 +17,8 @@
 #include <morphio/mut/section.h>
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
+
+#include "../shared_utils.hpp"
 
 namespace {
 // It's not clear if -1 is the only way of identifying the root section.
@@ -248,38 +249,6 @@ class SWCBuilder
         warnIfZeroDiameter(sample);
     }
 
-    void _checkNeuroMorphoSoma(const Sample& root, const std::vector<Sample>& _children) {
-        floatType x = root.point[0];
-        floatType y = root.point[1];
-        floatType z = root.point[2];
-        floatType d = root.diameter;
-        floatType r = root.diameter / 2;
-        const Sample& child1 = _children[0];
-        const Sample& child2 = _children[1];
-
-        // whether the soma should be checked for the special case of 3 point soma
-        // for details see https://github.com/BlueBrain/MorphIO/issues/273
-        bool isSuited = std::fabs(child1.diameter - d) < morphio::epsilon &&
-                        std::fabs(child2.diameter - d) < morphio::epsilon &&
-                        std::fabs(child1.point[0] - x) < morphio::epsilon &&
-                        std::fabs(child2.point[0] - x) < morphio::epsilon &&
-                        std::fabs(child1.point[2] - z) < morphio::epsilon &&
-                        std::fabs(child2.point[2] - z) < morphio::epsilon;
-        if (!isSuited) {
-            return;
-        }
-        // If the 2nd and the 3rd point have the same x,z,d values then the only valid soma is:
-        // 1 1 x   y   z r -1
-        // 2 1 x (y-r) z r  1
-        // 3 1 x (y+r) z r  1
-        if (child1.point[0] != x || child2.point[0] != x || child1.point[1] != y - r ||
-            child2.point[1] != y + r || child1.point[2] != z || child2.point[2] != z ||
-            child1.diameter != d || child2.diameter != d) {
-            printError(Warning::SOMA_NON_CONFORM,
-                       err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(root, child1, child2));
-        }
-    }
-
     SomaType somaType() {
         switch (morph.soma()->points().size()) {
         case 0: {
@@ -305,14 +274,21 @@ class SWCBuilder
             }
 
             if (children_soma_points.size() == 2) {
-                //  NeuroMorpho is the main provider of morphologies, but they
-                //  with SWC as their default file format: they convert all
-                //  uploads to SWC.  In the process of conversion, they turn all
-                //  somas into their custom 'Three-point soma representation':
-                //   http://neuromorpho.org/SomaFormat.html
-
                 if (!ErrorMessages::isIgnored(Warning::SOMA_NON_CONFORM)) {
-                    _checkNeuroMorphoSoma(this->samples[somaRootId], children_soma_points);
+                    const std::array<Point, 3> points = {
+                        samples[somaRootId].point,
+                        children_soma_points[0].point,
+                        children_soma_points[1].point,
+                    };
+                    if (!details::checkNeuroMorphoSoma<floatType>(points,
+                                                                  samples[somaRootId].diameter /
+                                                                      2)) {
+                        printError(
+                            Warning::SOMA_NON_CONFORM,
+                            err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(samples[somaRootId],
+                                                                     children_soma_points[0],
+                                                                     children_soma_points[1]));
+                    }
                 }
 
                 return SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;

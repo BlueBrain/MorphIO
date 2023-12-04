@@ -254,19 +254,22 @@ def test_simple_reversed():
                         [-5, -4, 0]])
 
 
-def test_soma_type():
-    '''The ordering of IDs is not required'''
+def test_soma_type_1_point():
     # 1 point soma
     content = '''1 1 0 0 0 3.0 -1'''
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_SINGLE_POINT)
 
+
+def test_soma_type_2_point():
     # 2 point soma
     content = ('''1 1 0 0 0 3.0 -1
                   2 1 0 0 0 3.0  1''')
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_CYLINDERS)
 
+
+def test_soma_type_many_point():
     # > 3 points soma
     content = ('''1 1 0 0 0 3.0 -1
                   2 1 0 0 0 3.0  1
@@ -276,16 +279,21 @@ def test_soma_type():
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_CYLINDERS)
 
+
+def test_soma_type_3_point():
     # 3 points soma can be of type SOMA_CYLINDERS or SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
     # depending on the point layout
 
     # SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS are characterized by
     # one soma point with 2 children
-    content = ('''1 1 0  0 0 3.0 -1
-                  2 1 0 -3 0 3.0  1
-                  3 1 0  3 0 3.0  1 # PID is 1''')
-    assert (Morphology(content, extension='swc').soma_type ==
-            SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            content = ('''1 1 0  0 0 3.0 -1
+                          2 1 0 -3 0 3.0  1
+                          3 1 0  3 0 3.0  1 # PID is 1''')
+            assert (Morphology(content, extension='swc').soma_type ==
+                    SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+            assert len(err.getvalue()) == 0
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
@@ -294,7 +302,18 @@ def test_soma_type():
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                     SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-            assert len(err.getvalue()) == 0
+            assert strip_color_codes(err.getvalue()).strip() == ('''\
+$STRING$:0:warning
+Warning: the soma does not conform the three point soma spec
+The only valid neuro-morpho soma is:
+1 1 x   y   z r -1
+2 1 x (y-r) z r  1
+3 1 x (y+r) z r  1
+
+Got:
+1 1 0 0 0 3 -1
+2 1 1 -3.000000 0.000000 3.000000 1
+3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1''')
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):

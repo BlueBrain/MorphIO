@@ -141,23 +141,32 @@ void swc(const Morphology& morphology, const std::string& filename) {
     std::ofstream myfile(filename);
     using std::setw;
 
-    myfile << "# " << version_string() << std::endl;
+    myfile << "# " << version_string() << '\n';
     myfile << "# index" << setw(9) << "type" << setw(10) << 'X' << setw(13) << 'Y' << setw(13)
-           << 'Z' << setw(13) << "radius" << setw(13) << "parent" << std::endl;
+           << 'Z' << setw(13) << "radius" << setw(13) << "parent" << '\n';
 
     int segmentIdOnDisk = 1;
     std::map<uint32_t, int32_t> newIds;
 
     const auto& soma_diameters = soma->diameters();
 
-    for (unsigned int i = 0; i < soma_points.size(); ++i) {
-        writeLine(myfile,
-                  segmentIdOnDisk,
-                  i == 0 ? -1 : segmentIdOnDisk - 1,
-                  SECTION_SOMA,
-                  soma_points[i],
-                  soma_diameters[i]);
-        ++segmentIdOnDisk;
+    if (soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS) {
+        throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_THREE_POINT_CYLINDER());
+
+        writeLine(myfile, 1, -1, SECTION_SOMA, soma_points[0], soma_diameters[0]);
+        writeLine(myfile, 2, 1, SECTION_SOMA, soma_points[2], soma_diameters[1]);
+        writeLine(myfile, 3, 1, SECTION_SOMA, soma_points[2], soma_diameters[2]);
+        segmentIdOnDisk += 3;
+    } else {
+        for (unsigned int i = 0; i < soma_points.size(); ++i) {
+            writeLine(myfile,
+                      segmentIdOnDisk,
+                      i == 0 ? -1 : segmentIdOnDisk - 1,
+                      SECTION_SOMA,
+                      soma_points[i],
+                      soma_diameters[i]);
+            ++segmentIdOnDisk;
+        }
     }
 
     for (auto it = morphology.depth_begin(); it != morphology.depth_end(); ++it) {
