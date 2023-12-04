@@ -105,18 +105,18 @@ Property::Properties MorphologyHDF5::load() {
         }
     }
 
-    switch(_properties._somaLevel._points.size()){
-        case 0:
-            _properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
-            break;
-        case 1:
-            throw RawDataError("Morphology contour with only a single point is not valid: " + _uri);
-        case 2:
-            _properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
-            break;
-        default:
-            _properties._cellLevel._somaType = enums::SOMA_SIMPLE_CONTOUR;
-            break;
+    switch (_properties._somaLevel._points.size()) {
+    case 0:
+        _properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
+        break;
+    case 1:
+        throw RawDataError("Morphology contour with only a single point is not valid: " + _uri);
+    case 2:
+        _properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
+        break;
+    default:
+        _properties._cellLevel._somaType = enums::SOMA_SIMPLE_CONTOUR;
+        break;
     }
 
     return _properties;

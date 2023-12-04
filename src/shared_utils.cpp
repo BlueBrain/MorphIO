@@ -99,48 +99,48 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
     };
 
     std::bitset<3> column_mask = {};
-    for(uint8_t i = 0; i < 3; ++i) {
+    for (uint8_t i = 0; i < 3; ++i) {
         column_mask[i] = (withinEpsilon(points[0][i], points[1][i]) &&
                           withinEpsilon(points[0][i], points[2][i]));
     }
     printf("`%s` \n", column_mask.to_string().c_str());
-    if(column_mask.none()){
+    if (column_mask.none()) {
         return ZeroColumnsAreTheSame;
-    }else if(column_mask.count() == 1){
+    } else if (column_mask.count() == 1) {
         return OneColumnIsTheSame;
-    }else if(column_mask.all()){
+    } else if (column_mask.all()) {
         return ThreeColumnsAreTheSame;
     }
 
     const size_t col = !column_mask[0] ? 0 : !column_mask[1] ? 1 : 2;
 
-    if(!(withinEpsilon(points[0][col], points[1][col] - radius) &&
-        withinEpsilon(points[0][col], points[2][col] + radius)) &&
-       !(withinEpsilon(points[0][col], points[1][col] + radius) &&
-        withinEpsilon(points[0][col], points[2][col] - radius))){
+    if (!(withinEpsilon(points[0][col], points[1][col] - radius) &&
+          withinEpsilon(points[0][col], points[2][col] + radius)) &&
+        !(withinEpsilon(points[0][col], points[1][col] + radius) &&
+          withinEpsilon(points[0][col], points[2][col] - radius))) {
         return NotRadiusOffset;
     }
 
     return Conforms;
 }
 
-std::ostream& operator<<(std::ostream& os, ThreePointSomaStatus s){
-    switch(s){
-        case ZeroColumnsAreTheSame:
-            os << "None of the columns (ie: all the X, Y or Z values) are the same.";
-            break;
-        case OneColumnIsTheSame:
-            os << "Only one column has the same coordinates.";
-            break;
-        case ThreeColumnsAreTheSame:
-            os << "All three columns have the same coordinates.";
-            break;
-        case NotRadiusOffset:
-            os << "The non-constant columns is not offset by +/- the radius from the initial sample.";
-            break;
-        case Conforms:
-            os << "Three point soma conforms";
-            break;
+std::ostream& operator<<(std::ostream& os, ThreePointSomaStatus s) {
+    switch (s) {
+    case ZeroColumnsAreTheSame:
+        os << "None of the columns (ie: all the X, Y or Z values) are the same.";
+        break;
+    case OneColumnIsTheSame:
+        os << "Only one column has the same coordinates.";
+        break;
+    case ThreeColumnsAreTheSame:
+        os << "All three columns have the same coordinates.";
+        break;
+    case NotRadiusOffset:
+        os << "The non-constant columns is not offset by +/- the radius from the initial sample.";
+        break;
+    case Conforms:
+        os << "Three point soma conforms";
+        break;
     }
     return os;
 }

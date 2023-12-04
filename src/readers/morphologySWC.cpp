@@ -280,18 +280,14 @@ class SWCBuilder
                         children_soma_points[0].point,
                         children_soma_points[1].point,
                     };
-                    details::ThreePointSomaStatus status = 
-                        details::checkNeuroMorphoSoma(points,
-                                                      samples[somaRootId].diameter /
-                                                      2);
-                    
-                    if (status != details::ThreePointSomaStatus::Conforms) {
+                    details::ThreePointSomaStatus status =
+                        details::checkNeuroMorphoSoma(points, samples[somaRootId].diameter / 2);
 
+                    if (status != details::ThreePointSomaStatus::Conforms) {
                         std::stringstream stream;
                         stream << status;
-                        printError(
-                            Warning::SOMA_NON_CONFORM,
-                            err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(stream.str()));
+                        printError(Warning::SOMA_NON_CONFORM,
+                                   err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(stream.str()));
                     }
                 }
 

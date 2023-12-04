@@ -162,17 +162,6 @@ std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(int mitoParentId) const {
            std::to_string(mitoParentId) + " does not exist.";
 }
 
-/**
-   Return val1 and highlight it with some color if val1 != val2
-**/
-static std::string _col(morphio::floatType val1, morphio::floatType val2) {
-    bool is_ok = std::fabs(val1 - val2) < morphio::epsilon;
-    if (is_ok) {
-        return std::to_string(val1);
-    }
-    return "\033[1;33m" + std::to_string(val1) + " (exp. " + std::to_string(val2) + ")\033[0m";
-}
-
 ////////////////////////////////////////////////////////////////////////////////
 //             NEUROLUCIDA
 ////////////////////////////////////////////////////////////////////////////////

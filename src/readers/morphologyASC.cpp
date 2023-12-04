@@ -386,18 +386,18 @@ Property::Properties load(const std::string& path,
 
     Property::Properties properties = nb_.buildReadOnly();
 
-    switch(properties._somaLevel._points.size()){
-        case 0:
-            properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
-            break;
-        case 1:
-            throw RawDataError("Morphology contour with only a single point is not valid: " + path);
-        case 2:
-            properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
-            break;
-        default:
-            properties._cellLevel._somaType = enums::SOMA_SIMPLE_CONTOUR;
-            break;
+    switch (properties._somaLevel._points.size()) {
+    case 0:
+        properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
+        break;
+    case 1:
+        throw RawDataError("Morphology contour with only a single point is not valid: " + path);
+    case 2:
+        properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
+        break;
+    default:
+        properties._cellLevel._somaType = enums::SOMA_SIMPLE_CONTOUR;
+        break;
     }
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"asc", 1, 0};

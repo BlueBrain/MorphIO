@@ -70,13 +70,12 @@ bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLe
 }  // namespace property
 
 namespace details {
-enum ThreePointSomaStatus
-{
-   Conforms,
-   ZeroColumnsAreTheSame,
-   OneColumnIsTheSame,
-   ThreeColumnsAreTheSame,
-   NotRadiusOffset,
+enum ThreePointSomaStatus {
+    Conforms,
+    ZeroColumnsAreTheSame,
+    OneColumnIsTheSame,
+    ThreeColumnsAreTheSame,
+    NotRadiusOffset,
 };
 
 ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>&, floatType);
