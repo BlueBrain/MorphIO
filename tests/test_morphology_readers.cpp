@@ -44,7 +44,7 @@ TEST_CASE("LoadH5Morphology", "[morphology]") {
         REQUIRE(m.diameters().size() == 12);
         REQUIRE(m.points().size() == 12);
         // 2 point soma
-        REQUIRE(m.somaType() == morphio::SomaType::SOMA_SIMPLE_CONTOUR);
+        REQUIRE(m.somaType() == morphio::SomaType::SOMA_UNDEFINED);
     }
 
     {  // h5 file with a single point soma (ie: not a contour)

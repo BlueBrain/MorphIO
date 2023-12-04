@@ -10,6 +10,7 @@
 
 
 #include "NeurolucidaLexer.inc"
+#include "morphio/enums.h"
 
 namespace morphio {
 namespace readers {
@@ -385,12 +386,19 @@ Property::Properties load(const std::string& path,
 
     Property::Properties properties = nb_.buildReadOnly();
 
-    if (properties._somaLevel._points.size() == 1) {
-        throw RawDataError("Morphology contour with only a single point is not valid: " + path);
-    } else if (!properties._somaLevel._points.empty()) {
-        properties._cellLevel._somaType = SOMA_SIMPLE_CONTOUR;
+    switch(properties._somaLevel._points.size()){
+        case 0:
+            properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
+            break;
+        case 1:
+            throw RawDataError("Morphology contour with only a single point is not valid: " + path);
+        case 2:
+            properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
+            break;
+        default:
+            properties._cellLevel._somaType = enums::SOMA_SIMPLE_CONTOUR;
+            break;
     }
-
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"asc", 1, 0};
     return properties;

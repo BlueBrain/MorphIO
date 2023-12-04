@@ -302,18 +302,8 @@ def test_soma_type_3_point():
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                     SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-            assert strip_color_codes(err.getvalue()).strip() == ('''\
-$STRING$:0:warning
-Warning: the soma does not conform the three point soma spec
-The only valid neuro-morpho soma is:
-1 1 x   y   z r -1
-2 1 x (y-r) z r  1
-3 1 x (y+r) z r  1
-
-Got:
-1 1 0 0 0 3 -1
-2 1 1 -3.000000 0.000000 3.000000 1
-3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1''')
+            assert strip_color_codes(err.getvalue()).strip() == \
+                    '$STRING$:0:warning\nOnly one column has the same coordinates.'
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
@@ -322,18 +312,8 @@ Got:
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                          SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-            assert strip_color_codes(err.getvalue()).strip() == ('''\
-$STRING$:0:warning
-Warning: the soma does not conform the three point soma spec
-The only valid neuro-morpho soma is:
-1 1 x   y   z r -1
-2 1 x (y-r) z r  1
-3 1 x (y+r) z r  1
-
-Got:
-1 1 0 0 0 3 -1
-2 1 0.000000 -3.000000 0.000000 3.000000 1
-3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1''')
+            assert strip_color_codes(err.getvalue()).strip() == \
+                    '$STRING$:0:warning\nThe non-constant columns is not offset by +/- the radius from the initial sample.'
 
     # If this configuration is not respected -> SOMA_CYLINDERS
     content = ( '''1 1 0 0 0 3.0 -1

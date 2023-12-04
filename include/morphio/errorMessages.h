@@ -247,9 +247,7 @@ class ErrorMessages
                                    unsigned int childId) const;
 
     /** Soma does not conform NeuroMorpho warning message */
-    std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Sample& root,
-                                                     const Sample& child1,
-                                                     const Sample& child2);
+    std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const std::string&) const;
 
     /** Wrong root point warning message */
     std::string WARNING_WRONG_ROOT_POINT(const std::vector<Sample>& children) const;
