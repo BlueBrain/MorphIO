@@ -91,11 +91,11 @@ setup(
               ],
     zip_safe=False,
     classifiers=[
-        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+        "License :: OSI Approved :: Apache Software License v2.0",
     ],
     use_scm_version=True,
     setup_requires=[
         'setuptools_scm',
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
 )

@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <pybind11/numpy.h>
@@ -62,28 +66,3 @@ inline py::array_t<typename Sequence::value_type> as_pyarray(Sequence&& seq) {
                      capsule           // numpy array references this parent
     );
 }
-
-struct immutable_binding_classes {
-    // Immutable classes
-    py::class_<morphio::Morphology> Morphology_class;
-    py::class_<morphio::GlialCell, morphio::Morphology> GlialCell_class;
-    py::class_<morphio::Mitochondria> Mitochondria_class;
-    py::class_<morphio::EndoplasmicReticulum> EndoplasmicReticulum_class;
-    py::class_<morphio::Soma> Soma_class;
-    py::class_<morphio::Section> Section_class;
-    py::class_<morphio::MitoSection> MitoSection_class;
-    py::class_<morphio::DendriticSpine, morphio::Morphology> DendriticSpine_class;
-};
-
-struct mutable_binding_classes {
-    // Mutable classes
-    py::class_<morphio::mut::Morphology> Morphology_mut_class;
-    py::class_<morphio::mut::GlialCell, morphio::mut::Morphology> GlialCell_mut_class;
-    py::class_<morphio::mut::Mitochondria> Mitochondria_mut_class;
-    py::class_<morphio::mut::MitoSection, std::shared_ptr<morphio::mut::MitoSection>>
-        MitoSection_mut_class;
-    py::class_<morphio::mut::Section, std::shared_ptr<morphio::mut::Section>> Section_mut_class;
-    py::class_<morphio::mut::Soma, std::shared_ptr<morphio::mut::Soma>> Soma_mut_class;
-    py::class_<morphio::mut::EndoplasmicReticulum> EndoplasmicReticulum_mut_class;
-    py::class_<morphio::mut::DendriticSpine, morphio::mut::Morphology> DendriticSpine_mut_class;
-};

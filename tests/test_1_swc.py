@@ -1,3 +1,5 @@
+# Copyright (c) 2013-2023, EPFL/Blue Brain Project
+# SPDX-License-Identifier: Apache-2.0
 from pathlib import Path
 
 import numpy as np
@@ -119,19 +121,16 @@ def test_repeated_id():
 
 
 def test_neurite_followed_by_soma():
-    # Capturing the output to keep the unit test suite stdout clean
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            assert_swc_exception('''# An orphan neurite with a soma child
-                                 1 3 0 0 1 0.5 -1
-                                 2 3 0 0 2 0.5 1
-                                 3 3 0 0 3 0.5 2
-                                 4 3 0 0 4 0.5 3
-                                 5 3 0 0 5 0.5 4
-                                 6 1 0 0 0 3.0 5 # <-- soma child''',
-                                 SomaError,
-                                 'Found a soma point with a neurite as parent',
-                                 ':7:error')
+    assert_swc_exception('''# An orphan neurite with a soma child
+                         1 3 0 0 1 0.5 -1
+                         2 3 0 0 2 0.5 1
+                         3 3 0 0 3 0.5 2
+                         4 3 0 0 4 0.5 3
+                         5 3 0 0 5 0.5 4
+                         6 1 0 0 0 3.0 5 # <-- soma child''',
+                         SomaError,
+                         'Found a soma point with a neurite as parent',
+                         ':7:error')
 
 
 def test_read_split_soma():

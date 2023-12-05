@@ -31,6 +31,7 @@ endif()
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake)
 include(CompilerFlags)
+
 set(CMAKE_CXX_FLAGS "${FLAGS}")
 
 set(CMAKE_CXX_STANDARD 14)
@@ -51,20 +52,22 @@ if(BUILD_BINDINGS)
   add_subdirectory(binds/python)
 endif(BUILD_BINDINGS)
 
+include(GNUInstallDirs)
+
 install(
   DIRECTORY ${MORPHIO_INCLUDE_DIR}
-  DESTINATION include
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   )
 
 install(
   EXPORT MorphIOTargets
   NAMESPACE MorphIO::
-  DESTINATION lib/cmake/MorphIO
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MorphIO
   )
 
 install(
   FILES ${CMAKE_CURRENT_LIST_DIR}/CMake/MorphIOConfig.cmake
-  DESTINATION lib/cmake/MorphIO
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MorphIO
   )
 
 

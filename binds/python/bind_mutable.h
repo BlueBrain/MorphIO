@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <pybind11/pybind11.h>
@@ -17,6 +21,4 @@
 #include "bindings_utils.h"
 
 
-mutable_binding_classes bind_mutable_classes(pybind11::module& m);
-
-void bind_mutable_methods(mutable_binding_classes& mutable_classes);
+void bind_mutable(pybind11::module& m);

@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <iostream>  // std::cerr
 #include <sstream>   // std::ostringstream
 #include <string>
@@ -59,28 +63,34 @@ ErrorHandler& getErrorHandler(){
 namespace morphio {
 
 /**
-   Controls the maximum number of warning to be printed on screen
-   0 will print no warning
-   -1 will print them all
-**/
+ * Controls the maximum number of warning to be printed on screen.
+ * 0 will print no warning
+ * -1 will print them all
+ */
 void set_maximum_warnings(int n_warnings) {
     auto& errorHandler = getErrorHandler();
     errorHandler.MORPHIO_MAX_N_WARNINGS = n_warnings;
 }
 
-/**
-   Whether to raise warning as errors
-**/
+/*
+ *   Whether to raise warning as errors
+ */
 void set_raise_warnings(bool is_raise) {
     auto& errorHandler = getErrorHandler();
     errorHandler.MORPHIO_RAISE_WARNINGS = is_raise;
 }
 
+/**
+ *   Ignore/Unignore a specific warning message
+ */
 void set_ignored_warning(Warning warning, bool ignore) {
     auto& errorHandler = getErrorHandler();
     errorHandler.set_ignored_warning(warning, ignore);
 }
 
+/**
+ *   Ignore/Unignore a specific warning message
+ */
 void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
     for (auto warning : warnings) {
         set_ignored_warning(warning, ignore);

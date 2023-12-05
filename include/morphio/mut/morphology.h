@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <map>
@@ -100,7 +104,7 @@ class Morphology
         return _endoplasmicReticulum;
     }
 
-    /// Return the annotation object
+    /// Return the annotation objects
     const std::vector<Property::Annotation>& annotations() const noexcept {
         return _cellProperties->_annotations;
     }

@@ -1,9 +1,12 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #pragma once
 
 #include <map>        // std::map
 #include <memory>     // std::shared_ptr
 #include <set>        // std::set
-#include <stdexcept>  // std::out_of_range
 #include <string>     // std::string
 #include <vector>     // std::vector
 
@@ -30,6 +33,53 @@ enum ErrorLevel {
     INFO,     //!< Info
     WARNING,  //!< Warning
     ERROR     //!< Error
+};
+
+/** Debug info for error messages **/
+struct DebugInfo {
+  public:
+    /** Constructor
+
+        \param filename morphology filename.
+     */
+    explicit DebugInfo(std::string filename = "")
+        : _filename(filename) {}
+
+    /** Stores section's line number within morphology file */
+    void setLineNumber(uint32_t sectionId, unsigned int line) {
+        _lineNumbers[sectionId] = static_cast<int>(line);
+    }
+
+    /** Get section's line number within morphology file */
+    int32_t getLineNumber(uint32_t sectionId) const {
+        const auto it = _lineNumbers.find(sectionId);
+        if (it == _lineNumbers.end()) {
+            return -1;
+        }
+        return it->second;
+    }
+    /** Morphology filename */
+    std::string _filename;
+
+  private:
+    std::map<unsigned int, int> _lineNumbers;
+};
+
+// TODO: this shouldn't be global static
+static std::set<Warning> _ignoredWarnings;
+
+/** A sample of section for error reporting, includes its position (line) within the file. **/
+struct Sample {
+    enum : unsigned int { UNKNOWN_ID = 0xFFFFFFFE };
+    Sample() = default;
+
+    floatType diameter = -1.;
+    bool valid = false;
+    Point point{};
+    SectionType type = SECTION_UNDEFINED;
+    unsigned int parentId = UNKNOWN_ID;
+    unsigned int id = UNKNOWN_ID;
+    unsigned int lineNumber = 0;
 };
 
 /** Class that can generate error messages and holds a collection of predefined errors
@@ -101,7 +151,7 @@ class ErrorMessages
                                        const std::vector<unsigned int>& childrenLineNumbers) const;
 
     /** Soma with neurite parent error message */
-    std::string ERROR_SOMA_WITH_NEURITE_PARENT(unsigned int lineNumber) const;
+    std::string ERROR_SOMA_WITH_NEURITE_PARENT(const unsigned int lineNumber) const;
 
     /** Repeated section id error message */
     std::string ERROR_REPEATED_ID(unsigned int originalId,

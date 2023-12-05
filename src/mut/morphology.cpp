@@ -1,3 +1,7 @@
+/* Copyright (c) 2013-2023, EPFL/Blue Brain Project
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 #include <algorithm>  // std::find_if
 #include <cassert>
 #include <cctype>    // std::tolower
@@ -384,10 +388,12 @@ void Morphology::write(const std::string& filename) const {
         }
     }
 
-    std::string extension;
+    const size_t pos = filename.find_last_of('.');
+    if (pos == std::string::npos) {
+        throw UnknownFileType("Missing file extension.");
+    }
 
-    const size_t pos = filename.find_last_of(".");
-    assert(pos != std::string::npos);
+    std::string extension;
     for (char c : filename.substr(pos)) {
         extension += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     }

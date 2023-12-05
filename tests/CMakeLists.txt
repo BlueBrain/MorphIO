@@ -8,6 +8,7 @@ set(TESTS_SRC
         test_point_utils.cpp
         test_properties.cpp
         test_soma.cpp
+        test_swc_reader.cpp
         test_utilities.cpp
         test_vasculature_morphology.cpp
         )
@@ -39,13 +40,12 @@ target_compile_options(unittests PRIVATE
 
 if (MORPHIO_ENABLE_COVERAGE)
   include(CodeCoverage)
-  set(COVERAGE_LCOV_EXCLUDES '/usr/*' '${PROJECT_SOURCE_DIR}/include/*' '${PROJECT_SOURCE_DIR}/3rdparty/*')
   SETUP_TARGET_FOR_COVERAGE_LCOV(
       NAME coverage
       EXECUTABLE ctest
       DEPENDENCIES unittests
+      EXCLUDE "/usr/*" "${PROJECT_SOURCE_DIR}/include/*" "${PROJECT_SOURCE_DIR}/3rdparty/*"
   )
-  list(APPEND TESTS_LINK_LIBRAIRIES gcov)
 endif()
 
 target_link_libraries(unittests
