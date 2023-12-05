@@ -4,6 +4,7 @@
  */
 #include <catch2/catch.hpp>
 
+#include <morphio/enums.h>
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 
@@ -115,11 +116,70 @@ TEST_CASE("writing", "[mutableMorphology]") {
         }
 
         {
+            morphio::mut::Morphology morph("data/simple.swc");
+            morph.soma()->diameters().clear();
+            CHECK_THROWS_AS(morph.write(tmpDirectory / "diameter-sample-mismatch.swc"),
+                            morphio::WriterError);
+        }
+
+        /* { */
+        /*     morphio::mut::Morphology morph("data/simple.swc"); */
+        /*     for (const auto& rootSection : morph.rootSections()) { */
+        /*         morph.deleteSection(rootSection, true); */
+        /*     } */
+        /*     CHECK_THROWS_AS(morph.write(tmpDirectory / "diameter-sample-mismatch.swc"),
+         * morphio::WriterError); */
+        /* } */
+
+        {  // Can write empty morphologies
+            morphio::mut::Morphology morph;
+            morph.write(tmpDirectory / "empty.swc");
+        }
+
+        {  // Can write morph with no soma
+            morphio::mut::Morphology morph;
+            auto pt = morphio::Property::PointLevel({{0, 0, 0}, {1, 1, 1}}, {1, 1}, {});
+            morph.appendRootSection(pt, morphio::SectionType::SECTION_AXON);
+            morph.write(tmpDirectory / "no-soma.swc");
+        }
+
+        {  // Can write morph with SOMA_UNDEFINED/SOMA_SIMPLE_CONTOUR for now
+            morphio::mut::Morphology morph;
+            auto soma = morph.soma();
+            soma->points() = {{1, 1, 1}};
+            soma->diameters() = {1};
+
+            soma->type() = morphio::SOMA_UNDEFINED;
+            morph.write(tmpDirectory / "undefined-soma.swc");
+
+            soma->type() = morphio::SOMA_SIMPLE_CONTOUR;
+            morph.write(tmpDirectory / "simple-contour-soma.swc");
+        }
+
+        {  // should be a single point soma
+            morphio::mut::Morphology morph;
+            auto soma = morph.soma();
+            soma->points() = {{1, 1, 1}, {2, 2, 2}};
+            soma->diameters() = {1, 2};
+            soma->type() = morphio::SOMA_SINGLE_POINT;
+            CHECK_THROWS_AS(morph.write(tmpDirectory / "fail.swc"), morphio::WriterError);
+        }
+
+        {
             morphio::mut::Morphology morph("data/three_point_soma.swc");
             morph.write(tmpDirectory / "three_point_soma.swc");
             morphio::Morphology savedMorphSwc(tmpDirectory / "three_point_soma.swc");
             REQUIRE(savedMorphSwc.soma().type() ==
                     morphio::SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS);
+
+            std::vector<morphio::Point>& points = morph.soma()->points();
+            points[0][0] = 100;
+            // this only prints to stdout at the moment, but doesn't throw
+            morph.write(tmpDirectory / "bad-three-point-soma.swc");
+
+            points.pop_back();
+            CHECK_THROWS_AS(morph.write(tmpDirectory / "bad-three-point-soma.swc"),
+                            morphio::WriterError);
         }
     }
 
