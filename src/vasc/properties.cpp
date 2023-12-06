@@ -2,8 +2,6 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include <algorithm>
-#include <cmath>
 
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
@@ -13,18 +11,14 @@
 #include "../point_utils.h"
 #include "../shared_utils.hpp"
 
-namespace morphio {
-namespace vasculature {
-namespace property {
-
-namespace details {
-static bool compare_section_structure(
+namespace {
+bool compare_section_structure(
     const std::vector<morphio::vasculature::property::VascSection::Type>& vec1,
     const std::vector<morphio::vasculature::property::VascSection::Type>& vec2,
     const std::string& name,
-    LogLevel logLevel) {
+    morphio::LogLevel logLevel) {
     if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR) {
+        if (logLevel > morphio::LogLevel::ERROR) {
             morphio::printError(morphio::Warning::UNDEFINED,
                                 "Error comparing " + name +
                                     ", size differs: " + std::to_string(vec1.size()) + " vs " +
@@ -35,7 +29,7 @@ static bool compare_section_structure(
 
     for (size_t i = 1; i < vec1.size(); ++i) {
         if (vec1[i] - vec1[1] != vec2[i] - vec2[1]) {
-            if (logLevel > LogLevel::ERROR) {
+            if (logLevel > morphio::LogLevel::ERROR) {
                 morphio::printError(morphio::Warning::UNDEFINED,
                                     "Error comparing " + name + ", elements differ:");
                 morphio::printError(morphio::Warning::UNDEFINED,
@@ -49,8 +43,12 @@ static bool compare_section_structure(
 }
 
 
-}  // namespace details
+}  // namespace
 
+
+namespace morphio {
+namespace vasculature {
+namespace property {
 
 VascPointLevel::VascPointLevel(const std::vector<Point::Type>& points,
                                const std::vector<Diameter::Type>& diameters)
@@ -73,8 +71,7 @@ VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range) {
 
 bool VascSectionLevel::diff(const VascSectionLevel& other, LogLevel logLevel) const {
     return this == &other ||
-           (details::compare_section_structure(
-                this->_sections, other._sections, "_sections", logLevel) &&
+           (compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
             morphio::property::compare(
                 this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
             morphio::property::compare(
