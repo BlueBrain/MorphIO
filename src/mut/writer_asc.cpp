@@ -49,45 +49,26 @@ namespace morphio {
 namespace mut {
 namespace writer {
 
-void asc(const Morphology& morphology, const std::string& filename) {
-    const auto& soma = morphology.soma();
-    const std::vector<Point>& somaPoints = soma->points();
-
-    if (soma->points().empty() && morphology.rootSections().empty()) {
-        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+void asc(const Morphology& morph, const std::string& filename) {
+    if (details::emptyMorphology(morph)) {
         return;
-    } else if (soma->type() == SOMA_UNDEFINED) {
-        printError(Warning::WRITE_UNDEFINED_SOMA,
-                   readers::ErrorMessages().WARNING_UNDEFINED_SOMA());
-    } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
-        printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
-    } else if (somaPoints.empty()) {
-        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
-    } else if (somaPoints.size() < 3) {
-        throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
     }
 
-    details::checkSomaHasSameNumberPointsDiameters(*soma);
-
-    if (details::hasPerimeterData(morphology)) {
-        throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
-    }
-
-    if (!morphology.mitochondria().rootSections().empty()) {
-        printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-                   readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
-    }
+    details::validateContourSoma(morph);
+    details::checkSomaHasSameNumberPointsDiameters(*morph.soma());
+    details::validateHasNoMitochondria(morph);
+    details::validateHasNoPerimeterData(morph);
 
     std::ofstream myfile(filename);
 
+    const std::shared_ptr<Soma>& soma = morph.soma();
     if (!soma->points().empty()) {
         myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
         write_asc_points(myfile, soma->points(), soma->diameters(), 2);
         myfile << ")\n\n";
     }
 
-    for (const std::shared_ptr<Section>& section : morphology.rootSections()) {
+    for (const std::shared_ptr<Section>& section : morph.rootSections()) {
         const auto type = section->type();
         if (type == SECTION_AXON) {
             myfile << "( (Color Cyan)\n  (Axon)\n";

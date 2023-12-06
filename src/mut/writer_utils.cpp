@@ -22,14 +22,51 @@ void checkSomaHasSameNumberPointsDiameters(const Soma& soma) {
     }
 }
 
-bool hasPerimeterData(const morphio::mut::Morphology& morpho) {
-    return !morpho.rootSections().empty() && !morpho.rootSections().front()->perimeters().empty();
+bool hasPerimeterData(const morphio::mut::Morphology& morph) {
+    return !morph.rootSections().empty() && !morph.rootSections().front()->perimeters().empty();
 }
 
 std::string version_string() {
     return std::string("Created by MorphIO v") + getVersionString();
 }
 
+bool emptyMorphology(const morphio::mut::Morphology& morph) {
+    if (morph.soma()->points().empty() && morph.rootSections().empty()) {
+        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
+                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+        return true;
+    }
+    return false;
+}
+
+void validateContourSoma(const morphio::mut::Morphology& morph) {
+    const std::shared_ptr<Soma>& soma = morph.soma();
+    const std::vector<Point>& somaPoints = soma->points();
+
+    if (somaPoints.empty()) {
+        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    } else if (soma->type() == SOMA_UNDEFINED) {
+        printError(Warning::WRITE_UNDEFINED_SOMA,
+                   readers::ErrorMessages().WARNING_UNDEFINED_SOMA());
+    } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
+        printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
+    } else if (somaPoints.size() < 3) {
+        throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
+    }
+}
+
+void validateHasNoPerimeterData(const morphio::mut::Morphology& morph) {
+    if (details::hasPerimeterData(morph)) {
+        throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
+    }
+}
+
+void validateHasNoMitochondria(const morphio::mut::Morphology& morph) {
+    if (!morph.mitochondria().rootSections().empty()) {
+        printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
+                   readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+    }
+}
 
 }  // namespace details
 }  // namespace writer

@@ -146,27 +146,13 @@ void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 }
 }  // anonymous namespace
 
-void h5(const Morphology& morpho, const std::string& filename) {
-    const auto& soma = morpho.soma();
-    const auto& somaPoints = soma->points();
-
-    if (somaPoints.empty()) {
-        if (morpho.rootSections().empty()) {
-            printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                       readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
-            return;
-        }
-        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
-    } else if (soma->type() == SOMA_UNDEFINED) {
-        printError(Warning::WRITE_UNDEFINED_SOMA,
-                   readers::ErrorMessages().WARNING_UNDEFINED_SOMA());
-    } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
-        printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
-    } else if (somaPoints.size() < 3) {
-        throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
+void h5(const Morphology& morph, const std::string& filename) {
+    if (details::emptyMorphology(morph)) {
+        return;
     }
 
-    details::checkSomaHasSameNumberPointsDiameters(*soma);
+    details::validateContourSoma(morph);
+    details::checkSomaHasSameNumberPointsDiameters(*morph.soma());
 
     HighFive::File h5_file(filename,
                            HighFive::File::ReadWrite | HighFive::File::Create |
@@ -178,7 +164,8 @@ void h5(const Morphology& morpho, const std::string& filename) {
     std::vector<std::vector<int32_t>> raw_structure;
     std::vector<morphio::floatType> raw_perimeters;
 
-    const auto& somaDiameters = soma->diameters();
+    const std::vector<Point>& somaPoints = morph.soma()->points();
+    const auto& somaDiameters = morph.soma()->diameters();
 
     for (unsigned int i = 0; i < somaPoints.size(); ++i) {
         raw_points.push_back(
@@ -187,16 +174,16 @@ void h5(const Morphology& morpho, const std::string& filename) {
         // If the morphology has some perimeter data, we need to fill some
         // perimeter dummy value in the soma range of the data structure to keep
         // the length matching
-        if (details::hasPerimeterData(morpho)) {
+        if (details::hasPerimeterData(morph)) {
             raw_perimeters.push_back(0);
         }
     }
 
     raw_structure.push_back({0, SECTION_SOMA, -1});
-    size_t offset = morpho.soma()->points().size();
+    size_t offset = morph.soma()->points().size();
 
     int sectionIdOnDisk = 1;
-    for (auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
+    for (auto it = morph.depth_begin(); it != morph.depth_end(); ++it) {
         const std::shared_ptr<Section>& section = *it;
 
         const auto& points = section->points();
@@ -234,17 +221,17 @@ void h5(const Morphology& morpho, const std::string& filename) {
     write_attribute(g_metadata, "version", std::array<uint32_t, 2>{1, 3});
     write_attribute(g_metadata,
                     "cell_family",
-                    std::vector<uint32_t>{static_cast<uint32_t>(morpho.cellFamily())});
+                    std::vector<uint32_t>{static_cast<uint32_t>(morph.cellFamily())});
     write_attribute(h5_file, "comment", std::vector<std::string>{details::version_string()});
 
-    if (details::hasPerimeterData(morpho)) {
+    if (details::hasPerimeterData(morph)) {
         write_dataset(h5_file, "/perimeters", raw_perimeters);
     }
 
-    mitochondriaH5(h5_file, morpho.mitochondria());
-    endoplasmicReticulumH5(h5_file, morpho.endoplasmicReticulum());
-    if (morpho.cellFamily() == SPINE) {
-        dendriticSpinePostSynapticDensityH5(h5_file, morpho._dendriticSpineLevel);
+    mitochondriaH5(h5_file, morph.mitochondria());
+    endoplasmicReticulumH5(h5_file, morph.endoplasmicReticulum());
+    if (morph.cellFamily() == SPINE) {
+        dendriticSpinePostSynapticDensityH5(h5_file, morph._dendriticSpineLevel);
     }
 }
 
