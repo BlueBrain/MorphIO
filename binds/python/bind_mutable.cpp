@@ -15,7 +15,6 @@
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 
-#include <array>
 #include <memory>  // std::make_unique
 
 #include "bind_enums.h"
@@ -312,7 +311,7 @@ void bind_mut_section(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(section->points().size()),
                                  section->points().data());
             },
-            [](morphio::mut::Section* section, py::array_t<morphio::floatType> _points) {
+            [](morphio::mut::Section* section, const py::array_t<morphio::floatType>& _points) {
                 section->points() = array_to_points(_points);
             },
             D(points))
@@ -409,7 +408,7 @@ void bind_mut_soma(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(soma->points().size()),
                                  soma->points().data());
             },
-            [](morphio::mut::Soma* soma, py::array_t<morphio::floatType> _points) {
+            [](morphio::mut::Soma* soma, const py::array_t<morphio::floatType>& _points) {
                 soma->points() = array_to_points(_points);
             },
             D(points))
@@ -419,7 +418,7 @@ void bind_mut_soma(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(soma->diameters().size()),
                                  soma->diameters().data());
             },
-            [](morphio::mut::Soma* soma, py::array_t<morphio::floatType> _diameters) {
+            [](morphio::mut::Soma* soma, const py::array_t<morphio::floatType>& _diameters) {
                 soma->diameters() = _diameters.cast<std::vector<morphio::floatType>>();
             },
             D(diameters))

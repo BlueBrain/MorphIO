@@ -4,6 +4,7 @@
  */
 #include <catch2/catch.hpp>
 #include <gsl/gsl-lite.hpp>
+#include <morphio/version.h>
 
 #include <filesystem>
 #include <fstream>

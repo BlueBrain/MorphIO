@@ -1,3 +1,11 @@
+v3.3.7
+======
+* Change license from LGPL-3.0 to Apache-2.0 #467
+* Switch to HDF5 1.14 for all wheels
+* Add wheel building for python 3.12
+* Add wheel building for ARM64 Apple Silicon
+* Better write for soma types #411
+
 v3.3.6
 ======
 Improvements:

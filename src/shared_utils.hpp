@@ -2,6 +2,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+#include <iosfwd>  // std::ostream
 #include <morphio/errorMessages.h>
 #include <morphio/types.h>
 
@@ -68,4 +69,16 @@ bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLe
 }
 }  // namespace property
 
+namespace details {
+enum ThreePointSomaStatus {
+    Conforms,
+    ZeroColumnsAreTheSame,
+    OneColumnIsTheSame,
+    ThreeColumnsAreTheSame,
+    NotRadiusOffset,
+};
+
+ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>&, floatType);
+std::ostream& operator<<(std::ostream& os, ThreePointSomaStatus s);
+}  // namespace details
 }  // namespace morphio
