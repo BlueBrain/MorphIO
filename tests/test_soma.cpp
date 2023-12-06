@@ -2,12 +2,14 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+#include <morphio/enums.h>
 #include <morphio/morphology.h>
 #include <morphio/properties.h>
 #include <morphio/soma.h>
 
 #include <catch2/catch.hpp>
 #include <sstream>
+
 
 TEST_CASE("morphio::soma") {
     using namespace morphio::Property;
@@ -32,5 +34,29 @@ TEST_CASE("morphio::soma") {
 
         const auto soma_simple_contour = morphio::Morphology("data/simple.asc");
         CHECK_THROWS(soma_simple_contour.soma().volume());
+    }
+
+    SECTION("print SomaTypes") {
+        using morphio::SomaType;
+        std::stringstream ss;
+
+        ss << SomaType::SOMA_UNDEFINED;
+        CHECK(ss.str() == "SOMA_UNDEFINED");
+
+        ss.str("");
+        ss << SomaType::SOMA_SINGLE_POINT;
+        CHECK(ss.str() == "SOMA_SINGLE_POINT");
+
+        ss.str("");
+        ss << SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
+        CHECK(ss.str() == "SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS");
+
+        ss.str("");
+        ss << SomaType::SOMA_CYLINDERS;
+        CHECK(ss.str() == "SOMA_CYLINDERS");
+
+        ss.str("");
+        ss << SomaType::SOMA_SIMPLE_CONTOUR;
+        CHECK(ss.str() == "SOMA_SIMPLE_CONTOUR");
     }
 }

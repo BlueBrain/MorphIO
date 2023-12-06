@@ -18,7 +18,4 @@
 #include <morphio/soma.h>
 #include <morphio/types.h>
 
-#include "bindings_utils.h"
-
-
 void bind_mutable(pybind11::module& m);

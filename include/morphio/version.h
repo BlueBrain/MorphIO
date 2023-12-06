@@ -10,9 +10,6 @@ namespace morphio {
 using MorphologyVersion = std::tuple<std::string, uint32_t, uint32_t>;
 
 std::string getVersionString();
-int getMajor();
-int getMinor();
-int getPatch();
 
 
 }  // namespace morphio

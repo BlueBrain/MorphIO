@@ -10,6 +10,7 @@
 
 
 #include "NeurolucidaLexer.inc"
+#include "morphio/enums.h"
 
 namespace morphio {
 namespace readers {
@@ -144,8 +145,9 @@ class NeurolucidaParser
             nb_.addMarker(marker);
             return_id = -1;
         } else if (header.token == Token::CELLBODY) {
-            if (!nb_.soma()->points().empty())
+            if (!nb_.soma()->points().empty()) {
                 throw SomaError(err_.ERROR_SOMA_ALREADY_DEFINED(lex_.line_num()));
+            }
             nb_.soma()->properties() = properties;
             return_id = -1;
         } else {
@@ -159,11 +161,12 @@ class NeurolucidaParser
                 return_id = header.parent_id;
             } else {
                 std::shared_ptr<morphio::mut::Section> section;
-                if (header.parent_id > -1)
+                if (header.parent_id > -1) {
                     section = nb_.section(static_cast<unsigned int>(header.parent_id))
                                   ->appendSection(properties, section_type);
-                else
+                } else {
                     section = nb_.appendRootSection(properties, section_type);
+                }
                 return_id = static_cast<int>(section->id());
             }
         }
@@ -382,6 +385,20 @@ Property::Properties load(const std::string& path,
     nb_.applyModifiers(options);
 
     Property::Properties properties = nb_.buildReadOnly();
+
+    switch (properties._somaLevel._points.size()) {
+    case 0:
+        properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
+        break;
+    case 1:
+        throw RawDataError("Morphology contour with only a single point is not valid: " + path);
+    case 2:
+        properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
+        break;
+    default:
+        properties._cellLevel._somaType = enums::SOMA_SIMPLE_CONTOUR;
+        break;
+    }
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"asc", 1, 0};
     return properties;

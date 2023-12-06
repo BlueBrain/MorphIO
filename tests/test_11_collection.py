@@ -9,7 +9,9 @@ import morphio
 
 
 DATA_DIR = Path(__file__).parent / "data"
-COLLECTION_PATHS = [DATA_DIR / "h5/v1/merged.h5", DATA_DIR / "h5/v1"]
+COLLECTION_PATHS = [DATA_DIR / "h5/v1/merged.h5",
+                    DATA_DIR / "h5/v1"
+                    ]
 
 
 def available_morphologies():
@@ -26,6 +28,7 @@ def check_load_from_collection(collection):
     morphology_names = available_morphologies()
 
     for morph_name in morphology_names:
+        print(morph_name)
         morph = collection.load(morph_name)
         assert isinstance(morph, morphio.Morphology)
 

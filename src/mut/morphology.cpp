@@ -47,11 +47,9 @@ void appendProperties(morphio::Property::PointLevel& to,
 }
 }  // namespace
 
-
 namespace morphio {
 namespace mut {
 
-using morphio::readers::ErrorMessages;
 Morphology::Morphology(const std::string& uri, unsigned int options)
     : Morphology(morphio::Morphology(uri, options)) {}
 
@@ -264,7 +262,7 @@ void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInf
 
         unsigned int parentId = section_->parent()->id();
 
-        if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
+        if (!morphio::readers::ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
             !_checkDuplicatePoint(section_->parent(), section_)) {
             printError(Warning::WRONG_DUPLICATE,
                        err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));

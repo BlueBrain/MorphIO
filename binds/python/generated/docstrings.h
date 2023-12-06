@@ -979,6 +979,8 @@ static const char *mkd_doc_morphio_enums_Warning_WRITE_EMPTY_MORPHOLOGY = R"doc(
 
 static const char *mkd_doc_morphio_enums_Warning_WRITE_NO_SOMA = R"doc(Writing without a soma)doc";
 
+static const char *mkd_doc_morphio_enums_Warning_WRITE_UNDEFINED_SOMA = R"doc(Soma is UNDEFINED)doc";
+
 static const char *mkd_doc_morphio_enums_Warning_WRONG_DUPLICATE = R"doc(A wrong duplicate point in a section)doc";
 
 static const char *mkd_doc_morphio_enums_Warning_WRONG_ROOT_POINT = R"doc(A wrong root point of a neurite in the case of 3 points soma)doc";
@@ -988,12 +990,6 @@ static const char *mkd_doc_morphio_enums_Warning_ZERO_DIAMETER = R"doc(Zero sect
 static const char *mkd_doc_morphio_enums_operator_lshift = R"doc()doc";
 
 static const char *mkd_doc_morphio_get = R"doc()doc";
-
-static const char *mkd_doc_morphio_getMajor = R"doc()doc";
-
-static const char *mkd_doc_morphio_getMinor = R"doc()doc";
-
-static const char *mkd_doc_morphio_getPatch = R"doc()doc";
 
 static const char *mkd_doc_morphio_getVersionString = R"doc()doc";
 
@@ -1590,11 +1586,9 @@ static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_NOT_IMPLEMENTED_U
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_ONLY_CHILD_SWC_WRITER = R"doc(Single section child SWC error message)doc";
 
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_OPENING_FILE = R"doc(Opening file error message)doc";
-
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_PARSING_POINT = R"doc(Parsing ASC points error message)doc";
 
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_PERIMETER_DATA_NOT_WRITABLE = R"doc(Cant write perimeter data to SWC,ASC error message)doc";
+static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_PERIMETER_DATA_NOT_WRITABLE = R"doc(Can't write perimeter data to SWC, ASC error message)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_REPEATED_ID = R"doc(Repeated section id error message)doc";
 
@@ -1652,6 +1646,8 @@ static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_SOMA_NON_CONTOU
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_SOMA_NON_CYLINDER_OR_POINT = R"doc()doc";
 
+static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_UNDEFINED_SOMA = R"doc(Soma is undefined)doc";
+
 static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_WRITE_EMPTY_MORPHOLOGY = R"doc(Writing empty morphology warning message)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_WRITE_NO_SOMA = R"doc(Writing without soma warning message)doc";
@@ -1675,6 +1671,8 @@ R"doc(A sample of section for error reporting, includes its position (line)
 within the file.)doc";
 
 static const char *mkd_doc_morphio_readers_Sample_Sample = R"doc()doc";
+
+static const char *mkd_doc_morphio_readers_Sample_UNKNOWN_ID = R"doc()doc";
 
 static const char *mkd_doc_morphio_readers_Sample_diameter = R"doc()doc";
 

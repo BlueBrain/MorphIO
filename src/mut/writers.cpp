@@ -17,6 +17,8 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5Object.hpp>
 
+#include "../shared_utils.hpp"
+
 namespace {
 
 /**
@@ -76,7 +78,6 @@ void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma& soma) {
     }
 }
 
-
 void raiseIfUnifurcations(const morphio::mut::Morphology& morph) {
     for (auto it = morph.depth_begin(); it != morph.depth_end(); ++it) {
         std::shared_ptr<morphio::mut::Section> section_ = *it;
@@ -104,10 +105,16 @@ namespace writer {
 void swc(const Morphology& morphology, const std::string& filename) {
     const auto& soma = morphology.soma();
     const auto& soma_points = soma->points();
-    if (soma_points.empty() && morphology.rootSections().empty()) {
-        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
-        return;
+    if (soma_points.empty()) {
+        if (morphology.rootSections().empty()) {
+            printError(Warning::WRITE_EMPTY_MORPHOLOGY,
+                       readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+            return;
+        }
+        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    } else if (soma->type() == SOMA_UNDEFINED) {
+        printError(Warning::WRITE_UNDEFINED_SOMA,
+                   readers::ErrorMessages().WARNING_UNDEFINED_SOMA());
     } else if (!(soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
                  soma->type() == SomaType::SOMA_CYLINDERS ||
                  soma->type() == SomaType::SOMA_SINGLE_POINT)) {
@@ -128,35 +135,54 @@ void swc(const Morphology& morphology, const std::string& filename) {
 
     raiseIfUnifurcations(morphology);
 
-    std::ofstream myfile(filename);
-    using std::setw;
-
-    myfile << "# " << version_string() << std::endl;
-    myfile << "# index" << setw(9) << "type" << setw(10) << 'X' << setw(13) << 'Y' << setw(13)
-           << 'Z' << setw(13) << "radius" << setw(13) << "parent" << std::endl;
-
-    int segmentIdOnDisk = 1;
-    std::map<uint32_t, int32_t> newIds;
-
     if (!morphology.mitochondria().rootSections().empty()) {
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                    readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
     }
 
+    std::ofstream myfile(filename);
+    using std::setw;
+
+    myfile << "# " << version_string() << '\n';
+    myfile << "# index" << setw(9) << "type" << setw(10) << 'X' << setw(13) << 'Y' << setw(13)
+           << 'Z' << setw(13) << "radius" << setw(13) << "parent" << '\n';
+
+    int segmentIdOnDisk = 1;
+    std::map<uint32_t, int32_t> newIds;
+
     const auto& soma_diameters = soma->diameters();
 
-    if (soma_points.empty()) {
-        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
-    }
+    if (soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS) {
+        const std::array<Point, 3> points = {
+            soma_points[0],
+            soma_points[1],
+            soma_points[2],
+        };
 
-    for (unsigned int i = 0; i < soma_points.size(); ++i) {
-        writeLine(myfile,
-                  segmentIdOnDisk,
-                  i == 0 ? -1 : segmentIdOnDisk - 1,
-                  SECTION_SOMA,
-                  soma_points[i],
-                  soma_diameters[i]);
-        ++segmentIdOnDisk;
+        const details::ThreePointSomaStatus status =
+            details::checkNeuroMorphoSoma(points, soma_diameters[0] / 2);
+
+        if (status != details::ThreePointSomaStatus::Conforms) {
+            std::stringstream stream;
+            stream << status;
+            printError(Warning::SOMA_NON_CONFORM,
+                       readers::ErrorMessages().WARNING_NEUROMORPHO_SOMA_NON_CONFORM(stream.str()));
+        }
+
+        writeLine(myfile, 1, -1, SECTION_SOMA, soma_points[0], soma_diameters[0]);
+        writeLine(myfile, 2, 1, SECTION_SOMA, soma_points[1], soma_diameters[1]);
+        writeLine(myfile, 3, 1, SECTION_SOMA, soma_points[2], soma_diameters[2]);
+        segmentIdOnDisk += 3;
+    } else {
+        for (unsigned int i = 0; i < soma_points.size(); ++i) {
+            writeLine(myfile,
+                      segmentIdOnDisk,
+                      i == 0 ? -1 : segmentIdOnDisk - 1,
+                      SECTION_SOMA,
+                      soma_points[i],
+                      soma_diameters[i]);
+            ++segmentIdOnDisk;
+        }
     }
 
     for (auto it = morphology.depth_begin(); it != morphology.depth_end(); ++it) {
@@ -199,15 +225,8 @@ static void _write_asc_points(std::ofstream& myfile,
 }
 
 static void _write_asc_section(std::ofstream& myfile,
-                               const Morphology& morpho,
                                const std::shared_ptr<Section>& section,
-                               const std::map<morphio::SectionType, std::string>& header,
                                size_t indentLevel) {
-    // allowed types are only the ones available in the header
-    if (header.count(section->type()) == 0) {
-        throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
-    }
-
     std::string indent(indentLevel, ' ');
     _write_asc_points(myfile, section->points(), section->diameters(), indentLevel);
 
@@ -216,7 +235,7 @@ static void _write_asc_section(std::ofstream& myfile,
         size_t nChildren = children.size();
         for (unsigned int i = 0; i < nChildren; ++i) {
             myfile << indent << (i == 0 ? "(\n" : "|\n");
-            _write_asc_section(myfile, morpho, children[i], header, indentLevel + 2);
+            _write_asc_section(myfile, children[i], indentLevel + 2);
         }
         myfile << indent << ")\n";
     }
@@ -230,6 +249,9 @@ void asc(const Morphology& morphology, const std::string& filename) {
         printError(Warning::WRITE_EMPTY_MORPHOLOGY,
                    readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
         return;
+    } else if (soma->type() == SOMA_UNDEFINED) {
+        printError(Warning::WRITE_UNDEFINED_SOMA,
+                   readers::ErrorMessages().WARNING_UNDEFINED_SOMA());
     } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
         printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
     } else if (somaPoints.empty()) {
@@ -244,17 +266,12 @@ void asc(const Morphology& morphology, const std::string& filename) {
         throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
 
-    std::ofstream myfile(filename);
-
     if (!morphology.mitochondria().rootSections().empty()) {
         printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                    readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
     }
 
-    std::map<morphio::SectionType, std::string> header;
-    header[SECTION_AXON] = "( (Color Cyan)\n  (Axon)\n";
-    header[SECTION_DENDRITE] = "( (Color Red)\n  (Dendrite)\n";
-    header[SECTION_APICAL_DENDRITE] = "( (Color Red)\n  (Apical)\n";
+    std::ofstream myfile(filename);
 
     if (!soma->points().empty()) {
         myfile << "(\"CellBody\"\n  (Color Red)\n  (CellBody)\n";
@@ -263,13 +280,17 @@ void asc(const Morphology& morphology, const std::string& filename) {
     }
 
     for (const std::shared_ptr<Section>& section : morphology.rootSections()) {
-        // allowed types are only the ones available in the header
-        if (header.count(section->type()) == 0) {
-            throw WriterError(
-                readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(section->type()));
+        const auto type = section->type();
+        if (type == SECTION_AXON) {
+            myfile << "( (Color Cyan)\n  (Axon)\n";
+        } else if (type == SECTION_DENDRITE) {
+            myfile << "( (Color Red)\n  (Dendrite)\n";
+        } else if (type == SECTION_APICAL_DENDRITE) {
+            myfile << "( (Color Red)\n  (Apical)\n";
+        } else {
+            throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(type));
         }
-        myfile << header.at(section->type());
-        _write_asc_section(myfile, morphology, section, header, 2);
+        _write_asc_section(myfile, section, 2);
         myfile << ")\n\n";
     }
 
@@ -395,6 +416,9 @@ void h5(const Morphology& morpho, const std::string& filename) {
             return;
         }
         printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+    } else if (soma->type() == SOMA_UNDEFINED) {
+        printError(Warning::WRITE_UNDEFINED_SOMA,
+                   readers::ErrorMessages().WARNING_UNDEFINED_SOMA());
     } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
         printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
     } else if (somaPoints.size() < 3) {
@@ -416,8 +440,6 @@ void h5(const Morphology& morpho, const std::string& filename) {
 
     const auto& somaDiameters = soma->diameters();
 
-    bool hasPerimeterData_ = hasPerimeterData(morpho);
-
     for (unsigned int i = 0; i < somaPoints.size(); ++i) {
         raw_points.push_back(
             {somaPoints[i][0], somaPoints[i][1], somaPoints[i][2], somaDiameters[i]});
@@ -425,7 +447,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
         // If the morphology has some perimeter data, we need to fill some
         // perimeter dummy value in the soma range of the data structure to keep
         // the length matching
-        if (hasPerimeterData_) {
+        if (hasPerimeterData(morpho)) {
             raw_perimeters.push_back(0);
         }
     }
@@ -475,7 +497,7 @@ void h5(const Morphology& morpho, const std::string& filename) {
                     std::vector<uint32_t>{static_cast<uint32_t>(morpho.cellFamily())});
     write_attribute(h5_file, "comment", std::vector<std::string>{version_string()});
 
-    if (hasPerimeterData_) {
+    if (hasPerimeterData(morpho)) {
         write_dataset(h5_file, "/perimeters", raw_perimeters);
     }
 

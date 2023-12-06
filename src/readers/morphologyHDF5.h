@@ -20,13 +20,13 @@ Property::Properties load(const HighFive::Group& group);
 class MorphologyHDF5
 {
   public:
-    MorphologyHDF5(const HighFive::Group& group);
+    explicit MorphologyHDF5(const HighFive::Group& group, const std::string& uri = "HDF5 GROUP");
     virtual ~MorphologyHDF5() = default;
     Property::Properties load();
 
   private:
-    void _checkVersion(const std::string& source);
-    void _readMetadata(const std::string& source);
+    void _checkVersion();
+    void _readMetadata();
     void _readPoints(int);
     int _readSections();
     void _readPerimeters(int);

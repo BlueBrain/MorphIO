@@ -20,7 +20,7 @@ def test_v1():
     assert len(n.root_sections) == 2
     assert n.root_sections[0].type == 3
     assert n.root_sections[1].type == 2
-    assert n.version == ("h5", 1, 1)
+    assert n.version == ("h5", 1, 3)
 
     n = Morphology(H5V1_PATH / 'Neuron.h5')
     assert n.version == ("h5", 1, 0)
