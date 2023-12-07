@@ -18,7 +18,10 @@ set(MORPHIO_SOURCES
     mut/morphology.cpp
     mut/section.cpp
     mut/soma.cpp
-    mut/writers.cpp
+    mut/writer_asc.cpp
+    mut/writer_hdf5.cpp
+    mut/writer_swc.cpp
+    mut/writer_utils.cpp
     point_utils.cpp
     properties.cpp
     readers/morphologyASC.cpp
