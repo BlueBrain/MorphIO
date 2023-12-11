@@ -2,6 +2,8 @@ name: Publish sdist and wheels for macos, manylinux, and windows, publish to pyp
 on: [pull_request, push]
 
 env:
+  apt_options: -o Acquire::Retries=3
+
   CIBW_BUILD_VERBOSITY: 3
   CIBW_BUILD: 'cp*'
   CIBW_SKIP: 'cp35-* cp36-* cp37-* *-manylinux_i686 *-musllinux_* *-win32'
@@ -157,7 +159,8 @@ jobs:
 
       - name: Test tarball
         run: |
-          sudo apt install -y libhdf5-dev
+          sudo apt-get ${{env.apt_options}} update -y
+          sudo apt-get ${{env.apt_options}} install -y libhdf5-dev
           pip install -r tests/requirement_tests.txt
           pip install dist/*
           pytest -s -v tests
