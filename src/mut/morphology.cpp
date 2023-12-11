@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <algorithm>  // std::find_if
-#include <cassert>
 #include <cctype>    // std::tolower
 #include <iterator>  // std::back_inserter
-#include <sstream>
 #include <string>
 
 #include <morphio/endoplasmic_reticulum.h>
@@ -46,7 +44,6 @@ void appendProperties(morphio::Property::PointLevel& to,
     }
 }
 }  // namespace
-
 
 namespace morphio {
 namespace mut {
@@ -259,7 +256,9 @@ void Morphology::removeUnifurcations() {
 
         unsigned int parentId = section_->parent()->id();
 
-        if (!_checkDuplicatePoint(section_->parent(), section_)) {
+        // XXX: should we check if ignored, or delegate that to the error handler?
+        if (!morphio::readers::ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
+            !_checkDuplicatePoint(section_->parent(), section_)) {
             printError(Warning::WRONG_DUPLICATE,
                        err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
         }

@@ -124,9 +124,6 @@ class ErrorMessages
     //              ERRORS
     ////////////////////////////////////////////////////////////////////////////////
 
-    /** Opening file error message */
-    std::string ERROR_OPENING_FILE() const;
-
     /** Non parsable line error message */
     std::string ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const;
 
@@ -213,7 +210,7 @@ class ErrorMessages
                                              const std::string& vec2,
                                              size_t length2) const;
 
-    /** Cant write perimeter data to SWC,ASC error message */
+    /** Can't write perimeter data to SWC, ASC error message */
     std::string ERROR_PERIMETER_DATA_NOT_WRITABLE();
     /** Single section child SWC error message */
     std::string ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const;
@@ -253,16 +250,14 @@ class ErrorMessages
     std::string WARNING_ONLY_CHILD(unsigned int parentId, unsigned int childId) const;
 
     /** Soma does not conform NeuroMorpho warning message */
-    std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Point& rootPoint,
-                                                     floatType rootDiameter,
-                                                     const Point& child1Point,
-                                                     floatType child1Diameter,
-                                                     const Point& child2Point,
-                                                     floatType child2Diameter);
+    std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const std::string&) const;
 
     /** Wrong root point warning message */
     std::string WARNING_WRONG_ROOT_POINT(
         const std::vector<unsigned int>& childrenLineNumbers) const;
+
+    /** Soma is undefined*/
+    std::string WARNING_UNDEFINED_SOMA() const;
 
     /**  Soma must be a contour for ASC and H5 */
     std::string WARNING_SOMA_NON_CONTOUR() const;

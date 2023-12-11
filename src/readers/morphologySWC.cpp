@@ -20,6 +20,8 @@
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
 
+#include "../shared_utils.hpp"
+
 namespace {
 // It's not clear if -1 is the only way of identifying the root section.
 const int SWC_UNDEFINED_PARENT = -1;
@@ -280,43 +282,6 @@ class SWCBuilder
         warnIfZeroDiameter(sample);
     }
 
-    void _checkNeuroMorphoSoma(const SWCSample& root, const std::vector<SWCSample>& _children) {
-        floatType x = root.point[0];
-        floatType y = root.point[1];
-        floatType z = root.point[2];
-        floatType d = root.diameter;
-        floatType r = root.diameter / 2;
-        const auto& child1 = _children[0];
-        const auto& child2 = _children[1];
-
-        // whether the soma should be checked for the special case of 3 point soma
-        // for details see https://github.com/BlueBrain/MorphIO/issues/273
-        bool isSuited = std::fabs(child1.diameter - d) < morphio::epsilon &&
-                        std::fabs(child2.diameter - d) < morphio::epsilon &&
-                        std::fabs(child1.point[0] - x) < morphio::epsilon &&
-                        std::fabs(child2.point[0] - x) < morphio::epsilon &&
-                        std::fabs(child1.point[2] - z) < morphio::epsilon &&
-                        std::fabs(child2.point[2] - z) < morphio::epsilon;
-        if (!isSuited) {
-            return;
-        }
-        // If the 2nd and the 3rd point have the same x,z,d values then the only valid soma is:
-        // 1 1 x   y   z r -1
-        // 2 1 x (y-r) z r  1
-        // 3 1 x (y+r) z r  1
-        if (child1.point[0] != x || child2.point[0] != x || child1.point[1] != y - r ||
-            child2.point[1] != y + r || child1.point[2] != z || child2.point[2] != z ||
-            child1.diameter != d || child2.diameter != d) {
-            printError(Warning::SOMA_NON_CONFORM,
-                       err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(root.point,
-                                                                root.diameter,
-                                                                child1.point,
-                                                                child1.diameter,
-                                                                child2.point,
-                                                                child2.diameter));
-        }
-    }
-
     SomaType somaType() {
         switch (morph.soma()->points().size()) {
         case 0: {
@@ -342,14 +307,21 @@ class SWCBuilder
             }
 
             if (children_soma_points.size() == 2) {
-                //  NeuroMorpho is the main provider of morphologies, but they
-                //  with SWC as their default file format: they convert all
-                //  uploads to SWC.  In the process of conversion, they turn all
-                //  somas into their custom 'Three-point soma representation':
-                //   http://neuromorpho.org/SomaFormat.html
-
                 if (!ErrorMessages::isIgnored(Warning::SOMA_NON_CONFORM)) {
-                    _checkNeuroMorphoSoma(this->samples[somaRootId], children_soma_points);
+                    const std::array<Point, 3> points = {
+                        samples[somaRootId].point,
+                        children_soma_points[0].point,
+                        children_soma_points[1].point,
+                    };
+                    details::ThreePointSomaStatus status =
+                        details::checkNeuroMorphoSoma(points, samples[somaRootId].diameter / 2);
+
+                    if (status != details::ThreePointSomaStatus::Conforms) {
+                        std::stringstream stream;
+                        stream << status;
+                        printError(Warning::SOMA_NON_CONFORM,
+                                   err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(stream.str()));
+                    }
                 }
 
                 return SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
@@ -414,11 +386,10 @@ class SWCBuilder
         return properties;
     }
 
-    /**
-       - Append last point of previous section if current section is not a root
-    section
-       - Update the parent ID of the new section
-    **/
+    /*
+       append last point of previous section if current section is not a root section
+       and update the parent ID of the new section
+    */
     void _processSectionStart(const SWCSample& sample) {
         Property::PointLevel properties;
 

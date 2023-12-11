@@ -4,8 +4,6 @@
  */
 #pragma once
 
-#include <functional>
-
 #include <morphio/properties.h>
 #include <morphio/section.h>
 #include <morphio/types.h>

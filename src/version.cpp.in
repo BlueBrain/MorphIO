@@ -7,19 +7,4 @@ namespace morphio
         static const std::string version("@MORPHIO_VERSION_STRING@");
         return version;
     }
-
-    int getMajor()
-    {
-        return @MorphIO_VERSION_MAJOR@;
-    }
-
-    int getMinor()
-    {
-        return @MorphIO_VERSION_MINOR@;
-    }
-
-    int getPatch()
-    {
-        return @MorphIO_VERSION_PATCH@;
-    }
 } // namespace morphio

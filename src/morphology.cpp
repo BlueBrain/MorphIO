@@ -56,20 +56,6 @@ void buildChildren(const std::shared_ptr<morphio::Property::Properties>& propert
     }
 }
 
-morphio::SomaType getSomaType(long unsigned int num_soma_points) {
-    switch (num_soma_points) {
-    case 0:
-        return morphio::SOMA_UNDEFINED;
-    case 1:
-        return morphio::SOMA_SINGLE_POINT;
-    case 2:
-        return morphio::SOMA_UNDEFINED;
-    default:
-        break;
-    }
-    return morphio::SOMA_SIMPLE_CONTOUR;
-}
-
 std::string tolower(const std::string& str) {
     std::string ret;
     std::transform(str.begin(), str.end(), std::back_inserter(ret), [](unsigned char c) {
@@ -123,10 +109,6 @@ namespace morphio {
 Morphology::Morphology(const Property::Properties& properties, unsigned int options)
     : properties_(std::make_shared<Property::Properties>(properties)) {
     buildChildren(properties_);
-
-    if (properties_->_cellLevel.fileFormat() != "swc") {
-        properties_->_cellLevel._somaType = getSomaType(soma().points().size());
-    }
 
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders

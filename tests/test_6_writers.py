@@ -2,20 +2,19 @@
 # SPDX-License-Identifier: Apache-2.0
 import h5py
 import numpy as np
-import pytest
-from numpy.testing import assert_array_equal
-from utils import captured_output
-
+import morphio
 from morphio import MitochondriaPointLevel
 from morphio import Morphology as ImmutMorphology
-from morphio import (PointLevel, SectionBuilderError, SectionType, WriterError,
-                     ostream_redirect, SomaType)
+from morphio import PointLevel, SectionBuilderError, SectionType, WriterError, ostream_redirect, SomaType
 from morphio.mut import Morphology
+import pytest
+from numpy.testing import assert_array_equal, assert_almost_equal
+from utils import captured_output
 
 
 def test_write_empty_file(tmp_path):
     '''Check that empty morphology are not written to disk'''
-    with captured_output() as (_, _):
+    with captured_output():
         with ostream_redirect(stdout=True, stderr=True):
             for ext in ['asc', 'swc', 'h5']:
                 outname = tmp_path / f'empty.{ext}'
@@ -23,10 +22,25 @@ def test_write_empty_file(tmp_path):
                 assert not outname.exists()
 
 
+def test_write_undefined_soma(tmp_path):
+    '''Check that we can write undefined soma, as long as it has at least two points'''
+    morph = Morphology()
+    morph.soma.points = [[-1, 0, 0], [0, 0, 0], [1, 0, 0]]
+    morph.soma.diameters = [2, 3, 3]
+
+    # by default, soma start off as SomaType.SOMA_UNDEFINED
+    for ext in ('asc', 'h5', 'swc',):
+        with captured_output() as (stdout, stderr):
+            with ostream_redirect(stdout=True, stderr=True):
+                morph.write(tmp_path / f'undefined_soma.{ext}')
+                assert stderr.getvalue().strip() == 'Warning: writing soma set to SOMA_UNDEFINED'
+
+
 def test_write_soma_basic(tmp_path):
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    morpho.soma.points = [[-1, 0, 0], [0, 0, 0], [1, 0, 0]]
     morpho.soma.diameters = [2, 3, 3]
+    morpho.soma.type = SomaType.SOMA_CYLINDERS
 
     morpho.write(tmp_path / "test_write.swc")
     morpho.write(tmp_path / "test_write_pathlib.swc")
@@ -35,8 +49,8 @@ def test_write_soma_basic(tmp_path):
 
 def test_write_basic(tmp_path):
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0]]
-    morpho.soma.diameters = [2]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
 
     dendrite = morpho.append_root_section(PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
                                           SectionType.basal_dendrite)
@@ -55,24 +69,32 @@ def test_write_basic(tmp_path):
                                      [2, 4]))
 
     axon = axon.append_section(PointLevel([[0, -4, 0],
-                                             [-5, -4, 0]],
-                                            [2, 4]))
-
-    morpho.write(tmp_path / "test_write.asc")
-    morpho.write(tmp_path / "test_write.swc")
-    h5_out = tmp_path / "test_write.h5"
-    morpho.write(h5_out)
+                                           [-5, -4, 0]],
+                                          [2, 4]))
 
     expected = [[0., 0., 0.], [0., 5., 0.], [0., 5., 0.], [-5., 5., 0.],
                 [0., 5., 0.], [6., 5., 0.], [0., 0., 0.], [0., -4., 0.],
                 [0., -4., 0.], [6., -4., 0.], [0., -4., 0.], [-5., -4., 0.]]
-    assert_array_equal(ImmutMorphology(tmp_path / "test_write.asc").points, expected)
-    assert_array_equal(ImmutMorphology(tmp_path / "test_write.swc").points, expected)
-    h5_morph = ImmutMorphology(tmp_path / "test_write.h5")
-    assert_array_equal(h5_morph.points, expected)
-    assert h5_morph.version == ('h5', 1, 3)
 
-    with h5py.File(h5_out, 'r') as h5_file:
+    for ext in ("asc", "swc", "h5"):
+        morpho.soma.type = (morphio.SomaType.SOMA_CYLINDERS
+                            if ext == 'swc' else morphio.SomaType.SOMA_SIMPLE_CONTOUR)
+        path = tmp_path / f"test_write.{ext}"
+        morpho.write(path)
+        loaded_morph = ImmutMorphology(path)
+        assert_array_equal(loaded_morph.points, expected)
+
+        assert_almost_equal(loaded_morph.soma.points,
+                            [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]])
+        assert_almost_equal(loaded_morph.soma.diameters, [0.17, 0.17, 0.17, 0.17,])
+
+        assert len(loaded_morph.root_sections) == 2
+        assert [SectionType.basal_dendrite, SectionType.axon] == \
+            [s.type for s in loaded_morph.root_sections]
+
+    h5_path = tmp_path / "test_write.h5"
+    assert ImmutMorphology(h5_path).version == ('h5', 1, 3)
+    with h5py.File(h5_path, 'r') as h5_file:
         assert '/perimeters' not in h5_file.keys()
 
 
@@ -85,8 +107,9 @@ def test_write_merge_only_child_asc_h5(tmp_path):
     '''
 
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0]]
-    morpho.soma.diameters = [2]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
+    morpho.soma.type = morphio.SomaType.SOMA_SIMPLE_CONTOUR
 
     root = morpho.append_root_section(PointLevel([[0, 0, 0],
                                                   [0, 5, 0]],
@@ -131,8 +154,9 @@ def test_write_merge_only_child_swc():
 
 def test_write_perimeter(tmp_path):
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0]]
-    morpho.soma.diameters = [2]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
+    morpho.soma.type = morphio.SomaType.SOMA_SIMPLE_CONTOUR
 
     dendrite = morpho.append_root_section(
                                      PointLevel([[0, 0, 0],
@@ -184,7 +208,8 @@ def test_write_no_soma(tmp_path):
             with ostream_redirect(stdout=True, stderr=True):
                 outfile = tmp_path / f'tmp.{ext}'
                 morpho.write(outfile)
-                assert 'Warning: writing file without a soma' in err.getvalue()
+                assert (err.getvalue().strip() ==
+                        'Warning: writing file without a soma')
                 read = Morphology(outfile)
 
         assert len(read.soma.points) == 0
@@ -221,9 +246,10 @@ def test_mitochondria(tmp_path):
         MitochondriaPointLevel([0, 0, 0, 0],
                                [0.6, 0.7, 0.8, 0.9],
                                [20, 30, 40, 50]))
-    morpho.write(tmp_path / "test.h5")
+    path = tmp_path / "test_mitochondria.h5"
+    morpho.write(path)
 
-    mito = ImmutMorphology(tmp_path / 'test.h5').mitochondria
+    mito = ImmutMorphology(path).mitochondria
     assert_array_equal(mito.root_sections[0].diameters,
                        diameters)
     assert_array_equal(mito.root_sections[0].neurite_section_ids,
@@ -232,7 +258,7 @@ def test_mitochondria(tmp_path):
                        relative_pathlengths)
     assert len(mito.root_sections) == 1
 
-    mito = Morphology(tmp_path / 'test.h5').mitochondria
+    mito = Morphology(path).mitochondria
     assert len(mito.root_sections) == 1
     assert mito.root_sections[0].neurite_section_ids == neuronal_section_ids
     assert_array_equal(mito.section(0).diameters,
@@ -260,8 +286,8 @@ def test_duplicate_different_diameter(tmp_path):
     '''Test that starting a child section with a different diamete
     work as expected'''
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0], [1, 1, 1]]
-    morpho.soma.diameters = [1, 1]
+    morpho.soma.points = [[0, 0, 0], [1, 1, 1], [2, 2, 2]]
+    morpho.soma.diameters = [1, 1, 1]
 
     section = morpho.append_root_section(PointLevel([[2, 2, 2], [3, 3, 3]],
                                                        [4, 4]),
@@ -273,7 +299,9 @@ def test_duplicate_different_diameter(tmp_path):
     for ext in ['asc', 'h5', 'swc']:
         with captured_output() as (_, err):
             with ostream_redirect(stdout=True, stderr=True):
-                outfile = tmp_path / f'tmp.{ext}'
+                outfile = tmp_path / f'test_duplicate_different_diameter.{ext}'
+                morpho.soma.type = (morphio.SomaType.SOMA_CYLINDERS
+                                    if ext == 'swc' else morphio.SomaType.SOMA_SIMPLE_CONTOUR)
                 morpho.write(outfile)
 
                 read = Morphology(outfile)
@@ -309,8 +337,8 @@ def test_single_point_root_section(tmp_path):
 
 def test_write_custom_property__throws(tmp_path):
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0]]
-    morpho.soma.diameters = [2]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
 
     morpho.append_root_section(
         PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
@@ -321,8 +349,8 @@ def test_write_custom_property__throws(tmp_path):
         morpho.write(tmp_path / "test_write.asc")
 
     morpho = Morphology()
-    morpho.soma.points = [[0, 0, 0]]
-    morpho.soma.diameters = [2]
+    morpho.soma.points = [[1, 0, 0], [1, 1, 0], [-1, 1, 0], [-1, -1, 0]]
+    morpho.soma.diameters = [0.17, 0.17, 0.17, 0.17,]
 
     morpho.append_root_section(
         PointLevel([[0, 0, 0], [0, 5, 0]], [2, 2]),
@@ -340,30 +368,23 @@ def test_write_custom_property__throws(tmp_path):
 
 def test_write_soma_types(tmp_path):
     morph = Morphology()
-    morph.soma.points = [[0, 0, 0]]
-    morph.soma.diameters = [2]
-    # by default, soma start off as SomaType.SOMA_UNDEFINED
+    morph.soma.points = [[0, 0, 0], [1, 1, 1], [2, 2, 3]]
+    morph.soma.diameters = [2, 2, 2]
 
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            morph.write(tmp_path / "SOMA_UNDEFINED.asc")
-    assert err.getvalue().strip() == (
-        'Soma must be a contour for ASC and H5: '
-        'see https://github.com/BlueBrain/MorphIO/issues/457')
+    url = 'https://github.com/BlueBrain/MorphIO/issues/457'
 
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            morph.write(tmp_path / "SOMA_UNDEFINED.h5")
+    for ext, msg in (
+        ('asc', 'Soma must be a contour for ASC and H5: see ' + url),
+        ('swc', 'Soma must be stacked cylinders or a point: see ' + url),
+        ('h5', 'Soma must be a contour for ASC and H5: see ' + url),
+         ):
+        with captured_output() as (_, err):
+            with ostream_redirect(stdout=True, stderr=True):
+                morph.soma.type = (morphio.SomaType.SOMA_SIMPLE_CONTOUR
+                                   if ext == 'swc' else morphio.SomaType.SOMA_CYLINDERS)
+                morph.write(tmp_path / f'test_write_soma_types.{ext}')
+        assert err.getvalue().strip() == msg
 
-    assert ('Soma must be a contour for ASC and H5: '
-            'see https://github.com/BlueBrain/MorphIO/issues/457') in err.getvalue()
-
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            morph.write(tmp_path / "SOMA_UNDEFINED.swc")
-    assert err.getvalue().strip() == (
-        'Soma must be stacked cylinders or a point: '
-        'see https://github.com/BlueBrain/MorphIO/issues/457')
 
 def test_write_soma_invariants(tmp_path):
     morph = Morphology()

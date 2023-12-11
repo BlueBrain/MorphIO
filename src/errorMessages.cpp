@@ -121,10 +121,6 @@ std::string ErrorMessages::errorMsg(long unsigned int lineNumber,
 //              ERRORS
 ////////////////////////////////////////////////////////////////////////////////
 
-std::string ErrorMessages::ERROR_OPENING_FILE() const {
-    return "Error opening morphology file:\n" + errorMsg(0, ErrorLevel::ERROR);
-}
-
 std::string ErrorMessages::ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const {
     return errorMsg(lineNumber, ErrorLevel::ERROR, "Unable to parse this line");
 }
@@ -383,46 +379,8 @@ std::string ErrorMessages::WARNING_ONLY_CHILD(unsigned int parentId, unsigned in
     return errorMsg(0, ErrorLevel::WARNING, oss.str());
 }
 
-std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const Point& rootPoint,
-                                                                const floatType rootDiameter,
-                                                                const Point& child1Point,
-                                                                const floatType child1Diameter,
-                                                                const Point& child2Point,
-                                                                const floatType child2Diameter) {
-    std::stringstream ss;
-
-    // Return val1 and highlight it with some color if val1 != val2
-    auto _col = [](floatType val1, floatType val2) {
-        bool is_ok = std::fabs(val1 - val2) < morphio::epsilon;
-        if (is_ok) {
-            return std::to_string(val1);
-        }
-        return "\033[1;33m" + std::to_string(val1) + " (exp. " + std::to_string(val2) + ")\033[0m";
-    };
-
-    floatType x = rootPoint[0];
-    floatType y = rootPoint[1];
-    floatType z = rootPoint[2];
-    floatType r = rootDiameter / 2;
-
-    ss << "Warning: the soma does not conform the three point soma spec\n"
-          "The only valid neuro-morpho soma is:\n"
-          "1 1 x   y   z r -1\n"
-          "2 1 x (y-r) z r  1\n"
-          "3 1 x (y+r) z r  1\n\n"
-
-          "Got:\n"
-          "1 1 "
-       << x << ' ' << y << ' ' << z << ' ' << r
-       << " -1\n"
-          "2 1 "
-       << _col(child1Point[0], x) << ' ' << _col(child1Point[1], y - r) << ' '
-       << _col(child1Point[2], z) << ' ' << _col(child1Diameter / 2, r)
-       << " 1\n"
-          "3 1 "
-       << _col(child2Point[0], x) << ' ' << _col(child2Point[1], y + r) << ' '
-       << _col(child2Point[2], z) << ' ' << _col(child2Diameter / 2, r) << " 1\n";
-    return errorMsg(0, ErrorLevel::WARNING, ss.str());
+std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const std::string& s) const {
+    return errorMsg(0, ErrorLevel::WARNING, s);
 }
 
 std::string ErrorMessages::WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const {
@@ -441,6 +399,10 @@ std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(
         oss << errorMsg(lineNumber, ErrorLevel::WARNING, "");
     }
     return oss.str();
+}
+
+std::string ErrorMessages::WARNING_UNDEFINED_SOMA() const {
+    return errorMsg(0, ErrorLevel::WARNING, "Warning: writing soma set to SOMA_UNDEFINED");
 }
 
 std::string ErrorMessages::WARNING_SOMA_NON_CONTOUR() const {

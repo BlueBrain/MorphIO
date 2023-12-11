@@ -82,7 +82,7 @@ setup(
     cmdclass={'build_ext': CMakeBuild,
               },
     packages=['morphio', 'morphio.mut', 'morphio.vasculature'],
-    license="LGPLv3",
+    license="Apache License 2.0",
     keywords=['computational neuroscience',
               'morphology',
               'neuron',

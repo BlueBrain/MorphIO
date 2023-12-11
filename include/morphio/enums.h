@@ -34,6 +34,7 @@ enum Warning {
     NO_SOMA_FOUND,         //!< No soma found in a file
     DISCONNECTED_NEURITE,  //!< Found a disconnected neurite in a morphology
     WRONG_DUPLICATE,       //!< A wrong duplicate point in a section
+    WRITE_UNDEFINED_SOMA,  //!< Soma is UNDEFINED
     APPENDING_EMPTY_SECTION,     //!< Appending of an empty section
     WRONG_ROOT_POINT,            //!< A wrong root point of a neurite in the case of 3 points soma
     ONLY_CHILD,                  //!< Single child sections are not allowed in SWC format

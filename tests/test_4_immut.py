@@ -59,8 +59,9 @@ def test_is_root():
 
 
 def test_distance():
-    for _, cell in CELLS.items():
-        assert cell.soma.max_distance == 0.
+    for ext, cell in CELLS.items():
+        distance = 0 if ext == 'swc' else 0.00141
+        assert cell.soma.max_distance == pytest.approx(distance, abs=1e-3)
 
 
 def test_iter():
