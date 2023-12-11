@@ -1,6 +1,9 @@
 name: docstring-check
 on: [pull_request, push]
 
+env:
+  apt_options: -o Acquire::Retries=3
+
 jobs:
   build:
     name: docstring-check
@@ -15,7 +18,9 @@ jobs:
         with:
           submodules: recursive
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev python3-venv libclang1-12
+        run: |
+          sudo apt-get ${{env.apt_options}} update -y
+          sudo apt-get ${{env.apt_options}} install -y build-essential libhdf5-dev python3-venv libclang1-12
       - name: Check docstrings
         run: |
           export LIBCLANG_PATH=/usr/lib/x86_64-linux-gnu/libclang-12.so
