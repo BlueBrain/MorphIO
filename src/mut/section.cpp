@@ -133,14 +133,14 @@ std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> origina
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection) {
-        printError(Warning::APPENDING_EMPTY_SECTION,
-                   morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+        emitWarningOrError(Warning::APPENDING_EMPTY_SECTION,
+                           morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
     }
 
     if (!emptySection && !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
-        printError(Warning::WRONG_DUPLICATE,
-                   morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
-                                                            _sections.at(parentId)));
+        emitWarningOrError(Warning::WRONG_DUPLICATE,
+                           morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
+                                                                    _sections.at(parentId)));
     }
 
     morphology->_parent[childId] = parentId;
@@ -169,14 +169,14 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection) {
-        printError(Warning::APPENDING_EMPTY_SECTION,
-                   morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+        emitWarningOrError(Warning::APPENDING_EMPTY_SECTION,
+                           morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
     }
 
     if (!emptySection && !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
-        printError(Warning::WRONG_DUPLICATE,
-                   morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
-                                                            _sections.at(parentId)));
+        emitWarningOrError(Warning::WRONG_DUPLICATE,
+                           morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
+                                                                    _sections.at(parentId)));
     }
 
     morphology->_parent[childId] = parentId;
@@ -212,19 +212,22 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
 
     bool emptySection = _emptySection(_sections[childId]);
     if (emptySection) {
-        printError(Warning::APPENDING_EMPTY_SECTION,
-                   morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
+        emitWarningOrError(Warning::APPENDING_EMPTY_SECTION,
+                           morphology->_err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]));
     }
 
     if (!emptySection && !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
-        printError(Warning::WRONG_DUPLICATE,
-                   morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
-                                                            _sections[parentId]));
+        emitWarningOrError(Warning::WRONG_DUPLICATE,
+                           morphology->_err.WARNING_WRONG_DUPLICATE(_sections[childId],
+                                                                    _sections[parentId]));
     }
 
     morphology->_parent[childId] = parentId;
     morphology->_children[parentId].push_back(ptr);
     return ptr;
+}
+void Section::emitWarningOrError(Warning warning, const std::string& msg) {
+    getOwningMorphologyOrThrow()->getWarningOrErrorHandler()->emit(warning, msg);
 }
 
 }  // end namespace mut

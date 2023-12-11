@@ -35,51 +35,45 @@ enum ErrorLevel {
     ERROR     //!< Error
 };
 
-/** Debug info for error messages **/
-struct DebugInfo {
+class ErrorMessage;
+
+class ErrorAndWarningHandler
+{
   public:
-    /** Constructor
+    ErrorAndWarningHandler() = default;
+    virtual ~ErrorAndWarningHandler() = default;
+    virtual void emit(const morphio::Warning& warning, const std::string& msg) = 0;
 
-        \param filename morphology filename.
-     */
-    explicit DebugInfo(std::string filename = "")
-        : _filename(filename) {}
-
-    /** Stores section's line number within morphology file */
-    void setLineNumber(uint32_t sectionId, unsigned int line) {
-        _lineNumbers[sectionId] = static_cast<int>(line);
+    bool isIgnored(morphio::Warning warning) {
+        return ignoredWarnings_.find(warning) != ignoredWarnings_.end();
     }
 
-    /** Get section's line number within morphology file */
-    int32_t getLineNumber(uint32_t sectionId) const {
-        const auto it = _lineNumbers.find(sectionId);
-        if (it == _lineNumbers.end()) {
-            return -1;
+    void setIgnoredWarning(morphio::Warning warning, bool ignore) {
+        if (ignore) {
+            ignoredWarnings_.insert(warning);
+        } else {
+            ignoredWarnings_.erase(warning);
         }
-        return it->second;
     }
-    /** Morphology filename */
-    std::string _filename;
+
+    int getMaxWarningCount() const {
+        return maxWarningCount_;
+    }
+    void setMaxWarningCount(int warningCount) {
+        maxWarningCount_ = warningCount;
+    }
+
+    bool getRaiseWarnings() const {
+        return raiseWarnings_;
+    }
+    void setRaiseWarnings(bool raise) {
+        raiseWarnings_ = raise;
+    }
 
   private:
-    std::map<unsigned int, int> _lineNumbers;
-};
-
-// TODO: this shouldn't be global static
-static std::set<Warning> _ignoredWarnings;
-
-/** A sample of section for error reporting, includes its position (line) within the file. **/
-struct Sample {
-    enum : unsigned int { UNKNOWN_ID = 0xFFFFFFFE };
-    Sample() = default;
-
-    floatType diameter = -1.;
-    bool valid = false;
-    Point point{};
-    SectionType type = SECTION_UNDEFINED;
-    unsigned int parentId = UNKNOWN_ID;
-    unsigned int id = UNKNOWN_ID;
-    unsigned int lineNumber = 0;
+    int maxWarningCount_ = 100;
+    bool raiseWarnings_ = false;
+    std::set<morphio::Warning> ignoredWarnings_;
 };
 
 /** Class that can generate error messages and holds a collection of predefined errors
@@ -270,5 +264,7 @@ class ErrorMessages
 };
 
 }  // namespace readers
+
+std::shared_ptr<readers::ErrorAndWarningHandler> getErrorHandler();
 
 }  // namespace morphio

@@ -146,12 +146,14 @@ void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 }
 }  // anonymous namespace
 
-void h5(const Morphology& morph, const std::string& filename) {
-    if (details::emptyMorphology(morph)) {
+void h5(const Morphology& morph,
+        const std::string& filename,
+        std::shared_ptr<morphio::readers::ErrorAndWarningHandler> handler) {
+    if (details::emptyMorphology(morph, handler)) {
         return;
     }
 
-    details::validateContourSoma(morph);
+    details::validateContourSoma(morph, handler);
     details::checkSomaHasSameNumberPointsDiameters(*morph.soma());
 
     HighFive::File h5_file(filename,

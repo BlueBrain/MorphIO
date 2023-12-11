@@ -49,14 +49,16 @@ namespace morphio {
 namespace mut {
 namespace writer {
 
-void asc(const Morphology& morph, const std::string& filename) {
-    if (details::emptyMorphology(morph)) {
+void asc(const Morphology& morph,
+         const std::string& filename,
+         std::shared_ptr<morphio::readers::ErrorAndWarningHandler> handler) {
+    if (details::emptyMorphology(morph, handler)) {
         return;
     }
 
-    details::validateContourSoma(morph);
+    details::validateContourSoma(morph, handler);
     details::checkSomaHasSameNumberPointsDiameters(*morph.soma());
-    details::validateHasNoMitochondria(morph);
+    details::validateHasNoMitochondria(morph, handler);
     details::validateHasNoPerimeterData(morph);
 
     std::ofstream myfile(filename);

@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include <cassert>
 #include <map>
 #include <memory>
 #include <string>
@@ -32,7 +33,8 @@ class Morphology
     Morphology()
         : _soma(std::make_shared<Soma>())
         , _cellProperties(
-              std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel())) {}
+              std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel()))
+        , handler(morphio::getErrorHandler()) {}
 
     /**
        Build a mutable Morphology from an on-disk morphology
@@ -218,6 +220,11 @@ class Morphology
     EndoplasmicReticulum _endoplasmicReticulum;
     morphio::Property::DendriticSpine::Level _dendriticSpineLevel;
 
+    std::shared_ptr<readers::ErrorAndWarningHandler> getWarningOrErrorHandler() {
+        assert(handler != nullptr);
+        return handler;
+    }
+
   private:
     std::vector<std::shared_ptr<Section>> _rootSections;
     std::map<uint32_t, std::shared_ptr<Section>> _sections;
@@ -230,10 +237,13 @@ class Morphology
     uint32_t _counter = 0;
 
     uint32_t _register(const std::shared_ptr<Section>&);
-    morphio::readers::ErrorMessages _err;
 
     void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
-                      const std::shared_ptr<Section> section);
+                      const std::shared_ptr<Section>& section);
+
+    morphio::readers::ErrorMessages _err;
+
+    std::shared_ptr<readers::ErrorAndWarningHandler> handler;
 
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);

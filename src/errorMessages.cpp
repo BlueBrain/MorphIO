@@ -11,24 +11,22 @@
 
 namespace {
 
-struct ErrorHandler {
-    int MORPHIO_MAX_N_WARNINGS = 100;
-    bool MORPHIO_RAISE_WARNINGS = false;
-    int errorCount = 0;
-    std::set<morphio::Warning> ignoredWarnings;
-
-    void printError(const morphio::Warning& warning, const std::string& msg) {
-        if (isIgnored(warning) || MORPHIO_MAX_N_WARNINGS == 0) {
+class StaticErrorAndWarningHandler: public morphio::readers::ErrorAndWarningHandler
+{
+  public:
+    void emit(const morphio::Warning& warning, const std::string& msg) final {
+        const int maxWarningCount = getMaxWarningCount();
+        if (isIgnored(warning) || maxWarningCount == 0) {
             return;
         }
 
-        if (MORPHIO_RAISE_WARNINGS) {
+        if (getRaiseWarnings()) {
             throw morphio::MorphioError(msg);
         }
 
-        if (MORPHIO_MAX_N_WARNINGS < 0 || errorCount <= MORPHIO_MAX_N_WARNINGS) {
+        if (maxWarningCount < 0 || errorCount <= maxWarningCount) {
             std::cerr << msg << '\n';
-            if (errorCount == MORPHIO_MAX_N_WARNINGS) {
+            if (errorCount == maxWarningCount) {
                 std::cerr << "Maximum number of warning reached. Next warnings "
                     "won't be displayed.\n"
                     "You can change this number by calling:\n"
@@ -40,27 +38,17 @@ struct ErrorHandler {
         }
     }
 
-    bool isIgnored(morphio::Warning warning) {
-        return ignoredWarnings.find(warning) != ignoredWarnings.end();
-    }
-
-    void set_ignored_warning(morphio::Warning warning, bool ignore) {
-        if (ignore) {
-            ignoredWarnings.insert(warning);
-        } else {
-            ignoredWarnings.erase(warning);
-        }
-    }
+    int errorCount = 0;
 };
-
-ErrorHandler& getErrorHandler(){
-    static ErrorHandler error_handler;
-    return error_handler;
-}
 
 } // namespace
 
 namespace morphio {
+
+std::shared_ptr<morphio::readers::ErrorAndWarningHandler> getErrorHandler() {
+    static StaticErrorAndWarningHandler error_handler;
+    return {std::shared_ptr<StaticErrorAndWarningHandler>{}, &error_handler};
+}
 
 /**
  * Controls the maximum number of warning to be printed on screen.
@@ -68,29 +56,23 @@ namespace morphio {
  * -1 will print them all
  */
 void set_maximum_warnings(int n_warnings) {
-    auto& errorHandler = getErrorHandler();
-    errorHandler.MORPHIO_MAX_N_WARNINGS = n_warnings;
+    auto static_handler = getErrorHandler();
+    static_handler->setMaxWarningCount(n_warnings);
 }
 
-/*
- *   Whether to raise warning as errors
- */
+/* Whether to raise warning as errors */
 void set_raise_warnings(bool is_raise) {
-    auto& errorHandler = getErrorHandler();
-    errorHandler.MORPHIO_RAISE_WARNINGS = is_raise;
+    auto static_handler = getErrorHandler();
+    static_handler->setRaiseWarnings(is_raise);
 }
 
-/**
- *   Ignore/Unignore a specific warning message
- */
+/** Ignore/Unignore a specific warning message */
 void set_ignored_warning(Warning warning, bool ignore) {
-    auto& errorHandler = getErrorHandler();
-    errorHandler.set_ignored_warning(warning, ignore);
+    auto static_handler = getErrorHandler();
+    static_handler->setIgnoredWarning(warning, ignore);
 }
 
-/**
- *   Ignore/Unignore a specific warning message
- */
+/** Ignore/Unignore a specific warning message */
 void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
     for (auto warning : warnings) {
         set_ignored_warning(warning, ignore);
@@ -98,15 +80,15 @@ void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
 }
 
 void printError(Warning warning, const std::string& msg) {
-    auto& errorHandler = getErrorHandler();
-    errorHandler.printError(warning, msg);
+    auto static_handler = getErrorHandler();
+    static_handler->emit(warning, msg);
 }
 
 namespace readers {
 
 bool ErrorMessages::isIgnored(const Warning& warning) {
-    auto& errorHandler = getErrorHandler();
-    return errorHandler.isIgnored(warning);
+    auto static_handler = getErrorHandler();
+    return static_handler->isIgnored(warning);
 }
 
 std::string ErrorMessages::errorMsg(long unsigned int lineNumber,

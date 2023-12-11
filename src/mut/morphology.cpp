@@ -58,7 +58,8 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
     : _soma(std::make_shared<Soma>(*morphology.soma()))
     , _cellProperties(std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
-    , _dendriticSpineLevel(morphology._dendriticSpineLevel) {
+    , _dendriticSpineLevel(morphology._dendriticSpineLevel)
+    , handler(morphio::getErrorHandler()) {
     for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -75,7 +76,8 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
     , _cellProperties(
           std::make_shared<morphio::Property::CellLevel>(morphology.properties_->_cellLevel))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
-    , _dendriticSpineLevel(morphology.properties_->_dendriticSpineLevel) {
+    , _dendriticSpineLevel(morphology.properties_->_dendriticSpineLevel)
+    , handler(morphio::getErrorHandler()) {
     for (const morphio::Section& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -122,7 +124,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 
     const bool emptySection = ptr->points().empty();
     if (emptySection) {
-        printError(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+        handler->emit(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
     }
 
     if (recursive) {
@@ -141,8 +143,8 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
     _rootSections.push_back(section_copy);
     const bool emptySection = section_copy->points().empty();
     if (emptySection) {
-        printError(Warning::APPENDING_EMPTY_SECTION,
-                   _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
+        handler->emit(Warning::APPENDING_EMPTY_SECTION,
+                      _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
     }
 
     if (recursive) {
@@ -162,7 +164,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLeve
 
     bool emptySection = ptr->points().empty();
     if (emptySection) {
-        printError(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+        handler->emit(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
     }
 
     return ptr;
@@ -185,7 +187,7 @@ Morphology::~Morphology() {
 }
 
 void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
-                              const std::shared_ptr<Section> section) {
+                              const std::shared_ptr<Section>& section) {
     if (section->morphology_ == this) {
         section->morphology_ = nullptr;
         section->id_ = 0xffffffff;
@@ -259,8 +261,8 @@ void Morphology::removeUnifurcations() {
         // XXX: should we check if ignored, or delegate that to the error handler?
         if (!morphio::readers::ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
             !_checkDuplicatePoint(section_->parent(), section_)) {
-            printError(Warning::WRONG_DUPLICATE,
-                       err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
+            handler->emit(Warning::WRONG_DUPLICATE,
+                          err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
         }
 
         auto parent = section_->parent();
@@ -269,7 +271,7 @@ void Morphology::removeUnifurcations() {
         // This "if" condition ensures that "unifurcations" (ie. successive
         // sections with only 1 child) get merged together into a bigger section
         if (isUnifurcation) {
-            printError(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(parentId, sectionId));
+            handler->emit(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(parentId, sectionId));
             bool duplicate = _checkDuplicatePoint(section_->parent(), section_);
 
             addAnnotation(Property::Annotation(AnnotationType::SINGLE_CHILD,
@@ -398,11 +400,11 @@ void Morphology::write(const std::string& filename) const {
     }
 
     if (extension == ".h5") {
-        writer::h5(*this, filename);
+        writer::h5(*this, filename, handler);
     } else if (extension == ".asc") {
-        writer::asc(*this, filename);
+        writer::asc(*this, filename, handler);
     } else if (extension == ".swc") {
-        writer::swc(*this, filename);
+        writer::swc(*this, filename, handler);
     } else {
         throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
     }
