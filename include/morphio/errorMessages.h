@@ -76,6 +76,13 @@ class ErrorAndWarningHandler
     std::set<morphio::Warning> ignoredWarnings_;
 };
 
+class ErrorAndWarningHandlerCollector : public ErrorAndWarningHandler
+{
+    void emit(const morphio::Warning& warning, const std::string& msg) final {
+        std::cout << msg;
+    }
+};
+
 /** Class that can generate error messages and holds a collection of predefined errors
     messages **/
 class ErrorMessages
