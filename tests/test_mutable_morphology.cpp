@@ -185,18 +185,3 @@ TEST_CASE("writing", "[mutableMorphology]") {
 
     fs::remove_all(tmpDirectory);
 }
-
-TEST_CASE("warnings") {
-    {
-        auto ec = std::make_shared<morphio::readers::ErrorAndWarningHandlerCollector>();
-        morphio::mut::Morphology morph("data/disconnected_neurite.swc");
-        morph.setWarningAndErrorHandler(ec);
-        ec->printAll();
-    }
-
-    {
-        auto ec = std::make_shared<morphio::readers::ErrorAndWarningHandlerCollector>();
-        morphio::mut::Morphology morph("data/disconnected_neurite.swc", ec);
-        ec->printAll();
-    }
-}

@@ -31,7 +31,7 @@ std::string version_string() {
 }
 
 bool emptyMorphology(const morphio::mut::Morphology& morph,
-                     std::shared_ptr<morphio::readers::ErrorAndWarningHandler> handler) {
+                     std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
     if (morph.soma()->points().empty() && morph.rootSections().empty()) {
         handler->emit(Warning::WRITE_EMPTY_MORPHOLOGY,
                       readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
@@ -41,7 +41,7 @@ bool emptyMorphology(const morphio::mut::Morphology& morph,
 }
 
 void validateContourSoma(const morphio::mut::Morphology& morph,
-                         std::shared_ptr<morphio::readers::ErrorAndWarningHandler> handler) {
+                         std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
     const std::shared_ptr<Soma>& soma = morph.soma();
     const std::vector<Point>& somaPoints = soma->points();
 
@@ -65,7 +65,7 @@ void validateHasNoPerimeterData(const morphio::mut::Morphology& morph) {
 }
 
 void validateHasNoMitochondria(const morphio::mut::Morphology& morph,
-                               std::shared_ptr<morphio::readers::ErrorAndWarningHandler> handler) {
+                               std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
     if (!morph.mitochondria().rootSections().empty()) {
         handler->emit(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
                       readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());

@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <morphio/errorMessages.h>
+#include <morphio/error_warning_handling.h>
 #include <morphio/exceptions.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/mitochondria.h>
@@ -34,7 +35,7 @@ class Morphology
         : _soma(std::make_shared<Soma>())
         , _cellProperties(
               std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel()))
-        , handler(morphio::getErrorHandler()) {}
+        {}
 
     /**
        Build a mutable Morphology from an on-disk morphology
@@ -46,6 +47,12 @@ class Morphology
            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
     **/
     explicit Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
+
+    explicit Morphology(const std::string& uri, std::shared_ptr<ErrorAndWarningHandler> h)
+        : Morphology(uri)
+    {
+        setWarningAndErrorHandler(h);
+    }
 
     /// Build a mutable Morphology from an HighFive::Group
     explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
@@ -214,16 +221,18 @@ class Morphology
        if the section starts and ends are inconsistent
      **/
     void removeUnifurcations();
-
+    
     std::shared_ptr<Soma> _soma;
     std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     EndoplasmicReticulum _endoplasmicReticulum;
     morphio::Property::DendriticSpine::Level _dendriticSpineLevel;
 
-    std::shared_ptr<readers::ErrorAndWarningHandler> getWarningOrErrorHandler() {
+    std::shared_ptr<ErrorAndWarningHandler> getWarningOrErrorHandler() {
         assert(handler != nullptr);
         return handler;
     }
+    void setWarningAndErrorHandler(std::shared_ptr<ErrorAndWarningHandler> h) {handler = h;}
+
 
   private:
     std::vector<std::shared_ptr<Section>> _rootSections;
@@ -243,7 +252,7 @@ class Morphology
 
     morphio::readers::ErrorMessages _err;
 
-    std::shared_ptr<readers::ErrorAndWarningHandler> handler;
+    std::shared_ptr<ErrorAndWarningHandler> handler = getErrorHandler();
 
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);

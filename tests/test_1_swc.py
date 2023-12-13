@@ -8,7 +8,7 @@ from numpy.testing import assert_array_equal
 from utils import (assert_swc_exception, captured_output, ignored_warning,
                    strip_color_codes)
 
-from morphio import (mut, MorphioError, Morphology, RawDataError, SomaError,
+from morphio import (MorphioError, Morphology, RawDataError, SomaError,
                      SomaType, Warning, ostream_redirect, set_raise_warnings)
 
 

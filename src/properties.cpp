@@ -9,33 +9,17 @@
 
 #include "point_utils.h"
 #include "shared_utils.hpp"
+
 namespace {
 
 bool compare_section_structure(const std::vector<morphio::Property::Section::Type>& vec1,
-                               const std::vector<morphio::Property::Section::Type>& vec2,
-                               const std::string& name,
-                               morphio::LogLevel logLevel) {
+                               const std::vector<morphio::Property::Section::Type>& vec2) {
     if (vec1.size() != vec2.size()) {
-        if (logLevel > morphio::LogLevel::ERROR) {
-            morphio::printError(morphio::Warning::UNDEFINED,
-                                "Error comparing " + name +
-                                    ", size differs: " + std::to_string(vec1.size()) + " vs " +
-                                    std::to_string(vec2.size()));
-        }
         return false;
     }
 
     for (unsigned int i = 1; i < vec1.size(); ++i) {
         if (vec1[i][0] - vec1[1][0] != vec2[i][0] - vec2[1][0] || vec1[i][1] != vec2[i][1]) {
-            if (logLevel > morphio::LogLevel::ERROR) {
-                morphio::printError(morphio::Warning::UNDEFINED,
-                                    "Error comparing " + name + ", elements differ:");
-                morphio::printError(morphio::Warning::UNDEFINED,
-                                    std::to_string(vec1[i][0] - vec1[1][0]) + ", " +
-                                        std::to_string(vec1[i][1]) + " <--> " +
-                                        std::to_string(vec2[i][0] - vec2[1][0]) + ", " +
-                                        std::to_string(vec2[i][1]));
-            }
             return false;
         }
     }
@@ -89,40 +73,35 @@ PointLevel& PointLevel::operator=(const PointLevel& other) {
     return *this;
 }
 
-bool SectionLevel::diff(const SectionLevel& other, LogLevel logLevel) const {
+bool SectionLevel::diff(const SectionLevel& other) const {
     return !(this == &other ||
-             (compare_section_structure(_sections, other._sections, "_sections", logLevel) &&
-              morphio::property::compare(
-                  _sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
-              morphio::property::compare(_children, other._children, "_children", logLevel)));
+             (compare_section_structure(_sections, other._sections) &&
+              morphio::property::compare(_sectionTypes, other._sectionTypes) &&
+              morphio::property::compare(_children, other._children)));
 }
 
 bool SectionLevel::operator==(const SectionLevel& other) const {
-    return !diff(other, LogLevel::ERROR);
+    return !diff(other);
 }
 
 bool SectionLevel::operator!=(const SectionLevel& other) const {
-    return diff(other, LogLevel::ERROR);
+    return diff(other);
 }
 
-bool CellLevel::diff(const CellLevel& other, LogLevel logLevel) const {
+bool CellLevel::diff(const CellLevel& other) const {
     if (this == &other) {
         return false;
     }
 
-    if (logLevel > 0 && this->_cellFamily != other._cellFamily) {
-        std::cout << "this->_cellFamily: " << this->_cellFamily << '\n'
-                  << "other._cellFamily: " << other._cellFamily << '\n';
-    }
     return !(_cellFamily == other._cellFamily && _somaType == other._somaType);
 }
 
 bool CellLevel::operator==(const CellLevel& other) const {
-    return !diff(other, LogLevel::ERROR);
+    return !diff(other);
 }
 
 bool CellLevel::operator!=(const CellLevel& other) const {
-    return diff(other, LogLevel::ERROR);
+    return diff(other);
 }
 
 MitochondriaPointLevel::MitochondriaPointLevel(const MitochondriaPointLevel& data,
@@ -156,39 +135,37 @@ MitochondriaPointLevel::MitochondriaPointLevel(
     }
 }
 
-bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other,
-                                    LogLevel logLevel) const {
+bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other) const {
     return !(this == &other ||
-             (compare_section_structure(this->_sections, other._sections, "_sections", logLevel) &&
-              morphio::property::compare(this->_children, other._children, "_children", logLevel)));
+             (compare_section_structure(this->_sections, other._sections) &&
+              morphio::property::compare(this->_children, other._children)));
 }
 
 bool MitochondriaSectionLevel::operator==(const MitochondriaSectionLevel& other) const {
-    return !diff(other, LogLevel::ERROR);
+    return !diff(other);
 }
 
 bool MitochondriaSectionLevel::operator!=(const MitochondriaSectionLevel& other) const {
-    return diff(other, LogLevel::ERROR);
+    return diff(other);
 }
 
-bool MitochondriaPointLevel::diff(const MitochondriaPointLevel& other, LogLevel logLevel) const {
+bool MitochondriaPointLevel::diff(const MitochondriaPointLevel& other) const {
     return !(this == &other ||
              (morphio::property::compare(
-                  this->_sectionIds, other._sectionIds, "mito section ids", logLevel) &&
+                  this->_sectionIds, other._sectionIds) &&
               morphio::property::compare(this->_relativePathLengths,
-                                         other._relativePathLengths,
-                                         "mito relative pathlength",
-                                         logLevel) &&
+                                         other._relativePathLengths)
+                                          &&
               morphio::property::compare(
-                  this->_diameters, other._diameters, "mito section diameters", logLevel)));
+                  this->_diameters, other._diameters)));
 }
 
 bool MitochondriaPointLevel::operator==(const MitochondriaPointLevel& other) const {
-    return !diff(other, LogLevel::ERROR);
+    return !diff(other);
 }
 
 bool MitochondriaPointLevel::operator!=(const MitochondriaPointLevel& other) const {
-    return diff(other, LogLevel::ERROR);
+    return diff(other);
 }
 
 std::ostream& operator<<(std::ostream& os, const PointLevel& pointLevel) {

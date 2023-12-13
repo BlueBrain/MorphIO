@@ -196,14 +196,15 @@ class SWCBuilder
         }
     }
 
-    void warnIfDisconnectedNeurite(const SWCSample& sample) {
+    void warnIfDisconnectedNeurite(const SWCSample& sample,
+                                   std::shared_ptr<ErrorAndWarningHandler>& h) {
         if (sample.parentId == SWC_ROOT && sample.type != SECTION_SOMA) {
-            printError(Warning::DISCONNECTED_NEURITE,
-                       err.WARNING_DISCONNECTED_NEURITE(sample.lineNumber));
+            h->emit(Warning::DISCONNECTED_NEURITE,
+                    err.WARNING_DISCONNECTED_NEURITE(sample.lineNumber));
         }
     }
 
-    void checkSoma() {
+    void checkSoma(std::shared_ptr<ErrorAndWarningHandler>& h) {
         auto somata = _potentialSomata();
 
         if (somata.size() > 1) {
@@ -212,11 +213,11 @@ class SWCBuilder
         }
 
         if (somata.empty()) {
-            printError(Warning::NO_SOMA_FOUND, err.WARNING_NO_SOMA_FOUND());
+            h->emit(Warning::NO_SOMA_FOUND, err.WARNING_NO_SOMA_FOUND());
         } else {
             for (const auto& sample_pair : samples) {
                 const auto& sample = sample_pair.second;
-                warnIfDisconnectedNeurite(sample);
+                warnIfDisconnectedNeurite(sample, h);
             }
         }
     }
@@ -228,9 +229,11 @@ class SWCBuilder
         }
     }
 
-    void warnIfZeroDiameter(const SWCSample& sample) {
+    void warnIfZeroDiameter(const SWCSample& sample,
+                            std::shared_ptr<ErrorAndWarningHandler> h
+                            ) {
         if (sample.diameter < morphio::epsilon) {
-            printError(Warning::ZERO_DIAMETER, err.WARNING_ZERO_DIAMETER(sample.lineNumber));
+            h->emit(Warning::ZERO_DIAMETER, err.WARNING_ZERO_DIAMETER(sample.lineNumber));
         }
     }
 
@@ -275,14 +278,7 @@ class SWCBuilder
         return ret;
     }
 
-    void raiseIfNonConform(const SWCSample& sample) {
-        raiseIfSelfParent(sample);
-        raiseIfBrokenSoma(sample);
-        raiseIfNoParent(sample);
-        warnIfZeroDiameter(sample);
-    }
-
-    SomaType somaType() {
+    SomaType somaType(std::shared_ptr<ErrorAndWarningHandler> h) {
         switch (morph.soma()->points().size()) {
         case 0: {
             return SOMA_UNDEFINED;
@@ -319,8 +315,8 @@ class SWCBuilder
                     if (status != details::ThreePointSomaStatus::Conforms) {
                         std::stringstream stream;
                         stream << status;
-                        printError(Warning::SOMA_NON_CONFORM,
-                                   err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(stream.str()));
+                        h->emit(Warning::SOMA_NON_CONFORM,
+                                err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(stream.str()));
                     }
                 }
 
@@ -333,15 +329,20 @@ class SWCBuilder
         }
     }
 
-    Property::Properties buildProperties(const std::string& contents, unsigned int options) {
+    Property::Properties buildProperties(const std::string& contents, unsigned int options,
+                                         std::shared_ptr<ErrorAndWarningHandler> h
+                                        ) {
         _readSamples(contents);
 
         for (const auto& sample_pair : samples) {
             const auto& sample = sample_pair.second;
-            raiseIfNonConform(sample);
+            raiseIfSelfParent(sample);
+            raiseIfBrokenSoma(sample);
+            raiseIfNoParent(sample);
+            warnIfZeroDiameter(sample, h);
         }
 
-        checkSoma();
+        checkSoma(h);
 
         // The process might occasionally creates empty section before
         // filling them so the warning is ignored
@@ -372,14 +373,14 @@ class SWCBuilder
         }
 
         if (morph.soma()->points().size() == 3 && !neurite_wrong_root.empty()) {
-            printError(morphio::WRONG_ROOT_POINT,
-                       err.WARNING_WRONG_ROOT_POINT(gatherLineNumbers(neurite_wrong_root)));
+            h->emit(morphio::WRONG_ROOT_POINT,
+                    err.WARNING_WRONG_ROOT_POINT(gatherLineNumbers(neurite_wrong_root)));
         }
 
         morph.applyModifiers(options);
 
         Property::Properties properties = morph.buildReadOnly();
-        properties._cellLevel._somaType = somaType();
+        properties._cellLevel._somaType = somaType(h);
 
         set_ignored_warning(morphio::Warning::APPENDING_EMPTY_SECTION, originalIsIgnored);
 
@@ -435,8 +436,10 @@ class SWCBuilder
 
 Property::Properties load(const std::string& path,
                           const std::string& contents,
-                          unsigned int options) {
-    auto properties = SWCBuilder(path).buildProperties(contents, options);
+                          unsigned int options,
+                          std::shared_ptr<ErrorAndWarningHandler> h
+                          ) {
+    auto properties = SWCBuilder(path).buildProperties(contents, options, h);
 
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"swc", 1, 0};

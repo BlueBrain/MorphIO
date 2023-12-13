@@ -305,4 +305,14 @@ Note: This API is 'experimental', meaning it might change in the future.
             // Bind the lifetime of the `morphio::LoadUnordered` (1) to the
             // lifetime of the returned iterator (0).
             py::keep_alive<0, 1>());
+
+    py::class_<morphio::ErrorAndWarningHandler, std::shared_ptr<morphio::ErrorAndWarningHandler>>(
+        m, "ErrorAndWarningHandler", "ErrorAndWarningHandler base")
+        .def_property_readonly("get_max_warning_count",
+                               &morphio::ErrorAndWarningHandler::getMaxWarningCount,
+                               "ibid");
+    py::class_<morphio::ErrorAndWarningHandlerCollector, morphio::ErrorAndWarningHandler, std::shared_ptr<morphio::ErrorAndWarningHandlerCollector>>(
+        m, "ErrorAndWarningHandlerCollector", "ErrorAndWarningHandler base")
+        .def(py::init<>())
+        .def("print_all", &morphio::ErrorAndWarningHandlerCollector::printAll, "ibid");
 }

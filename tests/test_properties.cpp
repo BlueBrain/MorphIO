@@ -73,13 +73,13 @@ TEST_CASE("morphio::SectionLevel") {
                                 children};
 
         CHECK(sl0 != sl1);
-        CHECK(sl0.diff(sl1, morphio::enums::LogLevel::DEBUG));
+        CHECK(sl0.diff(sl1));
     }
 
     SECTION("different lenghts") {
         auto sl1 = SectionLevel{{}, {}, {}};
         CHECK(sl0 != sl1);
-        CHECK(sl0.diff(sl1, morphio::enums::LogLevel::DEBUG));
+        CHECK(sl0.diff(sl1));
     }
 }
 
@@ -97,14 +97,14 @@ TEST_CASE("morphio::CellLevel::compare") {
     SECTION("different cell families") {
         auto cl1 = CellLevel{{}, morphio::enums::GLIA, {}, {}, {}};
         CHECK(cl0 != cl1);
-        CHECK(cl0.diff(cl1, morphio::enums::LogLevel::DEBUG));
+        CHECK(cl0.diff(cl1));
     }
 
     SECTION("different soma types") {
         auto cl1 =
             CellLevel{{}, morphio::enums::NEURON, morphio::enums::SomaType::SOMA_CYLINDERS, {}, {}};
         CHECK(cl0 != cl1);
-        CHECK(cl0.diff(cl1, morphio::enums::LogLevel::DEBUG));
+        CHECK(cl0.diff(cl1));
     }
 }
 
@@ -158,12 +158,12 @@ TEST_CASE("morphio::MitochondriaSectionLevel") {
         auto sl1 = MitochondriaSectionLevel{sections1, children};
 
         CHECK(sl0 != sl1);
-        CHECK(sl0.diff(sl1, morphio::enums::LogLevel::DEBUG));
+        CHECK(sl0.diff(sl1));
     }
 
     SECTION("different lenghts") {
         auto sl1 = MitochondriaSectionLevel{{}, {}};
         CHECK(sl0 != sl1);
-        CHECK(sl0.diff(sl1, morphio::enums::LogLevel::DEBUG));
+        CHECK(sl0.diff(sl1));
     }
 }

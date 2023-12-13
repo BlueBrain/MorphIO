@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include <morphio/errorMessages.h>
+#include <morphio/error_warning_handling.h>
 #include <morphio/mut/morphology.h>
 
 namespace morphio {
@@ -14,17 +14,17 @@ namespace writer {
 /** Save morphology in SWC format */
 void swc(const Morphology& morphology,
          const std::string& filename,
-         std::shared_ptr<readers::ErrorAndWarningHandler> handler);
+         std::shared_ptr<ErrorAndWarningHandler> handler);
 
 /** Save morphology in ASC format */
 void asc(const Morphology& morphology,
          const std::string& filename,
-         std::shared_ptr<readers::ErrorAndWarningHandler> handler);
+         std::shared_ptr<ErrorAndWarningHandler> handler);
 
 /** Save morphology in H5 format */
 void h5(const Morphology& morphology,
         const std::string& filename,
-        std::shared_ptr<readers::ErrorAndWarningHandler> handler);
+        std::shared_ptr<ErrorAndWarningHandler> handler);
 
 }  // namespace writer
 }  // end namespace mut

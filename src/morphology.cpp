@@ -8,6 +8,7 @@
 #include <memory>
 
 #include <morphio/endoplasmic_reticulum.h>
+#include <morphio/error_warning_handling.h> // ErrorAndWarningHandler
 #include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
 #include <morphio/section.h>
@@ -64,7 +65,10 @@ std::string tolower(const std::string& str) {
     return ret;
 }
 
-morphio::Property::Properties loadFile(const std::string& path, unsigned int options) {
+morphio::Property::Properties loadFile(const std::string& path,
+                                       std::shared_ptr<morphio::ErrorAndWarningHandler> h,
+                                       unsigned int options
+                                       ) {
     const size_t pos = path.find_last_of('.');
     if (pos == std::string::npos || pos == path.length() - 1) {
         throw(morphio::UnknownFileType("File has no extension"));
@@ -79,7 +83,7 @@ morphio::Property::Properties loadFile(const std::string& path, unsigned int opt
         return morphio::readers::asc::load(path, contents, options);
     } else if (extension == "swc") {
         std::string contents = readCompleteFile(path);
-        return morphio::readers::swc::load(path, contents, options);
+        return morphio::readers::swc::load(path, contents, options, h);
     }
 
     throw(morphio::UnknownFileType("Unhandled file type: '" + extension +
@@ -89,13 +93,15 @@ morphio::Property::Properties loadFile(const std::string& path, unsigned int opt
 
 morphio::Property::Properties loadString(const std::string& contents,
                                          const std::string& extension,
+                                         std::shared_ptr<morphio::ErrorAndWarningHandler> h,
                                          unsigned int options) {
+
     std::string lower_extension = tolower(extension);
 
     if (lower_extension == "asc") {
         return morphio::readers::asc::load("$STRING$", contents, options);
     } else if (lower_extension == "swc") {
-        return morphio::readers::swc::load("$STRING$", contents, options);
+        return morphio::readers::swc::load("$STRING$", contents, options, h);
     }
 
     throw(morphio::UnknownFileType("Unhandled file type: '" + lower_extension +
@@ -112,7 +118,7 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
 
     // For SWC and ASC, sanitization and modifier application are already taken care of by
     // their respective loaders
-    if (properties._cellLevel.fileFormat() == "h5" && options) {
+    if (properties._cellLevel.fileFormat() == "h5" && options > 0) {
         mut::Morphology mutable_morph(*this);
         mutable_morph.applyModifiers(options);
         properties_ = std::make_shared<Property::Properties>(mutable_morph.buildReadOnly());
@@ -121,7 +127,10 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
 }
 
 Morphology::Morphology(const std::string& path, unsigned int options)
-    : Morphology(loadFile(path, options), options) {}
+    : Morphology(loadFile(path, getErrorHandler(), options), options) {}
+
+Morphology::Morphology(const std::string& path, std::shared_ptr<ErrorAndWarningHandler> h, unsigned int options)
+    : Morphology(loadFile(path, h, options), options) {}
 
 Morphology::Morphology(const HighFive::Group& group, unsigned int options)
     : Morphology(readers::h5::load(group), options) {}
@@ -134,7 +143,7 @@ Morphology::Morphology(const mut::Morphology& morphology) {
 Morphology::Morphology(const std::string& contents,
                        const std::string& extension,
                        unsigned int options)
-    : Morphology(loadString(contents, extension, options), options) {}
+    : Morphology(loadString(contents, extension, getErrorHandler(), options), options) {}
 
 Soma Morphology::soma() const {
     return Soma(properties_);

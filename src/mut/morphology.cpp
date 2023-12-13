@@ -3,8 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <algorithm>  // std::find_if
-#include <cctype>    // std::tolower
-#include <iterator>  // std::back_inserter
 #include <string>
 
 #include <morphio/endoplasmic_reticulum.h>
@@ -59,7 +57,7 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
     , _cellProperties(std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
     , _dendriticSpineLevel(morphology._dendriticSpineLevel)
-    , handler(morphio::getErrorHandler()) {
+    {
     for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -76,8 +74,7 @@ Morphology::Morphology(const morphio::Morphology& morphology, unsigned int optio
     , _cellProperties(
           std::make_shared<morphio::Property::CellLevel>(morphology.properties_->_cellLevel))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
-    , _dendriticSpineLevel(morphology.properties_->_dendriticSpineLevel)
-    , handler(morphio::getErrorHandler()) {
+    , _dendriticSpineLevel(morphology.properties_->_dendriticSpineLevel){
     for (const morphio::Section& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }

@@ -6,11 +6,11 @@
 
 #include <map>        // std::map
 #include <memory>     // std::shared_ptr
-#include <set>        // std::set
 #include <string>     // std::string
 #include <vector>     // std::vector
 
 #include <morphio/enums.h>        // Warning, Option
+#include <morphio/error_warning_handling.h> // ErrorAndWarningHandler
 #include <morphio/mut/section.h>  // Warning, Option
 
 namespace morphio {
@@ -33,54 +33,6 @@ enum ErrorLevel {
     INFO,     //!< Info
     WARNING,  //!< Warning
     ERROR     //!< Error
-};
-
-class ErrorMessage;
-
-class ErrorAndWarningHandler
-{
-  public:
-    ErrorAndWarningHandler() = default;
-    virtual ~ErrorAndWarningHandler() = default;
-    virtual void emit(const morphio::Warning& warning, const std::string& msg) = 0;
-
-    bool isIgnored(morphio::Warning warning) {
-        return ignoredWarnings_.find(warning) != ignoredWarnings_.end();
-    }
-
-    void setIgnoredWarning(morphio::Warning warning, bool ignore) {
-        if (ignore) {
-            ignoredWarnings_.insert(warning);
-        } else {
-            ignoredWarnings_.erase(warning);
-        }
-    }
-
-    int getMaxWarningCount() const {
-        return maxWarningCount_;
-    }
-    void setMaxWarningCount(int warningCount) {
-        maxWarningCount_ = warningCount;
-    }
-
-    bool getRaiseWarnings() const {
-        return raiseWarnings_;
-    }
-    void setRaiseWarnings(bool raise) {
-        raiseWarnings_ = raise;
-    }
-
-  private:
-    int maxWarningCount_ = 100;
-    bool raiseWarnings_ = false;
-    std::set<morphio::Warning> ignoredWarnings_;
-};
-
-class ErrorAndWarningHandlerCollector : public ErrorAndWarningHandler
-{
-    void emit(const morphio::Warning& warning, const std::string& msg) final {
-        std::cout << msg;
-    }
 };
 
 /** Class that can generate error messages and holds a collection of predefined errors
@@ -272,6 +224,6 @@ class ErrorMessages
 
 }  // namespace readers
 
-std::shared_ptr<readers::ErrorAndWarningHandler> getErrorHandler();
+std::shared_ptr<ErrorAndWarningHandler> getErrorHandler();
 
 }  // namespace morphio

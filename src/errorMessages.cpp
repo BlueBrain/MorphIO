@@ -11,7 +11,7 @@
 
 namespace {
 
-class StaticErrorAndWarningHandler: public morphio::readers::ErrorAndWarningHandler
+class StaticErrorAndWarningHandler: public morphio::ErrorAndWarningHandler
 {
   public:
     void emit(const morphio::Warning& warning, const std::string& msg) final {
@@ -45,7 +45,7 @@ class StaticErrorAndWarningHandler: public morphio::readers::ErrorAndWarningHand
 
 namespace morphio {
 
-std::shared_ptr<morphio::readers::ErrorAndWarningHandler> getErrorHandler() {
+std::shared_ptr<morphio::ErrorAndWarningHandler> getErrorHandler() {
     static StaticErrorAndWarningHandler error_handler;
     return {std::shared_ptr<StaticErrorAndWarningHandler>{}, &error_handler};
 }
@@ -79,10 +79,10 @@ void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
     }
 }
 
-void printError(Warning warning, const std::string& msg) {
-    auto static_handler = getErrorHandler();
-    static_handler->emit(warning, msg);
-}
+/* void printError(Warning warning, const std::string& msg) { */
+/*     auto static_handler = getErrorHandler(); */
+/*     static_handler->emit(warning, msg); */
+/* } */
 
 namespace readers {
 

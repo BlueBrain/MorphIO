@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <morphio/errorMessages.h>
+#include <morphio/error_warning_handling.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
@@ -148,7 +149,7 @@ void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 
 void h5(const Morphology& morph,
         const std::string& filename,
-        std::shared_ptr<morphio::readers::ErrorAndWarningHandler> handler) {
+        std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
     if (details::emptyMorphology(morph, handler)) {
         return;
     }

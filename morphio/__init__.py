@@ -12,6 +12,8 @@ if platform.system() == "Windows":
 
 
 from ._morphio import (
+    ErrorAndWarningHandlerCollector,
+
     Annotation,
     AnnotationType,
     CellFamily,

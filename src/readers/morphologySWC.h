@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <morphio/errorMessages.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
 
@@ -13,7 +14,9 @@ namespace readers {
 namespace swc {
 Property::Properties load(const std::string& path,
                           const std::string& contents,
-                          unsigned int options);
+                          unsigned int options,
+                          std::shared_ptr<ErrorAndWarningHandler> h
+                          );
 }  // namespace swc
 }  // namespace readers
 }  // namespace morphio

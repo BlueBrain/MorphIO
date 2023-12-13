@@ -2,7 +2,6 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include <cmath>
 #include <limits>
 
 #include <catch2/catch.hpp>
@@ -328,4 +327,12 @@ TEST_CASE("operator<<", "[immutableMorphology]") {
     std::stringstream ss;
 
     ss << section;
+}
+
+TEST_CASE("warnings-asdf") {
+    {
+        auto ec = std::make_shared<morphio::ErrorAndWarningHandlerCollector>();
+        morphio::Morphology morph("data/disconnected_neurite.swc", ec);
+        ec->printAll();
+    }
 }

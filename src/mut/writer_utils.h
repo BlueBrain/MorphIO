@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include <morphio/error_warning_handling.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/soma.h>
 
@@ -15,12 +16,12 @@ void checkSomaHasSameNumberPointsDiameters(const morphio::mut::Soma&);
 bool hasPerimeterData(const morphio::mut::Morphology&);
 std::string version_string();
 bool emptyMorphology(const morphio::mut::Morphology&,
-                     std::shared_ptr<morphio::readers::ErrorAndWarningHandler> handler);
+                     std::shared_ptr<morphio::ErrorAndWarningHandler> handler);
 void validateContourSoma(const morphio::mut::Morphology&,
-                         std::shared_ptr<morphio::readers::ErrorAndWarningHandler> handler);
+                         std::shared_ptr<morphio::ErrorAndWarningHandler> handler);
 void validateHasNoPerimeterData(const morphio::mut::Morphology&);
 void validateHasNoMitochondria(const morphio::mut::Morphology&,
-                               std::shared_ptr<morphio::readers::ErrorAndWarningHandler> handler);
+                               std::shared_ptr<morphio::ErrorAndWarningHandler> handler);
 
 }  // namespace details
 }  // namespace writer
