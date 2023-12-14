@@ -4,6 +4,7 @@
  */
 #include <iostream>  // std::cerr
 #include <sstream>   // std::ostringstream
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -41,6 +42,37 @@ class StaticErrorAndWarningHandler: public morphio::ErrorAndWarningHandler
     int errorCount = 0;
 };
 
+/** Returns a link to a line number within the morphology file **/
+std::string errorLink(
+                      const std::string& uri,
+                      long unsigned int lineNumber,
+                      morphio::readers::ErrorLevel errorLevel) {
+    using morphio::readers::ErrorLevel;
+
+    const auto SEVERITY = [](ErrorLevel el){
+        switch(el){
+            case ErrorLevel::INFO: return "info";
+            case ErrorLevel::WARNING: return "warning";
+            case ErrorLevel::ERROR: return "error";
+        }
+        throw std::runtime_error("Unknown ErrorLevel");
+    };
+
+    auto COLOR = [](ErrorLevel el){
+        switch(el){
+        case ErrorLevel::INFO: return "\033[1;34m";
+        case ErrorLevel::WARNING: return "\033[1;33m";
+        case ErrorLevel::ERROR: return "\033[1;31m";
+        }
+        throw std::runtime_error("Unknown ErrorLevel");
+    };
+
+    const std::string COLOR_END("\033[0m");
+
+    return COLOR(errorLevel) + uri + ":" + std::to_string(lineNumber) + ":" +
+           SEVERITY(errorLevel) + COLOR_END;
+}
+
 } // namespace
 
 namespace morphio {
@@ -50,7 +82,7 @@ std::shared_ptr<morphio::ErrorAndWarningHandler> getErrorHandler() {
     return {std::shared_ptr<StaticErrorAndWarningHandler>{}, &error_handler};
 }
 
-/**
+/*
  * Controls the maximum number of warning to be printed on screen.
  * 0 will print no warning
  * -1 will print them all
@@ -93,8 +125,8 @@ bool ErrorMessages::isIgnored(const Warning& warning) {
 
 std::string ErrorMessages::errorMsg(long unsigned int lineNumber,
                                     ErrorLevel errorLevel,
-                                    std::string msg) const {
-    return "\n" + (_uri.empty() ? "" : errorLink(lineNumber, errorLevel) + "\n") + msg;
+                                    const std::string& msg) const {
+    return "\n" + (_uri.empty() ? "" : errorLink(_uri, lineNumber, errorLevel) + "\n") + msg;
 }
 
 // LCOV_EXCL_START {  all the error messages are excluded from coverage
@@ -160,7 +192,7 @@ std::string ErrorMessages::ERROR_REPEATED_ID(const unsigned int originalId,
     return errorMsg(newLineNumber,
                     ErrorLevel::WARNING,
                     "Repeated ID: " + std::to_string(originalId)) +
-           "\nID already appears here: \n" + errorLink(originalLineNumber, ErrorLevel::INFO);
+           "\nID already appears here: \n" + errorLink(_uri, originalLineNumber, ErrorLevel::INFO);
 }
 
 std::string ErrorMessages::ERROR_SELF_PARENT(const unsigned int lineNumber) const {
