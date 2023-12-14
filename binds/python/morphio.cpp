@@ -10,8 +10,6 @@
 #include "bind_mutable.h"
 #include "bind_vasculature.h"
 
-#include "bindings_utils.h"
-
 
 namespace py = pybind11;
 

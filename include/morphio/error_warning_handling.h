@@ -58,23 +58,36 @@ class ErrorAndWarningHandler
 };
 
 
+struct Caution {
+    Caution() = default;
+    Caution(enums::Warning level_, std::string msg_)
+        : level(level_)
+        , msg(msg_) {}
+    enums::Warning level = enums::Warning::UNDEFINED;
+    std::string msg;
+};
+
 class ErrorAndWarningHandlerCollector : public ErrorAndWarningHandler
 {
 public:
     void emit(const enums::Warning& warning, const std::string& msg) final {
-        std::cout << "************emit: " << msg << '\n';
+        // std::cout << "************emit: " << msg << '\n';
         m.emplace_back(warning, msg);
     }
 
     void printAll(){
         std::cout << "printing all errors:\n";
         for(const auto& e : m){
-            std::cout << "************error: " << std::get<1>(e) << '\n';
+            std::cout << "************error: " << e.msg << '\n';
         }
     }
 
-    std::vector<std::pair<enums::Warning, std::string>> m;
-};
+    std::vector<Caution> getAll() const {
+        return m;
+    }
 
+  private:
+    std::vector<Caution> m;
+};
 
 }  // namespace morphio
