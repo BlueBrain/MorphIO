@@ -2,7 +2,6 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include <morphio/errorMessages.h>
 #include <morphio/error_warning_handling.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>

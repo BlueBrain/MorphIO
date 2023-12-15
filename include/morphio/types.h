@@ -9,6 +9,7 @@
 namespace morphio {
 
 using namespace enums;
+
 class DendriticSpine;
 class EndoplasmicReticulum;
 class MitoSection;

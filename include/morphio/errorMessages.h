@@ -7,9 +7,8 @@
 #include <memory>     // std::shared_ptr
 #include <vector>     // std::vector
 
-#include <morphio/enums.h>        // Warning, Option
+#include <morphio/enums.h>                  // Warning
 #include <morphio/error_warning_handling.h> // ErrorAndWarningHandler
-#include <morphio/mut/section.h>  // Warning, Option
 
 namespace morphio {
 
@@ -18,9 +17,9 @@ void set_maximum_warnings(int n_warnings);
 /** Set whether to interpet warning as errors **/
 void set_raise_warnings(bool is_raise);
 /** Set a warning to ignore **/
-void set_ignored_warning(Warning warning, bool ignore = true);
+void set_ignored_warning(enums::Warning warning, bool ignore = true);
 /** Set an array of warnings to ignore **/
-void set_ignored_warning(const std::vector<Warning>& warning, bool ignore = true);
+void set_ignored_warning(const std::vector<enums::Warning>& warning, bool ignore = true);
 
 namespace readers {
 

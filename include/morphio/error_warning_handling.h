@@ -71,7 +71,6 @@ class ErrorAndWarningHandlerCollector : public ErrorAndWarningHandler
 {
 public:
     void emit(const enums::Warning& warning, const std::string& msg) final {
-        // std::cout << "************emit: " << msg << '\n';
         m.emplace_back(warning, msg);
     }
 

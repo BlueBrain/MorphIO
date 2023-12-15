@@ -17,9 +17,11 @@
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/modifiers.h>
+#include <morphio/mut/section.h>
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
+
 
 namespace morphio {
 namespace mut {

@@ -6,10 +6,12 @@
 #pragma once
 
 #include <string>
+#include <utility>
 #include <vector>
 
 #include <morphio/errorMessages.h>
 #include <morphio/error_warning_handling.h> // ErrorAndWarningHandler
+#include <morphio/mut/section.h>            // morphio::mut::Section
 
 namespace morphio {
 namespace details {
@@ -25,11 +27,11 @@ class ErrorMessages
 
        \param uri path to a morphology file.
      */
-    explicit ErrorMessages(const std::string& uri)
-        : _uri(uri) {}
+    explicit ErrorMessages(std::string uri)
+        : _uri(std::move(uri)) {}
 
     /** Is the output of the warning ignored */
-    static bool isIgnored(const Warning& warning);
+    static bool isIgnored(const enums::Warning& warning);
 
     /** Generate an error message. */
     std::string errorMsg(long unsigned int lineNumber,
@@ -45,11 +47,11 @@ class ErrorMessages
 
     /** Unsupported morphology section type error message */
     std::string ERROR_UNSUPPORTED_SECTION_TYPE(long unsigned int lineNumber,
-                                               const SectionType& type) const;
+                                               const enums::SectionType& type) const;
 
     /** Unsupported vasculature section type error message */
-    std::string ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(long unsigned int lineNumber,
-                                                           const VascularSectionType& type) const;
+    std::string ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(
+        long unsigned int lineNumber, const enums::VascularSectionType& type) const;
 
     /** Multiple somas error message */
     std::string ERROR_MULTIPLE_SOMATA(const std::vector<unsigned int>& lineNumbers) const;
@@ -64,7 +66,7 @@ class ErrorMessages
                                        const std::vector<unsigned int>& childrenLineNumbers) const;
 
     /** Soma with neurite parent error message */
-    std::string ERROR_SOMA_WITH_NEURITE_PARENT(const unsigned int lineNumber) const;
+    std::string ERROR_SOMA_WITH_NEURITE_PARENT(unsigned int lineNumber) const;
 
     /** Repeated section id error message */
     std::string ERROR_REPEATED_ID(unsigned int originalId,
@@ -108,14 +110,14 @@ class ErrorMessages
     std::string ERROR_EOF_UNBALANCED_PARENS(long unsigned int lineNumber) const;
 
     /** Incompatible flags error message */
-    std::string ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1, morphio::Option flag2) const;
+    std::string ERROR_UNCOMPATIBLE_FLAGS(enums::Option flag1, enums::Option flag2) const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //              WRITERS
     ////////////////////////////////////////////////////////////////////////////////
 
     /** Unsupported morphology section type error message */
-    std::string ERROR_UNSUPPORTED_SECTION_TYPE(const SectionType& type) const;
+    std::string ERROR_UNSUPPORTED_SECTION_TYPE(const enums::SectionType& type) const;
 
     /** Wrong morphology file extension error message */
     std::string ERROR_WRONG_EXTENSION(const std::string& filename) const;

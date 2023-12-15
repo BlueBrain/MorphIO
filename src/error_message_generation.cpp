@@ -1,6 +1,9 @@
 #include "error_message_generation.h"
 
+#include <sstream>  // std::ostringstream
+
 #include <morphio/errorMessages.h>
+
 namespace {
 /** Returns a link to a line number within the morphology file **/
 std::string errorLink(

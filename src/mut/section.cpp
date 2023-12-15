@@ -4,10 +4,8 @@
  */
 #include <algorithm>  // any_of
 
-#include <morphio/errorMessages.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
-#include <morphio/tools.h>
 #include <morphio/vector_types.h>
 
 #include "../error_message_generation.h"
@@ -15,10 +13,6 @@
 
 namespace morphio {
 namespace mut {
-
-static inline bool _emptySection(const std::shared_ptr<Section>& section) {
-    return section->points().empty();
-}
 
 Section::Section(Morphology* morphology,
                  unsigned int id,
@@ -132,7 +126,7 @@ std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> origina
     uint32_t childId = morphology->_register(ptr);
     auto& _sections = morphology->_sections;
 
-    bool emptySection = _emptySection(_sections[childId]);
+    bool emptySection = _sections[childId]->points().empty();
     if (emptySection) {
         const auto err = details::ErrorMessages(morphology->_uri);
         emitWarningOrError(Warning::APPENDING_EMPTY_SECTION,
@@ -170,7 +164,7 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
     uint32_t childId = morphology->_register(ptr);
     auto& _sections = morphology->_sections;
 
-    bool emptySection = _emptySection(_sections[childId]);
+    bool emptySection = _sections[childId]->points().empty();
     if (emptySection) {
         const auto err = details::ErrorMessages(morphology->_uri);
         emitWarningOrError(Warning::APPENDING_EMPTY_SECTION,
@@ -215,7 +209,7 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
 
     uint32_t childId = morphology->_register(ptr);
 
-    bool emptySection = _emptySection(_sections[childId]);
+    bool emptySection = _sections[childId]->points().empty();
     if (emptySection) {
         const auto err = details::ErrorMessages(morphology->_uri);
         emitWarningOrError(Warning::APPENDING_EMPTY_SECTION,

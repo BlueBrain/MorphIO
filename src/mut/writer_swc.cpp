@@ -7,7 +7,6 @@
 #include <iomanip>  // std::fixed, std::setw, std::setprecision
 #include <unordered_map>
 
-#include <morphio/errorMessages.h>
 #include <morphio/error_warning_handling.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>

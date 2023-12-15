@@ -3,19 +3,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <iostream>  // std::cerr
-#include <sstream>   // std::ostringstream
-#include <stdexcept>
 #include <string>
 #include <vector>
 
+#include <morphio/enums.h>
 #include <morphio/errorMessages.h>
+#include <morphio/exceptions.h>
 
 namespace {
 
 class StaticErrorAndWarningHandler: public morphio::ErrorAndWarningHandler
 {
   public:
-    void emit(const morphio::Warning& warning, const std::string& msg) final {
+    void emit(const morphio::enums::Warning& warning, const std::string& msg) final {
         const int maxWarningCount = getMaxWarningCount();
         if (isIgnored(warning) || maxWarningCount == 0) {
             return;
@@ -68,13 +68,13 @@ void set_raise_warnings(bool is_raise) {
 }
 
 /** Ignore/Unignore a specific warning message */
-void set_ignored_warning(Warning warning, bool ignore) {
+void set_ignored_warning(enums::Warning warning, bool ignore) {
     auto static_handler = getErrorHandler();
     static_handler->setIgnoredWarning(warning, ignore);
 }
 
 /** Ignore/Unignore a specific warning message */
-void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
+void set_ignored_warning(const std::vector<enums::Warning>& warnings, bool ignore) {
     for (auto warning : warnings) {
         set_ignored_warning(warning, ignore);
     }
