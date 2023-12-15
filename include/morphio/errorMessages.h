@@ -4,7 +4,6 @@
  */
 #pragma once
 
-#include <map>        // std::map
 #include <memory>     // std::shared_ptr
 #include <string>     // std::string
 #include <vector>     // std::vector
@@ -23,8 +22,6 @@ void set_raise_warnings(bool is_raise);
 void set_ignored_warning(Warning warning, bool ignore = true);
 /** Set an array of warnings to ignore **/
 void set_ignored_warning(const std::vector<Warning>& warning, bool ignore = true);
-/** Print a warning. Raises an error if  `set_raise_warnings` was set to `true`. **/
-void printError(Warning warning, const std::string& msg);
 
 namespace readers {
 

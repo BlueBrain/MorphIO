@@ -111,11 +111,6 @@ void set_ignored_warning(const std::vector<Warning>& warnings, bool ignore) {
     }
 }
 
-/* void printError(Warning warning, const std::string& msg) { */
-/*     auto static_handler = getErrorHandler(); */
-/*     static_handler->emit(warning, msg); */
-/* } */
-
 namespace readers {
 
 bool ErrorMessages::isIgnored(const Warning& warning) {
