@@ -22,6 +22,16 @@
 #endif
 
 
+static const char *mkd_doc_morphio_Caution = R"doc()doc";
+
+static const char *mkd_doc_morphio_Caution_Caution = R"doc()doc";
+
+static const char *mkd_doc_morphio_Caution_Caution_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_Caution_level = R"doc()doc";
+
+static const char *mkd_doc_morphio_Caution_msg = R"doc()doc";
+
 static const char *mkd_doc_morphio_Collection = R"doc()doc";
 
 static const char *mkd_doc_morphio_CollectionImpl = R"doc()doc";
@@ -111,6 +121,48 @@ static const char *mkd_doc_morphio_EndoplasmicReticulum_sectionIndices = R"doc(R
 static const char *mkd_doc_morphio_EndoplasmicReticulum_surfaceAreas = R"doc(Returns the surface areas for each neuronal section)doc";
 
 static const char *mkd_doc_morphio_EndoplasmicReticulum_volumes = R"doc(Returns the volumes for each neuronal section)doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_emit = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_getAll = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_m = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_printAll = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_ErrorAndWarningHandler = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_ErrorAndWarningHandler_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_ErrorAndWarningHandler_3 = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_emit = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_getMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_getRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_ignoredWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_isIgnored = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_maxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_operator_assign = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_operator_assign_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_raiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_setIgnoredWarning = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_setMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_ErrorAndWarningHandler_setRaiseWarnings = R"doc()doc";
 
 static const char *mkd_doc_morphio_GlialCell = R"doc(Class to represent morphologies of glial cells)doc";
 
@@ -306,13 +358,15 @@ Parameter ``options``:
 
 Example: Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);)doc";
 
-static const char *mkd_doc_morphio_Morphology_Morphology_4 = R"doc(Constructor from an already parsed file)doc";
+static const char *mkd_doc_morphio_Morphology_Morphology_4 = R"doc()doc";
 
-static const char *mkd_doc_morphio_Morphology_Morphology_5 = R"doc(Constructor from an instance of morphio::mut::Morphology)doc";
+static const char *mkd_doc_morphio_Morphology_Morphology_5 = R"doc(Constructor from an already parsed file)doc";
 
-static const char *mkd_doc_morphio_Morphology_Morphology_6 = R"doc(Load a morphology from a string)doc";
+static const char *mkd_doc_morphio_Morphology_Morphology_6 = R"doc(Constructor from an instance of morphio::mut::Morphology)doc";
 
-static const char *mkd_doc_morphio_Morphology_Morphology_7 = R"doc()doc";
+static const char *mkd_doc_morphio_Morphology_Morphology_7 = R"doc(Load a morphology from a string)doc";
+
+static const char *mkd_doc_morphio_Morphology_Morphology_8 = R"doc()doc";
 
 static const char *mkd_doc_morphio_Morphology_annotations = R"doc(Return the annotation object)doc";
 
@@ -991,6 +1045,8 @@ static const char *mkd_doc_morphio_enums_operator_lshift = R"doc()doc";
 
 static const char *mkd_doc_morphio_get = R"doc()doc";
 
+static const char *mkd_doc_morphio_getErrorHandler = R"doc()doc";
+
 static const char *mkd_doc_morphio_getVersionString = R"doc()doc";
 
 static const char *mkd_doc_morphio_isRoot = R"doc(Return true if this section is a root section (parent ID == -1))doc";
@@ -1200,11 +1256,13 @@ their enum: morphio::enum::Option and can be composed.
 
 Example: Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);)doc";
 
-static const char *mkd_doc_morphio_mut_Morphology_Morphology_3 = R"doc(Build a mutable Morphology from an HighFive::Group)doc";
+static const char *mkd_doc_morphio_mut_Morphology_Morphology_3 = R"doc()doc";
 
-static const char *mkd_doc_morphio_mut_Morphology_Morphology_4 = R"doc(Build a mutable Morphology from a mutable morphology)doc";
+static const char *mkd_doc_morphio_mut_Morphology_Morphology_4 = R"doc(Build a mutable Morphology from an HighFive::Group)doc";
 
-static const char *mkd_doc_morphio_mut_Morphology_Morphology_5 = R"doc(Build a mutable Morphology from a read-only morphology)doc";
+static const char *mkd_doc_morphio_mut_Morphology_Morphology_5 = R"doc(Build a mutable Morphology from a mutable morphology)doc";
+
+static const char *mkd_doc_morphio_mut_Morphology_Morphology_6 = R"doc(Build a mutable Morphology from a read-only morphology)doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_addAnnotation = R"doc()doc";
 
@@ -1276,6 +1334,10 @@ static const char *mkd_doc_morphio_mut_Morphology_eraseByValue = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_err = R"doc()doc";
 
+static const char *mkd_doc_morphio_mut_Morphology_getWarningOrErrorHandler = R"doc()doc";
+
+static const char *mkd_doc_morphio_mut_Morphology_handler = R"doc()doc";
+
 static const char *mkd_doc_morphio_mut_Morphology_markers = R"doc(Return the markers from the ASC file)doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_mitochondria = R"doc(Return the mitochondria container class)doc";
@@ -1304,6 +1366,8 @@ Note: multiple morphologies can share the same Section instances.)doc";
 static const char *mkd_doc_morphio_mut_Morphology_sections = R"doc(Returns the dictionary id -> Section for this tree)doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_sections_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_mut_Morphology_setWarningAndErrorHandler = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_soma =
 R"doc(Returns a shared pointer on the Soma
@@ -1352,6 +1416,8 @@ static const char *mkd_doc_morphio_mut_Section_depth_end = R"doc()doc";
 static const char *mkd_doc_morphio_mut_Section_diameters = R"doc(@{ Return the diameters of all points of this section)doc";
 
 static const char *mkd_doc_morphio_mut_Section_diameters_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_mut_Section_emitWarningOrError = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Section_getOwningMorphologyOrThrow =
 R"doc(Getter for morphology_; checks the pointer is non-null, throws
@@ -1530,26 +1596,6 @@ R"doc(Return the parent section of this section
 Throws:
     MissingParentError is the section doesn't have a parent.)doc";
 
-static const char *mkd_doc_morphio_printError =
-R"doc(Print a warning. Raises an error if `set_raise_warnings` was set to
-`true`.)doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo = R"doc(Debug info for error messages)doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_DebugInfo =
-R"doc(Constructor
-
-Parameter ``filename``:
-    morphology filename.)doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_filename = R"doc(Morphology filename)doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_getLineNumber = R"doc(Get section's line number within morphology file)doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_lineNumbers = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_setLineNumber = R"doc(Stores section's line number within morphology file)doc";
-
 static const char *mkd_doc_morphio_readers_ErrorLevel = R"doc(Level of error reporting)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorLevel_ERROR = R"doc(Error)doc";
@@ -1654,35 +1700,11 @@ static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_WRONG_ROOT_POIN
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_ZERO_DIAMETER = R"doc(Writing zero diameter warning message)doc";
 
-static const char *mkd_doc_morphio_readers_ErrorMessages_errorLink = R"doc(Returns a link to a line number within the morphology file)doc";
-
 static const char *mkd_doc_morphio_readers_ErrorMessages_errorMsg = R"doc(Generate an error message.)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_isIgnored = R"doc(Is the output of the warning ignored)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorMessages_uri = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample =
-R"doc(A sample of section for error reporting, includes its position (line)
-within the file.)doc";
-
-static const char *mkd_doc_morphio_readers_Sample_Sample = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_UNKNOWN_ID = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_diameter = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_id = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_lineNumber = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_parentId = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_point = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_type = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_valid = R"doc()doc";
 
 static const char *mkd_doc_morphio_set_ignored_warning = R"doc(Set a warning to ignore)doc";
 
