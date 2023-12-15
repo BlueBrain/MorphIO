@@ -8,6 +8,8 @@
 #include <highfive/H5DataType.hpp>  // for HighFive::SilenceHDF5
 #include <highfive/H5Utility.hpp>  // for HighFive::SilenceHDF5
 
+#include "../error_message_generation.h"
+
 namespace HighFive {
 template <>
 inline AtomicType<morphio::VascularSectionType>::AtomicType() {
@@ -96,7 +98,8 @@ void VasculatureHDF5::_readSectionTypes() {
     selection.read(types);
     for (int type : types) {
         if (type > SECTION_CUSTOM || type < 0) {
-            throw morphio::RawDataError(_err.ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(
+            const auto err = details::ErrorMessages(_uri);
+            throw morphio::RawDataError(err.ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE(
                 0, static_cast<VascularSectionType>(type)));
         }
     }

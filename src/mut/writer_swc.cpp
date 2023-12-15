@@ -21,6 +21,7 @@
 #include <highfive/H5Object.hpp>
 
 #include "../shared_utils.hpp"
+#include "../error_message_generation.h"
 #include "writer_utils.h"
 
 namespace {
@@ -74,7 +75,7 @@ int writeSoma(std::ofstream& myfile,
             std::stringstream stream;
             stream << status;
             handler->emit(morphio::Warning::SOMA_NON_CONFORM,
-                          morphio::readers::ErrorMessages().WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
+                          morphio::details::ErrorMessages().WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
                               stream.str()));
         }
         writeLine(myfile, 1, -1, SectionType::SECTION_SOMA, soma_points[0], soma_diameters[0]);
@@ -105,7 +106,7 @@ void validateSWCSoma(const morphio::mut::Morphology& morph,
     using morphio::SomaType;
     using morphio::Warning;
     using morphio::WriterError;
-    using morphio::readers::ErrorMessages;
+    using morphio::details::ErrorMessages;
 
     const auto& soma = morph.soma();
     const auto& soma_points = soma->points();
@@ -167,7 +168,7 @@ void swc(const Morphology& morph,
             bool isUnifurcation = section->parent()->children().size() == 1;
             if (isUnifurcation) {
                 throw morphio::WriterError(
-                    morphio::readers::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(
+                    morphio::details::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(
                         section->parent()->id()));
             }
         }

@@ -11,6 +11,8 @@
 
 #include <morphio/errorMessages.h>
 
+#include "../error_message_generation.h"
+
 namespace {
 
 constexpr size_t SECTION_START_OFFSET = 0;
@@ -275,7 +277,7 @@ int MorphologyHDF5::_readSections() {
         SectionType type = static_cast<SectionType>(section[SECTION_TYPE]);
 
         if (section[SECTION_TYPE] >= SECTION_OUT_OF_RANGE_START || section[SECTION_TYPE] <= 0) {
-            ErrorMessages err;
+            details::ErrorMessages err;
             throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(0, type));
         } else if (!hasSoma && type == SECTION_SOMA) {
             throw(RawDataError("Error reading morphology " + _uri +

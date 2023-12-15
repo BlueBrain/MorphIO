@@ -13,6 +13,7 @@
 #include <morphio/mut/writers.h>
 #include <morphio/soma.h>
 
+#include "../error_message_generation.h"
 #include "../shared_utils.hpp"
 
 namespace {
@@ -121,7 +122,8 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 
     const bool emptySection = ptr->points().empty();
     if (emptySection) {
-        handler->emit(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+        const auto err = details::ErrorMessages(_uri);
+        handler->emit(Warning::APPENDING_EMPTY_SECTION, err.WARNING_APPENDING_EMPTY_SECTION(ptr->id()));
     }
 
     if (recursive) {
@@ -140,8 +142,9 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
     _rootSections.push_back(section_copy);
     const bool emptySection = section_copy->points().empty();
     if (emptySection) {
+        const auto err = details::ErrorMessages(_uri);
         handler->emit(Warning::APPENDING_EMPTY_SECTION,
-                      _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
+                      err.WARNING_APPENDING_EMPTY_SECTION(section_copy->id()));
     }
 
     if (recursive) {
@@ -161,7 +164,8 @@ std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLeve
 
     bool emptySection = ptr->points().empty();
     if (emptySection) {
-        handler->emit(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+        const auto err = details::ErrorMessages(_uri);
+        handler->emit(Warning::APPENDING_EMPTY_SECTION, err.WARNING_APPENDING_EMPTY_SECTION(ptr->id()));
     }
 
     return ptr;
@@ -239,7 +243,7 @@ void Morphology::deleteSection(const std::shared_ptr<Section> section_, bool rec
 }
 
 void Morphology::removeUnifurcations() {
-    morphio::readers::ErrorMessages err;
+    morphio::details::ErrorMessages err;
 
     auto it = depth_begin();
     while (it != depth_end()) {
@@ -256,7 +260,7 @@ void Morphology::removeUnifurcations() {
         unsigned int parentId = section_->parent()->id();
 
         // XXX: should we check if ignored, or delegate that to the error handler?
-        if (!morphio::readers::ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
+        if (!handler->isIgnored(Warning::WRONG_DUPLICATE) &&
             !_checkDuplicatePoint(section_->parent(), section_)) {
             handler->emit(Warning::WRONG_DUPLICATE,
                           err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
@@ -336,8 +340,9 @@ breadth_iterator Morphology::breadth_end() const {
 
 void Morphology::applyModifiers(unsigned int modifierFlags) {
     if (modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS) {
+        const auto err = details::ErrorMessages(_uri);
         throw SectionBuilderError(
-            _err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
+            err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
     }
 
     if (modifierFlags & SOMA_SPHERE) {
@@ -403,7 +408,8 @@ void Morphology::write(const std::string& filename) const {
     } else if (extension == ".swc") {
         writer::swc(*this, filename, handler);
     } else {
-        throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
+        const auto err = details::ErrorMessages(_uri);
+        throw UnknownFileType(err.ERROR_WRONG_EXTENSION(filename));
     }
 }
 

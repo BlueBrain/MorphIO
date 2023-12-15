@@ -9,6 +9,7 @@
 #include <morphio/mut/section.h>
 
 
+#include "../error_message_generation.h"
 #include "NeurolucidaLexer.inc"
 #include "morphio/enums.h"
 
@@ -371,7 +372,7 @@ class NeurolucidaParser
     std::string uri_;
     NeurolucidaLexer lex_;
 
-    ErrorMessages err_;
+    details::ErrorMessages err_;
 };
 
 }  // namespace

@@ -12,6 +12,7 @@
 #include <sstream>        // std::stringstream
 #include <string>         // std::string
 #include <unordered_map>  // std::unordered_map
+#include <utility>
 #include <vector>         // std::vector
 
 #include <morphio/errorMessages.h>
@@ -20,6 +21,7 @@
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
 
+#include "../error_message_generation.h"
 #include "../shared_utils.hpp"
 
 namespace {
@@ -109,10 +111,10 @@ namespace swc {
 class SWCBuilder
 {
   public:
-    explicit SWCBuilder(const std::string& path)
-        : err(path) {}
+    explicit SWCBuilder(std::string uri_)
+        : uri(std::move(uri_)) {}
 
-    void _readSamples(const std::string& contents) {
+    void readSamples(const std::string& contents) {
         std::stringstream stream{contents};
         unsigned int lineNumber = 0;
         std::string line;
@@ -126,14 +128,17 @@ class SWCBuilder
             const auto sample = readSample(line.data(), lineNumber);
 
             if (!sample.valid) {
+                const auto err = details::ErrorMessages(uri);
                 throw RawDataError(err.ERROR_LINE_NON_PARSABLE(lineNumber));
             }
 
             if (sample.type >= SECTION_OUT_OF_RANGE_START || sample.type <= 0) {
+                const auto err = details::ErrorMessages(uri);
                 throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(lineNumber, sample.type));
             }
 
             if (samples.count(sample.id) > 0) {
+                const auto err = details::ErrorMessages(uri);
                 auto original = samples[sample.id];
                 throw RawDataError(
                     err.ERROR_REPEATED_ID(original.id, original.lineNumber, sample.lineNumber));
@@ -178,6 +183,7 @@ class SWCBuilder
             }
 
             if (soma_bifurcations.size() > 1) {
+                const auto err = details::ErrorMessages(uri);
                 throw morphio::SomaError(
                     err.ERROR_SOMA_BIFURCATION(sample.lineNumber,
                                                gatherLineNumbers(soma_bifurcations)));
@@ -186,12 +192,14 @@ class SWCBuilder
 
         if (sample.parentId != SWC_ROOT && samples.count(sample.parentId) > 0 &&
             samples[sample.parentId].type != SECTION_SOMA) {
+            const auto err = details::ErrorMessages(uri);
             throw morphio::SomaError(err.ERROR_SOMA_WITH_NEURITE_PARENT(sample.lineNumber));
         }
     }
 
     void raiseIfSelfParent(const SWCSample& sample) {
         if (sample.parentId == sample.id) {
+            const auto err = details::ErrorMessages(uri);
             throw morphio::RawDataError(err.ERROR_SELF_PARENT(sample.id));
         }
     }
@@ -199,6 +207,7 @@ class SWCBuilder
     void warnIfDisconnectedNeurite(const SWCSample& sample,
                                    std::shared_ptr<ErrorAndWarningHandler>& h) {
         if (sample.parentId == SWC_ROOT && sample.type != SECTION_SOMA) {
+            const auto err = details::ErrorMessages(uri);
             h->emit(Warning::DISCONNECTED_NEURITE,
                     err.WARNING_DISCONNECTED_NEURITE(sample.lineNumber));
         }
@@ -208,11 +217,13 @@ class SWCBuilder
         auto somata = _potentialSomata();
 
         if (somata.size() > 1) {
+            const auto err = details::ErrorMessages(uri);
             const auto lineNumbers = gatherLineNumbers(somata);
             throw morphio::SomaError(err.ERROR_MULTIPLE_SOMATA(lineNumbers));
         }
 
         if (somata.empty()) {
+            const auto err = details::ErrorMessages(uri);
             h->emit(Warning::NO_SOMA_FOUND, err.WARNING_NO_SOMA_FOUND());
         } else {
             for (const auto& sample_pair : samples) {
@@ -224,6 +235,7 @@ class SWCBuilder
 
     void raiseIfNoParent(const SWCSample& sample) {
         if (sample.parentId != SWC_ROOT && samples.count(sample.parentId) == 0) {
+            const auto err = details::ErrorMessages(uri);
             throw morphio::MissingParentError(err.ERROR_MISSING_PARENT(
                 sample.id, static_cast<int>(sample.parentId), sample.lineNumber));
         }
@@ -233,6 +245,7 @@ class SWCBuilder
                             std::shared_ptr<ErrorAndWarningHandler> h
                             ) {
         if (sample.diameter < morphio::epsilon) {
+            const auto err = details::ErrorMessages(uri);
             h->emit(Warning::ZERO_DIAMETER, err.WARNING_ZERO_DIAMETER(sample.lineNumber));
         }
     }
@@ -303,7 +316,7 @@ class SWCBuilder
             }
 
             if (children_soma_points.size() == 2) {
-                if (!ErrorMessages::isIgnored(Warning::SOMA_NON_CONFORM)) {
+                if (!h->isIgnored(Warning::SOMA_NON_CONFORM)) {
                     const std::array<Point, 3> points = {
                         samples[somaRootId].point,
                         children_soma_points[0].point,
@@ -313,6 +326,7 @@ class SWCBuilder
                         details::checkNeuroMorphoSoma(points, samples[somaRootId].diameter / 2);
 
                     if (status != details::ThreePointSomaStatus::Conforms) {
+                        const auto err = details::ErrorMessages(uri);
                         std::stringstream stream;
                         stream << status;
                         h->emit(Warning::SOMA_NON_CONFORM,
@@ -332,7 +346,7 @@ class SWCBuilder
     Property::Properties buildProperties(const std::string& contents, unsigned int options,
                                          std::shared_ptr<ErrorAndWarningHandler> h
                                         ) {
-        _readSamples(contents);
+        readSamples(contents);
 
         for (const auto& sample_pair : samples) {
             const auto& sample = sample_pair.second;
@@ -346,7 +360,7 @@ class SWCBuilder
 
         // The process might occasionally creates empty section before
         // filling them so the warning is ignored
-        bool originalIsIgnored = err.isIgnored(morphio::Warning::APPENDING_EMPTY_SECTION);
+        bool originalIsIgnored = h->isIgnored(morphio::Warning::APPENDING_EMPTY_SECTION);
         set_ignored_warning(morphio::Warning::APPENDING_EMPTY_SECTION, true);
 
         std::vector<unsigned int> depthFirstSamples = constructDepthFirstSamples();
@@ -373,6 +387,7 @@ class SWCBuilder
         }
 
         if (morph.soma()->points().size() == 3 && !neurite_wrong_root.empty()) {
+            const auto err = details::ErrorMessages(uri);
             h->emit(morphio::WRONG_ROOT_POINT,
                     err.WARNING_WRONG_ROOT_POINT(gatherLineNumbers(neurite_wrong_root)));
         }
@@ -382,7 +397,7 @@ class SWCBuilder
         Property::Properties properties = morph.buildReadOnly();
         properties._cellLevel._somaType = somaType(h);
 
-        set_ignored_warning(morphio::Warning::APPENDING_EMPTY_SECTION, originalIsIgnored);
+        h->setIgnoredWarning(morphio::Warning::APPENDING_EMPTY_SECTION, originalIsIgnored);
 
         return properties;
     }
@@ -431,7 +446,7 @@ class SWCBuilder
     std::unordered_map<unsigned int, std::vector<unsigned int>> children;
     std::unordered_map<unsigned int, SWCSample> samples;
     mut::Morphology morph;
-    ErrorMessages err;
+    std::string uri;
 };
 
 Property::Properties load(const std::string& path,

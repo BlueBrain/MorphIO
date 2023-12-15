@@ -12,6 +12,7 @@
 #include <morphio/mut/writers.h>
 #include <morphio/version.h>
 
+#include "../error_message_generation.h"
 #include "../shared_utils.hpp"
 #include "writer_utils.h"
 
@@ -79,7 +80,7 @@ void asc(const Morphology& morph,
         } else if (type == SECTION_APICAL_DENDRITE) {
             myfile << "( (Color Red)\n  (Apical)\n";
         } else {
-            throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(type));
+            throw WriterError(morphio::details::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(type));
         }
         write_asc_section(myfile, section, 2);
         myfile << ")\n\n";

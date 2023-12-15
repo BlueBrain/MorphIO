@@ -250,9 +250,8 @@ class Morphology
     void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
                       const std::shared_ptr<Section>& section);
 
-    morphio::readers::ErrorMessages _err;
-
     std::shared_ptr<ErrorAndWarningHandler> handler = getErrorHandler();
+    std::string _uri;
 
     friend class Section;
     friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);

@@ -31,11 +31,6 @@ class Section;
 class Vasculature;
 }  // namespace vasculature
 
-/** Functionality for reading of morphologies from files  **/
-namespace readers {
-class ErrorMessages;
-}  // namespace readers
-
 /** Functionality for mutating(editing) of morphologies  **/
 namespace mut {
 class DendriticSpine;
