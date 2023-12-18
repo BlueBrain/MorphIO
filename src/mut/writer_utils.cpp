@@ -5,6 +5,7 @@
 #include <morphio/errorMessages.h>
 
 #include "../error_message_generation.h"
+#include "morphio/error_warning_handling.h"
 #include "writer_utils.h"
 
 namespace morphio {
@@ -35,8 +36,7 @@ std::string version_string() {
 bool emptyMorphology(const morphio::mut::Morphology& morph,
                      std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
     if (morph.soma()->points().empty() && morph.rootSections().empty()) {
-        handler->emit(Warning::WRITE_EMPTY_MORPHOLOGY,
-                      ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+        handler->emit(std::make_unique<morphio::WriteEmptyMorphology>());
         return true;
     }
     return false;
@@ -48,13 +48,11 @@ void validateContourSoma(const morphio::mut::Morphology& morph,
     const std::vector<Point>& somaPoints = soma->points();
 
     if (somaPoints.empty()) {
-        handler->emit(Warning::WRITE_NO_SOMA, ErrorMessages().WARNING_WRITE_NO_SOMA());
+        handler->emit(std::make_unique<morphio::WriteNoSoma>());
     } else if (soma->type() == SOMA_UNDEFINED) {
-        handler->emit(Warning::WRITE_UNDEFINED_SOMA,
-                      ErrorMessages().WARNING_UNDEFINED_SOMA());
+        handler->emit(std::make_unique<morphio::WriteUndefinedSoma>());
     } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
-        handler->emit(Warning::SOMA_NON_CONTOUR,
-                      ErrorMessages().WARNING_SOMA_NON_CONTOUR());
+        handler->emit(std::make_unique<morphio::SomaNonContour>());
     } else if (somaPoints.size() < 3) {
         throw WriterError(ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
     }
@@ -69,8 +67,7 @@ void validateHasNoPerimeterData(const morphio::mut::Morphology& morph) {
 void validateHasNoMitochondria(const morphio::mut::Morphology& morph,
                                std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
     if (!morph.mitochondria().rootSections().empty()) {
-        handler->emit(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-                      ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+        handler->emit(std::make_unique<morphio::MitochondriaWriteNotSupported>());
     }
 }
 

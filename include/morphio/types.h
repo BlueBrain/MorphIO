@@ -43,6 +43,16 @@ class Section;
 class Soma;
 }  // namespace mut
 
+namespace readers {
+/** Level of error reporting **/
+enum ErrorLevel {
+    INFO,     //!< Info
+    WARNING,  //!< Warning
+    ERROR     //!< Error
+};
+}  // namespace readers
+
+
 using SectionRange = std::pair<size_t, size_t>;
 
 }  // namespace morphio

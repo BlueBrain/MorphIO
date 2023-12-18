@@ -231,128 +231,17 @@ std::string ErrorMessages::ERROR_SOMA_INVALID_CONTOUR() const {
     return "Contour soma must have at least 3 points.";
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 //              WARNINGS
 ////////////////////////////////////////////////////////////////////////////////
-std::string ErrorMessages::WARNING_WRITE_NO_SOMA() const {
-    return errorMsg(0, ErrorLevel::WARNING, "Warning: writing file without a soma");
-}
-
-std::string ErrorMessages::WARNING_WRITE_EMPTY_MORPHOLOGY() const {
-    return errorMsg(0,
-                    ErrorLevel::WARNING,
-                    "Warning: Skipping an attempt to write an empty morphology.");
-}
-
-std::string ErrorMessages::WARNING_NO_SOMA_FOUND() const {
-    return errorMsg(0, ErrorLevel::WARNING, "Warning: no soma found in file");
-}
-
-std::string ErrorMessages::WARNING_ZERO_DIAMETER(const long unsigned int lineNumber) const {
-    return errorMsg(lineNumber, ErrorLevel::WARNING, "Warning: zero diameter in file");
-}
-
-std::string ErrorMessages::WARNING_DISCONNECTED_NEURITE(const long unsigned int lineNumber) const {
-    return errorMsg(lineNumber,
-                    ErrorLevel::WARNING,
-                    "Warning: found a disconnected neurite.\n"
-                    "Neurites are not supposed to have parentId: -1\n"
-                    "(although this is normal if this neuron has no soma)");
-}
-
 std::string ErrorMessages::WARNING_APPENDING_EMPTY_SECTION(unsigned long sectionId) const {
     return errorMsg(0,
                     ErrorLevel::WARNING,
                     "Warning: appending empty section with id: " + std::to_string(sectionId));
 }
 
-std::string ErrorMessages::WARNING_WRONG_DUPLICATE(
-    const std::shared_ptr<morphio::mut::Section>& current,
-    const std::shared_ptr<morphio::mut::Section>& parent) const {
-    std::string msg("Warning: while appending section: " + std::to_string(current->id()) +
-                    " to parent: " + std::to_string(parent->id()));
-
-    if (parent->points().empty()) {
-        return errorMsg(0, ErrorLevel::WARNING, msg + "\nThe parent section is empty.");
-    }
-
-    if (current->points().empty()) {
-        return errorMsg(0,
-                        ErrorLevel::WARNING,
-                        msg +
-                            "\nThe current section has no points. It should at "
-                            "least contains "
-                            "parent section last point");
-    }
-
-    auto p0 = parent->points()[parent->points().size() - 1];
-    auto p1 = current->points()[0];
-    auto d0 = parent->diameters()[parent->diameters().size() - 1];
-    auto d1 = current->diameters()[0];
-
-    std::ostringstream oss;
-    oss << msg
-        << "\nThe section first point should be parent section last point: "
-           "\n        : X Y Z Diameter"
-           "\nparent last point :["
-        << std::to_string(p0[0]) << ", " << std::to_string(p0[1]) << ", " << std::to_string(p0[2])
-        << ", " << std::to_string(d0) << "]\nchild first point :[" << std::to_string(p1[0]) << ", "
-        << std::to_string(p1[1]) << ", " << std::to_string(p1[2]) << ", " << std::to_string(d1)
-        << "]\n";
-    return errorMsg(0, ErrorLevel::WARNING, oss.str());
-}
-
-std::string ErrorMessages::WARNING_ONLY_CHILD(unsigned int parentId, unsigned int childId) const {
-    std::string parentMsg;
-    std::string childMsg;
-
-    std::ostringstream oss;
-    oss << "Warning: section " << childId << childMsg << " is the only child of "
-        << "section: " << std::to_string(parentId) << parentMsg
-        << "\nIt will be merged with the parent section";
-
-    return errorMsg(0, ErrorLevel::WARNING, oss.str());
-}
-
 std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const std::string& s) const {
     return errorMsg(0, ErrorLevel::WARNING, s);
-}
-
-std::string ErrorMessages::WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const {
-    return errorMsg(0,
-                    ErrorLevel::WARNING,
-                    "Warning: this cell has mitochondria, they cannot be saved in "
-                    " ASC or SWC format. Please use H5 if you want to save them.");
-}
-
-std::string ErrorMessages::WARNING_WRONG_ROOT_POINT(
-    const std::vector<unsigned int>& childrenLineNumbers) const {
-    std::ostringstream oss;
-    oss << "Warning: with a 3 points soma, neurites must be connected to the first soma "
-           "point:";
-    for (const auto& lineNumber : childrenLineNumbers) {
-        oss << errorMsg(lineNumber, ErrorLevel::WARNING, "");
-    }
-    return oss.str();
-}
-
-std::string ErrorMessages::WARNING_UNDEFINED_SOMA() const {
-    return errorMsg(0, ErrorLevel::WARNING, "Warning: writing soma set to SOMA_UNDEFINED");
-}
-
-std::string ErrorMessages::WARNING_SOMA_NON_CONTOUR() const {
-    return errorMsg(0,
-                    ErrorLevel::WARNING,
-                    "Soma must be a contour for ASC and H5: see "
-                    "https://github.com/BlueBrain/MorphIO/issues/457");
-}
-
-std::string ErrorMessages::WARNING_SOMA_NON_CYLINDER_OR_POINT() const {
-    return errorMsg(0,
-                    ErrorLevel::WARNING,
-                    "Soma must be stacked cylinders or a point: see "
-                    "https://github.com/BlueBrain/MorphIO/issues/457");
 }
 
 // LCOV_EXCL_STOP }

@@ -20,6 +20,7 @@
 #include <morphio/mut/section.h>
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
+#include <morphio/error_warning_handling.h>
 
 #include "../error_message_generation.h"
 #include "../shared_utils.hpp"
@@ -207,9 +208,7 @@ class SWCBuilder
     void warnIfDisconnectedNeurite(const SWCSample& sample,
                                    std::shared_ptr<ErrorAndWarningHandler>& h) {
         if (sample.parentId == SWC_ROOT && sample.type != SECTION_SOMA) {
-            const auto err = details::ErrorMessages(uri);
-            h->emit(Warning::DISCONNECTED_NEURITE,
-                    err.WARNING_DISCONNECTED_NEURITE(sample.lineNumber));
+            h->emit(std::make_unique<WarningDisconnectedNeurite>(uri, sample.lineNumber));
         }
     }
 
@@ -224,7 +223,8 @@ class SWCBuilder
 
         if (somata.empty()) {
             const auto err = details::ErrorMessages(uri);
-            h->emit(Warning::NO_SOMA_FOUND, err.WARNING_NO_SOMA_FOUND());
+            h->emit(std::make_unique<NoSomaFound>(uri));
+
         } else {
             for (const auto& sample_pair : samples) {
                 const auto& sample = sample_pair.second;
@@ -245,8 +245,7 @@ class SWCBuilder
                             std::shared_ptr<ErrorAndWarningHandler> h
                             ) {
         if (sample.diameter < morphio::epsilon) {
-            const auto err = details::ErrorMessages(uri);
-            h->emit(Warning::ZERO_DIAMETER, err.WARNING_ZERO_DIAMETER(sample.lineNumber));
+            h->emit(std::make_unique<WarningZeroDiameter>(uri, sample.lineNumber));
         }
     }
 
@@ -329,8 +328,7 @@ class SWCBuilder
                         const auto err = details::ErrorMessages(uri);
                         std::stringstream stream;
                         stream << status;
-                        h->emit(Warning::SOMA_NON_CONFORM,
-                                err.WARNING_NEUROMORPHO_SOMA_NON_CONFORM(stream.str()));
+                        h->emit(std::make_unique<SomaNonConform>(uri, stream.str()));
                     }
                 }
 
@@ -388,8 +386,9 @@ class SWCBuilder
 
         if (morph.soma()->points().size() == 3 && !neurite_wrong_root.empty()) {
             const auto err = details::ErrorMessages(uri);
-            h->emit(morphio::WRONG_ROOT_POINT,
-                    err.WARNING_WRONG_ROOT_POINT(gatherLineNumbers(neurite_wrong_root)));
+            //h->emit(morphio::WRONG_ROOT_POINT,
+            //        err.WARNING_WRONG_ROOT_POINT(gatherLineNumbers(neurite_wrong_root)));
+            h->emit(std::make_unique<WrongRootPoint>(uri, gatherLineNumbers(neurite_wrong_root)));
         }
 
         morph.applyModifiers(options);

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <algorithm>  // std::find_if
+#include <memory>
 #include <string>
 
 #include <morphio/endoplasmic_reticulum.h>
@@ -124,6 +125,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
     if (emptySection) {
         const auto err = details::ErrorMessages(_uri);
         handler->emit(Warning::APPENDING_EMPTY_SECTION, err.WARNING_APPENDING_EMPTY_SECTION(ptr->id()));
+        //handler->emit(std::make_unique<AppendingEmptySection>(_uri, ptr->id()));
     }
 
     if (recursive) {
@@ -145,6 +147,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
         const auto err = details::ErrorMessages(_uri);
         handler->emit(Warning::APPENDING_EMPTY_SECTION,
                       err.WARNING_APPENDING_EMPTY_SECTION(section_copy->id()));
+        //handler->emit(std::make_unique<AppendingEmptySection>(_uri, section_copy->id()));
     }
 
     if (recursive) {
@@ -166,6 +169,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLeve
     if (emptySection) {
         const auto err = details::ErrorMessages(_uri);
         handler->emit(Warning::APPENDING_EMPTY_SECTION, err.WARNING_APPENDING_EMPTY_SECTION(ptr->id()));
+        //handler->emit(std::make_unique<AppendingEmptySection>(_uri, ptr->id()));
     }
 
     return ptr;
@@ -257,23 +261,19 @@ void Morphology::removeUnifurcations() {
             continue;
         }
 
-        unsigned int parentId = section_->parent()->id();
+        const auto& parent = section_->parent();
+        bool duplicate = _checkDuplicatePoint(parent, section_);
 
-        // XXX: should we check if ignored, or delegate that to the error handler?
-        if (!handler->isIgnored(Warning::WRONG_DUPLICATE) &&
-            !_checkDuplicatePoint(section_->parent(), section_)) {
-            handler->emit(Warning::WRONG_DUPLICATE,
-                          err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
+        if (!duplicate) {
+            handler->emit(std::make_unique<WrongDuplicate>(_uri, section_, parent));
         }
 
-        auto parent = section_->parent();
         bool isUnifurcation = parent->children().size() == 1;
 
         // This "if" condition ensures that "unifurcations" (ie. successive
         // sections with only 1 child) get merged together into a bigger section
         if (isUnifurcation) {
-            handler->emit(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(parentId, sectionId));
-            bool duplicate = _checkDuplicatePoint(section_->parent(), section_);
+            handler->emit(std::make_unique<OnlyChild>(_uri, parent->id(), sectionId));
 
             addAnnotation(Property::Annotation(AnnotationType::SINGLE_CHILD,
                                                sectionId,

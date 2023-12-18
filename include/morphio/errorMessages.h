@@ -21,16 +21,6 @@ void set_ignored_warning(enums::Warning warning, bool ignore = true);
 /** Set an array of warnings to ignore **/
 void set_ignored_warning(const std::vector<enums::Warning>& warning, bool ignore = true);
 
-namespace readers {
-
-/** Level of error reporting **/
-enum ErrorLevel {
-    INFO,     //!< Info
-    WARNING,  //!< Warning
-    ERROR     //!< Error
-};
-}  // namespace readers
-
 std::shared_ptr<ErrorAndWarningHandler> getErrorHandler();
 
 }  // namespace morphio

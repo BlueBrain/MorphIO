@@ -5,6 +5,7 @@
 #include <cassert>
 #include <fstream>
 #include <iomanip>  // std::fixed, std::setw, std::setprecision
+#include <memory>
 #include <unordered_map>
 
 #include <morphio/error_warning_handling.h>
@@ -111,18 +112,17 @@ void validateSWCSoma(const morphio::mut::Morphology& morph,
     const auto& soma_points = soma->points();
     if (soma_points.empty()) {
         if (morph.rootSections().empty()) {
-            handler->emit(Warning::WRITE_EMPTY_MORPHOLOGY,
-                          ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+            handler->emit(std::make_unique<morphio::WriteEmptyMorphology>());
             return;
         }
-        handler->emit(Warning::WRITE_NO_SOMA, ErrorMessages().WARNING_WRITE_NO_SOMA());
+        handler->emit(std::make_unique<morphio::WriteNoSoma>());
+
     } else if (soma->type() == morphio::SOMA_UNDEFINED) {
-        handler->emit(Warning::WRITE_UNDEFINED_SOMA, ErrorMessages().WARNING_UNDEFINED_SOMA());
+        handler->emit(std::make_unique<morphio::WriteUndefinedSoma>());
     } else if (!(soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
                  soma->type() == SomaType::SOMA_CYLINDERS ||
                  soma->type() == SomaType::SOMA_SINGLE_POINT)) {
-        handler->emit(Warning::SOMA_NON_CYLINDER_OR_POINT,
-                      ErrorMessages().WARNING_SOMA_NON_CYLINDER_OR_POINT());
+        handler->emit(std::make_unique<morphio::SomaNonCynlinderOrPoint>());
     } else if (soma->type() == SomaType::SOMA_SINGLE_POINT && soma_points.size() != 1) {
         throw WriterError(ErrorMessages().ERROR_SOMA_INVALID_SINGLE_POINT());
     } else if (soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS &&

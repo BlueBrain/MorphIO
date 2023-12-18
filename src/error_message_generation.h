@@ -147,44 +147,15 @@ class ErrorMessages
     //              WARNINGS
     ////////////////////////////////////////////////////////////////////////////////
 
-    /** Writing of mitochondria is not supported warning message */
-    std::string WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED() const;
-    /** Writing without soma warning message */
-    std::string WARNING_WRITE_NO_SOMA() const;
-    /** Writing empty morphology warning message */
-    std::string WARNING_WRITE_EMPTY_MORPHOLOGY() const;
-    /** Soma not found warning message */
-    std::string WARNING_NO_SOMA_FOUND() const;
-    /** Writing zero diameter warning message */
-    std::string WARNING_ZERO_DIAMETER(long unsigned int lineNumber) const;
-    /** Writing disconnected neurite warning message */
-    std::string WARNING_DISCONNECTED_NEURITE(long unsigned int lineNumber) const;
-    /** Writing wrong duplicate warning message */
-    std::string WARNING_WRONG_DUPLICATE(const std::shared_ptr<morphio::mut::Section>& current,
-                                        const std::shared_ptr<morphio::mut::Section>& parent) const;
     /** Writing empty section warning message */
     std::string WARNING_APPENDING_EMPTY_SECTION(unsigned long sectionId) const;
-    /** Writing single child section warning message */
-    std::string WARNING_ONLY_CHILD(unsigned int parentId, unsigned int childId) const;
 
     /** Soma does not conform NeuroMorpho warning message */
     std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const std::string&) const;
 
-    /** Wrong root point warning message */
-    std::string WARNING_WRONG_ROOT_POINT(
-        const std::vector<unsigned int>& childrenLineNumbers) const;
-
-    /** Soma is undefined*/
-    std::string WARNING_UNDEFINED_SOMA() const;
-
-    /**  Soma must be a contour for ASC and H5 */
-    std::string WARNING_SOMA_NON_CONTOUR() const;
-
-    /* Soma must be stacked cylinders or a point */
-    std::string WARNING_SOMA_NON_CYLINDER_OR_POINT() const;
-
   private:
     std::string _uri;
 };
+
 }  // namespace details
 }  // namespace morphio

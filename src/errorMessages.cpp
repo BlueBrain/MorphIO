@@ -8,6 +8,7 @@
 
 #include <morphio/enums.h>
 #include <morphio/errorMessages.h>
+#include <morphio/error_warning_handling.h>
 #include <morphio/exceptions.h>
 
 namespace {
@@ -38,7 +39,6 @@ class StaticErrorAndWarningHandler: public morphio::ErrorAndWarningHandler
             ++errorCount;
         }
     }
-
     int errorCount = 0;
 };
 
