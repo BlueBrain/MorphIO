@@ -141,18 +141,6 @@ class ErrorMessages
 
     /** Contour soma must have at least 3 points. */
     std::string ERROR_SOMA_INVALID_CONTOUR() const;
-
-
-    ////////////////////////////////////////////////////////////////////////////////
-    //              WARNINGS
-    ////////////////////////////////////////////////////////////////////////////////
-
-    /** Writing empty section warning message */
-    std::string WARNING_APPENDING_EMPTY_SECTION(unsigned long sectionId) const;
-
-    /** Soma does not conform NeuroMorpho warning message */
-    std::string WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const std::string&) const;
-
   private:
     std::string _uri;
 };

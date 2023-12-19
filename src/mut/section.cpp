@@ -129,11 +129,8 @@ std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> origina
 
     bool emptySection = _sections[childId]->points().empty();
     if (emptySection) {
-        const auto err = details::ErrorMessages(morphology->_uri);
-        emitWarningOrError(Warning::APPENDING_EMPTY_SECTION,
-                           err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]->id()));
-        //emitWarningOrError(std::make_unique<AppendingEmptySection>(morphology->_uri,
-        //                                                           _sections[childId]->id()));
+        emitWarningOrError(std::make_unique<AppendingEmptySection>(morphology->_uri,
+                                                                   _sections[childId]->id()));
     }
 
     if (!emptySection && !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
@@ -166,11 +163,8 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
 
     bool emptySection = _sections[childId]->points().empty();
     if (emptySection) {
-        const auto err = details::ErrorMessages(morphology->_uri);
-        emitWarningOrError(Warning::APPENDING_EMPTY_SECTION,
-                           err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]->id()));
-        //emitWarningOrError(std::make_unique<AppendingEmptySection>(morphology->_uri,
-        //                                                           _sections[childId]->id()));
+        emitWarningOrError(std::make_unique<AppendingEmptySection>(morphology->_uri,
+                                                                   _sections[childId]->id()));
     }
 
     if (!emptySection && !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
@@ -210,11 +204,8 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
 
     bool emptySection = _sections[childId]->points().empty();
     if (emptySection) {
-        const auto err = details::ErrorMessages(morphology->_uri);
-        emitWarningOrError(Warning::APPENDING_EMPTY_SECTION,
-                           err.WARNING_APPENDING_EMPTY_SECTION(_sections[childId]->id()));
-        //emitWarningOrError(std::make_unique<AppendingEmptySection>(morphology->_uri,
-        //                                                           _sections[childId]->id()));
+        emitWarningOrError(std::make_unique<AppendingEmptySection>(morphology->_uri,
+                                                                   _sections[childId]->id()));
     }
 
     if (!emptySection && !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
@@ -232,7 +223,7 @@ void Section::emitWarningOrError(Warning warning, const std::string& msg) {
 }
 
 void Section::emitWarningOrError(const std::unique_ptr<WarningMessage> wm) {
-    getOwningMorphologyOrThrow()->getWarningOrErrorHandler()->emit(wm->warning, wm->msg());
+    getOwningMorphologyOrThrow()->getWarningOrErrorHandler()->emit(wm->warning(), wm->msg());
 }
 
 }  // end namespace mut

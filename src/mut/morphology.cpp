@@ -123,9 +123,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 
     const bool emptySection = ptr->points().empty();
     if (emptySection) {
-        const auto err = details::ErrorMessages(_uri);
-        handler->emit(Warning::APPENDING_EMPTY_SECTION, err.WARNING_APPENDING_EMPTY_SECTION(ptr->id()));
-        //handler->emit(std::make_unique<AppendingEmptySection>(_uri, ptr->id()));
+        handler->emit(std::make_unique<AppendingEmptySection>(_uri, ptr->id()));
     }
 
     if (recursive) {
@@ -144,10 +142,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
     _rootSections.push_back(section_copy);
     const bool emptySection = section_copy->points().empty();
     if (emptySection) {
-        const auto err = details::ErrorMessages(_uri);
-        handler->emit(Warning::APPENDING_EMPTY_SECTION,
-                      err.WARNING_APPENDING_EMPTY_SECTION(section_copy->id()));
-        //handler->emit(std::make_unique<AppendingEmptySection>(_uri, section_copy->id()));
+        handler->emit(std::make_unique<AppendingEmptySection>(_uri, section_copy->id()));
     }
 
     if (recursive) {
@@ -167,9 +162,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLeve
 
     bool emptySection = ptr->points().empty();
     if (emptySection) {
-        const auto err = details::ErrorMessages(_uri);
-        handler->emit(Warning::APPENDING_EMPTY_SECTION, err.WARNING_APPENDING_EMPTY_SECTION(ptr->id()));
-        //handler->emit(std::make_unique<AppendingEmptySection>(_uri, ptr->id()));
+        handler->emit(std::make_unique<AppendingEmptySection>(_uri, ptr->id()));
     }
 
     return ptr;

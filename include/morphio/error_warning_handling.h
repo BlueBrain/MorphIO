@@ -7,9 +7,9 @@
 #include <iostream>
 #include <memory>
 #include <set>
+#include <sstream>  // std::ostringstream
 #include <string>
 #include <utility>
-#include <sstream>  // std::ostringstream
 #include <vector>
 
 #include <morphio/enums.h>
@@ -52,7 +52,7 @@ std::string errorLink1(
            SEVERITY(errorLevel) + COLOR_END + "\n";
 }
 
-std::string errorMsg(std::string uri,
+std::string errorMsg(const std::string& uri,
                      long unsigned int lineNumber,
                      morphio::readers::ErrorLevel errorLevel,
                      const std::string& msg){
@@ -61,18 +61,21 @@ std::string errorMsg(std::string uri,
 }
 
 
+//XXX
+using morphio::enums::Warning;
+
 struct WarningMessage {
     explicit WarningMessage(std::string uri_): uri(std::move(uri_)) {}
     virtual std::string msg() const = 0;
     virtual ~WarningMessage() = default;
-    morphio::enums::Warning warning;
+    virtual Warning warning() const = 0;
     std::string uri;
 };
 
 struct WarningZeroDiameter : public WarningMessage {
     WarningZeroDiameter(const std::string& uri_, uint64_t lineNumber_):
         WarningMessage(uri_), lineNumber(lineNumber_) {}
-    morphio::enums::Warning warning = Warning::ZERO_DIAMETER;
+    morphio::enums::Warning warning() const final { return Warning::ZERO_DIAMETER;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         static const char* description = "Warning: zero diameter in file";
@@ -85,7 +88,7 @@ struct WarningZeroDiameter : public WarningMessage {
 struct WarningDisconnectedNeurite : public WarningMessage {
     WarningDisconnectedNeurite(const std::string& uri_, uint64_t lineNumber_):
         WarningMessage(uri_), lineNumber(lineNumber_) {}
-    morphio::enums::Warning warning = Warning::ZERO_DIAMETER;
+    Warning warning() const final {return Warning::ZERO_DIAMETER;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         static const char* description = 
@@ -100,7 +103,7 @@ struct WarningDisconnectedNeurite : public WarningMessage {
 
 struct NoSomaFound : public WarningMessage {
     explicit NoSomaFound(const std::string& uri_): WarningMessage(uri_) {}
-    morphio::enums::Warning warning = Warning::NO_SOMA_FOUND;
+    Warning warning() const final {return Warning::NO_SOMA_FOUND;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         static const char* description = "Warning: no soma found in file";
@@ -110,7 +113,7 @@ struct NoSomaFound : public WarningMessage {
 
 struct SomaNonConform : public WarningMessage {
     explicit SomaNonConform(const std::string& uri_, const std::string description_): WarningMessage(uri_), description(description_) {}
-    morphio::enums::Warning warning = Warning::SOMA_NON_CONFORM;
+    Warning warning() const final {return Warning::SOMA_NON_CONFORM;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         return "\n" + errorLink1(uri, 0, errorLevel) + description;
@@ -120,7 +123,7 @@ struct SomaNonConform : public WarningMessage {
 
 struct WrongRootPoint : public WarningMessage {
     explicit WrongRootPoint(const std::string& uri_, const std::vector<unsigned int> lineNumbers_): WarningMessage(uri_), lineNumbers(lineNumbers_) {}
-    morphio::enums::Warning warning = Warning::WRONG_ROOT_POINT;
+    Warning warning() const final {return Warning::WRONG_ROOT_POINT;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         std::ostringstream oss;
@@ -136,7 +139,7 @@ struct WrongRootPoint : public WarningMessage {
 struct AppendingEmptySection : public WarningMessage {
     explicit AppendingEmptySection(std::string uri_, uint32_t sectionId_):
         WarningMessage(uri_), sectionId(sectionId_) {}
-    morphio::enums::Warning warning = Warning::APPENDING_EMPTY_SECTION;
+    Warning warning() const final {return Warning::APPENDING_EMPTY_SECTION;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         static const char* description = "Warning: appending empty section with id: ";
@@ -156,7 +159,7 @@ struct WrongDuplicate : public WarningMessage {
           , parent(parent_) {}
     std::string msg() const final;
 
-    morphio::enums::Warning warning = Warning::WRONG_DUPLICATE;
+    Warning warning() const final {return Warning::WRONG_DUPLICATE;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::shared_ptr<morphio::mut::Section> current;
     std::shared_ptr<morphio::mut::Section> parent;
@@ -168,7 +171,7 @@ struct OnlyChild : public WarningMessage {
                        unsigned int childId_
                       ):
         WarningMessage(uri_), parentId(parentId_), childId(childId_) {}
-    morphio::enums::Warning warning = Warning::APPENDING_EMPTY_SECTION;
+    Warning warning() const final {return Warning::APPENDING_EMPTY_SECTION;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         std::ostringstream oss;
@@ -184,7 +187,7 @@ struct OnlyChild : public WarningMessage {
 
 struct WriteNoSoma : public WarningMessage {
     WriteNoSoma(): WarningMessage(std::string()) {}
-    morphio::enums::Warning warning = Warning::WRITE_NO_SOMA;
+    Warning warning() const final {return Warning::WRITE_NO_SOMA;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         return errorMsg(uri, 0, errorLevel, "Warning: writing file without a soma");
@@ -193,7 +196,7 @@ struct WriteNoSoma : public WarningMessage {
 
 struct WriteEmptyMorphology : public WarningMessage {
     WriteEmptyMorphology(): WarningMessage(std::string()) {}
-    morphio::enums::Warning warning = Warning::WRITE_EMPTY_MORPHOLOGY;
+    Warning warning() const final {return Warning::WRITE_EMPTY_MORPHOLOGY;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         return errorMsg(uri, 0, errorLevel, "Warning: Skipping an attempt to write an empty morphology.");
@@ -202,7 +205,7 @@ struct WriteEmptyMorphology : public WarningMessage {
 
 struct WriteUndefinedSoma : public WarningMessage {
     WriteUndefinedSoma(): WarningMessage(std::string()) {}
-    morphio::enums::Warning warning = Warning::WRITE_UNDEFINED_SOMA;
+    Warning warning() const final {return Warning::WRITE_UNDEFINED_SOMA;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         return errorMsg(uri, 0, errorLevel, "Warning: writing soma set to SOMA_UNDEFINED");
@@ -211,7 +214,7 @@ struct WriteUndefinedSoma : public WarningMessage {
 
 struct MitochondriaWriteNotSupported : public WarningMessage {
     MitochondriaWriteNotSupported(): WarningMessage(std::string()) {}
-    morphio::enums::Warning warning = Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED;
+    Warning warning() const final {return Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         return errorMsg(uri, 0, errorLevel,
@@ -222,7 +225,7 @@ struct MitochondriaWriteNotSupported : public WarningMessage {
 
 struct SomaNonContour : public WarningMessage {
     SomaNonContour(): WarningMessage(std::string()) {}
-    morphio::enums::Warning warning = Warning::SOMA_NON_CONTOUR;
+    Warning warning() const final {return Warning::SOMA_NON_CONTOUR;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         return errorMsg(uri, 0, errorLevel,
@@ -233,7 +236,7 @@ struct SomaNonContour : public WarningMessage {
 
 struct SomaNonCynlinderOrPoint : public WarningMessage {
     SomaNonCynlinderOrPoint(): WarningMessage(std::string()) {}
-    morphio::enums::Warning warning = Warning::SOMA_NON_CYLINDER_OR_POINT;
+    Warning warning() const final {return Warning::SOMA_NON_CYLINDER_OR_POINT;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         return errorMsg(uri, 0, errorLevel,
@@ -241,7 +244,6 @@ struct SomaNonCynlinderOrPoint : public WarningMessage {
                     "https://github.com/BlueBrain/MorphIO/issues/457");
     }
 };
-
 
 
 class ErrorAndWarningHandler
@@ -255,37 +257,16 @@ class ErrorAndWarningHandler
     virtual ~ErrorAndWarningHandler() = default;
 
     virtual void emit(const enums::Warning& warning, const std::string& msg) = 0;
-    void emit(const std::unique_ptr<WarningMessage> wm) {
-        emit(wm->warning, wm->msg());
-    }
+    void emit(const std::unique_ptr<WarningMessage> wm);
+    bool isIgnored(enums::Warning warning);
+    void setIgnoredWarning(enums::Warning warning, bool ignore);
+    int getMaxWarningCount() const; 
+    void setMaxWarningCount(int warningCount);
+    bool getRaiseWarnings() const; 
+    void setRaiseWarnings(bool raise);
 
-    bool isIgnored(enums::Warning warning) {
-        return ignoredWarnings_.find(warning) != ignoredWarnings_.end();
-    }
-
-    void setIgnoredWarning(enums::Warning warning, bool ignore) {
-        if (ignore) {
-            ignoredWarnings_.insert(warning);
-        } else {
-            ignoredWarnings_.erase(warning);
-        }
-    }
-
-    int getMaxWarningCount() const {
-        return maxWarningCount_;
-    }
-    void setMaxWarningCount(int warningCount) {
-        maxWarningCount_ = warningCount;
-    }
-
-    bool getRaiseWarnings() const {
-        return raiseWarnings_;
-    }
-    void setRaiseWarnings(bool raise) {
-        raiseWarnings_ = raise;
-    }
-
-  private:
+    //XXX
+  //private:
     int maxWarningCount_ = 100;
     bool raiseWarnings_ = false;
     std::set<enums::Warning> ignoredWarnings_;

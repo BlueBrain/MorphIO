@@ -1,10 +1,11 @@
 Warnings
 ========
 
-MorphIO is trying to be as less rigid as possible in validating of morphologies. That's why most of problems with
-morphologies are come as warnings instead of errors. Because of that the output of MorphIO might be verbose.
-In order to minimize it you can set the maximum number of warnings, or ignore some of warnings. On the other hand
-if you want morphologies to be as valid as possible then you can tell MorphIO to interpret warnings as errors.
+MorphIO is trying to be as less rigid as possible in validating of morphologies.
+That's why most of problems with morphologies are come as warnings instead of errors.
+Because of that the output of MorphIO might be verbose.
+In order to minimize it you can set the maximum number of warnings, or ignore some of warnings.
+On the other hand if you want morphologies to be as valid as possible then you can tell MorphIO to interpret warnings as errors.
 
 Maximum number of warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -231,19 +231,6 @@ std::string ErrorMessages::ERROR_SOMA_INVALID_CONTOUR() const {
     return "Contour soma must have at least 3 points.";
 }
 
-////////////////////////////////////////////////////////////////////////////////
-//              WARNINGS
-////////////////////////////////////////////////////////////////////////////////
-std::string ErrorMessages::WARNING_APPENDING_EMPTY_SECTION(unsigned long sectionId) const {
-    return errorMsg(0,
-                    ErrorLevel::WARNING,
-                    "Warning: appending empty section with id: " + std::to_string(sectionId));
-}
-
-std::string ErrorMessages::WARNING_NEUROMORPHO_SOMA_NON_CONFORM(const std::string& s) const {
-    return errorMsg(0, ErrorLevel::WARNING, s);
-}
-
 // LCOV_EXCL_STOP }
 
 }  // namespace details

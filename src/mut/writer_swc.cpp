@@ -74,10 +74,9 @@ int writeSoma(std::ofstream& myfile,
         if (status != morphio::details::ThreePointSomaStatus::Conforms) {
             std::stringstream stream;
             stream << status;
-            handler->emit(morphio::Warning::SOMA_NON_CONFORM,
-                          morphio::details::ErrorMessages().WARNING_NEUROMORPHO_SOMA_NON_CONFORM(
-                              stream.str()));
+            handler->emit(std::make_unique<morphio::SomaNonConform>("", stream.str()));
         }
+
         writeLine(myfile, 1, -1, SectionType::SECTION_SOMA, soma_points[0], soma_diameters[0]);
         writeLine(myfile, 2, 1, SectionType::SECTION_SOMA, soma_points[1], soma_diameters[1]);
         writeLine(myfile, 3, 1, SectionType::SECTION_SOMA, soma_points[2], soma_diameters[2]);

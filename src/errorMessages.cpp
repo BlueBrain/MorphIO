@@ -15,9 +15,10 @@ namespace {
 
 class StaticErrorAndWarningHandler: public morphio::ErrorAndWarningHandler
 {
-  public:
+public:
     void emit(const morphio::enums::Warning& warning, const std::string& msg) final {
         const int maxWarningCount = getMaxWarningCount();
+
         if (isIgnored(warning) || maxWarningCount == 0) {
             return;
         }
@@ -39,12 +40,43 @@ class StaticErrorAndWarningHandler: public morphio::ErrorAndWarningHandler
             ++errorCount;
         }
     }
+private:
     int errorCount = 0;
 };
 
 } // namespace
 
 namespace morphio {
+void ErrorAndWarningHandler::emit(const std::unique_ptr<WarningMessage> wm) {
+        emit(wm->warning(), wm->msg());
+    }
+
+bool ErrorAndWarningHandler::isIgnored(enums::Warning warning) {
+    return ignoredWarnings_.find(warning) != ignoredWarnings_.end();
+}
+
+void ErrorAndWarningHandler::setIgnoredWarning(enums::Warning warning, bool ignore) {
+    if (ignore) {
+        ignoredWarnings_.insert(warning);
+    } else {
+        ignoredWarnings_.erase(warning);
+    }
+}
+
+int ErrorAndWarningHandler::getMaxWarningCount() const {
+    return maxWarningCount_;
+}
+
+void ErrorAndWarningHandler::setMaxWarningCount(int warningCount) {
+    maxWarningCount_ = warningCount;
+}
+
+bool ErrorAndWarningHandler::getRaiseWarnings() const {
+    return raiseWarnings_;
+}
+void ErrorAndWarningHandler::setRaiseWarnings(bool raise) {
+    raiseWarnings_ = raise;
+}
 
 std::shared_ptr<morphio::ErrorAndWarningHandler> getErrorHandler() {
     static StaticErrorAndWarningHandler error_handler;
