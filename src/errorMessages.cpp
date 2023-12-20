@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <iostream>  // std::cerr
-#include <string>
 #include <vector>
 
 #include <morphio/enums.h>
@@ -16,30 +15,33 @@ namespace {
 class StaticErrorAndWarningHandler: public morphio::ErrorAndWarningHandler
 {
 public:
-    void emit(const morphio::enums::Warning& warning, const std::string& msg) final {
-        const int maxWarningCount = getMaxWarningCount();
+  void emit(std::shared_ptr<morphio::WarningMessage> wm) final {
+      const int maxWarningCount = getMaxWarningCount();
 
-        if (isIgnored(warning) || maxWarningCount == 0) {
-            return;
-        }
+      const auto& warning = wm->warning();
 
-        if (getRaiseWarnings()) {
-            throw morphio::MorphioError(msg);
-        }
+      if (isIgnored(warning) || maxWarningCount == 0) {
+          return;
+      }
 
-        if (maxWarningCount < 0 || errorCount <= maxWarningCount) {
-            std::cerr << msg << '\n';
-            if (errorCount == maxWarningCount) {
-                std::cerr << "Maximum number of warning reached. Next warnings "
-                    "won't be displayed.\n"
-                    "You can change this number by calling:\n"
-                    "\t- C++: set_maximum_warnings(int)\n"
-                    "\t- Python: morphio.set_maximum_warnings(int)\n"
-                    "0 will print no warning. -1 will print them all\n";
-            }
-            ++errorCount;
-        }
-    }
+      if (getRaiseWarnings()) {
+          throw morphio::MorphioError(wm->msg());
+      }
+
+      if (maxWarningCount < 0 || errorCount <= maxWarningCount) {
+          std::cerr << wm->msg() << '\n';
+          if (errorCount == maxWarningCount) {
+              std::cerr << "Maximum number of warning reached. Next warnings "
+                           "won't be displayed.\n"
+                           "You can change this number by calling:\n"
+                           "\t- C++: set_maximum_warnings(int)\n"
+                           "\t- Python: morphio.set_maximum_warnings(int)\n"
+                           "0 will print no warning. -1 will print them all\n";
+          }
+          ++errorCount;
+      }
+  }
+
 private:
     int errorCount = 0;
 };
@@ -47,10 +49,6 @@ private:
 } // namespace
 
 namespace morphio {
-void ErrorAndWarningHandler::emit(const std::unique_ptr<WarningMessage> wm) {
-        emit(wm->warning(), wm->msg());
-    }
-
 bool ErrorAndWarningHandler::isIgnored(enums::Warning warning) {
     return ignoredWarnings_.find(warning) != ignoredWarnings_.end();
 }

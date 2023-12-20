@@ -74,7 +74,7 @@ int writeSoma(std::ofstream& myfile,
         if (status != morphio::details::ThreePointSomaStatus::Conforms) {
             std::stringstream stream;
             stream << status;
-            handler->emit(std::make_unique<morphio::SomaNonConform>("", stream.str()));
+            handler->emit(std::make_shared<morphio::SomaNonConform>("", stream.str()));
         }
 
         writeLine(myfile, 1, -1, SectionType::SECTION_SOMA, soma_points[0], soma_diameters[0]);
@@ -111,17 +111,17 @@ void validateSWCSoma(const morphio::mut::Morphology& morph,
     const auto& soma_points = soma->points();
     if (soma_points.empty()) {
         if (morph.rootSections().empty()) {
-            handler->emit(std::make_unique<morphio::WriteEmptyMorphology>());
+            handler->emit(std::make_shared<morphio::WriteEmptyMorphology>());
             return;
         }
-        handler->emit(std::make_unique<morphio::WriteNoSoma>());
+        handler->emit(std::make_shared<morphio::WriteNoSoma>());
 
     } else if (soma->type() == morphio::SOMA_UNDEFINED) {
-        handler->emit(std::make_unique<morphio::WriteUndefinedSoma>());
+        handler->emit(std::make_shared<morphio::WriteUndefinedSoma>());
     } else if (!(soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
                  soma->type() == SomaType::SOMA_CYLINDERS ||
                  soma->type() == SomaType::SOMA_SINGLE_POINT)) {
-        handler->emit(std::make_unique<morphio::SomaNonCynlinderOrPoint>());
+        handler->emit(std::make_shared<morphio::SomaNonCynlinderOrPoint>());
     } else if (soma->type() == SomaType::SOMA_SINGLE_POINT && soma_points.size() != 1) {
         throw WriterError(ErrorMessages().ERROR_SOMA_INVALID_SINGLE_POINT());
     } else if (soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS &&

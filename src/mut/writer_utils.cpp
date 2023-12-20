@@ -36,7 +36,7 @@ std::string version_string() {
 bool emptyMorphology(const morphio::mut::Morphology& morph,
                      std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
     if (morph.soma()->points().empty() && morph.rootSections().empty()) {
-        handler->emit(std::make_unique<morphio::WriteEmptyMorphology>());
+        handler->emit(std::make_shared<morphio::WriteEmptyMorphology>());
         return true;
     }
     return false;
@@ -48,11 +48,11 @@ void validateContourSoma(const morphio::mut::Morphology& morph,
     const std::vector<Point>& somaPoints = soma->points();
 
     if (somaPoints.empty()) {
-        handler->emit(std::make_unique<morphio::WriteNoSoma>());
+        handler->emit(std::make_shared<morphio::WriteNoSoma>());
     } else if (soma->type() == SOMA_UNDEFINED) {
-        handler->emit(std::make_unique<morphio::WriteUndefinedSoma>());
+        handler->emit(std::make_shared<morphio::WriteUndefinedSoma>());
     } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
-        handler->emit(std::make_unique<morphio::SomaNonContour>());
+        handler->emit(std::make_shared<morphio::SomaNonContour>());
     } else if (somaPoints.size() < 3) {
         throw WriterError(ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
     }
@@ -67,7 +67,7 @@ void validateHasNoPerimeterData(const morphio::mut::Morphology& morph) {
 void validateHasNoMitochondria(const morphio::mut::Morphology& morph,
                                std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
     if (!morph.mitochondria().rootSections().empty()) {
-        handler->emit(std::make_unique<morphio::MitochondriaWriteNotSupported>());
+        handler->emit(std::make_shared<morphio::MitochondriaWriteNotSupported>());
     }
 }
 

@@ -10,6 +10,7 @@ from utils import (assert_swc_exception, captured_output, ignored_warning,
 
 from morphio import (MorphioError, Morphology, RawDataError, SomaError,
                      SomaType, Warning, ostream_redirect, set_raise_warnings)
+import morphio
 
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -516,3 +517,12 @@ def test_no_soma():
             Morphology(content, extension='swc')
             assert ('$STRING$:0:warning\nWarning: no soma found in file' ==
                     strip_color_codes(err.getvalue().strip()))
+
+
+def test_ErrorAndWarningHandlerCollector():
+    ec = morphio.ErrorAndWarningHandlerCollector()
+    n = Morphology(str(DATA_DIR /  'neurite_wrong_root_point.swc'), h=ec)
+    assert len(ec.get_all()) == 3
+    assert [True, True, False] == [e.was_marked_ignore for e in ec.get_all()]
+    assert ec.get_all()[2].warning.line_numbers[0] == 4
+    assert ec.get_all()[2].warning.line_numbers[1] == 6

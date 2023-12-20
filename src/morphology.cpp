@@ -129,7 +129,9 @@ Morphology::Morphology(const Property::Properties& properties, unsigned int opti
 Morphology::Morphology(const std::string& path, unsigned int options)
     : Morphology(loadFile(path, getErrorHandler(), options), options) {}
 
-Morphology::Morphology(const std::string& path, std::shared_ptr<ErrorAndWarningHandler> h, unsigned int options)
+Morphology::Morphology(const std::string& path,
+                       std::shared_ptr<ErrorAndWarningHandler> h,
+                       unsigned int options)
     : Morphology(loadFile(path, h, options), options) {}
 
 Morphology::Morphology(const HighFive::Group& group, unsigned int options)

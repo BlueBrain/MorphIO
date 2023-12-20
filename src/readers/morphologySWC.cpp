@@ -16,11 +16,11 @@
 #include <vector>         // std::vector
 
 #include <morphio/errorMessages.h>
+#include <morphio/error_warning_handling.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
-#include <morphio/error_warning_handling.h>
 
 #include "../error_message_generation.h"
 #include "../shared_utils.hpp"
@@ -205,14 +205,13 @@ class SWCBuilder
         }
     }
 
-    void warnIfDisconnectedNeurite(const SWCSample& sample,
-                                   std::shared_ptr<ErrorAndWarningHandler>& h) {
+    void warnIfDisconnectedNeurite(const SWCSample& sample, ErrorAndWarningHandler* h) {
         if (sample.parentId == SWC_ROOT && sample.type != SECTION_SOMA) {
-            h->emit(std::make_unique<WarningDisconnectedNeurite>(uri, sample.lineNumber));
+            h->emit(std::make_shared<WarningDisconnectedNeurite>(uri, sample.lineNumber));
         }
     }
 
-    void checkSoma(std::shared_ptr<ErrorAndWarningHandler>& h) {
+    void checkSoma(ErrorAndWarningHandler* h) {
         auto somata = _potentialSomata();
 
         if (somata.size() > 1) {
@@ -223,7 +222,7 @@ class SWCBuilder
 
         if (somata.empty()) {
             const auto err = details::ErrorMessages(uri);
-            h->emit(std::make_unique<NoSomaFound>(uri));
+            h->emit(std::make_shared<NoSomaFound>(uri));
 
         } else {
             for (const auto& sample_pair : samples) {
@@ -241,11 +240,9 @@ class SWCBuilder
         }
     }
 
-    void warnIfZeroDiameter(const SWCSample& sample,
-                            std::shared_ptr<ErrorAndWarningHandler> h
-                            ) {
+    void warnIfZeroDiameter(const SWCSample& sample, ErrorAndWarningHandler* h) {
         if (sample.diameter < morphio::epsilon) {
-            h->emit(std::make_unique<WarningZeroDiameter>(uri, sample.lineNumber));
+            h->emit(std::make_shared<WarningZeroDiameter>(uri, sample.lineNumber));
         }
     }
 
@@ -290,7 +287,7 @@ class SWCBuilder
         return ret;
     }
 
-    SomaType somaType(std::shared_ptr<ErrorAndWarningHandler> h) {
+    SomaType somaType(ErrorAndWarningHandler* h) {
         switch (morph.soma()->points().size()) {
         case 0: {
             return SOMA_UNDEFINED;
@@ -328,7 +325,7 @@ class SWCBuilder
                         const auto err = details::ErrorMessages(uri);
                         std::stringstream stream;
                         stream << status;
-                        h->emit(std::make_unique<SomaNonConform>(uri, stream.str()));
+                        h->emit(std::make_shared<SomaNonConform>(uri, stream.str()));
                     }
                 }
 
@@ -341,9 +338,10 @@ class SWCBuilder
         }
     }
 
-    Property::Properties buildProperties(const std::string& contents, unsigned int options,
-                                         std::shared_ptr<ErrorAndWarningHandler> h
-                                        ) {
+    Property::Properties buildProperties(const std::string& contents,
+                                         unsigned int options,
+                                         std::shared_ptr<ErrorAndWarningHandler>& h) {
+        morph.setErrorHandler(h);
         readSamples(contents);
 
         for (const auto& sample_pair : samples) {
@@ -351,15 +349,15 @@ class SWCBuilder
             raiseIfSelfParent(sample);
             raiseIfBrokenSoma(sample);
             raiseIfNoParent(sample);
-            warnIfZeroDiameter(sample, h);
+            warnIfZeroDiameter(sample, h.get());
         }
 
-        checkSoma(h);
+        checkSoma(h.get());
 
         // The process might occasionally creates empty section before
         // filling them so the warning is ignored
         bool originalIsIgnored = h->isIgnored(morphio::Warning::APPENDING_EMPTY_SECTION);
-        set_ignored_warning(morphio::Warning::APPENDING_EMPTY_SECTION, true);
+        h->setIgnoredWarning(morphio::Warning::APPENDING_EMPTY_SECTION, true);
 
         std::vector<unsigned int> depthFirstSamples = constructDepthFirstSamples();
         for (const auto id : depthFirstSamples) {
@@ -388,13 +386,13 @@ class SWCBuilder
             const auto err = details::ErrorMessages(uri);
             //h->emit(morphio::WRONG_ROOT_POINT,
             //        err.WARNING_WRONG_ROOT_POINT(gatherLineNumbers(neurite_wrong_root)));
-            h->emit(std::make_unique<WrongRootPoint>(uri, gatherLineNumbers(neurite_wrong_root)));
+            h->emit(std::make_shared<WrongRootPoint>(uri, gatherLineNumbers(neurite_wrong_root)));
         }
 
         morph.applyModifiers(options);
 
         Property::Properties properties = morph.buildReadOnly();
-        properties._cellLevel._somaType = somaType(h);
+        properties._cellLevel._somaType = somaType(h.get());
 
         h->setIgnoredWarning(morphio::Warning::APPENDING_EMPTY_SECTION, originalIsIgnored);
 
@@ -451,8 +449,7 @@ class SWCBuilder
 Property::Properties load(const std::string& path,
                           const std::string& contents,
                           unsigned int options,
-                          std::shared_ptr<ErrorAndWarningHandler> h
-                          ) {
+                          std::shared_ptr<ErrorAndWarningHandler>& h) {
     auto properties = SWCBuilder(path).buildProperties(contents, options, h);
 
     properties._cellLevel._cellFamily = NEURON;

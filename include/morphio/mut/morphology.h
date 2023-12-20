@@ -50,12 +50,6 @@ class Morphology
     **/
     explicit Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
 
-    explicit Morphology(const std::string& uri, std::shared_ptr<ErrorAndWarningHandler> h)
-        : Morphology(uri)
-    {
-        setWarningAndErrorHandler(h);
-    }
-
     /// Build a mutable Morphology from an HighFive::Group
     explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
 
@@ -223,18 +217,19 @@ class Morphology
        if the section starts and ends are inconsistent
      **/
     void removeUnifurcations();
-    
+
+    std::shared_ptr<ErrorAndWarningHandler> getHandler() const {
+        return _handler;
+    }
+
+    void setErrorHandler(std::shared_ptr<ErrorAndWarningHandler> h) {
+        _handler = h;
+    }
+
     std::shared_ptr<Soma> _soma;
     std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
     EndoplasmicReticulum _endoplasmicReticulum;
     morphio::Property::DendriticSpine::Level _dendriticSpineLevel;
-
-    std::shared_ptr<ErrorAndWarningHandler> getWarningOrErrorHandler() {
-        assert(handler != nullptr);
-        return handler;
-    }
-    void setWarningAndErrorHandler(std::shared_ptr<ErrorAndWarningHandler> h) {handler = h;}
-
 
   private:
     std::vector<std::shared_ptr<Section>> _rootSections;
@@ -252,7 +247,7 @@ class Morphology
     void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
                       const std::shared_ptr<Section>& section);
 
-    std::shared_ptr<ErrorAndWarningHandler> handler = getErrorHandler();
+    std::shared_ptr<ErrorAndWarningHandler> _handler = getErrorHandler();
     std::string _uri;
 
     friend class Section;

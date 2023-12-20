@@ -123,7 +123,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 
     const bool emptySection = ptr->points().empty();
     if (emptySection) {
-        handler->emit(std::make_unique<AppendingEmptySection>(_uri, ptr->id()));
+        getHandler()->emit(std::make_shared<AppendingEmptySection>(_uri, ptr->id()));
     }
 
     if (recursive) {
@@ -142,7 +142,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
     _rootSections.push_back(section_copy);
     const bool emptySection = section_copy->points().empty();
     if (emptySection) {
-        handler->emit(std::make_unique<AppendingEmptySection>(_uri, section_copy->id()));
+        getHandler()->emit(std::make_shared<AppendingEmptySection>(_uri, section_copy->id()));
     }
 
     if (recursive) {
@@ -162,7 +162,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLeve
 
     bool emptySection = ptr->points().empty();
     if (emptySection) {
-        handler->emit(std::make_unique<AppendingEmptySection>(_uri, ptr->id()));
+        getHandler()->emit(std::make_shared<AppendingEmptySection>(_uri, ptr->id()));
     }
 
     return ptr;
@@ -258,7 +258,7 @@ void Morphology::removeUnifurcations() {
         bool duplicate = _checkDuplicatePoint(parent, section_);
 
         if (!duplicate) {
-            handler->emit(std::make_unique<WrongDuplicate>(_uri, section_, parent));
+            getHandler()->emit(std::make_shared<WrongDuplicate>(_uri, section_, parent));
         }
 
         bool isUnifurcation = parent->children().size() == 1;
@@ -266,7 +266,7 @@ void Morphology::removeUnifurcations() {
         // This "if" condition ensures that "unifurcations" (ie. successive
         // sections with only 1 child) get merged together into a bigger section
         if (isUnifurcation) {
-            handler->emit(std::make_unique<OnlyChild>(_uri, parent->id(), sectionId));
+            getHandler()->emit(std::make_shared<OnlyChild>(_uri, parent->id(), sectionId));
 
             addAnnotation(Property::Annotation(AnnotationType::SINGLE_CHILD,
                                                sectionId,
@@ -395,11 +395,11 @@ void Morphology::write(const std::string& filename) const {
     }
 
     if (extension == ".h5") {
-        writer::h5(*this, filename, handler);
+        writer::h5(*this, filename, getHandler());
     } else if (extension == ".asc") {
-        writer::asc(*this, filename, handler);
+        writer::asc(*this, filename, getHandler());
     } else if (extension == ".swc") {
-        writer::swc(*this, filename, handler);
+        writer::swc(*this, filename, getHandler());
     } else {
         const auto err = details::ErrorMessages(_uri);
         throw UnknownFileType(err.ERROR_WRONG_EXTENSION(filename));
