@@ -33,11 +33,6 @@ class ErrorMessages
     /** Is the output of the warning ignored */
     static bool isIgnored(const enums::Warning& warning);
 
-    /** Generate an error message. */
-    std::string errorMsg(long unsigned int lineNumber,
-                         morphio::readers::ErrorLevel errorLevel,
-                         const std::string& msg = std::string()) const;
-
     ////////////////////////////////////////////////////////////////////////////////
     //              ERRORS
     ////////////////////////////////////////////////////////////////////////////////

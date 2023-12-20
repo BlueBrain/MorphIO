@@ -17,41 +17,11 @@
 
 
 namespace morphio {
-namespace {
-/** Returns a link to a line number within the morphology file **/
-std::string errorLink1(
-                      const std::string& uri,
+namespace details {
+std::string errorLink(const std::string& uri,
                       long unsigned int lineNumber,
-                      morphio::readers::ErrorLevel errorLevel) {
-    using morphio::readers::ErrorLevel;
-    if(uri.empty()){
-       return {};
-   }
-
-    const auto SEVERITY = [](ErrorLevel el){
-        switch(el){
-            case ErrorLevel::INFO: return "info";
-            case ErrorLevel::WARNING: return "warning";
-            case ErrorLevel::ERROR: return "error";
-        }
-        throw std::runtime_error("Unknown ErrorLevel");
-    };
-
-    auto COLOR = [](ErrorLevel el){
-        switch(el){
-        case ErrorLevel::INFO: return "\033[1;34m";
-        case ErrorLevel::WARNING: return "\033[1;33m";
-        case ErrorLevel::ERROR: return "\033[1;31m";
-        }
-        throw std::runtime_error("Unknown ErrorLevel");
-    };
-
-    const std::string COLOR_END("\033[0m");
-
-    return COLOR(errorLevel) + uri + ":" + std::to_string(lineNumber) + ":" +
-           SEVERITY(errorLevel) + COLOR_END + "\n";
-}
-}
+                      morphio::readers::ErrorLevel errorLevel);
+}  // namespace details
 
 
 //XXX
@@ -79,7 +49,7 @@ struct WarningZeroDiameter : public WarningMessage {
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         static const char* description = "Warning: zero diameter in file";
-        return "\n" + errorLink1(uri, lineNumber, errorLevel) + description;
+        return "\n" + details::errorLink(uri, lineNumber, errorLevel) + description;
     }
 
     uint64_t lineNumber;
@@ -96,7 +66,7 @@ struct WarningDisconnectedNeurite : public WarningMessage {
                     "Warning: found a disconnected neurite.\n"
                     "Neurites are not supposed to have parentId: -1\n"
                     "(although this is normal if this neuron has no soma)";
-        return "\n" + errorLink1(uri, lineNumber, errorLevel) + description;
+        return "\n" + details::errorLink(uri, lineNumber, errorLevel) + description;
     }
 
     uint64_t lineNumber;
@@ -109,7 +79,7 @@ struct NoSomaFound : public WarningMessage {
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         static const char* description = "Warning: no soma found in file";
-        return "\n" + errorLink1(uri, 0, errorLevel) + description;
+        return "\n" + details::errorLink(uri, 0, errorLevel) + description;
     }
 };
 
@@ -120,7 +90,7 @@ struct SomaNonConform : public WarningMessage {
     Warning warning() const final {return Warning::SOMA_NON_CONFORM;}
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
-        return "\n" + errorLink1(uri, 0, errorLevel) + description;
+        return "\n" + details::errorLink(uri, 0, errorLevel) + description;
     }
     std::string description;
 };
@@ -135,7 +105,7 @@ struct WrongRootPoint : public WarningMessage {
         std::ostringstream oss;
         oss << "Warning: with a 3 points soma, neurites must be connected to the first soma point:";
         for (const auto& lineNumber : lineNumbers) {
-            oss << "\n" + errorLink1(uri, lineNumber, errorLevel);
+            oss << "\n" + details::errorLink(uri, lineNumber, errorLevel);
         }
         return oss.str();
     }
@@ -150,7 +120,8 @@ struct AppendingEmptySection : public WarningMessage {
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         static const char* description = "Warning: appending empty section with id: ";
-        return "\n" + errorLink1(uri, 0, errorLevel) + description + std::to_string(sectionId);
+        return "\n" + details::errorLink(uri, 0, errorLevel) + description +
+               std::to_string(sectionId);
     }
     uint32_t sectionId;
 };
@@ -183,7 +154,7 @@ struct OnlyChild : public WarningMessage {
             << "section: " << std::to_string(parentId)
             << "\nIt will be merged with the parent section";
 
-        return "\n" + errorLink1(uri, 0, errorLevel) + oss.str();
+        return "\n" + details::errorLink(uri, 0, errorLevel) + oss.str();
     }
     unsigned int parentId;
     unsigned int childId;
@@ -195,7 +166,7 @@ struct WriteNoSoma : public WarningMessage {
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         static const char* description = "Warning: writing file without a soma";
-        return "\n" + errorLink1(uri, 0, errorLevel) + description;
+        return "\n" + details::errorLink(uri, 0, errorLevel) + description;
     }
 };
 
@@ -206,7 +177,7 @@ struct WriteEmptyMorphology : public WarningMessage {
     std::string msg() const final {
         static const char* description =
             "Warning: Skipping an attempt to write an empty morphology.";
-        return "\n" + errorLink1(uri, 0, errorLevel) + description;
+        return "\n" + details::errorLink(uri, 0, errorLevel) + description;
     }
 };
 
@@ -216,7 +187,7 @@ struct WriteUndefinedSoma : public WarningMessage {
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
         static const char* description = "Warning: writing soma set to SOMA_UNDEFINED";
-        return "\n" + errorLink1(uri, 0, errorLevel) + description;
+        return "\n" + details::errorLink(uri, 0, errorLevel) + description;
     }
 };
 
@@ -228,7 +199,7 @@ struct MitochondriaWriteNotSupported : public WarningMessage {
         static const char* description =
             "Warning: this cell has mitochondria, they cannot be saved in "
             " ASC or SWC format. Please use H5 if you want to save them.";
-        return "\n" + errorLink1(uri, 0, errorLevel) + description;
+        return "\n" + details::errorLink(uri, 0, errorLevel) + description;
     }
 };
 
@@ -240,7 +211,7 @@ struct SomaNonContour : public WarningMessage {
         static const char* description =
             "Soma must be a contour for ASC and H5: see "
             "https://github.com/BlueBrain/MorphIO/issues/457";
-        return "\n" + errorLink1(uri, 0, errorLevel) + description;
+        return "\n" + details::errorLink(uri, 0, errorLevel) + description;
     }
 };
 
@@ -252,10 +223,9 @@ struct SomaNonCynlinderOrPoint : public WarningMessage {
         static const char* description =
             "Soma must be stacked cylinders or a point: see "
             "https://github.com/BlueBrain/MorphIO/issues/457";
-        return "\n" + errorLink1(uri, 0, errorLevel) + description;
+        return "\n" + details::errorLink(uri, 0, errorLevel) + description;
     }
 };
-
 
 class ErrorAndWarningHandler
 {
@@ -280,7 +250,6 @@ class ErrorAndWarningHandler
     bool raiseWarnings_ = false;
     std::set<enums::Warning> ignoredWarnings_;
 };
-
 
 class ErrorAndWarningHandlerCollector : public ErrorAndWarningHandler
 {

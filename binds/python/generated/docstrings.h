@@ -956,7 +956,15 @@ static const char *mkd_doc_morphio_WarningMessage = R"doc()doc";
 
 static const char *mkd_doc_morphio_WarningMessage_WarningMessage = R"doc()doc";
 
+static const char *mkd_doc_morphio_WarningMessage_WarningMessage_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_WarningMessage_3 = R"doc()doc";
+
 static const char *mkd_doc_morphio_WarningMessage_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_operator_assign = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_operator_assign_2 = R"doc()doc";
 
 static const char *mkd_doc_morphio_WarningMessage_uri = R"doc()doc";
 
@@ -1035,6 +1043,8 @@ static const char *mkd_doc_morphio_WrongRootPoint_msg = R"doc()doc";
 static const char *mkd_doc_morphio_WrongRootPoint_warning = R"doc()doc";
 
 static const char *mkd_doc_morphio_children = R"doc(Return a list of children sections)doc";
+
+static const char *mkd_doc_morphio_details_errorLink = R"doc()doc";
 
 static const char *mkd_doc_morphio_diff = R"doc(Perform a diff on 2 morphologies, returns True if items differ)doc";
 
@@ -1208,10 +1218,6 @@ static const char *mkd_doc_morphio_enums_Warning_WRONG_ROOT_POINT = R"doc(A wron
 static const char *mkd_doc_morphio_enums_Warning_ZERO_DIAMETER = R"doc(Zero section diameter)doc";
 
 static const char *mkd_doc_morphio_enums_operator_lshift = R"doc()doc";
-
-static const char *mkd_doc_morphio_errorLink1 = R"doc(Returns a link to a line number within the morphology file)doc";
-
-static const char *mkd_doc_morphio_errorMsg = R"doc()doc";
 
 static const char *mkd_doc_morphio_get = R"doc()doc";
 
