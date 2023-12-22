@@ -395,11 +395,11 @@ void Morphology::write(const std::string& filename) const {
     }
 
     if (extension == ".h5") {
-        writer::h5(*this, filename, getHandler());
+        writer::h5(*this, filename, _handler);
     } else if (extension == ".asc") {
-        writer::asc(*this, filename, getHandler());
+        writer::asc(*this, filename, _handler);
     } else if (extension == ".swc") {
-        writer::swc(*this, filename, getHandler());
+        writer::swc(*this, filename, _handler);
     } else {
         const auto err = details::ErrorMessages(_uri);
         throw UnknownFileType(err.ERROR_WRONG_EXTENSION(filename));

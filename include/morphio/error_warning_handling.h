@@ -254,17 +254,17 @@ class ErrorAndWarningHandler
 class ErrorAndWarningHandlerCollector : public ErrorAndWarningHandler
 {
 public:
-  struct Emission {
-      Emission(bool wasMarkedIgnore_, std::shared_ptr<WarningMessage> warning_)
-          : wasMarkedIgnore(wasMarkedIgnore_)
-          , warning(std::move(warning_)) {}
-      bool wasMarkedIgnore = false;
-      std::shared_ptr<WarningMessage> warning;
-  };
+    struct Emission {
+        Emission(bool wasMarkedIgnore_, std::shared_ptr<WarningMessage> warning_)
+            : wasMarkedIgnore(wasMarkedIgnore_)
+              , warning(std::move(warning_)) {}
+        bool wasMarkedIgnore = false;
+        std::shared_ptr<WarningMessage> warning;
+    };
 
-  void emit(std::shared_ptr<WarningMessage> wm) final {
-      m.emplace_back(isIgnored(wm->warning()), wm);
-  }
+    void emit(std::shared_ptr<WarningMessage> wm) final {
+        m.emplace_back(isIgnored(wm->warning()), wm);
+    }
 
     void printAll(){
         for(const auto& e : m){
@@ -276,7 +276,7 @@ public:
         return m;
     }
 
-  private:
+private:
     std::vector<Emission> m;
 };
 
