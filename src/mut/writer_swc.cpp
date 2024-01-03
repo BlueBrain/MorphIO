@@ -94,7 +94,8 @@ int writeSoma(std::ofstream& myfile, const std::shared_ptr<morphio::mut::Soma>& 
 
 /* Only skip duplicate if it has the same diameter */
 bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
-    return section->diameters().front() == section->parent()->diameters().back();
+    return std::fabs(section->diameters().front() - section->parent()->diameters().back()) <
+           morphio::epsilon;
 }
 
 void validateSWCSoma(const morphio::mut::Morphology& morph) {

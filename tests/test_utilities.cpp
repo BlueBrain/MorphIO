@@ -125,7 +125,7 @@ TEST_CASE("morphio::shared_utils") {
         const std::vector<Point> points = {{0, 0, 0}};
         const std::vector<floatType> diameters = {1};
         CHECK(centerOfGravity(points) == points[0]);
-        CHECK(maxDistanceToCenterOfGravity(points) == 0);
+        CHECK(maxDistanceToCenterOfGravity(points) == Approx(0));
         CHECK(_somaSurface(SOMA_SINGLE_POINT, diameters, points) == Approx(morphio::PI));
         CHECK(_somaSurface(SOMA_SINGLE_POINT, diameters, points) == Approx(morphio::PI));
     }
