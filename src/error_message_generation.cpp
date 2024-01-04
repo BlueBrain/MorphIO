@@ -11,12 +11,14 @@ bool ErrorMessages::isIgnored(const Warning& warning) {
     return static_handler->isIgnored(warning);
 }
 
+namespace {
 std::string errorMsg(const std::string& uri,
                      long unsigned int lineNumber,
                      ErrorLevel errorLevel,
                      const std::string& msg) {
     return "\n" + (uri.empty() ? "" : errorLink(uri, lineNumber, errorLevel) + "\n") + msg;
 }
+} // namespace
 
 // LCOV_EXCL_START {  all the error messages are excluded from coverage
 

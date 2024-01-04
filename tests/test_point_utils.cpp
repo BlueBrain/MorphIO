@@ -11,10 +11,11 @@
 TEST_CASE("morphio::Point") {
     using namespace morphio;
     Point p{10., 10., 10.};
+
     std::vector<Point> points = {p, p, p};
 
     CHECK(subtract(p, p) == morphio::Point{0, 0, 0});
-    CHECK(euclidean_distance(p, p) == 0);
+    REQUIRE_THAT(euclidean_distance(p, p), Catch::WithinAbs(0, 0.001));
     CHECK(dumpPoint(p) == "10 10 10");
     CHECK(dumpPoints(points) == "10 10 10\n10 10 10\n10 10 10\n");
 
@@ -34,7 +35,7 @@ TEST_CASE("morphio::Point") {
         auto r = morphio::range<const morphio::Point>();
         std::stringstream ss;
         ss << r;
-        CHECK(ss.str() == "");
+        CHECK(ss.str().empty());
 
         ss.clear();
 

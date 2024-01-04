@@ -91,7 +91,10 @@ setup(
               ],
     zip_safe=False,
     classifiers=[
-        "License :: OSI Approved :: Apache Software License v2.0",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
+        "Programming Language :: Python",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     use_scm_version=True,
     setup_requires=[
