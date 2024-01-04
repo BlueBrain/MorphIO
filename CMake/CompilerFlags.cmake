@@ -27,7 +27,6 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(FLAGS "${FLAGS} -Wno-documentation")
     set(FLAGS "${FLAGS} -Wno-documentation-unknown-command")
 
-    set(FLAGS "${FLAGS} -Wno-float-equal")
     set(FLAGS "${FLAGS} -Wno-padded")
     set(FLAGS "${FLAGS} -Wno-weak-vtables")
     set(FLAGS "${FLAGS} -Wno-covered-switch-default")

@@ -62,8 +62,8 @@ range<const typename TProperty::Type> Section::get() const {
     if (data.empty()) {
         return range<const typename TProperty::Type>();
     }
-    auto ptr_start = data.data() + range_.first;
-    return range<const typename TProperty::Type>(ptr_start, range_.second - range_.first);
+    return range<const typename TProperty::Type>(&data.at(range_.first),
+                                                 range_.second - range_.first);
 }
 
 std::vector<Section> Section::predecessors() const {

@@ -101,8 +101,7 @@ range<const typename TProperty::Type> SectionBase<T>::get() const {
         return {};
     }
 
-    auto ptr_start = data.data() + range_.first;
-    return {ptr_start, range_.second - range_.first};
+    return {&data.at(range_.first), range_.second - range_.first};
 }
 
 template <typename T>
