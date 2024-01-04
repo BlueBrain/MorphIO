@@ -2,91 +2,21 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include <iostream>  // std::cerr
 #include <vector>
 
 #include <morphio/enums.h>
 #include <morphio/errorMessages.h>
-#include <morphio/error_warning_handling.h>
 #include <morphio/exceptions.h>
+#include <morphio/warning_handling.h>
 
-namespace {
-
-class StaticErrorAndWarningHandler: public morphio::ErrorAndWarningHandler
-{
-public:
-  void emit(std::shared_ptr<morphio::WarningMessage> wm) final {
-      const int maxWarningCount = getMaxWarningCount();
-
-      const auto& warning = wm->warning();
-
-      if (isIgnored(warning) || maxWarningCount == 0) {
-          return;
-      }
-
-      if (getRaiseWarnings()) {
-          throw morphio::MorphioError(wm->msg());
-      }
-
-      if (maxWarningCount < 0 || errorCount <= maxWarningCount) {
-          std::cerr << wm->msg() << '\n';
-          if (errorCount == maxWarningCount) {
-              std::cerr << "Maximum number of warning reached. Next warnings "
-                           "won't be displayed.\n"
-                           "You can change this number by calling:\n"
-                           "\t- C++: set_maximum_warnings(int)\n"
-                           "\t- Python: morphio.set_maximum_warnings(int)\n"
-                           "0 will print no warning. -1 will print them all\n";
-          }
-          ++errorCount;
-      }
-  }
-
-private:
-    int errorCount = 0;
-};
-
-} // namespace
 
 namespace morphio {
-bool ErrorAndWarningHandler::isIgnored(enums::Warning warning) {
-    return ignoredWarnings_.find(warning) != ignoredWarnings_.end();
-}
-
-void ErrorAndWarningHandler::setIgnoredWarning(enums::Warning warning, bool ignore) {
-    if (ignore) {
-        ignoredWarnings_.insert(warning);
-    } else {
-        ignoredWarnings_.erase(warning);
-    }
-}
-
-int ErrorAndWarningHandler::getMaxWarningCount() const {
-    return maxWarningCount_;
-}
-
-void ErrorAndWarningHandler::setMaxWarningCount(int warningCount) {
-    maxWarningCount_ = warningCount;
-}
-
-bool ErrorAndWarningHandler::getRaiseWarnings() const {
-    return raiseWarnings_;
-}
-void ErrorAndWarningHandler::setRaiseWarnings(bool raise) {
-    raiseWarnings_ = raise;
-}
-
-std::shared_ptr<morphio::ErrorAndWarningHandler> getErrorHandler() {
-    static StaticErrorAndWarningHandler error_handler;
-    return {std::shared_ptr<StaticErrorAndWarningHandler>{}, &error_handler};
-}
-
 /*
  * Controls the maximum number of warning to be printed on screen.
  * 0 will print no warning
  * -1 will print them all
  */
-void set_maximum_warnings(int n_warnings) {
+void set_maximum_warnings(int32_t n_warnings) {
     auto static_handler = getErrorHandler();
     static_handler->setMaxWarningCount(n_warnings);
 }
@@ -110,7 +40,9 @@ void set_ignored_warning(const std::vector<enums::Warning>& warnings, bool ignor
     }
 }
 
-namespace readers {
-}  // namespace readers
+std::shared_ptr<morphio::WarningHandler> getErrorHandler() {
+    static morphio::WarningHandlerPrinter error_handler;
+    return {std::shared_ptr<morphio::WarningHandler>{}, &error_handler};
+}
 
 }  // namespace morphio

@@ -5,7 +5,6 @@ set(MORPHIO_SOURCES
     enums.cpp
     errorMessages.cpp
     error_message_generation.cpp
-    error_warning_handling.cpp
     glial_cell.cpp
     mito_section.cpp
     mitochondria.cpp
@@ -37,6 +36,7 @@ set(MORPHIO_SOURCES
     vasc/section.cpp
     vasc/vasculature.cpp
     version.cpp
+    warning_handling.cpp
     )
 
 if(NOT MORPHIO_VERSION_STRING)

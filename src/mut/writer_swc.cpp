@@ -8,13 +8,13 @@
 #include <memory>
 #include <unordered_map>
 
-#include <morphio/error_warning_handling.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 #include <morphio/vector_types.h>
 #include <morphio/version.h>
+#include <morphio/warning_handling.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
@@ -54,7 +54,7 @@ void writeHeader(std::ofstream& myfile) {
 
 int writeSoma(std::ofstream& myfile,
               const std::shared_ptr<morphio::mut::Soma>& soma,
-              std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
+              std::shared_ptr<morphio::WarningHandler> handler) {
     using morphio::enums::SectionType;
 
     const auto& soma_points = soma->points();
@@ -102,7 +102,7 @@ bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
 }
 
 void validateSWCSoma(const morphio::mut::Morphology& morph,
-                     std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
+                     std::shared_ptr<morphio::WarningHandler> handler) {
     using morphio::SomaType;
     using morphio::Warning;
     using morphio::WriterError;
@@ -140,7 +140,7 @@ namespace writer {
 
 void swc(const Morphology& morph,
          const std::string& filename,
-         std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
+         std::shared_ptr<morphio::WarningHandler> handler) {
     if (details::emptyMorphology(morph, handler)) {
         return;
     }

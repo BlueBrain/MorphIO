@@ -8,11 +8,11 @@
 #include <memory>
 
 #include <morphio/endoplasmic_reticulum.h>
-#include <morphio/error_warning_handling.h> // ErrorAndWarningHandler
 #include <morphio/mitochondria.h>
 #include <morphio/morphology.h>
 #include <morphio/section.h>
 #include <morphio/soma.h>
+#include <morphio/warning_handling.h>  // ErrorAndWarningHandler
 
 #include <morphio/mut/morphology.h>
 
@@ -66,9 +66,8 @@ std::string tolower(const std::string& str) {
 }
 
 morphio::Property::Properties loadFile(const std::string& path,
-                                       std::shared_ptr<morphio::ErrorAndWarningHandler> h,
-                                       unsigned int options
-                                       ) {
+                                       std::shared_ptr<morphio::WarningHandler> h,
+                                       unsigned int options) {
     const size_t pos = path.find_last_of('.');
     if (pos == std::string::npos || pos == path.length() - 1) {
         throw(morphio::UnknownFileType("File has no extension"));
@@ -93,9 +92,8 @@ morphio::Property::Properties loadFile(const std::string& path,
 
 morphio::Property::Properties loadString(const std::string& contents,
                                          const std::string& extension,
-                                         std::shared_ptr<morphio::ErrorAndWarningHandler> h,
+                                         std::shared_ptr<morphio::WarningHandler> h,
                                          unsigned int options) {
-
     std::string lower_extension = tolower(extension);
 
     if (lower_extension == "asc") {
@@ -130,7 +128,7 @@ Morphology::Morphology(const std::string& path, unsigned int options)
     : Morphology(loadFile(path, getErrorHandler(), options), options) {}
 
 Morphology::Morphology(const std::string& path,
-                       std::shared_ptr<ErrorAndWarningHandler> h,
+                       std::shared_ptr<WarningHandler> h,
                        unsigned int options)
     : Morphology(loadFile(path, h, options), options) {}
 

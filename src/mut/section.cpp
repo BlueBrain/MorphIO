@@ -4,10 +4,10 @@
  */
 #include <algorithm>  // any_of
 
-#include <morphio/error_warning_handling.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/vector_types.h>
+#include <morphio/warning_handling.h>
 
 #include "../point_utils.h"
 
@@ -128,14 +128,14 @@ std::shared_ptr<Section> Section::appendSection(std::shared_ptr<Section> origina
 
     bool emptySection = _sections[childId]->points().empty();
     if (emptySection) {
-        emitWarningOrError(
+        emitWarning(
             std::make_shared<AppendingEmptySection>(morphology->_uri, _sections[childId]->id()));
     }
 
     if (!emptySection && !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
-        emitWarningOrError(std::make_shared<WrongDuplicate>(morphology->_uri,
-                                                            _sections[childId],
-                                                            _sections.at(parentId)));
+        emitWarning(std::make_shared<WrongDuplicate>(morphology->_uri,
+                                                     _sections[childId],
+                                                     _sections.at(parentId)));
     }
 
     morphology->_parent[childId] = parentId;
@@ -164,14 +164,14 @@ std::shared_ptr<Section> Section::appendSection(const morphio::Section& section,
 
     bool emptySection = _sections[childId]->points().empty();
     if (emptySection) {
-        emitWarningOrError(
+        emitWarning(
             std::make_shared<AppendingEmptySection>(morphology->_uri, _sections[childId]->id()));
     }
 
     if (!emptySection && !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
-        emitWarningOrError(std::make_shared<WrongDuplicate>(morphology->_uri,
-                                                            _sections[childId],
-                                                            _sections.at(parentId)));
+        emitWarning(std::make_shared<WrongDuplicate>(morphology->_uri,
+                                                     _sections[childId],
+                                                     _sections.at(parentId)));
     }
 
     morphology->_parent[childId] = parentId;
@@ -207,14 +207,14 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
 
     bool emptySection = _sections[childId]->points().empty();
     if (emptySection) {
-        emitWarningOrError(
+        emitWarning(
             std::make_shared<AppendingEmptySection>(morphology->_uri, _sections[childId]->id()));
     }
 
     if (!emptySection && !_checkDuplicatePoint(_sections[parentId], _sections[childId])) {
-        emitWarningOrError(std::make_shared<WrongDuplicate>(morphology->_uri,
-                                                            _sections[childId],
-                                                            _sections[parentId]));
+        emitWarning(std::make_shared<WrongDuplicate>(morphology->_uri,
+                                                     _sections[childId],
+                                                     _sections[parentId]));
     }
 
     morphology->_parent[childId] = parentId;
@@ -222,7 +222,7 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
     return ptr;
 }
 
-void Section::emitWarningOrError(std::shared_ptr<WarningMessage> wm) {
+void Section::emitWarning(std::shared_ptr<WarningMessage> wm) {
     getOwningMorphologyOrThrow()->getHandler()->emit(std::move(wm));
 }
 

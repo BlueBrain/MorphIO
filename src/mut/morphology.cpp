@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <algorithm>  // std::find_if
+#include <cctype>     // std::tolower
 #include <memory>
 #include <string>
 

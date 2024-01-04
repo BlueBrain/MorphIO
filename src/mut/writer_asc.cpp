@@ -5,12 +5,12 @@
 #include <fstream>
 #include <iomanip>  // std::fixed, std::setw, std::setprecision
 
-#include <morphio/error_warning_handling.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 #include <morphio/version.h>
+#include <morphio/warning_handling.h>
 
 #include "../error_message_generation.h"
 #include "../shared_utils.hpp"
@@ -52,7 +52,7 @@ namespace writer {
 
 void asc(const Morphology& morph,
          const std::string& filename,
-         std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
+         std::shared_ptr<morphio::WarningHandler> handler) {
     if (details::emptyMorphology(morph, handler)) {
         return;
     }

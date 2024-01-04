@@ -12,8 +12,6 @@ if platform.system() == "Windows":
 
 
 from ._morphio import (
-    ErrorAndWarningHandlerCollector,
-
     Annotation,
     AnnotationType,
     CellFamily,
@@ -48,6 +46,7 @@ from ._morphio import (
     UnknownFileType,
     VasculatureSectionType,
     Warning,
+    WarningHandlerCollector,
     WriterError,
     mut,
     ostream_redirect,

@@ -519,9 +519,9 @@ def test_no_soma():
                     strip_color_codes(err.getvalue().strip()))
 
 
-def test_ErrorAndWarningHandlerCollector():
-    ec = morphio.ErrorAndWarningHandlerCollector()
-    n = Morphology(str(DATA_DIR /  'neurite_wrong_root_point.swc'), h=ec)
+def test_WarningHandlerCollector():
+    ec = morphio.WarningHandlerCollector()
+    Morphology(str(DATA_DIR /  'neurite_wrong_root_point.swc'), h=ec)
     assert len(ec.get_all()) == 3
     assert [True, True, False] == [e.was_marked_ignore for e in ec.get_all()]
     assert ec.get_all()[2].warning.line_numbers[0] == 4

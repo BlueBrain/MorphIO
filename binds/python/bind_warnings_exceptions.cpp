@@ -46,25 +46,38 @@ void bind_warnings_exceptions(py::module& m) {
     py::register_exception<SectionBuilderError&>(m, "SectionBuilderError", raw.ptr());
     py::register_exception<WriterError&>(m, "WriterError", base.ptr());
 
-    py::class_<ErrorAndWarningHandler, std::shared_ptr<ErrorAndWarningHandler>>(
-        m, "ErrorAndWarningHandler", "ErrorAndWarningHandler base")
-        .def_property_readonly("get_max_warning_count",
-                               &ErrorAndWarningHandler::getMaxWarningCount,
-                               "ibid");
-    py::class_<ErrorAndWarningHandlerCollector,
-               ErrorAndWarningHandler,
-               std::shared_ptr<ErrorAndWarningHandlerCollector>>(m,
-                                                                 "ErrorAndWarningHandlerCollector",
-                                                                 "ErrorAndWarningHandler base")
-        .def(py::init<>())
-        .def("print_all", &ErrorAndWarningHandlerCollector::printAll, "ibid")
-        .def("get_all", &ErrorAndWarningHandlerCollector::getAll, "ibid");
+    py::class_<WarningHandler, std::shared_ptr<WarningHandler>>(m,
+                                                                "WarningHandler",
+                                                                "WarningHandler base")
+        .def_property_readonly("get_max_warning_count", &WarningHandler::getMaxWarningCount, "ibid")
+        .def("set_ignored_warning",
+             &WarningHandler::setIgnoredWarning,
+             DOC(morphio, set_ignored_warning),
+             "warning"_a,
+             "ignore"_a = true);
 
-    py::class_<ErrorAndWarningHandlerCollector::Emission>(m, "Emission")
+    py::class_<WarningHandlerPrinter, WarningHandler, std::shared_ptr<WarningHandlerPrinter>>(
+        m, "WarningHandlerPrinter", "WarningHandler base")
+        .def(py::init<>())
+        .def("set_maximum_warnings",
+             &WarningHandlerPrinter::setMaxWarningCount,
+             DOC(morphio, set_maximum_warnings))
+        .def("set_raise_warnings",
+             &WarningHandlerPrinter::setRaiseWarnings,
+             DOC(morphio, set_raise_warnings))
+        .def("get_raise_warnings", &WarningHandlerPrinter::getRaiseWarnings, "ibid");
+
+    py::class_<WarningHandlerCollector, WarningHandler, std::shared_ptr<WarningHandlerCollector>>(
+        m, "WarningHandlerCollector", "WarningHandler base")
+        .def(py::init<>())
+        .def("reset", &WarningHandlerCollector::reset, "ibid")
+        .def("get_all", &WarningHandlerCollector::getAll, "ibid");
+
+    py::class_<WarningHandlerCollector::Emission>(m, "Emission")
         .def_readonly("was_marked_ignore",
-                      &ErrorAndWarningHandlerCollector::Emission::wasMarkedIgnore,
+                      &WarningHandlerCollector::Emission::wasMarkedIgnore,
                       "ibid")
-        .def_readonly("warning", &ErrorAndWarningHandlerCollector::Emission::warning, "ibid");
+        .def_readonly("warning", &WarningHandlerCollector::Emission::warning, "ibid");
 
     py::class_<WarningMessage, std::shared_ptr<WarningMessage>>(m, "WarningMessage")
         .def("warning", &WarningMessage::warning, "ibid")

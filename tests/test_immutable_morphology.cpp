@@ -329,10 +329,11 @@ TEST_CASE("operator<<", "[immutableMorphology]") {
     ss << section;
 }
 
-TEST_CASE("warnings-asdf") {
+TEST_CASE("warnings-collection") {
     {
-        auto ec = std::make_shared<morphio::ErrorAndWarningHandlerCollector>();
+        auto ec = std::make_shared<morphio::WarningHandlerCollector>();
         morphio::Morphology morph("data/disconnected_neurite.swc", ec);
-        ec->printAll();
+        auto allErrors = ec->getAll();
+        REQUIRE(allErrors.size() == 3);
     }
 }

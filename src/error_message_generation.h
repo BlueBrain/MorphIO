@@ -10,8 +10,8 @@
 #include <vector>
 
 #include <morphio/errorMessages.h>
-#include <morphio/error_warning_handling.h> // ErrorAndWarningHandler
-#include <morphio/mut/section.h>            // morphio::mut::Section
+#include <morphio/mut/section.h>       // morphio::mut::Section
+#include <morphio/warning_handling.h>  // ErrorAndWarningHandler
 
 namespace morphio {
 namespace details {

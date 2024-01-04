@@ -16,11 +16,11 @@
 #include <vector>         // std::vector
 
 #include <morphio/errorMessages.h>
-#include <morphio/error_warning_handling.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
+#include <morphio/warning_handling.h>
 
 #include "../error_message_generation.h"
 #include "../shared_utils.hpp"
@@ -205,13 +205,13 @@ class SWCBuilder
         }
     }
 
-    void warnIfDisconnectedNeurite(const SWCSample& sample, ErrorAndWarningHandler* h) {
+    void warnIfDisconnectedNeurite(const SWCSample& sample, WarningHandler* h) {
         if (sample.parentId == SWC_ROOT && sample.type != SECTION_SOMA) {
             h->emit(std::make_shared<WarningDisconnectedNeurite>(uri, sample.lineNumber));
         }
     }
 
-    void checkSoma(ErrorAndWarningHandler* h) {
+    void checkSoma(WarningHandler* h) {
         auto somata = _potentialSomata();
 
         if (somata.size() > 1) {
@@ -240,7 +240,7 @@ class SWCBuilder
         }
     }
 
-    void warnIfZeroDiameter(const SWCSample& sample, ErrorAndWarningHandler* h) {
+    void warnIfZeroDiameter(const SWCSample& sample, WarningHandler* h) {
         if (sample.diameter < morphio::epsilon) {
             h->emit(std::make_shared<WarningZeroDiameter>(uri, sample.lineNumber));
         }
@@ -287,7 +287,7 @@ class SWCBuilder
         return ret;
     }
 
-    SomaType somaType(ErrorAndWarningHandler* h) {
+    SomaType somaType(WarningHandler* h) {
         switch (morph.soma()->points().size()) {
         case 0: {
             return SOMA_UNDEFINED;
@@ -340,7 +340,7 @@ class SWCBuilder
 
     Property::Properties buildProperties(const std::string& contents,
                                          unsigned int options,
-                                         std::shared_ptr<ErrorAndWarningHandler>& h) {
+                                         std::shared_ptr<WarningHandler>& h) {
         morph.setErrorHandler(h);
         readSamples(contents);
 
@@ -449,7 +449,7 @@ class SWCBuilder
 Property::Properties load(const std::string& path,
                           const std::string& contents,
                           unsigned int options,
-                          std::shared_ptr<ErrorAndWarningHandler>& h) {
+                          std::shared_ptr<WarningHandler>& h) {
     auto properties = SWCBuilder(path).buildProperties(contents, options, h);
 
     properties._cellLevel._cellFamily = NEURON;

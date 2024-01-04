@@ -5,7 +5,7 @@
 #include <morphio/errorMessages.h>
 
 #include "../error_message_generation.h"
-#include "morphio/error_warning_handling.h"
+#include "morphio/warning_handling.h"
 #include "writer_utils.h"
 
 namespace morphio {
@@ -34,7 +34,7 @@ std::string version_string() {
 }
 
 bool emptyMorphology(const morphio::mut::Morphology& morph,
-                     std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
+                     std::shared_ptr<morphio::WarningHandler> handler) {
     if (morph.soma()->points().empty() && morph.rootSections().empty()) {
         handler->emit(std::make_shared<morphio::WriteEmptyMorphology>());
         return true;
@@ -43,7 +43,7 @@ bool emptyMorphology(const morphio::mut::Morphology& morph,
 }
 
 void validateContourSoma(const morphio::mut::Morphology& morph,
-                         std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
+                         std::shared_ptr<morphio::WarningHandler> handler) {
     const std::shared_ptr<Soma>& soma = morph.soma();
     const std::vector<Point>& somaPoints = soma->points();
 
@@ -65,7 +65,7 @@ void validateHasNoPerimeterData(const morphio::mut::Morphology& morph) {
 }
 
 void validateHasNoMitochondria(const morphio::mut::Morphology& morph,
-                               std::shared_ptr<morphio::ErrorAndWarningHandler> handler) {
+                               std::shared_ptr<morphio::WarningHandler> handler) {
     if (!morph.mitochondria().rootSections().empty()) {
         handler->emit(std::make_shared<morphio::MitochondriaWriteNotSupported>());
     }

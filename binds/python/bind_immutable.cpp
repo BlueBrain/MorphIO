@@ -11,7 +11,6 @@
 #include <morphio/dendritic_spine.h>
 #include <morphio/endoplasmic_reticulum.h>
 #include <morphio/enums.h>
-#include <morphio/error_warning_handling.h> // ErrorAndWarningHandler
 #include <morphio/glial_cell.h>
 #include <morphio/mut/dendritic_spine.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
@@ -20,6 +19,7 @@
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
 #include <morphio/types.h>
+#include <morphio/warning_handling.h>  // WarningHandler
 
 #include <memory>  // std::make_unique
 
@@ -59,7 +59,7 @@ void bind_morphology(py::module& m) {
         .def(py::init<const std::string&, unsigned int>(),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const std::string&, std::shared_ptr<morphio::ErrorAndWarningHandler>, unsigned int>(),
+        .def(py::init<const std::string&, std::shared_ptr<morphio::WarningHandler>, unsigned int>(),
              "filename"_a,
              "h"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER)

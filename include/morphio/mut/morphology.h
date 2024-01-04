@@ -4,7 +4,6 @@
  */
 #pragma once
 
-#include <cassert>
 #include <map>
 #include <memory>
 #include <string>
@@ -12,7 +11,6 @@
 #include <vector>
 
 #include <morphio/errorMessages.h>
-#include <morphio/error_warning_handling.h>
 #include <morphio/exceptions.h>
 #include <morphio/mut/endoplasmic_reticulum.h>
 #include <morphio/mut/mitochondria.h>
@@ -21,6 +19,7 @@
 #include <morphio/mut/soma.h>
 #include <morphio/properties.h>
 #include <morphio/types.h>
+#include <morphio/warning_handling.h>
 
 
 namespace morphio {
@@ -218,11 +217,11 @@ class Morphology
      **/
     void removeUnifurcations();
 
-    std::shared_ptr<ErrorAndWarningHandler> getHandler() const {
+    std::shared_ptr<WarningHandler> getHandler() const {
         return _handler;
     }
 
-    void setErrorHandler(std::shared_ptr<ErrorAndWarningHandler> h) {
+    void setErrorHandler(std::shared_ptr<WarningHandler> h) {
         _handler = h;
     }
 
@@ -247,7 +246,7 @@ class Morphology
     void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
                       const std::shared_ptr<Section>& section);
 
-    std::shared_ptr<ErrorAndWarningHandler> _handler = getErrorHandler();
+    std::shared_ptr<WarningHandler> _handler = getErrorHandler();
     std::string _uri;
 
     friend class Section;
