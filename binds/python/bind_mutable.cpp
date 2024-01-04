@@ -50,22 +50,29 @@ void bind_mut_morphology(py::module& m) {
 
     py::class_<Morphology>(m, "Morphology", "Class representing a mutable Morphology")
         .def(py::init<>())
-        .def(py::init<const std::string&, unsigned int>(),
+        .def(py::init<const std::string&, unsigned int, std::shared_ptr<morphio::WarningHandler>>(),
              "filename"_a,
-             "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const morphio::Morphology&, unsigned int>(),
+             "options"_a = morphio::enums::Option::NO_MODIFIER,
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr))
+        .def(py::init<const morphio::Morphology&,
+                      unsigned int,
+                      std::shared_ptr<morphio::WarningHandler>>(),
              "morphology"_a,
-             "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const Morphology&, unsigned int>(),
+             "options"_a = morphio::enums::Option::NO_MODIFIER,
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr))
+        .def(py::init<const Morphology&, unsigned int, std::shared_ptr<morphio::WarningHandler>>(),
              "morphology"_a,
-             "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init([](py::object arg, unsigned int options) {
-                 return std::make_unique<Morphology>(py::str(arg), options);
+             "options"_a = morphio::enums::Option::NO_MODIFIER,
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr))
+        .def(py::init([](py::object arg,
+                         unsigned int options,
+                         std::shared_ptr<morphio::WarningHandler> warning_handler) {
+                 return std::make_unique<Morphology>(py::str(arg), options, warning_handler);
              }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER,
-             "Additional Ctor that accepts as filename any python "
-             "object that implements __repr__ or __str__")
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr),
+             "Accepts as filename any python object that implements __repr__ or __str__")
 
         // Cell sub-part accessors
         .def_property_readonly("sections", &Morphology::sections, D(sections))

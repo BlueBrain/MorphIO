@@ -69,7 +69,7 @@ MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group, const std::string& 
     : _group(group)
     , _uri(uri) {}
 
-Property::Properties load(const std::string& uri) {
+Property::Properties load(const std::string& uri, WarningHandler* /*warning_handler*/) {
     try {
         std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
         HighFive::SilenceHDF5 silence;

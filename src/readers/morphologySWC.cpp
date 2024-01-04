@@ -449,8 +449,8 @@ class SWCBuilder
 Property::Properties load(const std::string& path,
                           const std::string& contents,
                           unsigned int options,
-                          std::shared_ptr<WarningHandler>& h) {
-    auto properties = SWCBuilder(path).buildProperties(contents, options, h);
+                          std::shared_ptr<WarningHandler>& warning_handler) {
+    auto properties = SWCBuilder(path).buildProperties(contents, options, warning_handler);
 
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"swc", 1, 0};

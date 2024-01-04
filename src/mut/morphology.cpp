@@ -49,18 +49,22 @@ void appendProperties(morphio::Property::PointLevel& to,
 namespace morphio {
 namespace mut {
 
-Morphology::Morphology(const std::string& uri, unsigned int options)
-    : Morphology(morphio::Morphology(uri, options)) {}
+Morphology::Morphology(const std::string& uri,
+                       unsigned int options,
+                       std::shared_ptr<WarningHandler> warning_handler)
+    : Morphology(morphio::Morphology(uri, options, warning_handler)) {}
 
 Morphology::Morphology(const HighFive::Group& group, unsigned int options)
     : Morphology(morphio::Morphology(group, options)) {}
 
-Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int options)
+Morphology::Morphology(const morphio::mut::Morphology& morphology,
+                       unsigned int options,
+                       std::shared_ptr<WarningHandler> warning_handler)
     : _soma(std::make_shared<Soma>(*morphology.soma()))
     , _cellProperties(std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
     , _dendriticSpineLevel(morphology._dendriticSpineLevel)
-    {
+    , _handler(warning_handler ? warning_handler : getErrorHandler()) {
     for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -72,12 +76,15 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
     applyModifiers(options);
 }
 
-Morphology::Morphology(const morphio::Morphology& morphology, unsigned int options)
+Morphology::Morphology(const morphio::Morphology& morphology,
+                       unsigned int options,
+                       std::shared_ptr<WarningHandler> warning_handler)
     : _soma(std::make_shared<Soma>(morphology.soma()))
     , _cellProperties(
           std::make_shared<morphio::Property::CellLevel>(morphology.properties_->_cellLevel))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
-    , _dendriticSpineLevel(morphology.properties_->_dendriticSpineLevel){
+    , _dendriticSpineLevel(morphology.properties_->_dendriticSpineLevel)
+    , _handler(warning_handler ? warning_handler : getErrorHandler()) {
     for (const morphio::Section& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }

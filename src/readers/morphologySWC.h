@@ -15,7 +15,7 @@ namespace swc {
 Property::Properties load(const std::string& path,
                           const std::string& contents,
                           unsigned int options,
-                          std::shared_ptr<WarningHandler>& h);
+                          std::shared_ptr<WarningHandler>& warning_handler);
 }  // namespace swc
 }  // namespace readers
 }  // namespace morphio

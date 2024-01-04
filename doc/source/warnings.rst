@@ -8,6 +8,10 @@ The recommendation is to provide a handler when loading or creating morphologies
 
 .. code-block:: python
 
+    warning_handler = morphio.WarningHandlerCollector()
+    morph = Morphology('path/to/morph.swc', warning_handler=warning_handler)
+    for w in warning_handler.get_all():
+       print(w.warning.line_numbers) 
 
 Maximum number of warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

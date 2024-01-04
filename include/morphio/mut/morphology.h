@@ -36,7 +36,7 @@ class Morphology
         : _soma(std::make_shared<Soma>())
         , _cellProperties(
               std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel()))
-        {}
+        , _handler(getErrorHandler()) {}
 
     /**
        Build a mutable Morphology from an on-disk morphology
@@ -47,16 +47,22 @@ class Morphology
        Example:
            Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
     **/
-    explicit Morphology(const std::string& uri, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const std::string& uri,
+                        unsigned int options = NO_MODIFIER,
+                        std::shared_ptr<WarningHandler> warning_handler = nullptr);
 
     /// Build a mutable Morphology from an HighFive::Group
     explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
 
     /// Build a mutable Morphology from a mutable morphology
-    Morphology(const morphio::mut::Morphology& morphology, unsigned int options = NO_MODIFIER);
+    Morphology(const morphio::mut::Morphology& morphology,
+               unsigned int options = NO_MODIFIER,
+               std::shared_ptr<WarningHandler> warning_handler = nullptr);
 
     /// Build a mutable Morphology from a read-only morphology
-    explicit Morphology(const morphio::Morphology& morphology, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const morphio::Morphology& morphology,
+                        unsigned int options = NO_MODIFIER,
+                        std::shared_ptr<WarningHandler> warning_handler = nullptr);
 
     virtual ~Morphology();
 
@@ -246,7 +252,7 @@ class Morphology
     void eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
                       const std::shared_ptr<Section>& section);
 
-    std::shared_ptr<WarningHandler> _handler = getErrorHandler();
+    std::shared_ptr<WarningHandler> _handler;
     std::string _uri;
 
     friend class Section;

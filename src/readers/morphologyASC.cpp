@@ -379,7 +379,8 @@ class NeurolucidaParser
 
 Property::Properties load(const std::string& path,
                           const std::string& contents,
-                          unsigned int options) {
+                          unsigned int options,
+                          WarningHandler* /*warning_handler*/) {
     NeurolucidaParser parser(path);
 
     morphio::mut::Morphology& nb_ = parser.parse(contents);
