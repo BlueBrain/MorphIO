@@ -182,36 +182,42 @@ void bind_misc(py::module& m) {
             [](morphio::Collection* collection,
                const std::string& morph_name,
                unsigned int options,
-               bool is_mutable) -> py::object {
+               bool is_mutable,
+               std::shared_ptr<morphio::WarningHandler> warning_handler) -> py::object {
                 if (is_mutable) {
-                    return py::cast(
-                        collection->load<morphio::mut::Morphology>(morph_name, options));
+                    return py::cast(collection->load<morphio::mut::Morphology>(morph_name,
+                                                                               options,
+                                                                               warning_handler));
                 } else {
-                    return py::cast(collection->load<morphio::Morphology>(morph_name, options));
+                    return py::cast(collection->load<morphio::Morphology>(morph_name,
+                                                                          options,
+                                                                          warning_handler));
                 }
             },
             "morph_name"_a,
             "options"_a = morphio::enums::Option::NO_MODIFIER,
             "mutable"_a = false,
+            "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr),
             "Load the morphology named 'morph_name' form the collection.")
         .def(
             "load_unordered",
             [](morphio::Collection* collection,
                std::vector<std::string> morphology_names,
                unsigned int options,
-               bool is_mutable) -> py::object {
+               bool is_mutable,
+               std::shared_ptr<morphio::WarningHandler> warning_handler) -> py::object {
                 if (is_mutable) {
-                    return py::cast(
-                        collection->load_unordered<morphio::mut::Morphology>(morphology_names,
-                                                                             options));
+                    return py::cast(collection->load_unordered<morphio::mut::Morphology>(
+                        morphology_names, options, warning_handler));
                 } else {
-                    return py::cast(
-                        collection->load_unordered<morphio::Morphology>(morphology_names, options));
+                    return py::cast(collection->load_unordered<morphio::Morphology>(
+                        morphology_names, options, warning_handler));
                 }
             },
             "morphology_names"_a,
             "options"_a = morphio::enums::Option::NO_MODIFIER,
             "mutable"_a = false,
+            "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr),
             R"(Create an iterable of loop index and morphology.
 
 When reading from containers, the order in which morphologies are read can

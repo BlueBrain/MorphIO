@@ -1,6 +1,5 @@
 # Copyright (c) 2013-2023, EPFL/Blue Brain Project
 # SPDX-License-Identifier: Apache-2.0
-from collections import OrderedDict
 from pathlib import Path
 
 import numpy as np
@@ -15,11 +14,11 @@ from morphio import (CellFamily, DendriticSpine, GlialCell, IterType,
 
 DATA_DIR = Path(__file__).parent / "data"
 # These 3 cells are identical
-CELLS = OrderedDict({
+CELLS = {
     'asc': Morphology(DATA_DIR /  "simple.asc"),
     'swc': Morphology(DATA_DIR /  "simple.swc"),
     'h5': Morphology(DATA_DIR /  "h5/v1/simple.h5"),
-})
+}
 
 
 def test_heterogeneous_sections():

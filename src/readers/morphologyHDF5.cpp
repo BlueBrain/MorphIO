@@ -81,9 +81,12 @@ Property::Properties load(const std::string& uri, WarningHandler* warning_handle
     }
 }
 
-Property::Properties load(const HighFive::Group& group) {
+Property::Properties load(const HighFive::Group& group, WarningHandler* warning_handler) {
     std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
-    return MorphologyHDF5(group).load(getErrorHandler().get());
+    if (warning_handler == nullptr) {
+        warning_handler = getWarningHandler().get();
+    }
+    return MorphologyHDF5(group).load(warning_handler);
 }
 
 Property::Properties MorphologyHDF5::load(WarningHandler* warning_handler) {

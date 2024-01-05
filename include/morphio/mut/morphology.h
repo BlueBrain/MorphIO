@@ -32,11 +32,10 @@ bool _checkDuplicatePoint(const std::shared_ptr<Section>& parent,
 class Morphology
 {
   public:
-    Morphology()
+    Morphology(std::shared_ptr<WarningHandler> warning_handler = nullptr)
         : _soma(std::make_shared<Soma>())
-        , _cellProperties(
-              std::make_shared<morphio::Property::CellLevel>(morphio::Property::CellLevel()))
-        , _handler(getErrorHandler()) {}
+        , _cellProperties(std::make_shared<Property::CellLevel>())
+        , _handler(warning_handler ? warning_handler : morphio::getWarningHandler()) {}
 
     /**
        Build a mutable Morphology from an on-disk morphology
@@ -52,10 +51,12 @@ class Morphology
                         std::shared_ptr<WarningHandler> warning_handler = nullptr);
 
     /// Build a mutable Morphology from an HighFive::Group
-    explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const HighFive::Group& group,
+                        unsigned int options = NO_MODIFIER,
+                        std::shared_ptr<WarningHandler> warning_handler = nullptr);
 
     /// Build a mutable Morphology from a mutable morphology
-    Morphology(const morphio::mut::Morphology& morphology,
+    Morphology(const mut::Morphology& morphology,
                unsigned int options = NO_MODIFIER,
                std::shared_ptr<WarningHandler> warning_handler = nullptr);
 
@@ -199,11 +200,11 @@ class Morphology
     /// Write file to H5, SWC, ASC format depending on filename extension
     void write(const std::string& filename) const;
 
-    void addAnnotation(const morphio::Property::Annotation& annotation) {
+    void addAnnotation(const Property::Annotation& annotation) {
         _cellProperties->_annotations.push_back(annotation);
     }
 
-    void addMarker(const morphio::Property::Marker& marker) {
+    void addMarker(const Property::Marker& marker) {
         _cellProperties->_markers.push_back(marker);
     }
 
@@ -223,18 +224,14 @@ class Morphology
      **/
     void removeUnifurcations();
 
-    std::shared_ptr<WarningHandler> getHandler() const {
+    std::shared_ptr<WarningHandler> getWarningHandler() const {
         return _handler;
     }
 
-    void setErrorHandler(std::shared_ptr<WarningHandler> h) {
-        _handler = h;
-    }
-
     std::shared_ptr<Soma> _soma;
-    std::shared_ptr<morphio::Property::CellLevel> _cellProperties;
+    std::shared_ptr<Property::CellLevel> _cellProperties;
     EndoplasmicReticulum _endoplasmicReticulum;
-    morphio::Property::DendriticSpine::Level _dendriticSpineLevel;
+    Property::DendriticSpine::Level _dendriticSpineLevel;
 
   private:
     std::vector<std::shared_ptr<Section>> _rootSections;
@@ -256,10 +253,8 @@ class Morphology
     std::string _uri;
 
     friend class Section;
-    friend void modifiers::nrn_order(morphio::mut::Morphology& morpho);
-    friend bool diff(const Morphology& left,
-                     const Morphology& right,
-                     morphio::enums::LogLevel verbose);
+    friend void modifiers::nrn_order(mut::Morphology& morpho);
+    friend bool diff(const Morphology& left, const Morphology& right, enums::LogLevel verbose);
 };
 
 }  // namespace mut

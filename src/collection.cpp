@@ -39,11 +39,13 @@ class LoadUnorderedFromLoopIndices: public LoadUnorderedImpl
     LoadUnorderedFromLoopIndices(Collection collection,
                                  std::vector<size_t> loop_indices,
                                  std::vector<std::string> morphology_names,
-                                 unsigned int options)
+                                 unsigned int options,
+                                 std::shared_ptr<WarningHandler> warning_handler)
         : _collection(std::move(collection))
         , _loop_indices(std::move(loop_indices))
         , _morphology_names(std::move(morphology_names))
-        , _options(options) {}
+        , _options(options)
+        , _warning_handler(std::move(warning_handler)) {}
 
     size_t size() const override {
         return _morphology_names.size();
@@ -69,6 +71,7 @@ class LoadUnorderedFromLoopIndices: public LoadUnorderedImpl
     std::vector<size_t> _loop_indices;
     std::vector<std::string> _morphology_names;
     unsigned int _options;
+    std::shared_ptr<WarningHandler> _warning_handler;
 };
 
 }  // namespace detail
@@ -79,13 +82,19 @@ class CollectionImpl
   public:
     virtual ~CollectionImpl() = default;
 
-    virtual Morphology load(const std::string& morph_name, unsigned int options) const = 0;
+    virtual Morphology load(const std::string& morph_name,
+                            unsigned int options,
+                            std::shared_ptr<WarningHandler> warning_handler) const = 0;
 
-    virtual mut::Morphology load_mut(const std::string& morph_name, unsigned int options) const = 0;
+    virtual mut::Morphology load_mut(const std::string& morph_name,
+                                     unsigned int options,
+                                     std::shared_ptr<WarningHandler> warning_handler) const = 0;
 
-    virtual std::shared_ptr<LoadUnorderedImpl> load_unordered(Collection collection,
-                                                              std::vector<std::string> morph_name,
-                                                              unsigned int options) const = 0;
+    virtual std::shared_ptr<LoadUnorderedImpl> load_unordered(
+        Collection collection,
+        std::vector<std::string> morph_name,
+        unsigned int options,
+        std::shared_ptr<WarningHandler> warning_handler) const = 0;
 
     virtual std::vector<size_t> argsort(const std::vector<std::string>& morphology_names) const = 0;
 };
@@ -97,25 +106,32 @@ class CollectionImpl: public morphio::CollectionImpl
     // The purpose of this class is to implement the two separate
     // functions in terms of a single templated method `load_impl`.
   public:
-    morphio::Morphology load(const std::string& morph_name, unsigned int options) const override {
+    morphio::Morphology load(const std::string& morph_name,
+                             unsigned int options,
+                             std::shared_ptr<WarningHandler> warning_handler) const override {
         const auto& derived = static_cast<const Derived&>(*this);
-        return derived.template load_impl<Morphology>(morph_name, options);
+        return derived.template load_impl<Morphology>(morph_name, options, warning_handler);
     }
 
-    morphio::mut::Morphology load_mut(const std::string& morph_name,
-                                      unsigned int options) const override {
+    morphio::mut::Morphology load_mut(
+        const std::string& morph_name,
+        unsigned int options,
+        std::shared_ptr<WarningHandler> warning_handler) const override {
         const auto& derived = static_cast<const Derived&>(*this);
-        return derived.template load_impl<mut::Morphology>(morph_name, options);
+        return derived.template load_impl<mut::Morphology>(morph_name, options, warning_handler);
     }
 
-    std::shared_ptr<LoadUnorderedImpl> load_unordered(Collection collection,
-                                                      std::vector<std::string> morphology_names,
-                                                      unsigned int options) const override {
+    std::shared_ptr<LoadUnorderedImpl> load_unordered(
+        Collection collection,
+        std::vector<std::string> morphology_names,
+        unsigned int options,
+        std::shared_ptr<WarningHandler> warning_handler) const override {
         auto loop_indices = argsort(morphology_names);
         return std::make_shared<detail::LoadUnorderedFromLoopIndices>(std::move(collection),
                                                                       std::move(loop_indices),
                                                                       std::move(morphology_names),
-                                                                      options);
+                                                                      options,
+                                                                      warning_handler);
     }
 };
 }  // namespace detail
@@ -131,8 +147,10 @@ class DirectoryCollection: public morphio::detail::CollectionImpl<DirectoryColle
     friend morphio::detail::CollectionImpl<DirectoryCollection>;
 
     template <class M>
-    M load_impl(const std::string& morph_name, unsigned int options) const {
-        return M(morphology_path(morph_name), options);
+    M load_impl(const std::string& morph_name,
+                unsigned int options,
+                std::shared_ptr<WarningHandler> warning_handler) const {
+        return M(morphology_path(morph_name), options, warning_handler);
     }
 
     std::string morphology_path(const std::string& morph_name) const {
@@ -214,9 +232,11 @@ class HDF5ContainerCollection: public morphio::detail::CollectionImpl<HDF5Contai
     friend morphio::detail::CollectionImpl<HDF5ContainerCollection>;
 
     template <class M>
-    M load_impl(const std::string& morph_name, unsigned int options) const {
+    M load_impl(const std::string& morph_name,
+                unsigned int options,
+                std::shared_ptr<WarningHandler> warning_handler) const {
         std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
-        return M(_file.getGroup(morph_name), options);
+        return M(_file.getGroup(morph_name), options, warning_handler);
     }
 
   protected:
@@ -261,20 +281,24 @@ Collection::Collection(std::string collection_path, std::vector<std::string> ext
 
 
 template <class M>
-typename enable_if_immutable<M, M>::type Collection::load(const std::string& morph_name,
-                                                          unsigned int options) const {
+typename enable_if_immutable<M, M>::type Collection::load(
+    const std::string& morph_name,
+    unsigned int options,
+    std::shared_ptr<WarningHandler> warning_handler) const {
     if (_collection != nullptr) {
-        return _collection->load(morph_name, options);
+        return _collection->load(morph_name, options, warning_handler);
     }
 
     throw std::runtime_error("The collection has been closed.");
 }
 
 template <class M>
-typename enable_if_mutable<M, M>::type Collection::load(const std::string& morph_name,
-                                                        unsigned int options) const {
+typename enable_if_mutable<M, M>::type Collection::load(
+    const std::string& morph_name,
+    unsigned int options,
+    std::shared_ptr<WarningHandler> warning_handler) const {
     if (_collection != nullptr) {
-        return _collection->load_mut(morph_name, options);
+        return _collection->load_mut(morph_name, options, warning_handler);
     }
 
     throw std::runtime_error("The collection has been closed.");
@@ -288,24 +312,34 @@ std::vector<size_t> Collection::argsort(const std::vector<std::string>& morpholo
     throw std::runtime_error("The collection has been closed.");
 }
 
-template mut::Morphology Collection::load<mut::Morphology>(const std::string& morph_name,
-                                                           unsigned int options) const;
+template mut::Morphology Collection::load<mut::Morphology>(
+    const std::string& morph_name,
+    unsigned int options,
+    std::shared_ptr<WarningHandler> warning_handler = nullptr) const;
 
-template Morphology Collection::load<Morphology>(const std::string& morph_name,
-                                                 unsigned int options) const;
+template Morphology Collection::load<Morphology>(
+    const std::string& morph_name,
+    unsigned int options,
+    std::shared_ptr<WarningHandler> warning_handler = nullptr) const;
 
 
 template <class M>
 LoadUnordered<M> Collection::load_unordered(std::vector<std::string> morphology_names,
-                                            unsigned int options) const {
-    return LoadUnordered<M>(_collection->load_unordered(*this, morphology_names, options));
+                                            unsigned int options,
+                                            std::shared_ptr<WarningHandler> warning_handler) const {
+    return LoadUnordered<M>(
+        _collection->load_unordered(*this, morphology_names, options, warning_handler));
 }
 
 template LoadUnordered<mut::Morphology> Collection::load_unordered<mut::Morphology>(
-    std::vector<std::string> morphology_names, unsigned int options) const;
+    std::vector<std::string> morphology_names,
+    unsigned int options,
+    std::shared_ptr<WarningHandler> warning_handler) const;
 
 template LoadUnordered<Morphology> Collection::load_unordered<Morphology>(
-    std::vector<std::string> morphology_names, unsigned int options) const;
+    std::vector<std::string> morphology_names,
+    unsigned int options,
+    std::shared_ptr<WarningHandler> warning_handler) const;
 
 
 void Collection::close() {

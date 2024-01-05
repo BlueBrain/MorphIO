@@ -22,8 +22,8 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(_morphio, m) {
     bind_enums(m);
-    bind_misc(m);
     bind_warnings_exceptions(m);
+    bind_misc(m);
 
     bind_immutable(m);
 

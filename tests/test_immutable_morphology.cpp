@@ -106,11 +106,11 @@ TEST_CASE("heterogeneous-sections", "[immutableMorphology]") {
     }
 }
 
-TEST_CASE("modifers", "[immutableMorphology]") {
+TEST_CASE("modifiers", "[immutableMorphology]") {
     morphio::Morphology morphNoModifier = morphio::Morphology(
         "data/reversed_NRN_neurite_order.swc");
     std::vector<morphio::SectionType> rootSectionTypesNoModifier;
-    for (auto sectionNoMod : morphNoModifier.rootSections()) {
+    for (const auto& sectionNoMod : morphNoModifier.rootSections()) {
         rootSectionTypesNoModifier.push_back(sectionNoMod.type());
     }
     REQUIRE(rootSectionTypesNoModifier == std::vector<morphio::SectionType>{
@@ -123,7 +123,7 @@ TEST_CASE("modifers", "[immutableMorphology]") {
                                                     morphio::Option::NRN_ORDER);
 
     std::vector<morphio::SectionType> rootSectionTypes;
-    for (auto section : morph.rootSections()) {
+    for (const auto& section : morph.rootSections()) {
         rootSectionTypes.push_back(section.type());
     }
     REQUIRE(rootSectionTypes.size() == 3);
@@ -137,7 +137,7 @@ TEST_CASE("modifers", "[immutableMorphology]") {
                                                               morphio::Option::NRN_ORDER);
 
     std::vector<morphio::SectionType> rootSectionTypesH5;
-    for (auto section : morphModifierh5.rootSections()) {
+    for (const auto& section : morphModifierh5.rootSections()) {
         rootSectionTypesH5.push_back(section.type());
     }
     // Should be inverted without the option

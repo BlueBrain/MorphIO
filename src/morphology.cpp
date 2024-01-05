@@ -74,7 +74,7 @@ morphio::Property::Properties loadFile(const std::string& path,
     }
 
     if (warning_handler == nullptr) {
-        warning_handler = morphio::getErrorHandler();
+        warning_handler = morphio::getWarningHandler();
     }
 
     std::string extension = tolower(path.substr(pos + 1));
@@ -101,7 +101,7 @@ morphio::Property::Properties loadString(const std::string& contents,
     std::string lower_extension = tolower(extension);
 
     if (warning_handler == nullptr) {
-        warning_handler = morphio::getErrorHandler();
+        warning_handler = morphio::getWarningHandler();
     }
 
     if (lower_extension == "asc") {
@@ -137,8 +137,10 @@ Morphology::Morphology(const std::string& path,
                        std::shared_ptr<WarningHandler> warning_handler)
     : Morphology(loadFile(path, warning_handler, options), options) {}
 
-Morphology::Morphology(const HighFive::Group& group, unsigned int options)
-    : Morphology(readers::h5::load(group), options) {}
+Morphology::Morphology(const HighFive::Group& group,
+                       unsigned int options,
+                       std::shared_ptr<WarningHandler> warning_handler)
+    : Morphology(readers::h5::load(group, warning_handler.get()), options) {}
 
 Morphology::Morphology(const mut::Morphology& morphology) {
     properties_ = std::make_shared<Property::Properties>(morphology.buildReadOnly());

@@ -1243,9 +1243,9 @@ static const char *mkd_doc_morphio_enums_operator_lshift = R"doc()doc";
 
 static const char *mkd_doc_morphio_get = R"doc()doc";
 
-static const char *mkd_doc_morphio_getErrorHandler = R"doc()doc";
-
 static const char *mkd_doc_morphio_getVersionString = R"doc()doc";
+
+static const char *mkd_doc_morphio_getWarningHandler = R"doc()doc";
 
 static const char *mkd_doc_morphio_isRoot = R"doc(Return true if this section is a root section (parent ID == -1))doc";
 
@@ -1528,7 +1528,7 @@ static const char *mkd_doc_morphio_mut_Morphology_endoplasmicReticulum_3 = R"doc
 
 static const char *mkd_doc_morphio_mut_Morphology_eraseByValue = R"doc()doc";
 
-static const char *mkd_doc_morphio_mut_Morphology_getHandler = R"doc()doc";
+static const char *mkd_doc_morphio_mut_Morphology_getWarningHandler = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_handler = R"doc()doc";
 
@@ -1560,8 +1560,6 @@ Note: multiple morphologies can share the same Section instances.)doc";
 static const char *mkd_doc_morphio_mut_Morphology_sections = R"doc(Returns the dictionary id -> Section for this tree)doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_sections_2 = R"doc()doc";
-
-static const char *mkd_doc_morphio_mut_Morphology_setErrorHandler = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_soma =
 R"doc(Returns a shared pointer on the Soma

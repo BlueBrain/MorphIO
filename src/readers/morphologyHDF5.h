@@ -16,7 +16,7 @@ namespace morphio {
 namespace readers {
 namespace h5 {
 Property::Properties load(const std::string& uri, WarningHandler*);
-Property::Properties load(const HighFive::Group& group);
+Property::Properties load(const HighFive::Group& group, WarningHandler*);
 
 class MorphologyHDF5
 {

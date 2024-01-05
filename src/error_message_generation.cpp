@@ -6,11 +6,6 @@ namespace morphio {
 namespace details {
 using morphio::readers::ErrorLevel;
 
-bool ErrorMessages::isIgnored(const Warning& warning) {
-    auto static_handler = getErrorHandler();
-    return static_handler->isIgnored(warning);
-}
-
 namespace {
 std::string errorMsg(const std::string& uri,
                      long unsigned int lineNumber,
@@ -21,10 +16,6 @@ std::string errorMsg(const std::string& uri,
 } // namespace
 
 // LCOV_EXCL_START {  all the error messages are excluded from coverage
-
-////////////////////////////////////////////////////////////////////////////////
-//              ERRORS
-////////////////////////////////////////////////////////////////////////////////
 
 std::string ErrorMessages::ERROR_LINE_NON_PARSABLE(long unsigned int lineNumber) const {
     return errorMsg(_uri, lineNumber, ErrorLevel::ERROR, "Unable to parse this line");

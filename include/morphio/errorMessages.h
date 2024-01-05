@@ -21,6 +21,6 @@ void set_ignored_warning(enums::Warning warning, bool ignore = true);
 /** Set an array of warnings to ignore **/
 void set_ignored_warning(const std::vector<enums::Warning>& warning, bool ignore = true);
 
-std::shared_ptr<WarningHandler> getErrorHandler();
+std::shared_ptr<WarningHandler> getWarningHandler();
 
 }  // namespace morphio

@@ -52,10 +52,12 @@ namespace mut {
 Morphology::Morphology(const std::string& uri,
                        unsigned int options,
                        std::shared_ptr<WarningHandler> warning_handler)
-    : Morphology(morphio::Morphology(uri, options, std::move(warning_handler))) {}
+    : Morphology(morphio::Morphology(uri, options, warning_handler)) {}
 
-Morphology::Morphology(const HighFive::Group& group, unsigned int options)
-    : Morphology(morphio::Morphology(group, options)) {}
+Morphology::Morphology(const HighFive::Group& group,
+                       unsigned int options,
+                       std::shared_ptr<WarningHandler> warning_handler)
+    : Morphology(morphio::Morphology(group, options, warning_handler)) {}
 
 Morphology::Morphology(const morphio::mut::Morphology& morphology,
                        unsigned int options,
@@ -64,7 +66,7 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology,
     , _cellProperties(std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
     , _dendriticSpineLevel(morphology._dendriticSpineLevel)
-    , _handler(warning_handler ? warning_handler : getErrorHandler()) {
+    , _handler(warning_handler ? warning_handler : morphio::getWarningHandler()) {
     for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -84,7 +86,7 @@ Morphology::Morphology(const morphio::Morphology& morphology,
           std::make_shared<morphio::Property::CellLevel>(morphology.properties_->_cellLevel))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
     , _dendriticSpineLevel(morphology.properties_->_dendriticSpineLevel)
-    , _handler(warning_handler ? warning_handler : getErrorHandler()) {
+    , _handler(warning_handler != nullptr ? warning_handler : morphio::getWarningHandler()) {
     for (const morphio::Section& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -131,7 +133,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 
     const bool emptySection = ptr->points().empty();
     if (emptySection) {
-        getHandler()->emit(std::make_shared<AppendingEmptySection>(_uri, ptr->id()));
+        getWarningHandler()->emit(std::make_shared<AppendingEmptySection>(_uri, ptr->id()));
     }
 
     if (recursive) {
@@ -150,7 +152,8 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
     _rootSections.push_back(section_copy);
     const bool emptySection = section_copy->points().empty();
     if (emptySection) {
-        getHandler()->emit(std::make_shared<AppendingEmptySection>(_uri, section_copy->id()));
+        getWarningHandler()->emit(
+            std::make_shared<AppendingEmptySection>(_uri, section_copy->id()));
     }
 
     if (recursive) {
@@ -170,7 +173,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLeve
 
     bool emptySection = ptr->points().empty();
     if (emptySection) {
-        getHandler()->emit(std::make_shared<AppendingEmptySection>(_uri, ptr->id()));
+        getWarningHandler()->emit(std::make_shared<AppendingEmptySection>(_uri, ptr->id()));
     }
 
     return ptr;
@@ -266,7 +269,7 @@ void Morphology::removeUnifurcations() {
         bool duplicate = _checkDuplicatePoint(parent, section_);
 
         if (!duplicate) {
-            getHandler()->emit(std::make_shared<WrongDuplicate>(_uri, section_, parent));
+            getWarningHandler()->emit(std::make_shared<WrongDuplicate>(_uri, section_, parent));
         }
 
         bool isUnifurcation = parent->children().size() == 1;
@@ -274,7 +277,7 @@ void Morphology::removeUnifurcations() {
         // This "if" condition ensures that "unifurcations" (ie. successive
         // sections with only 1 child) get merged together into a bigger section
         if (isUnifurcation) {
-            getHandler()->emit(std::make_shared<OnlyChild>(_uri, parent->id(), sectionId));
+            getWarningHandler()->emit(std::make_shared<OnlyChild>(_uri, parent->id(), sectionId));
 
             addAnnotation(Property::Annotation(AnnotationType::SINGLE_CHILD,
                                                sectionId,

@@ -223,7 +223,7 @@ std::shared_ptr<Section> Section::appendSection(const Property::PointLevel& poin
 }
 
 void Section::emitWarning(std::shared_ptr<WarningMessage> wm) {
-    getOwningMorphologyOrThrow()->getHandler()->emit(std::move(wm));
+    getOwningMorphologyOrThrow()->getWarningHandler()->emit(std::move(wm));
 }
 
 }  // end namespace mut

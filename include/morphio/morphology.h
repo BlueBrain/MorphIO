@@ -48,13 +48,11 @@ class Morphology
                         unsigned int options = NO_MODIFIER,
                         std::shared_ptr<WarningHandler> = nullptr);
 
-    /** Constructor from an already parsed file */
-    explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
 
     /** Constructor from an already parsed file */
-    // explicit Morphology(const HighFive::Group& group,
-    //                    unsigned int options = NO_MODIFIER,
-    //                    std::shared_ptr<WarningHandler> = nullptr);
+    explicit Morphology(const HighFive::Group& group,
+                        unsigned int options = NO_MODIFIER,
+                        std::shared_ptr<WarningHandler> = nullptr);
 
     /** Constructor from an instance of morphio::mut::Morphology */
     explicit Morphology(const mut::Morphology&);

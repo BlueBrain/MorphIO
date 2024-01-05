@@ -285,7 +285,7 @@ class SWCBuilder
         return ret;
     }
 
-    SomaType somaType(WarningHandler* h) {
+    SomaType somaType(mut::Morphology& morph, WarningHandler* h) {
         switch (morph.soma()->points().size()) {
         case 0: {
             return SOMA_UNDEFINED;
@@ -338,7 +338,7 @@ class SWCBuilder
     Property::Properties buildProperties(const std::string& contents,
                                          unsigned int options,
                                          std::shared_ptr<WarningHandler>& h) {
-        morph.setErrorHandler(h);
+        mut::Morphology morph{h};
         readSamples(contents);
 
         for (const auto& sample_pair : samples) {
@@ -366,7 +366,7 @@ class SWCBuilder
             }
 
             if (isSectionStart(sample)) {
-                _processSectionStart(sample);
+                _processSectionStart(morph, sample);
             } else if (sample.type != SECTION_SOMA) {
                 swcIdToSectionId[sample.id] =
                     swcIdToSectionId[static_cast<unsigned int>(sample.parentId)];
@@ -386,7 +386,7 @@ class SWCBuilder
         morph.applyModifiers(options);
 
         Property::Properties properties = morph.buildReadOnly();
-        properties._cellLevel._somaType = somaType(h.get());
+        properties._cellLevel._somaType = somaType(morph, h.get());
 
         h->setIgnoredWarning(morphio::Warning::APPENDING_EMPTY_SECTION, originalIsIgnored);
 
@@ -397,7 +397,7 @@ class SWCBuilder
        append last point of previous section if current section is not a root section
        and update the parent ID of the new section
     */
-    void _processSectionStart(const SWCSample& sample) {
+    void _processSectionStart(mut::Morphology& morph, const SWCSample& sample) {
         Property::PointLevel properties;
 
         uint32_t id = 0;
@@ -436,7 +436,6 @@ class SWCBuilder
     unsigned int lastSomaPoint = 0;
     std::unordered_map<unsigned int, std::vector<unsigned int>> children;
     std::unordered_map<unsigned int, SWCSample> samples;
-    mut::Morphology morph;
     std::string uri;
 };
 
