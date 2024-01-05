@@ -121,7 +121,7 @@ void WarningHandlerPrinter::emit(std::shared_ptr<morphio::WarningMessage> wm) {
 
     if (maxWarningCount < 0 || errorCount <= static_cast<uint32_t>(maxWarningCount)) {
         std::cerr << wm->msg() << '\n';
-        if (maxWarningCount >= 0 && errorCount == static_cast<uint32_t>(maxWarningCount)) {
+        if (maxWarningCount > 0 && errorCount == static_cast<uint32_t>(maxWarningCount)) {
             std::cerr << "Maximum number of warning reached. Next warnings "
                          "won't be displayed.\n"
                          "You can change this number by calling:\n"

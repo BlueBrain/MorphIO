@@ -380,7 +380,7 @@ class NeurolucidaParser
 Property::Properties load(const std::string& path,
                           const std::string& contents,
                           unsigned int options,
-                          WarningHandler* /*warning_handler*/) {
+                          WarningHandler* warning_handler) {
     NeurolucidaParser parser(path);
 
     morphio::mut::Morphology& nb_ = parser.parse(contents);
@@ -390,6 +390,7 @@ Property::Properties load(const std::string& path,
 
     switch (properties._somaLevel._points.size()) {
     case 0:
+        warning_handler->emit(std::make_shared<NoSomaFound>(path));
         properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
         break;
     case 1:

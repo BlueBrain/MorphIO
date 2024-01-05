@@ -266,12 +266,12 @@ def test_mitochondria(tmp_path):
     assert_array_equal(mito.section(0).neurite_section_ids,
                        neuronal_section_ids)
 
-    with captured_output() as (_, err):
+    with captured_output() as (stdout, err):
         with ostream_redirect(stdout=True, stderr=True):
             morpho.write(tmp_path / "test.asc")
-            assert ("Warning: this cell has mitochondria, they cannot be saved in "
-                    " ASC or SWC format. Please use H5 if you want to save them." in
-                    err.getvalue().strip())
+    assert ("Warning: this cell has mitochondria, they cannot be saved in "
+            " ASC or SWC format. Please use H5 if you want to save them." in
+            err.getvalue().strip())
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):

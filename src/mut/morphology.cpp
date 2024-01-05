@@ -52,7 +52,7 @@ namespace mut {
 Morphology::Morphology(const std::string& uri,
                        unsigned int options,
                        std::shared_ptr<WarningHandler> warning_handler)
-    : Morphology(morphio::Morphology(uri, options, warning_handler)) {}
+    : Morphology(morphio::Morphology(uri, options, std::move(warning_handler))) {}
 
 Morphology::Morphology(const HighFive::Group& group, unsigned int options)
     : Morphology(morphio::Morphology(group, options)) {}

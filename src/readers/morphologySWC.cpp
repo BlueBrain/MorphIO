@@ -221,9 +221,7 @@ class SWCBuilder
         }
 
         if (somata.empty()) {
-            const auto err = details::ErrorMessages(uri);
             h->emit(std::make_shared<NoSomaFound>(uri));
-
         } else {
             for (const auto& sample_pair : samples) {
                 const auto& sample = sample_pair.second;
@@ -322,7 +320,6 @@ class SWCBuilder
                         details::checkNeuroMorphoSoma(points, samples[somaRootId].diameter / 2);
 
                     if (status != details::ThreePointSomaStatus::Conforms) {
-                        const auto err = details::ErrorMessages(uri);
                         std::stringstream stream;
                         stream << status;
                         h->emit(std::make_shared<SomaNonConform>(uri, stream.str()));
@@ -383,9 +380,6 @@ class SWCBuilder
         }
 
         if (morph.soma()->points().size() == 3 && !neurite_wrong_root.empty()) {
-            const auto err = details::ErrorMessages(uri);
-            //h->emit(morphio::WRONG_ROOT_POINT,
-            //        err.WARNING_WRONG_ROOT_POINT(gatherLineNumbers(neurite_wrong_root)));
             h->emit(std::make_shared<WrongRootPoint>(uri, gatherLineNumbers(neurite_wrong_root)));
         }
 

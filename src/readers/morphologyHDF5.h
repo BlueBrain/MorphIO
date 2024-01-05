@@ -23,7 +23,7 @@ class MorphologyHDF5
   public:
     explicit MorphologyHDF5(const HighFive::Group& group, const std::string& uri = "HDF5 GROUP");
     virtual ~MorphologyHDF5() = default;
-    Property::Properties load();
+    Property::Properties load(WarningHandler*);
 
   private:
     void _checkVersion();
