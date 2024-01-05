@@ -124,56 +124,6 @@ static const char *mkd_doc_morphio_EndoplasmicReticulum_surfaceAreas = R"doc(Ret
 
 static const char *mkd_doc_morphio_EndoplasmicReticulum_volumes = R"doc(Returns the volumes for each neuronal section)doc";
 
-static const char *mkd_doc_morphio_ErrorAndWarningHandler = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_Emission = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_Emission_Emission = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_Emission_warning = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_Emission_wasMarkedIgnore = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_emit = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_getAll = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_m = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandlerCollector_printAll = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_ErrorAndWarningHandler = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_ErrorAndWarningHandler_2 = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_ErrorAndWarningHandler_3 = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_emit = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_getMaxWarningCount = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_getRaiseWarnings = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_ignoredWarnings = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_isIgnored = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_maxWarningCount = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_operator_assign = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_operator_assign_2 = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_raiseWarnings = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_setIgnoredWarning = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_setMaxWarningCount = R"doc()doc";
-
-static const char *mkd_doc_morphio_ErrorAndWarningHandler_setRaiseWarnings = R"doc()doc";
-
 static const char *mkd_doc_morphio_GlialCell = R"doc(Class to represent morphologies of glial cells)doc";
 
 static const char *mkd_doc_morphio_GlialCell_GlialCell = R"doc()doc";
@@ -378,15 +328,13 @@ Parameter ``options``:
 
 Example: Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);)doc";
 
-static const char *mkd_doc_morphio_Morphology_Morphology_4 = R"doc()doc";
+static const char *mkd_doc_morphio_Morphology_Morphology_4 = R"doc(Constructor from an already parsed file)doc";
 
-static const char *mkd_doc_morphio_Morphology_Morphology_5 = R"doc(Constructor from an already parsed file)doc";
+static const char *mkd_doc_morphio_Morphology_Morphology_5 = R"doc(Constructor from an instance of morphio::mut::Morphology)doc";
 
-static const char *mkd_doc_morphio_Morphology_Morphology_6 = R"doc(Constructor from an instance of morphio::mut::Morphology)doc";
+static const char *mkd_doc_morphio_Morphology_Morphology_6 = R"doc(Load a morphology from a string)doc";
 
-static const char *mkd_doc_morphio_Morphology_Morphology_7 = R"doc(Load a morphology from a string)doc";
-
-static const char *mkd_doc_morphio_Morphology_Morphology_8 = R"doc()doc";
+static const char *mkd_doc_morphio_Morphology_Morphology_7 = R"doc()doc";
 
 static const char *mkd_doc_morphio_Morphology_annotations = R"doc(Return the annotation object)doc";
 
@@ -951,6 +899,80 @@ static const char *mkd_doc_morphio_WarningDisconnectedNeurite_lineNumber = R"doc
 static const char *mkd_doc_morphio_WarningDisconnectedNeurite_msg = R"doc()doc";
 
 static const char *mkd_doc_morphio_WarningDisconnectedNeurite_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector =
+R"doc(This warning handler collects the warnings, which can be retrieved
+with `getAll()`)doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_Emission = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_Emission_Emission = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_Emission_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_Emission_wasMarkedIgnore = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_emit = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_getAll = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_getMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_getRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_m = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_reset = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_setMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_setRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter = R"doc(This warning handler prints warnings immediately to STDERR)doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_emit = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_errorCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_getMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_getRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_maxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_raiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_setMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_setRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_WarningHandler = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_WarningHandler_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_WarningHandler_3 = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_emit = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_getMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_getRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_ignoredWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_isIgnored = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_operator_assign = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_operator_assign_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_setIgnoredWarning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_setMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_setRaiseWarnings = R"doc()doc";
 
 static const char *mkd_doc_morphio_WarningMessage = R"doc()doc";
 
@@ -1591,7 +1613,7 @@ static const char *mkd_doc_morphio_mut_Section_diameters = R"doc(@{ Return the d
 
 static const char *mkd_doc_morphio_mut_Section_diameters_2 = R"doc()doc";
 
-static const char *mkd_doc_morphio_mut_Section_emitWarningOrError = R"doc()doc";
+static const char *mkd_doc_morphio_mut_Section_emitWarning = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Section_getOwningMorphologyOrThrow =
 R"doc(Getter for morphology_; checks the pointer is non-null, throws
@@ -1782,7 +1804,7 @@ static const char *mkd_doc_morphio_set_ignored_warning = R"doc(Set a warning to 
 
 static const char *mkd_doc_morphio_set_ignored_warning_2 = R"doc(Set an array of warnings to ignore)doc";
 
-static const char *mkd_doc_morphio_set_maximum_warnings = R"doc(Set the maximum number of warnings to be printed on screen)doc";
+static const char *mkd_doc_morphio_set_maximum_warnings = R"doc(Set the maximum number of warnings to be printed; -1 for unlimited)doc";
 
 static const char *mkd_doc_morphio_set_raise_warnings = R"doc(Set whether to interpet warning as errors)doc";
 
