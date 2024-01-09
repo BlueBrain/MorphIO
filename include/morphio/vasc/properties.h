@@ -67,8 +67,7 @@ struct VascSectionLevel {
     bool operator==(const VascSectionLevel& other) const;
     bool operator!=(const VascSectionLevel& other) const;
 
-    // Like operator!= but with logLevel argument
-    bool diff(const VascSectionLevel& other, LogLevel logLevel) const;
+    bool diff(const VascSectionLevel& other) const;
 };
 
 /** Class that holds all other levels(point, edge, etc.) information */

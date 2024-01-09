@@ -1,10 +1,17 @@
 Warnings
 ========
 
-MorphIO is trying to be as less rigid as possible in validating of morphologies. That's why most of problems with
-morphologies are come as warnings instead of errors. Because of that the output of MorphIO might be verbose.
-In order to minimize it you can set the maximum number of warnings, or ignore some of warnings. On the other hand
-if you want morphologies to be as valid as possible then you can tell MorphIO to interpret warnings as errors.
+MorphIO attempts to faithfully represent what is loaded from a morphology file.
+However, as a morphology is loaded, deviations from the specification and oddities can be noted - these are considered warnings.
+By default, the warnings are printed to the console, if no handler is specified.
+The recommendation is to provide a handler when loading or creating morphologies:
+
+.. code-block:: python
+
+    warning_handler = morphio.WarningHandlerCollector()
+    morph = Morphology('path/to/morph.swc', warning_handler=warning_handler)
+    for w in warning_handler.get_all():
+       print(w.warning.line_numbers) 
 
 Maximum number of warnings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

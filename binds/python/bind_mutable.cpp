@@ -15,7 +15,6 @@
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 
-#include <array>
 #include <memory>  // std::make_unique
 
 #include "bind_enums.h"
@@ -51,22 +50,29 @@ void bind_mut_morphology(py::module& m) {
 
     py::class_<Morphology>(m, "Morphology", "Class representing a mutable Morphology")
         .def(py::init<>())
-        .def(py::init<const std::string&, unsigned int>(),
+        .def(py::init<const std::string&, unsigned int, std::shared_ptr<morphio::WarningHandler>>(),
              "filename"_a,
-             "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const morphio::Morphology&, unsigned int>(),
+             "options"_a = morphio::enums::Option::NO_MODIFIER,
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr))
+        .def(py::init<const morphio::Morphology&,
+                      unsigned int,
+                      std::shared_ptr<morphio::WarningHandler>>(),
              "morphology"_a,
-             "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const Morphology&, unsigned int>(),
+             "options"_a = morphio::enums::Option::NO_MODIFIER,
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr))
+        .def(py::init<const Morphology&, unsigned int, std::shared_ptr<morphio::WarningHandler>>(),
              "morphology"_a,
-             "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init([](py::object arg, unsigned int options) {
-                 return std::make_unique<Morphology>(py::str(arg), options);
+             "options"_a = morphio::enums::Option::NO_MODIFIER,
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr))
+        .def(py::init([](py::object arg,
+                         unsigned int options,
+                         std::shared_ptr<morphio::WarningHandler> warning_handler) {
+                 return std::make_unique<Morphology>(py::str(arg), options, warning_handler);
              }),
              "filename"_a,
              "options"_a = morphio::enums::Option::NO_MODIFIER,
-             "Additional Ctor that accepts as filename any python "
-             "object that implements __repr__ or __str__")
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr),
+             "Accepts as filename any python object that implements __repr__ or __str__")
 
         // Cell sub-part accessors
         .def_property_readonly("sections", &Morphology::sections, D(sections))
@@ -115,7 +121,7 @@ void bind_mut_morphology(py::module& m) {
         .def_property_readonly("soma_type", &Morphology::somaType, D(somaType))
         .def_property_readonly("version", &Morphology::version, D(version))
         .def("remove_unifurcations",
-             static_cast<void (Morphology::*)()>(&Morphology::removeUnifurcations),
+             &morphio::mut::Morphology::removeUnifurcations,
              D(removeUnifurcations))
         .def(
             "write",
@@ -312,7 +318,7 @@ void bind_mut_section(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(section->points().size()),
                                  section->points().data());
             },
-            [](morphio::mut::Section* section, py::array_t<morphio::floatType> _points) {
+            [](morphio::mut::Section* section, const py::array_t<morphio::floatType>& _points) {
                 section->points() = array_to_points(_points);
             },
             D(points))
@@ -409,7 +415,7 @@ void bind_mut_soma(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(soma->points().size()),
                                  soma->points().data());
             },
-            [](morphio::mut::Soma* soma, py::array_t<morphio::floatType> _points) {
+            [](morphio::mut::Soma* soma, const py::array_t<morphio::floatType>& _points) {
                 soma->points() = array_to_points(_points);
             },
             D(points))
@@ -419,7 +425,7 @@ void bind_mut_soma(py::module& m) {
                 return py::array(static_cast<py::ssize_t>(soma->diameters().size()),
                                  soma->diameters().data());
             },
-            [](morphio::mut::Soma* soma, py::array_t<morphio::floatType> _diameters) {
+            [](morphio::mut::Soma* soma, const py::array_t<morphio::floatType>& _diameters) {
                 soma->diameters() = _diameters.cast<std::vector<morphio::floatType>>();
             },
             D(diameters))

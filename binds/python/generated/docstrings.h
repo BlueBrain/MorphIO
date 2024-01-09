@@ -22,6 +22,18 @@
 #endif
 
 
+static const char *mkd_doc_morphio_AppendingEmptySection = R"doc()doc";
+
+static const char *mkd_doc_morphio_AppendingEmptySection_AppendingEmptySection = R"doc()doc";
+
+static const char *mkd_doc_morphio_AppendingEmptySection_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_AppendingEmptySection_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_AppendingEmptySection_sectionId = R"doc()doc";
+
+static const char *mkd_doc_morphio_AppendingEmptySection_warning = R"doc()doc";
+
 static const char *mkd_doc_morphio_Collection = R"doc()doc";
 
 static const char *mkd_doc_morphio_CollectionImpl = R"doc()doc";
@@ -265,6 +277,16 @@ object for the queried mitochondrial section.)doc";
 
 static const char *mkd_doc_morphio_Mitochondria_2 = R"doc()doc";
 
+static const char *mkd_doc_morphio_MitochondriaWriteNotSupported = R"doc()doc";
+
+static const char *mkd_doc_morphio_MitochondriaWriteNotSupported_MitochondriaWriteNotSupported = R"doc()doc";
+
+static const char *mkd_doc_morphio_MitochondriaWriteNotSupported_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_MitochondriaWriteNotSupported_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_MitochondriaWriteNotSupported_warning = R"doc()doc";
+
 static const char *mkd_doc_morphio_Mitochondria_Mitochondria = R"doc()doc";
 
 static const char *mkd_doc_morphio_Mitochondria_properties = R"doc()doc";
@@ -398,9 +420,33 @@ static const char *mkd_doc_morphio_MultipleTrees = R"doc()doc";
 
 static const char *mkd_doc_morphio_MultipleTrees_MultipleTrees = R"doc()doc";
 
+static const char *mkd_doc_morphio_NoSomaFound = R"doc()doc";
+
+static const char *mkd_doc_morphio_NoSomaFound_NoSomaFound = R"doc()doc";
+
+static const char *mkd_doc_morphio_NoSomaFound_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_NoSomaFound_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_NoSomaFound_warning = R"doc()doc";
+
 static const char *mkd_doc_morphio_NotImplementedError = R"doc()doc";
 
 static const char *mkd_doc_morphio_NotImplementedError_NotImplementedError = R"doc()doc";
+
+static const char *mkd_doc_morphio_OnlyChild = R"doc()doc";
+
+static const char *mkd_doc_morphio_OnlyChild_OnlyChild = R"doc()doc";
+
+static const char *mkd_doc_morphio_OnlyChild_childId = R"doc()doc";
+
+static const char *mkd_doc_morphio_OnlyChild_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_OnlyChild_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_OnlyChild_parentId = R"doc()doc";
+
+static const char *mkd_doc_morphio_OnlyChild_warning = R"doc()doc";
 
 static const char *mkd_doc_morphio_Property_Annotation = R"doc(Class that holds service information about a warning.)doc";
 
@@ -782,6 +828,38 @@ static const char *mkd_doc_morphio_SomaError = R"doc()doc";
 
 static const char *mkd_doc_morphio_SomaError_SomaError = R"doc()doc";
 
+static const char *mkd_doc_morphio_SomaNonConform = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonConform_SomaNonConform = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonConform_description = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonConform_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonConform_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonConform_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonContour = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonContour_SomaNonContour = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonContour_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonContour_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonContour_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_SomaNonCynlinderOrPoint = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_warning = R"doc()doc";
+
 static const char *mkd_doc_morphio_Soma_Soma = R"doc()doc";
 
 static const char *mkd_doc_morphio_Soma_center = R"doc(Return the center of gravity of the soma points)doc";
@@ -810,11 +888,185 @@ static const char *mkd_doc_morphio_UnknownFileType = R"doc()doc";
 
 static const char *mkd_doc_morphio_UnknownFileType_UnknownFileType = R"doc()doc";
 
+static const char *mkd_doc_morphio_WarningDisconnectedNeurite = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningDisconnectedNeurite_WarningDisconnectedNeurite = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningDisconnectedNeurite_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningDisconnectedNeurite_lineNumber = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningDisconnectedNeurite_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningDisconnectedNeurite_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector =
+R"doc(This warning handler collects the warnings, which can be retrieved
+with `getAll()`)doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_Emission = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_Emission_Emission = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_Emission_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_Emission_wasMarkedIgnore = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_emit = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_getAll = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_getMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_getRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_m = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_reset = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_setMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerCollector_setRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter = R"doc(This warning handler prints warnings immediately to STDERR)doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_emit = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_errorCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_getMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_getRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_maxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_raiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_setMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandlerPrinter_setRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_WarningHandler = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_WarningHandler_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_WarningHandler_3 = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_emit = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_getMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_getRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_ignoredWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_isIgnored = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_operator_assign = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_operator_assign_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_setIgnoredWarning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_setMaxWarningCount = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningHandler_setRaiseWarnings = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_WarningMessage = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_WarningMessage_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_WarningMessage_3 = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_operator_assign = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_operator_assign_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_uri = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningMessage_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningZeroDiameter = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningZeroDiameter_WarningZeroDiameter = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningZeroDiameter_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningZeroDiameter_lineNumber = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningZeroDiameter_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_WarningZeroDiameter_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteEmptyMorphology = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteEmptyMorphology_WriteEmptyMorphology = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteEmptyMorphology_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteEmptyMorphology_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteEmptyMorphology_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteNoSoma = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteNoSoma_WriteNoSoma = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteNoSoma_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteNoSoma_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteNoSoma_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteUndefinedSoma = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteUndefinedSoma_WriteUndefinedSoma = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteUndefinedSoma_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteUndefinedSoma_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_WriteUndefinedSoma_warning = R"doc()doc";
+
 static const char *mkd_doc_morphio_WriterError = R"doc()doc";
 
 static const char *mkd_doc_morphio_WriterError_WriterError = R"doc()doc";
 
+static const char *mkd_doc_morphio_WrongDuplicate = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongDuplicate_WrongDuplicate = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongDuplicate_current = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongDuplicate_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongDuplicate_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongDuplicate_parent = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongDuplicate_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongRootPoint = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongRootPoint_WrongRootPoint = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongRootPoint_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongRootPoint_lineNumbers = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongRootPoint_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_WrongRootPoint_warning = R"doc()doc";
+
 static const char *mkd_doc_morphio_children = R"doc(Return a list of children sections)doc";
+
+static const char *mkd_doc_morphio_details_errorLink = R"doc()doc";
 
 static const char *mkd_doc_morphio_diff = R"doc(Perform a diff on 2 morphologies, returns True if items differ)doc";
 
@@ -979,6 +1231,8 @@ static const char *mkd_doc_morphio_enums_Warning_WRITE_EMPTY_MORPHOLOGY = R"doc(
 
 static const char *mkd_doc_morphio_enums_Warning_WRITE_NO_SOMA = R"doc(Writing without a soma)doc";
 
+static const char *mkd_doc_morphio_enums_Warning_WRITE_UNDEFINED_SOMA = R"doc(Soma is UNDEFINED)doc";
+
 static const char *mkd_doc_morphio_enums_Warning_WRONG_DUPLICATE = R"doc(A wrong duplicate point in a section)doc";
 
 static const char *mkd_doc_morphio_enums_Warning_WRONG_ROOT_POINT = R"doc(A wrong root point of a neurite in the case of 3 points soma)doc";
@@ -989,13 +1243,9 @@ static const char *mkd_doc_morphio_enums_operator_lshift = R"doc()doc";
 
 static const char *mkd_doc_morphio_get = R"doc()doc";
 
-static const char *mkd_doc_morphio_getMajor = R"doc()doc";
-
-static const char *mkd_doc_morphio_getMinor = R"doc()doc";
-
-static const char *mkd_doc_morphio_getPatch = R"doc()doc";
-
 static const char *mkd_doc_morphio_getVersionString = R"doc()doc";
+
+static const char *mkd_doc_morphio_getWarningHandler = R"doc()doc";
 
 static const char *mkd_doc_morphio_isRoot = R"doc(Return true if this section is a root section (parent ID == -1))doc";
 
@@ -1278,7 +1528,9 @@ static const char *mkd_doc_morphio_mut_Morphology_endoplasmicReticulum_3 = R"doc
 
 static const char *mkd_doc_morphio_mut_Morphology_eraseByValue = R"doc()doc";
 
-static const char *mkd_doc_morphio_mut_Morphology_err = R"doc()doc";
+static const char *mkd_doc_morphio_mut_Morphology_getWarningHandler = R"doc()doc";
+
+static const char *mkd_doc_morphio_mut_Morphology_handler = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_markers = R"doc(Return the markers from the ASC file)doc";
 
@@ -1295,8 +1547,6 @@ static const char *mkd_doc_morphio_mut_Morphology_register = R"doc()doc";
 static const char *mkd_doc_morphio_mut_Morphology_removeUnifurcations =
 R"doc(Fixes the morphology single child sections and issues warnings if the
 section starts and ends are inconsistent)doc";
-
-static const char *mkd_doc_morphio_mut_Morphology_removeUnifurcations_2 = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_rootSections = R"doc(Returns all section ids at the tree root)doc";
 
@@ -1324,6 +1574,8 @@ Note: multiple morphologies can share the same Soma instance)doc";
 static const char *mkd_doc_morphio_mut_Morphology_soma_3 = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_somaType = R"doc(Return the soma type)doc";
+
+static const char *mkd_doc_morphio_mut_Morphology_uri = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Morphology_version = R"doc(Return the version)doc";
 
@@ -1358,6 +1610,8 @@ static const char *mkd_doc_morphio_mut_Section_depth_end = R"doc()doc";
 static const char *mkd_doc_morphio_mut_Section_diameters = R"doc(@{ Return the diameters of all points of this section)doc";
 
 static const char *mkd_doc_morphio_mut_Section_diameters_2 = R"doc()doc";
+
+static const char *mkd_doc_morphio_mut_Section_emitWarning = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_Section_getOwningMorphologyOrThrow =
 R"doc(Getter for morphology_; checks the pointer is non-null, throws
@@ -1536,28 +1790,6 @@ R"doc(Return the parent section of this section
 Throws:
     MissingParentError is the section doesn't have a parent.)doc";
 
-static const char *mkd_doc_morphio_printError =
-R"doc(Print a warning. Raises an error if `set_raise_warnings` was set to
-`true`.)doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo = R"doc(Debug info for error messages)doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_2 = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_DebugInfo =
-R"doc(Constructor
-
-Parameter ``filename``:
-    morphology filename.)doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_filename = R"doc(Morphology filename)doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_getLineNumber = R"doc(Get section's line number within morphology file)doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_lineNumbers = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_DebugInfo_setLineNumber = R"doc(Stores section's line number within morphology file)doc";
-
 static const char *mkd_doc_morphio_readers_ErrorLevel = R"doc(Level of error reporting)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorLevel_ERROR = R"doc(Error)doc";
@@ -1566,139 +1798,11 @@ static const char *mkd_doc_morphio_readers_ErrorLevel_INFO = R"doc(Info)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorLevel_WARNING = R"doc(Warning)doc";
 
-static const char *mkd_doc_morphio_readers_ErrorMessages =
-R"doc(Class that can generate error messages and holds a collection of
-predefined errors messages)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_2 = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_EARLY_END_OF_FILE = R"doc(The end of the file was reached before parsing finshed)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_EOF_IN_NEURITE = R"doc(ASC EOF reached in neurite error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_EOF_REACHED = R"doc(ASC EOF reached error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_EOF_UNBALANCED_PARENS = R"doc(ASC unbalanced parents error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_LINE_NON_PARSABLE = R"doc(Non parsable line error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_MISSING_MITO_PARENT = R"doc(Missing mitochondria parent section error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_MISSING_PARENT = R"doc(Missing section parent error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_MULTIPLE_SOMATA = R"doc(Multiple somas error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_NEGATIVE_ID = R"doc(A negative ID is used in SWC)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA = R"doc(Undefined soma error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_ONLY_CHILD_SWC_WRITER = R"doc(Single section child SWC error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_OPENING_FILE = R"doc(Opening file error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_PARSING_POINT = R"doc(Parsing ASC points error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_PERIMETER_DATA_NOT_WRITABLE = R"doc(Can't write perimeter data to SWC, ASC error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_REPEATED_ID = R"doc(Repeated section id error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_SELF_PARENT = R"doc(Section self parent error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_SOMA_ALREADY_DEFINED = R"doc(Already defined soma error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_SOMA_BIFURCATION = R"doc(Bifurcating soma error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_CONTOUR = R"doc(Contour soma must have at least 3 points.)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_SINGLE_POINT = R"doc(Single point soma must have one point)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_SOMA_INVALID_THREE_POINT_CYLINDER = R"doc(Multiple points for single point soma)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_SOMA_WITH_NEURITE_PARENT = R"doc(Soma with neurite parent error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_UNCOMPATIBLE_FLAGS = R"doc(Incompatible flags error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_UNEXPECTED_TOKEN = R"doc(Unexpected ASC token error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_UNKNOWN_TOKEN = R"doc(Unknown ASC token error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_UNSUPPORTED_SECTION_TYPE = R"doc(Unsupported morphology section type error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_UNSUPPORTED_SECTION_TYPE_2 = R"doc(Unsupported morphology section type error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_UNSUPPORTED_VASCULATURE_SECTION_TYPE = R"doc(Unsupported vasculature section type error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_VECTOR_LENGTH_MISMATCH = R"doc(Vector length mismatch error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ERROR_WRONG_EXTENSION = R"doc(Wrong morphology file extension error message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ErrorMessages = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_ErrorMessages_2 =
-R"doc(Constructor.
-
-Parameter ``uri``:
-    path to a morphology file.)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_APPENDING_EMPTY_SECTION = R"doc(Writing empty section warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_DISCONNECTED_NEURITE = R"doc(Writing disconnected neurite warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED = R"doc(Writing of mitochondria is not supported warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_NEUROMORPHO_SOMA_NON_CONFORM = R"doc(Soma does not conform NeuroMorpho warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_NO_SOMA_FOUND = R"doc(Soma not found warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_ONLY_CHILD = R"doc(Writing single child section warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_SOMA_NON_CONTOUR = R"doc(Soma must be a contour for ASC and H5)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_SOMA_NON_CYLINDER_OR_POINT = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_WRITE_EMPTY_MORPHOLOGY = R"doc(Writing empty morphology warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_WRITE_NO_SOMA = R"doc(Writing without soma warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_WRONG_DUPLICATE = R"doc(Writing wrong duplicate warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_WRONG_ROOT_POINT = R"doc(Wrong root point warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_WARNING_ZERO_DIAMETER = R"doc(Writing zero diameter warning message)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_errorLink = R"doc(Returns a link to a line number within the morphology file)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_errorMsg = R"doc(Generate an error message.)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_isIgnored = R"doc(Is the output of the warning ignored)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorMessages_uri = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample =
-R"doc(A sample of section for error reporting, includes its position (line)
-within the file.)doc";
-
-static const char *mkd_doc_morphio_readers_Sample_Sample = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_UNKNOWN_ID = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_diameter = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_id = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_lineNumber = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_parentId = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_point = R"doc()doc";
-
-static const char *mkd_doc_morphio_readers_Sample_type = R"doc()doc";
-
 static const char *mkd_doc_morphio_set_ignored_warning = R"doc(Set a warning to ignore)doc";
 
 static const char *mkd_doc_morphio_set_ignored_warning_2 = R"doc(Set an array of warnings to ignore)doc";
 
-static const char *mkd_doc_morphio_set_maximum_warnings = R"doc(Set the maximum number of warnings to be printed on screen)doc";
+static const char *mkd_doc_morphio_set_maximum_warnings = R"doc(Set the maximum number of warnings to be printed; -1 for unlimited)doc";
 
 static const char *mkd_doc_morphio_set_raise_warnings = R"doc(Set whether to interpet warning as errors)doc";
 

@@ -4,6 +4,7 @@ set(MORPHIO_SOURCES
     endoplasmic_reticulum.cpp
     enums.cpp
     errorMessages.cpp
+    error_message_generation.cpp
     glial_cell.cpp
     mito_section.cpp
     mitochondria.cpp
@@ -18,7 +19,10 @@ set(MORPHIO_SOURCES
     mut/morphology.cpp
     mut/section.cpp
     mut/soma.cpp
-    mut/writers.cpp
+    mut/writer_asc.cpp
+    mut/writer_hdf5.cpp
+    mut/writer_swc.cpp
+    mut/writer_utils.cpp
     point_utils.cpp
     properties.cpp
     readers/morphologyASC.cpp
@@ -33,6 +37,7 @@ set(MORPHIO_SOURCES
     vasc/section.cpp
     vasc/vasculature.cpp
     version.cpp
+    warning_handling.cpp
     )
 
 if(NOT MORPHIO_VERSION_STRING)

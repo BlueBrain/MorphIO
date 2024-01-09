@@ -1,6 +1,5 @@
 # Copyright (c) 2013-2023, EPFL/Blue Brain Project
 # SPDX-License-Identifier: Apache-2.0
-from collections import OrderedDict
 from pathlib import Path
 
 import numpy as np
@@ -15,11 +14,11 @@ from morphio import (CellFamily, DendriticSpine, GlialCell, IterType,
 
 DATA_DIR = Path(__file__).parent / "data"
 # These 3 cells are identical
-CELLS = OrderedDict({
+CELLS = {
     'asc': Morphology(DATA_DIR /  "simple.asc"),
     'swc': Morphology(DATA_DIR /  "simple.swc"),
     'h5': Morphology(DATA_DIR /  "h5/v1/simple.h5"),
-})
+}
 
 
 def test_heterogeneous_sections():
@@ -59,8 +58,9 @@ def test_is_root():
 
 
 def test_distance():
-    for _, cell in CELLS.items():
-        assert cell.soma.max_distance == 0.
+    for ext, cell in CELLS.items():
+        distance = 0 if ext == 'swc' else 0.00141
+        assert cell.soma.max_distance == pytest.approx(distance, abs=1e-3)
 
 
 def test_iter():

@@ -1,6 +1,9 @@
 name: Run tests
 on: [pull_request, push]
 
+env:
+  apt_options: -o Acquire::Retries=3
+
 jobs:
   build:
     name: Run tests on ${{ matrix.os }}.${{ matrix.compiler.CC }}
@@ -32,7 +35,9 @@ jobs:
 
       - name: Install packages on Linux
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install build-essential libhdf5-dev language-pack-de
+        run: |
+          sudo apt-get ${{env.apt_options}} update -y
+          sudo apt-get ${{env.apt_options}} install -y build-essential libhdf5-dev language-pack-de
 
       - name: Install packages on MacOS
         if: runner.os == 'macOS'

@@ -11,6 +11,7 @@ from utils import (assert_swc_exception, captured_output, ignored_warning,
 
 from morphio import (MorphioError, Morphology, RawDataError, SomaError,
                      SomaType, Warning, ostream_redirect, set_raise_warnings)
+import morphio
 
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -120,19 +121,16 @@ def test_repeated_id():
 
 
 def test_neurite_followed_by_soma():
-    # Capturing the output to keep the unit test suite stdout clean
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            assert_swc_exception('''# An orphan neurite with a soma child
-                                 1 3 0 0 1 0.5 -1
-                                 2 3 0 0 2 0.5 1
-                                 3 3 0 0 3 0.5 2
-                                 4 3 0 0 4 0.5 3
-                                 5 3 0 0 5 0.5 4
-                                 6 1 0 0 0 3.0 5 # <-- soma child''',
-                                 SomaError,
-                                 'Found a soma point with a neurite as parent',
-                                 ':7:error')
+    assert_swc_exception('''# An orphan neurite with a soma child
+                         1 3 0 0 1 0.5 -1
+                         2 3 0 0 2 0.5 1
+                         3 3 0 0 3 0.5 2
+                         4 3 0 0 4 0.5 3
+                         5 3 0 0 5 0.5 4
+                         6 1 0 0 0 3.0 5 # <-- soma child''',
+                         SomaError,
+                         'Found a soma point with a neurite as parent',
+                         ':7:error')
 
 
 def test_read_split_soma():
@@ -266,7 +264,7 @@ def test_soma_type_2_point():
             SomaType.SOMA_CYLINDERS)
 
 
-def test_soma_type_more_than_3_point():
+def test_soma_type_many_point():
     content = ('''1 1 0 0 0 3.0 -1
                   2 1 0 0 0 3.0  1
                   3 1 0 0 0 3.0  2
@@ -275,17 +273,25 @@ def test_soma_type_more_than_3_point():
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_CYLINDERS)
 
-def test_soma_type_3_point_neuromorpho():
+def test_soma_type_3_point_neuromorpho(tmp_path):
     # 3 points soma can be of type SOMA_CYLINDERS or SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
     # depending on the point layout
 
     # SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS are characterized by
     # one soma point with 2 children
-    content = ('''1 1 0  0 0 3.0 -1
-                  2 1 0 -3 0 3.0  1
-                  3 1 0  3 0 3.0  1 # PID is 1''')
-    assert (Morphology(content, extension='swc').soma_type ==
-            SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            content = ('''1 1 0  0 0 3.0 -1
+                          2 1 0 -3 0 3.0  1
+                          3 1 0  3 0 3.0  1 # PID is 1''')
+            m = Morphology(content, extension='swc')
+            assert (m.soma_type ==
+                    SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
+            assert len(err.getvalue()) == 0
+
+            m = m.as_mutable()
+            m.write(tmp_path / 'test_soma_type_3_point.swc')
+            assert len(err.getvalue()) == 0
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
@@ -294,7 +300,8 @@ def test_soma_type_3_point_neuromorpho():
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                     SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-            assert len(err.getvalue()) == 0
+            assert strip_color_codes(err.getvalue()).strip() == \
+                    '$STRING$:0:warning\nOnly one column has the same coordinates.'
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
@@ -303,18 +310,8 @@ def test_soma_type_3_point_neuromorpho():
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                          SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-            assert strip_color_codes(err.getvalue()).strip() == ('''\
-$STRING$:0:warning
-Warning: the soma does not conform the three point soma spec
-The only valid neuro-morpho soma is:
-1 1 x   y   z r -1
-2 1 x (y-r) z r  1
-3 1 x (y+r) z r  1
-
-Got:
-1 1 0 0 0 3 -1
-2 1 0.000000 -3.000000 0.000000 3.000000 1
-3 1 0.000000 0.000000 (exp. 3.000000) 0.000000 3.000000 1''')
+            assert strip_color_codes(err.getvalue()).strip() == \
+                    '$STRING$:0:warning\nThe non-constant columns is not offset by +/- the radius from the initial sample.'
 
 def test_soma_type_3_point():
     # If this configuration is not respected -> SOMA_CYLINDERS
@@ -564,7 +561,7 @@ def test_missing_parent():
 4 2  2  6 0 10  10
 ''')
     with pytest.raises(morphio.MissingParentError, match='Sample id: 4 refers to non-existant parent ID: 10'):
-        n = Morphology(contents, "swc")
+        Morphology(contents, "swc")
 
 
 def test_read_simple_windows_eol():
@@ -572,3 +569,18 @@ def test_read_simple_windows_eol():
     assert len(simple.root_sections) == 2
     assert simple.root_sections[0].id == 0
     assert simple.root_sections[1].id == 3
+
+def test_WarningHandlerCollector():
+    warnings = morphio.WarningHandlerCollector()
+    Morphology(DATA_DIR /  'neurite_wrong_root_point.swc', warning_handler=warnings)
+    assert len(warnings.get_all()) == 3
+    assert [True, True, False] == [e.was_marked_ignore for e in warnings.get_all()]
+    assert warnings.get_all()[2].warning.line_numbers[0] == 4
+    assert warnings.get_all()[2].warning.line_numbers[1] == 6
+
+    warnings0 = morphio.WarningHandlerCollector()
+    warnings1 = morphio.WarningHandlerCollector()
+    Morphology(DATA_DIR /  'neurite_wrong_root_point.swc', warning_handler=warnings0)
+    Morphology("", extension="swc", warning_handler=warnings1)
+    assert len(warnings0.get_all()) == 3
+    assert len(warnings1.get_all()) == 1

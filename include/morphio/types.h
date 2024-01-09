@@ -9,6 +9,7 @@
 namespace morphio {
 
 using namespace enums;
+
 class DendriticSpine;
 class EndoplasmicReticulum;
 class MitoSection;
@@ -31,12 +32,6 @@ class Section;
 class Vasculature;
 }  // namespace vasculature
 
-/** Functionality for reading of morphologies from files  **/
-namespace readers {
-struct DebugInfo;
-class ErrorMessages;
-}  // namespace readers
-
 /** Functionality for mutating(editing) of morphologies  **/
 namespace mut {
 class DendriticSpine;
@@ -47,6 +42,16 @@ class Morphology;
 class Section;
 class Soma;
 }  // namespace mut
+
+namespace readers {
+/** Level of error reporting **/
+enum ErrorLevel {
+    INFO,     //!< Info
+    WARNING,  //!< Warning
+    ERROR     //!< Error
+};
+}  // namespace readers
+
 
 using SectionRange = std::pair<size_t, size_t>;
 

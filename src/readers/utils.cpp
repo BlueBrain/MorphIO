@@ -56,7 +56,7 @@ std::tuple<floatType, size_t> StringToNumber::toFloat(const std::string& s, size
 
     auto new_offset = static_cast<size_t>(endpos - s.data());
 
-    if (ret == 0 && new_offset == 0) {
+    if (std::fabs(ret - 0) < morphio::epsilon && new_offset == 0) {
         throw std::invalid_argument("could not parse float");
     }
 

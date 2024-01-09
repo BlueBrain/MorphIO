@@ -41,6 +41,7 @@ def test_nrn_order():
 
     collection_relpaths = ["h5/v1", "h5/v1/merged.h5"]
     for collection_relpath in collection_relpaths:
+        print(collection_relpath, morph_name)
         collection = Collection(DATA_DIR /  collection_relpath)
 
         check_nrn_order(collection.load(morph_name, options=Option.nrn_order))

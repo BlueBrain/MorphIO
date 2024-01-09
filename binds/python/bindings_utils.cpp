@@ -10,7 +10,6 @@
 
 #include <array>
 #include <string>
-#include <utility>  // std::move
 
 #include <morphio/exceptions.h>  // morphio::MorphioError
 #include <morphio/types.h>
@@ -35,14 +34,14 @@ void _raise_if_wrong_shape(const py::buffer_info& info) {
 }
 }  // anonymous namespace
 
-morphio::Points array_to_points(py::array_t<morphio::floatType>& buf) {
-    morphio::Points points;
+morphio::Points array_to_points(const py::array_t<morphio::floatType>& buf) {
     py::buffer_info info = buf.request();
     _raise_if_wrong_shape(info);
+    morphio::Points points;
+    points.reserve(static_cast<size_t>(info.shape[0]));
 
     for (int i = 0; i < info.shape[0]; ++i) {
-        points.push_back(
-            std::array<morphio::floatType, 3>{*buf.data(i, 0), *buf.data(i, 1), *buf.data(i, 2)});
+        points.push_back({*buf.data(i, 0), *buf.data(i, 1), *buf.data(i, 2)});
     }
     return points;
 }

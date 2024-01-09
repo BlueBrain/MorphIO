@@ -9,14 +9,20 @@
 #include "bind_misc.h"
 #include "bind_mutable.h"
 #include "bind_vasculature.h"
-
-#include "bindings_utils.h"
+#include "bind_warnings_exceptions.h"
 
 
 namespace py = pybind11;
 
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunknown-warning-option"
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
+
 PYBIND11_MODULE(_morphio, m) {
     bind_enums(m);
+    bind_warnings_exceptions(m);
     bind_misc(m);
 
     bind_immutable(m);
@@ -27,3 +33,7 @@ PYBIND11_MODULE(_morphio, m) {
     py::module vasc_module = m.def_submodule("vasculature");
     bind_vasculature(vasc_module);
 }
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#endif

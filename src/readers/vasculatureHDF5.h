@@ -24,8 +24,7 @@ class VasculatureHDF5
 {
   public:
     explicit VasculatureHDF5(const std::string& uri)
-        : _err(uri)
-        , _uri(uri) {}
+        : _uri(uri) {}
 
     virtual ~VasculatureHDF5() = default;
 
@@ -51,7 +50,6 @@ class VasculatureHDF5
 
     vasculature::property::Properties _properties;
     bool _write;
-    ErrorMessages _err;
     std::string _uri;
 };
 }  // namespace h5

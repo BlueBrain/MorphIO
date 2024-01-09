@@ -82,7 +82,7 @@ setup(
     cmdclass={'build_ext': CMakeBuild,
               },
     packages=['morphio', 'morphio.mut', 'morphio.vasculature'],
-    license="LGPLv3",
+    license="Apache License 2.0",
     keywords=['computational neuroscience',
               'morphology',
               'neuron',
@@ -91,11 +91,14 @@ setup(
               ],
     zip_safe=False,
     classifiers=[
-        "License :: OSI Approved :: Apache Software License v2.0",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
+        "Programming Language :: Python",
+        "Topic :: Scientific/Engineering :: Bio-Informatics",
     ],
     use_scm_version=True,
     setup_requires=[
         'setuptools_scm',
     ],
-    python_requires=">=3.7",
+    python_requires=">=3.8",
 )

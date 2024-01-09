@@ -19,8 +19,9 @@
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
 #include <morphio/types.h>
+#include <morphio/warning_handling.h>  // WarningHandler
 
-#include <memory>  // std::make_unique
+#include <memory>  // std::make_unique, std::shared_ptr
 
 #include "bind_enums.h"
 #include "bindings_utils.h"
@@ -55,21 +56,30 @@ void bind_immutable(py::module& m) {
 void bind_morphology(py::module& m) {
 #define D(x) DOC(morphio, Morphology, x)
     py::class_<morphio::Morphology>(m, "Morphology", DOC(morphio, Morphology))
-        .def(py::init<const std::string&, unsigned int>(),
+        .def(py::init<const std::string&, unsigned int, std::shared_ptr<morphio::WarningHandler>>(),
              "filename"_a,
-             "options"_a = morphio::enums::Option::NO_MODIFIER)
-        .def(py::init<const std::string&, const std::string&, unsigned int>(),
+             "options"_a = morphio::NO_MODIFIER,
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr))
+        .def(py::init<const std::string&,
+                      const std::string&,
+                      unsigned int,
+                      std::shared_ptr<morphio::WarningHandler>>(),
              "filename"_a,
              "extension"_a,
-             "options"_a = morphio::enums::Option::NO_MODIFIER)
+             "options"_a = morphio::NO_MODIFIER,
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr))
         .def(py::init<morphio::mut::Morphology&>())
-        .def(py::init([](py::object arg, unsigned int options) {
-                 return std::make_unique<morphio::Morphology>(py::str(arg), options);
+        .def(py::init([](py::object arg,
+                         unsigned int options,
+                         std::shared_ptr<morphio::WarningHandler> warning_handler) {
+                 return std::make_unique<morphio::Morphology>(py::str(arg),
+                                                              options,
+                                                              warning_handler);
              }),
              "filename"_a,
-             "options"_a = morphio::enums::Option::NO_MODIFIER,
-             "Additional Ctor that accepts as filename any python object that implements __repr__ "
-             "or __str__")
+             "options"_a = morphio::NO_MODIFIER,
+             "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr),
+             "Accepts as filename any python object that implements __repr__ or __str__")
         .def("as_mutable",
              [](const morphio::Morphology* morph) { return morphio::mut::Morphology(*morph); })
 

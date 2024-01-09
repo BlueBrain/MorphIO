@@ -82,8 +82,7 @@ struct SectionLevel {
     bool operator==(const SectionLevel& other) const;
     bool operator!=(const SectionLevel& other) const;
 
-    // Like operator!= but with logLevel argument
-    bool diff(const SectionLevel& other, LogLevel logLevel) const;
+    bool diff(const SectionLevel& other) const;
 };
 
 /**
@@ -104,7 +103,7 @@ struct MitochondriaPointLevel {
                            std::vector<MitoPathLength::Type> relativePathLengths,
                            std::vector<MitoDiameter::Type> diameters);
 
-    bool diff(const MitochondriaPointLevel& other, LogLevel logLevel) const;
+    bool diff(const MitochondriaPointLevel& other) const;
     bool operator==(const MitochondriaPointLevel& other) const;
     bool operator!=(const MitochondriaPointLevel& other) const;
 };
@@ -114,7 +113,7 @@ struct MitochondriaSectionLevel {
     std::vector<Section::Type> _sections;
     std::map<int, std::vector<unsigned int>> _children;
 
-    bool diff(const MitochondriaSectionLevel& other, LogLevel logLevel) const;
+    bool diff(const MitochondriaSectionLevel& other) const;
     bool operator==(const MitochondriaSectionLevel& other) const;
     bool operator!=(const MitochondriaSectionLevel& other) const;
 };
@@ -191,7 +190,7 @@ struct CellLevel {
     std::vector<Annotation> _annotations;
     std::vector<Marker> _markers;
 
-    bool diff(const CellLevel& other, LogLevel logLevel) const;
+    bool diff(const CellLevel& other) const;
     bool operator==(const CellLevel& other) const;
     bool operator!=(const CellLevel& other) const;
 

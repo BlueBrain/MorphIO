@@ -9,7 +9,9 @@ import morphio
 
 
 DATA_DIR = Path(__file__).parent / "data"
-COLLECTION_PATHS = [DATA_DIR / "h5/v1/merged.h5", DATA_DIR / "h5/v1"]
+COLLECTION_PATHS = [DATA_DIR / "h5/v1/merged.h5",
+                    DATA_DIR / "h5/v1"
+                    ]
 
 
 def available_morphologies():
@@ -26,6 +28,7 @@ def check_load_from_collection(collection):
     morphology_names = available_morphologies()
 
     for morph_name in morphology_names:
+        print(morph_name)
         morph = collection.load(morph_name)
         assert isinstance(morph, morphio.Morphology)
 
@@ -34,7 +37,6 @@ def check_load_from_collection(collection):
 
         morph = collection.load(morph_name, mutable=True)
         assert isinstance(morph, morphio.mut.Morphology)
-
 
 @pytest.mark.parametrize("collection_path", COLLECTION_PATHS)
 def test_load_from_collection_with_context(collection_path):
@@ -78,3 +80,9 @@ def test_container_unordered1(collection_path):
             sorted(loop_indices),
             np.arange(len(morphology_names))
         )
+
+def test_container_with_warning_handler():
+    with morphio.Collection(DATA_DIR) as collection:
+        warning_handler = morphio.WarningHandlerCollector()
+        collection.load('neurite_wrong_root_point', warning_handler=warning_handler)
+        assert len(warning_handler.get_all()) == 3

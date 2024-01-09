@@ -3,10 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <algorithm>  // std::find_if
-#include <cassert>
-#include <cctype>    // std::tolower
-#include <iterator>  // std::back_inserter
-#include <sstream>
+#include <cctype>     // std::tolower
+#include <memory>
 #include <string>
 
 #include <morphio/endoplasmic_reticulum.h>
@@ -17,6 +15,7 @@
 #include <morphio/mut/writers.h>
 #include <morphio/soma.h>
 
+#include "../error_message_generation.h"
 #include "../shared_utils.hpp"
 
 namespace {
@@ -47,22 +46,27 @@ void appendProperties(morphio::Property::PointLevel& to,
 }
 }  // namespace
 
-
 namespace morphio {
 namespace mut {
 
-using morphio::readers::ErrorMessages;
-Morphology::Morphology(const std::string& uri, unsigned int options)
-    : Morphology(morphio::Morphology(uri, options)) {}
+Morphology::Morphology(const std::string& uri,
+                       unsigned int options,
+                       std::shared_ptr<WarningHandler> warning_handler)
+    : Morphology(morphio::Morphology(uri, options, warning_handler)) {}
 
-Morphology::Morphology(const HighFive::Group& group, unsigned int options)
-    : Morphology(morphio::Morphology(group, options)) {}
+Morphology::Morphology(const HighFive::Group& group,
+                       unsigned int options,
+                       std::shared_ptr<WarningHandler> warning_handler)
+    : Morphology(morphio::Morphology(group, options, warning_handler)) {}
 
-Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int options)
+Morphology::Morphology(const morphio::mut::Morphology& morphology,
+                       unsigned int options,
+                       std::shared_ptr<WarningHandler> warning_handler)
     : _soma(std::make_shared<Soma>(*morphology.soma()))
     , _cellProperties(std::make_shared<morphio::Property::CellLevel>(*morphology._cellProperties))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
-    , _dendriticSpineLevel(morphology._dendriticSpineLevel) {
+    , _dendriticSpineLevel(morphology._dendriticSpineLevel)
+    , _handler(warning_handler ? warning_handler : morphio::getWarningHandler()) {
     for (const std::shared_ptr<Section>& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -74,12 +78,15 @@ Morphology::Morphology(const morphio::mut::Morphology& morphology, unsigned int 
     applyModifiers(options);
 }
 
-Morphology::Morphology(const morphio::Morphology& morphology, unsigned int options)
+Morphology::Morphology(const morphio::Morphology& morphology,
+                       unsigned int options,
+                       std::shared_ptr<WarningHandler> warning_handler)
     : _soma(std::make_shared<Soma>(morphology.soma()))
     , _cellProperties(
           std::make_shared<morphio::Property::CellLevel>(morphology.properties_->_cellLevel))
     , _endoplasmicReticulum(morphology.endoplasmicReticulum())
-    , _dendriticSpineLevel(morphology.properties_->_dendriticSpineLevel) {
+    , _dendriticSpineLevel(morphology.properties_->_dendriticSpineLevel)
+    , _handler(warning_handler != nullptr ? warning_handler : morphio::getWarningHandler()) {
     for (const morphio::Section& root : morphology.rootSections()) {
         appendRootSection(root, true);
     }
@@ -126,7 +133,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const morphio::Section& s
 
     const bool emptySection = ptr->points().empty();
     if (emptySection) {
-        printError(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+        getWarningHandler()->emit(std::make_shared<AppendingEmptySection>(_uri, ptr->id()));
     }
 
     if (recursive) {
@@ -145,8 +152,8 @@ std::shared_ptr<Section> Morphology::appendRootSection(const std::shared_ptr<Sec
     _rootSections.push_back(section_copy);
     const bool emptySection = section_copy->points().empty();
     if (emptySection) {
-        printError(Warning::APPENDING_EMPTY_SECTION,
-                   _err.WARNING_APPENDING_EMPTY_SECTION(section_copy));
+        getWarningHandler()->emit(
+            std::make_shared<AppendingEmptySection>(_uri, section_copy->id()));
     }
 
     if (recursive) {
@@ -166,7 +173,7 @@ std::shared_ptr<Section> Morphology::appendRootSection(const Property::PointLeve
 
     bool emptySection = ptr->points().empty();
     if (emptySection) {
-        printError(Warning::APPENDING_EMPTY_SECTION, _err.WARNING_APPENDING_EMPTY_SECTION(ptr));
+        getWarningHandler()->emit(std::make_shared<AppendingEmptySection>(_uri, ptr->id()));
     }
 
     return ptr;
@@ -189,7 +196,7 @@ Morphology::~Morphology() {
 }
 
 void Morphology::eraseByValue(std::vector<std::shared_ptr<Section>>& vec,
-                              const std::shared_ptr<Section> section) {
+                              const std::shared_ptr<Section>& section) {
     if (section->morphology_ == this) {
         section->morphology_ = nullptr;
         section->id_ = 0xffffffff;
@@ -244,11 +251,7 @@ void Morphology::deleteSection(const std::shared_ptr<Section> section_, bool rec
 }
 
 void Morphology::removeUnifurcations() {
-    removeUnifurcations(morphio::readers::DebugInfo());
-}
-
-void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInfo) {
-    morphio::readers::ErrorMessages err(debugInfo._filename);
+    morphio::details::ErrorMessages err;
 
     auto it = depth_begin();
     while (it != depth_end()) {
@@ -262,37 +265,32 @@ void Morphology::removeUnifurcations(const morphio::readers::DebugInfo& debugInf
             continue;
         }
 
-        unsigned int parentId = section_->parent()->id();
+        const auto& parent = section_->parent();
+        bool duplicate = _checkDuplicatePoint(parent, section_);
 
-        if (!ErrorMessages::isIgnored(Warning::WRONG_DUPLICATE) &&
-            !_checkDuplicatePoint(section_->parent(), section_)) {
-            printError(Warning::WRONG_DUPLICATE,
-                       err.WARNING_WRONG_DUPLICATE(section_, section_->parent()));
+        if (!duplicate) {
+            getWarningHandler()->emit(std::make_shared<WrongDuplicate>(_uri, section_, parent));
         }
 
-        auto parent = section_->parent();
         bool isUnifurcation = parent->children().size() == 1;
 
         // This "if" condition ensures that "unifurcations" (ie. successive
         // sections with only 1 child) get merged together into a bigger section
         if (isUnifurcation) {
-            printError(Warning::ONLY_CHILD, err.WARNING_ONLY_CHILD(debugInfo, parentId, sectionId));
-            bool duplicate = _checkDuplicatePoint(section_->parent(), section_);
+            getWarningHandler()->emit(std::make_shared<OnlyChild>(_uri, parent->id(), sectionId));
 
-            addAnnotation(morphio::Property::Annotation(morphio::AnnotationType::SINGLE_CHILD,
-                                                        sectionId,
-                                                        section_->properties(),
-                                                        "",
-                                                        debugInfo.getLineNumber(parentId)));
+            addAnnotation(Property::Annotation(AnnotationType::SINGLE_CHILD,
+                                               sectionId,
+                                               section_->properties(),
+                                               "SingleChild",
+                                               -1));
 
-            morphio::_appendVector(parent->points(), section_->points(), duplicate ? 1 : 0);
+            _appendVector(parent->points(), section_->points(), duplicate ? 1 : 0);
 
-            morphio::_appendVector(parent->diameters(), section_->diameters(), duplicate ? 1 : 0);
+            _appendVector(parent->diameters(), section_->diameters(), duplicate ? 1 : 0);
 
             if (!parent->perimeters().empty()) {
-                morphio::_appendVector(parent->perimeters(),
-                                       section_->perimeters(),
-                                       duplicate ? 1 : 0);
+                _appendVector(parent->perimeters(), section_->perimeters(), duplicate ? 1 : 0);
             }
 
             deleteSection(section_, false);
@@ -346,8 +344,8 @@ breadth_iterator Morphology::breadth_end() const {
 
 void Morphology::applyModifiers(unsigned int modifierFlags) {
     if (modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS) {
-        throw SectionBuilderError(
-            _err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
+        const auto err = details::ErrorMessages(_uri);
+        throw SectionBuilderError(err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
     }
 
     if (modifierFlags & SOMA_SPHERE) {
@@ -401,13 +399,14 @@ void Morphology::write(const std::string& filename) const {
     }
 
     if (extension == ".h5") {
-        writer::h5(*this, filename);
+        writer::h5(*this, filename, _handler);
     } else if (extension == ".asc") {
-        writer::asc(*this, filename);
+        writer::asc(*this, filename, _handler);
     } else if (extension == ".swc") {
-        writer::swc(*this, filename);
+        writer::swc(*this, filename, _handler);
     } else {
-        throw UnknownFileType(_err.ERROR_WRONG_EXTENSION(filename));
+        const auto err = details::ErrorMessages(_uri);
+        throw UnknownFileType(err.ERROR_WRONG_EXTENSION(filename));
     }
 }
 

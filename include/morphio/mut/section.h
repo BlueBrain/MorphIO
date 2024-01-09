@@ -4,8 +4,6 @@
  */
 #pragma once
 
-#include <functional>
-
 #include <morphio/properties.h>
 #include <morphio/section.h>
 #include <morphio/types.h>
@@ -132,6 +130,8 @@ class Section: public std::enable_shared_from_this<Section>
       Getter for morphology_; checks the pointer is non-null, throws otherwise
     **/
     Morphology* getOwningMorphologyOrThrow() const;
+
+    void emitWarning(std::shared_ptr<WarningMessage>);
 
     Morphology* morphology_;
     Property::PointLevel point_properties_;

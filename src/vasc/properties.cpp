@@ -2,8 +2,6 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include <algorithm>
-#include <cmath>
 
 #include <morphio/errorMessages.h>
 #include <morphio/properties.h>
@@ -13,35 +11,16 @@
 #include "../point_utils.h"
 #include "../shared_utils.hpp"
 
-namespace morphio {
-namespace vasculature {
-namespace property {
-
-namespace details {
-static bool compare_section_structure(
+namespace {
+bool compare_section_structure(
     const std::vector<morphio::vasculature::property::VascSection::Type>& vec1,
-    const std::vector<morphio::vasculature::property::VascSection::Type>& vec2,
-    const std::string& name,
-    LogLevel logLevel) {
+    const std::vector<morphio::vasculature::property::VascSection::Type>& vec2) {
     if (vec1.size() != vec2.size()) {
-        if (logLevel > LogLevel::ERROR) {
-            morphio::printError(morphio::Warning::UNDEFINED,
-                                "Error comparing " + name +
-                                    ", size differs: " + std::to_string(vec1.size()) + " vs " +
-                                    std::to_string(vec2.size()));
-        }
         return false;
     }
 
     for (size_t i = 1; i < vec1.size(); ++i) {
         if (vec1[i] - vec1[1] != vec2[i] - vec2[1]) {
-            if (logLevel > LogLevel::ERROR) {
-                morphio::printError(morphio::Warning::UNDEFINED,
-                                    "Error comparing " + name + ", elements differ:");
-                morphio::printError(morphio::Warning::UNDEFINED,
-                                    std::to_string(vec1[i] - vec1[1]) + " <--> " +
-                                        std::to_string(vec2[i] - vec2[1]));
-            }
             return false;
         }
     }
@@ -49,8 +28,12 @@ static bool compare_section_structure(
 }
 
 
-}  // namespace details
+}  // namespace
 
+
+namespace morphio {
+namespace vasculature {
+namespace property {
 
 VascPointLevel::VascPointLevel(const std::vector<Point::Type>& points,
                                const std::vector<Diameter::Type>& diameters)
@@ -71,24 +54,20 @@ VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range) {
     _diameters = copySpan<property::Diameter>(data._diameters, range);
 }
 
-bool VascSectionLevel::diff(const VascSectionLevel& other, LogLevel logLevel) const {
+bool VascSectionLevel::diff(const VascSectionLevel& other) const {
     return this == &other ||
-           (details::compare_section_structure(
-                this->_sections, other._sections, "_sections", logLevel) &&
-            morphio::property::compare(
-                this->_sectionTypes, other._sectionTypes, "_sectionTypes", logLevel) &&
-            morphio::property::compare(
-                this->_predecessors, other._predecessors, "_predecessors", logLevel) &&
-            morphio::property::compare(
-                this->_successors, other._successors, "_successors", logLevel));
+           (compare_section_structure(this->_sections, other._sections) &&
+            morphio::property::compare(this->_sectionTypes, other._sectionTypes) &&
+            morphio::property::compare(this->_predecessors, other._predecessors) &&
+            morphio::property::compare(this->_successors, other._successors));
 }
 
 bool VascSectionLevel::operator==(const VascSectionLevel& other) const {
-    return !diff(other, LogLevel::ERROR);
+    return !diff(other);
 }
 
 bool VascSectionLevel::operator!=(const VascSectionLevel& other) const {
-    return diff(other, LogLevel::ERROR);
+    return diff(other);
 }
 
 std::ostream& operator<<(std::ostream& os, const VascPointLevel& pointLevel) {

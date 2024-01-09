@@ -11,6 +11,8 @@
 #include <lexertl/iterator.hpp>
 #include <lexertl/lookup.hpp>
 
+#include "../error_message_generation.h"
+
 namespace morphio {
 namespace readers {
 namespace asc {
@@ -211,7 +213,7 @@ class NeurolucidaLexer
 {
   private:
     bool debug_;
-    ErrorMessages err_;
+    details::ErrorMessages err_;
 
     lexertl::siterator current_;
     lexertl::siterator next_;
@@ -248,7 +250,7 @@ class NeurolucidaLexer
         return next_;
     }
 
-    size_t skip_whitespace(lexertl::siterator& iter) {
+    static size_t skip_whitespace(lexertl::siterator& iter) {
         const lexertl::siterator end;
         size_t endlines = 0;
         while (iter != end) {

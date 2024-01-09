@@ -53,15 +53,19 @@ class Collection
      * Load the morphology as an immutable morphology.
      */
     template <class M>
-    typename enable_if_mutable<M, M>::type load(const std::string& morph_name,
-                                                unsigned int options = NO_MODIFIER) const;
+    typename enable_if_mutable<M, M>::type load(
+        const std::string& morph_name,
+        unsigned int options = NO_MODIFIER,
+        std::shared_ptr<WarningHandler> warning_handler = nullptr) const;
 
     /**
      * Load the morphology as a mutable morphology.
      */
     template <class M>
-    typename enable_if_immutable<M, M>::type load(const std::string& morph_name,
-                                                  unsigned int options = NO_MODIFIER) const;
+    typename enable_if_immutable<M, M>::type load(
+        const std::string& morph_name,
+        unsigned int options = NO_MODIFIER,
+        std::shared_ptr<WarningHandler> warning_handler = nullptr) const;
 
     /**
      * Returns an iterable of loop index, morphology pairs.
@@ -69,8 +73,10 @@ class Collection
      * See `LoadUnordered` for details.
      */
     template <class M>
-    LoadUnordered<M> load_unordered(std::vector<std::string> morphology_names,
-                                    unsigned int options = NO_MODIFIER) const;
+    LoadUnordered<M> load_unordered(
+        std::vector<std::string> morphology_names,
+        unsigned int options = NO_MODIFIER,
+        std::shared_ptr<WarningHandler> warning_handler = nullptr) const;
 
     /**
      * Returns the reordered loop indices.
@@ -183,15 +189,23 @@ extern template
         LoadUnordered<mut::Morphology>::Iterator::operator*<mut::Morphology>() const;
 
 extern template typename enable_if_mutable<mut::Morphology, mut::Morphology>::type
-Collection::load<mut::Morphology>(const std::string& morph_name, unsigned int options) const;
+Collection::load<mut::Morphology>(const std::string& morph_name,
+                                  unsigned int options,
+                                  std::shared_ptr<WarningHandler> warning_handler) const;
 
 extern template typename enable_if_immutable<Morphology, Morphology>::type
-Collection::load<Morphology>(const std::string& morph_name, unsigned int options) const;
+Collection::load<Morphology>(const std::string& morph_name,
+                             unsigned int options,
+                             std::shared_ptr<WarningHandler> warning_handler) const;
 
 extern template LoadUnordered<Morphology> Collection::load_unordered<Morphology>(
-    std::vector<std::string> morphology_names, unsigned int options) const;
+    std::vector<std::string> morphology_names,
+    unsigned int options,
+    std::shared_ptr<WarningHandler> warning_handler) const;
 
 extern template LoadUnordered<mut::Morphology> Collection::load_unordered<mut::Morphology>(
-    std::vector<std::string> morphology_names, unsigned int options) const;
+    std::vector<std::string> morphology_names,
+    unsigned int options,
+    std::shared_ptr<WarningHandler> warning_handler) const;
 
 }  // namespace morphio
