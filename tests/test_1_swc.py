@@ -526,3 +526,10 @@ def test_WarningHandlerCollector():
     assert [True, True, False] == [e.was_marked_ignore for e in warnings.get_all()]
     assert warnings.get_all()[2].warning.line_numbers[0] == 4
     assert warnings.get_all()[2].warning.line_numbers[1] == 6
+
+    warnings0 = morphio.WarningHandlerCollector()
+    warnings1 = morphio.WarningHandlerCollector()
+    Morphology(DATA_DIR /  'neurite_wrong_root_point.swc', warning_handler=warnings0)
+    Morphology("", extension="swc", warning_handler=warnings1)
+    assert len(warnings0.get_all()) == 3
+    assert len(warnings1.get_all()) == 1

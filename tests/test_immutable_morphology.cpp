@@ -342,7 +342,10 @@ TEST_CASE("warnings-collection") {
         auto warningHandler = std::make_shared<morphio::WarningHandlerCollector>();
         std::string contents;
         morphio::Morphology morph(contents, "swc", morphio::NO_MODIFIER, warningHandler);
-        auto allErrors = warningHandler->getAll();
-        REQUIRE(allErrors.size() == 1);
+        const auto errors = warningHandler->getAll();
+        REQUIRE(errors.size() == 1);
+        const auto msg = errors[0].warning->msg();
+        const auto expected_end_of_msg = std::string("Warning: no soma found in file");
+        REQUIRE(std::equal(expected_end_of_msg.rbegin(), expected_end_of_msg.rend(), msg.rbegin()));
     }
 }
