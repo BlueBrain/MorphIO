@@ -5,6 +5,7 @@
 #include <bitset>
 #include <cstdint>
 
+#include "error_message_generation.h"
 #include "shared_utils.hpp"
 
 #include <ghc/filesystem.hpp>
@@ -19,14 +20,14 @@ floatType _somaSurface(const SomaType type,
     switch (type) {
     case SOMA_SINGLE_POINT: {
         if (diameters.size() != 1) {
-            throw MorphioError(readers::ErrorMessages().ERROR_SOMA_INVALID_SINGLE_POINT());
+            throw MorphioError(details::ErrorMessages().ERROR_SOMA_INVALID_SINGLE_POINT());
         }
         floatType radius = diameters[0] / 2;
         return 4 * morphio::PI * radius * radius;
     }
     case SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS: {
         if (diameters.size() != 3) {
-            throw MorphioError(readers::ErrorMessages().ERROR_SOMA_INVALID_THREE_POINT_CYLINDER());
+            throw MorphioError(details::ErrorMessages().ERROR_SOMA_INVALID_THREE_POINT_CYLINDER());
         }
         floatType radius = diameters[0] / 2;
         return 4 * morphio::PI * radius * radius;
@@ -49,7 +50,7 @@ floatType _somaSurface(const SomaType type,
     }
     case SOMA_UNDEFINED:
     default: {
-        morphio::readers::ErrorMessages err;
+        morphio::details::ErrorMessages err;
         throw SomaError(err.ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA("Soma::surface"));
     }
     }

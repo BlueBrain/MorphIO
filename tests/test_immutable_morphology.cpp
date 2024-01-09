@@ -2,7 +2,6 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include <cmath>
 #include <limits>
 
 #include <catch2/catch.hpp>
@@ -107,11 +106,11 @@ TEST_CASE("heterogeneous-sections", "[immutableMorphology]") {
     }
 }
 
-TEST_CASE("modifers", "[immutableMorphology]") {
+TEST_CASE("modifiers", "[immutableMorphology]") {
     morphio::Morphology morphNoModifier = morphio::Morphology(
         "data/reversed_NRN_neurite_order.swc");
     std::vector<morphio::SectionType> rootSectionTypesNoModifier;
-    for (auto sectionNoMod : morphNoModifier.rootSections()) {
+    for (const auto& sectionNoMod : morphNoModifier.rootSections()) {
         rootSectionTypesNoModifier.push_back(sectionNoMod.type());
     }
     REQUIRE(rootSectionTypesNoModifier == std::vector<morphio::SectionType>{
@@ -124,7 +123,7 @@ TEST_CASE("modifers", "[immutableMorphology]") {
                                                     morphio::Option::NRN_ORDER);
 
     std::vector<morphio::SectionType> rootSectionTypes;
-    for (auto section : morph.rootSections()) {
+    for (const auto& section : morph.rootSections()) {
         rootSectionTypes.push_back(section.type());
     }
     REQUIRE(rootSectionTypes.size() == 3);
@@ -138,7 +137,7 @@ TEST_CASE("modifers", "[immutableMorphology]") {
                                                               morphio::Option::NRN_ORDER);
 
     std::vector<morphio::SectionType> rootSectionTypesH5;
-    for (auto section : morphModifierh5.rootSections()) {
+    for (const auto& section : morphModifierh5.rootSections()) {
         rootSectionTypesH5.push_back(section.type());
     }
     // Should be inverted without the option
@@ -328,4 +327,25 @@ TEST_CASE("operator<<", "[immutableMorphology]") {
     std::stringstream ss;
 
     ss << section;
+}
+
+TEST_CASE("warnings-collection") {
+    {
+        auto warningHandler = std::make_shared<morphio::WarningHandlerCollector>();
+        morphio::Morphology morph("data/disconnected_neurite.swc",
+                                  morphio::NO_MODIFIER,
+                                  warningHandler);
+        auto allErrors = warningHandler->getAll();
+        REQUIRE(allErrors.size() == 3);
+    }
+    {
+        auto warningHandler = std::make_shared<morphio::WarningHandlerCollector>();
+        std::string contents;
+        morphio::Morphology morph(contents, "swc", morphio::NO_MODIFIER, warningHandler);
+        const auto errors = warningHandler->getAll();
+        REQUIRE(errors.size() == 1);
+        const auto msg = errors[0].warning->msg();
+        const auto expected_end_of_msg = std::string("Warning: no soma found in file");
+        REQUIRE(std::equal(expected_end_of_msg.rbegin(), expected_end_of_msg.rend(), msg.rbegin()));
+    }
 }

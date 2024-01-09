@@ -9,6 +9,8 @@
 #include "bind_misc.h"
 #include "bind_mutable.h"
 #include "bind_vasculature.h"
+#include "bind_warnings_exceptions.h"
+
 
 namespace py = pybind11;
 
@@ -20,6 +22,7 @@ namespace py = pybind11;
 
 PYBIND11_MODULE(_morphio, m) {
     bind_enums(m);
+    bind_warnings_exceptions(m);
     bind_misc(m);
 
     bind_immutable(m);

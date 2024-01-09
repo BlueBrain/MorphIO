@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <algorithm>
-#include <cmath>
+
 #include <morphio/mut/modifiers.h>
 #include <morphio/mut/morphology.h>
+#include <morphio/mut/section.h>
 
 namespace morphio {
 namespace mut {
@@ -13,7 +14,7 @@ namespace modifiers {
 
 void two_points_sections(morphio::mut::Morphology& morpho) {
     for (auto it = morpho.depth_begin(); it != morpho.depth_end(); ++it) {
-        std::shared_ptr<Section> section = *it;
+        std::shared_ptr<morphio::mut::Section> section = *it;
         size_t size = section->points().size();
         if (size < 2) {
             continue;

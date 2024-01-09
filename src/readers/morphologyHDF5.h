@@ -8,21 +8,22 @@
 #include <string>  // std::string
 
 #include <morphio/properties.h>
+#include <morphio/warning_handling.h>
 
 #include <highfive/H5File.hpp>
 
 namespace morphio {
 namespace readers {
 namespace h5 {
-Property::Properties load(const std::string& uri);
-Property::Properties load(const HighFive::Group& group);
+Property::Properties load(const std::string& uri, WarningHandler*);
+Property::Properties load(const HighFive::Group& group, WarningHandler*);
 
 class MorphologyHDF5
 {
   public:
     explicit MorphologyHDF5(const HighFive::Group& group, const std::string& uri = "HDF5 GROUP");
     virtual ~MorphologyHDF5() = default;
-    Property::Properties load();
+    Property::Properties load(WarningHandler*);
 
   private:
     void _checkVersion();

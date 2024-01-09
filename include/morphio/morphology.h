@@ -5,9 +5,11 @@
 #pragma once
 
 #include <highfive/H5Group.hpp>
+
 #include <morphio/properties.h>
 #include <morphio/section_iterators.hpp>
 #include <morphio/types.h>
+#include <morphio/warning_handling.h>  // WarningHandler
 
 namespace morphio {
 
@@ -42,10 +44,15 @@ class Morphology
         Example:
             Morphology("neuron.asc", TWO_POINTS_SECTIONS | SOMA_SPHERE);
      */
-    explicit Morphology(const std::string& path, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const std::string& path,
+                        unsigned int options = NO_MODIFIER,
+                        std::shared_ptr<WarningHandler> = nullptr);
+
 
     /** Constructor from an already parsed file */
-    explicit Morphology(const HighFive::Group& group, unsigned int options = NO_MODIFIER);
+    explicit Morphology(const HighFive::Group& group,
+                        unsigned int options = NO_MODIFIER,
+                        std::shared_ptr<WarningHandler> = nullptr);
 
     /** Constructor from an instance of morphio::mut::Morphology */
     explicit Morphology(const mut::Morphology&);
@@ -53,7 +60,8 @@ class Morphology
     /** Load a morphology from a string */
     explicit Morphology(const std::string& contents,
                         const std::string& extension,
-                        unsigned int options = NO_MODIFIER);
+                        unsigned int options = NO_MODIFIER,
+                        std::shared_ptr<WarningHandler> = nullptr);
 
     /** Return the soma object */
     Soma soma() const;

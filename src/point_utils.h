@@ -7,6 +7,7 @@
 #include <iosfwd>  // std::ostream
 #include <string>  // std::string
 
+#pragma once
 
 namespace morphio {
 Point subtract(const Point& left, const Point& right);

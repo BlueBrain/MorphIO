@@ -5,13 +5,14 @@
 #include <fstream>
 #include <iomanip>  // std::fixed, std::setw, std::setprecision
 
-#include <morphio/errorMessages.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 #include <morphio/version.h>
+#include <morphio/warning_handling.h>
 
+#include "../error_message_generation.h"
 #include "../shared_utils.hpp"
 #include "writer_utils.h"
 
@@ -49,14 +50,16 @@ namespace morphio {
 namespace mut {
 namespace writer {
 
-void asc(const Morphology& morph, const std::string& filename) {
-    if (details::emptyMorphology(morph)) {
+void asc(const Morphology& morph,
+         const std::string& filename,
+         std::shared_ptr<morphio::WarningHandler> handler) {
+    if (details::emptyMorphology(morph, handler)) {
         return;
     }
 
-    details::validateContourSoma(morph);
+    details::validateContourSoma(morph, handler);
     details::checkSomaHasSameNumberPointsDiameters(*morph.soma());
-    details::validateHasNoMitochondria(morph);
+    details::validateHasNoMitochondria(morph, handler);
     details::validateHasNoPerimeterData(morph);
 
     std::ofstream myfile(filename);
@@ -77,7 +80,7 @@ void asc(const Morphology& morph, const std::string& filename) {
         } else if (type == SECTION_APICAL_DENDRITE) {
             myfile << "( (Color Red)\n  (Apical)\n";
         } else {
-            throw WriterError(readers::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(type));
+            throw WriterError(morphio::details::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(type));
         }
         write_asc_section(myfile, section, 2);
         myfile << ")\n\n";

@@ -10,6 +10,7 @@ pybind11_add_module(_morphio SYSTEM
     bind_misc.cpp
     bind_mutable.cpp
     bind_vasculature.cpp
+    bind_warnings_exceptions.cpp
     bindings_utils.cpp
 )
 

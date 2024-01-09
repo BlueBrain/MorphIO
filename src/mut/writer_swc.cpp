@@ -5,21 +5,23 @@
 #include <cassert>
 #include <fstream>
 #include <iomanip>  // std::fixed, std::setw, std::setprecision
+#include <memory>
 #include <unordered_map>
 
-#include <morphio/errorMessages.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 #include <morphio/vector_types.h>
 #include <morphio/version.h>
+#include <morphio/warning_handling.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5Object.hpp>
 
 #include "../shared_utils.hpp"
+#include "../error_message_generation.h"
 #include "writer_utils.h"
 
 namespace {
@@ -50,7 +52,9 @@ void writeHeader(std::ofstream& myfile) {
            << 'Z' << setw(13) << "radius" << setw(13) << "parent" << '\n';
 }
 
-int writeSoma(std::ofstream& myfile, const std::shared_ptr<morphio::mut::Soma>& soma) {
+int writeSoma(std::ofstream& myfile,
+              const std::shared_ptr<morphio::mut::Soma>& soma,
+              std::shared_ptr<morphio::WarningHandler> handler) {
     using morphio::enums::SectionType;
 
     const auto& soma_points = soma->points();
@@ -70,10 +74,9 @@ int writeSoma(std::ofstream& myfile, const std::shared_ptr<morphio::mut::Soma>& 
         if (status != morphio::details::ThreePointSomaStatus::Conforms) {
             std::stringstream stream;
             stream << status;
-            morphio::printError(morphio::Warning::SOMA_NON_CONFORM,
-                                morphio::readers::ErrorMessages()
-                                    .WARNING_NEUROMORPHO_SOMA_NON_CONFORM(stream.str()));
+            handler->emit(std::make_shared<morphio::SomaNonConform>("", stream.str()));
         }
+
         writeLine(myfile, 1, -1, SectionType::SECTION_SOMA, soma_points[0], soma_diameters[0]);
         writeLine(myfile, 2, 1, SectionType::SECTION_SOMA, soma_points[1], soma_diameters[1]);
         writeLine(myfile, 3, 1, SectionType::SECTION_SOMA, soma_points[2], soma_diameters[2]);
@@ -98,29 +101,28 @@ bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
            morphio::epsilon;
 }
 
-void validateSWCSoma(const morphio::mut::Morphology& morph) {
+void validateSWCSoma(const morphio::mut::Morphology& morph,
+                     std::shared_ptr<morphio::WarningHandler> handler) {
     using morphio::SomaType;
     using morphio::Warning;
     using morphio::WriterError;
-    using morphio::readers::ErrorMessages;
+    using morphio::details::ErrorMessages;
 
     const auto& soma = morph.soma();
     const auto& soma_points = soma->points();
     if (soma_points.empty()) {
         if (morph.rootSections().empty()) {
-            morphio::printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                                ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+            handler->emit(std::make_shared<morphio::WriteEmptyMorphology>());
             return;
         }
-        morphio::printError(Warning::WRITE_NO_SOMA, ErrorMessages().WARNING_WRITE_NO_SOMA());
+        handler->emit(std::make_shared<morphio::WriteNoSoma>());
+
     } else if (soma->type() == morphio::SOMA_UNDEFINED) {
-        morphio::printError(Warning::WRITE_UNDEFINED_SOMA,
-                            ErrorMessages().WARNING_UNDEFINED_SOMA());
+        handler->emit(std::make_shared<morphio::WriteUndefinedSoma>());
     } else if (!(soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
                  soma->type() == SomaType::SOMA_CYLINDERS ||
                  soma->type() == SomaType::SOMA_SINGLE_POINT)) {
-        morphio::printError(Warning::SOMA_NON_CYLINDER_OR_POINT,
-                            ErrorMessages().WARNING_SOMA_NON_CYLINDER_OR_POINT());
+        handler->emit(std::make_shared<morphio::SomaNonCynlinderOrPoint>());
     } else if (soma->type() == SomaType::SOMA_SINGLE_POINT && soma_points.size() != 1) {
         throw WriterError(ErrorMessages().ERROR_SOMA_INVALID_SINGLE_POINT());
     } else if (soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS &&
@@ -136,19 +138,22 @@ namespace morphio {
 namespace mut {
 namespace writer {
 
-void swc(const Morphology& morph, const std::string& filename) {
-    if (details::emptyMorphology(morph)) {
+void swc(const Morphology& morph,
+         const std::string& filename,
+         std::shared_ptr<morphio::WarningHandler> handler) {
+    if (details::emptyMorphology(morph, handler)) {
         return;
     }
+
     const std::shared_ptr<Soma>& soma = morph.soma();
-    validateSWCSoma(morph);
+    validateSWCSoma(morph, handler);
     details::checkSomaHasSameNumberPointsDiameters(*soma);
-    details::validateHasNoMitochondria(morph);
+    details::validateHasNoMitochondria(morph, handler);
     details::validateHasNoPerimeterData(morph);
 
     std::ofstream myfile(filename);
     writeHeader(myfile);
-    int segmentIdOnDisk = writeSoma(myfile, soma);
+    int segmentIdOnDisk = writeSoma(myfile, soma, handler);
 
     std::unordered_map<uint32_t, int32_t> newIds;
     for (auto it = morph.depth_begin(); it != morph.depth_end(); ++it) {
@@ -162,7 +167,7 @@ void swc(const Morphology& morph, const std::string& filename) {
             bool isUnifurcation = section->parent()->children().size() == 1;
             if (isUnifurcation) {
                 throw morphio::WriterError(
-                    morphio::readers::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(
+                    morphio::details::ErrorMessages().ERROR_ONLY_CHILD_SWC_WRITER(
                         section->parent()->id()));
             }
         }

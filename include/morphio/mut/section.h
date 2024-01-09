@@ -131,6 +131,8 @@ class Section: public std::enable_shared_from_this<Section>
     **/
     Morphology* getOwningMorphologyOrThrow() const;
 
+    void emitWarning(std::shared_ptr<WarningMessage>);
+
     Morphology* morphology_;
     Property::PointLevel point_properties_;
     uint32_t id_;

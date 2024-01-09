@@ -8,8 +8,9 @@ from numpy.testing import assert_array_equal
 from utils import (assert_swc_exception, captured_output, ignored_warning,
                    strip_color_codes)
 
-from morphio import (mut, MorphioError, Morphology, RawDataError, SomaError,
+from morphio import (MorphioError, Morphology, RawDataError, SomaError,
                      SomaType, Warning, ostream_redirect, set_raise_warnings)
+import morphio
 
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -121,19 +122,16 @@ def test_repeated_id():
 
 
 def test_neurite_followed_by_soma():
-    # Capturing the output to keep the unit test suite stdout clean
-    with captured_output() as (_, err):
-        with ostream_redirect(stdout=True, stderr=True):
-            assert_swc_exception('''# An orphan neurite with a soma child
-                                 1 3 0 0 1 0.5 -1
-                                 2 3 0 0 2 0.5 1
-                                 3 3 0 0 3 0.5 2
-                                 4 3 0 0 4 0.5 3
-                                 5 3 0 0 5 0.5 4
-                                 6 1 0 0 0 3.0 5 # <-- soma child''',
-                                 SomaError,
-                                 'Found a soma point with a neurite as parent',
-                                 ':7:error')
+    assert_swc_exception('''# An orphan neurite with a soma child
+                         1 3 0 0 1 0.5 -1
+                         2 3 0 0 2 0.5 1
+                         3 3 0 0 3 0.5 2
+                         4 3 0 0 4 0.5 3
+                         5 3 0 0 5 0.5 4
+                         6 1 0 0 0 3.0 5 # <-- soma child''',
+                         SomaError,
+                         'Found a soma point with a neurite as parent',
+                         ':7:error')
 
 
 def test_read_split_soma():
@@ -519,3 +517,19 @@ def test_no_soma():
             Morphology(content, extension='swc')
             assert ('$STRING$:0:warning\nWarning: no soma found in file' ==
                     strip_color_codes(err.getvalue().strip()))
+
+
+def test_WarningHandlerCollector():
+    warnings = morphio.WarningHandlerCollector()
+    Morphology(DATA_DIR /  'neurite_wrong_root_point.swc', warning_handler=warnings)
+    assert len(warnings.get_all()) == 3
+    assert [True, True, False] == [e.was_marked_ignore for e in warnings.get_all()]
+    assert warnings.get_all()[2].warning.line_numbers[0] == 4
+    assert warnings.get_all()[2].warning.line_numbers[1] == 6
+
+    warnings0 = morphio.WarningHandlerCollector()
+    warnings1 = morphio.WarningHandlerCollector()
+    Morphology(DATA_DIR /  'neurite_wrong_root_point.swc', warning_handler=warnings0)
+    Morphology("", extension="swc", warning_handler=warnings1)
+    assert len(warnings0.get_all()) == 3
+    assert len(warnings1.get_all()) == 1

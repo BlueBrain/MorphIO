@@ -46,6 +46,7 @@ from ._morphio import (
     UnknownFileType,
     VasculatureSectionType,
     Warning,
+    WarningHandlerCollector,
     WriterError,
     mut,
     ostream_redirect,

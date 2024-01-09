@@ -9,6 +9,7 @@
 #include <morphio/mut/section.h>
 
 
+#include "../error_message_generation.h"
 #include "NeurolucidaLexer.inc"
 #include "morphio/enums.h"
 
@@ -371,14 +372,15 @@ class NeurolucidaParser
     std::string uri_;
     NeurolucidaLexer lex_;
 
-    ErrorMessages err_;
+    details::ErrorMessages err_;
 };
 
 }  // namespace
 
 Property::Properties load(const std::string& path,
                           const std::string& contents,
-                          unsigned int options) {
+                          unsigned int options,
+                          WarningHandler* warning_handler) {
     NeurolucidaParser parser(path);
 
     morphio::mut::Morphology& nb_ = parser.parse(contents);
@@ -388,6 +390,7 @@ Property::Properties load(const std::string& path,
 
     switch (properties._somaLevel._points.size()) {
     case 0:
+        warning_handler->emit(std::make_shared<NoSomaFound>(path));
         properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
         break;
     case 1:

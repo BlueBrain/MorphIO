@@ -13,7 +13,6 @@
 #include <morphio/types.h>
 #include <morphio/version.h>
 
-#include "bind_enums.h"
 #include "generated/docstrings.h"
 
 
@@ -22,34 +21,7 @@ namespace py = pybind11;
 void bind_misc(py::module& m) {
     using namespace py::literals;
 
-    m.def("set_maximum_warnings",
-          &morphio::set_maximum_warnings,
-          DOC(morphio, set_maximum_warnings));
-    m.def("set_raise_warnings", &morphio::set_raise_warnings, DOC(morphio, set_raise_warnings));
-    m.def("set_ignored_warning",
-          static_cast<void (*)(morphio::Warning, bool)>(&morphio::set_ignored_warning),
-          DOC(morphio, set_ignored_warning),
-          "warning"_a,
-          "ignore"_a = true);
-    m.def("set_ignored_warning",
-          static_cast<void (*)(const std::vector<morphio::Warning>&, bool)>(
-              &morphio::set_ignored_warning),
-          DOC(morphio, set_ignored_warning),
-          "warning"_a,
-          "ignore"_a = true);
-
     m.attr("version") = morphio::getVersionString();
-
-    auto base = py::register_exception<morphio::MorphioError&>(m, "MorphioError");
-    // base.ptr() signifies "inherits from"
-    auto raw = py::register_exception<morphio::RawDataError&>(m, "RawDataError", base.ptr());
-    py::register_exception<morphio::UnknownFileType&>(m, "UnknownFileType", base.ptr());
-    py::register_exception<morphio::SomaError&>(m, "SomaError", base.ptr());
-    py::register_exception<morphio::IDSequenceError&>(m, "IDSequenceError", raw.ptr());
-    py::register_exception<morphio::MultipleTrees&>(m, "MultipleTrees", raw.ptr());
-    py::register_exception<morphio::MissingParentError&>(m, "MissingParentError", raw.ptr());
-    py::register_exception<morphio::SectionBuilderError&>(m, "SectionBuilderError", raw.ptr());
-    py::register_exception<morphio::WriterError&>(m, "WriterError", base.ptr());
 
     py::class_<morphio::Points>(m, "Points", py::buffer_protocol())
         .def_buffer([](morphio::Points& points) -> py::buffer_info {
@@ -210,36 +182,42 @@ void bind_misc(py::module& m) {
             [](morphio::Collection* collection,
                const std::string& morph_name,
                unsigned int options,
-               bool is_mutable) -> py::object {
+               bool is_mutable,
+               std::shared_ptr<morphio::WarningHandler> warning_handler) -> py::object {
                 if (is_mutable) {
-                    return py::cast(
-                        collection->load<morphio::mut::Morphology>(morph_name, options));
+                    return py::cast(collection->load<morphio::mut::Morphology>(morph_name,
+                                                                               options,
+                                                                               warning_handler));
                 } else {
-                    return py::cast(collection->load<morphio::Morphology>(morph_name, options));
+                    return py::cast(collection->load<morphio::Morphology>(morph_name,
+                                                                          options,
+                                                                          warning_handler));
                 }
             },
             "morph_name"_a,
             "options"_a = morphio::enums::Option::NO_MODIFIER,
             "mutable"_a = false,
+            "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr),
             "Load the morphology named 'morph_name' form the collection.")
         .def(
             "load_unordered",
             [](morphio::Collection* collection,
                std::vector<std::string> morphology_names,
                unsigned int options,
-               bool is_mutable) -> py::object {
+               bool is_mutable,
+               std::shared_ptr<morphio::WarningHandler> warning_handler) -> py::object {
                 if (is_mutable) {
-                    return py::cast(
-                        collection->load_unordered<morphio::mut::Morphology>(morphology_names,
-                                                                             options));
+                    return py::cast(collection->load_unordered<morphio::mut::Morphology>(
+                        morphology_names, options, warning_handler));
                 } else {
-                    return py::cast(
-                        collection->load_unordered<morphio::Morphology>(morphology_names, options));
+                    return py::cast(collection->load_unordered<morphio::Morphology>(
+                        morphology_names, options, warning_handler));
                 }
             },
             "morphology_names"_a,
             "options"_a = morphio::enums::Option::NO_MODIFIER,
             "mutable"_a = false,
+            "warning_handler"_a = std::shared_ptr<morphio::WarningHandler>(nullptr),
             R"(Create an iterable of loop index and morphology.
 
 When reading from containers, the order in which morphologies are read can
@@ -305,4 +283,5 @@ Note: This API is 'experimental', meaning it might change in the future.
             // Bind the lifetime of the `morphio::LoadUnordered` (1) to the
             // lifetime of the returned iterator (0).
             py::keep_alive<0, 1>());
+
 }

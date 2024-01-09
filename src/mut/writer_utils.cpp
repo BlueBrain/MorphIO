@@ -4,6 +4,8 @@
  */
 #include <morphio/errorMessages.h>
 
+#include "../error_message_generation.h"
+#include "morphio/warning_handling.h"
 #include "writer_utils.h"
 
 namespace morphio {
@@ -11,13 +13,14 @@ namespace mut {
 namespace writer {
 namespace details {
 
+using morphio::details::ErrorMessages;
 
 void checkSomaHasSameNumberPointsDiameters(const Soma& soma) {
     const size_t n_points = soma.points().size();
     const size_t n_diameters = soma.diameters().size();
 
     if (n_points != n_diameters) {
-        throw morphio::WriterError(morphio::readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+        throw morphio::WriterError(ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
             "soma points", n_points, "soma diameters", n_diameters));
     }
 }
@@ -30,41 +33,41 @@ std::string version_string() {
     return std::string("Created by MorphIO v") + getVersionString();
 }
 
-bool emptyMorphology(const morphio::mut::Morphology& morph) {
+bool emptyMorphology(const morphio::mut::Morphology& morph,
+                     std::shared_ptr<morphio::WarningHandler> handler) {
     if (morph.soma()->points().empty() && morph.rootSections().empty()) {
-        printError(Warning::WRITE_EMPTY_MORPHOLOGY,
-                   readers::ErrorMessages().WARNING_WRITE_EMPTY_MORPHOLOGY());
+        handler->emit(std::make_shared<morphio::WriteEmptyMorphology>());
         return true;
     }
     return false;
 }
 
-void validateContourSoma(const morphio::mut::Morphology& morph) {
+void validateContourSoma(const morphio::mut::Morphology& morph,
+                         std::shared_ptr<morphio::WarningHandler> handler) {
     const std::shared_ptr<Soma>& soma = morph.soma();
     const std::vector<Point>& somaPoints = soma->points();
 
     if (somaPoints.empty()) {
-        printError(Warning::WRITE_NO_SOMA, readers::ErrorMessages().WARNING_WRITE_NO_SOMA());
+        handler->emit(std::make_shared<morphio::WriteNoSoma>());
     } else if (soma->type() == SOMA_UNDEFINED) {
-        printError(Warning::WRITE_UNDEFINED_SOMA,
-                   readers::ErrorMessages().WARNING_UNDEFINED_SOMA());
+        handler->emit(std::make_shared<morphio::WriteUndefinedSoma>());
     } else if (soma->type() != SomaType::SOMA_SIMPLE_CONTOUR) {
-        printError(Warning::SOMA_NON_CONTOUR, readers::ErrorMessages().WARNING_SOMA_NON_CONTOUR());
+        handler->emit(std::make_shared<morphio::SomaNonContour>());
     } else if (somaPoints.size() < 3) {
-        throw WriterError(readers::ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
+        throw WriterError(ErrorMessages().ERROR_SOMA_INVALID_CONTOUR());
     }
 }
 
 void validateHasNoPerimeterData(const morphio::mut::Morphology& morph) {
     if (details::hasPerimeterData(morph)) {
-        throw WriterError(readers::ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
+        throw WriterError(ErrorMessages().ERROR_PERIMETER_DATA_NOT_WRITABLE());
     }
 }
 
-void validateHasNoMitochondria(const morphio::mut::Morphology& morph) {
+void validateHasNoMitochondria(const morphio::mut::Morphology& morph,
+                               std::shared_ptr<morphio::WarningHandler> handler) {
     if (!morph.mitochondria().rootSections().empty()) {
-        printError(Warning::MITOCHONDRIA_WRITE_NOT_SUPPORTED,
-                   readers::ErrorMessages().WARNING_MITOCHONDRIA_WRITE_NOT_SUPPORTED());
+        handler->emit(std::make_shared<morphio::MitochondriaWriteNotSupported>());
     }
 }
 

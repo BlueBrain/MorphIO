@@ -11,6 +11,8 @@
 
 #include <morphio/errorMessages.h>
 
+#include "../error_message_generation.h"
+
 namespace {
 
 constexpr size_t SECTION_START_OFFSET = 0;
@@ -67,24 +69,27 @@ MorphologyHDF5::MorphologyHDF5(const HighFive::Group& group, const std::string& 
     : _group(group)
     , _uri(uri) {}
 
-Property::Properties load(const std::string& uri) {
+Property::Properties load(const std::string& uri, WarningHandler* warning_handler) {
     try {
         std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
         HighFive::SilenceHDF5 silence;
         auto file = HighFive::File(uri, HighFive::File::ReadOnly);
-        return MorphologyHDF5(file.getGroup("/"), uri).load();
+        return MorphologyHDF5(file.getGroup("/"), uri).load(warning_handler);
 
     } catch (const HighFive::FileException& exc) {
         throw RawDataError("Could not open morphology file " + uri + ": " + exc.what());
     }
 }
 
-Property::Properties load(const HighFive::Group& group) {
+Property::Properties load(const HighFive::Group& group, WarningHandler* warning_handler) {
     std::lock_guard<std::recursive_mutex> lock(morphio::readers::h5::global_hdf5_mutex());
-    return MorphologyHDF5(group).load();
+    if (warning_handler == nullptr) {
+        warning_handler = getWarningHandler().get();
+    }
+    return MorphologyHDF5(group).load(warning_handler);
 }
 
-Property::Properties MorphologyHDF5::load() {
+Property::Properties MorphologyHDF5::load(WarningHandler* warning_handler) {
     _readMetadata();
 
     int firstSectionOffset = _readSections();
@@ -107,6 +112,7 @@ Property::Properties MorphologyHDF5::load() {
 
     switch (_properties._somaLevel._points.size()) {
     case 0:
+        warning_handler->emit(std::make_shared<NoSomaFound>(_uri));
         _properties._cellLevel._somaType = enums::SOMA_UNDEFINED;
         break;
     case 1:
@@ -275,7 +281,7 @@ int MorphologyHDF5::_readSections() {
         SectionType type = static_cast<SectionType>(section[SECTION_TYPE]);
 
         if (section[SECTION_TYPE] >= SECTION_OUT_OF_RANGE_START || section[SECTION_TYPE] <= 0) {
-            ErrorMessages err;
+            details::ErrorMessages err;
             throw RawDataError(err.ERROR_UNSUPPORTED_SECTION_TYPE(0, type));
         } else if (!hasSoma && type == SECTION_SOMA) {
             throw(RawDataError("Error reading morphology " + _uri +

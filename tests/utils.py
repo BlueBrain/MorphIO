@@ -8,7 +8,7 @@ from functools import partial
 from io import StringIO
 
 import pytest
-from morphio import Morphology, set_ignored_warning
+from morphio import Morphology, set_ignored_warning, set_maximum_warnings
 
 
 @contextmanager
@@ -48,6 +48,7 @@ def captured_output():
         print('hello world')
     assert_equal(out.getvalue().strip(), 'hello world')
     '''
+    set_maximum_warnings(-1)
     new_out, new_err = StringIO(), StringIO()
     old_out, old_err = sys.stdout, sys.stderr
     try:

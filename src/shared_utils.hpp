@@ -57,15 +57,8 @@ std::string join_path(const std::string& dirname, const std::string& filename);
 namespace property {
 
 template <typename T>
-bool compare(const T& el1, const T& el2, const std::string& name, LogLevel logLevel) {
-    if (el1 == el2) {
-        return true;
-    }
-
-    if (logLevel > LogLevel::ERROR) {
-        printError(Warning::UNDEFINED, name + " differs");
-    }
-    return false;
+bool compare(const T& el1, const T& el2) {
+    return el1 == el2;
 }
 }  // namespace property
 

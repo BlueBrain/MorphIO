@@ -2,18 +2,19 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-#include <morphio/errorMessages.h>
 #include <morphio/mut/mitochondria.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/mut/section.h>
 #include <morphio/mut/writers.h>
 #include <morphio/version.h>
+#include <morphio/warning_handling.h>
 
 #include <highfive/H5DataSet.hpp>
 #include <highfive/H5File.hpp>
 #include <highfive/H5Object.hpp>
 
 #include "../shared_utils.hpp"
+#include "../error_message_generation.h"
 #include "writer_utils.h"
 
 namespace {
@@ -146,12 +147,14 @@ void dendriticSpinePostSynapticDensityH5(HighFive::File& h5_file,
 }
 }  // anonymous namespace
 
-void h5(const Morphology& morph, const std::string& filename) {
-    if (details::emptyMorphology(morph)) {
+void h5(const Morphology& morph,
+        const std::string& filename,
+        std::shared_ptr<morphio::WarningHandler> handler) {
+    if (details::emptyMorphology(morph, handler)) {
         return;
     }
 
-    details::validateContourSoma(morph);
+    details::validateContourSoma(morph, handler);
     details::checkSomaHasSameNumberPointsDiameters(*morph.soma());
 
     HighFive::File h5_file(filename,
@@ -201,8 +204,9 @@ void h5(const Morphology& morph, const std::string& filename) {
         const auto numberOfPerimeters = perimeters.size();
         if (numberOfPerimeters > 0) {
             if (numberOfPerimeters != numberOfPoints) {
-                throw WriterError(readers::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
-                    "points", numberOfPoints, "perimeters", numberOfPerimeters));
+                auto error = morphio::details::ErrorMessages().ERROR_VECTOR_LENGTH_MISMATCH(
+                    "points", numberOfPoints, "perimeters", numberOfPerimeters);
+                throw WriterError(error);
             }
             for (unsigned int i = 0; i < numberOfPerimeters; ++i) {
                 raw_perimeters.push_back(perimeters[i]);
