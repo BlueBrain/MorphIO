@@ -358,7 +358,7 @@ Neurites are not supposed to have parentId: -1
 (although this is normal if this neuron has no soma)''' ==
                 strip_color_codes(err.getvalue().strip()))
 
-def test_neurite_wrong_root_point():
+def test_neurite_wrong_root_point_neuromorpho_3_point_soma():
     '''Test that for 3 points soma, the neurites are attached to first soma point'''
 
     # Not 3-points soma --> OK
@@ -373,6 +373,9 @@ def test_neurite_wrong_root_point():
             path = DATA_DIR /  'neurite_wrong_root_point.swc'
             n = Morphology(path)
     assert strip_color_codes(err.getvalue().strip()) == f'''\
+Warning: with a 3 points soma, neurites must be connected to the first soma point:
+{path}:2:warning
+
 Warning: with a 3 points soma, neurites must be connected to the first soma point:
 {path}:3:warning'''
     assert len(n.root_sections) == 2
@@ -504,17 +507,27 @@ def test_version():
 
 
 def test_no_soma():
+    with captured_output() as (_, err):
+        with ostream_redirect(stdout=True, stderr=True):
+            Morphology("", extension='swc')
+    assert ('$STRING$:0:warning\nWarning: no soma found in file' ==
+            strip_color_codes(err.getvalue().strip()))
+
     content = '''1 2 0 0 0 3.0 -1
                  2 2 0 0 0 3.0  1
                  3 2 0 0 0 3.0  2'''
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             Morphology(content, extension='swc')
-            assert ('''$STRING$:1:warning
+    assert ('''$STRING$:1:warning
 Warning: found a disconnected neurite.
 Neurites are not supposed to have parentId: -1
-(although this is normal if this neuron has no soma)''' ==
-                    strip_color_codes(err.getvalue().strip()))
+(although this is normal if this neuron has no soma)
+
+$STRING$:0:warning
+Warning: no soma found in file''' ==
+
+            strip_color_codes(err.getvalue().strip()))
 
 def test_throw_on_missing_data():
     content = ''' 3    #    missing data '''
@@ -573,14 +586,15 @@ def test_read_simple_windows_eol():
 def test_WarningHandlerCollector():
     warnings = morphio.WarningHandlerCollector()
     Morphology(DATA_DIR /  'neurite_wrong_root_point.swc', warning_handler=warnings)
-    assert len(warnings.get_all()) == 3
-    assert [True, True, False] == [e.was_marked_ignore for e in warnings.get_all()]
-    assert warnings.get_all()[2].warning.line_numbers[0] == 4
-    assert warnings.get_all()[2].warning.line_numbers[1] == 6
+    warnings = warnings.get_all()
+    assert len(warnings) == 2
+    assert [False, False] == [e.was_marked_ignore for e in warnings]
+    assert warnings[0].warning.line_numbers[0] == 2
+    assert warnings[1].warning.line_numbers[0] == 3
 
     warnings0 = morphio.WarningHandlerCollector()
     warnings1 = morphio.WarningHandlerCollector()
     Morphology(DATA_DIR /  'neurite_wrong_root_point.swc', warning_handler=warnings0)
     Morphology("", extension="swc", warning_handler=warnings1)
-    assert len(warnings0.get_all()) == 3
+    assert len(warnings0.get_all()) == 2
     assert len(warnings1.get_all()) == 1

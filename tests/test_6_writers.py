@@ -319,12 +319,9 @@ def test_single_point_root_section(tmp_path):
     points = []
     diameters = []
 
-    # To hide warning: appending empty section
-    with captured_output():
-        with ostream_redirect(stdout=True, stderr=True):
-            m.append_root_section(PointLevel(points, diameters), SectionType(2))
-            with pytest.raises(SectionBuilderError):
-                m.write(tmp_path / "empty_vasculature.h5")
+    m.append_root_section(PointLevel(points, diameters), SectionType(2))
+    with pytest.raises(SectionBuilderError):
+        m.write(tmp_path / "empty_vasculature.h5")
 
     m = Morphology()
     points = [[1., 1., 1.]]
