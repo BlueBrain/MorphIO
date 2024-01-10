@@ -38,8 +38,8 @@ struct WarningMessage {
     std::string uri;
 };
 
-struct WarningZeroDiameter: public WarningMessage {
-    WarningZeroDiameter(std::string uri_, uint64_t lineNumber_)
+struct ZeroDiameter: public WarningMessage {
+    ZeroDiameter(std::string uri_, uint64_t lineNumber_)
         : WarningMessage(std::move(uri_))
         , lineNumber(lineNumber_) {}
     morphio::enums::Warning warning() const final {
@@ -54,12 +54,12 @@ struct WarningZeroDiameter: public WarningMessage {
     uint64_t lineNumber;
 };
 
-struct WarningDisconnectedNeurite: public WarningMessage {
-    WarningDisconnectedNeurite(std::string uri_, uint64_t lineNumber_)
+struct DisconnectedNeurite: public WarningMessage {
+    DisconnectedNeurite(std::string uri_, uint64_t lineNumber_)
         : WarningMessage(std::move(uri_))
         , lineNumber(lineNumber_) {}
     Warning warning() const final {
-        return Warning::ZERO_DIAMETER;
+        return Warning::DISCONNECTED_NEURITE;
     }
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
@@ -158,7 +158,7 @@ struct OnlyChild: public WarningMessage {
         , parentId(parentId_)
         , childId(childId_) {}
     Warning warning() const final {
-        return Warning::APPENDING_EMPTY_SECTION;
+        return Warning::ONLY_CHILD;
     }
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {

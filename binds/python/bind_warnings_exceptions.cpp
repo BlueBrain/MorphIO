@@ -87,9 +87,8 @@ void bind_warnings_exceptions(py::module& m) {
 #define QUOTE(a) #a
 #define C(name) \
     py::class_<name, WarningMessage, std::shared_ptr<name>>(m, QUOTE(name), "WarningMessage")
-    C(WarningZeroDiameter).def_readonly("line_number", &WarningZeroDiameter::lineNumber, "ibid");
-    C(WarningDisconnectedNeurite)
-        .def_readonly("line_number", &WarningDisconnectedNeurite::lineNumber, "ibid");
+    C(ZeroDiameter).def_readonly("line_number", &ZeroDiameter::lineNumber, "ibid");
+    C(DisconnectedNeurite).def_readonly("line_number", &DisconnectedNeurite::lineNumber, "ibid");
     (void) C(NoSomaFound);
     C(SomaNonConform).def_readonly("description", &SomaNonConform::description, "ibid");
     C(WrongRootPoint).def_readonly("line_numbers", &WrongRootPoint::lineNumbers, "ibid");
