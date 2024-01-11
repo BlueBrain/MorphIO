@@ -207,7 +207,7 @@ class SWCBuilder
 
     void warnIfDisconnectedNeurite(const SWCSample& sample, WarningHandler* h) {
         if (sample.parentId == SWC_ROOT && sample.type != SECTION_SOMA) {
-            h->emit(std::make_shared<WarningDisconnectedNeurite>(uri, sample.lineNumber));
+            h->emit(std::make_shared<DisconnectedNeurite>(uri, sample.lineNumber));
         }
     }
 
@@ -240,7 +240,7 @@ class SWCBuilder
 
     void warnIfZeroDiameter(const SWCSample& sample, WarningHandler* h) {
         if (sample.diameter < morphio::epsilon) {
-            h->emit(std::make_shared<WarningZeroDiameter>(uri, sample.lineNumber));
+            h->emit(std::make_shared<ZeroDiameter>(uri, sample.lineNumber));
         }
     }
 
