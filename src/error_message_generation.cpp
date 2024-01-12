@@ -169,6 +169,9 @@ std::string ErrorMessages::ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
 ////////////////////////////////////////////////////////////////////////////////
 //              WRITERS
 ////////////////////////////////////////////////////////////////////////////////
+std::string ErrorMessages::ERROR_EMPTY_MORPHOLOGY() const {
+    return errorMsg(_uri, 0, ErrorLevel::ERROR, "Morphology is empty.");
+}
 
 std::string ErrorMessages::ERROR_UNSUPPORTED_SECTION_TYPE(const SectionType& type) const {
     return ("Attempted to write unsupported section type: " + std::to_string(type) +

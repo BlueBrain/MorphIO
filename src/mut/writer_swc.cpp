@@ -142,7 +142,8 @@ void swc(const Morphology& morph,
          const std::string& filename,
          std::shared_ptr<morphio::WarningHandler> handler) {
     if (details::emptyMorphology(morph, handler)) {
-        return;
+        throw morphio::WriterError(
+            morphio::details::ErrorMessages(filename).ERROR_EMPTY_MORPHOLOGY());
     }
 
     const std::shared_ptr<Soma>& soma = morph.soma();

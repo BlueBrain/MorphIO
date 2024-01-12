@@ -11,7 +11,6 @@ from utils import (assert_swc_exception, captured_output, ignored_warning,
 
 from morphio import (MorphioError, Morphology, RawDataError, SomaError,
                      SomaType, Warning, ostream_redirect, set_raise_warnings)
-import morphio
 
 
 DATA_DIR = Path(__file__).parent / "data"

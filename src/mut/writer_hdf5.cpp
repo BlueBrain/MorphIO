@@ -152,7 +152,7 @@ void h5(const Morphology& morph,
         const std::string& filename,
         std::shared_ptr<morphio::WarningHandler> handler) {
     if (details::emptyMorphology(morph, handler)) {
-        return;
+        throw morphio::WriterError(morphio::details::ErrorMessages().ERROR_EMPTY_MORPHOLOGY());
     }
 
     details::validateContourSoma(morph, handler);

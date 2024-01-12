@@ -118,6 +118,9 @@ class ErrorMessages
     //              WRITERS
     ////////////////////////////////////////////////////////////////////////////////
 
+    /** Morphology is empty */
+    std::string ERROR_EMPTY_MORPHOLOGY() const;
+
     /** Unsupported morphology section type error message */
     std::string ERROR_UNSUPPORTED_SECTION_TYPE(const enums::SectionType& type) const;
 
@@ -132,6 +135,7 @@ class ErrorMessages
 
     /** Can't write perimeter data to SWC, ASC error message */
     std::string ERROR_PERIMETER_DATA_NOT_WRITABLE();
+
     /** Single section child SWC error message */
     std::string ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const;
 
