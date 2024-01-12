@@ -336,7 +336,7 @@ TEST_CASE("warnings-collection") {
                                   morphio::NO_MODIFIER,
                                   warningHandler);
         auto allErrors = warningHandler->getAll();
-        REQUIRE(allErrors.size() == 3);
+        REQUIRE(allErrors.size() == 1);
     }
     {
         auto warningHandler = std::make_shared<morphio::WarningHandlerCollector>();

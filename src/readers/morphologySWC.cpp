@@ -245,10 +245,10 @@ class SWCBuilder
             soma->points() = {sample.point};
             soma->diameters() = {sample.diameter};
             return;
-        } else if (soma_samples.size() == 3 && (soma_samples[0].id == 1 &&
-                   soma_samples[0].parentId == SWC_ROOT && soma_samples[1].id == 2 &&
-                    soma_samples[1].parentId == 1 && soma_samples[2].id == 3 &&
-                    soma_samples[2].parentId == 1)) {
+        } else if (soma_samples.size() == 3 &&
+                   (soma_samples[0].id == 1 && soma_samples[0].parentId == SWC_ROOT &&
+                    soma_samples[1].id == 2 && soma_samples[1].parentId == 1 &&
+                    soma_samples[2].id == 3 && soma_samples[2].parentId == 1)) {
             const std::array<Point, 3> points = {
                 soma_samples[0].point,
                 soma_samples[1].point,

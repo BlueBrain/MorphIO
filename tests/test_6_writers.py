@@ -5,7 +5,7 @@ import numpy as np
 import morphio
 from morphio import MitochondriaPointLevel
 from morphio import Morphology as ImmutMorphology
-from morphio import PointLevel, SectionBuilderError, SectionType, WriterError, ostream_redirect, SomaType
+from morphio import PointLevel, RawDataError, SectionType, WriterError, ostream_redirect, SomaType
 from morphio.mut import Morphology
 import pytest
 from numpy.testing import assert_array_equal, assert_almost_equal
@@ -320,7 +320,7 @@ def test_single_point_root_section(tmp_path):
     diameters = []
 
     m.append_root_section(PointLevel(points, diameters), SectionType(2))
-    with pytest.raises(SectionBuilderError):
+    with pytest.raises(RawDataError):
         m.write(tmp_path / "empty_vasculature.h5")
 
     m = Morphology()
@@ -328,7 +328,7 @@ def test_single_point_root_section(tmp_path):
     diameters = [2.]
     m.append_root_section(PointLevel(points, diameters), SectionType(2))
 
-    with pytest.raises(SectionBuilderError):
+    with pytest.raises(RawDataError):
         m.write(tmp_path / "empty_vasculature.h5")
 
 

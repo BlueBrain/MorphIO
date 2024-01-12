@@ -22,6 +22,7 @@ void validateContourSoma(const morphio::mut::Morphology&,
 void validateHasNoPerimeterData(const morphio::mut::Morphology&);
 void validateHasNoMitochondria(const morphio::mut::Morphology&,
                                std::shared_ptr<morphio::WarningHandler> handler);
+void validateRootPointsHaveTwoOrMorePoints(const morphio::mut::Morphology& morph);
 
 }  // namespace details
 }  // namespace writer

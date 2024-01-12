@@ -61,6 +61,7 @@ void asc(const Morphology& morph,
     details::checkSomaHasSameNumberPointsDiameters(*morph.soma());
     details::validateHasNoMitochondria(morph, handler);
     details::validateHasNoPerimeterData(morph);
+    details::validateRootPointsHaveTwoOrMorePoints(morph);
 
     std::ofstream myfile(filename);
 
