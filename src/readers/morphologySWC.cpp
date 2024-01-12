@@ -245,7 +245,10 @@ class SWCBuilder
             soma->points() = {sample.point};
             soma->diameters() = {sample.diameter};
             return;
-        } else if (soma_samples.size() == 3) {
+        } else if (soma_samples.size() == 3 && (soma_samples[0].id == 1 &&
+                   soma_samples[0].parentId == SWC_ROOT && soma_samples[1].id == 2 &&
+                    soma_samples[1].parentId == 1 && soma_samples[2].id == 3 &&
+                    soma_samples[2].parentId == 1)) {
             const std::array<Point, 3> points = {
                 soma_samples[0].point,
                 soma_samples[1].point,
@@ -255,16 +258,19 @@ class SWCBuilder
             // SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
             const details::ThreePointSomaStatus status =
                 details::checkNeuroMorphoSoma(points, soma_samples[0].diameter / 2);
-            if (status == details::ThreePointSomaStatus::Conforms) {
-                soma->type() = SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
-                soma->points() = std::vector<Point>(points.begin(), points.end());
-                soma->diameters() = {
-                    soma_samples[0].diameter,
-                    soma_samples[1].diameter,
-                    soma_samples[2].diameter,
-                };
-                return;
+            if (status != details::ThreePointSomaStatus::Conforms) {
+                std::stringstream stream;
+                stream << status;
+                warning_handler_->emit(std::make_unique<SomaNonConform>(path_, stream.str()));
             }
+            soma->type() = SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS;
+            soma->points() = std::vector<Point>(points.begin(), points.end());
+            soma->diameters() = {
+                soma_samples[0].diameter,
+                soma_samples[1].diameter,
+                soma_samples[2].diameter,
+            };
+            return;
         }
         // might also have 3 points at this point, as well
 
