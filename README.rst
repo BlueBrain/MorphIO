@@ -75,7 +75,7 @@ License
 MorphIO is licensed under the terms of the Apache License 2.0.
 See LICENSE.txt for further details.
 
-Copyright (c) 2013-2023 Blue Brain Project/EPFL
+Copyright (c) 2013-2024 Blue Brain Project/EPFL
 
 .. |license| image:: https://img.shields.io/pypi/l/morphio
                 :target: https://github.com/BlueBrain/morphio/blob/master/COPYING.LESSER
