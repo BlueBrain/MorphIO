@@ -576,11 +576,21 @@ def test_missing_parent():
         Morphology(contents, "swc")
 
 
+def test_extra_column():
+    # some SWC files include extra columns; this goes outside the spec, but we will allow it for
+    # backwards compatibility
+    contents =('''
+1 1  0  0 0 10 -1  3
+2 2 -2 -6 0 10  1  3
+''')
+    Morphology(contents, "swc")
+
 def test_read_simple_windows_eol():
     simple = Morphology(DATA_DIR /  'simple-windows-eol.swc')
     assert len(simple.root_sections) == 2
     assert simple.root_sections[0].id == 0
     assert simple.root_sections[1].id == 3
+
 
 def test_WarningHandlerCollector():
     warnings = morphio.WarningHandlerCollector()

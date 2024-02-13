@@ -93,9 +93,13 @@ public:
 
   int64_t read_int() {
       advance_to_number();
-      auto parsed = stn_.toInt(contents_, pos_);
-      pos_ = std::get<1>(parsed);
-      return std::get<0>(parsed);
+      try {
+          auto parsed = stn_.toInt(contents_, pos_);
+          pos_ = std::get<1>(parsed);
+          return std::get<0>(parsed);
+      } catch(std::invalid_argument&e) {
+          throw RawDataError(e.what());
+      }
   }
 
   floatType read_float() {
@@ -161,6 +165,7 @@ static std::vector<SWCSample> readSamples(const std::string& contents, const std
 
     SWCTokenizer tokenizer{contents, path};
     tokenizer.consume_line_and_trailing_comments();
+    bool has_extra_columns = false;
 
     while (!tokenizer.done()) {
         sample.lineNumber = static_cast<unsigned int>(tokenizer.lineNumber());
@@ -169,6 +174,8 @@ static std::vector<SWCSample> readSamples(const std::string& contents, const std
         if (id < 0) {
             details::ErrorMessages err(path);
             throw RawDataError(err.ERROR_NEGATIVE_ID(sample.lineNumber));
+        }else if(id > std::numeric_limits<unsigned int>::max()){
+            throw RawDataError("SWC does not support ids larger than" + std::to_string(std::numeric_limits<unsigned int>::max()));
         }
 
         sample.id = static_cast<unsigned int>(id);
@@ -185,6 +192,8 @@ static std::vector<SWCSample> readSamples(const std::string& contents, const std
         if (parentId < -1) {
             details::ErrorMessages err(path);
             throw RawDataError(err.ERROR_NEGATIVE_ID(sample.lineNumber));
+        }else if(parentId > std::numeric_limits<unsigned int>::max()){
+            throw RawDataError("SWC does not support parent ids larger than" + std::to_string(std::numeric_limits<unsigned int>::max()));
         } else if (parentId == SWC_UNDEFINED_PARENT) {
             sample.parentId = SWC_ROOT;
         } else {
@@ -197,6 +206,8 @@ static std::vector<SWCSample> readSamples(const std::string& contents, const std
         }
         samples.push_back(sample);
     }
+
+    warning_handler_->emit(std::make_unique<NoSomaFound>(path_));
     return samples;
 }
 
