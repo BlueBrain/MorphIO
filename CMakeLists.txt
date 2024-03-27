@@ -61,11 +61,11 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   )
 
-install(
-  EXPORT MorphIOTargets
-  NAMESPACE MorphIO::
-  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MorphIO
-  )
+#install(
+#  EXPORT MorphIOTargets
+#  NAMESPACE MorphIO::
+#  DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/MorphIO
+#  )
 
 install(
   FILES ${CMAKE_CURRENT_LIST_DIR}/CMake/MorphIOConfig.cmake
