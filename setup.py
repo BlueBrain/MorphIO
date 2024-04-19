@@ -45,6 +45,9 @@ class CMakeBuild(build_ext):
 
         build_args = ['--config', cfg]
 
+        if "STATIC_HDF5" in os.environ:
+            cmake_args += ["-DHDF5_USE_STATIC_LIBRARIES=True", ]
+
         cmake_args += ['-DCMAKE_BUILD_TYPE={}'.format(cfg),
                        '-DMorphIO_CXX_WARNINGS=OFF',
                        '-GNinja',
