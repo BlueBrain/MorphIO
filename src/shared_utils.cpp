@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 #include <bitset>
-#include <cstdint>
+#include <cfloat> // FLT_EPSILON
 
 #include "error_message_generation.h"
 #include "shared_utils.hpp"
@@ -95,14 +95,18 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
     //  2 1 x y (z + r) r  1 <- have `+` first
     //  3 1 x y (z - r) r  1
 
-    auto withinEpsilon = [](floatType a, floatType b) {
-        return std::fabs(a - b) < morphio::epsilon;
+    auto withinRelativeEpsilon = [](floatType a, floatType b) {
+        floatType diff = std::fabs(a - b);
+        a = std::fabs(a);
+        b = std::fabs(b);
+        float largest = (b > a) ? b : a;
+        return diff <= largest * FLT_EPSILON;
     };
 
     std::bitset<3> column_mask = {};
-    for (uint8_t i = 0; i < 3; ++i) {
-        column_mask[i] = (withinEpsilon(points[0][i], points[1][i]) &&
-                          withinEpsilon(points[0][i], points[2][i]));
+    for (size_t i = 0; i < 3; ++i) {
+        column_mask[i] = (withinRelativeEpsilon(points[0][i], points[1][i]) &&
+                          withinRelativeEpsilon(points[0][i], points[2][i]));
     }
 
     if (column_mask.none()) {
@@ -115,10 +119,10 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
 
     const size_t col = !column_mask[0] ? 0 : !column_mask[1] ? 1 : 2;
 
-    if (!(withinEpsilon(points[0][col], points[1][col] - radius) &&
-          withinEpsilon(points[0][col], points[2][col] + radius)) &&
-        !(withinEpsilon(points[0][col], points[1][col] + radius) &&
-          withinEpsilon(points[0][col], points[2][col] - radius))) {
+    if (!(withinRelativeEpsilon(points[0][col], points[1][col] - radius) &&
+          withinRelativeEpsilon(points[0][col], points[2][col] + radius)) &&
+        !(withinRelativeEpsilon(points[0][col], points[1][col] + radius) &&
+          withinRelativeEpsilon(points[0][col], points[2][col] - radius))) {
         return NotRadiusOffset;
     }
 
@@ -128,19 +132,19 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
 std::ostream& operator<<(std::ostream& os, ThreePointSomaStatus s) {
     switch (s) {
     case ZeroColumnsAreTheSame:
-        os << "None of the columns (ie: all the X, Y or Z values) are the same.";
+        os << "Three Point Soma: None of the columns (ie: all the X, Y or Z values) are the same.";
         break;
     case OneColumnIsTheSame:
-        os << "Only one column has the same coordinates.";
+        os << "Three Point Soma: Only one column has the same coordinates.";
         break;
     case ThreeColumnsAreTheSame:
-        os << "All three columns have the same coordinates.";
+        os << "Three Point Soma: All three columns have the same coordinates.";
         break;
     case NotRadiusOffset:
-        os << "The non-constant columns is not offset by +/- the radius from the initial sample.";
+        os << "Three Point Soma: The non-constant columns is not offset by +/- the radius from the initial sample.";
         break;
     case Conforms:
-        os << "Three point soma conforms";
+        os << "Three Point Soma: conforms to specification";
         break;
     }
     return os;
