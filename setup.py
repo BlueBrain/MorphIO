@@ -70,7 +70,7 @@ if platform.system() == 'Windows':
                          ]
 
 setup(
-    name='MorphIO',
+    name='morphio',
     author='Blue Brain Project, EPFL',
     description='A neuron morphology IO library',
     long_description=long_description,
