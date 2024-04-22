@@ -4,8 +4,8 @@
  */
 #include <algorithm>  // std::max
 #include <bitset>
-#include <cfloat> // FLT_EPSILON
 #include <cmath>  // std::abs
+#include <limits>  // std::numeric_limits
 
 #include "error_message_generation.h"
 #include "shared_utils.hpp"
@@ -99,7 +99,8 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
 
     auto withinRelativeEpsilon = [](floatType a, floatType b) {
         floatType diff = std::abs(a - b);
-        return diff <= std::max(std::abs(a), std::abs(b)) * FLT_EPSILON;
+        return diff <=
+               std::max(std::abs(a), std::abs(b)) * std::numeric_limits<floatType>::epsilon();
     };
 
     std::bitset<3> column_mask = {};
