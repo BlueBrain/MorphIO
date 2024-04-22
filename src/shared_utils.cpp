@@ -4,7 +4,7 @@
  */
 #include <algorithm>  // std::max
 #include <bitset>
-#include <cmath>  // std::abs
+#include <cmath>  // std::fabs
 #include <limits>  // std::numeric_limits
 
 #include "error_message_generation.h"
@@ -72,6 +72,7 @@ bool is_regular_file(const std::string& path) {
 std::string join_path(const std::string& dirname, const std::string& filename) {
     return (ghc::filesystem::path(dirname) / filename).string();
 }
+
 namespace details {
 ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, floatType radius) {
     //  NeuroMorpho is the main provider of morphologies, but they
@@ -98,9 +99,9 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
     //  3 1 x y (z - r) r  1
 
     auto withinRelativeEpsilon = [](floatType a, floatType b) {
-        floatType diff = std::abs(a - b);
+        floatType diff = std::fabs(a - b);
         return diff <=
-               std::max(std::abs(a), std::abs(b)) * std::numeric_limits<floatType>::epsilon();
+               (std::max)(std::fabs(a), std::fabs(b)) * std::numeric_limits<floatType>::epsilon();
     };
 
     std::bitset<3> column_mask = {};
