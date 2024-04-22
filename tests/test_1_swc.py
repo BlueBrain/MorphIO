@@ -326,6 +326,18 @@ def test_soma_type_3_point(tmp_path):
             SomaType.SOMA_CYLINDERS)
 
 
+def test_swc_threepoint_soma_tolerance():
+    # from https://github.com/BlueBrain/MorphIO/issues/492
+    contents = """
+    1 1 5789.674999999998 1322.85 2846.65 5.165118027 -1
+    2 1 5789.674999999998 1317.6848819729996 2846.65 5.165118027 1
+    3 1 5789.674999999998 1328.015118027 2846.65 5.165118027 1
+    """
+    warnings = morphio.WarningHandlerCollector()
+    Morphology(contents, extension="swc", warning_handler=warnings)
+    assert len(warnings.get_all()) == 0
+
+
 def test_read_weird_ids():
     '''The ordering of IDs is not required'''
     content = ('''10000 3 0 0 5 0.5 100 # neurite 4th point
