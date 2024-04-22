@@ -97,10 +97,7 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
 
     auto withinRelativeEpsilon = [](floatType a, floatType b) {
         floatType diff = std::fabs(a - b);
-        a = std::fabs(a);
-        b = std::fabs(b);
-        float largest = (b > a) ? b : a;
-        return diff <= largest * FLT_EPSILON;
+        return diff <= std::max(std::fabs(a), std::fabs(b)) * FLT_EPSILON;
     };
 
     std::bitset<3> column_mask = {};

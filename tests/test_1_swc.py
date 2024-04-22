@@ -305,8 +305,10 @@ def test_soma_type_3_point(tmp_path):
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                     SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-            assert strip_color_codes(err.getvalue()).strip() == \
-                    '$STRING$:0:warning\nOnly one column has the same coordinates.'
+            assert strip_color_codes(err.getvalue()).strip() == (
+                    "$STRING$:0:warning\n"
+                    "Three Point Soma: Only one column has the same coordinates."
+                    )
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
@@ -315,8 +317,10 @@ def test_soma_type_3_point(tmp_path):
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                          SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-            assert strip_color_codes(err.getvalue()).strip() == \
-                    '$STRING$:0:warning\nThe non-constant columns is not offset by +/- the radius from the initial sample.'
+            assert strip_color_codes(err.getvalue()).strip() == (
+                    "$STRING$:0:warning\n"
+                    "Three Point Soma: The non-constant columns is not offset by +/- the radius from the initial sample."
+                    )
 
     # If this configuration is not respected -> SOMA_CYLINDERS
     content = ( '''1 1 0 0 0 3.0 -1
