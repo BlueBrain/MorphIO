@@ -2,8 +2,10 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+#include <algorithm>  // std::max
 #include <bitset>
 #include <cfloat> // FLT_EPSILON
+#include <cmath>  // std::abs
 
 #include "error_message_generation.h"
 #include "shared_utils.hpp"
@@ -96,8 +98,8 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
     //  3 1 x y (z - r) r  1
 
     auto withinRelativeEpsilon = [](floatType a, floatType b) {
-        floatType diff = std::fabs(a - b);
-        return diff <= std::max(std::fabs(a), std::fabs(b)) * FLT_EPSILON;
+        floatType diff = std::abs(a - b);
+        return diff <= std::max(std::abs(a), std::abs(b)) * FLT_EPSILON;
     };
 
     std::bitset<3> column_mask = {};
