@@ -148,7 +148,8 @@ std::ostream& operator<<(std::ostream& os, ThreePointSomaStatus s) {
         os << "Three Point Soma: All three columns have the same coordinates.";
         break;
     case NotRadiusOffset:
-        os << "Three Point Soma: The non-constant columns is not offset by +/- the radius from the initial sample.";
+        os << "Three Point Soma: The non-constant columns is not offset by +/- the radius from the "
+              "initial sample.";
         break;
     case Conforms:
         os << "Three Point Soma: conforms to specification";
