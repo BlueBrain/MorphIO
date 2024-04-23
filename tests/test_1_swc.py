@@ -341,6 +341,35 @@ def test_swc_threepoint_soma_tolerance():
     Morphology(contents, extension="swc", warning_handler=warnings)
     assert len(warnings.get_all()) == 0
 
+    contents = """
+    1 1 10000 10000             10000 100.999999999999999999 -1
+    2 1 10000 9899.000000000001 10000 100.999999999999999999 1
+    3 1 10000 10100.99999999999 10000 100.999999999999999999 1
+    """
+    warnings = morphio.WarningHandlerCollector()
+    Morphology(contents, extension="swc", warning_handler=warnings)
+    assert len(warnings.get_all()) == 0
+
+    # This still passes, even with the third point being off by 0.0000008 which seems reasonable
+    contents = """
+    1 1 10000 10000             10000 100.999999999999999999 -1
+    2 1 10000 9899.000000000001 10000 100.999999999999999999 1
+    3 1 10000 10100.99999911111 10000 100.999999999999999999 1
+    """
+    warnings = morphio.WarningHandlerCollector()
+    Morphology(contents, extension="swc", warning_handler=warnings)
+    assert len(warnings.get_all()) == 0
+
+    # The third point being off by 0.0088888 creates warning
+    contents = """
+    1 1 10000 10000             10000 100.999999999999999999 -1
+    2 1 10000 9899.000000000001 10000 100.999999999999999999 1
+    3 1 10000 10100.99111111111 10000 100.999999999999999999 1
+    """
+    warnings = morphio.WarningHandlerCollector()
+    Morphology(contents, extension="swc", warning_handler=warnings)
+    assert len(warnings.get_all()) == 1
+
 
 def test_read_weird_ids():
     '''The ordering of IDs is not required'''

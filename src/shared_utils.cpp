@@ -8,6 +8,7 @@
 #include <limits>  // std::numeric_limits
 
 #include "error_message_generation.h"
+#include "morphio/vector_types.h"
 #include "shared_utils.hpp"
 
 #include <ghc/filesystem.hpp>
@@ -98,16 +99,20 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
     //  2 1 x y (z + r) r  1 <- have `+` first
     //  3 1 x y (z - r) r  1
 
-    auto withinRelativeEpsilon = [](floatType a, floatType b) {
+    auto withinTolerance = [](floatType a, floatType b) {
         floatType diff = std::fabs(a - b);
-        return diff <=
-               (std::max)(std::fabs(a), std::fabs(b)) * std::numeric_limits<floatType>::epsilon();
+        // either we below the absolute epsilon...
+        return diff < morphio::epsilon ||
+               // or within a reasonable tolerance...
+               // note: `(std::max)` is to work around `#define max` existing on some MSVC versions
+               (diff <=
+                (std::max)(std::fabs(a), std::fabs(b)) * std::numeric_limits<floatType>::epsilon());
     };
 
     std::bitset<3> column_mask = {};
     for (size_t i = 0; i < 3; ++i) {
-        column_mask[i] = (withinRelativeEpsilon(points[0][i], points[1][i]) &&
-                          withinRelativeEpsilon(points[0][i], points[2][i]));
+        column_mask[i] = (withinTolerance(points[0][i], points[1][i]) &&
+                          withinTolerance(points[0][i], points[2][i]));
     }
 
     if (column_mask.none()) {
@@ -119,11 +124,12 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
     }
 
     const size_t col = !column_mask[0] ? 0 : !column_mask[1] ? 1 : 2;
+    std::cout << "asdf\n";
 
-    if (!(withinRelativeEpsilon(points[0][col], points[1][col] - radius) &&
-          withinRelativeEpsilon(points[0][col], points[2][col] + radius)) &&
-        !(withinRelativeEpsilon(points[0][col], points[1][col] + radius) &&
-          withinRelativeEpsilon(points[0][col], points[2][col] - radius))) {
+    if (!(withinTolerance(points[0][col], points[1][col] - radius) &&
+          withinTolerance(points[0][col], points[2][col] + radius)) &&
+        !(withinTolerance(points[0][col], points[1][col] + radius) &&
+          withinTolerance(points[0][col], points[2][col] - radius))) {
         return NotRadiusOffset;
     }
 
