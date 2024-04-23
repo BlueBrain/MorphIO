@@ -2,10 +2,13 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+#include <algorithm>  // std::max
 #include <bitset>
-#include <cstdint>
+#include <cmath>  // std::fabs
+#include <limits>  // std::numeric_limits
 
 #include "error_message_generation.h"
+#include "morphio/vector_types.h"
 #include "shared_utils.hpp"
 
 #include <ghc/filesystem.hpp>
@@ -70,6 +73,7 @@ bool is_regular_file(const std::string& path) {
 std::string join_path(const std::string& dirname, const std::string& filename) {
     return (ghc::filesystem::path(dirname) / filename).string();
 }
+
 namespace details {
 ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, floatType radius) {
     //  NeuroMorpho is the main provider of morphologies, but they
@@ -95,14 +99,20 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
     //  2 1 x y (z + r) r  1 <- have `+` first
     //  3 1 x y (z - r) r  1
 
-    auto withinEpsilon = [](floatType a, floatType b) {
-        return std::fabs(a - b) < morphio::epsilon;
+    auto withinTolerance = [](floatType a, floatType b) {
+        floatType diff = std::fabs(a - b);
+        // either we below the absolute epsilon...
+        return diff < morphio::epsilon ||
+               // or within a reasonable tolerance...
+               // note: `(std::max)` is to work around `#define max` existing on some MSVC versions
+               (diff <=
+                (std::max)(std::fabs(a), std::fabs(b)) * std::numeric_limits<floatType>::epsilon());
     };
 
     std::bitset<3> column_mask = {};
-    for (uint8_t i = 0; i < 3; ++i) {
-        column_mask[i] = (withinEpsilon(points[0][i], points[1][i]) &&
-                          withinEpsilon(points[0][i], points[2][i]));
+    for (size_t i = 0; i < 3; ++i) {
+        column_mask[i] = (withinTolerance(points[0][i], points[1][i]) &&
+                          withinTolerance(points[0][i], points[2][i]));
     }
 
     if (column_mask.none()) {
@@ -114,11 +124,12 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
     }
 
     const size_t col = !column_mask[0] ? 0 : !column_mask[1] ? 1 : 2;
+    std::cout << "asdf\n";
 
-    if (!(withinEpsilon(points[0][col], points[1][col] - radius) &&
-          withinEpsilon(points[0][col], points[2][col] + radius)) &&
-        !(withinEpsilon(points[0][col], points[1][col] + radius) &&
-          withinEpsilon(points[0][col], points[2][col] - radius))) {
+    if (!(withinTolerance(points[0][col], points[1][col] - radius) &&
+          withinTolerance(points[0][col], points[2][col] + radius)) &&
+        !(withinTolerance(points[0][col], points[1][col] + radius) &&
+          withinTolerance(points[0][col], points[2][col] - radius))) {
         return NotRadiusOffset;
     }
 
@@ -128,19 +139,19 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
 std::ostream& operator<<(std::ostream& os, ThreePointSomaStatus s) {
     switch (s) {
     case ZeroColumnsAreTheSame:
-        os << "None of the columns (ie: all the X, Y or Z values) are the same.";
+        os << "Three Point Soma: None of the columns (ie: all the X, Y or Z values) are the same.";
         break;
     case OneColumnIsTheSame:
-        os << "Only one column has the same coordinates.";
+        os << "Three Point Soma: Only one column has the same coordinates.";
         break;
     case ThreeColumnsAreTheSame:
-        os << "All three columns have the same coordinates.";
+        os << "Three Point Soma: All three columns have the same coordinates.";
         break;
     case NotRadiusOffset:
-        os << "The non-constant columns is not offset by +/- the radius from the initial sample.";
+        os << "Three Point Soma: The non-constant columns is not offset by +/- the radius from the initial sample.";
         break;
     case Conforms:
-        os << "Three point soma conforms";
+        os << "Three Point Soma: conforms to specification";
         break;
     }
     return os;
