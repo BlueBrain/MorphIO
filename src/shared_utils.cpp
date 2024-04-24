@@ -124,7 +124,6 @@ ThreePointSomaStatus checkNeuroMorphoSoma(const std::array<Point, 3>& points, fl
     }
 
     const size_t col = !column_mask[0] ? 0 : !column_mask[1] ? 1 : 2;
-    std::cout << "asdf\n";
 
     if (!(withinTolerance(points[0][col], points[1][col] - radius) &&
           withinTolerance(points[0][col], points[2][col] + radius)) &&
