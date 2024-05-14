@@ -15,6 +15,13 @@ from morphio import (MorphioError, Morphology, RawDataError, SomaError,
 
 DATA_DIR = Path(__file__).parent / "data"
 
+def test_basic():
+    contents =('''\
+1 1 0 4 0 3.0 -1
+2 3 0 0 2 0.5 1
+''')
+    Morphology(contents, "swc")
+
 
 def test_build_from_string():
     contents =('''1 1 0 4 0 3.0 -1
@@ -575,13 +582,13 @@ Warning: no soma found in file''' ==
 
 def test_throw_on_missing_data():
     content = ''' 3    #    missing data '''
-    with pytest.raises(RawDataError, match='The end of the file was reached before parsing finshed'):
+    with pytest.raises(RawDataError, match='Unable to parse this line'):
         Morphology(content, extension='swc')
 
     content = '''
     # some pre data
     3 3   #    missing data '''
-    with pytest.raises(RawDataError, match='The end of the file was reached before parsing finshed'):
+    with pytest.raises(RawDataError, match='Unable to parse this line'):
         Morphology(content, extension='swc')
 
 

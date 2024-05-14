@@ -4,7 +4,7 @@
  */
 #include <algorithm>  // std::max
 #include <bitset>
-#include <cmath>  // std::fabs
+#include <cmath>   // std::fabs
 #include <limits>  // std::numeric_limits
 
 #include "error_message_generation.h"

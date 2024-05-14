@@ -91,6 +91,7 @@ std::string ErrorMessages::EARLY_END_OF_FILE(long unsigned int lineNumber) const
                     ErrorLevel::ERROR,
                     "The end of the file was reached before parsing finshed");
 }
+
 std::string ErrorMessages::ERROR_SELF_PARENT(const unsigned int lineNumber) const {
     return errorMsg(_uri, lineNumber, ErrorLevel::ERROR, "Parent ID can not be itself");
 }
