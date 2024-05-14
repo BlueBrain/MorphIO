@@ -6,6 +6,19 @@ Improvements:
     * ~800 line SWC parse time goes from 0.976 to 0.699
     * Doesn't create changes to bifurcations at the root nodes of SWC fils
 
+v3.3.8
+======
+* Make ThreePointSoma use relative tolerance (494)
+* Fix incorrect warning types for `OnlyChild` and `DisconnectedNeurite` (#487)
+* Better error handling, allows for non-global errors and collecting the errors for a single morphology load,
+  see https://morphio.readthedocs.io/en/latest/warnings.html for an example on how to use a `warning_handler` (#482)
+
+Improvements:
+* work w/ clang17 (#486)
+* Turn on -Wno-poison-system-directories on clang (#489)
+* follow libsonata's example, and publish wheels that statically use hdf5, to reduce h5py version conflicts (#493)
+* update to pybind11 v2.12.0 (#495)
+
 v3.3.7
 ======
 * Change license from LGPL-3.0 to Apache-2.0 #467

@@ -9,8 +9,7 @@ env:
   CIBW_SKIP: 'cp35-* cp36-* cp37-* *-manylinux_i686 *-musllinux_* *-win32'
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
   CIBW_TEST_COMMAND: pytest -s -v {project}/tests
-  UNIXY_AEC_VERSION: 1.0.4
-  UNIXY_HDF5_VERSION: 1.14.2
+  UNIXY_HDF5_VERSION: 1.14.3
   WINDOWS_HDF5: 1.14.2
 
 jobs:
@@ -32,7 +31,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install cibuildwheel
         run: |
@@ -51,48 +50,49 @@ jobs:
       - name: Build wheels on Linux
         if: runner.os == 'Linux'
         env:
-          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
-          CIBW_BEFORE_ALL: |
-            yum -y install zlib-devel
-
+          CIBW_ENVIRONMENT_PASS: "STATIC_HDF5 CMAKE_PREFIX_PATH"
+          CIBW_BEFORE_BUILD: |
             # CMake complains if the dependencies come from within the same tree
             # as the source, so we'll just pretend they are elsewhere
-            mkdir -p $PWD/src-cache
-            ln -s $PWD/src-cache /opt/src-cache
-
-            bash ci/hdf5-build.sh /opt/src-cache
+            mkdir -p /host/home/runner/work/src-cache
+            ln -s /host/home/runner/work/src-cache /opt/hdf5-static
+            bash ci/hdf5-build.sh /opt/hdf5-static
 
         run: |
-          export HDF5_ROOT=/opt/src-cache/install-
-          export CIBW_ENVIRONMENT_PASS=HDF5_ROOT
+          # used by setup.py to decide if to set `FindHDF5` to use static hdf5 libraries
+          export STATIC_HDF5=True
+          export CMAKE_PREFIX_PATH=/opt/hdf5-static/install-/install/
 
-          python -m cibuildwheel --output-dir dist
+          CIBW_MANYLINUX_X86_64_IMAGE=manylinux2014 python -m cibuildwheel --output-dir dist
+          CIBW_MANYLINUX_X86_64_IMAGE=manylinux_2_28 python -m cibuildwheel --output-dir dist
 
       - name: Build wheels Mac OS
         if: runner.os == 'macOS'
         env:
-          CIBW_ENVIRONMENT_PASS: "HDF5_ROOT CMAKE_OSX_ARCHITECTURES MACOSX_DEPLOYMENT_TARGET"
+          CIBW_ENVIRONMENT_PASS: "STATIC_HDF5 CMAKE_PREFIX_PATH CMAKE_OSX_ARCHITECTURES MACOSX_DEPLOYMENT_TARGET"
           CIBW_BEFORE_BUILD: |
             # CMake complains if the dependencies come from within the same tree
             # as the source, so we'll just pretend they are elsewhere
             mkdir -p $PWD/src-cache
             ln -s $PWD/src-cache /Users/runner/work/src-cache
-
             bash ci/hdf5-build.sh /Users/runner/work/src-cache
         run: |
+          # used by setup.py to decide if to set `FindHDF5` to use static hdf5 libraries
+          export STATIC_HDF5=True
+
           # x86_64 macOS allows for cross compilation; first we do arm64,
           # only for the 11.0 target; and store in the cache the compiled code...
           export CIBW_ARCHS_MACOS="arm64"
           export CMAKE_OSX_ARCHITECTURES="arm64"
           export MACOSX_DEPLOYMENT_TARGET="11.0"
-          export HDF5_ROOT=/Users/runner/work/src-cache/install-$CIBW_ARCHS_MACOS
+          export CMAKE_PREFIX_PATH=/Users/runner/work/src-cache/install-$CIBW_ARCHS_MACOS/install
           python -m cibuildwheel --output-dir dist
 
           # ...and now we do both targets for x86_64
           export CIBW_ARCHS_MACOS="x86_64"
           export CMAKE_OSX_ARCHITECTURES="x86_64"
           unset MACOSX_DEPLOYMENT_TARGET
-          export HDF5_ROOT=/Users/runner/work/src-cache/install-$CIBW_ARCHS_MACOS
+          export CMAKE_PREFIX_PATH=/Users/runner/work/src-cache/install-$CIBW_ARCHS_MACOS/install
           python -m cibuildwheel --output-dir dist
 
       - name: Cache HDF5 On Windows

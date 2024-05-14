@@ -299,8 +299,10 @@ def test_soma_type_3_point_neuromorpho(tmp_path):
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                     SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-            assert strip_color_codes(err.getvalue()).strip() == \
-                    '$STRING$:0:warning\nOnly one column has the same coordinates.'
+            assert strip_color_codes(err.getvalue()).strip() == (
+                    "$STRING$:0:warning\n"
+                    "Three Point Soma: Only one column has the same coordinates."
+                    )
 
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
@@ -309,8 +311,10 @@ def test_soma_type_3_point_neuromorpho(tmp_path):
                           3 1 0  0 0 3.0  1 # PID is 1''')
             assert (Morphology(content, extension='swc').soma_type ==
                          SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS)
-            assert strip_color_codes(err.getvalue()).strip() == \
-                    '$STRING$:0:warning\nThe non-constant columns is not offset by +/- the radius from the initial sample.'
+            assert strip_color_codes(err.getvalue()).strip() == (
+                    "$STRING$:0:warning\n"
+                    "Three Point Soma: The non-constant columns is not offset by +/- the radius from the initial sample."
+                    )
 
 def test_soma_type_3_point():
     # If this configuration is not respected -> SOMA_CYLINDERS
@@ -319,6 +323,47 @@ def test_soma_type_3_point():
                    3 1 0 0 0 3.0  2 # PID is 2''')
     assert (Morphology(content, extension='swc').soma_type ==
             SomaType.SOMA_CYLINDERS)
+
+
+def test_swc_threepoint_soma_tolerance():
+    # from https://github.com/BlueBrain/MorphIO/issues/492
+    contents = """
+    1 1 5789.674999999998 1322.85 2846.65 5.165118027 -1
+    2 1 5789.674999999998 1317.6848819729996 2846.65 5.165118027 1
+    3 1 5789.674999999998 1328.015118027 2846.65 5.165118027 1
+    """
+    warnings = morphio.WarningHandlerCollector()
+    Morphology(contents, extension="swc", warning_handler=warnings)
+    assert len(warnings.get_all()) == 0
+
+    contents = """
+    1 1 10000 10000             10000 100.999999999999999999 -1
+    2 1 10000 9899.000000000001 10000 100.999999999999999999 1
+    3 1 10000 10100.99999999999 10000 100.999999999999999999 1
+    """
+    warnings = morphio.WarningHandlerCollector()
+    Morphology(contents, extension="swc", warning_handler=warnings)
+    assert len(warnings.get_all()) == 0
+
+    # This still passes, even with the third point being off by 0.0000008 which seems reasonable
+    contents = """
+    1 1 10000 10000             10000 100.999999999999999999 -1
+    2 1 10000 9899.000000000001 10000 100.999999999999999999 1
+    3 1 10000 10100.99999911111 10000 100.999999999999999999 1
+    """
+    warnings = morphio.WarningHandlerCollector()
+    Morphology(contents, extension="swc", warning_handler=warnings)
+    assert len(warnings.get_all()) == 0
+
+    # The third point being off by 0.0088888 creates warning
+    contents = """
+    1 1 10000 10000             10000 100.999999999999999999 -1
+    2 1 10000 9899.000000000001 10000 100.999999999999999999 1
+    3 1 10000 10100.99111111111 10000 100.999999999999999999 1
+    """
+    warnings = morphio.WarningHandlerCollector()
+    Morphology(contents, extension="swc", warning_handler=warnings)
+    assert len(warnings.get_all()) == 1
 
 
 def test_read_weird_ids():

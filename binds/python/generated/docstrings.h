@@ -104,6 +104,18 @@ static const char *mkd_doc_morphio_DendriticSpine_soma = R"doc()doc";
 
 static const char *mkd_doc_morphio_DendriticSpine_somaType = R"doc()doc";
 
+static const char *mkd_doc_morphio_DisconnectedNeurite = R"doc()doc";
+
+static const char *mkd_doc_morphio_DisconnectedNeurite_DisconnectedNeurite = R"doc()doc";
+
+static const char *mkd_doc_morphio_DisconnectedNeurite_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_DisconnectedNeurite_lineNumber = R"doc()doc";
+
+static const char *mkd_doc_morphio_DisconnectedNeurite_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_DisconnectedNeurite_warning = R"doc()doc";
+
 static const char *mkd_doc_morphio_EndoplasmicReticulum =
 R"doc(The entry-point class to access endoplasmic reticulum data
 
@@ -888,18 +900,6 @@ static const char *mkd_doc_morphio_UnknownFileType = R"doc()doc";
 
 static const char *mkd_doc_morphio_UnknownFileType_UnknownFileType = R"doc()doc";
 
-static const char *mkd_doc_morphio_WarningDisconnectedNeurite = R"doc()doc";
-
-static const char *mkd_doc_morphio_WarningDisconnectedNeurite_WarningDisconnectedNeurite = R"doc()doc";
-
-static const char *mkd_doc_morphio_WarningDisconnectedNeurite_errorLevel = R"doc()doc";
-
-static const char *mkd_doc_morphio_WarningDisconnectedNeurite_lineNumber = R"doc()doc";
-
-static const char *mkd_doc_morphio_WarningDisconnectedNeurite_msg = R"doc()doc";
-
-static const char *mkd_doc_morphio_WarningDisconnectedNeurite_warning = R"doc()doc";
-
 static const char *mkd_doc_morphio_WarningHandler = R"doc()doc";
 
 static const char *mkd_doc_morphio_WarningHandlerCollector =
@@ -992,18 +992,6 @@ static const char *mkd_doc_morphio_WarningMessage_uri = R"doc()doc";
 
 static const char *mkd_doc_morphio_WarningMessage_warning = R"doc()doc";
 
-static const char *mkd_doc_morphio_WarningZeroDiameter = R"doc()doc";
-
-static const char *mkd_doc_morphio_WarningZeroDiameter_WarningZeroDiameter = R"doc()doc";
-
-static const char *mkd_doc_morphio_WarningZeroDiameter_errorLevel = R"doc()doc";
-
-static const char *mkd_doc_morphio_WarningZeroDiameter_lineNumber = R"doc()doc";
-
-static const char *mkd_doc_morphio_WarningZeroDiameter_msg = R"doc()doc";
-
-static const char *mkd_doc_morphio_WarningZeroDiameter_warning = R"doc()doc";
-
 static const char *mkd_doc_morphio_WriteEmptyMorphology = R"doc()doc";
 
 static const char *mkd_doc_morphio_WriteEmptyMorphology_WriteEmptyMorphology = R"doc()doc";
@@ -1063,6 +1051,18 @@ static const char *mkd_doc_morphio_WrongRootPoint_lineNumbers = R"doc()doc";
 static const char *mkd_doc_morphio_WrongRootPoint_msg = R"doc()doc";
 
 static const char *mkd_doc_morphio_WrongRootPoint_warning = R"doc()doc";
+
+static const char *mkd_doc_morphio_ZeroDiameter = R"doc()doc";
+
+static const char *mkd_doc_morphio_ZeroDiameter_ZeroDiameter = R"doc()doc";
+
+static const char *mkd_doc_morphio_ZeroDiameter_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_ZeroDiameter_lineNumber = R"doc()doc";
+
+static const char *mkd_doc_morphio_ZeroDiameter_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_ZeroDiameter_warning = R"doc()doc";
 
 static const char *mkd_doc_morphio_children = R"doc(Return a list of children sections)doc";
 

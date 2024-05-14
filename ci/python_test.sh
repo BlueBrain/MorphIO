@@ -38,7 +38,7 @@ create_venv
 
 python3 -m pip install build
 python3 -m build . --outdir "$DIST_DIR"
-python3 -m pip install "$DIST_DIR"/MorphIO*.tar.gz
+python3 -m pip install "$DIST_DIR"/morphio*.tar.gz
 python3 -m pip install -r tests/requirement_tests.txt
 
 pushd $(pwd)/tests
