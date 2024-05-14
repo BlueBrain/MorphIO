@@ -146,7 +146,6 @@ struct SWCSample {
 
     SWCSample() = default;  // XXX
     floatType diameter = -1.;
-    bool valid = false;
     Point point{};
     SectionType type = SECTION_UNDEFINED;
     unsigned int parentId = UNKNOWN_ID;
@@ -375,7 +374,7 @@ class SWCBuilder
             }
 
             if (!samples_.insert({sample.id, sample}).second) {
-                const auto& original = samples[sample.id];
+                const auto& original = samples_[sample.id];
                 details::ErrorMessages err_(path_);
                 throw RawDataError(err_.ERROR_REPEATED_ID(original.id, original.lineNumber, sample.id));
             }
