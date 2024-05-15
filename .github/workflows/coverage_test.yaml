@@ -29,7 +29,9 @@ jobs:
           sudo apt-get ${{env.apt_options}} update -y
           sudo apt-get ${{env.apt_options}} install -y build-essential libhdf5-dev lcov
       - name: Build and run unittests
-        run: locale -a && ci/coverage_test.sh
+        run: |
+          locale -a 
+          ci/coverage_test.sh
 
       - name: Upload Coverage to Coveralls
         uses: coverallsapp/github-action@master

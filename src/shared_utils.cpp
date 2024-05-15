@@ -153,6 +153,8 @@ std::ostream& operator<<(std::ostream& os, ThreePointSomaStatus s) {
     case Conforms:
         os << "Three Point Soma: conforms to specification";
         break;
+    default:    // LCOV_EXCL_LINE
+        break;  // LCOV_EXCL_LINE
     }
     return os;
 }

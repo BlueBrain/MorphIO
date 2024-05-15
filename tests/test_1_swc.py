@@ -409,16 +409,9 @@ Neurites are not supposed to have parentId: -1
 (although this is normal if this neuron has no soma)''' ==
                 strip_color_codes(err.getvalue().strip()))
 
+
 def test_neurite_wrong_root_point_neuromorpho_3_point_soma():
     '''Test that for 3 points soma, the neurites are attached to first soma point'''
-
-    # Not 3-points soma --> OK
-    #with captured_output() as (_, err):
-    #    with ostream_redirect(stdout=True, stderr=True):
-    #        n = Morphology(DATA_DIR /  'soma_cylinders.swc')
-    #        assert err.getvalue().strip() == ''
-    #    assert len(n.root_sections) == 1
-
     with captured_output() as (_, err):
         with ostream_redirect(stdout=True, stderr=True):
             path = DATA_DIR /  'neurite_wrong_root_point.swc'
@@ -528,9 +521,15 @@ def test_root_node_split():
                        [[2, 1, 0], [1, 0, 1]])
 
 
-def test_three_point_soma():
+def test_three_point_soma_neuromorpho():
     n = Morphology(DATA_DIR /  'three_point_soma.swc')
     assert n.soma_type == SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
+
+
+def test_three_point_soma_stacked_cylinders():
+    n = Morphology(DATA_DIR /  'soma_cylinders.swc')
+    assert n.soma_type == SomaType.SOMA_CYLINDERS
+    assert len(n.root_sections) == 1
 
 
 def test_trailing_space():
