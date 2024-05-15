@@ -27,7 +27,7 @@ jobs:
       - name: Install packages
         run: |
           sudo apt-get ${{env.apt_options}} update -y
-          sudo apt-get ${{env.apt_options}} install -y build-essential libhdf5-dev lcov
+          sudo apt-get ${{env.apt_options}} install -y build-essential libhdf5-dev lcov language-pack-de
       - name: Build and run unittests
         run: |
           locale -a 

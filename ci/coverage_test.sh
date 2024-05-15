@@ -25,5 +25,3 @@ cmake                           \
     ../..
 
 make -j all coverage
-
-[[ -e /Testing/Temporary/LastTest.log ]] && cat /Testing/Temporary/LastTest.log
