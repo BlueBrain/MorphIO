@@ -123,7 +123,7 @@ def test_repeated_id():
                          ''',
                          RawDataError,
                          'Repeated ID: 4\nID already appears here:',
-                         ':6:warning')
+                         ':4:warning')
 
 
 def test_neurite_followed_by_soma():
