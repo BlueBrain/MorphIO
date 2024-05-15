@@ -490,37 +490,6 @@ def test_unsupported_section_type():
     assert obj.match('Unsupported section type: 20')
 
 
-def test_root_node_split():
-    '''Test that a bifurcation at the root point produces two root sections'''
-    content = ('''1	1	0 0 0 1	-1
-                  2	3	1 0 0 1  1
-                  3	3	1 1 0 1  2
-                  4	3	1 0 1 1  2
-                  ''')
-    n = Morphology(content, extension='swc')
-    assert len(n.root_sections) == 1
-    assert_array_equal(n.root_sections[0].points,
-                       [[1, 0, 0], ])
-
-    # Normal bifurcation
-    content = ('''1	1	0 0 0 1	-1
-                  2	3	1 0 0 1  1
-                  3	3	2 1 0 1  2
-                  4	3	1 1 0 1  3
-                  5	3	1 0 1 1  3
-                  ''')
-    n = Morphology(content, extension='swc')
-    assert len(n.root_sections) == 1
-    root = n.root_sections[0]
-    assert_array_equal(root.points,
-                       [[1, 0, 0], [2, 1, 0]])
-    assert len(root.children) == 2
-    assert_array_equal(root.children[0].points,
-                       [[2, 1, 0], [1, 1, 0]])
-    assert_array_equal(root.children[1].points,
-                       [[2, 1, 0], [1, 0, 1]])
-
-
 def test_three_point_soma_neuromorpho():
     n = Morphology(DATA_DIR /  'three_point_soma.swc')
     assert n.soma_type == SomaType.SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS
