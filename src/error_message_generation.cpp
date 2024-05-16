@@ -82,7 +82,8 @@ std::string ErrorMessages::ERROR_REPEATED_ID(const unsigned int originalId,
                     newLineNumber,
                     ErrorLevel::WARNING,
                     "Repeated ID: " + std::to_string(originalId)) +
-           "\nID already appears here: \n" + errorLink(_uri, originalLineNumber, ErrorLevel::INFO);
+           "\nID already appears here: \n" +
+           errorLink(_uri, originalLineNumber, ErrorLevel::WARNING);
 }
 
 std::string ErrorMessages::ERROR_SELF_PARENT(const unsigned int lineNumber) const {
