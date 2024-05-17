@@ -71,6 +71,15 @@ void validateHasNoMitochondria(const morphio::mut::Morphology& morph,
     }
 }
 
+void validateRootPointsHaveTwoOrMorePoints(const morphio::mut::Morphology& morph) {
+    for (const auto& root : morph.rootSections()) {
+        if (root->points().size() < 2) {
+            throw morphio::RawDataError("Root sections must have at least 2 points");
+        }
+    }
+
+}
+
 }  // namespace details
 }  // namespace writer
 }  // namespace mut

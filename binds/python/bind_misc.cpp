@@ -283,5 +283,4 @@ Note: This API is 'experimental', meaning it might change in the future.
             // Bind the lifetime of the `morphio::LoadUnordered` (1) to the
             // lifetime of the returned iterator (0).
             py::keep_alive<0, 1>());
-
 }

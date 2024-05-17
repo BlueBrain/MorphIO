@@ -345,8 +345,7 @@ breadth_iterator Morphology::breadth_end() const {
 void Morphology::applyModifiers(unsigned int modifierFlags) {
     if (modifierFlags & NO_DUPLICATES & TWO_POINTS_SECTIONS) {
         const auto err = details::ErrorMessages(_uri);
-        throw SectionBuilderError(
-            err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
+        throw SectionBuilderError(err.ERROR_UNCOMPATIBLE_FLAGS(NO_DUPLICATES, TWO_POINTS_SECTIONS));
     }
 
     if (modifierFlags & SOMA_SPHERE) {
@@ -389,12 +388,6 @@ std::unordered_map<int, std::vector<unsigned int>> Morphology::connectivity() {
 }
 
 void Morphology::write(const std::string& filename) const {
-    for (const auto& root : rootSections()) {
-        if (root->points().size() < 2) {
-            throw morphio::SectionBuilderError("Root sections must have at least 2 points");
-        }
-    }
-
     const size_t pos = filename.find_last_of('.');
     if (pos == std::string::npos) {
         throw UnknownFileType("Missing file extension.");

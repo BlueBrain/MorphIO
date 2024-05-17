@@ -20,8 +20,8 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5Object.hpp>
 
-#include "../shared_utils.hpp"
 #include "../error_message_generation.h"
+#include "../shared_utils.hpp"
 #include "writer_utils.h"
 
 namespace {
@@ -142,7 +142,8 @@ void swc(const Morphology& morph,
          const std::string& filename,
          std::shared_ptr<morphio::WarningHandler> handler) {
     if (details::emptyMorphology(morph, handler)) {
-        return;
+        throw morphio::WriterError(
+            morphio::details::ErrorMessages(filename).ERROR_EMPTY_MORPHOLOGY());
     }
 
     const std::shared_ptr<Soma>& soma = morph.soma();
