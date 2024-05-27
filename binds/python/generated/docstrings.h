@@ -1068,10 +1068,6 @@ static const char *mkd_doc_morphio_children = R"doc(Return a list of children se
 
 static const char *mkd_doc_morphio_details_errorLink = R"doc()doc";
 
-static const char *mkd_doc_morphio_diff = R"doc(Perform a diff on 2 morphologies, returns True if items differ)doc";
-
-static const char *mkd_doc_morphio_diff_2 = R"doc(Perform a diff on 2 sections, returns True if items differ)doc";
-
 static const char *mkd_doc_morphio_enable_if_immutable = R"doc(Enable if `T` is a immutable morphology.)doc";
 
 static const char *mkd_doc_morphio_enable_if_mutable = R"doc(Enable if `T` is a mutable morphology.)doc";
@@ -1090,11 +1086,7 @@ static const char *mkd_doc_morphio_enums_CellFamily_SPINE = R"doc(Spine)doc";
 
 static const char *mkd_doc_morphio_enums_LogLevel = R"doc()doc";
 
-static const char *mkd_doc_morphio_enums_LogLevel_DEBUG = R"doc()doc";
-
 static const char *mkd_doc_morphio_enums_LogLevel_ERROR = R"doc()doc";
-
-static const char *mkd_doc_morphio_enums_LogLevel_INFO = R"doc()doc";
 
 static const char *mkd_doc_morphio_enums_LogLevel_WARNING = R"doc()doc";
 
@@ -1719,10 +1711,6 @@ static const char *mkd_doc_morphio_mut_diameters_3 = R"doc(@{ Return the diamete
 
 static const char *mkd_doc_morphio_mut_diameters_4 = R"doc()doc";
 
-static const char *mkd_doc_morphio_mut_diff = R"doc(Perform a diff on 2 morphologies, returns True if items differ)doc";
-
-static const char *mkd_doc_morphio_mut_diff_2 = R"doc(Perform a diff on 2 sections, returns True if items differ)doc";
-
 static const char *mkd_doc_morphio_mut_friendDtorForSharedPtrMito = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_id = R"doc(Return the section id)doc";
@@ -1793,8 +1781,6 @@ Throws:
 static const char *mkd_doc_morphio_readers_ErrorLevel = R"doc(Level of error reporting)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorLevel_ERROR = R"doc(Error)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorLevel_INFO = R"doc(Info)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorLevel_WARNING = R"doc(Warning)doc";
 
