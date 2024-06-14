@@ -119,10 +119,10 @@ foreach(TARGET morphio_shared morphio_static)
   target_link_libraries(${TARGET} PUBLIC gsl-lite PRIVATE HighFive lexertl)
 endforeach(TARGET)
 
-install(
-  # DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  TARGETS morphio_shared
-  EXPORT MorphIOTargets
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-  PUBLIC_HEADER DESTINATION include
-)
+#install(
+#  # DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#  TARGETS morphio_shared
+#  EXPORT MorphIOTargets
+#  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#  PUBLIC_HEADER DESTINATION include
+#)
