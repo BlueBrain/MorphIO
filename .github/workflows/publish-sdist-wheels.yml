@@ -61,7 +61,7 @@ jobs:
         run: |
           # used by setup.py to decide if to set `FindHDF5` to use static hdf5 libraries
           export STATIC_HDF5=True
-          export CMAKE_PREFIX_PATH=/opt/hdf5-static/install-/install/
+          export CMAKE_PREFIX_PATH=/opt/hdf5-static/install-x86_64/install/
 
           CIBW_MANYLINUX_X86_64_IMAGE=manylinux2014 python -m cibuildwheel --output-dir dist
           CIBW_MANYLINUX_X86_64_IMAGE=manylinux_2_28 python -m cibuildwheel --output-dir dist
