@@ -151,7 +151,7 @@ jobs:
       - name: Store wheel as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-wheels
           path: dist/*.whl
 
   build_sdist:
@@ -184,7 +184,7 @@ jobs:
       - name: Store sdist as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-sdist
           path: dist/*.tar.gz
 
   upload_artifacts:
@@ -198,8 +198,9 @@ jobs:
       - name: Download artifacts produced during the build_wheels and build_sdist jobs
         uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: dist-*
           path: dist/
+          merge-multiple: true
 
       - name: Display structure of downloaded files
         run: ls -R
