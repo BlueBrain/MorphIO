@@ -122,7 +122,7 @@ void validateSWCSoma(const morphio::mut::Morphology& morph,
     } else if (!(soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
                  soma->type() == SomaType::SOMA_CYLINDERS ||
                  soma->type() == SomaType::SOMA_SINGLE_POINT)) {
-        handler->emit(std::make_shared<morphio::SomaNonCynlinderOrPoint>());
+        handler->emit(std::make_shared<morphio::SomaNonCylinderOrPoint>());
     } else if (soma->type() == SomaType::SOMA_SINGLE_POINT && soma_points.size() != 1) {
         throw WriterError(ErrorMessages().ERROR_SOMA_INVALID_SINGLE_POINT());
     } else if (soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS &&

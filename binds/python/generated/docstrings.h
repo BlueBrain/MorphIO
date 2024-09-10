@@ -862,15 +862,15 @@ static const char *mkd_doc_morphio_SomaNonContour_msg = R"doc()doc";
 
 static const char *mkd_doc_morphio_SomaNonContour_warning = R"doc()doc";
 
-static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint = R"doc()doc";
+static const char *mkd_doc_morphio_SomaNonCylinderOrPoint = R"doc()doc";
 
-static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_SomaNonCynlinderOrPoint = R"doc()doc";
+static const char *mkd_doc_morphio_SomaNonCylinderOrPoint_SomaNonCylinderOrPoint = R"doc()doc";
 
-static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_errorLevel = R"doc()doc";
+static const char *mkd_doc_morphio_SomaNonCylinderOrPoint_errorLevel = R"doc()doc";
 
-static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_msg = R"doc()doc";
+static const char *mkd_doc_morphio_SomaNonCylinderOrPoint_msg = R"doc()doc";
 
-static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_warning = R"doc()doc";
+static const char *mkd_doc_morphio_SomaNonCylinderOrPoint_warning = R"doc()doc";
 
 static const char *mkd_doc_morphio_Soma_Soma = R"doc()doc";
 

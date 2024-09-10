@@ -243,8 +243,8 @@ struct SomaNonContour: public WarningMessage {
     }
 };
 
-struct SomaNonCynlinderOrPoint: public WarningMessage {
-    SomaNonCynlinderOrPoint()
+struct SomaNonCylinderOrPoint: public WarningMessage {
+    SomaNonCylinderOrPoint()
         : WarningMessage(std::string()) {}
     Warning warning() const final {
         return Warning::SOMA_NON_CYLINDER_OR_POINT;

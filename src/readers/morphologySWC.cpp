@@ -443,7 +443,8 @@ class SWCBuilder
         std::unordered_map<DeclaredID, std::shared_ptr<morphio::mut::Section>>& declared_to_swc,
         const Point& start_point,
         floatType start_diameter,
-        bool is_root) {
+        bool is_root)
+    {
         Property::PointLevel properties;
         auto& points = properties._points;
         auto& diameters = properties._diameters;
@@ -484,6 +485,7 @@ class SWCBuilder
             id = children_.at(id)[0];
             children_count = get_child_count(id);
         }
+
         sample = &samples_.at(id);
         points.push_back(sample->point);
         diameters.push_back(sample->diameter);
