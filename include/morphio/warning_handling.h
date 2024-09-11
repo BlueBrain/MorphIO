@@ -54,6 +54,22 @@ struct ZeroDiameter: public WarningMessage {
     uint64_t lineNumber;
 };
 
+struct SectionTypeChanged: public WarningMessage {
+    SectionTypeChanged(std::string uri_, uint64_t lineNumber_)
+        : WarningMessage(std::move(uri_))
+        , lineNumber(lineNumber_) {}
+    morphio::enums::Warning warning() const final {
+        return Warning::SECTION_TYPE_CHANGED;
+    }
+    morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
+    std::string msg() const final {
+        static const char* description = "Warning: Type changed within section, without bifurcation";
+        return "\n" + details::errorLink(uri, lineNumber, errorLevel) + description;
+    }
+
+    uint64_t lineNumber;
+};
+
 struct DisconnectedNeurite: public WarningMessage {
     DisconnectedNeurite(std::string uri_, uint64_t lineNumber_)
         : WarningMessage(std::move(uri_))

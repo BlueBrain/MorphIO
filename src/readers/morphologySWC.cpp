@@ -477,6 +477,8 @@ class SWCBuilder
         while (children_count == 1) {
             sample = &samples_.at(id);
             if(sample->type != samples_.at(children_.at(id)[0]).type){
+                warning_handler_->emit(std::make_unique<SectionTypeChanged>(
+                    path_, sample->lineNumber));
                 break;
             }
             points.push_back(sample->point);

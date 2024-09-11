@@ -42,6 +42,7 @@ enum Warning {
     ZERO_DIAMETER,               //!< Zero section diameter
     SOMA_NON_CONTOUR,            //!< Soma must be a contour for ASC and H5
     SOMA_NON_CYLINDER_OR_POINT,  //!< Soma must be stacked cylinders or a point
+    SECTION_TYPE_CHANGED,  //!< In SWC, the type changed within a section, not post bifurcation
 };
 
 enum AnnotationType {
