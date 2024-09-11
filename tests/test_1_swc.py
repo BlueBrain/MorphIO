@@ -574,7 +574,8 @@ def test_multi_type_section():
                   3 7 0 0 3 0.5 2        # <- type 7
                   4 8 0 0 4 0.5 3        # <- type 8
                   5 9 0 0 5 0.5 4''')    # <- type 9
-    n = Morphology(contents, "swc")
+    warnings = morphio.WarningHandlerCollector()
+    n = Morphology(contents, "swc", warning_handler=warnings)
     assert_array_equal(n.soma.points, [[0, 4, 0]])
     assert_array_equal(n.soma.diameters, [6.0])
     assert len(n.root_sections) == 1
@@ -583,6 +584,10 @@ def test_multi_type_section():
                        np.array([[0, 0, 2], ]))
     assert len(n.sections) == 4
     assert_array_equal(n.section_offsets, [0, 1, 3, 5, 7])
+    warnings = [f.warning for f in warnings.get_all()]
+    assert len(warnings) == 3  # type 7, 8, and 9
+    for warning in warnings:
+        assert warning.warning() == Warning.type_changed_within_section
 
 
 def test_missing_parent():

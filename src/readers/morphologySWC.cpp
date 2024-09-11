@@ -467,8 +467,7 @@ class SWCBuilder
         const SWCSample* sample = &samples_.at(id);
 
         // create duplicate point if needed
-        if (!is_root && sample->point != start_point /*|| sample->diameter != start_diameter */) {
-        //if (!(is_root && sample->type == SECTION_SOMA) && sample->point != start_point /*|| sample->diameter != start_diameter */) {
+        if (!is_root && sample->point != start_point) {
             points.push_back(start_point);
             diameters.push_back(start_diameter);
         }
@@ -478,6 +477,8 @@ class SWCBuilder
         while (children_count == 1) {
             sample = &samples_.at(id);
             if(sample->type != samples_.at(children_.at(id)[0]).type){
+                warning_handler_->emit(std::make_unique<SectionTypeChanged>(
+                    path_, sample->lineNumber));
                 break;
             }
             points.push_back(sample->point);

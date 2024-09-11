@@ -97,7 +97,8 @@ void bind_enums(py::module& m) {
         .value("write_empty_morphology", morphio::enums::WRITE_EMPTY_MORPHOLOGY)
         .value("zero_diameter", morphio::enums::Warning::ZERO_DIAMETER)
         .value("soma_non_contour", morphio::enums::Warning::SOMA_NON_CONTOUR)
-        .value("soma_non_cylinder_or_point", morphio::enums::Warning::SOMA_NON_CYLINDER_OR_POINT);
+        .value("soma_non_cylinder_or_point", morphio::enums::Warning::SOMA_NON_CYLINDER_OR_POINT)
+        .value("type_changed_within_section", morphio::enums::Warning::SECTION_TYPE_CHANGED);
 
     py::enum_<morphio::enums::SomaType>(m, "SomaType", py::arithmetic())
         .value("SOMA_UNDEFINED", morphio::enums::SomaType::SOMA_UNDEFINED)
