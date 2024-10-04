@@ -4,9 +4,9 @@ on: [pull_request, push]
 env:
   apt_options: -o Acquire::Retries=3
 
-  CIBW_BUILD_VERBOSITY: 3
+  CIBW_BUILD_VERBOSITY: 1
   CIBW_BUILD: 'cp*'
-  CIBW_SKIP: 'cp35-* cp36-* cp37-* *-manylinux_i686 *-musllinux_* *-win32'
+  CIBW_SKIP: 'cp35-* cp36-* cp37-* cp313-* *-manylinux_i686 *-musllinux_* *-win32'
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
   CIBW_TEST_COMMAND: pytest -s -v {project}/tests
   UNIXY_HDF5_VERSION: 1.14.3
@@ -21,15 +21,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-11, windows-2022]
+        os: [ubuntu-20.04, macos-12, windows-2022]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'true'
 
       - name: Install Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
@@ -61,7 +61,7 @@ jobs:
         run: |
           # used by setup.py to decide if to set `FindHDF5` to use static hdf5 libraries
           export STATIC_HDF5=True
-          export CMAKE_PREFIX_PATH=/opt/hdf5-static/install-/install/
+          export CMAKE_PREFIX_PATH=/opt/hdf5-static/install-x86_64/install/
 
           CIBW_MANYLINUX_X86_64_IMAGE=manylinux2014 python -m cibuildwheel --output-dir dist
           CIBW_MANYLINUX_X86_64_IMAGE=manylinux_2_28 python -m cibuildwheel --output-dir dist
@@ -149,9 +149,9 @@ jobs:
           python -m cibuildwheel --output-dir dist
 
       - name: Store wheel as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-wheels-${{ matrix.os }}
           path: dist/*.whl
 
   build_sdist:
@@ -160,12 +160,12 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: 'true'
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
@@ -182,9 +182,9 @@ jobs:
           pytest -s -v tests
 
       - name: Store sdist as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: dist
+          name: dist-sdist
           path: dist/*.tar.gz
 
   upload_artifacts:
@@ -196,10 +196,11 @@ jobs:
 
     steps:
       - name: Download artifacts produced during the build_wheels and build_sdist jobs
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: dist
+          name: dist-*
           path: dist/
+          merge-multiple: true
 
       - name: Display structure of downloaded files
         run: ls -R
