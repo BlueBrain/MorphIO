@@ -10,7 +10,7 @@ from utils import (assert_swc_exception, captured_output, ignored_warning,
                    strip_color_codes)
 
 from morphio import (MorphioError, Morphology, RawDataError, SomaError,
-                     SomaType, Warning, ostream_redirect, set_raise_warnings)
+                     SomaType, Warning, ostream_redirect, set_raise_warnings, Option)
 
 
 DATA_DIR = Path(__file__).parent / "data"
@@ -568,14 +568,37 @@ def test_throw_on_negative_id():
         Morphology(content, extension='swc')
 
 
+def test_axon_carrying_dendrite():
+    contents =('''
+    1 1 0 0 1 1 -1
+    2 2 0 0 2 2 1
+    3 2 0 0 3 3 2
+
+    4 3 0 0 4 4 3  # dendrite splits off
+    5 3 0 0 5 5 4
+
+    6 2 0 0 6 6 3  # axon carries on
+    7 2 0 0 7 7 3
+               ''')
+    Morphology(contents, "swc")
+    breakpoint() # XXX BREAKPOINT
+
+
 def test_multi_type_section():
     contents =('''1 1 0 4 0 3.0 -1
                   2 6 0 0 2 0.5 1        # <- type 6
                   3 7 0 0 3 0.5 2        # <- type 7
                   4 8 0 0 4 0.5 3        # <- type 8
                   5 9 0 0 5 0.5 4''')    # <- type 9
+
+    with pytest.raises(RawDataError):
+        Morphology(contents, "swc")
+
     warnings = morphio.WarningHandlerCollector()
-    n = Morphology(contents, "swc", warning_handler=warnings)
+    n = Morphology(contents,
+                   "swc",
+                   warning_handler=warnings,
+                   options=Option.unifurcated_section_change)
     assert_array_equal(n.soma.points, [[0, 4, 0]])
     assert_array_equal(n.soma.diameters, [6.0])
     assert len(n.root_sections) == 1
