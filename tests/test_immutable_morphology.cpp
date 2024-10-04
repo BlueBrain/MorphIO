@@ -14,6 +14,7 @@
 #include <morphio/section.h>
 #include <morphio/soma.h>
 #include <morphio/vector_types.h>
+#include <stdexcept>
 
 namespace {
 
@@ -347,5 +348,12 @@ TEST_CASE("warnings-collection") {
         const auto msg = errors[0].warning->msg();
         const auto expected_end_of_msg = std::string("Warning: no soma found in file");
         REQUIRE(std::equal(expected_end_of_msg.rbegin(), expected_end_of_msg.rend(), msg.rbegin()));
+    }
+    {
+        auto warningHandler = std::make_shared<morphio::WarningHandlerCollector>();
+        CHECK_THROWS_AS(warningHandler->getMaxWarningCount(), std::runtime_error);
+        CHECK_THROWS_AS(warningHandler->setMaxWarningCount(1), std::runtime_error);
+        CHECK_THROWS_AS(warningHandler->getRaiseWarnings(), std::runtime_error);
+        CHECK_THROWS_AS(warningHandler->setRaiseWarnings(true), std::runtime_error);
     }
 }

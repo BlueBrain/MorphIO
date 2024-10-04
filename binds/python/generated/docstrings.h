@@ -770,6 +770,18 @@ static const char *mkd_doc_morphio_SectionBuilderError = R"doc()doc";
 
 static const char *mkd_doc_morphio_SectionBuilderError_SectionBuilderError = R"doc()doc";
 
+static const char *mkd_doc_morphio_SectionTypeChanged = R"doc()doc";
+
+static const char *mkd_doc_morphio_SectionTypeChanged_SectionTypeChanged = R"doc()doc";
+
+static const char *mkd_doc_morphio_SectionTypeChanged_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_SectionTypeChanged_lineNumber = R"doc()doc";
+
+static const char *mkd_doc_morphio_SectionTypeChanged_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_SectionTypeChanged_warning = R"doc()doc";
+
 static const char *mkd_doc_morphio_Section_Section = R"doc()doc";
 
 static const char *mkd_doc_morphio_Section_breadth_begin = R"doc(Breadth first iterator)doc";
@@ -862,15 +874,15 @@ static const char *mkd_doc_morphio_SomaNonContour_msg = R"doc()doc";
 
 static const char *mkd_doc_morphio_SomaNonContour_warning = R"doc()doc";
 
-static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint = R"doc()doc";
+static const char *mkd_doc_morphio_SomaNonCylinderOrPoint = R"doc()doc";
 
-static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_SomaNonCynlinderOrPoint = R"doc()doc";
+static const char *mkd_doc_morphio_SomaNonCylinderOrPoint_SomaNonCylinderOrPoint = R"doc()doc";
 
-static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_errorLevel = R"doc()doc";
+static const char *mkd_doc_morphio_SomaNonCylinderOrPoint_errorLevel = R"doc()doc";
 
-static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_msg = R"doc()doc";
+static const char *mkd_doc_morphio_SomaNonCylinderOrPoint_msg = R"doc()doc";
 
-static const char *mkd_doc_morphio_SomaNonCynlinderOrPoint_warning = R"doc()doc";
+static const char *mkd_doc_morphio_SomaNonCylinderOrPoint_warning = R"doc()doc";
 
 static const char *mkd_doc_morphio_Soma_Soma = R"doc()doc";
 
@@ -1068,10 +1080,6 @@ static const char *mkd_doc_morphio_children = R"doc(Return a list of children se
 
 static const char *mkd_doc_morphio_details_errorLink = R"doc()doc";
 
-static const char *mkd_doc_morphio_diff = R"doc(Perform a diff on 2 morphologies, returns True if items differ)doc";
-
-static const char *mkd_doc_morphio_diff_2 = R"doc(Perform a diff on 2 sections, returns True if items differ)doc";
-
 static const char *mkd_doc_morphio_enable_if_immutable = R"doc(Enable if `T` is a immutable morphology.)doc";
 
 static const char *mkd_doc_morphio_enable_if_mutable = R"doc(Enable if `T` is a mutable morphology.)doc";
@@ -1090,11 +1098,7 @@ static const char *mkd_doc_morphio_enums_CellFamily_SPINE = R"doc(Spine)doc";
 
 static const char *mkd_doc_morphio_enums_LogLevel = R"doc()doc";
 
-static const char *mkd_doc_morphio_enums_LogLevel_DEBUG = R"doc()doc";
-
 static const char *mkd_doc_morphio_enums_LogLevel_ERROR = R"doc()doc";
-
-static const char *mkd_doc_morphio_enums_LogLevel_INFO = R"doc()doc";
 
 static const char *mkd_doc_morphio_enums_LogLevel_WARNING = R"doc()doc";
 
@@ -1111,6 +1115,8 @@ static const char *mkd_doc_morphio_enums_Option_NRN_ORDER = R"doc(Order of neuri
 static const char *mkd_doc_morphio_enums_Option_SOMA_SPHERE = R"doc(Interpret morphology soma as a sphere)doc";
 
 static const char *mkd_doc_morphio_enums_Option_TWO_POINTS_SECTIONS = R"doc(Read sections only with 2 or more points)doc";
+
+static const char *mkd_doc_morphio_enums_Option_UNIFURCATED_SECTION_CHANGE = R"doc(Allow section type to change without bifurcation)doc";
 
 static const char *mkd_doc_morphio_enums_SectionType = R"doc(Classification of neuron substructures.)doc";
 
@@ -1218,6 +1224,8 @@ static const char *mkd_doc_morphio_enums_Warning_MITOCHONDRIA_WRITE_NOT_SUPPORTE
 static const char *mkd_doc_morphio_enums_Warning_NO_SOMA_FOUND = R"doc(No soma found in a file)doc";
 
 static const char *mkd_doc_morphio_enums_Warning_ONLY_CHILD = R"doc(Single child sections are not allowed in SWC format)doc";
+
+static const char *mkd_doc_morphio_enums_Warning_SECTION_TYPE_CHANGED = R"doc(In SWC, the type changed within a section, not post bifurcation)doc";
 
 static const char *mkd_doc_morphio_enums_Warning_SOMA_NON_CONFORM = R"doc(Soma does not conform the three point soma spec from NeuroMorpho.org)doc";
 
@@ -1719,10 +1727,6 @@ static const char *mkd_doc_morphio_mut_diameters_3 = R"doc(@{ Return the diamete
 
 static const char *mkd_doc_morphio_mut_diameters_4 = R"doc()doc";
 
-static const char *mkd_doc_morphio_mut_diff = R"doc(Perform a diff on 2 morphologies, returns True if items differ)doc";
-
-static const char *mkd_doc_morphio_mut_diff_2 = R"doc(Perform a diff on 2 sections, returns True if items differ)doc";
-
 static const char *mkd_doc_morphio_mut_friendDtorForSharedPtrMito = R"doc()doc";
 
 static const char *mkd_doc_morphio_mut_id = R"doc(Return the section id)doc";
@@ -1793,8 +1797,6 @@ Throws:
 static const char *mkd_doc_morphio_readers_ErrorLevel = R"doc(Level of error reporting)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorLevel_ERROR = R"doc(Error)doc";
-
-static const char *mkd_doc_morphio_readers_ErrorLevel_INFO = R"doc(Info)doc";
 
 static const char *mkd_doc_morphio_readers_ErrorLevel_WARNING = R"doc(Warning)doc";
 

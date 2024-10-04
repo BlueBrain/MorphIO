@@ -46,7 +46,6 @@ class Soma;
 namespace readers {
 /** Level of error reporting **/
 enum ErrorLevel {
-    INFO,     //!< Info
     WARNING,  //!< Warning
     ERROR     //!< Error
 };

@@ -16,26 +16,24 @@ std::string errorLink(const std::string& uri,
 
     const auto SEVERITY = [](ErrorLevel el) {
         switch (el) {
-        case ErrorLevel::INFO:
-            return "info";
         case ErrorLevel::WARNING:
             return "warning";
         case ErrorLevel::ERROR:
             return "error";
+        default:
+            throw std::runtime_error("Unknown ErrorLevel");
         }
-        throw std::runtime_error("Unknown ErrorLevel");
     };
 
     auto COLOR = [](ErrorLevel el) {
         switch (el) {
-        case ErrorLevel::INFO:
-            return "\033[1;34m";
         case ErrorLevel::WARNING:
             return "\033[1;33m";
         case ErrorLevel::ERROR:
             return "\033[1;31m";
+        default:
+            throw std::runtime_error("Unknown ErrorLevel");
         }
-        throw std::runtime_error("Unknown ErrorLevel");
     };
 
     const std::string COLOR_END("\033[0m");

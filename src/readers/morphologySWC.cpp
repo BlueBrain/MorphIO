@@ -234,14 +234,15 @@ class SWCBuilder
     using Samples = std::vector<SWCSample>;
 
   public:
-    SWCBuilder(std::string path, WarningHandler* warning_handler)
+    SWCBuilder(std::string path, WarningHandler* warning_handler, unsigned int options)
         : path_(std::move(path))
-        , warning_handler_(warning_handler) {}
+        , warning_handler_(warning_handler)
+        , options_(options) {}
 
-    Property::Properties buildProperties(const std::string& contents, unsigned int options) {
+    Property::Properties buildProperties(const std::string& contents) {
         const Samples samples = readSamples(contents, path_);
         buildSWC(samples);
-        morph_.applyModifiers(options);
+        morph_.applyModifiers(options_);
         return morph_.buildReadOnly();
     }
 
@@ -443,7 +444,8 @@ class SWCBuilder
         std::unordered_map<DeclaredID, std::shared_ptr<morphio::mut::Section>>& declared_to_swc,
         const Point& start_point,
         floatType start_diameter,
-        bool is_root) {
+        bool is_root)
+    {
         Property::PointLevel properties;
         auto& points = properties._points;
         auto& diameters = properties._diameters;
@@ -466,8 +468,7 @@ class SWCBuilder
         const SWCSample* sample = &samples_.at(id);
 
         // create duplicate point if needed
-        if (!is_root && sample->point != start_point /*|| sample->diameter != start_diameter */) {
-        //if (!(is_root && sample->type == SECTION_SOMA) && sample->point != start_point /*|| sample->diameter != start_diameter */) {
+        if (!is_root && sample->point != start_point) {
             points.push_back(start_point);
             diameters.push_back(start_diameter);
         }
@@ -477,13 +478,21 @@ class SWCBuilder
         while (children_count == 1) {
             sample = &samples_.at(id);
             if(sample->type != samples_.at(children_.at(id)[0]).type){
-                break;
+                if (options_ & UNIFURCATED_SECTION_CHANGE) {
+                    warning_handler_->emit(
+                        std::make_unique<SectionTypeChanged>(path_, sample->lineNumber));
+                    break;
+                }
+                throw RawDataError("Section type changed without a bifucation at line: " +
+                                   std::to_string(sample->lineNumber) +
+                                   ", consider using UNIFURCATED_SECTION_CHANGE option");
             }
             points.push_back(sample->point);
             diameters.push_back(sample->diameter);
             id = children_.at(id)[0];
             children_count = get_child_count(id);
         }
+
         sample = &samples_.at(id);
         points.push_back(sample->point);
         diameters.push_back(sample->diameter);
@@ -517,8 +526,8 @@ class SWCBuilder
     mut::Morphology morph_;
     std::string path_;
     WarningHandler* warning_handler_;
+    unsigned int options_;
 };
-
 
 }  // namespace details
 
@@ -529,7 +538,7 @@ Property::Properties load(const std::string& path,
                           unsigned int options,
                           std::shared_ptr<WarningHandler>& warning_handler) {
     auto properties =
-        details::SWCBuilder(path, warning_handler.get()).buildProperties(contents, options);
+        details::SWCBuilder(path, warning_handler.get(), options).buildProperties(contents);
 
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"swc", 1, 0};

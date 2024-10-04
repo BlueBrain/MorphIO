@@ -16,8 +16,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Fetch repository
         run: git fetch --prune --unshallow
 
