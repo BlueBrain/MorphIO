@@ -63,7 +63,8 @@ struct SectionTypeChanged: public WarningMessage {
     }
     morphio::readers::ErrorLevel errorLevel = morphio::readers::ErrorLevel::WARNING;
     std::string msg() const final {
-        static const char* description = "Warning: Type changed within section, without bifurcation";
+        static const char* description =
+            "Warning: Type changed within section, without bifurcation";
         return "\n" + details::errorLink(uri, lineNumber, errorLevel) + description;
     }
 

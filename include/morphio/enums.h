@@ -19,7 +19,8 @@ enum Option {
     TWO_POINTS_SECTIONS = 0x01,  //!< Read sections only with 2 or more points
     SOMA_SPHERE = 0x02,          //!< Interpret morphology soma as a sphere
     NO_DUPLICATES = 0x04,        //!< Skip duplicating points
-    NRN_ORDER = 0x08             //!< Order of neurites will be the same as in NEURON simulator
+    NRN_ORDER = 0x08,            //!< Order of neurites will be the same as in NEURON simulator
+    UNIFURCATED_SECTION_CHANGE = 0x10  //!< Allow section type to change without bifurcation
 };
 
 /**
