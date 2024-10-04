@@ -10,7 +10,7 @@ namespace morphio {
 /** A collection of enums for different util purposes **/
 namespace enums {
 
-enum LogLevel { ERROR, WARNING, INFO, DEBUG };
+enum LogLevel { ERROR, WARNING };
 
 /** The list of modifier flags that can be passed when loading a morphology
  * See morphio::mut::modifiers for more information **/

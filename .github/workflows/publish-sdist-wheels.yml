@@ -115,13 +115,29 @@ jobs:
 
       - name: Build wheels Windows
         if: runner.os == 'Windows'
-        shell: cmd
         # the v140 toolchain is used, so that fewer vc_redist installs are required
         # some of the information is available here:
         # https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line
         # but tracking down the 14.0 magic number (and especially newer ones isn't always easy)
         # this has a partial table:
         # https://devblogs.microsoft.com/cppblog/side-by-side-minor-version-msvc-toolsets-in-visual-studio-2017/
+        run: |
+          # vc141 was removed, add it back here: https://github.com/actions/runner-images/issues/9701 
+          Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
+          $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
+          $componentsToAdd= @(
+            "Microsoft.VisualStudio.Component.VC.v141.x86.x64"
+            "Microsoft.VisualStudio.Component.VC.v141.x86.x64.Spectre"
+            )
+          [string]$workloadArgs = $componentsToAdd | ForEach-Object {" --add " +  $_}
+          $Arguments = ('/c', "vs_installer.exe", 'modify', '--installPath', "`"$InstallPath`"",$workloadArgs, '--quiet', '--norestart', '--nocache')
+          # should be run twice
+          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+          $process = Start-Process -FilePath cmd.exe -ArgumentList $Arguments -Wait -PassThru -WindowStyle Hidden
+
+      - name: Build wheels Windows
+        if: runner.os == 'Windows'
+        shell: cmd
         run: |
           C:\windows\system32\tar.exe xf C:\cache\hdf5\${{ env.WINDOWS_HDF5 }}\hdf5.zip
           start /wait msiexec /a "%cd%\hdf\HDF5-${{ env.WINDOWS_HDF5 }}-win64.msi" /qn TARGETDIR="c:\hdf5\"

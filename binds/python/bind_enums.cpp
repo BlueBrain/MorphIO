@@ -21,9 +21,7 @@ void bind_enums(py::module& m) {
 
     py::enum_<morphio::enums::LogLevel>(m, "LogLevel")
         .value("error", morphio::enums::LogLevel::ERROR)
-        .value("warning", morphio::enums::LogLevel::WARNING)
-        .value("info", morphio::enums::LogLevel::INFO)
-        .value("debug", morphio::enums::LogLevel::DEBUG);
+        .value("warning", morphio::enums::LogLevel::WARNING);
 
     py::enum_<morphio::enums::SectionType>(m, "SectionType", py::arithmetic())
         .value("undefined", morphio::enums::SectionType::SECTION_UNDEFINED)
