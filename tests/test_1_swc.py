@@ -581,7 +581,6 @@ def test_axon_carrying_dendrite():
     7 2 0 0 7 7 3
                ''')
     Morphology(contents, "swc")
-    breakpoint() # XXX BREAKPOINT
 
 
 def test_multi_type_section():
