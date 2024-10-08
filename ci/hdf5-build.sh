@@ -1,18 +1,19 @@
 #!/bin/bash
 set -e -x
 
+: "${UNIXY_HDF5_VERSION:=1.14.3}"
+: "${CIBW_ARCHS_MACOS:=$(uname -m)}"
 
 export INPUT=$(cd $(dirname "$1") && pwd -P)/$(basename "$1")
 export OUTPUT="$INPUT/install-$CIBW_ARCHS_MACOS"
 
-: "${UNIXY_HDF5_VERSION:=1.14.3}"
 
 function download_unpack_hdf5 {
     pushd "$INPUT"
     local name=CMake-hdf5-$UNIXY_HDF5_VERSION.tar.gz
     if [[ ! -e $name ]]; then
         echo "Downloading & unpacking HDF5 ${UNIXY_HDF5_VERSION}"
-        curl -fsSLO "https://www.hdfgroup.org/ftp/HDF5/releases/hdf5-${UNIXY_HDF5_VERSION%.*}/hdf5-$UNIXY_HDF5_VERSION/src/$name"
+        curl -fsSLO "https://hdf-wordpress-1.s3.amazonaws.com/wp-content/uploads/manual/HDF5/HDF5_${UNIXY_HDF5_VERSION//\./_}/src/$name"
     fi
     tar xzf "$name"
     popd

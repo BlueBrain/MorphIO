@@ -16,8 +16,6 @@ std::string errorLink(const std::string& uri,
 
     const auto SEVERITY = [](ErrorLevel el) {
         switch (el) {
-        case ErrorLevel::INFO:
-            return "info";
         case ErrorLevel::WARNING:
             return "warning";
         case ErrorLevel::ERROR:
@@ -28,8 +26,6 @@ std::string errorLink(const std::string& uri,
 
     auto COLOR = [](ErrorLevel el) {
         switch (el) {
-        case ErrorLevel::INFO:
-            return "\033[1;34m";
         case ErrorLevel::WARNING:
             return "\033[1;33m";
         case ErrorLevel::ERROR:
