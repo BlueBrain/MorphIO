@@ -13,7 +13,7 @@ function download_unpack_hdf5 {
     local name=CMake-hdf5-$UNIXY_HDF5_VERSION.tar.gz
     if [[ ! -e $name ]]; then
         echo "Downloading & unpacking HDF5 ${UNIXY_HDF5_VERSION}"
-        curl -fsSLO "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-${UNIXY_HDF5_VERSION%.*}/hdf5-$UNIXY_HDF5_VERSION/src/$name"
+        curl -fsSLO "https://hdf-wordpress-1.s3.amazonaws.com/wp-content/uploads/manual/HDF5/HDF5_${UNIXY_HDF5_VERSION//\./_}/src/$name"
     fi
     tar xzf "$name"
     popd
