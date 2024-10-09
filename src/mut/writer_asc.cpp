@@ -54,13 +54,14 @@ void asc(const Morphology& morph,
          const std::string& filename,
          std::shared_ptr<morphio::WarningHandler> handler) {
     if (details::emptyMorphology(morph, handler)) {
-        return;
+        throw morphio::WriterError(morphio::details::ErrorMessages().ERROR_EMPTY_MORPHOLOGY());
     }
 
     details::validateContourSoma(morph, handler);
     details::checkSomaHasSameNumberPointsDiameters(*morph.soma());
     details::validateHasNoMitochondria(morph, handler);
     details::validateHasNoPerimeterData(morph);
+    details::validateRootPointsHaveTwoOrMorePoints(morph);
 
     std::ofstream myfile(filename);
 
@@ -80,7 +81,8 @@ void asc(const Morphology& morph,
         } else if (type == SECTION_APICAL_DENDRITE) {
             myfile << "( (Color Red)\n  (Apical)\n";
         } else {
-            throw WriterError(morphio::details::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(type));
+            throw WriterError(
+                morphio::details::ErrorMessages().ERROR_UNSUPPORTED_SECTION_TYPE(type));
         }
         write_asc_section(myfile, section, 2);
         myfile << ")\n\n";

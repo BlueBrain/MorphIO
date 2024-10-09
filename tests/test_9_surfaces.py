@@ -70,3 +70,36 @@ def test_contour():
     # assert_almost_equal(Morphology(DATA_DIR /  "simple.asc").soma.surface,
     #                     4 * np.pi, decimal=2)
 
+    # single point SWC
+    assert_almost_equal(ImmutMorphology(DATA_DIR /  "simple.swc").soma.surface,
+                        4 * np.pi, decimal=2)
+    assert_almost_equal(Morphology(DATA_DIR /  "simple.swc").soma.surface,
+                        4 * np.pi, decimal=2)
+
+    # SWC three points cylinder
+    assert_almost_equal(ImmutMorphology(DATA_DIR /  "soma_three_points_cylinder.swc").soma.surface,
+                        4 * np.pi * 81, decimal=2)
+    assert_almost_equal(Morphology(DATA_DIR /  "soma_three_points_cylinder.swc").soma.surface,
+                        4 * np.pi * 81, decimal=2)
+
+    # SWC consecutive cylinders  (3 cylinders along X)
+    assert_almost_equal(ImmutMorphology(DATA_DIR /  "soma_cylinders.swc").soma.surface,
+                        2 * np.pi * 40 * 3, decimal=2)
+    assert_almost_equal(Morphology(DATA_DIR /  "soma_cylinders.swc").soma.surface,
+                        2 * np.pi * 40 * 3, decimal=2)
+
+    with pytest.raises(SomaError):
+        Morphology(DATA_DIR /  "no_soma.swc").soma.surface
+
+    assert_almost_equal(Morphology(DATA_DIR /  "soma_single_frustum.swc").soma.surface,
+                        1201.428, decimal=3)
+
+    # SWC multiple frustums
+    assert_almost_equal(ImmutMorphology(DATA_DIR /  "soma_multiple_frustums.swc").soma.surface,
+                        4164.610254415956, decimal=3)
+    assert_almost_equal(Morphology(DATA_DIR /  "soma_multiple_frustums.swc").soma.surface,
+                        4164.610254415956, decimal=3)
+
+    # SWC complex
+    assert_almost_equal(ImmutMorphology(DATA_DIR /  "complexe.swc").soma.surface,
+                        13.980, decimal=2)

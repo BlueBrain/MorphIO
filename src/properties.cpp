@@ -74,10 +74,9 @@ PointLevel& PointLevel::operator=(const PointLevel& other) {
 }
 
 bool SectionLevel::diff(const SectionLevel& other) const {
-    return !(this == &other ||
-             (compare_section_structure(_sections, other._sections) &&
-              morphio::property::compare(_sectionTypes, other._sectionTypes) &&
-              morphio::property::compare(_children, other._children)));
+    return !(this == &other || (compare_section_structure(_sections, other._sections) &&
+                                morphio::property::compare(_sectionTypes, other._sectionTypes) &&
+                                morphio::property::compare(_children, other._children)));
 }
 
 bool SectionLevel::operator==(const SectionLevel& other) const {
@@ -136,9 +135,8 @@ MitochondriaPointLevel::MitochondriaPointLevel(
 }
 
 bool MitochondriaSectionLevel::diff(const MitochondriaSectionLevel& other) const {
-    return !(this == &other ||
-             (compare_section_structure(this->_sections, other._sections) &&
-              morphio::property::compare(this->_children, other._children)));
+    return !(this == &other || (compare_section_structure(this->_sections, other._sections) &&
+                                morphio::property::compare(this->_children, other._children)));
 }
 
 bool MitochondriaSectionLevel::operator==(const MitochondriaSectionLevel& other) const {
@@ -151,13 +149,9 @@ bool MitochondriaSectionLevel::operator!=(const MitochondriaSectionLevel& other)
 
 bool MitochondriaPointLevel::diff(const MitochondriaPointLevel& other) const {
     return !(this == &other ||
-             (morphio::property::compare(
-                  this->_sectionIds, other._sectionIds) &&
-              morphio::property::compare(this->_relativePathLengths,
-                                         other._relativePathLengths)
-                                          &&
-              morphio::property::compare(
-                  this->_diameters, other._diameters)));
+             (morphio::property::compare(this->_sectionIds, other._sectionIds) &&
+              morphio::property::compare(this->_relativePathLengths, other._relativePathLengths) &&
+              morphio::property::compare(this->_diameters, other._diameters)));
 }
 
 bool MitochondriaPointLevel::operator==(const MitochondriaPointLevel& other) const {

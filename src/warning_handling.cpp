@@ -20,8 +20,9 @@ std::string errorLink(const std::string& uri,
             return "warning";
         case ErrorLevel::ERROR:
             return "error";
+        default:
+            throw std::runtime_error("Unknown ErrorLevel");
         }
-        throw std::runtime_error("Unknown ErrorLevel");
     };
 
     auto COLOR = [](ErrorLevel el) {
@@ -30,8 +31,9 @@ std::string errorLink(const std::string& uri,
             return "\033[1;33m";
         case ErrorLevel::ERROR:
             return "\033[1;31m";
+        default:
+            throw std::runtime_error("Unknown ErrorLevel");
         }
-        throw std::runtime_error("Unknown ErrorLevel");
     };
 
     const std::string COLOR_END("\033[0m");
