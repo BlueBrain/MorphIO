@@ -24,7 +24,7 @@ jobs:
 
       - name: Build a source tarball
         run:
-          python setup.py sdist
+          python -m build --sdist
 
       - name: Test tarball
         run: |
