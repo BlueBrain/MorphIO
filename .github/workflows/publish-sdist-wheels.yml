@@ -6,7 +6,7 @@ env:
 
   CIBW_BUILD_VERBOSITY: 1
   CIBW_BUILD: 'cp*'
-  CIBW_SKIP: 'cp35-* cp36-* cp37-* cp313-* *-manylinux_i686 *-musllinux_* *-win32'
+  CIBW_SKIP: 'cp35-* cp36-* cp37-* cp38-* *-manylinux_i686 *-musllinux_* *-win32'
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
   CIBW_TEST_COMMAND: pytest -s -v {project}/tests
   UNIXY_HDF5_VERSION: 1.14.3
@@ -39,7 +39,7 @@ jobs:
 
       - name: Cache HDF5 On Linux/macOS
         if: runner.os == 'Linux' || runner.os == 'macOS'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-hdf5-posix
         env:
           cache-name: cache-hdf5-posix
@@ -98,7 +98,7 @@ jobs:
       - name: Cache HDF5 On Windows
         if: runner.os == 'Windows'
         id: cache-hdf5-windows
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-hdf5-windows
         with:
