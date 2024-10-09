@@ -467,8 +467,7 @@ class SWCBuilder
         const SWCSample* sample = &samples_.at(id);
 
         // create duplicate point if needed
-        if (!is_root && sample->point != start_point /*|| sample->diameter != start_diameter */) {
-        //if (!(is_root && sample->type == SECTION_SOMA) && sample->point != start_point /*|| sample->diameter != start_diameter */) {
+        if (!is_root && sample->point != start_point) {
             points.push_back(start_point);
             diameters.push_back(start_diameter);
         }
