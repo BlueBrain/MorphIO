@@ -19,7 +19,7 @@ def test_doc_exists():
         morphio.mut.Soma,
     ]
     for cls in classes:
-        public_methods = (method for method in dir(cls) if not method[:2] == '__')
+        public_methods = (method for method in dir(cls) if not method.startswith("_"))
         for method in public_methods:
             assert getattr(cls, method).__doc__, \
                 'Public method {} of class {} is not documented !'.format(method, cls)

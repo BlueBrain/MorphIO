@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.15)
 #allow using of HDF5_ROOT for building with a custom HDF5 version
 cmake_policy(SET CMP0074 NEW)
 project(MorphIO VERSION 2.0.0)
@@ -42,6 +42,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if (EXTERNAL_HIGHFIVE)
   find_package(HighFive REQUIRED)
 endif()
+
+set(PYBIND11_NEWPYTHON ON)
+
 if (EXTERNAL_PYBIND11)
   find_package(pybind11 REQUIRED CONFIG)
 endif()
