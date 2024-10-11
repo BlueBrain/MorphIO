@@ -172,6 +172,7 @@ The following flags are supported:
     each section is no longer the last point of the parent section.
 * ``morphio::NRN_ORDER``\: Neurite are reordered according to the
     `NEURON simulator ordering <https://github.com/neuronsimulator/nrn/blob/2dbf2ebf95f1f8e5a9f0565272c18b1c87b2e54c/share/lib/hoc/import3d/import3d_gui.hoc#L874>`_
+* ``morphio::UNIFURCATED_SECTION_CHANGE``\: Allow section type to change without bifurcation, emits warning
 
 Multiple flags can be passed by using the standard bit flag manipulation (works the same way in C++
 and Python):

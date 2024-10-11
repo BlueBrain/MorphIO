@@ -144,7 +144,6 @@ private:
 struct SWCSample {
     enum : unsigned int { UNKNOWN_ID = 0xFFFFFFFE };
 
-    SWCSample() = default;  // XXX
     floatType diameter = -1.;
     Point point{};
     SectionType type = SECTION_UNDEFINED;
@@ -234,14 +233,15 @@ class SWCBuilder
     using Samples = std::vector<SWCSample>;
 
   public:
-    SWCBuilder(std::string path, WarningHandler* warning_handler)
+    SWCBuilder(std::string path, WarningHandler* warning_handler, unsigned int options)
         : path_(std::move(path))
-        , warning_handler_(warning_handler) {}
+        , warning_handler_(warning_handler)
+        , options_(options) {}
 
-    Property::Properties buildProperties(const std::string& contents, unsigned int options) {
+    Property::Properties buildProperties(const std::string& contents) {
         const Samples samples = readSamples(contents, path_);
         buildSWC(samples);
-        morph_.applyModifiers(options);
+        morph_.applyModifiers(options_);
         return morph_.buildReadOnly();
     }
 
@@ -305,10 +305,6 @@ class SWCBuilder
         for (const auto& s : soma_samples) {
             if (s.parentId == SWC_ROOT) {
                 parent_count++;
-            } else if (samples_.count(s.parentId) == 0) {
-                details::ErrorMessages err_(path_);
-                throw MissingParentError(
-                    err_.ERROR_MISSING_PARENT(s.id, static_cast<int>(s.parentId), s.lineNumber));
             } else if (samples_.at(s.parentId).type != SECTION_SOMA) {
                 details::ErrorMessages err_(path_);
                 throw SomaError(err_.ERROR_SOMA_WITH_NEURITE_PARENT(s.lineNumber));
@@ -477,7 +473,14 @@ class SWCBuilder
         while (children_count == 1) {
             sample = &samples_.at(id);
             if(sample->type != samples_.at(children_.at(id)[0]).type){
-                break;
+                if (options_ & ALLOW_UNIFURCATED_SECTION_CHANGE) {
+                    warning_handler_->emit(
+                        std::make_unique<SectionTypeChanged>(path_, sample->lineNumber));
+                    break;
+                }
+                throw RawDataError("Section type changed without a bifucation at line: " +
+                                   std::to_string(sample->lineNumber) +
+                                   ", consider using UNIFURCATED_SECTION_CHANGE option");
             }
             points.push_back(sample->point);
             diameters.push_back(sample->diameter);
@@ -518,8 +521,8 @@ class SWCBuilder
     mut::Morphology morph_;
     std::string path_;
     WarningHandler* warning_handler_;
+    unsigned int options_;
 };
-
 
 }  // namespace details
 
@@ -530,7 +533,7 @@ Property::Properties load(const std::string& path,
                           unsigned int options,
                           std::shared_ptr<WarningHandler>& warning_handler) {
     auto properties =
-        details::SWCBuilder(path, warning_handler.get()).buildProperties(contents, options);
+        details::SWCBuilder(path, warning_handler.get(), options).buildProperties(contents);
 
     properties._cellLevel._cellFamily = NEURON;
     properties._cellLevel._version = {"swc", 1, 0};

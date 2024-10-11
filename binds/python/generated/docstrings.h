@@ -770,6 +770,18 @@ static const char *mkd_doc_morphio_SectionBuilderError = R"doc()doc";
 
 static const char *mkd_doc_morphio_SectionBuilderError_SectionBuilderError = R"doc()doc";
 
+static const char *mkd_doc_morphio_SectionTypeChanged = R"doc()doc";
+
+static const char *mkd_doc_morphio_SectionTypeChanged_SectionTypeChanged = R"doc()doc";
+
+static const char *mkd_doc_morphio_SectionTypeChanged_errorLevel = R"doc()doc";
+
+static const char *mkd_doc_morphio_SectionTypeChanged_lineNumber = R"doc()doc";
+
+static const char *mkd_doc_morphio_SectionTypeChanged_msg = R"doc()doc";
+
+static const char *mkd_doc_morphio_SectionTypeChanged_warning = R"doc()doc";
+
 static const char *mkd_doc_morphio_Section_Section = R"doc()doc";
 
 static const char *mkd_doc_morphio_Section_breadth_begin = R"doc(Breadth first iterator)doc";
@@ -1094,6 +1106,8 @@ static const char *mkd_doc_morphio_enums_Option =
 R"doc(The list of modifier flags that can be passed when loading a
 morphology See morphio::mut::modifiers for more information)doc";
 
+static const char *mkd_doc_morphio_enums_Option_ALLOW_UNIFURCATED_SECTION_CHANGE = R"doc(Allow section type to change without bifurcation)doc";
+
 static const char *mkd_doc_morphio_enums_Option_NO_DUPLICATES = R"doc(Skip duplicating points)doc";
 
 static const char *mkd_doc_morphio_enums_Option_NO_MODIFIER = R"doc(Read morphology as is without any modification)doc";
@@ -1210,6 +1224,8 @@ static const char *mkd_doc_morphio_enums_Warning_MITOCHONDRIA_WRITE_NOT_SUPPORTE
 static const char *mkd_doc_morphio_enums_Warning_NO_SOMA_FOUND = R"doc(No soma found in a file)doc";
 
 static const char *mkd_doc_morphio_enums_Warning_ONLY_CHILD = R"doc(Single child sections are not allowed in SWC format)doc";
+
+static const char *mkd_doc_morphio_enums_Warning_SECTION_TYPE_CHANGED = R"doc(In SWC, the type changed within a section, not post bifurcation)doc";
 
 static const char *mkd_doc_morphio_enums_Warning_SOMA_NON_CONFORM = R"doc(Soma does not conform the three point soma spec from NeuroMorpho.org)doc";
 
