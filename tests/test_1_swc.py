@@ -584,6 +584,12 @@ def test_axon_carrying_dendrite():
 
 
 def test_multi_type_section():
+    """
+    A section within MorphIO is defined as a series of segments between
+    bifurcation/multifurcation points.  However, SWC files allow section
+    change without a branch. Normal parsing of this will raise an
+    exception, but can be allowed using the option `UNIFURCATED_SECTION_CHANGE`
+    """
     contents =('''1 1 0 4 0 3.0 -1
                   2 6 0 0 2 0.5 1        # <- type 6
                   3 7 0 0 3 0.5 2        # <- type 7
