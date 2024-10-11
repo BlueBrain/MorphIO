@@ -603,7 +603,7 @@ def test_multi_type_section():
     n = Morphology(contents,
                    "swc",
                    warning_handler=warnings,
-                   options=Option.unifurcated_section_change)
+                   options=Option.allow_unifurcated_section_change)
     assert_array_equal(n.soma.points, [[0, 4, 0]])
     assert_array_equal(n.soma.diameters, [6.0])
     assert len(n.root_sections) == 1

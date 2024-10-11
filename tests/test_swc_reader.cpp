@@ -2,6 +2,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+#include <morphio/enums.h>
 #include <morphio/exceptions.h>
 #include <morphio/morphology.h>
 #include <morphio/section.h>
@@ -161,5 +162,19 @@ TEST_CASE("morphio::swc::working") {
         const auto m = Morphology(aod, "swc");
         REQUIRE(m.sections().size() == 3);
         REQUIRE(m.diameters().size() == 6);
+    }
+
+    SECTION("section_type_change") {
+        const auto* changes = R"(
+1 1 0 4 0 3.0 -1
+2 6 0 0 2 0.5 1        # <- type 6
+3 7 0 0 3 0.5 2        # <- type 7
+4 8 0 0 4 0.5 3        # <- type 8
+5 9 0 0 5 0.5 4        # <- type 9
+        )";
+        CHECK_THROWS_AS(Morphology(changes, "swc"), RawDataError);
+        const auto m =
+            Morphology(changes, "swc", morphio::Option::ALLOW_UNIFURCATED_SECTION_CHANGE);
+        REQUIRE(m.sections().size() == 4);
     }
 }

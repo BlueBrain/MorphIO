@@ -473,7 +473,7 @@ class SWCBuilder
         while (children_count == 1) {
             sample = &samples_.at(id);
             if(sample->type != samples_.at(children_.at(id)[0]).type){
-                if (options_ & UNIFURCATED_SECTION_CHANGE) {
+                if (options_ & ALLOW_UNIFURCATED_SECTION_CHANGE) {
                     warning_handler_->emit(
                         std::make_unique<SectionTypeChanged>(path_, sample->lineNumber));
                     break;

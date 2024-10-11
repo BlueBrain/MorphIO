@@ -1106,6 +1106,8 @@ static const char *mkd_doc_morphio_enums_Option =
 R"doc(The list of modifier flags that can be passed when loading a
 morphology See morphio::mut::modifiers for more information)doc";
 
+static const char *mkd_doc_morphio_enums_Option_ALLOW_UNIFURCATED_SECTION_CHANGE = R"doc(Allow section type to change without bifurcation)doc";
+
 static const char *mkd_doc_morphio_enums_Option_NO_DUPLICATES = R"doc(Skip duplicating points)doc";
 
 static const char *mkd_doc_morphio_enums_Option_NO_MODIFIER = R"doc(Read morphology as is without any modification)doc";
@@ -1115,8 +1117,6 @@ static const char *mkd_doc_morphio_enums_Option_NRN_ORDER = R"doc(Order of neuri
 static const char *mkd_doc_morphio_enums_Option_SOMA_SPHERE = R"doc(Interpret morphology soma as a sphere)doc";
 
 static const char *mkd_doc_morphio_enums_Option_TWO_POINTS_SECTIONS = R"doc(Read sections only with 2 or more points)doc";
-
-static const char *mkd_doc_morphio_enums_Option_UNIFURCATED_SECTION_CHANGE = R"doc(Allow section type to change without bifurcation)doc";
 
 static const char *mkd_doc_morphio_enums_SectionType = R"doc(Classification of neuron substructures.)doc";
 
