@@ -111,7 +111,7 @@ jobs:
         # this has a partial table:
         # https://devblogs.microsoft.com/cppblog/side-by-side-minor-version-msvc-toolsets-in-visual-studio-2017/
         run: |
-          # vc141 was removed, add it back here: https://github.com/actions/runner-images/issues/9701 
+          # vc141 was removed, add it back here: https://github.com/actions/runner-images/issues/9701
           Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
           $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
           $componentsToAdd= @(
@@ -187,7 +187,7 @@ jobs:
       - name: Download artifacts produced during the build_wheels and build_sdist jobs
         uses: actions/download-artifact@v4
         with:
-          name: dist-*
+          pattern: dist-*
           path: dist/
           merge-multiple: true
 
