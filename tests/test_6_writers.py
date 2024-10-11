@@ -1,16 +1,22 @@
 # Copyright (c) 2013-2023, EPFL/Blue Brain Project
 # SPDX-License-Identifier: Apache-2.0
+from pathlib import Path
+
 import h5py
 import numpy as np
+
 import morphio
 from morphio import MitochondriaPointLevel
 from morphio import Morphology as ImmutMorphology
-from morphio import PointLevel, SectionBuilderError, SectionType, WriterError, ostream_redirect, SomaType
+from morphio import PointLevel, RawDataError, SectionType, WriterError, ostream_redirect, SomaType
 from morphio.mut import Morphology
+
 import pytest
+
 from numpy.testing import assert_array_equal, assert_almost_equal
 from utils import captured_output
 
+DATA_DIR = Path(__file__).parent / "data"
 
 def test_write_empty_file(tmp_path):
     '''Check that empty morphology are not written to disk'''
@@ -18,8 +24,8 @@ def test_write_empty_file(tmp_path):
         with ostream_redirect(stdout=True, stderr=True):
             for ext in ['asc', 'swc', 'h5']:
                 outname = tmp_path / f'empty.{ext}'
-                Morphology().write(outname)
-                assert not outname.exists()
+                with pytest.raises(WriterError, match='Morphology is empty.'):
+                    Morphology().write(outname)
 
 
 def test_write_undefined_soma(tmp_path):
@@ -319,20 +325,17 @@ def test_single_point_root_section(tmp_path):
     points = []
     diameters = []
 
-    # To hide warning: appending empty section
-    with captured_output():
-        with ostream_redirect(stdout=True, stderr=True):
-            m.append_root_section(PointLevel(points, diameters), SectionType(2))
-            with pytest.raises(SectionBuilderError):
-                m.write(tmp_path / "h5/empty_vasculature.h5")
+    m.append_root_section(PointLevel(points, diameters), SectionType(2))
+    with pytest.raises(RawDataError):
+        m.write(tmp_path / "empty_vasculature.h5")
 
     m = Morphology()
     points = [[1., 1., 1.]]
     diameters = [2.]
     m.append_root_section(PointLevel(points, diameters), SectionType(2))
 
-    with pytest.raises(SectionBuilderError):
-        m.write(tmp_path / "h5/empty_vasculature.h5")
+    with pytest.raises(RawDataError):
+        m.write(tmp_path / "empty_vasculature.h5")
 
 
 def test_write_custom_property__throws(tmp_path):
@@ -397,3 +400,10 @@ def test_write_soma_invariants(tmp_path):
 
     with pytest.raises(WriterError):
         morph.write(tmp_path / "test_write.h5")
+
+
+def test_diameter_mismatch(tmp_path):
+    morph = Morphology(DATA_DIR / 'simple.swc')
+    morph.soma.diameters = []
+    with pytest.raises(WriterError, match='Vector length mismatch:'):
+        morph.write(tmp_path / "diameter-sample-mismatch.swc")

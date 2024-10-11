@@ -19,14 +19,19 @@ jobs:
         uses: actions/checkout@v4
       - name: Fetch repository
         run: git fetch --prune --unshallow
+
       - name: Get submodules
         run: git submodule update --init --force --recursive
+
       - name: Install packages
         run: |
           sudo apt-get ${{env.apt_options}} update -y
-          sudo apt-get ${{env.apt_options}} install -y build-essential libhdf5-dev lcov
+          sudo apt-get ${{env.apt_options}} install -y build-essential libhdf5-dev lcov language-pack-de
       - name: Build and run unittests
-        run: ci/coverage_test.sh
+        run: |
+          locale -a 
+          ci/coverage_test.sh
+
       - name: Upload Coverage to Coveralls
         uses: coverallsapp/github-action@master
         with:

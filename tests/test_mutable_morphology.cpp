@@ -131,9 +131,9 @@ TEST_CASE("writing", "[mutableMorphology]") {
          * morphio::WriterError); */
         /* } */
 
-        {  // Can write empty morphologies
+        {  // Can't write empty morphologies
             morphio::mut::Morphology morph;
-            morph.write(tmpDirectory / "empty.swc");
+            CHECK_THROWS_AS(morph.write(tmpDirectory / "empty.swc"), morphio::WriterError);
         }
 
         {  // Can write morph with no soma

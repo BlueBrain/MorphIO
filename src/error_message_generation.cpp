@@ -13,7 +13,7 @@ std::string errorMsg(const std::string& uri,
                      const std::string& msg) {
     return "\n" + (uri.empty() ? "" : errorLink(uri, lineNumber, errorLevel) + "\n") + msg;
 }
-} // namespace
+}  // namespace
 
 // LCOV_EXCL_START {  all the error messages are excluded from coverage
 
@@ -82,8 +82,14 @@ std::string ErrorMessages::ERROR_REPEATED_ID(const unsigned int originalId,
                     newLineNumber,
                     ErrorLevel::WARNING,
                     "Repeated ID: " + std::to_string(originalId)) +
-           "\nID already appears here: \n" +
-           errorLink(_uri, originalLineNumber, ErrorLevel::WARNING);
+           "\nID already appears here: \n" + errorLink(_uri, originalLineNumber, ErrorLevel::WARNING);
+}
+
+std::string ErrorMessages::EARLY_END_OF_FILE(long unsigned int lineNumber) const {
+    return errorMsg(_uri,
+                    lineNumber,
+                    ErrorLevel::ERROR,
+                    "The end of the file was reached before parsing finshed");
 }
 
 std::string ErrorMessages::ERROR_SELF_PARENT(const unsigned int lineNumber) const {
@@ -98,6 +104,13 @@ std::string ErrorMessages::ERROR_MISSING_MITO_PARENT(int mitoParentId) const {
     return "While trying to append new mitochondria section.\n"
            "Mitochondrial parent section: " +
            std::to_string(mitoParentId) + " does not exist.";
+}
+
+std::string ErrorMessages::ERROR_NEGATIVE_ID(long unsigned int lineNumber) const {
+    return errorMsg(_uri,
+                    lineNumber,
+                    ErrorLevel::WARNING,
+                    "The ID assigned to this line is negative");
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -157,6 +170,9 @@ std::string ErrorMessages::ERROR_UNCOMPATIBLE_FLAGS(morphio::Option flag1,
 ////////////////////////////////////////////////////////////////////////////////
 //              WRITERS
 ////////////////////////////////////////////////////////////////////////////////
+std::string ErrorMessages::ERROR_EMPTY_MORPHOLOGY() const {
+    return errorMsg(_uri, 0, ErrorLevel::ERROR, "Morphology is empty.");
+}
 
 std::string ErrorMessages::ERROR_UNSUPPORTED_SECTION_TYPE(const SectionType& type) const {
     return ("Attempted to write unsupported section type: " + std::to_string(type) +

@@ -104,7 +104,7 @@ void bind_warnings_exceptions(py::module& m) {
     (void) C(WriteUndefinedSoma);
     (void) C(MitochondriaWriteNotSupported);
     (void) C(SomaNonContour);
-    (void) C(SomaNonCynlinderOrPoint);
+    (void) C(SomaNonCylinderOrPoint);
 #undef QUOTE
 #undef C
 }

@@ -57,12 +57,9 @@ VascPointLevel::VascPointLevel(const VascPointLevel& data, SectionRange range) {
 bool VascSectionLevel::diff(const VascSectionLevel& other) const {
     return this == &other ||
            (compare_section_structure(this->_sections, other._sections) &&
-            morphio::property::compare(
-                this->_sectionTypes, other._sectionTypes) &&
-            morphio::property::compare(
-                this->_predecessors, other._predecessors) &&
-            morphio::property::compare(
-                this->_successors, other._successors));
+            morphio::property::compare(this->_sectionTypes, other._sectionTypes) &&
+            morphio::property::compare(this->_predecessors, other._predecessors) &&
+            morphio::property::compare(this->_successors, other._successors));
 }
 
 bool VascSectionLevel::operator==(const VascSectionLevel& other) const {

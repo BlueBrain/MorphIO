@@ -1,3 +1,33 @@
+v3.4.0
+======
+Improvements:
+* New SWC parser:
+    * handles `locale` correctly, so decimal numbers using comma are allowed
+    * ~800 line SWC parse time goes from 0.976 to 0.699
+    * Doesn't create changes to bifurcations at the root nodes of SWC files
+    * More strict Neuromorpho 3 point soma checks
+    * disallow repeated Sample IDs
+    * Follow https://swc-specification.readthedocs.io/en/latest/swc.html more closely
+    * Allow only positive integer Sample IDs 
+    * Allow for the type of neurite to change at bifurcation points
+    * Allow Window style `End of Lines`
+    * allow trailing spaces on sample lines
+
+* Since this is a large change to the SWC parser, the minor release was increased 
+
+v3.3.10
+=======
+* This is primarily so that 3.13 wheels exist before the new SWC parser is put into production.
+* try to work around removal of older MSVC tools
+* Remove Errorlevel::Info; it's not an error if it's only informative
+* Update upload/download actions to v4.
+* update HDF5 url
+* Update HighFive to 2.10.0
+
+v3.3.9
+======
+* remove embarrassing debug print; Hat-tip SarahM
+
 v3.3.8
 ======
 * Make ThreePointSoma use relative tolerance (494)

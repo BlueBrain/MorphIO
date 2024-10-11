@@ -52,9 +52,7 @@ class ErrorMessages
     std::string ERROR_MULTIPLE_SOMATA(const std::vector<unsigned int>& lineNumbers) const;
 
     /** Missing section parent error message */
-    std::string ERROR_MISSING_PARENT(unsigned int id,
-                                     int parentId,
-                                     unsigned int lineNumber) const;
+    std::string ERROR_MISSING_PARENT(unsigned int id, int parentId, unsigned int lineNumber) const;
 
     /** Bifurcating soma error message */
     std::string ERROR_SOMA_BIFURCATION(unsigned int sampleLineNumber,
@@ -71,11 +69,20 @@ class ErrorMessages
     /** Section self parent error message */
     std::string ERROR_SELF_PARENT(unsigned int lineNumber) const;
 
+    /** The end of the file was reached before parsing finshed */
+    std::string EARLY_END_OF_FILE(long unsigned int lineNumber) const;
+
     /** Undefined soma error message */
     std::string ERROR_NOT_IMPLEMENTED_UNDEFINED_SOMA(const std::string&) const;
 
     /** Missing mitochondria parent section error message */
     std::string ERROR_MISSING_MITO_PARENT(int mitoParentId) const;
+
+    ////////////////////////////////////////////////////////////////////////////////
+    //             SWC
+    ////////////////////////////////////////////////////////////////////////////////
+    /** A negative ID is used in SWC */
+    std::string ERROR_NEGATIVE_ID(long unsigned int lineNumber) const;
 
     ////////////////////////////////////////////////////////////////////////////////
     //             NEUROLUCIDA
@@ -111,6 +118,9 @@ class ErrorMessages
     //              WRITERS
     ////////////////////////////////////////////////////////////////////////////////
 
+    /** Morphology is empty */
+    std::string ERROR_EMPTY_MORPHOLOGY() const;
+
     /** Unsupported morphology section type error message */
     std::string ERROR_UNSUPPORTED_SECTION_TYPE(const enums::SectionType& type) const;
 
@@ -125,6 +135,7 @@ class ErrorMessages
 
     /** Can't write perimeter data to SWC, ASC error message */
     std::string ERROR_PERIMETER_DATA_NOT_WRITABLE();
+
     /** Single section child SWC error message */
     std::string ERROR_ONLY_CHILD_SWC_WRITER(unsigned int parentId) const;
 
@@ -136,6 +147,7 @@ class ErrorMessages
 
     /** Contour soma must have at least 3 points. */
     std::string ERROR_SOMA_INVALID_CONTOUR() const;
+
   private:
     std::string _uri;
 };

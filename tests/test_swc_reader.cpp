@@ -4,43 +4,71 @@
  */
 #include <morphio/exceptions.h>
 #include <morphio/morphology.h>
+#include <morphio/section.h>
+#include <morphio/soma.h>
 
 #include <catch2/catch.hpp>
 
 using namespace morphio;
 
 
-TEST_CASE("morphio::swc") {
-    /*
+TEST_CASE("morphio::swc::errors") {
+    SECTION("super-early-file-end") {
+        const auto* contents = R"(
+1
+        )";
+        CHECK_THROWS_AS(Morphology(contents, "swc"), RawDataError);
+    }
+
+    SECTION("early-file-end") {
+        const auto* contents = R"(
+-100 1 0 0 1
+        )";
+        CHECK_THROWS_AS(Morphology(contents, "swc"), RawDataError);
+    }
+
     SECTION("negative_id") {
-        const auto* negative_id = R"(
+        const auto* contents = R"(
 -100 1 0 0 1 0.5 -1
         )";
-        CHECK_THROWS_AS(Morphology(negative_id, "swc"), RawDataError);
+        CHECK_THROWS_AS(Morphology(contents, "swc"), RawDataError);
     }
-    */
+
+    SECTION("negative_id_parent") {
+        const auto* contents = R"(
+100 1 0 0 1 0.5 -10
+        )";
+        CHECK_THROWS_AS(Morphology(contents, "swc"), RawDataError);
+    }
+
+    SECTION("unparseable") {
+        const auto* contents = R"(
+100 1 0 0 1 0.5 -10 this is some random text that isn't commented
+        )";
+        CHECK_THROWS_AS(Morphology(contents, "swc"), RawDataError);
+    }
 
     SECTION("repeated_id") {
-        const auto* repeated_id = R"(
+        const auto* contents = R"(
 1 1 0 0 1 0.5 -1
 2 3 0 0 2 0.5 1
 2 3 0 0 2 0.5 1 # <-- repeated id
         )";
-        CHECK_THROWS_AS(Morphology(repeated_id, "swc"), RawDataError);
+        CHECK_THROWS_AS(Morphology(contents, "swc"), RawDataError);
     }
 
     SECTION("unsupported_section_type") {
-        const auto* unsupported_section_type = R"(
+        const auto* contents = R"(
 1 10000 0 0 1 0.5 -1
         )";
-        CHECK_THROWS_AS(Morphology(unsupported_section_type, "swc"), RawDataError);
+        CHECK_THROWS_AS(Morphology(contents, "swc"), RawDataError);
     }
 
     SECTION("non_parsable") {
-        const auto* non_parsable = R"(
+        const auto* contents = R"(
 1 1 0 0 1 .5 "-1"
         )";
-        CHECK_THROWS_AS(Morphology(non_parsable, "swc"), RawDataError);
+        CHECK_THROWS_AS(Morphology(contents, "swc"), RawDataError);
     }
 
     SECTION("soma_multi_bifurcation") {
@@ -83,5 +111,34 @@ TEST_CASE("morphio::swc") {
 2 1 0 0 1 .5 -1
         )";
         CHECK_THROWS_AS(Morphology(multiple_soma, "swc"), SomaError);
+    }
+}
+
+TEST_CASE("morphio::swc::working") {
+    SECTION("no-soma") {
+        const auto* no_soma = R"(
+1 2 0 0 1 .5 -1
+2 2 0 0 1 .5 1
+3 2 0 0 1 .5 -1
+4 2 0 0 1 .5 3
+        )";
+        const auto m = Morphology(no_soma, "swc");
+
+        REQUIRE(m.soma().points().empty());
+        REQUIRE(m.somaType() == morphio::SomaType::SOMA_UNDEFINED);
+        REQUIRE(m.diameters().size() == 4);
+    }
+
+    SECTION("chimera-axon-on-dendrite") {
+        const auto* no_soma = R"(
+1 1 0 0 1 1 -1
+2 2 0 0 2 2 1
+3 2 0 0 3 3 2
+4 3 0 0 4 4 3
+5 3 0 0 5 5 4
+        )";
+        const auto m = Morphology(no_soma, "swc");
+        REQUIRE(m.sections().size() == 2);
+        REQUIRE(m.diameters().size() == 5);
     }
 }

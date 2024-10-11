@@ -4,7 +4,7 @@
  */
 #include <algorithm>  // std::max
 #include <bitset>
-#include <cmath>  // std::fabs
+#include <cmath>   // std::fabs
 #include <limits>  // std::numeric_limits
 
 #include "error_message_generation.h"
@@ -153,6 +153,8 @@ std::ostream& operator<<(std::ostream& os, ThreePointSomaStatus s) {
     case Conforms:
         os << "Three Point Soma: conforms to specification";
         break;
+    default:    // LCOV_EXCL_LINE
+        break;  // LCOV_EXCL_LINE
     }
     return os;
 }

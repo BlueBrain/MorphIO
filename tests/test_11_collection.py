@@ -85,4 +85,4 @@ def test_container_with_warning_handler():
     with morphio.Collection(DATA_DIR) as collection:
         warning_handler = morphio.WarningHandlerCollector()
         collection.load('neurite_wrong_root_point', warning_handler=warning_handler)
-        assert len(warning_handler.get_all()) == 3
+        assert len(warning_handler.get_all()) == 2

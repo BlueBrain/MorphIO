@@ -13,8 +13,9 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5Object.hpp>
 
-#include "../shared_utils.hpp"
 #include "../error_message_generation.h"
+#include "../shared_utils.hpp"
+#include "morphio/exceptions.h"
 #include "writer_utils.h"
 
 namespace {
@@ -151,11 +152,12 @@ void h5(const Morphology& morph,
         const std::string& filename,
         std::shared_ptr<morphio::WarningHandler> handler) {
     if (details::emptyMorphology(morph, handler)) {
-        return;
+        throw morphio::WriterError(morphio::details::ErrorMessages().ERROR_EMPTY_MORPHOLOGY());
     }
 
     details::validateContourSoma(morph, handler);
     details::checkSomaHasSameNumberPointsDiameters(*morph.soma());
+    details::validateRootPointsHaveTwoOrMorePoints(morph);
 
     HighFive::File h5_file(filename,
                            HighFive::File::ReadWrite | HighFive::File::Create |
@@ -169,7 +171,6 @@ void h5(const Morphology& morph,
 
     const std::vector<Point>& somaPoints = morph.soma()->points();
     const auto& somaDiameters = morph.soma()->diameters();
-
     for (unsigned int i = 0; i < somaPoints.size(); ++i) {
         raw_points.push_back(
             {somaPoints[i][0], somaPoints[i][1], somaPoints[i][2], somaDiameters[i]});

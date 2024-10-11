@@ -20,8 +20,8 @@
 #include <highfive/H5File.hpp>
 #include <highfive/H5Object.hpp>
 
-#include "../shared_utils.hpp"
 #include "../error_message_generation.h"
+#include "../shared_utils.hpp"
 #include "writer_utils.h"
 
 namespace {
@@ -122,7 +122,7 @@ void validateSWCSoma(const morphio::mut::Morphology& morph,
     } else if (!(soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS ||
                  soma->type() == SomaType::SOMA_CYLINDERS ||
                  soma->type() == SomaType::SOMA_SINGLE_POINT)) {
-        handler->emit(std::make_shared<morphio::SomaNonCynlinderOrPoint>());
+        handler->emit(std::make_shared<morphio::SomaNonCylinderOrPoint>());
     } else if (soma->type() == SomaType::SOMA_SINGLE_POINT && soma_points.size() != 1) {
         throw WriterError(ErrorMessages().ERROR_SOMA_INVALID_SINGLE_POINT());
     } else if (soma->type() == SomaType::SOMA_NEUROMORPHO_THREE_POINT_CYLINDERS &&
@@ -142,7 +142,8 @@ void swc(const Morphology& morph,
          const std::string& filename,
          std::shared_ptr<morphio::WarningHandler> handler) {
     if (details::emptyMorphology(morph, handler)) {
-        return;
+        throw morphio::WriterError(
+            morphio::details::ErrorMessages(filename).ERROR_EMPTY_MORPHOLOGY());
     }
 
     const std::shared_ptr<Soma>& soma = morph.soma();

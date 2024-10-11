@@ -1,6 +1,7 @@
 set(TESTS_SRC
         main.cpp
         test_collection.cpp
+        test_enums.cpp
         test_immutable_morphology.cpp
         test_mitochondria.cpp
         test_morphology_readers.cpp
@@ -42,7 +43,7 @@ if (MORPHIO_ENABLE_COVERAGE)
   include(CodeCoverage)
   SETUP_TARGET_FOR_COVERAGE_LCOV(
       NAME coverage
-      EXECUTABLE ctest
+      EXECUTABLE ctest --output-on-failure
       DEPENDENCIES unittests
       EXCLUDE "/usr/*" "${PROJECT_SOURCE_DIR}/include/*" "${PROJECT_SOURCE_DIR}/3rdparty/*"
   )
