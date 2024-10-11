@@ -144,7 +144,6 @@ private:
 struct SWCSample {
     enum : unsigned int { UNKNOWN_ID = 0xFFFFFFFE };
 
-    SWCSample() = default;  // XXX
     floatType diameter = -1.;
     Point point{};
     SectionType type = SECTION_UNDEFINED;
@@ -306,10 +305,6 @@ class SWCBuilder
         for (const auto& s : soma_samples) {
             if (s.parentId == SWC_ROOT) {
                 parent_count++;
-            } else if (samples_.count(s.parentId) == 0) {
-                details::ErrorMessages err_(path_);
-                throw MissingParentError(
-                    err_.ERROR_MISSING_PARENT(s.id, static_cast<int>(s.parentId), s.lineNumber));
             } else if (samples_.at(s.parentId).type != SECTION_SOMA) {
                 details::ErrorMessages err_(path_);
                 throw SomaError(err_.ERROR_SOMA_WITH_NEURITE_PARENT(s.lineNumber));

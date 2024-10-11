@@ -112,6 +112,27 @@ TEST_CASE("morphio::swc::errors") {
         )";
         CHECK_THROWS_AS(Morphology(multiple_soma, "swc"), SomaError);
     }
+    SECTION("multiple_soma") {
+        const auto* multiple_soma = R"(
+1 2 0 0 1 .5 -1
+2 1 0 0 1 .5 1
+        )";
+        CHECK_THROWS_AS(Morphology(multiple_soma, "swc"), SomaError);
+    }
+
+    SECTION("large_id") {
+        const auto* multiple_soma = R"(
+01234567890123456789 1 0 0 1 .5 -1
+        )";
+        CHECK_THROWS_AS(Morphology(multiple_soma, "swc"), RawDataError);
+    }
+
+    SECTION("large_parent_id") {
+        const auto* multiple_soma = R"(
+1 1 0 0 1 .5 01234567890123456789
+        )";
+        CHECK_THROWS_AS(Morphology(multiple_soma, "swc"), RawDataError);
+    }
 }
 
 TEST_CASE("morphio::swc::working") {
