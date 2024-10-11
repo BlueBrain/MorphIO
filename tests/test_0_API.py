@@ -18,8 +18,14 @@ def test_doc_exists():
         morphio.mut.Section,
         morphio.mut.Soma,
     ]
+    ignored_methods = {
+        "_pybind11_conduit_v1_"
+    }
     for cls in classes:
-        public_methods = (method for method in dir(cls) if not method.startswith("_"))
+        public_methods = (
+            method for method in dir(cls)
+            if not (method.startswith("__") or method in ignored_methods)
+        )
         for method in public_methods:
             assert getattr(cls, method).__doc__, \
                 'Public method {} of class {} is not documented !'.format(method, cls)
