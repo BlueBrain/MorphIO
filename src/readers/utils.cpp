@@ -21,11 +21,14 @@ namespace morphio {
 
 #endif
 
+// Only create the `locale` to facilitate number handling once
 StringToNumber::StringToNumber()
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32)
+    // On windows, use their locale handling for their runtime
     : locale(_create_locale(LC_ALL, "C")) {
 }
 #else
+    // On other platforms, use the POSIX version
     : locale(newlocale(LC_NUMERIC_MASK, "POSIX", nullptr)) {
 }
 #endif

@@ -318,7 +318,7 @@ class SWCBuilder
             if (children_.count(s.id) > 0 && children_.at(s.id).size() > 1) {
                 std::vector<SWCSample> soma_bifurcations;
                 for (auto id : children_.at(s.id)) {
-                    if (samples_[id].type == SECTION_SOMA) {
+                    if (samples_[id].type == SECTION_SOMA && s.parentId != SWC_ROOT) {
                         soma_bifurcations.push_back(samples_[id]);
                     }
                 }
@@ -528,7 +528,6 @@ class SWCBuilder
     WarningHandler* warning_handler_;
     unsigned int options_;
 };
-
 }  // namespace details
 
 namespace readers {

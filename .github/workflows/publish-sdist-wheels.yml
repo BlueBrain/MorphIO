@@ -6,7 +6,7 @@ env:
 
   CIBW_BUILD_VERBOSITY: 1
   CIBW_BUILD: 'cp*'
-  CIBW_SKIP: 'cp35-* cp36-* cp37-* cp313-* *-manylinux_i686 *-musllinux_* *-win32'
+  CIBW_SKIP: 'cp35-* cp36-* cp37-* cp38-* *-manylinux_i686 *-musllinux_* *-win32'
   CIBW_BEFORE_TEST: pip install -r {project}/tests/requirement_tests.txt
   CIBW_TEST_COMMAND: pytest -s -v {project}/tests
   UNIXY_HDF5_VERSION: 1.14.3
@@ -21,7 +21,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, macos-12, windows-2022]
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os: [ubuntu-20.04, windows-2022, macos-13, macos-14]
 
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +40,7 @@ jobs:
 
       - name: Cache HDF5 On Linux/macOS
         if: runner.os == 'Linux' || runner.os == 'macOS'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: cache-hdf5-posix
         env:
           cache-name: cache-hdf5-posix
@@ -69,7 +70,7 @@ jobs:
       - name: Build wheels Mac OS
         if: runner.os == 'macOS'
         env:
-          CIBW_ENVIRONMENT_PASS: "STATIC_HDF5 CMAKE_PREFIX_PATH CMAKE_OSX_ARCHITECTURES MACOSX_DEPLOYMENT_TARGET"
+          CIBW_ENVIRONMENT_PASS: "STATIC_HDF5 CMAKE_PREFIX_PATH"
           CIBW_BEFORE_BUILD: |
             # CMake complains if the dependencies come from within the same tree
             # as the source, so we'll just pretend they are elsewhere
@@ -80,25 +81,13 @@ jobs:
           # used by setup.py to decide if to set `FindHDF5` to use static hdf5 libraries
           export STATIC_HDF5=True
 
-          # x86_64 macOS allows for cross compilation; first we do arm64,
-          # only for the 11.0 target; and store in the cache the compiled code...
-          export CIBW_ARCHS_MACOS="arm64"
-          export CMAKE_OSX_ARCHITECTURES="arm64"
-          export MACOSX_DEPLOYMENT_TARGET="11.0"
-          export CMAKE_PREFIX_PATH=/Users/runner/work/src-cache/install-$CIBW_ARCHS_MACOS/install
-          python -m cibuildwheel --output-dir dist
-
-          # ...and now we do both targets for x86_64
-          export CIBW_ARCHS_MACOS="x86_64"
-          export CMAKE_OSX_ARCHITECTURES="x86_64"
-          unset MACOSX_DEPLOYMENT_TARGET
-          export CMAKE_PREFIX_PATH=/Users/runner/work/src-cache/install-$CIBW_ARCHS_MACOS/install
+          export CMAKE_PREFIX_PATH=/Users/runner/work/src-cache/install-`uname -m`/install
           python -m cibuildwheel --output-dir dist
 
       - name: Cache HDF5 On Windows
         if: runner.os == 'Windows'
         id: cache-hdf5-windows
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-hdf5-windows
         with:
@@ -122,7 +111,7 @@ jobs:
         # this has a partial table:
         # https://devblogs.microsoft.com/cppblog/side-by-side-minor-version-msvc-toolsets-in-visual-studio-2017/
         run: |
-          # vc141 was removed, add it back here: https://github.com/actions/runner-images/issues/9701 
+          # vc141 was removed, add it back here: https://github.com/actions/runner-images/issues/9701
           Set-Location "C:\Program Files (x86)\Microsoft Visual Studio\Installer\"
           $InstallPath = "C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
           $componentsToAdd= @(
@@ -198,7 +187,7 @@ jobs:
       - name: Download artifacts produced during the build_wheels and build_sdist jobs
         uses: actions/download-artifact@v4
         with:
-          name: dist-*
+          pattern: dist-*
           path: dist/
           merge-multiple: true
 
