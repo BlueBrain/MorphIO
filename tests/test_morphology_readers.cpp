@@ -12,6 +12,7 @@
 #include <morphio/morphology.h>
 #include <morphio/mut/morphology.h>
 #include <morphio/soma.h>
+#include <stdexcept>
 
 TEST_CASE("LoadH5Morphology", "[morphology]") {
     {
@@ -210,15 +211,31 @@ private:
     std::locale previousLocale;
 };
 
+static std::unique_ptr<LocaleGuard> make_locale() {
+#ifdef __APPLE__
+    const std::string locale_name = "de_CH.UTF-8";
+#else
+    const std::string locale_name = "de_CH.UTF8";
+#endif
+    try {
+        return std::make_unique<LocaleGuard>(std::locale(locale_name));
+    } catch (const std::runtime_error&) {
+        return nullptr;
+    }
+}
+
+
 TEST_CASE("LoadSWCMorphologyLocale", "[morphology]") {
     {
-#ifdef __APPLE__
-        const auto locale = LocaleGuard(std::locale("de_CH.UTF-8"));
-#else
-        const auto locale = LocaleGuard(std::locale("de_CH.UTF8"));
-#endif
-        const morphio::Morphology m("data/simple.swc");
-        REQUIRE(m.diameters().size() == 12);
+        const auto locale = make_locale();
+        if (locale) {
+            const morphio::Morphology m("data/simple.swc");
+            REQUIRE(m.diameters().size() == 12);
+        } else {
+            // With Catch2 v3 this can be modernize using SKIP.
+            std::cout << "Skipping LoadSWCMorphologyLocale because `std::locale` failed."
+                      << std::endl;
+        }
     }
 }
 
