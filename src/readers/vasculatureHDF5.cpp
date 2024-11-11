@@ -81,9 +81,7 @@ void VasculatureHDF5::_readSections() {
     auto& sections = _properties.get_mut<vasculature::property::VascSection>();
     auto selection = _sections->select({0, 0}, {_sectionsDims[0], 1});
 
-    std::vector<unsigned int> vec;
-    vec.resize(_sectionsDims[0]);
-    selection.read(vec);
+    auto vec = selection.squeezeMemSpace({1}).read<std::vector<unsigned int>>();
 
     for (auto p : vec) {
         sections.push_back(p);
@@ -94,8 +92,7 @@ void VasculatureHDF5::_readSectionTypes() {
     auto& types = _properties.get_mut<vasculature::property::SectionType>();
 
     auto selection = _sections->select({0, 1}, {_sectionsDims[0], 1});
-    types.resize(_sectionsDims[0]);
-    selection.read(types);
+    selection.squeezeMemSpace({1}).read(types);
     for (int type : types) {
         if (type > SECTION_CUSTOM || type < 0) {
             const auto err = details::ErrorMessages(_uri);

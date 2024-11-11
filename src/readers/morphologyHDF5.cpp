@@ -194,11 +194,7 @@ void MorphologyHDF5::_readPoints(int firstSectionOffset) {
                            "': incorrect number of columns for points");
     }
 
-    std::vector<std::array<floatType, pointColumns>> hdf5Data(numberPoints);
-
-    if (!hdf5Data.empty()) {
-        pointsDataSet.read(hdf5Data.front().data());
-    }
+    auto hdf5Data = pointsDataSet.read<std::vector<std::array<floatType, pointColumns>>>();
 
     const bool hasSoma = firstSectionOffset != 0;
     const bool hasNeurites = static_cast<size_t>(firstSectionOffset) < numberPoints;
@@ -252,11 +248,7 @@ int MorphologyHDF5::_readSections() {
                            " bad number of dimensions in 'structure' dataspace"));
     }
 
-    std::vector<std::array<int, structureV1Columns>> vec(dims[0]);
-    if (dims[0] > 0) {
-        structure.read(vec.front().data());
-    }
-
+    auto vec = structure.read<std::vector<std::array<int, structureV1Columns>>>();
     assert(!vec.empty());
 
     bool hasSoma = true;
