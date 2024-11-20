@@ -50,14 +50,9 @@ if (MORPHIO_ENABLE_COVERAGE)
 endif()
 
 target_link_libraries(unittests
-  PRIVATE 
+  PRIVATE
   ${TESTS_LINK_LIBRAIRIES}
 )
-
-add_test(NAME unittests
-         COMMAND unittests
-         WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-         )
 
 if (NOT EXTERNAL_CATCH2)
   catch_discover_tests( unittests
