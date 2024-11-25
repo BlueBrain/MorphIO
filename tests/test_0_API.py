@@ -2,7 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 import morphio
 
-
 def test_doc_exists():
     classes = [
         morphio.EndoplasmicReticulum,
@@ -18,9 +17,18 @@ def test_doc_exists():
         morphio.mut.Section,
         morphio.mut.Soma,
     ]
+
+    # we want to makes sure we never forget to add imports in the morphio.__init__
+    # however, sometimes pybind adds new functions in that namespace, this is the
+    # place to explicitly ignore them
+    ignored_methods = {
+        "_pybind11_conduit_v1_"
+    }
+
     for cls in classes:
         public_methods = (
-            method for method in dir(cls) if not method.startswith(("__", "_pybind11"))
+            method for method in dir(cls)
+            if not (method.startswith("__") or method in ignored_methods)
         )
         for method in public_methods:
             assert getattr(cls, method).__doc__, \
