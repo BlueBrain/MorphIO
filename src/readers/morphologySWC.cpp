@@ -478,7 +478,7 @@ class SWCBuilder
                         std::make_unique<SectionTypeChanged>(path_, sample->lineNumber));
                     break;
                 }
-                throw RawDataError("Section type changed without a bifucation at line: " +
+                throw RawDataError("Section type changed without a bifurcation at line: " +
                                    std::to_string(sample->lineNumber) +
                                    ", consider using UNIFURCATED_SECTION_CHANGE option");
             }
@@ -491,6 +491,14 @@ class SWCBuilder
         sample = &samples_.at(id);
         points.push_back(sample->point);
         diameters.push_back(sample->diameter);
+
+        if (points.size() == 1) {
+            // To maintain the invariant that each section has a segment, which in turn has 2 points
+            // a point is added
+            diameters.insert(diameters.begin(), start_diameter);
+            points.insert(points.begin(), start_point);
+        }
+
         appendSection(DeclaredID(id), parent_id, sample->type);
 
         if (children_count == 0) {
