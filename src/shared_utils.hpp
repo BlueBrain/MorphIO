@@ -6,8 +6,6 @@
 #include <morphio/errorMessages.h>
 #include <morphio/types.h>
 
-#include "point_utils.h"
-
 
 namespace morphio {
 

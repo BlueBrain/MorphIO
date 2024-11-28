@@ -2,6 +2,8 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
+#include "shared_utils.hpp"
+
 #include <algorithm>  // std::max
 #include <bitset>
 #include <cmath>   // std::fabs
@@ -9,7 +11,7 @@
 
 #include "error_message_generation.h"
 #include "morphio/vector_types.h"
-#include "shared_utils.hpp"
+#include "point_utils.h"
 
 #include <ghc/filesystem.hpp>
 
