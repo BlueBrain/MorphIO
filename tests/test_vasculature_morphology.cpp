@@ -59,9 +59,7 @@ TEST_CASE("vasculature_section_connectivity", "[vasculature]") {
 
     REQUIRE(section_connectivity.size() == n_connections);
 
-    std::vector<std::array<unsigned int, 2>> expected_connectivity(n_connections);
-
-    dset.read(expected_connectivity.front().data());
+    auto expected_connectivity = dset.read<std::vector<std::array<unsigned int, 2>>>();
 
     REQUIRE(section_connectivity == expected_connectivity);
 }
