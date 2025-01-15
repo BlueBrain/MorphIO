@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>  // uint32_t
+#include <cstdint>  // int32_t, uint32_t
 
 #include <array>
 #include <map>

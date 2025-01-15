@@ -4,6 +4,8 @@
  */
 #pragma once
 
+#include <cstdint>  // uint32_t
+
 #include <string>  // std::string
 
 #include <morphio/mut/morphology.h>  // mut::Morphology

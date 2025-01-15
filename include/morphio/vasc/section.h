@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include <cstdint>  // uint32_t
 #include <iosfwd>  // std::ostream
 #include <memory>  // std::shared_ptr
 #include <vector>  // std::vector

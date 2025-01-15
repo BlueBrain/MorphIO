@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include <cstdint>  // uint32_t
 #include <memory>
 #include <vector>
 

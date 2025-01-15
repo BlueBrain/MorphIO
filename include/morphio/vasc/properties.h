@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include <cstdint>  // uint32_t
 #include <map>
 #include <string>  // std::string
 #include <vector>  // std::vector
