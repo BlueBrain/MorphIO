@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include <cstdint>  // int32_t, uint32_t, uint64_t
 #include <iostream>
 #include <memory>
 #include <set>

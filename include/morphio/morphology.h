@@ -4,6 +4,8 @@
  */
 #pragma once
 
+#include <cstdint>  // uint32_t
+
 #include <highfive/H5Group.hpp>
 
 #include <morphio/properties.h>
