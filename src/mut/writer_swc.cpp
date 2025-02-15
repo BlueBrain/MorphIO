@@ -24,7 +24,23 @@
 #include "../shared_utils.hpp"
 #include "writer_utils.h"
 
+
 namespace {
+bool anySamplesMatch(const morphio::Point& point,
+                     const morphio::floatType diameter,
+                     const morphio::Points& points,
+                     const std::vector<morphio::floatType>& diameters) {
+    for (size_t i = 0; i < points.size(); ++i) {
+        if (std::fabs(diameters[i] - diameter) < morphio::epsilon &&
+            std::fabs(points[0][0] - point[0]) < morphio::epsilon &&
+            std::fabs(points[0][1] - point[1]) < morphio::epsilon &&
+            std::fabs(points[0][2] - point[2]) < morphio::epsilon) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void writeLine(std::ofstream& myfile,
                int id,
                int parentId,
@@ -95,8 +111,7 @@ int writeSoma(std::ofstream& myfile,
     return startIdOnDisk;
 }
 
-/* Only skip duplicate if it has the same diameter */
-bool _skipDuplicate(const std::shared_ptr<morphio::mut::Section>& section) {
+bool _sameDiameter(const std::shared_ptr<morphio::mut::Section>& section) {
     return std::fabs(section->diameters().front() - section->parent()->diameters().back()) <
            morphio::epsilon;
 }
@@ -154,6 +169,7 @@ void swc(const Morphology& morph,
 
     std::ofstream myfile(filename);
     writeHeader(myfile);
+
     int segmentIdOnDisk = writeSoma(myfile, soma, handler);
 
     std::unordered_map<uint32_t, int32_t> newIds;
@@ -173,13 +189,31 @@ void swc(const Morphology& morph,
             }
         }
 
-        // skips duplicate point for non-root sections
-        unsigned int firstPoint = ((isRootSection || !_skipDuplicate(section)) ? 0 : 1);
+        unsigned int firstPoint = 0;
+        // When there is only a single point in a section on read, MorphIO adds a point to keep the
+        // invariant that each section has a segment, which in turn has 2 points. When writing, that
+        // point is dropped
+        if (isRootSection &&
+            anySamplesMatch(points[0], diameters[0], soma->points(), soma->diameters())) {
+            firstPoint = 1;
+        } else if (!isRootSection && _sameDiameter(section)) {
+            // skips duplicate point for non-root sections, if they have the same diameter
+            firstPoint = 1;
+        }
+
         for (unsigned int i = firstPoint; i < points.size(); ++i) {
-            int parentIdOnDisk = (i > firstPoint)
-                                     ? segmentIdOnDisk - 1
-                                     : (isRootSection ? (soma->points().empty() ? -1 : 1)
-                                                      : newIds[section->parent()->id()]);
+            int parentIdOnDisk = 0;
+            if (i > firstPoint) {
+                parentIdOnDisk = segmentIdOnDisk - 1;
+            } else if (isRootSection) {
+                if (soma->points().empty()) {
+                    parentIdOnDisk = -1;
+                } else {
+                    parentIdOnDisk = 1;
+                }
+            } else {
+                parentIdOnDisk = newIds[section->parent()->id()];
+            }
 
             writeLine(
                 myfile, segmentIdOnDisk, parentIdOnDisk, section->type(), points[i], diameters[i]);

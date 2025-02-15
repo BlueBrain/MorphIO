@@ -609,14 +609,31 @@ def test_multi_type_section():
     assert len(n.root_sections) == 1
     assert n.root_sections[0].id == 0
     assert_array_equal(n.root_sections[0].points,
-                       np.array([[0, 0, 2], ]))
+                       np.array([[0, 4, 0], [0, 0, 2]]))
     assert len(n.sections) == 4
-    assert_array_equal(n.section_offsets, [0, 1, 3, 5, 7])
+    assert_array_equal(n.section_offsets, [0, 2, 4, 6, 8])
     warnings = [f.warning for f in warnings.get_all()]
     assert len(warnings) == 3  # type 7, 8, and 9
     for warning in warnings:
         assert warning.warning() == Warning.type_changed_within_section
 
+
+def test_single_point_section(tmp_path):
+    '''SWC allows for single point sections, but MorphIO defines a section as having one segment, and a segment has two points'''
+    contents =('''\
+1 1 1 2 1 1 -1
+2 3 1 2 2 1 1       # <- single point section, bifurcates right away
+3 3 1 2 3 1 2
+4 3 1 2 4 1 2
+5 3 1 2 6 1 4
+6 3 1 2 7 1 4''')
+    m = Morphology(contents, "swc")
+    path = tmp_path / 'test_single_point_section.swc'
+    m.as_mutable().write(path)
+
+    with open(path) as fd:
+        # added MorphIO header, and column names
+        assert len(fd.readlines()) == len(contents.splitlines()) + 2
 
 def test_missing_parent():
     contents =('''

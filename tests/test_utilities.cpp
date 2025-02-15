@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 
+#include "../src/point_utils.h"
 #include "../src/shared_utils.hpp"
 
 namespace fs = std::filesystem;
