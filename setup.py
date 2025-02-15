@@ -8,12 +8,6 @@ from setuptools import Extension, setup
 from setuptools.command.build_ext import build_ext
 
 
-class CMakeExtension(Extension):
-    def __init__(self, name, sourcedir=''):
-        Extension.__init__(self, name, sources=[])
-        self.sourcedir = os.path.abspath(sourcedir)
-
-
 class CMakeBuild(build_ext):
     user_options = build_ext.user_options + [
         ("cmake-defs=", None, "Additional CMake definitions, comma split")
