@@ -1,3 +1,7 @@
+.. warning::
+   The Blue Brain Project concluded in December 2024, so development has ceased under the BlueBrain GitHub organization.
+   Future development will take place at: https://github.com/openbraininstitute/MorphIO
+
 .. image:: doc/source/logo/BBP-MorphIO.jpg
 
 
